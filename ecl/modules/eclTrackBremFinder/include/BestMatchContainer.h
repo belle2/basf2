@@ -77,7 +77,7 @@ namespace Belle2 {
     /**
      * Set a new item as the best match
      */
-    void setBestMatch(const TItem& item, TEstimator est)
+    void setBestMatch(TItem const& item, TEstimator est)
     {
       m_bestMatch = item;
       m_bestEstimator = est;

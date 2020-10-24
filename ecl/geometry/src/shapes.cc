@@ -146,12 +146,13 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0; //, sum2 = 0; //not used now
+        double smin = 1e9, smax = -1e9;
         for (int i = 0; i < 4; i++) {
           for (int j = i + 1; j < 4; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
+            //sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;
@@ -498,13 +499,14 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0; //, sum2 = 0; //not used now
+        double smin = 1e9, smax = -1e9;
         int count = 0;
         for (int i = 0; i < 5; i++) {
           for (int j = i + 1; j < 5; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
+            //sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;

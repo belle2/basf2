@@ -384,8 +384,6 @@ void ECLPackerModule::resetBuffPosition()
 
 void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite)
 {
-  unsigned int tmpval = 0;
-
   if (!bitsToWrite) return;
 
   if (value > (unsigned int)(1 << bitsToWrite) - 1) {
@@ -398,7 +396,7 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
       B2ERROR("Error compressing ADC samples: unexpectedly reach end of buffer");
       throw Write_adc_samples_error();
     } else {
-      tmpval = (1 << m_bitPos) - 1;
+      unsigned tmpval = (1 << m_bitPos) - 1;
       buff[m_bufPos] &= tmpval;
       buff[m_bufPos] += value << m_bitPos;
       m_bufPos++;
@@ -407,7 +405,7 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
       m_bitPos -= 32;
     }
   else {
-    tmpval = (1 << m_bitPos) - 1;
+    unsigned tmpval = (1 << m_bitPos) - 1;
     buff[m_bufPos] &= tmpval;
     buff[m_bufPos] += value << m_bitPos;
     m_bitPos += bitsToWrite;

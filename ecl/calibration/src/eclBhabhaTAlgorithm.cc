@@ -428,17 +428,12 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   B2DEBUG(30, "Retrieved Ts and Tcrate histograms from tcol root file");
 
-  double database_mean_crate = 0;
-  double database_mean_crate_unc = 0;
-
-  double mean_crate = 0;
-  double sigma_crate = -1;
 
   vector<float> tcrate_mean_new(52, 0.0);
   vector<float> tcrate_mean_unc_new(52, 0.0);
   vector<float> tcrate_sigma_new(52, 0.0);
   vector<float> tcrate_mean_prev(52, 0.0);
-  vector<float> tcrate_sigma_prev(52, 0.0);
+  // vector<float> tcrate_sigma_prev(52, 0.0); // currently not used
   vector<bool> tcrate_new_was_set(52, false);
 
   B2DEBUG(30, "crate vectors set");
@@ -522,8 +517,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     gaus->SetParNames("numCrateHisNormalization", "mean", "sigma");
     double hist_max = h_time_crate->GetMaximum();
     double stddev = h_time_crate->GetStdDev();
-    sigma_crate = stddev;
-    mean_crate = default_mean_crate;
+    double sigma_crate = stddev;
+    double mean_crate = default_mean_crate;
     gaus->SetParameter(0, hist_max / 2.);
     gaus->SetParameter(1, mean_crate);
     gaus->SetParameter(2, sigma_crate);
@@ -565,6 +560,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     int numEntries = h_time_crate->GetEntries();
     B2INFO("Number entries = " << numEntries);
+    double database_mean_crate = 0;
+    double database_mean_crate_unc = 0;
     if ((numEntries >= minNumEntries)  &&  good_fit) {
 
       database_mean_crate = fit_mean_crate;
@@ -672,9 +669,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   tree_crate->Write();
 
   histfile->Close();
-
-  tree_crystal = 0;
-  tree_crate = 0;
 
   B2INFO("Finished talgorithm");
   return c_OK;

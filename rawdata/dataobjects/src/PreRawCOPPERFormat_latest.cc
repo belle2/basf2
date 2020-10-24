@@ -81,7 +81,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     char hostname[128];
     GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs :", hostname, -1);
-    for (int i = 0; i < summary_table.size(); i++) {
+    for (unsigned i = 0; i < summary_table.size(); ++i) {
       memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
       sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
               err_buf_temp,
@@ -95,7 +95,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 
     printf("[DEBUG] %s\n", err_buf);
     PrintData(m_buffer, m_nwords);
-    for (int i = 0; i < MAX_PCIE40_CH; i++) {
+    for (int i = 0; i < MAX_PCIE40_CH; ++i) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
         CheckCRC16(n, i);
@@ -185,7 +185,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       if (*cur_evenum_rawcprhdr != 0) {
 
         unsigned int eve[MAX_PCIE40_CH];
-        for (int i = 0; i < MAX_PCIE40_CH ; i++) {
+        for (int i = 0; i < MAX_PCIE40_CH ; ++i) {
           eve[ i ] = 0xbaadf00d;
           if (GetFINESSENwords(n, i) > 0) {
             int pos_nwords = GetOffsetFINESSE(n, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
@@ -205,7 +205,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                 *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
 
         char err_buf_temp[2500];
-        for (int i = 0; i < summary_table.size(); i++) {
+        for (unsigned i = 0; i < summary_table.size(); ++i) {
           memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
           sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
                   err_buf_temp,
@@ -279,7 +279,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 
 }
 
-bool PreRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
+bool PreRawCOPPERFormat_latest::CheckCOPPERMagic(int /*n*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -523,7 +523,7 @@ void PreRawCOPPERFormat_latest::CopyReducedData(int* bufin, int nwords, int num_
 }
 
 
-int PreRawCOPPERFormat_latest::CalcReducedNwords(int n)
+int PreRawCOPPERFormat_latest::CalcReducedNwords(int /*n*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -534,7 +534,7 @@ int PreRawCOPPERFormat_latest::CalcReducedNwords(int n)
 }
 
 
-int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
+int PreRawCOPPERFormat_latest::CopyReducedBuffer(int /*n*/, int* /*buf_to*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",

@@ -131,7 +131,7 @@ namespace Belle2 {
     /*************/
 
     /** Return version of packer algorithm used in [un]packCoefVector */
-    static short int getPackerVersion() { return c_packerVersion; }
+    static constexpr short int getPackerVersion() { return c_packerVersion; }
 
     /**
      * @return Vector with all parameters that haven't been

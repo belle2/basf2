@@ -207,9 +207,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
-    mean = 0;
-    mean_unc = -1;
-    sigma = -1;
     crystalCalibSaved = 0;
 
     double database_mean = 0;

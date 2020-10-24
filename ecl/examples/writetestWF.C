@@ -86,8 +86,6 @@ void writetestWF()
       if ( v.size() == 0 ) continue;
       ncellId1 = ncellId2 = v.size();
       for ( size_t i = 0; i< v.size(); ++i)
-				//Suppressing cppcheck warning, as cellId2 value is used in the tree
-				//cppcheck-suppress unreadVariable
 				cellId2[i] = cellId1[i] = v[i];
       for ( size_t idx=0; idx< data -> c_nElements; ++idx)
 	data->setMatrixElement( idx ,  idx*n);

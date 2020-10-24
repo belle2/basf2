@@ -194,7 +194,7 @@ void bit(int num, char* inputPath)
 
 
   int idd;
-  int ia, i16;
+  int i16;
   int mxf, mxf1, mxfg31, mxfg32, mxfg33, mxfg41, mxfg43;
   mxf = 0;
   mxf1 = 0;
@@ -497,11 +497,11 @@ void bit(int num, char* inputPath)
     constexpr int n16 = 16;
 
 
-    const int ipardsp13 = 14 + 14 * 256;
+    //const int ipardsp13 = 14 + 14 * 256; TODO variable unused
     const int ipardsp14 = 0 * 256 + 17;
 
-    const int ibb = ipardsp13 / 256;
-    const int iaa = ipardsp13 - ibb * 256;
+    //const int ibb = ipardsp13 / 256; TODO variable unused
+    //const int iaa = ipardsp13 - ibb * 256; TODO is this var useful?
     idd = ipardsp14 / 256;
 //     const int icc = ipardsp14 - idd * 256; //Value never used (AH)
 
@@ -509,7 +509,7 @@ void bit(int num, char* inputPath)
 
 
 
-    ia = myPow(2, iaa);
+    //int ia = myPow(2, iaa); TODO is this line useful? Since ia value is not used aftervards...
 //     const int ib = myPow(2, ibb); //ib value unused (AH)
 
 //     const int ic = myPow(2, icc); //ic value unused (AH)
@@ -592,7 +592,7 @@ void bit(int num, char* inputPath)
          bitfg43);
   printf("xf=%lf xf1=%lf xfg31=%lf xfg32=%lf xfg33=%lf xfg41=%lf xfg43=%lf \n", xf, xf1, xfg31, xfg32, xfg33, xfg41, xfg43);
 
-  ia = myPow(2, bitf);
+  int ia = myPow(2, bitf);
   mxf = (int)(xf * ia / idd + ia + 0.5) - ia;
 
   ia = myPow(2, bitf1);

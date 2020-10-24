@@ -23,7 +23,7 @@ namespace Belle2 {
    * A database class to hold the prior probability for
    * the particle identification.
    * This prior probability  for each particle species is stored as PIDPriorsTable object, that allows to bin it in 2 dimensions defined by two kinematic variables.
-   * This class provides a container for 6 PIDPriorsTable objects, some wrappers around the most used getters and setteres, and
+   * This class provides a container for 6 PIDPriorsTable objects, some wrappers around the most used getters and setters, and
    * some setters that allow the user to load the priors starting from a TH2 object.
    */
   class PIDPriors : public TObject {
@@ -56,7 +56,7 @@ namespace Belle2 {
 
 
     /**
-     * Sets the prior table for a particle species from a the std::vectors of the bin edges and the probability values
+     * Sets the prior table for a particle species from the std::vectors of the bin edges and the probability values
      * @param particle the charged stable type of the particle
      * @param xAxisEdge the std::vector<float> containing the bin edges of the X axis
      * @param yAxisEdge the std::vector<float> containing the bin edges of the Y axis
@@ -155,7 +155,7 @@ namespace Belle2 {
 
     /**
      * Returns the priors table of the selected particle species.
-     * @param particle the charged stabel type of the prior's species
+     * @param particle the charged stable type of the prior's species
      * @return the priors table
      */
     PIDPriorsTable getPriorsTable(const Const::ChargedStable& particle) const
@@ -196,7 +196,7 @@ namespace Belle2 {
     /**
      * Returns the X axis label of the prior
      * @param particle the charged stable type of the prior's species
-     * @return the X axis label for the prior tabel of the selected particle species
+     * @return the X axis label for the prior table of the selected particle species
      */
     std::string getXAxisLabel(const Const::ChargedStable& particle) const
     {
@@ -208,7 +208,7 @@ namespace Belle2 {
     /**
      * Returns the Y axis label of the prior
      * @param particle the charged stable type of the prior's species
-     * @return the Y axis label for the prior tabel of the selected particle species
+     * @return the Y axis label for the prior table of the selected particle species
      */
     std::string getYAxisLabel(const Const::ChargedStable& particle) const
     {

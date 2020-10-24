@@ -30,9 +30,9 @@ namespace Belle2 {
     const int m_outOfRangeBinID = -1; /**< ID of out-of-range bin */
 
     /**
-     * Return TRUE if bin exisits or overlaps with existing
+     * Return TRUE if bin exists or overlaps with existing
      * @param bin - tested bin
-     * @return is this bin overlatpping with existing bins or not
+     * @return is this bin overlapping with existing bins or not
      */
     bool isOverlappingBin(ParticleWeightingBinLimits* bin);
 
@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Returns name of an axis
      */
-    std::string getName() { return m_axisName;}
+    std::string getName() const { return m_axisName;}
 
     /**
      * Sets name of an axis
@@ -56,7 +56,7 @@ namespace Belle2 {
 
     /**
      * Check if bin exists and creates it if not. Returns bin ID
-     * Issues fatal error in case of ovarlaping bins.
+     * Issues fatal error in case of overlapping bins.
      * @param bin bin limits
      * @return key ID
      */
@@ -68,19 +68,19 @@ namespace Belle2 {
      * @param bin bin limits
      * @return key ID
      */
-    int findBin(ParticleWeightingBinLimits* bin);
+    int findBin(ParticleWeightingBinLimits* bin) const;
 
     /**
-     * Returns id of bin containig value
+     * Returns id of bin containing value
      * @param value value
      * @return key ID
      */
-    int findBin(double value);
+    int findBin(double value) const;
 
     /**
      * Prints axis information to the B2INFO stream
      */
-    void printAxis();
+    void printAxis() const;
   };
 
 } // Belle2 namespace

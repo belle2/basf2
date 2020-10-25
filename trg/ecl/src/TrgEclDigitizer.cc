@@ -621,12 +621,7 @@ TrgEclDigitizer::FADC(int flag_gen,
   double tsh, dd;
   static double tc, tc2, tsc, tris, b1, b2;
   static double amp, dft, as;
-  /* cppcheck-suppress variableScope */
-  static double td;
-  /* cppcheck-suppress variableScope */
-  static double t1;
-  /* cppcheck-suppress variableScope */
-  static double t2;
+  static double td, t1, t2;
 
   static int ifir = 0;
 
@@ -819,7 +814,7 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
   //--------------------------------------
   double tsh, dd;
   static double tc, tc2, tsc, tris;
-  static double amp, td, t1, t2,  dft, as;
+  static double amp, dft, as;
 
 
   //  int im, ij;
@@ -828,10 +823,10 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
   if (ifir == 0) {
 
-    td =  0.10;  // diff time    (  0.10)
-    t1 =  0.10;  // integ1 real  (  0.10)
+    const double td =  0.10;  // diff time    (  0.10)
+    const double t1 =  0.10;  // integ1 real  (  0.10)
     // b1 = 30.90;  // integ1 imag  ( 30.90)
-    t2 =  0.01;  // integ2 real  (  0.01)
+    const double t2 =  0.01;  // integ2 real  (  0.01)
     // b2 = 30.01;  // integ2 imag  ( 30.01)
     double ts =  1.00;  // scint decay  (  1.00)
     dft = 0.600; // diff delay   ( 0.600)

@@ -68,7 +68,7 @@ namespace Belle2 {
 
     m_mConstD["Trg_PI"] = 3.141592653589793;
     // Get rr,zToStraw,angleSt,nWire
-    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+    const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
     m_mConstV["nWires"] = vector<double> (9);
     m_mConstV["nTSs"] = vector<double> (9);

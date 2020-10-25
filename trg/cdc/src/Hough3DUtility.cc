@@ -60,7 +60,7 @@ int Hough3DFinder::getMode(void)
   return m_mode;
 }
 
-void Hough3DFinder::initialize(TVectorD& geometryVariables, vector<float >& initVariables)
+void Hough3DFinder::initialize(const TVectorD& geometryVariables, vector<float >& initVariables)
 {
 
   m_findRhoMax = -9999;
@@ -170,7 +170,7 @@ void Hough3DFinder::runFinder(std::vector<double>& trackVariables, vector<vector
 
 }
 
-void Hough3DFinder::initVersion1(vector<float >& initVariables)
+void Hough3DFinder::initVersion1(const vector<float >& initVariables)
 {
   // Hough Variables.
   m_cotStart = (int)initVariables[0];
@@ -252,7 +252,7 @@ void Hough3DFinder::initVersion3(vector<float >& initVariables)
   m_mBool["fVerbose"] = 0;
 }
 
-void Hough3DFinder::setInputFileName(string inputFileName)
+void Hough3DFinder::setInputFileName(const string& inputFileName)
 {
   m_inputFileName = inputFileName;
 }
@@ -318,8 +318,9 @@ void Hough3DFinder::destVersion3()
 }
 
 // Hough 3D finder
-void Hough3DFinder::runFinderVersion1(vector<double>& trackVariables, vector<vector<double> >& stTSs, vector<double>& tsArcS,
-                                      vector<vector<double> >& tsZ)
+void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, const vector<vector<double> >& stTSs,
+                                      const vector<double>& tsArcS,
+                                      const vector<vector<double> >& tsZ)
 {
 
   int charge = (int)trackVariables[0];

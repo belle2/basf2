@@ -472,7 +472,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCPeakFinder::findPeaks(TCHPlaneMulti2& hp,
+  TRGCDCPeakFinder::findPeaks(const TCHPlaneMulti2& hp,
                               const unsigned threshold,
                               vector<vector<unsigned>>& peaks) const
   {

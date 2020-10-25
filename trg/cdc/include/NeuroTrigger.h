@@ -134,7 +134,7 @@ namespace Belle2 {
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
-    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, std::string et_option);
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, const std::string& et_option);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -254,7 +254,7 @@ namespace Belle2 {
      * @param isector index of the MLP
      * @param input vector of input values
      * @return unscaled output values (z vertex in cm and/or theta in radian) */
-    std::vector<float> runMLP(unsigned isector, std::vector<float> input);
+    std::vector<float> runMLP(unsigned isector, const std::vector<float>& input);
 
     /** Run an expert MLP with fixed point arithmetic. */
     std::vector<float> runMLPFix(unsigned isector, std::vector<float> input);

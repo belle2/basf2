@@ -53,9 +53,9 @@ namespace Belle2 {
   /** enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
   struct SubTrigger {
     /** constructor */
-    SubTrigger(std::string inName,
+    SubTrigger(const std::string& inName,
                unsigned inEventWidth, unsigned inOffset,
-               int inHeaderSize, std::vector<int> inNodeID,
+               int inHeaderSize, const std::vector<int>& inNodeID,
                int& inDelay, int& inCnttrg, int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
       headerSize(inHeaderSize), iNode(inNodeID.front()),
@@ -233,16 +233,16 @@ namespace Belle2 {
     CDCTriggerUnpackerModule();
 
     /** Register input and output data */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Delete dynamically allocated variables */
-    virtual void terminate() override;
+    void terminate() override;
 
     /** begin Run */
-    virtual void beginRun();
+    void beginRun() override;
 
     /** convert raw data (in B2L buffer to bitstream) */
-    virtual void event() override;
+    void event() override;
 
     /** small function to rescale the NN output from -1, 1 to output scale */
     std::vector<float> unscaleNNOutput(std::vector<float> input) const;

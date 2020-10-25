@@ -388,32 +388,33 @@ namespace Belle2 {
     int m_nclk_top    = intNaN;
 
 
-    int cntr_good_odr[50];
-    int cntr_bad_odr[50];
-    int cntr_bad_ddd[50];
-    int cntr_bad_nwd[50];
+    //TODO is zero default value good for these arrays
+    int cntr_good_odr[50] = {};
+    int cntr_bad_odr[50] = {};
+    int cntr_bad_ddd[50] = {};
+    int cntr_bad_nwd[50] = {};
 
-    int cntr_nw3[50];
-    int cntr_nw3_badvet[50];
-    int cntr_nw3_badtrg[50];
-    int cntr_nw3_badrvc[50];
+    int cntr_nw3[50] = {};
+    int cntr_nw3_badvet[50] = {};
+    int cntr_nw3_badtrg[50] = {};
+    int cntr_nw3_badrvc[50] = {};
 
-    int cntr_nwn[50];
-    int cntr_nwn_badvet[50];
-    int cntr_nwn_badtrg[50];
-    int cntr_nwn_badrvc[50];
+    int cntr_nwn[50] = {};
+    int cntr_nwn_badvet[50] = {};
+    int cntr_nwn_badtrg[50] = {};
+    int cntr_nwn_badrvc[50] = {};
 
-    int cntr_nwn_badbbb[50];
-    int cntr_nwn_badddd[50];
+    int cntr_nwn_badbbb[50] = {};
+    int cntr_nwn_badddd[50] = {};
 
-    int cntr_nwe_badnwd[50];
+    int cntr_nwe_badnwd[50] = {};
 
   protected :
     //! Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     std::vector<std::vector<int>> BitMap;
-    int LeafBitMap[320];
+    int LeafBitMap[320] = {};
     char LeafNames[320][100];
 
   };

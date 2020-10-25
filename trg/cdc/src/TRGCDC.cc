@@ -1075,7 +1075,7 @@ namespace Belle2 {
         else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
         const unsigned layerId = t_layerId;
         const unsigned wireId = h.getIWire();
-        TCWire& w = *(TCWire*) wire(layerId, wireId);
+        const TCWire& w = * static_cast<const TCWire*>(wire(layerId, wireId));
 
         //...TDC count...
         B2INFO("t0:" << m_cdcp->getT0(WireID(h.getID())) <<
@@ -1561,7 +1561,7 @@ namespace Belle2 {
       unsigned t_layerId = hitCdcData[iHit][0] + 50;
       unsigned t_wireId = hitCdcData[iHit][1];
       int t_rawTdc = hitCdcData[iHit][2];
-      TCWire& currentWire = *(TCWire*) wire(t_layerId, t_wireId);
+      const TCWire& currentWire = *static_cast<const TCWire*>(wire(t_layerId, t_wireId));
 
       // Update currentWire._signal
       TRGTime rise = TRGTime(t_rawTdc, true, _clockFE, currentWire.name());

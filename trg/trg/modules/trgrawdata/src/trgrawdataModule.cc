@@ -680,7 +680,7 @@ void TRGRAWDATAModule::event()
         unsigned cprid = raw_trgarray[i]->GetNodeID(j);
 //      int _exp       = raw_trgarray[i]->GetExpNo(j);
 //      int _run       = raw_trgarray[i]->GetRunNo(j);
-        int _eve       = raw_trgarray[i]->GetEveNo(j);
+        unsigned _eve       = raw_trgarray[i]->GetEveNo(j);
         if ((0x11000001 <= cprid && cprid <= 0x1100000a) ||
             (0x15000001 <= cprid && cprid <= 0x15000002) ||
             (0x12000001 == cprid) // TOPTRG
@@ -747,14 +747,14 @@ void TRGRAWDATAModule::event()
           int nword = raw_trgarray[i]->GetDetectorNwords(j, hslb);
           if (nword == _hdr_nwd) continue;
           if (nword != _nwd) {
-            printf("bu:Nword mismatch:nword(%d),expected(%d). eve(%d), %s(0x%x%c), nword(%d)\n",
+            printf("bu:Nword mismatch:nword(%d),expected(%u). eve(%u), %s(0x%x%c), nword(%d)\n",
                    nword, _nwd, _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
           }
           int* buf  = raw_trgarray[i]->GetDetectorBuffer(j, hslb);
           int i47 = _hdr_nwd + (nclks - 1) * (_nwd - _hdr_nwd) / nclks;
           if (i47 > nword - 1) {
             if (m_print_clkcyc_err)
-              printf("bp:data truncation. eve(%d), %s(0x%x%c), nword(%d)\n",
+              printf("bp:data truncation. eve(%u), %s(0x%x%c), nword(%d)\n",
                      _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
             break;
           }
@@ -773,7 +773,7 @@ void TRGRAWDATAModule::event()
             unsigned ibuf = _hdr_nwd + clk * (nword - _hdr_nwd) / nclks;
             if (ibuf > nword - 1) {
               if (m_print_clkcyc_err)
-                printf("bq:data truncation. eve(%d), %s(0x%x%c), nword(%d)\n",
+                printf("bq:data truncation. eve(%u), %s(0x%x%c), nword(%d)\n",
                        _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
               cntr_bad_nwd[e_mdl]++;
@@ -811,7 +811,7 @@ void TRGRAWDATAModule::event()
               dddd = (ddddcc >> 24);
               if (dddd != 0xdd) {
                 if (m_print_clkcyc_err)
-                  printf("br:dddd not found. eve(%d), %s(0x%x%c), nword(%d)\n",
+                  printf("br:dddd not found. eve(%u), %s(0x%x%c), nword(%d)\n",
                          _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
                 break_this_module = true;
                 cntr_bad_ddd[e_mdl]++;
@@ -819,7 +819,7 @@ void TRGRAWDATAModule::event()
               }
             } else if (dddd != 0xdddd) {
               if (m_print_clkcyc_err)
-                printf("bs:dddd not found. eve(%d), %s(0x%x%c), nword(%d)\n",
+                printf("bs:dddd not found. eve(%u), %s(0x%x%c), nword(%d)\n",
                        _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
               cntr_bad_ddd[e_mdl]++;
@@ -837,7 +837,7 @@ void TRGRAWDATAModule::event()
           if (cc_disorder) {
             cntr_bad_odr[e_mdl]++;
             if (m_print_cc) {
-              printf("bt:ccdisorder: eve(%d), %s(0x%x%c), nword(%d), %s\n",
+              printf("bt:ccdisorder: eve(%u), %s(0x%x%c), nword(%d), %s\n",
                      _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword, ccs.c_str());
             }
           } else {

@@ -54,7 +54,7 @@ void kumacOutput(ofstream&, string logic, string ftd);
 
 class Term {
 public:
-  Term(const string&);
+  explicit Term(const string&);
   virtual ~Term();
 
 public:

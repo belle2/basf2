@@ -38,7 +38,7 @@ namespace Belle2 {
 
   public:
     //! SetUp
-    void Setup(std::vector<int>, std::vector<double>, std::vector<double>);
+    void Setup(const std::vector<int>&, const std::vector<double>&, const std::vector<double>&);
     //! Get Evnet-timing
     double GetEventTiming(int);//Get eventtming
     //! Fastest TC Timing

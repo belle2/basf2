@@ -48,7 +48,7 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = register_module('SVDRecoDigitCreator')
         recoDigitCreator.set_name(recocreatorName)
-        main.add_module(recoDigitCreator)
+        path.add_module(recoDigitCreator)
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):

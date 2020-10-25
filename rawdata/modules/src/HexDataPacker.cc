@@ -54,19 +54,10 @@ HexDataPackerModule::HexDataPackerModule() : Module()
 {
   ///Set module properties
   setDescription("an Example to pack data to a RawCOPPER object");
-
-  ///  maximum # of events to produce( -1 : inifinite)
-  addParam("MaxEventNum", max_ > nevt, "Maximum event number to make", -1);
-
-  ///  maximum # of events to produce( -1 : inifinite)
-  //  addParam("NodeID", m_nodeid, "Node ID", 0);
-
+  addParam("inputFileName", m_fileName, "Output binary filename", string(""));
   B2INFO("HexDataPacker: Constructor done.");
-
   // initialize event #
   n_basf2evt = 0;
-
-
 }
 
 
@@ -97,18 +88,13 @@ void HexDataPackerModule::initialize()
 
   B2INFO("HexDataPacker: initialize() done.");
 
-
-  // Read the channel map from the local text.
-  std::string fileName = "/home/usr/yamadas/hex.txt";
-  std::cout << fileName << std::endl;
-
-  if (fileName == "") {
+  if (m_fileName == "") {
     B2FATAL("HexDataPacker can't fine a filename: ");
   }
 
-  m_ifs.open(fileName.c_str());
+  m_ifs.open(m_fileName.c_str());
   if (!m_ifs) {
-    B2FATAL("HexDataPacker can't open a file " << fileName.c_str());
+    B2FATAL("HexDataPacker can't open a file " << m_fileName.c_str());
   }
 }
 
@@ -230,6 +216,7 @@ void HexDataPackerModule::event()
 
   } else {
     delete[] evtbuf;
+    evtmetadata.create();
     evtmetadata->setEndOfData();
   }
 

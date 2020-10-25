@@ -380,7 +380,7 @@ namespace Belle2 {
     return ;
   }
 
-  inline int RawCOPPERFormat_latest::GetMaxNumOfCh(int  n)
+  inline int RawCOPPERFormat_latest::GetMaxNumOfCh(int/* n */)
   {
     return MAX_PCIE40_CH;
   }

@@ -364,7 +364,7 @@ namespace Belle2 {
     return ;
   }
 
-  inline int RawCOPPERFormat_v2::GetMaxNumOfCh(int  n)
+  inline int RawCOPPERFormat_v2::GetMaxNumOfCh(int/* n */)
   {
     return MAX_COPPER_CH;
   }

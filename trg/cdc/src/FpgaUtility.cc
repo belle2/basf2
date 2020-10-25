@@ -104,7 +104,7 @@ string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits)
   return result;
 }
 // Change number system between strings.
-string FpgaUtility::arbToArb(std::string& in, int inRadix, int outRadix, int numberOfDigits)
+string FpgaUtility::arbToArb(const std::string& in, int inRadix, int outRadix, int numberOfDigits)
 {
   return doubleToArb(arbToDouble(in, inRadix), outRadix, numberOfDigits);
 }
@@ -272,7 +272,7 @@ void FpgaUtility::readCoe(std::string inFilePath, std::vector<signed long long>&
       else reformatCoeFile << t_line.substr(0, t_line.size() - 1) << endl;
     }
     // Process reformatted file.
-    vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
+    //vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
     int t_radix = 0;
     vector<string> t_rawData;
     while (getline(reformatCoeFile, t_line)) {

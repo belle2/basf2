@@ -503,7 +503,6 @@ namespace Belle2 {
         // can be blank (white space) or any delimiter.
         if (reading_word) {
           // end of a word, 'xxxx '
-          reading_word = false;
           if (result_the_term) {
             // worth to try
             bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];

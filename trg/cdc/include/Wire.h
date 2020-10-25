@@ -132,14 +132,16 @@ namespace Belle2 {
   const TRGCDCWireHit*
   TRGCDCWire::hit(const TRGCDCWireHit* h)
   {
-    return (const TRGCDCWireHit*) TRGCDCCell::hit((const TRGCDCCellHit*) h);
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCWireHit*>(TRGCDCCell::hit(reinterpret_cast<const TRGCDCCellHit*>(h)));
   }
 
   inline
   const TRGCDCWireHit*
   TRGCDCWire::hit(void) const
   {
-    return (const TRGCDCWireHit*) TRGCDCCell::hit();
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCWireHit*>(TRGCDCCell::hit());
   }
 
   inline

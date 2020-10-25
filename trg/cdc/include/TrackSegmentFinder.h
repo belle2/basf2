@@ -59,7 +59,7 @@ namespace Belle2 {
                              const TRGClock& dataClock,
                              const TRGClock& userClockInput,
                              const TRGClock& userClockOutput,
-                             std::vector<TRGCDCSegment*>& tsSL);
+                             const std::vector<TRGCDCSegment*>& tsSL);
 
     /// Destructor.
     ~TRGCDCTrackSegmentFinder();

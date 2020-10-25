@@ -209,15 +209,16 @@ namespace Belle2 {
   const TRGCDCSegmentHit*
   TRGCDCSegment::hit(const TRGCDCSegmentHit* h)
   {
-    return (const TRGCDCSegmentHit*)
-           TRGCDCCell::hit((const TRGCDCCellHit*) h);
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCSegmentHit*>(TRGCDCCell::hit(reinterpret_cast<const TRGCDCCellHit*>(h)));
   }
 
   inline
   const TRGCDCSegmentHit*
   TRGCDCSegment::hit(void) const
   {
-    return (const TRGCDCSegmentHit*) TRGCDCCell::hit();
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCSegmentHit*>(TRGCDCCell::hit());
   }
 
   inline

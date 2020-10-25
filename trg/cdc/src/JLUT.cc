@@ -419,7 +419,7 @@ namespace Belle2 {
   }
 
   /// make COE file.
-  void TRGCDCJLUT::makeCOE(string fileName)
+  void TRGCDCJLUT::makeCOE(const string& fileName)
   {
     m_write = 1;
     // Check if function is set.
@@ -493,7 +493,7 @@ namespace Belle2 {
     return t_offsetName.str();
   }
 
-  TRGCDCJSignal const TRGCDCJLUT::operate(TRGCDCJSignal const& in, TRGCDCJSignal& out)
+  TRGCDCJSignal const TRGCDCJLUT::operate(const TRGCDCJSignal& in, TRGCDCJSignal& out)
   {
 
     //cout<<"Operate start"<<endl;

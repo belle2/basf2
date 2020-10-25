@@ -247,9 +247,9 @@ namespace Belle2 {
     static std::string ifElseVhdlCode(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal*, TRGCDCJSignal> > > >
                                       const& data);
     /// Prints vhdl code.
-    void printVhdl(std::string& vhdlCode);
+    void printVhdl(const std::string& vhdlCode) const;
     /// Checks underflow or overflow for TRGCDCJSignal.
-    void checkInt(std::string name) const;
+    void checkInt(const std::string& name) const;
     /// Checks if signal is same signal
     static bool isSameSignal(TRGCDCJSignal const& lhs, TRGCDCJSignal const& rhs);
     /// Values => [name, value, bitwidth, min, max, clock]

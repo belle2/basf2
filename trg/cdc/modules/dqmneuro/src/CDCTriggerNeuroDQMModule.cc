@@ -1872,8 +1872,6 @@ void CDCTriggerNeuroDQMModule::event()
         m_RecoInvPt->Fill(invptTarget);
         if (m_unpackedNeuroTracksName != "") {
           CDCTriggerTrack* neuroHWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_unpackedNeuroTracksName);
-          double neuroHWZ, neuroHWcosTh, neuroHWPhi0, neuroHWPt ;
-          double neuroSWZ, neuroSWcosTh, neuroSWPhi0, neuroSWPt ;
 
           if (neuroHWTrack) {
             bool valtrack = false;
@@ -1894,17 +1892,17 @@ void CDCTriggerNeuroDQMModule::event()
             m_RecoHWD0->Fill(d0Target);
             m_RecoHWInvPt->Fill(invptTarget);
 
-            neuroHWZ = neuroHWTrack->getZ0() ;
+            double neuroHWZ = neuroHWTrack->getZ0() ;
             m_neuroRecoHWOutZ->Fill(neuroHWZ);
             double cotTh = neuroHWTrack->getCotTheta() ;
             double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
-            neuroHWcosTh = cosTh ;
+            double neuroHWcosTh = cosTh ;
             m_neuroRecoHWOutCosTheta->Fill(neuroHWcosTh);
-            neuroHWPt = neuroHWTrack->getPt() ;
+            double neuroHWPt = neuroHWTrack->getPt() ;
             m_neuroRecoHWOutInvPt->Fill(neuroHWPt);
             phinorm = neuroHWTrack->getPhi0() * 180 / M_PI ;
             if (phinorm < 0.) {phinorm = phinorm + 360. ;}
-            neuroHWPhi0 = phinorm;
+            double neuroHWPhi0 = phinorm;
             m_neuroRecoHWOutPhi0->Fill(neuroHWPhi0);
             m_neuroRecoHWOutHitPattern->Fill(getPattern(neuroHWTrack, m_unpackedNeuroInputSegmentsName));
             nhwmatched++;
@@ -1941,17 +1939,17 @@ void CDCTriggerNeuroDQMModule::event()
               m_RecoSWD0->Fill(d0Target);
               m_RecoSWInvPt->Fill(invptTarget);
 
-              neuroSWZ = neuroSWTrack->getZ0() ;
+              double neuroSWZ = neuroSWTrack->getZ0() ;
               m_neuroRecoSWOutZ->Fill(neuroSWZ);
               double cotTh = neuroSWTrack->getCotTheta() ;
               double cosTh = copysign(1.0, cotTh) / sqrt(1. / (cotTh * cotTh) + 1);
-              neuroSWcosTh = cosTh ;
+              double neuroSWcosTh = cosTh ;
               m_neuroRecoSWOutCosTheta->Fill(neuroSWcosTh);
-              neuroSWPt = neuroSWTrack->getPt() ;
+              double neuroSWPt = neuroSWTrack->getPt() ;
               m_neuroRecoSWOutInvPt->Fill(neuroSWPt);
               phinorm = neuroSWTrack->getPhi0() * 180 / M_PI ;
               if (phinorm < 0.) {phinorm = phinorm + 360. ;}
-              neuroSWPhi0 = phinorm ;
+              double neuroSWPhi0 = phinorm ;
               m_neuroRecoSWOutPhi0->Fill(neuroSWPhi0);
               m_neuroRecoSWOutHitPattern->Fill(getPattern(neuroSWTrack, m_unpackedNeuroInputSegmentsName));
               nswmatched++;
@@ -2277,8 +2275,6 @@ void CDCTriggerNeuroDQMModule::event()
   int nofouttracks = 0;
   int nofintracks = 0;
   int nofinsegments = 0;
-  int nof2douttracks = 0;
-  int nof2dinsegments = 0;
   if (m_unpackedNeuroTracksName != "") {
     // fill neurotrigger histograms
     for (CDCTriggerTrack& neuroTrack : m_unpackedNeuroTracks) {
@@ -2462,9 +2458,8 @@ void CDCTriggerNeuroDQMModule::event()
         condFill(m_neuroHWInputID_Layer8    , nnInput[24]);
         condFill(m_neuroHWInputT_Layer8     , nnInput[25]);
         condFill(m_neuroHWInputAlpha_Layer8 , nnInput[26]);
-      }
 
-      if (!m_limitedoutput) {
+
         if (m_simNeuroTracksName != "") {
           // get related track from TSIM (via 2D finder track)
           CDCTriggerTrack* finderTrack =
@@ -2600,6 +2595,8 @@ void CDCTriggerNeuroDQMModule::event()
       m_neuroHWInTSCount->Fill(nofinsegments);
     }
   }
+
+
   if (!m_limitedoutput && m_simSegmentHitsName != "" && m_sim2DTracksSWTSName != "") {
     m_2DSWOutTrackCount->Fill(m_sim2DTracksSWTS.getEntries());
     for (CDCTriggerTrack& sim2dtrack : m_sim2DTracksSWTS) {
@@ -2611,8 +2608,9 @@ void CDCTriggerNeuroDQMModule::event()
     }
   }
   if (m_unpacked2DTracksName != "") {
+    int nof2douttracks = 0;
     for (CDCTriggerTrack& finder2dtrack : m_unpacked2DTracks) {
-      nof2douttracks ++;
+      ++nof2douttracks;
       phinorm = finder2dtrack.getPhi0() * 180. / M_PI ;
       if (phinorm < 0.) {phinorm = phinorm + 360. ;}
       m_2DHWOutPhi0->Fill(phinorm);
@@ -2626,9 +2624,10 @@ void CDCTriggerNeuroDQMModule::event()
       }
     }
 
+    int nof2dinsegments = 0;
 
     for (CDCTriggerSegmentHit& hit : m_unpackedSegmentHits) {
-      nof2dinsegments++;
+      ++nof2dinsegments;
       if (!m_limitedoutput) {
         unsigned int sl = hit.getISuperLayer();
         switch (sl) {
@@ -2762,8 +2761,9 @@ void CDCTriggerNeuroDQMModule::event()
                   + padto(std::to_string(xhit.priorityTime()), 4) + ", "
                   + padto(std::to_string(xhit.foundTime()), 3) + ", "
                   + padto(std::to_string(tsIDInTracker), 4) + ") | ";
-      unsigned count2d = 0;
+
       if (m_unpackedNeuroTracksName != "") {
+        unsigned count2d = 0;
         for (CDCTriggerTrack& track : m_unpackedNeuroInput2DTracks) {
           count2d++;
           if (have_relation(track, xhit, m_unpackedNeuroInputSegmentsName)) {
@@ -2854,8 +2854,9 @@ void CDCTriggerNeuroDQMModule::event()
                   + padto(std::to_string(xhit.priorityTime()), 4) + ", "
                   + padto(std::to_string(xhit.foundTime()), 3) + ", "
                   + padto(std::to_string(tsIDInTracker), 4) + ") ";
-      unsigned count2d = 0;
+
       if (m_sim2DTracksSWTSName != "") {
+        unsigned count2d = 0;
         for (CDCTriggerTrack& track : m_sim2DTracksSWTS) {
           count2d++;
           if (have_relation(track, xhit, m_simSegmentHitsName)) {
@@ -2866,8 +2867,8 @@ void CDCTriggerNeuroDQMModule::event()
         }
         l.strline += " | ";
       }
-      unsigned countswn = 0;
       if (m_simNeuroTracksSWTSSW2DName != "") {
+        unsigned countswn = 0;
         for (CDCTriggerTrack& track : m_simNeuroTracksSWTSSW2D) {
           countswn++;
           if (have_relation(track, xhit, m_simSegmentHitsName)) {

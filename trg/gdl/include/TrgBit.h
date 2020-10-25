@@ -34,7 +34,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      InputBitPattern() : _pattern{0}   {}; //TODO is is good default?
+      InputBitPattern() : _pattern{}   {}; //TODO is it good default?
 
       /// Destructor
       virtual ~InputBitPattern() {};
@@ -66,7 +66,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      OutputBitPattern() {};
+      OutputBitPattern() : _pattern{}  {}; //TODO is it good default?
 
       /// Destructor
       virtual ~OutputBitPattern() {};

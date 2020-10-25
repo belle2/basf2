@@ -1115,13 +1115,13 @@ namespace Belle2 {
     return slvToUnsigned(in, in.m_toReal, in.m_minInt, in.m_maxInt, in.m_actual, in.m_minActual, in.m_maxActual, in.m_finishClock);
   }
 
-  TRGCDCJSignal const TRGCDCJSignal::toSlv(TRGCDCJSignal const& in, int test)
+  TRGCDCJSignal const TRGCDCJSignal::toSlv(TRGCDCJSignal const& in, int /*test*/)
   {
 
     TRGCDCJSignal result(in);
 
     // Temporary signal.
-    test += 0;
+    //test += 0; //TODO why?
     signed long long t_int = in.m_int;
     if (in.m_type == -1) {
       // Change signed m_int to vector<bool>
@@ -2148,7 +2148,7 @@ namespace Belle2 {
 
   }
 
-  void TRGCDCJSignal::printVhdl(std::string& vhdlCode)
+  void TRGCDCJSignal::printVhdl(const std::string& vhdlCode) const
   {
     if (m_commonData) {
       ofstream outFile;
@@ -2162,7 +2162,7 @@ namespace Belle2 {
     }
   }
 
-  void TRGCDCJSignal::checkInt(std::string name) const
+  void TRGCDCJSignal::checkInt(const std::string& name) const
   {
     if (m_int > calMaxInteger()) {
       cout << "[Error] " << name << " => m_int overflow" << endl;

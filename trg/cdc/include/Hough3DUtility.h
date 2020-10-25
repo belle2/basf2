@@ -29,8 +29,8 @@ public:
   /// Track variables. [charge, rho, phi0]
   /// Stereo TS candidates[layer][TS ID]
   /// Uses the 3D finder.
-  void runFinder(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                 std::vector<std::vector<int> >& stTSDrift);
+  void runFinder(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                 const std::vector<std::vector<int> >& stTSDrift);
   /// Init variables. [cotStart, cotEnd, z0Start, z0Ent, nCotSteps, nZ0Steps]
   /// Initializes the 3D finder for mode 1.
   void initVersion1(const std::vector<float >& initVariables);
@@ -51,11 +51,11 @@ public:
                          const std::vector<double>& tsArcS,
                          const std::vector<std::vector<double> >& tsZ);
   /// Uses the 3D finder for mode 2.
-  void runFinderVersion2(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                         std::vector<std::vector<int> >& stTSDrift);
+  void runFinderVersion2(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                         const std::vector<std::vector<int> >& stTSDrift);
   /// Uses the 3D finder for mode 3.
-  void runFinderVersion3(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                         std::vector<std::vector<int> >& stTSDrift);
+  void runFinderVersion3(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                         const std::vector<std::vector<int> >& stTSDrift);
   /// Gets results from the 3D finder.
   void getValues(const std::string& input, std::vector<double>& result);
   /// Gets the Hough plane for the 3D finder.

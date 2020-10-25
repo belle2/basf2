@@ -89,7 +89,7 @@ namespace Belle2 {
                                                      const TRGClock& dataClock,
                                                      const TRGClock& userClockInput,
                                                      const TRGClock& userClockOutput,
-                                                     std::vector<TCSegment*>& tsSL)
+                                                     const std::vector<TCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
       m_Trg_PI(), // 2019/07/31 by ytlai

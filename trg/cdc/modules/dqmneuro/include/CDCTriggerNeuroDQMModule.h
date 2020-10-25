@@ -49,7 +49,7 @@ namespace Belle2 {
       std::string strline;
       //vector<const CDCTriggerTrack*> relin2dtracks;
       //vector<const CDCTriggerTrack*> relin2dtracks;
-      TSLine(const CDCTriggerSegmentHit& h)
+      explicit TSLine(const CDCTriggerSegmentHit& h)
       {
         hit = &h;
       }

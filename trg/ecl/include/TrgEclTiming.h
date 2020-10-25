@@ -52,7 +52,7 @@ namespace Belle2 {
     //! Get Timing Source
     int GetTimingSource() {return Source;}
     // set energy threshold of event timing quality flag
-    void setEventTimingQualityThresholds(std::vector<double> iEventTimingQualityThresholds)
+    void setEventTimingQualityThresholds(const std::vector<double>& iEventTimingQualityThresholds)
     {
       m_EventTimingQualityThresholds = iEventTimingQualityThresholds;
     }

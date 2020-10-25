@@ -73,7 +73,7 @@ CDCTrigger3DFitterModule::initialize()
   TRGCDCFitter3D::getConstants(m_mConstD, m_mConstV);
 
   // get geometry constants for first priority layers
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   // TODO: avoid hard coding the priority layers here
   vector<unsigned> iL = {10, 22, 34, 46};
   for (int iSt = 0; iSt < 4; ++iSt) {

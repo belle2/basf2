@@ -1143,7 +1143,7 @@ namespace Belle2 {
       }
 
       if (TRGDebug::level() > 2) {
-        StoreArray<CDCSimHit> simHits("CDCSimHits");
+        // StoreArray<CDCSimHit> simHits("CDCSimHits"); //TODO variable is not used, is it ok?
         _clock.dump("detail", TRGDebug::tab());
         _clockFE.dump("detail", TRGDebug::tab());
         if (TRGDebug::level() > 10) {

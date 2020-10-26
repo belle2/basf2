@@ -85,7 +85,7 @@ You can save information from analysis jobs directly from the ``VariableManager`
 --------------------------
 
 You can also save events to your own mDST or user-defined dst (uDST) output files.
-These files are also created by the :ref`skim` but the functonal code is part of :ref`analysis`.
+These files are also created by the :ref:`skim` but the functional code is part of :ref:`analysis`.
 
 .. toctree:: MdstAndUdstOutput
 

@@ -4,7 +4,7 @@
 """
 Test backwards compatibility for a udst file produced with release-05-00-00.
 
-This is the *start* of analysis objects guarantee of backwwards compatibility.
+This is the *start* of analysis objects guarantee of backwards compatibility.
 Pragmatically, we are backwards compatible with release-04 **in** release-05
 but we cannot guarantee this in general.
 
@@ -29,7 +29,7 @@ import udst
 
 if __name__ == "__main__":
 
-    # clear out stray env variables and set seeding for reprodcible results
+    # clear out stray env variables and set seeding for reproducible results
     b2test_utils.configure_logging_for_tests()
     basf2.set_random_seed(1)
 

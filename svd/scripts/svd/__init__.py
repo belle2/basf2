@@ -12,14 +12,16 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
         clusterizerName = '__ROISVDClusterizer'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
-        clusterName = '__ROIsvdClusters'
+        recoDigitsName = '__ROIsvdRecoDigits'
+        clustersName = '__ROIsvdClusters'
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         clusterizerName = 'SVDClusterizer'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
-        clusterName = ""
+        recoDigitsName = ""
+        clustersName = ""
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
@@ -31,7 +33,7 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = register_module('SVDClusterizer')
         clusterizer.set_name(clusterizerName)
-        clusterizer.param('Clusters', clusterName)
+        clusterizer.param('Clusters', clustersName)
         clusterizer.param('useDB', True)
         path.add_module(clusterizer)
 
@@ -48,6 +50,8 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = register_module('SVDRecoDigitCreator')
         recoDigitCreator.set_name(recocreatorName)
+        recoDigitCreator.param('RecoDigits', recoDigitsName)
+        recoDigitCreator.param('Clusters', clustersName)
         path.add_module(recoDigitCreator)
 
 

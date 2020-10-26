@@ -16,8 +16,6 @@ except ModuleNotFoundError:
     light_build = True
 
 if __name__ == "__main__":
-    #: ignore html_static_path
-    ignorehtmlstaticpath = 'html_static_path'
     #: ignore unsupported theme option
     ignoreunsupportedthemeoption = 'unsupported theme option'
     #: ignore environment variables
@@ -44,7 +42,6 @@ if __name__ == "__main__":
     if light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
-                         re.findall(ignorehtmlstaticpath, x) or
                          re.findall(ignoreunsupportedthemeoption, x) or
                          re.findall(ignoreenvironmentvariables, x) or
                          re.findall(ignorepythonclass, x) or
@@ -61,7 +58,6 @@ if __name__ == "__main__":
     else:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
-                         re.findall(ignorehtmlstaticpath, x) or
                          re.findall(ignoreunsupportedthemeoption, x) or
                          re.findall(ignoreenvironmentvariables, x) or
                          re.findall(ignorepythonclass, x) or

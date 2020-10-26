@@ -37,8 +37,6 @@ if __name__ == "__main__":
     #: ignore online_book
     ignoreonlinebook = 'online_book'
     #: ignore further warnings in light builds
-    #: ignore add_mdst_output of reconstruction package
-    ignoreaddmdstoutput = 'add_mdst_output'
     #: ignore add_simulation of simulation package
     ignoreaddsimulation = 'add_simulation'
     #: ignore add_reconstruction of reconstruction package
@@ -56,7 +54,6 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
                          re.findall(ignorechoosingarelease, x) or
-                         re.findall(ignoreaddmdstoutput, x) or
                          re.findall(ignoreaddsimulation, x) or
                          re.findall(ignoreaddreconstruction, x) or
                          re.findall(ignoreincludeproblem, x) or

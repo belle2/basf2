@@ -32,14 +32,15 @@ eklm_numbers = Belle2.EKLMElementNumbers.Instance()
 class CosmicsExtapolationPlotModule(basf2.Module):
     """ Class for creation of cosmics extrapolation plot module. """
 
-    def set_options_coordinate(self, histogram, description):
+    def set_options_coordinate(self, histogram, description, shifter):
         histogram.SetXTitle('cm')
         histogram.SetYTitle('Events')
         function_list = histogram.GetListOfFunctions()
         function_list.Add(TNamed('Description', description))
         function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
         function_list.Add(TNamed('Contact', contact))
-        function_list.Add(TNamed('MetaOptions', 'shifter'))
+        if shifter:
+            function_list.Add(TNamed('MetaOptions', 'shifter'))
 
     def set_options_momentum(self, histogram, description):
         histogram.SetXTitle('p [GeV]')
@@ -48,7 +49,6 @@ class CosmicsExtapolationPlotModule(basf2.Module):
         function_list.Add(TNamed('Description', description))
         function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
         function_list.Add(TNamed('Contact', contact))
-        function_list.Add(TNamed('MetaOptions', 'shifter'))
 
     def __init__(self):
         """Initialization."""
@@ -64,14 +64,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_xres_forward_mum,
-            'Extrapolated hit X resolution (mu-, forward propagation).')
+            'Extrapolated hit X resolution (mu-, forward propagation).', True)
         self.hist_xres_forward_mup = \
             ROOT.TH1F('xres_forward_mup',
                       'X resolution (#mu^{+}, forward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_xres_forward_mup,
-            'Extrapolated hit X resolution (mu+, forward propagation).')
+            'Extrapolated hit X resolution (mu+, forward propagation).', True)
         # Y resolution histograms (forward propagation).
         self.hist_yres_forward_mum = \
             ROOT.TH1F('yres_forward_mum',
@@ -79,14 +79,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_yres_forward_mum,
-            'Extrapolated hit Y resolution (mu-, forward propagation).')
+            'Extrapolated hit Y resolution (mu-, forward propagation).', False)
         self.hist_yres_forward_mup = \
             ROOT.TH1F('yres_forward_mup',
                       'Y resolution (#mu^{+}, forward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_yres_forward_mup,
-            'Extrapolated hit Y resolution (mu+, forward propagation).')
+            'Extrapolated hit Y resolution (mu+, forward propagation).', False)
         # Z resolution histograms (forward propagation).
         self.hist_zres_forward_mum = \
             ROOT.TH1F('zres_forward_mum',
@@ -94,14 +94,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_zres_forward_mum,
-            'Extrapolated hit Z resolution (mu-, forward propagation).')
+            'Extrapolated hit Z resolution (mu-, forward propagation).', False)
         self.hist_zres_forward_mup = \
             ROOT.TH1F('zres_forward_mup',
                       'Z resolution (#mu^{+}, forward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_zres_forward_mup,
-            'Extrapolated hit Z resolution (mu+, forward propagation).')
+            'Extrapolated hit Z resolution (mu+, forward propagation).', False)
 
         # X resolution histograms (backward propagation).
         self.hist_xres_backward_mum = \
@@ -110,14 +110,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_xres_backward_mum,
-            'Extrapolated hit X resolution (mu-, backward propagation).')
+            'Extrapolated hit X resolution (mu-, backward propagation).', True)
         self.hist_xres_backward_mup = \
             ROOT.TH1F('xres_backward_mup',
                       'X resolution (#mu^{+}, backward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_xres_backward_mup,
-            'Extrapolated hit X resolution (mu+, backward propagation).')
+            'Extrapolated hit X resolution (mu+, backward propagation).', True)
         # Y resolution histograms (backward propagation).
         self.hist_yres_backward_mum = \
             ROOT.TH1F('yres_backward_mum',
@@ -125,14 +125,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_yres_backward_mum,
-            'Extrapolated hit Y resolution (mu-, backward propagation).')
+            'Extrapolated hit Y resolution (mu-, backward propagation).', False)
         self.hist_yres_backward_mup = \
             ROOT.TH1F('yres_backward_mup',
                       'Y resolution (#mu^{+}, backward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_yres_backward_mup,
-            'Extrapolated hit Y resolution (mu+, backward propagation).')
+            'Extrapolated hit Y resolution (mu+, backward propagation).', False)
         # Z resolution histograms (backward propagation).
         self.hist_zres_backward_mum = \
             ROOT.TH1F('zres_backward_mum',
@@ -140,14 +140,14 @@ class CosmicsExtapolationPlotModule(basf2.Module):
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_zres_backward_mum,
-            'Extrapolated hit Z resolution (mu-, backward propagation).')
+            'Extrapolated hit Z resolution (mu-, backward propagation).', False)
         self.hist_zres_backward_mup = \
             ROOT.TH1F('zres_backward_mup',
                       'Z resolution (#mu^{+}, backward)',
                       100, -20, 20)
         self.set_options_coordinate(
             self.hist_zres_backward_mup,
-            'Extrapolated hit Z resolution (mu+, backward propagation).')
+            'Extrapolated hit Z resolution (mu+, backward propagation).', False)
 
         # Momentum resolution histograms (forward propagation).
         self.hist_pres_forward_mum = \

@@ -194,13 +194,13 @@ namespace Belle2 {
     if (p->getNDaughters() == 0) {
       idSequence.push_back(p->getMdstArrayIndex());
     } else {
-      // decorate number of daughters with flavor sign of particle
       idSequence.push_back(p->getNDaughters());
-      // this is not FSP (go one level down)
       auto daughters = p->getDaughters();
+      // sorting the daughters by their pdgCode to identify decay chains only differing by the order of their daughters
       sort(daughters.begin(), daughters.end(), [](const auto a, const auto b) {
         return a->getPDGCode() > b->getPDGCode();
       });
+      // this is not FSP (go one level down)
       for (const auto& daughter : daughters)
         fillUniqueIdentifier(daughter, idSequence);
     }

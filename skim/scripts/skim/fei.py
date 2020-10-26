@@ -109,6 +109,8 @@ class BaseFEISkim(BaseSkim):
 
     NoisyModules = ["ParticleCombiner"]
 
+    ApplyHLTHadronCut = True
+
     @staticmethod
     @lru_cache()
     def fei_precuts(path):

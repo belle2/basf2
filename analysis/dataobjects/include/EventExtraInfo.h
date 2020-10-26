@@ -29,7 +29,7 @@ namespace Belle2 {
      */
     float getExtraInfo(const std::string& name) const;
 
-    /** Return wether the extra info with the given name is set. */
+    /** Return whether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
 
 

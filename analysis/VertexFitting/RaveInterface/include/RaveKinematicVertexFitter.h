@@ -165,16 +165,16 @@ namespace Belle2 {
       TVector3 m_fittedPos;
       /** 4 momentum of the mother particle after the fit */
       TLorentzVector m_fitted4Vector;
-      /** 7x7 errror matrix of the mother particle after the fit */
+      /** 7x7 error matrix of the mother particle after the fit */
       TMatrixFSym m_fitted7Cov;
 
 
     private:
 
-      /** Convert the error matrix from P-M to P-E. It Requires an input error matrit in the form X,P,M */
+      /** Convert the error matrix from P-M to P-E. It Requires an input error matrix in the form X,P,M */
       TMatrixDSym ErrorMatrixMassToEnergy(const TLorentzVector& p4, const TMatrixDSym& MassErr);
 
-      /** Convert the error matrix from P-E to P-M. It Requires an input error matrit in the form X,P,E */
+      /** Convert the error matrix from P-E to P-M. It Requires an input error matrix in the form X,P,E */
       TMatrixDSym ErrorMatrixEnergyToMass(const TLorentzVector& p4, const TMatrixDSym& EnergyErr);
 
       /** Start capturing the output of rave and divert it to log messages.

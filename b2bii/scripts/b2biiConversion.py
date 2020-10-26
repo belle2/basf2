@@ -72,7 +72,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   matchType2E9oE25Threshold=-1.1,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
-                                  enableRecTrg=False, enableEvtcls=True):
+                                  enableRecTrg=False, enableEvtcls=True,
+                                  SmearTrack=0):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -93,6 +94,9 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
         enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
+        SmearTrack (float): Smear the MC tracks to match real data. Does not work on real data.
+            Default value is 0 which does no smearing. The recommended value is 2 if you want track smearing.
+            Details can be found https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -134,6 +138,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
+        fix.param('Smear_trk', SmearTrack)
         if (HadronA is not True and HadronB is True):
             B2WARNING('The Hadron A skim is turned off.'
                       'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')

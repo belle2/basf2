@@ -222,7 +222,8 @@ def create_script_function(args):
     cuts = args.database.get_all_cuts()
     df = pd.DataFrame(cuts)
 
-    sfmt = 'b2hlt_triggers add_cut {Base Identifier} {Cut Identifier} "{Cut Condition}" {Cut Prescaling} {Reject Cut}'.format
+    sfmt = 'b2hlt_triggers add_cut \
+"{Base Identifier}" "{Cut Identifier}" "{Cut Condition}" "{Cut Prescaling}" "{Reject Cut}"'.format
     if args.filename is None:
         df.apply(lambda x: print(sfmt(**x)), 1)
     else:

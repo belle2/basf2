@@ -144,7 +144,7 @@ void ParticleStatsModule::terminate()
     // format the pass matrix table
     stream << "=======================================================================\n";
     stream << " Pass matrix (for i, j: fraction passing selection i also passes selection j)\n";
-    stream << "\t\t  ";
+    stream << "                  ";
 
     // table headings
     for (unsigned iList = 0; iList < m_nLists; ++iList)
@@ -172,8 +172,8 @@ void ParticleStatsModule::terminate()
   stream << " Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) \n\n";
 
   // table headings
-  stream << "\t\t             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |\n";
-  stream << "\t\t  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|\n";
+  stream << "                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |\n";
+  stream << "                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|\n";
 
   // table data
   for (unsigned iList = 0; iList < m_nLists; ++iList) {

@@ -284,6 +284,15 @@ namespace Belle2 {
     };
 
     /**
+     * Sets momentum scaling
+     * @param momentumScalingFactor scaling factor
+     */
+    void setMomentumScalingFactor(float momentumScalingFactor)
+    {
+      m_momentumScale = momentumScalingFactor;
+    }
+
+    /**
      * Sets 7x7 error matrix
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
@@ -451,7 +460,7 @@ namespace Belle2 {
     TLorentzVector get4Vector() const
     {
       TLorentzVector vec;
-      vec.SetXYZM(m_px, m_py, m_pz, m_mass);
+      vec.SetXYZM(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, m_mass);
       return vec;
     }
 
@@ -461,7 +470,7 @@ namespace Belle2 {
      */
     TVector3 getMomentum() const
     {
-      return TVector3(m_px, m_py, m_pz);
+      return m_momentumScale * TVector3(m_px, m_py, m_pz);
     };
 
     /**
@@ -470,7 +479,7 @@ namespace Belle2 {
      */
     float getMomentumMagnitude() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -479,7 +488,7 @@ namespace Belle2 {
      */
     float getP() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -488,7 +497,7 @@ namespace Belle2 {
      */
     float getPx() const
     {
-      return m_px;
+      return m_momentumScale * m_px;
     }
 
     /**
@@ -497,7 +506,7 @@ namespace Belle2 {
      */
     float getPy() const
     {
-      return m_py;
+      return m_momentumScale * m_py;
     }
 
     /**
@@ -506,7 +515,16 @@ namespace Belle2 {
      */
     float getPz() const
     {
-      return m_pz;
+      return m_momentumScale * m_pz;
+    }
+
+    /**
+     * Returns momentum scaling factor
+     * @return momentum scaling factor
+     */
+    float getMomentumScalingFactor() const
+    {
+      return m_momentumScale;
     }
 
     /**
@@ -896,6 +914,7 @@ namespace Belle2 {
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
     float m_pz;     /**< momentum component z */
+    float m_momentumScale = 1.0; /**< momentum scaling factor */
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
@@ -986,12 +1005,13 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 12); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 13); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
+    // v13: added m_momentumScale
 
     friend class ParticleSubset;
   };

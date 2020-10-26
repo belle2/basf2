@@ -48,7 +48,7 @@ class TrackPoint : public TObject {
  public:
 
   TrackPoint();
-  explicit TrackPoint(Track* track);
+  TrackPoint(Track* track);
 
   /**
    * @brief Contructor taking list of measurements.

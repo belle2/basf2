@@ -136,9 +136,6 @@ namespace Belle2 {
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(particle, idSeq);
-        // the unique identifier sequence is sorted so that different orders of
-        // daughter particles are registered as duplicates
-        sort(idSeq.begin(), idSeq.end());
         m_particlesInTheList.push_back(idSeq);
       }
     }
@@ -181,10 +178,6 @@ namespace Belle2 {
 
       std::vector<int> idSeq;
       fillUniqueIdentifier(part, idSeq);
-      // before checking whether the sequence is already present it is sorted so
-      // that a different order of daughter particles is registered as a
-      // duplicated candidate
-      sort(idSeq.begin(), idSeq.end());
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {
@@ -201,11 +194,15 @@ namespace Belle2 {
     if (p->getNDaughters() == 0) {
       idSequence.push_back(p->getMdstArrayIndex());
     } else {
-      // decorate number of daughters with flavor sign of particle
-      idSequence.push_back(p->getPDGCode() / abs(p->getPDGCode()) * p->getNDaughters());
+      idSequence.push_back(p->getNDaughters());
+      auto daughters = p->getDaughters();
+      // sorting the daughters by their pdgCode to identify decay chains only differing by the order of their daughters
+      sort(daughters.begin(), daughters.end(), [](const auto a, const auto b) {
+        return a->getPDGCode() > b->getPDGCode();
+      });
       // this is not FSP (go one level down)
-      for (unsigned i = 0; i < p->getNDaughters(); i++)
-        fillUniqueIdentifier(p->getDaughter(i), idSequence);
+      for (const auto& daughter : daughters)
+        fillUniqueIdentifier(daughter, idSequence);
     }
   }
 

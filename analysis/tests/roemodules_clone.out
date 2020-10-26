@@ -18,7 +18,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts: E > 0.05 and eclCluster cuts: E > 0.05
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
@@ -34,7 +34,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: B+:other (B-:other)
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -1554,8 +1554,8 @@
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
       B+:other( 0)|    3.2000|   4.0000|   1.2500|   0.0000|   0.0000|   0.0000|   0.0000|   4.0000|   1.2500|
 
 [INFO] 
@@ -1569,8 +1569,8 @@ Total Number of Particles created in the DataStore: 7084
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
             K-( 0)|    1.0000|  10.6000|  10.6000|   5.0000|   5.0000|   5.6000|   5.6000|   0.0000|   0.0000|
 
 [INFO] 

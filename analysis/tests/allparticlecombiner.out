@@ -12,14 +12,14 @@
 [INFO]    -> With cuts  : abs(dzFromMedianDz) < 0.05
 [INFO] ParticleVertexFitter: Performing vertex fit on vpho:PVFit using KFit
 [INFO] ParticleVertexFitter: Additional iptube will be applied
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] ParticleStats Summary:
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
     vpho:PVFit( 0)|    1.0000|   1.0000|   1.0000|   0.0000|   0.0000|   0.0000|   0.0000|   1.0000|   1.0000|
 
 [INFO] 

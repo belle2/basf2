@@ -10,7 +10,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
 [INFO]    -> MDST source: Tracks
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts:  and eclCluster cuts: 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma:conv (gamma:conv)
@@ -83,8 +83,8 @@
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
            mu+( 0)|    0.0040|   0.0080|   2.0000|   0.0040|   1.0000|   0.0040|   1.0000|   0.0000|   0.0000|
 
 [INFO] 

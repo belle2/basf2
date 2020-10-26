@@ -94,9 +94,9 @@
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists to be studied 10 
-[INFO] Number of ParticleLists to be studied 12 
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 10 
+[INFO] Number of ParticleLists to be studied: 12 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -105,8 +105,8 @@
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
    Upsilon(4S)( 0)|    0.2800|   0.6600|   2.3571|   0.0000|   0.0000|   0.0000|   0.0000|   0.6600|   2.3571|
 
 [INFO] 
@@ -118,7 +118,8 @@ Total Number of Particles created in the DataStore: 7734
 [INFO] ParticleStats Summary:
 [INFO] =======================================================================
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
-		  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
      e+:frommc( 0)| 1.0000| 1.0000| 0.9000| 0.5000| 1.0000| 0.4600| 0.1200| 0.4400| 1.0000| 0.9200| 0.4600| 0.7600| 0.0000|
     pi+:frommc( 1)| 1.0000| 1.0000| 0.9000| 0.5000| 1.0000| 0.4600| 0.1200| 0.4400| 1.0000| 0.9200| 0.4600| 0.7600| 0.0000|
      K+:frommc( 2)| 1.0000| 1.0000| 1.0000| 0.5111| 1.0000| 0.4000| 0.1111| 0.4000| 1.0000| 0.9111| 0.4222| 0.8000| 0.0000|
@@ -136,8 +137,8 @@ Lambda0:frommc( 6)| 1.0000| 1.0000| 0.8333| 0.6667| 1.0000| 0.5000| 1.0000| 0.50
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
      e+:frommc( 0)|    1.0000|   7.8600|   7.8600|   4.4800|   4.4800|   3.3800|   3.3800|   0.0000|   0.0000|
     pi+:frommc( 1)|    1.0000|   8.8600|   8.8600|   4.4600|   4.4600|   4.4000|   4.4000|   0.0000|   0.0000|
      K+:frommc( 2)|    0.9000|   1.6600|   1.8444|   0.7400|   0.8222|   0.9200|   1.0222|   0.0000|   0.0000|
@@ -160,7 +161,8 @@ Total Number of Particles created in the DataStore: 7734
 [INFO] ParticleStats Summary:
 [INFO] =======================================================================
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
-		  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
             e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.2800| 0.3800| 1.0000| 1.0000| 1.0000| 0.0000|
            pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.2800| 0.3800| 1.0000| 1.0000| 1.0000| 0.0000|
             K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.2800| 0.3800| 1.0000| 1.0000| 1.0000| 0.0000|
@@ -176,8 +178,8 @@ Total Number of Particles created in the DataStore: 7734
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
             e+( 0)|    1.0000|  11.4000|  11.4000|   5.9800|   5.9800|   5.4200|   5.4200|   0.0000|   0.0000|
            pi+( 1)|    1.0000|  11.4000|  11.4000|   5.9800|   5.9800|   5.4200|   5.4200|   0.0000|   0.0000|
             K+( 2)|    1.0000|  11.4000|  11.4000|   5.8800|   5.8800|   5.5200|   5.5200|   0.0000|   0.0000|
@@ -295,9 +297,9 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists to be studied 10 
-[INFO] Number of ParticleLists to be studied 12 
-[INFO] Number of ParticleLists to be studied 1 
+[INFO] Number of ParticleLists to be studied: 10 
+[INFO] Number of ParticleLists to be studied: 12 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -1730,8 +1732,8 @@ Total Number of Particles created in the DataStore: 7734
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
    Upsilon(4S)( 0)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
 
 [INFO] 
@@ -1743,7 +1745,8 @@ Total Number of Particles created in the DataStore: 117
 [INFO] ParticleStats Summary:
 [INFO] =======================================================================
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
-		  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
      e+:frommc( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
     pi+:frommc( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
      K+:frommc( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
@@ -1761,8 +1764,8 @@ Lambda0:frommc( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.00
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
      e+:frommc( 0)|    0.0200|   0.4200|  21.0000|   0.1000|   5.0000|   0.3200|  16.0000|   0.0000|   0.0000|
     pi+:frommc( 1)|    0.0200|   0.1400|   7.0000|   0.0800|   4.0000|   0.0600|   3.0000|   0.0000|   0.0000|
      K+:frommc( 2)|    0.0200|   0.0400|   2.0000|   0.0200|   1.0000|   0.0200|   1.0000|   0.0000|   0.0000|
@@ -1785,7 +1788,8 @@ Total Number of Particles created in the DataStore: 117
 [INFO] ParticleStats Summary:
 [INFO] =======================================================================
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
-		  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
             e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
            pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
             K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
@@ -1801,8 +1805,8 @@ Total Number of Particles created in the DataStore: 117
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
-		             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
-		  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
             e+( 0)|    0.0200|   0.2000|  10.0000|   0.1000|   5.0000|   0.1000|   5.0000|   0.0000|   0.0000|
            pi+( 1)|    0.0200|   0.2000|  10.0000|   0.1000|   5.0000|   0.1000|   5.0000|   0.0000|   0.0000|
             K+( 2)|    0.0200|   0.2000|  10.0000|   0.1000|   5.0000|   0.1000|   5.0000|   0.0000|   0.0000|

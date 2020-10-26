@@ -278,7 +278,7 @@ namespace HandleRoot {
     }
   }
 
-  void getTrackValues(std::string& prefix, int iTrack,
+  void getTrackValues(const std::string& prefix, int iTrack,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
                       std::map<std::string, double>& trackMapD, std::map<std::string, std::vector<double> >& trackMapV
                      )
@@ -317,7 +317,7 @@ namespace HandleRoot {
         string t_vectorName = t_name.substr(0, t_find);
         int t_vectorIndex = stoi(t_name.substr(t_find + 1, t_name.size()));
         // Create vector if not in map.
-        if (trackMapV.find(t_vectorName) == trackMapV.end()) {
+        if (!trackMapV.count(t_vectorName)) {
           trackMapV[t_vectorName] = vector<double> (1);
         }
         // Increase vector size if vector size is too small

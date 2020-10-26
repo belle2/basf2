@@ -29,7 +29,7 @@ TrgEclDataBase::TrgEclDataBase()
 
 
 }
-void TrgEclDataBase::MakeFitterCoefficient(std::vector<int> SignalPDF, std::vector<int> NoiseMatrix)
+void TrgEclDataBase::MakeFitterCoefficient(const std::vector<int>& SignalPDF, std::vector<int> NoiseMatrix)
 {
   double DeltaTTT = 0.125;
   const  int NFitBin = 12; // The # of bin for fit

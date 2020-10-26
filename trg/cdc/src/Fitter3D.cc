@@ -1284,7 +1284,7 @@ namespace Belle2 {
     m_mVector_in["LR"] = vector<double> (9);
     m_mVector_in["driftLength"] = vector<double> (9);
     m_mVector_in["tdc"] = vector<double> (9);
-    if (m_mVector_in.find("mcLR") == m_mVector_in.end()) m_mVector_in["mcLR"] = vector<double> (9);
+    if (!m_mVector_in.count("mcLR")) m_mVector_in["mcLR"] = vector<double> (9);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
       if (m_mVector_in["useAxSl"][iAx] == 1) {
         const vector<TCLink*>& links = aTrack.links(iAx * 2);

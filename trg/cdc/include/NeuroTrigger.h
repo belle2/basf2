@@ -130,7 +130,7 @@ namespace Belle2 {
     void setConstants();
 
     /** set fixed point precision */
-    void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
+    void setPrecision(const std::vector<unsigned>& precision) { m_precision = precision; }
 
     /** set the hit collection and event time to required
      * and store the hit collection name */

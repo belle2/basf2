@@ -106,14 +106,14 @@ namespace Belle2 {
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
       unsigned id = list[i]->cell()->layerId();
-      if (id < 32) l0 |= (1 << id);
+      if (id < 32) l0 |= (1u << id);
       else         l1 |= (1 << (id - 32));
     }
 
     unsigned l = 0;
     for (unsigned i = 0; i < 32; i++) {
-      if (l0 & (1 << i)) ++l;
-      if (l1 & (1 << i)) ++l;
+      if (l0 & (1u << i)) ++l;
+      if (l1 & (1u << i)) ++l;
     }
     return l;
   }

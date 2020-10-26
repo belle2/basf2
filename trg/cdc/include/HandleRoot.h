@@ -60,7 +60,7 @@ namespace HandleRoot {
                       std::map<std::string, TVectorD*>& eventMapTVectorD,
                       std::map<std::string, double>& eventMapD, std::map<std::string, std::vector<double> >& eventMapV
                      );
-  void getTrackValues(std::string& prefix, int iTrack,
+  void getTrackValues(const std::string& prefix, int iTrack,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
                       std::map<std::string, double>& trackMapD, std::map<std::string, std::vector<double> >& trackMapV
                      );

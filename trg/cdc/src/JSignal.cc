@@ -1661,7 +1661,8 @@ namespace Belle2 {
     return (signed long long) FpgaUtility::roundInt(value / mother.m_toReal);
   }
 
-  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
+  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second,
+                                          int& type,
                                           int& bitwidth)
   {
     if (first.m_type != second.m_type) {

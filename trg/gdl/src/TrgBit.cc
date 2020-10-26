@@ -42,9 +42,12 @@ TrgBit::TrgBit(void)
       _ftdl.set(f32b, i);
       _psnm.set(p32b, i);
       for (unsigned j = 0; j < 32; j++) {
-        if (j + i * 32 < n_input) _itdVector.push_back((i32b & (1 << j)) ? 1 : 0);
-        if (j + i * 32 < n_output) _ftdVector.push_back((f32b & (1 << j)) ? 1 : 0);
-        if (j + i * 32 < n_output) _psnVector.push_back((p32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_input)
+          _itdVector.push_back((i32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_output) {
+          _ftdVector.push_back((f32b & (1 << j)) ? 1 : 0);
+          _psnVector.push_back((p32b & (1 << j)) ? 1 : 0);
+        }
       }
     }
     timtype = trgsum->getTimType();

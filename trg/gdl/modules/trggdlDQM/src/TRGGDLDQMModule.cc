@@ -569,7 +569,7 @@ void TRGGDLDQMModule::event()
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
-        if (itd_tmp[j] & (1 << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
+        if (itd_tmp[j] & (1u << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
       }
     }
     if (nconf == 0) {
@@ -578,7 +578,7 @@ void TRGGDLDQMModule::event()
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[0] & (1 << i)) h_p->SetBinContent(clk, i + 1, 1);
+        if (psn_tmp[0] & (1u << i)) h_p->SetBinContent(clk, i + 1, 1);
         if (ftd_tmp[0] & (1 << i)) h_f->SetBinContent(clk, i + 1, 1);
       }
       psn_tmp[1] = h_0->GetBinContent(clk, 1 + ee_psn[2]) * (1 << 16) + h_0->GetBinContent(clk, 1 + ee_psn[1]);
@@ -586,7 +586,7 @@ void TRGGDLDQMModule::event()
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[1] & (1 << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
+        if (psn_tmp[1] & (1u << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
@@ -596,7 +596,7 @@ void TRGGDLDQMModule::event()
         psn[j] |= psn_tmp[j];
         ftd[j] |= ftd_tmp[j];
         for (int i = 0; i < 32; i++) {
-          if (psn_tmp[j] & (1 << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
+          if (psn_tmp[j] & (1u << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
           if (ftd_tmp[j] & (1 << i)) h_f->SetBinContent(clk, i + 1 +  j * 32, 1);
         }
       }

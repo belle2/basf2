@@ -217,7 +217,7 @@ namespace Belle2 {
     /// Calculates integer value with unit of a TRGCDCJSignal.
     static signed long long calInt(double value, TRGCDCJSignal const& mother);
     /// Calculates vhdl bitwidth and type for operation.
-    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
+    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second, int& type,
                                     int& bitwidth);
     /// Initializes the argument signals for the signal.
     void initArgumentSignals();

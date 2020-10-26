@@ -663,7 +663,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
   //double E_br;  //variable not used
   //double E_fwd; //variable not used
-  double E_bwd;
+  //double E_bwd; //variable not used
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;
@@ -672,7 +672,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
     //if (iii < 3) {E_fwd += phiringsum[iii];} //TODO variable not used, should be?
     //if (iii > 2 && iii < 15) {E_br += phiringsum[iii];} //TODO not used, should be?
-    if (iii > 14) {E_bwd += phiringsum[iii];}
+    //if (iii > 14) {E_bwd += phiringsum[iii];} //TODO not used, should be?
     E_total += phiringsum[iii];
   }
   if (E_total == 0) {return;}

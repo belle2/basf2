@@ -179,7 +179,7 @@ namespace Belle2 {
                     TRGSignalVector* s);
 
     /// Simulate TSF response for the inner
-    vector<TRGSignalVector*> simulateInner(TRGSignalVector& in,
+    vector<TRGSignalVector*> simulateInner(const TRGSignalVector& in,
                                            unsigned id);
 
     /// Simulate TSF response for the inner

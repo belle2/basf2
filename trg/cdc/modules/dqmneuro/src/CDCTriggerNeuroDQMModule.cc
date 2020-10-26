@@ -2272,10 +2272,10 @@ void CDCTriggerNeuroDQMModule::event()
     }
   }
 
-  int nofouttracks = 0;
   int nofintracks = 0;
-  int nofinsegments = 0;
   if (m_unpackedNeuroTracksName != "") {
+    int nofouttracks = 0;
+    int nofinsegments = 0;
     // fill neurotrigger histograms
     for (CDCTriggerTrack& neuroTrack : m_unpackedNeuroTracks) {
       bool valtrack = false;
@@ -2290,7 +2290,7 @@ void CDCTriggerNeuroDQMModule::event()
         continue;
       }
       // count number of tracks
-      nofouttracks ++;
+      ++nofouttracks;
       // fill raw distributions
       m_neuroHWOutZ->Fill(neuroTrack.getZ0());
       double cotTh = neuroTrack.getCotTheta();
@@ -2538,7 +2538,7 @@ void CDCTriggerNeuroDQMModule::event()
       m_neuroHWOutVsInTrackCount->Fill((nofouttracks - nofintracks));
     }
     for (CDCTriggerSegmentHit& neuroinputsegment : m_unpackedNeuroInputSegments) {
-      nofinsegments ++;
+      ++nofinsegments;
       m_neuroHWInTSID->Fill(neuroinputsegment.getSegmentID());
       if (!m_limitedoutput) {
         unsigned int sl = neuroinputsegment.getISuperLayer();

@@ -577,7 +577,7 @@ namespace Belle2 {
       // Fill signal map for definition.
       {
         map<string, vector<int> >& t_signals = out.getCommonData()->m_signals;
-        if (t_signals.find(t_offsetOutput.getName()) == t_signals.end()) {
+        if (!t_signals.count(t_offsetOutput.getName())) {
           t_signals[t_offsetOutput.getName()] = {t_offsetOutput.getType(), (int)t_offsetOutput.getBitsize()};
         }
       }

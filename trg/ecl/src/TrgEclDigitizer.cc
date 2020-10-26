@@ -496,12 +496,12 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   double times_pileup   =  1;   // noise scale based on Belle noise.
   double times_parallel =  1;   // noise scale
   double times_serial   =  1;   // noise scale
-  double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
-  double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
-  corr_pileup   = 0.011068;
-  corr_parallel = 0.00727324;
-  corr_serial   = 0.0173925;
+  //double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
+  //double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
+  //double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
+  double corr_pileup   = 0.011068;
+  double corr_parallel = 0.00727324;
+  double corr_serial   = 0.0173925;
 
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
@@ -921,12 +921,13 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
 double TrgEclDigitizer::ShapeF(double t00, double ts1)
 {
+  static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
   double dzna;
   // double das1,das0,dac0;
-  double dcs0s, dsn0s, dcs0d, dsn0d;
-  double dcs1s, dsn1s, dcs1d, dsn1d;
-  double a1, a2, b1, b2, c1, c2;
+  double dcs0s = realNaN, dsn0s = realNaN, dcs0d, dsn0d;
+  double dcs1s = realNaN, dsn1s = realNaN, dcs1d, dsn1d;
+  double a1, a2, b1, b2, c1, c2 = realNaN;
   double sv123 = 0.0;
 
   if (t00 <= 0.0) return 0;

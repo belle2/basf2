@@ -28,7 +28,7 @@ public:
   static void writeSignals(std::string outFilePath, std::map<std::string, std::vector<signed long long> >& data);
   /// Writes multiple signal values to a file in coe format.
   static void multipleWriteCoe(int lutInBitsize, std::map<std::string, std::vector<signed long long> >& data,
-                               std::string fileDirectory);
+                               const std::string& fileDirectory);
   /// Writes a signal's values to a file in coe format.
   static void writeCoe(std::string outFilePath, int lutInBitsize, std::vector<signed long long>& data);
   /// Reads a coe format file and stores the values in vector.

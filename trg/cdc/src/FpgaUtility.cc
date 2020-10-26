@@ -211,7 +211,7 @@ void FpgaUtility::writeSignals(std::string outFilePath, std::map<std::string, st
 
 // COE file functions. [TODO] Should  limit number of entries for write functions.
 void FpgaUtility::multipleWriteCoe(int lutInBitsize, std::map<std::string, std::vector<signed long long> >& data,
-                                   std::string fileDirectory)
+                                   const std::string& fileDirectory)
 {
   // Loop over all data.
   for (auto it = data.begin(); it != data.end(); it++) {

@@ -376,7 +376,7 @@ namespace Belle2 {
             if (_debugLevel == 971 && ftdl_fired) {
               int i_ehigh    = m_InputBitsDB->getinbitnum("ehigh");
               int i_bha_veto = m_InputBitsDB->getinbitnum("bha_veto");
-              printf("TRGGDL:hie:i=%d,evt=%d,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
+              printf("TRGGDL:hie:i=%d,evt=%u,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
                      i, _evt, m_PrescalesDB->getprescales(i),
                      _inpBits[i_ehigh] ? 1 : 0,
                      _inpBits[i_bha_veto] ? 1 : 0,

@@ -41,7 +41,7 @@ void ParticleStatsModule::initialize()
       B2ERROR("ParticleStatsModule::initialize Invalid input DecayString " << m_strParticleLists[i]
               << ". DecayString should not contain any daughters, only the mother particle.");
   }
-  B2INFO("Number of ParticleLists to be studied " << m_nLists << " ");
+  B2INFO("Number of ParticleLists to be studied: " << m_nLists << " ");
 
   m_PassMatrix = new TMatrix(m_nLists, m_nLists + 1);
   m_MultiplicityMatrix = new TMatrix(m_nLists, 4); // 0 All particles; 1 Negative; 2 Positive; 3 SelfConjugated
@@ -115,7 +115,7 @@ void ParticleStatsModule::event()
 
   } // end outer loop over all particle lists
 
-  // finally cound the particles created in this event, and the number of events
+  // finally count the particles created in this event, and the number of events
   // passing any of the list selections that we were interested in
   m_nParticles += m_particles.getEntries();
   if (pass) m_nPass++;
@@ -128,8 +128,8 @@ void ParticleStatsModule::terminate()
   B2INFO("ParticleStats Summary:");
   std::ostringstream stream;
 
-  // divide every the pass matrix by the number of events processed (entrywise)
-  // to get the fraction of events
+  // divide every entry of the pass matrix by the number of events processed
+  // (entrywise) to get the fraction of events
   for (unsigned iList = 0; iList < m_nLists; ++iList)
     for (unsigned jList = 0; jList < m_nLists + 1; ++jList)
       (*m_PassMatrix)(iList, jList) = (*m_PassMatrix)(iList, jList) / nEvents;
@@ -143,7 +143,7 @@ void ParticleStatsModule::terminate()
 
     // format the pass matrix table
     stream << "=======================================================================\n";
-    stream << " Pass matrix (for i, j: fraction passing selection i also passes selection j)\n";
+    stream << " Pass matrix (for i, j: fraction passing selection i also passes selection j)\n\n";
     stream << "                  ";
 
     // table headings

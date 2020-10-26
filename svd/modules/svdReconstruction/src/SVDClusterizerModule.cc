@@ -366,13 +366,14 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //apply the Lorentz Shift Correction
   position = applyLorentzShiftCorrection(position, sensorID, isU);
 
-  //append the new cluster to the StoreArray
-  if (SNR > m_cutSeed)
+  //append the new cluster to the StoreArray...
+  if (SNR > m_cutSeed) {
     m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
                                          firstFrame));
 
-  // write relations
-  writeClusterRelations(rawCluster);
+    //..and write relations
+    writeClusterRelations(rawCluster);
+  }
 }
 
 void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawCluster)

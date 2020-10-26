@@ -30,8 +30,6 @@ if __name__ == "__main__":
     ignoreduplicatecalibrationlabel = 'duplicate label calibration'
     #: ignore framework description of role warnings (should be fixed)
     ignoreduplicatedescriptionofrole = 'duplicate description of role'
-    #: ignore warning from tools repository
-    ignorechoosingarelease = 'Choosing a release'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
     #: ignore online_book
@@ -53,7 +51,6 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignorechoosingarelease, x) or
                          re.findall(ignoreaddsimulation, x) or
                          re.findall(ignoreaddreconstruction, x) or
                          re.findall(ignoreincludeproblem, x) or
@@ -71,7 +68,6 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignorechoosingarelease, x) or
                          re.findall(ignoreonlinebook, x) or
                          re.findall(ignoregeometry, x)
                          )

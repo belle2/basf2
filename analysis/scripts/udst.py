@@ -171,7 +171,6 @@ def add_udst_dump(path, print_untested=False):
     # Define a list of all the udst dataobjects we want to print out
     # and all the members we want to check
     protected_udst_dataobjects = [
-        # DataStorePrinter("ParticleList", [], {}), # <--- !!
         DataStorePrinter(
             "Particle",
             [
@@ -223,7 +222,6 @@ def add_udst_dump(path, print_untested=False):
                 "getExtraInfoNames",
                 "getExtraInfoMap",
                 "getExtraInfoSize",
-                # "getArrayPointer",
                 "print",
             ],
             {
@@ -231,42 +229,15 @@ def add_udst_dump(path, print_untested=False):
                     "MCParticles",
                     "TrackFitResults",
                     "PIDLikelihoods"
-                    # "Tracks",
-                    # "ECLClusters",
-                    # "KLMClusters",
                 ],
                 "getMdstArrayIndices": eparticlesourceobjects,
-                # extra info
-                # ~~~~~~~~~~
                 "addExtraInfo": [["foo", 1337]],
                 "hasExtraInfo": ["foo", "bar"],
                 "getExtraInfo": ["foo"],
-                # "writeExtraInfo": [["foo", 1234]],
-                # "removeExtraInfo": ["foo"],
-                # daughters
-                # ~~~~~~~~~
                 "getDaughter": [0, 1],
                 "getCosHelicityDaughter": [0],
                 "getParticleFromGeneralizedIndexString": ["0:0", "0:1"],
-                # "forEachDaughter": [],
-                # "appendDaughter": [],
-                # "removeDaughter": [],
-                # compartison to another particle
-                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                # -- untestable with these tools? but also not an issue for
-                #    backwards compatibility
-                # "isCopyOf": [],
-                # "overlapsWith": [],
-                # setters
-                # ~~~~~~~
                 "updateMass": [13],
-                # "updateMomentum": [],
-                # "set4Vector": [],
-                # "setExtraInfo": [],
-                # "setMomentumVertexErrorMatrix": [],
-                # "setPValue": [],
-                # "setProperty": [],
-                # "setVertex": [],
             },
         ),
         DataStorePrinter(
@@ -276,7 +247,6 @@ def add_udst_dump(path, print_untested=False):
                 "getMap": [0],
                 "getIndex": [[0, "foo"], [0, "bar"]],
                 "getMapForNewVar": [["foo"], ["bar"]],
-                # "getMapForNewVar": []
             },
             array=False,
         ),
@@ -285,13 +255,11 @@ def add_udst_dump(path, print_untested=False):
             [
                 "getNames",
                 "getInfoHTML",
-                # removeExtraInfo",
             ],
             {
                 "addExtraInfo": [["foo", 1337]],
                 "hasExtraInfo": ["foo"],
                 "getExtraInfo": ["foo"],
-                # "setExtraInfo": []
             },
             array=False,
         ),

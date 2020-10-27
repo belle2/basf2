@@ -4,7 +4,6 @@
 """
 <header>
     <input>SVDValidationTTreeRecoDigit.root</input>
-    <input>SVDValidationTTreeStrip.root</input>
     <output>SVDRecoDigitPerformance.root</output>
     <description>
     Validation plots related to RecoDigit performance.
@@ -18,10 +17,8 @@
 from plotUtils import *
 
 inputRD = R.TFile.Open("../SVDValidationTTreeRecoDigit.root")
-inputS = R.TFile.Open("../SVDValidationTTreeStrip.root")
 
 treeRD = inputRD.Get("tree")
-treeS = inputS.Get("tree")
 
 histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
@@ -51,9 +48,9 @@ ploter(
     x_label='Strip charge (# of electrons)',
     y_label='counts',
     granules=gD,
-    tree=treeS,
-    expr='strip_charge',
+    tree=treeRD,
+    expr='recodigit_charge',
     cut='',
-    descr='Strip charge as the highest charge among its digits. For all RecoDigit related to one TrueHit.',
+    descr='Strip charge for all RecoDigits related to one TrueHit.',
     check='Distribution peak around 15-30 ke.',
     isShifter=False)

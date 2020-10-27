@@ -224,7 +224,7 @@ void SVDRecoDigitCreatorModule::event()
     int recoIndex = m_storeReco.getEntries() - 1;
     int shaperIndex = i;
     if (recoIndex != shaperIndex)
-      B2ERROR("incompatible SVDShaperDigit and sVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
+      B2ERROR("incompatible SVDShaperDigit and SVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
               recoIndex << " != " << shaperIndex << " = SVDShaperDigit index");
 
     vector<pair<unsigned int, float> > digit_weights;

@@ -83,6 +83,10 @@ namespace Belle2 {
     addParam("enforceFitHypothesis", m_enforceFitHypothesis,
              "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
              m_enforceFitHypothesis);
+
+    addParam("loadPhotonsFromKLM", m_loadPhotonsFromKLM,
+             "If true, create photon candidates from KLM cluster.",
+             false);
   }
 
   void ParticleLoaderModule::initialize()
@@ -205,8 +209,13 @@ namespace Belle2 {
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
-              B2INFO("   -> MDST source: ECLClusters");
               m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+              if (m_loadPhotonsFromKLM) {
+                m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+                B2INFO("   -> MDST source: ECLClusters and KLMClusters");
+              } else {
+                B2INFO("   -> MDST source: ECLClusters");
+              }
             } else {
               B2INFO("   -> MDST source: V0");
               m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
@@ -730,7 +739,7 @@ namespace Belle2 {
       }
     }
 
-    // load reconstructed neutral KLM cluster's as Klongs or neutrons
+    // load reconstructed neutral KLM clusters as Klongs or neutrons or photons
     for (int i = 0; i < m_klmclusters.getEntries(); i++) {
       const KLMCluster* cluster      = m_klmclusters[i];
 

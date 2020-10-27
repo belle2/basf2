@@ -91,12 +91,17 @@
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO]    -> With cuts  : isFromKLM
+[INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
+ ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -114,7 +119,22 @@
 [INFO] 
 ======================================================================
 Total Retention: 44199 events passing / 90000 events processed = 0.4911
-Total Number of Particles created in the DataStore: 15077401
+Total Number of Particles created in the DataStore: 16663097
+======================================================================
+
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+ gamma:fromKLM( 0)|    0.9162|   2.3651|   2.5815|   0.0000|   0.0000|   0.0000|   0.0000|   2.3651|   2.5815|
+
+[INFO] 
+======================================================================
+Total Retention: 82457 events passing / 90000 events processed = 0.9162
+Total Number of Particles created in the DataStore: 16663097
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -157,7 +177,7 @@ Lambda0:frommc( 6)|    0.1183|   0.1330|   1.1244|   0.0967|   0.8175|   0.0363|
 [INFO] 
 ======================================================================
 Total Retention: 90000 events passing / 90000 events processed = 1.0000
-Total Number of Particles created in the DataStore: 15077401
+Total Number of Particles created in the DataStore: 16663097
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -196,7 +216,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO] 
 ======================================================================
 Total Retention: 90000 events passing / 90000 events processed = 1.0000
-Total Number of Particles created in the DataStore: 15077401
+Total Number of Particles created in the DataStore: 16663097
 ======================================================================
 
 [WARNING] There were 518 v0s skipped because of same charge daughters for Lambda0
@@ -298,12 +318,17 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO]    -> With cuts  : isFromKLM
+[INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
+ ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -1731,6 +1756,89 @@ Total Number of Particles created in the DataStore: 15077401
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : gamma:fromKLM (0+4)
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=121 identifier=0 daughterIndices:  (none)
+ mass=0
+ momentum=(0.08, -1.01, -0.35) p=1.075
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=1 arrayIndex=122 identifier=1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.25, -0.24, -0.25) p=0.43
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=2 arrayIndex=123 identifier=2 daughterIndices:  (none)
+ mass=0
+ momentum=(-0.01, 0.18, 0.11) p=0.215
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=3 arrayIndex=124 identifier=3 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, -0.00, -0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] ParticleStats Summary:
 [INFO] 
 ======================================================================
@@ -1743,7 +1851,22 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO] 
 ======================================================================
 Total Retention: 0 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 117
+Total Number of Particles created in the DataStore: 125
+======================================================================
+
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+ gamma:fromKLM( 0)|    0.0000|   0.0000|   4.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0000|   4.0000|
+
+[INFO] 
+======================================================================
+Total Retention: 1 events passing / 90000 events processed = 0.0000
+Total Number of Particles created in the DataStore: 125
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -1786,7 +1909,7 @@ Lambda0:frommc( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|
 [INFO] 
 ======================================================================
 Total Retention: 1 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 117
+Total Number of Particles created in the DataStore: 125
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -1825,6 +1948,6 @@ Total Number of Particles created in the DataStore: 117
 [INFO] 
 ======================================================================
 Total Retention: 1 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 117
+Total Number of Particles created in the DataStore: 125
 ======================================================================
 

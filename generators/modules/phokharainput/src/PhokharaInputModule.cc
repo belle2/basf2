@@ -127,6 +127,13 @@ void PhokharaInputModule::initialize()
               "the results will be incorrect.");
     }
   }
+  if (m_finalState == 11 || m_finalState == 12) {
+    if (m_narres != 1 || m_LO != 0 || m_NLO != 0) {
+      B2FATAL("Generation of the chi_c1 or chi_c2 (final states 11 and 12, "
+              "respectively) requires to turn on the J/psi (NarrowRes = 1) "
+              "and use LO radiative-return mode (LO = 0, NLO = 0)");
+    }
+  }
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
   if (m_BeamEnergySpread) {
     m_initial.setAllowedFlags(BeamParameters::c_smearVertex |

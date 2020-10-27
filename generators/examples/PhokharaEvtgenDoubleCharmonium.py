@@ -7,11 +7,16 @@
 #
 # Author: Kirill Chilikin
 #
-# Example steering file
+# This is example of expert usage with setting and explanation of individual
+# generator parameters. If you just need to generate using the default settings,
+# please use generators.add_phokhara_evtgen_combination().
+# Example can be found in generators/validation/PhokharaEvtgenGenerate.py.
 ########################################################
 
 import basf2
 import beamparameters
+import pdg
+from ROOT import Belle2
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -106,7 +111,8 @@ phokhara.param('MinInvMassHadronsGamma', 0.)
 # Minimal hadrons/muons invariant mass squared [GeV^2]
 # original comment: minimal inv. mass squared of the hadrons(muons)
 # Set to sum the masses of final-state particles (J/psi and eta_c) squared.
-phokhara.param('MinInvMassHadrons', 36.932554310656)
+mass = pdg.get('J/psi').Mass() + pdg.get('eta_c').Mass()
+phokhara.param('MinInvMassHadrons', mass * mass)
 phokhara.param('ForceMinInvMassHadronsCut', True)
 
 # Maximal hadrons/muons invariant mass squared [GeV^2]
@@ -119,7 +125,8 @@ phokhara.param('MinEnergyGamma', 0.01)
 
 # EvtGen
 evtgendecay = basf2.register_module('EvtGenDecay')
-evtgendecay.param('UserDecFile', 'PhokharaEvtgenDoubleCharmonium.dec')
+decay_file = Belle2.FileSystem.findFile('generators/examples/PhokharaEvtgenDoubleCharmonium.dec')
+evtgendecay.param('UserDecFile', decay_file)
 
 # Output
 output = basf2.register_module('RootOutput')

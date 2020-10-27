@@ -160,7 +160,7 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
   double abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
 
-  // dstar momentum approximated colinear to pion direction
+  // dstar momentum approximated collinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
   TVector3 momentum_vec_dstar = abs_momentum_dstar * momentum_vector_pion.Unit();
 

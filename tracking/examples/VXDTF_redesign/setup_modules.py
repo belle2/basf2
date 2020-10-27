@@ -28,7 +28,7 @@ def setup_Geometry(path=None):
 
     """
 
-    basf2.B2WARNING("This function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
+    B2WARNING("This function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
 
 
 def setup_VXDTF2(path=None,
@@ -94,20 +94,24 @@ def setup_VXDTF2(path=None,
     secMapBootStrap.param('SetupToRead', "")
     modules.append(secMapBootStrap)
 
+    # Register EventLevelTrackingInfo
+    regEventLevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
+    modules.append(regEventLevelTrackingInfo)
+
     ##################
     # VXDTF2 Step 1
     # SegmentNet
     ##################
 
     segNetProducer = register_module('SegmentNetworkProducer')
-    segNetProducer.param('CreateNeworks', 3)
+    # segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', 'test2Hits')
     segNetProducer.param('allFiltersOff', not use_segment_network_filters)
     segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', setup_name)
     segNetProducer.param('addVirtualIP', False)
-    segNetProducer.param('observerType', observerType)
+    # segNetProducer.param('observerType', observerType)
     segNetProducer.logging.log_level = log_level
     segNetProducer.logging.debug_level = debug_level
     modules.append(segNetProducer)

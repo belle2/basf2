@@ -35,3 +35,5 @@ Modules
  * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument
    ``dmID``. One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation``
    (true by default).
+ * The special treatment of MCMatching for the tau-decay is fixed. The treatment was working fine in release-04, but it was broken
+   in the release-05.

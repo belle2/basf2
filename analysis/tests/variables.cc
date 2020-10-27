@@ -1028,6 +1028,32 @@ namespace {
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+
+    // sin 30 = 0.5
+    var = Manager::Instance().getVariable("sin(0.5235987755983)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // sin 90 = 1
+    var = Manager::Instance().getVariable("sin(1.5707963267948966)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    // asin 1 = 90
+    var = Manager::Instance().getVariable("asin(1.0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
+    // cos 60 = 0.5
+    var = Manager::Instance().getVariable("cos(1.0471975511965976)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // acos 0 = 90
+    var = Manager::Instance().getVariable("acos(0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
   }
 
   TEST_F(MetaVariableTest, formula)

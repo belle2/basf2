@@ -71,181 +71,181 @@ namespace Belle2 {
     /**
      * Returns BTag Vertex
      */
-    TVector3 getTagVertex();
+    TVector3 getTagVertex() const;
 
     /**
      * Returns BTag Vertex (3x3) error matrix
      */
-    TMatrixDSym getTagVertexErrMatrix();
+    TMatrixDSym getTagVertexErrMatrix() const;
 
     /**
      * Returns BTag Vertex P value
      */
-    float getTagVertexPval();
+    float getTagVertexPval() const;
 
     /**
      * Returns a ptr to the particle constructed from the tag vtx track indexed by trackIndex
      */
-    const Particle* getVtxFitParticle(unsigned int trackIndex);
+    const Particle* getVtxFitParticle(unsigned int trackIndex) const;
 
     /**
      * Returns a ptr to the MC particle matched to the tag vtx track indexed by trackIndex
      */
-    const MCParticle* getVtxFitMCParticle(unsigned int trackIndex);
+    const MCParticle* getVtxFitMCParticle(unsigned int trackIndex) const;
 
     /**
      * Returns DeltaT
      */
-    float getDeltaT();
+    float getDeltaT() const;
 
     /**
      * Returns DeltaTErr
      */
-    float getDeltaTErr();
+    float getDeltaTErr() const;
 
     /**
      * Returns generated BTag Vertex
      */
-    TVector3 getMCTagVertex();
+    TVector3 getMCTagVertex() const;
 
     /**
      * Returns generated Btag PDG code
      */
-    int getMCTagBFlavor();
+    int getMCTagBFlavor() const;
 
     /**
      * Returns generated DeltaTau
      */
-    float getMCDeltaTau();
+    float getMCDeltaTau() const;
 
     /**
      * Returns mc DeltaT (in kin. approximation)
      */
-    float getMCDeltaT();
+    float getMCDeltaT() const;
 
     /**
      * Returns fit algo type
      */
-    int getFitType() ;
+    int getFitType() const;
 
     /**
      * get the constraint type used in the tag fit
      */
 
-    std::string getConstraintType();
+    std::string getConstraintType() const;
 
     /**
      * Returns number of tracks used in the fit
      */
-    int getNTracks() ;
+    int getNTracks() const;
 
     /**
      * Returns number of tracks used in the fit (not counting the ones removed because they come from Kshorts)
      */
-    int getNFitTracks() ;
+    int getNFitTracks() const;
 
     /**
      * Returns the tagV component in the boost direction
      */
-    float getTagVl() ;
+    float getTagVl() const;
 
     /**
      * Returns the MC tagV component in the boost direction
      */
-    float getTruthTagVl() ;
+    float getTruthTagVl() const;
 
     /**
      * Returns the error of the tagV component in the boost direction
      */
-    float getTagVlErr() ;
+    float getTagVlErr() const;
 
     /**
      * Returns the tagV component in the direction orthogonal to the boost
      */
-    float getTagVol() ;
+    float getTagVol() const;
 
     /**
      * Returns the MC tagV component in the direction orthogonal to the boost
      */
-    float getTruthTagVol() ;
+    float getTruthTagVol() const;
 
     /**
      * Returns the error of the tagV component in the direction orthogonal to the boost
      */
-    float getTagVolErr() ;
+    float getTagVolErr() const;
 
     /**
      * Returns the number of degrees of freedom in the tag vertex fit
      */
-    float getTagVNDF() ;
+    float getTagVNDF() const;
 
     /**
      * Returns the chi^2 value of the tag vertex fit result
      */
-    float getTagVChi2() ;
+    float getTagVChi2() const;
 
     /**
      * Returns the IP component of the chi^2 value of the tag vertex fit result
      */
-    float getTagVChi2IP() ;
+    float getTagVChi2IP() const;
 
     /**
      *
      *  Returns the position of the constraint, ie centre of the constraint ellipse
      */
 
-    TVector3 getConstraintCenter();
+    TVector3 getConstraintCenter() const;
 
     /**
      * Get the covariance matrix of the constraint for the tag fit
      */
 
-    TMatrixDSym getConstraintCov();
+    TMatrixDSym getConstraintCov() const;
 
     /**
      * Returns the position vector (X, Y, Z) of the tag track indexed by trackindex
      */
 
-    TVector3 getVtxFitTrackPosition(unsigned int trackIndex);
+    TVector3 getVtxFitTrackPosition(unsigned int trackIndex) const;
 
     /**
      * Returns the momentum vector of the tag track indexed by trackindex
      */
 
-    TVector3 getVtxFitTrackP(unsigned int trackIndex);
+    TVector3 getVtxFitTrackP(unsigned int trackIndex) const;
 
     /**
      * Returns one of the 3 components of the momentum of tag track indexed by trackindex
      */
-    double getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component);
+    double getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component) const;
 
     /**
      * Returns the longitudinal distance from the IP to the POCA of the tag track indexed by trackIndex
      */
 
-    double getVtxFitTrackZ0(unsigned int trackIndex);
+    double getVtxFitTrackZ0(unsigned int trackIndex) const;
 
     /**
      * Returns the radial distance from the IP to the POCA of the tag track indexed by trackIndex
      */
 
-    double getVtxFitTrackD0(unsigned int trackIndex);
+    double getVtxFitTrackD0(unsigned int trackIndex) const;
 
     /**
      * Returns the weight assigned by Rave to the track indexed by trackIndex
      */
 
-    double getRaveWeight(unsigned int trackIndex);
+    double getRaveWeight(unsigned int trackIndex) const;
 
     /**
      * Get the status of the fit performed with the truth info of the tracks
      */
-    int getFitTruthStatus();
+    int getFitTruthStatus() const;
 
     /**
      * Get the status of the fit performed with the rolled back tracks
      */
-    int getRollBackStatus();
+    int getRollBackStatus() const;
 
     // set methods
 

@@ -77,52 +77,52 @@ void FlavorTaggerInfoMap::setB0barProbability(float B0barProbability)
 /************************GETTERS***********************/
 
 
-std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetTrackLevel()
+std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetTrackLevel() const
 {
   return m_targetTrackLevel;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getProbTrackLevel()
+std::map<std::string, float> FlavorTaggerInfoMap::getProbTrackLevel() const
 {
   return m_probTrackLevel;
 }
 
-std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetEventLevel()
+std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetEventLevel() const
 {
   return m_targetEventLevel;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getProbEventLevel()
+std::map<std::string, float> FlavorTaggerInfoMap::getProbEventLevel() const
 {
   return m_probEventLevel;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getQpCategory()
+std::map<std::string, float> FlavorTaggerInfoMap::getQpCategory() const
 {
   return m_qpCategory;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getHasTrueTarget()
+std::map<std::string, float> FlavorTaggerInfoMap::getHasTrueTarget() const
 {
   return m_hasTrueTarget;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getIsTrueCategory()
+std::map<std::string, float> FlavorTaggerInfoMap::getIsTrueCategory() const
 {
   return m_isTrueCategory;
 }
 
-float FlavorTaggerInfoMap::getQrCombined()
+float FlavorTaggerInfoMap::getQrCombined() const
 {
   return m_qrCombined;
 }
 
-float FlavorTaggerInfoMap::getB0Probability()
+float FlavorTaggerInfoMap::getB0Probability() const
 {
   return m_B0Probability;
 }
 
-float FlavorTaggerInfoMap::getB0barProbability()
+float FlavorTaggerInfoMap::getB0barProbability() const
 {
   return m_B0barProbability;
 }

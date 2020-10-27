@@ -35,6 +35,8 @@ Variables
  * Added the new variable :b2:var:`mcCosThetaBetweenParticleAndNominalB`. This is an MC version of
    :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
    during the calculation.
+ * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
+ * Added new variables :b2:var:`exp` and :b2:var:`log`.
 
 Modules
 +++++++

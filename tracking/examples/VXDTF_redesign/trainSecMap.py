@@ -15,8 +15,10 @@
 # commandline arguments specifically for this script.
 # The file name under which the trained SecMap will be stored can be
 # specified via the argument --secmap
+# The pruning of the X least used relations can be specified via
+# the argument --threshold X
 #
-# Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root
+# Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root --threshold 70
 #
 #
 # Contributors: Jonas Wagner, Felix Metzner
@@ -25,6 +27,7 @@
 from basf2 import *
 import sys
 import argparse
+import os
 
 
 # ---------------------------------------------------------------------------------------
@@ -33,14 +36,21 @@ arg_parser = argparse.ArgumentParser(description='Sector Map Training:\
                                      Trains and stores SecMap from provided data sample.\n\
                                      Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root')
 
-arg_parser.add_argument('--train_sample', '-i', type=str, action='append',
+arg_parser.add_argument('--train_sample', '-i', type=str, nargs='*',
                         help='List of prepared training data file names which will be used for the training of the SecMap')
 arg_parser.add_argument('--secmap', '-s', type=str,
                         help='Inclusion of the root file containing the trained SecMap for the application of the VXDTF2.')
+arg_parser.add_argument(
+    '--threshold',
+    '-t',
+    type=int,
+    default=70,
+    help='Relative threshold (in %) used to prune the sector maps. Will remove X % of the least used subgraphs.')
 
 arguments = arg_parser.parse_args(sys.argv[1:])
 train_data = arguments.train_sample
 secmap_name = arguments.secmap
+relThreshold = arguments.threshold
 assert len(train_data) > 0, 'No data sample for training provided!'
 
 # ---------------------------------------------------------------------------------------
@@ -87,6 +97,7 @@ path.add_module(secMapBootStrap)
 # Perform SecMap Training on provided data sample
 merger = register_module('RawSecMapMerger')
 merger.param('rootFileNames', train_data)
+merger.param('threshold', relThreshold)
 path.add_module(merger)
 
 print_path(path)

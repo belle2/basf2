@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import inspect
 import unittest
+
 from basf2 import create_path
 import stdPi0s
 
@@ -41,6 +43,28 @@ class TestStdPi0s(unittest.TestCase):
     def test_nonsense_list(self):
         """check that the builder function raises a ValueError for a non-existing list name"""
         self.assertRaises(ValueError, self._check_list, "flibble")
+
+    def test_default_list_exists(self):
+        """
+        Check that the default list type is one of the lists in the cases that are checked for in :func:`stdPi0s.stdPi0s`.
+
+        This test relies on ``ValueError`` being raised for nonsense list types, which is tested by
+        :func:`test_nonsense_list`.  However, :func:`test_nonsense_list` doesn't ensure that the default list works, so
+        for that this test is needed.
+        """
+        test_path = create_path()
+        try:
+            stdPi0s.stdPi0s(path=test_path)
+        except ValueError:
+            stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
+            default_listtype = stdPi0s_signature.parameters["listtype"].default
+            self.fail(f"stdPi0s default listtype {default_listtype} is not in set of allowed list names.")
+
+    def test_default_list_works(self):
+        """Check that the default list type works."""
+        stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
+        default_listtype = stdPi0s_signature.parameters["listtype"].default
+        self._check_list(expected_lists=["pi0" + default_listtype, default_listtype])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""

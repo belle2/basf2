@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ROOT import EventData
 import sys
 import math
 from basf2 import *
@@ -40,8 +41,6 @@ gROOT.ProcessLine('struct EventData {\
 };'
                   )
 
-from ROOT import EventData
-
 
 class PXDHitErrorsTTree(Module):
 
@@ -66,7 +65,13 @@ class PXDHitErrorsTTree(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(
+                    key,
+                    AddressOf(
+                        self.data,
+                        key),
+                    key +
+                    formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -105,8 +110,10 @@ class PXDHitErrorsTTree(Module):
                 self.data.truehit_v = truehit.getV()
                 self.data.truehit_time = truehit.getGlobalTime()
                 self.data.truehit_charge = truehit.getEnergyDep()
-                self.data.theta_u = math.atan2(truehit.getExitU() - truehit.getEntryU(), thickness)
-                self.data.theta_v = math.atan2(truehit.getExitV() - truehit.getEntryV(), thickness)
+                self.data.theta_u = math.atan2(
+                    truehit.getExitU() - truehit.getEntryU(), thickness)
+                self.data.theta_v = math.atan2(
+                    truehit.getExitV() - truehit.getEntryV(), thickness)
                 # Cluster information
                 self.data.cluster_u = cluster.getU()
                 self.data.cluster_v = cluster.getV()
@@ -118,8 +125,10 @@ class PXDHitErrorsTTree(Module):
                 self.data.cluster_size = cluster.getSize()
                 self.data.cluster_uSize = cluster.getUSize()
                 self.data.cluster_vSize = cluster.getVSize()
-                self.data.cluster_uPull = (cluster.getU() - truehit.getU()) / cluster.getUSigma()
-                self.data.cluster_vPull = (cluster.getV() - truehit.getV()) / cluster.getVSigma()
+                self.data.cluster_uPull = (
+                    cluster.getU() - truehit.getU()) / cluster.getUSigma()
+                self.data.cluster_vPull = (
+                    cluster.getV() - truehit.getV()) / cluster.getVSigma()
                 self.file.cd()
                 self.tree.Fill()
 

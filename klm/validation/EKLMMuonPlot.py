@@ -34,7 +34,7 @@ functions.Add(TNamed('Check', 'No bias.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-eklm_digits_tres = ROOT.TH1F('eklm_digits_tres', 'KLMDigits time resolution in EKLM',
+eklm_digits_tres = ROOT.TH1F('eklm_digits_tres', 'KLMDigits Time resolution in EKLM',
                              250, -25, 25)
 eklm_digits_tres.SetXTitle('ns')
 eklm_digits_tres.SetYTitle('Events')

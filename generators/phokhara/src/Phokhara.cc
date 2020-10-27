@@ -105,7 +105,7 @@ void Phokhara::setDefaultSettings()
 //   m_LO = 1;
 //   m_NLO = 0;
 //   m_QED = 0;
-//   m_NLOIFI = 0;
+//   m_IFSNLO = 0;
 //   m_alpha = 1;
 //   m_pionff = 0;
 //   m_pionstructure = 0;
@@ -125,10 +125,12 @@ void Phokhara::setDefaultSettings()
   m_nMaxTrials = -1;
   m_nSearchMax = -1;
   m_epsilon = 1.e-4;
+  m_weighted = 0;
   m_LO = -1;
   m_NLO = -1;
+  m_fullNLO = -1;
   m_QED = -1;
-  m_NLOIFI = -1;
+  m_IFSNLO = -1;
   m_alpha = -1;
   m_pionff = -1;
   m_pionstructure = -1;
@@ -142,6 +144,9 @@ void Phokhara::setDefaultSettings()
   m_ForceMinInvMassHadronsCut = false;
   m_MaxInvMassHadrons = 0.;
   m_MinEnergyGamma = 0.;
+  m_chi_sw = 0;
+  m_be_r = 0;
+  m_beamres = 0.;
 
   m_pi = 0.;
   m_conversionFactor = 0.;
@@ -281,17 +286,21 @@ void Phokhara::applySettings()
   //--------------------
   m_npar[1]   = m_nMaxTrials;
   m_npar[2]   = m_nSearchMax;
+  m_npar[3]   = m_weighted;
   m_npar[20]  = m_finalState;
   m_npar[30]  = m_LO;
   m_npar[31]  = m_NLO;
   m_npar[32]  = m_QED;
-  m_npar[33]  = m_NLOIFI;
+  m_npar[33]  = m_IFSNLO;
   m_npar[34]  = m_alpha;
   m_npar[35]  = m_pionff;
   m_npar[36]  = m_pionstructure;
   m_npar[37]  = m_kaonff;
   m_npar[38]  = m_narres;
   m_npar[39]  = m_protonff;
+  m_npar[40]  = m_fullNLO;
+  m_npar[50]  = m_chi_sw;
+  m_npar[51]  = m_be_r;
 
   //--------------------
   // Double parameters
@@ -308,6 +317,8 @@ void Phokhara::applySettings()
   m_xpar[21] = m_ScatteringAngleRangePhoton.second;
   m_xpar[22] = m_ScatteringAngleRangeFinalStates.first;
   m_xpar[23] = m_ScatteringAngleRangeFinalStates.second;
+
+  m_xpar[30] = m_beamres;
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
   phokhara(&mode, m_xpar, m_npar);

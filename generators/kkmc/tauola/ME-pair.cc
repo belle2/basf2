@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <iostream>
 #include <complex>
-//#include "MEutils.h"
 #include "ME-pair.hh"
 using namespace std;
 
@@ -73,12 +72,10 @@ void eepi_(const float* pt, const float* pn, const float* p1, const float* p2, c
 {
 
   double Mtau = 1.777;
-  double Mnu = 0.0; // 0.01
   double me = 0.000511;
   double Gf = 0.0000116637;
   double fpi = 0.0922;
   double vud = 0.9742;
-
 
   float p23[4]; // momentum of e- e+ pair
   p23[3] = p3[3] + p2[3];
@@ -114,7 +111,6 @@ void eepi_(const float* pt, const float* pn, const float* p1, const float* p2, c
   ptq[1] = pn[1] * pt[1];
   ptq[0] = pn[0] * pt[0];
   float ptpn = ptq[3] - ptq[2] - ptq[1] - ptq[0];
-
 
   float pp[4];
   pp[3] = p2[3] * p3[3];
@@ -167,8 +163,6 @@ void eepi_(const float* pt, const float* pn, const float* p1, const float* p2, c
 
   float ptsq = pt[3] * pt[3] - pt[2] * pt[2] - pt[1] * pt[1] - pt[0] * pt[0];
   float p1sq = p1[3] * p1[3] - p1[2] * p1[2] - p1[1] * p1[1] - p1[0] * p1[0];
-
-
 
   // eq. 31 of https://arxiv.org/pdf/1306.1732.pdf
   float d1, d2;  //denominator parts
@@ -225,12 +219,10 @@ void mumupi_(const float* pt, const float* pn, const float* p1, const float* p2,
 {
 
   double Mtau = 1.777;
-  double Mnu = 0.0; // 0.01
   double me = 0.1056584;
   double Gf = 0.0000116637;
   double fpi = 0.0922;
   double vud = 0.9742;
-
 
   float p23[4]; // momentum of pair
   p23[3] = p3[3] + p2[3];
@@ -266,7 +258,6 @@ void mumupi_(const float* pt, const float* pn, const float* p1, const float* p2,
   ptq[1] = pn[1] * pt[1];
   ptq[0] = pn[0] * pt[0];
   float ptpn = ptq[3] - ptq[2] - ptq[1] - ptq[0];
-
 
   float pp[4];
   pp[3] = p2[3] * p3[3];
@@ -319,8 +310,6 @@ void mumupi_(const float* pt, const float* pn, const float* p1, const float* p2,
 
   float ptsq = pt[3] * pt[3] - pt[2] * pt[2] - pt[1] * pt[1] - pt[0] * pt[0];
   float p1sq = p1[3] * p1[3] - p1[2] * p1[2] - p1[1] * p1[1] - p1[0] * p1[0];
-
-
 
   // eq. 31 of https://arxiv.org/pdf/1306.1732.pdf
   float d1, d2;  //denominator parts
@@ -377,10 +366,6 @@ void eemu_(const float* pt, const float* pn, const float* p1, const float* p2, c
            float* hv)
 {
 //we assume order: neutrino, muon, electron, positron
-  double Gf = 1.16637E-5;
-  double me = 0.000511;
-  double mmu = 0.10566;
-  double Mtau = 1.777;
 
   double p34[4];
   p34[3] = p3[3] + p4[3];
@@ -388,33 +373,14 @@ void eemu_(const float* pt, const float* pn, const float* p1, const float* p2, c
   p34[1] = p3[1] + p4[1];
   p34[0] = p3[0] + p4[0];
 
-//double p234[4];
-  float p234[4];
-
-  p234[3] = p2[3] + p3[3] + p4[3];
-  p234[2] = p2[2] + p3[2] + p4[2];
-  p234[1] = p2[1] + p3[1] + p4[1];
-  p234[0] = p2[0] + p3[0] + p4[0];
-
-  double pl[4];
-  pl[3] = p2[3] + p1[3] + pn[3];
-  pl[2] = p2[2] + p1[2] + pn[2];
-  pl[1] = p2[1] + p1[1] + pn[1];
-  pl[0] = p2[0] + p1[0] + pn[0];
-
-  double pl2 = pl[3] * pl[3] - pl[2] * pl[2] - pl[1] * pl[1] - pl[0] * pl[0];
-
   double col[4];
   col[3] = p2[3] * p34[3];
   col[2] = p2[2] * p34[2];
   col[1] = p2[1] * p34[1];
   col[0] = p2[0] * p34[0];
 
-  double p2sq = p2[3] * p2[3] - p2[2] * p2[2] - p2[1] * p2[1] - p2[0] * p2[0];
-
   double pk = col[3] - col[2] - col[1] - col[0];
   double m2ee = p34[3] * p34[3] - p34[2] * p34[2] - p34[1] * p34[1] - p34[0] * p34[0];
-  double col2 = col[3] * col[3] - col[2] * col[2] - col[1] * col[1] - col[0] * col[0];
 
   double ptk[4];
   ptk[3] = pt[3] * p34[3];
@@ -441,11 +407,7 @@ void eemu_(const float* pt, const float* pn, const float* p1, const float* p2, c
   p4PP = p4[3] * PP[3] - p4[2] * PP[2] - p4[1] * PP[1] - p4[0] * PP[0];
 
 
-
-//amplit = 4*p2sq/(2*pk+m2ee)/(2*pk+m2ee)/m2ee/m2ee; // matrix element squared
-//amplit=1/m2ee/m2ee;
-
-  double ampser, ce, ampser2;
+  double ampser, ce;
   ce = 4.*(16.*M_PI * M_PI / 137. / 137.);
   ampser = (4.*p3PP * p4PP - m2ee * PPsq) / (2.*m2ee * m2ee) * ce;
 
@@ -454,35 +416,26 @@ void eemu_(const float* pt, const float* pn, const float* p1, const float* p2, c
   hv[0] = 0.0;
   hv[1] = 0.0;
   hv[2] = 0.0;
-//amplit = (float)nunul(p234,pn,p1,ak0,hv);
   amplit = (float)nunul_(p2, pn, p1, ak0, hv) * ampser;
 
 }
 
-
 double nunul_(const float* pl, const float* pnu, const float* pnl, float ak0, float* hv)
 {
 
-  double p234[4];
-  p234[3] = pl[3] + pnu[3] + pnl[3];
-  p234[2] = pl[2] + pnu[2] + pnl[2];
-  p234[1] = pl[1] + pnu[1] + pnl[1];
-  p234[0] = pl[0] + pnu[0] + pnl[0];
+  double Mtau = 1.777;
 
-  double Mtau = 1.777; //sqrt(p234[3]*p234[3]-p234[2]*p234[2]-p234[1]*p234[1]-p234[0]*p234[0]);
-//1.777;
   double Mnu = 0.0; // 0.01
   double Gf = 1.16637E-5;
   double alpha = 137.03604;
   double Msq = Mtau * Mtau;
   double pr[4];
   double rxnl[3], rxnu[3], rxl[3];
+  pr[0] = 0.0;
+  pr[1] = 0.0;
+  pr[2] = 0.0;
   pr[3] = Mtau;
   for (int i = 0; i < 3; i++) {
-    pr[0] = 0.0;
-    pr[1] = 0.0;
-    pr[2] = 0.0;
-    pr[i] = Mtau;
     rxnl[i] = pr[3] * pnl[3] - pr[2] * pnl[2] - pr[1] * pnl[1] - pr[0] * pnl[0];
     rxnu[i] = pr[3] * pnu[3] - pr[2] * pnu[2] - pr[1] * pnu[1] - pr[0] * pnu[0];
     rxl[i] = pr[3] * pl[3] - pr[2] * pl[2] - pr[1] * pl[1] - pr[0] * pl[0];
@@ -497,10 +450,10 @@ double nunul_(const float* pl, const float* pnu, const float* pnl, float ak0, fl
   um = u0 - u3;
   wp = w0 + w3;
   wm = w0 - w3;
-  yu = log(up / um) / 2.;
-  yw = log(wp / wm) / 2.;
+  yu = (up / um) > 0 ? log(up / um) / 2. : 0;
+  yw = (wp / wm) > 0 ? log(wp / wm) / 2. : 0;
   eps2 = u0 * u0 - u3 * u3;
-  eps = sqrt(eps2);
+  eps = eps2 > 0 ? sqrt(eps2) : 0;
   y = w0 * w0 - w3 * w3;
   al = ak0 / Mtau;
 
@@ -525,10 +478,15 @@ double nunul_(const float* pl, const float* pnu, const float* pnl, float ak0, fl
 //     DECAY DIFFERENTIAL WIDTH WITHOUT AND WITH POLARIZATION
   double c3, am3, xm3;
   c3 = 1. / (2.*alpha * M_PI) * 64.*Gf * Gf;
-//    if(itdkrc==0) c3=0.0;
   xm3 = -(f0 * lxnu * mxnl + fp * eps2 * mxnu * mxnl + fm * lxnu * lxnl + f3 * Msq * nuxnl);
-  am3 = 0.0; // xm3*c3;
-//    am3=xm3*c3;
+  am3 = 0.0 * xm3 * c3;
+  if (isnan(xm3)) {
+    cout << up << " " << um << " " << yu << endl;
+    cout << wp << " " << wm << " " << yw << endl;
+    cout << eps2 << " " << f0 << " " << fp << " " << fm << " " << f3 << " " << c3 << endl;
+    am3 = 0.0;
+  }
+
 //     V-A  AND  V+A COUPLINGS, BUT IN THE BORN PART ONLY
   double brak, gv, ga, born, xm3pol[3], am3pol[3], bornp[3];
   gv = 1.;
@@ -541,7 +499,8 @@ double nunul_(const float* pl, const float* pnu, const float* pnl, float ak0, fl
     xm3pol[i] = -(f0 * lxnu * rxnl[i] + fp * eps2 * mxnu * rxnl[i]
                   + fm * lxnu * (lxnl + (rxnl[i] * mxl - mxnl * rxl[i]) / Msq)
                   + f3 * (Msq * nuxnl + mxnu * rxnl[i] - rxnu[i] * mxnl));
-    am3pol[i] = 0.0; // xm3pol[i]*c3;
+    am3pol[i] = 0.0 * xm3pol[i] * c3;
+    if (isnan(xm3pol[i])) am3pol[i] = 0.0;
 //     V-A  AND  V+A COUPLINGS, BUT IN THE BORN PART ONLY
     bornp[i] = born + ((gv + ga) * (gv + ga) * Mtau * nuxnl * pl[i]
                        - (gv + ga) * (gv + ga) * Mtau * lxnu * pnu[i]
@@ -553,21 +512,16 @@ double nunul_(const float* pl, const float* pnu, const float* pnl, float ak0, fl
   double tbh;
   tbh = born + am3;
   if (isnan(tbh)) {
-    cout << f0 << yw << wm << wp << " " << w0 << " " << w3 << endl;
-    exit(-1);
+    cout << f0 << yw << wm << wp << " " << w0 << " " << w3 << " " << xm3pol[3] << endl;
+    tbh = 0.0;
+    return tbh;
   }
   if (tbh / born < 0.1) {
     cout << "ERROR in nunul (matrix element)" << tbh / born << endl;
     tbh = 0.0;
     return tbh;
   }
-//    if(tbh!=0.0) cout<<"amplit= "<< tbh << endl;
+  // if(tbh!=0.0) cout<<"amplit= "<< tbh << endl;
   return tbh;
 }
 
-void demo_mu_(const float* pt, const float* pn, const float* pnu_mu, const float* pmu, float& amplit, float* hv)
-{
-  double ak0 = 0.001 * 1.777;
-  hv[3] = 1.0;
-  amplit = nunul_(pmu, pn, pnu_mu, ak0, hv);
-}

@@ -141,7 +141,7 @@ void KKGenInputModule::initializeGenerator()
 
 
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Info, 100, 100);
-  initLogCapture.start();
+  //  initLogCapture.start();
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
@@ -151,7 +151,7 @@ void KKGenInputModule::initializeGenerator()
 
   //set the beam parameters, ignoring beam energy spread for the moment
   m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);
-  initLogCapture.finish();
+  //  initLogCapture.finish();
 
   m_initialized = true;
 

@@ -221,7 +221,7 @@ public :
 };
 
 //TODO what is the #if to this?
-#endif
+//#endif
 
 #ifdef eclChargedPidSelector_cxx
 void eclChargedPidSelector::Init(TTree* tree)

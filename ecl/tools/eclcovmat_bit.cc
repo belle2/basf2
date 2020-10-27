@@ -495,26 +495,10 @@ void bit(int num, char* inputPath)
     //%%%%%%%%%%%%%%%%%%%adduction to integer
 
     constexpr int n16 = 16;
-
-
-    //const int ipardsp13 = 14 + 14 * 256; TODO variable unused
     const int ipardsp14 = 0 * 256 + 17;
-
-    //const int ibb = ipardsp13 / 256; TODO variable unused
-    //const int iaa = ipardsp13 - ibb * 256; TODO is this var useful?
     idd = ipardsp14 / 256;
-//     const int icc = ipardsp14 - idd * 256; //Value never used (AH)
-
-
-
-
-
-    //int ia = myPow(2, iaa); TODO is this line useful? Since ia value is not used aftervards...
-//     const int ib = myPow(2, ibb); //ib value unused (AH)
-
-//     const int ic = myPow(2, icc); //ic value unused (AH)
     i16 = myPow(2, 15);
-//     const int ilim = myPow(2, 15); //ilim value unused (AH)
+
 
     for (i = 0; i < 16; i++) {
       if (i == 0) {

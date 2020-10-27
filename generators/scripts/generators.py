@@ -603,7 +603,7 @@ def add_phokhara_evtgen_combination(
     phokhara.param('QED', 0)
 
     # No interference.
-    phokhara.param('NLOIFI', 0)
+    phokhara.param('IFSNLO', 0)
 
     # Vacuum polarization by Fred Jegerlehner.
     phokhara.param('Alpha', 1)

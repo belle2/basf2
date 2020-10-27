@@ -83,6 +83,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
   }
   return result;
 }
+
 std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName, bool unpackComposite) const
 {
   auto particles = getParticles(maskName, unpackComposite);
@@ -94,6 +95,7 @@ std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName
   }
   return photons;
 }
+
 std::vector<const Particle*> RestOfEvent::getHadrons(const std::string& maskName, bool unpackComposite) const
 {
   auto particles = getParticles(maskName, unpackComposite);
@@ -306,71 +308,39 @@ RestOfEvent::Mask* RestOfEvent::findMask(const std::string& name)
   return nullptr;
 
 }
-std::vector<const Track*> RestOfEvent::getTracks(const std::string& maskName) const
-{
-  std::vector<const Track*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-      result.push_back(particle->getTrack());
-    }
-  }
-  return result;
-}
-std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& maskName) const
-{
-  std::vector<const ECLCluster*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    //Get all ECL clusters independently of the particle type, (both charged and neutral)
-    auto* cluster = particle->getECLCluster();
-    if (cluster and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-      result.push_back(cluster);
-    }
-  }
-  return result;
-}
-std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& maskName) const
-{
-  std::vector<const KLMCluster*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
-      result.push_back(particle->getKLMCluster());
-    }
-  }
-  return result;
-}
 
 int RestOfEvent::getNTracks(const std::string& maskName) const
 {
-  int nTracks = getTracks(maskName).size();
+  int nTracks = getChargedParticles(maskName).size();
   return nTracks;
 }
 
 int RestOfEvent::getNECLClusters(const std::string& maskName) const
 {
-  int nROEECLClusters = getECLClusters(maskName).size();
-  return nROEECLClusters;
+  int nROEneutralECLClusters = getPhotons(maskName).size();
+  int nROEchargedECLClusters = 0;
+  for (auto& roeParticle : getChargedParticles(maskName)) {
+    if (roeParticle->getECLCluster()) ++nROEchargedECLClusters;
+  }
+
+  return nROEneutralECLClusters + nROEchargedECLClusters;
 }
 
 int RestOfEvent::getNKLMClusters(const std::string& maskName) const
 {
-  int nROEKLMClusters = getKLMClusters(maskName).size();
+  int nROEKLMClusters = getHadrons(maskName).size();
   return nROEKLMClusters;
 }
 
 TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
 {
-  std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
+  auto roeClusters = getPhotons(maskName);
   TLorentzVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
-  ClusterUtils C;
   for (auto& roeCluster : roeClusters) {
-    if (roeCluster->isNeutral())
-      if (roeCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeCluster, ECLCluster::EHypothesisBit::c_nPhotons);
+    if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+      roe4VectorECLClusters += roeCluster->get4Vector();
   }
 
   return roe4VectorECLClusters;

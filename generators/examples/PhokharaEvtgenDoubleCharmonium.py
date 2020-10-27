@@ -7,7 +7,7 @@
 #
 # Author: Kirill Chilikin
 #
-# This is example of expert usage with setting and explanation of individual
+# This is an example of expert usage with setting and explanation of individual
 # generator parameters. If you just need to generate using the default settings,
 # please use generators.add_phokhara_evtgen_combination().
 # Example can be found in generators/validation/PhokharaEvtgenGenerate.py.

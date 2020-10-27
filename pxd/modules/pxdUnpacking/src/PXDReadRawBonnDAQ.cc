@@ -54,7 +54,7 @@ PXDReadRawBonnDAQModule::~PXDReadRawBonnDAQModule()
 void PXDReadRawBonnDAQModule::initialize()
 {
   // Open file
-  fh = fopen(m_filename.c_str(), "rb");
+  fh = new PXDLocalDAQFile(m_filename);
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
   } else {
@@ -69,16 +69,13 @@ void PXDReadRawBonnDAQModule::initialize()
   B2DEBUG(29, "PXDReadRawBonnDAQModule: initialized.");
 }
 
-int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
-{
-  size_t l = 0;
-  if (fh) l = fread(data, 1, len, fh);
-  if (l != len) return 0;
-  return l;
-}
-
 int PXDReadRawBonnDAQModule::readOneEvent()
 {
+
+  if (!fh) {
+    B2ERROR("BonnDAQ Data file is not open ");
+  }
+
   unsigned int triggernr = 0xFFFFFFFF;
 
   struct EvtHeader {
@@ -98,7 +95,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     ulittle32_t* data32 = (ulittle32_t*)data;
     ulittle16_t* data16 = (ulittle16_t*)data;
     // Read 8 bytes header (group)
-    int br = read_data(data, 4);
+    int br = fh->read_data(data, 4);
     if (br <= 0) return br;
     unsigned int chunk_size = 0;
     if (evt->get_header8() == 0) {
@@ -109,7 +106,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
       chunk_size = evt->get_size();
     }
     if (chunk_size <= 1) return 0;
-    br = read_data(data + 4, chunk_size * 4 - 4);
+    br = fh->read_data(data + 4, chunk_size * 4 - 4);
     if (br <= 0) return br;
     if (evt->get_header12() == 0xe230) {
       B2DEBUG(29, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
@@ -165,7 +162,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
           }
 
           for (int i = 0; i < frames; i++) {
-            B2INFO(".... " << i << ": " << table16[i]);
+            //B2INFO(".... " << i << ": " << table16[i]); -> do we need this?
             size += table16[i];
 
             /** For current processed frames */
@@ -248,7 +245,9 @@ void PXDReadRawBonnDAQModule::event()
 
 void PXDReadRawBonnDAQModule::terminate()
 {
-  if (fh) fclose(fh);
-  fh = 0;
+  if (fh) {
+    delete(fh);
+    fh = 0;
+  }
 }
 

@@ -121,7 +121,5 @@ namespace Belle2 {
      * This method is called when EclFrame is closed.
      */
     void handleClosedFrame();
-
-    ClassDefNV(EclDisplayModule, 0)
   };
 }

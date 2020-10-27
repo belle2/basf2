@@ -59,7 +59,7 @@ ploter(
     descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
-    isShifter=True)
+    isShifter=False)
 
 
 ploter(
@@ -73,7 +73,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size1,
     descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
@@ -91,7 +91,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size2,
     descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
@@ -109,7 +109,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size3plus,
     descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
@@ -145,7 +145,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size1,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -163,7 +163,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size2,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -181,7 +181,7 @@ ploter(
     granules=gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=cut_oneTH,
+    cut=cut_oneTH+cut_size3plus,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -203,7 +203,7 @@ ploter(
     descr='Definition: (reconstructed time of the cluster) - (time of the TrueHit)\
     for all signal clusters.',
     check='Distribution peak around 0.',
-    isShifter=True)
+    isShifter=False)
 
 
 ploter(

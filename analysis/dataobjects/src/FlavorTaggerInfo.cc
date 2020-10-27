@@ -155,12 +155,12 @@ void FlavorTaggerInfo::setCategories(const std::string& category)
 /************************GETTERS***********************/
 
 
-std::string FlavorTaggerInfo::getUseModeFlavorTagger()
+std::string FlavorTaggerInfo::getUseModeFlavorTagger() const
 {
   return m_useModeFlavorTagger;
 }
 
-FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(const std::string& method)
+FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(const std::string& method) const
 {
   auto it = m_methodMap.find(method);
   if (it == m_methodMap.end()) {
@@ -170,7 +170,7 @@ FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(const std::string& method)
   }
 }
 
-bool FlavorTaggerInfo::isMethodInMap(const std::string& method)
+bool FlavorTaggerInfo::isMethodInMap(const std::string& method) const
 {
   auto it = m_methodMap.find(method);
   if (it == m_methodMap.end()) {
@@ -180,106 +180,102 @@ bool FlavorTaggerInfo::isMethodInMap(const std::string& method)
   }
 }
 
-std::vector<float> FlavorTaggerInfo::getCatProb()
+std::vector<float> FlavorTaggerInfo::getCatProb() const
 {
   return m_categoryProb;
 }
 
-std::vector<float> FlavorTaggerInfo::getTargProb()
+std::vector<float> FlavorTaggerInfo::getTargProb() const
 {
   return m_targetProb;
 }
 
-std::vector<float> FlavorTaggerInfo::getP()
+std::vector<float> FlavorTaggerInfo::getP() const
 {
   return m_P;
 }
 
-std::vector<Particle*> FlavorTaggerInfo::getParticle()
+std::vector<Particle*> FlavorTaggerInfo::getParticle() const
 {
   return m_particle;
 }
 
-std::vector<MCParticle*> FlavorTaggerInfo::getMCParticle()
+std::vector<MCParticle*> FlavorTaggerInfo::getMCParticle() const
 {
   return m_MCparticle;
 }
 
-std::vector<MCParticle*> FlavorTaggerInfo::getMCParticleMother()
+std::vector<MCParticle*> FlavorTaggerInfo::getMCParticleMother() const
 {
   return m_MCparticle_mother;
 }
 
-std::vector<Track*> FlavorTaggerInfo::getTracks()
+std::vector<Track*> FlavorTaggerInfo::getTracks() const
 {
-  for (auto& track : m_tracks) {
-    if (track) {
-    }
-  }
   return m_tracks;
 }
 
-std::vector<float> FlavorTaggerInfo::getD0()
+std::vector<float> FlavorTaggerInfo::getD0() const
 {
   return m_D0;
 }
 
-std::vector<float> FlavorTaggerInfo::getZ0()
+std::vector<float> FlavorTaggerInfo::getZ0() const
 {
   return m_Z0;
 }
 
-Track* FlavorTaggerInfo::getTrack(int track)
+Track* FlavorTaggerInfo::getTrack(int track) const
 {
-  return m_tracks[track];
+  return m_tracks.at(track);
 }
 
-std::vector<int> FlavorTaggerInfo::getIsFromB()
+std::vector<int> FlavorTaggerInfo::getIsFromB() const
 {
   return m_isFromB;
 }
 
 
-float FlavorTaggerInfo::getGoodTracksPurityFT()
+float FlavorTaggerInfo::getGoodTracksPurityFT() const
 {
   return m_goodTracksPurityFT;
 }
 
 
-float FlavorTaggerInfo::getGoodTracksPurityROE()
+float FlavorTaggerInfo::getGoodTracksPurityROE() const
 {
   return m_goodTracksPurityROE;
 }
 
 
-int FlavorTaggerInfo::getGoodTracksROE()
+int FlavorTaggerInfo::getGoodTracksROE() const
 {
   return m_goodTracksROE;
 }
 
-int FlavorTaggerInfo::getBadTracksROE()
+int FlavorTaggerInfo::getBadTracksROE() const
 {
   return m_badTracksROE;
 }
 
-int FlavorTaggerInfo::getGoodTracksFT()
+int FlavorTaggerInfo::getGoodTracksFT() const
 {
   return m_goodTracksFT;
 }
 
-int FlavorTaggerInfo::getBadTracksFT()
+int FlavorTaggerInfo::getBadTracksFT() const
 {
   return m_badTracksFT;
 }
 
 
-std::vector<float> FlavorTaggerInfo::getProdPointResolutionZ()
+std::vector<float> FlavorTaggerInfo::getProdPointResolutionZ() const
 {
   return m_prodPointResZ;
 }
 
 
-std::vector<std::string> FlavorTaggerInfo::getCategories()
+std::vector<std::string> FlavorTaggerInfo::getCategories() const
 {
   return m_categories;
 }

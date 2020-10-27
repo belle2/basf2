@@ -13,6 +13,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
@@ -47,6 +48,8 @@ namespace Belle2 {
     std::string m_inputListName;
     /** input particle list */
     StoreObjPtr<ParticleList> m_inputList;
+    /** event extra info object pointer */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
     /** Map of variables and extraInfo names to save in the event-extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::map<std::string, std::string> m_variables;
     /** Vector of function pointers corresponding to given variables. */

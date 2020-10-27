@@ -85,7 +85,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
     path.add_module('Progress')
 
     # collector setup
-    collector = register_module('SVDCoGTimeCalibrationCollector')
+    collector = register_module('SVDTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDEventInfoName", "SVDEventInfo")
     collector.param("EventT0Name", "EventT0")

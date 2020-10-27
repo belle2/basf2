@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <analysis/modules/DistanceCalculator/DistanceCalculatorModule.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -62,6 +60,7 @@ void DistanceCalculatorModule::initialize()
   } else {
     B2FATAL("Please provide a decay string for DistanceCalculatorModule");
   }
+  m_plist.isRequired(m_listName);
 }
 
 Eigen::Vector3d getDocaTrackVertex(const Particle* pTrack, const Particle* pVertex)
@@ -271,10 +270,9 @@ void DistanceCalculatorModule::getBtubeDistanceErrors(const Particle* p, const B
 
 void DistanceCalculatorModule::event()
 {
-  StoreObjPtr<ParticleList> plist(m_listName);
-  unsigned int n = plist->getListSize();
+  unsigned int n = m_plist->getListSize();
   for (unsigned int i = 0; i < n; i++) {
-    Particle* particle = plist->getParticle(i);
+    Particle* particle = m_plist->getParticle(i);
     std::vector<const Particle*> selectedParticles = m_decayDescriptor.getSelectionParticles(particle);
     if ((m_mode == "vertexbtube") || (m_mode == "trackbtube")) {
       if (selectedParticles.size() == 1) {

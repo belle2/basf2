@@ -77,7 +77,7 @@ namespace TreeFitter {
                                 TVector3& position,
                                 TVector3& momentum, int& charge);
 
-    /** map of the helix paramteres by list index */
+    /** map of the helix parameters by list index */
     static std::string helixParName(int i) ;
 
     /** map of the vertex parameters by list index */

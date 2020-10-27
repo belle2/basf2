@@ -51,6 +51,9 @@ void KLMChannelStatusCollectorModule::prepare()
 void KLMChannelStatusCollectorModule::collect()
 {
   for (KLMDigit& digit : m_KLMDigits) {
+    /* Multi-strip digits do not correspond to individual channels. */
+    if (digit.isMultiStrip())
+      continue;
     uint16_t channel =
       m_ElementNumbers->channelNumber(
         digit.getSubdetector(), digit.getSection(), digit.getSector(),

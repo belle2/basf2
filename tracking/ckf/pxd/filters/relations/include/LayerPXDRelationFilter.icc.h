@@ -70,10 +70,10 @@ namespace Belle2 {
         // they are only related if the one from sensor 1 is on the half, that is pointing towards sensor 2
         // and the one on sensor 2 is on the half that is pointing towards sensor 1.
         //
-        //                       X                         X                         X
-        //               ----|----                    ----|----                    ----|----
-        //  This is fine:         X        This not:                X   This not:          X
-        //                      ----|----                    ----|----                    ----|----
+        //                       X                            X                               X
+        //                      ----|----                    ----|----                ----|----
+        //  This is fine:       X           This not:    X             This not:        X
+        //                ----|----                    ----|----                 ----|----
 
         // for PXD its the other way round!
         if (currentStateCache.localNormalizedu <= 0.8) {

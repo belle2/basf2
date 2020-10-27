@@ -24,7 +24,6 @@ class defaultCrossTalkStripsImporter(basf2.Module):
         '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
-        #      iov = IntervalOfValidity(0,0,-1,-1)
 
         payload = Belle2.SVDCrossTalkStripsCalibrations.t_payload(
             0, "CrossTalkStrips_default_" + str(now.isoformat()) + "_INFO:_noCrossTalkstrips")
@@ -44,8 +43,6 @@ class defaultCrossTalkStripsImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDCrossTalkStripsCalibrations.name, payload, iov)
 
 
-use_local_database("localDB_crossTalk/database.txt", "localDB_crossTalk")
-
 main = create_path()
 
 # Event info setter - execute single event
@@ -53,9 +50,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = True)
-
+main.add_module("Gearbox")
+main.add_module("Geometry")
 main.add_module(defaultCrossTalkStripsImporter())
 
 # Show progress of processing

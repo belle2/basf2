@@ -10,13 +10,6 @@
 
 #include <analysis/modules/ContinuumSuppressionBuilder/ContinuumSuppressionBuilderModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-
 #include <analysis/ContinuumSuppression/ContinuumSuppression.h>
 
 using namespace Belle2;
@@ -36,7 +29,7 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
   setDescription("Creates for each Particle in the given ParticleLists a ContinuumSuppression dataobject and makes BASF2 relation between them.");
 
   // Parameter definitions
-  addParam("particleList", m_particleList, "Name of the ParticleList", std::string(""));
+  addParam("particleList", m_particleListName, "Name of the ParticleList", std::string(""));
 
   addParam("ROEMask", m_ROEMask, "ROE mask", std::string(""));
 
@@ -45,23 +38,18 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
 void ContinuumSuppressionBuilderModule::initialize()
 {
   // Input
-  StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Particle> particles;
-  particles.isRequired();
+  m_plist.isRequired(m_particleListName);
+  StoreArray<Particle>().isRequired();
 
   // Output
-  StoreArray<ContinuumSuppression> csArray;
-  csArray.registerInDataStore();
-  particles.registerRelationTo(csArray);
+  m_csarray.registerInDataStore();
+  StoreArray<Particle>().registerRelationTo(m_csarray);
 }
 
 void ContinuumSuppressionBuilderModule::event()
 {
-  // Input Particle
-  StoreObjPtr<ParticleList> plist(m_particleList);
-
-  for (unsigned i = 0; i < plist->getListSize(); i++) {
-    addContinuumSuppression(plist->getParticle(i), m_ROEMask);      // pass the ROEMask to cs.cc here as a second argument.
+  for (unsigned i = 0; i < m_plist->getListSize(); i++) {
+    addContinuumSuppression(m_plist->getParticle(i), m_ROEMask);      // pass the ROEMask to cs.cc here as a second argument.
   }
 }
 

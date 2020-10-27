@@ -25,7 +25,7 @@ main = b2.create_path()
 
 # specify number of events to be generated
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5000])
+eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)

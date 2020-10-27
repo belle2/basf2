@@ -924,10 +924,10 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
-  // set momenum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  // set momentum
+  m_px = m_momentumScale * trackFit->getMomentum().Px();
+  m_py = m_momentumScale * trackFit->getMomentum().Py();
+  m_pz = m_momentumScale * trackFit->getMomentum().Pz();
 
   // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());
@@ -1119,6 +1119,9 @@ std::string Particle::getInfoHTML() const
 
   stream << " <b>momentum</b>=" << HTML::getString(getMomentum());
   stream << " <b>p</b>=" << getP();
+  stream << "<br>";
+
+  stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
   stream << " <b>position</b>=" << HTML::getString(getVertex());

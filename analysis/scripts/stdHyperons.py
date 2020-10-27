@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from basf2 import B2ERROR
+
+from basf2 import B2ERROR, B2WARNING
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
 
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
-from stdPi0s import stdPi0s
 
 
 def stdXi(fitter='TreeFit', b2bii=False, path=None):
@@ -79,7 +78,8 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
 
     Parameters:
         gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
-                         for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
+                         to select the signal efficiency of the photons used in the pi0 reconstruction
+                         (default ``eff40``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
@@ -97,8 +97,8 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
             [ chiProb > 0.0 ]',
             True, path=path)
         # ~7*sigma Range around nominal mass
-        stdPhotons(f'pi0{gammatype}', path=path)
-        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype} gamma:pi0{gammatype}',
+        stdPhotons(f'pi0{gammatype}_Jan2020', path=path)
+        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_Jan2020 gamma:pi0{gammatype}_Jan2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)
 
@@ -235,6 +235,11 @@ def goodXi(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
+    if not _std_hyperon_is_in_path("Xi-", path):
+        B2WARNING("Could not find standard Xi particle list! Creating it with default options.")
+        stdXi(path=path)
+        assert _std_hyperon_is_in_path("Xi-", path)
+
     if xitype == 'veryloose':
         cutAndCopyList(
             'Xi-:veryloose',
@@ -265,6 +270,8 @@ def goodXi(xitype='loose', path=None):
 <1.001 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{xitype}\" is none of the allowed Xi- list types!")
 
 
 def goodXi0(xitype='loose', path=None):
@@ -278,6 +285,11 @@ def goodXi0(xitype='loose', path=None):
         xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
         path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
+
+    if not _std_hyperon_is_in_path("Xi0", path):
+        B2WARNING("Could not find standard Xi0 particle list! Creating it with default options.")
+        stdXi0(path=path)
+        assert _std_hyperon_is_in_path("Xi0", path)
 
     if xitype == 'veryloose':
         # Select pi0 at 3*sigma around the nominal mass
@@ -311,6 +323,8 @@ def goodXi0(xitype='loose', path=None):
             abs( daughter(1,dM) ) < 0.0116 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{xitype}\" is none of the allowed Xi0 list types!")
 
 
 def goodOmega(omegatype='loose', path=None):
@@ -326,6 +340,11 @@ def goodOmega(omegatype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
                            or ``Omega-:tight``, list
     """
+
+    if not _std_hyperon_is_in_path("Omega-", path):
+        B2WARNING("Could not find standard Omega particle list! Creating it with default options.")
+        stdOmega(path=path)
+        assert _std_hyperon_is_in_path("Omega-", path)
 
     if omegatype == 'veryloose':
         cutAndCopyList(
@@ -357,3 +376,29 @@ def goodOmega(omegatype='loose', path=None):
 <1.0005 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{omegatype}\" is none of the allowed Omega list types!")
+
+
+def _std_hyperon_is_in_path(hyperon, path):
+    """
+    Helper function to check if the std hyperon is already in the reconstruction path.
+
+    Checks whether there is a ``PListCutAndCopy`` module with the
+    ``outputListName``: ``<hyperon>:std``.
+    :param hyperon: One of ["Xi-", "Xi0", "Omega-"]
+    :param path: Instance of basf2.Path
+    :returns: Boolean, whether  ``PListCutAndCopy`` with ``outputListName`` ``<hyperon>:std`` was found in path.
+    """
+    # maybe this function could be generalized for other standard particles, but
+    # so far it has only been tested for standard hyperons:
+    allowed_hyperons = {"Xi-", "Xi0", "Omega-"}
+    if hyperon not in allowed_hyperons:
+        raise ValueError(
+            f"\"{hyperon}\" is not in list of hyperons that this function has been tested for ({allowed_hyperons})."
+        )
+    for module in path.modules():
+        if (module.name() == f"PListCutAndCopy_{hyperon}:std" or
+                module.name().split(" -> ")[0] == f"ParticleCombiner_{hyperon}:std"):
+            return True
+    return False

@@ -17,7 +17,7 @@
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>
-#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v2.h> // Should be the latest version before ver.4(PCIe40)
 #include <rawdata/switch_basf2_standalone.h>
 
 #include <daq/dataobjects/SendHeader.h>
@@ -183,7 +183,8 @@ namespace Belle2 {
     //    static RunInfoBuffer g_status;
     //    RunInfoBuffer g_status;
 
-    PreRawCOPPERFormat_latest m_pre_rawcpr;
+    //! Use ver.2 for the moment(ver.4 -> PCI40)
+    PreRawCOPPERFormat_v2 m_pre_rawcpr; // Should be the latest version before ver.4(PCIe40)
 
     ///////////////////////////////
     // From Serializer.cc
@@ -315,7 +316,7 @@ namespace Belle2 {
 #endif
 
     //! which format is used
-    RawHeader_latest tmp_header;
+    RawHeader_v2 tmp_header; // Should be the latest version before ver.4(PCIe40)
 
   };
 

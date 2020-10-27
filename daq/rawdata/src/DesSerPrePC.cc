@@ -14,7 +14,6 @@
 #include <netinet/tcp.h>
 
 #include <sys/socket.h>
-#include <unistd.h>
 
 //#define NO_DATA_CHECK
 //#define DUMHSLB
@@ -473,16 +472,16 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
         //
         // RawCOPPER
         //
-        PreRawCOPPERFormat_latest* pre_rawcpr_fmt = new PreRawCOPPERFormat_latest;
+        PreRawCOPPERFormat_v2* pre_rawcpr_fmt = new PreRawCOPPERFormat_v2;
         pre_rawcpr_fmt->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
         int block_id = 0;
         "do not use the following for actual DAQ"
-        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_v2::POS_EXP_RUN_NO ] = exp_run_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_v2::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
+        (pre_rawcpr_fmt->GetBuffer(block_id))[ RawHeader_v2::POS_TTUTIME ] = utime_ftsw;
 #endif
 
 #ifndef NO_DATA_CHECK
@@ -609,10 +608,10 @@ void DesSerPrePC::DataAcquisition()
         printf("Error was detected\n"); fflush(stdout);
         break;
       }
-      //     PreRawCOPPERFormat_latest pre_rawcopper_latest;
-      //     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+      //     PreRawCOPPERFormat_v2 pre_rawcopper_v2;
+      //     pre_rawcopper_v2.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
       //                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-      ////     pre_rawcopper_latest.CheckCRC16( 0, 0 );
+      ////     pre_rawcopper_v2.CheckCRC16( 0, 0 );
 
       int temp_num_events, temp_num_nodes;
       int temp_nwords_to;
@@ -662,17 +661,17 @@ void DesSerPrePC::DataAcquisition()
       // CRC16 check after data reduction
       //
 #ifdef REDUCED_RAWCOPPER
-      PostRawCOPPERFormat_latest post_rawcopper_latest;
+      PostRawCOPPERFormat_v2 post_rawcopper_v2; // Should be the latest version before ver.4(PCIe40)
 
-//       post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+//       post_rawcopper_v2.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
 //                                       0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-      post_rawcopper_latest.SetBuffer(raw_datablk[ j ].GetWholeBuffer(), raw_datablk[ j ].TotalBufNwords(),
-                                      0, raw_datablk[ j ].GetNumEvents(), raw_datablk[ j ].GetNumNodes());
+      post_rawcopper_v2.SetBuffer(raw_datablk[ j ].GetWholeBuffer(), raw_datablk[ j ].TotalBufNwords(),
+                                  0, raw_datablk[ j ].GetNumEvents(), raw_datablk[ j ].GetNumNodes());
 
       for (int i_finesse_num = 0; i_finesse_num < 4; i_finesse_num ++) {
         int block_num = 0;
-        if (post_rawcopper_latest.GetFINESSENwords(block_num, i_finesse_num) > 0) {
-          post_rawcopper_latest.CheckCRC16(block_num, i_finesse_num);
+        if (post_rawcopper_v2.GetFINESSENwords(block_num, i_finesse_num) > 0) {
+          post_rawcopper_v2.CheckCRC16(block_num, i_finesse_num);
         }
       }
 

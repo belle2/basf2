@@ -24,7 +24,7 @@ using namespace std;
 using namespace Belle2;
 
 SVD3SampleCoGTimeCalibrationAlgorithm::SVD3SampleCoGTimeCalibrationAlgorithm(const std::string& str) :
-  CalibrationAlgorithm("SVDCoGTimeCalibrationCollector")
+  CalibrationAlgorithm("SVDTimeCalibrationCollector")
 {
   setDescription("SVD3SampleCoGTimeCalibration calibration algorithm");
   m_id = str;
@@ -43,20 +43,11 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
   std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10,
                                     80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
-  // pol3->SetParLimits(0, -200, 0);
-  // pol3->SetParLimits(1, 0, 10);
-  // pol3->SetParLimits(2, -1, 0);
-  // pol3->SetParLimits(3, 0, 1);
 
   FileStat_t info;
   int cal_rev = 1;
-  while (gSystem->GetPathInfo(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), info) == 0) {
-    // std::unique_ptr<TFile> f_check(new TFile(Form("algorithm_3SampleCoG_output_rev_%d.root",cal_rev)));
-    // if(f_check->Get(Form("rev_%d", cal_rev)))
+  while (gSystem->GetPathInfo(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), info) == 0)
     cal_rev++;
-    // else
-    //   break;
-  }
   std::unique_ptr<TFile> f(new TFile(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), "RECREATE"));
 
   auto m_tree = new TTree(Form("rev_%d", cal_rev), "RECREATE");
@@ -104,7 +95,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           }
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-              if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {
+              if (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }
@@ -112,9 +103,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
-          // pfx->SetErrorOption("S");
-          // pfx->Fit("pol3", "RQ");
-          TFitResultPtr tfr = pfx->Fit("pol3", "RQS");
+          TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
           double par[4];
           pol3->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();
@@ -153,26 +142,26 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
 bool SVD3SampleCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
-  float meanRawCoGTimeL3V = 0;
-  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
-  auto rawCoGTimeL3V = getObjectPtr<TH1F>("hRawCoGTimeL3V");
+  float meanRawTimeL3V = 0;
+  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDC");
+  auto rawTimeL3V = getObjectPtr<TH1F>("hRawTimeL3V");
   // float meanEventT0 = eventT0Hist->GetMean();
-  if (!rawCoGTimeL3V) {
-    meanRawCoGTimeL3V = m_previousRawCoGTimeMeanL3V.value();
+  if (!rawTimeL3V) {
+    meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   } else {
-    meanRawCoGTimeL3V = rawCoGTimeL3V->GetMean();
+    meanRawTimeL3V = rawTimeL3V->GetMean();
   }
-  if (!m_previousRawCoGTimeMeanL3V) {
+  if (!m_previousRawTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
+    m_previousRawTimeMeanL3V.emplace(meanRawTimeL3V);
 
     return true;
-  } else if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
-    B2INFO("Histogram mean has shifted from " << m_previousRawCoGTimeMeanL3V.value()
-           << " to " << meanRawCoGTimeL3V << ". We are requesting a new payload boundary for ("
+  } else if (abs(meanRawTimeL3V - m_previousRawTimeMeanL3V.value()) > m_allowedTimeShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousRawTimeMeanL3V.value()
+           << " to " << meanRawTimeL3V << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
+    m_previousRawTimeMeanL3V.emplace(meanRawTimeL3V);
     return true;
   } else {
     return false;

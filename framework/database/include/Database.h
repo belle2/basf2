@@ -124,6 +124,20 @@ namespace Belle2 {
     bool getData(const EventMetaData& event, std::vector<DBQuery>& query);
 
     /**
+     * Convenience function to get an object for an arbitrary experiment and run.
+     *
+     * @param name       The name identifying the object.
+     * @param experiment The experiment number.
+     * @param event      The event number.
+     */
+    const TObject* getData(const std::string& name, int experiment, int run)
+    {
+      EventMetaData eventMetaData(1, run, experiment);
+      return getData(eventMetaData, name).first;
+    }
+
+
+    /**
      * Store an object in the database.
      *
      * @param name   Name that identifies the object in the database.

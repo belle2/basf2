@@ -15,7 +15,7 @@ def create_udst():
     pa = b2.create_path()
     ma.inputMdst("default", b2.find_file("analysis/tests/mdst.root"), path=pa)
     ma.fillParticleList("pi+:all", "", path=pa)
-    udst.add_udst_output(pa, "test.udst.root", particleLists=['pi+:all'])
+    udst.add_udst_output(path=pa, filename="test.udst.root", particleLists=["pi+:all"])
     b2tu.safe_process(pa, 1)
     return
 
@@ -25,7 +25,7 @@ def test_read_udst():
     pa = b2.create_path()
     ma.inputMdst("default", "test.udst.root", path=pa)
     ma.printDataStore(path=pa)
-    b2tu.safe_process(pa)
+    b2tu.safe_process(path=pa)
     return
 
 

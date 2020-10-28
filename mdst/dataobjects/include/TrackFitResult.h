@@ -218,6 +218,10 @@ namespace Belle2 {
     Helix getHelix() const
     { return Helix(getD0(), getPhi0(), getOmega(), getZ0(), getTanLambda()); }
 
+    /** Conversion to framework Helix with momentum scaling (without covariance).  */
+    Helix getHelix(float momentumScale) const
+    { return Helix(getD0(), getPhi0(), getOmega() / momentumScale, getZ0(), getTanLambda()); }
+
     /** Conversion to framework Uncertain Helix (i.e., with covariance).  */
     UncertainHelix getUncertainHelix() const
     {

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from basf2 import *
 import os
 import sys
 
 argvs = sys.argv
 argc = len(argvs)
 
-from basf2 import *
 
 # set_log_level(LogLevel.ERROR)
 

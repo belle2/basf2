@@ -79,7 +79,7 @@ namespace Belle2 {
     void setUseModeFlavorTagger(const std::string& mode);
 
     /**
-    * Saves the method and the correspondig FlavorTaggerMap
+    * Saves the method and the corresponding FlavorTaggerMap
     * @param method "TMVA" or "FANN".
     */
     void addMethodMap(const std::string& method);
@@ -91,7 +91,7 @@ namespace Belle2 {
     void setTrack(Belle2::Track* track);
 
     /**
-    * Vector filler: Set the pointer of the Partcile related to the track with the highest probability
+    * Vector filler: Set the pointer of the Particle related to the track with the highest probability
     * for each category.
     * @param Particle pointer to Particle object related to the track
     */
@@ -136,7 +136,7 @@ namespace Belle2 {
     * 0 - does not come from the B
     * 1,2,3,4 - come from an immediately decaying daughter of the B (number depends on the PDG code of each meson)
     * 5 - come directly from the B
-    * > 5 - come from a chain of immediately decaying daugthers of the B (11 - 14: one step, 21-24: two steps...)
+    * > 5 - come from a chain of immediately decaying daughters of the B (11 - 14: one step, 21-24: two steps...)
     * @param isFromB MC matched code
     */
     void setIsFromB(int isFromB);
@@ -148,13 +148,13 @@ namespace Belle2 {
     void setCategories(const std::string& catName);
 
     /**
-    * Vector filler: Set the impact parameter D0 of each track in an accesible way
+    * Vector filler: Set the impact parameter D0 of each track in an accessible way
     * @param D0 impact parameter
     */
     void setD0(double D0);
 
     /**
-    * Vector filler: Set the impact parameter Z0 of each track in an accesible way
+    * Vector filler: Set the impact parameter Z0 of each track in an accessible way
     * @param Z0 impact parameter
     */
     void setZ0(double Z0);
@@ -221,137 +221,137 @@ namespace Belle2 {
     * usemode of the FlavorTagger
     * @return mode "Teacher" or "Expert"
     */
-    std::string getUseModeFlavorTagger();
+    std::string getUseModeFlavorTagger() const;
 
     /** method used for the FlavorTagger and corresponding FlavorTaggerInfoMap
     * @param method "TMVA" or "FANN".
     * @return FlavorTaggerInfoMap with all FlavorTagger Information
     */
-    FlavorTaggerInfoMap* getMethodMap(const std::string& method);
+    FlavorTaggerInfoMap* getMethodMap(const std::string& method) const;
 
     /** checks if the given method method is used for the FlavorTagger with a corresponding FlavorTaggerInfoMap
     * @param method "TMVA" or "FANN".
     * @return True if the given method is in the FlavorTaggerInfo
     */
-    bool isMethodInMap(const std::string& method);
+    bool isMethodInMap(const std::string& method) const;
 
     /**
     * Get all the tracks
     * @return vector of tracks
     */
-    std::vector<Belle2::Track*> getTracks();
+    std::vector<Belle2::Track*> getTracks() const;
 
     /**
     * Get a single track
     * @return track
     * @param position integer corresponding to the position of the desired track
     */
-    Belle2::Track* getTrack(int position);
+    Belle2::Track* getTrack(int position) const;
 
     /**
     * Get all the event probabilities to correspond to each category
     * @return vector of event probabilities
     */
-    std::vector<float> getCatProb();
+    std::vector<float> getCatProb() const;
 
     /**
     * Get all the track probabilities to come directly from the Btag for each category
     * @return vector of track probabilities
     */
-    std::vector<float> getTargProb();
+    std::vector<float> getTargProb() const;
 
     /**
     * Get the momentum of every category's track
     * @return vector momentum
     */
-    std::vector<float> getP();
+    std::vector<float> getP() const;
 
     /**
     * Get the particle's pointer related to each track
     * @return vector of particle pointers
     */
-    std::vector<Particle*> getParticle();
+    std::vector<Particle*> getParticle() const;
 
     /**
     * Get the MC particle's pointer related to each track
     * @return vector of particle pointers
     */
-    std::vector<Belle2::MCParticle*> getMCParticle();
+    std::vector<Belle2::MCParticle*> getMCParticle() const;
 
     /**
     * Get the mother MC particle's pointer related to each track
     * @return vector of particle pointers
     */
-    std::vector<Belle2::MCParticle*> getMCParticleMother();
+    std::vector<Belle2::MCParticle*> getMCParticleMother() const;
 
     /**
     * Get the impact parameter D0 of every category's track
     * @return vector of D0
     */
-    std::vector<float> getD0();
+    std::vector<float> getD0() const;
 
     /**
     * Get the impact parameter Z0 of every category's track
     * @return vector of Z0
     */
-    std::vector<float> getZ0();
+    std::vector<float> getZ0() const;
 
     /**
     *  Get the MC matched code of every track depending on its mother. Code explained in the setter
     * @return vector of codes
     */
-    std::vector<int> getIsFromB();
+    std::vector<int> getIsFromB() const;
 
     /**
     * Get the list of names of the categories of this object
     * @return vector of names
     */
-    std::vector<std::string> getCategories();
+    std::vector<std::string> getCategories() const;
 
     /**
     * Get resolution of the production point of each track, i.e
     * real production point - MC matched production point.
     * @return vector of production point resolutions
     */
-    std::vector<float> getProdPointResolutionZ();
+    std::vector<float> getProdPointResolutionZ() const;
 
     /**
     * Get the ratio (purity) of tracks coming from the Btag out of the total amount of
     * tracks within this object.
     * @return Primary tracks purity
     */
-    float getGoodTracksPurityFT();
+    float getGoodTracksPurityFT() const;
 
     /**
     * Get the ratio (purity) of tracks coming from the Btag out of the total amount of
     * tracks within the correspondent RestOfEvent object.
     * @return Primary tracks purity
     */
-    float getGoodTracksPurityROE();
+    float getGoodTracksPurityROE() const;
 
     /**
     * Get the number of tracks not coming from the Btag within the correspondent RestOfEvent object
     * @return number of tracks
     */
-    int getBadTracksROE();
+    int getBadTracksROE() const;
 
     /**
     * Get the number of tracks coming from the Btag within the correspondent RestOfEvent object
     * @return number of tracks
     */
-    int getGoodTracksROE();
+    int getGoodTracksROE() const;
 
     /**
     * Get the number of tracks not coming from the Btag within this object
     * @return number of tracks
     */
-    int getBadTracksFT();
+    int getBadTracksFT() const;
 
     /**
     * Get the number of tracks not coming from the Btag within this object
     * @return number of tracks
     */
-    int getGoodTracksFT();
+    int getGoodTracksFT() const;
 
 
   private:
@@ -380,12 +380,12 @@ namespace Belle2 {
     std::vector<float> m_P; /**< absolute 3 momentum of each track */
     std::vector<int> m_isFromB; /**< MC matched code of each track depending on its mother */
 
-    float m_goodTracksPurityFT; /**< purity of tracks coming from the Btag in this objecy */
+    float m_goodTracksPurityFT; /**< purity of tracks coming from the Btag in this object */
     float m_goodTracksPurityROE; /**< purity of tracks coming from the Btag in the correspondent RestOfEvent object */
-    int m_badTracksROE; /**< number of tracksc not coming from Btag in the correspondent RestOfEvent object*/
-    int m_goodTracksROE; /**< number of tracksc coming from Btag in the correspondent RestOfEvent */
-    int m_badTracksFT; /**< number of tracksc not coming from Btag in this object */
-    int m_goodTracksFT; /**< number of tracksc coming from Btag in this object */
+    int m_badTracksROE; /**< number of tracks not coming from Btag in the correspondent RestOfEvent object*/
+    int m_goodTracksROE; /**< number of tracks coming from Btag in the correspondent RestOfEvent */
+    int m_badTracksFT; /**< number of tracks not coming from Btag in this object */
+    int m_goodTracksFT; /**< number of tracks coming from Btag in this object */
 
     ClassDef(FlavorTaggerInfo, 3) /**< class definition */
 

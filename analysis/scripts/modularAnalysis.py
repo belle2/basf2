@@ -719,7 +719,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
     path.add_module(pload)
 
 
-def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False):
+def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
+                      loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -759,6 +760,11 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         fillParticleLists([kaons, pions, v0lambdas], path=mypath)
 
     Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
+
+    Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
         the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
 
@@ -785,6 +791,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
     """
 
     pload = register_module('ParticleLoader')
@@ -792,10 +799,12 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
+    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
 
 
-def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False):
+def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
+                     loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -825,6 +834,11 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
 
     Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
+
+    Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
         the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
 
@@ -844,6 +858,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
     """
 
     pload = register_module('ParticleLoader')
@@ -851,6 +866,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
+    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
 
 
@@ -1894,6 +1910,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('mostLikely', fillWithMostLikely)
     path.add_module(roeBuilder)
 
 

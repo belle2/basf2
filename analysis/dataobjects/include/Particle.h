@@ -365,7 +365,7 @@ namespace Belle2 {
      * Removes index of daughter from daughters index array
      * @param daughter pointer to the daughter particle
      */
-    void removeDaughter(const Particle* daughter);
+    void removeDaughter(const Particle* daughter, const bool updateType = true);
 
     // getters
 

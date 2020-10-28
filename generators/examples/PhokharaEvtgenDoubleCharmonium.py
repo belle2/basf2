@@ -16,7 +16,6 @@
 import basf2
 import beamparameters
 import pdg
-from ROOT import Belle2
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -125,7 +124,7 @@ phokhara.param('MinEnergyGamma', 0.01)
 
 # EvtGen
 evtgendecay = basf2.register_module('EvtGenDecay')
-decay_file = Belle2.FileSystem.findFile('generators/examples/PhokharaEvtgenDoubleCharmonium.dec')
+decay_file = basf2.find_file('generators/examples/PhokharaEvtgenDoubleCharmonium.dec')
 evtgendecay.param('UserDecFile', decay_file)
 
 # Output

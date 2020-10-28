@@ -19,8 +19,8 @@ CHANGES between release-04-00-00 and release-05-00-00:
       See BII-3959 and BII-7148.
 
 CHANGES since release-05-00-00:
-
-    * ...
+    * Added m_momentumScale to handle the momentum scale correction for
+      TreeFitter. See BII-6971.
 """
 
 import basf2

@@ -63,14 +63,15 @@ Likelihood extraction
 
     Sample longitudinal-profile PDFs for energetic positevely-charged muons (left) and pions (right), for the barrel (top), forward endcap (middle) and a selected barrel-endcap-overlap (bottom). Barrel (endcap) layers are numbered 0-14 (15-28).
 
+
  .. _rchiSquared:
 
  .. figure:: figures/rchisquared-MuonPlus-PionPlus-ndof.png
     :width: 30em
     :align: center
 
-    Sample transverse-profile (reduced :math:`\chi^{2}`) distributions for positively charged muons (left) and pions (right) for 2-12 degrees of freedom. In each panel the red curve is the fit to the upper tail
-  of the histogram, starting at the given cutoff.
+    Sample transverse-profile (reduced :math:`\chi^{2}`) distributions for positively charged muons (left) and pions (right) for 2-12 degrees of freedom. In each panel the red curve is the fit to the upper tail of the histogram, starting at the given cutoff.
+
 
 The likelihood of having the matched-hit range and transverse-scattering :math:`\chi^{2}` distribution is obtained from pre-calculated probability density functions (PDFs). 
 There are separate PDFs for each charged-particle hypothesis and charge and for each extrapolation outcome. 

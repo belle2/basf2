@@ -11,6 +11,7 @@
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
 #include <analysis/variables/MCTruthVariables.h>
+#include <analysis/variables/KLMClusterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
@@ -56,22 +57,14 @@ namespace Belle2 {
 
     double momentumMissingTagSide(const Particle*)
     {
-      TLorentzVector trackiCMSVec;
-      TLorentzVector roeCMSVec;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (roe.isValid()) {
-        const auto& tracks = roe->getTracks();
-        for (auto track : tracks) {
-          const PIDLikelihood* trackiPidLikelihood = track->getRelated<PIDLikelihood>();
-          const Const::ChargedStable trackiChargedStable = trackiPidLikelihood ? trackiPidLikelihood->getMostLikely() : Const::pion;
-          double trackiMassHypothesis = trackiChargedStable.getMass();
-          const TrackFitResult* tracki = track->getTrackFitResultWithClosestMass(trackiChargedStable);
-          if (tracki == nullptr) continue;
-          double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
-          TLorentzVector trackiVec(tracki->getMomentum(), energy);
-          trackiCMSVec = PCmsLabTransform::labToCms(trackiVec);
-          roeCMSVec += trackiCMSVec;
-        }
+      if (!roe.isValid()) return 0;
+      TLorentzVector roeCMSVec;
+
+      const auto& roeChargedParticles = roe->getChargedParticles();
+      for (auto roeChargedParticle : roeChargedParticles) {
+        if (not roeChargedParticle->isMostLikely()) continue;
+        roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
       }
       double missMom = -roeCMSVec.P();
       return missMom ;
@@ -80,81 +73,61 @@ namespace Belle2 {
     double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      PCmsLabTransform T;
+      if (!roe.isValid()) return 0;
+
       std::vector<TVector3> p3_cms_roe;
-      TVector3 thrustO;
       static const double P_MAX(3.2);
 
-      double result = 0 ;
+      // The following calculation of the thrust axis has been copied and modified
+      // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
+      // At some point this has to be updated!
 
-      if (roe.isValid()) {
-
-        // The following calculation of the thrust axis has been copied and modified
-        // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
-        // At some point this has to be updated!
-
-        // FIXME the following three loops reimplements the ParticleLoader and should be avoided -- SC
-
-        // Charged tracks
-        //
-        const auto& roeTracks = roe->getTracks();
-        for (auto& track : roeTracks) {
-          if (track == nullptr) continue;
-          // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
-          // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-          // Create particle from track with most probable hypothesis
-          const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
-          const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-          // Here we skip tracks with 0 charge
-          if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
-          Particle particle(track, charged);
-          if (particle.getParticleSource() == Particle::c_Track) {
-            TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
+      // Charged tracks
+      //
+      const auto& roeTracks = roe->getChargedParticles();
+      for (auto& roeChargedParticle : roeTracks) {
+        // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
+        // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+        if (roeChargedParticle->isMostLikely()) {
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
         }
-
-        // ECLCluster -> Gamma
-        const auto& roeECLClusters = roe->getECLClusters();
-        for (auto& cluster : roeECLClusters) {
-          if (cluster == nullptr) continue;
-          if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
-          if (cluster->isNeutral()) {
-            // Create particle from ECLCluster with gamma hypothesis
-            Particle particle(cluster);
-            TLorentzVector p_lab = particle.get4Vector();
-            if (p_lab != p_lab) continue;
-            if (p_lab.Rho() < 0.05) continue;
-            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
-        }
-
-        const auto& roeKLMClusters = roe->getKLMClusters();
-        for (auto& cluster : roeKLMClusters) {
-          if (cluster == nullptr) continue;
-          if (!(cluster -> getAssociatedTrackFlag()) && !(cluster -> getAssociatedEclClusterFlag())) {
-            // Create particle from KLMCluster with K0_L hypothesis
-            Particle particle(cluster);
-            TLorentzVector p_lab = particle.get4Vector();
-            if (p_lab != p_lab) continue;
-            if (p_lab.Rho() < 0.05) continue;
-            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
-        }
-
-        thrustO  = Thrust::calculateThrust(p3_cms_roe);
-        const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
-        if (pAxis == pAxis) result = fabs(cos(pAxis.Angle(thrustO)));
-
       }
+
+      // ECLCluster -> Gamma
+      const auto& roePhotons = roe->getPhotons();
+      for (auto& roePhoton : roePhotons) {
+        if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+          TLorentzVector p_lab = roePhoton->get4Vector();
+          if (p_lab != p_lab) continue;
+          if (p_lab.Rho() < 0.05) continue;
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(p_lab);
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+      }
+
+      const auto& roeKlongs = roe->getHadrons();
+      for (auto& roeKlong : roeKlongs) {
+        if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+          TLorentzVector p_lab = roeKlong->get4Vector();
+          if (p_lab != p_lab) continue;
+          if (p_lab.Rho() < 0.05) continue;
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(p_lab);
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+      }
+
+      const TVector3 thrustO = Thrust::calculateThrust(p3_cms_roe);
+      const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+      double result = 0;
+      if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
+
       return result;
     }
 
@@ -225,23 +198,16 @@ namespace Belle2 {
     double transverseMomentumOfChargeTracksInRoe(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (!roe.isValid()) return 0;
 
       double sum = 0.0;
 
-      if (roe.isValid()) {
-        for (const auto& track : roe->getTracks()) {
-          if (part->getTrack() == track) continue;
-          if (track == nullptr) continue;
-          const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
-          const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-          // TODO: this will always return something (so not nullptr) contrary to the previous method
-          // used here. This line can be removed as soon as the multi hypothesis fitting method
-          // has been properly established
-          if (track->getTrackFitResultWithClosestMass(charged) == nullptr) continue;
-          double pt = track->getTrackFitResultWithClosestMass(charged)->getTransverseMomentum();
-          if (pt == pt) sum += sqrt(pt * pt);
-        }
+      for (const auto& track : roe->getChargedParticles()) {
+        if (part->isCopyOf(track, true)) continue;
+        if (!track->isMostLikely()) continue;
+        sum += track->getMomentum().Perp2();
       }
+
       return sum;
 
     }
@@ -297,49 +263,47 @@ namespace Belle2 {
       } else return 0.0;
     }
 
+    // helper function to get flavour of MC B0
+    static int getB0flavourMC(const MCParticle* mcParticle)
+    {
+      while (mcParticle) {
+        if (mcParticle->getPDG() == 511) {
+          return 1;
+        } else if (mcParticle->getPDG() == -511) {
+          return -1;
+        }
+        mcParticle = mcParticle->getMother();
+      }
+      return 0; //no B found
+    }
+
 //     Target Variables --------------------------------------------------------------------------------------------------
 
     double isMajorityInRestOfEventFromB0(const Particle*)
     {
-      int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (roe.isValid()) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              vote++;
-              break;
-            }
-            if (mcParticle->getPDG() == -511) {
-              vote--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+      if (!roe.isValid()) return 0;
+
+      int vote = 0;
+      for (auto& track : roe->getChargedParticles()) {
+        const MCParticle* mcParticle = track->getMCParticle();
+        vote += getB0flavourMC(mcParticle);
       }
+
       return vote > 0;
     }
 
     double isMajorityInRestOfEventFromB0bar(const Particle*)
     {
-      int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (roe.isValid()) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              vote++;
-            }
-            if (mcParticle->getPDG() == -511) {
-              vote--;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+      if (!roe.isValid()) return 0;
+
+      int vote = 0;
+      for (auto& track : roe->getChargedParticles()) {
+        const MCParticle* mcParticle = track->getMCParticle();
+        vote += getB0flavourMC(mcParticle);
       }
+
       return vote < 0;
     }
 
@@ -374,8 +338,8 @@ namespace Belle2 {
         if (Variable::isSignal(particle) > 0 && BcpMC != nullptr) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
-            for (auto& iTrack : roe->getTracks()) {
-              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+            for (auto& roeChargedParticle : roe->getChargedParticles()) {
+              const MCParticle* mcParticle = roeChargedParticle->getMCParticle();
               while (mcParticle != nullptr) {
                 if (mcParticle->getMother() == Y4S) {
                   if (mcParticle == BcpMC) {
@@ -460,8 +424,8 @@ namespace Belle2 {
       float q_MC = 0; //Flavor of B
       if (roe != nullptr) {
         if (roe-> getNTracks() != 0) {
-          for (auto& track : roe->getTracks()) {
-            const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          for (auto& track : roe->getChargedParticles()) {
+            const MCParticle* mcParticle = track->getMCParticle();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
                 q_MC++;
@@ -475,24 +439,25 @@ namespace Belle2 {
             }
           }
         } else if (roe-> getNECLClusters() != 0) {
-          for (auto& cluster : roe-> getECLClusters()) {
-            if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
-            const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-            while (mcParticle != nullptr) {
-              if (mcParticle->getPDG() == 511) {
-                q_MC++;
-                break;
+          for (auto& cluster : roe->getPhotons()) {
+            if (cluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+              const MCParticle* mcParticle = cluster->getMCParticle();
+              while (mcParticle != nullptr) {
+                if (mcParticle->getPDG() == 511) {
+                  q_MC++;
+                  break;
+                }
+                if (mcParticle->getPDG() == -511) {
+                  q_MC--;
+                  break;
+                }
+                mcParticle = mcParticle->getMother();
               }
-              if (mcParticle->getPDG() == -511) {
-                q_MC--;
-                break;
-              }
-              mcParticle = mcParticle->getMother();
             }
           }
         } else if (roe-> getNKLMClusters() != 0) {
-          for (auto& klmcluster : roe-> getKLMClusters()) {
-            const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
+          for (auto& klmcluster : roe->getHadrons()) {
+            const MCParticle* mcParticle = klmcluster->getMCParticle();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
                 q_MC++;
@@ -613,91 +578,71 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
-          PCmsLabTransform T;
-          ClusterUtils C;
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          if (!roe.isValid()) return 0;
+
           TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
-          TLorentzVector momXChargedClusters; //Momentum of charged X clusters in CMS-System
-          TLorentzVector momXNeutralClusters; //Momentum of neutral X clusters in CMS-System
-          TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
+
+          const auto& roeChargedParticles = roe->getChargedParticles();
+          for (auto& roeChargedParticle : roeChargedParticles)
+          {
+            if (roeChargedParticle->isCopyOf(particle, true)) continue;
+            momXChargedTracks += roeChargedParticle->get4Vector();
+          }
+
+          TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(); //Momentum of neutral X clusters in CMS-System
+
+          const auto& klongs = roe->getHadrons();
+          for (auto& klong : klongs)
+          {
+            if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+              momXNeutralClusters += klong->get4Vector();
+            }
+          }
+
+          TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
+          TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
 
           double output = 0.0;
-
-          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          if (roe.isValid())
+          if (requestedVariable == "recoilMass") output = momX.M();
+          else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+          else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
+          else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+          else if (requestedVariable == "EW90")
           {
-            const auto& tracks = roe->getTracks();
-            for (auto& track : tracks) {
-              const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
-              const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-              const TrackFitResult* iTrack = track->getTrackFitResultWithClosestMass(charged);
-              if (iTrack == nullptr) continue;
-              if (track != particle->getTrack()) {
-                TLorentzVector iTrackMom = iTrack->get4Momentum();
-                if (iTrackMom == iTrackMom) momXChargedTracks += iTrackMom;
+
+            TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+            float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+            const auto& photons = roe->getPhotons();
+            for (auto& photon : photons) {
+              if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+                E_W_90 += photon->getECLClusterEnergy();
               }
             }
-
-            momXNeutralClusters = roe->get4VectorNeutralECLClusters();
-
-            const auto& klm = roe->getKLMClusters();
-            for (auto& x : klm) {
-              if (x == nullptr) continue;
-              TLorentzVector iMomKLMCluster = x -> getMomentum();
-              if (iMomKLMCluster == iMomKLMCluster) {
-                if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-                  momXNeutralClusters += iMomKLMCluster;
-                }
-              }
-            }
-
-            // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
-                                                        momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-            TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-
-            if (requestedVariable == "recoilMass") output = momX.M();
-            else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
-            else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
-            else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
-            else if (requestedVariable == "EW90") {
-
-              TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
-              float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-
-              const auto& ecl = roe->getECLClusters();
-              for (auto& x : ecl) {
-                if (x == nullptr) continue;
-                float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                if (x->isNeutral() && iEnergy == iEnergy) {
-                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x,
-                                                                      ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
-                }
-              }
-              for (auto& track : tracks) {
-                if (track != particle->getTrack()) {
-                  for (const ECLCluster& chargedCluster : track->getRelationsWith<ECLCluster>()) {
-                    // ignore everything except the nPhotons hypothesis
-                    if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-                      continue;
-                    float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                    if (iEnergy == iEnergy) {
-                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
-                                                                          ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
-                    }
+            for (auto& roeChargedParticle : roeChargedParticles) {
+              if (!roeChargedParticle->isCopyOf(particle, true)) {
+                for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
+                  // ignore everything except the nPhotons hypothesis
+                  if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+                    continue;
+                  float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+                  if (iEnergy == iEnergy) {
+                    if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
+                                                   ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
+                      E_W_90 += iEnergy;
                   }
                 }
               }
-
-              //       for (auto & i : klm) {
-              //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-              //         }
-
-              output = E_W_90;
-            } else {
-              B2FATAL("Wrong variable  " << requestedVariable <<
-                      " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
             }
+
+            output = E_W_90;
+          } else {
+            B2FATAL("Wrong variable " << requestedVariable <<
+            " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
           }
+
           return output;
         };
         return func;

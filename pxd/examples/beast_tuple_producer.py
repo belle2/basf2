@@ -15,26 +15,26 @@
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
+from ROOT import Belle2
+import ROOT
+import multiprocessing
+import SetMetaTimeModule
+from caf.utils import IoV
+from basf2 import *
 NUMBER_OF_PROCESSES = 20
 
-from basf2 import *
 set_log_level(LogLevel.ERROR)
 
 reset_database()
 use_central_database("Calibration_Offline_Development")
 
-from caf.utils import IoV
-import SetMetaTimeModule
-
-import multiprocessing
 
 # Some ROOT tools
-import ROOT
-from ROOT import Belle2
 
 
 class CalculationProcess(multiprocessing.Process):
     """ Main class to steer the production of ROOT tuples for beast """
+
     def __init__(self, iov, file_paths, output_dir):
         """ Constructor """
         super(CalculationProcess, self).__init__()
@@ -50,7 +50,9 @@ class CalculationProcess(multiprocessing.Process):
         # Register modules
         rootinput = register_module('RootInput')
         rootinput.param('inputFileNames', self.file_paths)
-        rootinput.param('branchNames', ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs'])
+        rootinput.param(
+            'branchNames', [
+                'EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs'])
         gearbox = register_module('Gearbox')
         gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
         geometry = register_module('Geometry')
@@ -59,10 +61,12 @@ class CalculationProcess(multiprocessing.Process):
         pxdclusterizer.param('ElectronicNoise', 1.0)
         pxdclusterizer.param('SeedSN', 9.0)
         pxdtupleproducer = register_module('PXDBgTupleProducer')
-        pxdtupleproducer.param('outputFileName',
-                               '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(self.output_dir,
-                                                                              self.iov.exp_low,
-                                                                              self.iov.run_low))
+        pxdtupleproducer.param(
+            'outputFileName',
+            '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(
+                self.output_dir,
+                self.iov.exp_low,
+                self.iov.run_low))
 
         # Create the path
         main = create_path()
@@ -99,15 +103,33 @@ if __name__ == "__main__":
 
     import pickle
     import argparse
-    parser = argparse.ArgumentParser(description="Produce pxd tuples and histofiles from ROOT formatted raw data")
-    parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
-    parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
-    parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-    parser.add_argument('--outputDir', default='./', type=str, help='Name of output directory for tuples')
+    parser = argparse.ArgumentParser(
+        description="Produce pxd tuples and histofiles from ROOT formatted raw data")
+    parser.add_argument(
+        '--runLow',
+        default=0,
+        type=int,
+        help='Compute mask for specific IoV')
+    parser.add_argument('--runHigh', default=-1, type=int,
+                        help='Compute mask for specific IoV')
+    parser.add_argument(
+        '--expNo',
+        default=3,
+        type=int,
+        help='Compute mask for specific IoV')
+    parser.add_argument(
+        '--outputDir',
+        default='./',
+        type=str,
+        help='Name of output directory for tuples')
     args = parser.parse_args()
 
     # Set the IoV range for this calibration
-    iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
+    iov_to_calibrate = IoV(
+        exp_low=args.expNo,
+        run_low=args.runLow,
+        exp_high=args.expNo,
+        run_high=args.runHigh)
 
     map_file_path = "file_iov_map.pkl"
     with open(map_file_path, 'br') as map_file:
@@ -133,7 +155,9 @@ if __name__ == "__main__":
 
     # Start worker processes
     for i in range(NUMBER_OF_PROCESSES):
-        multiprocessing.Process(target=worker, args=(task_queue, done_queue)).start()
+        multiprocessing.Process(
+            target=worker, args=(
+                task_queue, done_queue)).start()
 
     # Get and print results
     print('Unordered results:')

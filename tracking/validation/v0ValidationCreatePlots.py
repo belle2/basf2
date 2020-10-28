@@ -205,7 +205,7 @@ class V0ValidationPlots:
                                           description='Reconstruction Efficiency vs. r (perpendicular)',
                                           check='',
                                           contact='software-tracking@belle2.org',
-                                          meta_options='').Write()
+                                          meta_options='shifter').Write()
 
         V0ValidationPlots.efficiency_plot(self.hist_theta_found, self.hist_theta, 'Efficiency vs Theta', 'Theta', 'deg',
                                           description='Reconstruction Efficiency vs. theta',
@@ -223,7 +223,7 @@ class V0ValidationPlots:
                                           description='Reconstruction Efficiency vs momentum',
                                           check='',
                                           contact='software-tracking@belle2.org',
-                                          meta_options='shifter').Write()
+                                          meta_options='').Write()
 
         V0ValidationPlots.histogram_plot(self.hist_invariant_mass, "KShort Invariant Mass", "m", "GeV",
                                          description='Reconstructed invariant mass of KShorts with standard reconstruction',

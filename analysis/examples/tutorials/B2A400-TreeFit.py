@@ -7,7 +7,7 @@
 #
 # If you want to fit precise vertices with nTracks>2 attached and you are
 # interested in the vertex position, TagV COULD BE the better tool as it
-# reweights the tracks. However, you have to check yourself.
+# reweighs the tracks. However, you have to check yourself.
 #
 # This tutorial demonstrates how to perform a fit with
 # the TreeFitter. In this example the following decay chain:

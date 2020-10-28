@@ -16,7 +16,7 @@
 # MC campaign 3.5, therefore it can be ran only on KEKCC computers.
 #
 # Contributors: A. Zupanc (June 2014)
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #
 ######################################################
 

@@ -1,6 +1,6 @@
 # EventType: 1110024001
-# Descriptor: [B0 -> (rho+ -> pi+ pi0) (rho- -> pi- pi0) ]cc 
-# NickName: Bb_rho+rho-
+# Descriptor: [B0 -> (rho+ -> pi+ pi0) (rho- -> pi- pi0) ]cc f_L=PDG
+# NickName: Bd_rho+rho-
 # Documentation:    Decay mode for phi2/alpha and rediscoveries
 # Reponsible: R. Manfredi
 # Email: riccardo.manfredi@ts.infn.it

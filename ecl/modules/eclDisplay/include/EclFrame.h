@@ -70,7 +70,7 @@ namespace Belle2 {
     /**  EclData, class containing data to display. */
     EclData* m_ecl_data;
     /** Slider to set the time range */
-    TGDoubleHSlider* m_time_slider;
+    //TGDoubleHSlider* m_time_slider;
 
     /**  Slider for choosing events range. */
     TGDoubleHSlider* m_ev_slider;

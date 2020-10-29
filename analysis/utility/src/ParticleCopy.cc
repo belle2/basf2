@@ -31,10 +31,15 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
 
     Particle* daughterCopy = copyParticle(originalDaughter);
 
+    // If the particle has undergone Bremsstrahlung correction, removing its
+    // daughters (the original lepton and potential photons) and then appending
+    // the copied versions should not change its source type.
+    bool updateType = true;
+    if (copy->hasExtraInfo("bremsCorrected")) updateType = false;
     // remove original daughter
-    copy->removeDaughter(originalDaughter);
+    copy->removeDaughter(originalDaughter, updateType);
     // append copied daughter instead
-    copy->appendDaughter(daughterCopy);
+    copy->appendDaughter(daughterCopy, updateType);
   }
 
   return copy;

@@ -1,6 +1,13 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
+Bremsstrahlung correction
++++++++++++++++++++++++++
+
+ * Fixed that the copies of particles to which Bremsstrahlung was applied (whether this resulted in a added photon or
+   not) are considered as sources of tracks. This allows to update the daughters in vertex fits that involve
+   brems-corrected particles.
+
 Variables
 +++++++++
 

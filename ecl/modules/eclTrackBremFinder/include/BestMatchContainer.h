@@ -35,7 +35,7 @@ namespace Belle2 {
      * @param estComparison The default estimator will favor items with
      *  smaller estimates
      */
-    bool add(TItem const& item, TEstimator est,
+    bool add(TItem item, TEstimator est,
              EstimatorComparison estComparison
     = [](TEstimator currentBest, TEstimator newEst) {return newEst < currentBest;}
             )
@@ -77,7 +77,7 @@ namespace Belle2 {
     /**
      * Set a new item as the best match
      */
-    void setBestMatch(TItem const& item, TEstimator est)
+    void setBestMatch(TItem item, TEstimator est)
     {
       m_bestMatch = item;
       m_bestEstimator = est;

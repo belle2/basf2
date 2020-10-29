@@ -104,8 +104,6 @@ void ECLChargedPIDDataAnalysisValidationModule::beginRun()
 void ECLChargedPIDDataAnalysisValidationModule::event()
 {
 
-  std::string chargedPdgIdStr;
-
   for (const auto& chargedPdgId : m_inputPdgIdSet) {
 
     // Get the idx of this pdgId in the Const::chargedStableSet

@@ -147,8 +147,8 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
     dirs.emplace_back(getenv(envVar.c_str()));
   }
   std::string dirName = boost::to_lower_copy(dataType) + "-data";
-  if (getenv("VO_BELL2_SW_DIR")) {
-    dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
+  if (getenv("VO_BELLE2_SW_DIR")) {
+    dirs.push_back((fs::path(getenv("VO_BELLE2_SW_DIR")) / dirName).string());
   }
   dirs.push_back(dirName);
   std::string result = findFile(path, dirs, true);

@@ -1,7 +1,0 @@
-EEMMG_1.0 {
-    global:
-        eemmgloopisrfsr_;
-        eemmgsqampisrfsr_;
-    local:
-        *;
-};

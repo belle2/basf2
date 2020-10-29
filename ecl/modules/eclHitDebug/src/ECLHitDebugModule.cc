@@ -92,7 +92,7 @@ void ECLHitDebugModule::event()
     const TVector3& VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
 
-    int iECLCell = hitCellId; //TODO at the next line is a == of these identical variables, why?
+    int iECLCell = hitCellId;
     if (hitTOF < 8000) {
       int TimeIndex = (int) hitTOF / interval;
       E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;

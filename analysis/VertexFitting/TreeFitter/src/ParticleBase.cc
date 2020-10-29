@@ -159,7 +159,11 @@ namespace TreeFitter {
 
       }
     } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
-      rc = new RecoTrack(particle, mother);
+      if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> simple track
+        rc = new RecoTrack(particle, mother);
+      } else { // Got gammas -> composite particle
+        rc = new RecoComposite(particle, mother, config, true);
+      }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||
                particle->getECLCluster() ||

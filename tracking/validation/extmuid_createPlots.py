@@ -217,6 +217,8 @@ def draw_likelihoods(file_chain):
     Draw the Muid likelihood-based distributions.
     """
 
+    contact_mail = "depietro@infn.it"
+
     outcome = TH1F('Outcome', 'Outcome', 5, -0.5, 4.5)
 
     llBins = 120

@@ -50,7 +50,7 @@ namespace Belle2 {
       _y(0),
       _winx(0), _winy(0), _winw(0), _winh(0), _wind(0),
       _innerR(innerR),
-      _outerR(outerR)
+      _outerR(outerR),
 
       _blue(Gdk::Color("blue")),
       _red(Gdk::Color("red")),

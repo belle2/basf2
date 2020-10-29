@@ -364,6 +364,7 @@ namespace Belle2 {
     /**
      * Removes index of daughter from daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool whether particle type should be updated if last daughter was removed
      */
     void removeDaughter(const Particle* daughter, const bool updateType = true);
 

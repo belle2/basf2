@@ -94,6 +94,7 @@ CDCTriggerRecoHitMatcherModule::event()
     Track* ttrack = recoTrack->getRelatedFrom<Track>(m_TrackCollectionName);
     const TrackFitResult* fitres = ttrack->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(
                                      211));
+    /*
     continue;
     if (fitres) {
       // double omega = fitres->getOmega();
@@ -122,5 +123,6 @@ CDCTriggerRecoHitMatcherModule::event()
         }
       }
     }
+    */
   }
 }

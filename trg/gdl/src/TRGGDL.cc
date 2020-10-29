@@ -380,7 +380,7 @@ namespace Belle2 {
                      i, _evt, m_PrescalesDB->getprescales(i),
                      _inpBits[i_ehigh] ? 1 : 0,
                      _inpBits[i_bha_veto] ? 1 : 0,
-                     ftdl_fired ? 1 : 0,
+                     ftdl_fired,
                      psnm_fired ? 1 : 0,
                      i_ehigh,
                      i_bha_veto,
@@ -467,6 +467,7 @@ namespace Belle2 {
               B2DEBUG(20,
                       alg.substr(begin_word, word_length).c_str()
                       << "(" << fired << ")");
+              // cppcheck-suppress knownConditionTrueFalse
               if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
                 return true;
               }

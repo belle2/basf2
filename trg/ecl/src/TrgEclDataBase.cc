@@ -305,6 +305,7 @@ TrgEclDataBase::getCoeffNoise(int TCId, std::vector<std::vector<double>>& CoeffN
 {
 
   TCId = 0; //This value will be used later
+  // cppcheck-suppress knownConditionTrueFalse
   if (TCId != 0) {return;}
 
   CoeffNoise31 = {

@@ -308,6 +308,7 @@ namespace Belle2 {
         cout << " total " << nMC << " mc fit valid contribution(s)";
       }
 
+      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
     }
@@ -339,6 +340,7 @@ namespace Belle2 {
           }
         }
       }
+      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
       cout << endl;

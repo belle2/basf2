@@ -1520,8 +1520,7 @@ namespace Belle2 {
     // }
     //}
 
-    /* cppcheck-suppress variableScope */
-    int trgOutput = 2;
+    const int trgOutput = 2;
     // Store TRG data to TRGSignalBundle.
     // 1 is FE output. 2 is Merger output. 3 is TRG output.
     //...Clock...
@@ -1550,6 +1549,7 @@ namespace Belle2 {
     if (_makeRootFile) {
       saveTRGRawInformation(trgInformations);
       saveCDCHitInformation(hitCdcData);
+      // cppcheck-suppress knownConditionTrueFalse
       if (trgOutput == 2) {
         saveTRGHitInformation(hitTrgData);
       }
@@ -2469,6 +2469,7 @@ namespace Belle2 {
       unsigned fid = 0;
       unsigned mid = 0;
       unsigned tid = 0;
+      // cppcheck-suppress knownConditionTrueFalse
       if (lid != 0) mid = lid + tid; //jb
       for (unsigned i = 0; i < 5; i++) {
         const string car = TRGUtil::carstring(cdr);

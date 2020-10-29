@@ -415,7 +415,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     std::vector<std::vector<int>> BitMap;
     int LeafBitMap[320] = {};
-    char LeafNames[320][100];
+    char LeafNames[320][100] = {};
 
   };
 

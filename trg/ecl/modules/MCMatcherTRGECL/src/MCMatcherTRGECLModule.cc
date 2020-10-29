@@ -222,7 +222,7 @@ void MCMatcherTRGECLModule::event()
       if (hitTCId != TCId[ihit]) {continue;}
       if (itimeindex != timeindex) {continue;}
       if (backtag == 0) { SignalContribution[ihit] =  SignalContribution[ihit] + hitE;}
-      else if (backtag != 0) { BKGContribution[ihit] =  BKGContribution[ihit] + hitE;}
+      else              { BKGContribution[ihit] =  BKGContribution[ihit] + hitE;}
 
 
       if (TCId[ihit] == hitTCId && maxEnergy[ihit][0] < hitE) {

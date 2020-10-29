@@ -864,6 +864,7 @@ namespace Belle2 {
 
     //...Event time...
     bool fEvtTime = true;
+    // cppcheck-suppress knownConditionTrueFalse
     double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
 
     // Loop over all tracks
@@ -957,8 +958,10 @@ namespace Belle2 {
         lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
         mcLR[iSL] = _segment->hit()->mcLR();
         driftLength[iSL] = _segment->hit()->drift();
-        if (fmcLR == 1) LR[iSL] = mcLR[iSL];
-        else if (fLRLUT == 1) LR[iSL] = lutLR[iSL];
+        // cppcheck-suppress knownConditionTrueFalse
+        if (fmcLR)       LR[iSL] = mcLR[iSL];
+        // cppcheck-suppress knownConditionTrueFalse
+        else if (fLRLUT) LR[iSL] = lutLR[iSL];
         else LR[iSL] = 3;
       }//End superlayer loop
       // 2D fit values from IW 2D fitter

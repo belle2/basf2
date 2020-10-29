@@ -174,9 +174,9 @@ namespace Belle2 {
 
   private:
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* _TCMap = nullptr;
     /** Object of Trigger ECL DataBase */
-    TrgEclDataBase* _database;
+    TrgEclDataBase* _database = nullptr;
 
     /** Bhabha Combination*/
     std::vector<double> BhabhaComb;
@@ -218,7 +218,7 @@ namespace Belle2 {
     // theta region(low and high) of 3D Bhbabha veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     // flag which shows theta position of clusters of 3DBhabha Selection.
-    int m_3DBhabhaSelectionThetaFlag;
+    int m_3DBhabhaSelectionThetaFlag = std::numeric_limits<int>::quiet_NaN();
     // TCIDs of two clusters of 3D Bhabha selection
     std::vector<int>    m_3DBhabhaSelectionClusterTCIds;
     // ThetaIDs of two clusters used for 3D Bhabha selection

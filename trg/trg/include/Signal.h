@@ -46,7 +46,7 @@ namespace Belle2 {
     TRGSignal(const TRGSignal&);
 
     /// Constructor.
-    TRGSignal(const TRGTime&);
+    explicit TRGSignal(const TRGTime&);
 
     /// Default assignment operator
     TRGSignal& operator=(const TRGSignal&) = default;

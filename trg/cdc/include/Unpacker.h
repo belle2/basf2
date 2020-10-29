@@ -1356,6 +1356,8 @@ namespace Belle2 {
                   //   }
 
                   // }
+
+                  // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
                     hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
                     // if (sim13dt) {

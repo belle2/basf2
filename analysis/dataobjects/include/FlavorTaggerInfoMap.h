@@ -141,61 +141,61 @@ namespace Belle2 {
      * get map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
     * @return map
     */
-    std::map<std::string, const Belle2::Track*> getTargetTrackLevel();
+    std::map<std::string, const Belle2::Track*> getTargetTrackLevel() const;
 
     /**
-     * get map containing the category name and thecorresponding highest target track probability in Track Level
+     * get map containing the category name and the corresponding highest target track probability in Track Level
     * @return map
     */
-    std::map<std::string, float> getProbTrackLevel();
+    std::map<std::string, float> getProbTrackLevel() const;
 
     /**
      * get map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
     * @return map
     */
-    std::map<std::string, const Belle2::Track*> getTargetEventLevel();
+    std::map<std::string, const Belle2::Track*> getTargetEventLevel() const;
 
     /**
      * get map containing the category name and the corresponding highest category probability in Event Level
     * @return map
     */
-    std::map<std::string, float> getProbEventLevel();
+    std::map<std::string, float> getProbEventLevel() const;
 
     /**
      * get map containing the category name and the corresponding qr Output
     * @return map
     */
-    std::map<std::string, float> getQpCategory();
+    std::map<std::string, float> getQpCategory() const;
 
     /**
      * get map containing the category truth. 1 if the Category has a target or 0 else.
     * @return map
     */
-    std::map<std::string, float> getHasTrueTarget();
+    std::map<std::string, float> getHasTrueTarget() const;
 
     /**
      * get map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
      * @return map
      */
-    std::map<std::string, float> getIsTrueCategory();
+    std::map<std::string, float> getIsTrueCategory() const;
 
     /**
      * qr Output of the Combiner. Output of the FlavorTagger after the complete process.
     * @return qr
     */
-    float getQrCombined();
+    float getQrCombined() const;
 
     /**
      * Probability of being a B0. Output of the FlavorTagger after the complete process.
     * @return B0Probability
     */
-    float getB0Probability();
+    float getB0Probability() const;
 
     /**
      * Probability of being a B0bar. Output of the FlavorTagger after the complete process.
     * @return B0barProbability
     */
-    float getB0barProbability();
+    float getB0barProbability() const;
 
 
   private:
@@ -207,7 +207,7 @@ namespace Belle2 {
     std::map<std::string, const Belle2::Track*>
     m_targetTrackLevel; /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level*/
     std::map<std::string, float>
-    m_probTrackLevel; /**< map containing the category name and thecorresponding highest target track probability in Track Level*/
+    m_probTrackLevel; /**< map containing the category name and the corresponding highest target track probability in Track Level*/
     std::map<std::string, const Belle2::Track*>
     m_targetEventLevel; /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level*/
     std::map<std::string, float>

@@ -1,33 +1,30 @@
+from itertools import islice
+from tracking import add_tracking_reconstruction
+import rawdata as raw
+from caf.strategies import SequentialBoundaries
+import modularAnalysis as ana
+import svd as svd
+from prompt.utils import events_in_basf2_file
+from caf.utils import ExpRun, IoV
+from caf import strategies
+from caf import backends
+from prompt import CalibrationSettings
+from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
+from ROOT import Belle2, TFile
+import ROOT
+from random import choice, seed
+import glob
+import datetime
+import multiprocessing
+import sys
+import os
 import basf2
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
-import os
-import sys
-import multiprocessing
-import datetime
-import glob
-from random import choice, seed
-
-import ROOT
-from ROOT import Belle2, TFile
-from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
-
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
-from prompt import CalibrationSettings
-from caf import backends
-from caf import strategies
-from caf.utils import ExpRun, IoV
-from prompt.utils import events_in_basf2_file
-
-import svd as svd
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
-import rawdata as raw
-
-from tracking import add_tracking_reconstruction
 
 now = datetime.datetime.now()
 isMC = False
@@ -39,11 +36,11 @@ settings = CalibrationSettings(name="caf_svd_time",
                                input_data_names=["hlt_hadron"],
                                depends_on=[],
                                expert_config={
-                                              "max_files_per_run": 20,
-                                              "min_events_per_run": 10000,
-                                              "min_events_per_file": 2000,
-                                              "max_events_per_file": 5000
-                                              })
+                                   "max_files_per_run": 20,
+                                   "min_events_per_run": 10000,
+                                   "min_events_per_file": 2000,
+                                   "max_events_per_file": 5000
+                               })
 
 ##################################################################
 # Remove Module from the Path
@@ -56,7 +53,8 @@ def remove_module(path, name):
         if name != m.name():
             new_path.add_module(m)
     return new_path
-#####################################################################################################
+##########################################################################
+
 
 NEW_RECO_DIGITS_NAME = "SVDRecoDigitsFromTracks"
 NEW_SHAPER_DIGITS_NAME = "SVDShaperDigitsFromTracks"
@@ -124,8 +122,6 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster.param("timeAlgorithm", time_algorithm)
     return cluster
 
-from itertools import islice
-
 
 def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
     """
@@ -173,9 +169,15 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
     iter_all_input_files = iter(all_input_files)
     iter_exp_list = iter(exp_list)
     iter_run_list = iter(run_list)
-    splitted_all_input_files = [list(islice(iter_all_input_files, elem)) for elem in size_for_run]
-    splitted_exp_list = [list(islice(iter_exp_list, elem)) for elem in size_for_run]
-    splitted_run_list = [list(islice(iter_run_list, elem)) for elem in size_for_run]
+    splitted_all_input_files = [
+        list(
+            islice(
+                iter_all_input_files,
+                elem)) for elem in size_for_run]
+    splitted_exp_list = [list(islice(iter_exp_list, elem))
+                         for elem in size_for_run]
+    splitted_run_list = [list(islice(iter_run_list, elem))
+                         for elem in size_for_run]
 
     selected_files = []
     selected_files_per_run = []
@@ -204,11 +206,15 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
                 events_counter = max_events_per_each_file
             total_events += events_counter
             total_events_per_run += events_counter
-        basf2.B2INFO(f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
-        basf2.B2INFO(f"Total chosen files per run = {len(selected_files_per_run)}")
-        basf2.B2INFO(f"Total events in chosen files per run = {total_events_per_run}")
+        basf2.B2INFO(
+            f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
+        basf2.B2INFO(
+            f"Total chosen files per run = {len(selected_files_per_run)}")
+        basf2.B2INFO(
+            f"Total events in chosen files per run = {total_events_per_run}")
         if total_events < min_events:
-            basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_each_file={max_events_per_each_file}.")
+            basf2.B2ERROR(
+                f"Not enough files for the calibration when max_events_per_each_file={max_events_per_each_file}.")
         selected_files_per_run.clear()
         total_events_per_run = 0
     basf2.B2INFO(f"Total chosen files = {len(selected_files)}")
@@ -281,19 +287,29 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hlt_hadron"]
     expert_config = kwargs.get("expert_config")
-    max_files_per_run = expert_config["max_files_per_run"]  # This number should be setted from the biginning
-    min_events_per_run = expert_config["min_events_per_run"]  # Minimum number of events selected per each run
-    min_events_per_file = expert_config["min_events_per_file"]  # Files with less events will be discarded
-    # Nominal max number of events selected per file. The events in the file can be more.
+    # This number should be setted from the biginning
+    max_files_per_run = expert_config["max_files_per_run"]
+    # Minimum number of events selected per each run
+    min_events_per_run = expert_config["min_events_per_run"]
+    # Files with less events will be discarded
+    min_events_per_file = expert_config["min_events_per_file"]
+    # Nominal max number of events selected per file. The events in the file
+    # can be more.
     max_events_selected_per_file = expert_config["max_events_per_file"]
 
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
-    good_input_files = select_files(reduced_file_to_iov_physics, min_events_per_run, max_events_selected_per_file)
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(
+        file_to_iov_physics, max_files_per_run, min_events_per_file)
+    good_input_files = select_files(
+        reduced_file_to_iov_physics,
+        min_events_per_run,
+        max_events_selected_per_file)
 
-    basf2.B2INFO(f"Total number of files before selection = {max_files_per_run}")
-    basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")
+    basf2.B2INFO(
+        f"Total number of files before selection = {max_files_per_run}")
+    basf2.B2INFO(
+        f"Total number of files actually used as input = {len(good_input_files)}")
 
     exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]
     runs = sorted([i.run_low for i in reduced_file_to_iov_physics.values()])
@@ -332,23 +348,26 @@ def get_calibrations(input_data, **kwargs):
     # Build the clusterizers with the different options.
     ####
 
-    cog6 = create_svd_clusterizer(name=f"ClusterReconstruction{cog6_suffix}",
-                                  clusters=f"SVDClustersFromTracks{cog6_suffix}",
-                                  reco_digits=NEW_RECO_DIGITS_NAME,
-                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
-                                  time_algorithm=0)
+    cog6 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog6_suffix}",
+        clusters=f"SVDClustersFromTracks{cog6_suffix}",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=0)
 
-    cog3 = create_svd_clusterizer(name=f"ClusterReconstruction{cog3_suffix}",
-                                  clusters=f"SVDClustersFromTracks{cog3_suffix}",
-                                  reco_digits=NEW_RECO_DIGITS_NAME,
-                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
-                                  time_algorithm=1)
+    cog3 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog3_suffix}",
+        clusters=f"SVDClustersFromTracks{cog3_suffix}",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=1)
 
-    els3 = create_svd_clusterizer(name=f"ClusterReconstruction{els3_suffix}",
-                                  clusters=f"SVDClustersFromTracks{els3_suffix}",
-                                  reco_digits=NEW_RECO_DIGITS_NAME,
-                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
-                                  time_algorithm=2)
+    els3 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{els3_suffix}",
+        clusters=f"SVDClustersFromTracks{els3_suffix}",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=2)
 
     ####
     # Build the Collectors and Algorithms with the different (but matching) options
@@ -357,33 +376,46 @@ def get_calibrations(input_data, **kwargs):
     if isMC:
         eventInfo = "SVDEventInfoSim"
 
-    coll_cog6 = create_collector(name=f"SVDTimeCalibrationCollector{cog6_suffix}",
-                                 clusters=f"SVDClustersFromTracks{cog6_suffix}",
-                                 event_info=eventInfo,
-                                 event_t0="EventT0")
+    coll_cog6 = create_collector(
+        name=f"SVDTimeCalibrationCollector{cog6_suffix}",
+        clusters=f"SVDClustersFromTracks{cog6_suffix}",
+        event_info=eventInfo,
+        event_t0="EventT0")
 
-    algo_cog6 = create_algorithm(unique_id_cog6, prefix=coll_cog6.name(), min_entries=10000)
+    algo_cog6 = create_algorithm(
+        unique_id_cog6,
+        prefix=coll_cog6.name(),
+        min_entries=10000)
 
-    coll_cog3 = create_collector(name=f"SVDTimeCalibrationCollector{cog3_suffix}",
-                                 clusters=f"SVDClustersFromTracks{cog3_suffix}",
-                                 event_info=eventInfo,
-                                 event_t0="EventT0")
+    coll_cog3 = create_collector(
+        name=f"SVDTimeCalibrationCollector{cog3_suffix}",
+        clusters=f"SVDClustersFromTracks{cog3_suffix}",
+        event_info=eventInfo,
+        event_t0="EventT0")
 
-    algo_cog3 = create_algorithm(unique_id_cog3, prefix=coll_cog3.name(), min_entries=10000)
+    algo_cog3 = create_algorithm(
+        unique_id_cog3,
+        prefix=coll_cog3.name(),
+        min_entries=10000)
 
-    coll_els3 = create_collector(name=f"SVDTimeCalibrationCollector{els3_suffix}",
-                                 clusters=f"SVDClustersFromTracks{els3_suffix}",
-                                 event_info=eventInfo,
-                                 event_t0="EventT0")
+    coll_els3 = create_collector(
+        name=f"SVDTimeCalibrationCollector{els3_suffix}",
+        clusters=f"SVDClustersFromTracks{els3_suffix}",
+        event_info=eventInfo,
+        event_t0="EventT0")
 
-    algo_els3 = create_algorithm(unique_id_els3, prefix=coll_els3.name(), min_entries=10000)
+    algo_els3 = create_algorithm(
+        unique_id_els3,
+        prefix=coll_els3.name(),
+        min_entries=10000)
 
     ####
     # Build the pre_collector_path for reconstruction BUT we also sneakily
     # add the two cog collectors to it.
     ####
 
-    pre_collector_path = create_pre_collector_path(clusterizers=[cog6, cog3, els3])
+    pre_collector_path = create_pre_collector_path(
+        clusterizers=[cog6, cog3, els3])
     pre_collector_path.add_module(coll_cog6)
     pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF

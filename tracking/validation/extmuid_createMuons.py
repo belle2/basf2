@@ -15,7 +15,7 @@
 """
 <header>
     <output>muon-ExtMuidValidation.root</output>
-    <contact>piilonen@vt.edu</contact>
+    <contact>depietro@infn.it</contact>
     <description>Create events with 1 muon track for ext/muid validation.</description>
 </header>
 """

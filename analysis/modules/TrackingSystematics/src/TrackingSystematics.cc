@@ -117,10 +117,7 @@ void TrackingMomentumModule::event()
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
 
-      double m = particle->getMass();
-      TVector3 p = m_scale * particle->getMomentum();
-      double e = sqrt(p.Mag2() + m * m);
-      particle->set4Vector(TLorentzVector(p, e));
+      particle->setMomentumScalingFactor(m_scale);
     }
   }
 }

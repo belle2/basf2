@@ -134,7 +134,7 @@ namespace Belle2 {
 
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */
     std::map<WireID, std::pair<int, int>> m_chMap = {}; /**< Channel map retrieved  */
-    DBArray<CDCChannelMap>* m_channelMapFromDB; /**< Channel map retrieved from DB. */
+    DBArray<CDCChannelMap>* m_channelMapFromDB = nullptr; /**< Channel map retrieved from DB. */
     float m_senseR[56] = {}; /**< Radius of sense (+field) layer.  */
     float m_fieldR[57] = {}; /**< Radius of field layer.  */
     float m_offset[56] = {}; /**< Offset of sense layer  */

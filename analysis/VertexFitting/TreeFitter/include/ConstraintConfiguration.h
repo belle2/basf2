@@ -78,13 +78,13 @@ namespace TreeFitter {
     /** list of constraints not to apply in tree fit */
     const std::vector<std::string>  m_removeConstraintList;
 
-    /** automatically determing if it is worth extrating a vertex for this particle or if it should be joined with the mother */
+    /** automatically determining if it is worth extracting a vertex for this particle or if it should be joined with the mother */
     const bool  m_automatic_vertex_constraining;
 
-    /** is IP cosntraint  */
+    /** is IP constraint  */
     const bool m_ipConstraint;
 
-    /** is constum origin */
+    /** is custom origin */
     const bool m_customOrigin;
 
     /** x,y,z of custom origin as vector len 3 */

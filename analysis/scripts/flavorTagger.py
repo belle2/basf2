@@ -1035,7 +1035,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
 
 def flavorTagger(
-    particleLists=[],
+    particleLists=None,
     mode='Expert',
     weightFiles='B2nunubarBGx1',
     workingDirectory='.',

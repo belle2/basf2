@@ -32,8 +32,9 @@ def setupBelleMagneticField(path):
     """
     This function set the Belle Magnetic field (constant).
     """
-    B2WARNING('setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
-              'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
+    B2WARNING(
+        'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
+        'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
 
 def setupB2BIIDatabase(isMC=False):
@@ -56,12 +57,22 @@ def setupB2BIIDatabase(isMC=False):
     use_database_chain()
     # fallback to previously downloaded payloads if offline
     if not isMC:
-        use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, True, LogLevel.ERROR)
+        use_local_database(
+            "%s/dbcache.txt" %
+            payloaddir,
+            payloaddir,
+            True,
+            LogLevel.ERROR)
         # get payloads from central database
         use_central_database(tagname, LogLevel.WARNING, payloaddir)
     # unless they are already found locally
     if isMC:
-        use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
+        use_local_database(
+            "%s/dbcache.txt" %
+            payloaddir,
+            payloaddir,
+            False,
+            LogLevel.WARNING)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
@@ -72,7 +83,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   matchType2E9oE25Threshold=-1.1,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
-                                  enableRecTrg=False, enableEvtcls=True):
+                                  enableRecTrg=False, enableEvtcls=True,
+                                  SmearTrack=0):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -93,12 +105,16 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
         enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
+        SmearTrack (float): Smear the MC tracks to match real data. Does not work on real data.
+            Default value is 0 which does no smearing. The recommended value is 2 if you want track smearing.
+            Details can be found https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
     try:
-        cdll.LoadLibrary('/sw/belle/local/neurobayes/lib/libNeuroBayesCore_shared.so')
-    except:
+        cdll.LoadLibrary(
+            '/sw/belle/local/neurobayes/lib/libNeuroBayesCore_shared.so')
+    except BaseException:
         pass
 
     if useBelleDBServer is None:
@@ -123,7 +139,10 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
     from ROOT import Belle2  # reduced scope of potentially-misbehaving import
     field = Belle2.MagneticField()
-    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+    field.addComponent(
+        Belle2.MagneticFieldComponentConstant(
+            Belle2.B2Vector3D(
+                0, 0, 1.5 * Belle2.Unit.T)))
     Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):
@@ -134,9 +153,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
+        fix.param('Smear_trk', SmearTrack)
         if (HadronA is not True and HadronB is True):
-            B2WARNING('The Hadron A skim is turned off.'
-                      'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
+            B2WARNING(
+                'The Hadron A skim is turned off.'
+                'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
         path.add_module(fix)
 
         if(applySkim):
@@ -205,7 +226,8 @@ def parse_process_url(url):
         if os.path.exists(url):
             return [url]
         else:
-            B2ERROR("Could not parse url '{0}': no such file or directory".format(url))
+            B2ERROR(
+                "Could not parse url '{0}': no such file or directory".format(url))
             return []
 
     # regular expression to find process_event lines in html response
@@ -214,8 +236,11 @@ def parse_process_url(url):
     try:
         request = requests.get(url)
         request.raise_for_status()
-        return [e.decode("ASCII") for e in process_event.findall(request.content)]
+        return [e.decode("ASCII")
+                for e in process_event.findall(request.content)]
     except (requests.ConnectionError, requests.HTTPError) as e:
-        B2ERROR("Failed to connect to '{url}': {message}".format(url=url, message=str(e)))
+        B2ERROR(
+            "Failed to connect to '{url}': {message}".format(
+                url=url, message=str(e)))
 
     return []

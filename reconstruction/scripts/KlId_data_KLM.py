@@ -73,7 +73,7 @@ add_reconstruction(mypath)
 #      m.logging.info("Setting KLMclassifier to {}".format(KLMexpertPath))
 #      m.param("classifierPath",KLMexpertPath)
 
-if((not useKLM)and(not useECL)):
+if((not useKLM) and (not useECL)):
     sys.exit("nether KLM nor ECL data will be written. Aborting...")
 
 data_writer = register_module('DataWriter')

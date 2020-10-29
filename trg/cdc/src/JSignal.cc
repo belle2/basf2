@@ -635,8 +635,7 @@ namespace Belle2 {
     // Calculate result final clock.
     int t_maxClock = t_reference.m_finishClock;
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
-      TRGCDCJSignal* assign;
-      assign = &(data[iCondition][0]);
+      const TRGCDCJSignal* assign = &(data[iCondition][0]);
       if (t_maxClock < assign->m_finishClock) t_maxClock = assign->m_finishClock;
     }
     // Save final clock.
@@ -655,8 +654,7 @@ namespace Belle2 {
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
       TRGCDCJSignal* from = 0;
       TRGCDCJSignal* to = 0;
-      TRGCDCJSignal* assign = 0;
-      assign = &(data[iCondition][0]);
+      TRGCDCJSignal* assign = &(data[iCondition][0]);
 
       // To keep properties.
       TRGCDCJSignal t_assign(*assign);
@@ -703,8 +701,7 @@ namespace Belle2 {
     }
     // For integer case.
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
-      TRGCDCJSignal const* assign;
-      assign = &(data[iCondition][0]);
+      TRGCDCJSignal const* assign = &(data[iCondition][0]);
       // For default case.
       if (data[iCondition].size() == 1) {
         string t_string = "";
@@ -722,8 +719,7 @@ namespace Belle2 {
     }
     // For actual case.
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
-      TRGCDCJSignal const* assign;
-      assign = &(data[iCondition][0]);
+      TRGCDCJSignal const* assign = &(data[iCondition][0]);
       // For default case.
       if (data[iCondition].size() == 1) {
         target.m_actual = (*assign).m_actual;
@@ -751,12 +747,13 @@ namespace Belle2 {
   }
 
   void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& targetMin, TRGCDCJSignal const& targetMax,
-                             TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data)
+                             TRGCDCJSignal const& reference, const std::vector<std::vector<TRGCDCJSignal> >& data)
   {
     choose(target, targetMin, targetMax, reference, data, -3);
   }
 
-  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data,
+  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference,
+                             const std::vector<std::vector<TRGCDCJSignal> >& data,
                              int targetClock)
   {
 
@@ -767,8 +764,7 @@ namespace Belle2 {
     double t_toReal;
     // Find targetMin and targetMax between assignments.
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
-      TRGCDCJSignal* assign;
-      assign = &(data[iCondition][0]);
+      const TRGCDCJSignal* assign = &(data[iCondition][0]);
       if (iCondition == 0) {
         t_minInt = assign->getMinInt();
         t_maxInt = assign->getMaxInt();
@@ -791,7 +787,8 @@ namespace Belle2 {
     choose(target, t_targetMin, t_targetMax, reference, data, targetClock);
   }
 
-  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data)
+  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference,
+                             const std::vector<std::vector<TRGCDCJSignal> >& data)
   {
     choose(target, reference, data, -3);
   }
@@ -1118,13 +1115,13 @@ namespace Belle2 {
     return slvToUnsigned(in, in.m_toReal, in.m_minInt, in.m_maxInt, in.m_actual, in.m_minActual, in.m_maxActual, in.m_finishClock);
   }
 
-  TRGCDCJSignal const TRGCDCJSignal::toSlv(TRGCDCJSignal const& in, int test)
+  TRGCDCJSignal const TRGCDCJSignal::toSlv(TRGCDCJSignal const& in, int /*test*/)
   {
 
     TRGCDCJSignal result(in);
 
     // Temporary signal.
-    test += 0;
+    //test += 0; //TODO why?
     signed long long t_int = in.m_int;
     if (in.m_type == -1) {
       // Change signed m_int to vector<bool>
@@ -1166,7 +1163,7 @@ namespace Belle2 {
 
 
 
-  TRGCDCJSignal TRGCDCJSignal::comp(TRGCDCJSignal const& lhs, std::string operate, TRGCDCJSignal const& rhs)
+  TRGCDCJSignal TRGCDCJSignal::comp(TRGCDCJSignal const& lhs, const std::string& operate, TRGCDCJSignal const& rhs)
   {
     // Make copies for method.
     TRGCDCJSignal t_lhs(lhs);
@@ -1664,7 +1661,8 @@ namespace Belle2 {
     return (signed long long) FpgaUtility::roundInt(value / mother.m_toReal);
   }
 
-  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
+  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second,
+                                          int& type,
                                           int& bitwidth)
   {
     if (first.m_type != second.m_type) {
@@ -2151,7 +2149,7 @@ namespace Belle2 {
 
   }
 
-  void TRGCDCJSignal::printVhdl(std::string& vhdlCode)
+  void TRGCDCJSignal::printVhdl(const std::string& vhdlCode) const
   {
     if (m_commonData) {
       ofstream outFile;
@@ -2165,7 +2163,7 @@ namespace Belle2 {
     }
   }
 
-  void TRGCDCJSignal::checkInt(std::string name) const
+  void TRGCDCJSignal::checkInt(const std::string& name) const
   {
     if (m_int > calMaxInteger()) {
       cout << "[Error] " << name << " => m_int overflow" << endl;

@@ -182,7 +182,7 @@ CDCTriggerNeuroModule::event()
     tsvector = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getTSVector() : tsvector;
     std::vector<bool> driftthreshold;
     for (int k = 8; k >= 0; k--) {
-      driftthreshold.push_back(!tsvector[k] | bool ((puredriftth & (1 << k)) >> k));
+      driftthreshold.push_back(!tsvector[k] || static_cast<bool>((puredriftth & (1 << k)) >> k));
     }
     int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
     short quadrant;

@@ -38,7 +38,7 @@ namespace Belle2 {
 
   public:
     //! SetUp
-    void Setup(std::vector<int>, std::vector<double>, std::vector<double>);
+    void Setup(const std::vector<int>&, const std::vector<double>&, const std::vector<double>&);
     //! Get Evnet-timing
     double GetEventTiming(int);//Get eventtming
     //! Fastest TC Timing
@@ -52,7 +52,7 @@ namespace Belle2 {
     //! Get Timing Source
     int GetTimingSource() {return Source;}
     // set energy threshold of event timing quality flag
-    void setEventTimingQualityThresholds(std::vector<double> iEventTimingQualityThresholds)
+    void setEventTimingQualityThresholds(const std::vector<double>& iEventTimingQualityThresholds)
     {
       m_EventTimingQualityThresholds = iEventTimingQualityThresholds;
     }

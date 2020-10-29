@@ -158,8 +158,7 @@ CDCTriggerTrackCombinerModule::event()
                 << " (choose one of 3Dfitter, neuro, avg)");
       }
       // only fitter calculates a chi2 value
-      if (track3Dfitter)
-        chi3D = track3Dfitter->getChi3D();
+      chi3D = track3Dfitter->getChi3D();
     }
 
     // create new track

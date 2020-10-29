@@ -89,7 +89,7 @@ namespace Belle2 {
                                                      const TRGClock& dataClock,
                                                      const TRGClock& userClockInput,
                                                      const TRGClock& userClockOutput,
-                                                     std::vector<TCSegment*>& tsSL)
+                                                     const std::vector<TCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
       m_Trg_PI(), // 2019/07/31 by ytlai
@@ -2066,33 +2066,33 @@ namespace Belle2 {
   }
 
   vector<TRGSignalVector*>
-  TRGCDCTrackSegmentFinder::simulateInner(TRGSignalVector& s, unsigned)
+  TRGCDCTrackSegmentFinder::simulateInner(const TRGSignalVector& s, unsigned)
   {
 
     // This is just a simple coincidence logic. Should be replaced by
     // real logic.
 
-    const int width = 10;
+    //const int width = 10;
 
     //...Layer hit...
-    TRGSignal l0 = s[0 + 1].widen(width);
-    TRGSignal l1 = s[1 + 1].widen(width) | s[2 + 1].widen(width);
-    TRGSignal l2 = s[3 + 1].widen(width) | s[4 + 1].widen(width) |
-                   s[5 + 1].widen(width);
-    TRGSignal l3 = s[6 + 1].widen(width) | s[7 + 1].widen(width) |
-                   s[8 + 1].widen(width) | s[9 + 1].widen(width);
-    TRGSignal l4 = s[10 + 1].widen(width) | s[11 + 1].widen(width) |
-                   s[12 + 1].widen(width) | s[13 + 1].widen(width);
+    //TRGSignal l0 = s[0 + 1].widen(width);
+    //TRGSignal l1 = s[1 + 1].widen(width) | s[2 + 1].widen(width);
+    //TRGSignal l2 = s[3 + 1].widen(width) | s[4 + 1].widen(width) |
+    //               s[5 + 1].widen(width);
+    //TRGSignal l3 = s[6 + 1].widen(width) | s[7 + 1].widen(width) |
+    //               s[8 + 1].widen(width) | s[9 + 1].widen(width);
+    //TRGSignal l4 = s[10 + 1].widen(width) | s[11 + 1].widen(width) |
+    //               s[12 + 1].widen(width) | s[13 + 1].widen(width);
 
     //...Layer coincidence...
-    TRGSignal a0 = l1 & l2 & l3 & l4;
-    TRGSignal a1 = l0 & l2 & l3 & l4;
-    TRGSignal a2 = l0 & l1 & l3 & l4;
-    TRGSignal a3 = l0 & l1 & l2 & l4;
-    TRGSignal a4 = l0 & l1 & l2 & l3;
+    //TRGSignal a0 = l1 & l2 & l3 & l4;
+    //TRGSignal a1 = l0 & l2 & l3 & l4;
+    //TRGSignal a2 = l0 & l1 & l3 & l4;
+    //TRGSignal a3 = l0 & l1 & l2 & l4;
+    //TRGSignal a4 = l0 & l1 & l2 & l3;
 
     //...Final hit... (detail hit pattern changes are ignored here)
-    TRGSignal a = a0 | a1 | a2 | a3 | a4;
+    //TRGSignal a = a0 | a1 | a2 | a3 | a4; TODO should it be used somewhere?
 
     //...Check timing cells...
     vector<int> sc = s.stateChanges();
@@ -2841,7 +2841,7 @@ namespace Belle2 {
       int tmpPTime = 0 ;
       int tmpCTime = 0 ;
       int tmpOutInt;
-      TRGState ft(10);
+      //TRGState ft(10); //TODO variable not used at all
       bool eOut = false;
       for (unsigned i = 0; i < changeTime.size(); i++) {
 
@@ -2862,7 +2862,7 @@ namespace Belle2 {
             lastFastHit = ct;
             TRGState ftnow = fTime.state(ct);
             ftnow += TRGState(1, 1);
-            ft = ftnow;
+            //ft = ftnow;
             eOut = true;
           }
         }
@@ -3058,7 +3058,7 @@ namespace Belle2 {
       const string fn = "TSF::simulateTSF2:tsid=" + to_string(tsid);
       TRGDebug::enterStage(fn);
 
-      TRGState ft(10);
+      //TRGState ft(10); //not used, should be?
       bool eOut = false;
 
       unsigned stateHitPos = 0; // 0:wait, 1:active1st, 2:active2nd
@@ -3091,7 +3091,7 @@ namespace Belle2 {
             lastFastHit = ct;
             TRGState ftnow = fTime.state(ct);
             ftnow += TRGState(1, 1);
-            ft = ftnow;
+            //ft = ftnow;
             eOut = true;
           }
         }

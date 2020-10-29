@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <framework/utilities/Utils.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -45,7 +46,7 @@ namespace Belle2 {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
         value &= 0xffffffffu >> (32 - n);
         // check if we have enough space and double in size if necessary.
-        if (m_pos + n > m_store.size() * 32) m_store.resize(2 * m_store.size(), 0);
+        if (branch_unlikely(m_pos + n > m_store.size() * 32)) m_store.resize(2 * m_store.size(), 0);
         m_store[wpos] |= value << bpos;
         if (bpos + n > 32) m_store[wpos + 1] = value >> (32 - bpos);
         m_pos += n;
@@ -59,7 +60,7 @@ namespace Belle2 {
       {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
         // make sure we don't access memory we don't own
-        if (m_pos + n > m_store.size() * 32) throw std::range_error("Not enough bits in stream");
+        if (branch_unlikely(m_pos + n > m_store.size() * 32)) throw std::range_error("Not enough bits in stream");
         unsigned int res = m_store[wpos] >> bpos;
         if (bpos + n > 32) res |= m_store[wpos + 1] << (32 - bpos);
         m_pos += n;

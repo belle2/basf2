@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <vector>
-#include <string.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -35,11 +34,7 @@ namespace Belle2 {
        *  since the class does not check bounds.  Current position is at
        *  begining of the storage.
        */
-      explicit BitStream(int n): m_pos(0)
-      {
-        m_store.resize(n);
-        memset(m_store.data(), 0, m_store.size()*sizeof(unsigned int));
-      }
+      explicit BitStream(int n): m_pos(0), m_store(n, 0) {}
 
       /** Push n least significant bits of "value" to the stream. Update current position accordingly.
        * @param value -- value to put in the stream
@@ -49,6 +44,9 @@ namespace Belle2 {
       {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
         value &= 0xffffffffu >> (32 - n);
+        // check if we have enough space and extend if necessary.
+        const size_t minSize = wpos + ((bpos + n > 32) ? 2 : 1);
+        if (minSize > m_store.size()) m_store.resize(2 * minSize, 0);
         m_store[wpos] |= value << bpos;
         if (bpos + n > 32) m_store[wpos + 1] = value >> (32 - bpos);
         m_pos += n;
@@ -61,6 +59,9 @@ namespace Belle2 {
       unsigned int getNBits(unsigned int n)
       {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
+        // make sure we don't access memory we don't own
+        const size_t minSize = wpos + ((bpos + n > 32) ? 2 : 1);
+        if (m_store.size() < minSize) throw std::range_error("Not enough bits in stream");
         unsigned int res = m_store[wpos] >> bpos;
         if (bpos + n > 32) res |= m_store[wpos + 1] << (32 - bpos);
         m_pos += n;

@@ -322,33 +322,6 @@ class Luminosity:
         df['intLumiDel'] *= 1E-6
         #df.fillna(0)
 
-        # TEMPORARY and AWFULFIX for exp12 runs 1329-1333: integrated delivered luminosity is wrong.
-        print(exp)
-        if 12 in exp:
-            print('FIXING DELIVERED LUMI FOR RUNS 1329-1333')
-            intLumiDelRun1200=df.at[df.index[(df['run']==1200) & (df['exp']==12)].tolist()[0], 'intLumiDel']
-            #print('Lumi for run 1200',intLumiDelRun1200)
-        
-            for run in range(1329,1334):
-                #run index
-                index=df.index[(df['exp']==12) & (df['run']==run)].tolist()[0]
-                # new lumi
-                newlumi=df.at[index,'intLumiDel']+intLumiDelRun1200
-                #print(newlumi)
-                df.at[index,'intLumiDel']=newlumi
-                b2.B2INFO(f'Fixed runs {run} delivered lumi to {newlumi:0.3f} /pb')
-        
-            print('FIXING DELIVERED LUMI FOR RUNS 1188,1189,2596')
-            df = df.reset_index(drop=True)
-            index_1188=df.index[(df['exp']==12) & (df['run']==1188)]
-            index_1189=df.index[(df['exp']==12) & (df['run']==1189)]
-            index_2596=df.index[(df['exp']==12) & (df['run']==2596)]
-            df.loc[index_1188,'intLumiDel']=df.loc[index_1188-1,'intLumiDel'].values[0]+df.loc[index_1188, 'lumi'].values[0]
-            df.loc[index_1189,'intLumiDel']=df.loc[index_1189-1,'intLumiDel'].values[0]+df.loc[index_1189,'lumi'].values[0]
-            df.loc[index_2596,'intLumiDel']=df.loc[index_2596-1,'intLumiDel'].values[0]+df.loc[index_2596,'lumi'].values[0]
-            print("Fixed runs 1188 delivered intLumi to", df.loc[index_1188,'intLumiDel'].values[0].round(decimals=5), "/pb,")
-            print("Fixed runs 1189 delivered intLumi to", df.loc[index_1189,'intLumiDel'].values[0].round(decimals=5), "/pb")
-            print("Fixed runs 2596 delivered intLumi to", df.loc[index_2596,'intLumiDel'].values[0].round(decimals=5), "/pb")
         return df
 
     def getDataFrame(self,exp):

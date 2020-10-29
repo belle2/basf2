@@ -52,6 +52,7 @@ int HistoServer::server()
   int loop_counter = 0;
   bool updated = false;
   while (m_force_exit == 0) {
+    fflush(stdout);
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
@@ -83,6 +84,19 @@ int HistoServer::server()
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
             string objname = strlist.at(i);
+            if (objname == string("DQMRC:CLEAR")) {
+              m_hman->clear();
+              m_hman->merge();
+              printf("HistoServer: CLEAR\n");
+              updated = false;
+              continue;
+            }
+            if (objname == string("DQMRC:MERGE")) {
+              m_hman->merge();
+              printf("HistoServer: MERGE\n");
+              updated = false;
+              continue;
+            }
             int lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);

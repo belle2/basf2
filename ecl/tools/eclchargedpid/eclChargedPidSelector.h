@@ -220,10 +220,8 @@ public :
   ClassDef(eclChargedPidSelector, 0); /**< ClassDef */
 };
 
-//TODO what is the #if to this?
-//#endif
 
-#ifdef eclChargedPidSelector_cxx
+
 void eclChargedPidSelector::Init(TTree* tree)
 {
   // The Init() function is called when the selector needs to initialize

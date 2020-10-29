@@ -27,7 +27,7 @@ namespace Belle2 {
       /** Default constructor for ROOT.
        *  Current position is at begining of the storage.
        */
-      BitStream(): m_pos(0) {}
+      BitStream(): m_pos(0), m_store(1, 0) {}
 
       /** Constructor with the reserved and cleared storage prepared for
        *  incoming bits. Be sure the size is enough for incoming data
@@ -44,9 +44,8 @@ namespace Belle2 {
       {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
         value &= 0xffffffffu >> (32 - n);
-        // check if we have enough space and extend if necessary.
-        const size_t minSize = wpos + ((bpos + n > 32) ? 2 : 1);
-        if (minSize > m_store.size()) m_store.resize(2 * minSize, 0);
+        // check if we have enough space and double in size if necessary.
+        if (m_pos + n > m_store.size() * 32) m_store.resize(2 * m_store.size(), 0);
         m_store[wpos] |= value << bpos;
         if (bpos + n > 32) m_store[wpos + 1] = value >> (32 - bpos);
         m_pos += n;
@@ -60,8 +59,7 @@ namespace Belle2 {
       {
         unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
         // make sure we don't access memory we don't own
-        const size_t minSize = wpos + ((bpos + n > 32) ? 2 : 1);
-        if (m_store.size() < minSize) throw std::range_error("Not enough bits in stream");
+        if (m_pos + n > m_store.size() * 32) throw std::range_error("Not enough bits in stream");
         unsigned int res = m_store[wpos] >> bpos;
         if (bpos + n > 32) res |= m_store[wpos + 1] << (32 - bpos);
         m_pos += n;

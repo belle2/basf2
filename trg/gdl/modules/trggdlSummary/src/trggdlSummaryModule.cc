@@ -221,7 +221,7 @@ void TRGGDLSummaryModule::event()
     GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
   }
 
-  TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
+  TRGSummary::ETimingType tt;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {

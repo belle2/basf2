@@ -203,7 +203,7 @@ namespace Belle2 {
       //...In region ?...
       if (iY0 < 0) iY0 = 0;
       if (iY0 >= (int) _nY) iY0 = _nY - 1;
-      if (iY1 < 0) iY1 = 0;
+      //if (iY1 < 0) iY1 = 0; //redundant condition
       if (iY1 >= (int) _nY) iY1 = _nY - 1;
 
       //...Voting...

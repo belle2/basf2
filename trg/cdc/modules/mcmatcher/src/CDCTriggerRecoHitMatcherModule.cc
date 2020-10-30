@@ -9,7 +9,7 @@ namespace {
   //with range based for
   template<class Iter>
   struct iter_pair_range : std::pair<Iter, Iter> {
-    iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
+    explicit iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
     Iter begin() const {return this->first;}
     Iter end()   const {return this->second;}
   };
@@ -94,6 +94,7 @@ CDCTriggerRecoHitMatcherModule::event()
     Track* ttrack = recoTrack->getRelatedFrom<Track>(m_TrackCollectionName);
     const TrackFitResult* fitres = ttrack->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(
                                      211));
+    /*
     continue;
     if (fitres) {
       // double omega = fitres->getOmega();
@@ -122,5 +123,6 @@ CDCTriggerRecoHitMatcherModule::event()
         }
       }
     }
+    */
   }
 }

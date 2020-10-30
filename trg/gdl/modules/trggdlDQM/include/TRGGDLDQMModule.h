@@ -205,7 +205,7 @@ namespace Belle2 {
     };
 
     //ecltrg<->ecl mappint
-    TrgEclMapping* trgeclmap;
+    TrgEclMapping* trgeclmap = nullptr;
     StoreArray<ECLCalDigit> m_ECLCalDigitData;
     StoreArray<ECLDigit>    m_ECLDigitData;
 

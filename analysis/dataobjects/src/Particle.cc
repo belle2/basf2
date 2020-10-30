@@ -642,7 +642,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
   m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
-void Particle::removeDaughter(const Particle* daughter)
+void Particle::removeDaughter(const Particle* daughter, const bool updateType)
 {
   if (getNDaughters() == 0)
     return;
@@ -655,7 +655,7 @@ void Particle::removeDaughter(const Particle* daughter)
     }
   }
 
-  if (getNDaughters() == 0)
+  if (getNDaughters() == 0 and updateType)
     m_particleSource = c_Undefined;
 }
 

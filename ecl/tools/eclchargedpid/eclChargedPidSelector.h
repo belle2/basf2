@@ -220,9 +220,8 @@ public :
   ClassDef(eclChargedPidSelector, 0); /**< ClassDef */
 };
 
-#endif
 
-#ifdef eclChargedPidSelector_cxx
+
 void eclChargedPidSelector::Init(TTree* tree)
 {
   // The Init() function is called when the selector needs to initialize

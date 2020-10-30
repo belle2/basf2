@@ -51,9 +51,9 @@ namespace Belle2 {
   /** unpacker for the merger reader (TSF which reads the merger output) */
   struct Merger : SubTrigger {
     /** Constructor */
-    Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
+    Merger(StoreArray<MergerBits>* inArrayPtr, const std::string& inName,
            unsigned inEventWidth, unsigned inOffset,
-           int inHeaderSize, std::vector<int> inNodeID,
+           int inHeaderSize, const std::vector<int>& inNodeID,
            unsigned inNInnerMergers, int& inDelay,
            int& inCnttrg,
            int inDebugLevel) :
@@ -133,8 +133,8 @@ namespace Belle2 {
     /** constructor */
     Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
               StoreArray<T2DOutputBitStream>* outArrayPtr,
-              std::string inName, unsigned inEventWidth, unsigned inOffset,
-              unsigned inHeaderSize, std::vector<int> inNodeID,
+              const std::string& inName, unsigned inEventWidth, unsigned inOffset,
+              unsigned inHeaderSize, const std::vector<int>& inNodeID,
               unsigned inNumTS, int& inDelay,
               int& inCnttrg,
               int inDebugLevel) :
@@ -398,8 +398,8 @@ namespace Belle2 {
   struct Neuro : SubTrigger {
     /** Constructor */
     Neuro(StoreArray<NNBitStream>* arrPtr,
-          std::string inName, unsigned inEventWidth, unsigned inOffset,
-          unsigned inHeaderSize, std::vector<int> inNodeID, int& inDelay,
+          const std::string& inName, unsigned inEventWidth, unsigned inOffset,
+          unsigned inHeaderSize, const std::vector<int>& inNodeID, int& inDelay,
           int& inCnttrg,
           int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,

@@ -39,9 +39,9 @@ namespace Belle2 {
 
     /**
      * Search for given file or directory in the directory given by the
-     * environment variable BELLE2_<DATATYPE>_DATA_DIR or subdirectory
-     * <datatype>-data of $VO_BELLE2_SW_DIR or local/central release directory
-     * and return absolute path if found.
+     * environment variable BELLE2_<DATATYPE>_DATA_DIR or local/central release
+     * directory and return absolute path if found.
+     *
      * If the file isn't found in either of these, absolute paths and paths
      * relative to the current working directory are also accepted.
      *

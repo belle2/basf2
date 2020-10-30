@@ -2355,9 +2355,9 @@ def buildContinuumSuppression(list_name, roe_mask, path):
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
 
-    @param list_name name of the input ParticleList
-    @param mask_name: name of the ROE mask
-    @param path      modules are added to this path
+    :param list_name: name of the input ParticleList
+    :param roe_mask: name of the ROE mask
+    :param path: modules are added to this path
     """
 
     qqBuilder = register_module('ContinuumSuppressionBuilder')

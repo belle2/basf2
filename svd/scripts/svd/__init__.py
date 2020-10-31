@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_new_reconstruction(path, isROIsimulation=False):
+def add_new_svd_reconstruction(path, isROIsimulation=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -45,6 +45,7 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
 
+'''
     # Add SVDRecoDigit creator module
     # useful for DQM and validation
     if recocreatorName not in [e.name() for e in path.modules()]:
@@ -53,6 +54,7 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
         recoDigitCreator.param('RecoDigits', recoDigitsName)
         recoDigitCreator.param('Clusters', clustersName)
         path.add_module(recoDigitCreator)
+'''
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):

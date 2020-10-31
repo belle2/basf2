@@ -123,6 +123,14 @@ void SVDClusterizerModule::beginRun()
     B2WARNING("cluster charge algorithm " << m_chargeRecoWith3SamplesAlgorithm << " is NOT available, using MaxSample");
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
+  if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith6SamplesAlgorithm)) {
+    B2WARNING("cluster position algorithm " << m_positionRecoWith6SamplesAlgorithm << " is NOT available, using oldDefault");
+    m_positionRecoWith6SamplesAlgorithm = "oldDefault";
+  };
+  if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith3SamplesAlgorithm)) {
+    B2WARNING("cluster position algorithm " << m_positionRecoWith3SamplesAlgorithm << " is NOT available, using oldDefault");
+    m_positionRecoWith3SamplesAlgorithm = "oldDefault";
+  };
 
 
   m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);

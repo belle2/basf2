@@ -131,6 +131,14 @@ namespace Belle2 {
         return m_chargeAlgorithms.find(chargeAlg) != m_chargeAlgorithms.end();
       }
 
+      /**
+       * @return true if the positionAlg is implemented and available for reconstruction
+       */
+      bool isPositionAlgorithmAvailable(TString positionAlg)
+      {
+        return m_positionAlgorithms.find(positionAlg) != m_positionAlgorithms.end();
+      }
+
 
     protected:
 
@@ -183,7 +191,10 @@ namespace Belle2 {
       /** set containing the available charge algorithms */
       std::set<TString> m_chargeAlgorithms;
 
-      /** build the sets containing the available time and charge algorithms */
+      /** set containing the available position algorithms */
+      std::set<TString> m_positionAlgorithms;
+
+      /** build the sets containing the available time, charge and position algorithms */
       void buildAlgorithmSets()
       {
         m_timeAlgorithms.insert("CoG6");
@@ -193,6 +204,9 @@ namespace Belle2 {
         m_chargeAlgorithms.insert("MaxSample");
         m_chargeAlgorithms.insert("SumSamples");
         m_chargeAlgorithms.insert("ELS3");
+
+        m_positionAlgorithms.insert("CoGOnly");
+        m_positionAlgorithms.insert("oldDefault");
       }
 
 

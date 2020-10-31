@@ -12,8 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <svd/reconstruction/RawCluster.h>
@@ -66,6 +64,16 @@ namespace Belle2 {
       std::string m_storeTrueHitsName;
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
+      /** Name of the relation between SVDShaperDigits and MCParticles */
+      std::string m_relShaperDigitMCParticleName;
+      /** Name of the relation between SVDClusters and MCParticles */
+      std::string m_relClusterMCParticleName;
+      /** Name of the relation between SVDClusters and SVDShaperDigits */
+      std::string m_relClusterShaperDigitName;
+      /** Name of the relation between SVDShaperDigits and SVDTrueHits */
+      std::string m_relShaperDigitTrueHitName;
+      /** Name of the relation between SVDClusters and SVDTrueHits */
+      std::string m_relClusterTrueHitName;
 
       /** Collection of SVDClusters */
       StoreArray<SVDCluster> m_storeClusters;

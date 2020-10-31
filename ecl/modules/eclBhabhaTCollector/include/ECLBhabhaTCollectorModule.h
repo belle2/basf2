@@ -19,6 +19,7 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
 
 class TTree;
@@ -71,6 +72,9 @@ namespace Belle2 {
      * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
     StoreObjPtr<EventT0> m_eventT0;
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /** electronics amplitude calibration from database
         Scale amplitudefor each crystal and for dead pre-amps*/

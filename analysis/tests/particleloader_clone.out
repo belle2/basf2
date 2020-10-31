@@ -91,113 +91,133 @@
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO]    -> With cuts  : isFromKLM
+[INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists studied 10 
-[INFO] Number of ParticleLists studied 12 
-[INFO] Number of ParticleLists studied 1 
+[INFO] Number of ParticleLists to be studied: 10 
+[INFO] Number of ParticleLists to be studied: 12 
+[INFO] Number of ParticleLists to be studied: 1 
+ ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
  ... message repeated 19 times
-[INFO] ParticleStats Summary: 
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
 
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+   Upsilon(4S)( 0)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
+
+[INFO] 
+======================================================================
+Total Retention: 44199 events passing / 90000 events processed = 0.4911
+Total Number of Particles created in the DataStore: 16663097
+======================================================================
+
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+ gamma:fromKLM( 0)|    0.9162|   2.3651|   2.5815|   0.0000|   0.0000|   0.0000|   0.0000|   2.3651|   2.5815|
+
+[INFO] 
+======================================================================
+Total Retention: 82457 events passing / 90000 events processed = 0.9162
+Total Number of Particles created in the DataStore: 16663097
+======================================================================
+
+[INFO] ParticleStats Summary:
 [INFO] =======================================================================
-			|Retention|	    0| Unique 
-   Upsilon(4S)( 0)	|	0.4911	1.0000	1.0000
+ Pass matrix (for i, j: fraction passing selection i also passes selection j)
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
+     e+:frommc( 0)| 1.0000| 0.9996| 0.8351| 0.5478| 0.9950| 0.5624| 0.1183| 0.5056| 0.9998| 0.9188| 0.4847| 0.8440| 0.0000|
+    pi+:frommc( 1)| 0.9997| 1.0000| 0.8350| 0.5479| 0.9949| 0.5624| 0.1183| 0.5055| 0.9998| 0.9189| 0.4847| 0.8441| 0.0000|
+     K+:frommc( 2)| 0.9998| 0.9996| 1.0000| 0.5500| 0.9964| 0.5263| 0.1150| 0.4759| 0.9998| 0.9205| 0.4740| 0.8615| 0.0000|
+     p+:frommc( 3)| 0.9998| 0.9998| 0.8384| 1.0000| 0.9954| 0.5566| 0.1873| 0.5257| 0.9999| 0.9418| 0.4898| 0.8347| 0.0000|
+    mu+:frommc( 4)| 0.9997| 0.9996| 0.8362| 0.5480| 1.0000| 0.5625| 0.1184| 0.5059| 0.9998| 0.9187| 0.4853| 0.8443| 0.0000|
+   K_S0:frommc( 5)| 0.9997| 0.9997| 0.7814| 0.5421| 0.9951| 1.0000| 0.1056| 0.4782| 0.9998| 0.9230| 0.5035| 0.8394| 0.0000|
+Lambda0:frommc( 6)| 0.9999| 0.9999| 0.8121| 0.8672| 0.9961| 0.5022| 1.0000| 0.5475| 1.0000| 0.9641| 0.4920| 0.7745| 0.0000|
+   K_L0:frommc( 7)| 0.9997| 0.9996| 0.7860| 0.5696| 0.9956| 0.5319| 0.1281| 1.0000| 0.9998| 0.9265| 0.5162| 0.8276| 0.0000|
+  gamma:frommc( 8)| 0.9997| 0.9996| 0.8350| 0.5478| 0.9949| 0.5624| 0.1183| 0.5056| 1.0000| 0.9188| 0.4846| 0.8440| 0.0000|
+     n0:frommc( 9)| 0.9997| 0.9998| 0.8365| 0.5615| 0.9949| 0.5650| 0.1241| 0.5098| 0.9998| 1.0000| 0.4861| 0.8436| 0.0000|
+     B0:frommc(10)| 0.9998| 0.9998| 0.8167| 0.5536| 0.9962| 0.5843| 0.1201| 0.5384| 0.9997| 0.9216| 1.0000| 0.7166| 0.0000|
+     D0:frommc(11)| 0.9996| 0.9997| 0.8523| 0.5417| 0.9952| 0.5593| 0.1085| 0.4957| 0.9998| 0.9183| 0.4115| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-   Upsilon(4S)( 0)	|	  1.0199	  2.0768	  0.0000	  0.0000	  0.0000	  0.0000	  1.0199	  2.0768
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+     e+:frommc( 0)|    0.9996|   8.0996|   8.1025|   4.6006|   4.6022|   3.4990|   3.5003|   0.0000|   0.0000|
+    pi+:frommc( 1)|    0.9996|   9.9370|   9.9408|   4.9454|   4.9473|   4.9916|   4.9935|   0.0000|   0.0000|
+     K+:frommc( 2)|    0.8350|   1.6240|   1.9450|   0.8129|   0.9736|   0.8111|   0.9714|   0.0000|   0.0000|
+     p+:frommc( 3)|    0.5477|   0.9387|   1.7138|   0.8225|   1.5017|   0.1162|   0.2121|   0.0000|   0.0000|
+    mu+:frommc( 4)|    0.9949|   4.7858|   4.8102|   3.8028|   3.8222|   0.9830|   0.9880|   0.0000|   0.0000|
+   K_S0:frommc( 5)|    0.5624|   0.7872|   1.3998|   0.0000|   0.0000|   0.0000|   0.0000|   0.7872|   1.3998|
+Lambda0:frommc( 6)|    0.1183|   0.1330|   1.1244|   0.0967|   0.8175|   0.0363|   0.3069|   0.0000|   0.0000|
+   K_L0:frommc( 7)|    0.5055|   0.6834|   1.3519|   0.0000|   0.0000|   0.0000|   0.0000|   0.6834|   1.3519|
+  gamma:frommc( 8)|    0.9998|  16.3277|  16.3311|   0.0000|   0.0000|   0.0000|   0.0000|  16.3277|  16.3311|
+     n0:frommc( 9)|    0.9188|   3.3937|   3.6938|   3.3068|   3.5992|   0.0869|   0.0946|   0.0000|   0.0000|
+     B0:frommc(10)|    0.4846|   0.9693|   2.0000|   0.4835|   0.9976|   0.4858|   1.0024|   0.0000|   0.0000|
+     D0:frommc(11)|    0.8440|   1.3977|   1.6560|   0.7004|   0.8298|   0.6974|   0.8262|   0.0000|   0.0000|
 
 [INFO] 
-=======================================================
-Total Retention: 0.4911
-Total Number of Particles created in the DataStore: 15077401
-=======================================================
+======================================================================
+Total Retention: 90000 events passing / 90000 events processed = 1.0000
+Total Number of Particles created in the DataStore: 16663097
+======================================================================
 
-[INFO] ParticleStats Summary: 
-
+[INFO] ParticleStats Summary:
 [INFO] =======================================================================
-			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9|	   10|	   11| Unique 
-     e+:frommc( 0)	|	0.9996	1.0000	0.9996	0.8351	0.5478	0.9950	0.5624	0.1183	0.5056	0.9998	0.9188	0.4847	0.8440	0.0000
-    pi+:frommc( 1)	|	0.9996	0.9997	1.0000	0.8350	0.5479	0.9949	0.5624	0.1183	0.5055	0.9998	0.9189	0.4847	0.8441	0.0000
-     K+:frommc( 2)	|	0.8350	0.9998	0.9996	1.0000	0.5500	0.9964	0.5263	0.1150	0.4759	0.9998	0.9205	0.4740	0.8615	0.0000
-     p+:frommc( 3)	|	0.5477	0.9998	0.9998	0.8384	1.0000	0.9954	0.5566	0.1873	0.5257	0.9999	0.9418	0.4898	0.8347	0.0000
-    mu+:frommc( 4)	|	0.9949	0.9997	0.9996	0.8362	0.5480	1.0000	0.5625	0.1184	0.5059	0.9998	0.9187	0.4853	0.8443	0.0000
-   K_S0:frommc( 5)	|	0.5624	0.9997	0.9997	0.7814	0.5421	0.9951	1.0000	0.1056	0.4782	0.9998	0.9230	0.5035	0.8394	0.0000
-Lambda0:frommc( 6)	|	0.1183	0.9999	0.9999	0.8121	0.8672	0.9961	0.5022	1.0000	0.5475	1.0000	0.9641	0.4920	0.7745	0.0000
-   K_L0:frommc( 7)	|	0.5055	0.9997	0.9996	0.7860	0.5696	0.9956	0.5319	0.1281	1.0000	0.9998	0.9265	0.5162	0.8276	0.0000
-  gamma:frommc( 8)	|	0.9998	0.9997	0.9996	0.8350	0.5478	0.9949	0.5624	0.1183	0.5056	1.0000	0.9188	0.4846	0.8440	0.0000
-     n0:frommc( 9)	|	0.9188	0.9997	0.9998	0.8365	0.5615	0.9949	0.5650	0.1241	0.5098	0.9998	1.0000	0.4861	0.8436	0.0000
-     B0:frommc(10)	|	0.4846	0.9998	0.9998	0.8167	0.5536	0.9962	0.5843	0.1201	0.5384	0.9997	0.9216	1.0000	0.7166	0.0000
-     D0:frommc(11)	|	0.8440	0.9996	0.9997	0.8523	0.5417	0.9952	0.5593	0.1085	0.4957	0.9998	0.9183	0.4115	1.0000	0.0000
+ Pass matrix (for i, j: fraction passing selection i also passes selection j)
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
+            e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+           pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+            K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+            p+( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+           mu+( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+          K_S0( 5)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.9961| 1.0000| 1.0000| 1.0000| 0.0000|
+       Lambda0( 6)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.8806| 1.0000| 1.0000| 0.9999| 1.0000| 0.0000|
+          K_L0( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+         gamma( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 1.0000| 1.0000| 0.0000|
+            n0( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-     e+:frommc( 0)	|	  8.0996	  8.1025	  4.6006	  4.6022	  3.4990	  3.5003	  0.0000	  0.0000
-    pi+:frommc( 1)	|	  9.9370	  9.9408	  4.9454	  4.9473	  4.9916	  4.9935	  0.0000	  0.0000
-     K+:frommc( 2)	|	  1.6240	  1.9450	  0.8129	  0.9736	  0.8111	  0.9714	  0.0000	  0.0000
-     p+:frommc( 3)	|	  0.9387	  1.7138	  0.8225	  1.5017	  0.1162	  0.2121	  0.0000	  0.0000
-    mu+:frommc( 4)	|	  4.7858	  4.8102	  3.8028	  3.8222	  0.9830	  0.9880	  0.0000	  0.0000
-   K_S0:frommc( 5)	|	  0.7872	  1.3998	  0.0000	  0.0000	  0.0000	  0.0000	  0.7872	  1.3998
-Lambda0:frommc( 6)	|	  0.1330	  1.1244	  0.0967	  0.8175	  0.0363	  0.3069	  0.0000	  0.0000
-   K_L0:frommc( 7)	|	  0.6834	  1.3519	  0.0000	  0.0000	  0.0000	  0.0000	  0.6834	  1.3519
-  gamma:frommc( 8)	|	 16.3277	 16.3311	  0.0000	  0.0000	  0.0000	  0.0000	 16.3277	 16.3311
-     n0:frommc( 9)	|	  3.3937	  3.6938	  3.3068	  3.5992	  0.0869	  0.0946	  0.0000	  0.0000
-     B0:frommc(10)	|	  0.9693	  2.0000	  0.4835	  0.9976	  0.4858	  1.0024	  0.0000	  0.0000
-     D0:frommc(11)	|	  1.3977	  1.6560	  0.7004	  0.8298	  0.6974	  0.8262	  0.0000	  0.0000
 
-[INFO] 
-=======================================================
-Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 15077401
-=======================================================
-
-[INFO] ParticleStats Summary: 
-
-[INFO] =======================================================================
-			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9| Unique 
-            e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-           pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-            K+( 2)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-            p+( 3)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-           mu+( 4)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-          K_S0( 5)	|	0.4911	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.9961	1.0000	1.0000	1.0000	0.0000
-       Lambda0( 6)	|	0.5555	1.0000	1.0000	1.0000	1.0000	1.0000	0.8806	1.0000	1.0000	0.9999	1.0000	0.0000
-          K_L0( 7)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
-         gamma( 8)	|	0.9999	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	1.0000	1.0000	0.0000
-            n0( 9)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4911	0.5555	1.0000	0.9999	1.0000	0.0000
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+            e+( 0)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+           pi+( 1)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+            K+( 2)|    1.0000|  12.4562|  12.4562|   6.4886|   6.4886|   5.9676|   5.9676|   0.0000|   0.0000|
+            p+( 3)|    1.0000|  12.4556|  12.4556|   6.4868|   6.4868|   5.9688|   5.9688|   0.0000|   0.0000|
+           mu+( 4)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+          K_S0( 5)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
+       Lambda0( 6)|    0.5555|   2.3510|   4.2324|   1.1804|   2.1250|   1.1706|   2.1074|   0.0000|   0.0000|
+          K_L0( 7)|    1.0000|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|  14.8899|  14.8899|
+         gamma( 8)|    0.9999|  15.2537|  15.2551|   0.0000|   0.0000|   0.0000|   0.0000|  15.2537|  15.2551|
+            n0( 9)|    1.0000|  14.8899|  14.8899|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|
 
 [INFO] 
 ======================================================================
- Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-            e+( 0)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
-           pi+( 1)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
-            K+( 2)	|	 12.4562	 12.4562	  6.4886	  6.4886	  5.9676	  5.9676	  0.0000	  0.0000
-            p+( 3)	|	 12.4556	 12.4556	  6.4868	  6.4868	  5.9688	  5.9688	  0.0000	  0.0000
-           mu+( 4)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
-          K_S0( 5)	|	  1.0199	  2.0768	  0.0000	  0.0000	  0.0000	  0.0000	  1.0199	  2.0768
-       Lambda0( 6)	|	  2.3510	  4.2324	  1.1804	  2.1250	  1.1706	  2.1074	  0.0000	  0.0000
-          K_L0( 7)	|	 14.8899	 14.8899	  0.0000	  0.0000	  0.0000	  0.0000	 14.8899	 14.8899
-         gamma( 8)	|	 15.2537	 15.2551	  0.0000	  0.0000	  0.0000	  0.0000	 15.2537	 15.2551
-            n0( 9)	|	 14.8899	 14.8899	 14.8899	 14.8899	  0.0000	  0.0000	  0.0000	  0.0000
-
-[INFO] 
-=======================================================
-Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 15077401
-=======================================================
+Total Retention: 90000 events passing / 90000 events processed = 1.0000
+Total Number of Particles created in the DataStore: 16663097
+======================================================================
 
 [WARNING] There were 518 v0s skipped because of same charge daughters for Lambda0
 [WARNING] There were 181 v0s skipped because of same charge daughters for K_S0
@@ -298,12 +318,17 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> MDST source: MCParticles
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO]    -> With cuts  : isFromKLM
+[INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
 [INFO]    -> MDST source: RestOfEvents
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists studied 10 
-[INFO] Number of ParticleLists studied 12 
-[INFO] Number of ParticleLists studied 1 
+[INFO] Number of ParticleLists to be studied: 10 
+[INFO] Number of ParticleLists to be studied: 12 
+[INFO] Number of ParticleLists to be studied: 1 
+ ... message repeated 1 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
@@ -315,6 +340,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=0 identifier=0 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.02, 0.22, -0.10) p=0.2459
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.01)
  p-value of fit (if done): 0.114
  error matrix (px, py, pz, E, x, y ,z):
@@ -334,6 +360,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=1 identifier=1 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.52, -0.60, -0.23) p=0.8266
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.01)
  p-value of fit (if done): 0.6495
  error matrix (px, py, pz, E, x, y ,z):
@@ -353,6 +380,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=3 identifier=3 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.30, -0.27, 0.35) p=0.5362
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.04)
  p-value of fit (if done): 0.003605
  error matrix (px, py, pz, E, x, y ,z):
@@ -372,6 +400,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=5 identifier=5 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.63, -0.16, 0.51) p=0.8243
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.3419
  error matrix (px, py, pz, E, x, y ,z):
@@ -391,6 +420,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=7 identifier=7 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.17, 0.09, 0.49) p=0.5298
+ momentum scaling factor=1
  position=(1.95, 3.77, -2.51)
  p-value of fit (if done): 0.1835
  error matrix (px, py, pz, E, x, y ,z):
@@ -410,6 +440,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=2 identifier=2 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.27, 0.24, -0.18) p=0.404
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.1085
  error matrix (px, py, pz, E, x, y ,z):
@@ -429,6 +460,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=4 arrayIndex=4 identifier=4 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.16, -0.86, -0.35) p=0.9433
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.00)
  p-value of fit (if done): 0.532
  error matrix (px, py, pz, E, x, y ,z):
@@ -448,6 +480,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=6 arrayIndex=6 identifier=6 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.07, 1.49, 1.55) p=2.153
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.00)
  p-value of fit (if done): 0.1674
  error matrix (px, py, pz, E, x, y ,z):
@@ -467,6 +500,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=8 arrayIndex=8 identifier=8 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.10, -0.13, 0.33) p=0.3647
+ momentum scaling factor=1
  position=(-0.01, 0.00, 0.04)
  p-value of fit (if done): 0.8702
  error matrix (px, py, pz, E, x, y ,z):
@@ -486,6 +520,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=9 arrayIndex=9 identifier=9 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.07, -0.43, -0.55) p=0.7039
+ momentum scaling factor=1
  position=(0.03, -0.00, 0.03)
  p-value of fit (if done): 0.4484
  error matrix (px, py, pz, E, x, y ,z):
@@ -508,6 +543,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=10 identifier=0 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.02, 0.22, -0.10) p=0.2459
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.01)
  p-value of fit (if done): 0.114
  error matrix (px, py, pz, E, x, y ,z):
@@ -527,6 +563,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=11 identifier=1 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.52, -0.60, -0.23) p=0.8266
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.01)
  p-value of fit (if done): 0.6495
  error matrix (px, py, pz, E, x, y ,z):
@@ -546,6 +583,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=13 identifier=3 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.30, -0.27, 0.35) p=0.5362
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.04)
  p-value of fit (if done): 0.003605
  error matrix (px, py, pz, E, x, y ,z):
@@ -565,6 +603,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=15 identifier=5 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.63, -0.16, 0.51) p=0.8243
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.3419
  error matrix (px, py, pz, E, x, y ,z):
@@ -584,6 +623,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=17 identifier=7 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.17, 0.09, 0.49) p=0.5298
+ momentum scaling factor=1
  position=(1.95, 3.77, -2.51)
  p-value of fit (if done): 0.1835
  error matrix (px, py, pz, E, x, y ,z):
@@ -603,6 +643,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=12 identifier=2 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.27, 0.24, -0.18) p=0.404
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.1085
  error matrix (px, py, pz, E, x, y ,z):
@@ -622,6 +663,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=4 arrayIndex=14 identifier=4 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.16, -0.86, -0.35) p=0.9433
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.00)
  p-value of fit (if done): 0.532
  error matrix (px, py, pz, E, x, y ,z):
@@ -641,6 +683,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=6 arrayIndex=16 identifier=6 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.07, 1.49, 1.55) p=2.153
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.00)
  p-value of fit (if done): 0.1674
  error matrix (px, py, pz, E, x, y ,z):
@@ -660,6 +703,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=8 arrayIndex=18 identifier=8 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.10, -0.13, 0.33) p=0.3647
+ momentum scaling factor=1
  position=(-0.01, 0.00, 0.04)
  p-value of fit (if done): 0.8702
  error matrix (px, py, pz, E, x, y ,z):
@@ -679,6 +723,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=9 arrayIndex=19 identifier=9 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.07, -0.43, -0.55) p=0.7039
+ momentum scaling factor=1
  position=(0.03, -0.00, 0.03)
  p-value of fit (if done): 0.4484
  error matrix (px, py, pz, E, x, y ,z):
@@ -701,6 +746,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=20 identifier=0 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.02, 0.24, -0.10) p=0.2584
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.01)
  p-value of fit (if done): 2.434e-15
  error matrix (px, py, pz, E, x, y ,z):
@@ -720,6 +766,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=21 identifier=1 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.52, -0.60, -0.23) p=0.8274
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 0.5873
  error matrix (px, py, pz, E, x, y ,z):
@@ -739,6 +786,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=23 identifier=3 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.30, -0.27, 0.35) p=0.5387
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.04)
  p-value of fit (if done): 0.002274
  error matrix (px, py, pz, E, x, y ,z):
@@ -758,6 +806,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=25 identifier=5 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.63, -0.16, 0.51) p=0.8253
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.3563
  error matrix (px, py, pz, E, x, y ,z):
@@ -777,6 +826,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=27 identifier=7 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.17, 0.09, 0.50) p=0.5335
+ momentum scaling factor=1
  position=(1.95, 3.74, -2.33)
  p-value of fit (if done): 0.1794
  error matrix (px, py, pz, E, x, y ,z):
@@ -796,6 +846,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=22 identifier=2 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.28, 0.24, -0.18) p=0.4088
+ momentum scaling factor=1
  position=(0.00, 0.01, 0.03)
  p-value of fit (if done): 0.2264
  error matrix (px, py, pz, E, x, y ,z):
@@ -815,6 +866,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=4 arrayIndex=24 identifier=4 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.16, -0.86, -0.35) p=0.9436
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.00)
  p-value of fit (if done): 0.4716
  error matrix (px, py, pz, E, x, y ,z):
@@ -834,6 +886,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=6 arrayIndex=26 identifier=6 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.07, 1.49, 1.55) p=2.153
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.00)
  p-value of fit (if done): 0.1702
  error matrix (px, py, pz, E, x, y ,z):
@@ -853,6 +906,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=8 arrayIndex=28 identifier=8 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.10, -0.13, 0.33) p=0.3702
+ momentum scaling factor=1
  position=(-0.01, 0.00, 0.04)
  p-value of fit (if done): 0.992
  error matrix (px, py, pz, E, x, y ,z):
@@ -872,6 +926,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=9 arrayIndex=29 identifier=9 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.07, -0.43, -0.55) p=0.705
+ momentum scaling factor=1
  position=(0.03, -0.00, 0.03)
  p-value of fit (if done): 0.6845
  error matrix (px, py, pz, E, x, y ,z):
@@ -894,6 +949,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=30 identifier=0 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.02, 0.24, -0.10) p=0.2584
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.01)
  p-value of fit (if done): 2.434e-15
  error matrix (px, py, pz, E, x, y ,z):
@@ -913,6 +969,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=31 identifier=1 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.52, -0.60, -0.23) p=0.8309
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 0.3442
  error matrix (px, py, pz, E, x, y ,z):
@@ -932,6 +989,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=33 identifier=3 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.31, -0.28, 0.36) p=0.5486
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.04)
  p-value of fit (if done): 0.0001816
  error matrix (px, py, pz, E, x, y ,z):
@@ -951,6 +1009,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=35 identifier=5 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.63, -0.16, 0.51) p=0.8303
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.2502
  error matrix (px, py, pz, E, x, y ,z):
@@ -970,6 +1029,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=37 identifier=7 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.18, 0.09, 0.51) p=0.5503
+ momentum scaling factor=1
  position=(1.94, 3.68, -2.27)
  p-value of fit (if done): 0.1675
  error matrix (px, py, pz, E, x, y ,z):
@@ -989,6 +1049,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=32 identifier=2 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.29, 0.25, -0.19) p=0.4273
+ momentum scaling factor=1
  position=(0.01, 0.01, 0.04)
  p-value of fit (if done): 0.01312
  error matrix (px, py, pz, E, x, y ,z):
@@ -1008,6 +1069,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=4 arrayIndex=34 identifier=4 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.16, -0.86, -0.35) p=0.9459
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.00)
  p-value of fit (if done): 0.282
  error matrix (px, py, pz, E, x, y ,z):
@@ -1027,6 +1089,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=6 arrayIndex=36 identifier=6 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.07, 1.49, 1.55) p=2.153
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.00)
  p-value of fit (if done): 0.2249
  error matrix (px, py, pz, E, x, y ,z):
@@ -1046,6 +1109,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=8 arrayIndex=38 identifier=8 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.11, -0.14, 0.35) p=0.3917
+ momentum scaling factor=1
  position=(-0.01, 0.01, 0.04)
  p-value of fit (if done): 0.9998
  error matrix (px, py, pz, E, x, y ,z):
@@ -1065,6 +1129,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=9 arrayIndex=39 identifier=9 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.07, -0.43, -0.55) p=0.7028
+ momentum scaling factor=1
  position=(0.03, -0.00, 0.03)
  p-value of fit (if done): 0.03546
  error matrix (px, py, pz, E, x, y ,z):
@@ -1087,6 +1152,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=40 identifier=0 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.02, 0.22, -0.10) p=0.2459
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.01)
  p-value of fit (if done): 0.114
  error matrix (px, py, pz, E, x, y ,z):
@@ -1106,6 +1172,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=41 identifier=1 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.52, -0.60, -0.23) p=0.8266
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.01)
  p-value of fit (if done): 0.6495
  error matrix (px, py, pz, E, x, y ,z):
@@ -1125,6 +1192,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=43 identifier=3 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.30, -0.27, 0.35) p=0.5362
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.04)
  p-value of fit (if done): 0.003605
  error matrix (px, py, pz, E, x, y ,z):
@@ -1144,6 +1212,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=45 identifier=5 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.63, -0.16, 0.51) p=0.8243
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.3419
  error matrix (px, py, pz, E, x, y ,z):
@@ -1163,6 +1232,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=47 identifier=7 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.17, 0.09, 0.49) p=0.5298
+ momentum scaling factor=1
  position=(1.95, 3.77, -2.51)
  p-value of fit (if done): 0.1835
  error matrix (px, py, pz, E, x, y ,z):
@@ -1182,6 +1252,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=42 identifier=2 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.27, 0.24, -0.18) p=0.404
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.03)
  p-value of fit (if done): 0.1085
  error matrix (px, py, pz, E, x, y ,z):
@@ -1201,6 +1272,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=4 arrayIndex=44 identifier=4 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.16, -0.86, -0.35) p=0.9433
+ momentum scaling factor=1
  position=(0.01, 0.00, 0.00)
  p-value of fit (if done): 0.532
  error matrix (px, py, pz, E, x, y ,z):
@@ -1220,6 +1292,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=6 arrayIndex=46 identifier=6 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.07, 1.49, 1.55) p=2.153
+ momentum scaling factor=1
  position=(0.00, -0.00, 0.00)
  p-value of fit (if done): 0.1674
  error matrix (px, py, pz, E, x, y ,z):
@@ -1239,6 +1312,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=8 arrayIndex=48 identifier=8 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.10, -0.13, 0.33) p=0.3647
+ momentum scaling factor=1
  position=(-0.01, 0.00, 0.04)
  p-value of fit (if done): 0.8702
  error matrix (px, py, pz, E, x, y ,z):
@@ -1258,6 +1332,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=9 arrayIndex=49 identifier=9 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.07, -0.43, -0.55) p=0.7039
+ momentum scaling factor=1
  position=(0.03, -0.00, 0.03)
  p-value of fit (if done): 0.4484
  error matrix (px, py, pz, E, x, y ,z):
@@ -1280,6 +1355,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.01, -0.02, 0.09) p=0.09314
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1299,6 +1375,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.00, -0.02, 0.02) p=0.02535
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1318,6 +1395,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.04, 0.09, 0.07) p=0.1225
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1337,6 +1415,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.06, -0.12, -0.15) p=0.1977
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1356,6 +1435,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=54 identifier=0 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.08, -1.01, -0.35) p=1.075
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1375,6 +1455,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=55 identifier=1 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.25, -0.24, -0.25) p=0.43
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1394,6 +1475,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=56 identifier=2 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.01, 0.18, 0.11) p=0.215
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1413,6 +1495,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=57 identifier=3 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.00, -0.00, -0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1435,6 +1518,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=58 identifier=1001 daughterIndices:  (none)
  mass=0
  momentum=(-0.01, -0.02, 0.09) p=0.09314
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1454,6 +1538,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=5 arrayIndex=59 identifier=6001 daughterIndices:  (none)
  mass=0
  momentum=(-0.00, -0.02, 0.02) p=0.02579
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1473,6 +1558,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=7 arrayIndex=60 identifier=8001 daughterIndices:  (none)
  mass=0
  momentum=(0.04, 0.10, 0.07) p=0.1263
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1492,6 +1578,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=11 arrayIndex=61 identifier=13001 daughterIndices:  (none)
  mass=0
  momentum=(0.06, -0.12, -0.15) p=0.2045
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1514,6 +1601,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=12 arrayIndex=62 identifier=1001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, -0.02, 0.09) p=0.09314
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1533,6 +1621,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=17 arrayIndex=63 identifier=6001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.00, -0.02, 0.02) p=0.02535
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1552,6 +1641,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=19 arrayIndex=64 identifier=8001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.04, 0.09, 0.07) p=0.1225
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1571,6 +1661,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=23 arrayIndex=65 identifier=13001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.06, -0.12, -0.15) p=0.1977
+ momentum scaling factor=1
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1590,6 +1681,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=0 arrayIndex=66 identifier=0 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.08, -1.01, -0.35) p=1.075
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1609,6 +1701,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=1 arrayIndex=67 identifier=1 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.25, -0.24, -0.25) p=0.43
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1628,6 +1721,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=2 arrayIndex=68 identifier=2 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, 0.18, 0.11) p=0.215
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1647,6 +1741,7 @@ Total Number of Particles created in the DataStore: 15077401
  mdstIndex=3 arrayIndex=69 identifier=3 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.00, -0.00, -0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1661,100 +1756,198 @@ Total Number of Particles created in the DataStore: 15077401
  extra info=( ) 
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
-[INFO] ParticleStats Summary: 
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : gamma:fromKLM (0+4)
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=121 identifier=0 daughterIndices:  (none)
+ mass=0
+ momentum=(0.08, -1.01, -0.35) p=1.075
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
 
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=1 arrayIndex=122 identifier=1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.25, -0.24, -0.25) p=0.43
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=2 arrayIndex=123 identifier=2 daughterIndices:  (none)
+ mass=0
+ momentum=(-0.01, 0.18, 0.11) p=0.215
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=22 Charge=0 PDGMass=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
+ mdstIndex=3 arrayIndex=124 identifier=3 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, -0.00, -0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+   Upsilon(4S)( 0)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+
+[INFO] 
+======================================================================
+Total Retention: 0 events passing / 90000 events processed = 0.0000
+Total Number of Particles created in the DataStore: 125
+======================================================================
+
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+ gamma:fromKLM( 0)|    0.0000|   0.0000|   4.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0000|   4.0000|
+
+[INFO] 
+======================================================================
+Total Retention: 1 events passing / 90000 events processed = 0.0000
+Total Number of Particles created in the DataStore: 125
+======================================================================
+
+[INFO] ParticleStats Summary:
 [INFO] =======================================================================
-			|Retention|	    0| Unique 
-   Upsilon(4S)( 0)	|	0.0000	1.0000	0.0000
+ Pass matrix (for i, j: fraction passing selection i also passes selection j)
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
+     e+:frommc( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+    pi+:frommc( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+     K+:frommc( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+     p+:frommc( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+    mu+:frommc( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+   K_S0:frommc( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+Lambda0:frommc( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+   K_L0:frommc( 7)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+  gamma:frommc( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+     n0:frommc( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+     B0:frommc(10)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+     D0:frommc(11)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-   Upsilon(4S)( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+     e+:frommc( 0)|    0.0000|   0.0002|  21.0000|   0.0001|   5.0000|   0.0002|  16.0000|   0.0000|   0.0000|
+    pi+:frommc( 1)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
+     K+:frommc( 2)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+     p+:frommc( 3)|    0.0000|   0.0000|   1.0000|   0.0000|   0.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+    mu+:frommc( 4)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
+   K_S0:frommc( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+Lambda0:frommc( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+   K_L0:frommc( 7)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+  gamma:frommc( 8)|    0.0000|   0.0001|   5.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   5.0000|
+     n0:frommc( 9)|    0.0000|   0.0000|   2.0000|   0.0000|   2.0000|   0.0000|   0.0000|   0.0000|   0.0000|
+     B0:frommc(10)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+     D0:frommc(11)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
 
 [INFO] 
-=======================================================
-Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 117
-=======================================================
+======================================================================
+Total Retention: 1 events passing / 90000 events processed = 0.0000
+Total Number of Particles created in the DataStore: 125
+======================================================================
 
-[INFO] ParticleStats Summary: 
-
+[INFO] ParticleStats Summary:
 [INFO] =======================================================================
-			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9|	   10|	   11| Unique 
-     e+:frommc( 0)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-    pi+:frommc( 1)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-     K+:frommc( 2)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-     p+:frommc( 3)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-    mu+:frommc( 4)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-   K_S0:frommc( 5)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000
-Lambda0:frommc( 6)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000
-   K_L0:frommc( 7)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000
-  gamma:frommc( 8)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-     n0:frommc( 9)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-     B0:frommc(10)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000	0.0000
-     D0:frommc(11)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000
+ Pass matrix (for i, j: fraction passing selection i also passes selection j)
+
+                  |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
+            e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+           pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+            K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+            p+( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+           mu+( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+          K_S0( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+       Lambda0( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+          K_L0( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+         gamma( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+            n0( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-     e+:frommc( 0)	|	  0.0002	 21.0000	  0.0001	  5.0000	  0.0002	 16.0000	  0.0000	  0.0000
-    pi+:frommc( 1)	|	  0.0001	  7.0000	  0.0000	  4.0000	  0.0000	  3.0000	  0.0000	  0.0000
-     K+:frommc( 2)	|	  0.0000	  2.0000	  0.0000	  1.0000	  0.0000	  1.0000	  0.0000	  0.0000
-     p+:frommc( 3)	|	  0.0000	  1.0000	  0.0000	  0.0000	  0.0000	  1.0000	  0.0000	  0.0000
-    mu+:frommc( 4)	|	  0.0001	  7.0000	  0.0000	  4.0000	  0.0000	  3.0000	  0.0000	  0.0000
-   K_S0:frommc( 5)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-Lambda0:frommc( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-   K_L0:frommc( 7)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-  gamma:frommc( 8)	|	  0.0001	  5.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0001	  5.0000
-     n0:frommc( 9)	|	  0.0000	  2.0000	  0.0000	  2.0000	  0.0000	  0.0000	  0.0000	  0.0000
-     B0:frommc(10)	|	  0.0000	  2.0000	  0.0000	  1.0000	  0.0000	  1.0000	  0.0000	  0.0000
-     D0:frommc(11)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
 
-[INFO] 
-=======================================================
-Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 117
-=======================================================
-
-[INFO] ParticleStats Summary: 
-
-[INFO] =======================================================================
-			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9| Unique 
-            e+( 0)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-           pi+( 1)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-            K+( 2)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-            p+( 3)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-           mu+( 4)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-          K_S0( 5)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000
-       Lambda0( 6)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000
-          K_L0( 7)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-         gamma( 8)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
-            n0( 9)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	1.0000	0.0000
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+            e+( 0)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+           pi+( 1)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+            K+( 2)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+            p+( 3)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+           mu+( 4)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+          K_S0( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+       Lambda0( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+          K_L0( 7)|    0.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   8.0000|
+         gamma( 8)|    0.0000|   0.0000|   4.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0000|   4.0000|
+            n0( 9)|    0.0000|   0.0001|   8.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|
 
 [INFO] 
 ======================================================================
- Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-            e+( 0)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
-           pi+( 1)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
-            K+( 2)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
-            p+( 3)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
-           mu+( 4)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
-          K_S0( 5)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-       Lambda0( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-          K_L0( 7)	|	  0.0001	  8.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0001	  8.0000
-         gamma( 8)	|	  0.0000	  4.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0000	  4.0000
-            n0( 9)	|	  0.0001	  8.0000	  0.0001	  8.0000	  0.0000	  0.0000	  0.0000	  0.0000
-
-[INFO] 
-=======================================================
-Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 117
-=======================================================
+Total Retention: 1 events passing / 90000 events processed = 0.0000
+Total Number of Particles created in the DataStore: 125
+======================================================================
 

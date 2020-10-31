@@ -36,7 +36,7 @@ class TestTreeFits(unittest.TestCase):
         ma.reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         ma.matchMCTruth('B0:rec', path=main)
 
-        treeFit('B0:rec', conf_level=-1, ipConstraint=True, updateAllDaughters=True, path=main)
+        treeFit('B0:rec', conf_level=-1, ipConstraint=False, updateAllDaughters=True, path=main)
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)

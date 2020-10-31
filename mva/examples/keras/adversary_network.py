@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 # Justin Tan 2017

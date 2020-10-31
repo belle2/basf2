@@ -1,3 +1,8 @@
+/* ---------------------------------------------------------------------- *\
+   nsmlib2.h
+
+   revision history can be found in nsmlib2.c
+\* ---------------------------------------------------------------------- */
 
 #ifndef __nsmlib2_h__
 #define __nsmlib2_h__
@@ -7,7 +12,6 @@
 #include <netinet/in.h>  /* for struct sockaddr_in */
 
 #include "nsm2.h"
-#include "nsmsys2.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -54,10 +58,10 @@ typedef struct {
   char name[64];
 } NSMrequest;
 
-typedef struct NSMrecvqueue_struct {
-  struct NSMrecvqueue_struct* next;
-  NSMtcphead h;
-} NSMrecvqueue;
+struct NSMtcphead_struct;
+struct NSMrecvqueue_struct;
+struct NSMmem_struct;
+struct NSMsys_struct;
 
 struct NSMcontext_struct {
   /* seq */
@@ -73,16 +77,16 @@ struct NSMcontext_struct {
   int  sock;
   int  port;
   int  shmkey;
-  SOCKAD_IN sa;
+  struct sockaddr_in sa;
   char nodename[NSMSYS_NAME_SIZ + 1];
   char hostname[1024];
 
   /* initshm (shared memory related) */
   int  initshm_done;
   int  sysid;
-  NSMsys* sysp;
+  struct NSMsys_struct* sysp;
   int  memid;
-  NSMmem* memp;
+  struct NSMmem_struct* memp;
 
   /* initsig (signal handler related) */
   int  usesig;
@@ -98,7 +102,7 @@ struct NSMcontext_struct {
   struct NSMcontext_struct* next;
 
   /* recv queue */
-  NSMrecvqueue* recvqueue;
+  struct NSMrecvqueue_struct* recvqueue;
 
   /* callback hook */
   NSMhook_t hook;
@@ -110,14 +114,15 @@ struct NSMcontext_struct {
 
 
 void nsmlib_logflush();
-void nsmlib_logging(FILE* logfp);
+FILE* nsmlib_logging(FILE* logfp);
 void nsmlib_checkpoint(NSMcontext* nsmc, int val);
 int nsmlib_debuglevel(int val);
 int nsmlib_addincpath(const char* path);
 const char* nsmlib_nodename(NSMcontext* nsmc, int nodeid);
 int nsmlib_nodeid(NSMcontext* nsmc, const char* nodename);
+int nsmlib_nodepid(NSMcontext* nsmc, const char* nodename);
 int nsmlib_nodeproc(NSMcontext* nsmc, const char* nodename);
-int nsmlib_recv(NSMcontext* nsmc, NSMtcphead* hp, int wait_msec);
+int nsmlib_recv(NSMcontext* nsmc, struct NSMtcphead_struct* hp, int wait_msec);
 int nsmlib_reqid(NSMcontext* nsmc, const char* reqname);
 const char* nsmlib_reqname(NSMcontext* nsmc, int reqid);
 const char* nsmlib_strerror(NSMcontext* nsmc);
@@ -142,7 +147,7 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
 int nsmlib_term(NSMcontext* nsmc);
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
-void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
+void nsmlib_call(NSMcontext* nsmc, struct NSMtcphead_struct* hp);
 NSMparse* nsmlib_parsefile(const char* datname, int revision,
                            const char* incpath, char* fmtstr, int* revisionp);
 

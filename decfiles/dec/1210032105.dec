@@ -1,0 +1,51 @@
+# EventType: 1210032105
+# Descriptor: [B+ -> KS0 pi+ pi0]
+# NickName: Bu_KSpi+pi0
+# Documentation: BtoCharmless Phase 3 data validation studies.
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Markus Reif
+# Email: mreif@mpp.mpg.de
+# Cuts: None
+# Date: 27 May, 2020
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+0.0000068   K*+     pi0             SVS;
+0.000017    K_0*+   pi0             PHSP;
+0.00001     K*0     pi+             SVS;
+0.00005     K_0*0   pi+             PHSP;
+0.0000073   rho+    K_S0            SVS;
+0.000045    K_S0    pi+     pi0     PHSP;
+Enddecay
+CDecay B-sig
+
+Decay K*+
+1.0     K_S0    pi+     VSS;
+Enddecay
+CDecay K*-
+
+Decay K_0*+
+1.0     K_S0    pi+     PHSP;
+Enddecay
+CDecay K_0*-
+
+Decay K*0
+1.0     K_S0    pi0     VSS;
+Enddecay
+
+Decay K_0*0
+1.0     K_S0    pi0     PHSP;
+Enddecay
+
+Decay rho+
+1.0     pi+     pi0     VSS;
+Enddecay
+CDecay rho-
+
+End
+

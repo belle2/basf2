@@ -43,7 +43,7 @@ class TestTreeFits(unittest.TestCase):
                         massConstraintList=[],
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
-                        ipConstraint=True,
+                        ipConstraint=False,
                         updateAllDaughters=True)
 
         ntupler = basf2.register_module('VariablesToNtuple')

@@ -50,8 +50,6 @@ class defaultPedestalImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPedestalCalibrations.name, payload, iov)
 
 
-use_local_database("localDB_pedestal/database.txt", "localDB_pedestal")
-
 main = create_path()
 
 # Event info setter - execute single event

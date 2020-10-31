@@ -76,4 +76,3 @@ namespace Belle2 {
 
   } // end namespace PXD
 } // end namespace Belle2
-

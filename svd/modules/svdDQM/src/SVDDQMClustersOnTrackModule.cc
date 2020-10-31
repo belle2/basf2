@@ -95,10 +95,10 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   int SNRBins = 50;
   float SNRMax = 100;
   int TimeBins = 200;
-  float TimeMin = -60;
-  float TimeMax = 140;
+  float TimeMin = -100;
+  float TimeMax = 100;
   if (m_isSVDTimeCalibrated) {
-    TimeMin = -100 ;
+    TimeMin = -150 ;
     TimeMax =  100 ;
   }
 

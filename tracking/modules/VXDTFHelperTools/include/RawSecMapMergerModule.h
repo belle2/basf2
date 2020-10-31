@@ -51,6 +51,9 @@ namespace Belle2 {
 
     /** If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases! */
     bool m_PARAMprintFullGraphs;
+
+    /** Relative threshold for pruning the sector maps (in %). */
+    int m_RelThreshold;
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:
 
@@ -199,6 +202,14 @@ namespace Belle2 {
       for (auto& subgraph : mainGraph) {
         subgraph.second.prepareDataCollection(config.quantiles); // TODO small-sample-case!
       }
+
+      // Get the absolute threshold (nfound) from the relative threshold
+      int absThreshold = mainGraph.getAbsThreshold(m_RelThreshold);
+
+      // Prune the sector map
+      nKilled += mainGraph.pruneGraphBeforeTraining(absThreshold);
+
+      B2INFO("processSectorCombinations: nKilled before the training: " << nKilled);
 
       trainGraph(mainGraph, chain, sectorBranches, filterBranches);
       /// TODO next steps: implement nice and neat way to take care of the ram-threshold!

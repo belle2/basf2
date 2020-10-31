@@ -12,6 +12,10 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
@@ -99,7 +103,7 @@ namespace Belle2 {
      * */
     int getDstarOutputPDG(int pion_charge, int input_dstar_pdg);
 
-    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
     std::unique_ptr<Variable::Cut> m_cut_pion; /**< cut object which performs the cuts */
     std::unique_ptr<Variable::Cut> m_cut_dstar; /**< cut object which performs the cuts */
@@ -115,6 +119,11 @@ namespace Belle2 {
 
     float m_dstar_pdg_mass; /**< PDG mass of the mother-D* */
     float m_d_pdg_mass; /**< PDG mass of the daughter-D  */
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreObjPtr<ParticleList> m_outputDstarList; /**< output Dstar particle list */
+    StoreObjPtr<ParticleList> m_outputAntiDstarList; /**< output anti-Dstar particle list */
+    StoreObjPtr<ParticleList> m_inputPionList; /**< input pion particle list */
   };
 
 }

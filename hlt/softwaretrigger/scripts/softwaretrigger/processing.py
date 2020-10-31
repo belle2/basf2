@@ -45,7 +45,7 @@ def setup_basf2_and_db(zmq=False):
                             help="Don't write any output files",
                             action="store_true", default=False)
 
-    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count()-5,
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
@@ -239,7 +239,7 @@ def add_expressreco_processing(path,
     # this is needed as by default also un-selected events will get passed to ereco,
     # however they are empty.
     if select_only_accepted_events:
-        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"], resultOnMissing=0)
         skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # ensure that only DataStore content is present that we expect in

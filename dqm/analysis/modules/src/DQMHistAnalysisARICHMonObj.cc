@@ -55,10 +55,10 @@ void DQMHistAnalysisARICHMonObjModule::initialize()
   m_monObj = getMonitoringObject("arich");
 
   // make canvases to be added to MonitoringObject
-  m_c_main = new TCanvas("main", "main", 1500, 800);
-  m_c_mask = new TCanvas("mask", "mask", 750, 1600);
-  m_c_mirror = new TCanvas("mirror", "mirror", 1000, 1000);
-  m_c_tracks = new TCanvas("tracks", "tracks", 500, 500);
+  m_c_main = new TCanvas("arich_main", "main", 1500, 800);
+  m_c_mask = new TCanvas("arich_mask", "mask", 750, 1600);
+  m_c_mirror = new TCanvas("arich_mirror", "mirror", 1000, 1000);
+  m_c_tracks = new TCanvas("arich_tracks", "tracks", 500, 500);
 
   m_apdHist = new ARICHChannelHist("tmpApdHist", "tmpApdHist", 2); /**<ARICH TObject to draw hit map for each APD*/
   //m_chHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 0); /**<ARICH TObject to draw hit map for each channel*/
@@ -156,7 +156,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
 
   TH1F* flash = (TH1F*)hapdHitPerEvent->ProjectionX("flash", 40, 144);
   m_hapdHist->fillFromTH1(flash);
-  m_hapdHist->Scale(1. / float(nevt));
+  if (nevt) m_hapdHist->Scale(1. / float(nevt));
 
   m_hapdHist->setPoly(pflash);
   // draw sector lines
@@ -182,7 +182,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   m_c_tracks->cd();
   tracks2D->RebinX(4);
   tracks2D->RebinY(4);
-  double trkevt = tracks2D->GetEntries() / nevt;
+  double trkevt = nevt > 0 ? tracks2D->GetEntries() / nevt : 0;
   int ntracks = tracks2D->GetEntries();
   m_monObj->setVariable("ntracks", ntracks ? ntracks : 0);
   m_monObj->setVariable("ntracksPerEvent", trkevt ? trkevt : 0);
@@ -221,14 +221,14 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
     if (status) return;
 
     sigbkg[0] = nphot;
-    sigbkg[1] = nphot * f1->GetParError(0) / f1->GetParameter(0);
+    sigbkg[1] = f1->GetParameter(0) > 0 ? nphot * f1->GetParError(0) / f1->GetParameter(0) : 0.;
     sigbkg[2] = nbkg;
-    sigbkg[3] = nbkg * f1->GetParError(3) / f1->GetParameter(3);
+    sigbkg[3] = f1->GetParameter(3) > 0 ? nbkg * f1->GetParError(3) / f1->GetParameter(3) : 0.;
     sigbkg[4] = f1->GetParameter(1);
     sigbkg[5] = f1->GetParError(1);
     sigbkg[6] = f1->GetParameter(2);
     sigbkg[7] = f1->GetParError(2);
-
+    if (theta->GetBinWidth(1) == 0) return;
     m_monObj->setVariable("nsig", sigbkg[0] / float(ntracks) / theta->GetBinWidth(1),
                           sigbkg[1] / float(ntracks) / theta->GetBinWidth(1));
     m_monObj->setVariable("nbgr", sigbkg[2] / float(ntracks) / theta->GetBinWidth(1),
@@ -251,7 +251,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
     for (int i = 1; i < 18 + 1; i++) {
       TH1F* hmir = (TH1F*)mirrorThetaPhi->ProjectionZ(TString::Format("hmir_%d", i), i, i, 1, 10000);
       hmir->SetTitle(TString::Format("mirror %d", i));
-      hmir->Scale(theta->GetEntries() / hmir->GetEntries());
+      if (hmir->GetEntries() > 0) hmir->Scale(theta->GetEntries() / hmir->GetEntries());
       hmir->Rebin(2);
       hmir->SetLineWidth(2);
       int iplot = (i - 1) / 2;
@@ -268,17 +268,19 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
 
 
   //chDigit
-  if (chDigit != NULL) chDigit->Scale(1. / nevt);
-  chHit->Scale(1. / nevt);
-  flash->Scale(1. / nevt);
-
+  if (chDigit != NULL && nevt) chDigit->Scale(1. / nevt);
+  if (nevt) {
+    chHit->Scale(1. / nevt);
+    flash->Scale(1. / nevt);
+  }
   int nhot = 0, ndead = 0;
-  TH2F* hotCh = new TH2F("hot", "Number of channels in APD with >0.5% occ.", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* hotCh1 = new TH2F("hot1", "Number of channels in APD with >0.5% occ. after mask", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* deadCh = new TH2F("dead", "Number of channels in APD with no hits", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* falseCh = new TH2F("false", "Number of wrongly masked channels in APD (masked but not dead/hot)", 42, 0.5, 42.5, 40, 0.5,
+  TH2F* hotCh = new TH2F("arich_hot", "Number of channels in APD with >0.5% occ.", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* hotCh1 = new TH2F("arich_hot1", "Number of channels in APD with >0.5% occ. after mask", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* deadCh = new TH2F("arich_dead", "Number of channels in APD with no hits", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* falseCh = new TH2F("arich_false", "Number of wrongly masked channels in APD (masked but not dead/hot)", 42, 0.5, 42.5, 40,
+                           0.5,
                            40.5);
-  TH1F* occ = new TH1F("occ", "nhits / nevt for all channels; nhits/nevt;# of chn", 500, 0, 0.005);
+  TH1F* occ = new TH1F("arich_occ", "nhits / nevt for all channels; nhits/nevt;# of chn", 500, 0, 0.005);
 
   int ndeadHapd = 0;
   if (chDigit != NULL) {
@@ -370,7 +372,6 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   m_monObj->setVariable("hitsPerEvent", hitsPerEvent ? hitsPerEvent->GetMean() : 0, hitsPerEvent ? hitsPerEvent->GetMeanError() : -1);
   // without error
   m_monObj->setVariable("bitsMean", bits ? bits->GetMean() : 0);
-
   B2DEBUG(20, "DQMHistAnalysisARICHMonObj : endRun called");
 }
 

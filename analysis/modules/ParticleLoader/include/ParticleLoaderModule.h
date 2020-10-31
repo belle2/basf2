@@ -14,9 +14,26 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
+
+// framework - DataStore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// dataobjects
+#include <mdst/dataobjects/V0.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
@@ -145,6 +162,18 @@ namespace Belle2 {
      */
     void appendDaughtersRecursive(Particle* mother);
 
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreArray<MCParticle> m_mcparticles; /**< StoreArray of MCParticles */
+    StoreArray<ECLCluster> m_eclclusters; /**< StoreArray of ECLCluster */
+    StoreArray<KLMCluster> m_klmclusters; /**< StoreArray of KLMCluster */
+    StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihoods */
+    StoreArray<Track> m_tracks; /**< StoreArray of Tracks */
+    StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResults */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< object pointer to event extra info */
+    StoreObjPtr<ParticleExtraInfoMap> m_particleExtraInfoMap; /**< object pointer to extra info map */
+    StoreArray<RestOfEvent> m_roes; /**< StoreArray of ROEs */
+    StoreArray<V0> m_v0s; /**< StoreArray of V0s */
+
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
     bool m_useROEs;  /**< Switch to load ROE as Particle */
@@ -173,6 +202,7 @@ namespace Belle2 {
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
+    bool m_loadPhotonsFromKLM; /**< If true, create photon candidates from KLM cluster */
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
     std::vector<int> m_sameChargeDaughtersV0Counts; /**< internally used to count the number of V0s with same charge daughters*/
   };

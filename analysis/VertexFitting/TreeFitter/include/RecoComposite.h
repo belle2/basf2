@@ -29,7 +29,7 @@ namespace TreeFitter {
     /** init particle in case it has no mother */
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
-    /** update chaed params */
+    /** update changed params */
     void updateParams();
 
     /** project this particle constraint  */
@@ -38,7 +38,7 @@ namespace TreeFitter {
     /** dimension of the measurement vector */
     int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
 
-    /** get dimension of cosntraint */
+    /** get dimension of constraint */
     virtual int dim() const override { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
     /** get dimension  of measurement*/

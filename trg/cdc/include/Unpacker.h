@@ -270,7 +270,8 @@ namespace Belle2 {
         unsigned iTracker,
         const CDCTriggerNeuroConfig::B2FormatLine b2line)
       {
-        if (int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
+        if (int(b2line.offset + foundtime) >= 0 &&
+            int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
 
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
 

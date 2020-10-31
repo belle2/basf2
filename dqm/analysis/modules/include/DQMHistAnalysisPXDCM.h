@@ -48,14 +48,22 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    /** Update entry intervall */
+    int m_minEntries = 10000;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
     TH2F* m_hCommonMode = nullptr;
+    //! histogram covering all modules
+    TH2F* m_hCommonModeDelta = nullptr;
+    //! histogram covering all modules
+    TH2F* m_hCommonModeOld = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonMode = nullptr;
+    //! Final Canvas
+    TCanvas* m_cCommonModeDelta = nullptr;
     //! Line in the Canvas to guide the eye
     TLine* m_line1 = nullptr;
     //! Line in the Canvas to guide the eye
@@ -65,6 +73,9 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
+
+    /** flag if to export to EPICS */
+    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! epics PVs

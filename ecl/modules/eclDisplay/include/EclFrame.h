@@ -193,6 +193,5 @@ namespace Belle2 {
      * See EclPainterFactory.h, EclPainterType.
      */
     void changeType(int type, bool redraw = true);
-    ClassDef(EclFrame, 0)
   };
 }

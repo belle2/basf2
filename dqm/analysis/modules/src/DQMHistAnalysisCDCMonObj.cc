@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kindo Haruki, Luka Santelj                               *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -51,7 +51,7 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   // set module description (e.g. insert text)
   setDescription("Modify and analyze the data quality histograms of CDCMonObj");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Filename", m_filename, "Output root filename (if not set mon_e{exp}r{run}.root is used", std::string(""));
+  // addParam("Filename", m_filename, "Output root filename (if not set monCDC_e{exp}r{run}.root is used", std::string(""));
 }
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
@@ -83,10 +83,28 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   gStyle->SetPadBottomMargin(0.1);
   gStyle->SetPadLeftMargin(0.15);
 
-  m_cMain = new TCanvas("main", "main", 1500, 1000);
+  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
-  m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
-  m_monObj->addCanvas(m_cBadWire);
+
+  m_cADC = new TCanvas("cdc_adc", "cdc_adc", 2000, 10000);
+  m_monObj->addCanvas(m_cADC);
+  m_cTDC = new TCanvas("cdc_tdc", "cdc_tdc", 2000, 10000);
+  m_monObj->addCanvas(m_cTDC);
+  m_cHit = new TCanvas("cdc_hit", "cdc_hit", 1500, 6000);
+  m_monObj->addCanvas(m_cHit);
+  //m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
+  //m_monObj->addCanvas(m_cADC1000);
+  //  m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
+  //m_monObj->addCanvas(m_cHitL);
+  // m_cADCs=new TCanvas("hADCs","hADCs",2000,10000);
+  //m_cADCs = new TCanvas("hADCs", "hADCs", 2000, 10000);
+  //m_monObj->addCanvas(m_cADCs);
+  //m_cTDCs = new TCanvas("hTDCs", "hTDCs", 2000, 10000);
+  //m_monObj->addCanvas(m_cTDCs);
+
+
+  //  m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
+  // m_monObj->addCanvas(m_cBadWire);
   B2DEBUG(20, "DQMHistAnalysisCDCMonObj: initialized.");
 
 }
@@ -126,18 +144,6 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
   m_fieldR[56] = geom.getOuterWall(0).getRmin();
   m_fieldR[0] = geom.getInnerWall(0).getRmax();
 
-  //    const double offset = m_offSet[L];
-  //...Offset modification to be aligned to axial at z=0...
-  //  const double phiSize = 2 * M_PI / double(m_nWires[L]);
-
-  //  const double phiF = phiSize * (double(C) + offset)
-  //                      + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
-
-
-  /*
-   * calculate cell geometry
-   */
-
 }
 
 void DQMHistAnalysisCDCMonObjModule::event()
@@ -176,9 +182,9 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
 {
   m_badChannels.clear();
   for (int il = 0; il < 56; ++il) {
-    const int nbins = m_hHit[il]->GetNbinsX();
-    for (int iw = 0; iw < nbins; ++iw) {
-      const int y = m_hHit[il]->GetBinContent(iw + 1);
+    // const int nbins = m_hHits[il]->GetNbinsX();
+    for (int iw = 0; iw < m_nSenseWires[il]; ++iw) {
+      const int y = m_hHits[il]->GetBinContent(iw + 1);
       if (y == 0) {
         //B2INFO("l " << layer << " w " << wire);
         m_badChannels.push_back(std::make_pair(il, iw));
@@ -188,9 +194,10 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2INFO("num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1F* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
 {
-  TH1F* hist = (TH1F*)h->Clone();
+  TH1D
+  * hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0);
   float m = hist->GetMean();
   return m;
@@ -212,12 +219,14 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 
 void DQMHistAnalysisCDCMonObjModule::endRun()
 {
-
+  B2INFO("end run");
   m_hNEvent = (TH1F*)findHist("CDC/hNEvents");
+  m_hADC = (TH2F*)findHist("CDC/hADC");
+  m_hADCTOTCut = (TH2F*)findHist("CDC/hADCTOTCut");
+  m_hTDC = (TH2F*)findHist("CDC/hTDC");
+  m_hHit = (TH2F*)findHist("CDC/hHit");
   TF1* fitFunc[300] = {};
   for (int i = 0; i < 300; ++i) {
-    m_hADC[i] = (TH1F*)findHist(Form("CDC/hADC%d", i));
-    m_hTDC[i] = (TH1F*)findHist(Form("CDC/hTDC%d", i));
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",
                          4921 - 100, 4921 + 100);
     fitFunc[i]->SetParLimits(0, 0, 100);
@@ -225,44 +234,62 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
     fitFunc[i]->SetParLimits(5, 0, 50.0);
   }
-
-  for (int i = 0; i < 56; ++i) {
-    m_hHit[i]  = (TH1F*)findHist(Form("CDC/hHitL%d", i));
-  }
-
-  const int neve = m_hNEvent->GetBinContent(1);
-
+  TH1F* hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
+  int neve = hfastTDC->GetEntries();
+  //  const int neve = m_hNEvent->GetBinContent(1);
+  //  B2INFO("neve"<<m_hNEvent->GetBinContent(0));
+  //B2INFO("neve"<<m_hNEvent->GetBinContent(1));
+  //B2INFO("neve"<<m_hNEvent->GetBinContent(2));
   // ADC related
+  B2INFO("adc related");
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
+  TH1F* hADC1000 = new TH1F("ADC1000", "ADC1000", 300, 0, 300);
+  TH1F* hADC0 = new TH1F("ADC0", "ADC0", 300, 0, 300);
+
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
-    if (m_hADC[i]->GetEntries() == 0) {
+    m_hADCTOTCuts[i] = m_hADCTOTCut->ProjectionY(Form("hADCTOTCut%d", i), i + 1, i + 1, "");
+    m_hADCTOTCuts[i]->SetTitle(Form("hADCTOTCut%d", i));
+    m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
+    m_hADCs[i]->SetTitle(Form("hADC%d", i));
+    float n = static_cast<float>(m_hADCs[i]->GetEntries());
+    if (m_hADCs[i]->GetEntries() == 0) {
       nDeadADC += 1;
+      hADC0->SetBinContent(i + 1, -0.1);
     } else {
-      float n = static_cast<float>(m_hADC[i]->GetEntries());
-      float n0 = static_cast<float>(m_hADC[i]->GetBinContent(1));
+      float n0 = static_cast<float>(m_hADCs[i]->GetBinContent(1));
       if (n0 / n > 0.9) {
         B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
+        //B2INFO("bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
-      float m = getHistMean(m_hADC[i]);
+      float bin1 = m_hADCs[i]->GetBinContent(1);
+      float m = getHistMean(m_hADCs[i]);
       //B2INFO(i << " " << m );
       means.push_back(m);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
+      double overflow = m_hADCs[i]->GetBinContent(1001);
+      hADC1000->SetBinContent(i + 1, overflow / (overflow + n));
+      hADC0->SetBinContent(i + 1, bin1 / (overflow + n));
+      //cout<<n<<" "<<overflow+n<<" "<<bin1<<endl;
+      /// for some reason, GetEntries() does not include overflow???
     }
   }
 
   // TDC related
+  B2INFO("tdc related");
   int nDeadTDC = 1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
   std::vector<float> tdcEdges = {};
   std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
-    if (m_hTDC[i]->GetEntries() == 0 || m_hTDC[i] == nullptr) {
+    m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
+    m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
+    if (m_hTDCs[i]->GetEntries() == 0 || m_hTDCs[i] == nullptr) {
       nDeadTDC += 1;
     } else {
       fitFunc[i]->SetParameters(0, 100, 0.01, 4700, 4900, 2, 0.01);
@@ -270,9 +297,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       fitFunc[i]->SetParameter(6, 0.02);
       int xxx = -1;
       if (i < 28) {
-        xxx = m_hTDC[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
+        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
       } else {
-        xxx = m_hTDC[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
+        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
@@ -284,10 +311,37 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         tdcEdges.push_back(p4);
         tdcSlopes.push_back(p5);
       }
+      //      cout<<i<<" "<<p4<<endl;
+    }
+
+  }
+
+
+  // Hit related
+  B2INFO("hit related");
+  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
+  int nHits = 0;
+  for (int i = 0; i < 56; ++i) {
+    m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
+    m_hHits[i]->SetTitle(Form("hHit%d", i));
+    if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
+      int nhitSumL = 0;
+      int nBins = m_nSenseWires[i];
+      // B2INFO("layer " << i << " nbins " << nBins);
+      for (int j = 0; j < nBins; ++j) {
+        nhitSumL += m_hHits[i]->GetBinContent(j + 1);
+      }
+      //B2INFO("bbb");
+      if (neve > 0) {
+        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
+      } else hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
+      hHitPerLayer->SetBinError(i + 1, 0);
+      nHits += nhitSumL;
     }
   }
 
-  // Bad wires relasted
+  // Bad wires related
+  B2INFO("bad wire related");
   TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
   for (int i = 0; i < 400; ++i) {
     for (int j = 0; j < 56; ++j) {
@@ -324,28 +378,14 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
 
-  // Hit related
-  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
-
-  int nHits = 0;
-  for (int i = 0; i < 56; ++i) {
-    int nhitSumL = 0;
-    const int nBins = m_hHit[i]->GetNbinsX();
-    for (int j = 0; j < nBins; ++j) {
-      nhitSumL += m_hHit[i]->GetBinContent(j + 1);
-    }
-    hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
-    hHitPerLayer->SetBinError(i + 1, 0);
-    nHits += nhitSumL;
-  }
 
 
-
-  m_cMain->Divide(3, 2);
+  B2INFO("writing");
+  m_cMain->Divide(3, 3);
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
-  hADCMean->SetMaximum(200);
+  hADCMean->SetMaximum(300);
   hADCMean->Draw();
 
   m_cMain->cd(2);
@@ -357,16 +397,65 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
   hTDCSlope->Draw();
-
+  //m_hADCs[2]->Draw();
   m_cMain->cd(4);
   hBadChannel->Draw("col");
 
   m_cMain->cd(5);
   hBadChannelBC->Draw("col");
-  m_cMain->cd(6);
+  m_cMain->cd(9);
   hHitPerLayer->Draw();
+  m_cMain->cd(7);
+  hADC1000->Draw();
+  m_cMain->cd(8);
+  hADC0->Draw();
 
-  m_cBadWire->cd();
+  /*
+  m_cADC->cd();
+  m_hADC->Draw("colz");
+
+  m_cTDC->cd();
+  m_hTDC->Draw("colz");
+
+  m_cHit->cd();
+  m_hHit->Draw("colz");
+  */
+  //m_cADC1000->cd();
+  //hADC1000->Draw();
+
+  m_cHit->Divide(4, 14);
+  for (int i = 0; i < 56; i++) {
+    m_cHit->cd(i + 1);
+    m_hHits[i]->GetXaxis()->SetRangeUser(0, m_nSenseWires[i]);
+    m_hHits[i]->Draw("hist");
+  }
+
+  m_cADC->Divide(6, 50, 0.0002, 0.0002);
+  m_cTDC->Divide(6, 50, 0.0002, 0.0002);
+
+  for (int i = 0; i < 300; i++) {
+    m_cADC->cd(i + 1);
+    m_hADCTOTCuts[i]->SetFillColor(42);
+    Double_t max = m_hADCTOTCuts[i]->GetMaximum();
+    m_hADCs[i]->GetYaxis()->SetRangeUser(0, 3 * max);
+    m_hADCs[i]->Draw("hist");
+    m_hADCTOTCuts[i]->Draw("hist same");
+
+    m_cTDC->cd(i + 1);
+    m_hTDCs[i]->Draw("hist");
+    fitFunc[i]->SetLineColor(kRed);
+    fitFunc[i]->Draw("same");
+    max = m_hTDCs[i]->GetMaximum();
+    TLine* l1 = new TLine(tdcEdges[i], 0, tdcEdges[i], max * 1.05);
+    l1->SetLineColor(kRed);
+    l1->Draw();
+    TLine* l0 = new TLine(4900, 0, 4900, max * 1.05);
+    l0->Draw();
+    //cout<<i<<" "<<tdcEdges[i]<<endl;
+  }
+
+  //  m_cBadWire->cd();
+  m_cMain->cd(6);
   h2p->Draw("col");
   float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
                            79.39, 90.31, 101.23, 112.05
@@ -381,6 +470,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     circs[i]->Draw("same");
   }
 
+  /*
   std::string comment = "";
   m_monObj->setVariable("comment", comment); // tentative no comments
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0) / means.size());
@@ -392,10 +482,33 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nHits", nHits / neve);
   m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC);
   m_monObj->setVariable("nBadWires", m_badChannels.size());
+  */
+  //  cout<<nBadADC<<endl;
+  // nBadADC=3.5;
+  //m_monObj->setVariable("nbadADC", nBadADC); //"nADC(n_0/n_tot>0.9)"
 
+  m_monObj->setVariable("nEvents", neve);
+  m_monObj->setVariable("nHits", nHits / neve);
+  m_monObj->setVariable("nBadWires", m_badChannels.size());
+  m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
+  m_monObj->setVariable("nDeadADC", nDeadADC);
+  m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
+  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / tdcEdges.size());
+  m_monObj->setVariable("nDeadTDC", nDeadTDC);
+  m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / tdcSlopes.size());
+
+  /*
   TString fname;
+  //  if (m_filename.length()) fname = m_filename;
+  //else fname = "cdc_mon_output.root";
   if (m_filename.length()) fname = m_filename;
-  else fname = "cdc_mon_output.root";
+  else {
+    TH1* hrun = findHist("DQMInfo/runno");
+    TH1* hexp = findHist("DQMInfo/expno");
+    int run = hrun ? std::stoi(hrun->GetTitle()) : 0;
+    int exp = hexp ? std::stoi(hexp->GetTitle()) : 0;
+    fname = TString::Format("monCDC_e%04dr%06d.root", exp, run);
+  }
 
   TFile f(fname, "NEW");
 
@@ -403,13 +516,15 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     B2WARNING("File " << fname << "already exists and it will not be rewritten. If desired please delete file and re-run.");
     return;
   }
+
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
   for (const auto& obj : objts)(obj.second)->Write();
+  m_cMain->Write();
 
   f.Close();
-
+  */
 }
 
 void DQMHistAnalysisCDCMonObjModule::terminate()

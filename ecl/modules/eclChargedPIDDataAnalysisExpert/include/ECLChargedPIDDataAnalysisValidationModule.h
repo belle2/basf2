@@ -11,6 +11,9 @@
 
 #pragma once
 
+// Belle 2
+#include <mdst/dataobjects/MCParticle.h>
+
 // ROOT
 #include <TFile.h>
 #include <TH1F.h>
@@ -18,6 +21,7 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {
@@ -251,6 +255,9 @@ namespace Belle2 {
      * It follows the ECL geometry (although ECL gaps are not accounted for).
      */
     std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.385, 0.561996, 1.13, 1.57, 1.88, 2.2462387, 2.47, 2.7070057, 3.1415926};
+
+    /** MCParticles. */
+    StoreArray<MCParticle> m_MCParticles;
 
     /**
      * Dump PID vars.

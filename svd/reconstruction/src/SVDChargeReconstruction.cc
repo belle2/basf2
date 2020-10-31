@@ -104,10 +104,7 @@ namespace Belle2 {
       //check if we can continue
       weCanContinue();
 
-      double charge = 0;
-
-      for (auto sample : m_samples)
-        if (sample > charge) charge = sample;
+      double charge = *std::max_element(begin(m_samples), end(m_samples));
 
       if (isnan(m_cellID))
         B2FATAL("OOPS, we can't continue, you are probably using the wrong SVDReconstructionBase constructor");

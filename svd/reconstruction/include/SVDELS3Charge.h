@@ -36,6 +36,10 @@ namespace Belle2 {
        */
       virtual ~SVDELS3Charge() {};
 
+      /**
+      * compute the cluster charge, charge error and SNR with ELS3
+       */
+      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override {};
 
       /**
        * @return the cluster charge

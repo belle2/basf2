@@ -28,6 +28,11 @@ namespace Belle2 {
     public:
 
       /**
+      * compute the cluster charge, charge error and SNR with MaxSample
+       */
+      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
+
+      /**
        * @return the cluster charge
        */
       double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) override;

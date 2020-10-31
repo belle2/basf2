@@ -20,31 +20,16 @@ namespace Belle2 {
   namespace SVD {
 
 
+    void SVDMaxSampleCharge::computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
+    {
+      applyMaxSampleCharge(rawCluster, charge, SNR, seedCharge);
+    }
+
     double SVDMaxSampleCharge::getClusterCharge(const Belle2::SVD::RawCluster& rawCluster)
     {
 
-      //as sum of the strip charges ( = max sample)
+      return 20000;
 
-      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-      double charge = 0;
-
-      for (int i = 0; i < (int)strips.size(); i++) {
-
-        Belle2::SVD::StripInRawCluster strip = strips.at(i);
-
-        SVDChargeReconstruction chargeReco(strip, rawCluster.getSensorID(), rawCluster.isUSide());
-
-        float noiseInADC = strip.noise;
-        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID,
-                                                                  noiseInADC);
-        chargeReco.setAverageNoise(noiseInADC, noiseInElectrons);
-
-        charge += chargeReco.getMaxSampleCharge();
-      }
-
-
-      return charge;
     }
 
     double SVDMaxSampleCharge::getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster)

@@ -272,32 +272,32 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double muonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double pionID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double kaonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double protonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double deuteronID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)
@@ -307,7 +307,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();;
       }
       return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(int(std::lround(arguments[0]))) + ", "
-                                             + std::to_string(int(std::lround(arguments[1]))) + ", all)")->function(part);
+                                             + std::to_string(int(std::lround(arguments[1]))) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
     Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& arguments)

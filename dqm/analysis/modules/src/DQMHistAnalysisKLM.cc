@@ -289,7 +289,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   canvas->cd();
   histogram->SetStats(false);
   histogram->Draw();
-  canvas->Modified();
   if (histName.find("bklm") != std::string::npos) {
     /* First draw the vertical lines and the sector names. */
     const double maximalSector = BKLMElementNumbers::getMaximalSectorGlobalNumber();
@@ -311,7 +310,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
      * and write an error message. */
     if (m_DeadBarrelModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
-      canvas->Update();
     } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
       for (uint16_t module : m_DeadBarrelModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
@@ -324,7 +322,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       alarm = "Call the KLM experts immediately!";
       latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
       canvas->Pad()->SetFillColor(kRed);
-      canvas->Update();
     }
   } else {
     /* First draw the vertical lines and the sector names. */
@@ -349,7 +346,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
      * and write an error message. */
     if (m_DeadEndcapModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
-      canvas->Update();
     } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
       for (uint16_t module : m_DeadEndcapModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
@@ -362,9 +358,10 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       alarm = "Call the KLM experts immediately!";
       latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
       canvas->Pad()->SetFillColor(kRed);
-      canvas->Update();
     }
   }
+  canvas->Modified();
+  canvas->Update();
 }
 
 TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)

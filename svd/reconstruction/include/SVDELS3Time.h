@@ -35,7 +35,7 @@ namespace Belle2 {
        * computes the cluster time, timeError and FirstFrame
        * with the ELS3 algorithm
        */
-      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
       /**
        * virtual destructor

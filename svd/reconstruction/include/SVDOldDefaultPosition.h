@@ -32,7 +32,7 @@ namespace Belle2 {
        * computes the cluster position and position error
        * with the oldDefault algorithm
        */
-      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
 
       /**
        * virtual destructor

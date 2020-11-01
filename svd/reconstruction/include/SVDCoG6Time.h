@@ -33,7 +33,7 @@ namespace Belle2 {
        * computes the cluster time, timeError and FirstFrame
        * with the CoG6 algorithm
        */
-      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
       /**
        * virtual destructor

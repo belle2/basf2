@@ -13,7 +13,7 @@
 
 """
 <header>
-    <input>../muon-KLMValidation.root</input>
+    <input>muon-KLMValidation.root</input>
     <contact>martina.laurenza@roma3.infn.it</contact>
     <description>Create validation plots for BKLM</description>
 </header>

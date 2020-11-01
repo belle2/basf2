@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>../muon-KLMValidation.root</input>
+    <input>muon-KLMValidation.root</input>
     <contact>Martina Laurenza (martina.laurenza@roma3.infn.it)</contact>
     <description>Creation of EKLM muon validation plots.</description>
 </header>

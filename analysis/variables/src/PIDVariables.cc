@@ -57,7 +57,7 @@ namespace Belle2 {
       return Const::pion;
     }
 
-    // Parses the detector list for the PID metafunctions
+
     Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments)
     {
       Const::PIDDetectorSet result;

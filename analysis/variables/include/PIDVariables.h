@@ -163,6 +163,10 @@ namespace Belle2 {
      **/
     double eIDBelle(const Particle*);
 
+    /**
+     * Parses the detector list for the PID metafunctions.
+     **/
+    Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

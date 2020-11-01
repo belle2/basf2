@@ -31,6 +31,11 @@ namespace Belle2 {
       SVDClusterPosition() {};
 
       /**
+       * computes the cluster position and position error
+       */
+      virtual void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
+
+      /**
        * @return the cluster position
        */
       virtual double getClusterPosition(const Belle2::SVD::RawCluster& rawCluster) = 0;
@@ -45,8 +50,17 @@ namespace Belle2 {
        */
       virtual ~SVDClusterPosition() {};
 
+      /** CoG Position Algorithm*/
+      void applyCoGPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+
+      /** AHT Position Algorithm*/
+      void applyAHTPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+
 
     protected:
+
+      /** helper, returns the sum pf the strip charges*/
+      double getSumOfStripCharges(Belle2::SVD::RawCluster& rawCluster);
 
 
     };

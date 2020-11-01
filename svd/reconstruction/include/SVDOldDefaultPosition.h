@@ -29,6 +29,12 @@ namespace Belle2 {
     public:
 
       /**
+       * computes the cluster position and position error
+       * with the oldDefault algorithm
+       */
+      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+
+      /**
        * @return the first frame and the cluster position
        */
       double getClusterPosition(const Belle2::SVD::RawCluster& rawCluster) override;

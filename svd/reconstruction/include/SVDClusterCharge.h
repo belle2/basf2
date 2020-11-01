@@ -74,7 +74,7 @@ namespace Belle2 {
       }
 
       /**
-       * @return the cluster charge
+       * computes the cluster charge, SNr and seedCharge
        */
       virtual void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) = 0;
 

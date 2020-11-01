@@ -320,46 +320,37 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   double seedCharge = std::numeric_limits<float>::quiet_NaN();
   double SNR = std::numeric_limits<double>::quiet_NaN();
 
-  float position = std::numeric_limits<float>::quiet_NaN();
-  float positionError = std::numeric_limits<float>::quiet_NaN();
+  double position = std::numeric_limits<float>::quiet_NaN();
+  double positionError = std::numeric_limits<float>::quiet_NaN();
 
 
   if (m_numberOfAcquiredSamples == 6) {
+
     //time
-    /*    std::pair<int, double> FFandTime = m_time6SampleClass->getFirstFrameAndClusterTime(rawCluster);
-    firstFrame = FFandTime.first;
-    time = FFandTime.second;
-    timeError = m_time6SampleClass->getClusterTimeError(rawCluster);
-    */
+    m_time6SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
     //charge
     m_charge6SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
 
     //position
-    /*    position = m_position6SampleClass->getClusterPosition(rawCluster);
-    positionError = m_position6SampleClass->getClusterPositionError(rawCluster);
-    */
+    m_position6SampleClass->computeClusterPosition(rawCluster, position, positionError);
   } else if (m_numberOfAcquiredSamples == 3) {
     //time
-    std::pair<int, double> FFandTime = m_time3SampleClass->getFirstFrameAndClusterTime(rawCluster);
-    firstFrame = FFandTime.first;
-    time = FFandTime.second;
-    timeError = m_time3SampleClass->getClusterTimeError(rawCluster);
+    m_time6SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
 
     //charge
     m_charge3SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
 
     //position
-    position = m_position3SampleClass->getClusterPosition(rawCluster);
-    positionError = m_position3SampleClass->getClusterPositionError(rawCluster);
+    m_position3SampleClass->computeClusterPosition(rawCluster, position, positionError);
 
   } else //we should never get here!
     B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
   // now go into FTSW time reference frame
-  //  time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+  time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
   //apply the Lorentz Shift Correction
-  //  position = applyLorentzShiftCorrection(position, sensorID, isU);
+  position = applyLorentzShiftCorrection(position, sensorID, isU);
 
 
   //append the new cluster to the StoreArray...

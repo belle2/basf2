@@ -30,6 +30,12 @@ namespace Belle2 {
     public:
 
       /**
+       * computes the cluster time, timeError and FirstFrame
+       * with the CoG6 algorithm
+       */
+      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+
+      /**
        * @return the first frame and the cluster time
        */
       std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) override;

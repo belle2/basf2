@@ -20,6 +20,11 @@ namespace Belle2 {
 
   namespace SVD {
 
+    void SVDCoG6Time::computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
+    {
+      applyCoG6Time(rawCluster, time, timeError, firstFrame);
+    }
+
 
     std::pair<int,  double> SVDCoG6Time::getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster)
     {

@@ -44,13 +44,13 @@ namespace Belle2 {
       /** get strip charge error as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
       double getStripChargeError(const TString& chargeAlgo = "fromRecoDBObject");
 
-      /** CoG6 Charge */
+      /** MaxSample Charge */
       double getMaxSampleCharge();
-      /** CoG6 Charge Error*/
+      /** MaxSample Charge Error*/
       double getMaxSampleChargeError();
-      /** CoG3 Charge */
+      /** SumSamples Charge */
       double getSumSamplesCharge();
-      /** CoG3 Charge Error*/
+      /** SumSamples Charge Error*/
       double getSumSamplesChargeError();
       /** ELS3 Charge */
       double getELS3Charge();

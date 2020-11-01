@@ -180,7 +180,7 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
       }
     }
   }
-  B2DEBUG(1, "num bad wires " << m_badChannels.size());
+  B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
 float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
@@ -207,7 +207,7 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 
 void DQMHistAnalysisCDCMonObjModule::endRun()
 {
-  B2DEBUG(1, "end run");
+  B2DEBUG(20, "end run");
   m_hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
   m_hADC = (TH2F*)findHist("CDC/hADC");
   m_hADCTOTCut = (TH2F*)findHist("CDC/hADCTOTCut");
@@ -226,7 +226,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   int neve = m_hfastTDC->GetEntries();
   if (neve == 0)neve = 1;
 
-  B2DEBUG(1, "adc related");
+  B2DEBUG(20, "adc related");
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
@@ -246,7 +246,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     } else {
       float n0 = static_cast<float>(m_hADCs[i]->GetBinContent(1));
       if (n0 / n > 0.9) {
-        B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
+        B2DEBUG(21, "bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
       float bin1 = m_hADCs[i]->GetBinContent(1);
@@ -261,7 +261,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     }
   }
   // TDC related
-  B2DEBUG(1, "tdc related");
+  B2DEBUG(20, "tdc related");
   int nDeadTDC = 1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
@@ -298,7 +298,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
 
   // Hit related
-  B2DEBUG(1, "hit related");
+  B2DEBUG(20, "hit related");
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
   int nHits = 0;
   for (int i = 0; i < 56; ++i) {
@@ -319,7 +319,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   // Bad wires related
-  B2DEBUG(1, "bad wire related");
+  B2DEBUG(20, "bad wire related");
   TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
   for (int i = 0; i < 400; ++i) {
     for (int j = 0; j < 56; ++j) {
@@ -343,7 +343,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   for (const auto& lw : m_badChannels) {
     const int l = lw.first;
     const int w = lw.second;
-    B2DEBUG(99, "l " << l << " w " << w);
+    B2DEBUG(21, "l " << l << " w " << w);
     hBadChannel->Fill(w, l);
     std::pair<int, int> bc = getBoardChannel(l, w);
     hBadChannelBC->Fill(bc.first, bc.second);
@@ -355,7 +355,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     h2p->Fill(x, y, 1.1);
   }
 
-  B2DEBUG(1, "writing");
+  B2DEBUG(20, "writing");
   m_cMain->Divide(3, 3);
 
   m_cMain->cd(1);

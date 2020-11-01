@@ -35,16 +35,6 @@ namespace Belle2 {
       void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
       /**
-       * @return the first frame and the cluster position
-       */
-      double getClusterPosition(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
-       * @return the cluster position error
-       */
-      double getClusterPositionError(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
        * virtual destructor
        */
       virtual ~SVDOldDefaultPosition() {};

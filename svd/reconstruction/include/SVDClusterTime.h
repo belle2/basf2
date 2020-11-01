@@ -47,16 +47,6 @@ namespace Belle2 {
       virtual void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) = 0;
 
       /**
-       * @return the first frame and the cluster time
-       */
-      virtual std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) = 0;
-
-      /**
-       * @return the cluster time error
-       */
-      virtual double getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster) = 0;
-
-      /**
        * virtual destructor
        */
       virtual ~SVDClusterTime() {};

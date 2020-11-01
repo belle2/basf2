@@ -8,12 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDELS3Charge.h>
-#include <svd/reconstruction/SVDChargeReconstruction.h>
-
-#include <svd/reconstruction/SVDELS3Time.h>
-#include <svd/calibration/SVDNoiseCalibrations.h>
+//#include <svd/reconstruction/SVDELS3Time.h>
+//#include <svd/calibration/SVDNoiseCalibrations.h>
 
 #include <TMath.h>
 
@@ -23,35 +20,9 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDELS3Charge::getClusterCharge(const Belle2::SVD::RawCluster& rawCluster)
+    void SVDELS3Charge::computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
     {
-      bool inElectrons = true;
-
-      SVDChargeReconstruction chargeReco(rawCluster.getClsSamples(inElectrons),
-                                         rawCluster.getSensorID(), rawCluster.isUSide());
-
-      chargeReco.setSamplesAreInElectrons();
-
-      double charge = chargeReco.getELS3Charge();
-
-      return  charge;
-
-    }
-
-
-    double SVDELS3Charge::getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster)
-    {
-      bool inElectrons = true;
-
-
-      SVDChargeReconstruction chargeReco(rawCluster.getClsSamples(inElectrons),
-                                         rawCluster.getSensorID(), rawCluster.isUSide());
-
-      chargeReco.setSamplesAreInElectrons();
-
-      double chargeError = chargeReco.getELS3ChargeError();
-
-      return  chargeError;
+      applyELS3Charge(rawCluster, charge, SNR, seedCharge);
     }
 
 

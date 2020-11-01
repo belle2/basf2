@@ -30,17 +30,7 @@ namespace Belle2 {
       /**
       * compute the cluster charge, charge error and SNR with SumSample
        */
-      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override {};
-
-      /**
-       * @return the cluster charge
-       */
-      double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
-       * @return the cluster charge error
-       */
-      double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) override;
+      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
 
       /**
        * virtual destructor

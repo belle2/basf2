@@ -10,7 +10,6 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDELS3Time.h>
-#include <svd/reconstruction/SVDTimeReconstruction.h>
 
 using namespace std;
 
@@ -18,34 +17,9 @@ namespace Belle2 {
 
   namespace SVD {
 
-    std::pair<int, double> SVDELS3Time::getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster)
+    void SVDELS3Time::computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
-
-      bool inElectrons = false;
-
-      SVDTimeReconstruction timeReco(rawCluster.getClsSamples(inElectrons),
-                                     rawCluster.getSensorID(), rawCluster.isUSide());
-
-      timeReco.setTriggerBin(m_triggerBin);
-
-      return timeReco.getELS3FirstFrameAndTime();
-
-    }
-
-    double SVDELS3Time::getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster)
-    {
-
-      bool inElectrons = false;
-
-      SVDTimeReconstruction timeReco(rawCluster.getClsSamples(inElectrons),
-                                     rawCluster.getSensorID(), rawCluster.isUSide());
-
-      timeReco.setTriggerBin(m_triggerBin);
-
-      double timeError = timeReco.getELS3TimeError();
-
-      return  timeError;
-
+      applyELS3Time(rawCluster, time, timeError, firstFrame);
     }
 
   }  //SVD namespace

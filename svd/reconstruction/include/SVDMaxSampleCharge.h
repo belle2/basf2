@@ -32,16 +32,6 @@ namespace Belle2 {
        */
       void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
 
-      /**
-       * @return the cluster charge
-       */
-      double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
-       * @return the cluster charge error
-       */
-      double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) override;
-
 
       /**
        * virtual destructor

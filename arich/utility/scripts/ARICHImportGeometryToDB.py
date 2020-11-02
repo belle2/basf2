@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
 import os
@@ -16,20 +16,20 @@ home = os.environ['BELLE2_LOCAL_DIR']
 #                    home + "/arich/database/cosmicTest_payloads")
 # use_local_database(home + "/arich/database/newGeo/database.txt",
 #                   home + "/arich/database/newGeo")
-use_local_database("localdb/database.txt", "localdb")
+b2.use_local_database("localdb/database.txt", "localdb")
 
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
-main = create_path()
-main.add_module('EventInfoSetter', evtNumList=1, logLevel=LogLevel.DEBUG)
+main = b2.create_path()
+main.add_module('EventInfoSetter', evtNumList=1, logLevel=b2.LogLevel.DEBUG)
 main.add_module(gearbox)
 
 # import geometry for ARICH only
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['ARICH'])
 geometry.param('payloadIov', [0, 0, -1, -1])
 geometry.param('createPayloads', 1)
 main.add_module(geometry)
 print("Geometry Imported to the database!")
-process(main)
+b2.process(main)

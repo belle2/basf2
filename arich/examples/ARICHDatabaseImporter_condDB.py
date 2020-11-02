@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
 import os
@@ -25,7 +25,7 @@ home = os.environ['BELLE2_LOCAL_DIR']
 
 # More information about use_local_database please find here:
 # https://b2-master.belle2.org/software/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
-use_local_database()
+b2.use_local_database()
 # use_local_database("./ARICHdata/centraldb/database.txt", "./ARICHdata/centraldb/", False, LogLevel.ERROR, False)
 # use_local_database("./ARICH_db_Test/centraldb/database.txt", "", False, LogLevel.ERROR, False)
 # use_local_database("test_database.txt", "test_payloads")
@@ -38,10 +38,10 @@ use_local_database()
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
-eventinfo = register_module('EventInfoSetter')
+eventinfo = b2.register_module('EventInfoSetter')
 eventinfo.initialize()
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfo)
 
 # create a gearbox module to read read the aerogel data so it can be used
@@ -50,7 +50,7 @@ main.add_module(eventinfo)
 # folder so that gearbox can find all files in there.
 
 if(ie == "import"):
-    paramloader = register_module('Gearbox')
+    paramloader = b2.register_module('Gearbox')
     pathname = 'file://%s/data/AllData/' % (os.getcwd())
     paramloader.param('backends', [pathname])
     paramloader.param('fileName', 'ArichData.xml')
@@ -100,20 +100,20 @@ if(ie == "import"):
     mypath = '%s/moduleTest/modules/' % (os.getcwd())
 
 if(ie == 'importAerogelInfoOnly'):
-    paramloader = register_module('Gearbox')
+    paramloader = b2.register_module('Gearbox')
     pathname = '/home/b-lab050/KEK/xmlarichdata/data/aerogel_xml_ver3_R/'
     paramloader.param('backends', [pathname])
     paramloader.param('fileName', 'AerogelData.xml')
     paramloader.initialize()
 
 if(ie == 'importAerogelRayleighScatteringFit'):
-    paramloader = register_module('Gearbox')
+    paramloader = b2.register_module('Gearbox')
     pathname = '/home/b-lab050/KEK/xmlarichdata/xmlData/aerogel_xml_ver3_L/'
     paramloader.param('backends', [pathname])
     paramloader.param('fileName', 'aerogel_xml_ver3_L_fit.xml')
     paramloader.initialize()
 
-process(main)
+b2.process(main)
 
 if(ie == 'importAerogelInfoOnly'):
     dbImporter = ARICHDatabaseImporter()

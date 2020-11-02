@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 try:
-    from inspect import signature
+    pass
 except ImportError:
-    from funcsigs import signature
+    pass
 import time
 
 from hep_ipython_tools import viewer

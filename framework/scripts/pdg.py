@@ -25,7 +25,6 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 
 import re
 import basf2
-import ROOT
 from ROOT.Belle2 import EvtGenDatabasePDG
 
 # the particle database (filled from evt.pdl by framework)

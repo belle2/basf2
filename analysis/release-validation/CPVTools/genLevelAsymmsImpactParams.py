@@ -23,7 +23,6 @@ from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
-import basf2_mva
 
 import numpy as np
 import matplotlib as mpl

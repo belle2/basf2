@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Thomas Keck
 
-import sys
 import re
 import struct
 import pdg
@@ -9,9 +8,7 @@ import basf2
 
 import pybasf2
 # inspect is also used by LogPythonInterface. Do not remove
-import inspect
 import numpy as np
-import collections
 import ROOT
 from ROOT import Belle2
 

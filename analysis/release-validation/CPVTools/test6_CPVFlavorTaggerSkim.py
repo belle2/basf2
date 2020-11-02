@@ -17,9 +17,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import flavorTagger as ft
-import vertex as vx
-from variables import variables
 import os
 import sys
 
@@ -39,7 +36,7 @@ cp_val_path = b2.Path()
 environmentType = "default"
 
 if belleOrBelle2Flag == "Belle":
-    from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+    from b2biiConversion import setupB2BIIDatabase
 
     isBelleMC = True
     # if belleData == "BelleDataConv":

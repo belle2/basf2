@@ -8,21 +8,15 @@
 """
 
 import fei
-from fei.default_channels import get_unittest_channels
 import os
-import sys
 
 import tempfile
 import shutil
 import glob
-import sys
 
 import basf2 as b2
 import modularAnalysis as ma
-from ROOT import Belle2
 import basf2_mva
-import pdg
-from basf2 import conditions
 
 basf2_mva.loadRootDictionary()
 

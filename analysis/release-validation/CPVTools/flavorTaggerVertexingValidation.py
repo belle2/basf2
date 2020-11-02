@@ -30,7 +30,6 @@ import variables.collections as vc
 import variables.utils as vu
 from ROOT import Belle2
 import argparse
-import sys
 import os
 
 

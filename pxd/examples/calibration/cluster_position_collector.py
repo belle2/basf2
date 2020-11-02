@@ -14,7 +14,7 @@
 #
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import math
 import os
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         vertex_z = [-2.0085, -2.0]
 
     # Now let's create a path to simulate our events.
-    main = create_path()
+    main = b2.create_path()
 
     # Now let's add modules to simulate our events.
     eventinfosetter = main.add_module("EventInfoSetter")
@@ -92,5 +92,5 @@ if __name__ == "__main__":
     main.add_module('PXDClusterPositionCollector', granularity="all", clusterKind=args.clusterkind)
     main.add_module("Progress")
 
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)

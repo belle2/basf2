@@ -87,8 +87,8 @@ import ROOT
 import os
 import glob
 import pickle
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 parser = argparse.ArgumentParser(
@@ -205,7 +205,7 @@ else:
 
 # Charge collector for MC or data
 
-charge_collector = register_module("PXDClusterChargeCollector")
+charge_collector = b2.register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
 charge_collector.param("minClusterCharge", 8)
 charge_collector.param("minClusterSize", 2)
@@ -222,7 +222,7 @@ charge_collector.param("matchTrack", args.useTrackClusters)
 
 # The pre collector path for MC or data
 
-pre_charge_collector_path = create_path()
+pre_charge_collector_path = b2.create_path()
 pre_charge_collector_path.add_module("Gearbox")
 pre_charge_collector_path.add_module("Geometry")
 if args.mcOnly:

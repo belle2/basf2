@@ -34,8 +34,8 @@ import ROOT
 import os
 import glob
 import pickle
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 parser = argparse.ArgumentParser(
@@ -87,15 +87,15 @@ for file_iov in input_file_iov_set:
 print('Number selected input files:  {}'.format(len(input_files)))
 
 # Create and configure the collector and its pre collector path
-hotpixelcollector = register_module("PXDRawHotPixelMaskCollector")
+hotpixelcollector = b2.register_module("PXDRawHotPixelMaskCollector")
 hotpixelcollector.param("granularity", "run")
 
 # The pre collector path must contain geometry and unpacker
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['PXD'])
-pre_collector_path = create_path()
+pre_collector_path = b2.create_path()
 pre_collector_path.add_module(gearbox)
 pre_collector_path.add_module(geometry)
 pre_collector_path.add_module('PXDUnpacker')

@@ -10,7 +10,7 @@
 
 import os
 import sys
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import IntervalOfValidity

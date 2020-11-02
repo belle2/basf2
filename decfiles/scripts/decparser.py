@@ -10,7 +10,7 @@ import sys
 import settings
 import os
 import time
-from colours import *
+from colours import mesg, query, fail, done, warning
 import descriptcheck
 
 mesg('Starting the decfile check')
@@ -116,7 +116,7 @@ for line in file:
                 eventtype = int(tmp)
             except:
                 fail(['Failed parsing eventtype on line ' + str(linecount),
-                     'Not a number.'])
+                      'Not a number.'])
             order += ['EventType']
             mesg('Eventtype found: ' + str(eventtype))
 
@@ -404,8 +404,7 @@ for (bf2, dec2) in current_decay:
                 for (bf3, dau3) in decay[daug]:
                     norm += float(bf3)
                 newbf = bf * bf2 / norm
-                newdecay2 = newdecay[:] + dau2[:]
-                newdecay2.sort()
+                newdecay2 = sorted(newdecay[:] + dau2[:])
                 current_decay += [(newbf, newdecay2)]
             break
 
@@ -477,8 +476,7 @@ for (bf, dec) in current_decay:
             break
     else:
         if not final:
-            final = dec
-            final.sort()
+            final = sorted(dec)
         else:
             dec.sort()
             if final == dec:
@@ -764,7 +762,7 @@ if len(nick[2].split(',')) < len(cuts.split(',')):
 query('Checking the Physics WG.')
 if physicswg not in settings.groups:
     fail(['The group /' + physicswg + '/ is not known. Please use one of the following:',
-         settings.groups])
+          settings.groups])
 else:
     done()
 
@@ -834,7 +832,7 @@ if mother:
         done()
     else:
         fail(['Descriptor not matched. Please check the old one:', descriptor,
-             '\nAnd the one built by the parser: ', descript])
+              '\nAnd the one built by the parser: ', descript])
         for mes in descriptcheck.mesgdict:
             warning(mes)
 

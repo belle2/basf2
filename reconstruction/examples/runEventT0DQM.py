@@ -18,7 +18,6 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
 import basf2 as b2
 
 # main path

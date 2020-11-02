@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-from rawdata import add_unpackers
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_mdst_output
 from softwaretrigger.constants import SoftwareTriggerModes
 from softwaretrigger.processing import add_hlt_processing
 

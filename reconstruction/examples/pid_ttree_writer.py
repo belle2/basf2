@@ -17,8 +17,6 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import sys
-import math
 import basf2 as b2
 
 # Some ROOT tools

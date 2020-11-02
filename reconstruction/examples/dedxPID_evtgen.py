@@ -14,10 +14,7 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
-import random
 import basf2 as b2
-from simulation import add_simulation
 from tracking import add_tracking_reconstruction
 
 # change to True if you want to use PXD hits (fairly small benefit, if any)

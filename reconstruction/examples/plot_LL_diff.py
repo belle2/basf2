@@ -16,7 +16,7 @@
 import basf2 as b2
 
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TCanvas
+from ROOT import TCanvas, TH2F
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 

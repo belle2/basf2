@@ -11,7 +11,6 @@ from generators import add_kkmc_generator
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
-from ROOT import TFile
 from argparse import ArgumentParser
 import os
 import glob

@@ -16,7 +16,7 @@
 import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_cdst_output
+from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
 # create path

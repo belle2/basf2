@@ -6,10 +6,7 @@
 
 import basf2
 import os
-import sys
 import ROOT
-from ROOT import Belle2
-import modularAnalysis as ma
 
 basf2.reset_database()
 basf2.use_database_chain()

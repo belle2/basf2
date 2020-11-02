@@ -20,12 +20,10 @@ list_of_wg = ['SL', 'EWP', 'TCPV', 'HAD', 'CHARM', 'ONIA', 'TAU']
 
 import os
 import re
-import string
 import logging
 import sys
 import time
 import glob
-import mmap
 from optparse import OptionParser, OptionValueError
 
 
@@ -1083,7 +1081,6 @@ def main():
                        options.force)
         except UserWarning:
             exit_status = 1
-            pass
     else:
         run_loop(options.remove, options.python, options.force)
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import os
+import sys
 from ROOT import Belle2
 
 # ---------------------------------------------------------------------------
@@ -16,15 +17,15 @@ from ROOT import Belle2
 # ---------------------------------------------------------------------------
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 argvs = sys.argv
 if len(argvs) > 1:
     fileName = argvs[1]
@@ -32,13 +33,13 @@ if len(argvs) > 1:
 main.add_module(gearbox)
 
 # geometry (TOP only)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # event display
-display = register_module('Display')
+display = b2.register_module('Display')
 display.param('showMCInfo', False)
 display.param('assignHitsToPrimaries', False)
 display.param('showAllPrimaries', False)
@@ -53,4 +54,4 @@ display.param('fullGeometry', True)
 display.param('hideObjects', [])
 main.add_module(display)
 
-process(main)
+b2.process(main)

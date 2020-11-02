@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import os
 import math
 
@@ -10,32 +10,32 @@ import math
 # ----------------------------------------------------------------------------
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # pulse generator
-calpulse = register_module('TOPCalPulseGenerator')
+calpulse = b2.register_module('TOPCalPulseGenerator')
 calpulse.param('asicChannels', [0])
 calpulse.param('moduleIDs', [1])
 calpulse.param('amplitude', 750.0)
 main.add_module(calpulse)
 
 # digitization
-topdigi = register_module('TOPDigitizer')
+topdigi = b2.register_module('TOPDigitizer')
 topdigi.param('useSampleTimeCalibration', True)
 main.add_module(topdigi)
 
@@ -43,11 +43,11 @@ main.add_module(topdigi)
 main.add_module('RootOutput')
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

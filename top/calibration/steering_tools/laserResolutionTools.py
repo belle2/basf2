@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------
 
 
-from basf2 import *
+import basf2 as b2
 import sys
 import glob
 from ROOT import Belle2
@@ -69,10 +69,10 @@ def fitLaserResolution(
     """
 
     if maxPeaks > 2 or maxPeaks < 1:
-        B2FATAL('Usupported value for the maximum number for peaks (maxPeaks = ' +
-                str(maxPeaks) + '). Please set maxPeak o either 1 or 2.')
+        b2.B2FATAL('Usupported value for the maximum number for peaks (maxPeaks = ' +
+                   str(maxPeaks) + '). Please set maxPeak o either 1 or 2.')
     if pdfType is not 'cb' and pdfType is not 'gaus' and pdfType is not 'gausExpo':
-        B2FATAL(
+        b2.B2FATAL(
             'Unknown PDF type ' +
             pdfType +
             ". The possible options are cb for the Crystal Ball,"

@@ -12,7 +12,7 @@ import sys
 import time
 import numpy
 from array import array
-from basf2 import *
+import basf2 as b2
 from ROOT import gROOT
 gROOT.SetBatch(True)  # noqa
 from ROOT import TFile, TTree, TMath

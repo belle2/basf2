@@ -12,7 +12,7 @@
 # note: runLast is inclusive
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import sys
 import glob
@@ -49,7 +49,7 @@ for run in range(run_first, run_last + 1):
         folder = data_dir + '/' + expNo + '/' + typ + '/' + runNo + '/' + skim_dir
         files += glob.glob(folder + '/cdst.*.root')
 if len(files) == 0:
-    B2ERROR('No cdst files found')
+    b2.B2ERROR('No cdst files found')
     sys.exit()
 
 # Output folder
@@ -67,7 +67,7 @@ fileName += run1 + '_to_' + run2 + '.root'
 print('Output file:', fileName)
 
 
-class Mask_BS13d(Module):
+class Mask_BS13d(b2.Module):
     ''' exclude (mask-out) BS 13d '''
 
     def event(self):
@@ -79,18 +79,18 @@ class Mask_BS13d(Module):
 
 
 # Database
-use_central_database(globalTag)
+b2.use_central_database(globalTag)
 for tag in stagingTags:
-    use_central_database(tag)
+    b2.use_central_database(tag)
 for db in localDB:
     if os.path.isfile(db):
-        use_local_database(db, invertLogging=True)
+        b2.use_local_database(db, invertLogging=True)
     else:
-        B2ERROR(db + ": local database not found")
+        b2.B2ERROR(db + ": local database not found")
         sys.exit()
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input (cdst files)
 main.add_module('RootInput', inputFileNames=files)
@@ -114,11 +114,11 @@ main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=
 main.add_module('TOPModuleT0Calibrator', sample=sampleType, outputFileName=fileName)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

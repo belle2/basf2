@@ -6,7 +6,7 @@ CDC Database importer.
 Simple example.
 """
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT.Belle2 import FileSystem
@@ -36,21 +36,21 @@ alfile = FileSystem.findFile('data/cdc/alignment_v2.dat')
 # misalfile = FileSystem.findFile('data/cdc/misalignment_v2.dat')
 fefile = FileSystem.findFile('cdc/data/fee_phase3.dat')
 # edfile = FileSystem.findFile('cdc/data/edeptoadc.dat')
-use_local_database("localDB/database.txt", "localDB")
+b2.use_local_database("localDB/database.txt", "localDB")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # process single event
-process(main)
+b2.process(main)
 
 dbImporter = CDCDatabaseImporter(expFirst, runFirst, expLast, runLast)
 # dbImporter = CDCDatabaseImporter()

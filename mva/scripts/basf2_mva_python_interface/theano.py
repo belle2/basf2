@@ -108,7 +108,7 @@ def load(obj):
 
 def apply(state, X):
     result = state.eval_function(X)
-    return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
+    return numpy.require(result, dtype=numpy.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state, Xvalid, Svalid, yvalid, wvalid):

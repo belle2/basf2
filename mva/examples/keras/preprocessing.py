@@ -8,6 +8,8 @@ import basf2_mva
 import basf2_mva_util
 import time
 
+import numpy as np
+
 import tensorflow as tf
 import tensorflow.contrib.keras as keras
 

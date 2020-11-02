@@ -14,7 +14,7 @@
 import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -38,7 +38,7 @@ gROOT.ProcessLine('struct EventDataSimhit {\
 from ROOT import EventDataSimhit  # noqa
 
 
-class SVDValidationTTreeSimhit(Module):
+class SVDValidationTTreeSimhit(b2.Module):
     '''class to create sim hit ttree'''
 
     def __init__(self):

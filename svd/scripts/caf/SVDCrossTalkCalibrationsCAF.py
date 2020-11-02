@@ -5,7 +5,7 @@
 # James Webb (Nov. 2019)
 ############################################################
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
@@ -23,7 +23,7 @@ import rawdata as raw
 
 from basf2 import conditions
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 input_branches = [
     'RawSVDs'
 ]
@@ -32,7 +32,7 @@ input_branches = [
 def SVDCrossTalkCalibrations(files, tags):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     path.add_module('Progress')
     path.add_module('RootInput', branchNames=input_branches)
@@ -42,7 +42,7 @@ def SVDCrossTalkCalibrations(files, tags):
 
     raw.add_unpackers(path, components=['SVD'])
 
-    collector = register_module('SVDCrossTalkCalibrationsCollector')
+    collector = b2.register_module('SVDCrossTalkCalibrationsCollector')
     algorithm = SVDCrossTalkCalibrationsAlgorithm("SVDCrossTalkCAF")
 
     calibration = Calibration('SVDCrossTalk',

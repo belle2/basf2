@@ -37,7 +37,7 @@ from scipy import stats as stats
 from scipy.optimize import minimize_scalar
 from sklearn.neural_network import MLPClassifier
 from sklearn2pmml import sklearn2pmml, PMMLPipeline
-from svd.SVDSimBase import *
+from svd.SVDSimBase import dt, betaprime_wave, tau_encoder
 from lxml import etree as ET
 import argparse
 

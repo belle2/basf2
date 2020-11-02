@@ -5,7 +5,7 @@
 # Laura Zani (September 2019)
 ############################################################
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
@@ -24,19 +24,19 @@ import reconstruction as reco
 import modularAnalysis as ana
 # import vertex as vx
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 input_branches = [
     'RawSVDs'
 ]
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def SVDOccupancyCalibrations(files, tags):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     # logging.log_level = LogLevel.WARNING
 
@@ -61,7 +61,7 @@ def SVDOccupancyCalibrations(files, tags):
         ShaperDigitsIN='SVDShaperDigitsZS5',
         FADCmode=True)
 
-    collector = register_module('SVDOccupancyCalibrationsCollector')
+    collector = b2.register_module('SVDOccupancyCalibrationsCollector')
 #    collector.param("SVDShaperDigitsName", "SVDShaperDigits")
     collector.param("SVDShaperDigitsName", "SVDShaperDigitsZS5")
     algorithm = SVDOccupancyCalibrationsAlgorithm("SVDOccupancyCAF")

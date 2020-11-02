@@ -3,14 +3,14 @@
 
 import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 
 
-class dump_digits(Module):
+class dump_digits(b2.Module):
 
     """A simple module to check SVD digit fits."""
 

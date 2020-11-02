@@ -6,7 +6,7 @@ SVD Database importer.
 Script to Import SVD Channel Mapping into a local DB
 """
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
 import sys
@@ -63,11 +63,11 @@ if not str(proceed) == 'y':
 
 b2conditions.prepend_globaltag("svd_basic")
 
-main = create_path()
+main = b2.create_path()
 
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run})
 main.add_module(eventinfosetter)
 
@@ -77,7 +77,7 @@ main.add_module("Gearbox")
 run = int(run)
 
 
-class dbImporterModule(Module):
+class dbImporterModule(b2.Module):
     '''channel mapping importer module'''
 
     def beginRun(self):
@@ -93,6 +93,6 @@ class dbImporterModule(Module):
 
 main.add_module(dbImporterModule())
 
-process(main)
+b2.process(main)
 
 print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")

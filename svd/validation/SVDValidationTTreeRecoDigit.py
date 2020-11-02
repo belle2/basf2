@@ -14,7 +14,7 @@
 import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -38,7 +38,7 @@ gROOT.ProcessLine('struct EventDataRecoDigit {\
 from ROOT import EventDataRecoDigit  # noqa
 
 
-class SVDValidationTTreeRecoDigit(Module):
+class SVDValidationTTreeRecoDigit(b2.Module):
     '''class to create reco digitis ttree'''
 
     def __init__(self):

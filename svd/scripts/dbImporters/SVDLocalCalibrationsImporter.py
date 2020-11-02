@@ -6,8 +6,7 @@ SVD Database importer.
 Script to Import Calibrations into a local DB
 """
 
-import basf2
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
 import os
@@ -73,11 +72,11 @@ b2conditions.prepend_globaltag("svd_basic")
 
 # local tag and database needed for commissioning
 
-main = create_path()
+main = b2.create_path()
 
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run})
 main.add_module(eventinfosetter)
 
@@ -87,7 +86,7 @@ main.add_module("Gearbox")
 run = int(run)
 
 
-class dbImporterModule(basf2.Module):
+class dbImporterModule(b2.Module):
     """
     :author: Laura Zani
     Module to call the importer methods for the payloads creation from XML file
@@ -127,6 +126,6 @@ class dbImporterModule(basf2.Module):
 
 main.add_module(dbImporterModule())
 
-process(main)
+b2.process(main)
 
 print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")

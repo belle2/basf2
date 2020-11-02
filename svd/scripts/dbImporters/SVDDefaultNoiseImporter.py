@@ -5,9 +5,8 @@
 SVD Default Noise Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDNoiseCalibrations
@@ -50,7 +49,7 @@ noise_fwd_V = -1
 '''
 
 
-class defaultNoiseImporter(basf2.Module):
+class defaultNoiseImporter(b2.Module):
     ''' default strip noise importer'''
 
     def beginRun(self):
@@ -106,10 +105,10 @@ class defaultNoiseImporter(basf2.Module):
 
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
@@ -119,8 +118,8 @@ main.add_module("Geometry")
 main.add_module(defaultNoiseImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

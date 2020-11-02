@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import glob
 from basf2 import conditions as b2conditions
 
@@ -43,9 +43,9 @@ b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 b2conditions.prepend_globaltag("data_reprocessing_prompt")
 b2conditions.prepend_globaltag("svd_basic")
 
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 main.add_module(
     'RootInput',
@@ -74,8 +74,8 @@ main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFi
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

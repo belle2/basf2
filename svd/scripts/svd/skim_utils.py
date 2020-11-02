@@ -18,13 +18,12 @@
 #     skimRNDtrg.if_false(emptypath)
 ####
 
-import basf2
 import ROOT
 from ROOT import Belle2
-from basf2 import *
+import basf2 as b2
 
 
-class skimOutRNDTrgModule(basf2.Module):
+class skimOutRNDTrgModule(b2.Module):
     """
     returns True if the event is NOT a random triggered event
     """
@@ -37,7 +36,7 @@ class skimOutRNDTrgModule(basf2.Module):
         rawFTSW = Belle2.PyStoreArray('RawFTSWs')
 
         if not rawFTSW.isValid():
-            B2WARNING('No RawFTSW available - event ignored')
+            b2.B2WARNING('No RawFTSW available - event ignored')
             self.return_value(0)
 
             return
@@ -50,7 +49,7 @@ class skimOutRNDTrgModule(basf2.Module):
             self.return_value(0)
 
 
-class skimSVDBurstEventsModule(basf2.Module):
+class skimSVDBurstEventsModule(b2.Module):
     """
     returns True if the event is a Burst event (number of strips > max number of strips)
     use set_nMaxStrips(nMaxStrips) to set the max number of strips iof a non-burst event, default is nMaxStrips=5000
@@ -75,7 +74,7 @@ class skimSVDBurstEventsModule(basf2.Module):
         strips = Belle2.PyStoreArray('SVDShaperDigits')
 
         if not strips.isValid():
-            B2WARNING('No SVDShaperDigits - event ignored')
+            b2.B2WARNING('No SVDShaperDigits - event ignored')
             self.return_value(0)
 
             return
@@ -86,7 +85,7 @@ class skimSVDBurstEventsModule(basf2.Module):
             self.return_value(0)
 
 
-class skim6SampleEventsPyModule(basf2.Module):
+class skim6SampleEventsPyModule(b2.Module):
     """
     returns True if the event is acquired with 6 samples
     """
@@ -106,7 +105,7 @@ class skim6SampleEventsPyModule(basf2.Module):
             eventInfo = Belle2.PyStoreObjPtr('SVDEventInfoSim')
 
         if not eventInfo.isValid():
-            B2WARNING('No SVDEventInfo/SVDEventInfoSim - event ignored')
+            b2.B2WARNING('No SVDEventInfo/SVDEventInfoSim - event ignored')
             self.return_value(0)
 
             return
@@ -119,7 +118,7 @@ class skim6SampleEventsPyModule(basf2.Module):
 
 
 """
-class skimSVDBurstEventsDataSizeModule(basf2.Module):
+class skimSVDBurstEventsDataSizeModule(b2.Module):
 
     returns True if the event is a Burst event (svd data size above limit))
     use set_MaxDataSize(maxDataSize) to set the max data sieze of a non-burst event, default is maxDataSize=50kB
@@ -140,7 +139,7 @@ class skimSVDBurstEventsDataSizeModule(basf2.Module):
         raw = Belle2.PyStoreArray('RawSVDs')
 
         if not raw.isValid():
-            B2WARNING('No RawSVDs - event ignored')
+            b2.B2WARNING('No RawSVDs - event ignored')
             self.return_value(0)
 
             return
@@ -164,7 +163,7 @@ class skimSVDBurstEventsDataSizeModule(basf2.Module):
 """
 
 
-class skimSVDTriggerBinEventsModule(basf2.Module):
+class skimSVDTriggerBinEventsModule(b2.Module):
     """
     returns True if TriggerBin of the event is the selected one
     use set_tb(tb) to set the value of the selected TriggerBin (0,1,2,3)
@@ -191,7 +190,7 @@ class skimSVDTriggerBinEventsModule(basf2.Module):
         eventInfo = Belle2.PyStoreObj('SVDEventInfo')
 
         if not eventInfo.isValid():
-            B2ERROR('No SVDEventInfo - event ignored')
+            b2.B2ERROR('No SVDEventInfo - event ignored')
             self.return_value(0)
 
             return

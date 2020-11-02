@@ -15,8 +15,8 @@
 #
 
 
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import ROOT
 from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
 from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory
@@ -25,7 +25,6 @@ import numpy
 import math
 import random
 from array import array
-import basf2
 import sys
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
@@ -41,7 +40,7 @@ gROOT.SetBatch(True)
 # mode = True
 
 
-class SVDCoGTimeCalibrationImporterModule(basf2.Module):
+class SVDCoGTimeCalibrationImporterModule(b2.Module):
     """
     Python class used for evaluating the CoG corrections, create a localDB,
     creating a localDB with the corrections and a root file to check the corrections

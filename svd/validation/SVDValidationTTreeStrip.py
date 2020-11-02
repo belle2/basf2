@@ -15,7 +15,7 @@ import sys
 import math
 import xml.etree.ElementTree as ET
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -39,7 +39,7 @@ gROOT.ProcessLine('struct EventDataStrip {\
 from ROOT import EventDataStrip  # noqa
 
 
-class SVDValidationTTreeStrip(Module):
+class SVDValidationTTreeStrip(b2.Module):
     '''class to create the strip ttree'''
 
     def __init__(self):

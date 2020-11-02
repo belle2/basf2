@@ -14,7 +14,7 @@
 import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -37,7 +37,7 @@ gROOT.ProcessLine('struct EventDataSpacePoint {\
 from ROOT import EventDataSpacePoint  # noqa
 
 
-class SVDValidationTTreeSpacePoint(Module):
+class SVDValidationTTreeSpacePoint(b2.Module):
     '''class to create spacepoint ttree'''
 
     def __init__(self):

@@ -5,9 +5,8 @@
 SVD Default FADC Masked Strips Calibration importer.
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDFADCMaskedStrips
@@ -18,7 +17,7 @@ from basf2 import conditions as b2conditions
 now = datetime.datetime.now()
 
 
-class defaultFADCMaskedStripsImporter(basf2.Module):
+class defaultFADCMaskedStripsImporter(b2.Module):
     '''default importer for FADC masked strips'''
 
     def beginRun(self):
@@ -56,10 +55,10 @@ class defaultFADCMaskedStripsImporter(basf2.Module):
 
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
@@ -69,8 +68,8 @@ main.add_module("Geometry")
 main.add_module(defaultFADCMaskedStripsImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

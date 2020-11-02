@@ -9,8 +9,8 @@
 #
 
 
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import ROOT
 from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
 from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory, TTree
@@ -19,7 +19,6 @@ import os
 import math
 import random
 from array import array
-import basf2
 import sys
 
 import matplotlib.pyplot as plt
@@ -37,7 +36,7 @@ gROOT.SetBatch(True)
 # mode = True
 
 
-class SVDCoGTimeCalibrationCheckModule(basf2.Module):
+class SVDCoGTimeCalibrationCheckModule(b2.Module):
     """
     Python class used for checking SVD CoG Calibration stored in a localDB
     """

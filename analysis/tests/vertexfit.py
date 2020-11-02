@@ -20,13 +20,13 @@ def check(filename):
     ntuple = ntuplefile.Get('ntuple')
 
     if ntuple.GetEntries() == 0:
-        B2FATAL("No D0s saved")
+        basf2.B2FATAL("No D0s saved")
 
     if ntuple.GetEntries("significanceOfDistance < 0 && significanceOfDistance != -1") > 0:
-        B2FATAL("Some entries have negative significanceOfDistance?")
+        basf2.B2FATAL("Some entries have negative significanceOfDistance?")
 
     if ntuple.GetEntries("significanceOfDistance > 0") == 0:
-        B2FATAL("significanceOfDistance never positive?")
+        basf2.B2FATAL("significanceOfDistance never positive?")
 
 
 testFile = tempfile.NamedTemporaryFile()

@@ -20,6 +20,7 @@ import modularAnalysis as ma
 import flavorTagger as ft
 import vertex as vx
 from variables import variables
+import os
 import sys
 
 from reconstruction import add_mdst_output

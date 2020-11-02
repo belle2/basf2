@@ -12,7 +12,6 @@
 # Notice that we NEVER UNPACK the RAW data during this step, making this very fast.
 
 import basf2 as b2
-from ROOT import Belle2
 
 # Create path
 main = b2.create_path()

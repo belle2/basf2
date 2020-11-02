@@ -7,7 +7,6 @@ import basf2 as b2
 import sys
 from pathlib import Path
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV

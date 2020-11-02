@@ -10,7 +10,6 @@ import basf2 as b2
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
@@ -31,7 +30,7 @@ def main(argv):
     # We'll use the same data for all calibrations but this is not a requirement in general.
     input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
-    from caf.strategies import SequentialRunByRun, SingleIOV
+    from caf.strategies import SequentialRunByRun
     ###################################################
     # Test Calibration Setup
     # Make a bunch of test calibrations

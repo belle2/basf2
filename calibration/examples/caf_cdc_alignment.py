@@ -3,17 +3,12 @@ import basf2 as b2
 import os
 import sys
 
-import ROOT
-from ROOT import Belle2
 
-from caf.framework import Calibration, CAF
+from caf.framework import CAF
 from caf import backends
 
 from reconstruction import add_cosmics_reconstruction
-from ROOT import Belle2
-import cdc.cr as gcr
 
-from alignment import MillepedeCalibration
 from alignment import setups
 
 b2.set_log_level(b2.LogLevel.INFO)

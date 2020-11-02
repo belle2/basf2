@@ -1,26 +1,17 @@
 from itertools import islice
 from tracking import add_tracking_reconstruction
 import rawdata as raw
-from caf.strategies import SequentialBoundaries
-import modularAnalysis as ana
-import svd as svd
 from prompt.utils import events_in_basf2_file
-from caf.utils import ExpRun, IoV
+from caf.utils import IoV
 from caf import strategies
-from caf import backends
 from prompt import CalibrationSettings
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import Calibration
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from ROOT import Belle2, TFile
-import ROOT
-from random import choice, seed
-import glob
+from random import choice
 import datetime
-import multiprocessing
 import sys
-import os
 import basf2 as b2
 b2.set_log_level(b2.LogLevel.INFO)
 

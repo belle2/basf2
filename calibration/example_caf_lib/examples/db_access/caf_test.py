@@ -9,13 +9,11 @@
 import basf2 as b2
 
 import os
-import sys
 
-import ROOT
 from ROOT.Belle2 import TestDBAccessAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
-from caf.strategies import SequentialRunByRun, SingleIOV
+from caf.strategies import SequentialRunByRun
 
 b2.set_log_level(b2.LogLevel.DEBUG)
 b2.set_debug_level(100)

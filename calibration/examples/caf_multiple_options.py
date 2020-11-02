@@ -8,7 +8,6 @@ import basf2 as b2
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
@@ -38,7 +37,6 @@ def main(argv):
         """
         Just to show that the function is correctly applied
         """
-        from basf2 import set_log_level, LogLevel
         b2.set_log_level(b2.LogLevel.DEBUG)
         b2.B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
         b2.B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))

@@ -1,11 +1,7 @@
 import unittest
 from unittest import TestCase
 
-import basf2 as b2
-import ROOT
-from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from caf.framework import Calibration
-from caf.state_machines import Machine, CalibrationMachine, MachineError, ConditionError
+from caf.state_machines import ConditionError, Machine, MachineError
 
 
 class Test_Machine(TestCase):

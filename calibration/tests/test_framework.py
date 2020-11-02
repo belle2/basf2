@@ -3,12 +3,9 @@ import os
 import shutil
 import glob
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
 
 from caf.framework import Calibration, CAF
-from caf.backends import Local
 
 import unittest
 from unittest import TestCase

@@ -1,5 +1,4 @@
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
 from caf.state_machines import CalibrationMachine
 from caf.framework import Calibration

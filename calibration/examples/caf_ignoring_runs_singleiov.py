@@ -8,11 +8,9 @@ import basf2 as b2
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
-from caf import backends
 from caf.utils import ExpRun, IoV
 
 b2.set_log_level(b2.LogLevel.INFO)

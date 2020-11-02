@@ -12,7 +12,7 @@ from caf import cli
 from caf.backends import Job, monitor_jobs, Local
 from pathlib import Path
 import basf2
-from basf2 import B2INFO, find_file
+from basf2 import find_file
 
 # Prevent ROOT inserting its own help text and arguments
 import ROOT

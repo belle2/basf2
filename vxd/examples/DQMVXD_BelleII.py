@@ -15,11 +15,9 @@ import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-from daqdqm.commondqm import add_common_dqm
 
 import PXDROIUnpackerModule
 
-import glob
 
 import argparse
 parser = argparse.ArgumentParser(

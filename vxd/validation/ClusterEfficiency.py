@@ -10,7 +10,6 @@
   </description>
 </header>
 """
-import sys
 import math
 import basf2 as b2
 from ROOT import PyConfig

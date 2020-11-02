@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
-from sets import Set
 import basf2 as b2
 import ROOT
 from ROOT import Belle2

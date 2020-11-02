@@ -14,10 +14,7 @@ import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
-from reconstruction import add_cosmics_reconstruction
-from daqdqm.commondqm import add_common_dqm
 
 # background (collision) files
 # bg = glob.glob('./BG/*.root')

@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import math
 import basf2 as b2
 
 # Import xml parser
 import xml.etree.ElementTree as xml
 
 # Load the required libraries
-import ROOT
-from ROOT import Belle2
 
 b2.logging.log_level = b2.LogLevel.WARNING
 

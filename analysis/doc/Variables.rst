@@ -147,9 +147,16 @@ Here is a list of particle identification variables:
 .. warning ::
   The **standard** global and binary PID variables - namely `electronID`, `pionID`... `binaryPID` - currently use information
   from all detectors **except for the SVD**.
-  This is because at the moment "physical" SVD :math:`dE/dx` PDFs are available only for some particle hypotheses (:math:`\pi,K,p`) but not for others (:math:`e,\mu`), which could potentially bias the PID definition.
-  Users can access at their own discretion PID variables that include SVD information via the `pidProbabilityExpert` metafunction, and individual log-likelihoods via the `pidLogLikelihoodValueExpert` metafunction.
-  This behaviour is meant to be only temporary: as soon as SVD PDFs are available for all particle hypotheses and thoroughly validated, the standard PID variables will include the SVD information back.
+  This is because at the moment "physical" SVD :math:`dE/dx` PDFs are available only for some particle hypotheses (:math:`\pi,K,p`) but not for others (:math:`e,\mu,d`), which could potentially bias the PID definition.
+
+  For **hadronID** only, a set of convenience variables have been defined that include the SVD:
+
+    * For *global* PID, :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/(\mathcal{L}_\pi+\mathcal{L}_K+\mathcal{L}_p)`, where :math:`\text{<Part>}\in[\pi,K,p]` : `pionID_SVD`, `kaonID_SVD`, `protonID_SVD`.
+    * For *binary* PID, :math:`\pi/K,\pi/p,K/p` : `binaryPID_SVD`.
+
+  Note that in the above the particle hypotheses :math:`e,\mu,d` have been excluded in the PID definition.
+
+  Please note, this distinction is meant to be only temporary: as soon as SVD PDFs are available for all particle hypotheses and thoroughly validated, the standard PID variables will include the SVD information back.
 
 .. warning ::
   The **definitions** of the default PID variables have changed between

@@ -4290,6 +4290,18 @@ namespace {
     EXPECT_FLOAT_EQ(particleID(particleProtonAllNoSVD),   std::exp(1.72) / numsumexp_noSVD);
     EXPECT_FLOAT_EQ(particleID(particleDeuteronAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
 
+    // Hadron ID vars w/ SVD info included. Only pi, K, p.
+    double numsumexp_had = std::exp(1.2) + std::exp(1.7) + std::exp(2.2);
+    EXPECT_FLOAT_EQ(pionID_SVD(particleAll), std::exp(1.2) / numsumexp_had);
+    EXPECT_FLOAT_EQ(kaonID_SVD(particleAll), std::exp(1.7) / numsumexp_had);
+    EXPECT_FLOAT_EQ(protonID_SVD(particleAll), std::exp(2.2) / numsumexp_had);
+    std::vector<double> v_pi_K {211., 321.};
+    std::vector<double> v_pi_p {211., 2212.};
+    std::vector<double> v_K_p {321., 2212.};
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_K), std::exp(1.2) / (std::exp(1.2) + std::exp(1.7)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_p), std::exp(1.2) / (std::exp(1.2) + std::exp(2.2)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_K_p), std::exp(1.7) / (std::exp(1.7) + std::exp(2.2)));
+
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));

@@ -109,6 +109,26 @@ namespace Belle2 {
     double binaryPID(const Particle* part, const std::vector<double>& arguments);
 
     /**
+     * return pion ID to be used in the physics analyses. SVD is included.
+     */
+    double pionID_SVD(const Particle* part);
+
+    /**
+     * return kaon ID to be used in the physics analyses. SVD is included.
+     */
+    double kaonID_SVD(const Particle* part);
+
+    /**
+     * return proton ID to be used in the physics analyses. SVD is included.
+     */
+    double protonID_SVD(const Particle* part);
+
+    /**
+     * return binary PID between two particle hypotheses. SVD is included.
+     */
+    double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments);
+
+    /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
      *
      * The signal hypothesis pdgId and the detector(s) used for the BDT training are passed as a vector of strings of size = 2.

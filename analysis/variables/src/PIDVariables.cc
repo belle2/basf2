@@ -310,6 +310,41 @@ namespace Belle2 {
                                              + std::to_string(int(std::lround(arguments[1]))) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
     }
 
+    double pionID_SVD(const Particle* part)
+    {
+      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(211, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+               part);
+    }
+
+    double kaonID_SVD(const Particle* part)
+    {
+      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(321, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+               part);
+    }
+
+    double protonID_SVD(const Particle* part)
+    {
+      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(2212, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+               part);
+    }
+
+    double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_SVD needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      size_t pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      size_t pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      std::vector<size_t> pdgIds {pdgCodeHyp, pdgCodeTest};
+      if (std::any_of(pdgIds.begin(), pdgIds.end(), [](size_t p) {return (p == 11 || p == 13 || p == 1000010020);})) {
+        B2ERROR("The variable binaryPID_SVD is not defined for particle hypotheses {11, 13, 1000010020}.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
+                                               pdgCodeTest) + ", ALL)")->function(part);
+    }
+
     Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
@@ -520,7 +555,14 @@ namespace Belle2 {
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
                       "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.");
-
+    REGISTER_VARIABLE("pionID_SVD", pionID_SVD,
+                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+)`, using info from all available detectors, *including the SVD*");
+    REGISTER_VARIABLE("kaonID_SVD", kaonID_SVD,
+                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*");
+    REGISTER_VARIABLE("protonID_SVD", protonID_SVD,
+                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*");
+    REGISTER_VARIABLE("binaryPID_SVD(pdgCode1, pdgCode2)", binaryPID_SVD,
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *including the SVD*. Accepted mass hypotheses are: 211 (:math:`\\pi`), 321 (:math:`K`), 2212 (:math:`p`)");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

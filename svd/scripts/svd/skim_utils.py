@@ -18,7 +18,6 @@
 #     skimRNDtrg.if_false(emptypath)
 ####
 
-import ROOT
 from ROOT import Belle2
 import basf2 as b2
 

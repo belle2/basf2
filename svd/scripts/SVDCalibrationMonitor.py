@@ -16,9 +16,7 @@ cog -> cog calibration parameters
 """
 
 import basf2 as b2
-import ROOT
 import argparse
-from basf2 import conditions
 
 
 parser = argparse.ArgumentParser(description="SVD Calibration Monitor")

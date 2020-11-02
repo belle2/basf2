@@ -11,8 +11,6 @@
   </description>
 </header>
 """
-import sys
-import math
 
 import basf2 as b2
 
@@ -20,8 +18,6 @@ import basf2 as b2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
-from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataSpacePoint {\

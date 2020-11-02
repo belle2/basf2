@@ -14,18 +14,15 @@ import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
 from ROOT.Belle2 import SVDHotStripsCalibrationsAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
 import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
 # import vertex as vx
 
 b2.set_log_level(b2.LogLevel.INFO)

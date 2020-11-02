@@ -6,12 +6,8 @@ SVD Default HotStrips Calibration importer.
 Script to Import Calibrations into a local DB
 """
 import basf2 as b2
-import svd
-import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDHotStripsCalibrations
 import datetime
-import os
 from basf2 import conditions as b2conditions
 
 now = datetime.datetime.now()

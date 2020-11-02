@@ -14,18 +14,10 @@
 
 
 import basf2 as b2
-import os
-import math
-from array import array
 import sys
-from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd import add_svd_reconstruction
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
 import rawdata as raw
-
-import matplotlib.pyplot as plt
-import simulation
 
 
 def remove_module(path, name):

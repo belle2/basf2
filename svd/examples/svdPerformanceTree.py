@@ -6,7 +6,6 @@ import rawdata as raw
 import tracking as trk
 import simulation as sim
 import glob
-import modularAnalysis as ma
 
 ##################################################################################
 #

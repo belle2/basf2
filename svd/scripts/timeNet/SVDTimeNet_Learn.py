@@ -28,13 +28,9 @@
 #
 # A sample of training data, plus binning and bounds information in pickle (*.pkl) files.
 
-import math
-import datetime
 import pickle
 import numpy as np
 import pandas as pd
-from scipy import stats as stats
-from scipy.optimize import minimize_scalar
 from sklearn.neural_network import MLPClassifier
 from sklearn2pmml import sklearn2pmml, PMMLPipeline
 from svd.SVDSimBase import dt, betaprime_wave, tau_encoder

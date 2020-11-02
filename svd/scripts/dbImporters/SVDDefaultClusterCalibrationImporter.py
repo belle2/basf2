@@ -6,14 +6,11 @@ SVD Default Cluster Calibration importer.
 t_min = -80,
 """
 import basf2 as b2
-import svd
-import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDClusterCuts
 from ROOT.Belle2 import SVDHitTimeSelectionFunction
 from basf2 import conditions as b2conditions
 import datetime
-import os
 
 # import sys
 

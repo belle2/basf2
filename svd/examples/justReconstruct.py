@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import basf2 as b2
 from svd import add_svd_reconstruction
-from tracking import add_tracking_reconstruction
-import glob
 
 numEvents = 2000
 

@@ -16,7 +16,6 @@
 #############################################################
 
 import sys
-import os
 import basf2 as b2
 import svd.overlay_utils as svdou
 import simulation as simu

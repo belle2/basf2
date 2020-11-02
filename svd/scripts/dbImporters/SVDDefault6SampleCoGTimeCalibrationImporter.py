@@ -7,14 +7,10 @@ alfa = 1 and beta = 0 for all sensors and sides
 Script to Import Calibrations into a local DB
 """
 import basf2 as b2
-import svd
-import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 from basf2 import conditions as b2conditions
 import datetime
-import os
 
 now = datetime.datetime.now()
 

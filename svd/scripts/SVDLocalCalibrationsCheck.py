@@ -9,7 +9,6 @@ where:
 """
 
 import basf2 as b2
-import ROOT
 
 import argparse
 

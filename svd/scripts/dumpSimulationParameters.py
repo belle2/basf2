@@ -3,7 +3,6 @@
 
 import basf2 as b2
 from ROOT import Belle2
-from basf2 import conditions as b2conditions
 
 ##################################################################################
 #

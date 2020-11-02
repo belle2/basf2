@@ -3,8 +3,6 @@
 
 # remove empty events from beam background data files.
 
-import os
-import random
 import basf2 as b2
 from ROOT import Belle2
 

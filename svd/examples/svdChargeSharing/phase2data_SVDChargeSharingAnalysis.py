@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
-import tracking
-import svd
-from ROOT import Belle2
-import os.path
 import sys
 from basf2 import conditions as b2conditions
 

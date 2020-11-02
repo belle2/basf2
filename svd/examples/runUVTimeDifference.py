@@ -12,7 +12,6 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
 import glob
 import sys
 

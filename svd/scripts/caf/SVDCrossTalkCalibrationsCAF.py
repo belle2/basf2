@@ -8,20 +8,17 @@
 import basf2 as b2
 
 import os
-import sys
 import multiprocessing
 
-import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCrossTalkCalibrationsAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
 import rawdata as raw
 
-from basf2 import conditions
 
 b2.set_log_level(b2.LogLevel.INFO)
 input_branches = [

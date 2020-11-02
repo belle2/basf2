@@ -20,15 +20,9 @@
 import basf2 as b2
 import svd
 import os
-import math
-from array import array
 import sys
-from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd.CoGCalibration_utils_tbindependent import SVDCoGTimeCalibrationImporterModule
 from basf2 import conditions as b2conditions
-import matplotlib.pyplot as plt
-import simulation
 
 localdb = sys.argv[1]
 # filename = sys.argv[2]

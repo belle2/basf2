@@ -15,12 +15,10 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
 import basf2 as b2
 from basf2 import conditions as b2conditions
 import tracking as trk
 import rawdata as raw
-import svd as svd
 import daqdqm.commondqm as cdqm
 
 # needed for some temporary issues with BKLMDisplacement payload

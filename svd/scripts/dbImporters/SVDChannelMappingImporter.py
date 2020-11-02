@@ -7,12 +7,9 @@ Script to Import SVD Channel Mapping into a local DB
 """
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
 import sys
-import glob
 import argparse
-from fnmatch import fnmatch
 from termcolor import colored
 from basf2 import conditions as b2conditions
 

@@ -1,24 +1,16 @@
 import basf2 as b2
 
-import os
 import sys
-import multiprocessing
 import datetime
-import glob
 
-import ROOT
-from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import Calibration
 from prompt import CalibrationSettings
-from caf import backends
 from caf import strategies
-from caf.utils import ExpRun, IoV
+from caf.utils import IoV
 
 import svd as svd
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
 
 b2.set_log_level(b2.LogLevel.INFO)
 now = datetime.datetime.now()

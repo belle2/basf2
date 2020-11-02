@@ -4,7 +4,6 @@
 # Geometry helpers for VXD testbeam 2017
 
 import basf2 as b2
-from ROOT import Belle2
 from testbeam.utils import add_vxdtf_v2
 
 

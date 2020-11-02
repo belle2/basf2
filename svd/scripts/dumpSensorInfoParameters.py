@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
 from ROOT import Belle2
-import math as m
 import ROOT as r
-import os.path
-import sys
-from basf2 import conditions as b2conditions
 
 ##################################################################################
 #

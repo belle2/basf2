@@ -22,7 +22,6 @@
 ######
 
 import basf2 as b2
-from ROOT import Belle2
 
 
 def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):

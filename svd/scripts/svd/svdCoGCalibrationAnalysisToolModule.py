@@ -2,17 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import svd
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TCanvas, TH2F, TGraph, TMultiGraph, TH2D, TLegend, TROOT, gROOT, TF1, TMath
-import os
+from ROOT import Belle2, TFile, TTree, gROOT
 import numpy
-import math
-from array import array
 
-import simulation
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 import sys

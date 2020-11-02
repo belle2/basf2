@@ -18,23 +18,12 @@
 
 
 import basf2 as b2
-import svd
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory
-import os
+from ROOT import Belle2, TFile, TFitResultPtr, TH1F, TH2D
+from ROOT import TF1, gDirectory, gROOT
 # import numpy
 import math
-import random
-from array import array
-import sys
 from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 
-import matplotlib.pyplot as plt
-import numpy as np
-from numpy.linalg import inv, pinv
-from numpy.linalg import det, norm, cond
 
 svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"

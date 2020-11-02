@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import basf2 as b2
-import svd
-import glob
 from basf2 import conditions as b2conditions
 
 #########

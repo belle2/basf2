@@ -8,8 +8,7 @@ Alternative version with stacked bars
 """
 
 import numpy as np
-from ROOT import TFile, TTree, TObjArray
-import math
+from ROOT import TFile
 from pylab import plt, savefig, show, subplot
 
 components = {'Touschek_LER', 'Touschek_HER'}

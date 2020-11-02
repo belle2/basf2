@@ -10,21 +10,12 @@
 
 
 import basf2 as b2
-import svd
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory, TTree
-import os
+from ROOT import Belle2, TFile, TFitResultPtr, TH1F, TH2D, TTree
+from ROOT import TF1, TTree, gDirectory, gROOT
 # import numpy
 import math
-import random
-from array import array
-import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
-from numpy.linalg import inv, pinv
-from numpy.linalg import det, norm, cond
 
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClustersFromTracks"

@@ -2,22 +2,17 @@ import basf2 as b2
 
 import os
 import sys
-import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm  # changed
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
-from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
 import svd as svd
 
 b2.set_log_level(b2.LogLevel.INFO)

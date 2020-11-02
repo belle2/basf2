@@ -5,7 +5,6 @@
 # Simulating BBbar events with geometry created from xml file
 # usage: basf2_phase2_simulate.py fileOUT
 ##################################################################################
-import os
 import sys
 import basf2 as b2
 from generators import add_evtgen_generator

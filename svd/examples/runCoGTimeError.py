@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
-import tracking
-import svd
 from rawdata import add_unpackers
 from simulation import add_simulation
 from tracking import add_tracking_reconstruction
-from ROOT import Belle2
 
 from basf2 import conditions as b2conditions
 

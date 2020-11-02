@@ -6,12 +6,8 @@ SVD Default Pedestal Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
 import basf2 as b2
-import svd
-import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDPedestalCalibrations
 import datetime
-import os
 
 now = datetime.datetime.now()
 

@@ -4,10 +4,8 @@
 import basf2 as b2
 from svd import add_svd_simulation
 from ROOT import Belle2
-import os
 import numpy
 
-import simulation
 
 svd_digits_pack_unpack_collection = "SVDShaperDigits_test"
 b2.set_random_seed(42)

@@ -12,10 +12,8 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
 import basf2 as b2
 from basf2 import conditions as b2conditions
-from svd import add_svd_reconstruction
 from tracking import add_tracking_reconstruction
 from rawdata import add_unpackers
 

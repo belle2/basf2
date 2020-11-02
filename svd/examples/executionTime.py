@@ -14,7 +14,6 @@
 #############################################################
 
 import sys
-import os
 import basf2 as b2
 from svd.executionTime_utils import SVDExtraEventStatisticsModule
 import simulation as simu

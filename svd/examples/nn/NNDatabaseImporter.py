@@ -7,7 +7,6 @@ Simple example for testing the import to database.
 """
 
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
 
 main = b2.create_path()

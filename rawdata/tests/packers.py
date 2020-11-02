@@ -10,7 +10,6 @@ import rawdata as raw
 from ROOT import Belle2
 
 import sys
-import os
 import multiprocessing as mp
 
 b2.set_random_seed("L1V0RN0")

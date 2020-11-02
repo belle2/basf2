@@ -3,10 +3,8 @@
 
 import basf2 as b2
 from geometry import check_components
-from ROOT import Belle2
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
-from iov_conditional import make_conditional_at
 from neurotrigger import add_neuro_2d_unpackers
 
 

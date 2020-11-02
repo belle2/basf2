@@ -4,8 +4,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from rawdata import add_packers, add_raw_output, add_raw_seqoutput
-from glob import glob
-import ROOT
 
 # create path
 main = b2.create_path()

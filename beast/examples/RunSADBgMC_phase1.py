@@ -3,10 +3,7 @@
 
 import basf2 as b2
 from ROOT import Belle2
-import os
 import sys
-import math
-import string
 import datetime
 
 

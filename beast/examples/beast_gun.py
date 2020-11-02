@@ -12,9 +12,6 @@
 # -------------------------------------------------------------------------------------
 
 import basf2 as b2
-import sys
-import os
-from background import add_output
 
 # set parameters
 main = b2.create_path()

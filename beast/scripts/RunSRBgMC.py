@@ -3,7 +3,6 @@
 
 import basf2 as b2
 import sys
-import string
 argvs = sys.argv
 argc = len(argvs)
 

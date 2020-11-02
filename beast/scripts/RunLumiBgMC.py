@@ -1,9 +1,6 @@
 import basf2 as b2
 from beamparameters import add_beamparameters
-import os
 import sys
-import math
-import string
 import datetime
 from background import add_output
 

@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 import sys
-import math
-import string
 import datetime
 from background import add_output
 

@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import sys
 import datetime
 import basf2 as b2
-from subprocess import call
 
 d = datetime.datetime.today()
 print((d.strftime('job start: %Y-%m-%d %H:%M:%S\n')))

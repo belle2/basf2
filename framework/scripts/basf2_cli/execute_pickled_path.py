@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from basf2 import *
+import basf2 as b2
 
 # for actual implementation, see process()
-process(None)
+b2.process(None)

@@ -14,7 +14,7 @@
 import os
 import sys
 import glob
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 

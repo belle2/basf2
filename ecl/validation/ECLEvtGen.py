@@ -11,24 +11,24 @@
 
 import os
 import glob
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Fixed random seed
-set_random_seed(123456)
+b2.set_random_seed(123456)
 
 inputFile = '../EvtGenSimRec.root'
 main.add_module('RootInput', inputFileName=inputFile)
 
 # eclDataAnalysis module
-ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis = b2.register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', '../ECLEvtGenOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
-process(main)
+b2.process(main)
 # print(statistics)

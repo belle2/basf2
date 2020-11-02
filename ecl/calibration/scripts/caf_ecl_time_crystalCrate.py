@@ -3,7 +3,7 @@
 """ECL timing calibration that performs the crystal and crate calibrations."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 
 
 ##############################

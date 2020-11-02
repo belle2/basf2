@@ -1,4 +1,4 @@
-from basf2 import *
+import basf2 as b2
 import os
 import sys
 
@@ -13,7 +13,7 @@ def matchTriggerClusters(minClusterEnergy=0.1, maxAngle=0.1, minFracEnergy=0.0, 
 
     """
 
-    matchtrgclust = register_module('ECLTriggerClusterMatcher')
+    matchtrgclust = b2.register_module('ECLTriggerClusterMatcher')
     matchtrgclust.param('minClusterEnergy', minClusterEnergy)
     matchtrgclust.param('maxAngle', maxAngle)
     matchtrgclust.param('minFracEnergy', minFracEnergy)
@@ -32,7 +32,7 @@ def matchTrackECLCalDigits(extRadius=130.0, angleFWDGap=31.80, angleBWDGap=129.7
     @param trackHypothesis track hypothesis
     """
 
-    matchtrkdig = register_module('ECLTrackCalDigitMatch')
+    matchtrkdig = b2.register_module('ECLTrackCalDigitMatch')
     matchtrkdig.param('extRadius', extRadius)
     matchtrkdig.param('angleFWDGap', angleFWDGap)
     matchtrkdig.param('angleBWDGap', angleBWDGap)

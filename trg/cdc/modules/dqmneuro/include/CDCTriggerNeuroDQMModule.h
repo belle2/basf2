@@ -409,8 +409,8 @@ namespace Belle2 {
 
 
     // hw 2D received TS
-    TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
-    TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
+    //TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
+    //TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
     TH1F* m_2DHWInTSPrioT_Layer0 = nullptr;            /**< Priority time of 2D track segments in layer 0 */
     TH1F* m_2DHWInTSPrioT_Layer2 = nullptr;            /**< Priority time of 2D track segments in layer 2 */
     TH1F* m_2DHWInTSPrioT_Layer4 = nullptr;            /**< Priority time of 2D track segments in layer 4 */

@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Unpack function */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords)
+                std::array<int, 4> nWords) override
     {
       if (subDetectorId != iNode) {
         return;
@@ -198,7 +198,7 @@ namespace Belle2 {
      */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords)
+                std::array<int, 4> nWords) override
     {
       if (subDetectorId != iNode) {
         return;

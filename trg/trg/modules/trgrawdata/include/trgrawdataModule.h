@@ -104,7 +104,7 @@ namespace Belle2 {
       printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
              "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
              "--------", "--------", "--------", "--------", "--------");
-      for (int i = 0; i < c_nModules; i++) {
+      for (unsigned i = 0; i < c_nModules; ++i) {
         if (m_ons[i]) {
           printf(" %3s | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d |\n",
                  moduleNames[i],
@@ -231,31 +231,31 @@ namespace Belle2 {
     int m_hdr_nwd_grl = intNaN;
     int m_hdr_nwd_top = intNaN;
 
-    int m_cpr_sl0 = intNaN;
-    int m_cpr_sl1 = intNaN;
-    int m_cpr_sl2 = intNaN;
-    int m_cpr_sl3 = intNaN;
-    int m_cpr_sl4 = intNaN;
-    int m_cpr_sl5 = intNaN;
-    int m_cpr_sl6 = intNaN;
+    unsigned m_cpr_sl0 = intNaN;
+    unsigned m_cpr_sl1 = intNaN;
+    unsigned m_cpr_sl2 = intNaN;
+    unsigned m_cpr_sl3 = intNaN;
+    unsigned m_cpr_sl4 = intNaN;
+    unsigned m_cpr_sl5 = intNaN;
+    unsigned m_cpr_sl6 = intNaN;
     int m_cpr_sl7 = intNaN;
-    int m_cpr_sl8 = intNaN;
-    int m_cpr_2d0 = intNaN;
-    int m_cpr_2d1 = intNaN;
-    int m_cpr_2d2 = intNaN;
-    int m_cpr_2d3 = intNaN;
-    int m_cpr_3d0 = intNaN;
-    int m_cpr_3d1 = intNaN;
-    int m_cpr_3d2 = intNaN;
-    int m_cpr_3d3 = intNaN;
-    int m_cpr_nn0 = intNaN;
-    int m_cpr_nn1 = intNaN;
-    int m_cpr_nn2 = intNaN;
-    int m_cpr_nn3 = intNaN;
-    int m_cpr_gdl = intNaN;
-    int m_cpr_etf = intNaN;
+    unsigned m_cpr_sl8 = intNaN;
+    unsigned m_cpr_2d0 = intNaN;
+    unsigned m_cpr_2d1 = intNaN;
+    unsigned m_cpr_2d2 = intNaN;
+    unsigned m_cpr_2d3 = intNaN;
+    unsigned m_cpr_3d0 = intNaN;
+    unsigned m_cpr_3d1 = intNaN;
+    unsigned m_cpr_3d2 = intNaN;
+    unsigned m_cpr_3d3 = intNaN;
+    unsigned m_cpr_nn0 = intNaN;
+    unsigned m_cpr_nn1 = intNaN;
+    unsigned m_cpr_nn2 = intNaN;
+    unsigned m_cpr_nn3 = intNaN;
+    unsigned m_cpr_gdl = intNaN;
+    unsigned m_cpr_etf = intNaN;
     int m_cpr_grl = intNaN;
-    int m_cpr_top = intNaN;
+    unsigned m_cpr_top = intNaN;
 
     int m_hslb_sl0 = intNaN;
     int m_hslb_sl1 = intNaN;
@@ -304,7 +304,7 @@ namespace Belle2 {
     int m_fmid_nn1 = intNaN;
     int m_fmid_nn2 = intNaN;
     int m_fmid_nn3 = intNaN;
-    int m_fmid_gdl = intNaN;
+    unsigned m_fmid_gdl = intNaN;
     int m_fmid_etf = intNaN;
     int m_fmid_grl = intNaN;
     int m_fmid_top = intNaN;

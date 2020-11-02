@@ -24,7 +24,6 @@
 
 import basf2 as b2
 
-import ROOT
 from ROOT.Belle2 import eclMuMuEAlgorithm
 from caf.framework import Calibration, CAF
 

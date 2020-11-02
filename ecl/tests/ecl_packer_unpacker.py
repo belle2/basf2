@@ -14,7 +14,6 @@ from unittest import TestCase
 from ROOT import gRandom
 import simulation
 import itertools
-import random
 
 logLevel = b2.LogLevel.INFO  # LogLevel.DEBUG #
 b2.set_random_seed(42)

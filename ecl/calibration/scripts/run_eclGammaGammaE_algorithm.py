@@ -11,11 +11,8 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-import os
 import sys
 import glob
-import basf2 as b2
-import ROOT
 from ROOT import Belle2
 
 # Usage: basf2 run_eclGammaGammaE_algorithm.py

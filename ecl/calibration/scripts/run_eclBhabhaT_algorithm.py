@@ -15,7 +15,6 @@
 # Glob expression can be passed as an input file.
 # Example: basf2 run_eclBhabhaT_algorithm.py "exp_0003_run_*.root"
 
-import os
 import sys
 import ROOT
 import basf2 as b2

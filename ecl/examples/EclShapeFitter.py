@@ -7,9 +7,7 @@
 
 import glob
 import basf2 as b2
-from ROOT import Belle2, gSystem, gInterpreter
-from ROOT import TFile, TTree
-from array import array
+from ROOT import Belle2
 
 __author__ = 'Mikhail Remnev'
 __copyright__ = 'Copyright 2020 - Belle II Collaboration'

@@ -22,10 +22,8 @@
 # run_eclGammaGammaE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
 # them to an output file.
 
-import os
 import sys
 import basf2 as b2
-from ROOT import Belle2
 
 
 main = b2.create_path()

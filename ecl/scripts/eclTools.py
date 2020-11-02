@@ -1,6 +1,4 @@
 import basf2 as b2
-import os
-import sys
 
 
 def matchTriggerClusters(minClusterEnergy=0.1, maxAngle=0.1, minFracEnergy=0.0, maxFracEnergy=2.0, path=None):

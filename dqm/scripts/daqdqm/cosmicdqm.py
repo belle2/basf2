@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2 as b2
 
 from daqdqm.commondqm import add_common_dqm
 

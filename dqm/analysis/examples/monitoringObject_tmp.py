@@ -6,7 +6,6 @@
 # set to use local database
 
 import basf2 as b2
-from ROOT import Belle2
 import sys
 argv = sys.argv
 

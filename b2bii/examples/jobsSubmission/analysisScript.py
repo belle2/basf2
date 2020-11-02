@@ -9,18 +9,11 @@ import os
 import sys
 from tools import getBelleUrl_data, getBelleUrl_mc
 import basf2 as b2
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
-from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
-from modularAnalysis import printVariableValues
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
 
 # ------- Arguments sorting

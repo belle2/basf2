@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import ROOT
-from ROOT import Belle2
 from modularAnalysis import fillParticleList
 from modularAnalysis import copyParticles
 from modularAnalysis import copyList

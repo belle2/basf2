@@ -6,7 +6,6 @@ from modularAnalysis import setAnalysisConfigParams
 import os
 import re
 import requests
-import http
 from ctypes import cdll
 
 

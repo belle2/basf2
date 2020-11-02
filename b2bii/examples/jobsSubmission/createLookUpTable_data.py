@@ -5,7 +5,7 @@
 
 import os
 import sys
-from tools import getMaxRunNo_data, getBelleUrl_data, readConfigFile_data, countEventsInUrl, addLine
+from tools import addLine, getBelleUrl_data, getMaxRunNo_data, readConfigFile_data
 
 # print debug messages ?
 debug = False

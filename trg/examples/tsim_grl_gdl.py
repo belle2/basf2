@@ -5,10 +5,8 @@
 # basf2 tsim_grl_gdl.py -i inputrootfile -o outputrootfile
 # the inputrootfile should be the output file of tsim_subdetectors.py
 
-import os
 import basf2 as b2
 from L1trigger import add_grl_gdl_tsim
-import glob
 
 main = b2.create_path()
 main.add_module('RootInput')

@@ -1,5 +1,4 @@
 import basf2 as b2
-from ROOT import Belle2
 
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):

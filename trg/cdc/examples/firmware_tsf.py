@@ -3,7 +3,6 @@
 
 import basf2 as b2
 from ROOT import Belle2
-from math import pi, tan
 import os
 import socket
 from subprocess import call

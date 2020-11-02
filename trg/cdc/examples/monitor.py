@@ -3,7 +3,6 @@
 
 import basf2 as b2
 from ROOT import Belle2
-import os
 from monitor_module import Monitor
 
 # skip the event in the output if it doesn't contain trg data

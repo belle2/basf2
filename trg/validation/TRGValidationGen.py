@@ -9,12 +9,10 @@
 </header>
 """
 
-import os
 import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_tsim
 
-import glob
 
 main = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')

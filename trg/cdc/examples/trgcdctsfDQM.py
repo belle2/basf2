@@ -12,7 +12,6 @@ import basf2 as b2
 ################
 import sys  # get argv
 import re
-import os.path
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 

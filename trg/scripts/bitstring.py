@@ -775,7 +775,6 @@ class Bits(object):
                   initialising using 'bytes' or 'filename'.
 
         """
-        pass
 
     def __new__(cls, auto=None, length=None, offset=None, _cache=None, **kwargs):
         # For instances auto-initialised with a string we intern the

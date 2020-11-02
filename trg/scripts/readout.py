@@ -24,7 +24,6 @@ hslb = (('11000001', 'b'),
 integrity_check = False
 
 import basf2 as b2
-import interactive
 
 from ROOT import Belle2
 import numpy as np

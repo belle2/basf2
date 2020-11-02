@@ -3,9 +3,7 @@
 
 import basf2 as b2
 from ROOT import Belle2
-from cdctrigger import add_cdc_trigger
 from math import pi, tan
-from interactive import embed
 
 """
 generate tracks with particle gun, simulate CDC and CDC trigger, save the output.

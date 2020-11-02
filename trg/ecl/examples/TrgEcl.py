@@ -7,7 +7,6 @@
 #        ex)
 #        commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
 # -------------------------------------------------------------------------------------------------------
-import os
 import basf2 as b2
 from L1trigger import add_tsim
 ################

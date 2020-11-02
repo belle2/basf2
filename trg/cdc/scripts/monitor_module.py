@@ -3,10 +3,9 @@
 
 import os
 import basf2 as b2
-from ROOT import Belle2, TH2F, TH1F, TFile, gStyle, TColor, TCanvas
+from ROOT import Belle2, TCanvas, TColor, TH1F, TH2F, gStyle
 import numpy
 from math import pi
-from interactive import embed
 
 
 # make the monitoring plots

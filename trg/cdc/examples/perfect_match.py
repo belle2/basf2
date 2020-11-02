@@ -11,7 +11,6 @@
 import basf2 as b2
 from ROOT import Belle2
 
-from interactive import embed
 # Set the log level to show only error and fatal messages
 b2.set_log_level(b2.LogLevel.INFO)
 

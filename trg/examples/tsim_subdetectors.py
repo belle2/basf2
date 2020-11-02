@@ -4,12 +4,10 @@
 # The example of running simulation of subdetectors trigger.
 # basf2 tsim_subdetectors.py -o outputrootfile
 
-import os
 import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_subdetector_tsim
 
-import glob
 
 main = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')

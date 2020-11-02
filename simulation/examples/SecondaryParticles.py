@@ -12,9 +12,9 @@ This script saves all the secondary particles in MCParticles.
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 
-main = create_path()
+main = b2.create_path()
 
 # create 100 events
 main.add_module("EventInfoSetter", evtNumList=[100])
@@ -35,7 +35,7 @@ main.add_module("FullSim", StoreAllSecondaries=True, SecondariesEnergyCut=1.0)
 main.add_module("RootOutput", outputFileName="EvtGenSimNoBkgYesSecondaries.root")
 
 # run it
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

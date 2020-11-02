@@ -13,8 +13,6 @@ import basf2 as b2
 from simulation import add_simulation
 import os
 import glob
-import sys
-import math
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 

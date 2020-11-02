@@ -3,7 +3,6 @@
 
 from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process, statistics
 import os
-from simulation import add_simulation
 from svd import add_svd_simulation
 import glob
 import sys

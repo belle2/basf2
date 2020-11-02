@@ -4,9 +4,7 @@
 import os
 import sys
 import os.path
-import shutil
 
-import basf2
 
 from tracking.path_utils import add_cdc_track_finding
 from tracking.run.event_generation import ReadOrGenerateEventsRun

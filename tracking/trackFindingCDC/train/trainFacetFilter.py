@@ -7,9 +7,7 @@
 # Nevertheless this script can be used to generate variables to consider
 # for improvements or cross checks with --task explore
 
-import os
 import sys
-import os.path
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.run.training import TrainingRunMixin

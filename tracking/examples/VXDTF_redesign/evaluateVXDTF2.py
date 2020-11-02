@@ -20,7 +20,6 @@ import sys
 import argparse
 # Import custom module chain for VXDTF2
 from setup_modules import setup_VXDTF2
-from setup_modules import setup_Geometry
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
 # ---------------------------------------------------------------------------------------

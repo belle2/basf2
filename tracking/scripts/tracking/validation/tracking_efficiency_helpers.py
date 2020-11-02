@@ -19,7 +19,7 @@
 """
 
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mc_reconstruction
+from reconstruction import add_reconstruction
 import basf2 as b2
 import glob
 import os

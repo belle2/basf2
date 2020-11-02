@@ -16,7 +16,6 @@
 
 import sys
 import glob
-from ROOT import Belle2
 import basf2 as b2
 from simulation import add_simulation
 

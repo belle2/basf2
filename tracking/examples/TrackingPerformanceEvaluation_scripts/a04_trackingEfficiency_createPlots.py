@@ -16,7 +16,6 @@
 
 import sys
 import basf2 as b2
-from ROOT import Belle2
 
 release = sys.argv[1]
 

@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
 from tracking import add_tracking_reconstruction
 from simulation import add_simulation
-from simulation import add_roiFinder
-from svd import add_svd_reconstruction
-from tracking import add_tracking_for_PXDDataReduction_simulation
-from ROOT import Belle2
 
 numEvents = 100
 

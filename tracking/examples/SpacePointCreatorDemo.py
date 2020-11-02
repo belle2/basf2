@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # This steering file will
-import os
-from sys import argv
 import basf2 as b2
-from time import time
 from beamparameters import add_beamparameters
 
 numEvents = 25

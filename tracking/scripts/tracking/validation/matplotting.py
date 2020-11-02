@@ -30,7 +30,6 @@ try:
     matplotlib.use('Agg')
 
     import matplotlib.pyplot as plt
-    import matplotlib.transforms as transforms
 except ImportError:
     raise ImportError("matplotlib is not installed in your basf2 environment. "
                       "You may install it with 'pip install matplotlib'")

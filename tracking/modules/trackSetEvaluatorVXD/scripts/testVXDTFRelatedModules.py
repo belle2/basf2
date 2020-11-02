@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
-from subprocess import call
-from sys import argv
 import time
 
 from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,

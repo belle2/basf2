@@ -1,11 +1,7 @@
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 import bisect
 from datetime import datetime
-import subprocess
 import numpy as np
-import matplotlib.cm as cmx
-import matplotlib.colors as colors
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import basf2
 import ROOT

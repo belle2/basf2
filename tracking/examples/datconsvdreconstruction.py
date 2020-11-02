@@ -9,7 +9,6 @@ import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
 # background (collision) files
 bg = None

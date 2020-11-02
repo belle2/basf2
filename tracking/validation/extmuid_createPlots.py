@@ -25,7 +25,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
 ROOT.gROOT.SetBatch(True)  # noqa
 
-from ROOT import TFile, TChain, TTree, TH1F, TH2F, TCanvas, TNamed, gStyle
+from ROOT import TChain, TFile, TH1F, TH2F, TNamed, gStyle
 import sys
 import math
 import numpy as np

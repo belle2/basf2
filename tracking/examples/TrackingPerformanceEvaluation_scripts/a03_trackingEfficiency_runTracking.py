@@ -16,7 +16,6 @@
 
 import sys
 import basf2 as b2
-from reconstruction import add_reconstruction
 from tracking import add_tracking_reconstruction
 
 mcTrackFinding = False

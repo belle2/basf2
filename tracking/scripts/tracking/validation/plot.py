@@ -3,7 +3,6 @@
 
 import sys
 import math
-import itertools
 import collections
 import array
 import numpy as np

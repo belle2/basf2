@@ -170,7 +170,6 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   //  }
 
   // various test patterns will be used to check the data
-  /* cppcheck-suppress variableScope */
   unsigned int testPattern;
 
   int revoClockLast = -1;

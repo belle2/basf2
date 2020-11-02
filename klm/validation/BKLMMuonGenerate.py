@@ -19,8 +19,6 @@
 </header>
 """
 
-import glob
-import os
 
 import basf2 as b2
 import simulation as sim

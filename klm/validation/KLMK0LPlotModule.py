@@ -11,7 +11,7 @@
 import basf2 as b2
 import ROOT
 from ROOT import Belle2
-from ROOT import TFile, TH1F, TNamed
+from ROOT import TNamed
 import math
 import numpy
 

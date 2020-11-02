@@ -44,10 +44,8 @@ import basf2 as b2
 import sys
 import re
 import EventInspector
-import simulation
-import reconstruction
 import rawdata
-from optparse import Option, OptionValueError, OptionParser
+from optparse import OptionParser
 import glob
 
 parser = OptionParser()

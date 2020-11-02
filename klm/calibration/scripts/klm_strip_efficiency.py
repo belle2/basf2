@@ -2,13 +2,12 @@
 
 """Custom calibration strategy for KLM strip efficiency."""
 
-import collections
 import os
 
 import basf2
 from ROOT import Belle2
 
-from caf.utils import ExpRun, IoV, AlgResult
+from caf.utils import AlgResult, IoV
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy, StrategyError

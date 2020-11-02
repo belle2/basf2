@@ -9,8 +9,6 @@
 </header>
 """
 
-import os
-import random
 import basf2 as b2
 from ROOT import Belle2
 from beamparameters import add_beamparameters

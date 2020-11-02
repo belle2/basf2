@@ -39,7 +39,7 @@ import sys
 import re
 import EventInspectorLookback
 import rawdata
-from optparse import Option, OptionValueError, OptionParser
+from optparse import OptionParser
 import glob
 
 parser = OptionParser()

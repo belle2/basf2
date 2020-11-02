@@ -23,7 +23,6 @@ class Cluster(ClusterBase):
         Check if qsub is available
         """
         try:
-            import drmaa
             return True
         except ImportError:
             print("drmaa library is not installed, please ues 'pip3 install "

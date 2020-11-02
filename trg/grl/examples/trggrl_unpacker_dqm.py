@@ -7,7 +7,7 @@
 #    usage : %> basf2 TrgCdcT3dUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 import os
 from optparse import OptionParser
 from reconstruction import add_cosmics_reconstruction
@@ -26,29 +26,29 @@ parser.add_option('-g', '--gdl', dest='gdl', default=0)
 
 runID = str(options.run)
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
-main = create_path()
+main = b2.create_path()
 
 # input
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', options.filename)
 
 main.add_module(input)
 
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', "dqm.root")  # File to save histograms
 main.add_module(histo)
 
-unpacker = register_module('TRGGRLUnpacker')
+unpacker = b2.register_module('TRGGRLUnpacker')
 main.add_module(unpacker)
 
-trggrldqm = register_module('TRGGRLDQM')
+trggrldqm = b2.register_module('TRGGRLDQM')
 main.add_module(trggrldqm)
 
 
 if int(options.tracking):
-    cdcunpacker = register_module('CDCUnpacker')
+    cdcunpacker = b2.register_module('CDCUnpacker')
     cdcunpacker.param('xmlMapFileName', "cdc/data/ch_map.dat")
     cdcunpacker.param('enablePrintOut', False)
     main.add_module(cdcunpacker)
@@ -56,14 +56,14 @@ if int(options.tracking):
 
 
 if int(options.gdl):
-    trggdlUnpacker = register_module("TRGGDLUnpacker")
+    trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
     main.add_module(trggdlUnpacker)
-    trggdlsummary = register_module('TRGGDLSummary')
+    trggdlsummary = b2.register_module('TRGGDLSummary')
     main.add_module(trggdlsummary)
 
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param("outputFileName", options.output)
 main.add_module(output, branchNames=["TRGGRLUnpackerStore"])
 
 # Process all events
-process(main)
+b2.process(main)

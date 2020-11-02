@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 # suppress messages and warnings during processing:
 # set_log_level(LogLevel.ERROR)
 # Register modules
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # particlegun.param('randomSeed', 3452346)
 # particlegun.param('randomSeed', 345)
 particlegun.param('randomSeed', 346)
@@ -28,15 +28,15 @@ particlegun.param('yVertexParams', [0, 0.0])
 particlegun.param('zVertexParams', [0, 0.0])
 
 # Register modules
-eventinfosetter = register_module('EventInfoSetter')
-eventinfoprinter = register_module('Progress')
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfoprinter = b2.register_module('Progress')
 # eventinfoprinter = fw.register_module("EventInfoPrinter")
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
+paramloader = b2.register_module('Gearbox')
+geobuilder = b2.register_module('Geometry')
 # geobuilder.log_level = LogLevel.INFO
-g4sim = register_module('FullSim')
-cdcdigitizer = register_module('CDCDigitizer')
-out = register_module('SimpleOutput')
+g4sim = b2.register_module('FullSim')
+cdcdigitizer = b2.register_module('CDCDigitizer')
+out = b2.register_module('SimpleOutput')
 cdctrg = fw.register_module("TRGCDC")
 tsstream = fw.register_module("TRGCDCTSStream")
 # mcparticle  = fw.register_module('PrintMCParticles')
@@ -59,7 +59,7 @@ tsstream.param('OutputStreamFile', "TRGCDCTSStream.dat")
 
 
 # set mcprinter
-mcparticleprinter = register_module('PrintMCParticles')
+mcparticleprinter = b2.register_module('PrintMCParticles')
 mcparticleprinter.param('maxLevel', -1)
 
 # set geometry(geobuilder)
@@ -71,7 +71,7 @@ param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.00, 'Resolution2': 0.0}
 cdcdigitizer.param(param_cdcdigi)
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Add modules to paths
 main.add_module(eventinfosetter)
@@ -87,7 +87,7 @@ main.add_module(tsstream)
 # main.add_module(out)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

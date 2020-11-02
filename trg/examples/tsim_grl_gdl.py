@@ -6,11 +6,11 @@
 # the inputrootfile should be the output file of tsim_subdetectors.py
 
 import os
-from basf2 import *
-from L1trigger import *
+import basf2 as b2
+from L1trigger import add_grl_gdl_tsim
 import glob
 
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput')
 # add trigger simlation of sub detectors (CDC, ECL, and bKLM are included currently)
 add_grl_gdl_tsim(main)
@@ -20,6 +20,6 @@ main.add_module('RootOutput')
 
 
 # main
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)
 # ===<END>

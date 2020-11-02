@@ -1,4 +1,4 @@
-import basf2
+import basf2 as b2
 from ROOT import Belle2
 
 ################################################################################
@@ -29,10 +29,10 @@ sim2dtracks_swts = 'TRGCDC2DFinderTracks'
 ################################################################################
 
 
-class filterTRG(basf2.Module):
+class filterTRG(b2.Module):
     def initialize(self, branchname=hwneuroinput2dfindertracks):
         self.branchname = branchname
-        self.nullpath = basf2.create_path()
+        self.nullpath = b2.create_path()
 
     def event(self):
         self.return_value(bool(Belle2.PyStoreArray(self.branchname).getEntries() > 0))
@@ -41,11 +41,11 @@ class filterTRG(basf2.Module):
 
 def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     #
-    unpacker = basf2.register_module('CDCTriggerUnpacker')
+    unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
-        unpacker.logging.log_level = LogLevel.DEBUG
+        unpacker.logging.log_level = b2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
-        unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
@@ -81,11 +81,11 @@ def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     #
-    unpacker = basf2.register_module('CDCTriggerUnpacker')
+    unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
-        unpacker.logging.log_level = LogLevel.DEBUG
+        unpacker.logging.log_level = b2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
-        unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
@@ -121,7 +121,7 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
 
 
 def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
-    nnt = basf2.register_module('CDCTriggerNeuro')
+    nnt = b2.register_module('CDCTriggerNeuro')
     if 'inputCollectionName' in kwargs:
         nnt.param('inputCollectionName', kwargs['inputCollectionName'])
     else:
@@ -148,13 +148,13 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     if debugout:
-        nnt.logging.log_level = LogLevel.DEBUG
+        nnt.logging.log_level = b2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
     path.add_module(nnt)
 
 
 def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
-    nnt = basf2.register_module('CDCTriggerNeuro')
+    nnt = b2.register_module('CDCTriggerNeuro')
     if 'inputCollectionName' in kwargs:
         nnt.param('inputCollectionName', kwargs['inputCollectionName'])
     else:
@@ -186,7 +186,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     if debugout:
-        nnt.logging.log_level = LogLevel.DEBUG
+        nnt.logging.log_level = b2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
     path.add_module(nnt)
 

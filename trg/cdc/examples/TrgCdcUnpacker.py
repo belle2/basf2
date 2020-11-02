@@ -7,7 +7,7 @@
 #    usage : %> basf2 TrgCdcTsfUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 
 import sys
 
@@ -21,18 +21,18 @@ if argc == 3:
     f_in_root = argvs[1]
     f_out_root = argvs[2]
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 # unpacker
-unpacker = register_module('TRGCDCTSFUnpacker')
+unpacker = b2.register_module('TRGCDCTSFUnpacker')
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -45,4 +45,4 @@ output.param("outputFileName", f_out_root)
 main.add_module(output, branchNames=["TRGCDCTSFUnpackerStores"])
 
 # Process all events
-process(main)
+b2.process(main)

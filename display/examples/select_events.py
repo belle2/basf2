@@ -11,7 +11,6 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 # register necessary modules
 eventinfosetter = b2.register_module('EventInfoSetter')

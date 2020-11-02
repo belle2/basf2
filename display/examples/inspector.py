@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import random
 import basf2 as b2
 
 # this loads gui libraries
-from ROOT import TGClient
 
 
 class InspectorModule(b2.Module):

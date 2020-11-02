@@ -11,8 +11,6 @@
 # The same thing can also be done using only C++, by calling
 # Module::setReturnValue() in your module's event() function.
 
-import os
-import random
 import basf2 as b2
 from ROOT import Belle2
 from simulation import add_simulation

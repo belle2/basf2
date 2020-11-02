@@ -5,14 +5,11 @@
 # Doubleclicking them will show them in the current canvas (added on
 # the right side of the screen) and keep them updated each event.
 
-import os
-import random
 import basf2 as b2
 
 from ROOT import Belle2
 from ROOT import TH1F
 from ROOT import TH3F
-from ROOT import TVector3
 
 
 class GenerateHist(b2.Module):

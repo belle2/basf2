@@ -5,8 +5,6 @@
 # and highlights all final state particles assigned to the candidate
 # in the display.
 
-import os
-import random
 import basf2 as b2
 
 from ROOT import Belle2

@@ -4,8 +4,6 @@
 # This example uses a python module to show the ParticleGun vertex
 # mean and sigma in the display.
 
-import os
-import random
 import basf2 as b2
 
 from ROOT import Belle2

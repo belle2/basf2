@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 from daqdqm.commondqm import add_common_dqm
 from IPDQM import add_IP_dqm

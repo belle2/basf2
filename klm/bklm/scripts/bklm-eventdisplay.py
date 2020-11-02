@@ -37,13 +37,12 @@
 #   PDF file named bklmEvents-e#r#.pdf, using the experiment number and run number
 #
 
-import basf2
-from basf2 import *
+import basf2 as b2
 import EventDisplayer
-from EventDisplayer import *
 import simulation
 import reconstruction
 import tracking
+import sys
 from tracking import add_tracking_reconstruction
 import rawdata
 from optparse import Option, OptionValueError, OptionParser
@@ -148,11 +147,11 @@ else:
     print('   Write at most', maxDisplays, 'event displays, requiring # RPC hits per sector >=', minRPCHits,
           '  # Muids in event >=', minMuidHits)
 
-reset_database()
-use_database_chain()
-use_central_database(tagName)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database(tagName)
 
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput', inputFileName=inputName)
 main.add_module('ProgressBar')
 
@@ -166,5 +165,5 @@ muid = main.add_module('Muid')
 # muid.param('MaxDistSigma', 10.0)
 main.add_module(eventDisplayer)
 
-process(main, max_event=maxCount)
-print(statistics)
+b2.process(main, max_event=maxCount)
+print(b2.statistics)

@@ -40,12 +40,10 @@
 #   PDF file named bklmHists-e#r#.pdf, using the experiment number and run number
 #
 
-import basf2
-from basf2 import *
+import basf2 as b2
 import sys
 import re
 import EventInspector
-from EventInspector import *
 import simulation
 import reconstruction
 import rawdata
@@ -167,11 +165,11 @@ if maxCount >= 0:
 else:
     print('bklm-dst: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze all events using ' + tagName)
 
-reset_database()
-use_database_chain()
-use_central_database(tagName)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database(tagName)
 
-main = create_path()
+main = b2.create_path()
 if inputName.find(".sroot") >= 0:
     main.add_module('SeqRootInput', inputFileNames=inputName)
 else:
@@ -184,5 +182,5 @@ rawdata.add_unpackers(main, components=['KLM'])
 main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
-process(main, max_event=maxCount)
-print(statistics)
+b2.process(main, max_event=maxCount)
+print(b2.statistics)

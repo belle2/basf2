@@ -11,46 +11,46 @@
 
 import os
 import random
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from beamparameters import add_beamparameters
 
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(123456)
+b2.set_random_seed(123456)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Event data
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 
 # Evtgen and beam parameters.
-evtgen = register_module('EvtGenInput')
+evtgen = b2.register_module('EvtGenInput')
 evtgen.param('userDECFile', Belle2.FileSystem.findFile('klm/validation/btojpsikl0.dec'))
 beamparameters = add_beamparameters(main, "Y4S")
 
 # Geometry and Geant simulation
-paramloader = register_module('Gearbox')
-geometry = register_module('Geometry')
+paramloader = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 
 # KLM modules.
-klmDigitizer = register_module('KLMDigitizer')
-klmReconstructor = register_module('KLMReconstructor')
-klmClustersReconstructor = register_module('KLMClustersReconstructor')
-mc_matcher = register_module('MCMatcherKLMClusters')
+klmDigitizer = b2.register_module('KLMDigitizer')
+klmReconstructor = b2.register_module('KLMReconstructor')
+klmClustersReconstructor = b2.register_module('KLMClustersReconstructor')
+mc_matcher = b2.register_module('MCMatcherKLMClusters')
 
 # Add progress bars
-progress = register_module('Progress')
-progressBar = register_module('ProgressBar')
+progress = b2.register_module('Progress')
+progressBar = b2.register_module('ProgressBar')
 
 # Output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', '../KLMK0LOutput.root')
 
 # Add modules to main path
@@ -71,4 +71,4 @@ main.add_module(progressBar)
 main.add_module(output)
 
 # Process the path
-process(main)
+b2.process(main)

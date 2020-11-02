@@ -11,7 +11,7 @@ from ROOT import Belle2
 from caf.utils import ExpRun, IoV, AlgResult
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
-from caf.strategies import AlgorithmStrategy
+from caf.strategies import AlgorithmStrategy, StrategyError
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \

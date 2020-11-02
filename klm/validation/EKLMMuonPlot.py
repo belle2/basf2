@@ -9,7 +9,7 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 from ROOT import TFile, TTree, TH1F, TNamed

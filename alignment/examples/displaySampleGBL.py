@@ -13,11 +13,8 @@
 ##############################################################################
 ##
 
-import os
 import basf2 as b2
-import simulation
 import reconstruction
-from ROOT import Belle2
 
 import ROOT
 ROOT.gROOT.SetBatch(0)

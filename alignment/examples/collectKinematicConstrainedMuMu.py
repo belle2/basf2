@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-from ROOT import Belle2
 
 import simulation as sim
 import reconstruction as reco
 import modularAnalysis as ana
-import BeamSpot as beam
+import beamparameters as beam
 
 main = basf2.create_path()
 
@@ -46,7 +45,7 @@ main.add_module('VariablesToEventBasedTree',
                 event_variables=['nTracks', 'expNum', 'runNum', 'evtNum'])
 main.add_module(
     'MillepedeCollector',
-    components=['BeamSpot'],
+    components=['beamparameters'],
     primaryTwoBodyDecays=['Z0:mumu'], tracks=[],
     calibrateVertex=True,
     useGblTree=False)

@@ -5,7 +5,6 @@ import basf2 as b2
 from ROOT import Belle2
 
 import os
-import pickle
 import math
 
 
@@ -77,7 +76,6 @@ class Constraints():
         Can be overriden be child classes to pass additional configuration to the
         MillepedeCollector (activated by the use of the constraints)
         """
-        pass
 
 
 def generate_constraints(constraint_sets, timedep, global_tags, init_event):
@@ -199,7 +197,6 @@ class CDCLayerConstraints(Constraints):
         self.z_offset = z_offset
         self.r_scale = r_scale
         self.z_scale = z_scale
-        pass
 
     def generate(self):
         """Generate constraints from CDC geometry
@@ -333,7 +330,6 @@ class CDCTimeZerosConstraint(Constraints):
           Can use different filename
         """
         super(CDCTimeZerosConstraint, self).__init__(filename)
-        pass
 
     def generate(self):
         """
@@ -404,7 +400,6 @@ class CDCWireConstraints(Constraints):
         #: 2 Constraints: Sum(dr)=0 for all wires in CDC at each end-plate -> "average CDC radius" kept same
         #  by this constraint (1 per CDC)
         self.cdc_radius = cdc_radius
-        pass
 
     def configure_collector(self, collector):
         """Enables wire-by-wire derivatives in collector

@@ -6,10 +6,7 @@ Generate alignment payload for VXD
 
 """
 
-import os
-import sys
 import basf2 as b2
-from ROOT import Belle2
 
 from alignment.utils import AlignmentGeneratorConfig
 

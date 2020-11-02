@@ -4,7 +4,6 @@ Created on 28 May 2018
 @author: kleinwrt
 '''
 import basf2 as b2
-from ROOT import Belle2
 
 import os
 import sys

@@ -10,16 +10,11 @@
 # *****************************************************************************
 
 
-import os
 import sys
 import numpy as np
 import pandas as pd
-import math
 import matplotlib.pyplot as plt
-from matplotlib import ticker
-import matplotlib as mpl
 import matplotlib.patches as patches
-import basf2 as b2
 import ROOT
 from ROOT import Belle2
 

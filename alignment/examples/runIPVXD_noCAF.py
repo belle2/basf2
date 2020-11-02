@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import basf2
-import os
-import sys
 import ROOT
 from ROOT import Belle2
 import numpy as np

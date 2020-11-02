@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import basf2 as b2
 from ROOT import Belle2
 
 import numpy as np
-import pandas as pd
-import math
 
 numberOfLayer = 6
 numberOfLadders = [8, 12, 7, 10, 12, 16]

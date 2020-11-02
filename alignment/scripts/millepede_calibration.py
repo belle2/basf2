@@ -3,17 +3,10 @@
 
 import basf2
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
-from caf import backends
+from caf.framework import Calibration, CentralDatabase, Collection, LocalDatabase
 from caf import strategies
 
 import os
-
-import alignment.parameters as parameters
-import alignment.constraints as constraints
-
-import alignment.collections as collections
-from alignment.collections import make_collection
 
 
 def limit_file_events(calibration, collection_limits):

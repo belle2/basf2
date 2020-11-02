@@ -4,7 +4,6 @@
 import basf2
 from ROOT import Belle2
 
-from beamparameters import add_beamparameters
 from simulation import add_simulation
 from L1trigger import add_tsim
 

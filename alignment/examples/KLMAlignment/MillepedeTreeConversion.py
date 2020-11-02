@@ -3,9 +3,7 @@
 
 import sys
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
-import numpy as np
 
 main = b2.create_path()
 

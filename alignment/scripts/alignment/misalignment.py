@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
-import sys
 import basf2 as b2
 
 import ROOT
 from ROOT import Belle2
 
 import math
-import numpy
 
 
 class GlobalDeformation:
@@ -42,7 +39,6 @@ class GlobalDeformation:
 
     def _transform(self, r, phi, z):
         """ Fcn to be overriden by child classes, return vector (list of 3 numbers) of displacement """
-        pass
 
     def _xyz_to_rphiz(self, xyz):
         """ Convert (x,y,z) to (r,phi,z) """
@@ -126,7 +122,6 @@ class Clamshell(GlobalDeformation):
     def _transform(self, r, phi, z):
         """ the transformation """
         import math
-        import numpy
 
         return [0., self.scale * math.cos(phi), 0.]
 

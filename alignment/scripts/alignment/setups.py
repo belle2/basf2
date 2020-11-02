@@ -140,7 +140,6 @@ def setup_VXDHalfShells():
             for sensor in range(1, 6):
                 # Fix all sensors
                 millepede.fixVXDid(layer, ladder, sensor)
-                pass
     return millepede
 
 

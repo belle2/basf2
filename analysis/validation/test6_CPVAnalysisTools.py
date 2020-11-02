@@ -39,7 +39,7 @@ ma.reconstructDecay(decayString='B0:jpsiks -> J/psi:mumu K_S0:pipi', cut='Mbc > 
 ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(target_list_name='B0:jpsiks', path=cp_val_path)
+ma.buildRestOfEvent(target_list_name='B0:jpsiks', fillWithMostLikely=True, path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
 b2.use_central_database("analysis_tools_release-03-01-00")

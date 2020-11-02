@@ -1,0 +1,33 @@
+# EventType: 1110024001
+# Descriptor: [B0 -> (rho+ -> pi+ pi0) (rho- -> pi- pi0) ]cc f_L=PDG
+# NickName: Bd_rho+rho-
+# Documentation:    Decay mode for phi2/alpha and rediscoveries
+# Reponsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Tested: Yes
+# PhysicsWG: BToCharmless
+# Cuts: None
+# Date: 05/10/2020
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
+### 100% transverse   polarization (1 0 0 0 1 0)
+### 100% longitudinal polarization (0 0 1 0 0 0)
+###
+### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
+### 2019 PDG f_L = 0.990 + 0.021 - 0.019
+Decay B0sig
+1.0  rho+ rho-          PHOTOS SVV_HELAMP  0.07071068 0.0 0.99498744 0.0 0.07071068 0.0;
+Enddecay
+CDecay anti-B0sig
+###
+###
+###
+###
+###
+End
+

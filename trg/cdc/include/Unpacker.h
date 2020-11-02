@@ -234,11 +234,13 @@ namespace Belle2 {
       return globalID;
     }
 
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+
     using tsOut = std::array<unsigned, 4>;
     using tsOutArray = std::array<tsOut, 5>;
     /// TRG 2DFinder Track
     struct TRG2DFinderTrack {
-      TRG2DFinderTrack() {}
+      TRG2DFinderTrack() : omega(realNaN), phi0(realNaN) {}
       /// omega of a 2D track
       double omega;
       /// phi0 of a 2D track
@@ -268,7 +270,7 @@ namespace Belle2 {
         StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
         unsigned foundtime,
         unsigned iTracker,
-        const CDCTriggerNeuroConfig::B2FormatLine b2line)
+        const CDCTriggerNeuroConfig::B2FormatLine& b2line)
       {
         if (int(b2line.offset + foundtime) >= 0 &&
             int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
@@ -322,7 +324,7 @@ namespace Belle2 {
       }
       return res;
     }
-    bool decodevalstereobit(std::string p_valstereobit)
+    bool decodevalstereobit(const std::string& p_valstereobit)
     {
       bool res;
       if (p_valstereobit == "1") {
@@ -463,16 +465,16 @@ namespace Belle2 {
      *
      *  @return         TRG2DFinderTrack containing omega, phi0 and related TS hit
      */
-    TRG2DFinderTrack decode2DTrack(std::string p_charge __attribute__((unused)),
+    TRG2DFinderTrack decode2DTrack(const std::string& p_charge __attribute__((unused)),
                                    std::string p_omega,
                                    std::string p_phi,
-                                   std::string p_ts0,
-                                   std::string p_ts2,
-                                   std::string p_ts4,
-                                   std::string p_ts6,
-                                   std::string p_ts8,
+                                   const std::string& p_ts0,
+                                   const std::string& p_ts2,
+                                   const std::string& p_ts4,
+                                   const std::string& p_ts6,
+                                   const std::string& p_ts8,
                                    unsigned iTracker,
-                                   std::string p_2dcc,
+                                   const std::string& p_2dcc,
                                    bool sim13dt)
     {
 //constexpr unsigned lenomega = p_omega.size();
@@ -565,7 +567,7 @@ namespace Belle2 {
                                 std::string p_mlpin_id,
                                 std::string p_netsel,
                                 const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
-                                std::string p_2dcc,
+                                const std::string& p_2dcc,
                                 bool sim13dt,
                                 B2LDataField p_extendedpts)
     {
@@ -1369,6 +1371,8 @@ namespace Belle2 {
                   //   }
 
                   // }
+
+                  // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
                     hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
                     // if (sim13dt) {

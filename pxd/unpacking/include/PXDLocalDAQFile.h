@@ -18,7 +18,7 @@ namespace Belle2 {
   class PXDLocalDAQFile {
   public:
     /** Constructor */
-    PXDLocalDAQFile(const std::string& filename);
+    explicit PXDLocalDAQFile(const std::string& filename);
     /** Destructor */
     ~PXDLocalDAQFile();
     /** No copying */

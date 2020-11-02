@@ -146,11 +146,6 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
   if (getenv(envVar.c_str())) {
     dirs.emplace_back(getenv(envVar.c_str()));
   }
-  std::string dirName = boost::to_lower_copy(dataType) + "-data";
-  if (getenv("VO_BELL2_SW_DIR")) {
-    dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
-  }
-  dirs.push_back(dirName);
   std::string result = findFile(path, dirs, true);
   if (result.empty() && !silent)
     B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."

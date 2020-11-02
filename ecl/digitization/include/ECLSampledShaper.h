@@ -21,7 +21,7 @@ namespace Belle2 {
     class ECLSampledShaper {
     public:
       /** constructor */
-      ECLSampledShaper(const TH1F* s, double ts = 1)
+      explicit ECLSampledShaper(const TH1F* s, double ts = 1)
         : m_sampledShape(s), m_timeScale(ts) {}
       /** destructor */
       ~ECLSampledShaper() { delete m_sampledShape;}

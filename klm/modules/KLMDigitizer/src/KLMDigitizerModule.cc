@@ -41,7 +41,7 @@ KLMDigitizerModule::KLMDigitizerModule() :
            "Simulation mode (\"Generic\" or \"ChannelSpecific\").",
            std::string("Generic"));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
-           "Initial digitization time (ns).", double(-40.));
+           "Initial digitization time in TDC periods.", -40);
   addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data and set a relation with KLMDigits.", false);
   addParam("Efficiency", m_Efficiency,
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
@@ -204,8 +204,9 @@ void KLMDigitizerModule::digitizeEKLM()
 {
   uint16_t tdc;
   int strip;
-  KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter,
-                                       m_DigitizationInitialTime, m_Debug);
+  KLM::ScintillatorSimulator simulator(
+    &(*m_DigPar), m_Fitter,
+    m_DigitizationInitialTime * m_TimeConversion->getTDCPeriod(), m_Debug);
   const EKLMChannelData* channelData;
   std::multimap<uint16_t, const EKLMSimHit*>::iterator it, ub;
   for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();

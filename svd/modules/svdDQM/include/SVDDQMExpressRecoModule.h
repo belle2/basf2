@@ -61,9 +61,6 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
-    /** parameter to change the range of the time histograms*/
-    bool m_isSVDTimeCalibrated = false;
-
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
     /** if true skip events rejected by HLT (default)*/

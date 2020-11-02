@@ -17,7 +17,7 @@ REG_MODULE(ExtraInfoPrinter)
 ExtraInfoPrinterModule::ExtraInfoPrinterModule() : Module()
 {
   setDescription("Prints the names of all ExtraInfo set for each particle in"
-                 " the event. Usefull for debugging and development.");
+                 " the event. Useful for debugging and development.");
 
   addParam("particleList", m_listName, "Name of the particle list (an empty "
            "string prints the EventExtraInfo)");

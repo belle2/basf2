@@ -30,9 +30,8 @@ testinput = [b2test_utils.require_file('analysis/tests/Btonunubar.root')]
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 
-ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=testpath)
-
-ma.matchMCTruth('B0:sig', path=testpath)
+ma.fillParticleListFromMC('nu_tau', '', path=testpath)
+ma.reconstructMCDecay(decayString='B0:sig -> nu_tau anti-nu_tau', cut='', path=testpath)
 
 # Test to build a rest of event from the MC B0 decaying to two neutrinos
 ma.buildRestOfEvent('B0:sig', path=testpath)

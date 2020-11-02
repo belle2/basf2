@@ -140,10 +140,9 @@ void ECLChargedPIDModule::event()
       double pdfval(0.0);
 
       // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
-      unsigned int hypo_idx(-1);
       for (const auto& hypo : Const::chargedStableSet) {
 
-        hypo_idx = hypo.getIndex();
+        unsigned int hypo_idx = hypo.getIndex();
 
         auto pdgId = hypo.getPDGCode();
 
@@ -250,7 +249,6 @@ void ECLChargedPIDModule::transfoGaussDecorr(const unsigned int pdg, const int c
   std::vector<double> vtransfo_gauss;
   vtransfo_gauss.reserve(nvars);
 
-  double cumulant;
   for (unsigned int ivar(0); ivar < nvars; ivar++) {
 
     int ndivs = vts->nDivisions[ivar];
@@ -274,7 +272,7 @@ void ECLChargedPIDModule::transfoGaussDecorr(const unsigned int pdg, const int c
 
     double dx = vts->x[ij] - vts->x[ijnext];
     double dy = vts->cumulDist[ij] - vts->cumulDist[ijnext];
-    cumulant  = vts->cumulDist[ij] + (variables.at(ivar) - vts->x[ijnext]) * dy / dx;
+    double cumulant  = vts->cumulDist[ij] + (variables.at(ivar) - vts->x[ijnext]) * dy / dx;
 
     cumulant = std::min(cumulant, 1.0 - 10e-10);
     cumulant = std::max(cumulant, 10e-10);

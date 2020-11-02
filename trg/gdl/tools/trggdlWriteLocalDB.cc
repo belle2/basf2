@@ -24,6 +24,7 @@
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 //#include <TFile.h>
 //#include <TH1F.h>
 
@@ -449,10 +450,11 @@ void setftdlbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        ftdlbits->setoutbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        ftdlbits->setoutbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       ftdlbits->setnoutbit(j);
@@ -473,10 +475,11 @@ void setftdlbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        ftdlbits->setoutbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        ftdlbits->setoutbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       ftdlbits->setnoutbit(j);
@@ -508,10 +511,11 @@ void setinputbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        inputbits->setinbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        inputbits->setinbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       inputbits->setninbit(j);
@@ -532,10 +536,11 @@ void setinputbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        inputbits->setinbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        inputbits->setinbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       inputbits->setninbit(j);

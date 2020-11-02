@@ -48,9 +48,7 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   m_ElectronicsTimeDB("ECLCrystalElectronicsTime"),
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
-  m_CrateTimeDB("ECLCrateTimeOffset"),
-  m_dbgTree_electrons(0),
-  m_tree_evtNum(0)//,
+  m_CrateTimeDB("ECLCrateTimeOffset")
 {
   setDescription("This module generates sum of all event times per crystal");
 
@@ -743,8 +741,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   //=== Check each crystal in the processed event and fill histogram.
 
-  int cid;
-  double time;
   int numCrystalsPassingCuts = 0;
 
   int crystalIDs[2] = { -1, -1};
@@ -770,8 +766,8 @@ void ECLBhabhaTCollectorModule::collect()
     auto amplitude = ecl_dig->getAmp();
     crystalEnergies[iCharge] = en;
 
-    cid   = ecl_dig->getCellId();
-    time  = ecl_dig->getTimeFit() * TICKS_TO_NS - evt_t0;
+    int cid   = ecl_dig->getCellId();
+    double time  = ecl_dig->getTimeFit() * TICKS_TO_NS - evt_t0;
 
     // Offset time by electronics calibration and flight time calibration.
     time -= m_ElectronicsTime[cid - 1] * TICKS_TO_NS;

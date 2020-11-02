@@ -205,7 +205,7 @@ class V0ValidationPlots:
                                           description='Reconstruction Efficiency vs. r (perpendicular)',
                                           check='',
                                           contact='software-tracking@belle2.org',
-                                          meta_options='').Write()
+                                          meta_options='shifter').Write()
 
         V0ValidationPlots.efficiency_plot(self.hist_theta_found, self.hist_theta, 'Efficiency vs Theta', 'Theta', 'deg',
                                           description='Reconstruction Efficiency vs. theta',
@@ -229,7 +229,7 @@ class V0ValidationPlots:
                                          description='Reconstructed invariant mass of KShorts with standard reconstruction',
                                          check='Invariant mass peak around KShort nominal mass 497.61 MeV.',
                                          contact='software-tracking@belle2.org',
-                                         meta_options='').Write()
+                                         meta_options='shifter').Write()
 
         V0ValidationPlots.histogram_plot(self.hist_invariant_mass_residuum, "KShort Invariant Mass Residuum", "Rec - MC", "GeV",
                                          description='Invariant mass residuum of KShorts with standard reconstruction',
@@ -247,20 +247,20 @@ class V0ValidationPlots:
                                          description='Chi2 distributions of the vertex fits inside the beampipe.',
                                          check='Check if distribution looks like a Chi2 distribution with 1 dof',
                                          contact='software-tracking@belle2.org',
-                                         meta_options='expert').Write()
+                                         meta_options='').Write()
 
         V0ValidationPlots.histogram_plot(self.hist_chi2_outside, "Chi2 of Vertex Fits Outside Beampipe.", "Chi2", None,
                                          description='Chi2 distributions of the vertex fits outside the beampipe.',
                                          check='Check if distribution looks like a Chi2 distribution with 1 dof',
                                          contact='software-tracking@belle2.org',
-                                         meta_options='expert').Write()
+                                         meta_options='').Write()
 
         V0ValidationPlots.histogram_2d_plot(self.hist_mass_vs_mc_mass, "Reconstructed vs MC Mass.",
                                             "Reconstructed Mass", "GeV", "MC Mass", "GeV",
                                             description="Reconstructed mass vs invariant Mass.",
                                             check="",
                                             contact="software-tracking@belle2.org",
-                                            meta_options='expert').Write()
+                                            meta_options='').Write()
 
         V0ValidationPlots.histogram_plot(self.hist_r_residuum, "KShort R Residuum", "Rec - MC", "cm",
                                          description='R residuum of KShorts with standard reconstruction',

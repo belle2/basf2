@@ -150,7 +150,7 @@ namespace Belle2 {
     /**
      * Helper method to load ROE object as Particle
      */
-    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0, bool isSelfConjugatedParticle = true);
+    void addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode = 0, bool isSelfConjugatedParticle = true);
 
     /**
      * returns true if the PDG code determined from the decayString is valid
@@ -202,6 +202,7 @@ namespace Belle2 {
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
+    bool m_loadPhotonsFromKLM; /**< If true, create photon candidates from KLM cluster */
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
     std::vector<int> m_sameChargeDaughtersV0Counts; /**< internally used to count the number of V0s with same charge daughters*/
   };

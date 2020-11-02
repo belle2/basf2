@@ -22,9 +22,11 @@ namespace Belle2 {
      *  @param quadrant  iTracker of the unpacked quadrant.
      *
      */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
     CDCTriggerTrack(double phi0, double omega, double chi2,
-                    std::vector<bool> foundoldtrack,
-                    std::vector<bool> driftthreshold,
+                    std::vector<bool>& foundoldtrack,
+                    std::vector<bool>& driftthreshold,
                     bool valstereobit = false,
                     int expert = -1,
                     short time = 0,
@@ -62,18 +64,6 @@ namespace Belle2 {
      *  @param time      found time for firmware tracks.
      *  @param quadrant  iTracker of the unpacked quadrant.
      */
-    /**
-    CDCTriggerTrack(double phi0, double omega, double chi2D,
-                    double z0, double cotTheta, double chi3D,
-                    short time = 0, short quadrant = -1):
-      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
-      m_foundoldtrack(6, false),
-      m_driftthreshold(9, false),
-      m_valstereobit(false),
-      m_expert(-1),
-      m_tsvector(9, false),
-      m_qualityvector(0) { }
-    */
     CDCTriggerTrack(double phi0, double omega, double chi2D,
                     double z0, double cotTheta, double chi3D,
                     std::vector<bool> foundoldtrack = std::vector<bool>(6, false),

@@ -7,9 +7,7 @@
 """
 
 import basf2
-from stdCharged import *
-from stdV0s import *
-from stdPhotons import *
+from stdV0s import stdKshorts
 from ROOT import Belle2
 from glob import glob
 import modularAnalysis as ma

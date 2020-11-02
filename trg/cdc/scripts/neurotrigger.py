@@ -64,8 +64,6 @@ class nnt_eventfilter(basf2.Module):
     def neurotrack_allgoodquality(self):
         isgoodquality = True
         for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
-            print("quality vector")
-            print(tr.getQualityVector())
             if tr.getQualityVector() > 0:
                 isgoodquality = False
                 break

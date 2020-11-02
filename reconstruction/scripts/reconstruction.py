@@ -20,8 +20,8 @@ from tracking import (
     add_cr_tracking_reconstruction,
     add_mc_track_finding,
     add_track_finding,
-    add_prune_tracks,
 )
+from tracking.path_utils import add_prune_tracks
 
 from softwaretrigger.path_utils import (
     add_filter_software_trigger,
@@ -493,7 +493,7 @@ def add_cdst_output(
             ]
 
         if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
+            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
 
     if dataDescription is None:
         dataDescription = {}
@@ -600,13 +600,13 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
                         addHitsToRecoTrack=add_hits_to_reco_track)
     if components is not None and 'CDC' in components:
         if ('ECL' not in components and 'KLM' in components):
-            B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
-                      'for correct muonID computation, will not be added to your reconstruction path. '
-                      'Make sure that this is fine for your purposes, otherwise please include also ECL.')
+            basf2.B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
+                            'for correct muonID computation, will not be added to your reconstruction path. '
+                            'Make sure that this is fine for your purposes, otherwise please include also ECL.')
         if ('ECL' in components and 'KLM' not in components):
-            B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
-                      'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
-                      ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
+            basf2.B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
+                            'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
+                            ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
 def add_ecl_modules(path, components=None):

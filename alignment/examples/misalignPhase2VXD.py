@@ -3,7 +3,7 @@
 
 import os
 import sys
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import numpy as np

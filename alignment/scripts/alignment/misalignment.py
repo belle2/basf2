@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-from basf2 import *
+import basf2 as b2
 
 import ROOT
 from ROOT import Belle2
@@ -179,7 +179,7 @@ class ZExpansion(GlobalDeformation):
         return [0., 0., self.scale * z]
 
 
-class CreateMisalignmentModule(Module):
+class CreateMisalignmentModule(b2.Module):
     """ Module to create misalignment (first reads real sensor positions, then applies misalignment and returns DB payload)
         TODO: random misalignment not finished...
     """

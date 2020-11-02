@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from alignment import MillepedeCalibration
 
@@ -44,7 +44,7 @@ def get_path(
     import modularAnalysis as ana
     import reconstruction as reco
 
-    path = create_path()
+    path = b2.create_path()
     path.add_module('Progress')
 
     path.add_module('Gearbox', fileName=gearboxFile) if gearboxFile else path.add_module('Gearbox')

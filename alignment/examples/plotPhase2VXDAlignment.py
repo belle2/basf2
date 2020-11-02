@@ -15,12 +15,11 @@ import sys
 import numpy as np
 import pandas as pd
 import math
-from pylab import *
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import matplotlib as mpl
 import matplotlib.patches as patches
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 

@@ -10,7 +10,6 @@ except ImportError:
     sys.exit(1)
 
 import numpy
-from collections import namedtuple
 
 
 class State(object):

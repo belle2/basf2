@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from SCons.Script import *
+from SCons.Script import AddOption, GetOption, BUILD_TARGETS
 from SCons import Node
 from SCons.Action import Action
 import re

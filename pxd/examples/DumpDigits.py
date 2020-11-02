@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import math
 import basf2 as b2
 
 # Some ROOT tools
-import ROOT
 from ROOT import Belle2
 
 

@@ -73,19 +73,14 @@
 import argparse
 from tracking import add_tracking_reconstruction
 from rawdata import add_unpackers
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
+from caf.strategies import SequentialRunByRun
 from caf.utils import CentralDatabase
 from caf.utils import LocalDatabase
-from caf.utils import find_absolute_file_paths
-from caf.utils import get_iov_from_file
 from caf.utils import ExpRun, IoV
 from caf.backends import LSF
-from caf import backends
 from caf.framework import Calibration, CAF
 from ROOT.Belle2 import PXDDataMCGainCalibrationAlgorithm
 import ROOT
-import os
-import glob
 import pickle
 import basf2 as b2
 b2.set_log_level(b2.LogLevel.INFO)

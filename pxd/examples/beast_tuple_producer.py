@@ -15,8 +15,6 @@
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
-from ROOT import Belle2
-import ROOT
 import multiprocessing
 import SetMetaTimeModule
 from caf.utils import IoV

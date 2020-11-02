@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import sys
-
 import basf2 as b2
-from ROOT import Belle2
 from ROOT import gROOT
 
 import PXDROIUnpackerModule

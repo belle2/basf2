@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import shutil
 import basf2 as b2
 
-from basf2 import Module
 
 main = b2.create_path()
 

@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2 as b2
-import tracking
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from ROOT import Belle2
 
 numEvents = 2000
 

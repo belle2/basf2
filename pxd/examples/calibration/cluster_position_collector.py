@@ -15,10 +15,6 @@
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
 import basf2 as b2
-from ROOT import Belle2
-import math
-import os
-import shutil
 
 if __name__ == "__main__":
 

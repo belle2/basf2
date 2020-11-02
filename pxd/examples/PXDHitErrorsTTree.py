@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from ROOT import EventData
-import sys
 import math
 import basf2 as b2
 

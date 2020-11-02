@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-import sys
 # print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
 # sys.exit(1)
 

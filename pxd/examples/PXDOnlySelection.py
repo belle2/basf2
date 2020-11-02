@@ -8,8 +8,6 @@
 #############################################################
 
 import basf2 as b2
-import glob
-import rawdata
 
 # output filename, can be overriden with -o
 output_filename = "RootOutput_PXDOnly.root"

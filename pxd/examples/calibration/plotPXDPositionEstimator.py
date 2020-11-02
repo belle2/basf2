@@ -14,7 +14,6 @@ import seaborn as sns
 
 import basf2 as b2
 from ROOT import Belle2
-import ROOT
 
 
 class PlotClusterPositionEstimatorPayload(b2.Module):

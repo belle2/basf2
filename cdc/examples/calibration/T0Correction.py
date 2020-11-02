@@ -1,7 +1,5 @@
-import ROOT
 import re
 import datetime
-import os
 import basf2 as b2
 from ROOT import Belle2
 from ROOT import gSystem

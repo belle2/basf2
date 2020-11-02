@@ -16,12 +16,9 @@ output : Output root file, which contains helix parameters.
 '''
 
 import basf2 as b2
-import ROOT
 import os
 import os.path
 import argparse
-from reconstruction import add_cosmics_reconstruction
-from ROOT import Belle2
 from cdc import cr
 
 # Set your suitable DB

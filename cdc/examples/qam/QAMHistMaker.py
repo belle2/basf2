@@ -2,13 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import ROOT
-from ROOT import Belle2
-from ROOT import TFile, TH1D, TH2D, TCanvas, TFile, TChain
-from ROOT import TH1F
 import argparse
 import glob
-import time
 
 b2.reset_database()
 b2.use_database_chain()

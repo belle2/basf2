@@ -7,7 +7,6 @@ Simple example to import CDCWireHitRequirements to the database.
 """
 
 import basf2
-import ROOT
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 

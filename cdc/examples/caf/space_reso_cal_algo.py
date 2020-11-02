@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import datetime
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
-from caf.utils import IoV
 
 b2.reset_database()
 b2.use_database_chain()

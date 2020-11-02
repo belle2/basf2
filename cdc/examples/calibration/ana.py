@@ -1,10 +1,6 @@
-import ROOT
 import datetime
-import os
 import re
-import subprocess
 import basf2 as b2
-from ROOT import Belle2
 from tracking import add_cr_tracking_reconstruction
 
 # reset_database()

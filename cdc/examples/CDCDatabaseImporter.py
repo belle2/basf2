@@ -7,14 +7,8 @@ Simple example.
 """
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT.Belle2 import FileSystem
-import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
 # Specify the exp and run where iov is valid.
 # N.B. -1 means unbound.

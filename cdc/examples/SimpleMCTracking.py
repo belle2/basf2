@@ -26,7 +26,6 @@
 ##############################################################################
 ##
 
-import os
 import basf2 as b2
 
 b2.set_log_level(b2.LogLevel.INFO)

@@ -10,7 +10,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from beamparameters import add_beamparameters
-import glob
 
 b2.set_random_seed(12345)
 

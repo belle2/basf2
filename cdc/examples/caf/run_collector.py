@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ROOT
-import datetime
-import os
 import sys
-import subprocess
 import basf2 as b2
-from ROOT import Belle2
-from tracking.path_utils import add_cdc_cr_track_finding
-from caf.framework import Calibration, CAF
-from caf import backends
 from cdc import cr
 
 # The backend creates a file with the input data file paths inside it and places it in the job's working directory.

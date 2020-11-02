@@ -7,7 +7,7 @@ basf2 CDCHistMaker exp run
 '''
 import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1D, TH2D, TCanvas, TFile
+from ROOT import TFile, TH1D, TH2D
 import argparse
 import glob
 import os

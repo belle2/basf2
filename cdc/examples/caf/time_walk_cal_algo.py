@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import datetime
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
-from caf.utils import IoV
 
 # logging.log_level = LogLevel.DEBUG
 

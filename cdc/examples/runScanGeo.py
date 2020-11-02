@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 from basf2 import register_module, create_path, process
 
 # Create main path

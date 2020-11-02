@@ -1,10 +1,7 @@
-import ROOT
 import datetime
-import os
 import re
 import basf2 as b2
 from ROOT import Belle2
-from ROOT.Belle2 import FileSystem
 from ROOT import gSystem
 gSystem.Load('libcdc')
 # gSystem.SetBatch(1);

@@ -45,10 +45,6 @@ SVD3SamplesEmulatorModule::~SVD3SamplesEmulatorModule()
 
 void SVD3SamplesEmulatorModule::initialize()
 {
-  if (m_startingSample > 3 || m_startingSample < 0) {
-    B2FATAL("The starting sample must be between 0 and 3, you set = " << m_startingSample);
-    return;
-  }
 
   B2DEBUG(10, "SVDShaperDigits: " << m_shaperDigitInputName);
   B2DEBUG(10, "StartingSample: " << m_startingSample);
@@ -57,7 +53,11 @@ void SVD3SamplesEmulatorModule::initialize()
   B2DEBUG(10, "chooseStartingSample: " <<  m_chooseStartingSample);
 
   if (m_chooseStartingSample) {
-    B2INFO("The starting sample from which start to select the three samples:  " << m_startingSample);
+    if (m_startingSample > 3 || m_startingSample < 0) {
+      B2FATAL("The starting sample must be between 0 and 3, you set = " << m_startingSample);
+      return;
+    }
+    B2INFO("The starting sample from which to start to select the three samples:  " << m_startingSample);
     B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
   } else {
     B2INFO("The starting sample has not be chosen. It will be chosen automatocally from the information of the trigger bin and relative shift");

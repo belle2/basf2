@@ -4,7 +4,6 @@
 # Usage: basf2 runTOPTBCComparator.py calSetList.txt
 #
 import basf2 as b2
-import os
 import sys
 
 b2.set_log_level(b2.LogLevel.INFO)

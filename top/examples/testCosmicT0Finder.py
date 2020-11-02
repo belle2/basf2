@@ -9,7 +9,7 @@
 
 import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1F, TFile
+from ROOT import TH1F
 from ROOT import gROOT, AddressOf
 import math
 import ROOT

@@ -10,7 +10,6 @@
 """
 
 import basf2 as b2
-import os
 
 # ---------------------------------------------------------------------------------
 # Simulate, reconstruct and make a flat ntuple for validation of top reconstruction

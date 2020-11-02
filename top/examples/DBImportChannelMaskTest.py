@@ -7,8 +7,6 @@
 # --------------------------------------------------------------------------------
 
 import basf2 as b2
-import os
-import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
 
 # define local database with write access

@@ -8,7 +8,6 @@
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
-import sys
 
 # Global tag
 b2.use_central_database('data_reprocessing_proc7')

@@ -7,7 +7,6 @@
 # -------------------------------------------------------------------------
 
 import basf2 as b2
-import os
 
 # particle parameters (emitted from IP) - change as you like
 p = 3       # GeV/c

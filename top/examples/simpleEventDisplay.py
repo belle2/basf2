@@ -11,7 +11,7 @@ import glob
 import sys
 
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TCanvas
+from ROOT import TCanvas, TH1F
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 

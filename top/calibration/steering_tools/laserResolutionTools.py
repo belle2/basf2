@@ -11,14 +11,7 @@
 
 
 import basf2 as b2
-import sys
-import glob
-from ROOT import Belle2
-from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors, TSpectrum, TCanvas, TTree, TMath
-import ROOT
-import pylab
-import numpy
-import time
+from ROOT import TF1, TFile, TH1F, TSpectrum, TTree
 from array import array
 
 

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 from tracking import add_tracking_reconstruction
 from reconstruction import add_dedx_modules
 from simulation import add_svd_simulation

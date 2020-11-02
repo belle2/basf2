@@ -12,8 +12,7 @@
 #
 # ---------------------------------------------------------------------------------------
 
-import basf2 as b2
-from ROOT import Belle2, TTree, TFile, TH1F
+from ROOT import TFile, TTree
 import sys
 import math
 from array import array

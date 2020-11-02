@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
-import math
 
 # ----------------------------------------------------------------------------
 # Example of generating double calibration pulses with TOPDoublePulseGenerator

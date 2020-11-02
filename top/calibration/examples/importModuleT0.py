@@ -10,10 +10,8 @@
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
-from ROOT import TH1F, TFile
-import os
+from ROOT import TFile
 import sys
 import glob
 

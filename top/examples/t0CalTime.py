@@ -13,7 +13,6 @@ from ROOT import Belle2
 import ROOT
 from ROOT import gStyle, gROOT, AddressOf, TH2F
 import sys
-from sys import argv
 
 
 gStyle.SetOptStat(0)

@@ -8,7 +8,6 @@
 
 import basf2 as b2
 import sys
-import os
 import argparse
 import re
 

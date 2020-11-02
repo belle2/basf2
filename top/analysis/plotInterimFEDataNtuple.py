@@ -9,11 +9,9 @@
 # ---------------------------------------------------------------------------------------
 
 import sys
-import time
-import basf2 as b2
 from ROOT import gROOT
 gROOT.SetBatch(True)  # noqa
-from ROOT import gStyle, gPad, TFile, TTree, TStyle, TCanvas, TH1F, TH2F, TF1, TLegend, TAxis, TPaveStats, TLatex, TLine, TArrow
+from ROOT import TArrow, TCanvas, TFile, TH1F, TLatex, TLegend, TLine, gPad, gStyle
 
 
 def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=False):

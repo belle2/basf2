@@ -17,11 +17,7 @@ import basf2 as b2
 import sys
 import glob
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors, TSpectrum, TCanvas
-import ROOT
-import pylab
-import numpy
-import time
+from ROOT import TFile, TH2F
 from laserResolutionTools import fitLaserResolution, plotLaserResolution
 
 

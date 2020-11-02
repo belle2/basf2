@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
-from ROOT import gSystem
 import os
 import sys
 import glob

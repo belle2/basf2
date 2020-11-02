@@ -7,13 +7,7 @@
 # --------------------------------------------------------------------------------
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
-import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
 # define a local database (will be created automatically, if doesn't exist)
 b2.use_local_database("localDB/localDB.txt", "localDB", False)

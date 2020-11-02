@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 import sys
-from ROOT import Belle2
 
 # ---------------------------------------------------------------------------
 # Shows the TOP counter using event display

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import sys
 
 b2.set_log_level(b2.LogLevel.ERROR)
 

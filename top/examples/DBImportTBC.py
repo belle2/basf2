@@ -8,13 +8,9 @@
 # --------------------------------------------------------------------------------
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
-import os
 import sys
 import glob
-import subprocess
-from fnmatch import fnmatch
 
 # define a local database with write access
 # (will be created automatically, if doesn't exist)

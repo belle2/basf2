@@ -13,9 +13,6 @@ from ROOT import gROOT
 gROOT.SetBatch()  # noqa
 
 import basf2 as b2
-import sys
-from ROOT import Belle2
-from ROOT import TH1F, TCanvas, TGraph
 
 import argparse
 parser = argparse.ArgumentParser(description='Go through a data file, apply calibration, and write the waveforms to a root file.',

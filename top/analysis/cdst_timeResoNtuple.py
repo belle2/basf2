@@ -13,12 +13,11 @@
 
 import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TFile
-from ROOT import gROOT, AddressOf, gRandom
+from ROOT import TH1F, TH2F
+from ROOT import AddressOf, gROOT
 from ROOT import TLorentzVector
 import math
 import ROOT
-import glob
 import sys
 
 MC = False

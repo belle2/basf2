@@ -14,13 +14,10 @@ Note: data writing uses AwkwardArrays (tested with v0.12.6).
 """
 
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
-from tracking import add_tracking_reconstruction, add_cr_tracking_reconstruction
+from tracking import add_tracking_reconstruction
 from svd import add_svd_reconstruction, add_svd_simulation
 from pxd import add_pxd_reconstruction, add_pxd_simulation
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 from argparse import ArgumentParser
 import numpy as np

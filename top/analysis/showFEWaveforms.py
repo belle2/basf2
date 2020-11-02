@@ -12,7 +12,6 @@ from ROOT import PyConfig
 PyConfig.StartGuiThread = False  # noqa
 
 import basf2 as b2
-import sys
 from ROOT import Belle2
 from ROOT import TH1F, TCanvas, TGraph
 

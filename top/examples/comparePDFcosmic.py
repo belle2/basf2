@@ -9,7 +9,6 @@
 # ----------------------------------------------------------------------------
 
 import basf2 as b2
-import os
 import math
 
 # particle parameters (given in local bar frame) - change as you like

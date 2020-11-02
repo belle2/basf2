@@ -10,7 +10,6 @@ import basf2 as b2
 from optparse import OptionParser
 import os
 import os.path
-import sys
 
 b2.set_log_level(b2.LogLevel.INFO)
 

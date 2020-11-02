@@ -4,10 +4,6 @@
 import basf2 as b2
 from optparse import OptionParser
 from tracking import add_tracking_reconstruction
-from reconstruction import add_reconstruction
-from svd import add_svd_reconstruction
-from svd import add_svd_reconstruction_CoG
-from pxd import add_pxd_reconstruction
 from simulation import add_simulation
 import os
 # --------------------------------------------------------------------

@@ -12,7 +12,6 @@
 # Author: Luka Santelj
 #
 
-import os
 import sys
 import basf2 as b2
 b2.logging.log_level = b2.LogLevel.WARNING

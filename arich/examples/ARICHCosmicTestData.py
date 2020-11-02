@@ -17,7 +17,6 @@
 import basf2 as b2
 import os
 from optparse import OptionParser
-from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
 

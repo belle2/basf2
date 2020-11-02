@@ -5,9 +5,7 @@ import basf2 as b2
 import os
 from simulation import add_simulation
 from optparse import OptionParser
-from tracking import add_tracking_reconstruction
 from L1trigger import add_tsim
-from ROOT import Belle2
 from reconstruction import add_cdst_output, add_reconstruction
 import glob
 

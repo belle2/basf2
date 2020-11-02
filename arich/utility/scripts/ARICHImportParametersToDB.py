@@ -11,13 +11,8 @@
 # Author: luka.santelj@ijs.si
 
 import basf2 as b2
-import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
-import os
 import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
 argvs = sys.argv
 argc = len(argvs)

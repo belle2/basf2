@@ -4,10 +4,7 @@ import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
 import os
-import sys
-from optparse import Option, OptionValueError, OptionParser
-import glob
-import subprocess
+from optparse import OptionParser
 from fnmatch import fnmatch
 
 parser = OptionParser()

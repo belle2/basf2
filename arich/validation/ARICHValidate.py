@@ -14,7 +14,6 @@ import basf2 as b2
 from optparse import OptionParser
 from simulation import add_simulation
 from reconstruction import add_mc_reconstruction
-import glob
 
 # Options from command line
 parser = OptionParser()

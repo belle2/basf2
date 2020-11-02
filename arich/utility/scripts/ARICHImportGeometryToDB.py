@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import basf2 as b2
-import ROOT
-from ROOT.Belle2 import ARICHDatabaseImporter
 import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
 home = os.environ['BELLE2_LOCAL_DIR']
 

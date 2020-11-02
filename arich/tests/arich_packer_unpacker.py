@@ -4,8 +4,6 @@
 import basf2 as b2
 from ROOT import Belle2
 from simulation import add_simulation
-import os
-import numpy
 
 
 b2.set_random_seed(12345)

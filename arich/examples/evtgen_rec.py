@@ -3,7 +3,6 @@
 
 import basf2 as b2
 from optparse import OptionParser
-from tracking import add_tracking_reconstruction
 import os
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction

@@ -5,7 +5,7 @@
 
 # Not all of the configuration is strictly necessary, it's just to show some options
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
@@ -15,7 +15,7 @@ from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -37,7 +37,7 @@ def main(argv):
     # Make a bunch of test calibrations
     calibrations = []
     for i in range(1, 3):
-        col_test = register_module('CaTest')
+        col_test = b2.register_module('CaTest')
         col_test.set_name('Test{}'.format(i))  # Sets the prefix of the collected data in the datastore
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
         col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV

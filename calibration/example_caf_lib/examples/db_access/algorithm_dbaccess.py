@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import pathlib
@@ -25,9 +25,9 @@ parser.add_argument("--resetdb-after-execute",
 
 args = parser.parse_args()
 
-set_log_level(LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.DEBUG)
 # View the framework debugging
-set_debug_level(100)
+b2.set_debug_level(100)
 # For just the Algorithm debugging
 # set_debug_level(29)
 
@@ -38,23 +38,23 @@ inputFileNames = [pathlib.Path(args.input_data, "CollectorOutput.root").absolute
 algo.setInputFileNames(inputFileNames)
 
 if not args.reset:
-    reset_database()
-    use_database_chain()
+    b2.reset_database()
+    b2.use_database_chain()
     # The local db that we will both write to and read from
-    use_local_database("localdb/database.txt",
-                       directory="localdb",
-                       readonly=False)
+    b2.use_local_database("localdb/database.txt",
+                          directory="localdb",
+                          readonly=False)
 
 # We iterate over some runs and execute separately.
 # This means that we repeatedly access the DB interface after committing
 for i in range(1, 5):
     if args.reset:
         # We're doing this here to test what happens when resetting in a single Python process
-        reset_database()
-        use_database_chain()
+        b2.reset_database()
+        b2.use_database_chain()
         # The local db that we will both write to and read from
-        use_local_database("localdb/database.txt",
-                           directory="localdb",
-                           readonly=False)
+        b2.use_local_database("localdb/database.txt",
+                              directory="localdb",
+                              readonly=False)
     print("Result of calibration =", algo.execute([(0, i)], args.iteration))
     algo.commit()

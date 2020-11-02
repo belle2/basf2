@@ -2,7 +2,7 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
+import basf2 as b2
 
 import sys
 from pathlib import Path
@@ -14,7 +14,7 @@ from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 
 
-set_log_level(LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.DEBUG)
 
 
 def main(argv):

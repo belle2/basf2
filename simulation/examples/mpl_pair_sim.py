@@ -8,13 +8,7 @@
 ######################################################
 
 import basf2 as b2
-from modularAnalysis import inputMdst
-from simulation import add_simulation
-from reconstruction import add_reconstruction
-from reconstruction import add_mdst_output
 
-import sys
-import glob
 import pdg
 
 # monopole characteristics

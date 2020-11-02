@@ -3,7 +3,6 @@
 
 import basf2 as b2
 from geometry import check_components
-from ROOT import Belle2
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction

@@ -10,7 +10,7 @@
 # NOTE: This script should only be used by experts!
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 import sys
 
 # file with the sector map
@@ -26,7 +26,7 @@ if(len(sys.argv) > 2):
     setupToRead = sys.argv[2]
 
 # read the sectormap from file
-SMBSM1 = register_module("SectorMapBootstrap")
+SMBSM1 = b2.register_module("SectorMapBootstrap")
 SMBSM1.param("ReadSecMapFromDB", False)
 SMBSM1.param("ReadSectorMap", True)
 SMBSM1.param("SectorMapsInputFile", sectorMapFile)
@@ -60,13 +60,13 @@ SMBSM1.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "T
 
 
 # needed else no sectormap from DB can be loaded
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 
 # create path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(SMBSM1)
-print_path(main)
+b2.print_path(main)
 # run path
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

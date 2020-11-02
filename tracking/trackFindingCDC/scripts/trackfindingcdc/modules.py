@@ -1,4 +1,5 @@
 import basf2
+import numpy as np
 
 import ROOT
 

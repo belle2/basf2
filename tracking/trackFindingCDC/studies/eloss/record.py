@@ -39,7 +39,7 @@ CONTACT = "oliver.frost@desy.de"
 def getNaiveBetheEnergyLoss(p, pdg_code, s):
     eloss = s * 0.00008  # Miriam's / Sasha's value
     eloss = s * 1 * 10**-4  # Miriam's / Sasha's value
-    return eLoss
+    return eloss
 
 
 def getBetheStoppingPower(p, pdg_code):

@@ -1915,7 +1915,7 @@ class ValidationPlot(object):
             n_bins = int(n_bins)
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % n_bins
                 raise ValueError(message)
 
         return n_bins, lower_bound, upper_bound
@@ -2211,8 +2211,8 @@ class ValidationPlot(object):
 
             # Workaround for a ROOT bug
             if i_target == -1:
-                for i_target in range(target_tf1.GetNpar()):
-                    if parameter_name == target_tf1.GetParName(i_target):
+                for i_target in range(tf1_target.GetNpar()):
+                    if parameter_name == tf1_target.GetParName(i_target):
                         break
                 else:
                     i_target = -1

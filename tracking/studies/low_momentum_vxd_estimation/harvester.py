@@ -41,7 +41,7 @@ class VXDMomentumEnergyEstimator:
 
         for cluster in clusters:
 
-            charge = tools.getCalibratedCharge(cluster)
+            calibrated_charge = tools.getCalibratedCharge(cluster)
             path_length = tools.getPathLength(cluster, helix)
 
             charge_list.append(calibrated_charge)
@@ -116,6 +116,7 @@ class MCParticleHarvester(HarvestingModule):
 
     def peel(self, mc_particle):
         """Aggregate the PXD and SVD cluster information for an MCParticle"""
+        result = dict()
 
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
         svd_clusters = mc_particle.getRelationsFrom("SVDClusters")

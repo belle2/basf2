@@ -44,9 +44,9 @@ b2.logging.enable_summary(False)
 main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(packer)
-unpacker.set_log_level(LogLevel.WARNING)  # this does not work yet, will fall back to ERROR
+unpacker.set_log_level(b2.LogLevel.WARNING)  # this does not work yet, will fall back to ERROR
 main.add_module(unpacker)
-packercheck.set_log_level(LogLevel.INFO)  # tell us more in the log in case of any problem
+packercheck.set_log_level(b2.LogLevel.INFO)  # tell us more in the log in case of any problem
 main.add_module(packercheck, Check=True)
 
 b2.process(main)

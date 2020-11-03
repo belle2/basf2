@@ -166,12 +166,10 @@ def create_pre_collector_path(clusterizers):
     for cluster in clusterizers:
         path.add_module(cluster)
 
-    for moda in path.modules():
-        if moda.name() == "CoGReconstruction":
-            moda.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
-            moda.param("RecoDigits", NEW_RECO_DIGITS_NAME)
-            moda.param("CalibrationWithEventT0", False)
-
+    b2.set_module_parameters(path, 'CoGReconstruction',
+                             ShaperDigits=NEW_SHAPER_DIGITS_NAME,
+                             RecoDigits=NEW_RECO_DIGITS_NAME,
+                             CalibrationWithEventT0=False)
     path = remove_module(path, "SVDMissingAPVsClusterCreator")
 
     return path

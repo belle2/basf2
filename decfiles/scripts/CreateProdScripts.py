@@ -89,15 +89,16 @@ class GenericOptionFile(object):
         """
         Write header of .dec file.
         """
+        timeString = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
         lines = [
-            '{0} file {1} generated: {2}'.format(
-                self.comment, self.filename, time.strftime(
-                    '%a, %d %b %Y %H:%M:%S', time.localtime())), '{0}'.format(
-                self.comment), '{0} Event Type: {1}'.format(
-                    self.comment, eventtype), '{0}'.format(
-                        self.comment), '{0} ASCII decay Descriptor: {1}'.format(
-                            self.comment, descriptor), '{0}'.format(
-                                self.comment), ]
+            f"{self.comment} file {self.filename} generated: {timeString}",
+            self.comment,
+            f"{self.comment} Event Type: {eventtype}",
+            self.comment,
+            f"{self.comment} ASCII decay Descriptor: {descriptor}",
+            self.comment
+        ]
+
         self.Write(lines)
 
     def AddExtraOptions(self, eventtype):

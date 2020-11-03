@@ -57,13 +57,13 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../structure/ServiceGaps-earlyPhase3.xml"/> 
+  <xi:include href="../structure/ServiceGaps.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
-  <xi:include href="../pxd/PXD-earlyPhase3.xml"/>
+  <xi:include href="../pxd/PXD.xml"/>
   <xi:include href="../svd/SVD.xml"/>
   <xi:include href="../cdc/CDC.xml"/>
   <xi:include href="../top/TOP.xml"/>
@@ -106,7 +106,17 @@
     <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
-      <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- early phase 3 Service Gaps -->
+  <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
+    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- early phase 3 PXD -->
+  <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
+    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
   <!-- MUID muon identification -->

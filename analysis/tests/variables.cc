@@ -4271,12 +4271,6 @@ namespace {
     EXPECT_FLOAT_EQ(deuteronID(particleAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
 
     // smart PID that takes the hypothesis into account
-    // auto* particleMuonAll = particles.appendNew(allTrack, Const::muon);
-    // auto* particleKaonAll = particles.appendNew(allTrack, Const::kaon);
-    // auto* particleElectronAll = particles.appendNew(allTrack, Const::electron);
-    // auto* particleProtonAll = particles.appendNew(allTrack, Const::proton);
-    auto* particleDeuteronAll = particles.appendNew(allTrack, Const::deuteron);
-
     auto* particleMuonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::muon);
     auto* particleKaonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::kaon);
     auto* particleElectronAllNoSVD = particles.appendNew(allTrackNoSVD, Const::electron);
@@ -4362,8 +4356,6 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)

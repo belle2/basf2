@@ -52,7 +52,7 @@ if __name__ == '__main__':
         assert (0 == b2u.run_in_subprocess(input_file_name, file_to_check, None, ['Muids'],
                                            target=filter_input_output))
         assert (0 == check_file_content(file_to_check, ['Muids']))
-        assert (0 == check_file_content(file_to_check, ['TrakcsToMuids']))
+        assert (0 == check_file_content(file_to_check, ['TracksToMuids']))
         assert (1 == check_file_content(file_to_check, ['Tracks', 'ECLClusters']))
         # Let's include only Muids.
         file_to_check = 'mdst_only_muid.root'

@@ -6,6 +6,10 @@ import ROOT
 def filter_input_output(input_file_name, output_file_name, include_branches=None, exclude_branches=None):
 
     b2u.configure_logging_for_tests()
+    b2.set_random_seed('Forza Livorno!!!')
+    b2.B2INFO('We are testing the following configuration:',
+              include_branches=include_branches,
+              exclude_branches=exclude_branches)
     child_path = b2.Path()
     child_path.add_module('RootInput',
                           inputFileName=input_file_name,
@@ -20,7 +24,7 @@ def filter_input_output(input_file_name, output_file_name, include_branches=None
                                  excludeBranchNames=exclude_branches)
     child_path.add_module('RootOutput',
                           outputFileName=output_file_name)
-    b2.process(child_path, 10)
+    b2.process(child_path)
 
 
 def check_file_content(file_name, input_branches):

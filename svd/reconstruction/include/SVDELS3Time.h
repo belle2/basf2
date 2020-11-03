@@ -13,8 +13,6 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 
-#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -41,10 +39,6 @@ namespace Belle2 {
        * virtual destructor
        */
       virtual ~SVDELS3Time() {};
-
-    private:
-
-      SVD3SampleELSTimeCalibrations m_ELS3TimeCal; /**< SVD ELS3 Time calibration wrapper*/
 
     };
 

@@ -13,8 +13,6 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 
-#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -41,10 +39,6 @@ namespace Belle2 {
        */
       virtual ~SVDCoG3Time() {};
 
-
-    private:
-
-      SVD3SampleCoGTimeCalibrations m_CoG3TimeCal; /**< SVD CoG3 Time calibration wrapper*/
 
     };
 

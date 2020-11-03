@@ -12,6 +12,9 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
+
+#include <svd/calibration/SVDClusterCalibrations.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -33,7 +36,7 @@ namespace Belle2 {
       /**
        * computes the cluster position and position error
        */
-      virtual void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
+      virtual void computeClusterPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
 
       /**
        * virtual destructor
@@ -41,16 +44,20 @@ namespace Belle2 {
       virtual ~SVDClusterPosition() {};
 
       /** CoG Position Algorithm*/
-      void applyCoGPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+      void applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
       /** AHT Position Algorithm*/
-      void applyAHTPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+      void applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
 
     protected:
 
       /** helper, returns the sum pf the strip charges*/
-      double getSumOfStripCharges(Belle2::SVD::RawCluster& rawCluster);
+      double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
+
+    private:
+
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
 
 
     };

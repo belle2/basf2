@@ -12,7 +12,6 @@
 
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterPosition.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vector>
 
@@ -32,16 +31,13 @@ namespace Belle2 {
        * computes the cluster position and position error
        * with the oldDefault algorithm
        */
-      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
+      void computeClusterPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
 
       /**
        * virtual destructor
        */
       virtual ~SVDOldDefaultPosition() {};
 
-    private:
-
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors*/
     };
 
   }

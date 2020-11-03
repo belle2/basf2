@@ -22,7 +22,7 @@ namespace Belle2 {
   namespace SVD {
 
 
-    void SVDClusterPosition::applyCoGPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
+    void SVDClusterPosition::applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
       //NOTE: position error NOT computed!
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     }
 
 
-    void SVDClusterPosition::applyAHTPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
+    void SVDClusterPosition::applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
 
       //NOTE: position error NOT computed!
@@ -85,7 +85,7 @@ namespace Belle2 {
 
     }
 
-    double SVDClusterPosition::getSumOfStripCharges(Belle2::SVD::RawCluster& rawCluster)
+    double SVDClusterPosition::getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       double sumStripCharge = 0;

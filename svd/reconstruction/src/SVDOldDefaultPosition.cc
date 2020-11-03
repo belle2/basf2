@@ -18,7 +18,8 @@ namespace Belle2 {
 
   namespace SVD {
 
-    void SVDOldDefaultPosition::computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
+    void SVDOldDefaultPosition::computeClusterPosition(const Belle2::SVD::RawCluster& rawCluster, double& position,
+                                                       double& positionError)
     {
 
       if (rawCluster.getSize() < 3)

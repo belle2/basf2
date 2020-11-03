@@ -152,7 +152,7 @@ def create_pre_collector_path(clusterizers):
     # run tracking reconstruction
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
-    b2.set_module_parameters(path, 'SVDGoGTimeEstimator', CalibrationWithEventT0=False)
+    b2.set_module_parameters(path, 'SVDCoGTimeEstimator', CalibrationWithEventT0=False)
     path.add_module("SVDShaperDigitsFromTracks")
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks

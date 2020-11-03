@@ -222,7 +222,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -263,7 +263,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

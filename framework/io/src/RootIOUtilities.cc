@@ -98,7 +98,7 @@ size_t RootIOUtilities::setBranchStatus(TBranch* branch, bool process)
     auto* children = current->GetListOfBranches();
     const auto nchildren = children->GetEntriesFast();
     for (int i = 0; i < nchildren; ++i) {
-      branches.emplace((TBranch*)children->UncheckedAt(i));
+      branches.emplace(dynamic_cast<TBranch*>(children->UncheckedAt(i)));
     }
   }
   return found;

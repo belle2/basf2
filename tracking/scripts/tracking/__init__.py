@@ -2,29 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import tracking.path_utils as pu
 
 # Many scripts import these functions from `tracking`, so leave these imports here
-from tracking.path_utils import (
-    add_cdc_cr_track_finding,
-    add_cdc_track_finding,
-    add_cr_track_fit_and_track_creator,
-    add_eclcdc_track_finding,
-    add_geometry_modules,
-    add_hit_preparation_modules,
-    add_mc_matcher,
-    add_prune_tracks,
-    add_pxd_cr_track_finding,
-    add_pxd_track_finding,
-    add_svd_track_finding,
-    add_track_fit_and_track_creator,
-    add_vxd_track_finding_vxdtf2,
-    is_cdc_used,
-    is_ecl_used,
-    is_pxd_used,
-    is_svd_used,
-    use_local_sectormap,
-)
+from tracking.path_utils import *  # noqa
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
@@ -66,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         (Both other QIs needed as input.)
     """
 
-    if not pu.is_svd_used(components) and not pu.is_cdc_used(components):
+    if not is_svd_used(components) and not is_cdc_used(components):
         return
 
     if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
@@ -82,10 +62,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_recoTrack_QI = False
 
     if not skipGeometryAdding:
-        pu.add_geometry_modules(path, components=components)
+        add_geometry_modules(path, components=components)
 
     if not skipHitPreparerAdding:
-        pu.add_hit_preparation_modules(path, components=components)
+        add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -93,28 +73,28 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                         energyLossBrems=False, noiseBrems=False)
 
     if mcTrackFinding:
-        pu.add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
-                                use_second_cdc_hits=use_second_cdc_hits)
+        add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
+                             use_second_cdc_hits=use_second_cdc_hits)
     else:
-        pu.add_track_finding(path, components=components, reco_tracks=reco_tracks,
-                             prune_temporary_tracks=prune_temporary_tracks,
-                             use_second_cdc_hits=use_second_cdc_hits,
-                             use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
-                             use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
-                             add_cdcTrack_QI=add_cdcTrack_QI, add_vxdTrack_QI=add_vxdTrack_QI)
+        add_track_finding(path, components=components, reco_tracks=reco_tracks,
+                          prune_temporary_tracks=prune_temporary_tracks,
+                          use_second_cdc_hits=use_second_cdc_hits,
+                          use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                          use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
+                          add_cdcTrack_QI=add_cdcTrack_QI, add_vxdTrack_QI=add_vxdTrack_QI)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    pu.add_time_extraction(path, components=components)
+    add_time_extraction(path, components=components)
 
-    pu.add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
-                      use_second_cdc_hits=use_second_cdc_hits)
+    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
+                   use_second_cdc_hits=use_second_cdc_hits)
 
     if fit_tracks:
-        pu.add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                           trackFitHypotheses=trackFitHypotheses,
-                                           reco_tracks=reco_tracks,
-                                           add_mva_quality_indicator=add_recoTrack_QI)
+        add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
+                                        trackFitHypotheses=trackFitHypotheses,
+                                        reco_tracks=reco_tracks,
+                                        add_mva_quality_indicator=add_recoTrack_QI)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
@@ -125,7 +105,7 @@ def add_time_extraction(path, components=None):
     Add time extraction components via tracking
     """
 
-    if pu.is_cdc_used(components):
+    if is_cdc_used(components):
         path.add_module("FullGridChi2TrackTimeExtractor")
 
 
@@ -155,13 +135,13 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
            (assuming PMT is put at -z of the counter).
     """
     # make sure CDC is used
-    if not pu.is_cdc_used(components):
+    if not is_cdc_used(components):
         return
 
     if not skip_geometry_adding:
-        pu.add_geometry_modules(path, components)
+        add_geometry_modules(path, components)
 
-    pu.add_hit_preparation_modules(path, components=components)
+    add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -169,22 +149,22 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                         energyLossBrems=False, noiseBrems=False)
 
     # track finding
-    pu.add_cr_track_finding(path, reco_tracks="RecoTracks", components=components, data_taking_period=data_taking_period,
-                            merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
+    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components, data_taking_period=data_taking_period,
+                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
     # if tracks were merged, use the unmerged collection for time extraction
-    pu.add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
-                                          event_timing_extraction=event_time_extraction,
-                                          data_taking_period=data_taking_period,
-                                          top_in_counter=top_in_counter)
+    add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
+                                       event_timing_extraction=event_time_extraction,
+                                       data_taking_period=data_taking_period,
+                                       top_in_counter=top_in_counter)
 
     if merge_tracks:
         # Do also fit the not merged tracks
-        pu.add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
-                                              event_timing_extraction=False,
-                                              data_taking_period=data_taking_period, top_in_counter=top_in_counter,
-                                              reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
+        add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
+                                           event_timing_extraction=False,
+                                           data_taking_period=data_taking_period, top_in_counter=top_in_counter,
+                                           reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use_second_cdc_hits=False):
@@ -197,11 +177,11 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
-    pu.add_tracking_reconstruction(path,
-                                   components=components,
-                                   pruneTracks=pruneTracks,
-                                   mcTrackFinding=True,
-                                   use_second_cdc_hits=use_second_cdc_hits)
+    add_tracking_reconstruction(path,
+                                components=components,
+                                pruneTracks=pruneTracks,
+                                mcTrackFinding=True,
+                                use_second_cdc_hits=use_second_cdc_hits)
 
 
 def add_track_finding(path, components=None, reco_tracks="RecoTracks",
@@ -230,14 +210,14 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
         -> setting this option to 'True' will have some influence on the final track collection)
     """
-    if not pu.is_svd_used(components) and not pu.is_cdc_used(components):
+    if not is_svd_used(components) and not is_cdc_used(components):
         return
 
-    if use_ecl_to_cdc_ckf and not pu.is_cdc_used(components):
+    if use_ecl_to_cdc_ckf and not is_cdc_used(components):
         b2.B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
-    if use_ecl_to_cdc_ckf and not pu.is_ecl_used(components):
+    if use_ecl_to_cdc_ckf and not is_ecl_used(components):
         b2.B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
@@ -261,34 +241,34 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if not pu.is_pxd_used(components):
-        if use_ecl_to_cdc_ckf and pu.is_cdc_used(components):
+    if not is_pxd_used(components):
+        if use_ecl_to_cdc_ckf and is_cdc_used(components):
             combined_ecl_reco_tracks = reco_tracks
-        elif (not use_ecl_to_cdc_ckf) and pu.is_svd_used(components):
+        elif (not use_ecl_to_cdc_ckf) and is_svd_used(components):
             svd_cdc_reco_tracks = reco_tracks
-        elif (not use_ecl_to_cdc_ckf) and (not pu.is_svd_used(components)) and pu.is_cdc_used(components):
+        elif (not use_ecl_to_cdc_ckf) and (not is_svd_used(components)) and is_cdc_used(components):
             cdc_reco_tracks = reco_tracks
 
-    if pu.is_cdc_used(components):
-        pu.add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                                 add_mva_quality_indicator=add_cdcTrack_QI)
+    if is_cdc_used(components):
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
+                              add_mva_quality_indicator=add_cdcTrack_QI)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
-    if pu.is_svd_used(components):
-        pu.add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                 output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
-                                 temporary_reco_tracks=svd_reco_tracks,
-                                 svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
-                                 use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
-                                 add_mva_quality_indicator=add_vxdTrack_QI)
+    if is_svd_used(components):
+        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
+                              temporary_reco_tracks=svd_reco_tracks,
+                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
+                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
+                              add_mva_quality_indicator=add_vxdTrack_QI)
         temporary_reco_track_list.append(svd_reco_tracks)
         temporary_reco_track_list.append(svd_cdc_reco_tracks)
         latest_reco_tracks = svd_cdc_reco_tracks
 
-    if use_ecl_to_cdc_ckf and pu.is_cdc_used(components):
-        pu.add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,
-                                    prune_temporary_tracks=prune_temporary_tracks)
+    if use_ecl_to_cdc_ckf and is_cdc_used(components):
+        add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,
+                                 prune_temporary_tracks=prune_temporary_tracks)
 
         # TODO: add another merging step? (SVD track found by vxdtf2, and CDC track found by ECL CKF)?
 
@@ -300,11 +280,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         temporary_reco_track_list.append(combined_ecl_reco_tracks)
         latest_reco_tracks = combined_ecl_reco_tracks
 
-    if pu.is_pxd_used(components):
-        pu.add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                 use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
-                                 temporary_reco_tracks=pxd_reco_tracks,
-                                 add_both_directions=add_both_directions)
+    if is_pxd_used(components):
+        add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
+                              temporary_reco_tracks=pxd_reco_tracks,
+                              add_both_directions=add_both_directions)
         temporary_reco_track_list.append(pxd_reco_tracks)
 
     if prune_temporary_tracks:
@@ -325,11 +305,11 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
         # track finding
-        pu.add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
-                                    trigger_point=tuple(cosmics_setup.triggerPos))
+        add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
+                                 trigger_point=tuple(cosmics_setup.triggerPos))
 
     else:
-        if not pu.is_cdc_used(components):
+        if not is_cdc_used(components):
             b2.B2FATAL("CDC must be in components")
 
         reco_tracks_from_track_finding = reco_tracks
@@ -337,31 +317,31 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
             reco_tracks_from_track_finding = "NonMergedRecoTracks"
 
         cdc_reco_tracks = "CDCRecoTracks"
-        if not pu.is_pxd_used(components) and not pu.is_svd_used(components):
+        if not is_pxd_used(components) and not is_svd_used(components):
             cdc_reco_tracks = reco_tracks_from_track_finding
 
         svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-        if not pu.is_pxd_used(components):
+        if not is_pxd_used(components):
             svd_cdc_reco_tracks = reco_tracks_from_track_finding
 
         full_reco_tracks = reco_tracks_from_track_finding
 
         # CDC track finding with default settings
-        pu.add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
-                                    output_reco_tracks=cdc_reco_tracks)
+        add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
+                                 output_reco_tracks=cdc_reco_tracks)
 
         latest_reco_tracks = cdc_reco_tracks
 
-        if pu.is_svd_used(components):
-            pu.add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                     output_reco_tracks=svd_cdc_reco_tracks,
-                                     svd_ckf_mode="cosmics", add_both_directions=True)
+        if is_svd_used(components):
+            add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                  output_reco_tracks=svd_cdc_reco_tracks,
+                                  svd_ckf_mode="cosmics", add_both_directions=True)
             latest_reco_tracks = svd_cdc_reco_tracks
 
-        if pu.is_pxd_used(components):
-            pu.add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                        output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                        filter_cut=0.01)
+        if is_pxd_used(components):
+            add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                     output_reco_tracks=full_reco_tracks, add_both_directions=True,
+                                     filter_cut=0.01)
 
         if merge_tracks:
             # merge the tracks together
@@ -378,14 +358,14 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
-    if pu.is_cdc_used(components) or pu.is_pxd_used(components) or pu.is_svd_used(components):
+    if is_cdc_used(components) or is_pxd_used(components) or is_svd_used(components):
         # find MCTracks in CDC, SVD and PXD (or a subset of it)
         path.add_module('TrackFinderMCTruthRecoTracks',
                         RecoTracksStoreArrayName=reco_tracks,
                         UseSecondCDCHits=use_second_cdc_hits,
-                        UsePXDHits=pu.is_pxd_used(components),
-                        UseSVDHits=pu.is_svd_used(components),
-                        UseCDCHits=pu.is_cdc_used(components))
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseCDCHits=is_cdc_used(components))
 
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
@@ -397,7 +377,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.
     """
 
-    if not pu.is_svd_used(components):
+    if not is_svd_used(components):
         return
 
     # Material effects
@@ -411,8 +391,8 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
-    pu.add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
-                                    svd_clusters=svd_cluster)
+    add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                                 svd_clusters=svd_cluster)
 
     # TRACK FITTING
     dafRecoFitter = b2.register_module("DAFRecoFitter")

@@ -36,7 +36,7 @@ def getCommandLineOptions():
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
-                        help='Compile latex to pdf.')
+                        help='Compile latex to pdf')
     args = parser.parse_args()
     return args
 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
-    # a locadb in the current working directory.
+    # a localdb in the current working directory.
     with tempfile.TemporaryDirectory() as tempdir:
         if args.working_directory == '':
             os.chdir(tempdir)

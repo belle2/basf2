@@ -19,7 +19,7 @@
  at each stage.
 
  At the end it produces summary outputs using printReporting.py and latexReporting.py
- (this will only work of you use the monitoring mode)
+ (this will only work if you use the monitoring mode)
  In addition, a summary file for each mva training is produced using basf2_mva_evaluate.
 
  If your training fails for some reason (e.g. a job fails on the cluster),

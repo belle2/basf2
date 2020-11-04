@@ -84,9 +84,9 @@ namespace Belle2 {
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
 
-    //name of skims
-    static const int nskim_gdldqm = 11;
-    std::string skim_smap[nskim_gdldqm] = {
+
+    static const int nskim_gdldqm = 11;      /**number of HLT skims*/
+    std::string skim_smap[nskim_gdldqm] = {  /**name of HLT skims*/
       "all",
       "hadron",
       "tautau",
@@ -100,29 +100,82 @@ namespace Belle2 {
       "mumutight"
     };
 
-    //efficiency histogram and bin size
-    TH1D* m_h_psn_extra[nskim_gdldqm];
-    TH1D* m_h_psn_pure_extra;
-    TCanvas* m_c_eff[nskim_gdldqm]; /**<Canvas for TRGGDL efficiency*/
-    TH1D* m_h_eff[nskim_gdldqm];
-    TCanvas* m_c_eff_shifter; /**<Canvas for TRGGDL efficiency*/
-    TH1D* m_h_eff_shifter;
-    TCanvas* m_c_pure_eff; /**<Canvas for TRGGDL efficiency*/
-    TH1D* m_h_pure_eff;
-    //number of points
-    static const int n_eff = 35;
-    static const char* c_eff[n_eff];
-    static const int n_eff_shifter = 7;
-    static const char* c_eff_shifter[n_eff_shifter];
-    static const int n_pure_eff = 8;
-    static const char* c_pure_eff[n_pure_eff];
-    //limit for CR
-    TLine* m_line_limit_low_shifter[n_eff_shifter];
-    TLine* m_line_limit_high_shifter[n_eff_shifter];
-    double m_limit_low_shifter[n_eff_shifter] = {
+    TH1D* m_h_psn_extra[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
+    TH1D* m_h_psn_pure_extra = nullptr;   /**<DQM Histogram for PSN bits with offline selection*/
+    TCanvas* m_c_eff[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
+    TH1D* m_h_eff[nskim_gdldqm] = {};   /**<Histogram for TRGGDL efficiency in each HLT skim*/
+    static const int n_eff = 35;        /**number of bins for the efficiency histogram*/
+    /**label of bins for the efficiency histogram*/
+    const char* c_eff[n_eff] = {
+      "fff with c4|hie",
+      "ffo with c4|hie",
+      "ffb with c4|hie",
+      "ffy with c4|hie",
+      "fyo with c4|hie",
+      "fyb with c4|hie",
+      "hie with fff|ffo|ffb",
+      "c4 with fff|ffo|ffb",
+      "lml0 with fff|ffo|ffb",
+      "lml1 with fff|ffo|ffb",
+      "lml2 with fff|ffo|ffb",
+      "lml3 with fff|ffo|ffb",
+      "lml4 with fff|ffo|ffb",
+      "lml5 with fff|ffo|ffb",
+      "lml6 with fff|ffo|ffb",
+      "lml7 with fff|ffo|ffb",
+      "lml8 with fff|ffo|ffb",
+      "lml9 with fff|ffo|ffb",
+      "lml10 with fff|ffo|ffb",
+      "lml12 with fff|ffo|ffb",
+      "lml13 with fff|ffo|ffb",
+      "bha3d with all",
+      "mu_b2b with fff|ffo|ffb",
+      "mu_b2b with lml|eclmumu",
+      "mu_eb2b with lml|eclmumu",
+      "cdcklm1 with fff|ffo|ffb",
+      "cdcklm2 with fff|ffo|ffb",
+      "fff with lml|eclmumu",
+      "ffo with lml|eclmumu",
+      "ffb with lml|eclmumu",
+      "ff with lml|eclmumu",
+      "f with lml|eclmumu",
+      "ffy with lml|eclmumu",
+      "fyo with lml|eclmumu",
+      "fyb with lml|eclmumu"
+    };
+    TCanvas* m_c_eff_shifter = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
+    TH1D* m_h_eff_shifter = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
+    static const int n_eff_shifter = 7;                 /**number of bins for the simplified efficiency histogram*/
+    const char* c_eff_shifter[n_eff_shifter] = {        /**label of bins for the simplified efficiency histogram*/
+      "CDC fff",
+      "CDC ffo",
+      "CDC ffy",
+      "CDC fyo",
+      "ECL hie",
+      "ECL c4",
+      "KLM b2b"
+    };
+    TCanvas* m_c_pure_eff = nullptr;              /**<Canvas for TRGGDL efficiency with offline selection*/
+    TH1D* m_h_pure_eff = nullptr;                 /**<Histogram for TRGGDL efficiency with offline selection*/
+    static const int n_pure_eff = 8;              /**number of bins for the efficiency histogram with offline selection*/
+    /**label of bins for the efficiency histogram with offline selection*/
+    const char* c_pure_eff[n_pure_eff] = {
+      "fff with c4|hie",
+      "ffo with c4|hie",
+      "ffb with c4|hie",
+      "ffy with c4|hie",
+      "fyo with c4|hie",
+      "fyb with c4|hie",
+      "hie with fff|ffo|ffb",
+      "c4 with fff|ffo|ffb"
+    };
+
+    TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**lower limit line for the simplified efficiency histogram*/
+    TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**upper limit line for the simplified efficiency histogram*/
+    double m_limit_low_shifter[n_eff_shifter] = {       /**lower limit value in each bin*/
       0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 0.1
     };
-    double m_limit_high_shifter[n_eff_shifter] = {
+    double m_limit_high_shifter[n_eff_shifter] = {      /**upper limit value in each bin*/
       0.9, 0.9, 0.9, 0.9, 1.0, 1.0, 0.2
     };
   };

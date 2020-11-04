@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 import re
 import os
 from abc import ABC, abstractmethod
@@ -9,8 +9,7 @@ import json
 import xml.etree.ElementTree as ET
 from math import ceil
 from pathlib import Path
-import glob
-from collections import defaultdict, deque
+from collections import deque
 from itertools import count, takewhile
 import shutil
 import time
@@ -22,7 +21,6 @@ from .utils import method_dispatch
 from .utils import decode_json_string
 from .utils import grouper
 
-import ROOT
 
 __all__ = ["Job", "SubJob", "Backend", "Local", "Batch", "LSF", "PBS", "HTCondor", "get_input_data"]
 
@@ -150,7 +148,6 @@ class SubjobSplitter(ABC):
         """
         Implement this method in derived classes to generate the `SubJob` objects.
         """
-        pass
 
     def assign_arguments(self, job):
         """
@@ -729,7 +726,6 @@ class Backend(ABC):
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        pass
 
     @staticmethod
     def _add_setup(job, batch_file):
@@ -1035,7 +1031,7 @@ class Local(Backend):
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
         B2INFO(f"Starting Sub-process: {name}")
-        from subprocess import PIPE, STDOUT, Popen
+        from subprocess import Popen
         stdout_file_path = Path(working_dir, _STDOUT_FILE)
         stderr_file_path = Path(working_dir, _STDERR_FILE)
         # Create unix command to redirect stdour and stderr
@@ -1108,7 +1104,6 @@ class Batch(Backend):
         directives pasted directly into the submission script. It should be overwritten
         if needed.
         """
-        pass
 
     @classmethod
     @abstractmethod
@@ -1116,7 +1111,6 @@ class Batch(Backend):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        pass
 
     def can_submit(self, *args, **kwargs):
         """
@@ -1273,13 +1267,11 @@ class Batch(Backend):
     def _create_job_result(cls, job, batch_output):
         """
         """
-        pass
 
     @abstractmethod
     def _create_cmd(self, job):
         """
         """
-        pass
 
 
 class PBS(Batch):
@@ -2189,25 +2181,21 @@ class DIRAC(Backend):
     """
     Backend for submitting calibration processes to the grid.
     """
-    pass
 
 
 class BackendError(Exception):
     """
     Base exception class for Backend classes.
     """
-    pass
 
 
 class JobError(Exception):
     """
     Base exception class for Job objects.
     """
-    pass
 
 
 class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
-    pass

@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-try:
-    pass
-except ImportError:
-    pass
 import time
 
 from hep_ipython_tools import viewer

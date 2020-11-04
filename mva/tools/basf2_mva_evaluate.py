@@ -327,7 +327,7 @@ if __name__ == '__main__':
             B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")
             o.save(f'latex.pdf', compile=True)
         else:
-            B2INFO(f"Creating a .zip archive containing plots and a TeX file at {args.outputfile}.
+            B2INFO(f"Creating a .zip archive containing plots and a TeX file at {args.outputfile}."
                    f"Please unpack the archive and compile the latex.tex file with pdflatex.")
             o.save(f'latex.tex', compile=False)
 

@@ -151,24 +151,36 @@ void KLMDigitizerModule::digitizeBKLM()
 {
   int tdc;
   KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter, 0, false);
-  std::multimap<uint16_t, const BKLMSimHit*>::iterator it, ub;
+  std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2, ub;
   for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
        it = m_bklmSimHitChannelMap.upper_bound(it->first)) {
     const BKLMSimHit* simHit = it->second;
     ub = m_bklmSimHitChannelMap.upper_bound(it->first);
-    float efficiency = m_StripEfficiency->getBarrelEfficiency(
-                         simHit->getSection(), simHit->getSector(),
-                         simHit->getLayer(), simHit->getPlane(),
-                         simHit->getStrip());
     bool rpc = simHit->inRPC();
     if (m_EfficiencyMode == c_Strip) {
+      float efficiency = m_StripEfficiency->getBarrelEfficiency(
+                           simHit->getSection(), simHit->getSector(),
+                           simHit->getLayer(), simHit->getPlane(),
+                           simHit->getStrip());
       if (!efficiencyCorrection(efficiency))
         continue;
     }
     if (rpc) {
       int strip = BKLMElementNumbers::getStripByModule(
                     m_ElementNumbers->localChannelNumberBKLM(it->first));
-      KLMDigit* bklmDigit = m_Digits.appendNew(simHit, strip);
+      /* Select hit that has the smallest time. */
+      it2 = it;
+      const BKLMSimHit* hit = it->second;
+      double time = hit->getTime();
+      ++it2;
+      while (it2 != ub) {
+        if (it2->second->getTime() < time) {
+          time = it2->second->getTime();
+          hit = it2->second;
+        }
+        ++it2;
+      }
+      KLMDigit* bklmDigit = m_Digits.appendNew(hit, strip);
       bklmDigit->addRelationTo(simHit);
     } else {
       simulator.simulate(it, ub);
@@ -214,11 +226,11 @@ void KLMDigitizerModule::digitizeEKLM()
        it = m_eklmSimHitChannelMap.upper_bound(it->first)) {
     const EKLMSimHit* simHit = it->second;
     ub = m_eklmSimHitChannelMap.upper_bound(it->first);
-    float efficiency = m_StripEfficiency->getEndcapEfficiency(
-                         simHit->getSection(), simHit->getSector(),
-                         simHit->getLayer(), simHit->getPlane(),
-                         simHit->getStrip());
     if (m_EfficiencyMode == c_Strip) {
+      float efficiency = m_StripEfficiency->getEndcapEfficiency(
+                           simHit->getSection(), simHit->getSector(),
+                           simHit->getLayer(), simHit->getPlane(),
+                           simHit->getStrip());
       if (!efficiencyCorrection(efficiency))
         continue;
     }

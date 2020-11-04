@@ -9,6 +9,7 @@ import tempfile
 
 import numpy as np
 from B2Tools import b2latex, format
+from basf2 import B2INFO
 
 import ROOT
 
@@ -35,7 +36,7 @@ def getCommandLineOptions():
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
-                        help='Compile latex to pdf (does not work on KEKCC)')
+                        help='Compile latex to pdf.')
     args = parser.parse_args()
     return args
 
@@ -322,8 +323,10 @@ if __name__ == '__main__':
                 o += graphics.finish()
 
         if args.compile:
+            B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")
             filetype = 'pdf'
         else:
+            B2INFO(f"Creating a TeX file at {args.outputfile}. Please compile this file with pdflatex.")
             filetype = 'tex'
 
         o.save(f'latex.{filetype}', compile=args.compile)

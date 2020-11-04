@@ -238,14 +238,18 @@ or in bash::
 Evaluation / Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a PDF file with evaluation plots using the ``basf2_mva_evaluate.py`` tool::
+You can create a LaTex file with evaluation plots using the ``basf2_mva_evaluate.py`` tool::
 
     basf2_mva_evaluate.py -id DatabaseIdentifier \
                           -train train.root \
                           -data test.root \
-                          -o validation.pdf
+                          -o validation.tex
 
-Some example plots included in such a PDF are:
+
+The LaTeX file can also be compiled directly to PDF by passing the ``-c`` command line argument.                          
+If this fails, you can transfer the ``.tex`` file and the plot PDFs to a working LaTeX environment and compile them with ``pdflatex`` there.
+
+Some example plots included in the resulting PDF are:
 
 .. _correlation:
 

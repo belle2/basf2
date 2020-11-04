@@ -3,22 +3,22 @@
 
 # Reconstruction with EKLM alignment along strips data collection.
 
-import basf2 as b2
+import basf2
 from reconstruction import add_reconstruction
 import sys
 
 # Set the global log level
-b2.set_log_level(b2.LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-input = b2.register_module('RootInput')
+input = basf2.register_module('RootInput')
 input.param('inputFileName', sys.argv[1])
 
-gearbox = b2.register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 
-eklm_alignment_along_strips = b2.register_module('EKLMAlignmentAlongStripsCollector')
+eklm_alignment_along_strips = basf2.register_module('EKLMAlignmentAlongStripsCollector')
 
 # Create the main path and add the modules
-main = b2.create_path()
+main = basf2.create_path()
 main.add_module(input)
 main.add_module("HistoManager", histoFileName=sys.argv[2])
 main.add_module(gearbox)
@@ -26,7 +26,7 @@ add_reconstruction(main)
 main.add_module(eklm_alignment_along_strips)
 
 # generate events
-b2.process(main)
+basf2.process(main)
 
 # show call statistics
-print(b2.statistics)
+print(basf2.statistics)

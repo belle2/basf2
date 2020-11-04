@@ -9,22 +9,22 @@
 </header>
 """
 
-import basf2 as b2
+import basf2
 from KLMK0LPlotModule import KLMK0LPlotModule
 
 # Input.
-root_input = b2.register_module('RootInput')
+root_input = basf2.register_module('RootInput')
 root_input.param('inputFileName', '../KLMK0LOutput.root')
 
 # Plotting.
 klmk0lplot = KLMK0LPlotModule('KLMK0L.root', True, False)
 
 # Create main path.
-main = b2.create_path()
+main = basf2.create_path()
 
 # Add modules to main path
 main.add_module(root_input)
 main.add_module(klmk0lplot)
 
 # Run.
-b2.process(main)
+basf2.process(main)

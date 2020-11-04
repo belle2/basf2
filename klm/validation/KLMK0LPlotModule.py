@@ -8,7 +8,7 @@
 </header>
 """
 
-import basf2 as b2
+import basf2
 import ROOT
 from ROOT import Belle2
 from ROOT import TNamed
@@ -16,7 +16,7 @@ import math
 import numpy
 
 
-class KLMK0LPlotModule(b2.Module):
+class KLMK0LPlotModule(basf2.Module):
     """ Class for creation of KLM K0L validation plots. """
 
     def __init__(self, output_file, evtgen, check_eklm):

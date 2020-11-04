@@ -9,19 +9,19 @@
 </header>
 """
 
-import basf2 as b2
+import basf2
 
-b2.set_log_level(b2.LogLevel.WARNING)
+basf2.set_log_level(basf2.LogLevel.WARNING)
 
 # Fixed random seed
-b2.set_random_seed(12345)
+basf2.set_random_seed(12345)
 
 # Event data
-eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
 
 # Particle gun
-particlegun = b2.register_module('ParticleGun')
+particlegun = basf2.register_module('ParticleGun')
 particlegun.param('nTracks', 1)
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('momentumGeneration', 'uniform')
@@ -32,22 +32,22 @@ particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0, 360])
 
 # Geometry and Geant simulation
-paramloader = b2.register_module('Gearbox')
-geometry = b2.register_module('Geometry')
+paramloader = basf2.register_module('Gearbox')
+geometry = basf2.register_module('Geometry')
 geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
-g4sim = b2.register_module('FullSim')
+g4sim = basf2.register_module('FullSim')
 
 # EKLM Modules
-klmDigitizer = b2.register_module('KLMDigitizer')
-klmReconstructor = b2.register_module('KLMReconstructor')
+klmDigitizer = basf2.register_module('KLMDigitizer')
+klmReconstructor = basf2.register_module('KLMReconstructor')
 
 # Output
-output = b2.register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../EKLMMuonOutput.root')
 
 # Create main path
-main = b2.create_path()
+main = basf2.create_path()
 
 # Add modules to main path
 main.add_module(eventinfosetter)
@@ -62,4 +62,4 @@ main.add_module(klmReconstructor)
 main.add_module(output)
 
 # Process 100 events
-b2.process(main)
+basf2.process(main)

@@ -6,7 +6,7 @@
 import numpy as np
 
 try:
-    pass
+    import sklearn  # noqa
 except ImportError:
     print("Please install sklearn: pip3 install sklearn")
     import sys

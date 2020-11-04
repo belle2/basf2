@@ -60,6 +60,8 @@ namespace Belle2 {
     std::string m_svdEventInfoName; /**< Name of the input SVDEventInfo object */
     std::string m_svdEventInfoOutName; /**< Name of the output SVDEventInfo object */
     bool m_chooseStartingSample; /**< Set it True if you want to choose the starting sample manually */
+    bool m_chooseRelativeShift; /**< Set it True if you want to choose the relative shift manually */
+    int m_relativeShift; /**< Relative shift */
     /** return the starting sample */
     int getFirstSample(const SVDModeByte
                        modeByte); /**< return the starting sample from the information of the Trigger Bin and relative shift */

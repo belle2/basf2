@@ -36,6 +36,11 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
   addParam("outputSVDEventInfo", m_svdEventInfoOutName, "output SVDEventInfo name", std::string("SVDEventInfo3Samples"));
   addParam("chooseStartingSample", m_chooseStartingSample,
            "If you want to choose the starting sample manually set this parameter to True. Defauls is False.", false);
+  addParam("chooseRelativeShift", m_chooseRelativeShift,
+           "If you want to choose the relative shift sample manually set this parameter to True. Defauls is False, so the relative shift is taken from the original SVDEventInfoSim. Set this True and choose the right relative shift, if you are using data.",
+           false);
+  addParam("relativeShift", m_relativeShift,
+           "Set the relative shift manually. Default is 0", int(-1));
 }
 
 SVD3SamplesEmulatorModule::~SVD3SamplesEmulatorModule()
@@ -51,6 +56,8 @@ void SVD3SamplesEmulatorModule::initialize()
   B2DEBUG(10, "outputSVDShaperDigits: " <<  m_outputArrayName);
   B2DEBUG(10, "outputSVDEventInfo: " <<  m_svdEventInfoOutName);
   B2DEBUG(10, "chooseStartingSample: " <<  m_chooseStartingSample);
+  B2DEBUG(10, "chooseRelativeShift: " <<  m_chooseRelativeShift);
+  B2DEBUG(10, "relativeShift: " <<  m_relativeShift);
 
   if (m_chooseStartingSample) {
     if (m_startingSample > 3 || m_startingSample < 0) {
@@ -59,9 +66,18 @@ void SVD3SamplesEmulatorModule::initialize()
     }
     B2INFO("The starting sample from which to start to select the three samples:  " << m_startingSample);
     B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
+  } else if (m_chooseRelativeShift) {
+    if (m_relativeShift < 0 || m_relativeShift > 15) {
+      B2FATAL("The relative shift must be between 0 and 15, you set = " << m_relativeShift);
+      return;
+    }
+    B2INFO("The chosen relative shift is: " << m_relativeShift);
+    B2INFO("The starting sample has not been chosen. It will be chosen automatically from the information of the trigger bin in SVDEventInfo and relative shift set");
+    B2INFO("If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
   } else {
-    B2INFO("The starting sample has not be chosen. It will be chosen automatocally from the information of the trigger bin and relative shift");
-    B2INFO("If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire");
+    B2INFO("The relative shift and the starting sample have not been chosen. The starting sample will be obtained automatically from the information of the trigger bin and relative shift in SVDEventInfo");
+    B2INFO("If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
+    B2INFO("If you want to choose the relative shift manually, set 'chooseRelativeShift' parameter True, and 'relativeShift' parameter to the value you desire (between 0 and 15)");
   }
 
   m_ShaperDigit.isRequired(m_shaperDigitInputName);
@@ -98,7 +114,11 @@ void SVD3SamplesEmulatorModule::event()
   m_storeSVDEvtInfo3samples->setTriggerType(m_storeSVDEvtInfo->getTriggerType());
   modeByte.setDAQMode(int(1));
   m_storeSVDEvtInfo3samples->setModeByte(modeByte);
-  m_storeSVDEvtInfo3samples->setRelativeShift(m_storeSVDEvtInfo->getRelativeShift());
+  if (m_chooseRelativeShift) {
+    m_storeSVDEvtInfo3samples->setRelativeShift(m_relativeShift);
+  } else {
+    m_storeSVDEvtInfo3samples->setRelativeShift(m_storeSVDEvtInfo->getRelativeShift());
+  }
   m_storeSVDEvtInfo3samples->setNSamples(3);
 
   for (const SVDShaperDigit& shaper : m_ShaperDigit) {
@@ -142,7 +162,12 @@ void SVD3SamplesEmulatorModule::terminate()
 
 int SVD3SamplesEmulatorModule::getFirstSample(const SVDModeByte modeByte)
 {
-  int nTriggerClocks = modeByte.getTriggerBin() + m_storeSVDEvtInfo->getRelativeShift();
+  int nTriggerClocks = 0;
+  if (m_chooseRelativeShift) {
+    nTriggerClocks = modeByte.getTriggerBin() + m_relativeShift;
+  } else {
+    nTriggerClocks = modeByte.getTriggerBin() + m_storeSVDEvtInfo->getRelativeShift();
+  }
   return floor(nTriggerClocks / 4);
 }
 

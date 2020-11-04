@@ -165,7 +165,7 @@ CDCTriggerHoughETFModule::initialize()
 
   if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
 
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdc = CDCGeometryPar::Instance();
   int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {

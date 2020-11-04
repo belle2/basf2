@@ -316,19 +316,19 @@ namespace Belle2 {
         if (!roe) {
           B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
         } else {
-          addROEToParticleList(roe, pdgCode);
+          addROEToParticleList(roe, i, pdgCode, isSelfConjugatedParticle);
         }
       }
 
     } else {
       // Take all ROE if no particle list provided
       for (int i = 0; i < m_roes.getEntries(); i++) {
-        addROEToParticleList(m_roes[i]);
+        addROEToParticleList(m_roes[i], i);
       }
     }
   }
 
-  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode, bool isSelfConjugatedParticle)
+  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode, bool isSelfConjugatedParticle)
   {
 
     Particle* newPart = nullptr;
@@ -346,7 +346,8 @@ namespace Belle2 {
       TLorentzVector missing4Vector;
       missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
       missing4Vector.SetE(missing4Vector.Vect().Mag());
-      newPart = m_particles.appendNew(missing4Vector, pdgCode);
+      auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+      newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 
     }
     for (auto roe2Plist : m_ROE2Plists) {

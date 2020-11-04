@@ -245,11 +245,11 @@ namespace Belle2 {
 #ifdef TRGCDC_DISPLAY_HOUGH
         vector<const TCTrack*> cc;
         cc.push_back(t);
-        const string stg = "doFinding : track made";
-        const string inf = "   ";
+        const string stgNow = "doFinding : track made";
+        const string infNow = "   ";
         D->clear();
-        D->stage(stg);
-        D->information(inf);
+        D->stage(stgNow);
+        D->information(infNow);
         D->area().append(cc, Gdk::Color("#FF0066009900"));
         D->area().append(_cdc.hits());
         D->area().append(_cdc.segmentHits());
@@ -396,7 +396,7 @@ namespace Belle2 {
 
   double TRGCDCHoughFinder::calPhi(TRGCDCSegmentHit const* segmentHit, double eventTime)
   {
-    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+    const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     unsigned localId = segmentHit->segment().center().localId();
     unsigned layerId = segmentHit->segment().center().layerId();
     int nWires = cdcp.nWiresInLayer(layerId) * 2;
@@ -421,7 +421,7 @@ namespace Belle2 {
       string t_inputName = "phi_" + to_string(iSt);
       string t_outputName = "cosPhi_" + to_string(iSt);
 
-      if (mLutStorage.find(t_outputName) == mLutStorage.end()) {
+      if (!mLutStorage.count(t_outputName)) {
         mLutStorage[t_outputName] = new Belle2::TRGCDCJLUT(t_outputName);
         mLutStorage[t_outputName]->setFloatFunction(
           [ = ](double aValue) -> double{return cos(aValue);},
@@ -447,7 +447,7 @@ namespace Belle2 {
       string t_sininputName = "phi_" + to_string(iSt);
       string t_sinoutputName = "sinPhi_" + to_string(iSt);
 
-      if (mLutStorage.find(t_sinoutputName) == mLutStorage.end()) {
+      if (!mLutStorage.count(t_sinoutputName)) {
         mLutStorage[t_sinoutputName] = new Belle2::TRGCDCJLUT(t_sinoutputName);
 
         mLutStorage[t_sinoutputName]->setFloatFunction(
@@ -575,7 +575,7 @@ namespace Belle2 {
       mSignalStorage["iDenMax"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
     }
 
-    if (mLutStorage.find("iDen") == mLutStorage.end()) {
+    if (!mLutStorage.count("iDen")) {
       mLutStorage["iDen"] = new Belle2::TRGCDCJLUT("iDen");
       mLutStorage["iDen"]->setFloatFunction(
         [ = ](double aValue) -> double{return 0.5 / aValue;},
@@ -638,7 +638,7 @@ namespace Belle2 {
       mSignalStorage["iRhoMin"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
     }
     // Generate sqrt LUT sqrt(hcx*hcx + hcy*hcy)
-    if (mLutStorage.find("iRho") == mLutStorage.end()) {
+    if (!mLutStorage.count("iRho")) {
       mLutStorage["iRho"] = new Belle2::TRGCDCJLUT("iRho");
       mLutStorage["iRho"]->setFloatFunction(
         [ = ](double aValue) -> double{return abs(sqrt(aValue));},
@@ -864,6 +864,7 @@ namespace Belle2 {
 
     //...Event time...
     bool fEvtTime = true;
+    // cppcheck-suppress knownConditionTrueFalse
     double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
 
     // Loop over all tracks
@@ -957,8 +958,10 @@ namespace Belle2 {
         lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
         mcLR[iSL] = _segment->hit()->mcLR();
         driftLength[iSL] = _segment->hit()->drift();
-        if (fmcLR == 1) LR[iSL] = mcLR[iSL];
-        else if (fLRLUT == 1) LR[iSL] = lutLR[iSL];
+        // cppcheck-suppress knownConditionTrueFalse
+        if (fmcLR)       LR[iSL] = mcLR[iSL];
+        // cppcheck-suppress knownConditionTrueFalse
+        else if (fLRLUT) LR[iSL] = lutLR[iSL];
         else LR[iSL] = 3;
       }//End superlayer loop
       // 2D fit values from IW 2D fitter

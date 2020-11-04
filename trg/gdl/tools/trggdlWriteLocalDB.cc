@@ -24,6 +24,7 @@
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 //#include <TFile.h>
 //#include <TH1F.h>
 
@@ -35,7 +36,7 @@ using namespace Belle2;
 
 
 /* common for setalg, setinputbits, setftdlbits */
-const int N_FTD_VERS = 16;
+const int N_FTD_VERS = 17;
 const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end run
   0,  0,     6,   -1, //  0
   7,  0,     7, 2102, //  1 11
@@ -53,10 +54,11 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   10, 4601, 12, 1659, // 12 24 o and b for short trk chged to s2[sf][o5]
   12, 1660, 12, 1858, // 13 25 +{bff,bhie}
   12, 1859, 13,   -1, // 14 26 trk req removed from mu_pair
-  14,    0, -1,   -1  // 15 29
+  14,    0, 14,  637, // 15 29
+  14,  638, -1,   -1  // 16 30
 };
 const int ftd_version[] = {
-  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29
+  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30
 };
 
 
@@ -449,10 +451,11 @@ void setftdlbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        ftdlbits->setoutbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        ftdlbits->setoutbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       ftdlbits->setnoutbit(j);
@@ -473,10 +476,11 @@ void setftdlbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        ftdlbits->setoutbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        ftdlbits->setoutbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       ftdlbits->setnoutbit(j);
@@ -508,10 +512,11 @@ void setinputbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        inputbits->setinbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        inputbits->setinbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       inputbits->setninbit(j);
@@ -532,10 +537,11 @@ void setinputbits()
       int j = 0;
       while (std::getline(isinp, str)) {
         int bitnum;
-        char bitname[30];
-        sscanf(str.data(), "%d  %s", &bitnum, bitname);
-        inputbits->setinbitname(j, bitname);
-        j++;
+        std::string bitname;
+        std::istringstream strS(str);
+        strS >> bitnum >> bitname;
+        inputbits->setinbitname(j, bitname.data());
+        ++j;
       }
       isinp.close();
       inputbits->setninbit(j);

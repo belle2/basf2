@@ -68,7 +68,7 @@ namespace Belle2 {
 
     m_mConstD["Trg_PI"] = 3.141592653589793;
     // Get rr,zToStraw,angleSt,nWire
-    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+    const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
     m_mConstV["nWires"] = vector<double> (9);
     m_mConstV["nTSs"] = vector<double> (9);
@@ -243,8 +243,10 @@ namespace Belle2 {
     TRGDebug::enterStage("3D finder");
 
     // For saving to root file.
-    if (m_makeRootFile) m_mDouble["iSave"] = 0;
-    if (m_makeRootFile) HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    if (m_makeRootFile) {
+      m_mDouble["iSave"] = 0;
+      HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    }
 
     // Get event number.
     StoreObjPtr<EventMetaData> eventMetaDataPtr;

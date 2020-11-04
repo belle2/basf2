@@ -108,7 +108,7 @@ namespace Belle2 {
     void dump();
 
     /// make COE file.
-    void makeCOE(std::string = "");
+    void makeCOE(const std::string& fileName = "");
 
     /// Storage for values used in function.
     std::vector<double> m_const;
@@ -117,7 +117,7 @@ namespace Belle2 {
     std::string operate(std::string out, std::string in, std::map<std::string, std::map<std::string, double>* >& m_intStorage);
 
     /// Returns LUT value. Out is LUT value + offset. (LUT value + offset do not obey addition bitsize rules.)
-    TRGCDCJSignal const operate(TRGCDCJSignal const& in, TRGCDCJSignal& out);
+    TRGCDCJSignal const operate(const TRGCDCJSignal& in, TRGCDCJSignal& out);
 
     /// Output is LUT Out + offset. Input is non offset input.
     void operateNoOffset(TRGCDCJSignal const& in, TRGCDCJSignal& out) const;

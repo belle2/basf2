@@ -59,46 +59,43 @@ namespace Belle2 {
     };
 
     /** Default constructor for ROOT */
-    ECLShower()
-    {
-      m_isTrk = false;         /**< Match with track */
-      m_status = 0;            /**< Status (e.g. shower contains one hot crystal) */
-      m_showerId = 0;          /**< Shower ID */
-      m_connectedRegionId = 0; /**< Connected Region ID */
-      m_hypothesisId = 0;      /**< Hypothesis ID */
-      m_centralCellId = 0;     /**< Central Cell ID */
-      m_energy = 0.0;          /**< Energy (GeV) */
-      m_energyRaw = 0.0;       /**< Raw Energy Sum (GeV) */
-      m_theta = 0.0;           /**< Theta (rad) */
-      m_phi = 0.0;             /**< Phi (rad) */
-      m_r = 0.0;               /**< R (cm) */
-      m_Error[0] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Error[1] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Error[2] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Error[3] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Error[4] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Error[5] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_time = 0;              /**< Time */
-      m_deltaTime99 = 0;       /**< Time that contains 99% of true signals */
-      m_energyHighestCrystal = 0.0;   /**< Highest energy in Shower*/
-      m_lateralEnergy = 0.0;   /**< Lateral Energy  */
-      m_minTrkDistance = 0.0;  /**< Distance between shower and closest track  */
-      m_trkDepth = 0.0;        /**< Path on track extrapolation to POCA to average cluster direction   */
-      m_showerDepth = 0.0;     /**< Same as above, but on the cluster average direction */
-      m_numberOfCrystals = 0.0;     /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernike40 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 40 */
-      m_absZernike51 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 51 */
-      m_zernikeMVA = 0.0;      /**< Shower shape variable, Zernike MVA output */
-      m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
-      m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
-      m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
-      m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity. Will be removed in release-04.*/
-      m_PulseShapeDiscriminationMVA = 0.5;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
-      m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
-      m_numberOfCrystalsForEnergy = 0.0;         /**< number of crystals used for energy calculation*/
-      m_nominalNumberOfCrystalsForEnergy = 0.0;         /**< nominal number of crystals used for energy calculation*/
-      m_listOfCrystalsForEnergy = {}; /**< list of cell ids used for energy calculation*/
-    }
+    ECLShower() :
+      m_isTrk(false),                          /**< Match with track */
+      m_status(0),                             /**< Status (e.g. shower contains one hot crystal) */
+      m_showerId(0),                           /**< Shower ID */
+      m_connectedRegionId(0),                  /**< Connected Region ID */
+      m_hypothesisId(0),                       /**< Hypothesis ID */
+      m_centralCellId(0),                      /**< Central Cell ID */
+      m_energy(0.0),                           /**< Energy (GeV) */
+      m_energyRaw(0.0),                        /**< Raw Energy Sum (GeV) */
+      m_theta(0.0),                            /**< Theta (rad) */
+      m_phi(0.0),                              /**< Phi (rad) */
+      m_r(0.0),                                /**< R (cm) */
+      m_Error{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},   /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
+      m_time(0),                               /**< Time */
+      m_deltaTime99(0),                        /**< Time that contains 99% of true signals */
+      m_energyHighestCrystal(0.0),             /**< Highest energy in Shower*/
+      m_lateralEnergy(0.0),                    /**< Lateral Energy  */
+      m_minTrkDistance(0.0),                   /**< Distance between shower and closest track  */
+      m_trkDepth(0.0),                         /**< Path on track extrapolation to POCA to average cluster direction   */
+      m_showerDepth(0.0),                      /**< Same as above, but on the cluster average direction */
+      m_numberOfCrystals(0.0),                 /**< Sum of weights of crystals (~number of crystals) */
+      m_absZernike40(0.0),                     /**< Shower shape variable, absolute value of Zernike Moment 40 */
+      m_absZernike51(0.0),                     /**< Shower shape variable, absolute value of Zernike Moment 51 */
+      m_zernikeMVA(0.0),                       /**< Shower shape variable, Zernike MVA output */
+      m_secondMoment(0.0),                     /**< Shower shape variable, second moment (needed for merged pi0) */
+      m_E1oE9(0.0),                            /**< Shower shape variable, E1oE9 */
+      m_E9oE21(0.0),                           /**< Shower shape variable, E9oE21 */
+      m_ShowerHadronIntensity(0.0),            /**< Shower Hadron Intensity. Will be removed in release-04.*/
+      m_PulseShapeDiscriminationMVA(0.5),      /**< Digit level MVA classifier that uses pulse shape discrimination.*/
+      m_NumberOfHadronDigits(0.0),             /**< Shower Number of hadron digits*/
+      m_numberOfCrystalsForEnergy(0.0),        /**< number of crystals used for energy calculation*/
+      m_nominalNumberOfCrystalsForEnergy(0.0), /**< nominal number of crystals used for energy calculation*/
+      m_listOfCrystalsForEnergy{}              /**< list of cell ids used for energy calculation*/
+
+
+
+    { }
 
     /*! Set Match with Track
      */

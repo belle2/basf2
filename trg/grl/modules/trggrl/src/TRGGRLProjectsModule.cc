@@ -542,7 +542,7 @@ void TRGGRLProjectsModule::event()
   // bha_type10: 30
   bool bha_type10 = (ECLtoGDL[0] & (1 << (30 - 32 * 0))) != 0;
   // bha_type11: 31
-  bool bha_type11 = (ECLtoGDL[0] & (1 << (31 - 32 * 0))) != 0;
+  bool bha_type11 = (ECLtoGDL[0] & (1u << (31 - 32 * 0))) != 0;
   // bha_type12: 32
   bool bha_type12 = (ECLtoGDL[1] & (1 << (32 - 32 * 1))) != 0;
   // bha_type13: 33
@@ -577,7 +577,7 @@ void TRGGRLProjectsModule::event()
   // ecl_lml_0: 62
   bool ecl_lml_0 = (ECLtoGDL[1] & (1 << (62 - 32 * 1))) != 0;
   // ecl_lml_1: 63
-  bool ecl_lml_1 = (ECLtoGDL[1] & (1 << (63 - 32 * 1))) != 0;
+  bool ecl_lml_1 = (ECLtoGDL[1] & (1u << (63 - 32 * 1))) != 0;
   // ecl_lml_2: 64
   bool ecl_lml_2 = (ECLtoGDL[2] & (1 << (64 - 32 * 2))) != 0;
   // ecl_lml_3: 65

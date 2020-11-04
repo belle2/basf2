@@ -77,7 +77,7 @@ namespace Belle2 {
     /// friend functions and classes
     friend class TRGCDCLpav;
     /// ostream operator
-    friend std::ostream& operator<<(std::ostream& o, TRGCDCLpar&);
+    friend std::ostream& operator<<(std::ostream& o, const TRGCDCLpar&);
     /// intersection
     friend int intersect(const TRGCDCLpar&, const TRGCDCLpar&, CLHEP::HepVector&, CLHEP::HepVector&);
 

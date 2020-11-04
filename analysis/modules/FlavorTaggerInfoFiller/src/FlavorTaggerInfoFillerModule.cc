@@ -56,7 +56,10 @@ void FlavorTaggerInfoFillerModule::event()
   Variable::Manager& manager = Variable::Manager::Instance();
 
 
-  if (flavorTaggerInfo == nullptr) B2ERROR("flavorTaggerInfoFiller: FlavorTaggerInfo does not exist");
+  if (flavorTaggerInfo == nullptr) {
+    B2ERROR("flavorTaggerInfoFiller: FlavorTaggerInfo does not exist");
+    return;
+  }
 
   flavorTaggerInfo -> setUseModeFlavorTagger("Expert");
 

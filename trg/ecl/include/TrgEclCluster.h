@@ -40,9 +40,9 @@ namespace Belle2 {
   public:
 
     /** set ICN for each part(Fw,Br,Bw) */
-    void setICN(std::vector<int>);
+    void setICN(const std::vector<int>&);
     /** set Belle 2 Clustering */
-    void setICN(std::vector<int> , std::vector<double>, std::vector<double>);
+    void setICN(const std::vector<int>&, const std::vector<double>&, const std::vector<double>&);
     /** Save Cluster information in TRGECLCluster Table */
     void save(int);
     /**  calculate  Belle 2 Cluster in Barrel */

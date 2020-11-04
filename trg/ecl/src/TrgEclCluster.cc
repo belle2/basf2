@@ -155,7 +155,7 @@ TrgEclCluster::getFwICNCluster(int ICNId, int location)
 //
 //
 void
-TrgEclCluster::setICN(std::vector<int> tcid)
+TrgEclCluster::setICN(const std::vector<int>& tcid)
 {
   TCId = tcid ;
   _Quadrant.clear();
@@ -174,9 +174,9 @@ TrgEclCluster::setICN(std::vector<int> tcid)
   return;
 }
 void
-TrgEclCluster::setICN(std::vector<int> tcid,
-                      std::vector<double> tcenergy,
-                      std::vector<double> tctiming)
+TrgEclCluster::setICN(const std::vector<int>& tcid,
+                      const std::vector<double>& tcenergy,
+                      const std::vector<double>& tctiming)
 {
   TCId = tcid ;
   Energy = tcenergy;

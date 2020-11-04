@@ -178,12 +178,16 @@ def process_dir(
         destination_dir = os.path.join(env['LIBDIR'], destination_reldir)
         script_target = env.Install(destination_dir, script_file_node)
         script_targets.append(script_target)
+        if env['PACKAGE'] == 'framework':
+            parent_env['REQUIRED_TOOLS'].append(script_target)
 
     define_aliases(env, script_targets, dir_name, 'scripts')
 
     # install executable script files in the bin directory
     executables = env.Install(env['BINDIR'], env['EXECUTABLE_FILES'])
     define_aliases(env, executables, dir_name, 'tools')
+    if env['PACKAGE'] == 'framework':
+        parent_env['REQUIRED_TOOLS'].append(executables)
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'
@@ -254,6 +258,10 @@ def process_dir(
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
             aux_dict_targets.append(env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file))
+
+            # check class versions
+            check_filename = os.path.join(env['BUILDDIR'], str(linkdef_file).replace(os.sep, '_') + '.check')
+            aux_dict_targets.append(env.ClassVersionCheck(check_filename, [linkdef_file] + parent_env['REQUIRED_TOOLS']))
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0 or len(dict_files) > 0:

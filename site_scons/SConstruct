@@ -129,6 +129,9 @@ global_env = Environment(
         # in an dependency to boost_python so let's keep it for now.
         "-Wl,--copy-dt-needed-entries"
     ],
+    # scripts and python modules that have to be installed before we can use
+    # them as commands, e.g. b2code-classversion-check
+    REQUIRED_TOOLS=[],
 )
 
 # add this early because we want to be sure it's enabled before we create any

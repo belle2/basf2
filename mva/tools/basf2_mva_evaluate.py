@@ -131,7 +131,6 @@ if __name__ == '__main__':
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory.
-    # If no working directory is given but also no compiling is needed we have to save the plots somewhere.
     with tempfile.TemporaryDirectory() as tempdir:
         if args.working_directory == '':
             os.chdir(tempdir)

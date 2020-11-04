@@ -164,8 +164,7 @@ def create_report(args):
     Create all the reports for the FEI training and the individual mva trainings.
     This will only work if
       1) Monitoring mode is used (see FeiConfiguration)
-      2) Latex works on your system
-      3) The system has enough memory to hold the training data for the mva classifiers
+      2) The system has enough memory to hold the training data for the mva classifiers
     If this fails you can also copy the collection directory somewhere and
     execute the commands by hand.
     """
@@ -190,7 +189,7 @@ def create_report(args):
     for i in glob.glob("*.xml"):
         if not fei.core.Teacher.check_if_weightfile_is_fake(i):
             subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data '{i[:-4]}.root' "
-                            f"--treename variables -o '../{i[:-4]}.tex'", shell=True)
+                            f"--treename variables -o '../{i[:-4]}.zip'", shell=True)
     os.chdir(args.directory)
     return ret == 0
 

@@ -188,7 +188,8 @@ void KLMDigitizerModule::digitizeBKLM()
         continue;
       KLMDigit* bklmDigit = m_Digits.appendNew(simHit);
       bklmDigit->addRelationTo(simHit);
-      bklmDigit->setSiPMMCTime(simulator.getMCTime());
+      bklmDigit->setMCTime(simulator.getMCTime());
+      bklmDigit->setSiPMMCTime(simulator.getSiPMMCTime());
       bklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
       if (simulator.getFitStatus() ==
           KLM::c_ScintillatorFirmwareSuccessfulFit) {
@@ -249,7 +250,8 @@ void KLMDigitizerModule::digitizeEKLM()
       continue;
     KLMDigit* eklmDigit = m_Digits.appendNew(simHit);
     eklmDigit->addRelationTo(simHit);
-    eklmDigit->setSiPMMCTime(simulator.getMCTime());
+    eklmDigit->setMCTime(simulator.getMCTime());
+    eklmDigit->setSiPMMCTime(simulator.getSiPMMCTime());
     eklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
       tdc = simulator.getFPGAFit()->getStartTime();

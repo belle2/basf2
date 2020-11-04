@@ -78,7 +78,9 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   m_Debug(debug),
   m_FPGAStat(c_ScintillatorFirmwareNoSignal),
   m_npe(0),
-  m_Energy(0)
+  m_Energy(0),
+  m_MCTime(-1),
+  m_SiPMMCTime(-1)
 {
   int i;
   /* cppcheck-suppress variableScope */
@@ -152,6 +154,7 @@ void KLM::ScintillatorSimulator::setChannelData(
 void KLM::ScintillatorSimulator::prepareSimulation()
 {
   m_MCTime = -1;
+  m_SiPMMCTime = -1;
   m_npe = 0;
   m_Energy = 0;
   for (int i = 0; i < m_DigPar->getNDigitizations(); i++) {
@@ -192,10 +195,15 @@ void KLM::ScintillatorSimulator::simulate(
     double sipmDistance = hit->getPropagationTime() *
                           m_DigPar->getFiberLightSpeed();
     double time = hit->getTime() + hit->getPropagationTime();
-    if (m_MCTime < 0)
-      m_MCTime = time;
-    else
-      m_MCTime = time < m_MCTime ? time : m_MCTime;
+    if (m_MCTime < 0) {
+      m_MCTime = hit->getTime();
+      m_SiPMMCTime = time;
+    } else {
+      if (hit->getTime() < m_MCTime)
+        m_MCTime = hit->getTime();
+      if (time < m_SiPMMCTime)
+        m_SiPMMCTime = time;
+    }
     int generatedPhotons = gRandom->Poisson(nPhotons);
     generatePhotoelectrons(stripLength, sipmDistance, generatedPhotons,
                            hit->getTime(), false);

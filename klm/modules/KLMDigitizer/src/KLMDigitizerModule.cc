@@ -143,7 +143,8 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 {
   if (isnan(efficiency))
     B2FATAL("Incomplete KLM efficiency data.");
-  return (gRandom->Rndm() < efficiency);
+  double selection = gRandom->Rndm();
+  return (selection < efficiency);
 }
 
 void KLMDigitizerModule::digitizeBKLM()
@@ -274,16 +275,20 @@ void KLMDigitizerModule::event()
         if (hit->getStripMin() <= 0)
           continue;
         const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-        /* We do not simulate the plane efficiency for BKLMSimHits from beam background
-         * because there are no MCParticles associated to them. */
+        /*
+         * We do not simulate the plane efficiency for BKLMSimHits
+         * from beam background because there are no MCParticles associated
+         * to them.
+         */
         if (particle != nullptr) {
           uint16_t plane = m_ElementNumbers->planeNumberBKLM(
-                             hit->getSection(), hit->getSector(), hit->getLayer(),
-                             hit->getPlane());
+                             hit->getSection(), hit->getSector(),
+                             hit->getLayer(), hit->getPlane());
           m_bklmSimHitPlaneMap.insert(
             std::pair<uint16_t, const BKLMSimHit*>(plane, hit));
         } else {
-          B2ASSERT("The BKLMSimHit is not related to any MCParticle and it is also not a beam background hit.",
+          B2ASSERT("The BKLMSimHit is not related to any MCParticle and "
+                   "it is also not a beam background hit.",
                    hit->getBackgroundTag() != BackgroundMetaData::bg_none);
           channel = m_ElementNumbers->channelNumberBKLM(
                       hit->getSection(), hit->getSector(), hit->getLayer(),
@@ -351,16 +356,20 @@ void KLMDigitizerModule::event()
       for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
         const EKLMSimHit* hit = m_eklmSimHits[i];
         const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-        /* We do not simulate the plane efficiency for EKLMSimHits from beam background
-         * because there are no MCParticles associated to them. */
+        /*
+         * We do not simulate the plane efficiency for EKLMSimHits
+         * from beam background because there are no MCParticles
+         * associated to them.
+         */
         if (particle != nullptr) {
           uint16_t plane = m_ElementNumbers->planeNumberEKLM(
-                             hit->getSection(), hit->getSector(), hit->getLayer(),
-                             hit->getPlane());
+                             hit->getSection(), hit->getSector(),
+                             hit->getLayer(), hit->getPlane());
           m_eklmSimHitPlaneMap.insert(
             std::pair<uint16_t, const EKLMSimHit*>(plane, hit));
         } else {
-          B2ASSERT("The EKLMSimHit is not related to any MCParticle and it is also not a beam background hit.",
+          B2ASSERT("The EKLMSimHit is not related to any MCParticle and "
+                   "it is also not a beam background hit.",
                    hit->getBackgroundTag() != BackgroundMetaData::bg_none);
           channel = m_ElementNumbers->channelNumberEKLM(
                       hit->getSection(), hit->getSector(), hit->getLayer(),

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -19,18 +19,18 @@ from ROOT import Belle2
 # ----------------------------------------------------------------------------------
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Event generator (B0 -> K+pi- + cc, other B0 generic)
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 evtgeninput.param('userDECFile',
                   Belle2.FileSystem.findFile('top/examples/B2Kpi.dec'))
 main.add_module(evtgeninput)
@@ -48,16 +48,16 @@ add_reconstruction(main)
 add_mdst_output(main, filename='evtgenB2Kpi.mdst.root')
 
 # Output to a flat ntuple with TOP likelihoods, track info and MC truth
-ntuple = register_module('TOPNtuple')
+ntuple = b2.register_module('TOPNtuple')
 ntuple.param('outputFileName', 'ntupleB2Kpi.root')
 main.add_module(ntuple)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

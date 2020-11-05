@@ -9,10 +9,8 @@
 </header>
 """
 
-from basf2 import *
 import ROOT
-from ROOT import Belle2
-from ROOT import TFile, TTree, TH1F, TNamed
+from ROOT import TNamed
 
 ROOT.gROOT.SetBatch(True)
 input_file = ROOT.TFile('../EKLMMuonOutput.root')

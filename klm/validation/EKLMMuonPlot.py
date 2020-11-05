@@ -32,8 +32,8 @@ functions.Add(TNamed('Check', 'No bias.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-eklm_digits_tres = ROOT.TH1F('eklm_digits_tres', 'KLMDigits time resolution in EKLM',
-                             250, -25, 25)
+eklm_digits_tres = ROOT.TH1F('eklm_digits_tres',
+                             'KLMDigits time resolution in EKLM', 250, -25, 25)
 eklm_digits_tres.SetXTitle('ns')
 eklm_digits_tres.SetYTitle('Events')
 tree.Draw('KLMDigits.m_Time-KLMDigits.m_MCTime>>eklm_digits_tres',
@@ -44,7 +44,7 @@ functions.Add(TNamed('Check', '.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-section = TH1F('Forward', 'Section for EKLMHit2ds', 2, 0.5, 2.5)
+section = ROOT.TH1F('Forward', 'Section for EKLMHit2ds', 2, 0.5, 2.5)
 section.GetXaxis().SetTitle('1=backward  2=forward')
 section.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getSection()>>Forward', '')
@@ -54,7 +54,7 @@ functions.Add(TNamed('Check', ''))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-sector = TH1F('Sector', 'Sector for EKLMHit2ds', 6, -0.5, 5.5)
+sector = ROOT.TH1F('Sector', 'Sector for EKLMHit2ds', 6, -0.5, 5.5)
 sector.GetXaxis().SetTitle('Sector #')
 sector.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getSector()>>Sector', '')
@@ -64,7 +64,7 @@ functions.Add(TNamed('Check', ''))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-layer = TH1F('Layer', 'Layer for EKLMHit2ds', 16, -0.5, 15.5)
+layer = ROOT.TH1F('Layer', 'Layer for EKLMHit2ds', 16, -0.5, 15.5)
 layer.GetXaxis().SetTitle('Layer #')
 layer.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getLayer()>>Layer', '')
@@ -74,7 +74,7 @@ functions.Add(TNamed('Check', ''))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-time = TH1F('Time', 'Hit time for EKLMHit2ds', 150, 0.0, 30.0)
+time = ROOT.TH1F('Time', 'Hit time for EKLMHit2ds', 150, 0.0, 30.0)
 time.GetXaxis().SetTitle('t (ns)')
 time.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getTime()>>Time', '')
@@ -84,7 +84,7 @@ functions.Add(TNamed('Check', ''))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-nPE = TH1F('nGenPE', 'Generated PE in EKLM', 100, 0.0, 200)
+nPE = ROOT.TH1F('nGenPE', 'Generated PE in EKLM', 100, 0.0, 200)
 nPE.GetXaxis().SetTitle('# generated PE')
 nPE.GetYaxis().SetTitle('Events')
 tree.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE',
@@ -97,7 +97,7 @@ functions.Add(TNamed('MetaOptions', 'shifter'))
 
 # Expert Plots
 
-edep = TH1F('edep', 'Energy deposition for KLMDigits', 150, 0.0, 15)
+edep = ROOT.TH1F('edep', 'Energy deposition for KLMDigits', 150, 0.0, 15)
 edep.GetXaxis().SetTitle('E (MeV)')
 edep.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getEnergyDeposit()>>edep', '')

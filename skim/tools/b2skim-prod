@@ -807,7 +807,7 @@ def make_request_dict(
         "InputSandboxFilePrefix": SkimScriptsDirectory,
         "InputData": LPNList,
         "Priority": 8,
-        "SteeringFile": f"{skimName}_Skim_Standalone.py",
+        "SteeringFile": f"{skimName}_Skim.py",
         "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
         "DataDescription": [

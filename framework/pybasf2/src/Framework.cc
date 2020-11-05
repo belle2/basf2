@@ -404,15 +404,13 @@ Processes up to max_events events by starting with the first module in the speci
       Example data for examples and tutorials. Will try to find the file
 
       1. in ``$BELLE2_EXAMPLES_DATA_DIR``
-      2. in ``$VO_BELLE2_SW_DIR/examples-data``
-      3. relative to the current working directory
+      2. relative to the current working directory
 
   ``validation``
       Data for Validation purposes. Will try to find the file in
 
       1. in ``$BELLE2_VALIDATION_DATA_DIR``
-      2. in ``$VO_BELLE2_SW_DIR/validation-data``
-      3. relative to the current working directory
+      2. relative to the current working directory
 
   .. versionadded:: release-03-00-00
 

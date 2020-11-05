@@ -73,7 +73,7 @@ CDCTrigger3DFitterModule::initialize()
   TRGCDCFitter3D::getConstants(m_mConstD, m_mConstV);
 
   // get geometry constants for first priority layers
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   // TODO: avoid hard coding the priority layers here
   vector<unsigned> iL = {10, 22, 34, 46};
   for (int iSt = 0; iSt < 4; ++iSt) {
@@ -275,7 +275,7 @@ CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
 }
 
 void
-CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, [[maybe_unused]] vector<double>& bestTSPhi,
+CDCTrigger3DFitterModule::fitter(const vector<int>& bestTSIndex, [[maybe_unused]] vector<double>& bestTSPhi,
                                  int charge, double rho, double phi,
                                  double& z0, double& cot, double& chi2)
 {

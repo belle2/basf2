@@ -2355,8 +2355,9 @@ def buildContinuumSuppression(list_name, roe_mask, path):
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
 
-    @param list_name name of the input ParticleList
-    @param path      modules are added to this path
+    :param list_name: name of the input ParticleList
+    :param roe_mask: name of the ROE mask
+    :param path: modules are added to this path
     """
 
     qqBuilder = register_module('ContinuumSuppressionBuilder')
@@ -2613,8 +2614,6 @@ def writePi0EtaVeto(
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
     """
-
-    import basf2_mva
 
     renameSuffix = False
 

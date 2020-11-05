@@ -1,29 +1,19 @@
 from itertools import islice
 from tracking import add_tracking_reconstruction
 import rawdata as raw
-from caf.strategies import SequentialBoundaries
-import modularAnalysis as ana
-import svd as svd
 from prompt.utils import events_in_basf2_file
-from caf.utils import ExpRun, IoV
+from caf.utils import IoV
 from caf import strategies
-from caf import backends
 from prompt import CalibrationSettings
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import Calibration
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from ROOT import Belle2, TFile
-import ROOT
-from random import choice, seed
-import glob
+from random import choice
 import datetime
-import multiprocessing
 import sys
-import os
-import basf2
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 now = datetime.datetime.now()
@@ -48,7 +38,7 @@ settings = CalibrationSettings(name="caf_svd_time",
 
 def remove_module(path, name):
 
-    new_path = create_path()
+    new_path = b2.create_path()
     for m in path.modules():
         if name != m.name():
             new_path.add_module(m)
@@ -72,7 +62,7 @@ def create_collector(name="SVDTimeCalibrationCollector",
         pybasf2.Module
     """
 
-    collector = register_module("SVDTimeCalibrationCollector")
+    collector = b2.register_module("SVDTimeCalibrationCollector")
     collector.set_name(name)
     collector.param("SVDClustersFromTracksName", clusters)
     collector.param("SVDEventInfoName", event_info)
@@ -114,7 +104,7 @@ def create_svd_clusterizer(name="ClusterReconstruction",
         pybasf2.Module
     """
 
-    cluster = register_module("SVDSimpleClusterizer")
+    cluster = b2.register_module("SVDSimpleClusterizer")
     cluster.set_name(name)
     cluster.param("Clusters", clusters)
     cluster.param("RecoDigits", reco_digits)
@@ -186,7 +176,7 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
     for item2, list_of_file in enumerate(splitted_all_input_files):
         while total_events_per_run < min_events:
             if not all_input_files:
-                B2INFO(f"No Input files found.")
+                b2.B2INFO(f"No Input files found.")
                 break
             # Randomly selects one file from all_input_files list
             this_file = choice(list_of_file)
@@ -206,19 +196,19 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
                 events_counter = max_events_per_each_file
             total_events += events_counter
             total_events_per_run += events_counter
-        basf2.B2INFO(
+        b2.B2INFO(
             f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
-        basf2.B2INFO(
+        b2.B2INFO(
             f"Total chosen files per run = {len(selected_files_per_run)}")
-        basf2.B2INFO(
+        b2.B2INFO(
             f"Total events in chosen files per run = {total_events_per_run}")
         if total_events < min_events:
-            basf2.B2ERROR(
+            b2.B2ERROR(
                 f"Not enough files for the calibration when max_events_per_each_file={max_events_per_each_file}.")
         selected_files_per_run.clear()
         total_events_per_run = 0
-    basf2.B2INFO(f"Total chosen files = {len(selected_files)}")
-    basf2.B2INFO(f"Total events in chosen files = {total_events}")
+    b2.B2INFO(f"Total chosen files = {len(selected_files)}")
+    b2.B2INFO(f"Total events in chosen files = {total_events}")
 
     return selected_files
 
@@ -236,7 +226,7 @@ def create_pre_collector_path(clusterizers):
         pybasf2.Path
     """
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     # unpack raw data to do the tracking
     if not isMC:
@@ -246,9 +236,9 @@ def create_pre_collector_path(clusterizers):
         path.add_module("Geometry")
 
     # proceed only if we acquired 6-sample strips
-    skim6SampleEvents = register_module("SVD6SampleEventSkim")
+    skim6SampleEvents = b2.register_module("SVD6SampleEventSkim")
     path.add_module(skim6SampleEvents)
-    emptypath = create_path()
+    emptypath = b2.create_path()
     skim6SampleEvents.if_false(emptypath)
 
     # run tracking reconstruction
@@ -262,7 +252,7 @@ def create_pre_collector_path(clusterizers):
     path.add_module("SVDShaperDigitsFromTracks")
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
-    cog = register_module("SVDCoGTimeEstimator")
+    cog = b2.register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)
 
@@ -306,9 +296,9 @@ def get_calibrations(input_data, **kwargs):
         min_events_per_run,
         max_events_selected_per_file)
 
-    basf2.B2INFO(
+    b2.B2INFO(
         f"Total number of files before selection = {max_files_per_run}")
-    basf2.B2INFO(
+    b2.B2INFO(
         f"Total number of files actually used as input = {len(good_input_files)}")
 
     exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]

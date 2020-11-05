@@ -18,15 +18,12 @@
 import os
 import glob
 import sys
-import math
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
 import flavorTagger as ft
-import basf2_mva
-from defaultEvaluationParameters import r_subsample, r_size, categories
-from array import array
+from defaultEvaluationParameters import categories
 
 import numpy as np
 import matplotlib as mpl

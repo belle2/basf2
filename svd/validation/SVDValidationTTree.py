@@ -11,16 +11,14 @@
   </description>
 </header>
 """
-import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
 from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
@@ -55,7 +53,7 @@ gROOT.ProcessLine('struct EventData {\
 from ROOT import EventData  # noqa
 
 
-class SVDValidationTTree(Module):
+class SVDValidationTTree(b2.Module):
     '''class to produced the validation ttree '''
 
     def __init__(self):

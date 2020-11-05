@@ -3,7 +3,7 @@
 """
 This module contains various utility functions for the prompt calibration CAF scripts to use.
 """
-from basf2 import B2INFO, B2WARNING, B2DEBUG
+from basf2 import B2INFO
 from collections import defaultdict, OrderedDict
 from itertools import groupby
 import ROOT

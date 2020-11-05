@@ -138,13 +138,13 @@ namespace Belle2 {
 
     static const int n_output_extra = 62;
     static const char* output_extra[n_output_extra];
-    static const int n_output_pure_extra = 20;
+    static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];
     static const int n_eff = 35;
     static const char* c_eff[n_eff];
     static const int n_eff_shifter = 8;
     static const char* c_eff_shifter[n_eff_shifter];
-    static const int n_pure_eff = 10;
+    static const int n_pure_eff = 8;
     static const char* c_pure_eff[n_pure_eff];
 
     //condition database for unpacker
@@ -205,7 +205,7 @@ namespace Belle2 {
     };
 
     //ecltrg<->ecl mappint
-    TrgEclMapping* trgeclmap;
+    TrgEclMapping* trgeclmap = nullptr;
     StoreArray<ECLCalDigit> m_ECLCalDigitData;
     StoreArray<ECLDigit>    m_ECLDigitData;
 

@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from simulation import add_simulation
-import os
-import numpy
 
 
-set_random_seed(12345)
+b2.set_random_seed(12345)
 
 
-class DigitsTest(Module):
+class DigitsTest(b2.Module):
 
     """
     module which ckecks if two collections of TOPDigits are equal
@@ -52,7 +50,7 @@ class DigitsTest(Module):
         # check the sizes
         if not len(digits_sorted) == len(digitsUnpacked_sorted):
             print('size: ', len(digits_sorted), len(digitsUnpacked_sorted))
-            B2FATAL("TOPDigits: size not equal after packing and unpacking")
+            b2.B2FATAL("TOPDigits: size not equal after packing and unpacking")
 
         # check all quantities between the direct and the packed/unpacked
         precision = 0.0001  # precision for floats (e.g. in [ns])
@@ -78,7 +76,7 @@ class DigitsTest(Module):
             assert digit.isPrimaryChargeShare() == digitUnpacked.isPrimaryChargeShare()
 
 
-class RawDigitsTest(Module):
+class RawDigitsTest(b2.Module):
 
     """
     module which ckecks if two collections of TOPRawDigits are equal
@@ -121,7 +119,7 @@ class RawDigitsTest(Module):
         # check the sizes
         if not len(digits_sorted) == len(digitsUnpacked_sorted):
             print('size: ', len(digits_sorted), len(digitsUnpacked_sorted))
-            B2FATAL("TOPRawDigits: size not equal after packing and unpacking")
+            b2.B2FATAL("TOPRawDigits: size not equal after packing and unpacking")
 
         # check all quantities between the direct and the packed/unpacked
         for i in range(len(digits_sorted)):
@@ -151,29 +149,29 @@ class RawDigitsTest(Module):
             assert digit.getDataType() == digitUnpacked.getDataType()
 
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 add_simulation(main, components=['TOP'])
-set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
+b2.set_module_parameters(main, type="Geometry", useDB=False, components=["TOP"])
 
-Packer = register_module('TOPPacker')
+Packer = b2.register_module('TOPPacker')
 main.add_module(Packer)
 
-unPacker = register_module('TOPUnpacker')
+unPacker = b2.register_module('TOPUnpacker')
 unPacker.param('outputRawDigitsName', 'TOPRawDigitsUnpacked')
 unPacker.param('outputDigitsName', 'TOPDigitsUnpacked')
 main.add_module(unPacker)
 
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('inputRawDigitsName', 'TOPRawDigitsUnpacked')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
 converter.param('minPulseWidth', 0.0)
@@ -183,8 +181,8 @@ main.add_module(converter)
 main.add_module(RawDigitsTest())
 main.add_module(DigitsTest())
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

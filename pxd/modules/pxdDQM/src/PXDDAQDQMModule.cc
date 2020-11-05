@@ -48,14 +48,14 @@ void PXDDAQDQMModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
-  hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQUseableModule = new TH1F("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
-  hDAQNotUseableModule = new TH1F("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
-  hDAQDHPDataMissing = new TH1F("PXDDAQDHPDataMissing", "PXDDAQDHPDataMissing/DHE*DHP;DHE ID;", 64 * 4, 0, 64);
-  hDAQEndErrorDHC = new TH2F("PXDDAQDHCEndError", "PXDDAQEndError/DHC;DHC ID;", 16, 0, 16, 32, 0, 32);
-  hDAQEndErrorDHE = new TH2F("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 4 * 2 * 8, 0, 4 * 2 * 8);
+  hDAQErrorEvent = new TH1D("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHC = new TH2D("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHE = new TH2D("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQUseableModule = new TH1D("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQNotUseableModule = new TH1D("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQDHPDataMissing = new TH1D("PXDDAQDHPDataMissing", "PXDDAQDHPDataMissing/DHE*DHP;DHE ID;", 64 * 4, 0, 64);
+  hDAQEndErrorDHC = new TH2D("PXDDAQDHCEndError", "PXDDAQEndError/DHC;DHC ID;", 16, 0, 16, 32, 0, 32);
+  hDAQEndErrorDHE = new TH2D("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 4 * 2 * 8, 0, 4 * 2 * 8);
 
   // histograms might get unreadable, but, if necessary, you can zoom in anyways.
   // we could use full alphanumeric histograms, but then, the labels would change (in the worst case) depending on observed errors
@@ -83,16 +83,16 @@ void PXDDAQDQMModule::defineHisto()
 //     string s = str(format("DHE %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
 //     string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
-    hDAQDHETriggerGate[avxdid] = new TH1F("PXDDAQDHETriggerGate_" + bufful,
+    hDAQDHETriggerGate[avxdid] = new TH1D("PXDDAQDHETriggerGate_" + bufful,
                                           "TriggerGate DHE " + buff + "; Trigger Gate; Counts", 192, 0, 192);
-    hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
+    hDAQDHEReduction[avxdid] = new TH1D("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
                                         40);// If max changed, check overflow copy below
-    hDAQCM[avxdid] = new TH2F("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
+    hDAQCM[avxdid] = new TH2D("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
                               64, 0, 64);
-    hDAQCM2[avxdid] = new TH1F("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
+    hDAQCM2[avxdid] = new TH1D("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
   }
   for (int i = 0; i < 16; i++) {
-    hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
+    hDAQDHCReduction[i] = new TH1D(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
                                    ("Data Reduction DHC " + str(format(" %d") % i) + "; Raw/Red; Counts").c_str(), 200, 0,
                                    40); // If max changed, check overflow copy below
   }

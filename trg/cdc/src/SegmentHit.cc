@@ -88,7 +88,7 @@ namespace Belle2 {
   TRGCDCSegmentHit::operator new(size_t size)
   {
     void* p = malloc(size);
-    _all.push_back((TRGCDCSegmentHit*) p);
+    _all.push_back(static_cast<TRGCDCSegmentHit*>(p));
 
 //     cout << ">---------------------" << endl;
 //     for (unsigned i = 0; i < _all.size(); i++)
@@ -103,7 +103,7 @@ namespace Belle2 {
     for (vector<TRGCDCSegmentHit*>::iterator it = _all.begin();
          it != _all.end();
          ++it) {
-      if ((* it) == (TRGCDCSegmentHit*) t) {
+      if ((* it) == static_cast<TRGCDCSegmentHit*>(t)) {
         _all.erase(it);
         break;
       }

@@ -11,7 +11,6 @@
 # ---------------------------------------------------------------------------------------
 
 import sys
-import os
 import glob
 from caf import backends
 from caf.framework import CAF

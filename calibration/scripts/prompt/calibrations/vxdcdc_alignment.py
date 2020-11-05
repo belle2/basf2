@@ -172,7 +172,6 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.utils import IoV
 
-    from ROOT import Belle2
     import millepede_calibration as mpc
 
     import alignment.constraints

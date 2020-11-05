@@ -4,8 +4,6 @@
 import os
 
 import basf2
-import ROOT
-from ROOT import Belle2
 from b2biiConversion import convertBelleMdstToBelleIIMdst
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors

@@ -347,7 +347,7 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAll->cd(0);
       gr->Draw("AP");
 
-      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
+      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -412,7 +412,7 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAllUpdate->Clear();
     m_cEffAllUpdate->cd(0);
     gr->Draw("AP");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

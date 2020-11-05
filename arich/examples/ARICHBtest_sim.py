@@ -6,13 +6,12 @@
 # basf2 arich/examples/ARICHBtest2011.py --
 #       -r 102 -n 10000
 #
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
 import os
 import os.path
-import sys
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 outroot = 'arichbtest.root'
 
@@ -50,13 +49,13 @@ runno = int(options.runno)  # needed for geoarich module
 # this variable is called from GeoARICHBtest2011Creator
 averageagel = int(options.avgagel)
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [int(options.neve)])
 eventinfosetter.param('runList', [int(options.runno)])
 eventinfosetter.param('expList', [1])
 
 # Load XML parameters
-paramloader = register_module('Gearbox')
+paramloader = b2.register_module('Gearbox')
 
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
@@ -78,13 +77,13 @@ paramloader.param('fileName', xmlgeometry)
 
 # Create Geometry
 
-geobuilder = register_module('Geometry')
+geobuilder = b2.register_module('Geometry')
 geobuilder.param('components', ['ARICHBtest'])
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Setting the random seed for particle generation:
-set_random_seed(1097)
+b2.set_random_seed(1097)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211])
 # Setting the number of tracks to be generated per event:
@@ -107,10 +106,10 @@ particlegun.param('xVertexParams', [-2.5, 2.5])
 particlegun.param('yVertexParams', [18, 22])
 particlegun.param('zVertexParams', [-100, -101])
 # Print the parameters of the particle gun
-print_params(particlegun)
+b2.print_params(particlegun)
 
 # Simulation module
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # g4sim.param('StoreOpticalPhotons',True)
 # g4sim.param('SecondariesEnergyCut',0)
 # This line is necessary if you want to simulate Cerenkov photons!
@@ -121,9 +120,9 @@ g4sim.param('RegisterOptics', 1)
 # By default all photons are propagated.
 g4sim.param('PhotonFraction', 0.3)
 
-arichDIGI = register_module('ARICHDigitizer')
+arichDIGI = b2.register_module('ARICHDigitizer')
 
-arichrec = register_module('ARICHReconstructor')
+arichrec = b2.register_module('ARICHReconstructor')
 arichrec.param('inputTrackType', 1)
 # choose 1 for measured data, 2 for MC, 3 for data /w likelihood
 # calculation, and 4 for MC /w likelihood
@@ -135,10 +134,10 @@ arichrec.param('beamtest', 2)
 arichrec.param('outfileName', outroot)
 
 # Saves the geometry as a Root file
-geosaver = register_module('ExportGeometry')
+geosaver = b2.register_module('ExportGeometry')
 geosaver.param('Filename', 'BeamtestGeo.root')
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(paramloader)
 main.add_module(geobuilder)
@@ -147,8 +146,8 @@ main.add_module(g4sim)
 main.add_module(arichDIGI)
 main.add_module(arichrec)
 # main.add_module(geosaver)
-process(main)
+b2.process(main)
 
 # Print basic event statistics to stdout
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)

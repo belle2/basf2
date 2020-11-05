@@ -14,7 +14,8 @@
 </header>
 """
 
-from plotUtils import *
+import ROOT as R
+import plotUtils as pu
 
 inputSim = R.TFile.Open("../SVDValidationTTreeSimhit.root")
 
@@ -22,7 +23,7 @@ treeSim = inputSim.Get("tree")
 
 histsOV = R.TFile.Open("SVDOtherValidations.root", "recreate")
 
-ploter(
+pu.ploter(
     name='dEdxForSimhits',
     title='dE/dx for SimHits',
     nbins=100,
@@ -30,8 +31,8 @@ ploter(
     xmax=10,
     x_label='dE/dx (MeV/cm)',
     y_label='counts',
-    granules=gD2,
-    tree=treeSim,
+    granules=pu.gD2,
+    tree=pu.treeSim,
     expr='simhit_dEdx*1000',
     cut='',
     descr='Simulated dE/dx for SimHits.',

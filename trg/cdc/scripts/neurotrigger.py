@@ -39,6 +39,37 @@ class filterTRG(b2.Module):
         self.if_false(self.nullpath)
 
 
+class nnt_eventfilter(basf2.Module):
+    def initialize(self,
+                   tracksegmentsname=hwneuroinputsegmenthits,
+                   twodtracksname=hwneuroinput2dfindertracks,
+                   neurotracksname=hwneurotracks,
+                   recotracksname="RecoTracks"
+                   ):
+        self.tracksegmentsname = tracksegmentsname
+        self.twodtracksname = twodtracksname
+        self.neurotracksname = neurotracksname
+        self.recotracksname = recotracksname
+        self.nullpath = basf2.create_path()
+
+    def event(self):
+        self.return_value(bool(self.hastrginfo() and
+                               self.neurotrack_allgoodquality()
+                               ))
+        self.if_false(self.nullpath)
+
+    def hastrginfo(self):
+        return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
+
+    def neurotrack_allgoodquality(self):
+        isgoodquality = True
+        for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
+            if tr.getQualityVector() > 0:
+                isgoodquality = False
+                break
+        return isgoodquality
+
+
 def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     #
     unpacker = b2.register_module('CDCTriggerUnpacker')

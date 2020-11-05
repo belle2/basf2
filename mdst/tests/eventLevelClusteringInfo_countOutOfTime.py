@@ -15,7 +15,7 @@ energy below threshold for counting
 In order to be counted, both energy and time have to be above threshold
 """
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from unittest import TestCase
 import itertools
@@ -23,13 +23,13 @@ import itertools
 from b2test_utils import skip_test_if_light
 skip_test_if_light()  # light builds don't contain ECLCalDigits
 
-set_random_seed(42)
+b2.set_random_seed(42)
 
 # global variable that holds expected number of out of time digits
 expectOutOfTime = {"FWD": 0, "BRL": 0, "BWD": 0}
 
 
-class addECLCalDigitsModule(Module):
+class addECLCalDigitsModule(b2.Module):
     """
     Add combinations of ECLCalDigits above/below threshold to be counted as out of time
     """
@@ -79,7 +79,7 @@ class addECLCalDigitsModule(Module):
         # cellIds for corresponding to different regions
         cellId = {"FWD": 1, "BRL": 1153, "BWD": 7777}
 
-        B2DEBUG(37, "Event " + str(self.eventCounter))
+        b2.B2DEBUG(37, "Event " + str(self.eventCounter))
 
         # ECLCalDigit parameter for this event
         digitParam = self.digitParams[self.eventCounter]
@@ -108,14 +108,14 @@ class addECLCalDigitsModule(Module):
 
             # Set expected number of out of time calDigits per region
             expectOutOfTime[region] = int(digitParam[region]["aboveEnergythresh"] and digitParam[region]["aboveTimethresh"])
-            B2DEBUG(35, region + ": expecting " + str(expectOutOfTime[region]))
-            B2DEBUG(39, "region = " + region + ", time = " + str(time) + ", energy = " + str(energy))
+            b2.B2DEBUG(35, region + ": expecting " + str(expectOutOfTime[region]))
+            b2.B2DEBUG(39, "region = " + region + ", time = " + str(time) + ", energy = " + str(energy))
 
         # Increment event counter
         self.eventCounter += 1
 
 
-class checkNumOutOfTimeDigitsModule(Module):
+class checkNumOutOfTimeDigitsModule(b2.Module):
     """
     module which checks the number of out of time digits in EventLevelClusteringInfo is as expected
     """
@@ -135,28 +135,28 @@ class checkNumOutOfTimeDigitsModule(Module):
                        expectOutOfTime["FWD"] + expectOutOfTime["BRL"] + expectOutOfTime["BWD"])
 
 
-main = create_path()
+main = b2.create_path()
 
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 main.add_module(eventinfosetter)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
-geometry = register_module('Geometry', useDB=False)
+geometry = b2.register_module('Geometry', useDB=False)
 geometry.param('components', ['ECL'])
 main.add_module(geometry)
 
 # Add ECLCalDigits
 addECLCalDigits = main.add_module(addECLCalDigitsModule())
-addECLCalDigits.logging.log_level = LogLevel.DEBUG
+addECLCalDigits.logging.log_level = b2.LogLevel.DEBUG
 addECLCalDigits.logging.debug_level = 10
 
 # Set number of events according to number of different combination in addECLCalDigits
 eventinfosetter.param({'evtNumList': [len(addECLCalDigits.digitParams)], 'runList': [0]})
 
-ECLDigitCalibrator = register_module('ECLDigitCalibrator')
+ECLDigitCalibrator = b2.register_module('ECLDigitCalibrator')
 main.add_module(ECLDigitCalibrator)
 
 # Extract energy and time threshold from ECLDigitCalibrator module
@@ -169,4 +169,4 @@ for param in ECLDigitCalibrator.available_params():
 main.add_module(checkNumOutOfTimeDigitsModule())
 
 # Process events
-process(main)
+b2.process(main)

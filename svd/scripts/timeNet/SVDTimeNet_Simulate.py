@@ -18,9 +18,11 @@
 
 # In[1]:
 
-import pandas as pd
-from svd.SVDSimBase import *
 import argparse
+import numpy as np
+import pandas as pd
+
+from svd.SVDSimBase import dt, SampleGenerator
 
 # ### Sample generation
 #

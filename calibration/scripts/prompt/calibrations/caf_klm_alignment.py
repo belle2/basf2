@@ -149,10 +149,9 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT import Belle2
     from ROOT.Belle2 import KLMChannelIndex, KLMElementNumbers
-    from alignment import MillepedeCalibration, calibrate
+    from alignment import MillepedeCalibration
 
     # Create the algorithm.
     millepede = MillepedeCalibration(['BKLMAlignment', 'EKLMAlignment', 'EKLMSegmentAlignment'])
@@ -198,7 +197,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Calibration setup
 
-    from caf.framework import Calibration, Collection
+    from caf.framework import Collection
 
     ########
     # Collect on multiple input data types for one calibration

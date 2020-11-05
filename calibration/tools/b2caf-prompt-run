@@ -34,7 +34,7 @@ default_collection_heartbeat = 60
 from prompt import prompt_script_package
 
 
-def get_input_data(args):
+def get_input_data(args, no_prefix=False):
     """Path to input data json file, used to find input files for the CAF job.
 Also to create the IoV for each run so the calibrations can use it if necessary.
 
@@ -60,7 +60,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
         input_data = json.load(input_data_file)
 
     path_prefix = ""
-    if args.path_prefix: 
+    if args.path_prefix and no_prefix: 
         B2INFO(f"Adding path prefix {args.path_prefix} to input data path")
         path_prefix = args.path_prefix
 

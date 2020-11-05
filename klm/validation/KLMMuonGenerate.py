@@ -3,8 +3,8 @@
 
 #################################################################
 #                                                               #
-#    Script to simulate 1000 charged-muon single-track events   #
-#    using the ParticleGun for BKLM validation.                 #
+#    Script to simulate 2000 charged-muon single-track events   #
+#    using the ParticleGun for BKLM and EKLM validation.        #
 #                                                               #
 #    written by Leo Piilonen, VT                                #
 #    piilonen@vt.edu                                            #
@@ -13,9 +13,9 @@
 
 """
 <header>
-    <output>muon-BKLMValidation.root</output>
-    <contact>giacomo.depietro@roma3.infn.it</contact>
-    <description>Create events with 1 muon track for BKLM validation.</description>
+    <output>muon-KLMValidation.root</output>
+    <contact>martina.laurenza@roma3.infn.it</contact>
+    <description>Create events with 1 muon track for BKLM and EKLM validation.</description>
 </header>
 """
 
@@ -27,13 +27,12 @@ import reconstruction as rec
 basf2.set_random_seed(981543)
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
-output_filename = '../muon-BKLMValidation.root'
+output_filename = '../muon-KLMValidation.root'
 basf2.B2INFO('The output file name is ' + output_filename)
 
 main_path = basf2.create_path()
 
-main_path.add_module('EventInfoSetter',
-                     evtNumList=1000)
+main_path.add_module('EventInfoSetter', evtNumList=1000)
 
 main_path.add_module('Progress')
 main_path.add_module('ProgressBar')
@@ -45,7 +44,7 @@ main_path.add_module('ParticleGun',
                      momentumGeneration='uniform',
                      momentumParams=[0.5, 5.0],
                      thetaGeneration='uniformCos',
-                     thetaParams=[35., 130.],
+                     thetaParams=[18., 155.],
                      phiGeneration='uniform',
                      phiParams=[0., 360.],
                      vertexGeneration='fixed',
@@ -53,23 +52,12 @@ main_path.add_module('ParticleGun',
                      yVertexParams=[0.0],
                      zVertexParams=[0.0])
 
-"""
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bkg_filename = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-    basf2.B2INFO('The background files are: ' + str(bkg_filename))
-    sim.add_simulation(path=main_path,
-                       bkgfiles=bkg_filename)
-else:
-    basf2.B2WARNING('The variable BELLE2_BACKGROUND_DIR is not set: beam background is not used in the simulation')
-    sim.add_simulation(path=main_path)
-"""
-
 sim.add_simulation(path=main_path)
 rec.add_reconstruction(path=main_path)
 
 main_path.add_module('RootOutput',
                      outputFileName=output_filename,
-                     branchNames=['MCParticles', 'ExtHits', 'Muids', 'BKLMHit2ds', 'EKLMHit2ds'])
+                     branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds'])
 
 basf2.process(main_path)
 print(basf2.statistics)

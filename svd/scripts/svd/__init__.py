@@ -171,7 +171,7 @@ def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
         path.add_module(digitizer)
 
     # 3-sample acquisition mode
-    # we previously simulated this mode with digitizer.param("StartSampling", 58)
+    # we previously simulated this mode with StartSampling = 58 (default StartSampling = -2)
     if daqMode == 1:
         if relativeShift == -1 and latencyShift == -1:
             print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")

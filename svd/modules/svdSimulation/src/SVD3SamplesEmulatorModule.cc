@@ -64,20 +64,25 @@ void SVD3SamplesEmulatorModule::initialize()
       B2FATAL("The starting sample must be between 0 and 3, you set = " << m_startingSample);
       return;
     }
-    B2INFO("The starting sample from which to start to select the three samples:  " << m_startingSample);
-    B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
+    B2DEBUG(28, "The starting sample from which to start to select the three samples:  " << m_startingSample);
+    B2DEBUG(28, "The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
   } else if (m_chooseRelativeShift) {
     if (m_relativeShift < 0 || m_relativeShift > 15) {
       B2FATAL("The relative shift must be between 0 and 15, you set = " << m_relativeShift);
       return;
     }
-    B2INFO("The chosen relative shift is: " << m_relativeShift);
-    B2INFO("The starting sample has not been chosen. It will be chosen automatically from the information of the trigger bin in SVDEventInfo and relative shift set");
-    B2INFO("If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
+    B2DEBUG(28, "The chosen relative shift is: " << m_relativeShift);
+    B2DEBUG(28,
+            "The starting sample has not been chosen. It will be chosen automatically from the information of the trigger bin in SVDEventInfo and relative shift set");
+    B2DEBUG(28,
+            "If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
   } else {
-    B2INFO("The relative shift and the starting sample have not been chosen. The starting sample will be obtained automatically from the information of the trigger bin and relative shift in SVDEventInfo");
-    B2INFO("If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
-    B2INFO("If you want to choose the relative shift manually, set 'chooseRelativeShift' parameter True, and 'relativeShift' parameter to the value you desire (between 0 and 15)");
+    B2DEBUG(28,
+            "The relative shift and the starting sample have not been chosen. The starting sample will be obtained automatically from the information of the trigger bin and relative shift in SVDEventInfo");
+    B2DEBUG(28,
+            "If you want to choose the starting sample manually, set 'chooseStartingSample' parameter True, and 'StartingSample' parameter to the value of the starting sample you desire (between 0 and 3)");
+    B2DEBUG(28,
+            "If you want to choose the relative shift manually, set 'chooseRelativeShift' parameter True, and 'relativeShift' parameter to the value you desire (between 0 and 15)");
   }
 
   m_ShaperDigit.isRequired(m_shaperDigitInputName);

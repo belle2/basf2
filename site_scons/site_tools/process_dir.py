@@ -293,7 +293,7 @@ def process_dir(
 
             # check class versions
             for check_filename, linkdef_file in check_files:
-                env.ClassVersionCheck(check_filename, [linkdef_file, debug] + env['REQUIRED_TOOLS'])
+                env.ClassVersionCheck(check_filename, [linkdef_file, lib, debug] + env['REQUIRED_TOOLS'])
 
             # define build target aliases
             env.Alias(lib_name, lib_files)

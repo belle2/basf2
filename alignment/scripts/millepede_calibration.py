@@ -388,7 +388,6 @@ def create(name,
                               pre_collector_path=None,
                               database_chain=dbchain,
                               output_patterns=None,
-                              max_files_per_collector_job=1,
                               backend_args=None
                               )
 
@@ -433,7 +432,6 @@ def create(name,
         collection = Collection(collector=collector,
                                 input_files=filelist,
                                 pre_collector_path=path,
-                                max_files_per_collector_job=1,
                                 database_chain=dbchain)
 
         calibration.add_collection(colname, collection)

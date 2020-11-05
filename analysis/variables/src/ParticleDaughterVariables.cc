@@ -46,7 +46,7 @@ namespace Belle2 {
       }
 
       // Check if MC particle exists
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -94,7 +94,7 @@ namespace Belle2 {
       }
 
       // Check if MC particle exists
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
 

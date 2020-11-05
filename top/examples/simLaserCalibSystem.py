@@ -41,6 +41,7 @@ def addSource(x, angle, slotID, path):
                     # angularDistribution='(40-x)*TMath::Sin(x)' # You can have whatever distribution you like
                     )
 
+
 # Create path
 main = b2.create_path()
 

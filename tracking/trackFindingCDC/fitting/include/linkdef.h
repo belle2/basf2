@@ -3,8 +3,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCObservations2D+;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCSZObservations+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCObservations2D+; // checksum=0xd6d43fdc, version=-1
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSZObservations+; // checksum=0x994e7a0e, version=-1
 
 #pragma link C++ class Belle2::TrackFindingCDC::RiemannsMethod-;
 #pragma link C++ class Belle2::TrackFindingCDC::ExtendedRiemannsMethod-;

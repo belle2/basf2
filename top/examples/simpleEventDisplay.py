@@ -3,7 +3,7 @@
 
 # avoid race conditions beetween pyroot and GUI thread
 from ROOT import PyConfig
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 
 from basf2 import *
 import os
@@ -61,7 +61,7 @@ class TOPDisplay(Module):
                     moduleID = exthit.getCopyID()
                     self.hist[moduleID - 1].SetFillColor(2)
                     self.hist[moduleID - 1].SetLineColor(2)
-                except:
+                except BaseException:
                     B2ERROR('No relation to ExtHit')
 
         digits = Belle2.PyStoreArray('TOPDigits')
@@ -83,7 +83,7 @@ class TOPDisplay(Module):
             abc = eval(input('Type <CR> to continue or Q to quit '))
             evtMetaData = Belle2.PyStoreObj('EventMetaData')
             evtMetaData.obj().setEndOfData()
-        except:
+        except BaseException:
             abc = ''  # dummy line to terminate try-except
 
 

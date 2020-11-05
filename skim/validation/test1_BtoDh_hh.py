@@ -13,7 +13,7 @@ __author__ = "N. Rout"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.btocharm import BtoDh_hh
+from skim.btocharm import BtoD0h_hh
 
 path = b2.Path()
 

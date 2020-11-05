@@ -9,15 +9,13 @@ from rawdata import *
 from ROOT import Belle2
 import os.path
 import sys
+from basf2 import conditions as b2conditions
 
 fileIN = sys.argv[1]
 dirOUT = sys.argv[2]
 
 # setup database
-reset_database()
-use_database_chain()
-use_central_database("data_reprocessing_prod5", LogLevel.WARNING)
-use_central_database("svdonly_phase2analysis_with_master", LogLevel.WARNING)
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
 main = create_path()
 main.add_module('RootInput', inputFileName=str(fileIN))

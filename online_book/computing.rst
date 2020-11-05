@@ -9,5 +9,5 @@ Data model and computing
    computing/analysis_model
    computing/computing_system
    computing/gbasf2
-   computing/batch
+   computing/bsub
    computing/htcondor

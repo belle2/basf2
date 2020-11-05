@@ -12,6 +12,8 @@
 #include <daq/slc/base/StringUtil.h>
 #include <ctime>
 
+#include <TKey.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------

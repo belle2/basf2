@@ -5,19 +5,18 @@ import ROOT
 import re
 import functools
 import numpy as np
-#: ignore invalid floating-point operations
-np.seterr(invalid='ignore')
-
-import sys
-#: largest possible floating-point value
-flt_max = sys.float_info.max
-#: smallest possible floating-point value
-flt_min = sys.float_info.min
-
 import collections
 from .plot import ValidationPlot
 
 import logging
+
+import sys
+#: ignore invalid floating-point operations
+np.seterr(invalid='ignore')
+#: largest possible floating-point value
+flt_max = sys.float_info.max
+#: smallest possible floating-point value
+flt_min = sys.float_info.min
 
 
 def get_logger():
@@ -45,6 +44,7 @@ class defaults:
     legend = True
     #: show label by default
     label = True
+
 
 #: A list of classes that are implemented as plotable
 plotable_classes = (

@@ -10,11 +10,8 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from stdCharged import stdK, stdPi
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts
-from skim.standardlists.lightmesons import (
-    loadStdAllRhoPlus,
-    loadStdPi0ForBToHadrons)
 from skim.standardlists.charmless import (
     loadStdVeryLooseTracks,
     loadStdPi0ForBToCharmless,
@@ -23,7 +20,6 @@ from skim.standardlists.charmless import (
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
     loadStdVeryLooseRhoPlus)
-from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"

@@ -18,7 +18,7 @@ if _sys.version_info[0] < 3:
 from basf2 import _override_print  # noqa
 
 # import the C++ library with the exported functions
-import pybasf2
+import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
 from pybasf2 import *  # noqa
 
@@ -27,7 +27,7 @@ from basf2 import _constwrapper  # noqa
 
 
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2018  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2020  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2

@@ -244,6 +244,7 @@ namespace Belle2 {
       void print(void) const;
       inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
+      unsigned short getErrorBits(void) const;
     };
 
     /** DHC End frame data struct.
@@ -284,6 +285,9 @@ namespace Belle2 {
       void print(void) const;
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned int getErrorInfo(void) const {return errorinfo;};
+      unsigned int getErrorStateMachineDHP(int dhpid) const;
+      unsigned int getErrorStateMachineStartDHP(int dhpid) const;
+      unsigned int getErrorStateMachineEndDHP(int dhpid) const;
     };
 
 

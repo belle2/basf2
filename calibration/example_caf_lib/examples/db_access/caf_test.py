@@ -7,11 +7,6 @@
 # and change the input data below.
 
 from basf2 import *
-set_log_level(LogLevel.DEBUG)
-set_debug_level(100)
-# add time stamp to all INFO messages
-# currentInfo = logging.get_info(LogLevel.INFO)
-# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 import os
 import sys
@@ -22,6 +17,11 @@ from caf.framework import Calibration, CAF
 from caf.utils import IoV
 from caf.strategies import SequentialRunByRun, SingleIOV
 
+set_log_level(LogLevel.DEBUG)
+set_debug_level(100)
+# add time stamp to all INFO messages
+# currentInfo = logging.get_info(LogLevel.INFO)
+# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 data_dir = "../../../examples/test_data"
 
 ###################################################

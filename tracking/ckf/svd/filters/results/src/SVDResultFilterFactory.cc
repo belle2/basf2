@@ -61,7 +61,7 @@ std::string SVDResultFilterFactory::getIdentifier() const
 
 std::string SVDResultFilterFactory::getFilterPurpose() const
 {
-  return "Reject svd results";
+  return "Reject SVD CKF results. ";
 }
 
 std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAndDescriptions() const

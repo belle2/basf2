@@ -97,7 +97,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
     try:
-        cdll.LoadLibrary('/sw/belle/local/neurobayes-4.3.1/lib/libNeuroBayesCore_shared.so')
+        cdll.LoadLibrary('/sw/belle/local/neurobayes/lib/libNeuroBayesCore_shared.so')
     except:
         pass
 

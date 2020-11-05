@@ -86,9 +86,15 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
     G4ThreeVector dpMom  = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
     currParticle.setTrackID(track->GetTrackID());
-    G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
-    currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
-    currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+    // If the particle has simulated parents update the production vertex and time
+    // to the real values from Geant4. As convention we set NaN as production time
+    // in the MCParticleGenerator if the particle wasn't directly placed with a
+    // primary vertex in Geant4.
+    if (std::isnan(currParticle.getProductionTime())) {
+      G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
+      currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
+      currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+    }
 
     //Set the Values of the particle which are already known
     if (!neutral_llp) {

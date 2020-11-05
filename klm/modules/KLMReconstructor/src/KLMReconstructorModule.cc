@@ -69,6 +69,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_PromptWindow(0),
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),
   m_eklmTransformData(nullptr),
@@ -84,6 +85,9 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
+  addParam("IgnoreHotChannels", m_IgnoreHotChannels,
+           "Use only Normal and Dead (for debugging) channels during 2d hit reconstruction",
+           true);
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()
@@ -146,6 +150,23 @@ void KLMReconstructorModule::event()
   reconstructEKLMHits();
 }
 
+bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
+{
+  int subdetector = digit->getSubdetector();
+  int section = digit->getSection();
+  int sector = digit->getSector();
+  int layer = digit->getLayer();
+  int plane = digit->getPlane();
+  int strip = digit->getStrip();
+  uint16_t channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+  enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
+  if (status == KLMChannelStatus::c_Unknown)
+    B2FATAL("Incomplete KLM channel status data.");
+  if (status == KLMChannelStatus::c_Normal || status == KLMChannelStatus::c_Dead)
+    return true;
+  return false;
+}
+
 void KLMReconstructorModule::reconstructBKLMHits()
 {
   /* Construct BKLMHit1Ds from KLMDigits. */
@@ -158,6 +179,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
     if (digit->isMultiStrip())
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
+      continue;
+    if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->inRPC() || digit->isGood()) {
       uint16_t channel = BKLMElementNumbers::channelNumber(
@@ -242,12 +265,15 @@ void KLMReconstructorModule::reconstructEKLMHits()
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+    KLMDigit* digit = m_Digits[i];
+    if (digit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
-    if (m_Digits[i]->isMultiStrip())
+    if (digit->isMultiStrip())
       continue;
-    if (m_Digits[i]->isGood())
-      digitVector.push_back(m_Digits[i]);
+    if (m_IgnoreHotChannels && !isNormal(digit))
+      continue;
+    if (digit->isGood())
+      digitVector.push_back(digit);
   }
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);

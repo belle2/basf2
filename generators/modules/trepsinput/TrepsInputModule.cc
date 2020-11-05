@@ -86,7 +86,7 @@ void TrepsInputModule::event()
   }
 
   /* Generation of the initial particle from beam parameters. */
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
   TVector3 vertex = initial.getVertex();
 
   if (m_useDiscreteAndSortedW) {

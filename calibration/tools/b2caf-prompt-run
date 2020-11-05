@@ -59,13 +59,18 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
     with open(input_data_path, 'r') as input_data_file:
         input_data = json.load(input_data_file)
 
+    path_prefix = ""
+    if args.path_prefix: 
+        B2INFO(f"Adding path prefix {args.path_prefix} to input data path")
+        path_prefix = args.path_prefix
+
     # Use Pathlib to glob the root files beneath the input paths
     input_data_files = {}
     for input_name, run_list in input_data.items():
         B2INFO(f"Gathering files for '{input_name}' from {input_data_path.as_posix()}")
         file_to_iov = OrderedDict()
         for run_path, exp_run in run_list:
-            file_list = sorted([p.as_posix() for p in Path(run_path).glob("**/*.root")])
+            file_list = sorted([path_prefix+p.as_posix() for p in Path(run_path).glob("**/*.root")])
             for file_path in file_list:
                 file_to_iov[file_path] = IoV(exp_low=exp_run[0], run_low=exp_run[1], exp_high=exp_run[0], run_high=exp_run[1])
         B2INFO(f"Found {len(file_to_iov)} files in '{input_name}'")

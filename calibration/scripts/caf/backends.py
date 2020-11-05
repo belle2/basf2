@@ -529,13 +529,13 @@ class Job:
         job_dict["subjobs"] = [sj.job_dict for sj in self.subjobs.values()]
         return job_dict
 
-    def dump_input_data(self, path_prefix=""):
+    def dump_input_data(self):
         """
         Dumps the `Job.input_files` attribute to a JSON file. input_files should be a list of
         Path objects.
         """
         with open(Path(self.working_dir, _input_data_file_path), mode="w") as input_data_file:
-            json.dump([path_prefix+file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
+            json.dump([file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
 
     def copy_input_sandbox_files_to_working_dir(self):
         """
@@ -555,13 +555,16 @@ class Job:
         existing_input_files = []  # We use a list instead of set to avoid losing any ordering of files
         for file_path in self.input_files:
             file_path = Path(file_path).absolute()
-            if file_path.is_file():
-                if file_path not in existing_input_files:
-                    existing_input_files.append(file_path)
-                else:
-                    B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
+            if self.backend_args.get("path_prefix", ""):
+                B2INFO(f"Path prefix added, skipping checking if file exist")
             else:
-                B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
+                if file_path.is_file():
+                    if file_path not in existing_input_files:
+                        existing_input_files.append(file_path)
+                    else:
+                        B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
+                else:
+                    B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
 
         if self.input_files and not existing_input_files:
             B2WARNING(f"No valid input file paths found for {job}, but some were requested.")
@@ -1143,9 +1146,7 @@ class Batch(Backend):
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         job.copy_input_sandbox_files_to_working_dir()
-        job_backend_args = {**self.backend_args, **job.backend_args}
-        path_prefix = job_backend_args.get("path_prefix", "")
-        job.dump_input_data(path_prefix=path_prefix)
+        job.dump_input_data()
         # Make submission file if needed
         batch_submit_script_path = self.get_batch_submit_script_path(job)
         self._make_submit_file(job, batch_submit_script_path)
@@ -1184,13 +1185,12 @@ class Batch(Backend):
         # Add any required backend args that are missing (I'm a bit hesitant to actually merge with job.backend_args)
         # just in case you want to resubmit the same job with different backend settings later.
         job_backend_args = {**self.backend_args, **job.backend_args}
-        path_prefix = job_backend_args.get("path_prefix", "")
 
         # If there's no splitter then we just submit the Job with no SubJobs
         if not job.splitter:
             # Get all of the requested files for the input sandbox and copy them to the working directory
             job.copy_input_sandbox_files_to_working_dir()
-            job.dump_input_data(path_prefix=path_prefix)
+            job.dump_input_data()
             # Make submission file if needed
             batch_submit_script_path = self.get_batch_submit_script_path(job)
             self._make_submit_file(job, batch_submit_script_path)
@@ -1851,7 +1851,7 @@ class HTCondor(Batch):
                             "universe": "vanilla",
                             "getenv": "false",
                             "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
-                            "path_prefix": "",  # Path prefix for file path in backend_input_files.json
+                            "path_prefix": "",  # Path prefix for file path
                             "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
                            }
     #: Default ClassAd attributes to return from commands like condor_q

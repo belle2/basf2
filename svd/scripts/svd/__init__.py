@@ -4,6 +4,7 @@
 import basf2
 from basf2 import *
 from ROOT import Belle2
+import sys
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
@@ -153,17 +154,68 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path, daqMode=2):
+def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
 
-    svdevtinfoset = register_module("SVDEventInfoSetter")
-    svdevtinfoset.param("daqMode", daqMode)
-    path.add_module(svdevtinfoset)
+    if daqMode != 2 and daqMode != 1:
+        print("OOPS the acquisition mode that you want to simulate is not available.")
+        print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
+        sys.exit()
 
-    digitizer = register_module('SVDDigitizer')
+    # 6-sample acquisition mode
+    if daqMode == 2:
+        svdevtinfoset = register_module("SVDEventInfoSetter")
+        svdevtinfoset.param("daqMode", daqMode)
+        path.add_module(svdevtinfoset)
+
+        digitizer = register_module('SVDDigitizer')
+        path.add_module(digitizer)
+
+    # 3-sample acquisition mode
+    # we previously simulated this mode with digitizer.param("StartSampling", 58)
     if daqMode == 1:
-        digitizer.param("StartSampling", 58)
+        if relativeShift == -1 and latencyShift == -1:
+            print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
+            sys.exit(1)
+        if relativeShift != -1 and latencyShift != -1:
+            print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
+            sys.exit(1)
 
-    path.add_module(digitizer)
+        svdevtinfoset = register_module("SVDEventInfoSetter")
+        svdevtinfoset.param("daqMode", 2)
+        svdevtinfoset.param("SVDEventInfo", "SVDEventInfoOriginal")
+        path.add_module(svdevtinfoset)
+
+        digitizer = register_module('SVDDigitizer')
+        digitizer.param("ShaperDigits", "SVDShaperDigitsOriginal")
+        path.add_module(digitizer)
+
+        # emulate the 3-sample acquisition
+        emulator = register_module("SVD3SamplesEmulator")
+        emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
+        emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
+        if latencyShift == -1:
+            emulator.param("chooseStartingSample", False)
+        else:
+            emulator.param("chooseStartingSample", True)
+            emulator.param("StartingSample", latencyShift)
+
+        if relativeShift == -1:
+            emulator.param("chooseRelativeShift", False)
+        else:
+            emulator.param("chooseRelativeShift", True)
+            emulator.param("relativeShift", relativeShift)
+
+        emulator.param("outputSVDEventInfo", "SVDEventInfo")
+        emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
+        path.add_module(emulator)
+
+        # emulate online zero-suppression
+        zsonline = register_module("SVDZeroSuppressionEmulator")
+        zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
+        zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
+        path.add_module(zsonline)
+
+        # 3-mixed-6 sample mode not available
 
 
 def add_svd_unpacker(path):
@@ -172,7 +224,15 @@ def add_svd_unpacker(path):
     path.add_module(unpacker)
 
 
-def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
+def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1):
+
+    if relativeShift == -1 and latencyShift == -1:
+        print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
+        sys.exit(1)
+
+    if relativeShift != -1 and latencyShift != -1:
+        print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
+        sys.exit(1)
 
     unpacker = register_module('SVDUnpacker')
     unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")
@@ -183,7 +243,18 @@ def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
     emulator = register_module("SVD3SamplesEmulator")
     emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
     emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
-    emulator.param("StartingSample", latencyShift)
+    if latencyShift == -1:
+        emulator.param("chooseStartingSample", False)
+    else:
+        emulator.param("chooseStartingSample", True)
+        emulator.param("StartingSample", latencyShift)
+
+    if relativeShift == -1:
+        emulator.param("chooseRelativeShift", False)
+    else:
+        emulator.param("chooseRelativeShift", True)
+        emulator.param("relativeShift", relativeShift)
+
     emulator.param("outputSVDEventInfo", "SVDEventInfo")
     emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
     path.add_module(emulator)

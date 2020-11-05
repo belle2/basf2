@@ -129,10 +129,15 @@ global_env = Environment(
         # in an dependency to boost_python so let's keep it for now.
         "-Wl,--copy-dt-needed-entries"
     ],
-    # scripts and python modules that have to be installed before we can use
-    # them as commands, e.g. b2code-classversion-check
-    REQUIRED_TOOLS=[],
+    # scripts and python modules that have to be installed before we can run b2code-classversion-check
+    REQUIRED_TOOLS=[os.path.join('$BINDIR', 'b2code-classversion-check'),
+        os.path.join('$LIBDIR', 'b2test_utils', 'classversion.py'),
+        os.path.join('$LIBDIR', 'pybasf2.so')]
 )
+
+for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
+    if entry.endswith('.py'):
+        global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
 
 # add this early because we want to be sure it's enabled before we create any
 # targets as it needs to modify the object/shared object builders

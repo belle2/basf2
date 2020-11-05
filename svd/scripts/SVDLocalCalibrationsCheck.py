@@ -8,8 +8,7 @@ usage:
 where:
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 
 import argparse
 
@@ -19,18 +18,18 @@ parser.add_argument('--check', metavar='check', dest='check', type=str, nargs=1,
 
 args = parser.parse_args()
 
-main = create_path()
+main = b2.create_path()
 
 the_ref = args.ref[0]
 the_check = args.check[0]
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 main.add_module("Gearbox")
 main.add_module("Geometry")
 
-mod = register_module("SVDLocalCalibrationsCheck")
+mod = b2.register_module("SVDLocalCalibrationsCheck")
 # mod.param('plotGoodAPVs', True) #default is false
 mod.param('reference_root', str(the_ref))
 mod.param('check_root', str(the_check))
@@ -45,5 +44,5 @@ mod.param('cutPedestal_outliers', 0.3)
 main.add_module(mod)
 
 # process single event
-print_path(main)
-process(main)
+b2.print_path(main)
+b2.process(main)

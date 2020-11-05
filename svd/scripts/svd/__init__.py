@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
@@ -29,7 +28,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ""
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDClusterizerDirect')
+            clusterizer = b2.register_module('SVDClusterizerDirect')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -44,12 +43,12 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ''
 
         if fitterName not in [e.name() for e in path.modules()]:
-            fitter = register_module('SVDNNShapeReconstructor')
+            fitter = b2.register_module('SVDNNShapeReconstructor')
             fitter.set_name(fitterName)
             path.add_module(fitter)
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDNNClusterizer')
+            clusterizer = b2.register_module('SVDNNClusterizer')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -84,23 +83,23 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             maskingName = 'SVDStripMasking'
 
         if maskingName not in [e.name() for e in path.modules()]:
-            masking = register_module('SVDStripMasking')
+            masking = b2.register_module('SVDStripMasking')
             masking.set_name(maskingName)
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
     if dataFormatName not in [e.name() for e in path.modules()]:
-        dataFormat = register_module('SVDDataFormatCheck')
+        dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
 
     if fitterName not in [e.name() for e in path.modules()]:
-        fitter = register_module('SVDCoGTimeEstimator')
+        fitter = b2.register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
-        clusterizer = register_module('SVDSimpleClusterizer')
+        clusterizer = b2.register_module('SVDSimpleClusterizer')
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
@@ -108,7 +107,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
-        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
@@ -127,7 +126,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ""
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDClusterizerDirect')
+            clusterizer = b2.register_module('SVDClusterizerDirect')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -142,12 +141,12 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ''
 
         if fitterName not in [e.name() for e in path.modules()]:
-            fitter = register_module('SVDNNShapeReconstructor')
+            fitter = b2.register_module('SVDNNShapeReconstructor')
             fitter.set_name(fitterName)
             path.add_module(fitter)
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDNNClusterizer')
+            clusterizer = b2.register_module('SVDNNClusterizer')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -155,11 +154,11 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
 
 def add_svd_simulation(path, daqMode=2):
 
-    svdevtinfoset = register_module("SVDEventInfoSetter")
+    svdevtinfoset = b2.register_module("SVDEventInfoSetter")
     svdevtinfoset.param("daqMode", daqMode)
     path.add_module(svdevtinfoset)
 
-    digitizer = register_module('SVDDigitizer')
+    digitizer = b2.register_module('SVDDigitizer')
     if daqMode == 1:
         digitizer.param("StartSampling", 58)
 
@@ -168,19 +167,19 @@ def add_svd_simulation(path, daqMode=2):
 
 def add_svd_unpacker(path):
 
-    unpacker = register_module('SVDUnpacker')
+    unpacker = b2.register_module('SVDUnpacker')
     path.add_module(unpacker)
 
 
 def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
 
-    unpacker = register_module('SVDUnpacker')
+    unpacker = b2.register_module('SVDUnpacker')
     unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")
     unpacker.param("svdShaperDigitListName", "SVDShaperDigitsOriginal")
     path.add_module(unpacker)
 
     # emulate the 3-sample acquisition
-    emulator = register_module("SVD3SamplesEmulator")
+    emulator = b2.register_module("SVD3SamplesEmulator")
     emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
     emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
     emulator.param("StartingSample", latencyShift)
@@ -189,7 +188,7 @@ def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
     path.add_module(emulator)
 
     # emulate online zero-suppression
-    zsonline = register_module("SVDZeroSuppressionEmulator")
+    zsonline = b2.register_module("SVDZeroSuppressionEmulator")
     zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     path.add_module(zsonline)
@@ -197,7 +196,7 @@ def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
 
 def add_svd_packer(path):
 
-    packer = register_module('SVDPacker')
+    packer = b2.register_module('SVDPacker')
     path.add_module(packer)
 
 
@@ -213,7 +212,7 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         nameSPs = 'SVDSpacePoints'
 
     if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD = b2.register_module('SVDSpacePointCreator')
         spCreatorSVD.set_name(svdSPCreatorName)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)

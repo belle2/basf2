@@ -25,12 +25,12 @@ from basf2 import B2INFO, B2ERROR, B2WARNING
 
 class ClassVersionError(Exception):
     """Exception to report class version errors"""
-    pass
 
 
 class ErrorWithExtraVariables(Exception):
     """Exception class with extra keyword arguments to show in log message"""
     #: Initialize the class.
+
     def __init__(self, *args, **argk):
         super().__init__(*args)
         #: Class variables.

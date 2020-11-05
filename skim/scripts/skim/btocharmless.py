@@ -253,9 +253,9 @@ class BtoHad5Tracks(BaseSkim):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
         BsigList = []
         channels = {
-                    'B+:Charmless_b2K*KK': 'K*+:veryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 1
-                    'B+:Charmless_b2K*pipi': 'K*+:veryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 2
-                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 3
+                    'B+:Charmless_b2K*pKK': 'K*+:veryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 1
+                    'B+:Charmless_b2K*ppipi': 'K*+:veryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 2
+                    'B+:Charmless_b2K*pKpi': 'K*+:veryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 3
                     }
 
         for chID, channel in enumerate(channels.keys()):
@@ -377,27 +377,35 @@ class BtoHad3Tracks1Pi0(BaseSkim):
         loadStdVeryLooseTracks('K', path=path)
         loadStdVeryLooseTracks('pi', path=path)
         loadStdPi0ForBToCharmless(path=path)
-        stdKshorts(path=path)
         loadStdVeryLooseRho0(path=path)
         loadStdVeryLooseRhoPlus(path=path)
         loadStdVeryLooseKstarPlusPi0(path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        KstCuts = ''
         BsigList = []
 
         channels = {
                     'B+:Charmless_b2Kspipi0': 'K_S0:merged pi+:SkimVeryLoose pi0:charmlessFit',  # 1
                     'B+:Charmless_b2KsKpi0': 'K_S0:merged K+:SkimVeryLoose pi0:charmlessFit',  # 2
                     'B+:Charmless_b2rhorho0': 'rho+:veryLoose rho0:veryLoose',  # 3
-                    'B+:Charmless_b2K*KK': 'K*+:veryLoosePi0 K-:SkimVeryLoose K+:SkimVeryLoose',  # 4
-                    'B+:Charmless_b2K*pipi': 'K*+:veryLoosePi0 pi-:SkimVeryLoose pi+:SkimVeryLoose',  # 5
-                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoosePi0 K+:SkimVeryLoose pi-:SkimVeryLoose',  # 6
                     }
 
         for chID, channel in enumerate(channels.keys()):
             ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
                                 cut=Bcuts, dmID=chID, path=path)
+            BsigList.append(channel)
+
+        channels = {
+                    'B+:Charmless_b2K*KK_2': 'K*+:veryLoosePi0 K-:SkimVeryLoose K+:SkimVeryLoose',  # 4
+                    'B+:Charmless_b2K*pipi_2': 'K*+:veryLoosePi0 pi-:SkimVeryLoose pi+:SkimVeryLoose',  # 5
+                    'B+:Charmless_b2K*Kpi_2': 'K*+:veryLoosePi0 K+:SkimVeryLoose pi-:SkimVeryLoose',  # 6
+                    }
+        for chID, channel in enumerate(channels.keys()):
+            ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
+                                cut=Bcuts+KstCuts, dmID=chID, path=path)
             BsigList.append(channel)
 
         self.SkimLists = BsigList

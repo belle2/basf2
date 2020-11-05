@@ -357,7 +357,7 @@ class Job:
             self.output_patterns = job_dict["output_patterns"]
             self.cmd = job_dict["cmd"]
             self.args = job_dict["args"]
-            self.input_files = [Path(p) for p in job_dict["input_files"]]
+            self.input_files = job_dict["input_files"]
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
             self.subjobs = {}
@@ -472,7 +472,7 @@ class Job:
 
     @input_files.setter
     def input_files(self, value):
-        self._input_files = [Path(p).absolute() for p in value]
+        self._input_files = [p if p.startswith("root://") else Path(p).absolute() for p in value]
 
     @property
     def max_subjobs(self):
@@ -523,7 +523,7 @@ class Job:
         job_dict["output_patterns"] = self.output_patterns
         job_dict["cmd"] = self.cmd
         job_dict["args"] = self.args
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = self.input_files
         job_dict["setup_cmds"] = self.setup_cmds
         job_dict["backend_args"] = self.backend_args
         job_dict["subjobs"] = [sj.job_dict for sj in self.subjobs.values()]
@@ -535,7 +535,8 @@ class Job:
         Path objects.
         """
         with open(Path(self.working_dir, _input_data_file_path), mode="w") as input_data_file:
-            json.dump([file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
+            json.dump([file_path if file_path.startswith("root://") else Path(file_path).as_posix()
+                       for file_path in self.input_files], input_data_file, indent=2)
 
     def copy_input_sandbox_files_to_working_dir(self):
         """
@@ -554,10 +555,14 @@ class Job:
         """
         existing_input_files = []  # We use a list instead of set to avoid losing any ordering of files
         for file_path in self.input_files:
-            file_path = Path(file_path).absolute()
-            if self.backend_args.get("path_prefix", ""):
+            if file_path.startswith("root://"):
                 B2INFO(f"Path prefix added, skipping checking if file exist")
+                if file_path not in existing_input_files:
+                    existing_input_files.append(file_path)
+                else:
+                    B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
             else:
+                file_path = Path(file_path).absolute()
                 if file_path.is_file():
                     if file_path not in existing_input_files:
                         existing_input_files.append(file_path)
@@ -624,7 +629,7 @@ class SubJob(Job):
         #: Input files specific to this subjob
         if not input_files:
             input_files = []
-        self.input_files = [Path(p) for p in input_files]
+        self.input_files = [p for p in input_files]
         #: The result object of this SubJob. Only filled once it is is submitted to a backend
         #: since the backend creates a special result class depending on its type.
         self.result = None
@@ -680,7 +685,7 @@ class SubJob(Job):
         """
         job_dict = {}
         job_dict["id"] = self.id
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = [i if i.startswith("root://") else Path(i).as_posix() for i in self.input_files]
         job_dict["args"] = self.args
         return job_dict
 

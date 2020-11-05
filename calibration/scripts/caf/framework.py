@@ -198,11 +198,17 @@ This script will be copied into subjob directories as part of the input sandbox.
     @input_files.setter
     def input_files(self, value):
         if isinstance(value, str):
-            self._input_files = glob(str(value))
+            if str(value).startswith("root://"):
+                self._input_files = str(value)
+            else:
+                self._input_files = glob(str(value))
         elif isinstance(value, list):
             total_files = []
             for pattern in value:
-                total_files.extend(glob(str(pattern)))
+                if str(pattern).startswith("root://"):
+                    total_files.append(str(pattern))
+                else:
+                    total_files.extend(glob(str(pattern)))
             self._input_files = total_files
         else:
             raise TypeError("Input files must be a list or string")

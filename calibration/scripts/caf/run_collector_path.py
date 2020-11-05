@@ -64,7 +64,7 @@ def run_collectors():
         B2FATAL("Couldn't find any pickle files for collector path!")
 
     # Grab the input data. Can't continue without some
-    input_data = get_input_data(no_prefix=True)
+    input_data = get_input_data()
 
     # Now we need to create a path that definitely has RootInput as a module.
     main = create_path()

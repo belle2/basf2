@@ -523,6 +523,7 @@ class CalibrationMachine(Machine):
     def _resolve_file_paths(self):
         """
         """
+        print("HELLO WORLD")
         if isinstance(self.collector_backend, Local) or \
            isinstance(self.collector_backend, PBS) or \
            isinstance(self.collector_backend, LSF):

@@ -13,6 +13,7 @@
 #include <boost/format.hpp>
 
 namespace Belle2 {
+
   /**
    * Periodically writes the number of processed events/runs to the
    * logging system to give a progress indication.
@@ -48,7 +49,11 @@ namespace Belle2 {
     /** Number of processed runs. This is not the real runNumber, just counting */
     int m_runNr;
 
+    /** Total number of events in the current process */
+    int m_totalEvtNr;
+
     /** compiled output format */
     boost::format m_output;
+
   };
 } // end namespace Belle2

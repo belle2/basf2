@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <framework/modules/core/ProgressModule.h>
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 
@@ -17,7 +18,7 @@ using namespace Belle2;
 REG_MODULE(Progress)
 
 ProgressModule::ProgressModule() : Module(), m_maxOrder(3), m_evtNr(0), m_runNr(0),
-  m_output("Processed: %3d runs, %6d events")
+  m_totalEvtNr(0), m_output("Processed: %3d runs, %6d/%6d events")
 {
   setDescription("Periodically writes the number of processed events/runs to the"
                  " logging system to give a progress indication.\n"
@@ -34,6 +35,7 @@ void ProgressModule::initialize()
   //Force module logging level to be info
   setLogLevel(LogConfig::c_Info);
   m_runNr = m_evtNr = 0;
+  m_totalEvtNr = Environment::Instance().getNumberOfEvents();
 }
 
 void ProgressModule::beginRun()
@@ -48,5 +50,6 @@ void ProgressModule::event()
   //Calculate the order of magnitude
   int order = (m_evtNr == 0) ? 1 : (int)(min(log10(m_evtNr), (double)m_maxOrder));
   auto interval = (int)pow(10., order);
-  if (m_evtNr % interval == 0) B2INFO(m_output % m_runNr % m_evtNr);
+  if (m_evtNr % interval == 0)
+    B2INFO(m_output % m_runNr % m_evtNr % m_totalEvtNr);
 }

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+import os
 
 # suppress messages and warnings during processing:
 # set_log_level(LogLevel.ERROR)
@@ -37,8 +38,8 @@ geobuilder = b2.register_module('Geometry')
 g4sim = b2.register_module('FullSim')
 cdcdigitizer = b2.register_module('CDCDigitizer')
 out = b2.register_module('SimpleOutput')
-cdctrg = fw.register_module("TRGCDC")
-tsstream = fw.register_module("TRGCDCTSStream")
+cdctrg = b2.register_module("TRGCDC")
+tsstream = b2.register_module("TRGCDCTSStream")
 # mcparticle  = fw.register_module('PrintMCParticles')
 
 # ...EventInfoSetter...

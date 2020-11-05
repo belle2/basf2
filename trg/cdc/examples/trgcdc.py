@@ -14,6 +14,7 @@
 
 import basf2 as b2
 import glob
+import os
 
 # ...suppress messages and warnings during processing...
 b2.set_log_level(b2.LogLevel.ERROR)

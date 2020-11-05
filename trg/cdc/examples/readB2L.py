@@ -13,6 +13,7 @@
 # 2016/04/08 : Added NeuroTrigger. Updated for head //JB
 
 import basf2 as b2
+import os
 import glob
 
 # ...suppress messages and warnings during processing...

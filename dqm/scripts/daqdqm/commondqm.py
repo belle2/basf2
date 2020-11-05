@@ -90,12 +90,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         hlt_skim_lines_in_plot = [
             "accept_hadron",
-            "accept_mumu_2trk",
+            "accept_hadronb2",
             "accept_bhabha_all",
+            "accept_bhabha",
             "accept_gamma_gamma",
+            "accept_mumu_2trk",
+            "accept_mumutight",
             "accept_radmumu",
             "accept_offip",
-            "accept_mumutight",
             "accept_tau_2trk",
             "accept_tau_Ntrk",
         ]

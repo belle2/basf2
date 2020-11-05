@@ -16,15 +16,11 @@
 """
 
 
-import ROOT
-from ROOT import Belle2
-
 from fei import monitoring
 
 from B2Tools import b2latex
 from B2Tools import format
 
-import pickle
 import sys
 import glob
 

@@ -25,10 +25,7 @@ import ROOT
 from ROOT import Belle2
 import sys
 import flavorTagger as ft
-from defaultEvaluationParameters import r_subsample, r_size, categories
 from inputVariablesPlots import variablesPlotParamsDict
-import basf2_mva
-from array import array
 
 import numpy as np
 import matplotlib as mpl

@@ -1,6 +1,5 @@
 import argparse
 import multiprocessing
-import sys
 
 import basf2
 import ROOT
@@ -10,7 +9,6 @@ from pxd import add_roi_payload_assembler, add_roi_finder
 
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from softwaretrigger import path_utils
-import reconstruction
 from geometry import check_components
 from rawdata import add_unpackers
 

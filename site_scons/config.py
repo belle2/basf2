@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from SCons.Script import *
+from SCons.Script import Configure, Environment
 import os
-import subprocess
+import sys
 
 
 def CheckEnvVar(conf, var, text=None):

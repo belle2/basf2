@@ -19,7 +19,6 @@ import flavorTagger as ft
 import ROOT
 import os
 import math
-import unittest
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()

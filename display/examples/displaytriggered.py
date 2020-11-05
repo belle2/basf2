@@ -8,12 +8,12 @@
 # Usage:
 #  basf2 display/example/displaytrigger.py -i MyInputFile.root
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 
 
-class DisplayHLTTags(Module):
+class DisplayHLTTags(b2.Module):
     """Test DisplayData"""
 
     def initialize(self):
@@ -41,18 +41,18 @@ class DisplayHLTTags(Module):
 
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
 # Get type of input file to decide, which input module we want to use
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
 if not input_files.empty() and input_files.front().endswith(".sroot"):
-    rootinput = register_module('SeqRootInput')
+    rootinput = b2.register_module('SeqRootInput')
 else:
-    rootinput = register_module('RootInput')
+    rootinput = b2.register_module('RootInput')
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 # new ECL geometry contains custom objects that cannot be converted to TGeo
 # add MagneticField off B-field (also greatly speeds up startup)
 geometry.param('excludedComponents', ['ECL'])
@@ -63,7 +63,7 @@ main.add_module(geometry)
 
 main.add_module(DisplayHLTTags())
 
-display = register_module('Display')
+display = b2.register_module('Display')
 # --- MC options ---
 # Should Monte Carlo info be shown? (MCParticles, SimHits)
 display.param('showMCInfo', True)
@@ -125,17 +125,17 @@ display.param('fullGeometry', False)
 display.param('hideObjects', [])
 
 # this path will only be executed for events which satfisy the trigger skim
-triggered_event_path = Path()
+triggered_event_path = b2.Path()
 triggered_event_path.add_module(display)
 
-trigger_skim_module = register_module("TriggerSkim")
+trigger_skim_module = b2.register_module("TriggerSkim")
 # add whatever HLT/Calib trigger lines you would like to select here
 trigger_skim_module.param('triggerLines', ['software_trigger_cut&hlt&accept_mumu_2trk',
                                            'software_trigger_cut&hlt&accept_bhabha',
                                            'software_trigger_cut&hlt&accept_hadron'])
 # if any of the trigger lines are true, run the display path
-trigger_skim_module.if_value("==1", triggered_event_path, AfterConditionPath.CONTINUE)
+trigger_skim_module.if_value("==1", triggered_event_path, b2.AfterConditionPath.CONTINUE)
 
 main.add_module(trigger_skim_module)
 
-process(main)
+b2.process(main)

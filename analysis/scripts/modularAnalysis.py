@@ -2615,8 +2615,6 @@ def writePi0EtaVeto(
                                     (default is None)
     """
 
-    import basf2_mva
-
     renameSuffix = False
 
     for module in path.modules():

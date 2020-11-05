@@ -19,20 +19,18 @@
 </header>
 """
 
-import glob
-import os
 
-import basf2 as b2
+import basf2
 import simulation as sim
 import reconstruction as rec
 
-b2.set_random_seed(981543)
-b2.set_log_level(b2.LogLevel.ERROR)
+basf2.set_random_seed(981543)
+basf2.set_log_level(basf2.LogLevel.ERROR)
 
 output_filename = '../muon-KLMValidation.root'
-b2.B2INFO('The output file name is ' + output_filename)
+basf2.B2INFO('The output file name is ' + output_filename)
 
-main_path = b2.create_path()
+main_path = basf2.create_path()
 
 main_path.add_module('EventInfoSetter', evtNumList=1000)
 
@@ -54,7 +52,6 @@ main_path.add_module('ParticleGun',
                      yVertexParams=[0.0],
                      zVertexParams=[0.0])
 
-
 sim.add_simulation(path=main_path)
 rec.add_reconstruction(path=main_path)
 
@@ -62,5 +59,5 @@ main_path.add_module('RootOutput',
                      outputFileName=output_filename,
                      branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds'])
 
-b2.process(main_path)
-print(b2.statistics)
+basf2.process(main_path)
+print(basf2.statistics)

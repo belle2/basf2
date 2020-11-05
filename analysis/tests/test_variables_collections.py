@@ -2,7 +2,6 @@
 
 import unittest
 import variables.collections as vc
-from variables import utils
 from variables import variables as vm
 
 

@@ -11,7 +11,7 @@ from b2test_utils import check_error_free
 #: light build
 light_build = False
 try:
-    import generators
+    import generators  # noqa
 except ModuleNotFoundError:
     light_build = True
 

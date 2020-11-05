@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-from basf2 import *
-logging.log_level = LogLevel.WARNING
+import basf2 as b2
+b2.logging.log_level = b2.LogLevel.WARNING
 
 # -------------------------
 # here we register modules
 # -------------------------
 
-progress = register_module('Progress')
-paramloader = register_module('Gearbox')
-geometry = register_module('Geometry')
+progress = b2.register_module('Progress')
+paramloader = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('Components', ['TOP'])
-input = register_module('RootInput')
-topdigi = register_module('TOPDigitizer')
-topback = register_module('TOPBackground')
+input = b2.register_module('RootInput')
+topdigi = b2.register_module('TOPDigitizer')
+topback = b2.register_module('TOPBackground')
 
 param_back = {'TimeOfSimulation': 10.0, 'Type': 'Touschek_HER',
               'Output': 'Background_Touschek_HER.root'}
@@ -30,7 +29,7 @@ topback.param(param_back)
 input.param('inputFileName', '/home/belle/petric/Touschek_HER.root')
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # add modules to path
 
@@ -41,6 +40,6 @@ main.add_module(geometry)
 main.add_module(topdigi)
 main.add_module(topback)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

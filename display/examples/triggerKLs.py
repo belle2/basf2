@@ -11,15 +11,13 @@
 # The same thing can also be done using only C++, by calling
 # Module::setReturnValue() in your module's event() function.
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from simulation import *
-from reconstruction import *
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 
-class PyTrigger(Module):
+class PyTrigger(b2.Module):
 
     """Returns 1 if current event contains at least one K_L^0, 0 otherwise"""
 
@@ -35,7 +33,7 @@ class PyTrigger(Module):
         mcparticles = Belle2.PyStoreArray('MCParticles')
         for p in mcparticles:
             if abs(p.getPDG()) == 130:
-                B2INFO('found a K_L!')
+                b2.B2INFO('found a K_L!')
                 self.return_value(1)
 
                 # also select the object in the display
@@ -45,7 +43,7 @@ class PyTrigger(Module):
                 break
 
 
-main = create_path()
+main = b2.create_path()
 eventinfosetter = main.add_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [2000])
 
@@ -63,7 +61,7 @@ main.add_module(kltrigger)
 
 # if PyTrigger returns 0, we'll jump into an empty path
 # (skipping further modules in 'main': digitisation, tracking and display)
-emptypath = create_path()
+emptypath = b2.create_path()
 kltrigger.if_false(emptypath)
 ########################################
 
@@ -72,5 +70,5 @@ add_reconstruction(main, components)
 # default parameters
 display = main.add_module('Display')
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

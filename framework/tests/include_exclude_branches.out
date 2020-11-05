@@ -1,0 +1,39 @@
+[INFO] Steering file: framework/tests/include_exclude_branches.py
+[INFO] The random number seed is set to "Forza Livorno!!!"
+[INFO] We are testing the following configuration:
+	exclude_branches = None
+	include_branches = None
+[INFO] Starting event processing, random seed is set to 'Forza Livorno!!!'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/framework/tests/mdst_with_muid.root
+[WARNING] No dictionary found, object will not be saved  (This is probably an obsolete class that is still present in the input file.)
+	class = Belle2::Muid
+	branch = Muids
+[INFO] Statistics for event tree: read: 88935 Bytes, overhead: 0 Bytes, Read() calls: 305
+[INFO] Statistics for event tree (parent files): read: 0 Bytes, overhead: 0 Bytes, Read() calls: 0
+[INFO] The random number seed is set to "Forza Livorno!!!"
+[INFO] We are testing the following configuration:
+	exclude_branches = ['Muids']
+	include_branches = None
+[INFO] Starting event processing, random seed is set to 'Forza Livorno!!!'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/framework/tests/mdst_with_muid.root
+[INFO] Statistics for event tree: read: 83985 Bytes, overhead: 0 Bytes, Read() calls: 262
+[INFO] Statistics for event tree (parent files): read: 0 Bytes, overhead: 0 Bytes, Read() calls: 0
+[INFO] The random number seed is set to "Forza Livorno!!!"
+[INFO] We are testing the following configuration:
+	exclude_branches = None
+	include_branches = ['Muids']
+[INFO] Starting event processing, random seed is set to 'Forza Livorno!!!'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/framework/tests/mdst_with_muid.root
+[WARNING] No dictionary found, object will not be saved  (This is probably an obsolete class that is still present in the input file.)
+	class = Belle2::Muid
+	branch = Muids
+[INFO] Statistics for event tree: read: 43393 Bytes, overhead: 0 Bytes, Read() calls: 46
+[INFO] Statistics for event tree (parent files): read: 0 Bytes, overhead: 0 Bytes, Read() calls: 0
+[INFO] The random number seed is set to "Forza Livorno!!!"
+[INFO] We are testing the following configuration:
+	exclude_branches = None
+	include_branches = ['Tracks', 'ECLClusters']
+[INFO] Starting event processing, random seed is set to 'Forza Livorno!!!'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/framework/tests/mdst_with_muid.root
+[INFO] Statistics for event tree: read: 47280 Bytes, overhead: 0 Bytes, Read() calls: 80
+[INFO] Statistics for event tree (parent files): read: 0 Bytes, overhead: 0 Bytes, Read() calls: 0

@@ -3,7 +3,7 @@
 
 import os
 import stat
-from SCons.Script import *
+from SCons.Script import Environment, File, Flatten, Glob, SConscript
 
 
 def define_aliases(

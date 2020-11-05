@@ -6,6 +6,7 @@ import shlex
 import config
 import subprocess
 
+from SCons.Script import AddOption, Command, Dir, Environment, Exit, GetOption, Help, SetOption, Tool, VariantDir
 
 # determine whether we have an analysis or a local release
 analysis = 'BELLE2_ANALYSIS_DIR' in os.environ

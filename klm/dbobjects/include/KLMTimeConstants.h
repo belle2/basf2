@@ -76,8 +76,8 @@ namespace Belle2 {
      */
     void setAmpTimeConstant(double amplitudeTimeConstant, int cType);
 
-
   private:
+
     /** Effective light speed of scintillators for EKLM. */
     double m_effLightSpeed_end;
 
@@ -100,4 +100,5 @@ namespace Belle2 {
     ClassDef(KLMTimeConstants, 1);
 
   };
+
 }

@@ -34,36 +34,59 @@
 #include <TTree.h>
 
 namespace Belle2 {
-  /** Collect hit information for KLM time calibration with CAF */
+
+  /**
+   * Collect hit information for KLM time calibration with CAF.
+   */
   class KLMTimeCalibrationCollectorModule : public CalibrationCollectorModule {
 
   public:
-    /** Constructor */
+
+    /**
+     * Constructor.
+     */
     KLMTimeCalibrationCollectorModule();
 
-    /** Destructor */
+    /**
+     * Destructor.
+     */
     virtual ~KLMTimeCalibrationCollectorModule();
 
-    /** Initializes the Module */
+    /**
+     * Initializes the module.
+     */
     void prepare() override;
 
-    /** Event action, collect information for calibration */
+    /**
+     * Event action, collect information for calibration.
+     */
     void collect() override;
 
-    /** Termination action */
+    /**
+     * Termination action.
+     */
     void finish() override;
 
   private:
-    /** Collect hits information for RPC of BKLM */
+
+    /**
+     * Collect hits information for RPC of BKLM .
+     */
     void collectRPC(RelationVector<BKLMHit2d>&);
 
-    /** Collect hits information for scintillator of BKLM */
+    /**
+     * Collect hits information for scintillator of BKLM.
+     */
     void collectScint(RelationVector<BKLMHit2d>&);
 
-    /** Collect hits information for scintillator of EKLM */
+    /**
+     * Collect hits information for scintillator of EKLM.
+     */
     void collectScintEnd(RelationVector<EKLMHit2d>&);
 
-    /** Match KLM hit and extHit */
+    /**
+     * Match KLM hit and extHit.
+     */
     std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
@@ -159,6 +182,7 @@ namespace Belle2 {
 
     /** data collection tree */
     TTree* m_outTree;
+
   };
 }
 

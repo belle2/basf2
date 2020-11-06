@@ -18,6 +18,7 @@
 #include <map>
 
 namespace Belle2 {
+
   /**
    * Class to store BKLM delay time coused by cable in the database.
    */
@@ -53,7 +54,6 @@ namespace Belle2 {
      */
     void cleanTimeShift();
 
-
   private:
 
     /** Container of time calibration constant value. */
@@ -61,5 +61,6 @@ namespace Belle2 {
 
     /** Class version. */
     ClassDef(KLMTimeCableDelay, 1);
+
   };
 }

@@ -11,8 +11,6 @@
 
 // Includes
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawHeader_v0.h>
@@ -50,30 +48,39 @@ namespace Belle2 {
 
 
     //! get Detector buffer length
+    /* cppcheck-suppress missingOverride */
     int GetDetectorNwords(int n, int finesse_num) OVERRIDE_CPP17;
 
     //! get Detector buffer length of slot A
+    /* cppcheck-suppress missingOverride */
     int Get1stDetectorNwords(int n) OVERRIDE_CPP17;
 
     //! get Detector buffer length of slot B
+    /* cppcheck-suppress missingOverride */
     int Get2ndDetectorNwords(int n) OVERRIDE_CPP17;
 
     //! get Detector buffer length of slot C
+    /* cppcheck-suppress missingOverride */
     int Get3rdDetectorNwords(int n) OVERRIDE_CPP17;
 
     //! get Detector buffer length of slot D
+    /* cppcheck-suppress missingOverride */
     int Get4thDetectorNwords(int n) OVERRIDE_CPP17;
 
     //! get Detector buffer of slot A
+    /* cppcheck-suppress missingOverride */
     int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot B
+    /* cppcheck-suppress missingOverride */
     int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot C
+    /* cppcheck-suppress missingOverride */
     int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot D
+    /* cppcheck-suppress missingOverride */
     int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -81,60 +88,79 @@ namespace Belle2 {
     /*     virtual int GetBufferPos(int n); */
 
     //! get buffer pointer of rawcopper trailer
+    /* cppcheck-suppress missingOverride */
     virtual int* GetRawTrlBufPtr(int n) OVERRIDE_CPP17;
 
     //
     // Get information from "RawCOPPERFormat_v0 header" attached by DAQ software
     //
 
+    /* cppcheck-suppress missingOverride */
     int GetExpNo(int n) OVERRIDE_CPP17;    //! get Experimental # from header
 
+    /* cppcheck-suppress missingOverride */
     unsigned int GetExpRunSubrun(int n) OVERRIDE_CPP17;    //! Exp# (10bit) run# (14bit) restart # (8bit)
 
+    /* cppcheck-suppress missingOverride */
     int GetRunNo(int n) OVERRIDE_CPP17;    //! get run # (14bit)
 
+    /* cppcheck-suppress missingOverride */
     int GetSubRunNo(int n) OVERRIDE_CPP17;    //! get subrun #(8bit)
 
+    /* cppcheck-suppress missingOverride */
     unsigned int GetEveNo(int n) OVERRIDE_CPP17;    //! get contents of header
 
+    /* cppcheck-suppress missingOverride */
     int GetDataType(int n) OVERRIDE_CPP17;    //! get contents of header
 
+    /* cppcheck-suppress missingOverride */
     int GetTruncMask(int n) OVERRIDE_CPP17;    //! get contents of header
 
     //! Get Detected Error bitflag
+    /* cppcheck-suppress missingOverride */
     unsigned int GetErrorBitFlag(int n) OVERRIDE_CPP17;
 
     //! Add Detected Error bitflag
+    /* cppcheck-suppress missingOverride */
     void AddErrorBitFlag(int n, unsigned int error_bit_flag) OVERRIDE_CPP17;
 
     //! get node-ID from data
+    /* cppcheck-suppress missingOverride */
     unsigned int GetNodeID(int n) OVERRIDE_CPP17;
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board
     //
     //! get COPPER counter(not event number)
+    /* cppcheck-suppress missingOverride */
     virtual unsigned int GetCOPPERCounter(int n) OVERRIDE_CPP17;
 
     //! get # of FINNESEs which contains data
+    /* cppcheck-suppress missingOverride */
     virtual int GetNumFINESSEBlock(int n) OVERRIDE_CPP17;
 
     //! get # of offset words for FINESSE slot A buffer position
+    /* cppcheck-suppress missingOverride */
     int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE buffer
+    /* cppcheck-suppress missingOverride */
     int GetFINESSENwords(int n, int finesse) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE slot A buffer
+    /* cppcheck-suppress missingOverride */
     int Get1stFINESSENwords(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE slot B buffer
+    /* cppcheck-suppress missingOverride */
     int Get2ndFINESSENwords(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE slot C buffer
+    /* cppcheck-suppress missingOverride */
     int Get3rdFINESSENwords(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE slot D buffer
+    /* cppcheck-suppress missingOverride */
     int Get4thFINESSENwords(int n) OVERRIDE_CPP17;
 
     //
@@ -144,78 +170,102 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
+    /* cppcheck-suppress missingOverride */
     virtual int* GetExpRunSubrunBuf(int n) OVERRIDE_CPP17;
 
     //! get b2l block from "FEE b2link header"
+    /* cppcheck-suppress missingOverride */
     virtual unsigned int GetB2LFEE32bitEventNumber(int n) OVERRIDE_CPP17;
 
     //
     // read magic word to check data
     //
     //! get magic word of  COPPER driver header
+    /* cppcheck-suppress missingOverride */
     unsigned int GetMagicDriverHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA header
+    /* cppcheck-suppress missingOverride */
     unsigned int GetMagicFPGAHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA trailer
+    /* cppcheck-suppress missingOverride */
     unsigned int GetMagicFPGATrailer(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER driver trailer
+    /* cppcheck-suppress missingOverride */
     unsigned int GetMagicDriverTrailer(int n) OVERRIDE_CPP17;
 
     //! Get checksum in RawTrailer
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTrailerChksum(int  n) OVERRIDE_CPP17;
 
     //! Check if COPPER Magic words are correct
+    /* cppcheck-suppress missingOverride */
     bool CheckCOPPERMagic(int n) OVERRIDE_CPP17;
 
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
     //! Check B2LFEE header version
+    /* cppcheck-suppress missingOverride */
     void CheckB2LFEEHeaderVersion(int  n) OVERRIDE_CPP17;
 #endif
 
     //! Check if COPPER Magic words are correct
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTTCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! Check if COPPER Magic words are correct
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTTUtime(int n) OVERRIDE_CPP17;
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
+    /* cppcheck-suppress missingOverride */
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
                                        unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! read COPPER driver's checksum value
+    /* cppcheck-suppress missingOverride */
     unsigned int GetDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! calc COPPER driver's checksum value
+    /* cppcheck-suppress missingOverride */
     unsigned int CalcDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! check data contents
+    /* cppcheck-suppress missingOverride */
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
                    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! check data contents
+    /* cppcheck-suppress missingOverride */
     void CheckUtimeCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! Get ctime
+    /* cppcheck-suppress missingOverride */
     int GetTTCtime(int n) OVERRIDE_CPP17;
 
     //! Get trgtype
+    /* cppcheck-suppress missingOverride */
     int GetTRGType(int n) OVERRIDE_CPP17;
 
     //! Get timeval
+    /* cppcheck-suppress missingOverride */
     void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
+    /* cppcheck-suppress missingOverride */
     int* PackDetectorBuf(int* packed_buf_nwords,
                          int* detector_buf_1st, int nwords_1st,
                          int* detector_buf_2nd, int nwords_2nd,
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
+
+    //! Get the max number of channels in a readout board
+    /* cppcheck-suppress missingOverride */
+    int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
 
     enum {
       DATA_FORMAT_VERSION = 0
@@ -628,7 +678,10 @@ namespace Belle2 {
     return ;
   }
 
-
+  inline int RawCOPPERFormat_v0::GetMaxNumOfCh(int/* n */)
+  {
+    return MAX_COPPER_CH;
+  }
 
 }
 

@@ -73,6 +73,10 @@ namespace Belle2 {
       c_LAT = 11
     };
 
+
+    static const int iNaN = std::numeric_limits<int>::quiet_NaN();
+    static const int uNaN = std::numeric_limits<unsigned>::quiet_NaN();
+
     /**
      * Class to hold parameters needed to perform pre-processing of input variables
      * (e.g., gaussianisation, decorrelation) to build a multi-dimensional likelihood model.
@@ -81,8 +85,10 @@ namespace Belle2 {
     class VarTransfoSettings {
     public:
 
-      VarTransfoSettings() {}; /** Constructor */
-      ~VarTransfoSettings() {}; /** Destructor */
+      /** Constructor */
+      VarTransfoSettings() : nVars(iNaN), nDivisionsMax(iNaN), ip(uNaN), jth(uNaN), gbin(uNaN) {}
+      /** Destructor */
+      ~VarTransfoSettings() {}
 
       int nVars; /** Number of variables. */
       std::string classPath; /** Path of the class used to get the variables transfo. Useful for debugging. */

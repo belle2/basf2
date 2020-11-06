@@ -41,7 +41,7 @@ namespace Belle2 {
                double extTime, double hitTime, double chiSq);
 
     //! Destructor
-    virtual ~KLMMuidHit()
+    ~KLMMuidHit()
     {
     }
 

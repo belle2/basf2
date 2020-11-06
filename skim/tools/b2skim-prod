@@ -9,8 +9,8 @@
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of
-valid YAML entries for data and MC. The tool ``skim/tools/lpn2yaml.py`` is provided to
-create these YAML files from a list of LPNs.
+valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+to create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
 
@@ -80,8 +80,7 @@ create these YAML files from a list of LPNs.
         runNumber: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
-names of the skims. The combined skims must be defined in
-`skim.registry.combined_skims`. The other required arguments include the skim campaign,
+names of the skims. The other required arguments include the skim campaign,
 intended release to be used, and base directory of the repository to output the JSON
 files in.
 
@@ -295,10 +294,29 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
             )
         sys.exit(1)
 
-    # Verify that all the requested samples were tested, and returned non-None values
+    # Verify that all the requested samples were tested, and returned non-None values.
+    # Try to access the values bit-by-bit, so that the exact problem can be printed out.
     for skim, statistic, sampleLabel in product(skims, statistics, sampleLabels):
         try:
-            statValue = skimStatsDict[skim][statistic][sampleLabel]
+            singleSkimStatsDict = skimStatsDict[skim]
+        except KeyError:
+            B2ERROR(
+                f"Stats for {skim} skim could not be found in skim stats JSON file. "
+                "Perhaps you forgot to print the stats for this skim?"
+            )
+            sys.exit(1)
+
+        try:
+            statDict = singleSkimStatsDict[statistic]
+        except KeyError:
+            B2ERROR(
+                f"No entry found for {statistic} for {skim} skim in input stats JSON "
+                "file."
+            )
+            sys.exit(1)
+
+        try:
+            statValue = statDict[sampleLabel]
             if statValue is None:
                 B2ERROR(
                     f"The value for {statistic} for {skim} skim on {sampleLabel} sample"
@@ -306,10 +324,23 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
                 )
                 sys.exit(1)
         except KeyError:
+            # Make a list of all available sample labels that can be used
+            AllSampleLabels = {
+                sampleLabel
+                for stat in statistics
+                for sampleLabel in skimStatsDict[skim][stat]
+            }
+            SampleLabelString = "    - " + "\n    - ".join(sorted(AllSampleLabels))
+
             B2ERROR(
-                f"Missing value for {statistic} for {skim} skim on {sampleLabel} "
-                "sample. Perhaps you misspelled it or forgot to produce the stats "
-                "with `b2skim-stats-print`."
+                f"One or more of the blocks in {args.sampleRegistryYaml} has a "
+                f"'sampleLabel' of '{sampleLabel}', but this does not correspond to any"
+                f" of the sample labels in {args.SkimStatsJson}\n\n"
+                "To solve this, either:\n"
+                f" a) produce stats for the sample '{sampleLabel}' and retry "
+                "b2skim-prod with the resulting stats JSON file, or\n"
+                f" b) change the sampleLabel values in {args.sampleRegistryYaml} to match "
+                f"the existing labels:\n{SampleLabelString}"
             )
             sys.exit(1)
 
@@ -373,7 +404,7 @@ def get_output_directory(args, sampleRegistry):
     DBGlobalTag = get_DBGlobalTag(args.release)
     beamEnergy = get_beam_energy_from_registry(sampleRegistry)
 
-    return Path(baseDirectory, args.campaign, args.release, DBGlobalTag, beamEnergy)
+    return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
 
 
 def get_lpn_list(sampleInfo, mc):
@@ -655,6 +686,7 @@ def make_combined_steering_file(
     SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
 ):
     """Construct a steering file for the requested combined skim."""
+    SteeringFileDirectory = Path(SteeringFileDirectory)
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
@@ -755,6 +787,7 @@ def make_request_dict(
         fabricationType = "DataSkim"
         LPNPrefix = "/belle/Data"
 
+    SkimScriptsDirectory = f"skim/{args.campaign}/{args.release}/SkimScripts"
     skimRequestDict = {
         "FabricationType": fabricationType,
         "ProductionName": f"{args.campaign}_{skimName}_{strip_campaign(sampleLabel)}",
@@ -771,11 +804,11 @@ def make_request_dict(
         "ExpectedEventSize": (
             skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
         ),
-        "InputSandboxFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
+        "InputSandboxFilePrefix": SkimScriptsDirectory,
         "InputData": LPNList,
         "Priority": 8,
-        "SteeringFile": f"{skimName}_Skim_Standalone.py",
-        "SteeringFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
+        "SteeringFile": f"{skimName}_Skim.py",
+        "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
             {
@@ -801,9 +834,8 @@ def make_request_dict(
         if not skimScript.endswith(".py"):
             skimScript += ".py"
 
-        localScriptDirectory = str(Path(args.campaign, args.release, "SkimScripts"))
         skimRequestDict["InputSandboxFile"] = [skimScript]
-        skimRequestDict["InputSandboxFilePrefix"] = localScriptDirectory
+        skimRequestDict["InputSandboxFilePrefix"] = SkimScriptsDirectory
 
     return skimRequestDict
 
@@ -827,7 +859,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
     for skimName in args.skims:
         _, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
         SteeringFileDirectory = Path(
-            args.output_base_directory, args.campaign, args.release, "SkimScripts"
+            get_base_directory(args), "skim", args.campaign, args.release, "SkimScripts"
         )
         make_combined_steering_file(
             skimName,
@@ -856,7 +888,9 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 # need to add some more letters and numbers to keep our prod names and
                 # filenames unique.
                 if args.lpns_per_json:
-                    LPNBlockIdentifier = f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                    LPNBlockIdentifier = (
+                        f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                    )
                     outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
                 elif args.StartingBatchNumber > 1:
                     LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
@@ -912,8 +946,7 @@ def get_argument_parser():
         required=True,
         nargs="+",
         metavar="CombinedSkim",
-        help="List of skims to produce request files for. "
-        "Only accepts combined skims listed in `skim.registry.combined_skims`.",
+        help="List of skims to produce request files for."
     )
     parser.add_argument(
         "-o",

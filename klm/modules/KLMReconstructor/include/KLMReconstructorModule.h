@@ -21,6 +21,7 @@
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -48,36 +49,36 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMReconstructorModule();
+    ~KLMReconstructorModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * Called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
-    /* Methods. */
+    /* Functions. */
 
     /**
      * Reconstruct BKLMHit1d and BKLMHit2d.
@@ -90,19 +91,61 @@ namespace Belle2 {
     void reconstructEKLMHits();
 
     /**
+     * Check if channel is normal or dead. Dead channels should not
+     * contain any signal; they are allowed for debugging.
+     * @param[in] digit KLM digit.
+     */
+    bool isNormal(const KLMDigit* digit) const;
+
+    /**
      * Time correction by subtract cable delay.
      * @param[in] td    Original time of the digit.
      * @param[in] digit KLM Digit.
      */
     void correctCableDelay(double& td, const KLMDigit* digit);
 
+    /* Common member variables. */
 
-    /* Member variables. */
+    /**
+     * Half-width of the time coincidence window used to create a 2D hit
+     * from 1D digits/hits.
+     */
+    double m_CoincidenceWindow;
 
-    /* Parameters and switchs . */
-    /* switchs. */
+    /** Nominal time of prompt BKLMHit2ds. */
+    double m_PromptTime;
+
     /** Perform cable delay time correction (true) or not (false). */
     bool m_timeCableDelayCorrection;
+
+    /**
+     * Half-width of the time window relative to the prompt time
+     * for BKLMHit2ds.
+     */
+    double m_PromptWindow;
+
+    /**
+     * Use only normal and dead (for debugging) channels during 2d hit
+     * reconstruction.
+     */
+    bool m_IgnoreHotChannels;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** KLM time window. */
+    DBObjPtr<KLMTimeWindow> m_TimeWindow;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
+
+    /* BKLM member variables. */
+
+    /** BKLM GeometryPar singleton. */
+    bklm::GeometryPar* m_bklmGeoPar;
 
     /** Perform alignment correction (true) or not (false). */
     bool m_bklmIfAlign;
@@ -110,24 +153,19 @@ namespace Belle2 {
     /** Ignore scintillators (to debug their electronics mapping). */
     bool m_bklmIgnoreScintillators;
 
+    /** BKLM 1d hits. */
+    StoreArray<BKLMHit1d> m_bklmHit1ds;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
+
+    /* EKLM member variables. */
+
     /**
      * Check if segments intersect. Normally should be true, but it may be
      * necessary to turn this check off for debugging.
      */
     bool m_eklmCheckSegmentIntersection;
-
-    /* parameters. */
-    /** KLM time window. */
-    DBObjPtr<KLMTimeWindow> m_TimeWindow;
-
-    /** Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits. */
-    double m_CoincidenceWindow;
-
-    /** Nominal time of prompt BKLMHit2ds. */
-    double m_PromptTime;
-
-    /** Half-width of the time window relative to the prompt time for BKLMHit2ds. */
-    double m_PromptWindow;
 
     /** Constant used for time information correction. */
     DBObjPtr<KLMTimeConstants> m_timeConstants;
@@ -135,14 +173,14 @@ namespace Belle2 {
     /** Calibration constant of time delay from cable. */
     DBObjPtr<KLMTimeCableDelay> m_timeCableDelay;
 
-    /** BKLM GeometryPar singleton. */
-    bklm::GeometryPar* m_bklmGeoPar;
-
-    /** Element numbers. */
+    /** EKLM element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
+
+    /** Number of strips. */
+    int m_eklmNStrip;
 
     /** Transformation data. */
     EKLM::TransformData* m_eklmTransformData;
@@ -159,24 +197,12 @@ namespace Belle2 {
     /** Effective light speed in fiber for BKLM RPCs. */
     double m_effC_RPC;
 
-    /** Number of strips of EKLM. */
-    int m_eklmNStrip;
-
-
-    /* Input and output storeArrays. */
-    /** KLM digits. */
-    StoreArray<KLMDigit> m_Digits;
-
-    /** BKLM 1d hits. */
-    StoreArray<BKLMHit1d> m_bklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_bklmHit2ds;
-
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;
 
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
+
   };
-} // end namespace Belle2
+
+}

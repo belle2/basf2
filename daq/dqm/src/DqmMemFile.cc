@@ -45,6 +45,31 @@ DqmMemFile::DqmMemFile(string name, string mode, int size)
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");
 }
 
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, string mode, int size)
+{
+  // Record parameters
+  m_size = size;
+  if (mode != "write" && mode != "WRITE")
+    m_mode = 0;
+  else
+    m_mode = 1;
+  m_name = "dqm_mem_file";
+  m_memfile = NULL;
+
+  // Allocate memory space for TMemFile
+  m_buf = (char*) new int[size];
+
+  // Allocate shared memory
+  m_shm = new SharedMem(shm_id, sem_id, size);
+
+  // Open TMemFile if write mode selected
+  if (m_mode == 1) {
+    m_memfile = new TMemFile(m_name.c_str(), m_buf, size * sizeof(int), "RECREATE");
+    printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
+  } else
+    printf("DqmMemFile : TMemFile is opend in READ mode.\n");
+}
+
 // Destructor
 DqmMemFile::~DqmMemFile()
 {
@@ -68,6 +93,20 @@ int DqmMemFile::UpdateSharedMem()
   m_shm->lock();
   m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
   m_shm->unlock();
+  return 0;
+}
+
+int DqmMemFile::ClearSharedMem()
+{
+  if (m_mode == 0) return -1;
+
+  if (m_memfile != NULL) delete m_memfile;
+  m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");
+
+  m_shm->lock();
+  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  m_shm->unlock();
+
   return 0;
 }
 

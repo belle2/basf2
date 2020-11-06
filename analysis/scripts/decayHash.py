@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Thomas Keck
 
-import sys
 import re
 import struct
 import pdg
@@ -9,16 +8,14 @@ import basf2
 
 import pybasf2
 # inspect is also used by LogPythonInterface. Do not remove
-import inspect
+import numpy as np
+import ROOT
+from ROOT import Belle2
+
 logging = pybasf2.LogPythonInterface()
 
-import numpy as np
-import collections
-
-import ROOT
 ROOT.gSystem.Load("libanalysis.so")
 ROOT.gSystem.Load("libanalysis_utility.so")
-from ROOT import Belle2
 
 
 def _bitwiseConversion(value, i='f', o='i'):
@@ -53,6 +50,7 @@ class DecayHashMap(object):
     """
     DecayHashMap using the C++ implementation of DecayTree and DecayNode
     """
+
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
         import root_numpy
@@ -130,11 +128,11 @@ def _pdg_to_name(x):
     pdg_string = str(pdg_code)
     try:
         pdg_string = pdg.to_name(pdg_code)
-    except:
+    except BaseException:
         pass
 
     if selected:
-        if LogPythonInterface.terminal_supports_colors():
+        if pybasf2.LogPythonInterface.terminal_supports_colors():
             return '\x1b[31m' + pdg_string + '\x1b[0m'
         else:
             return '^' + pdg_string

@@ -4,9 +4,7 @@
 # This example uses a python module to show the ParticleGun vertex
 # mean and sigma in the display.
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 
 from ROOT import Belle2
 from ROOT import TVector3
@@ -22,7 +20,7 @@ from ROOT import TVector3
 vertexparams = [[0, 1], [0, 1], [10, 2]]
 
 
-class VisualizeVertex(Module):
+class VisualizeVertex(b2.Module):
     """Visualize the vertex configured for the ParticleGun"""
 
     def initialize(self):
@@ -59,16 +57,16 @@ class VisualizeVertex(Module):
 
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
 
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['CDC', 'MagneticField'])
 
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 
 particlegun.param('vertexGeneration', 'normal')
 
@@ -77,12 +75,12 @@ particlegun.param('yVertexParams', vertexparams[1])
 particlegun.param('zVertexParams', vertexparams[2])
 
 # simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
+g4sim.logging.log_level = b2.LogLevel.ERROR
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
@@ -95,9 +93,9 @@ main.add_module(particlegun)
 main.add_module(VisualizeVertex())
 
 # default parameters
-display = register_module('Display')
+display = b2.register_module('Display')
 display.param('showAllPrimaries', True)
 main.add_module(display)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

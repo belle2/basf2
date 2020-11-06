@@ -35,6 +35,8 @@ namespace {
   using MCTrackFilter = TruthVarFilter<BestMatchedTruthVarSet>;
   using RecordingTrackFilter =
     RecordingFilter<VariadicUnionVarSet<BestMatchedTruthVarSet, BasicTrackVarSet>>;
+  using RecordingDataTrackFilter =
+    RecordingFilter<BasicTrackVarSet>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 } // namespace
 
@@ -57,6 +59,8 @@ std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
     return std::make_unique<MCTrackFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingTrackFilter>("TrackQualityFilter.root");
+  } else if (filterName == "recording_data") {
+    return std::make_unique<RecordingDataTrackFilter>("TrackQualityFilter.root");
   } else if (filterName == "eval") {
     auto recordedVarSets = std::make_unique<UnionVarSet<CDCTrack>>();
     using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;

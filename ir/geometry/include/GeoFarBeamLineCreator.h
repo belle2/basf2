@@ -30,6 +30,8 @@ namespace Belle2 {
       G4Transform3D transform;
       /** Solid volume */
       G4VSolid* geo;
+      /** Logical volume */
+      G4LogicalVolume* logi;
     };
 
     class SensitiveDetector;

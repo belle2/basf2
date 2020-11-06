@@ -5,7 +5,7 @@
  * Calculation of shower positions using lists of digits and weights.     *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,7 +25,8 @@
 namespace Belle2 {
   namespace ECL {
     // computePositionLiLo
-    B2Vector3D computePositionLiLo(std::vector<ECLCalDigit>& digits, std::vector<double>& weights, std::vector<double>& parameters)
+    B2Vector3D computePositionLiLo(const std::vector<ECLCalDigit>& digits, std::vector<double>& weights,
+                                   const std::vector<double>& parameters)
     {
 
       // Total weighted sum.
@@ -108,7 +109,7 @@ namespace Belle2 {
     }
 
     // helper: computeEnergySum
-    double computeEnergySum(std::vector<ECLCalDigit>& digits, std::vector<double>& weights)
+    double computeEnergySum(const std::vector<ECLCalDigit>& digits, std::vector<double>& weights)
     {
       int n = 0;
       double sum = 0.0;

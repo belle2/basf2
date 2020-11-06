@@ -642,7 +642,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
   m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
-void Particle::removeDaughter(const Particle* daughter)
+void Particle::removeDaughter(const Particle* daughter, const bool updateType)
 {
   if (getNDaughters() == 0)
     return;
@@ -655,7 +655,7 @@ void Particle::removeDaughter(const Particle* daughter)
     }
   }
 
-  if (getNDaughters() == 0)
+  if (getNDaughters() == 0 and updateType)
     m_particleSource = c_Undefined;
 }
 
@@ -720,7 +720,10 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
        and oParticle->getParticleSource() != EParticleSourceObject::c_MCParticle)
       or (this->getParticleSource() != EParticleSourceObject::c_MCParticle
           and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle)) {
-    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+    B2WARNING("Something went wrong: MCParticle is being compared to a non MC Particle. Please check your script!\n"
+              "                              If the MCParticle <-> Particle comparison happens in the RestOfEventBuilder,\n"
+              "                              the Rest Of Event may contain signal side particles.");
+    return false;
   }
   if (this->getParticleSource() == EParticleSourceObject::c_MCParticle
       and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle) {
@@ -921,10 +924,10 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
-  // set momenum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  // set momentum
+  m_px = m_momentumScale * trackFit->getMomentum().Px();
+  m_py = m_momentumScale * trackFit->getMomentum().Py();
+  m_pz = m_momentumScale * trackFit->getMomentum().Pz();
 
   // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());
@@ -1087,7 +1090,7 @@ std::string Particle::getInfoHTML() const
   stream << " <b>PDGMass</b>=" << getPDGMass();
   stream << "<br>";
   stream << " <b>flavorType</b>=" << m_flavorType;
-  stream << " <b>particleType</b>=" << m_particleSource;
+  stream << " <b>particleSource</b>=" << m_particleSource;
   stream << " <b>particleTypeUsedForFit</b>=" << m_pdgCodeUsedForFit;
   stream << "<br>";
 
@@ -1116,6 +1119,9 @@ std::string Particle::getInfoHTML() const
 
   stream << " <b>momentum</b>=" << HTML::getString(getMomentum());
   stream << " <b>p</b>=" << getP();
+  stream << "<br>";
+
+  stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
   stream << " <b>position</b>=" << HTML::getString(getVertex());
@@ -1271,4 +1277,11 @@ int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::Charg
   // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
   if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
+}
+
+bool Particle::isMostLikely() const
+{
+  const PIDLikelihood* likelihood = Particle::getPIDLikelihood();
+  if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
+  else return false;
 }

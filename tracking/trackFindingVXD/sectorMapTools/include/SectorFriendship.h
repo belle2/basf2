@@ -41,8 +41,8 @@ namespace Belle2 {
 
     /** constructor */
     SectorFriendship() :
-      m_mainSector(NULL),
-      m_friendSector(NULL) {}
+      m_mainSector(nullptr),
+      m_friendSector(nullptr) {}
 
     /** returns friend sector */
     Sector* getFriend() { return m_friendSector; }

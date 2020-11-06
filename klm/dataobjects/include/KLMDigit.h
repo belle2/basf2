@@ -56,7 +56,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMDigit()
+    ~KLMDigit()
     {
     }
 

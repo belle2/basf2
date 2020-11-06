@@ -173,7 +173,7 @@ void SVDPerformanceTTreeModule::event()
     }
 
 
-    const TrackFitResult*  tfr = theTK[0]->getTrackFitResult(Const::ChargedStable(pionCode));
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::ChargedStable(pionCode));
     if (tfr) {
       m_svdTrkd0 = tfr->getD0();
       m_svdTrkz0 = tfr->getZ0();
@@ -370,7 +370,7 @@ void SVDPerformanceTTreeModule::event()
 void SVDPerformanceTTreeModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_t_U->Write();
     m_t_V->Write();

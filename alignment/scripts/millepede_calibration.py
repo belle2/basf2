@@ -62,7 +62,7 @@ def collect(calibration, collection, input_files, output_file='CollectorOutput.r
     main = tmp
     main.add_module(calibration.collections[collection].collector)
 
-    path_file_name = calibration.name + '.' + collection + '.path'
+    path_file_name = calibration.name + '.' + collection + '.' + output_file + '.path'
     with open(path_file_name, 'bw') as serialized_path_file:
         pickle.dump(basf2.pickle_path.serialize_path(main), serialized_path_file)
 
@@ -95,7 +95,7 @@ def calibrate(calibration, input_files=None, iteration=0):
     """
     for algo in calibration.algorithms:
         algo.algorithm.setInputFileNames(input_files)
-        algo.pre_algorithm(algo, iteration)
+        algo.pre_algorithm(algo.algorithm, iteration)
         algo.algorithm.execute()
         algo.algorithm.commit()
 
@@ -222,15 +222,19 @@ def create(name,
         depend on some constraint and collector configuration) and you might need to fix
         the unwanted ones (typically higher order sensor deformations) using the 'fixed' parameter.
 
-    collections : list(tuple(str, basf2.Path, dict(...)))
+    collections : list(namedtuple('MillepedeCollection', ['name', 'files', 'path', 'params']))
         List of collection definitions.
-        - str : collection name has to math entry in 'files' dictionary.
-        - basf2.Path : is the reprocessing path
+        - name : str
+            Collection name has to math entry in 'files' dictionary.
+        - files : list(str) | None
+            Optional list of files. Can (should if not set here) be overriden by 'files' parameter
+        - path : basf2.Path
+            The reprocessing path
         - dict(...) : additional dictionary of parameters passed to the collector.
           This has to contain the input data sample (tracks / particles / primaryVertices ...) configuration for the collector.
           Optionally additional arguments can be specified for the collector specific for this collection.
           (Default arguments for all collections can be set using the 'params' parameter)
-          Use make_collection(str, basf2.Path, **argk) for more convenient creation of custom collections.
+          Use make_collection(str, path=basf2.Path, **argk) for more convenient creation of custom collections.
           For standard collections to use, see alignment.collections
 
     files : dict( str -> list(str) )
@@ -384,7 +388,6 @@ def create(name,
                               pre_collector_path=None,
                               database_chain=dbchain,
                               output_patterns=None,
-                              max_files_per_collector_job=1,
                               backend_args=None
                               )
 
@@ -429,7 +432,6 @@ def create(name,
         collection = Collection(collector=collector,
                                 input_files=filelist,
                                 pre_collector_path=path,
-                                max_files_per_collector_job=1,
                                 database_chain=dbchain)
 
         calibration.add_collection(colname, collection)

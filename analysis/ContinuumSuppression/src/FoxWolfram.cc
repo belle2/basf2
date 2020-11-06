@@ -43,7 +43,7 @@ void FoxWolfram::calculateBasicMoments()
       if (iter1 != iter2) magProd *= 2;
 
       // Fills the moments' list.
-      // This part is quite ugly, but hard-coding the legendre polinimials makes the code
+      // This part is quite ugly, but hard-coding the Legendre polynomials makes the code
       // much faster than using the boost libraries, which are implementing the recursive formulas.
       // This implementation should also be faster than a switch...case one.
       double cTheta2 = cTheta * cTheta;
@@ -87,7 +87,7 @@ void FoxWolfram::calculateAllMoments()
       if (iter1 != iter2) magProd *= 2;
 
       // Fills the moments' list.
-      // This part is quite ugly, but hard-coding the legendre polinimials makes the code
+      // This part is quite ugly, but hard-coding the Legendre polynomials makes the code
       // much faster than using the boost libraries, which are implementing the recursive formulas.
       // This implementation should also be faster than a switch...case one.
       double cTheta2 = cTheta * cTheta;

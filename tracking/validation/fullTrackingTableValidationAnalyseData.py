@@ -11,13 +11,13 @@
 """
 import basf2
 from ROOT import TFile, TNamed, Belle2
-
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
 import os
 
+VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+
 try:
-    from root_pandas import read_root
-    import pandas as pd
+    from root_pandas import read_root  # noqa
+    import pandas as pd  # noqa
 except ImportError:
     basf2.B2FATAL("You need to have pandas installed for this validation script to run.")
 

@@ -113,6 +113,16 @@ namespace Belle2 {
     double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into seperate tracks. If < 0, don't do splitting.*/
 
     bool m_discardAuxiliaryHits = false; /**< if true hits marked as auxiliary will not be included in the RecoTrack */
+
+    std::vector<uint> m_param_useCDCSuperLayers;  /**< List of super layers to be used */
+
+    std::vector<uint> m_param_useCDCLayers;       /**< List of layers to be used */
+
+    std::vector<uint> m_param_ignoreCDCLayers;    /**< List of layers to be ignored in tracking */
+
+    std::array<bool, 9> m_useCDCSuperLayers{};   /**< Bits for the used super layers ATTENTION: hardcoded value for number of super layers */
+
+    std::array<bool, 56> m_useCDCLayers{};       /**< Bits for the used layers ATTENTION: hardcoded value for number of layers */
   };
 }
 

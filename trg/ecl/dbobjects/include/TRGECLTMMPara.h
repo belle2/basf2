@@ -28,7 +28,7 @@ namespace Belle2 {
 
     }
     //! Construction
-    TRGECLTMMPara(int FPGAversion):
+    explicit TRGECLTMMPara(int FPGAversion):
       m_FPGAversion(FPGAversion)
 
     {

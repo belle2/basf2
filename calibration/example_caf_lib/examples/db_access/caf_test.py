@@ -6,22 +6,20 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
-set_log_level(LogLevel.DEBUG)
-set_debug_level(100)
-# add time stamp to all INFO messages
-# currentInfo = logging.get_info(LogLevel.INFO)
-# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
+import basf2 as b2
 
 import os
-import sys
 
-import ROOT
 from ROOT.Belle2 import TestDBAccessAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
-from caf.strategies import SequentialRunByRun, SingleIOV
+from caf.strategies import SequentialRunByRun
 
+b2.set_log_level(b2.LogLevel.DEBUG)
+b2.set_debug_level(100)
+# add time stamp to all INFO messages
+# currentInfo = logging.get_info(LogLevel.INFO)
+# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 data_dir = "../../../examples/test_data"
 
 ###################################################
@@ -37,7 +35,7 @@ input_files_test.append(os.path.join(os.path.abspath(data_dir), '*.root'))
 alg_test = TestDBAccessAlgorithm()  # Getting a calibration algorithm instance
 # alg_test.setMinEntries(15000)
 
-col = register_module("CaTest")
+col = b2.register_module("CaTest")
 # col.param("granularity", "all")
 
 # Create a single calibration from a collector module name + algorithm + input files

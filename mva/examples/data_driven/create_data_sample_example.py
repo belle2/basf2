@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
 # Create a simple data sample with some variables
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
+import vertex as vx
+import b2biiConversion
 
 variables = ['p', 'pt', 'pz', 'phi',
              'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
@@ -23,27 +24,22 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(2, daughter(0, clusterHighestE))', 'daughter(2, daughter(1, clusterHighestE))',
              'daughter(2, daughter(0, clusterNHits))', 'daughter(2, daughter(1, clusterNHits))',
              'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-             'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+             'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
              'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
-spectators = ['isSignal', 'M', 'expNum', 'evtNum', 'runNum', 'mcErrors']
-
-import b2biiConversion
-import ROOT
-from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
+spectators = ['isSignal', 'M', 'mcErrors']
 
 
 def reconstruction_path(inputfiles):
-    path = create_path()
-    b2biiConversion.convertBelleMdstToBelleIIMdst(None, applyHadronBJSkim=True, path=path)
-    setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-    fillParticleLists([('K-', 'atcPIDBelle(3,2) > 0.2 and dr < 2 and abs(dz) < 4'),
-                       ('pi+', 'atcPIDBelle(3,2) < 0.2 and dr < 2 and abs(dz) < 4')], path=path)
-    KFit('pi0:mdst', 0.1, path=path, fit_type='massvertex')
-    reconstructDecay('D0 -> K- pi+ pi0:mdst', '1.7 < M < 2.0', path=path)
-    KFit('D0', 0.1, path=path)
-    applyCuts('D0', '1.7 < M < 2.0', path=path)
-    matchMCTruth('D0', path=path)
+    path = b2.create_path()
+    b2biiConversion.convertBelleMdstToBelleIIMdst(None, applySkim=True, path=path)
+    ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+    ma.fillParticleLists([('K-', 'atcPIDBelle(3,2) > 0.2 and dr < 2 and abs(dz) < 4'),
+                          ('pi+', 'atcPIDBelle(3,2) < 0.2 and dr < 2 and abs(dz) < 4')], path=path)
+    vx.kFit('pi0:mdst', 0.1, path=path, fit_type='massvertex')
+    ma.reconstructDecay('D0 -> K- pi+ pi0:mdst', '1.7 < M < 2.0', path=path)
+    vx.kFit('D0', 0.1, path=path)
+    ma.applyCuts('D0', '1.7 < M < 2.0', path=path)
+    ma.matchMCTruth('D0', path=path)
     return path
 
 
@@ -55,5 +51,5 @@ if __name__ == "__main__":
     ]
 
     path = reconstruction_path([])
-    variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
-    process(path)
+    ma.variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
+    b2.process(path)

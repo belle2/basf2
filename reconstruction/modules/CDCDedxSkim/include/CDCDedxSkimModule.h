@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSKIMMODULE_H
-#define CDCDEDXSKIMMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -73,5 +72,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

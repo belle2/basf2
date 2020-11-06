@@ -5,11 +5,11 @@ import sys
 import math
 from basf2 import create_path, register_module, process, logging, \
     LogLevel, Module, statistics
-logging.log_level = LogLevel.WARNING
 
 # Load the required libraries
 from ROOT import TH1D, TH2D, TCanvas, Belle2, PyConfig
 
+logging.log_level = LogLevel.WARNING
 # reenable GUI thread for our canvas
 PyConfig.StartGuiThread = True
 
@@ -50,6 +50,7 @@ class ShowMCParticles(Module):
                             mc.getProductionVertex().X() * 1e4)
             h_zyvertex.Fill(mc.getProductionVertex().Z() * 1e4,
                             mc.getProductionVertex().Y() * 1e4)
+
 
 # Create Modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -107,6 +108,7 @@ vertexsmear.param({
     # Angle between beamspot and z axis, rotation around y
     'angle_pv_zx': -1.11e-2,
 })
+
 
 # create processing path
 main = create_path()

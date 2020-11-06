@@ -293,7 +293,7 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1):
+      explicit ParticleType(int pdgCode, const ParticleSet* set = nullptr, int index = -1):
         m_pdgCode(pdgCode), m_set(set), m_index(index)  {}
 
       /** Copy constructor  */

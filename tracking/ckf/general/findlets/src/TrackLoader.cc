@@ -92,7 +92,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
       if (not hasAlreadyRelation) {
         seeds.push_back(&item);
       } else {
-        B2DEBUG(100, "Do not use this track, because it has already a valid relation");
+        B2DEBUG(29, "Do not use this track, because it has already a valid relation");
       }
     } else {
       seeds.push_back(&item);

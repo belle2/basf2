@@ -12,6 +12,9 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -60,6 +63,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks; /**< Required input array of RecoTracks */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     ECL::ECLNeighbours* m_eclNeighbours1x1{nullptr}; /**< Neighbour map of 1 crystal */
     ECL::ECLNeighbours* m_eclNeighbours3x3{nullptr}; /**< Neighbour map of 9 crystals */

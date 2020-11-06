@@ -25,13 +25,15 @@ from basf2 import B2INFO, B2ERROR, B2WARNING
 
 class ClassVersionError(Exception):
     """Exception to report class version errors"""
-    pass
 
 
 class ErrorWithExtraVariables(Exception):
     """Exception class with extra keyword arguments to show in log message"""
+    #: Initialize the class.
+
     def __init__(self, *args, **argk):
         super().__init__(*args)
+        #: Class variables.
         self.variables = argk
 
 
@@ -174,12 +176,6 @@ def check_linkdef(filename, message_style="belle2"):
 
         line, column, classname, clingflags, options = content
 
-        # check if we can actually load the class
-        try:
-            version, checksum = get_class_version(classname)
-        except ClassVersionError as e:
-            print_message("error", e)
-
         # no need to check anything else if we don't have storage enabled
         if "nostreamer" in clingflags:
             if "evolution" in clingflags:
@@ -193,8 +189,14 @@ def check_linkdef(filename, message_style="belle2"):
             print_message("warning", "using old ROOT3 streamer format without evolution. "
                           "Please add + or - (for classes not to be written to file) after the classname.")
 
+        # check if we can actually load the class
+        try:
+            version, checksum = get_class_version(classname)
+        except ClassVersionError as e:
+            print_message("error", e)
+
         # This class seems to be intended to be serialized so make sure we can
-        if version != 0:
+        if "version" in locals() and version != 0:
             try:
                 check_dictionary(classname)
             except ClassVersionError as e:

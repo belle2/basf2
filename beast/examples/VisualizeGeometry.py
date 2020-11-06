@@ -2,25 +2,25 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
-logging.log_level = LogLevel.WARNING
+import basf2 as b2
+b2.logging.log_level = b2.LogLevel.WARNING
 
 # Set the environment variable to automatically start the VRML viewer
 # for example http://freewrl.sourceforge.net/
 os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Load XML parameters
-paramloader = register_module('Gearbox')
+paramloader = b2.register_module('Gearbox')
 # paramloader.param('fileName', '/geometry/Beast2_phase2.xml')
 paramloader.param('fileName', '/geometry/Beast2_phase1.xml')
 # paramloader.param('fileName', '/home/igal/src/belle2/release/beast/examples/Beast2_phase1.xml')
 # paramloader.param('fileName', '/beast/Beast2_phase1.xml')
 # Create Geometry
-geobuilder = register_module('Geometry')
-geobuilder.log_level = LogLevel.INFO
-pguninput = register_module('ParticleGun')
-g4sim = register_module('FullSim')
+geobuilder = b2.register_module('Geometry')
+geobuilder.log_level = b2.LogLevel.INFO
+pguninput = b2.register_module('ParticleGun')
+g4sim = b2.register_module('FullSim')
 
 eventinfosetter.param('evtNumList', [1])
 
@@ -44,7 +44,7 @@ pguninput.param('momentumParams', [2.0, 5.0])
 pguninput.param('thetaParams', [85.0, 95.0])
 pguninput.param('phiParams', [-5.0, 5.0])
 
-main = create_path()
+main = b2.create_path()
 
 main.add_module(eventinfosetter)
 main.add_module(paramloader)
@@ -53,4 +53,4 @@ main.add_module(geobuilder)
 main.add_module(pguninput)
 main.add_module(g4sim)
 
-process(main)
+b2.process(main)

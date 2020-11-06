@@ -5,7 +5,6 @@
 
 import sys
 import basf2
-import ROOT
 from ROOT.Belle2 import KLMElectronicsMapImporter, KLMElementNumbers, BKLMElementNumbers
 
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -55,6 +54,7 @@ def load_eklm_electronics_map(version, mc):
     2 = phase 3
     """
     importer.loadEKLMElectronicsMap(version, mc)
+
 
 if mc:
     # MC map: a single version of map is used for all periods.

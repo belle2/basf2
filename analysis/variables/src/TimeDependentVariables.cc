@@ -284,7 +284,7 @@ namespace Belle2 {
       static DBObjPtr<BeamParameters> beamParamsDB;
       TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
 
-      const MCParticle* mcPart = part->getRelated<MCParticle>();
+      const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
       return pos.Dot(boostDir);
@@ -296,7 +296,7 @@ namespace Belle2 {
       TVector3 boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector();
       TVector3 orthBoostDir = getUnitOrthogonal(boost);
 
-      const MCParticle* mcPart = part->getRelated<MCParticle>();
+      const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);
@@ -920,9 +920,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
                       R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
     REGISTER_VARIABLE("mcDeltaTau", particleMCDeltaTau,
-                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps: :math:`\tau(B_{\rm rec})-\tau(B_{\rm tag})`)DOC");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
-                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
+                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps: :math:`(l(B_{\rm rec}) - l(B_{\rm tag}))/\beta_{\Upsilon(4S)}\gamma_{\Upsilon(4S)}`)DOC");
     REGISTER_VARIABLE("mcDeltaBoost", particleMCDeltaBoost,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");

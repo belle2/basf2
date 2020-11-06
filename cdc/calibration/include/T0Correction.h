@@ -56,7 +56,7 @@ namespace Belle2 {
       double m_xmin = 0.07;   /**< minimum drift length*/
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
-      double t0[56][385] = {{0.}};     /**< t0 */
+      //double t0[56][385] = {{0.}};     /**< t0 */
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/

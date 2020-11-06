@@ -18,8 +18,6 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
-using namespace std;
-
 namespace Belle2 {
   /**
    * This class serves as a base for the TrackDQMModule and AlignDQMModule (and possibly other DQM histogram modules).
@@ -44,28 +42,29 @@ namespace Belle2 {
 
     /** Function to create TH1F and add it to the vector of histograms (m_histograms).
      * All histograms in the module should be created via this function (or following Create- functions). */
-    virtual TH1F* Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle);
+    virtual TH1F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
+                         std::string yTitle);
     /** Same as above but for TH2F. */
-    virtual TH2F* Create(string name, string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow, double yup,
-                         string xTitle, string yTitle, string zTitle);
+    virtual TH2F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow, double yup,
+                         std::string xTitle, std::string yTitle, std::string zTitle);
 
     /** Function to create array of TH1F histograms, one for each layer.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the layer number and then used as a name for the histogram.
      * @param titleTemplate - same as nameTemplate but for title. */
     virtual TH1F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                                string xTitle, string yTitle);
+                                std::string xTitle, std::string yTitle);
     /** Same as above but for TH2F. */
     virtual TH2F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                                int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle);
+                                int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle);
 
     /** Function to create array of TH1F histograms, one for each sensor.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the output of the SensorNameDescription function and then used as a name for the histogram.
      * @param titleTemplate - same as nameTemplate but for title and with the SensorTitleDescription function. */
     virtual TH1F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                                 string xTitle, string yTitle);
+                                 std::string xTitle, std::string yTitle);
     /** Same as above but for TH2F. */
     virtual TH2F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                                 int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle);
+                                 int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle);
 
     /** @name Fill- functions
      * All the following Fill- functions are used by DQMEventProcessorBase or derived classes to fill histograms.
@@ -102,9 +101,9 @@ namespace Belle2 {
 
   protected:
     /** Creates string description of the sensor from given sensor ID to be used in a histogram name. Its used in the CreateSensors functions. */
-    static string SensorNameDescription(VxdID sensorID);
+    static std::string SensorNameDescription(VxdID sensorID);
     /** Creates string description of the sensor from given sensor ID to be used in a histogram title. Its used in the CreateSensors functions. */
-    static string SensorTitleDescription(VxdID sensorID);
+    static std::string SensorTitleDescription(VxdID sensorID);
 
     /** Creates a graph of means by given axis from given TH2F histogram.
      * @param output - value of every bin of this histogram is set to be the mean of all bins from input with the same x (or y) coordinate.
@@ -117,9 +116,9 @@ namespace Belle2 {
      * @param parameter - name of the parameter we want to change. Possible values are:
      * name, title, nbinsx, xlow, xup, xTitle, yTitle (for both TH1F and TH2F) and nbinsy, ylow, yup, zTitle (only for TH2F).
      * @param value - new value we wish the parameter of the histogram to have. Int and double values are parsed from string so they must be given correctly. */
-    void ProcessHistogramParameterChange(string name, string parameter, string value);
+    void ProcessHistogramParameterChange(const std::string& name, const std::string& parameter, const std::string& value);
     /** On given histogram sets given parameter to given value. Used in the function above. */
-    void EditHistogramParameter(TH1* histogram, string parameter, string value);
+    void EditHistogramParameter(TH1* histogram, const std::string& parameter, std::string value);
 
     /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
@@ -149,16 +148,16 @@ namespace Belle2 {
 
     /** All histograms created via the Create- functions are automatically added to this set.
      * Its used to easy call Reset() on all histograms in beginRun() and also for changing parameters of histograms via the ProcessHistogramParameterChange function. */
-    vector<TH1*> m_histograms;
+    std::vector<TH1*> m_histograms;
     /** True if the defineHisto() was called. If false, the event() function does nothing. */
     bool histogramsDefined = false;
 
     /** Used for changing parameters of histograms via the ProcessHistogramParameterChange function.  */
-    vector<tuple<string, string, string>> m_histogramParameterChanges;
+    std::vector<std::tuple<std::string, std::string, std::string>> m_histogramParameterChanges;
     /** StoreArray name where Tracks are written. */
-    string m_tracksStoreArrayName;
+    std::string m_tracksStoreArrayName;
     /** StoreArray name where RecoTracks are written. */
-    string m_recoTracksStoreArrayName;
+    std::string m_recoTracksStoreArrayName;
 
     /** p Value */
     TH1F* m_PValue = nullptr;

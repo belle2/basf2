@@ -130,6 +130,8 @@ namespace Belle2 {
     /** copy constructor */
     SVDCoGCalibrationFunction(const Belle2::SVDCoGCalibrationFunction& a);
 
+    /** operator = */
+    SVDCoGCalibrationFunction& operator=(const Belle2::SVDCoGCalibrationFunction& a);
 
   private:
 

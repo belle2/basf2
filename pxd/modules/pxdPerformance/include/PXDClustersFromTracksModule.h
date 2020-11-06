@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDCLUSTERSFROMTRACKSMODULE_H
-#define PXDCLUSTERSFROMTRACKSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
@@ -71,5 +70,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* PXDCLUSTERSFROMTRACKSMODULE_H */

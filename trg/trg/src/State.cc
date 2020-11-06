@@ -243,12 +243,11 @@ namespace Belle2 {
         if (! s.active())
           skip = true;
 
-        if (skip && (! skipLast)) {
-          cout << "... (all zero)" << endl;
-          skipLast = true;
-        }
-
         if (skip) {
+          if (!skipLast) {
+            cout << "... (all zero)" << endl;
+          }
+
           skipLast = true;
           continue;
         }

@@ -29,7 +29,7 @@ ma.inputMdst(environmentType='default',
 # creates "pi+:all" ParticleList (and c.c.)
 ma.fillParticleListFromMC(decayString='pi+:gen', cut='', path=my_path)
 
-# ID of weight table is taked from B2A904
+# ID of weight table is taken from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
 
 if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
@@ -41,7 +41,7 @@ b2.use_local_database(db_location + 'database.txt',
                       readonly=True)
 
 # We know what weight info will be added (see B2A904),
-# so we add aliases and add it ot tools
+# so we add aliases and add it to the tools
 va.variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
 va.variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
 va.variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')

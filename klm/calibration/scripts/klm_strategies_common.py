@@ -2,7 +2,8 @@
 
 """Common functions for KLM calibration strategies."""
 
-from caf.utils import ExpRun, IoV
+import basf2
+from caf.utils import ExpRun
 
 
 def calibration_result_string(result):

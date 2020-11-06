@@ -62,7 +62,7 @@ namespace Belle2 {
     std::string m_rootFileName;   /**< root file name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr = NULL; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
   private:
 
@@ -80,31 +80,31 @@ namespace Belle2 {
     int m_ntracks = 0; /**< number of tracks*/
 
     //TRACKS
-    TH1F* m_nTracks = NULL; /**< number of tracks*/
-    TH1F* m_Pvalue = NULL; /**< track p value*/
-    TH1F* m_mom = NULL; /**< track momentum*/
-    TH1F* m_nSVDhits = NULL; /**< track momentum*/
+    TH1F* m_nTracks = nullptr; /**< number of tracks*/
+    TH1F* m_Pvalue = nullptr; /**< track p value*/
+    TH1F* m_mom = nullptr; /**< track momentum*/
+    TH1F* m_nSVDhits = nullptr; /**< track momentum*/
 
     //RECO
-    SVDHistograms<TH1F>* h_recoCharge = NULL; /**< SVDRecoDigits Charge */
-    SVDHistograms<TH1F>* h_recoEnergy = NULL; /**< SVDRecoDigits Energy */
-    SVDHistograms<TH1F>* h_recoTime = NULL; /**< SVDRecoDigits Time */
-    SVDHistograms<TH1F>* h_recoNoise = NULL; /**< SVDRecoDigits Noise */
+    SVDHistograms<TH1F>* h_recoCharge = nullptr; /**< SVDRecoDigits Charge */
+    SVDHistograms<TH1F>* h_recoEnergy = nullptr; /**< SVDRecoDigits Energy */
+    SVDHistograms<TH1F>* h_recoTime = nullptr; /**< SVDRecoDigits Time */
+    SVDHistograms<TH1F>* h_recoNoise = nullptr; /**< SVDRecoDigits Noise */
 
     //CLUSTER
-    SVDHistograms<TH1F>* h_clusterCharge = NULL; /**< SVDClusters Charge */
-    SVDHistograms<TH1F>* h_clusterSize = NULL; /**< SVDClusters Size */
-    SVDHistograms<TH1F>* h_clusterSNR = NULL; /**< SVDClusters SNR */
-    SVDHistograms<TH1F>* h_clusterEnergy = NULL; /**< SVDClusters Energy */
-    SVDHistograms<TH1F>* h_clusterTime = NULL; /**< SVDClusters Time */
+    SVDHistograms<TH1F>* h_clusterCharge = nullptr; /**< SVDClusters Charge */
+    SVDHistograms<TH1F>* h_clusterSize = nullptr; /**< SVDClusters Size */
+    SVDHistograms<TH1F>* h_clusterSNR = nullptr; /**< SVDClusters SNR */
+    SVDHistograms<TH1F>* h_clusterEnergy = nullptr; /**< SVDClusters Energy */
+    SVDHistograms<TH1F>* h_clusterTime = nullptr; /**< SVDClusters Time */
 
     //CLUSTER RELATED TO TRACKS
-    SVDHistograms<TH1F>* h_clusterTrkCharge = NULL; /**< SVDClusters Charge */
-    SVDHistograms<TH1F>* h_clusterTrkSize = NULL; /**< SVDClusters Size */
-    SVDHistograms<TH1F>* h_clusterTrkSNR = NULL; /**< SVDClusters SNR */
-    SVDHistograms<TH1F>* h_clusterTrkEnergy = NULL; /**< SVDClusters Energy */
-    SVDHistograms<TH1F>* h_clusterTrkTime = NULL; /**< SVDClusters Time */
-    SVDHistograms<TH1F>* h_clusterTrkInterstripPos = NULL; /**< SVDClusters InterstripPosition */
+    SVDHistograms<TH1F>* h_clusterTrkCharge = nullptr; /**< SVDClusters Charge */
+    SVDHistograms<TH1F>* h_clusterTrkSize = nullptr; /**< SVDClusters Size */
+    SVDHistograms<TH1F>* h_clusterTrkSNR = nullptr; /**< SVDClusters SNR */
+    SVDHistograms<TH1F>* h_clusterTrkEnergy = nullptr; /**< SVDClusters Energy */
+    SVDHistograms<TH1F>* h_clusterTrkTime = nullptr; /**< SVDClusters Time */
+    SVDHistograms<TH1F>* h_clusterTrkInterstripPos = nullptr; /**< SVDClusters InterstripPosition */
 
   };
 }

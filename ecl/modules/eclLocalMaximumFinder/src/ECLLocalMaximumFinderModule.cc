@@ -9,7 +9,7 @@
  * candidate will result in one shower/cluster in the end.                *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,6 +23,7 @@
 
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MDST
@@ -120,8 +121,8 @@ void ECLLocalMaximumFinderModule::initialize()
   resetClassifierVariables();
 
   // Open output files and declare branches if in training mode. Each file will hold a flat ntuple of training data.
-  m_outfile = NULL;
-  m_tree = NULL;
+  m_outfile = nullptr;
+  m_tree = nullptr;
   if (m_isTrainingMode > 0) {
     const int cBufferLength = 500;
     char tmpBuffer[cBufferLength];
@@ -252,9 +253,8 @@ void ECLLocalMaximumFinderModule::event()
             m_geom->Mapping(m_cellId - 1);
             m_thetaId                 = static_cast < float >(m_geom->GetThetaID());
             m_phiId                   = static_cast < float >(m_geom->GetPhiID());
-          }
 
-          if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
+            // This requires MC matching before this stage!
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -513,7 +513,7 @@ void ECLLocalMaximumFinderModule::getMax(int& type, int& id)
 
 }
 
-void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motherindex, int& pi0index, const double& weight)
+void ECLLocalMaximumFinderModule::addToSignalEnergy(int motherpdg, int motherindex, int pi0index, double weight)
 {
 
   // for the LM training and CR/LM debugging
@@ -525,16 +525,17 @@ void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motheri
       int idpos = getIdPosition(0, motherindex);
       m_signalEnergy[0][idpos] += weight; // photon from another source
     }
-  } else if (abs(motherpdg) == 11) { // electron
+  } else if (abs(motherpdg) == Const::electron.getPDGCode()) { // electron
     int idpos = getIdPosition(2, motherindex);
     m_signalEnergy[2][idpos] += weight;
-  } else if (abs(motherpdg) == 13) { // muon
+  } else if (abs(motherpdg) == Const::muon.getPDGCode()) { // muon
     int idpos = getIdPosition(3, motherindex);
     m_signalEnergy[3][idpos] += weight;
-  } else if (abs(motherpdg) == 130 or abs(motherpdg) == 2112) { // neutral hadron
+  } else if (abs(motherpdg) == Const::Klong.getPDGCode() or abs(motherpdg) == Const::neutron.getPDGCode()) { // neutral hadron
     int idpos = getIdPosition(4, motherindex);
     m_signalEnergy[4][idpos] += weight;
-  } else if (abs(motherpdg) == 211 or abs(motherpdg) == 321 or abs(motherpdg) == 2212) { // charged hadron
+  } else if (abs(motherpdg) == Const::pion.getPDGCode() or abs(motherpdg) == Const::kaon.getPDGCode()
+             or abs(motherpdg) == Const::proton.getPDGCode()) { // charged hadron
     int idpos = getIdPosition(5, motherindex);
     m_signalEnergy[5][idpos] += weight;
   } else { // everything else

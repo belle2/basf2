@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
@@ -8,7 +7,7 @@
 # In this case you can create a fake training which produces a weightfile
 # which you can upload to the database, by overriding end_fit
 # In addition you have to override load and apply, so that the mva package
-# knows howto apply your custom training
+# knows how to apply your custom training
 
 
 import numpy as np
@@ -126,7 +125,7 @@ if __name__ == "__main__":
 
     basf2_mva.teacher(general_options, python_options)
 
-    # Apply the training as usualy
+    # Apply the training as usual
     method = basf2_mva_util.Method(general_options.m_identifier)
     p, t = method.apply_expert(basf2_mva.vector("test.root"), general_options.m_treename)
     auc = basf2_mva_util.calculate_roc_auc(p, t)

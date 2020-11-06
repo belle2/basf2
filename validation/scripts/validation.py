@@ -4,7 +4,7 @@
 # basf2 specific imports
 from basf2 import statistics
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 import ROOT
 
 # Normal library imports
@@ -835,9 +835,9 @@ class Validation:
 
         """
 
-        l = [s for s in self.scripts if s.name == name]
-        if len(l) == 1:
-            return l[0]
+        l_arr = [s for s in self.scripts if s.name == name]
+        if len(l_arr) == 1:
+            return l_arr[0]
         else:
             return None
 

@@ -5,13 +5,12 @@
  * Shower shape second moment angular corrections.                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWERSHAPESECONDMOMENTCORRECTION_H
-#define ECLSHOWERSHAPESECONDMOMENTCORRECTION_H
+#pragma once
 #include <TObject.h>
 #include <TGraph.h>
 
@@ -79,4 +78,3 @@ namespace Belle2 {
     ClassDef(ECLShowerShapeSecondMomentCorrection, 1); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

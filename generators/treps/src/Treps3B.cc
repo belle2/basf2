@@ -46,9 +46,17 @@ namespace Belle2 {
   //
   // constructor
   //
-
-  TrepsB::TrepsB(void) : sutool()
+  TrepsB::TrepsB(void) :
+    sutool(), w(0.), ntot(0), nsave(0), ebeam(0.), q2max(0.), cost_cut(0.), pt_cut(0.), cost_flag(0), pt_flag(0),
+    qzmin(0.), qptmin(0.), parti(nullptr), parts(nullptr), ephi(0.), etheta(0.), s(0.), imode(0), dmin(0.), dmax(0.),
+    ffmax(0.), rs(0.), vmax(0.), pppp(nullptr), wf(0.), inmode(0), wtcount(0), totalCrossSectionForMC(0.), ndecay(0),
+    pmodel(0), fmodel(0), ievent(0), treh1(nullptr), treh2(nullptr), treh3(nullptr), treh4(nullptr), treh5(nullptr),
+    treh6(nullptr), npart(0), partgen(nullptr), zdis(nullptr), zpdis(nullptr), zsdis(nullptr)
   {
+    for (int i = 0; i < 5000; ++i) {
+      wtcond[i] = 0.;
+      wthead[i] = 0;
+    }
   }
 
   //
@@ -427,13 +435,13 @@ namespace Belle2 {
         } while (gRandom->Uniform() > sf);
       } while (gRandom->Uniform() > tpform(q2p, w)*tpform(q2m, w));
 
-      double q2;
       int ivirt = 0;
 
       TVector3 tv1, tv2, tv3, tv4;
 
       if (q2m < q2zero || q2p < q2zero) {
         // single tag approx.
+        double q2;
         if (q2m > q2p) {
           q2 = q2m + q2p;
           ivirt = -1 ;

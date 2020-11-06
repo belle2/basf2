@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-PyConfig.StartGuiThread = False
+PyConfig.IgnoreCommandLineOptions = True  # noqa
+PyConfig.StartGuiThread = False  # noqa
 
 from argparse import ArgumentParser
 import basf2 as b2
@@ -45,6 +45,7 @@ def get_prescales(df):
         if col.find('software_trigger_cut_') >= 0 and df[col][PRESCALE_ROW] > 0:
             prescales.append(df[col][PRESCALE_ROW])
     return prescales
+
 
 if __name__ == "__main__":
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDEBUGHIT_H
-#define ECLDEBUGHIT_H
+#pragma once
 
 #include  <framework/datastore/RelationsObject.h>
 
@@ -24,7 +23,8 @@ namespace Belle2 {
   class ECLDebugHit : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLDebugHit() {
+    ECLDebugHit()
+    {
       m_cellId = 0;    /**< Cell ID */
       m_Edep = 0;    /**< deposited energy */
       m_TimeAve = 0; /**< average time */
@@ -76,4 +76,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

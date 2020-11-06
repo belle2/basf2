@@ -41,6 +41,7 @@ namespace Belle2 {
       std::map<ITrackType, size_t> hitCountByMCTrackId;
       for (const CDCHit* ptrHit : hits) {
         ITrackType mcTrackId = mcHitLookUp.getMCTrackId(ptrHit);
+        // cppcheck-suppress stlFindInsert
         if (hitCountByMCTrackId.count(mcTrackId) == 0) hitCountByMCTrackId[mcTrackId] = 0;
         ++(hitCountByMCTrackId[mcTrackId]);
       }
@@ -55,6 +56,7 @@ namespace Belle2 {
 
       size_t nHits = 0;
       std::pair<ITrackType, size_t> highestHitCountMCTrackId(0, 0);
+      // cppcheck-suppress ignoredReturnValue
       std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(), LessOf<Second>());
 
       for (const std::pair<ITrackType, size_t>& hitCountForMCTrackId : hitCountByMCTrackId) {

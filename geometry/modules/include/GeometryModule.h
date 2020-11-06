@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMETRYMODULE_H
-#define GEOMETRYMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
@@ -55,4 +54,3 @@ namespace Belle2 {
     DBObjPtr<GeoConfiguration>* m_geometryConfig{nullptr};
   };
 } //Belle2 namespace
-#endif

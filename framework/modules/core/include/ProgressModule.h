@@ -5,11 +5,18 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
  *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
+/* Framework headers. */
 #include <framework/core/Module.h>
+
+/* C++ headers. */
+#include <stdint.h>
+
+/* boost headers. */
 #include <boost/format.hpp>
 
 namespace Belle2 {
@@ -31,29 +38,30 @@ namespace Belle2 {
     ProgressModule();
 
     /** Init the module */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Show beginRun message */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** Show progress */
-    virtual void event() override;
+    void event() override;
 
   protected:
+
     /** Maximum order of magnitude for interval between showing progress */
-    int m_maxOrder;
+    uint32_t m_maxOrder{3};
 
     /** Number of processed events. This is not the real eventNumber, just counting */
-    int m_evtNr;
+    uint32_t m_evtNr{0};
 
     /** Number of processed runs. This is not the real runNumber, just counting */
-    int m_runNr;
+    uint32_t m_runNr{0};
 
     /** Total number of events in the current process */
-    int m_totalEvtNr;
+    uint32_t m_totalEvtNr{0};
 
-    /** compiled output format */
-    boost::format m_output;
+    /** Compiled output format */
+    boost::format m_output{"Processed: %3u runs, %6u/%6u events."};
 
   };
-} // end namespace Belle2
+}

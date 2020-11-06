@@ -57,7 +57,7 @@ namespace Belle2 {
     /**
      * Set effective light speed of scintillators.
      * @param[in] lightSpeed Effective light speed.
-     * @param[in] cType Flag of channel type.
+     * @param[in] cType      Flag of channel type.
      */
     void setEffLightSpeed(double lightSpeed, int cType);
 
@@ -72,7 +72,7 @@ namespace Belle2 {
      * Set amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
      * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
-     * @param[in] cType Flag of channel type.
+     * @param[in] cType                 Flag of channel type.
      */
     void setAmpTimeConstant(double amplitudeTimeConstant, int cType);
 

@@ -51,13 +51,13 @@ namespace Belle2 {
       /** Propagation distance from hit to FEE. */
       double dist;
 
-      /** Globel position difference between klmHit2d and ExtHit (X)*/
+      /** Global position difference between klmHit2d and ExtHit (X). */
       double diffDistX;
 
-      /** Globel position difference between klmHit2d and ExtHit (Y)*/
+      /** Global position difference between klmHit2d and ExtHit (Y). */
       double diffDistY;
 
-      /** Globel position difference between klmHit2d and ExtHit (Z)*/
+      /** Global position difference between klmHit2d and ExtHit (Z). */
       double diffDistZ;
 
       /** Collect energy eV. */
@@ -69,10 +69,10 @@ namespace Belle2 {
       /** Unique channel id Barral and endcap merged. */
       int channelId;
 
-      /** BKLM RPC flag, used for testing and not necessary */
+      /** BKLM RPC flag, used for testing and not necessary. */
       bool inRPC;
 
-      /** If phi and z plane flipped, used for testing and not necessary */
+      /** If phi and z plane flipped, used for testing and not necessary. */
       bool isFlipped;
 
       /**
@@ -105,7 +105,7 @@ namespace Belle2 {
 
     /**
      * If the input is MC sample.
-     * Different histogram scale of data and mc
+     * Different histogram scale of data and mc.
      */
     void isMC()
     {
@@ -113,7 +113,7 @@ namespace Belle2 {
     }
 
     /**
-     * Use event T0 as the initial time point or not
+     * Use event T0 as the initial time point or not.
      */
     void useEvtT0()
     {
@@ -121,9 +121,9 @@ namespace Belle2 {
     }
 
     /**
-     * Set the lower number of hits collected on one sigle strip.
-     * If the hit number is lower than the limit, the strip will not be calibrated
-     * and set the average value of the calibration constant.
+     * Set the lower number of hits collected on one sigle strip. If the hit
+     * number is lower than the limit, the strip will not be calibrated and
+     * set the average value of the calibration constant.
      */
     void setLowerLimit(int counts)
     {
@@ -131,7 +131,7 @@ namespace Belle2 {
     }
 
     /**
-     * Save histograms to file
+     * Save histograms to file.
      */
     void saveHist();
 
@@ -152,13 +152,16 @@ namespace Belle2 {
 
 
   protected:
-    // Run algo on data
+
+    /**
+     * Run algorithm on data.
+     */
     virtual EResult calibrate() override;
 
-
   private:
+
     /**
-     * data struct used in collector and alogrithm.
+     * Data struct used in collector and algorithm.
      */
     struct Event ev;
 
@@ -176,8 +179,11 @@ namespace Belle2 {
     /** Container of hit information of one sigle strip. */
     std::vector<struct Event> m_evtsChannel;
 
-    /** Calibration flag if the channel has enough hits collected and fitted OK. */
-    std::map<uint16_t, int>   m_cFlag;
+    /**
+     * Calibration flag if the channel has enough hits collected and
+     * fitted OK.
+     */
+    std::map<uint16_t, int> m_cFlag;
 
     /** Shift values of ecah channel. */
     std::map<uint16_t, double> m_timeShift;
@@ -194,16 +200,26 @@ namespace Belle2 {
     /** Central value error of the global time distribution (BKLM RPC part). */
     double m_etime_channelAvg_rpc;
 
-    /** Central value of the global time distribution (BKLM scintillator part). */
+    /**
+     * Central value of the global time distribution (BKLM scintillator part).
+     */
     double m_time_channelAvg_scint;
 
-    /** Central value error of the global time distribution (BKLM scintillator part). */
+    /**
+     * Central value error of the global time distribution
+     * (BKLM scintillator part).
+     */
     double m_etime_channelAvg_scint;
 
-    /** Central value of the global time distribution (EKLM scintillator part). */
+    /**
+     * Central value of the global time distribution (EKLM scintillator part).
+     */
     double m_time_channelAvg_scint_end;
 
-    /** Central value error of the global time distribution (EKLM scintillator part). */
+    /**
+     * Central value error of the global time distribution
+     * (EKLM scintillator part).
+     */
     double m_etime_channelAvg_scint_end;
 
     /** Lower limit of hits collected for on single channel. */
@@ -215,11 +231,10 @@ namespace Belle2 {
     /** KLM ChannelIndex object. */
     KLMChannelIndex m_klmChannels;
 
+    /** Minimization options. */
     ROOT::Math::MinimizerOptions m_minimizerOptions;
-    /**
-     * DBObject of time cost on some parts of
-     * the detector.
-     */
+
+    /** DBObject of time cost on some parts of the detector. */
     KLMTimeConstants* m_timeConstants;
 
     /**
@@ -234,241 +249,272 @@ namespace Belle2 {
     /** MC or data. */
     bool m_mc;
 
-    /** if use event T0 from CDC */
+    /** Whether to use event T0 from CDC. */
     bool m_useEventT0;
 
-    /** Calibration Statistics for each channel */
+    /** Calibration statistics for each channel. */
     TH1I* h_calibrated;
 
-    /** distance between global and local position */
+    /** Distance between global and local position. */
     TH1D* h_diff;
 
-    /* Monitor Graphe of peak value of time distribution for each channel */
+    /* Monitor graphs of peak value of time distribution for each channel. */
 
-    /** BKLM RPC */
+    /** BKLM RPC. */
     TGraphErrors* gre_time_channel_rpc;
 
-    /** BKLM Scintillator */
+    /** BKLM Scintillator. */
     TGraphErrors* gre_time_channel_scint;
 
-    /** EKLM */
+    /** EKLM. */
     TGraphErrors* gre_time_channel_scint_end;
 
-    /* Monitor Graphe of calibration constant value of each channel */
+    /* Monitor graphs of calibration constant value of each channel. */
 
-    /** BKLM RPC */
+    /** BKLM RPC. */
     TGraph* gr_timeShift_channel_rpc;
 
-    /** BKLM Scintillator */
+    /** BKLM scintillator. */
     TGraph* gr_timeShift_channel_scint;
 
     /** EKLM */
     TGraph* gr_timeShift_channel_scint_end;
 
-    /* Profiles used for effected light speed estimation */
+    /* Profiles used for effective light speed estimation. */
 
-    /** For BKLM RPC phi plane */
+    /** For BKLM RPC phi plane. */
     TProfile* hprf_rpc_phi_effC;
 
-    /** For BKLM RPC z plane */
+    /** For BKLM RPC z plane. */
     TProfile* hprf_rpc_z_effC;
 
-    /** For BKLM scintillator phi plane */
+    /** For BKLM scintillator phi plane. */
     TProfile* hprf_scint_phi_effC;
 
-    /** For BKLM scintillator z plane */
+    /** For BKLM scintillator z plane. */
     TProfile* hprf_scint_z_effC;
 
-    /** For EKLM scintillator plane1 */
+    /** For EKLM scintillator plane1. */
     TProfile* hprf_scint_plane1_effC_end;
 
-    /** For EKLM scintillator plane2 */
+    /** For EKLM scintillator plane2. */
     TProfile* hprf_scint_plane2_effC_end;
 
-    /* Histograms of Global time distribution used for effected light speed estimation */
-
-    /** BKLM RPC part */
-    TH1D* h_time_rpc_tc;
-
-    /** BKLM scintillator part */
-    TH1D* h_time_scint_tc;
-
-    /** EKLM part */
-    TH1D* h_time_scint_tc_end;
-
-    /* Histograms of Global time distribution before calibration */
-
-    /** BKLM RPC part */
-    TH1D* h_time_rpc;
-
-    /** BKLM scintillator part */
-    TH1D* h_time_scint;
-
-    /** EKLM part */
-    TH1D* h_time_scint_end;
-
-    /* Histograms of Global time distribution after calibration */
-
-    /** BKLM RPC part */
-    TH1D* hc_time_rpc;
-
-    /** BKLM scintillator part */
-    TH1D* hc_time_scint;
-
-    /** EKLM part */
-    TH1D* hc_time_scint_end;
-
-    /* Histograms of Time distribution for forward(backward) before calibration */
-
-    /** BKLM RPC part */
-    TH1D* h_timeF_rpc[2];
-
-    /** BKLM scintillator part */
-    TH1D* h_timeF_scint[2];
-
-    /** EKLM part */
-    TH1D* h_timeF_scint_end[2];
-
-    /* Histograms of Time distribution for forward(backward) after calibration */
-    /** BKLM RPC part */
-    TH1D* hc_timeF_rpc[2];
-
-    /** BKLM scintillator part */
-    TH1D* hc_timeF_scint[2];
-
-    /** EKLM part */
-    TH1D* hc_timeF_scint_end[2];
-
-    /* Histograms of Time dependent on sector for forward(backward) before calibration */
-
-    /** BKLM RPC part */
-    TH2D* h2_timeF_rpc[2];
-
-    /** BKLM scintillator part */
-    TH2D* h2_timeF_scint[2];
-
-    /** EKLM part */
-    TH2D* h2_timeF_scint_end[2];
-
-    /* Histograms of Time dependent on sector for forward(backward) after calibration */
-
-    /** BKLM RPC part */
-    TH2D* h2c_timeF_rpc[2];
-
-    /** BKLM scintillator part */
-    TH2D* h2c_timeF_scint[2];
-
-    /** EKLM part */
-    TH2D* h2c_timeF_scint_end[2];
-
-    /* Histograms of Time distribution for sectors before calibration */
-
-    /** BKLM RPC part */
-    TH1D* h_timeFS_rpc[2][8];
-
-    /** BKLM scintillator part */
-    TH1D* h_timeFS_scint[2][8];
-
-    /** EKLM part */
-    TH1D* h_timeFS_scint_end[2][4];
-
-    /* Histograms of Time distribution for sectors after calibration */
-
-    /** BKLM RPC part */
-    TH1D* hc_timeFS_rpc[2][8];
-
-    /** BKLM scintillator part */
-    TH1D* hc_timeFS_scint[2][8];
-
-    /** EKLM part */
-    TH1D* hc_timeFS_scint_end[2][4];
-
-    /* Histograms of Time distribution dependent on layer
-     * of sectors before calibration
+    /*
+     * Histograms of global time distribution used for effective light speed
+     * estimation.
      */
 
-    /** BKLM part */
+    /** BKLM RPC part. */
+    TH1D* h_time_rpc_tc;
+
+    /** BKLM scintillator part. */
+    TH1D* h_time_scint_tc;
+
+    /** EKLM part. */
+    TH1D* h_time_scint_tc_end;
+
+    /* Histograms of global time distribution before calibration. */
+
+    /** BKLM RPC part. */
+    TH1D* h_time_rpc;
+
+    /** BKLM scintillator part. */
+    TH1D* h_time_scint;
+
+    /** EKLM part. */
+    TH1D* h_time_scint_end;
+
+    /* Histograms of global time distribution after calibration. */
+
+    /** BKLM RPC part. */
+    TH1D* hc_time_rpc;
+
+    /** BKLM scintillator part. */
+    TH1D* hc_time_scint;
+
+    /** EKLM part. */
+    TH1D* hc_time_scint_end;
+
+    /*
+     * Histograms of time distribution for forward (backward)
+     * before calibration.
+     */
+
+    /** BKLM RPC part. */
+    TH1D* h_timeF_rpc[2];
+
+    /** BKLM scintillator part. */
+    TH1D* h_timeF_scint[2];
+
+    /** EKLM part. */
+    TH1D* h_timeF_scint_end[2];
+
+    /*
+     * Histograms of time distribution for forward (backward)
+     * after calibration.
+     */
+
+    /** BKLM RPC part. */
+    TH1D* hc_timeF_rpc[2];
+
+    /** BKLM scintillator part. */
+    TH1D* hc_timeF_scint[2];
+
+    /** EKLM part. */
+    TH1D* hc_timeF_scint_end[2];
+
+    /*
+     * Histograms of time dependent on sector for forward (backward)
+     * before calibration.
+     */
+
+    /** BKLM RPC part. */
+    TH2D* h2_timeF_rpc[2];
+
+    /** BKLM scintillator part. */
+    TH2D* h2_timeF_scint[2];
+
+    /** EKLM part. */
+    TH2D* h2_timeF_scint_end[2];
+
+    /*
+     * Histograms of time dependent on sector for forward (backward)
+     * after calibration.
+     */
+
+    /** BKLM RPC part. */
+    TH2D* h2c_timeF_rpc[2];
+
+    /** BKLM scintillator part. */
+    TH2D* h2c_timeF_scint[2];
+
+    /** EKLM part. */
+    TH2D* h2c_timeF_scint_end[2];
+
+    /* Histograms of time distribution for sectors before calibration. */
+
+    /** BKLM RPC part. */
+    TH1D* h_timeFS_rpc[2][8];
+
+    /** BKLM scintillator part. */
+    TH1D* h_timeFS_scint[2][8];
+
+    /** EKLM part. */
+    TH1D* h_timeFS_scint_end[2][4];
+
+    /* Histograms of time distribution for sectors after calibration. */
+
+    /** BKLM RPC part. */
+    TH1D* hc_timeFS_rpc[2][8];
+
+    /** BKLM scintillator part. */
+    TH1D* hc_timeFS_scint[2][8];
+
+    /** EKLM part. */
+    TH1D* hc_timeFS_scint_end[2][4];
+
+    /*
+     * Histograms of time distribution dependent on layer of sectors
+     * before calibration.
+     */
+
+    /** BKLM part. */
     TH2D* h2_timeFS[2][8];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH2D* h2_timeFS_end[2][4];
 
-    /* Histograms of Time distribution dependent on layer
-     * of sectors after calibration */
+    /*
+     * Histograms of time distribution dependent on layer of sectors
+     * after calibration.
+     */
 
-    /** BKLM part */
+    /** BKLM part. */
     TH2D* h2c_timeFS[2][8];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH2D* h2c_timeFS_end[2][4];
 
-    /* Histograms of Time distribution of one layer before calibration */
-    /** BKLM part */
+    /* Histograms of time distribution of one layer before calibration. */
+
+    /** BKLM part. */
     TH1D* h_timeFSL[2][8][15];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH1D* h_timeFSL_end[2][4][14];
 
-    /* Histograms of Time distribution of one layer after calibration */
-    /** BKLM part */
+    /* Histograms of time distribution of one layer after calibration. */
+
+    /** BKLM part. */
     TH1D* hc_timeFSL[2][8][15];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH1D* hc_timeFSL_end[2][4][14];
 
-    /* Histograms of Time distribution of one plane before calibration */
-    /** BKLM part */
+    /* Histograms of time distribution of one plane before calibration. */
+
+    /** BKLM part. */
     TH1D* h_timeFSLP[2][8][15][2];
-    /** EKLM part */
+
+    /** EKLM part. */
     TH1D* h_timeFSLP_end[2][4][14][2];
 
-    /* Histograms of Time distribution of one plane after calibration */
+    /* Histograms of time distribution of one plane after calibration. */
 
-    /** BKLM part */
+    /** BKLM part. */
     TH1D* hc_timeFSLP[2][8][15][2];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH1D* hc_timeFSLP_end[2][4][14][2];
 
-    /* Histograms of Time distribution dependent on channels before calibration */
-    /** BKLM part */
+    /*
+     * Histograms of time distribution dependent on channels
+     * before calibration.
+     */
+
+    /** BKLM part. */
     TH2D* h2_timeFSLP[2][8][15][2];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH2D* h2_timeFSLP_end[2][4][14][2];
 
-    /* Histograms of Time distribution dependent on channels after calibration */
-    /** BKLM part */
+    /*
+     * Histograms of time distribution dependent on channels
+     * after calibration.
+     */
+
+    /** BKLM part. */
     TH2D* h2c_timeFSLP[2][8][15][2];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH2D* h2c_timeFSLP_end[2][4][14][2];
 
-    /* Histograms of Time distribution of each channel befor calibration */
+    /* Histograms of time distribution of each channel before calibration. */
 
-    /** BKLM part, used for effected light speed estimation */
+    /** BKLM part, used for effective light speed estimation. */
     TH1D* h_timeFSLPC_tc[2][8][15][2][54];
 
-    /** BKLM part */
+    /** BKLM part. */
     TH1D* h_timeFSLPC[2][8][15][2][54];
 
-    /** EKLM part, used for effected light speed estimation */
+    /** EKLM part, used for effective light speed estimation. */
     TH1D* h_timeFSLPC_tc_end[2][4][14][2][75];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH1D* h_timeFSLPC_end[2][4][14][2][75];
 
-    /* Histograms of Time distribution of each channel after calibration */
+    /* Histograms of time distribution of each channel after calibration. */
 
-    /** BKLM part */
+    /** BKLM part. */
     TH1D* hc_timeFSLPC[2][8][15][2][54];
 
-    /** EKLM part */
+    /** EKLM part. */
     TH1D* hc_timeFSLPC_end[2][4][14][2][75];
 
-    /* Formulas used for fitting */
+    /* Formulas used for fitting. */
 
-    /** Pol1 function. Effected light speed fitting. */
+    /** Pol1 function. Effective light speed fitting. */
     TF1* fcn_pol1;
 
     /** Const function. Global time distribution fitting. */
@@ -484,5 +530,6 @@ namespace Belle2 {
     TFile* m_outFile;
 
   };
+
 }
 

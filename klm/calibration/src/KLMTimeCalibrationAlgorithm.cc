@@ -515,9 +515,9 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   /**********************************
    * First loop
-   * Estimation of effected light speed for Scintillators and RPCs, separately.
+   * Estimation of effective light speed for Scintillators and RPCs, separately.
    **********************************/
-  B2INFO("Effected Light Speed Estimation.");
+  B2INFO("Effective Light Speed Estimation.");
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
@@ -564,7 +564,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       }
     }
   }
-  B2INFO("Effected Light Speed Estimation! Hists and Graph filling done.");
+  B2INFO("Effective Light Speed Estimation! Hists and Graph filling done.");
 
   m_timeShift.clear();
 
@@ -609,7 +609,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   delete h_time_scint_tc;
   delete h_time_scint_tc_end;
   delete h_time_rpc_tc;
-  B2INFO("Effected Light m_timeShift obtained. done.");
+  B2INFO("Effective Light m_timeShift obtained. done.");
 
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
@@ -692,21 +692,21 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   TString logStr_phi, logStr_z;
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_rpc_phi, e_effC_rpc_phi);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_rpc_z, e_effC_rpc_z);
-  B2INFO("Estimation of Effected Speed Light of RPCs: "
+  B2INFO("Estimation of Effective Speed Light of RPCs: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_phi, e_effC_scint_phi);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_z, e_effC_scint_z);
-  B2INFO("Estimation of Effected Speed Light of Scintillators: "
+  B2INFO("Estimation of Effective Speed Light of Scintillators: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_plane1_end, e_effC_scint_plane1_end);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_plane2_end, e_effC_scint_plane2_end);
-  B2INFO("Estimation of Effected Speed Light of Scintillators (EKLM): "
+  B2INFO("Estimation of Effective Speed Light of Scintillators (EKLM): "
          << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
-  // Default Effected Light Speed in current Database
+  // Default Effective Light Speed in current Database
   effSpeed_end = 0.5 * (fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end));
   effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
   effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));

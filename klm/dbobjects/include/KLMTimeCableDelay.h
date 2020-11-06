@@ -63,4 +63,5 @@ namespace Belle2 {
     ClassDef(KLMTimeCableDelay, 1);
 
   };
+
 }

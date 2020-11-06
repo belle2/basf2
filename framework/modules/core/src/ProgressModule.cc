@@ -38,7 +38,6 @@ void ProgressModule::initialize()
 {
   // Force module logging level to be c_Info
   setLogLevel(LogConfig::c_Info);
-  m_runNr = m_evtNr = 0;
   m_totalEvtNr = Environment::Instance().getNumberOfEvents();
 }
 

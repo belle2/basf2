@@ -215,12 +215,13 @@ void KLMReconstructorModule::reconstructBKLMHits()
   std::vector<const KLMDigit*> digitCluster;
   uint16_t previousChannel = channelDigitMap.begin()->first;
   double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
-  if (m_timeCableDelayCorrection) correctCableDelay(averageTime,
-                                                      m_Digits[channelDigitMap.begin()->second]); // New, for time calibration.
+  if (m_timeCableDelayCorrection)
+    correctCableDelay(averageTime, m_Digits[channelDigitMap.begin()->second]);
   for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
     const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
-    if (m_timeCableDelayCorrection) correctCableDelay(digitTime, digit);
+    if (m_timeCableDelayCorrection)
+      correctCableDelay(digitTime, digit);
     if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_CoincidenceWindow)) {
       m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
       digitCluster.clear();
@@ -231,7 +232,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
     digitCluster.push_back(digit);
   }
   BKLMHit1d* hit1d = new BKLMHit1d(digitCluster);
-  if (m_timeCableDelayCorrection) hit1d->setTime(averageTime);
+  if (m_timeCableDelayCorrection)
+    hit1d->setTime(averageTime);
   m_bklmHit1ds.appendNew(*hit1d); // Also sets relation BKLMHit1d -> KLMDigit
 
   /* Construct BKLMHit2Ds from orthogonal same-module BKLMHit1Ds. */

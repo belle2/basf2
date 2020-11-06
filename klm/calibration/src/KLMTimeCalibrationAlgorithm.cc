@@ -523,7 +523,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     int iSub = klmChannel.getSubdetector();
 
     m_cFlag[channelId] = 0;
-    if (m_evts.find(channelId) == m_evts.end()) continue;
+    if (m_evts.find(channelId) == m_evts.end())
+      continue;
     m_evtsChannel = m_evts[channelId];
 
     int n = m_evtsChannel.size();
@@ -538,7 +539,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       TVector3 diffD = TVector3(it_v->diffDistX, it_v->diffDistY, it_v->diffDistZ);
       h_diff->Fill(diffD.Mag());
       double timeHit = it_v->time();
-      if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      if (m_useEventT0)
+        timeHit = timeHit - it_v->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -575,7 +577,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
-    if (!m_cFlag[channelId]) continue;
+    if (!m_cFlag[channelId])
+      continue;
 
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
@@ -610,14 +613,16 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
-    if (!m_cFlag[channelId]) continue;
+    if (!m_cFlag[channelId])
+      continue;
 
     m_evtsChannel = m_evts[channelId];
     int iSub = klmChannel.getSubdetector();
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       double timeHit = it_v->time() - m_timeShift[channelId];
-      if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      if (m_useEventT0)
+        timeHit = timeHit - it_v->t0;
       double distHit = it_v->dist;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
@@ -724,12 +729,14 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
 
-    if (!m_cFlag[channelId]) continue;
+    if (!m_cFlag[channelId])
+      continue;
     m_evtsChannel = m_evts[channelId];
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       double timeHit = it_v->time();
-      if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      if (m_useEventT0)
+        timeHit = timeHit - it_v->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -786,7 +793,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   int iChannel_end = 0;
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
-    if (!m_cFlag[channelId]) continue;
+    if (!m_cFlag[channelId])
+      continue;
     int iSub = klmChannel.getSubdetector();
 
     if (iSub == KLMElementNumbers::c_BKLM) {
@@ -797,8 +805,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       int iC = klmChannel.getStrip() - 1;
 
       TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
-      if (int(r) != 0) continue;
-      if (int(r) == 0) m_cFlag[channelId] = 2;
+      if (int(r) != 0)
+        continue;
+      if (int(r) == 0)
+        m_cFlag[channelId] = 2;
       m_time_channel[channelId] = fcn_gaus->GetParameter(1);
       m_etime_channel[channelId] = fcn_gaus->GetParError(1);
       if (iL > 1) {
@@ -818,8 +828,10 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       int iC = klmChannel.getStrip() - 1;
 
       TFitResultPtr r = h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
-      if (int(r) != 0) continue;
-      if (int(r) == 0) m_cFlag[channelId] = 2;
+      if (int(r) != 0)
+        continue;
+      if (int(r) == 0)
+        m_cFlag[channelId] = 2;
       m_time_channel[channelId] = fcn_gaus->GetParameter(1);
       m_etime_channel[channelId] = fcn_gaus->GetParError(1);
       gre_time_channel_scint_end->SetPoint(iChannel_end, channelId, m_time_channel[channelId]);
@@ -850,7 +862,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
     h_calibrated->Fill(int(m_cFlag[channelId]));
-    if (m_time_channel.find(channelId) == m_time_channel.end()) continue;
+    if (m_time_channel.find(channelId) == m_time_channel.end())
+      continue;
 
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
@@ -868,7 +881,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
-    if (m_timeShift.find(channelId) != m_timeShift.end()) continue;
+    if (m_timeShift.find(channelId) != m_timeShift.end())
+      continue;
     m_timeShift[channelId] = esti_timeShift(klmChannel);
     m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
     B2DEBUG(29, "Uncalibrated Estimation " << LogVar("Channel", channelId) << LogVar("Estimated value", m_timeShift[channelId]));
@@ -905,7 +919,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     m_evtsChannel = m_evts[channelId];
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       double timeHit = it_v->time();
-      if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      if (m_useEventT0)
+        timeHit = timeHit - it_v->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -1139,7 +1154,8 @@ double KLMTimeCalibrationAlgorithm::esti_timeShift(KLMChannelIndex& klmChannel)
   int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   int totNStrips = EKLMElementNumbers::getMaximalStripNumber();
-  if (iSub == KLMElementNumbers::c_BKLM) totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
+  if (iSub == KLMElementNumbers::c_BKLM)
+    totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
   if (iC == 1) {
     KLMChannelIndex kCIndex_upper(iSub, iF, iS, iL, iP, iC + 1);
     tS = tS_upperStrip(kCIndex_upper).second;
@@ -1170,7 +1186,8 @@ std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(KLMChannelInde
   int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   int totNStrips = EKLMElementNumbers::getMaximalStripNumber();
-  if (iSub == KLMElementNumbers::c_BKLM) totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
+  if (iSub == KLMElementNumbers::c_BKLM)
+    totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
   if (m_timeShift.find(cId) != m_timeShift.end()) {
     tS.first = iC;
     tS.second = m_timeShift[cId];

@@ -130,9 +130,9 @@ void KLMReconstructorModule::beginRun()
   m_PromptTime = m_TimeWindow->getPromptTime();
   m_PromptWindow = m_TimeWindow->getPromptWindow();
   if (m_timeCableDelayCorrection) {
-    m_effC_RPC = m_timeConstants->getEffLightSpeed(3);
-    m_effC_bklm = m_timeConstants->getEffLightSpeed(2);
-    m_effC_eklm = m_timeConstants->getEffLightSpeed(1);
+    m_effC_eklm = m_timeConstants->getEffLightSpeed(KLMTimeConstants::c_EKLM);
+    m_effC_bklm = m_timeConstants->getEffLightSpeed(KLMTimeConstants::c_BKLM);
+    m_effC_RPC = m_timeConstants->getEffLightSpeed(KLMTimeConstants::c_RPC);
   }
   /* EKLM. */
   /* cppcheck-suppress variableScope */

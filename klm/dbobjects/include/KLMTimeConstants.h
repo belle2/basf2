@@ -21,15 +21,16 @@ namespace Belle2 {
   class KLMTimeConstants : public TObject {
 
   public:
+
     /**
      * Channel type.
      */
     enum ChannelType {
 
-      /** EKLM Scintillator. */
+      /** EKLM scintillator. */
       c_EKLM = 1,
 
-      /** BKLM Scintillator. */
+      /** BKLM scintillator. */
       c_BKLM = 2,
 
       /** RPC. */

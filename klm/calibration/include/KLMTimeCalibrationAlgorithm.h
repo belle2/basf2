@@ -61,8 +61,15 @@ namespace Belle2 {
       bool     inRPC;
       /** If phi and z plane flipped, used for testing and not necessary */
       bool     isFlipped;
-      /** Return propagation time + cableDelay time. */
-      double   time() { return recTime - flyTime; }
+
+      /**
+       * Get propagation time + cableDelay time.
+       */
+      double time()
+      {
+        return recTime - flyTime;
+      }
+
     };
 
     /**
@@ -78,25 +85,37 @@ namespace Belle2 {
     /**
      * Turn on debug mode (prints histograms and output running log).
      */
-    void setDebug() { m_debug = true; }
+    void setDebug()
+    {
+      m_debug = true;
+    }
 
     /**
      * If the input is MC sample.
      * Different histogram scale of data and mc
      */
-    void isMC()     { m_mc = true; }
+    void isMC()
+    {
+      m_mc = true;
+    }
 
     /**
      * Use event T0 as the initial time point or not
      */
-    void useEvtT0() { m_useEventT0 = true; }
+    void useEvtT0()
+    {
+      m_useEventT0 = true;
+    }
 
     /**
      * Set the lower number of hits collected on one sigle strip.
      * If the hit number is lower than the limit, the strip will not be calibrated
      * and set the average value of the calibration constant.
      */
-    void setLowerLimit(int counts) { m_lower_limit_counts = counts; }
+    void setLowerLimit(int counts)
+    {
+      m_lower_limit_counts = counts;
+    }
 
     /**
      * Save histograms to file

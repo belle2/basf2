@@ -43,10 +43,10 @@ void DAQMonitorModule::defineHisto()
   h_svdSize = new TH1F("SVDDataSize", "SVD Data Size", 100, 0.0, 100000.0);
   h_cdcSize = new TH1F("CDCDataSize", "CDC Data Size", 100, 0.0, 100000.0);
   h_topSize = new TH1F("TOPDataSize", "TOP Data Size", 100, 0.0, 100000.0);
-  h_arichSize = new TH1F("ARICHDataSize", "ARICH Data Size", 100, 0.0, 100000.0);
+  h_arichSize = new TH1F("ARICHDataSize", "ARICH Data Size", 100, 0.0, 40000.0);
   h_eclSize = new TH1F("ECLDataSize", "ECL Data Size", 100, 0.0, 100000.0);
-  h_klmSize = new TH1F("KLMDataSize", "KLM Data Size", 100, 0.0, 100000.0);
-  h_trgSize = new TH1F("TRGDataSize", "TRG Data Size", 100, 0.0, 200000.0);
+  h_klmSize = new TH1F("KLMDataSize", "KLM Data Size", 100, 0.0, 40000.0);
+  h_trgSize = new TH1F("TRGDataSize", "TRG Data Size", 100, 0.0, 40000.0);
   h_hltSize = new TH1F("HLTDataSize", "HLT Data Size", 100, 0.0, 300000.0);
   h_totalSize = new TH1F("TotalDataSize", "Total (HLT + PXD) Data Size", 100, 0.0, 300000.0);
   oldDir->cd();

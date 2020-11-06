@@ -56,7 +56,7 @@ void DAQMonitorModule::defineHisto()
   oldDir->mkdir("DAQ");
   oldDir->cd("DAQ");
 
-  h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
+  h_nevt = new TH1F("Nevent", "Number of Events", 3, 0.0, 2.0);
 
   h_size = new TH1F("TotalDataSize", "Total Data Size", 100, 0.0, 300000.0);
   h_hltsize = new TH1F("HLTDataSize", "HLT Data Size", 100, 0.0, 300000.0);
@@ -110,7 +110,7 @@ void DAQMonitorModule::terminate()
 
 void DAQMonitorModule::event()
 {
-  h_nevt->Fill((float)m_nevt);
+  h_nevt->Fill(1.0);
 
   // PXD
   StoreArray<RawPXD> rawpxd;

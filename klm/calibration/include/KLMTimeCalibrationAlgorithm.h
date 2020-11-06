@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
 
@@ -20,13 +20,13 @@
 #include <calibration/CalibrationAlgorithm.h>
 
 /* ROOT headers. */
+#include <Math/MinimizerOptions.h>
 #include <TF1.h>
 #include <TGraphErrors.h>
 #include <TH1D.h>
 #include <TH1I.h>
 #include <TH2D.h>
 #include <TProfile.h>
-#include <Math/MinimizerOptions.h>
 
 namespace Belle2 {
   /**

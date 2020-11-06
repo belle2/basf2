@@ -15,9 +15,9 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
 
 /* Belle 2 headers */
 #include <calibration/CalibrationCollectorModule.h>

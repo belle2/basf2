@@ -15,17 +15,17 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
 /* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <framework/core/Environment.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 /* ROOT headers. */
+#include <Math/MinimizerOptions.h>
 #include <TFile.h>
 #include <TFitResult.h>
 #include <TString.h>
 #include <TTree.h>
 #include <TVector3.h>
-#include <Math/MinimizerOptions.h>
 
 using namespace Belle2;
 using namespace ROOT::Math;

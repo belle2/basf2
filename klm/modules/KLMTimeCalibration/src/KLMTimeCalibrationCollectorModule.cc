@@ -30,7 +30,7 @@
 #include <TTree.h>
 
 /* C++ headers. */
-#include  <utility>
+#include <utility>
 
 using namespace Belle2;
 using namespace Belle2::bklm;

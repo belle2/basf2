@@ -53,9 +53,12 @@ void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
     }
     for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
       GearDir detectorContent(content);
-      if (detector == 0) detectorContent.append("/TransversePDF/BarrelAndEndcap");
-      if (detector == 1) detectorContent.append("/TransversePDF/BarrelOnly");
-      if (detector == 2) detectorContent.append("/TransversePDF/EndcapOnly");
+      if (detector == 0)
+        detectorContent.append("/TransversePDF/BarrelAndEndcap");
+      if (detector == 1)
+        detectorContent.append("/TransversePDF/BarrelOnly");
+      if (detector == 2)
+        detectorContent.append("/TransversePDF/EndcapOnly");
       for (int halfNdof = 1; halfNdof <= MuidElementNumbers::getMaximalHalfNdof(); ++halfNdof) {
         double reducedChiSquaredThreshold = detectorContent.getDouble((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Tail/Threshold") %
                                             (2 * halfNdof)).str());

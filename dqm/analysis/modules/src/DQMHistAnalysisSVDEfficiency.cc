@@ -337,7 +337,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   if (matched_clusV == NULL || found_tracksV == NULL) {
     B2INFO("Histograms needed for Average Efficiency on V side are not found");
-    m_monObj->setVariable("avgEffV", avgEffV);
+    m_monObj->setVariable("avgEffV", -1);
   } else {
     double avgEffV = 1.*matched_clusV->GetEntries() / found_tracksV->GetEntries();
     m_monObj->setVariable("avgEffV", avgEffV);

@@ -6,16 +6,11 @@
 # create data store contents from Python modules.
 ######################################################
 
-import os
 import math
-import random
-import numpy as np
 
 import basf2
 import ROOT
 from ROOT import Belle2
-
-import simulation
 
 
 class SillyGeneratorModule(basf2.Module):

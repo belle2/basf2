@@ -17,8 +17,6 @@ import flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
-import ROOT
-import sys
 
 # create path
 cp_val_path = b2.Path()

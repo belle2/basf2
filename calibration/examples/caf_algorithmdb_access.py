@@ -9,12 +9,11 @@
 # that depends on it. AND we're going to show that when you have multiple algorithms
 # in a SINGLE Calibration, the constants are passed forwards to the next as they get saved.
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestDBAccessAlgorithm
 
 from caf.framework import Calibration, CAF
@@ -36,7 +35,7 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
-    dep_col = register_module('CaTest')
+    dep_col = b2.register_module('CaTest')
     dep_col.set_name('Dependent')   # Sets the prefix of the collected data in the datastore.
     # Allows us to execute algorithm over input data in a run-by-run way so we can see DB constants from each run.
     dep_col.param('granularity', 'run')
@@ -61,7 +60,7 @@ def main(argv):
     dep_cal.max_iterations = 5
 
     # This one runs last and picks up the final DB constants from the first one
-    last_col = register_module('CaTest')
+    last_col = b2.register_module('CaTest')
     last_col.set_name('Last')   # Sets the prefix of the collected data in the datastore.
     # Allows us to execute algorithm over input data in a run-by-run way so we can see DB constants from each run.
     last_col.param('granularity', 'run')

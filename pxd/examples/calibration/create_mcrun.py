@@ -20,7 +20,7 @@
 
 
 import glob
-from basf2 import *
+import basf2 as b2
 
 import argparse
 parser = argparse.ArgumentParser(
@@ -56,17 +56,17 @@ args = parser.parse_args()
 bg = glob.glob(args.bg + '/set' + str(args.setNo) + '/*.root')
 
 
-reset_database()
-use_central_database(args.tag)
+b2.reset_database()
+b2.use_central_database(args.tag)
 
-main = create_path()
+main = b2.create_path()
 main.add_module(
     "EventInfoSetter", expList=[
         args.expNo], runList=[
             args.runNo], evtNumList=[1000])
 main.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
 main.add_module("Geometry", useDB=False)
-bkgmixer = register_module('BeamBkgMixer')
+bkgmixer = b2.register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
 bkgmixer.param('overallScaleFactor', args.scaleFactor)
 main.add_module(bkgmixer)
@@ -80,5 +80,5 @@ output.param(
 output.param('branchNames', ['PXDSimHits', 'EventMetaData'])
 main.add_module("Progress")
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -1,14 +1,14 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 import rawdata as raw
 import tracking as tr
 from basf2 import conditions as b2conditions
-from svd import utils
+from caf.SVD3SampleCoGTimeCalibrationPromptCAF import remove_module
 
-main = Path()
+main = b2.Path()
 outputFile = sys.argv[1]
 
 b2conditions.prepend_globaltag('data_reprocessing_prompt')
@@ -31,7 +31,7 @@ main = remove_module(main, 'FullGridChi2TrackTimeExtractor')
 
 
 # ROI finder
-svdDataRed = register_module('SVDROIFinder')
+svdDataRed = b2.register_module('SVDROIFinder')
 param_svdDataRed = {
     'recoTrackListName': 'RecoTracks',
     'SVDInterceptListName': 'SVDIntercepts',
@@ -40,7 +40,7 @@ svdDataRed.param(param_svdDataRed)
 # svdDataRed.logging.log_level = LogLevel.INFO
 main.add_module(svdDataRed)
 
-dqm = register_module('SVDDQMEfficiency')
+dqm = b2.register_module('SVDDQMEfficiency')
 dqm.param("svdClustersName", "SVDClusters")
 dqm.param("interceptsName", "SVDIntercepts")
 dqm.param("histogramDirectoryName", "svdeff")
@@ -57,8 +57,8 @@ main.add_module(dqm)
 
 # Process the events
 main.add_module('Progress')
-print_path(main)
-process(main)
+b2.print_path(main)
+b2.process(main)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

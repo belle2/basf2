@@ -339,6 +339,14 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
 
   // variables for run dependent monitoring
 
+  //Efficiency for the U side
+  TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
+  TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
+
+  //Efficiency for the V side
+  TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
+  TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
+
   if (matched_clusU == NULL || found_tracksU == NULL) {
     B2INFO("Histograms needed for Average Efficiency on U side are not found");
     m_monObj->setVariable("avgEffU", -1);

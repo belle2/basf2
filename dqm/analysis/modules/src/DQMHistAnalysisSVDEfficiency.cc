@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.cc
-// Description :
+// Description : Description: module for DQM histogram analysis of SVD sensors efficiencies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20190428
@@ -54,13 +54,15 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_refFile = new TFile(m_refFileName.data(), "READ");
   }
 
+  m_monObj = getMonitoringObject("svd");
+
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
     B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
 
     TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
     if (!ref_eff)
-      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Refence not found! using module parameters");
+      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
     else {
       m_effEmpty = ref_eff->GetBinContent(1);
       m_effWarning = ref_eff->GetBinContent(2);
@@ -323,6 +325,23 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
 
+  // variables for run dependent monitoring
+
+  if (matched_clusU == NULL || found_tracksU == NULL) {
+    B2INFO("Histograms needed for Average Efficiency on U side are not found");
+    m_monObj->setVariable("avgEffU", -1);
+  } else {
+    double avgEffU = 1.*matched_clusU->GetEntries() / found_tracksU->GetEntries();
+    m_monObj->setVariable("avgEffU", avgEffU);
+  }
+
+  if (matched_clusV == NULL || found_tracksV == NULL) {
+    B2INFO("Histograms needed for Average Efficiency on V side are not found");
+    m_monObj->setVariable("avgEffV", avgEffV);
+  } else {
+    double avgEffV = 1.*matched_clusV->GetEntries() / found_tracksV->GetEntries();
+    m_monObj->setVariable("avgEffV", avgEffV);
+  }
 
 }
 

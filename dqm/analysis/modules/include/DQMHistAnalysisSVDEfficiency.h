@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.h
-// Description : An example module for DQM histogram analysis
+// Description : module for DQM histogram analysis of SVD sensors efficiencies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20190428
@@ -54,9 +54,9 @@ namespace Belle2 {
 
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */
     TCanvas* m_cEfficiencyV = nullptr; /**< efficiency V plot canvas */
-    SVDSummaryPlots* m_hEfficiency = nullptr; /**< efficiency  histo */
+    SVDSummaryPlots* m_hEfficiency = nullptr; /**< efficiency histo */
     TCanvas* m_cEfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
-    TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency Verror plot canvas */
+    TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
@@ -73,6 +73,8 @@ namespace Belle2 {
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
 
   };
 } // end namespace Belle2

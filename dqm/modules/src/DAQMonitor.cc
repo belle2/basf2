@@ -9,17 +9,6 @@
 /* Own header. */
 #include <dqm/modules/DAQMonitor.h>
 
-/* Belle 2 headers. */
-#include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawCDC.h>
-#include <rawdata/dataobjects/RawTOP.h>
-#include <rawdata/dataobjects/RawARICH.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawTRG.h>
-
 /* ROOT headers. */
 #include <TDirectory.h>
 
@@ -29,7 +18,7 @@ REG_MODULE(DAQMonitor)
 
 DAQMonitorModule::DAQMonitorModule() : HistoModule()
 {
-  setDescription("Monitor Raw Data");
+  setDescription("This module produces general DAQ DQM histograms.");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

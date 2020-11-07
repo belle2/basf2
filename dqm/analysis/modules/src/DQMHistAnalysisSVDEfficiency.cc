@@ -325,6 +325,18 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
 
+}
+
+void DQMHistAnalysisSVDEfficiencyModule::endRun()
+{
+  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
+  if (m_printCanvas) {
+    m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
+    m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
+    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
+    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
+  }
+
   // variables for run dependent monitoring
 
   if (matched_clusU == NULL || found_tracksU == NULL) {
@@ -343,17 +355,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_monObj->setVariable("avgEffV", avgEffV);
   }
 
-}
 
-void DQMHistAnalysisSVDEfficiencyModule::endRun()
-{
-  B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
-  if (m_printCanvas) {
-    m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
-    m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
-    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
-    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
-  }
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()

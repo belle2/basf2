@@ -54,8 +54,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_refFile = new TFile(m_refFileName.data(), "READ");
   }
 
-  m_monObj = getMonitoringObject("svd");
-
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
     B2INFO("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
@@ -123,6 +121,17 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
+
+  // add MonitoringObject and canvases
+  m_monObj = getMonitoringObject("svd");
+
+  m_c_found_tracks_UV = new TCanvas("found_tracks_UV");
+  m_c_matched_clusters_UV = new TCanvas("matched_clusters_UV");
+
+  // add canvases to MonitoringObject
+  m_monObj->addCanvas(m_c_found_tracks_UV);
+  m_monObj->addCanvas(m_c_matched_clusters_UV);
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -337,32 +346,46 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
     m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
   }
 
-  // variables for run dependent monitoring
-
-  //Efficiency for the U side
-  TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
-  TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
+  // get existing histograms produced by DQM modules
+  // Efficiency for the U side
+  TH2F* h_found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
+  TH2F* h_matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
 
   //Efficiency for the V side
-  TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
-  TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
+  TH2F* h_found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
+  TH2F* h_matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
 
-  if (matched_clusU == NULL || found_tracksU == NULL) {
+  m_c_found_tracks_UV->Clear();
+  m_c_found_tracks_UV->Divide(2, 1);
+  m_c_found_tracks_UV->cd(1);
+  if (h_found_tracksU) h_found_tracksU->Draw();
+  m_c_found_tracks_UV->cd(2);
+  if (h_found_tracksV) h_found_tracksV->Draw();
+
+  m_c_matched_clusters_UV->Clear();
+  m_c_matched_clusters_UV->Divide(2, 1);
+  m_c_matched_clusters_UV->cd(1);
+  if (h_matched_clusU) h_matched_clusU->Draw();
+  m_c_matched_clusters_UV->cd(2);
+  if (h_matched_clusV) h_matched_clusV->Draw();
+
+  // add variables for run dependent monitoring
+
+  if (h_matched_clusU == NULL || h_found_tracksU == NULL) {
     B2INFO("Histograms needed for Average Efficiency on U side are not found");
     m_monObj->setVariable("avgEffU", -1);
   } else {
-    double avgEffU = 1.*matched_clusU->GetEntries() / found_tracksU->GetEntries();
+    double avgEffU = 1.*h_matched_clusU->GetEntries() / h_found_tracksU->GetEntries();
     m_monObj->setVariable("avgEffU", avgEffU);
   }
 
-  if (matched_clusV == NULL || found_tracksV == NULL) {
+  if (h_matched_clusV == NULL || h_found_tracksV == NULL) {
     B2INFO("Histograms needed for Average Efficiency on V side are not found");
     m_monObj->setVariable("avgEffV", -1);
   } else {
-    double avgEffV = 1.*matched_clusV->GetEntries() / found_tracksV->GetEntries();
+    double avgEffV = 1.*h_matched_clusV->GetEntries() / h_found_tracksV->GetEntries();
     m_monObj->setVariable("avgEffV", avgEffV);
   }
-
 
 }
 

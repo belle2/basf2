@@ -15,6 +15,7 @@ from time import sleep
 from pathlib import Path
 import shutil
 from glob import glob
+from urllib.parse import urlparse
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import find_file
@@ -191,6 +192,26 @@ This script will be copied into subjob directories as part of the input sandbox.
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
 
+    @staticmethod
+    def uri_list_from_input_file(input_file):
+        """
+        Parameters:
+            input_file (str): A local file/glob pattern or XROOTD URI
+
+        Returns:
+            list: A list of the URIs found from the initial string.
+        """
+        # By default we assume it is a local file path if no "scheme" is given
+        uri = urlparse(input_file, scheme="file", allow_fragments=False)
+        if uri.scheme == "file":
+            # For local files we also perform a glob just in case it is a wildcard pattern.
+            # That way we will have all the uris of files separately
+            uris = [urlparse(f, scheme="file", allow_fragments=False).geturl() for f in glob(input_file)]
+        else:
+            # Just let everything else through and hop the backend can figure it out
+            uris = [input_file]
+        return uris
+
     @property
     def input_files(self):
         return self._input_files
@@ -198,17 +219,13 @@ This script will be copied into subjob directories as part of the input sandbox.
     @input_files.setter
     def input_files(self, value):
         if isinstance(value, str):
-            if str(value).startswith("root://"):
-                self._input_files = str(value)
-            else:
-                self._input_files = glob(str(value))
+            # If it's a string, we convert to a list of URIs
+            self._input_files = self.uri_list_from_input_file(value)
         elif isinstance(value, list):
+            # If it's a list we loop and do the same thing
             total_files = []
             for pattern in value:
-                if str(pattern).startswith("root://"):
-                    total_files.append(str(pattern))
-                else:
-                    total_files.extend(glob(str(pattern)))
+                total_files.extend(self.uri_list_from_input_file(pattern))
             self._input_files = total_files
         else:
             raise TypeError("Input files must be a list or string")

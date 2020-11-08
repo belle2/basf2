@@ -52,7 +52,7 @@ namespace Belle2 {
     virtual void terminate() override;
     /**
      * Find canvas by name
-     * @param a Name of the canvas
+     * @param s Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
      */
     TCanvas* find_canvas(TString s);
@@ -66,7 +66,7 @@ namespace Belle2 {
   private:
     /** Names of the histograms that should be monitored */
     std::vector<std::string> m_monitored_histos;
-    /** Map of queues of monitored histograms */
+    /** Map of histogram names to queues of monitoring objects */
     std::map<std::string, std::queue<SSNODE*> > m_histos_queues;
     /** Interval between checks in second. */
     int m_interval;

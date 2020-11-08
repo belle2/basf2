@@ -112,6 +112,11 @@ def configure_system(conf):
         conf.env['HAS_OPENMP'] = True
         conf.env.Append(CPPDEFINES='-DHAS_OPENMP')
 
+    # graphviz
+    conf.env['HAS_DOT'] = False
+    if conf.CheckProg('dot'):
+        conf.env['HAS_DOT'] = True
+
     return True
 
 

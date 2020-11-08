@@ -27,7 +27,6 @@ void StreamHistogramsInDir(TDirectory* curdir, MsgHandler* hdl, int& numobjs)
   int nobjs = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
-    //TObject* obj = curdir->FindObjectAny(key->GetName());
     TObject* obj = key->ReadObj();
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
@@ -62,7 +61,7 @@ int main(int argc, char** argv)
   string host = string(argv[2]);
   int port = atoi(argv[3]);
 
-  EvtSocketSend* m_sock = new EvtSocketSend(host.c_str(), port);
+  EvtSocketSend* sock = new EvtSocketSend(host.c_str(), port);
 
   MsgHandler hdl(0);
   int numobjs = 0;
@@ -75,8 +74,9 @@ int main(int argc, char** argv)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock->send(msg);
+  sock->send(msg);
   delete(msg);
+  delete(sock);
 
   f->Close();
   delete f;

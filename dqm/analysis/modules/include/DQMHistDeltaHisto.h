@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
@@ -50,7 +52,7 @@ namespace Belle2 {
     virtual void terminate() override;
     /**
      * Find canvas by name
-     * @param cname Name of the canvas
+     * @param a Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
      */
     TCanvas* find_canvas(TString s);
@@ -62,10 +64,14 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** Names of the histograms that should be monitored */
     std::vector<std::string> m_monitored_histos;
+    /** Map of queues of monitored histograms */
     std::map<std::string, std::queue<SSNODE*> > m_histos_queues;
     /** Interval between checks in second. */
     int m_interval;
+    /** The metadata for each event. */
+    StoreObjPtr<EventMetaData> m_evtMetaDataPtr;
 
   };
 } // end namespace Belle2

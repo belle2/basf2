@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   string host = string(argv[2]);
   int port = atoi(argv[3]);
 
-  EvtSocketSend* m_sock = new EvtSocketSend(host.c_str(), port);
+  EvtSocketSend* sock = new EvtSocketSend(host.c_str(), port);
 
   MsgHandler hdl(0);
   int numobjs = 0;
@@ -33,8 +33,9 @@ int main(int argc, char** argv)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock->send(msg);
+  sock->send(msg);
   delete(msg);
+  delete(sock);
 
   return 0;
 }

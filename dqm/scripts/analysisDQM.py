@@ -17,6 +17,7 @@ def add_analysis_dqm(path):
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
     ma.buildEventShape(
         path=path,
+        default_cleanup=False,
         foxWolfram=True,
         cleoCones=False,
         collisionAxis=False,

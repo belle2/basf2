@@ -5,7 +5,7 @@
 from prompt import CalibrationSettings
 from prompt.utils import events_in_basf2_file
 import basf2
-from random import choice, seed
+from random import choice
 
 
 #: Tells the automated system some details of this script

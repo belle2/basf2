@@ -3,9 +3,6 @@
 # Thomas Keck 2016
 
 import basf2_mva
-import basf2 as b2
-import modularAnalysis as ma
-import vertex as vx
 
 if __name__ == "__main__":
     from basf2 import conditions

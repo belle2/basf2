@@ -2,9 +2,8 @@ import basf2
 from basf2 import B2INFO
 
 import argparse
-import time
 
-from caf.backends import Local, Batch, LSF, PBS, HTCondor, monitor_jobs
+from caf.backends import Batch, HTCondor, LSF, Local, PBS
 
 
 def command_local(args, backend_args=None):

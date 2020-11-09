@@ -1299,23 +1299,38 @@ namespace Belle2 {
 
               std::vector<bool> tsvector(9, false);
               tsstr = "";
+              // turns false, as soon as there is a ts, which is not contained in the 2dfindertrack
+              bool isin2d = true;
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 if (trkNN.ts[iSL][3] > 0) {
                   tsvector[iSL] = true;
                   unsigned iTS = TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker);
                   tsstr += "(SL" + std::to_string(iSL) + ", " + std::to_string(iTS) + ", " + std::to_string(trkNN.ts[iSL][1]) + ", " + std::to_string(
                              trkNN.ts[iSL][2]) + ", " + std::to_string(trkNN.ts[iSL][3]) + "),\n";
-
+                  // check, wether axials are a subset of 2dfinderTS:
+                  if (iSL % 2 == 0) {
+                    if (!(trk2D.ts[iSL / 2][0] == trkNN.ts[iSL][0] &&
+                          //trk2D.ts[iSL / 2][1] == trkNN.ts[iSL][1] &&
+                          trk2D.ts[iSL / 2][2] == trkNN.ts[iSL][2] &&
+                          trk2D.ts[iSL / 2][3] == trkNN.ts[iSL][3])) {
+                      isin2d = false;
+                    }
+                  }
 
                 } else {
                   tsstr += "( - ),\n";
                 }
               }
+
               B2DEBUG(15, padright("      NNTrack TS: " + tsstr, 100));
 
               CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
                                                                   trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
                                                                   track2D->getValidStereoBit(), trkNN.sector, tsvector, iclock, iTracker);
+
+              if (isin2d == false) {
+                trackNN->setQualityVector(1);
+              }
               std::vector<float> inputVector(27, 0.);
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 inputVector[3 * iSL] = trkNN.inputID[iSL];

@@ -5,7 +5,6 @@
 import numpy as np
 import tensorflow as tf
 import basf2_mva
-import pandas
 
 from basf2_mva_python_interface.tensorflow import State
 

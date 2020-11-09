@@ -4,7 +4,7 @@
 # Jan and Alyssa's waveform analysis script for FE data
 # Jan Strube, Sam Cunliffe, Alyssa Loos
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2, gROOT
 from ROOT import TNtuple, TFile, TH1F, TCanvas, TGraph, gStyle
 import numpy as np
@@ -25,7 +25,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gROOT.SetBatch()
 
 
@@ -113,7 +113,7 @@ def wf_display(waveform, run, event, suffix=""):
     c1.SaveAs(pdfFile + suffix + '.pdf')
 
 
-class WaveformAnalyzer(Module):
+class WaveformAnalyzer(b2.Module):
     '''
     Analyzes waveform and FE data
     '''
@@ -280,37 +280,37 @@ class WaveformAnalyzer(Module):
 # Set the log level to show only error and fatal messages
 # set_log_level(LogLevel.ERROR)
 # Create path
-main = create_path()
-reader = register_module('SeqRootInput')
+main = b2.create_path()
+reader = b2.register_module('SeqRootInput')
 # file to read
 reader.param('inputFileName', args.filename)
 main.add_module(reader)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP
-converter = register_module('Convert2RawDet')
+converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
 # geometry parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry (only TOP needed)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Unpacking (format auto detection works now)
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
 
 
-topfe = register_module('TOPWaveformFeatureExtractor')
+topfe = b2.register_module('TOPWaveformFeatureExtractor')
 # topfe.param('threshold', 20)
 main.add_module(topfe)
 
 
-drdh = register_module(WaveformAnalyzer())
+drdh = b2.register_module(WaveformAnalyzer())
 main.add_module(drdh)
 
 # Process all events
-process(main)
+b2.process(main)

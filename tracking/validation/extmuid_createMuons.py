@@ -63,12 +63,9 @@ path.add_module(pgun)
 # add simulation and reconstruction modules to the path
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     background_files = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-    print('Background files:')
-    print(background_files)
     add_simulation(path, bkgfiles=background_files)
 else:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-    add_simulation(path)
+    b2.B2FATAL('BELLE2_BACKGROUND_DIR is not set.')
 
 add_reconstruction(path)
 

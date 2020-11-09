@@ -115,14 +115,23 @@ namespace Belle2 {
     /** Nominal time of prompt BKLMHit2ds. */
     double m_PromptTime;
 
-    /** Perform cable delay time correction (true) or not (false). */
-    bool m_timeCableDelayCorrection;
-
     /**
      * Half-width of the time window relative to the prompt time
      * for BKLMHit2ds.
      */
     double m_PromptWindow;
+
+    /** Effective light speed in fiber for EKLM scintillators. */
+    double m_effC_eklm;
+
+    /** Effective light speed in fiber for BKLM scintillators. */
+    double m_effC_bklm;
+
+    /** Effective light speed in fiber for BKLM RPCs. */
+    double m_effC_RPC;
+
+    /** Perform cable delay time correction (true) or not (false). */
+    bool m_TimeCableDelayCorrection;
 
     /**
      * Use only normal and dead (for debugging) channels during 2d hit
@@ -135,6 +144,12 @@ namespace Belle2 {
 
     /** KLM time window. */
     DBObjPtr<KLMTimeWindow> m_TimeWindow;
+
+    /** KLM time constants. */
+    OptionalDBObjPtr<KLMTimeConstants> m_TimeConstants;
+
+    /** KLM time cable delay. */
+    OptionalDBObjPtr<KLMTimeCableDelay> m_TimeCableDelay;
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
@@ -167,12 +182,6 @@ namespace Belle2 {
      */
     bool m_eklmCheckSegmentIntersection;
 
-    /** Constant used for time information correction. */
-    DBObjPtr<KLMTimeConstants> m_timeConstants;
-
-    /** Calibration constant of time delay from cable. */
-    DBObjPtr<KLMTimeCableDelay> m_timeCableDelay;
-
     /** EKLM element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
 
@@ -187,15 +196,6 @@ namespace Belle2 {
 
     /** Reconstruction parameters. */
     DBObjPtr<EKLMReconstructionParameters> m_eklmRecPar;
-
-    /** Effective light speed in fiber for EKLM scintillators. */
-    double m_effC_eklm;
-
-    /** Effective light speed in fiber for BKLM scintillators. */
-    double m_effC_bklm;
-
-    /** Effective light speed in fiber for BKLM RPCs. */
-    double m_effC_RPC;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;

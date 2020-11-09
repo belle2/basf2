@@ -12,7 +12,7 @@ __authors__ = [
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from stdCharged import stdK, stdPi, stdCharged
+from stdCharged import stdCharged
 from stdPhotons import stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts

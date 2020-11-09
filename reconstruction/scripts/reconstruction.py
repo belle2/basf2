@@ -20,8 +20,8 @@ from tracking import (
     add_cr_tracking_reconstruction,
     add_mc_track_finding,
     add_track_finding,
+    add_prune_tracks,
 )
-from tracking.path_utils import add_prune_tracks
 
 from softwaretrigger.path_utils import (
     add_filter_software_trigger,

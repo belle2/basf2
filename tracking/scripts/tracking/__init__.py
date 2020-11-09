@@ -4,7 +4,26 @@
 import basf2 as b2
 
 # Many scripts import these functions from `tracking`, so leave these imports here
-from tracking.path_utils import *  # noqa
+from tracking.path_utils import (  # noqa
+    add_cdc_cr_track_finding,
+    add_cdc_track_finding,
+    add_cr_track_fit_and_track_creator,
+    add_eclcdc_track_finding,
+    add_geometry_modules,
+    add_hit_preparation_modules,
+    add_mc_matcher,
+    add_prune_tracks,
+    add_pxd_cr_track_finding,
+    add_pxd_track_finding,
+    add_svd_track_finding,
+    add_track_fit_and_track_creator,
+    add_vxd_track_finding_vxdtf2,
+    is_cdc_used,
+    is_ecl_used,
+    is_pxd_used,
+    is_svd_used,
+    use_local_sectormap,
+)
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,

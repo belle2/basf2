@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import tempfile
-import shutil
 import json
 from concurrent.futures import ThreadPoolExecutor
 import difflib
@@ -410,7 +408,6 @@ top in the localdb will be shown.
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     choices = ["human-readable", "json", "list", "pandas"]
     try:
-        from tabulate import tabulate
         choices += ['jira', 'grid']
     except ImportError:
         pass

@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-from basf2 import *
+import basf2 as b2
 
 # Don't show all the messages :)
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Register modules
 
 # lets generate empty events
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # and shoot some particles into them
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # load the simulation parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # build the microtpc geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # simulate our microtpc detector
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # do something with the microtpc data
 # analysis = register_module('Csi')
 # analysis = register_module('He3tube')
@@ -27,11 +26,11 @@ simulation = register_module('FullSim')
 # analysis = register_module('Srsensor')
 # analysis = register_module('Microtpc')
 # analysis = register_module('FANGS')
-analysis = register_module('CLAWS')
+analysis = b2.register_module('CLAWS')
 # save the microtpc results
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 # an show some progress of the microtpc simulation
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 # Now lets set some parameters ...
 
@@ -78,10 +77,10 @@ gearbox.param('fileName', 'beast/claws/detector.xml')
 # gearbox.param('fileName', 'beast/plume/detector.xml')
 # gearbox.param('fileName', 'beast/csi/detector.xml')
 # Lets see some more information on geometry building
-geometry.set_log_level(LogLevel.INFO)
+geometry.set_log_level(b2.LogLevel.INFO)
 
 # and also on our own module
-analysis.set_log_level(LogLevel.INFO)
+analysis.set_log_level(b2.LogLevel.INFO)
 
 # And write the results to microtpc-simulation.root
 # output.param('outputFileName', 'microtpc-simulation.root')
@@ -96,7 +95,7 @@ output.param('outputFileName', 'claws-simulation.root')
 output.param('updateFileCatalog', False)
 
 # Here we create a processing path and add the modules
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
@@ -107,7 +106,7 @@ main.add_module(output)
 main.add_module(progress)
 
 # Now lets do the processing of the microtpc events
-process(main)
+b2.process(main)
 
 # Print call statistics of our microtpc event processing
-print(statistics)
+print(b2.statistics)

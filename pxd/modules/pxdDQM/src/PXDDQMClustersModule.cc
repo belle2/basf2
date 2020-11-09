@@ -91,20 +91,20 @@ void PXDDQMClustersModule::defineHisto()
   int nPXDChips = gTools->getTotalPXDChips();
 
   // Create basic histograms:
-  m_hitMapCounts = new TH1I("DQM_PXD_PixelHitmapCounts", "DQM PXD Integrated number of fired pixels per sensor",
+  m_hitMapCounts = new TH1D("DQM_PXD_PixelHitmapCounts", "DQM PXD Integrated number of fired pixels per sensor",
                             nPXDSensors, 0, nPXDSensors);
   m_hitMapCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCounts->GetYaxis()->SetTitle("counts");
-  m_hitMapClCounts = new TH1I("DQM_PXD_ClusterHitmapCounts", "DQM PXD Integrated number of clusters per sensor",
+  m_hitMapClCounts = new TH1D("DQM_PXD_ClusterHitmapCounts", "DQM PXD Integrated number of clusters per sensor",
                               nPXDSensors, 0, nPXDSensors);
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
   // basic counters per chip:
-  m_hitMapCountsChip = new TH1I("DQM_PXD_PixelHitmapCountsChip", "DQM PXD Integrated number of fired pixels per chip",
+  m_hitMapCountsChip = new TH1D("DQM_PXD_PixelHitmapCountsChip", "DQM PXD Integrated number of fired pixels per chip",
                                 nPXDChips, 0, nPXDChips);
   m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsChip = new TH1I("DQM_PXD_ClusterHitmapCountsChip", "DQM PXD Integrated number of clusters per chip",
+  m_hitMapClCountsChip = new TH1D("DQM_PXD_ClusterHitmapCountsChip", "DQM PXD Integrated number of clusters per chip",
                                   nPXDChips, 0, nPXDChips);
   m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");

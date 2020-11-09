@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 from basf2 import create_path, register_module
 import b2test_utils
 from modularAnalysis import fillParticleListFromMC, reconstructMCDecay, inputMdst
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestNewMCDecayFinder(unittest.TestCase):

@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 
 # this loads gui libraries
-from ROOT import TGClient
 
 
-class InspectorModule(Module):
+class InspectorModule(b2.Module):
 
     """Inspect DataStore contents"""
 
@@ -39,8 +36,8 @@ class InspectorModule(Module):
         interactive.embed()
 
 
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput')
 main.add_module(InspectorModule())
 
-process(main)
+b2.process(main)

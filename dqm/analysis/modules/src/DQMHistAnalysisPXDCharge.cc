@@ -224,7 +224,7 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
   tt->SetTextAngle(90);// Rotated
   tt->SetTextAlign(12);// Centered
   tt->Draw();

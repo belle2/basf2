@@ -5,7 +5,7 @@
 
 import os
 import sys
-from tools import *
+from tools import getMaxRunNo_mc, getBelleUrl_mc, readConfigFile_mc, countEventsInUrl, addLine
 
 # print debug messages ?
 debug = False

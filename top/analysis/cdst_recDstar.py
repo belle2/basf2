@@ -9,8 +9,9 @@
 # ---------------------------------------------------------------------------------------
 
 import basf2
-from modularAnalysis import *
+import modularAnalysis as ma
 from variables import variables
+from vertex import raveFit
 from ROOT import gSystem
 import argparse
 
@@ -26,7 +27,7 @@ MC = args.mc
 VFit = args.vfit
 
 if not MC:
-    use_central_database(args.tag, LogLevel.WARNING)
+    basf2.use_central_database(args.tag, basf2.LogLevel.WARNING)
 
 # Load top library
 gSystem.Load('libtop.so')
@@ -35,25 +36,25 @@ gSystem.Load('libtop.so')
 main = basf2.create_path()
 
 # Just a dummy input file, use basf2 -i option
-inputMdstList('default', 'Input.root', path=main)
+ma.inputMdstList('default', 'Input.root', path=main)
 
 # Particle lists
-fillParticleList('K-:all', '-2.0 < d0 < 2.0 and -4.0 < z0 < 4.0', path=main)
-fillParticleList('pi+:all', '-2.0 < d0 < 2.0 and -4.0 < z0 < 4.0', path=main)
+ma.fillParticleList('K-:all', '-2.0 < d0 < 2.0 and -4.0 < z0 < 4.0', path=main)
+ma.fillParticleList('pi+:all', '-2.0 < d0 < 2.0 and -4.0 < z0 < 4.0', path=main)
 
 # Reconstruct D0 -> K- pi+ decay
-reconstructDecay('D0:kpi -> K-:all pi+:all', '1.8 < M < 1.95', path=main)
+ma.reconstructDecay('D0:kpi -> K-:all pi+:all', '1.8 < M < 1.95', path=main)
 if VFit:
-    fitVertex('D0:kpi', 0.001, '', 'rave', 'vertex', '', True, path=main)
+    raveFit('D0:kpi', 0.001, fit_type='vertex', decay_string='', constraint='', daughtersUpdate=True, path=main)
 
 # Reconstruct D*+ -> D0 pi+ decay
-reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020', path=main)
+ma.reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020', path=main)
 if VFit:
-    fitVertex('D*+', 0.001, '', 'rave', 'vertex', 'ipprofile', True, path=main)
+    raveFit('D*+', 0.001, '', 'rave', 'vertex', 'ipprofile', True, path=main)
 
 # MC matching
 if MC:
-    matchMCTruth('D*+', path=main)
+    ma.matchMCTruth('D*+', path=main)
 
 # Output ntuple (extend the list if you need more)
 variables.addAlias('isBunch', 'isTopRecBunchReconstructed')
@@ -77,7 +78,7 @@ varlist = ['M_D0', 'Q', 'dQ', 'p_cms', 'isBunch', 'bunchOffset', 'p_K', 'p_pi',
            'kaonLL_K', 'pionLL_K', 'flag_K', 'slotID_K',
            'kaonLL_pi', 'pionLL_pi', 'flag_pi', 'slotID_pi']
 
-variablesToNtuple('D*+', varlist, 'dstar', args.out, path=main)
+ma.variablesToNtuple('D*+', varlist, 'dstar', args.out, path=main)
 
 # Process events
 basf2.process(main)

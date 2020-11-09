@@ -519,7 +519,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
    * First loop
    * Estimation of effective light speed for Scintillators and RPCs, separately.
    **********************************/
-  B2INFO("Effective Light Speed Estimation.");
+  B2INFO("Effective light speed Estimation.");
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
@@ -566,7 +566,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       }
     }
   }
-  B2INFO("Effective Light Speed Estimation! Hists and Graph filling done.");
+  B2INFO("Effective light speed Estimation! Hists and Graph filling done.");
 
   m_timeShift.clear();
 
@@ -654,7 +654,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
   }
 
-  B2INFO("Effective Ligit Spead Fitting.");
+  B2INFO("Effective light speed fitting.");
   hprf_rpc_phi_effC->Fit("fcn_pol1", "EMQ");
   double slope_rpc_phi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
@@ -694,21 +694,21 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   TString logStr_phi, logStr_z;
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_rpc_phi, e_effC_rpc_phi);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_rpc_z, e_effC_rpc_z);
-  B2INFO("Estimation of Effective Speed Light of RPCs: "
+  B2INFO("Estimation of effective light speed of RPCs: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_phi, e_effC_scint_phi);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_z, e_effC_scint_z);
-  B2INFO("Estimation of Effective Speed Light of Scintillators: "
+  B2INFO("Estimation of effective light speed of BKLM scintillators: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_plane1_end, e_effC_scint_plane1_end);
   logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_plane2_end, e_effC_scint_plane2_end);
-  B2INFO("Estimation of Effective Speed Light of Scintillators (EKLM): "
+  B2INFO("Estimation of effective light speed of EKLM scintillators: "
          << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
-  // Default Effective Light Speed in current Database
+  // Default Effective light speed in current Database
   effSpeed_end = 0.5 * (fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end));
   effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
   effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
@@ -788,7 +788,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
   }
 
-  B2INFO("Orignal Filling Done.");
+  B2INFO("Orignal filling done.");
 
   int iChannel_rpc = 0;
   int iChannel = 0;
@@ -854,11 +854,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   m_time_channelAvg_rpc = fcn_const->GetParameter(0);
   m_etime_channelAvg_rpc = fcn_const->GetParError(0);
 
-  B2INFO("Channel's time distribution Fitting Done.");
-  B2DEBUG(29, LogVar("Average Time (RPC)", m_time_channelAvg_rpc) << LogVar("Average Time (Scint BKLM)",
-          m_time_channelAvg_scint) << LogVar("Average Time (Scint EKLM)", m_time_channelAvg_scint_end));
+  B2INFO("Channel's time distribution fitting done.");
+  B2DEBUG(29, LogVar("Average time (RPC)", m_time_channelAvg_rpc)
+          << LogVar("Average time (BKLM scintillators)", m_time_channelAvg_scint)
+          << LogVar("Average time (EKLM scintillators)", m_time_channelAvg_scint_end));
 
-  B2INFO("Calibrated channel's time distribution Filling. Begins.");
+  B2INFO("Calibrated channel's time distribution filling begins.");
 
   m_timeShift.clear();
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {

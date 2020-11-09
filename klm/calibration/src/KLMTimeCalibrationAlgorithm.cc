@@ -977,8 +977,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   m_timeShift.clear();
   m_cFlag.clear();
 
-  saveCalibration(m_timeCableDelay, "KLMTime_cableDelay");
-  saveCalibration(m_timeConstants, "KLMTime_basicConstant");
+  saveCalibration(m_timeCableDelay, "KLMTimeCableDelay");
+  saveCalibration(m_timeConstants, "KLMTimeConstants");
   return CalibrationAlgorithm::c_OK;
 }
 

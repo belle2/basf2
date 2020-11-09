@@ -124,10 +124,10 @@ def get_calibrations(input_data, **kwargs):
 
     cal_klm.algorithms = [alg]
 
-    from klm_strip_efficiency import KLMTime
+    from caf.strategies import SequentialRunByRun
 
     for algorithm in cal_klm.algorithms:
-        algorithm.strategy = KLMTime
+        algorithm.strategy = SequentialRunByRun
         algorithm.params = {'iov_coverage': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one

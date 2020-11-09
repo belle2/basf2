@@ -21,27 +21,27 @@
 """
 
 import glob
-from basf2 import *
+import basf2 as b2
 import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
-set_random_seed(654321)
+b2.set_random_seed(654321)
 
 output_filename = '../pion-ExtMuidValidation.root'
 
 print(output_filename)
 
-path = create_path()
+path = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 path.add_module(eventinfosetter)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 path.add_module(progress)
 
-pgun = register_module('ParticleGun')
+pgun = b2.register_module('ParticleGun')
 param_pgun = {
     'pdgCodes': [-211, 211],
     'nTracks': 1,
@@ -72,10 +72,10 @@ else:
 
 add_reconstruction(path)
 
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', output_filename)
 output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'BKLMHit2ds', 'EKLMHit2ds'])
 path.add_module(output)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

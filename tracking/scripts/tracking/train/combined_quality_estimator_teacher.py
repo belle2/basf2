@@ -172,7 +172,7 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
 try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters, get_log_file_dir, create_output_dirs
-    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task, HaddTask
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
     from b2luigi.core.task import Task, ExternalTask
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:

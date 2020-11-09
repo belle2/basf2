@@ -3,15 +3,12 @@
 
 import basf2
 
-import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 
 import os
 import sys
 
 from tracking.validation.utilities import is_primary
-from tracking.validation.plot import ValidationPlot
 
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners

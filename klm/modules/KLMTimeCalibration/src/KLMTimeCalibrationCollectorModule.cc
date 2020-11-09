@@ -64,6 +64,8 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   addParam("debug", m_Debug, "debug mode.", false);
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu+:cali"));
   addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
+  addParam("IgnoreBackwardPropagation", m_IgnoreBackwardPropagation,
+           "Whether to ignore ExtHits with backward propagation.", false);
 
   m_elementNum = &(KLMElementNumbers::Instance());
 }
@@ -210,6 +212,11 @@ void KLMTimeCalibrationCollectorModule::collect()
     for (const ExtHit& eHit : extHits) {
       if (eHit.getStatus() != EXT_EXIT)
         continue;
+
+      if (m_IgnoreBackwardPropagation) {
+        if (eHit.isBackwardPropagated())
+          continue;
+      }
 
       bool bklmCover = (eHit.getDetectorID() == Const::EDetector::BKLM);
       bool eklmCover = (eHit.getDetectorID() == Const::EDetector::EKLM);

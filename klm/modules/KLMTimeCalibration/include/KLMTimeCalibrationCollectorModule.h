@@ -99,6 +99,9 @@ namespace Belle2 {
     /** Use event T0 or not. */
     bool m_useEvtT0;
 
+    /** Whether to ignore ExtHits with backward propagation. */
+    bool m_IgnoreBackwardPropagation;
+
     /** Input partilce list name */
     std::string m_inputListName;
 

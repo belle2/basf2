@@ -1047,7 +1047,8 @@ class Calibration(CalibrationBase):
         The current major state of the calibration in the database file. The machine may have a different state.
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "state")
+            state = db.get_calibration_value(self.name, "state")
+        return state
 
     @state.setter
     def state(self, state):
@@ -1058,7 +1059,7 @@ class Calibration(CalibrationBase):
             db.update_calibration_value(self.name, "state", str(state))
             if state in self.checkpoint_states:
                 db.update_calibration_value(self.name, "checkpoint", str(state))
-        B2DEBUG(29, f"{self.name} set to {self.state}.")
+        B2DEBUG(29, f"{self.name} set to {state}.")
 
     @property
     def iteration(self):
@@ -1069,7 +1070,8 @@ class Calibration(CalibrationBase):
             int: The current iteration number
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "iteration")
+            iteration = db.get_calibration_value(self.name, "iteration")
+        return iteration
 
     @iteration.setter
     def iteration(self, iteration):
@@ -1340,7 +1342,9 @@ class CAF():
         self._make_database()
 
         # Enter the overall output dir during processing and opena  connection to the DB
-        with temporary_workdir(self.output_dir), CAFDB(self._db_path) as db:
+        with temporary_workdir(self.output_dir):
+            db = CAFDB(self._db_path)
+            db.open()
             db_initial_calibrations = db.query("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
@@ -1366,6 +1370,8 @@ class CAF():
                     calibration.iteration = cal_initial_iteration
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
+
+            db.close()
 
             # Is it possible to keep going?
             keep_running = True
@@ -1402,7 +1408,8 @@ class CAF():
                 sleep(self.heartbeat)
 
             B2INFO("Printing summary of final CAF status.")
-            print(db.output_calibration_table())
+            with CAFDB(self._db_path, read_only=True) as db:
+                print(db.output_calibration_table())
 
     @property
     def backend(self):

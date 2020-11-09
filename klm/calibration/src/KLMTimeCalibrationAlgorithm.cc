@@ -23,6 +23,7 @@
 #include <Math/MinimizerOptions.h>
 #include <TFile.h>
 #include <TFitResult.h>
+#include <TROOT.h>
 #include <TString.h>
 #include <TTree.h>
 #include <TVector3.h>
@@ -145,6 +146,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 {
   int channelId;
   double effSpeed_end, effSpeed, effSpeed_RPC;
+  gROOT->SetBatch(kTRUE);
   m_timeCableDelay = new KLMTimeCableDelay();
   m_timeConstants = new KLMTimeConstants();
 

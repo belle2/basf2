@@ -32,7 +32,7 @@ pu.ploter(
     x_label='dE/dx (MeV/cm)',
     y_label='counts',
     granules=pu.gD2,
-    tree=pu.treeSim,
+    tree=treeSim,
     expr='simhit_dEdx*1000',
     cut='',
     descr='Simulated dE/dx for SimHits.',

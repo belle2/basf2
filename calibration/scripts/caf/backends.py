@@ -586,7 +586,8 @@ class Job:
         """
         This adds simple setup commands like ``source /path/to/tools/b2setup`` to your `Job`.
         It should detect if you are using a local release or CVMFS and append the correct commands
-        so that the job will have the same basf2 release environment.
+        so that the job will have the same basf2 release environment. It should also detect
+        if a local release is not compiled with the `opt` option.
 
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
@@ -599,8 +600,11 @@ class Job:
             self.setup_cmds.append("export BELLE2_NO_TOOLS_CHECK=\"TRUE\"")
             self.setup_cmds.append(f"BACKEND_B2SETUP={os.environ['BELLE2_TOOLS']}/b2setup")
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
+            self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
             self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
             self.setup_cmds.append(f"source $BACKEND_B2SETUP")
+            # b2code-option has to be executed only after the source of the tools.
+            self.setup_cmds.append(f"b2code-option $BACKEND_BELLE2_OPTION")
             self.setup_cmds.append(f"popd > /dev/null")
 
 

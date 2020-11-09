@@ -40,7 +40,7 @@ tree.Draw('KLMDigits.m_Time-KLMDigits.m_MCTime>>eklm_digits_tres',
           'KLMDigits.getSubdetector()==2')
 functions = eklm_digits_tres.GetListOfFunctions()
 functions.Add(TNamed('Description', 'KLMDigits time resolution in EKLM'))
-functions.Add(TNamed('Check', 'Mean around -19 ns.'))
+functions.Add(TNamed('Check', 'Mean around -12 ns.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -49,8 +49,9 @@ section.GetXaxis().SetTitle('1=backward  2=forward')
 section.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getSection()>>Forward', '')
 functions = section.GetListOfFunctions()
-functions.Add(TNamed('Description', 'Flag indicating if a muon hit is in backward(1) or forward(2) EKLM'))
-functions.Add(TNamed('Check', '2D hits are mostly backward.'))
+functions.Add(TNamed('Description',
+                     'Flag indicating if a muon hit is in backward(1) or forward(2) EKLM'))
+functions.Add(TNamed('Check', '2D hits mostly backward.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -70,7 +71,7 @@ layer.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getLayer()>>Layer', '')
 functions = layer.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Layer number of muon hit'))
-functions.Add(TNamed('Check', '.'))
+functions.Add(TNamed('Check', 'Number of events decrease with number of layer'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -84,6 +85,8 @@ functions.Add(TNamed('Check', 'Mean around 13 ns.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
+# Expert Plots
+
 nPE = ROOT.TH1F('nGenPE', 'Generated PE in EKLM', 100, 0.0, 200)
 nPE.GetXaxis().SetTitle('# generated PE')
 nPE.GetYaxis().SetTitle('Events')
@@ -93,9 +96,7 @@ functions = nPE.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Number of generated photoelectrons in EKLM.'))
 functions.Add(TNamed('Check', 'Mean around 37.'))
 functions.Add(TNamed('Contact', contact))
-functions.Add(TNamed('MetaOptions', 'shifter'))
-
-# Expert Plots
+functions.Add(TNamed('MetaOptions', 'expert'))
 
 edep = ROOT.TH1F('edep', 'Energy deposition for KLMDigits', 150, 0.0, 15)
 edep.GetXaxis().SetTitle('E (MeV)')
@@ -103,9 +104,9 @@ edep.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getEnergyDeposit()>>edep', '')
 functions = edep.GetListOfFunctions()
 functions.Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))
-functions.Add(TNamed('Check', 'Peak around 3 MeV, with mean 3.73 MeV.'))
+functions.Add(TNamed('Check', 'Peak around 3 MeV, with mean 3.7 MeV.'))
 functions.Add(TNamed('Contact', contact))
-functions.Add(TNamed('MetaOptions', 'shifter'))
+functions.Add(TNamed('MetaOptions', 'expert'))
 
 output_file.cd()
 h2dtres.Write()

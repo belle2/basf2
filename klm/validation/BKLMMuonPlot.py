@@ -197,7 +197,7 @@ def draw_bklmhists(file_chain):
     timeSci.GetXaxis().SetTitle('t (ns)')
     timeSci.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in scintillators'))
     timeSci.GetListOfFunctions().Add(TNamed('Check',
-                                            'Broad peak mainly between 2 ns and 8 ns, with the mean around 3.5 ns'))
+                                            'Broad peak mainly between 2 ns and 8 ns, with the mean around 3.5 ns.'))
     timeSci.GetListOfFunctions().Add(TNamed('Contact', contact))
     timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeSci.Write()
@@ -206,7 +206,7 @@ def draw_bklmhists(file_chain):
     file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.m_Layer < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
-    nPE.GetListOfFunctions().Add(TNamed('Check', 'Mean around 46'))
+    nPE.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 45, with mean at 47'))
     nPE.GetListOfFunctions().Add(TNamed('Contact', contact))
     nPE.GetListOfFunctions().Add(TNamed('MetaOptions', ''))
     nPE.Write()

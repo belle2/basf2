@@ -206,7 +206,7 @@ def draw_bklmhists(file_chain):
     file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.m_Layer < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
-    nPE.GetListOfFunctions().Add(TNamed('Check', ''))
+    nPE.GetListOfFunctions().Add(TNamed('Check', 'Mean around 46'))
     nPE.GetListOfFunctions().Add(TNamed('Contact', contact))
     nPE.GetListOfFunctions().Add(TNamed('MetaOptions', ''))
     nPE.Write()

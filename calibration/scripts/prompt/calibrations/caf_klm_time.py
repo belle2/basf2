@@ -107,11 +107,11 @@ def get_calibrations(input_data, **kwargs):
     ########
     # Collect on multiple input data types for one calibration
 
-    from klm_calibration_utils import get_strip_efficiency_pre_collector_path
+    from klm_calibration_utils import get_time_pre_collector_path
 
     if input_files_cdst:
         coll_cdst = get_collector('hlt_mumu')
-        rec_path_cdst = get_strip_efficiency_pre_collector_path()
+        rec_path_cdst = get_time_pre_collector_path()
 
         collection_cdst = Collection(collector=coll_cdst,
                                      input_files=input_files_cdst,

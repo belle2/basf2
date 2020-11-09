@@ -93,9 +93,9 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     import ROOT
-    from ROOT.Belle2 import KLMTimeAlgorithm
+    from ROOT.Belle2 import KLMTimeCalibrationAlgorithm
 
-    alg = KLMTimeAlgorithm()
+    alg = KLMTimeCalibrationAlgorithm()
 
     ###################################################
     # Calibration setup

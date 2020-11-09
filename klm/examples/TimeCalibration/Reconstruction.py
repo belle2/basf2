@@ -5,7 +5,7 @@
 
 import sys
 import basf2
-from reconstruction import add_reconstruction
+from reconstruction import add_reconstruction, add_cdst_output
 import sys
 
 # Set the global log level
@@ -16,15 +16,13 @@ input.param('inputFileName', sys.argv[1])
 
 gearbox = basf2.register_module('Gearbox')
 
-eklmtimecalibration = basf2.register_module('EKLMTimeCalibrationCollector')
-
-# Create the main path and add the modules
+# Create the main path and add the modules.
 main = basf2.create_path()
 main.add_module(input)
-main.add_module("HistoManager", histoFileName=sys.argv[2])
 main.add_module(gearbox)
 add_reconstruction(main)
-main.add_module(eklmtimecalibration)
+add_cdst_output(main, filename=sys.argv[2], raw_format=True)
+main.add_module('Progress')
 
 # generate events
 basf2.process(main)

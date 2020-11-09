@@ -120,3 +120,30 @@ def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
                         path=main)
 
     return main
+
+
+def get_time_pre_collector_path(entry_sequence="", raw_format=True):
+    """
+    Parameters:
+        entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
+        raw_format  (bool): True if cDST input files are in the raw+tracking format.
+
+    Returns:
+        basf2.Path:  A reconstruction path to run before the collector. Used for cDST input files.
+    """
+    main = basf2.create_path()
+    if entry_sequence:
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
+    if raw_format:
+        prepare_cdst_analysis(main)
+    else:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+
+    # Fill muon particle list
+    ma.fillParticleList('mu+:cali',
+                        '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
+                        path=main)
+
+    return main

@@ -67,15 +67,14 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_CoincidenceWindow(0),
   m_PromptTime(0),
   m_PromptWindow(0),
-  m_timeCableDelay(nullptr),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
+  m_eklmNStrip(0),
   m_effC_eklm(0.5671 * Const::speedOfLight),
   m_effC_bklm(0.5671 * Const::speedOfLight),
-  m_effC_RPC(0.5 * Const::speedOfLight),
-  m_eklmNStrip(0)
+  m_effC_RPC(0.5 * Const::speedOfLight)
 {
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);

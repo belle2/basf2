@@ -143,7 +143,7 @@ public:
                        std::vector<double>& arcS, std::vector<double>& zz, std::vector<double>& invZError2);
 
   /// Combines several functions for fitter3D firmware
-  static void fitter3DFirm(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+  static void fitter3DFirm(std::map<std::string, double>& mConstD, const std::map<std::string, std::vector<double> >& mConstV,
                            int eventTimeValid, int eventTime,
                            std::vector<std::vector<int> > const& rawStTSs,
                            int charge, double radius, double phi_c,
@@ -161,7 +161,7 @@ public:
   static void calHelixParameters(TVector3 position, TVector3 momentum, int charge, TVectorD& helixParameters);
 
   /// Calculates position and momentum at a certain radius.
-  static void calVectorsAtR(TVectorD& helixParameters, int charge, double radius, TVector3& position, TVector3& momentum);
+  static void calVectorsAtR(const TVectorD& helixParameters, int charge, double radius, TVector3& position, TVector3& momentum);
 
   /// Firmware convert functions
 

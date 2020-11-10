@@ -12,11 +12,10 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
 import glob
 import sys
 
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
 from rawdata import add_unpackers
 from simulation import add_simulation
@@ -55,15 +54,15 @@ else:
 # svd_timeCalibration_test CONTENT:
 # exp 0, run 0: no calibration applied: returned time from the database = raw time
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [0])
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.INFO
+evtgeninput = b2.register_module('EvtGenInput')
+evtgeninput.logging.log_level = b2.LogLevel.INFO
 
 # main main
-main = create_path()
+main = b2.create_path()
 
 # read input rootfile
 # -> can be overwritten with the -i option
@@ -99,9 +98,9 @@ main.add_module('RootOutput', outputFileName=fileout, branchNames=['SVDClusters'
 # Show progress
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

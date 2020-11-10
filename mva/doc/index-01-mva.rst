@@ -238,14 +238,19 @@ or in bash::
 Evaluation / Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a PDF file with evaluation plots using the ``basf2_mva_evaluate.py`` tool::
+You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool::
 
     basf2_mva_evaluate.py -id DatabaseIdentifier \
                           -train train.root \
                           -data test.root \
-                          -o validation.pdf
+                          -o validation.zip
 
-Some example plots included in such a PDF are:
+
+The LaTeX file can also be compiled directly to PDF by passing the ``-c`` command line argument.                          
+If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it there and compile 
+the ``latex.tex`` with ``pdflatex`` there.
+
+Some example plots included in the resulting PDF are:
 
 .. _correlation:
 

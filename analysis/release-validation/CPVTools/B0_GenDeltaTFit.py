@@ -24,9 +24,6 @@ import basf2 as b2
 from ROOT import Belle2
 import modularAnalysis as ma
 import numpy as np
-import matplotlib.pyplot as plt
-import pylab
-import sys
 import math
 import random
 from variables import variables as mc_variables

@@ -1,5 +1,4 @@
 import basf2
-from ROOT import Belle2
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.quadtree.quadTreePlotter import SegmentQuadTreePlotter

@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from ROOT import EventData
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -42,7 +41,7 @@ gROOT.ProcessLine('struct EventData {\
                   )
 
 
-class PXDHitErrorsTTree(Module):
+class PXDHitErrorsTTree(b2.Module):
 
     """
     A simple module to check the reconstruction of PXDTrueHits.

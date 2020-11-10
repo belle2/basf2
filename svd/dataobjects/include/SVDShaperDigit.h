@@ -130,16 +130,10 @@ namespace Belle2 {
      */
     int getMaxTimeBin() const
     {
-      float amplitude = 0;
-      int maxbin = 0;
       APVFloatSamples samples =  this->getSamples();
-      for (int k = 0; k < 6; k ++) {
-        if (samples[k] > amplitude) {
-          amplitude = samples[k];
-          maxbin = k;
-        }
-      }
-      return maxbin;
+      const auto maxBinIterator = std::max_element(begin(samples), end(samples));
+      const int maxBin = std::distance(begin(samples), maxBinIterator);
+      return maxBin;
     }
 
     /**
@@ -148,15 +142,10 @@ namespace Belle2 {
      */
     int getMaxADCCounts() const
     {
-      float amplitude = 0;
       APVFloatSamples samples =  this->getSamples();
-      for (int k = 0; k < 6; k ++) {
-        if (samples[k] > amplitude)
-          amplitude = samples[k];
-      }
+      const float amplitude = *std::max_element(begin(samples), end(samples));
       return amplitude;
     }
-
 
     /**
      * Get digit FADCTime estimate
@@ -251,7 +240,7 @@ namespace Belle2 {
     {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
-      for (int k = 0; k < 6; k ++)
+      for (int k = 0; k < c_nAPVSamples; k++)
         if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 

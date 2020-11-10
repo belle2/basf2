@@ -1,7 +1,6 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-import ROOT
 from skim.taupair import TauLFV
 import basf2 as b2
 import modularAnalysis as ma

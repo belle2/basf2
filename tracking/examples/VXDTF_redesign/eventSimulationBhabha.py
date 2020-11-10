@@ -27,7 +27,7 @@
 #####################################################################
 
 
-from basf2 import *
+import basf2 as b2
 from beamparameters import add_beamparameters
 from simulation import add_simulation
 
@@ -52,16 +52,16 @@ outputDir = './'
 if(len(sys.argv) > 2):
     outputDir = sys.argv[2]
 
-set_random_seed(rndseed)
+b2.set_random_seed(rndseed)
 
 
 # Set log level. Can be overridden with the "-l LEVEL" flag for basf2.
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # ---------------------------------------------------------------------------------------
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # default phase3 geometry:
 exp_number = 0
 # if environment variable is set then phase2 (aka Beast2) geometry will be taken
@@ -70,10 +70,10 @@ if os.environ.get('USE_BEAST2_GEOMETRY'):
 eventinfosetter.param("expList", [exp_number])
 main.add_module(eventinfosetter)
 
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 main.add_module(eventinfoprinter)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # ---------------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ print("WARNING: setting non-default beam vertex at x= " + str(vertex_x) + " y= "
 # additional flatly smear the muon vertex between +/- this value
 vertex_delta = 0.005  # in cm
 
-particlegun = register_module('ParticleGun')
-particlegun.logging.log_level = LogLevel.WARNING
+particlegun = b2.register_module('ParticleGun')
+particlegun.logging.log_level = b2.LogLevel.WARNING
 param_pGun = {
     'pdgCodes': [13, -13],   # 13 = muon --> negatively charged!
     'nTracks': 8,
@@ -150,7 +150,7 @@ add_svd_reconstruction(path=main)
 
 # ---------------------------------------------------------------------------------------
 # Setting up the MC based track finder.
-mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
+mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('UseCDCHits', False)
 mctrackfinder.param('UseSVDHits', True)
 # Always use PXD hits! For SVD only, these will be filtered later when converting to SPTrackCand
@@ -169,7 +169,7 @@ main.add_module(mctrackfinder)
 # Correct time seed: Do I need it for VXD only tracks ????
 main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
 # track fitting
-daffitter = register_module("DAFRecoFitter")
+daffitter = b2.register_module("DAFRecoFitter")
 daffitter.param('recoTracksStoreArrayName', "MCRecoTracks")
 # daffitter.logging.log_level = LogLevel.DEBUG
 main.add_module(daffitter)
@@ -187,7 +187,7 @@ else:
 outputFileName += '_' + str(rndseed) + '.root'
 
 # Root output. Default filename can be overriden with '-o' basf2 option.
-rootOutput = register_module('RootOutput')
+rootOutput = b2.register_module('RootOutput')
 rootOutput.param('outputFileName', outputFileName)
 # to save some space exclude everything except stuff needed for tracking
 rootOutput.param('excludeBranchNames', ["ARICHAeroHits",
@@ -215,9 +215,9 @@ rootOutput.param('excludeBranchNames', ["ARICHAeroHits",
                                         ])
 main.add_module(rootOutput)
 
-log_to_file('createSim.log', append=False)
+b2.log_to_file('createSim.log', append=False)
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

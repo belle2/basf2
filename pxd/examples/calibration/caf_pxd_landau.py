@@ -39,22 +39,17 @@
 
 
 import argparse
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from caf.utils import find_absolute_file_paths
-from caf.utils import get_iov_from_file
+from caf.strategies import SequentialRunByRun
 from caf.utils import ExpRun, IoV
 from caf.backends import LSF
-from caf import backends
 from caf.framework import Calibration, CAF
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
 import ROOT
-import os
-import glob
 import pickle
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
 
 ROOT.gROOT.SetBatch(True)
 
@@ -118,11 +113,11 @@ print('Number selected mc input files:  {}'.format(len(mc_input_files)))
 # HOTPIXEl CALIBRATION
 
 # Create and configure the collector and its pre collector path
-hotpixel_collector = register_module("PXDRawHotPixelMaskCollector")
+hotpixel_collector = b2.register_module("PXDRawHotPixelMaskCollector")
 hotpixel_collector.param("granularity", "run")
 
 # The pre collector path must contain geometry and unpacker
-pre_hotpixel_collector_path = create_path()
+pre_hotpixel_collector_path = b2.create_path()
 pre_hotpixel_collector_path.add_module(
     "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_hotpixel_collector_path.add_module("Geometry", useDB=False)
@@ -178,7 +173,7 @@ hotpixel_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
 
 
 # Create and configure the collector on beam data and its pre collector path
-charge_collector = register_module("PXDClusterChargeCollector")
+charge_collector = b2.register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
 charge_collector.param("minClusterCharge", 8)
 charge_collector.param("minClusterSize", 2)
@@ -188,7 +183,7 @@ charge_collector.param("nBinsV", 6)
 
 
 # The pre collector path on data
-pre_charge_collector_path = create_path()
+pre_charge_collector_path = b2.create_path()
 pre_charge_collector_path.add_module(
     "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_charge_collector_path.add_module("Geometry", useDB=False)
@@ -236,7 +231,7 @@ charge_cal.use_central_database("Calibration_Offline_Development")
 
 # gain calibration on mc
 
-gain_collector = register_module("PXDClusterChargeCollector")
+gain_collector = b2.register_module("PXDClusterChargeCollector")
 gain_collector.param("granularity", "run")
 gain_collector.param("minClusterCharge", 8)
 gain_collector.param("minClusterSize", 2)
@@ -245,7 +240,7 @@ gain_collector.param("nBinsU", 4)
 gain_collector.param("nBinsV", 6)
 
 # The pre collector path on mc files
-pre_gain_collector_path = create_path()
+pre_gain_collector_path = b2.create_path()
 pre_gain_collector_path.add_module(
     "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_gain_collector_path.add_module("Geometry", useDB=False)

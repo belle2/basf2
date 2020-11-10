@@ -14,9 +14,7 @@
 
 import basf2
 import ROOT
-import array
-from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, cutAndCopyList
-from stdPhotons import stdPhotons
+from modularAnalysis import cutAndCopyList, inputMdst, matchMCTruth
 from stdPi0s import stdPi0s
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update

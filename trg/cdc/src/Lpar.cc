@@ -324,7 +324,7 @@ namespace Belle2 {
 //
 
   /// ostream operator
-  std::ostream& operator<<(std::ostream& o, TRGCDCLpar& s)
+  std::ostream& operator<<(std::ostream& o, const TRGCDCLpar& s)
   {
     return o << " al=" << s.m_alpha << " be=" << s.m_beta
            << " ka=" << s.m_kappa << " ga=" << s.m_gamma;

@@ -1,9 +1,7 @@
-import basf2
 
 import ROOT
 from ROOT import Belle2
 
-import math
 import numpy as np
 
 import tracking.validation.utilities as utilities

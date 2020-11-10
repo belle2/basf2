@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-try:
-    from inspect import signature
-except ImportError:
-    from funcsigs import signature
 import time
 
 from hep_ipython_tools import viewer

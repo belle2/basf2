@@ -42,19 +42,19 @@ namespace Belle2 {
     virtual ~TRGECLUnpackerModule();
 
     /** Initilizes TRGECLUnpackerModuel.*/
-    virtual void initialize();
+    void initialize() override;
 
     /** Called event by event.*/
-    virtual void event();
+    void event() override;
 
     /** Called when processing ended.*/
-    virtual void terminate();
+    void terminate() override;
 
     /** Called when new run started.*/
-    virtual void beginRun();
+    void beginRun() override;
 
     /** Called when run ended*/
-    virtual void endRun();
+    void endRun() override;
 
     /** returns version of TRGECLUnpackerModule.*/
     std::string version() const;

@@ -39,7 +39,7 @@ class filterTRG(b2.Module):
         self.if_false(self.nullpath)
 
 
-class nnt_eventfilter(basf2.Module):
+class nnt_eventfilter(b2.Module):
     def initialize(self,
                    tracksegmentsname=hwneuroinputsegmenthits,
                    twodtracksname=hwneuroinput2dfindertracks,
@@ -50,7 +50,7 @@ class nnt_eventfilter(basf2.Module):
         self.twodtracksname = twodtracksname
         self.neurotracksname = neurotracksname
         self.recotracksname = recotracksname
-        self.nullpath = basf2.create_path()
+        self.nullpath = b2.create_path()
 
     def event(self):
         self.return_value(bool(self.hastrginfo() and

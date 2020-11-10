@@ -148,7 +148,7 @@ void KLMReconstructorModule::event()
 void KLMReconstructorModule::correctCableDelay(double& ct, const KLMDigit* d)
 {
   unsigned int cID = d->getUniqueChannelID();
-  ct -= m_TimeCableDelay->getTimeShift(cID);
+  ct -= m_TimeCableDelay->getTimeDelay(cID);
 }
 
 /*

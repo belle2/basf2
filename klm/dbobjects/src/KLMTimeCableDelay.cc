@@ -24,26 +24,26 @@ KLMTimeCableDelay::~KLMTimeCableDelay()
 {
 }
 
-void KLMTimeCableDelay::setTimeShift(uint16_t strip, double par)
+void KLMTimeCableDelay::setTimeDelay(uint16_t channel, double delay)
 {
   std::map<uint16_t, double>::iterator it;
-  it = m_timeShift.find(strip);
-  if (it == m_timeShift.end())
-    m_timeShift.insert(std::pair<uint16_t, double>(strip, par));
+  it = m_timeDelay.find(channel);
+  if (it == m_timeDelay.end())
+    m_timeDelay.insert(std::pair<uint16_t, double>(channel, delay));
   else
-    B2WARNING("TimeCalibration para for the strip already exists.");
+    it->second = delay;
 }
 
-double KLMTimeCableDelay::getTimeShift(uint16_t strip) const
+double KLMTimeCableDelay::getTimeDelay(uint16_t channel) const
 {
   std::map<uint16_t, double>::const_iterator it;
-  it = m_timeShift.find(strip);
-  if (it == m_timeShift.end())
-    return 0.0;
+  it = m_timeDelay.find(channel);
+  if (it == m_timeDelay.end())
+    return std::numeric_limits<double>::quiet_NaN();
   return it->second;
 }
 
-void KLMTimeCableDelay::cleanTimeShift()
+void KLMTimeCableDelay::clearTimeDelay()
 {
-  m_timeShift.clear();
+  m_timeDelay.clear();
 }

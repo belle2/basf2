@@ -37,27 +37,27 @@ namespace Belle2 {
     ~KLMTimeCableDelay();
 
     /**
-     * Set time calibration constant value.
-     * @param[in] KLM strip global element number.
-     * @param[in] calibration constant value for the strip.
+     * Set the time calibration constant.
+     * @param[in] channel   Channel number.
+     * @param[in] timeDelay Time calibration constant.
      */
-    void setTimeShift(uint16_t, double);
+    void setTimeDelay(uint16_t channel, double timeDelay);
 
     /**
-     * Get time calibration data.
-     * @param[in] KLM strip global element number.
+     * Get the time calibration constant.
+     * @param[in] channel Channel number.
      */
-    double getTimeShift(uint16_t) const;
+    double getTimeDelay(uint16_t channel) const;
 
     /**
-     * Clean time calibration constant.
+     * Clear the time calibration constants.
      */
-    void cleanTimeShift();
+    void clearTimeDelay();
 
   private:
 
-    /** Container of time calibration constant value. */
-    std::map<uint16_t, double> m_timeShift;
+    /** Map of the time calibration constants. */
+    std::map<uint16_t, double> m_timeDelay;
 
     /** Class version. */
     ClassDef(KLMTimeCableDelay, 1);

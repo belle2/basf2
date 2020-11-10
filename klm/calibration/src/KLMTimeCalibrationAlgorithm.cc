@@ -879,7 +879,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     } else {
       m_timeShift[channelId] = m_time_channel[channelId] - m_time_channelAvg_scint_end;
     }
-    m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
+    m_timeCableDelay->setTimeDelay(channelId, m_timeShift[channelId]);
   }
 
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
@@ -887,7 +887,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     if (m_timeShift.find(channelId) != m_timeShift.end())
       continue;
     m_timeShift[channelId] = esti_timeShift(klmChannel);
-    m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
+    m_timeCableDelay->setTimeDelay(channelId, m_timeShift[channelId]);
     B2DEBUG(29, "Uncalibrated Estimation " << LogVar("Channel", channelId) << LogVar("Estimated value", m_timeShift[channelId]));
   }
 

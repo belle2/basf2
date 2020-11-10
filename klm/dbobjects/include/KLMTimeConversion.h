@@ -49,6 +49,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get CTIME period.
+     */
+    double getCTimePeriod() const
+    {
+      return m_TDCPeriod * 8;
+    }
+
+    /**
      * Set time offset.
      * @param[in] offset Offset in ns.
      */

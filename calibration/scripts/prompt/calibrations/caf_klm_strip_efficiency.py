@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""
+Calibration of KLM strip efficiency. It provides calibration constants for the KLMSripEfficiency
+database object.
+"""
 
 import basf2
 from prompt import CalibrationSettings

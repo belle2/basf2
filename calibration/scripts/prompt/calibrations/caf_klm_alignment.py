@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""KLM alignment."""
+"""
+Calibration of KLM alignment. It provides calibration constants for the BKLMAlignment
+and EKLMAlignment database objects.
+"""
 
 import collections
 

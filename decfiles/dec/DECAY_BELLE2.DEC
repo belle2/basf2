@@ -25,14 +25,12 @@
 # March 2018, R. Godang (godang@southalabama.edu)
 #   Updated the BRs of the semitauonic decays: B0, anti-B0, B-, B+ decays including pi+ tau- anti-nu_tau
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overview
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overviewDe
 #   https://stash.desy.de/projects/B2/repos/software/commits/eb4481dfe852e60cde1fe9a79ea05828c8e87eac#generators/evtgen/decayfiles/DECAY_BELLE2.DEC
 #
 # March 2018, T. Lueck (lueck@pi.infn.it)
 #   Updated B -> X_c l nu BR to PDG2018 values
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/1739/overview
 #
-# March 2018, W. Sutcliffe (william.sutcliffe@desy.de)
 # March 2018, W. Sutcliffe (william.sutcliffe@desy.de)
 #   Updated B -> s gamma and B -> s l l
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/1712/overview#
@@ -3728,8 +3726,8 @@ Decay B+
 0.001005560   J/psi  K+                                    SVS; #Updated by PG 9/2021
 
 0.001429920   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.001142970   J/psi  K0  pi+                               PHSP; #Gamma_276 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.000100000   J/psi  K+  pi0                               PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000189690   J/psi  K0  pi+                               PHSP; #Gamma_276 PDGLive => 0.001142970. Subtract K* component: BF = 0.001142970 - 2/3 * 0.001429920.   #Updated by PG 9/2021
+0.000094840   J/psi  K+  pi0                               PHSP; #No PDGLive value 9/2021. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                  #Updated by PG 9/2021
 
 0.000038670   J/psi  pi+                                   SVS;  #Updated by PG 9/2021
 0.000040970   J/psi  rho+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Updated by PG 9/2021
@@ -3745,13 +3743,13 @@ Decay B+
 0.000014600   J/psi  p+  anti-Lambda0                      PHSP; #Updated by PG 9/2021
 
 #0.000000000   J/psi  K+  pi0  pi0                          PHSP; Previous .DEC versions had this commented out with value #rl0.00035. No idea what the rl means. Not in PDGLive. Keep commented out. #Updated by PG 9/2021
-#0.000000005   J/psi  K0  pi+  pi0                          PHSP; Previous .DEC versions had this commented out with value #rl0.00035. No idea what the rl means. Not in PDGLive. Keep commented out. #Updated by PG 9/2021
+#0.00000000    J/psi  K0  pi+  pi0                          PHSP; Previous .DEC versions had this commented out with value #rl0.00035. No idea what the rl means. Not in PDGLive. Keep commented out. #Updated by PG 9/2021
 
 0.000619130   psi(2S)  K+                                  SVS;  #Updated by PG 9/2021
 
-0.000667680   psi(2S)  K*+                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.000588000   psi(2S)  K0  pi+                             PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
-0.000200000   psi(2S)  K+  pi0                             PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000667680   psi(2S)  K*+                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #Updated by PG 9/2021
+0.000142880   psi(2S)  K0  pi+                             PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #Updated by PG 9/2021
+0.000071440   psi(2S)  K+  pi0                             PHSP; #No PDGLive value 9/2021. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                      #Updated by PG 9/2021
 
 0.000434100   psi(2S)  K+  pi+  pi-                        PHSP; #Updated by PG 9/2021
 0.000100000   psi(2S)  K+  pi0  pi0                        PHSP;
@@ -4765,8 +4763,8 @@ Decay B-
 0.001005560   J/psi  K-                                    SVS; #Updated by PG 9/2021
 
 0.001429920   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.001142970   J/psi  anti-K0  pi-                          PHSP; #Gamma_276 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.000100000   J/psi  K-  pi0                               PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000189690   J/psi  anti-K0  pi-                          PHSP; #Gamma_276 PDGLive => Exclusive BF.                                                               #Updated by PG 9/2021
+0.000094840   J/psi  K-  pi0                               PHSP; #No PDGLive value 9/2021. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                  #Updated by PG 9/2021
 
 0.000038670   J/psi  pi-                                   SVS;  #Updated by PG 9/2021
 0.000040970   J/psi  rho-                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;  #Updated by PG 9/2021
@@ -4786,9 +4784,9 @@ Decay B-
 
 0.000619130   psi(2S)  K-                                  SVS;  #Updated by PG 9/2021
 
-0.000667680   psi(2S)  K*-                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF. #Updated by PG 9/2021
-0.001142970   psi(2S)  anti-K0  pi-                        PHSP; #Updated by PG 9/2021. [Previously used babar's BF fit 0.000588]
-0.000200000   psi(2S)  K-  pi0                             PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000667680   psi(2S)  K*-                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #Updated by PG 9/2021
+0.000142880   psi(2S)  anti-K0  pi-                        PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #Updated by PG 9/2021
+0.000071440   psi(2S)  K-  pi0                             PHSP; #No PDGLive value 9/2021. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                      #Updated by PG 9/2021
 
 0.000434100   psi(2S)  K-  pi+  pi-                        PHSP; #Updated by PG 9/2021
 0.000100000   psi(2S)  K-  pi0  pi0                        PHSP;

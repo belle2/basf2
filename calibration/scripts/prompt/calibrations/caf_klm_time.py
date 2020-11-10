@@ -112,8 +112,10 @@ def get_calibrations(input_data, **kwargs):
     from klm_calibration_utils import get_time_pre_collector_path
 
     if input_files_cdst:
-        coll_cdst = get_collector('hlt_mumu')
-        rec_path_cdst = get_time_pre_collector_path()
+        muon_list_name = 'klmTime'
+        coll_cdst = get_collector(input_data_name='hlt_mumu',
+                                  muon_list_name=muon_list_name)
+        rec_path_cdst = get_time_pre_collector_path(muon_list_name=muon_list_name)
 
         collection_cdst = Collection(collector=coll_cdst,
                                      input_files=input_files_cdst,
@@ -138,12 +140,13 @@ def get_calibrations(input_data, **kwargs):
 ##############################
 
 
-def get_collector(input_data_name):
+def get_collector(input_data_name, muon_list_name):
     """
     Return the correct KLMTimeCollector module setup for each data type.
     Placed here so it can be different for prompt compared to standard.
     """
 
     if input_data_name == 'hlt_mumu':
-        return basf2.register_module('KLMTimeCalibrationCollector')
+        return basf2.register_module('KLMTimeCollector',
+                                     inputParticleList=f'mu+:{muon_list_name}')
     raise Exception("Unknown input data name used when setting up collector")

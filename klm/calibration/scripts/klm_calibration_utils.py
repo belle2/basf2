@@ -95,9 +95,10 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     return main
 
 
-def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
+def get_strip_efficiency_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True):
     """
     Parameters:
+        muon_list_name  (str): Name of the muon ParticleList to be filled.
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
         raw_format  (bool): True if cDST input files are in the raw+tracking format.
 
@@ -115,16 +116,17 @@ def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
         main.add_module('Geometry')
 
     # Fill muon particle list
-    ma.fillParticleList('mu+:klmStripEfficiency',
+    ma.fillParticleList(f'mu+:{muon_list_name}',
                         '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
                         path=main)
 
     return main
 
 
-def get_time_pre_collector_path(entry_sequence="", raw_format=True):
+def get_time_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True, ):
     """
     Parameters:
+        muon_list_name  (str): Name of the muon ParticleList to be filled.
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
         raw_format  (bool): True if cDST input files are in the raw+tracking format.
 
@@ -142,7 +144,7 @@ def get_time_pre_collector_path(entry_sequence="", raw_format=True):
         main.add_module('Geometry')
 
     # Fill muon particle list
-    ma.fillParticleList('mu+:cali',
+    ma.fillParticleList(f'mu+:{muon_list_name}',
                         '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
                         path=main)
 

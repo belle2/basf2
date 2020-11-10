@@ -5,7 +5,7 @@
 This module defines the uDST (user-defined data summary table) file format.
 A uDST contains all dataobjects from mdst plus Particles and ParticleLists.
 
-See also: mdst.py
+.. seealso:: :ref:`mdst`
 """
 
 import basf2

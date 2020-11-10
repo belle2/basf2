@@ -132,9 +132,6 @@ namespace Belle2 {
     /** KLM element numbers. */
     const KLMElementNumbers* m_elementNum;
 
-    /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
-
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_channelStatus;
 

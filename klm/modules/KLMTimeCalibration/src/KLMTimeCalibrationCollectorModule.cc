@@ -180,7 +180,7 @@ void KLMTimeCalibrationCollectorModule::collect()
     return;
   }  // track existence
 
-  B2DEBUG(30, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
+  B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
   getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_ev.t0);
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);
@@ -202,7 +202,7 @@ void KLMTimeCalibrationCollectorModule::collect()
     getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
     getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
 
-    B2DEBUG(30, "Track" << LogVar("exthits", extHits.size())
+    B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2)
       continue;
@@ -239,7 +239,7 @@ void KLMTimeCalibrationCollectorModule::collect()
       }
       if (tSub < 0)
         continue;
-      B2DEBUG(30, "Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber",
+      B2DEBUG(20, "Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber",
               tSub) << LogVar("bklmCover", bklmCover) << LogVar("eklmCover", eklmCover));
 
       bool crossed = false; // should be only once ?
@@ -383,7 +383,7 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d>& 
 
         TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
         TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(39, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -416,10 +416,6 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bk
   setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_RPC range.");
 
   for (BKLMHit2d& hit2d : bklmHit2ds) {
-    //for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
-    //B2DEBUG(20, "BKLMHit2d related Track loop begins");
-
-    //BKLMHit2d* hit2d = bklmHit2ds[iH2];
     if (!hit2d.inRPC())
       continue;
     if (hit2d.isOutOfTime())
@@ -456,7 +452,7 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bk
         m_ev.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
         TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
         TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(39, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(

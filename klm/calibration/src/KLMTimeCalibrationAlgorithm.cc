@@ -856,7 +856,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   m_etime_channelAvg_rpc = fcn_const->GetParError(0);
 
   B2INFO("Channel's time distribution fitting done.");
-  B2DEBUG(29, LogVar("Average time (RPC)", m_time_channelAvg_rpc)
+  B2DEBUG(20, LogVar("Average time (RPC)", m_time_channelAvg_rpc)
           << LogVar("Average time (BKLM scintillators)", m_time_channelAvg_scint)
           << LogVar("Average time (EKLM scintillators)", m_time_channelAvg_scint_end));
 
@@ -889,7 +889,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       continue;
     m_timeShift[channelId] = esti_timeShift(klmChannel);
     m_timeCableDelay->setTimeDelay(channelId, m_timeShift[channelId]);
-    B2DEBUG(29, "Uncalibrated Estimation " << LogVar("Channel", channelId) << LogVar("Estimated value", m_timeShift[channelId]));
+    B2DEBUG(20, "Uncalibrated Estimation " << LogVar("Channel", channelId) << LogVar("Estimated value", m_timeShift[channelId]));
   }
 
   iChannel_rpc = 0;

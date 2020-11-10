@@ -257,7 +257,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
-      double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
+      double time = 0.5 * (phiTime + zTime);
       BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);

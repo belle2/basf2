@@ -4,7 +4,7 @@
 import sys
 
 import basf2
-from ROOT.Belle2 import KLMTimeCalibrationAlgorithm
+from ROOT.Belle2 import KLMTimeAlgorithm
 from klm_calibration_utils import get_time_pre_collector_path
 from prompt.calibrations.caf_klm_time import get_collector
 from caf.framework import CAF, Calibration, Collection
@@ -14,7 +14,7 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 input_files = sys.argv[1:]
 
 # Create KLM time calibration.
-algorithm = KLMTimeCalibrationAlgorithm()
+algorithm = KLMTimeAlgorithm()
 cal_klm = Calibration(name='KLMTime', algorithms=algorithm)
 coll_cdst = get_collector('hlt_mumu')
 rec_path_cdst = get_time_pre_collector_path(raw_format=False)

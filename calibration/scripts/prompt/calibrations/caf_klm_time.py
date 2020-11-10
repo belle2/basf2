@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""
+Calibration of KLM time. It provides calibration constants for the KLMTimeCableDelay
+and KLMTimeConstants database objects.
+"""
 
 import basf2
 from prompt import CalibrationSettings
@@ -93,9 +95,9 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     import ROOT
-    from ROOT.Belle2 import KLMTimeCalibrationAlgorithm
+    from ROOT.Belle2 import KLMTimeAlgorithm
 
-    alg = KLMTimeCalibrationAlgorithm()
+    alg = KLMTimeAlgorithm()
 
     ###################################################
     # Calibration setup

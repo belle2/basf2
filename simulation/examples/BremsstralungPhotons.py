@@ -13,9 +13,9 @@ This script saves bremsstrahlung photons in MCParticles.
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 
-main = create_path()
+main = b2.create_path()
 
 # create 100 events
 main.add_module("EventInfoSetter", evtNumList=[100])
@@ -36,7 +36,7 @@ main.add_module("FullSim", StoreBremsstrahlungPhotons=True, BremsstrahlungPhoton
 main.add_module("RootOutput", outputFileName="EvtGenSimNoBkgYesBrems.root")
 
 # run it
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

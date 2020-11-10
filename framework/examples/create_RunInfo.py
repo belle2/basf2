@@ -63,9 +63,11 @@ if __name__ == "__main__":
             # create RunInfo object
             info = Belle2.RunInfo()
             try:
-                exp, run, runtype, starttime, stoptime, receivedNevent, acceptedNevent,
-                sentNevent, runlength, trigger_rate, pxd, svd, cdc, top, arich, ecl,
-                klm, badrun = line.split()
+                (
+                    exp, run, runtype, starttime, stoptime, receivedNevent, acceptedNevent,
+                    sentNevent, runlength, trigger_rate, pxd, svd, cdc, top, arich, ecl,
+                    klm, badrun
+                ) = line.split()
                 info.setExp(int(exp))
                 info.setRun(int(run))
                 info.setRunType(int(runtype))
@@ -75,7 +77,7 @@ if __name__ == "__main__":
                 info.setAcceptedNevent(int(acceptedNevent))
                 info.setSentNevent(int(sentNevent))
                 info.setRunLength(int(runlength))
-                info.setTriggerRate(double(trigger_rate))
+                info.setTriggerRate(float(trigger_rate))
                 info.setBelle2Detector(*[int(e) for e in (pxd, svd, cdc, top, arich, ecl, klm)])
                 info.setBadRun(int(badrun))
                 # convert all arguments to an int and pass them on

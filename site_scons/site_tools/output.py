@@ -72,6 +72,7 @@ def generate(env):
             COPYCOMSTR=color_map['copy'] + '*** copying    : ${TARGET}' + color_map['end'],
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}' + color_map['end'],
             ROOTCLINGCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
+            CLASSVERSIONCOMSTR=color_map['dict'] + '*** checking   : ${SOURCE}' + color_map['end'],
             STRIPCOMSTR=color_map['strip'] + '*** stripping  : ${TARGET}' + color_map['end'],
         )
 

@@ -1,8 +1,8 @@
 import basf2
+import numpy as np
 
 import ROOT
 
-import logging
 
 from ROOT import Belle2
 

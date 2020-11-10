@@ -11,15 +11,11 @@ and will be done offline for a while.
 Author: Jitendra Kumar
 Contact: jkumar@andrew.cmu.edu
 """
-import basf2
-import os
-import sys
 import ROOT
 from ROOT import gSystem
-from ROOT import Belle2
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
-from caf.framework import Calibration, CAF, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV
+from caf.framework import Calibration
+from caf.strategies import SequentialRunByRun
 from prompt import CalibrationSettings
 import reconstruction as recon
 from softwaretrigger.path_utils import (add_filter_software_trigger, add_skim_software_trigger)

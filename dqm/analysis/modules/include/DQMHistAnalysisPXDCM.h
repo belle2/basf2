@@ -17,7 +17,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
-#include <TH2F.h>
+#include <TH2.h>
 #include <TCanvas.h>
 #include <TLine.h>
 
@@ -55,11 +55,11 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2F* m_hCommonMode = nullptr;
+    TH2D* m_hCommonMode = nullptr;
     //! histogram covering all modules
-    TH2F* m_hCommonModeDelta = nullptr;
+    TH2D* m_hCommonModeDelta = nullptr;
     //! histogram covering all modules
-    TH2F* m_hCommonModeOld = nullptr;
+    TH2D* m_hCommonModeOld = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonMode = nullptr;
     //! Final Canvas

@@ -29,7 +29,6 @@ from modularAnalysis import matchMCTruth
 from vertex import raveFit
 from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-import sys
 import pdg
 import variables.collections as vc
 import variables.utils as vu

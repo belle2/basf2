@@ -15,18 +15,16 @@
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
-from ROOT import Belle2
-import ROOT
 import multiprocessing
 import SetMetaTimeModule
 from caf.utils import IoV
-from basf2 import *
+import basf2 as b2
 NUMBER_OF_PROCESSES = 20
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
-reset_database()
-use_central_database("Calibration_Offline_Development")
+b2.reset_database()
+b2.use_central_database("Calibration_Offline_Development")
 
 
 # Some ROOT tools
@@ -48,19 +46,19 @@ class CalculationProcess(multiprocessing.Process):
     def run(self):
         """ Run """
         # Register modules
-        rootinput = register_module('RootInput')
+        rootinput = b2.register_module('RootInput')
         rootinput.param('inputFileNames', self.file_paths)
         rootinput.param(
             'branchNames', [
                 'EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs'])
-        gearbox = register_module('Gearbox')
+        gearbox = b2.register_module('Gearbox')
         gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
-        geometry = register_module('Geometry')
+        geometry = b2.register_module('Geometry')
         geometry.param('components', ['PXD', 'SVD', 'CDC'])
-        pxdclusterizer = register_module('PXDClusterizer')
+        pxdclusterizer = b2.register_module('PXDClusterizer')
         pxdclusterizer.param('ElectronicNoise', 1.0)
         pxdclusterizer.param('SeedSN', 9.0)
-        pxdtupleproducer = register_module('PXDBgTupleProducer')
+        pxdtupleproducer = b2.register_module('PXDBgTupleProducer')
         pxdtupleproducer.param(
             'outputFileName',
             '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(
@@ -69,7 +67,7 @@ class CalculationProcess(multiprocessing.Process):
                 self.iov.run_low))
 
         # Create the path
-        main = create_path()
+        main = b2.create_path()
         main.add_module(rootinput)
         main.add_module(SetMetaTimeModule.SetMetaTimeModule())
         main.add_module(gearbox)
@@ -80,10 +78,10 @@ class CalculationProcess(multiprocessing.Process):
         main.add_module("PXDRawHitSorter")
         main.add_module(pxdclusterizer)
         main.add_module(pxdtupleproducer)
-        main.add_module(register_module('Progress'))
+        main.add_module(b2.register_module('Progress'))
 
         # Process the run
-        process(main)
+        b2.process(main)
 
 
 #

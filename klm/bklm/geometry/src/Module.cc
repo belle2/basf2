@@ -135,7 +135,8 @@ Module::Module(double                    stripWidth,
   m_DisplacedGeoInverse(HepGeom::Transform3D()),
   m_DisplacedGeoRotationInverse(CLHEP::HepRotation())
 {
-  if (isFlipped) m_Rotation.rotateZ(M_PI);
+  if (isFlipped)
+    m_Rotation.rotateZ(M_PI);
   m_RotationInverse = m_Rotation.inverse();
   m_PhiScintLengths.clear();
   m_PhiScintPositions.clear();

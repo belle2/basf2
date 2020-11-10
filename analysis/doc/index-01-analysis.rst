@@ -15,9 +15,9 @@ Examples of analysis steering files can be found in tutorial directory of analys
 
         ls $BELLE2_RELEASE_DIR/analysis/examples/tutorials
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
 
-.. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
+.. _Particle: https://software.belle2.org/|release|/classBelle2_1_1Particle.html
 
 
 .. _analysis_particles:
@@ -25,7 +25,7 @@ Examples of analysis steering files can be found in tutorial directory of analys
 Particles
 =========
 
-Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s) ECLClusters, and KLMClusters. 
+Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s), ECLClusters, and KLMClusters. 
 The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as phsical particles.
 All of the `Particle`_ s in an event that fall within certain criteria are collected into `ParticleList`_ s.
 
@@ -89,7 +89,7 @@ You can save information from analysis jobs directly from the ``VariableManager`
 You can also save events to your own mDST or user-defined dst (uDST) output files.
 These files are also created by the :ref:`skim` but the functional code is part of :ref:`analysis`.
 
-.. toctree:: MdstAndUdstOutput
+.. toctree:: UdstOutput
 
 Event-based analysis
 ====================

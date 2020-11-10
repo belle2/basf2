@@ -31,7 +31,26 @@ The post-reconstruction dataobjects are C++ classes found in the mdst dataobject
 
         ls $BELLE2_RELASE_DIR/mdst/dataobjects/include
 
-.. TODO can I link to the actual directory on sphinx here? I would obviously need to link to the release-tag that we're looking at right now.
+Or in the C++ doxygen documentation `here <https://software.belle2.org/|release|/group__mdst__dataobjects.html>`__.
+
+ROOT and compatibility guarantee
+================================
+
+Mdst files are written by the :b2:mod:`RootOutput` module and are based on the ROOT file format.
+However it is important to note that analysis of mdst with any software other than basf2 is not supported or permitted.
+I.e. use of the basf2 framework and the :ref:`analysis` package is mandatory.
+
+.. warning:: 
+
+        A common misconception: Opening an mdst file with standard ROOT tools (e.g. with a TBrowser) may initially "work", 
+        but the results are not reproducible.
+
+        Many dataobject member accessors require the basf2 environment to return meaningful values.
+        Segmentation faults and double-counting of tracks and/or clusters are very likely to be encountered.
+
+However! Backward-compatibility is guaranteed for two major basf2 releases and the supported light releases.
+
+.. seealso:: `Backward compatibility <https://confluence.desy.de/display/BI/Backward+Compatibility>`__ on confluence.
 
 Related packages
 ================

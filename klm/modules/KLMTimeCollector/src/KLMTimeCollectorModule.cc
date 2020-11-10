@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
+#include <klm/modules/KLMTimeCollector/KLMTimeCollectorModule.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
@@ -36,9 +36,9 @@ using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace Belle2::EKLM;
 
-REG_MODULE(KLMTimeCalibrationCollector)
+REG_MODULE(KLMTimeCollector)
 
-KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
+KLMTimeCollectorModule::KLMTimeCollectorModule() :
   CalibrationCollectorModule(),
   m_ev(),
   m_geoParB(nullptr),
@@ -72,15 +72,15 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   m_elementNum = &(KLMElementNumbers::Instance());
 }
 
-KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
+KLMTimeCollectorModule::~KLMTimeCollectorModule()
 {
   B2INFO("Destructor done..");
 }
 
 
-void KLMTimeCalibrationCollectorModule::prepare()
+void KLMTimeCollectorModule::prepare()
 {
-  setDescription("Preparation for BKLM TimeCalibration Collector Module.");
+  setDescription("Preparation for BKLM Time Collector Module.");
 
   /* Initialize geometry. */
   //B2INFO("prepare :: Initialize geometry..");
@@ -151,7 +151,7 @@ void KLMTimeCalibrationCollectorModule::prepare()
   registerObject<TH1I>("m_HnDigit_scint_end", m_HnumDigit_scint_end);
 }
 
-void KLMTimeCalibrationCollectorModule::collect()
+void KLMTimeCollectorModule::collect()
 {
   setDescription("Time Calibration Collector. Main Collect Function of Collector Module Begins.");
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
@@ -283,7 +283,7 @@ void KLMTimeCalibrationCollectorModule::collect()
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
+void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
 {
   setDescription("KLM time calibration collector. Used for collecting avaiable hits in EKLM range.");
   B2INFO("Match EKLMHit and ExtHit.");
@@ -339,7 +339,7 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
 {
   setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_SCINT range.");
   double stripWidtm_HZ, stripWidtm_HPhi;
@@ -411,7 +411,7 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d>& 
   }
 }
 
-void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
 {
   setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_RPC range.");
 
@@ -480,7 +480,7 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bk
   }
 }
 
-std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t kID,
+std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(uint16_t kID,
     std::multimap<unsigned int, ExtHit>& v_ExtHits)
 {
   setDescription("KLM time calibration collector. Used for KLM hit and ExtHit matching.");
@@ -529,7 +529,7 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t
   return p_extHits;
 }
 
-void KLMTimeCalibrationCollectorModule::storeDistDiff(TVector3& pDiff)
+void KLMTimeCollectorModule::storeDistDiff(TVector3& pDiff)
 {
   double diffM = pDiff.Mag();
   double diffX = pDiff.X();
@@ -544,7 +544,7 @@ void KLMTimeCalibrationCollectorModule::storeDistDiff(TVector3& pDiff)
   m_ev.diffDistZ = diffZ;
 }
 
-void KLMTimeCalibrationCollectorModule::finish()
+void KLMTimeCollectorModule::finish()
 {
   B2INFO("Data Collection Done.");
 }

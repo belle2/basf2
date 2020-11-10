@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
+#include <klm/calibration/KLMTimeAlgorithm.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
@@ -38,19 +38,19 @@ namespace Belle2 {
   /**
    * Collect hit information for KLM time calibration with CAF.
    */
-  class KLMTimeCalibrationCollectorModule : public CalibrationCollectorModule {
+  class KLMTimeCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor.
      */
-    KLMTimeCalibrationCollectorModule();
+    KLMTimeCollectorModule();
 
     /**
      * Destructor.
      */
-    virtual ~KLMTimeCalibrationCollectorModule();
+    virtual ~KLMTimeCollectorModule();
 
     /**
      * Initializes the module.
@@ -118,7 +118,7 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0;
 
     /** Time calibration data event. */
-    struct KLMTimeCalibrationAlgorithm::Event m_ev;
+    struct KLMTimeAlgorithm::Event m_ev;
 
     /** BKLM geometry parameters. */
     const bklm::GeometryPar* m_geoParB;

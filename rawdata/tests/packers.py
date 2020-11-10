@@ -4,7 +4,6 @@
 import multiprocessing as mp
 import os
 import sys
-import multiprocessing as mp
 from ROOT import Belle2
 import rawdata as raw
 import simulation as sim

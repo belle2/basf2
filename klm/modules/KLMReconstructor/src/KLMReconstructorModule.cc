@@ -74,7 +74,8 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
-  m_eklmNStrip(0)
+  m_eklmNStrip(0),
+  m_eklmTransformData{nullptr}
 {
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);

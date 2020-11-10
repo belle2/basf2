@@ -140,18 +140,21 @@ namespace Belle2 {
 
     /**
      * Estimate value of calibration constant for uncalibrated channels.
+     * @param[in] klmChannel KLM channel index.
      */
-    double esti_timeShift(KLMChannelIndex&);
+    double esti_timeShift(const KLMChannelIndex& klmChannel);
 
     /**
      * Tracing avaiable channels with increasing strip number.
+     * @param[in] klmChannel KLM channel index.
      */
-    std::pair<int, double> tS_upperStrip(KLMChannelIndex&);
+    std::pair<int, double> tS_upperStrip(const KLMChannelIndex& klmChannel);
 
     /**
      * Tracing avaiable channels with decreasing strip number.
+     * @param[in] klmChannel KLM channel index.
      */
-    std::pair<int, double> tS_lowerStrip(KLMChannelIndex&);
+    std::pair<int, double> tS_lowerStrip(const KLMChannelIndex& klmChannel);
 
 
   protected:

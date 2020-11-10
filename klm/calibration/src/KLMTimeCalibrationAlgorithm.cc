@@ -32,46 +32,52 @@ using namespace Belle2;
 using namespace ROOT::Math;
 
 KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
-  CalibrationAlgorithm("KLMTimeCalibrationCollector")
+  CalibrationAlgorithm("KLMTimeCalibrationCollector"),
+  ev(),
+  t_tin{nullptr},
+  m_time_channelAvg_rpc{0.0},
+  m_etime_channelAvg_rpc{0.0},
+  m_time_channelAvg_scint{0.0},
+  m_etime_channelAvg_scint{0.0},
+  m_time_channelAvg_scint_end{0.0},
+  m_etime_channelAvg_scint_end{0.0},
+  m_lower_limit_counts{50},
+  m_timeConstants{nullptr},
+  m_timeCableDelay{nullptr},
+  m_debug{false},
+  m_useEventT0{true},
+  h_calibrated{nullptr},
+  h_diff{nullptr},
+  gre_time_channel_rpc{nullptr},
+  gre_time_channel_scint{nullptr},
+  gre_time_channel_scint_end{nullptr},
+  gr_timeShift_channel_rpc{nullptr},
+  gr_timeShift_channel_scint{nullptr},
+  gr_timeShift_channel_scint_end{nullptr},
+  hprf_rpc_phi_effC{nullptr},
+  hprf_rpc_z_effC{nullptr},
+  hprf_scint_phi_effC{nullptr},
+  hprf_scint_z_effC{nullptr},
+  hprf_scint_plane1_effC_end{nullptr},
+  hprf_scint_plane2_effC_end{nullptr},
+  h_time_rpc_tc{nullptr},
+  h_time_scint_tc{nullptr},
+  h_time_scint_tc_end{nullptr},
+  h_time_rpc{nullptr},
+  h_time_scint{nullptr},
+  h_time_scint_end{nullptr},
+  hc_time_rpc{nullptr},
+  hc_time_scint{nullptr},
+  hc_time_scint_end{nullptr},
+  fcn_pol1{nullptr},
+  fcn_const{nullptr},
+  fcn_gaus{nullptr},
+  fcn_land{nullptr},
+  m_outFile{nullptr}
 {
-  m_debug = false;
-  m_useEventT0 = true;
-  m_lower_limit_counts = 50;
-
-  m_mc = Environment::Instance().isMC();
   m_elementNum = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
-
-  m_time_channelAvg_rpc = 0.0;
-  m_etime_channelAvg_rpc = 0.0;
-  m_time_channelAvg_scint = 0.0;
-  m_etime_channelAvg_scint = 0.0;
-  m_time_channelAvg_scint_end = 0.0;
-  m_etime_channelAvg_scint_end = 0.0;
-
-  h_calibrated = nullptr;
-  h_diff = nullptr;
-  gre_time_channel_rpc = nullptr;
-  gre_time_channel_scint = nullptr;
-  gre_time_channel_scint_end = nullptr;
-
-  hprf_rpc_phi_effC = nullptr;
-  hprf_rpc_z_effC = nullptr;
-  hprf_scint_phi_effC = nullptr;
-  hprf_scint_z_effC = nullptr;
-  hprf_scint_plane1_effC_end = nullptr;
-  hprf_scint_plane2_effC_end = nullptr;
-  h_time_rpc_tc = nullptr;
-  h_time_scint_tc = nullptr;
-  h_time_scint_tc_end = nullptr;
-
-  h_time_rpc = nullptr;
-  h_time_scint = nullptr;
-  h_time_scint_end = nullptr;
-  hc_time_rpc = nullptr;
-  hc_time_scint = nullptr;
-  hc_time_scint_end = nullptr;
-
+  m_mc = Environment::Instance().isMC();
   for (int ia = 0; ia < 2; ++ia) {
     h_timeF_rpc[ia] = nullptr;
     h_timeF_scint[ia] = nullptr;
@@ -130,12 +136,7 @@ KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
       }
     }
   }
-  fcn_pol1 = nullptr;
-  fcn_const = nullptr;
-  fcn_gaus = nullptr;
-  fcn_land = nullptr;
 
-  m_outFile = nullptr;
 }
 
 KLMTimeCalibrationAlgorithm::~KLMTimeCalibrationAlgorithm()
@@ -504,8 +505,6 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
   }
 
-
-  std::map<uint16_t, std::vector<struct Event> >::iterator it_m;
   std::vector<struct Event>::iterator it_v;
 
   m_evtsChannel.clear();
@@ -1147,7 +1146,7 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   B2INFO("File Write and Close. Done.");
 }
 
-double KLMTimeCalibrationAlgorithm::esti_timeShift(KLMChannelIndex& klmChannel)
+double KLMTimeCalibrationAlgorithm::esti_timeShift(const KLMChannelIndex& klmChannel)
 {
   double tS = 0.0;
   int iSub = klmChannel.getSubdetector();
@@ -1178,7 +1177,7 @@ double KLMTimeCalibrationAlgorithm::esti_timeShift(KLMChannelIndex& klmChannel)
   return tS;
 }
 
-std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(KLMChannelIndex& klmChannel)
+std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(const KLMChannelIndex& klmChannel)
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();
@@ -1204,7 +1203,7 @@ std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(KLMChannelInde
   return tS;
 }
 
-std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_lowerStrip(KLMChannelIndex& klmChannel)
+std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_lowerStrip(const KLMChannelIndex& klmChannel)
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();

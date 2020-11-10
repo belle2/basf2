@@ -40,6 +40,7 @@ REG_MODULE(KLMTimeCalibrationCollector)
 
 KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   CalibrationCollectorModule(),
+  m_ev(),
   m_geoParB(nullptr),
   m_geoParE(nullptr),
   m_TransformData(nullptr),
@@ -48,6 +49,7 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   m_HnumTrack(nullptr),
   m_HnBHit2dOfTrack(nullptr),
   m_HnEHit2dOfTrack(nullptr),
+  m_HpositionDiff{nullptr},
   m_HpositionXDiff(nullptr),
   m_HpositionYDiff(nullptr),
   m_HpositionZDiff(nullptr),

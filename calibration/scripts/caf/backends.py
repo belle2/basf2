@@ -587,7 +587,7 @@ class Job:
         This adds simple setup commands like ``source /path/to/tools/b2setup`` to your `Job`.
         It should detect if you are using a local release or CVMFS and append the correct commands
         so that the job will have the same basf2 release environment. It should also detect
-        if a local release is not compiled with the `opt` option.
+        if a local release is not compiled with the ``opt`` option.
 
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.

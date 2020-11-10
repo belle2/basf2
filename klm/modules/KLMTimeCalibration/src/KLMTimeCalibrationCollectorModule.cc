@@ -296,8 +296,6 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
     if (nDigit != 2)
       B2FATAL("Wrong number of related KLMDigits.");
 
-    //if (digits[0]->getNPhotoelectrons() == 0 || digits[1]->getNPhotoelectrons() == 0)
-    continue;
     if (!digits[0]->isGood() || !digits[1]->isGood())
       continue;
 

@@ -37,6 +37,9 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Event data.
+     */
     struct Event {
 
       /** EventT0 for the digit. */

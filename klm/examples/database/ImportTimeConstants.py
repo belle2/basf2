@@ -3,7 +3,6 @@
 
 # Import KLM time constants payloads.
 
-import basf2
 from ROOT import Belle2
 
 basf2.set_log_level(basf2.LogLevel.INFO)

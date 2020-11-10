@@ -193,19 +193,21 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   double upEdge_scint_end = 10.0;
 
   B2INFO("Sample Type" << LogVar("data or mc", m_mc));
-  //if (m_mc) {
-  //lowEdge_scint = -20.0;
-  //lowEdge_rpc = -20.0;
-  //upEdge_scint = 30.0;
-  //upEdge_rpc = 30.0;
-  //} else {
-  lowEdge_rpc = -800.0;
-  upEdge_rpc = -600.0;
-  lowEdge_scint = -4800.0;
-  upEdge_scint = -4400.0;
-  lowEdge_scint_end = -4950.0;
-  upEdge_scint_end = -4650.0;
-  //}
+  if (m_mc) {
+    lowEdge_rpc = -10.0;
+    upEdge_rpc = 10.0;
+    lowEdge_scint = 20.0;
+    upEdge_scint = 70.0;
+    lowEdge_scint_end = 20.0;
+    upEdge_scint_end = 70.0;
+  } else {
+    lowEdge_rpc = -800.0;
+    upEdge_rpc = -600.0;
+    lowEdge_scint = -4800.0;
+    upEdge_scint = -4400.0;
+    lowEdge_scint_end = -4950.0;
+    upEdge_scint_end = -4650.0;
+  }
   int nBin = 200;
   int nBin_scint = 400;
 

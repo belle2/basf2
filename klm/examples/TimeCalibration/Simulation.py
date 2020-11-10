@@ -18,8 +18,8 @@ input.param('inputFileName', sys.argv[1])
 main = basf2.create_path()
 main.add_module(input)
 add_simulation(main)
-add_reconstruction(main, reconstruct_cdst='rawFormat')
-add_cdst_output(main, filename=sys.argv[2], rawFormat=True)
+add_reconstruction(main)
+add_cdst_output(main, filename=sys.argv[2], rawFormat=False)
 main.add_module('Progress')
 
 # generate events

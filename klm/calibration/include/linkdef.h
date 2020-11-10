@@ -12,6 +12,6 @@
 #pragma link C++ class Belle2::KLMElectronicsMapImporter-;
 #pragma link C++ class Belle2::KLMLikelihoodParametersImporter-;
 #pragma link C++ class Belle2::KLMStripEfficiencyAlgorithm-;
-#pragma link C++ class Belle2::KLMTimeCalibrationAlgorithm-;
+#pragma link C++ class Belle2::KLMTimeAlgorithm-;
 
 #endif

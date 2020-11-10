@@ -33,7 +33,7 @@ namespace Belle2 {
   /**
    * KLM time calibration algorithm.
    */
-  class KLMTimeCalibrationAlgorithm : public CalibrationAlgorithm {
+  class KLMTimeAlgorithm : public CalibrationAlgorithm {
 
   public:
 
@@ -91,12 +91,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMTimeCalibrationAlgorithm();
+    KLMTimeAlgorithm();
 
     /**
      * Destructor.
      */
-    ~KLMTimeCalibrationAlgorithm();
+    ~KLMTimeAlgorithm();
 
     /**
      * Turn on debug mode (prints histograms and output running log).

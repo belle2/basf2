@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
+#include <klm/calibration/KLMTimeAlgorithm.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
@@ -31,7 +31,7 @@
 using namespace Belle2;
 using namespace ROOT::Math;
 
-KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
+KLMTimeAlgorithm::KLMTimeAlgorithm() :
   CalibrationAlgorithm("KLMTimeCalibrationCollector"),
   ev(),
   t_tin{nullptr},
@@ -139,11 +139,11 @@ KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
 
 }
 
-KLMTimeCalibrationAlgorithm::~KLMTimeCalibrationAlgorithm()
+KLMTimeAlgorithm::~KLMTimeAlgorithm()
 {
 }
 
-CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 {
   int channelId;
   double effSpeed_end, effSpeed, effSpeed_RPC;
@@ -987,7 +987,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 }
 
 
-void KLMTimeCalibrationAlgorithm::saveHist()
+void KLMTimeAlgorithm::saveHist()
 {
   m_outFile->cd();
   B2INFO("Save Histograms into Files.");
@@ -1148,7 +1148,7 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   B2INFO("File Write and Close. Done.");
 }
 
-double KLMTimeCalibrationAlgorithm::esti_timeShift(const KLMChannelIndex& klmChannel)
+double KLMTimeAlgorithm::esti_timeShift(const KLMChannelIndex& klmChannel)
 {
   double tS = 0.0;
   int iSub = klmChannel.getSubdetector();
@@ -1179,7 +1179,7 @@ double KLMTimeCalibrationAlgorithm::esti_timeShift(const KLMChannelIndex& klmCha
   return tS;
 }
 
-std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(const KLMChannelIndex& klmChannel)
+std::pair<int, double> KLMTimeAlgorithm::tS_upperStrip(const KLMChannelIndex& klmChannel)
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();
@@ -1205,7 +1205,7 @@ std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(const KLMChann
   return tS;
 }
 
-std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_lowerStrip(const KLMChannelIndex& klmChannel)
+std::pair<int, double> KLMTimeAlgorithm::tS_lowerStrip(const KLMChannelIndex& klmChannel)
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();

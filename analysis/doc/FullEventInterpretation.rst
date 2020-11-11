@@ -318,7 +318,7 @@ You can find up to date examples in ``analysis/examples/FEI``.
 In general a FEI training steering file consists of
 
 *    a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
-*    a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring, or if you use b2bii)
+*    a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
 *    a feistate object, which contains the BASF2 path for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).

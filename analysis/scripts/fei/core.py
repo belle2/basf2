@@ -175,7 +175,7 @@ class FSPLoader(object):
         """
         path = basf2.create_path()
 
-        if self.config.b2bii:
+        if os.environ.get("B2BII") == 'TRUE':
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
@@ -733,7 +733,7 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     @param config config.FeiConfiguration object
     @param cache current cache level
     """
-    configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
+    configuration = config.FeiConfiguration(configuration.prefix, cache,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
     # Backup existing Summary.pickle files

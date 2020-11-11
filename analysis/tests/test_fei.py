@@ -238,7 +238,8 @@ class TestFSPLoader(unittest.TestCase):
 
     def test_belle1_without_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=False, b2bii=True)
+        os.environ["B2BII"] = 'TRUE'
+        config = fei.config.FeiConfiguration(monitor=False)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
@@ -258,10 +259,12 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        os.environ["B2BII"] = 'FALSE'
 
     def test_belle1_with_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=True, b2bii=True)
+        os.environ["B2BII"] = 'TRUE'
+        config = fei.config.FeiConfiguration(monitor=True)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
@@ -286,6 +289,7 @@ class TestFSPLoader(unittest.TestCase):
                         fileName='Monitor_FSPLoader.root')
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        os.environ["B2BII"] = 'FALSE'
 
 
 class TestTrainingData(unittest.TestCase):

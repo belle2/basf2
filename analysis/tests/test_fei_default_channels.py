@@ -99,7 +99,8 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
 
     def test_get_specific_converted(self):
-        particles = fei.default_channels.get_default_channels(specific=True, KLong=True, convertedFromBelle=True)
+        os.environ["B2BII"] = 'TRUE'
+        particles = fei.default_channels.get_default_channels(specific=True, KLong=True)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -116,9 +117,11 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < InvM < 0.18 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
+        os.environ["B2BII"] = 'FALSE'
 
     def test_get_converted(self):
-        particles = fei.default_channels.get_default_channels(convertedFromBelle=True)
+        os.environ["B2BII"] = 'TRUE'
+        particles = fei.default_channels.get_default_channels()
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -150,6 +153,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                                                             'cosAngleBetweenMomentumAndVertexVector',
                                                             'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
                                                             'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'])
+        os.environ["B2BII"] = 'FALSE'
 
 
 class TestGetFRChannels(unittest.TestCase):

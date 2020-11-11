@@ -2882,7 +2882,6 @@ def labelTauPairMC(printDecayInfo=False, path=None):
 
 
 def tagCurlTracks(particleLists,
-                  belle=False,
                   mcTruth=False,
                   responseCut=0.324,
                   selectorType='cUt',
@@ -2907,7 +2906,6 @@ def tagCurlTracks(particleLists,
 
 
     @param particleLists: list of particle lists to check for curls.
-    @param belle:         bool flag for Belle or Belle II data/mc.
     @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
@@ -2920,6 +2918,9 @@ def tagCurlTracks(particleLists,
     @param train:         flag to set training mode if selector has a training mode (mva).
     @param path:          module is added to this path.
     """
+
+    import os
+    belle = (os.getenv("B2BII") == 'TRUE')
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string

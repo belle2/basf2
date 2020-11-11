@@ -341,7 +341,7 @@ namespace {
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
-    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack = myTracks.appendNew(mytrack);
@@ -367,7 +367,7 @@ namespace {
     //-----------------------------------------------------------------------
     // now add another track and mock up a V0 and a V0-based particle
     myResults.appendNew(position, momentum, cov6, charge * -1,
-                        Const::electron, pValue, bField, CDCValue, 16777215);
+                        Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track secondTrack;
     secondTrack.setTrackFitResultIndex(Const::electron, 1);
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
@@ -455,7 +455,7 @@ namespace {
       TMatrixDSym cov(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
       electron_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -463,7 +463,7 @@ namespace {
       TMatrixDSym cov1(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
       pion_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -1028,6 +1028,32 @@ namespace {
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+
+    // sin 30 = 0.5
+    var = Manager::Instance().getVariable("sin(0.5235987755983)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // sin 90 = 1
+    var = Manager::Instance().getVariable("sin(1.5707963267948966)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    // asin 1 = 90
+    var = Manager::Instance().getVariable("asin(1.0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
+    // cos 60 = 0.5
+    var = Manager::Instance().getVariable("cos(1.0471975511965976)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // acos 0 = 90
+    var = Manager::Instance().getVariable("acos(0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
   }
 
   TEST_F(MetaVariableTest, formula)
@@ -1234,13 +1260,13 @@ namespace {
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.4, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
@@ -4135,10 +4161,11 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* allTrack = tracks.appendNew(mytrack);
+    Track* allTrackNoSVD = tracks.appendNew(mytrack);
     Track* noPIDTrack = tracks.appendNew(mytrack);
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
@@ -4182,6 +4209,16 @@ namespace {
     lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
     lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
+    // All detectors but SVD
+    auto* lAllNoSVD = likelihood.appendNew();
+    std::vector<std::string> detectors_noSVD = {"CDC", "TOP", "ARICH", "ECL"};
+    Const::PIDDetectorSet detectorSetNoSVD = parseDetectors(detectors_noSVD);
+    for (size_t iDet(0); iDet < detectorSetNoSVD.size(); ++iDet) {
+      auto det = detectorSetNoSVD[iDet];
+      for (const auto& hypo : Const::chargedStableSet) {
+        lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
+      }
+    }
 
     // Likelihoods for a dEdx only case
     auto* ldEdx = likelihood.appendNew();
@@ -4205,43 +4242,59 @@ namespace {
 
 
     allTrack->addRelationTo(lAll);
+    allTrackNoSVD->addRelationTo(lAllNoSVD);
     dEdxTrack->addRelationTo(ldEdx);
 
     // Table with the sum(LogL) for several cases
-    //      All  dEdx
-    // e    0.7  0.22
-    // mu   2.7  1.14
-    // pi   1.2  0.54
-    // k    1.7  0.74
-    // p    2.2  0.94
-    // d    3.2  1.34
+    //      All  dEdx  AllNoSVD
+    // e    0.7  0.22  0.6
+    // mu   2.7  1.14  2.12
+    // pi   1.2  0.54  0.92
+    // k    1.7  0.74  1.32
+    // p    2.2  0.94  1.72
+    // d    3.2  1.34  2.52
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
+    auto* particleAllNoSVD = particles.appendNew(allTrackNoSVD, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
     double numsumexp = std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2);
+    double numsumexp_noSVD = std::exp(0.6) + std::exp(2.12) + std::exp(0.92) + std::exp(1.32) + std::exp(1.72) + std::exp(2.52);
 
     // Basic PID quantities. Currently just wrappers for global probability.
-    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.2) / numsumexp);
-    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
+    EXPECT_FLOAT_EQ(electronID(particleAllNoSVD), std::exp(0.6) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(muonID(particleAllNoSVD),     std::exp(2.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(pionID(particleAllNoSVD),     std::exp(0.92) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(kaonID(particleAllNoSVD),     std::exp(1.32) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(protonID(particleAllNoSVD),   std::exp(1.72) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(deuteronID(particleAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
 
     // smart PID that takes the hypothesis into account
-    auto* particleMuonAll = particles.appendNew(allTrack, Const::muon);
-    auto* particleKaonAll = particles.appendNew(allTrack, Const::kaon);
-    auto* particleElectronAll = particles.appendNew(allTrack, Const::electron);
-    auto* particleProtonAll = particles.appendNew(allTrack, Const::proton);
-    auto* particleDeuteronAll = particles.appendNew(allTrack, Const::deuteron);
-    EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.2) / numsumexp); // there's already a pion
-    EXPECT_FLOAT_EQ(particleID(particleMuonAll), std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleKaonAll), std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleElectronAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
+    auto* particleMuonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::muon);
+    auto* particleKaonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::kaon);
+    auto* particleElectronAllNoSVD = particles.appendNew(allTrackNoSVD, Const::electron);
+    auto* particleProtonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::proton);
+    auto* particleDeuteronAllNoSVD = particles.appendNew(allTrackNoSVD, Const::deuteron);
+
+    EXPECT_FLOAT_EQ(particleID(particleAllNoSVD), std::exp(0.92) / numsumexp_noSVD); // there's already a pion
+    EXPECT_FLOAT_EQ(particleID(particleMuonAllNoSVD), std::exp(2.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleKaonAllNoSVD), std::exp(1.32) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleElectronAllNoSVD), std::exp(0.6) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleProtonAllNoSVD),   std::exp(1.72) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleDeuteronAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
+
+    // Hadron ID vars w/ SVD info included. Only pi, K, p.
+    double numsumexp_had = std::exp(1.2) + std::exp(1.7) + std::exp(2.2);
+    EXPECT_FLOAT_EQ(pionID_SVD(particleAll), std::exp(1.2) / numsumexp_had);
+    EXPECT_FLOAT_EQ(kaonID_SVD(particleAll), std::exp(1.7) / numsumexp_had);
+    EXPECT_FLOAT_EQ(protonID_SVD(particleAll), std::exp(2.2) / numsumexp_had);
+    std::vector<double> v_pi_K {211., 321.};
+    std::vector<double> v_pi_p {211., 2212.};
+    std::vector<double> v_K_p {321., 2212.};
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_K), std::exp(1.2) / (std::exp(1.2) + std::exp(1.7)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_p), std::exp(1.2) / (std::exp(1.2) + std::exp(2.2)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_K_p), std::exp(1.7) / (std::exp(1.7) + std::exp(2.2)));
 
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -4303,8 +4356,6 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)
@@ -4329,7 +4380,7 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack1 = tracks.appendNew(mytrack);

@@ -263,4 +263,3 @@ void PXDReadRawBonnDAQMatchedModule::terminate()
   if (fh) fclose(fh);
   fh = 0;
 }
-

@@ -11,7 +11,6 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-from tracking.adjustments import adjust_module
 import tracking
 import logging
 import basf2

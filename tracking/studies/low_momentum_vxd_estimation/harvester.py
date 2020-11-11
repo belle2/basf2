@@ -1,11 +1,7 @@
-from tracking.validation.harvesting import HarvestingModule
-from tracking.run.event_generation import MinimalRun
-from tracking.validation import refiners
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest import refiners
 from ROOT import Belle2
 import numpy as np
-import ROOT
-from tracking.validation.pr_side_module import PRSideTrackingValidationModule
-from tracking.validation.module import TrackingValidationModule
 
 from tracking.ipython_tools.wrapper import QueueHarvester
 
@@ -41,7 +37,7 @@ class VXDMomentumEnergyEstimator:
 
         for cluster in clusters:
 
-            charge = tools.getCalibratedCharge(cluster)
+            calibrated_charge = tools.getCalibratedCharge(cluster)
             path_length = tools.getPathLength(cluster, helix)
 
             charge_list.append(calibrated_charge)
@@ -116,6 +112,7 @@ class MCParticleHarvester(HarvestingModule):
 
     def peel(self, mc_particle):
         """Aggregate the PXD and SVD cluster information for an MCParticle"""
+        result = dict()
 
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
         svd_clusters = mc_particle.getRelationsFrom("SVDClusters")

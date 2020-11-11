@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 
 def add_fbdtclassifier_training(path,
@@ -15,7 +15,7 @@ def add_fbdtclassifier_training(path,
                                 treeDepth=3,
                                 shrinkage=0.15,
                                 randRatio=0.5,
-                                logLevel=LogLevel.INFO,
+                                logLevel=b2.LogLevel.INFO,
                                 dbgLvl=1):
     """This function adds the FastBDTClassifierTraining-module to the given path and exposes all its parameters
     @param path the path to which the module should be added
@@ -29,7 +29,7 @@ def add_fbdtclassifier_training(path,
     @param logLevel the LogLevel of the module
     @param dbgLvl the debugLevel of the module
     """
-    fbdtTrainer = register_module('FastBDTClassifierTraining')
+    fbdtTrainer = b2.register_module('FastBDTClassifierTraining')
     fbdtTrainer.logging.log_level = logLevel
     fbdtTrainer.logging.debug_level = dbgLvl
     fbdtTrainer.param({'networkInputName': networkInputName,
@@ -51,14 +51,14 @@ def add_ml_threehitfilters(path,
                            networkInputName,
                            fbdtFileName='FBDTClassifier.dat',
                            cutVal=0.5,
-                           logLevel=LogLevel.INFO,
+                           logLevel=b2.LogLevel.INFO,
                            dbgLvl=1):
     """This function adds the MLSegmentNetworkProducerModule to the given path and exposes its parameters
     @param path the path to which the module should be added
     @param networkInputName parameter passed to the module
     @param fbdtFileName the filename where the FBDT is stored
     """
-    ml_segment = register_module('MLSegmentNetworkProducer')
+    ml_segment = b2.register_module('MLSegmentNetworkProducer')
     ml_segment.logging.log_level = logLevel
     ml_segment.logging.debug_level = dbgLvl
     ml_segment.param({'networkInputName': networkInputName,
@@ -74,7 +74,7 @@ def add_fbdtclassifier_analyzer(path,
                                 trainSamp,
                                 testSamp,
                                 outputFN='FBDTAnalyzer_out.root',
-                                logLevel=LogLevel.DEBUG,
+                                logLevel=b2.LogLevel.DEBUG,
                                 dbgLvl=50):
     """This function analyses all presented training and test samples and stores the outputs into a root file for later analysis
     @param path the path to which the module should be added
@@ -83,7 +83,7 @@ def add_fbdtclassifier_analyzer(path,
     @param testSamp the file name where the test smples are stored
     @param outputFN the file name of the root file which is created
     """
-    fbdtAnalyzer = register_module('FastBDTClassifierAnalyzer')
+    fbdtAnalyzer = b2.register_module('FastBDTClassifierAnalyzer')
     fbdtAnalyzer.logging.log_level = logLevel
     fbdtAnalyzer.logging.debug_level = dbgLvl
     fbdtAnalyzer.param({'fbdtFileName': fbdtFileName,

@@ -54,7 +54,7 @@ namespace Belle2 {
     /// main method of the findlet, merges and filters paths
     void apply(std::vector<CDCCKFResult>& results) override
     {
-      B2DEBUG(100, "CDCCKFDuplicateRemover: " << results.size() << " paths created (might be without any hits)");
+      B2DEBUG(29, "CDCCKFDuplicateRemover: " << results.size() << " paths created (might be without any hits)");
 
       std::vector<CDCCKFResult> goodResults;
 
@@ -70,11 +70,11 @@ namespace Belle2 {
 
       int n_goodresults = goodResults.size();
 
-      B2DEBUG(100, "CDCCKFDuplicateRemover: " << goodResults.size() << " paths created (after filtering)");
+      B2DEBUG(29, "CDCCKFDuplicateRemover: " << goodResults.size() << " paths created (after filtering)");
 
       if (n_goodresults > 1) {
         for (const auto& result : goodResults) {
-          B2DEBUG(100, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
+          B2DEBUG(29, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
@@ -108,11 +108,11 @@ namespace Belle2 {
         }
       }
 
-      B2DEBUG(100, "CDCCKFDuplicateRemover: " << goodResults.size() << " paths created (after duplicates)");
+      B2DEBUG(29, "CDCCKFDuplicateRemover: " << goodResults.size() << " paths created (after duplicates)");
 
       if (n_goodresults > 1) {
         for (const auto& result : goodResults) {
-          B2DEBUG(100, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
+          B2DEBUG(29, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
@@ -137,10 +137,10 @@ namespace Belle2 {
             // let filter decide which one to keep
             bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2}) > 0;
             if (! isDuplicate) {
-              B2DEBUG(100, "Keeping both tracks");
+              B2DEBUG(29, "Keeping both tracks");
               ++iter2;
             } else {
-              B2DEBUG(100, "Duplicate hits found");
+              B2DEBUG(29, "Duplicate hits found");
               bool selectFirst = m_filter_duplicateTrack({&*iter, &*iter2}) > 0;
               if (selectFirst) {
                 iter2 = goodResults.erase(iter2);
@@ -161,11 +161,11 @@ namespace Belle2 {
 
       results = goodResults;
 
-      B2DEBUG(100, "CDCCKFDuplicateRemover: " << results.size() << " paths created (after merging)");
+      B2DEBUG(29, "CDCCKFDuplicateRemover: " << results.size() << " paths created (after merging)");
 
       if (n_goodresults > 1) {
         for (const auto& result : results) {
-          B2DEBUG(100, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
+          B2DEBUG(29, "charge = " << result.front().getSeed()->getChargeSeed() << "; "
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "

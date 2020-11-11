@@ -10,8 +10,8 @@ Collaborative Tools.
 
     **Exercises**: 10 minutes
 
-    **Prerequisites**: 
-    	
+    **Prerequisites**:
+
     	* DESY accounts.
         * An internet browser.
 
@@ -28,18 +28,16 @@ Collaborative Tools.
         * Learn to ask good questions at the right places.
         * Learn how to report problems.
 
-Belle II is an international collaboration of more than 1000 members from all 
+Belle II is an international collaboration of more than 1000 members from all
 over the world.
+Since we are so spread out communication tools are really important.
 
-Since we are so spread out, an important part of the collaboration itself
-are our channels and avenues of communication.
-
-Since you are reading this page, you have already 
+You are reading this page, so you have already
 `registered as a member <https://confluence.desy.de/x/ET0HAg>`_
 and obtained DESY credentials.
 These allow you to access private areas of the
 `belle2.org <https://belle2.org>`_ website.
-Many (but not all) services are hosted at **<something>.belle2.org** or 
+Many (but not all) services are hosted at **<something>.belle2.org** or
 **<something>.desy.de**.
 
 .. figure:: collaborative_tools/Belle2CollaborationMap20200709.png
@@ -49,26 +47,26 @@ Many (but not all) services are hosted at **<something>.belle2.org** or
 Important services for you
 --------------------------
 
-Here is a curated list of the services and tools that we think are most useful 
+Here is a curated list of the services and tools that we think are most useful
 right away (for newcomers) and that are needed in these lessons.
 
 `confluence.desy.de <https://confluence.desy.de>`_
-    Our "wiki". 
-    Editable, linked pages that can be easily edited. 
+    Our "wiki".
+    Editable, linked pages that can be easily modified and updated.
     Used for many things from run planning to tracking progress through a
     physics analysis.
 
 `stash.desy.de <https://stash.desy.de>`_
-    Our git server. 
-    All code should go here, ideally under the Belle II "project". 
+    Our git server.
+    All code should go here, ideally under the Belle II "project".
     **It is a rule that your analysis code must be viewable to the rest of the
     collaboration.**
     To make this less painful, you should get happy with git and the stash tool.
 
 `agira.desy.de <https://agira.desy.de>`_
-    Our bug reporting and work-tracking system. 
+    Our bug reporting and work-tracking system.
     Used to report problems, request features, request MC samples, and track
-    work. 
+    work.
     You will hear people refer to this as "JIRA".
 
 `software.belle2.org <https://software.belle2.org>`_
@@ -77,7 +75,7 @@ right away (for newcomers) and that are needed in these lessons.
     You might occasionally hear people refer to this as "sphinx".
 
 `questions.belle2.org <https://questions.belle2.org>`_
-    Our Q&A forum. 
+    Our Q&A forum.
     Something like stack exchange if you've ever used that.
 
 `chat.belle2.org <https://chat.belle2.org>`_
@@ -88,10 +86,10 @@ right away (for newcomers) and that are needed in these lessons.
         What a lot of different places where information could be.
         If only there was a way to search all places at once!
 
-        We've got you covered. 
+        We've got you covered.
         Try `search.belle2.org <https://search.belle2.org>`_.
 
-You should note that **confluence**, **stash**, and agira/**jira** are part of 
+You should note that **confluence**, **stash**, and agira/**jira** are part of
 a `suite of commercial tools <https://www.atlassian.com/>`_, and **"sphinx"**
 is an industry-standard open-source tool for generating documentation.
 This means that there is non-Belle II-specific help on the internet.
@@ -99,14 +97,14 @@ This means that there is non-Belle II-specific help on the internet.
 .. admonition:: Question
      :class: exercise stacked
 
-     The software documentation is built using a tool called "sphinx". 
+     The software documentation is built using a tool called "sphinx".
      Where is the project's homepage?
 
 .. admonition:: Solution
    :class: toggle solution
 
    It's at `www.sphinx-doc.org <https://www.sphinx-doc.org>`_.
-   There is also an English-language wikipedia page 
+   There is also an English-language wikipedia page
    `here <https://en.wikipedia.org/wiki/Sphinx_(documentation_generator)>`__.
 
 .. admonition:: Question
@@ -151,13 +149,21 @@ Where do I go for help?
 
 With all of these tools, it might be hard to work out where to go to get help.
 
+.. hint::
+
+    If you get stuck or have any questions during a StarterKit workshop you don't need
+    to think about where to ask:
+    The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
+    in our chat will provide instant help.
+    Please also check out the quick tips section below: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
+
 ... meta
 ~~~~~~~~
 
 What if there is a problem with one of the collaborative tools themselves?
 It doesn't happen often, but sometimes the web services go down.
 Or maybe you have trouble logging in.
-Then you should check the confluence page for the responsible person and/or 
+Then you should check the confluence page for the responsible person and/or
 email to b2-helpdesk@belle2.org.
 
 ... with my analysis
@@ -166,10 +172,10 @@ email to b2-helpdesk@belle2.org.
 Let's assume you are working on an analysis when...
 
 * ...you have an error message or something is happening with your analysis
-  that you don't understand. 
+  that you don't understand.
   You should first try to understand it yourself.
 
-  - Search for your error in the documentation, the source code, and in 
+  - Search for your error in the documentation, the source code, and in
     previous question posts.
 
   - If you don't have any luck `ask a question <https://questions.belle2.org>`_.
@@ -186,12 +192,12 @@ Let's assume you are working on an analysis when...
 
 Let's assume you are working with the grid when...
 
-* ...you have an error message or something is happening that you don't 
+* ...you have an error message or something is happening that you don't
   understand.
   You should first try to understand it yourself.
 
-  - Look at recent announcements on the 
-    `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ 
+  - Look at recent announcements on the
+    `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_
     mailing list.
 
   - Look for question posts on a similar topic.
@@ -201,6 +207,60 @@ Let's assume you are working with the grid when...
 
 Some tips
 ---------
+
+.. _onlinebook_collaborative_tools_b2chat_howto:
+
+Asking a question in #starterkit-workshop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
+    is usually only active during the StarterKit workshop.
+    After the workshop, we recommend you to try one of the other alternatives
+    (but you can always try, of course).
+
+Our chat works like any other chat with a couple of nice features. For example you can
+put small parts of code in backticks ```print("hello world")``` and you can add larger
+bits of source code in triple backticks like so (note that you can create a new line by pressing
+Shift-Enter):
+
+.. code-block::
+
+   ```
+   print("foo")
+   print("bar")
+   ```
+
+The only thing that we would like you to pay attention to, is that you make use of
+the "threading" feature of our chat. This makes it easier to get an overview
+over all recent questions.
+
+If you want to reply to an existing message,
+please click on the small icon on the right:
+
+.. figure:: collaborative_tools/reply_1.png
+   :align: center
+   :alt: Clicking the reply button
+
+If there are already several replies, you can also click the reply button
+below (it will open a side panel with all the replies):
+
+.. figure:: collaborative_tools/reply_2.png
+   :align: center
+   :alt: Clicking the reply button
+
+.. admonition:: Exercise
+    :class: exercise
+
+    Join the `#test channel <https://chat.belle2.org/channel/test>`_ and type
+    some quick test messages. Try to include some bits of "code" as shown above.
+
+.. admonition:: Exercise
+    :class: exercise
+
+    Try out the "reply" feature, either by replying to one of the previous messages
+    from other users or by replying to your own message.
 
 Confluence
 ~~~~~~~~~~
@@ -218,12 +278,12 @@ It's not reliable for software documentation.
     All Belle II data and simulation is centrally processed and reconstructed.
     This is handled by the "data-production group".
     Find the current data-production status.
-    What data is processed? 
+    What data is processed?
     What is on-going?
 
 .. admonition:: Solution
     :class: toggle solution
-   
+
     It's on confluence:
     `Data Production Status
     <https://confluence.desy.de/x/fGCJC>`_
@@ -235,14 +295,14 @@ It's not reliable for software documentation.
 
 .. admonition:: Solution
     :class: toggle solution
-   
+
     It's on confluence:
     `Run Plan <https://confluence.desy.de/x/Xgp0Bw>`_
 
 .. admonition:: Question
     :class: exercise stacked
 
-    There are some Belle II-specific acronyms and jargon that you will 
+    There are some Belle II-specific acronyms and jargon that you will
     encounter in these lessons.
     What do the following mean?
 
@@ -258,12 +318,12 @@ It's not reliable for software documentation.
 
 .. admonition:: Solution
     :class: toggle solution
-   
-    Take a look at the `Main Glossary 
+
+    Take a look at the `Main Glossary
     <https://confluence.desy.de/x/gwgWAg>`_
     on confluence.
 
-There are some downsides to confluence. 
+There are some downsides to confluence.
 Pages may be outdated (check the "last edited" message at the top) and
 sometimes links are broken or pages re-organised.
 
@@ -280,7 +340,7 @@ of the software you are using.
 .. admonition:: Exercise
     :class: exercise
 
-    There is a sandbox confluence page for you to experiment with adding 
+    There is a sandbox confluence page for you to experiment with adding
     material.
     Go to the `Confluence Training Test Page <https://confluence.desy.de/x/61Z8Cg>`_ and add some content.
 
@@ -292,9 +352,8 @@ of the software you are using.
     * Add the date.
     * Add your favourite picture of a cat / piece of art.
 
-
-How to ask a good question
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to ask a good question on questions.belle2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Like most Q&A forums, `questions.belle2.org <https://questions.belle2.org>`_ is
 only as good as the posts.
@@ -302,9 +361,9 @@ Even though you have a problem and you want help quickly it is worthwile to
 take time on presentation.
 
 0. Search for existing questions.
-1. Try to boil down the issue to the minimal (non)-working example, what you 
+1. Try to boil down the issue to the minimal (non)-working example, what you
    expect to happen, as well as instructions on how to run it.
-2. Try to include all details that are needed to reproduce the issue but 
+2. Try to include all details that are needed to reproduce the issue but
    avoid walls of text.
 3. Include full error messages and logs.
 4. Make use of formatting (for code, logs, . . . ).
@@ -326,17 +385,17 @@ take time on presentation.
 
     It stands for minimal working example.
 
-    .. seealso:: 
+    .. seealso::
 
          `This excellent stack overflow post
-         <https://stackoverflow.com/help/minimal-reproducible-example>`_ 
+         <https://stackoverflow.com/help/minimal-reproducible-example>`_
          and `this English language wikipedia page
          <https://en.wikipedia.org/wiki/Minimal_working_example>`_.
 
 
 .. seealso::
 
-    There is a meta-question post: 
+    There is a meta-question post:
     `How do I ask a good software question here?
     <https://questions.belle2.org/question/3625/how-do-i-ask-a-good-software-question-here/>`_
 
@@ -392,12 +451,12 @@ This helps everyone find relevant good information.
 Don't forget to answer!
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The forum is a Q& **A** forum. 
+The forum is a Q& **A** forum.
 If you know an answer to a question: answer it!
 
 .. tip::
 
-    If you *don't* know the answer, but know someone who you think might: 
+    If you *don't* know the answer, but know someone who you think might:
     please tag them in a comment.
 
 A bit more about working with stash and JIRA
@@ -407,32 +466,32 @@ A bit more about working with stash and JIRA
      :class: exercise stacked
 
      Go to https://stash.desy.de
-     
+
      * What's displayed at the dashboard/home screen?
      * Find the main Belle II software repository.
      * Look at the commits.
 
 .. admonition:: Solution
    :class: toggle solution
-   
+
    Some of that is just browsing.
    We trust that you did it.
    The main software repository is:
-   https://stash.desy.de/projects/B2/repos/software , and the list of commits 
+   https://stash.desy.de/projects/B2/repos/software , and the list of commits
    is `here <https://stash.desy.de/projects/B2/repos/software/commits>`__.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
      Go to https://agira.desy.de
-     
+
      * What’s displayed at the dashboard/home screen?
      * Where is the Belle II "project"?
      * Browse a couple of issues.
 
 .. admonition:: Solution
    :class: toggle solution
-   
+
    The Belle II project is:
    https://agira.desy.de/projects/BII
 
@@ -447,7 +506,7 @@ Here is a rough workflow for working with stash and JIRA.
    - Click "create" and fill out the form.
 
    - It can be reassigned, so either guess someone or leave it as "Automatic".
-     If you leave assignee as Automatic but choose a "component" then the 
+     If you leave assignee as Automatic but choose a "component" then the
      person in charge of the package is automatically assigned.
 
 3. Discuss there in comments: Is this really a bug? Do we really need this
@@ -456,7 +515,7 @@ Here is a rough workflow for working with stash and JIRA.
 4. You (or someone else will) create a branch that references the issue,
    write some code, and add some commits to the branch.
 
-5. You (or someone else will) open a pull request, add reviewers, and add a 
+5. You (or someone else will) open a pull request, add reviewers, and add a
    clear description.
 
    - You (or someone else) can edit the text, title, and reviewers after a
@@ -470,15 +529,15 @@ Here is a rough workflow for working with stash and JIRA.
 
 8. After all reviewers agree: Merge!
 
-.. seealso:: 
+.. seealso::
 
     `How do I send a JIRA ticket?
     <https://questions.belle2.org/question/1317/how-do-i-send-a-jira-ticket/>`_
 
-.. tip:: 
+.. tip::
 
     You should already be ok with 1-3.
-    With a bit of practice, and the :ref:`onlinebook_software_prerequisites`, 
+    With a bit of practice, and the :ref:`onlinebook_software_prerequisites`,
     we hope you will be able to also do 4-8.
 
 There is a problem with the documentation!
@@ -504,7 +563,7 @@ The page you are now reading is written in sphinx.
 
    It's `here <../../_sources/online_book/welcome/collaborative_tools.rst.txt>`__.
 
-If you discover an omission or a problem (or even a typo) you can actually 
+If you discover an omission or a problem (or even a typo) you can actually
 fix it quite easily yourself.
 It is a good excuse for a first pull request, and you will make the software
 developers very happy.
@@ -538,6 +597,8 @@ Help us out with documentation: as a beginner, you know best what is missing!
 .. tip:: Good questions are also documentation and are also helpful!
 
 .. tip:: Bugs do exist, don't hesitate too much to report them.
+
+.. include:: ../survey.rst
 
 .. topic:: Author(s) of this lesson
 

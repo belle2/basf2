@@ -9,12 +9,7 @@
 **************************************************************************/
 
 #include <analysis/modules/MCDecayFinder/MCDecayFinderModule.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/MCMatching.h>
@@ -51,51 +46,40 @@ void MCDecayFinderModule::initialize()
 
 
   // Register output particle list, particle store and relation to MCParticles
-  StoreObjPtr<ParticleList> particleList(m_listName);
-  StoreArray<Particle> particles;
-  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
-  StoreArray<MCParticle> mcparticles;
-  mcparticles.isRequired();
+  m_mcparticles.isRequired();
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-  particleList.registerInDataStore(flags);
-  particles.registerInDataStore(flags);
-  extraInfoMap.registerInDataStore();
-  particles.registerRelationTo(mcparticles, DataStore::c_Event, flags);
+  m_outputList.registerInDataStore(m_listName, flags);
+  m_particles.registerInDataStore(flags);
+  m_extraInfoMap.registerInDataStore();
+  m_particles.registerRelationTo(m_mcparticles, DataStore::c_Event, flags);
 
   if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-    antiParticleList.registerInDataStore(flags);
+    m_antiOutputList.registerInDataStore(m_antiListName, flags);
   }
 }
 
 void MCDecayFinderModule::event()
 {
-  // particle store (working space)
-  StoreArray<Particle> particles(m_particleStore);
-
-  // Get output particle list
-  StoreObjPtr<ParticleList> outputList(m_listName);
-  outputList.create();
-  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
+  // Create output particle list
+  m_outputList.create();
+  m_outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
 
   if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> antiOutputList(m_antiListName);
-    antiOutputList.create();
-    antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName);
-    outputList->bindAntiParticleList(*(antiOutputList));
+    m_antiOutputList.create();
+    m_antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName);
+    m_outputList->bindAntiParticleList(*(m_antiOutputList));
   }
 
   // loop over all MCParticles
-  StoreArray<MCParticle> mcparticles;
-  int nMCParticles = mcparticles.getEntries();
+  int nMCParticles = m_mcparticles.getEntries();
   for (int i = 0; i < nMCParticles; i++) {
     for (int iCC = 0; iCC < 2; iCC++) {
-      std::unique_ptr<DecayTree<MCParticle>> decay(match(mcparticles[i], m_decaydescriptor, iCC));
+      std::unique_ptr<DecayTree<MCParticle>> decay(match(m_mcparticles[i], m_decaydescriptor, iCC));
       if (decay->getObj()) {
         B2DEBUG(19, "Match!");
         int iIndex = write(decay.get());
-        outputList->addParticle(particles[iIndex]);
+        m_outputList->addParticle(m_particles[iIndex]);
       }
     }
   }
@@ -232,17 +216,12 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
 int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
 {
-  // Particle array for output
-  StoreArray<Particle> particles;
-  // Input MCParticle array
-  StoreArray<MCParticle> mcparticles;
-
   // Create new Particle in particles array
-  Particle* newParticle = particles.appendNew(decay->getObj());
+  Particle* newParticle = m_particles.appendNew(decay->getObj());
 
   // set relation between the created Particle and the MCParticle
   newParticle->addRelationTo(decay->getObj());
-  const int iIndex = particles.getEntries() - 1;
+  const int iIndex = m_particles.getEntries() - 1;
 
   // Now save also daughters of this MCParticle and set the daughter relation
   vector< DecayTree<MCParticle>* > daughters = decay->getDaughters();

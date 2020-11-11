@@ -10,7 +10,7 @@
 [INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
 [INFO]    -> MDST source: Tracks
 [INFO]    -> With cuts  : 
-[INFO] Number of ParticleLists studied 1 
+[INFO] Number of ParticleLists to be studied: 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts:  and eclCluster cuts: 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma:conv (gamma:conv)
@@ -78,22 +78,18 @@
 [INFO]      o) daughter indices = 7 5
 [INFO]      o) nROE_Composites(cleanMask) = 3
 [INFO] [ParticlePrinterModule] END   ------------------------------
-[INFO] ParticleStats Summary: 
-
-[INFO] =======================================================================
-			|Retention|	    0| Unique 
-           mu+( 0)	|	0.0040	1.0000	1.0000
-
+[INFO] ParticleStats Summary:
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-           mu+( 0)	|	  0.0080	  2.0000	  0.0040	  1.0000	  0.0040	  1.0000	  0.0000	  0.0000
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+           mu+( 0)|    0.0040|   0.0080|   2.0000|   0.0040|   1.0000|   0.0040|   1.0000|   0.0000|   0.0000|
 
 [INFO] 
-=======================================================
-Total Retention: 0.0040
+======================================================================
+Total Retention: 2 events passing / 500 events processed = 0.0040
 Total Number of Particles created in the DataStore: 32
-=======================================================
+======================================================================
 

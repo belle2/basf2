@@ -25,3 +25,11 @@ Host sshcc1.kek.jp
     User YOUR_SSHLOGIN_USERNAME
     IdentityFile ~/.ssh/id_kekccgateway
     IdentitiesOnly yes
+
+# Configuration for directly connecting to specific KEKCC nodes
+# useful for connecting to a terminal multiplexer on a specific node
+Host ccw?? ccx??
+    HostName %h.cc.kek.jp
+    User YOUR_KEKCC_USERNAME
+    Compression yes
+    ProxyJump sshcc1.kek.jp

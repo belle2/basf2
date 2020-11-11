@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
@@ -7,8 +6,6 @@
 # This can be useful if you want to do something special which is not supported by the mva package
 
 import basf2_mva
-from basf2 import *
-from modularAnalysis import *
 
 if __name__ == "__main__":
     variables = ['p', 'pt', 'pz', 'phi',

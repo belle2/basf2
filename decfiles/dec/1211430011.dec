@@ -1,0 +1,95 @@
+# EventType: 1211430011
+# Descriptor: [B+ -> Jpsi [ -> mu+ mu-] X+ ]cc
+# NickName: Bu_JpsiX_mumu
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Sviatoslav Bilokin
+# Email: sviatoslav.bilokin@desy.de
+# Cuts: None
+# Date: 20200908
+#
+#
+Decay Upsilon(4S)
+0.5000 B+sig B-    VSS;
+0.5000 B+ B-sig    VSS;
+Enddecay
+#
+Decay B+sig
+0.09989  J/psisig K+                   SVS; #[Reconstructed PDG2018]
+0.13922  J/psisig K*+                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.00399  J/psisig pi+                  SVS; #[Reconstructed PDG2018]
+0.00487  J/psisig rho+                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.11001  J/psisig K0   pi+             PHSP;
+0.00974  J/psisig K+  pi0              PHSP;
+0.00974  J/psisig K'_1+                SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.04868  J/psisig K_2*+                PHSP;
+0.17524  J/psisig K_1+                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.07886  J/psisig K+ pi+ pi-           PHSP; #Added by Yubo Li 03/09/2018
+0.00328  J/psisig K+ K+ K-             PHSP; #Added by Yubo Li 03/09/2018
+0.01207  J/psisig eta  K+              PHSP; #Added by Yubo Li 03/09/2018
+0.00487  J/psisig phi  K+              PHSP; #Added by Yubo Li 03/09/2018
+0.03115  J/psisig omega  K+            PHSP; #Added by Yubo Li 03/09/2018
+0.00115  J/psisig pi- pi- pi+ pi+ pi+  PHSP; #Added by Yubo Li 03/09/2018
+0.00115  J/psisig p+ anti-Lambda0      PHSP; #Added by Yubo Li 03/09/2018
+0.03636  psi(2S)sig K+             SVS; #[Reconstructed PDG2018]
+0.03892  psi(2S)sig K*+            SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2018]
+0.03415  psi(2S)sig K0  pi+        PHSP; #[use babar's BF fit(not used in PDG)]
+0.01162  psi(2S)sig K+  pi0        PHSP;
+0.02498  psi(2S)sig K+  pi+  pi-   PHSP; #[Reconstructed PDG2018]
+0.00581  psi(2S)sig K+  pi0  pi0   PHSP;
+0.00581  psi(2S)sig K0  pi+  pi0   PHSP;
+0.02323  psi(2S)sig K_1+           PHSP;
+0.00142  psi(2S)sig pi+            PHSP; #Added by Yubo Li 03/09/2018
+0.00023  psi(2S)sig phi K+         PHSP; #Added by Yubo Li 03/09/2018
+0.00019  chi_c0sig  K+                     PHSP; #[Reconstructed PDG2018]
+0.00026  K*+   chi_c0sig                   SVS; #set as UL as PDG
+0.00025  chi_c0sig  K0   pi+               PHSP;
+0.00012  chi_c0sig  K+  pi0                PHSP;
+0.00025  chi_c0sig  K+  pi+  pi-           PHSP;
+0.00012  chi_c0sig  K+  pi0  pi0           PHSP;
+0.00012  chi_c0sig  K0  pi+  pi0           PHSP;
+0.01597  chi_c1sig  K+                     SVS; #[PDG2019]
+0.00990  chi_c1sig  K*+                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.01255  chi_c1sig  K0   pi+              PHSP;
+0.00756  chi_c1sig  K+   pi0              PHSP;
+0.01234  chi_c1sig  K+   pi+  pi-          PHSP;
+0.00660  chi_c1sig  K+  pi0  pi0           PHSP;
+0.00660  chi_c1sig  K0  pi+  pi0           PHSP;
+0.00073  chi_c1sig  pi+                    PHSP; #added by YuBo Li 03/10/2018
+0.00021  chi_c2sig  K+                  STS;
+0.00022  chi_c2sig  K*+                 PHSP; #set as UL as PDG
+0.00217  chi_c2sig  K0   pi+            PHSP;
+0.00116  chi_c2sig  K+  pi0             PHSP; #set as UL as PDG
+0.00250  chi_c2sig  K+  pi+  pi-        PHSP;
+0.00187  chi_c2sig  K+  pi0  pi0        PHSP;
+0.00187  chi_c2sig  K0   pi+  pi0       PHSP;
+Enddecay
+CDecay B-sig
+#
+Decay psi(2S)sig
+0.40826 J/psisig   pi+     pi-                             VVPIPI;
+0.21543 J/psisig   pi0     pi0                             VVPIPI;
+0.03985 J/psisig   eta                                     PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+0.00158 J/psisig   pi0                                     PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+0.11689 gamma   chi_c0sig                                  PHSP;
+0.11179 gamma   chi_c1sig                                  PHSP;
+0.10620 gamma   chi_c2sig                                  PHSP;
+Enddecay
+#
+Decay chi_c0sig
+1.00000 gamma   J/psisig                                   PHSP;
+Enddecay
+#
+Decay chi_c1sig
+1.00000 J/psisig   gamma                  VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+#
+Decay chi_c2sig
+1.00000 gamma   J/psisig                   PHSP;
+Enddecay
+#
+Decay J/psisig
+1.000 mu+ mu-         PHOTOS VLL;
+Enddecay
+#
+End

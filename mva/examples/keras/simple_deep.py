@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -11,8 +10,6 @@ import time
 
 from basf2_mva_python_interface.contrib_keras import State
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
 
 from keras.layers import Input, Dense, Dropout
 from keras.layers.normalization import BatchNormalization

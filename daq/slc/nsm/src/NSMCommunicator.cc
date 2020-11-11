@@ -1,3 +1,13 @@
+// revisions
+//
+// 20191119 nakao - following currently unused functions are removed
+// void NSMCommunicator::callContext()
+//   handling nsmlib_recv inside a user program is against the usage of NSM2
+// const std::string NSMCommunicator::getNodeHost(const std::string& nodename)
+//   making hostname visible to application is against the philosophy of NSM2
+// const std::string NSMCommunicator::getNodeHost()
+//   accessing NSM2 internal structure is against the philosophy of NSM2
+
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include <daq/slc/base/TimeoutException.h>
@@ -188,23 +198,6 @@ void NSMCommunicator::setCallback(NSMCallback* callback)
   }
 }
 
-void NSMCommunicator::callContext()
-{
-#if NSM_PACKAGE_VERSION >= 1914
-  if (!m_nsmc) {
-    throw (NSMHandlerException("No NSM context is available"));
-  }
-  char buf[NSM_TCPMSGSIZ];
-  NSMcontext* nsmc = m_nsmc;
-  if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0) {
-    throw (NSMHandlerException("Failed to read NSM context"));
-  }
-  nsmlib_call(nsmc, (NSMtcphead*)buf);
-#else
-#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
-#endif
-}
-
 int NSMCommunicator::getNodeIdByName(const std::string& name)
 {
 #if NSM_PACKAGE_VERSION >= 1914
@@ -237,44 +230,6 @@ bool NSMCommunicator::isConnected(const std::string& node)
   bool is_online = getNodeIdByName(node) >= 0 &&
                    getNodePidByName(node) > 0;
   return is_online;
-}
-
-const std::string NSMCommunicator::getNodeHost(const std::string& nodename)
-{
-#if NSM_PACKAGE_VERSION >= 1914
-  NSMsys* sys = m_nsmc->sysp;
-  for (int inod = 0; inod < NSMSYS_MAX_NOD; inod++) {
-    NSMnod& nod(sys->nod[inod]);
-    if (! nod.name[0]) continue;
-    if (nodename == nod.name) {
-      sockaddr_in addr;
-      addr.sin_addr.s_addr = nod.ipaddr;
-      return inet_ntoa(addr.sin_addr);
-    }
-  }
-#else
-#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
-#endif
-  return "";
-}
-
-const std::string NSMCommunicator::getNodeHost()
-{
-#if NSM_PACKAGE_VERSION >= 1914
-  if (!getMessage().getMsg()) return "";
-  unsigned int nodeid = getMessage().getMsg()->node;
-  NSMsys* sys = m_nsmc->sysp;
-  if (nodeid < NSMSYS_MAX_NOD) {
-    NSMnod& nod(sys->nod[nodeid]);
-    if (!nod.name[0]) return "";
-    sockaddr_in addr;
-    addr.sin_addr.s_addr = nod.ipaddr;
-    return inet_ntoa(addr.sin_addr);
-  }
-#else
-#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
-#endif
-  return "";
 }
 
 NSMMessage NSMCommunicator::popQueue()

@@ -20,7 +20,6 @@
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
 """
 
-import sys
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 from basf2 import B2FATAL, B2INFO
 

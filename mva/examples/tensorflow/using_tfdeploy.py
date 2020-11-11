@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck, Dennis Weyland 2017
 
@@ -10,7 +9,6 @@ except BaseException:
     pass
 import basf2_mva
 import basf2_mva_util
-import pandas
 import time
 import tempfile
 import os

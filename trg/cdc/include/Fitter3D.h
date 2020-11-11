@@ -62,29 +62,30 @@ namespace Belle2 {
     /// Utility functions.
     static double calPhi(TRGCDCSegmentHit const* segmentHit, double eventTime);
     /// Function for mc debugging.
-    static void getMCValues(const TRGCDC& m_cdc_in, TRGCDCTrack* aTrack, std::map<std::string, double>& m_mConstD_in,
+    static void getMCValues(const TRGCDC& m_cdc_in, TRGCDCTrack* aTrack, const std::map<std::string, double>& m_mConstD_in,
                             std::map<std::string, double>& m_mDouble_in, std::map<std::string, std::vector<double> >& m_mVector_in);
 
     /// Checks if axial track has 5 TSs. One per each superlayer.
-    bool isAxialTrackFull(TRGCDCTrack& aTrack);
+    bool isAxialTrackFull(const TRGCDCTrack& aTrack);
 
     /// Checks if stereo track has 4 TSs. One per each superlayer.
-    bool isStereoTrackFull(TRGCDCTrack& aTrack);
+    bool isStereoTrackFull(const TRGCDCTrack& aTrack);
 
     /// Finds which axial superlayers has TSs. useAxSL array indicating hit superlayers.
-    static void findHitAxialSuperlayers(TRGCDCTrack& aTrack, std::vector<double>& useAxSL , bool printError);
+    static void findHitAxialSuperlayers(const TRGCDCTrack& aTrack, std::vector<double>& useAxSL , bool printError);
 
     /// Finds which stereo superlayers has TSs. useStSL array indicating hit superlayers.
-    static void findHitStereoSuperlayers(TRGCDCTrack& aTrack, std::vector<double>& useStSL, bool printError);
+    static void findHitStereoSuperlayers(const TRGCDCTrack& aTrack, std::vector<double>& useStSL, bool printError);
 
     /// Removes TSs that are not possible with track Pt.
     void removeImpossibleStereoSuperlayers(std::vector<double>& useStSL);
 
     /// Selects priority TSs when there are multiple candidate TSs for a superlayer.
-    static void selectAxialTSs(TRGCDCTrack& aTrack, std::vector<int>& bestTSIndex);
+    static void selectAxialTSs(const TRGCDCTrack& aTrack, std::vector<int>& bestTSIndex);
 
     /// Does 2D fit. Returns 0 if fit is done successfully. m_mBool should have fIsPrintError, fmcLR, fLRLUT, fmcLR, f2DFit, f2DFitDrift. m_mConstD should have Trg_PI. m_mConstV should have nWires, driftPhi2DError, wirePhi2DError, rr, rr2D.
-    static int do2DFit(TRGCDCTrack& aTrack, std::map<std::string, bool>& m_mBool_in, std::map<std::string, double>& m_mConstD_in,
+    static int do2DFit(TRGCDCTrack& aTrack, const std::map<std::string, bool>& m_mBool_in,
+                       const std::map<std::string, double>& m_mConstD_in,
                        std::map<std::string, std::vector<double> >& m_mConstV_in, std::map<std::string, double>& m_mDouble_in,
                        std::map<std::string, std::vector<double> >& m_mVector_in);
 

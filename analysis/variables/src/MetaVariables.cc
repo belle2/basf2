@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014-2019 - Belle II Collaboration                        *
+ * Copyright(C) 2014-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe,                  *
@@ -1579,7 +1579,7 @@ namespace Belle2 {
           for (unsigned int i = 1; i < arguments.size(); ++i)
           {
             factorial *= i;
-            pValueSum += pow(-log(pValueProduct), i) / factorial;
+            pValueSum += pow(-std::log(pValueProduct), i) / factorial;
           }
           return pValueProduct * pValueSum;
         };
@@ -1653,6 +1653,17 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr asin(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::asin(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function asin");
+      }
+    }
+
     Manager::FunctionPtr cos(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1661,6 +1672,39 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function cos");
+      }
+    }
+
+    Manager::FunctionPtr acos(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::acos(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function acos");
+      }
+    }
+
+    Manager::FunctionPtr exp(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::exp(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function exp");
+      }
+    }
+
+    Manager::FunctionPtr log(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::log(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function log");
       }
     }
 
@@ -2995,19 +3039,15 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
-    REGISTER_VARIABLE("max(var1,var2)", max,
-                      "Returns max value of two variables.\n");
-    REGISTER_VARIABLE("min(var1,var2)", min,
-                      "Returns min value of two variables.\n");
-    REGISTER_VARIABLE("sin(variable)", sin,
-                      "Returns sin value of the given variable.\n"
-                      "E.g. sin(?) returns the sine of the value of the variable.");
-    REGISTER_VARIABLE("cos(variable)", cos,
-                      "Returns cos value of the given variable.\n"
-                      "E.g. cos(?) returns the cosine of the value of the variable.");
-    REGISTER_VARIABLE("log10(variable)", log10,
-                      "Returns log10 value of the given variable.\n"
-                      "E.g. log10(?) returns the log10 of the value of the variable.");
+    REGISTER_VARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n");
+    REGISTER_VARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n");
+    REGISTER_VARIABLE("sin(variable)", sin, "Returns sine value of the given variable.");
+    REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
+    REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
+    REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
+    REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.");
+    REGISTER_VARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.");
+    REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.");

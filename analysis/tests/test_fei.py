@@ -8,8 +8,6 @@ import os
 import tempfile
 import atexit
 import shutil
-import contextlib
-import subprocess
 import ROOT
 
 import fei
@@ -18,7 +16,6 @@ from fei.config import Particle
 import numpy as np
 
 import ROOT
-from ROOT import Belle2
 import basf2_mva
 import pdg
 

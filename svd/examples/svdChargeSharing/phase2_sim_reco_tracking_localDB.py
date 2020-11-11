@@ -6,14 +6,8 @@
 # usage: basf2 phase2_sim_reco_tracking.py fileIN fileOUT localDB_dir
 ##################################################################################
 
-import os
-from basf2 import *
-from tracking import *
-from svd import *
-from rawdata import *
-from ROOT import Belle2
-from reconstruction import add_reconstruction
-import os.path
+import basf2 as b2
+from tracking import add_tracking_reconstruction
 import sys
 
 print('***')
@@ -27,11 +21,7 @@ fileIN = sys.argv[1]
 fileOUT = sys.argv[2]
 localdb_dir = sys.argv[3]
 
-use_database_chain()
-# use_central_database("development")
-use_local_database(localdb_dir + "/database.txt", localdb_dir)
-
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput', inputFileName=fileIN)
 
 main.add_module('Gearbox')
@@ -67,8 +57,8 @@ main.add_module(
         "TracksToVXDDedxTracks",
         "VXDDedxLikelihoods",
         "VXDDedxTracks"])
-print_path(main)
+b2.print_path(main)
 main.add_module('ProgressBar')
 # Process events
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

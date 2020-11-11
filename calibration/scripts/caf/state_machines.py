@@ -1,40 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import basf2
+
 from functools import partial
 from collections import defaultdict
 
-import configparser
 import pickle
-import multiprocessing
 import glob
 import shutil
 import time
-import pathlib
+from pathlib import Path
+import os
+import json
 
-import basf2
 from basf2 import create_path
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
 
-import os
-import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+from ROOT.Belle2 import CalibrationAlgorithm
 
 from .utils import create_directories
 from .utils import method_dispatch
-from .utils import merge_local_databases
-from .utils import decode_json_string
 from .utils import iov_from_runs
 from .utils import IoV_Result
-from .utils import IoV
-from .utils import AlgResult
 from .utils import get_iov_from_file
 from .utils import find_absolute_file_paths
-from .utils import runs_overlapping_iov
-from .utils import runs_from_vector
-from .utils import B2INFO_MULTILINE
 from .backends import Job
 from .backends import LSF
 from .backends import PBS
@@ -416,7 +408,6 @@ class CalibrationMachine(Machine):
                                ]
 
         super().__init__(self.default_states, initial_state)
-        self.setup_defaults()
 
         #: Calibration object whose state we are modelling
         self.calibration = calibration
@@ -434,7 +425,7 @@ class CalibrationMachine(Machine):
         #: IoV to be executed, currently will loop over all runs in IoV
         self.iov_to_calibrate = iov_to_calibrate
         #: root directory for this Calibration
-        self.root_dir = pathlib.Path(os.getcwd(), calibration.name)
+        self.root_dir = Path(os.getcwd(), calibration.name)
 
         #: Times of various useful updates to the collector job e.g. start, elapsed, last update
         #: Used to periodically call update_status on the collector job
@@ -450,13 +441,12 @@ class CalibrationMachine(Machine):
                                     self._resolve_file_paths,
                                     self._build_iov_dicts,
                                     self._create_collector_jobs,
-                                    self._submit_collections])
+                                    self._submit_collections,
+                                    self._dump_job_config])
         self.add_transition("fail", "running_collector", "collector_failed",
                             conditions=self._collection_failed)
         self.add_transition("complete", "running_collector", "collector_completed",
-                            conditions=self._collection_completed,
-                            before=self._post_process_collections,
-                            after=self._dump_job_config)
+                            conditions=self._collection_completed)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
                             before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
@@ -497,20 +487,27 @@ class CalibrationMachine(Machine):
         Dumps the `Job` object for the collections to JSON files so that it's configuration can be recovered
         later in case of failure.
         """
+        # Wait for jobs (+subjobs) to be submitted so that all information is filled. Since the parent CAF object asynchronously
+        # submits the jobs this might need to wait a while.
+        while any(map(lambda j: j.status == "init", self._collector_jobs.values())):
+            B2DEBUG(29, "Some Collector Jobs still in 'init' state. Waiting...")
+            time.sleep(5)
+
         for collection_name, job in self._collector_jobs.items():
+            collector_job_output_file_name = self.calibration.collections[collection_name].job_config
             output_file = self.root_dir.joinpath(str(self.iteration), self.collector_input_dir,
-                                                 collection_name, 'collector_job.json')
+                                                 collection_name, collector_job_output_file_name)
             job.dump_to_json(output_file)
 
     def _recover_collector_jobs(self):
         """
         Recovers the `Job` object for the collector from a JSON file in the event that we are starting from a reset.
         """
-        for collection_name in self.calibration.collections:
+        for collection_name, collection in self.calibration.collections.items():
             output_file = self.root_dir.joinpath(str(self.iteration),
                                                  self.collector_input_dir,
                                                  collection_name,
-                                                 'collector_job.json')
+                                                 collection.job_config)
             self._collector_jobs[collection_name] = Job.from_json(output_file)
 
     def _iov_requested(self):
@@ -531,7 +528,7 @@ class CalibrationMachine(Machine):
            isinstance(self.collector_backend, LSF):
             B2INFO(f"Resolving absolute paths of input files for calibration: {self.calibration.name}.")
             for collection in self.calibration.collections.values():
-                collection.input_files = find_absolute_file_paths(collection.input_files)
+                collection.input_files = [Path(p) for p in find_absolute_file_paths(collection.input_files)]
 
     def _build_iov_dicts(self):
         """
@@ -600,18 +597,12 @@ class CalibrationMachine(Machine):
         else:
             return False
 
-    def _post_process_collections(self):
-        """
-        Used to run a merging job on the collector output ROOT files. Now does nothing.
-        """
-        pass
-
     def _collector_jobs_ready(self):
         """
         """
         since_last_update = time.time() - self._collector_timing["last_update"]
         if since_last_update > self.calibration.collector_full_update_interval:
-            B2DEBUG(29, "Updating full set of collector job statuses.")
+            B2INFO("Updating full collector job statuses.")
             for job in self._collector_jobs.values():
                 job.update_status()
                 self._collector_timing["last_update"] = time.time()
@@ -625,23 +616,9 @@ class CalibrationMachine(Machine):
     def _submit_collections(self):
         """
         """
-        self.collector_backend.submit(list(self._collector_jobs.values()))
+        self.calibration.jobs_to_submit.extend(list(self._collector_jobs.values()))
         self._collector_timing["start"] = time.time()
         self._collector_timing["last_update"] = time.time()
-        for job in self._collector_jobs.values():
-            if job.subjobs:
-                extra_indent = "  "
-                for subjob in job.subjobs.values():
-                    info_lines = [f"Collector SubJob({subjob.name}) Details"]
-                    info_lines.append(f"SubJob ID number: {subjob.id}")
-                    try:
-                        job_id = subjob.result.job_id
-                        info_lines.append(f"Batch Job ID: {job_id}")
-                    except AttributeError:
-                        pass
-                    info_lines.append("Input Files:")
-                    info_lines.extend(extra_indent + file_path for file_path in subjob.input_files)
-                    B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
         """
@@ -666,19 +643,6 @@ class CalibrationMachine(Machine):
             if iteration_called:
                 break
         return iteration_called
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        #: Default location of the generic collector steering file
-        self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
     def _log_new_state(self, **kwargs):
         """
@@ -768,14 +732,15 @@ class CalibrationMachine(Machine):
             # Remove previous failed attempt to avoid problems
             if job.output_dir.exists():
                 B2INFO(f"Previous output directory for {self.calibration.name} collector {collection_name} exists."
-                       f"Deleting {job.output.dir} before re-submitting.")
+                       f"Deleting {job.output_dir} before re-submitting.")
                 shutil.rmtree(job.output_dir)
-            job.cmd = ['basf2', 'run_collector_path.py']
-            job.input_sandbox_files.append(self.default_collector_steering_file_path)
-            collector_path_file = self._make_collector_path(collection_name, collection)
+            job.cmd = collection.job_cmd
+            job.append_current_basf2_setup_cmds()
+            job.input_sandbox_files.append(collection.job_script)
+            collector_path_file = Path(self._make_collector_path(collection_name, collection))
             job.input_sandbox_files.append(collector_path_file)
             if collection.pre_collector_path:
-                pre_collector_path_file = self._make_pre_collector_path(collection_name, collection)
+                pre_collector_path_file = Path(self._make_pre_collector_path(collection_name, collection))
                 job.input_sandbox_files.append(pre_collector_path_file)
 
             # Want to figure out which local databases are required for this job and their paths
@@ -798,7 +763,6 @@ class CalibrationMachine(Machine):
             # Let's use a directory to store some files later for input to the collector jobs. Should already exist from
             # collector path
             input_data_directory = self.root_dir.joinpath(str(self.iteration), self.collector_input_dir, collection_name)
-#            create_directories(pathlib.Path(input_data_directory))
 
             # Need to pass setup info to collector which would be tricky as arguments
             # We make a dictionary and pass it in as json
@@ -817,10 +781,9 @@ class CalibrationMachine(Machine):
                 json_db_chain.append(('local', database))
             job_config['database_chain'] = json_db_chain
 
-            import json
-            job_config_file_path = str(input_data_directory.joinpath('collector_config.json').absolute())
+            job_config_file_path = input_data_directory.joinpath('collector_config.json').absolute()
             with open(job_config_file_path, 'w') as job_config_file:
-                json.dump(job_config, job_config_file)
+                json.dump(job_config, job_config_file, indent=2)
             job.input_sandbox_files.append(job_config_file_path)
 
             # Define the input files
@@ -847,24 +810,7 @@ class CalibrationMachine(Machine):
                                    f" and Collection '{collection_name}'.")
             job.input_files = list(input_data_files)
 
-            job.max_files_per_subjob = collection.max_files_per_collector_job
-            # In PBS it seems like the environment needs to be set up again
-            if isinstance(self.collector_backend, PBS):
-                if "BELLE2_LOCAL_DIR" in os.environ:
-                    job.setup_cmds = [
-                        "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
-                        "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
-                        "export CAF_TOOLS_LOCATION",
-                        "export CAF_RELEASE_LOCATION",
-                        "source $CAF_TOOLS_LOCATION",
-                        "pushd $CAF_RELEASE_LOCATION > /dev/null",
-                        "setuprel",
-                        "popd > /dev/null"
-                    ]
-                else:
-                    job.basf2_release = os.environ["BELLE2_RELEASE"]
-                    job.basf2_tools = os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2")
-                    job.add_basf2_setup()
+            job.splitter = collection.splitter
             job.backend_args = collection.backend_args
             # Output patterns to be returned from collector job
             job.output_patterns = collection.output_patterns
@@ -891,7 +837,7 @@ class CalibrationMachine(Machine):
                     for pattern in subjob.output_patterns:
                         output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
                     if not output_files:
-                        raise MachineError(f"No output files from Collector SubJob({subjob.name}).")
+                        raise MachineError(f"No output files from Collector {subjob}")
 
     def _run_algorithms(self):
         """
@@ -934,7 +880,7 @@ class CalibrationMachine(Machine):
         list_dependent_databases = []
         for dependency in self.calibration.dependencies:
             database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-            B2INFO(f"Adding local database from {dependancy.name} for use by {self.calibration.name}.")
+            B2INFO(f"Adding local database from {dependency.name} for use by {self.calibration.name}.")
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
 
         # Add previous iteration databases from this calibration
@@ -1066,7 +1012,7 @@ class AlgorithmMachine(Machine):
         """
         Create working/output directory of algorithm. Any old directory is overwritten.
         """
-        create_directories(pathlib.Path(self.output_dir), overwrite=True)
+        create_directories(Path(self.output_dir), overwrite=True)
 
     def _setup_database_chain(self, **kwargs):
         """
@@ -1098,7 +1044,7 @@ class AlgorithmMachine(Machine):
             b2conditions.prepend_testing_payloads(filename)
 
         # Create a directory to store the payloads of this algorithm
-        create_directories(pathlib.Path(self.output_database_dir), overwrite=False)
+        create_directories(Path(self.output_database_dir), overwrite=False)
 
         # add local database to save payloads
         B2INFO(f"Output local database for {self.algorithm.name} stored at {self.output_database_dir}.")
@@ -1155,18 +1101,15 @@ class MachineError(Exception):
     """
     Base exception class for this module.
     """
-    pass
 
 
 class ConditionError(MachineError):
     """
     Exception for when conditions fail during a transition.
     """
-    pass
 
 
 class TransitionError(MachineError):
     """
     Exception for when transitions fail.
     """
-    pass

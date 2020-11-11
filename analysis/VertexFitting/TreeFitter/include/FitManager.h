@@ -100,7 +100,7 @@ namespace TreeFitter {
     /** getter for the current iteration number of the newton iteration  */
     int nIter() const { return m_niter; }
 
-    /** getter for some errorcode flag  FIXME isn't this covered by the statusflag?*/
+    /** getter for some errorcode flag  FIXME isn't this covered by the status-flag?*/
     const ErrCode& errCode() { return m_errCode; }
 
     /** const getter for the decay chain */

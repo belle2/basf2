@@ -4,10 +4,8 @@
 from .plot import ValidationPlot, compose_axis_label, get_unit
 
 # get error function as a np.ufunc vectorised for numpy array
-from .utilities import erf
 from tracking.root_utils import root_save_name
 
-import math
 import collections
 
 import numpy as np

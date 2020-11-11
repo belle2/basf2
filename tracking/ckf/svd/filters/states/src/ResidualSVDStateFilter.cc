@@ -20,7 +20,8 @@ using namespace TrackFindingCDC;
 void ResidualSVDStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalResidual"), m_param_maximalResidual,
-                                "Maximal residual.", m_param_maximalResidual);
+                                "Maximum residual between extrapolated and measured position based on Kalman step.",
+                                m_param_maximalResidual);
 }
 
 Weight ResidualSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)

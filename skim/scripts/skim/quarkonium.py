@@ -11,8 +11,10 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu, stdPi
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
+from stdV0s import stdLambdas
+from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
 
@@ -179,3 +181,43 @@ class CharmoniumPsi(BaseSkim):
 
         # Return the lists.
         self.SkimLists = ["J/psi:ee", "J/psi:mumu"]
+
+
+@fancy_skim_header
+class InclusiveLambda(BaseSkim):
+    """
+    Reconstructed decay
+    * :math:`\\Lambda \\to p \\pi^-` (and charge conjugate)
+
+    Selection criteria:
+    * proton
+    ``protonID > 0.1``
+    * Lambda:
+    ``cosAngleBetweenMomentumAndVertexVector > 0.99``
+    ``flightDistance/flightDistanceErr > 3.``
+    * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
+
+    """
+    __authors__ = ["Bianca Scavino"]
+    __description__ = "Inclusive Lambda skim"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
+
+    def build_lists(self, path):
+
+        # Add useful alias
+        v.addAlias("protonID_proton", "daughter(0, protonID)")
+        v.addAlias("momRatio_protonLambda", "formula(daughter(0, p)/p)")
+        v.addAlias('flightSignificance', 'formula(flightDistance/flightDistanceErr)')
+
+        # Apply selection to Lambdas
+        ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
+        ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
+        ma.applyCuts("Lambda0:merged", "flightSignificance > 3.", path=path)
+        ma.applyCuts("Lambda0:merged", "protonID_proton > 0.1", path=path)
+
+        # Return the lists.
+        self.SkimLists = ["Lambda0:merged"]

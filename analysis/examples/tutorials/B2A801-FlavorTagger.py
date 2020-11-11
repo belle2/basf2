@@ -37,13 +37,8 @@ cp_val_path = b2.Path()
 # Environment of the MC or data sample
 environmentType = "default"
 
-# If you want to use converted Belle data or MC set here "Belle"
-# Attention! If you set Belle you need to have the Belle database locally
-belleOrBelle2Flag = "Belle2"
-
-
 # For Belle data/MC use
-#  from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+#  from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 #  import os
 #
 #  isBelleMC = True  # False for Belle Data True for Belle MC
@@ -112,15 +107,12 @@ weightfiles = 'B2nunubarBGx1'
 ft.flavorTagger(
     particleLists=['B0:sig'],
     weightFiles=weightfiles,
-    belleOrBelle2=belleOrBelle2Flag,
     path=cp_val_path)
 
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
 # combinerMethods=['TMVA-FBDT']
-#
-# With the belleOrBelle2 argument you specify if you are using Belle MC (also Belle Data) or Belle2 MC.
 #
 # All available categories are:
 # [

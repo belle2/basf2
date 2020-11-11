@@ -1806,7 +1806,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
     REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if MCLambda0, 0.0 else.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the variance of the z-component of the decay vertex.");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
                       "Returns the Momentum of second daughter if existing, else 0.");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,

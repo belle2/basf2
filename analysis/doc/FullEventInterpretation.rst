@@ -340,7 +340,7 @@ There is a working neurobayes installation at KEKCC which you can use. This does
 
 If you are on KEKCC and get a crash you probably forgot to set the correct ``LD_LIBRARY_PATH``
 
-``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes-4.3.1/lib/:$LD_LIBRARY_PATH``
+``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
 You have to set this AFTER you set up basf2, otherwise basf2 will override the LD_LIBRARY_PATH again.
 
@@ -379,7 +379,7 @@ You can ensure this by adding:
 directly before you call ``process()``.
 
 
-The second problem is more difficult. You require a neurobayes installation. On KEKCC the installation is here ``/sw/belle/local/neurobayes-4.3.1/``,
+The second problem is more difficult. You require a neurobayes installation. On KEKCC the installation is here ``/sw/belle/local/neurobayes/``,
 and you might be tempted to copy the files from here and to run it on your local machine. However you require a license to run neurobayes on your machine.
 Since the latest neurobayes release 4.3.1 this license requirement is no longer technically enforced.
 
@@ -387,7 +387,7 @@ Neurobayes versions for Ubuntu (instead of SL6) are available as well.
 
 Anyway don't forget to add neurobayes to your ``LD_LIBRARY_PATH`` **after(!)** you set up basf2
 
-``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes-4.3.1/lib/:$LD_LIBRARY_PATH``
+``export LD_LIBRARY_PATH=/sw/belle/local/neurobayes/lib/:$LD_LIBRARY_PATH``
 
 Btw, the Neurobayes libraries which are shipped with the basf2 externals are only dummy libraries which will just crash if you try to use them.
 They are only used so everybody can compile b2bii (because you require the libraries to link the b2bii modules).

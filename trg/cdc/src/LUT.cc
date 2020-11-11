@@ -79,7 +79,7 @@ namespace Belle2 {
 
   TRGCDCLUT* TRGCDCLUT::getLUT(const std::string& filename, int nInputBit)
   {
-    if (TRGCDCLUT::dictionary.find(filename) == TRGCDCLUT::dictionary.end()) {
+    if (!TRGCDCLUT::dictionary.count(filename)) {
       TRGCDCLUT::dictionary[filename] = TRGCDCLUT();
       TRGCDCLUT::dictionary[filename].setDataFile(filename, nInputBit);
     }

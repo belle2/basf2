@@ -3,13 +3,11 @@
 
 # remove empty events from beam background data files.
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
-class SVDTrigger(Module):
+class SVDTrigger(b2.Module):
 
     """Returns 1 if current event contains at least one SVDSimHit or one
        SVD-related BeamBackHit, 0 otherwise"""
@@ -27,9 +25,9 @@ class SVDTrigger(Module):
             self.return_value(1)
 
 
-main = create_path()
+main = b2.create_path()
 
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 main.add_module(input)
 
 ########################################
@@ -39,15 +37,15 @@ main.add_module(trigger)
 
 # if SVDTrigger returns 0, we'll jump into an empty path
 # (skipping output)
-emptypath = create_path()
+emptypath = b2.create_path()
 trigger.if_false(emptypath)
 ########################################
 
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 main.add_module(output)
 
-main.add_module(register_module('ProgressBar'))
+main.add_module(b2.register_module('ProgressBar'))
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

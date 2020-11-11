@@ -10,7 +10,6 @@
 """
 
 
-import numpy
 import ROOT
 
 

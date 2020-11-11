@@ -12,6 +12,7 @@
 #include <analysis/variables/KLMClusterVariables.h>
 
 /* Analysis headers. */
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/VariableManager/Manager.h>
 
@@ -254,10 +255,22 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    const Track* track = particle->getTrack();
-    if (!track)
+    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    if (particleSource == Particle::EParticleSourceObject::c_Track) {
+      return particle->getTrack()->getRelationsTo<KLMCluster>().size();
+    } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
+      return particle->getECLCluster()->getRelationsTo<KLMCluster>().size();
+    } else {
       return std::numeric_limits<double>::quiet_NaN();
-    size_t out = track->getRelationsTo<KLMCluster>().size();
+    }
+  }
+
+  double nKLMClusterECLClusterMatches(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return std::numeric_limits<double>::quiet_NaN();
+    size_t out = cluster->getRelationsFrom<ECLCluster>().size();
     return double(out);
   }
 
@@ -339,8 +352,13 @@ Returns the azimuthal (:math:`\phi`) angle of the associated KLMCluster.
 Returns the number of Tracks matched to the KLMCluster associated to this Particle. This variable can return a number greater than 0 for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters and returns NaN for Particles with no KLMClusters associated.
 )DOC");
   REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters, R"DOC(
-Returns the number of KLMClusters matched to the Track associated to this Particle. This variable can return only 0 or 1 and return NaN for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters with no Tracks associated.
-)DOC");
+                     Returns the number of KLMClusters matched to the particle. It only works for
+                     Particles created either from Tracks or from ECLCluster, while it returns NaN
+                     for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters.
+              )DOC");
+  REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
+                     Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
+              )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
                     "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
 

@@ -166,7 +166,7 @@ main(int argc, char* argv[])
 
   //...Get output signal bundle...
   tsfb.simulate2();
-  TRGSignalBundle& osb = * tsfb.output(0)->signal();
+  const TRGSignalBundle& osb = * tsfb.output(0)->signal();
 
   //...Compare output...
   osb.dump();

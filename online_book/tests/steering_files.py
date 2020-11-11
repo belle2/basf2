@@ -12,7 +12,7 @@ import glob
 
 # basf2
 from basf2 import find_file
-from b2test_utils import clean_working_directory, skip_test_if_light
+from b2test_utils import clean_working_directory
 
 
 class SteeringFileTest(unittest.TestCase):

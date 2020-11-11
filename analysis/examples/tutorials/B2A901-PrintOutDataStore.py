@@ -7,7 +7,7 @@
 # This tutorial demonstrates how to print out the
 # contents of the DataStore for each event.
 # This is useful for debugging purposes, e.g. to check if
-# the MC files contain the neccessary (MDST) StoreArrays.
+# the MC files contain the necessary (MDST) StoreArrays.
 #
 # Contributors: A. Zupanc (June 2014)
 #               I. Komarov (September 2018)

@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 from svd import add_svd_reconstruction
-from tracking import add_tracking_reconstruction
-import glob
 
 numEvents = 2000
 
 # set this string to identify the output rootfiles
 outputfile = "mytest.root"
 
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 main.add_module('RootInput')
 
@@ -31,8 +29,8 @@ add_tracking_reconstruction(
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

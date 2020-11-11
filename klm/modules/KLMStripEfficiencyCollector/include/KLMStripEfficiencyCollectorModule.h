@@ -167,6 +167,9 @@ namespace Belle2 {
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;
 
+    /** Whether to ignore ExtHits with backward propagation. */
+    bool m_IgnoreBackwardPropagation;
+
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 

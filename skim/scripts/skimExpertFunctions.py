@@ -8,8 +8,9 @@ import re
 
 import yaml
 
+import udst
 import basf2 as b2
-from modularAnalysis import applyCuts, removeParticlesNotInLists, skimOutputUdst, summaryOfLists
+from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 
 
@@ -84,55 +85,6 @@ def get_events_per_file(sampleName):
         raise KeyError(msg)
 
 
-def add_skim(label, lists, path):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-
-    Parameters:
-        label (str): the registered skim name
-        lists (list(str)): the list of ParticleList names that have been created by a skim list builder function
-        path (basf2.Path): modules are added to this path
-
-    """
-    skimCode = Registry.encode_skim_name(label)
-    skimOutputUdst(skimCode, lists, path=path)
-    summaryOfLists(lists, path=path)
-
-
-def setSkimLogging(path, additional_modules=None):
-    """
-    Turns the log level to ERROR for  several modules to decrease
-    the total size of the skim log files
-
-    Parameters:
-        skim_path (basf2.Path): modules are added to this path
-        additional_modules (list(str)): an optional list of extra noisy module
-            names that should be silenced
-    """
-    if additional_modules is None:
-        additional_modules = []
-    noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
-    for module in path.modules():
-        if module.type() in noisy_modules:
-            module.set_log_level(b2.LogLevel.ERROR)
-    return
-
-
-def ifEventPasses(cut, conditional_path, path):
-    """
-    If the event passes the given ``cut`` proceed to process everything in ``conditional_path``.
-    Afterwards return here and continue processing with the next module.
-
-    Arguments:
-        cut (str): selection criteria which needs to be fulfilled in order to continue with ``conditional_path``
-        conditional_path (basf2.Path): path to execute if the event fulfills the criteria ``cut``
-        path (basf2.Path): modules are added to this path
-    """
-    eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
-    eselect.if_value('=1', conditional_path, b2.AfterConditionPath.CONTINUE)
-
-
 def get_eventN(fileName):
     """
     Returns the number of events in a specific file
@@ -149,70 +101,6 @@ def get_eventN(fileName):
         return nevents
     else:
         b2.B2ERROR("FILE INVALID OR NOT FOUND.")
-
-
-def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=None, outputParticleLists=None, includeArrays=None, *,
-                   outputFile=None, dataDescription=None):
-    """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a mdst file, saving only particles from skimParticleLists
-    and from outputParticleLists. It outputs a .mdst file.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
-
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
-    """
-    # Note: Keep this import! `skimExpertFunctions.py` a module used commonly throughout
-    # the skim package, and importing this up the top hijacks the argparser of any
-    # script which imports it.
-    from mdst import add_mdst_output
-
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
-
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
-
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".mdst.root"):
-        outputFile += ".mdst.root"
-
-    skimfilter = b2.register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = b2.create_path()
-    skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = b2.create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    add_mdst_output(skim_path, filename=outputFile)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
 def _sphinxify_decay(decay_string):
@@ -427,11 +315,7 @@ class BaseSkim(ABC):
 
     def additional_setup(self, path):
         """
-        Perform any setup steps necessary before running the skim. This may include:
-
-        * applying event-level cuts using `ifEventPasses`,
-        * adding the `MCMatcherParticles` module to the path,
-        * running the FEI.
+        Perform any setup steps necessary before running the skim.
 
         Warning:
             Standard particle lists should *not* be loaded in here. This should be done
@@ -610,7 +494,7 @@ class BaseSkim(ABC):
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
-        skimOutputUdst(
+        udst.add_skimmed_udst_output(
             skimDecayMode=self.code,
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,

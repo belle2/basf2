@@ -3,7 +3,6 @@
 
 import os
 import basf2
-from ROOT import Belle2
 import modularAnalysis as ma
 import b2test_utils
 

@@ -253,9 +253,8 @@ void ECLLocalMaximumFinderModule::event()
             m_geom->Mapping(m_cellId - 1);
             m_thetaId                 = static_cast < float >(m_geom->GetThetaID());
             m_phiId                   = static_cast < float >(m_geom->GetPhiID());
-          }
 
-          if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
+            // This requires MC matching before this stage!
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -514,7 +513,7 @@ void ECLLocalMaximumFinderModule::getMax(int& type, int& id)
 
 }
 
-void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motherindex, int& pi0index, const double& weight)
+void ECLLocalMaximumFinderModule::addToSignalEnergy(int motherpdg, int motherindex, int pi0index, double weight)
 {
 
   // for the LM training and CR/LM debugging

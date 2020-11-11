@@ -6,23 +6,22 @@ SVD Database importer.
 Simple example for testing the import to database.
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': [1], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # process single event
-process(main)
+b2.process(main)
 
 # call the importer class
 dbImporter = Belle2.SVDDatabaseImporter()

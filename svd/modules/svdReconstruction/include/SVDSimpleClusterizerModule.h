@@ -101,6 +101,9 @@ namespace Belle2 {
        *  2 = 3-sample ELS
        */
       int m_timeAlgorithm = 0;
+      /** Name of the SVDEventInfo to be used instead of SVDEventInfo.
+       * The defauls is SVDEventInfoSim */
+      std::string m_svdEventInfoSet;
 
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/

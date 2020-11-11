@@ -2,9 +2,8 @@ import basf2
 from basf2 import B2INFO
 
 import argparse
-import time
 
-from caf.backends import Local, Batch, LSF, PBS, HTCondor, monitor_jobs
+from caf.backends import Batch, HTCondor, LSF, Local, PBS
 
 
 def command_local(args, backend_args=None):
@@ -76,7 +75,8 @@ def command_condor(args, backend_args=None):
     B2INFO(f"Requested use of HTCondor backend")
     command_line_backend_args = {
                                  "universe": args.universe,
-                                 "getenv": args.getenv
+                                 "getenv": args.getenv,
+                                 "path_prefix": args.path_prefix
                                 }
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
@@ -205,6 +205,10 @@ def add_backends_subparsers(parser, default_max_processes=4,
     condor_parser.add_argument("--universe", dest="universe", metavar="",
                                help=("Jobs should be submitted using this univese."
                                      " e.g. vanilla"))
+
+    condor_parser.add_argument("--path-prefix", dest="path_prefix", metavar="",
+                               help=("The string that should be pre-appended to file path given to backend"
+                                     " e.g. root://dcbldoor.sdcc.bnl.gov:1096"))
 
     condor_parser.add_argument(
         "--global-job-limit",

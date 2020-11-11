@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
-import ROOT
 from ROOT import Belle2
 
 
-class SVDChargeSharing(Module):
+class SVDChargeSharing(b2.Module):
 
     """A module to gather data on charge sharing in the SVD."""
 

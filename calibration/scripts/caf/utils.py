@@ -20,7 +20,7 @@ import shutil
 import itertools
 
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+from ROOT.Belle2 import CalibrationAlgorithm, IntervalOfValidity
 
 #: A newline string for B2INFO that aligns with the indentation of B2INFO's first line
 b2info_newline = "\n" + (7 * " ")

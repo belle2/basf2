@@ -463,46 +463,6 @@ namespace Belle2 {
 
 //  ######################################### Meta Variables ##############################################
 
-//  Miscelaneous -------------------------------------------------------------------------------------------
-    Manager::FunctionPtr CheckingVariables(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() != 2)
-        B2FATAL("Wrong number of arguments (2 required) for meta function CheckingVariables");
-
-
-      std::string ListName = arguments[0];
-      std::string requestedVariable = arguments[1];
-      auto func = [requestedVariable, ListName](const Particle*) -> double {
-        if (requestedVariable != "getListSize")
-          B2FATAL("Wrong requested Variable. Available is getListSize for particle lists");
-
-        StoreObjPtr<ParticleList> ListOfParticles(ListName);
-        if (!ListOfParticles.isValid()) return 0;
-        return ListOfParticles->getListSize();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr IsDaughterOf(const std::vector<std::string>& arguments)
-    {
-      auto motherlist = arguments[0];
-      auto func = [motherlist](const Particle * particle) -> double {
-
-        StoreObjPtr<ParticleList> Y(motherlist);
-        if (!Y.isValid())
-          B2ERROR("Particle List with name " << motherlist << "isn't valid!");
-
-        for (unsigned int i = 0; i < Y->getListSize(); ++i)
-        {
-          const auto& oParticle = Y->getParticle(i);
-          if (particle->overlapsWith(oParticle))
-            return true;
-        }
-        return false;
-      };
-      return func;
-    }
-
 //  Track and Event Level variables ------------------------------------------------------------------------
 
     Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments)
@@ -1884,10 +1844,6 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 
-    REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables,
-                      "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
-    REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
-
     REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables,
                       "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, pMissCMS, cosThetaMissCMS or EW90) assuming a semileptonic decay with the given particle as target.");
     REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables ,
@@ -1897,7 +1853,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat,
                       "Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
-                      "Returns the highest target track probability value for the given category")
+                      "Returns the highest target track probability value for the given category");
 
     REGISTER_VARIABLE("isRightTrack(particleName)", isRightTrack,
                       "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
@@ -1915,15 +1871,15 @@ namespace Belle2 {
                       "The particles are ranked according to a flavor tagging extraInfo (argument[2]).");
 
     REGISTER_VARIABLE("hasTrueTarget(categoryName)", hasTrueTarget,
-                      "Returns 1 if the given category has a target. 0 Else.")
+                      "Returns 1 if the given category has a target. 0 Else.");
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
-                      "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.")
+                      "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.");
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
-                      "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
+                      "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
     REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
-                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
+                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle,
-                      "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
+                      "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
     REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory,
                       "Returns the output q (charge of target track) times p (probability that this is the right category) of the category with the given name. The allowed categories are the official Flavor Tagger Category Names.");
     REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory,

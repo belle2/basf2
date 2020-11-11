@@ -260,7 +260,8 @@ namespace TreeFitter {
           if (motherPosIndex >= 0) {
             setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
             setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
-            setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+            if (pb.mother()->dim() > 2)
+              setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
           }
         }
       }

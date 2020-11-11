@@ -1874,7 +1874,7 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=False,
+                     fillWithMostLikely=False,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
@@ -1892,7 +1892,6 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     if inputParticlelists is None:
@@ -1902,7 +1901,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
-    if not belle_sources:
+    import os
+    if not (os.environ.get("B2BII") == 'TRUE'):
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']

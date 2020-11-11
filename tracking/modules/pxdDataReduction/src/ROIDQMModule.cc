@@ -28,16 +28,16 @@ REG_MODULE(ROIDQM)
 
 ROIDQMModule::ROIDQMModule()
   : HistoModule()
-  , m_InterDir(NULL)
-  , m_ROIDir(NULL)
+  , m_InterDir(nullptr)
+  , m_ROIDir(nullptr)
   , m_hInterDictionary(40, [](const Belle2::VxdID & vxdid) {return (size_t)vxdid.getID(); })
 , m_hROIDictionary(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
 , m_hROIDictionaryEvt(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
 , m_numModules(0)
-, m_hnROIs(NULL)
-, m_hnInter(NULL)
-, m_harea(NULL)
-, m_hredFactor(NULL)
+, m_hnROIs(nullptr)
+, m_hnInter(nullptr)
+, m_harea(nullptr)
+, m_hredFactor(nullptr)
 {
   //Set module properties
   setDescription("Monitor of the ROI creation on HLT");

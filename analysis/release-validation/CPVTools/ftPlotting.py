@@ -5,9 +5,19 @@
 
 # Thomas Keck 2015
 
+import basf2_mva_util
+from basf2 import B2INFO, B2WARNING
+import basf2_mva_evaluation.histogram as histogram
+import matplotlib.ticker
+import matplotlib.patches
+import matplotlib.colors
+import matplotlib.gridspec
+import matplotlib.figure
+import matplotlib.artist
+import matplotlib.pyplot as plt
 import copy
 import math
-
+import pandas
 import numpy
 import numpy as np
 import matplotlib
@@ -17,19 +27,6 @@ matplotlib.use("svg")
 matplotlib.rcParams.update({'font.size': 40})
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-import matplotlib.artist
-import matplotlib.figure
-import matplotlib.gridspec
-import matplotlib.colors
-import matplotlib.patches
-import matplotlib.ticker
-
-import basf2_mva_evaluation.histogram as histogram
-
-from basf2 import B2INFO, B2WARNING
-
-import basf2_mva_util
 
 
 class Plotter(object):

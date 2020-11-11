@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
 
-import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
-import os
 import sys
 import random
 import numpy as np
@@ -19,13 +15,13 @@ import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 from tracking.harvest.run import HarvestingRun
 
-import argparse
 
 import logging
 
 
 def get_logger():
     return logging.getLogger(__name__)
+
 
 CONTACT = "oliver.frost@desy.de"
 
@@ -161,9 +157,9 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         cross_curvs = []
         for recoHit3D in track:
             wire_ref_pos = recoHit3D.getRefPos2D()
-            l = recoHit3D.getSignedRecoDriftLength()
+            drift_length = recoHit3D.getSignedRecoDriftLength()
             r = wire_ref_pos.norm()
-            cross_curv = -2 * (n12.dot(wire_ref_pos) - l) / (r * r - l * l)
+            cross_curv = -2 * (n12.dot(wire_ref_pos) - drift_length) / (r * r - drift_length * drift_length)
             cross_curvs.append(cross_curv)
 
         cross_curvs = np.array(cross_curvs)
@@ -235,6 +231,7 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
 def main():
     run = LegendreBinningValidationRun()
     run.configure_and_execute_from_commandline()
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

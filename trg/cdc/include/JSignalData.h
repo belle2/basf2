@@ -36,15 +36,15 @@ namespace Belle2 {
     /// Constructor for class.
     TRGCDCJSignalData();
     /// Sets the filename for VHDL output.
-    void setVhdlOutputFile(std::string);
+    void setVhdlOutputFile(const std::string&);
     /// Sets if to print VHDL output.
     void setPrintVhdl(bool);
     /// Set to remember that file was printed.
     void setPrintedToFile(bool);
     /// Set the VHDL code that are in a process statement.
-    void setVhdlInProcess(std::string);
+    void setVhdlInProcess(const std::string&);
     /// Set the VHDL code that is outside a process statement.
-    void setVhdlOutProcess(std::string);
+    void setVhdlOutProcess(const std::string&);
     /// Get the VHDL output code.
     std::string getVhdlOutputFile() const;
     /// Gets the status of m_printVhdl.

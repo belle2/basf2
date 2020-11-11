@@ -10,11 +10,7 @@
 #define RAWTRAILER_LATEST_H
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
-/* #include <framework/datastore/DataStore.h> */
-/* #include <TObject.h> */
 #include <rawdata/switch_basf2_standalone.h>
 
 //#define TRAILER_SIZE 16
@@ -59,7 +55,7 @@ namespace Belle2 {
     int GetMagicWord(); //! Get magic word
 
     enum {
-      RAWTRAILER_NWORDS = 2
+      RAWTRAILER_NWORDS = 4
     };
 
     enum {
@@ -67,8 +63,10 @@ namespace Belle2 {
     };
 
     enum {
-      POS_CHKSUM = 0,
-      POS_TERM_WORD = 1
+      POS_ERROR_BIT_CH1 = 0,
+      POS_ERROR_CH2 = 1,
+      POS_CHKSUM = 2,
+      POS_TERM_WORD = 3
     };
 
   private:

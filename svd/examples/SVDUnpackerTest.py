@@ -9,27 +9,27 @@
 #
 ##############################################################################
 
-from basf2 import *
+import basf2 as b2
 
 numEvents = 1
 
 # show warnings during processing
-set_log_level(LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.DEBUG)
 
 # Register modules
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
-eventinfoprinter = register_module('EventInfoPrinter')
-gearbox = register_module('Gearbox')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
+gearbox = b2.register_module('Gearbox')
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-svdUnpacker = register_module('SVDUnpacker')
+svdUnpacker = b2.register_module('SVDUnpacker')
 svdUnpacker.param('rawSVDListName', 'inputList')
 svdUnpacker.param('svdShaperDigitListName', 'outputList')
 # svdUnpacker.param('dataFileName','RUN19880101063811.dat')
@@ -38,7 +38,7 @@ svdUnpacker.param('svdShaperDigitListName', 'outputList')
 # ============================================================================
 # Do the simulation
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
@@ -46,7 +46,7 @@ main.add_module(geometry)
 main.add_module(svdUnpacker)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

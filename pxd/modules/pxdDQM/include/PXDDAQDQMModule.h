@@ -11,11 +11,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
@@ -42,25 +43,34 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
+      /** Input array for TTD/FTSW */
+      StoreArray<RawFTSW> m_rawTTD;
+
       /** the geometry */
       VXD::GeoCache& m_vxdGeometry;
 
       /// Remark: Because of DHH load balancing and sub event building,
       /// the very same DHE and DHC can show up in different packets (for different events)!
       /// but we will fill only one histogram
-      TH1F* hDAQErrorEvent{};          /**< per event errors */
-      TH1F* hDAQUseableModule{};          /**< Count Useable/unuseable decision */
-      TH1F* hDAQNotUseableModule{};          /**< Count Useable/unuseable decision */
+      TH1D* hDAQErrorEvent{};          /**< per event errors */
+      TH1D* hDAQUseableModule{};          /**< Count Useable/unuseable decision */
+      TH1D* hDAQNotUseableModule{};          /**< Count Useable/unuseable decision */
+      TH1D* hDAQDHPDataMissing{};          /**< Count Missing DHP data */
       // TH1F* hDAQErrorPacket{};         /**< per packet (event builder input) errors  */
-      TH2F* hDAQErrorDHC{};          /**< individual DHC errors  */
-      TH2F* hDAQErrorDHE{};          /**< individual DHE errors  */
-      TH2F* hDAQEndErrorDHC{};  /**< individual DHC END errors  */
-      TH2F* hDAQEndErrorDHE{}; /**< individual DHE END errors  */
-      std::map<VxdID, TH1F*> hDAQDHETriggerGate;/**< DHE Trigger Gate ("start Row")  */
-      std::map<VxdID, TH1F*> hDAQDHEReduction;/**< DHE data reduction  */
-      std::map<VxdID, TH2F*> hDAQCM;/**< Common Mode per DHE to gate and DHP level */
-      std::map<VxdID, TH1F*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
-      std::map<int, TH1F*> hDAQDHCReduction;/**< DHC data reduction  */
+      TH2D* hDAQErrorDHC{};          /**< individual DHC errors  */
+      TH2D* hDAQErrorDHE{};          /**< individual DHE errors  */
+      TH2D* hDAQEndErrorDHC{};  /**< individual DHC END errors  */
+      TH2D* hDAQEndErrorDHE{}; /**< individual DHE END errors  */
+      std::map<VxdID, TH1D*> hDAQDHETriggerGate;/**< DHE Trigger Gate ("start Row")  */
+      std::map<VxdID, TH1D*> hDAQDHEReduction;/**< DHE data reduction  */
+      std::map<VxdID, TH2D*> hDAQCM;/**< Common Mode per DHE to gate and DHP level */
+      std::map<VxdID, TH1D*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
+      std::map<int, TH1D*> hDAQDHCReduction;/**< DHC data reduction  */
+
+      TH1I* hCM63AfterInjLER{};          /**< Histogram of CM63 after LER injection */
+      TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
+      TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
+      TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
 
       void initialize() override final;
 

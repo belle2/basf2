@@ -88,7 +88,7 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, SVDClusterCalibrations& clusterCal)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDClusterCalibrations& clusterCal)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {

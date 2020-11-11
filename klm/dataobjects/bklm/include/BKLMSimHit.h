@@ -36,7 +36,7 @@ namespace Belle2 {
     BKLMSimHit(int moduleID, double x, double t, double dE);
 
     //! Destructor
-    virtual ~BKLMSimHit()
+    ~BKLMSimHit()
     {
     }
 

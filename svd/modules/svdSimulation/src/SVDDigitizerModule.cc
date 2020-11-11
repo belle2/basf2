@@ -58,6 +58,7 @@ REG_MODULE(SVDDigitizer)
 
 std::string Belle2::SVD::SVDDigitizerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 SVDDigitizerModule::SVDDigitizerModule() : Module(),
+  m_currentSensor(nullptr),
   m_mapping(m_xmlFileName)
 {
   //Set module properties
@@ -662,23 +663,14 @@ void SVDDigitizerModule::saveDigits()
   //Get time of the first sample
   const double bunchTimeSep = 2 * 1.96516; //in ns
   int triggerBin = modeByte.getTriggerBin();
-  int bunchXingsSinceAPVstart  = 2 * triggerBin + gRandom->Integer(2);
+  int bunchXingsSinceAPVstart  = 2 * triggerBin;
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   //Get SVD config from SVDEventInfo
   //  int runType = (int) modeByte.getRunType();
   //  int eventType = (int) modeByte.getEventType();
-  int daqMode = (int) modeByte.getDAQMode();
 
-  int nAPV25Samples = 0;
-  if (daqMode == 2)
-    nAPV25Samples = 6;
-  else if (daqMode == 1)
-    nAPV25Samples = 3;
-  else if (daqMode == 0)
-    nAPV25Samples = 1;
-  else
-    B2ERROR("daqMode not recongized, check SVDEventInfoSetter parameters");
+  int nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -757,7 +749,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, modeByte));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -838,7 +830,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, modeByte));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {

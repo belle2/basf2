@@ -15,12 +15,15 @@
 #
 ######################################################
 
+import os
+import glob
+import sys
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
 import flavorTagger as ft
-import basf2_mva
-from defaultEvaluationParameters import r_subsample, r_size, categories
-from array import array
+from defaultEvaluationParameters import categories
 
 import numpy as np
 import matplotlib as mpl
@@ -28,12 +31,6 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import sys
-import glob
-import os
 
 ROOT.gROOT.SetBatch(True)
 

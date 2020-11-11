@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLEGRAPH_H
-#define MCPARTICLEGRAPH_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/MemoryPool.h>
@@ -307,5 +306,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif //MCPARTICLEGRAPH_H

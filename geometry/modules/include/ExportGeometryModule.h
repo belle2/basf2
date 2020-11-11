@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOSAVERMODULE_H_
-#define GEOSAVERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -58,5 +57,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* GEOSAVERMODULE_H_ */

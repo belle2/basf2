@@ -1,13 +1,18 @@
+"""
+<header>
+    <input>../phigamma_neutral_skimmed.udst.root</input>
+    <output>phigamma_Validation.root</output>
+    <contact>giuseppe.finocchiaro@lnf.infn.it</contact>
+</header>
+"""
+
 import basf2
-from stdCharged import *
-from stdV0s import *
-from stdPhotons import *
-from ROOT import Belle2
+from stdV0s import stdKshorts
 from glob import glob
 import modularAnalysis as ma
 from variables import variables as vm
 
-inputFiles = 'phigamma_*_skimmed.udst.root'
+inputFiles = '../phigamma_neutral_skimmed.udst.root'
 histoRootFile = 'phigamma_Validation.root'
 inputFileList = glob(inputFiles)
 

@@ -11,37 +11,36 @@
 # re-do the reconstruction/calculation again i.e. using the Trigger decisions already done by the HLT.
 # Notice that we NEVER UNPACK the RAW data during this step, making this very fast.
 
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Root input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 # roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # Output only events that pass
-output_calib_path = create_path()
-output = register_module('RootOutput')
+output_calib_path = b2.create_path()
+output = b2.register_module('RootOutput')
 output.param('outputFileName', "calib_mumu.root")
 output_calib_path.add_module(output)
 
-cut_decision = register_module("TriggerSkim")
+cut_decision = b2.register_module("TriggerSkim")
 cut_decision.param('triggerLines', ['software_trigger_cut&hlt&accept_2_tracks',
                                     'software_trigger_cut&hlt&accept_mu_mu'])
 cut_decision.param('expectedResult', 1)
 # cut_decision.param('logicMode', 'and')  # Default == 'or'
-cut_decision.if_value("==1", output_calib_path, AfterConditionPath.CONTINUE)
+cut_decision.if_value("==1", output_calib_path, b2.AfterConditionPath.CONTINUE)
 main.add_module(cut_decision)
 
 # Output all events but in ROOT (not SeqROOT) format
-output_path = create_path()
-output = register_module('RootOutput')
+output_path = b2.create_path()
+output = b2.register_module('RootOutput')
 output.param('outputFileName', "raw.root")
 main.add_module(output)
 
 # Process events
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

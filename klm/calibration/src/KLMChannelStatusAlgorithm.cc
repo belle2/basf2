@@ -87,8 +87,11 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
       m_Results.m_HitNumberEKLM += hits;
   }
   clearCalibrationData();
-  if (m_Results.m_ChannelStatus != nullptr)
-    delete m_Results.m_ChannelStatus;
+  /*
+   * A new object is created, because saveCalibration() stores a pointer
+   * to KLMChannelStatus, and it is necessary to save the payloads to commit
+   * them at the end of calibration.
+   */
   m_Results.m_ChannelStatus = new KLMChannelStatus();
   m_Results.m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */

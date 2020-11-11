@@ -46,7 +46,7 @@ namespace Belle2 {
     BKLMHit2d& operator=(const BKLMHit2d&);
 
     //! Destructor
-    virtual ~BKLMHit2d()
+    ~BKLMHit2d()
     {
     }
 
@@ -202,21 +202,30 @@ namespace Belle2 {
     //! @param flag whether this hit is outside the trigger-coincidence window (true) or not (false)
     void isOutOfTime(bool flag)
     {
-      if (flag) { m_ModuleID |= BKLM_OUTOFTIME_MASK; } else { m_ModuleID &= ~BKLM_OUTOFTIME_MASK; }
+      if (flag)
+        m_ModuleID |= BKLM_OUTOFTIME_MASK;
+      else
+        m_ModuleID &= ~BKLM_OUTOFTIME_MASK;
     }
 
     //! Set or clear the OnTrack flag
     //! @param flag whether this hit is associated with a muid-extrapolated track (true) or not (false)
     void isOnTrack(bool flag)
     {
-      if (flag) { m_ModuleID |= BKLM_ONTRACK_MASK; } else { m_ModuleID &= ~BKLM_ONTRACK_MASK; }
+      if (flag)
+        m_ModuleID |= BKLM_ONTRACK_MASK;
+      else
+        m_ModuleID &= ~BKLM_ONTRACK_MASK;
     }
 
     //! Set or clear the On-BKLM-stand-alone-track flag
     //! @param flag whether this hit is associated with a stand-alone BKLM track (true) or not (false)
     void isOnStaTrack(bool flag)
     {
-      if (flag) { m_ModuleID |= BKLM_ONSTATRACK_MASK; } else { m_ModuleID &= ~BKLM_ONSTATRACK_MASK; }
+      if (flag)
+        m_ModuleID |= BKLM_ONSTATRACK_MASK;
+      else
+        m_ModuleID &= ~BKLM_ONSTATRACK_MASK;
     }
 
   private:

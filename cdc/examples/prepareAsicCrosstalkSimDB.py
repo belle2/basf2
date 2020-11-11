@@ -28,10 +28,10 @@ def getEff(var, cut, n=40, limits=(0., 2500.)):
     x = 0.5*(a[1][1:]+a[1][:-1])
     return x, eff, effErr
 
+
 #
 # Specify file name here:
 #
-
 #: Input root file, produced by AsicBackgroundLibraryCreator
 InputFile = "cosmic.0008.03420_03427.root"
 

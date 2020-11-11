@@ -44,7 +44,6 @@ class PostProcessingRunMixin(EmptyRun):
 
     def postprocess(self):
         """By default, do nothing. (may be overridden)"""
-        pass
 
 
 class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):

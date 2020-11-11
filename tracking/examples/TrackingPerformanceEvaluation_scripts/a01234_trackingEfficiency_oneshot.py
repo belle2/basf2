@@ -25,12 +25,13 @@
 
 import sys
 import glob
-from basf2 import *
+import basf2 as b2
+from generators import add_evtgen_generator
 from simulation import add_simulation
-from tracking import *
-from modularAnalysis import *
+from tracking import add_tracking_reconstruction
+import modularAnalysis as ma
 
-set_random_seed(1509)
+b2.set_random_seed(1509)
 
 particleGun = False
 
@@ -72,29 +73,29 @@ if bkg == 'std2GBKG':
 
 print(bkgFiles)
 
-path = create_path()
+path = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
-v0matcher = register_module('MCV0Matcher')
+v0matcher = b2.register_module('MCV0Matcher')
 v0matcher.param('V0ColName', 'V0ValidationVertexs')
-v0matcher.logging.log_level = LogLevel.INFO
+v0matcher.logging.log_level = b2.LogLevel.INFO
 
-create_plots_TRK = register_module('TrackingPerformanceEvaluation')
+create_plots_TRK = b2.register_module('TrackingPerformanceEvaluation')
 create_plots_TRK.param('outputFileName', root_file_name_TRK)
-create_plots_TRK.logging.log_level = LogLevel.INFO
+create_plots_TRK.logging.log_level = b2.LogLevel.INFO
 
 
-create_plots_V0 = register_module('V0findingPerformanceEvaluation')
+create_plots_V0 = b2.register_module('V0findingPerformanceEvaluation')
 create_plots_V0.param('outputFileName', root_file_name_V0)
-create_plots_V0.logging.log_level = LogLevel.INFO
+create_plots_V0.logging.log_level = b2.LogLevel.INFO
 
 if particleGun:
-    particleGunModule = register_module('ParticleGun')
+    particleGunModule = b2.register_module('ParticleGun')
     particleGunModule.param({
         'pdgCodes': [211, -211],
         'nTracks': 1,
@@ -107,7 +108,7 @@ if particleGun:
     path.add_module('EventInfoSetter')
     path.add_module(particleGunModule)
 else:
-    setupEventInfo(100, path)
+    ma.setupEventInfo(100, path)
     add_evtgen_generator(path, 'signal', None)
 
 path.add_module(progress)
@@ -132,6 +133,6 @@ path.add_module(v0matcher)
 path.add_module(create_plots_TRK)
 path.add_module(create_plots_V0)
 
-process(path)
+b2.process(path)
 
-print(statistics)
+print(b2.statistics)

@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
-import ROOT
 from ROOT import Belle2
 
 
-class dump_clusters(Module):
+class dump_clusters(b2.Module):
 
     """A simple module to timing of SVD clusters.
     Intended for use with the RandomizeEventTimes feature of SVDDigitizer,

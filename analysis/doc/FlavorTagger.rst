@@ -136,7 +136,7 @@ library. In future, also new methods could be included.
 
 The ``qr`` value of the tagged B is saved temporary as extraInfo of the
 reconstructed B particle at the end of the FlavorTagger process.  All
-FlavorTagging informations (qr of the two multivariate methods and the
+FlavorTagging information (qr of the two multivariate methods and the
 RightCategory probabilities) saved previously as extraInfo are saved into a
 dedicated DataStoreObject called FlavorTagInfo . After filling the
 FlavorTagInfo data object, all flavor tagger extraInfos are then deleted. The
@@ -243,7 +243,7 @@ accompaning tag-side :math:`B` meson (positive or negative) if the given particl
 :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
-The additional informations about individual categories are saved using the aliases
+The additional information about individual categories are saved using the aliases
 ``qpCategory<Name>``, where ``<name>`` is the cathegory.
 These are 13 values which correspond to the 13 inputs which are given to the
 combiners. They are actually not ``qr`` but ``qp`` where ``p`` is the output of the

@@ -10,11 +10,6 @@
 
 #include <analysis/modules/InclusiveBtagReconstruction/InclusiveBtagReconstructionModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <unordered_set>
@@ -50,27 +45,20 @@ InclusiveBtagReconstructionModule::~InclusiveBtagReconstructionModule() = defaul
 
 void InclusiveBtagReconstructionModule::initialize()
 {
-  StoreObjPtr<ParticleList> bsigList(m_bsigListName);
-  bsigList.isRequired();
+  m_bsigList.isRequired(m_bsigListName);
+
   for (const std::string& inputListName : m_inputListsNames) {
     StoreObjPtr<ParticleList> inputList(inputListName);
     inputList.isRequired();
   }
 
-  StoreObjPtr<ParticleList> btagList(m_btagListName);
-  btagList.registerInDataStore();
-
-  StoreObjPtr<ParticleList> antiBtagList(ParticleListName::antiParticleListName(m_btagListName));
-  antiBtagList.registerInDataStore();
-
-  StoreObjPtr<ParticleList> upsilonList(m_upsilonListName);
-  upsilonList.registerInDataStore();
+  m_btagList.registerInDataStore(m_btagListName);
+  m_antiBtagList.registerInDataStore(ParticleListName::antiParticleListName(m_btagListName));
+  m_upsilonList.registerInDataStore(m_upsilonListName);
 }
 
 void InclusiveBtagReconstructionModule::event()
 {
-  StoreObjPtr<ParticleList> bsigList(m_bsigListName);
-
   bool valid = m_decaydescriptor.init(m_bsigListName);
   if (!valid)
     B2ERROR("Invalid Bsig list name: " << m_bsigListName);
@@ -78,22 +66,19 @@ void InclusiveBtagReconstructionModule::event()
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
   int pdgCode  = mother->getPDGCode();
 
-  StoreObjPtr<ParticleList> btagList(m_btagListName);
-  btagList.create();
-  btagList->initialize(-pdgCode, btagList.getName());
+  m_btagList.create();
+  m_btagList->initialize(-pdgCode, m_btagList.getName());
 
-  StoreObjPtr<ParticleList> antiBtagList(ParticleListName::antiParticleListName(m_btagListName));
-  antiBtagList.create();
-  antiBtagList->initialize(pdgCode, antiBtagList.getName());
-  btagList->bindAntiParticleList(*antiBtagList);
+  m_antiBtagList.create();
+  m_antiBtagList->initialize(pdgCode, m_antiBtagList.getName());
+  m_btagList->bindAntiParticleList(*m_antiBtagList);
 
-  StoreObjPtr<ParticleList> upsilonList(m_upsilonListName);
-  upsilonList.create();
-  upsilonList->initialize(300553, upsilonList.getName());
+  m_upsilonList.create();
+  m_upsilonList->initialize(300553, m_upsilonList.getName());
 
-  const unsigned int n = bsigList->getListSize();
+  const unsigned int n = m_bsigList->getListSize();
   for (unsigned i = 0; i < n; i++) { // find Btag(s) for each Bsig
-    const Particle* bsig = bsigList->getParticle(i);
+    const Particle* bsig = m_bsigList->getParticle(i);
     const std::vector<const Particle*>& bsigFinalStateDaughters = bsig->getFinalStateDaughters();
     std::unordered_set<int> mdstSourcesOfBsigFinalStateDaughters;
     std::map<int, std::vector<int>> btagDaughtersMap;
@@ -136,14 +121,12 @@ void InclusiveBtagReconstructionModule::event()
     std::vector<std::vector<int>> btagCandidates;
     map2vector.convert(btagDaughtersMap, btagCandidates);
 
-    StoreArray<Particle> particles;
-
     for (std::vector<int> daughterIndices : btagCandidates) {
       std::map<int, size_t> nonFinalStateIndicesCount;
       TLorentzVector momentum;
       for (int index : daughterIndices) {
         // check if there are non-final-state particles. If yes, the momentum should be added just once.
-        if ((particles[index]->getFinalStateDaughters()).size() > 1) {
+        if ((m_particles[index]->getFinalStateDaughters()).size() > 1) {
           auto it = nonFinalStateIndicesCount.find(index);
           if (it != nonFinalStateIndicesCount.end()) {
             nonFinalStateIndicesCount[index]++;
@@ -152,12 +135,12 @@ void InclusiveBtagReconstructionModule::event()
             nonFinalStateIndicesCount[index] = 1;
           }
         }
-        momentum += particles[index]->get4Vector();
+        momentum += m_particles[index]->get4Vector();
       }
       // check the number of the daughters to make sure that the not-final-state particles are not mixed with the other particles that come from the same mdstSource
       bool rightDaughtersCount = true;
       for (auto& it : nonFinalStateIndicesCount) {
-        if (it.second != (particles[(it.first)]->getFinalStateDaughters()).size()) {
+        if (it.second != (m_particles[(it.first)]->getFinalStateDaughters()).size()) {
           rightDaughtersCount = false;
           break;
         }
@@ -173,12 +156,12 @@ void InclusiveBtagReconstructionModule::event()
       daughterIndices.resize(std::distance(daughterIndices.begin(), it));
 
       Particle btagCandidate(momentum, -1 * bsig->getPDGCode(), bsig->getFlavorType(), daughterIndices, bsig->getArrayPointer());
-      Particle* btag = particles.appendNew(btagCandidate);
-      btagList->addParticle(btag);
+      Particle* btag = m_particles.appendNew(btagCandidate);
+      m_btagList->addParticle(btag);
 
       Particle upsilon(momentum + bsig->get4Vector(), 300553, Particle::c_Unflavored, { bsig->getArrayIndex(), btag->getArrayIndex() },
                        bsig->getArrayPointer());
-      upsilonList->addParticle(particles.appendNew(upsilon));
+      m_upsilonList->addParticle(m_particles.appendNew(upsilon));
     }
   }
 }

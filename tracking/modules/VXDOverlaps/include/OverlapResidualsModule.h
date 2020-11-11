@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef OVERLAPRESIDUALSMODULE_H
-#define OVERLAPRESIDUALSMODULE_H
+#pragma once
 
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -239,4 +238,3 @@ namespace Belle2 {
                  extSize_SVD_V = 0; /**< V external size */
   };
 }
-#endif /* OVERLAPRESIDUALS_H */

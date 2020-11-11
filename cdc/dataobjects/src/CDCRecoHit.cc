@@ -48,7 +48,7 @@ void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTransla
 
 CDCRecoHit::CDCRecoHit()
   : genfit::AbsMeasurement(1),
-    m_tdcCount(0), m_adcCount(0), m_wireID(WireID()), m_cdcHit(NULL), m_leftRight(0)
+    m_tdcCount(0), m_adcCount(0), m_wireID(WireID()), m_cdcHit(nullptr), m_leftRight(0)
 {
 }
 

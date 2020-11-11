@@ -9,11 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/AllParticleCombiner/AllParticleCombinerModule.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 using namespace Belle2;
 
@@ -47,7 +43,7 @@ AllParticleCombinerModule::AllParticleCombinerModule() : Module()
 
 void AllParticleCombinerModule::initialize()
 {
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
 
   bool valid = m_decaydescriptor.init(m_outputListName);
   if (!valid)
@@ -60,12 +56,10 @@ void AllParticleCombinerModule::initialize()
   m_antiListName = ParticleListName::antiParticleListName(mother->getFullName());
   m_isSelfConjugatedParticle = (m_outputListName == m_antiListName);
 
-  StoreObjPtr<ParticleList> particleList(m_outputListName);
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-  particleList.registerInDataStore(flags);
+  m_outputList.registerInDataStore(m_outputListName, flags);
   if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-    antiParticleList.registerInDataStore(flags);
+    m_outputAntiList.registerInDataStore(m_antiListName, flags);
   }
 
   m_cut = Variable::Cut::compile(m_cutString);
@@ -73,18 +67,14 @@ void AllParticleCombinerModule::initialize()
 
 void AllParticleCombinerModule::event()
 {
-  StoreArray<Particle> particles;
-
-  StoreObjPtr<ParticleList> outputList(m_outputListName);
-  outputList.create();
-  outputList->initialize(m_pdgCode, m_outputListName);
+  m_outputList.create();
+  m_outputList->initialize(m_pdgCode, m_outputListName);
 
   if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
-    outputAntiList.create();
-    outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
+    m_outputAntiList.create();
+    m_outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
 
-    outputList->bindAntiParticleList(*(outputAntiList));
+    m_outputList->bindAntiParticleList(*(m_outputAntiList));
   }
 
   unsigned short nParticleLists = m_inputListNames.size();
@@ -126,10 +116,10 @@ void AllParticleCombinerModule::event()
   const TLorentzVector vec(px, py, pz, E);
 
   Particle combinedParticle = Particle(vec, m_pdgCode, m_isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                                       daughterIndices, particles.getPtr());
+                                       daughterIndices, m_particles.getPtr());
 
-  Particle* newParticle = particles.appendNew(combinedParticle);
+  Particle* newParticle = m_particles.appendNew(combinedParticle);
   if (m_cut->check(newParticle)) {
-    outputList->addParticle(newParticle);
+    m_outputList->addParticle(newParticle);
   }
 }

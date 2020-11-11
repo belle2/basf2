@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import random
 import basf2  # also test non-polluting import
 from ROOT import Belle2
 
@@ -53,6 +51,7 @@ class PrintName(basf2.Module):
         """reimplementation of Module::event()."""
         # error level to check that this doesn't prevent execution
         basf2.B2ERROR("In module " + self.name())
+
 
 main = basf2.create_path()
 

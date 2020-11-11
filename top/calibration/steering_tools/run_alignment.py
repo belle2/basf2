@@ -14,7 +14,6 @@
 # ---------------------------------------------------------------------------------------
 
 import sys
-import os
 import glob
 from caf import backends
 from caf.framework import CAF
@@ -76,9 +75,9 @@ run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/alignment-{sample}-{expNo}-{run_range}"
 
 # Define calibration
+backend_args = {"queue": "l"}
 cal = module_alignment(inputFiles, sample, fixedParameters,
-                       globalTags, localDBs, new_cdst_format)
-cal.backend_args = {"queue": "l"}
+                       globalTags, localDBs, new_cdst_format, backend_args)
 
 # Add calibrations to CAF
 cal_fw = CAF()

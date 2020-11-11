@@ -15,8 +15,7 @@
 #################################################################
 
 import sys
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 release = sys.argv[1]
 
@@ -39,30 +38,30 @@ print('simulation: ' + roi + ' ' + bkg)
 print('reconstruction ' + vxdtf)
 print()
 
-path = create_path()
+path = b2.create_path()
 
-root_input = register_module('RootInput')
+root_input = b2.register_module('RootInput')
 root_input.param('inputFileNames', input_root_files)
 path.add_module(root_input)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 path.add_module(gearbox)
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # geometry.param('components',['PXD','SVD','CDC'])
 path.add_module(geometry)
 
-create_plots_TRK = register_module('TrackingPerformanceEvaluation')
+create_plots_TRK = b2.register_module('TrackingPerformanceEvaluation')
 create_plots_TRK.param('outputFileName', root_file_name_TRK)
-create_plots_TRK.logging.log_level = LogLevel.INFO
+create_plots_TRK.logging.log_level = b2.LogLevel.INFO
 path.add_module(create_plots_TRK)
 
-create_plots_V0 = register_module('V0findingPerformanceEvaluation')
+create_plots_V0 = b2.register_module('V0findingPerformanceEvaluation')
 create_plots_V0.param('outputFileName', root_file_name_V0)
-create_plots_V0.logging.log_level = LogLevel.INFO
+create_plots_V0.logging.log_level = b2.LogLevel.INFO
 path.add_module(create_plots_V0)
 
 path.add_module('Progress')
-process(path)
+b2.process(path)
 
-print(statistics)
+print(b2.statistics)

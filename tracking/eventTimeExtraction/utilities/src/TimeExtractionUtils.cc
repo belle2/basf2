@@ -264,7 +264,6 @@ std::vector<int> TimeExtractionUtils::getMeasurementDimensions(const RecoTrack& 
   vDimMeas.reserve(hitPoints.size());
 
   for (const auto& hit : hitPoints) {
-    // cppcheck-suppress useStlAlgorithm
     vDimMeas.push_back(hit->getRawMeasurement(0)->getDim());
   }
 

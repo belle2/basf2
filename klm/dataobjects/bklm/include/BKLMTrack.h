@@ -44,7 +44,7 @@ namespace Belle2 {
     BKLMTrack& operator=(const BKLMTrack&);
 
     //! Destructor
-    virtual ~BKLMTrack()
+    ~BKLMTrack()
     {
     }
 

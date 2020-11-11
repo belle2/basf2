@@ -3,7 +3,7 @@
 
 import os
 import stat
-from SCons.Script import *
+from SCons.Script import Environment, File, Flatten, Glob, SConscript
 
 
 def define_aliases(
@@ -147,6 +147,18 @@ def process_dir(
             if not env.Dictionary().get('CONTINUE', True):
                 return
 
+    # Add additional sources.
+    if 'ADDITIONAL_SOURCES' in env.Dictionary():
+        additional_src_nodes = []
+        for source in env.Dictionary()['ADDITIONAL_SOURCES']:
+            additional_src_nodes += get_files(os.path.join(dir_name, source))
+        additional_src_files = [
+            os.path.join(parent_env['BUILDDIR'], str(node)) for node in
+            additional_src_nodes]
+        if (len(additional_src_files) > 0):
+            src_files.append(additional_src_files)
+        env['SRC_FILES'] = src_files
+
     # install header files in the include directory
     includes = env.Install(os.path.join(env['INCDIR'], dir_name),
                            env['HEADER_FILES'])
@@ -226,6 +238,7 @@ def process_dir(
         # generate dictionaries
         dict_files = []
         aux_dict_targets = []
+        check_files = []
         for linkdef_file in env['LINKDEF_FILES']:
             # set the name of library generated at this stage
             # will be read by the RootDict builder
@@ -242,6 +255,9 @@ def process_dir(
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
             aux_dict_targets.append(env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file))
+
+            # collect files for class version checks
+            check_files.append((os.path.join(env['BUILDDIR'], str(linkdef_file).replace(os.sep, '_') + '.check'), linkdef_file))
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0 or len(dict_files) > 0:
@@ -262,6 +278,9 @@ def process_dir(
                                     [env['SRC_FILES'], dict_files])
             debug = env.StripDebug(lib)
 
+            # make sure pcm and rootmap files are installed before the library
+            env.Depends(lib, aux_dict_targets)
+
             lib_files = [lib, debug] + aux_dict_targets
             if is_module_dir:
                 map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.b2modmap')
@@ -271,6 +290,10 @@ def process_dir(
 
                 reg_map = env.RegMap(map_file, map_sources)
                 lib_files.append(reg_map)
+
+            # check class versions
+            for check_filename, linkdef_file in check_files:
+                env.ClassVersionCheck(check_filename, [linkdef_file, lib, debug] + env['REQUIRED_TOOLS'])
 
             # define build target aliases
             env.Alias(lib_name, lib_files)

@@ -1,15 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
- *                                                                                             *
- * Author: The Belle II Collaboration                                          *
- * Contributors: CDC group                                                      *
- *                                                                                              *
- * This software is provided "as is" without any warranty.         *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: CDC group                                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOCONTROLPAR_H
-#define CDCGEOCONTROLPAR_H
+#pragma once
 
 #include <string>
 
@@ -186,7 +185,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire displacement
        */
-      void setDisplacementFile(std::string& input)
+      void setDisplacementFile(const std::string& input)
       {
         m_displacementFile = input;
       }
@@ -194,7 +193,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire alignment
        */
-      void setAlignmentFile(std::string& input)
+      void setAlignmentFile(const std::string& input)
       {
         m_alignmentFile = input;
       }
@@ -202,7 +201,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire misalignment
        */
-      void setMisalignmentFile(std::string& input)
+      void setMisalignmentFile(const std::string& input)
       {
         m_misalignmentFile = input;
       }
@@ -210,7 +209,7 @@ namespace Belle2 {
       /**
        * Set input file name for xt-relation
        */
-      void setXtFile(std::string& input)
+      void setXtFile(const std::string& input)
       {
         m_xtFile = input;
       }
@@ -218,7 +217,7 @@ namespace Belle2 {
       /**
        * Set input file name for sigma
        */
-      void setSigmaFile(std::string& input)
+      void setSigmaFile(const std::string& input)
       {
         m_sigmaFile = input;
       }
@@ -226,7 +225,7 @@ namespace Belle2 {
       /**
        * Set input file name for fudge factor
        */
-      void setFFactorFile(std::string& input)
+      void setFFactorFile(const std::string& input)
       {
         m_fFactorFile = input;
       }
@@ -234,7 +233,7 @@ namespace Belle2 {
       /**
        * Set input file name for prop-speed
        */
-      void setPropSpeedFile(std::string& input)
+      void setPropSpeedFile(const std::string& input)
       {
         m_propSpeedFile = input;
       }
@@ -242,7 +241,7 @@ namespace Belle2 {
       /**
        * Set input file name for t0
        */
-      void setT0File(std::string& input)
+      void setT0File(const std::string& input)
       {
         m_t0File = input;
       }
@@ -250,7 +249,7 @@ namespace Belle2 {
       /**
        * Set input file name for time-walk
        */
-      void setTwFile(std::string& input)
+      void setTwFile(const std::string& input)
       {
         m_twFile = input;
       }
@@ -258,7 +257,7 @@ namespace Belle2 {
       /**
        * Set input file name for bad wire
        */
-      void setBwFile(std::string& input)
+      void setBwFile(const std::string& input)
       {
         m_bwFile = input;
       }
@@ -266,7 +265,7 @@ namespace Belle2 {
       /**
        * Set input file name for channel map
        */
-      void setChMapFile(std::string& input)
+      void setChMapFile(const std::string& input)
       {
         m_chMapFile = input;
       }
@@ -274,7 +273,7 @@ namespace Belle2 {
       /**
        * Set input file name for edep-to-adc
        */
-      void setEDepToADCFile(std::string& input)
+      void setEDepToADCFile(const std::string& input)
       {
         m_eDepToADCFile = input;
       }
@@ -663,5 +662,3 @@ namespace Belle2 {
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/FileSystem.h>
 #include <fstream>
 #include <iomanip>
 #include <cstring>
@@ -89,13 +90,13 @@ EvtGenParticlePDG* EvtGenDatabasePDG::AddParticle(const char* name, const char* 
 void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
 {
   //ok, now load the data
-  //std::string default_filename = Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl";
-  std::string default_filename = std::getenv("BELLE2_EXTERNALS_DIR");
-  default_filename += "/share/evtgen/evt.pdl";
+  std::string defaultFilename = FileSystem::findFile("data/framework/particledb/evt.pdl");
+  if (defaultFilename.empty())
+    B2FATAL("Cannot find the default particle database file (evt.pdl).");
   if (!filename) {
-    filename = default_filename.c_str();
+    filename = defaultFilename.c_str();
   } else {
-    if (filename != default_filename) {
+    if (filename != defaultFilename) {
       B2RESULT("Loading non-standard evt.pdl file '" << filename << "'");
     }
   }

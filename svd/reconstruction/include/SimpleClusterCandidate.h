@@ -47,8 +47,8 @@ namespace Belle2 {
       /** which are needed to get clustered samples. */
       SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent, double cutSNR,
                              int timeAlgorithm,
-                             std::string storeShaperDigitsName,
-                             std::string storeRecoDigitsName);
+                             const std::string& storeShaperDigitsName,
+                             const std::string& storeRecoDigitsName);
 
       /**
        * Add a Strip to the current cluster.

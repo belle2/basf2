@@ -4,6 +4,8 @@
 from variables import printVars
 from variables import std_vector
 from variables import variables as v
+# used in FEI
+import ROOT
 
 # some variables should be there
 assert len(v.getVariables()) > 0
@@ -18,15 +20,13 @@ v.addAlias('sigProb', 'extraInfo(SignalProbability)')
 var = v.getVariable('sigProb')
 assert 'extraInfo(SignalProbability)' == var.name
 
-assert (v.evaluate('constant(123)', None) - 123) < 0.001
+assert (v.evaluate('constant(123)', ROOT.nullptr) - 123) < 0.001
 
 v.addAlias('anotherAlias', 'daughter(1, p)')
 
 for vn in v.getAliasNames():
     assert (vn == 'sigProb' or vn == 'anotherAlias')
 
-# used in FEI
-import ROOT
 assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
 assert 'extraInfo(SignalProbability)' == ROOT.Belle2.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')
 

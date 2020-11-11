@@ -1,16 +1,14 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
-import math
 import numpy as np
 
 import tracking.validation.utilities as utilities
 
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
+ROOT.gSystem.Load("libtracking")
 
 
 class EventwiseTrackingValidationModule(harvesting.HarvestingModule):

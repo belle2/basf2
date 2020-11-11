@@ -1,5 +1,3 @@
-#ifndef BPARTICLE_H
-#define BPARTICLE_H
 //+
 // File : BParticle.h
 // Description : class to contain particle info.
@@ -7,6 +5,8 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 28 - Jan - 2004
 //-
+
+#pragma once
 
 #include "TObject.h"
 #include "TClonesArray.h"
@@ -77,6 +77,3 @@ public:
 int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray* pout);
 int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, float masslow, float massup, SIMPLEPID pid,
                      TClonesArray* pout);
-
-
-#endif

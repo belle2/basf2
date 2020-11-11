@@ -18,7 +18,7 @@ public:
   /// Change octal to string.
   static std::string doubleToArb(double in, int outRadix, int numberOfDigits = -1);
   /// Change string number to another string number depending on radix.
-  static std::string arbToArb(std::string& in, int inRadix, int outRadix, int numberOfDigits = -1);
+  static std::string arbToArb(const std::string& in, int inRadix, int outRadix, int numberOfDigits = -1);
   /// Changes string signed binary(-sign) to two complements.
   static std::string signedToTwosComplement(std::string in, int numberOfDigits);
   /// Changes string two complements to string signed binary(-sign).
@@ -28,7 +28,7 @@ public:
   static void writeSignals(std::string outFilePath, std::map<std::string, std::vector<signed long long> >& data);
   /// Writes multiple signal values to a file in coe format.
   static void multipleWriteCoe(int lutInBitsize, std::map<std::string, std::vector<signed long long> >& data,
-                               std::string fileDirectory);
+                               const std::string& fileDirectory);
   /// Writes a signal's values to a file in coe format.
   static void writeCoe(std::string outFilePath, int lutInBitsize, std::vector<signed long long>& data);
   /// Reads a coe format file and stores the values in vector.

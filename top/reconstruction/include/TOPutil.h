@@ -11,8 +11,7 @@
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
-#ifndef _TOPutil_h
-#define _TOPutil_h
+#pragma once
 
 #include <top/reconstruction/TOPf77fun.h>
 
@@ -254,7 +253,4 @@ namespace Belle2 {
 
   } // top namespace
 } // Belle2 namespace
-
-
-#endif
 

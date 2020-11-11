@@ -37,6 +37,7 @@ int RawCOPPERFormat_latest::GetNumFINESSEBlock(int n)
   return cnt;
 }
 
+
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 void RawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
 {
@@ -86,3 +87,197 @@ void RawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
   return;
 }
 #endif
+
+int RawCOPPERFormat_latest::Get1stDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get2ndDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get3rdDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get4thDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int RawCOPPERFormat_latest::Get1stFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get2ndFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get3rdFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get4thFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int* RawCOPPERFormat_latest::Get1stDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get2ndDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get3rdDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get4thDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int RawCOPPERFormat_latest::GetOffset1stFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int RawCOPPERFormat_latest::GetOffset2ndFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int RawCOPPERFormat_latest::GetOffset3rdFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
+                                                std::vector<std::vector<unsigned int>>& summary_table)
+{
+
+  //
+  // Format of summary_table
+  //  <The 1st channel of a value> <# of channels of the value> <the value>
+  //
+  std::vector<std::vector<unsigned int>> temp;
+  for (int i = 0; i < MAX_PCIE40_CH; i++) {
+    if (GetFINESSENwords(n, i) > 0) {
+
+      int same_flag = 0;
+      for (unsigned j = 0; j < summary_table.size(); ++j) {
+        if (input_val[i] == summary_table.at(j).at(2)) {
+          summary_table.at(j).at(1)++;
+          same_flag = 1;
+          break;
+        }
+      }
+      if (same_flag == 0) {
+        summary_table.push_back({ static_cast<unsigned int>(i), 1, input_val[i] });
+      }
+    }
+  }
+  sort(summary_table.begin(), summary_table.end(), [](const std::vector<unsigned int>& alpha,
+  const std::vector<unsigned int>& beta) {return alpha.at(1) < beta.at(1);});
+  return;
+}

@@ -44,15 +44,14 @@ namespace Belle2 {
   }
 
 
-  ARICHBtestGeometryPar::ARICHBtestGeometryPar(const ARICHBtestGeometryPar& arichPar)
+  ARICHBtestGeometryPar::ARICHBtestGeometryPar(const ARICHBtestGeometryPar& arichPar) :
+    m_trackingShift(arichPar.m_trackingShift),
+    m_rotationCenter(arichPar.m_rotationCenter),
+    m_frameRotation(arichPar.m_frameRotation),
+    m_hapdmap(arichPar.m_hapdmap),
+    m_hapdeid(arichPar.m_hapdeid)
   {
-
-    m_trackingShift = arichPar.m_trackingShift;
-    m_rotationCenter = arichPar.m_rotationCenter;
-    m_frameRotation = arichPar.m_frameRotation;
     m_averageAgel = arichPar.m_averageAgel;
-    m_hapdmap = arichPar.m_hapdmap;
-    m_hapdeid = arichPar.m_hapdeid;
     m_nPads = arichPar.m_nPads;
     m_init = arichPar.m_init;
     m_simple = arichPar.m_simple;
@@ -177,6 +176,5 @@ namespace Belle2 {
   {
 
   }
-
 
 } // namespace Belle2

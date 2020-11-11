@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOECLCREATOR_H
-#define GEOECLCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -100,4 +99,3 @@ namespace Belle2 {
   } // end of ecl namespace
 } // end of Belle2 namespace
 
-#endif /* GEOECLCREATOR_H */

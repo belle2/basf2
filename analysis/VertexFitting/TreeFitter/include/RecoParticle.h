@@ -18,7 +18,7 @@ namespace TreeFitter {
 
   public:
 
-    /** hier koennte ihre werbung stehen */
+    /** constructor */
     RecoParticle(Belle2::Particle* bc, const ParticleBase* mother);
 
     /** destructor */
@@ -35,7 +35,7 @@ namespace TreeFitter {
 
     /** this here sets the size in the state vector
      * we are only interested in the momenta of photons and tracks
-     * as the postion were the track ends or the cluster is, is
+     * as the position were the track ends or the cluster is, is
      * not relevant for physics  */
     virtual int dim() const override { return 3; }
 

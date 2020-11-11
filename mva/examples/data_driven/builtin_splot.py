@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
 import basf2_mva
-from basf2 import *
-from modularAnalysis import *
-
 
 if __name__ == "__main__":
     variables = ['p', 'pt', 'pz', 'phi',
@@ -71,7 +67,7 @@ if __name__ == "__main__":
     meta_options.m_splot_boosted = False
     basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
-    # Now we use a bossted sPlot training
+    # Now we use a boosted sPlot training
     general_options.m_identifier = "MVASPlotBoosted"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = True

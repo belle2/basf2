@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef FILLTRACKFITNTUPLEMODULE_H_
-#define FILLTRACKFITNTUPLEMODULE_H_
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
@@ -57,6 +57,3 @@ namespace Belle2 {
     StoreArray<Track> m_Tracks; /**< Track StoreArray */
   };
 } // end of namespace
-
-
-#endif /* FILLTRACKFITNTUPLEMODULE_H_ */

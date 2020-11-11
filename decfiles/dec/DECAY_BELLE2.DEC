@@ -1456,36 +1456,35 @@ Decay B0
 
 # 2-pi
 0.007574640   rho+  D-                                     SVS;  #Updated by PG 9/2021
-0.000500000   D-  pi+  pi0                                 PHSP;
+0.000500000   D-  pi+  pi0                                 PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
-0.006798790   rho+  D*-                                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Parameters taken from ICHEP 98-852. #BF Updated by PG 9/2021
-0.015157710   D*-  pi+  pi0                                PHSP; #Updated by PG 9/2021
+0.006798790   rho+  D*-                                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Parameters taken from ICHEP 98-852. Gamma_51 PDGLive. #BF Updated by PG 9/2021
+0.015157710   D*-  pi+  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710. This Includes rho+ D*-. Need to subtract? #Updated by PG 9/2021
 
 0.000880260   anti-D0  pi-  pi+                            PHSP; #Updated by PG 9/2021
 0.000620000   anti-D*0  pi-  pi+                           PHSP;
-0.000500000   anti-D*0  pi0  pi0                           PHSP;
+0.000500000   anti-D*0  pi0  pi0                           PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
 # 3-pi
-0.006000000   a_1+  D-                                     SVS;  #Updated Ref. [B1]
+0.006000000   a_1+  D-                                     SVS;
+0.001100000   D-  rho0  pi+                                PHSP; #Gamma_48 PDGLive => Exclusive BF. #Updated by PG 9/2021
+0.003900000   D-  pi-  pi+  pi+                            PHSP; #Gamma_47 PDGLive => Nonresonant BF. #Updated by PG 9/2021
+
+0.001100000   D-  rho+  pi0                                PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.001000000   D-  pi0  pi+  pi0                            PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+
+0.001000000   anti-D0  pi-  pi+  pi0                       PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000100000   anti-D0  pi0  pi0  pi0                       PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+
 0.012994160   D*-  a_1+                                    SVV_HELAMP 0.458 0.0 0.866 0.0 0.458 0.0; #Parameters taken from factorization http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/168.html, updated Ref.[B1]. #BF Updated by PG 9/2021
+0.005726240   D*-  rho0  pi+                               PHSP; #Gamma_59 PDGLive => Exclusive BF. #Updated by PG 9/2021
+0.000000000   D*-  pi-  pi+  pi+                           PHSP; #Gamma_58 PDGLive => Nonresonant BF = 0. Use 0 or estimate? #Updated by PG 9/2021
 
-0.001100000   D-  rho0  pi+                                PHSP; #Updated by PG 9/2021
-0.006016930   D-  pi-  pi+  pi+                            PHSP; #Updated by PG 9/2021
+0.001000000   D*-  rho+  pi0                               PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.001000000   D*-  pi0  pi+  pi0                           PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
-0.001100000   D-  rho+  pi0                                PHSP;
-0.001000000   D-  pi0  pi+  pi0                            PHSP;
-
-0.001000000   anti-D0  pi-  pi+  pi0                       PHSP;
-0.000100000   anti-D0  pi0  pi0  pi0                       PHSP;
-
-0.005726240   D*-  rho0  pi+                               PHSP; #Updated by PG 9/2021
-0.007209070   D*-  pi-  pi+  pi+                           PHSP; #Updated by PG 9/2021
-
-0.001000000   D*-  rho+  pi0                               PHSP;
-0.001000000   D*-  pi0  pi+  pi0                           PHSP;
-
-0.001000000   anti-D*0  pi-  pi+  pi0                      PHSP;
-0.000100000   anti-D*0  pi0  pi0  pi0                      PHSP;
+0.001000000   anti-D*0  pi-  pi+  pi0                      PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000100000   anti-D*0  pi0  pi0  pi0                      PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
 
 # B->D** pi and D** rho, recommendation http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/151.html
@@ -1501,7 +1500,7 @@ Decay B0
 0.000212130   D*-  K+                                      SVS;  #Updated by PG 9/2021
 0.000185950   D-  K+                                       PHSP; #Updated by PG 9/2021
 0.000329710   D*-  K*+                                     SVV_HELAMP  0.283 0.0 0.932 0.0 0.228 0.0; #Updated by PG 9/2021
-0.000445780   K*+  D-                                      SVS; #Updated by PG 9/2021
+0.000445780   K*+  D-                                      SVS;  #Updated by PG 9/2021
 
 0.000036000   anti-D*0  anti-K0                            SVS;
 0.000052000   anti-D0  anti-K0                             PHSP;
@@ -2760,36 +2759,35 @@ Decay anti-B0
 
 # 2-pi
 0.007574640   rho-  D+                                     SVS;  #Updated by PG 9/2021
-0.000500000   D+  pi-  pi0                                 PHSP;
+0.000500000   D+  pi-  pi0                                 PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
 0.006798790   rho-  D*+                                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Parameters taken from ICHEP 98-852. #BF Updated by PG 9/2021
-0.015157710   D*+  pi-  pi0                                PHSP; #Updated by PG 9/2021
+0.015157710   D*+  pi-  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710. This Includes rho+ D*-. Need to subtract? #Updated by PG 9/2021
 
 0.000880260   D0  pi+  pi-                                 PHSP; #Updated by PG 9/2021
 0.000620000   D*0  pi+  pi-                                PHSP;
-0.000500000   D*0  pi0  pi0                                PHSP;
+0.000500000   D*0  pi0  pi0                                PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
 # 3-pi
-0.006000000   a_1-  D+                                     SVS;  #Updated Ref. [B1]
+0.006000000   a_1-  D+                                     SVS;
+0.001100000   D+  rho0  pi-                                PHSP; #Gamma_48 PDGLive => Exclusive BF. #Updated by PG 9/2021
+0.003900000   D+  pi+  pi-  pi-                            PHSP; #Gamma_47 PDGLive => Nonresonant BF. #Updated by PG 9/2021
+
+0.001100000   D+  rho-  pi0                                PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.001000000   D+  pi0  pi-  pi0                            PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+
+0.001000000   D0  pi+  pi-  pi0                            PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000100000   D0  pi0  pi0  pi0                            PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+
 0.012994160   D*+  a_1-                                    SVV_HELAMP 0.200 0.0 0.866 0.0 0.458 0.0; #Parameters taken from factorization http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/168.html, updated Ref.[B1]. #BF Updated by PG 9/2021
+0.005726240   D*+  rho0  pi-                               PHSP; #Gamma_59 PDGLive => Exclusive BF. #Updated by PG 9/2021
+0.000000000   D*+  pi+  pi-  pi-                           PHSP; #Gamma_58 PDGLive => Nonresonant BF = 0. Use 0 or estimate? #Updated by PG 9/2021
 
-0.001100000   D+  rho0  pi-                                PHSP; #Updated by PG 9/2021
-0.006016930   D+  pi+  pi-  pi-                            PHSP; #Updated by PG 9/2021
+0.001000000   D*+  rho-  pi0                               PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.001000000   D*+  pi0  pi-  pi0                           PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
-0.001100000   D+  rho-  pi0                                PHSP;
-0.001000000   D+  pi0  pi-  pi0                            PHSP;
-
-0.001000000   D0  pi+  pi-  pi0                            PHSP;
-0.000100000   D0  pi0  pi0  pi0                            PHSP;
-
-0.005726240   D*+  rho0  pi-                               PHSP; #Updated by PG 9/2021
-0.007209070   D*+  pi+  pi-  pi-                           PHSP; #Updated by PG 9/2021
-
-0.001000000   D*+  rho-  pi0                               PHSP;
-0.001000000   D*+  pi0  pi-  pi0                           PHSP;
-
-0.001000000   D*0  pi+  pi-  pi0                           PHSP;
-0.000100000   D*0  pi0  pi0  pi0                           PHSP;
+0.001000000   D*0  pi+  pi-  pi0                           PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
+0.000100000   D*0  pi0  pi0  pi0                           PHSP; #No PDGLive value 9/2021. Keep original value in .DEC.
 
 
 # B->D** pi and D** rho, recommendation http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/151.html

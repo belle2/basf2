@@ -99,6 +99,10 @@ void PXDDAQDQMModule::defineHisto()
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
 //   hDAQErrorEvent->SetStats(0);
+  hCM63AfterInjLER  = new TH1I("PXDCM63InjLER", "PXDCM63InjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hCM63AfterInjHER  = new TH1I("PXDCM63InjHER", "PXDCM63InjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
 
   // cd back to root directory
   oldDir->cd();
@@ -108,6 +112,7 @@ void PXDDAQDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
 }
 
 void PXDDAQDQMModule::beginRun()
@@ -125,6 +130,10 @@ void PXDDAQDQMModule::beginRun()
   for (auto& it : hDAQDHEReduction) if (it.second) it.second->Reset();
   for (auto& it : hDAQCM) if (it.second) it.second->Reset();
   for (auto& it : hDAQCM2) if (it.second) it.second->Reset();
+  if (hCM63AfterInjLER) hCM63AfterInjLER->Reset();
+  if (hCM63AfterInjHER) hCM63AfterInjHER->Reset();
+  if (hTruncAfterInjLER) hTruncAfterInjLER->Reset();
+  if (hTruncAfterInjHER) hTruncAfterInjHER->Reset();
 }
 
 void PXDDAQDQMModule::event()
@@ -137,6 +146,10 @@ void PXDDAQDQMModule::event()
   /// thus we have to check for a difference to the number of events, too
   /// Remark: for HLT event selection and/or events rejected by the event-
   /// of-doom-buster, we might count anyhow broken events as broken from PXD
+
+  bool truncFlag = false; // flag events which are DHE truncated
+  bool cm63Flag = false; // flag event which are CM63 truncated
+
   B2DEBUG(20, "Iterate PXD DAQ Status");
   auto evt = *m_storeDAQEvtStats;
   PXDErrorFlags evt_emask = evt.getErrorMask();
@@ -183,6 +196,7 @@ void PXDDAQDQMModule::event()
           if ((dhe.getDHPFoundMask() & (1 << i)) == 0) hDAQDHPDataMissing->Fill(dhe.getDHEID() + i * 0.25);
         }
         unsigned int emask = dhe.getEndErrorInfo();
+        truncFlag |= emask != 0; // lets make it simple, catch any DHE SM error
         for (int i = 0; i < 4 * 2; i++) {
           auto sm = (emask >> i * 4) & 0xF;
           if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
@@ -200,8 +214,31 @@ void PXDDAQDQMModule::event()
           // uint8_t, uint16_t, uint8_t ; tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
           if (hDAQCM[dhe.getSensorID()]) hDAQCM[dhe.getSensorID()]->Fill(std::get<0>(*cm) * 192 + std::get<1>(*cm) / 4, std::get<2>(*cm));
           if (hDAQCM2[dhe.getSensorID()]) hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
+          cm63Flag |= 63 == std::get<2>(*cm);
         }
       }
     }
+  }
+  // Now fill the histograms which need flags set above
+  // the code is unluckily a copy of whats in PXDInjection Module, but therewe dont have the DAQ flags :-/
+  for (auto& it : m_rawTTD) {
+//     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+//             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+//             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+
+    // get last injection time
+    auto difference = it.GetTimeSinceLastInjection(0);
+    // check time overflow, too long ago
+    if (difference != 0x7FFFFFFF) {
+      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      if (it.GetIsHER(0)) {
+        if (hCM63AfterInjHER && cm63Flag) hCM63AfterInjHER->Fill(diff2);
+        if (hTruncAfterInjHER && truncFlag) hTruncAfterInjHER->Fill(diff2);
+      } else {
+        if (hCM63AfterInjLER && cm63Flag) hCM63AfterInjLER->Fill(diff2);
+        if (hTruncAfterInjLER && truncFlag) hTruncAfterInjLER->Fill(diff2);
+      }
+    }
+    break;
   }
 }

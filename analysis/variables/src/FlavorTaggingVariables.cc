@@ -315,7 +315,7 @@ namespace Belle2 {
 
       const MCParticle* BcpMC = particle->getMCParticle();
       if (!BcpMC) return 0;
-      if (!Variable::isSignal(particle) > 0) return 0;
+      if (Variable::isSignal(particle) <= 0) return 0;
 
       const MCParticle* Y4S = BcpMC->getMother();
       if (!Y4S) return 0;

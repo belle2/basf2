@@ -46,7 +46,7 @@ def arg_parser():
     parser.add_argument('--no_mask',
                         default=False,
                         action='store_true',
-                        help='flag for disable masking of (very) hot channels; the masking is disabled for .sroot files, please convert them to .root first this is necessary')
+                        help='flag for disable masking of (very) hot channels; the masking is disabled for .sroot files, please convert them to .root if this is necessary')
     parser.add_argument('--output_dqm',
                         default='KLMDQM_Masked.root',
                         type=str,

@@ -125,6 +125,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
+    os.environ['B2BII'] = 'TRUE'
+
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:
         input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))

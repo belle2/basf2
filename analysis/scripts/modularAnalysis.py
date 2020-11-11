@@ -145,7 +145,9 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
+        import os
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+        os.environ["B2BII"] = 'TRUE'
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 

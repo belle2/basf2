@@ -1,7 +1,7 @@
 #!/bin/bash
 
-i=41
-imax=43
+i=0
+imax=2
 while [ "$i" -le "$imax" ]; do
     python3 raster_validation_helpertask.py $i
     python3 fullTrackingValidation.py

@@ -1,6 +1,6 @@
 {
     "result_path": "output/",
-    "process_type": "DATA",
+    "process_type": "BBBAR",
     "n_events_training": 20000,
     "n_events_testing": 5000,
     "n_events_per_task": 100,
@@ -11,7 +11,7 @@
     "run_validation_tasks": true,
     "globaltags": [],
     "experiment_numbers": [0, 1003],
-    "datafiles": ["/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT1.f00001.root"],
+    "datafiles": ["/group/belle2/dataprod/Data/Raw/e0012/r06423/sub00/physics.0012.06423.HLT1.f00001.root"],
     "bkgfiles_by_exp": {
         "0": "/group/belle2/dataprod/BGOverlay/nominal_phase3/prerelease-05-00-00a/overlay/phase3/BGx1/set0/",
         "1002": "/gpfs/group/belle2/BGFile/OfficialBKG/phase2/pseudorandom/prod6/",

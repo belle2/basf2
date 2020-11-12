@@ -172,7 +172,7 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
 try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters, get_log_file_dir, create_output_dirs
-    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task, HaddTask
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
     from b2luigi.core.task import Task, ExternalTask
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
@@ -204,6 +204,10 @@ if (
 def create_fbdt_option_string(fast_bdt_option):
     return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
                            str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
+
+
+def createV0momenta(x, mu, beta):
+    return (1/beta)*np.exp(-(x - mu)/beta) * np.exp(-np.exp(-(x - mu) / beta))
 
 
 def my_basf2_mva_teacher(
@@ -369,10 +373,15 @@ class GenerateSimTask(Basf2PathTask):
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -401,13 +410,58 @@ class GenerateSimTask(Basf2PathTask):
         )
         if "BBBAR" in self.random_seed:
             path.add_module("EvtGenInput")
+        elif "V0BBBAR" in self.random_seed:
+            path.add_module("EvtGenInput")
+            path.add_module("InclusiveParticleChecker", particles=[310, 3122], includeConjugates=True)
         else:
             import generators as ge
             # WARNING: There are a few differences in the production of MC13a and b like the following lines
             # as well as ActivatePXD.. and the beamparams for bhabha... I use these from MC13b, not a... :/
-            import beamparameters as bp
-            beamparameters = bp.add_beamparameters(path, "Y4S")
-            beamparameters.param("covVertex", [(14.8e-4)**2, (1.5e-4)**2, (360e-4)**2])
+            # import beamparameters as bp
+            # beamparameters = bp.add_beamparameters(path, "Y4S")
+            # beamparameters.param("covVertex", [(14.8e-4)**2, (1.5e-4)**2, (360e-4)**2])
+            if "V0STUDY" in self.random_seed:
+                if "V0STUDYKS" in self.random_seed:
+                    # Bianca looked at the Ks dists and extracted these values:
+                    mu = 0.5
+                    beta = 0.2
+                    pdgs = [310]  # Ks (has no antiparticle, Klong is different)
+                if "V0STUDYL0" in self.random_seed:
+                    # I just made the lamdba values up, such that they peak at 0.35 and are slightly shifted to lower values
+                    mu = 0.35
+                    beta = 0.15  # if this is chosen higher, one needs to make sure not to get values >0 for 0
+                    pdgs = [3122, -3122]  # Lamdba0
+                else:
+                    # also these values are made up
+                    mu = 0.43
+                    beta = 0.18
+                    pdgs = [310, 3122, -3122]  # Ks and Lambda0
+                # create realistic momentum distribution
+                myx = [i*0.01 for i in range(321)]
+                myy = []
+                for x in myx:
+                    y = createV0momenta(x, mu, beta)
+                    myy.append(y)
+                polParams = myx + myy
+                # define particles that are produced
+                pdg_list = pdgs
+
+                particlegun = basf2.register_module('ParticleGun')
+                particlegun.param('pdgCodes', pdg_list)
+                particlegun.param('nTracks', 8)  # number of particles (not tracks!) that is created in each event
+                # particlegun.param('momentumGeneration', 'uniformPt') #uniform
+                # particlegun.param('momentumParams', [0.05, 3.])
+                particlegun.param('momentumGeneration', 'polyline')
+                particlegun.param('momentumParams', polParams)
+                particlegun.param('thetaGeneration', 'uniformCos')
+                particlegun.param('thetaParams', [17, 150])  # [0, 180]) #[17, 150]
+                particlegun.param('phiGeneration', 'uniform')
+                particlegun.param('phiParams', [0, 360])
+                particlegun.param('vertexGeneration', 'fixed')
+                particlegun.param('xVertexParams', [0])
+                particlegun.param('yVertexParams', [0])
+                particlegun.param('zVertexParams', [0])
+                path.add_module(particlegun)
             if "BHABHA" in self.random_seed:
                 ge.add_babayaganlo_generator(path=path, finalstate='ee', minenergy=0.15, minangle=10.0)
             elif "MUMU" in self.random_seed:
@@ -435,7 +489,8 @@ class GenerateSimTask(Basf2PathTask):
                 generatorpreselection.param('MaxPhotonTheta', 165.0)
                 generatorpreselection.param('applyInCMS', True)
                 path.add_module(generatorpreselection)
-                # generatorpreselection.if_value('!=11', empty)
+                empty = basf2.create_path()
+                generatorpreselection.if_value('!=11', empty)
             elif "EEEE" in self.random_seed:
                 ge.add_aafh_generator(path=path, finalstate='e+e-e+e-', preselection=False)
             elif "EEMUMU" in self.random_seed:
@@ -452,15 +507,15 @@ class GenerateSimTask(Basf2PathTask):
                 ge.add_continuum_generator(path, finalstate='ccbar')
         # activate simulation of dead/masked pixel and reproduce detector gain, which will be
         # applied at reconstruction level when the data GT is present in the DB chain
-        path.add_module("ActivatePXDPixelMasker")
-        path.add_module("ActivatePXDGainCalibrator")
+        # path.add_module("ActivatePXDPixelMasker")
+        # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
         if self.experiment_number == 1002:
             # remove KLM because of bug in backround files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
-        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components, usePXDDataReduction=False)
+        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)  # , usePXDDataReduction=False)
 
         path.add_module(
             "RootOutput",
@@ -490,10 +545,15 @@ class SplitNMergeSimTask(Basf2Task):
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'sx'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -508,6 +568,9 @@ class SplitNMergeSimTask(Basf2Task):
         yield self.add_to_output(self.output_file_name())
 
     def requires(self):
+        """
+        Generate list of luigi Tasks that this Task depends on.
+        """
         n_events_per_task = MasterTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
         for i in range(quotient):
@@ -529,6 +592,9 @@ class SplitNMergeSimTask(Basf2Task):
 
     @b2luigi.on_temporary_files
     def process(self):
+        """
+        When all GenerateSimTasks finished, merge the output.
+        """
         create_output_dirs(self)
 
         file_list = []
@@ -554,6 +620,9 @@ class CheckExistingFile(ExternalTask):
     filename = b2luigi.Parameter()
 
     def output(self):
+        """
+        Specify the output to be the file that was just checked.
+        """
         from luigi import LocalTarget
         return LocalTarget(self.filename)
 
@@ -573,10 +642,15 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
     # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
     def get_records_file_name(self, n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -593,6 +667,11 @@ class VXDQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        Get input file names depending on the use case: If they already exist, search in
+        the corresponding folders, for data check the specified list and if they are created
+        in the same run, check for the task that produced them.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -701,10 +780,15 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
     # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
     def get_records_file_name(self,  n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -721,6 +805,11 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        Get input file names depending on the use case: If they already exist, search in
+        the corresponding folders, for data check the specified list and if they are created
+        in the same run, check for the task that produced them.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -823,10 +912,15 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
     def get_records_file_name(self, n_events=None, random_seed=None, recotrack_option=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -845,6 +939,11 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '_' + recotrack_option + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        Get input file names depending on the use case: If they already exist, search in
+        the corresponding folders, for data check the specified list and if they are created
+        in the same run, check for the task that produced them.
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -936,7 +1035,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         # (CDB payloads) to new weightfiles created by this b2luigi script
         if ('DATA' in self.random_seed or 'useCDC' in self.recotrack_option) and 'noCDC' not in self.recotrack_option:
             cdc_identifier = 'datafiles/' + \
-                             'trackfindingcdc_TrackQualityIndicator.weights.xml'
+                             'cdc_mva_qe_nTrees350_nCuts6_nLevels5_shrin10_exp0.weights.xml'
             # CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             if os.path.exists(cdc_identifier):
                 replace_cdc_qi = True
@@ -967,7 +1066,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
                 VXDQETeacherTask.get_weightfile_xml_identifier(
                     VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option))[0]
             replace_vxd_qi = True
-        # replace_cdc_qi = False
+
         cdc_qe_mva_filter_parameters = None
         # if tracks below a certain CDC QI index shall be deleted online, this needs to be specified in the filter parameters.
         # this is also possible in case of the default (CBD) payloads.
@@ -976,7 +1075,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             cut = int(self.recotrack_option[cut_index:cut_index+3])/100.
             if replace_cdc_qi:
                 cdc_qe_mva_filter_parameters = {
-                    "identifier": cdc_identifier, "cut": cut, }
+                    "identifier": cdc_identifier, "cut": cut}
             else:
                 cdc_qe_mva_filter_parameters = {
                     "cut": cut}
@@ -2305,6 +2404,7 @@ class MasterTask(b2luigi.WrapperTask):
     n_events_per_task = b2luigi.get_setting("n_events_per_task", default=100)
     #: Number of basf2 processes to use in Basf2PathTasks
     num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
+    #: list of raw-datafiles to be used in the case of processing data.
     datafiles = b2luigi.get_setting("datafiles")
     #: Dictionary with experiment numbers as keys and background directory paths as values
     bkgfiles_by_exp = b2luigi.get_setting("bkgfiles_by_exp")
@@ -2441,6 +2541,7 @@ class MasterTask(b2luigi.WrapperTask):
 
         fast_bdt_options = []
         # possible to run over a chosen hyperparameter space if wanted
+        # in principle this can be extended to specific options for the three different MVAs
         # for i in range(250, 400, 50):
         #     for j in range(6, 10, 2):
         #         for k in range(2, 6):
@@ -2458,12 +2559,8 @@ class MasterTask(b2luigi.WrapperTask):
             # if test_selected_task is activated, only run the following tasks:
             if b2luigi.get_setting("test_selected_task", default=False):
                 # for process_type in ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU', 'UUBAR', \
-                #    'DDBAR', 'CCBAR', 'SSBAR', 'BBBAR']:
-                    # if process_type in ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU']:
-                    #    events = self.n_events_testing*2
-                    # else:
-                # events = self.n_events_testing
-                for cut in ['000', '070']:  # , '050', '070', '080', '090']:
+                #    'DDBAR', 'CCBAR', 'SSBAR', 'BBBAR', 'V0BBBAR', 'V0STUDY']:
+                for cut in ['000', '070', '090', '095']:
                     yield RecoTrackQEDataCollectionTask(
                         num_processes=self.num_processes,
                         n_events=self.n_events_testing,
@@ -2580,6 +2677,9 @@ class MasterTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
+    # from ROOT import Belle2
+    # environment = Belle2.Environment.Instance()
+    # environment.setNumberEventsOverride(40000)
     # if global tags are specified in the settings, use them:
     globaltags = b2luigi.get_setting("globaltags", default=[])
     if len(globaltags) > 0:

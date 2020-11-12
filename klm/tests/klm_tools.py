@@ -27,9 +27,7 @@ if __name__ == '__main__':
                                  '--prepend_gt'] + vgt.get_validation_globaltags(), stdout=sp.DEVNULL))
 
     # Test b2klm-numberToIndex
-    command = 'b2klm-numberToIndex 20 50020'
     assert(0 == sp.call(['b2klm-numberToIndex', '20', '50020']))
 
     # Test b2klm-indexToNumber
-    command = 'b2klm-indexToNumber 11489 21997'
     assert(0 == sp.call(['b2klm-indexToNumber', '11489', '21997']))

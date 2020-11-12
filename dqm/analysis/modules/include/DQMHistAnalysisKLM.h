@@ -142,10 +142,6 @@ namespace Belle2 {
     /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
 
-    /** EKLM strip number within a layer. */
-    TCanvas* m_eklmStripLayer[
-      EKLMElementNumbers::getMaximalLayerGlobalNumber()];
-
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
 
@@ -162,7 +158,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
+    const EKLMElementNumbers* m_EklmElementNumbers;
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;

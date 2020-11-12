@@ -79,6 +79,12 @@ namespace Belle2 {
 
   private:
 
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
+
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
+
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -125,12 +131,6 @@ namespace Belle2 {
 
     /** Number of KLM Digits. */
     TH1F* m_KlmDigitsNumber;
-
-    /** Number of channel hit histograms per sector for BKLM. */
-    const int m_ChannelHitHistogramsBKLM = 2;
-
-    /** Number of channel hit histograms per sector for EKLM. */
-    const int m_ChannelHitHistogramsEKLM = 3;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

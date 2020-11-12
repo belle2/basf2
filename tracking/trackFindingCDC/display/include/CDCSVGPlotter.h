@@ -283,7 +283,7 @@ namespace Belle2 {
        *
        * Needs to know the type of the objects in the StoreArray and the right styling for these objects.
        *
-       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @tparam a_drawTrajectories Switch to draw the fitted trajectory from the object instead.
        * @param  storeArrayName   The name of the StoreArray containing the objects.
        * @param  styling          Functional object to construct attributes for each object to be drawn
        */
@@ -295,7 +295,7 @@ namespace Belle2 {
        *
        * Needs to know the type of the objects in the store objects and the right styling for these objects.
        *
-       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @tparam a_drawTrajectories Switch to draw the fitted trajectory from the object instead.
        * @param storeObjName     name of the StoreObject containing the objects.
        * @param styling          Functional object to construct attributes for each object to be drawn
        */

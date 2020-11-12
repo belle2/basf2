@@ -69,10 +69,11 @@
 #   Added two new "fake" resonances, phiR and f_2R, and improved documentation for K*0R and K*BR "fake" resonances
 #   Added decay table for sigma_0 particle (f_0(500) in the PDG)
 #
-# October 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
-#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://agira.desy.de/browse/BII-7249
+# Sept.-Nov. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
+#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://agira.desy.de/browse/BII-7249.
+#   Further updates and corrections applied in https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview.
 #   Pythia hadron contributions rescaled by S. Duell (https://stash.desy.de/projects/B2/repos/software/pull-requests/6690/overview)
-
+#   All Decay B0 & Decay anti-B0 channels have symmetric values. Same for B+ / B-. I.e., no Acp included.
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -495,7 +496,7 @@ Decay B0
 # 2- and 3-body modes revised Feb.2005  Markus Cristinziani, SLAC
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 #
-#    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
+# B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
 #
 0.000005120   pi+  pi-                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #[BF update - PG 09/2020]
 0.000001590   pi0  pi0                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #[BF update - PG 09/2020]
@@ -668,7 +669,6 @@ Decay B0
 0.000001000   pi0  pi0  eta'                               PHSP;
 0.000001000   pi0  eta  eta                                PHSP;
 0.000001000   pi0  eta  eta'                               PHSP;
-
 
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 0.000000960   rho0  rho0                                   SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
@@ -1206,7 +1206,7 @@ Decay B0
 0.000050000   a_1+  a_1-                                   PHSP;
 
 
-#       B -> cc= s
+# B -> cc= s
 #
 # Charmonium states - updated from Lange's recommendations (august 23,2000)
 # Based on new BABAR results I'm making the following changes (Lange, March 13, 2001)
@@ -1257,7 +1257,7 @@ Decay B0
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #[w/CPV - BO 09/2017]
 0.000098000   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000392000   psi(2S)  K*0T                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 
@@ -1366,7 +1366,7 @@ Decay B0
 0.000240000   psi(3770)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000240000   psi(3770)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   
 
-0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[w/CPV - BO 09/2017]
 0.000080000   psi(3770)  K*L                               SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000320000   psi(3770)  K*0T                              SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 
@@ -1449,7 +1449,7 @@ Decay B0
 0.001000000   D*0  anti-D*0  K*0                           PHSP;
 
 
-#  B -> D(*) X  Exclusive modes
+# B -> D(*) X  Exclusive modes
 #
 # 1-pi
 0.002742680   D*-  pi+                                     SVS;  #[BF update - PG 09/2020]
@@ -1644,7 +1644,7 @@ Decay anti-B0
 0.000460000   D*+  pi0  e-  anti-nu_e                      GOITY_ROBERTS;
 0.000920000   D0  pi+  e-  anti-nu_e                       GOITY_ROBERTS;
 0.000460000   D+  pi0  e-  anti-nu_e                       GOITY_ROBERTS;
-# The B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are inferred assuming Isospin symmetry
+# The B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are inferred assuming Isospin symmetry.
 0.000210000   D+  pi+  pi-  e-  anti-nu_e                  PHSP;
 0.000140000   D0  pi+  pi0  e-  anti-nu_e                  PHSP;
 0.000140000   D+  pi0  pi0  e-  anti-nu_e                  PHSP;
@@ -1793,7 +1793,7 @@ Decay anti-B0
 # 2- and 3-body modes revised Feb.2005  Markus Cristinziani, SLAC
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 #
-#    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
+# B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
 #
 0.000005120   pi+  pi-                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #[BF update - PG 09/2020]
 0.000001590   pi0  pi0                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #[BF update - PG 09/2020]
@@ -1966,7 +1966,6 @@ Decay anti-B0
 0.000001000   pi0  pi0  eta'                               PHSP;
 0.000001000   pi0  eta  eta                                PHSP;
 0.000001000   pi0  eta  eta'                               PHSP;
-
 
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 0.000000960   rho0  rho0                                   SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
@@ -2504,7 +2503,7 @@ Decay anti-B0
 0.000050000   a_1+  a_1-                                   PHSP;
 
 
-#       B -> cc= s
+# B -> cc= s
 #
 # Charmonium states - updated from Lange's recommendations (august 23,2000)
 # Based on new BABAR results I'm making the following changes (Lange, March 13, 2001)
@@ -2519,7 +2518,7 @@ Decay anti-B0
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  
 
-0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[w/CPV - BO 09/2017]
 0.000210000   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000860000   J/psi  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
@@ -2555,7 +2554,7 @@ Decay anti-B0
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #[w/CPV - BO 09/2017]
 0.000098000   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000392000   psi(2S)  anti-K*0T                           SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
@@ -2664,7 +2663,7 @@ Decay anti-B0
 0.000240000   psi(3770)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #[w/CPV - BO 09/2017]
 0.000240000   psi(3770)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   
 
-0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000080000   psi(3770)  K*S                               SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[w/CPV - BO 09/2017]
 0.000080000   psi(3770)  K*L                               SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000320000   psi(3770)  anti-K*0T                         SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
@@ -2747,7 +2746,7 @@ Decay anti-B0
 0.001000000   anti-D*0  D*0  anti-K*0                      PHSP;
 
 
-#  B -> D(*) X  Exclusive modes
+# B -> D(*) X  Exclusive modes
 #
 # 1-pi
 0.002742680   D*+  pi-                                     SVS;  #[BF update - PG 09/2020]
@@ -3097,7 +3096,7 @@ Decay B+
 0.000000200   K*+  tau+  tau-                              BTOSLLBALL;
 0.000000200   Xsu  tau+  tau-                              BTOXSLL 4.8 0.2 0.0 0.41;
 
-#   b -> l nu
+# b -> l nu
 #
 0.000109000   tau+  nu_tau                                 SLN;
 0.000000000   mu+  nu_mu                                   SLN;
@@ -3199,7 +3198,6 @@ Decay B+
 0.000046000   K+  K0  anti-K0                              PHSP; #4*BF(K+KsKs) (4 is a guess).
 0.000001000   pi+  K0  anti-K0                             PHSP;
 
-#4-body modes from Andrei Gritsan
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 # PR LHCb 22 Apr 2004 Set long. pol. for rho rho
 0.000024030   rho+  rho0                                   SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[BF update - PG 09/2020]
@@ -3658,7 +3656,7 @@ Decay B+
 0.000050000   a_1+  a_10                                   PHSP;
 
 
-#   B -> cc= s          sum = 1.92%
+# B -> cc= s          sum = 1.92%
 #
 0.001005560   J/psi  K+                                    SVS; #[BF update - PG 09/2020]
 
@@ -3780,7 +3778,7 @@ Decay B+
 # hc(1P) mode
 0.000037000   h_c  K+                                      PHSP; #[BF update - PG 09/2020]
 
-#   b -> c (sc=) -> D Ds X    Sum = 10%
+# b -> c (sc=) -> D Ds X    Sum = 10%
 #
 0.009009770   anti-D0  D_s+                                PHSP; #[BF update - PG 09/2020]
 0.008218450   anti-D*0  D_s+                               SVS;  #[BF update - PG 09/2020]
@@ -3805,7 +3803,7 @@ Decay B+
 0.003300000   D_s*+  anti-D0  pi+  pi-                     PHSP;
 0.000800000   D_s*+  anti-D0  pi0  pi0                     PHSP;
 
-#  b -> c (sc=) -> D D= K X    Sum = 8%
+# b -> c (sc=) -> D D= K X    Sum = 8%
 # update: Ref.[B1] October 26, 2004
 #
 # External W-emission amplitude
@@ -3845,7 +3843,7 @@ Decay B+
 0.000630000   anti-D*0  D+                                 SVS;
 0.000810000   anti-D*0  D*+                                SVV_HELAMP 0.56 0.0 0.96 0.0 0.47 0.0;
 
-#  B -> D(*) X  Exclusive Modes
+# B -> D(*) X  Exclusive Modes
 #
 # 1-pi
 0.004675170   anti-D0  pi+                                 PHSP; #[BF update - PG 09/2020]
@@ -4138,7 +4136,7 @@ Decay B-
 0.000000200   K*-  tau+  tau-                              BTOSLLBALL;
 0.000000200   anti-Xsu  tau+  tau-                         BTOXSLL 4.8 0.2 0.0 0.41;
 
-#   b -> l nu
+# b -> l nu
 #
 0.000109000   tau-  anti-nu_tau                            SLN;
 0.000000000   mu-  anti-nu_mu                              SLN;
@@ -4240,7 +4238,6 @@ Decay B-
 0.000046000   K-  anti-K0  K0                              PHSP; #4*BF(K+KsKs) (4 is a guess).
 0.000001000   pi-  anti-K0  K0                             PHSP;
 
-#4-body modes from Andrei Gritsan
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 # PR LHCb 22 Apr 2004 Set long. pol. for rho rho
 0.000024030   rho-  rho0                                   SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[BF update - PG 09/2020]
@@ -4699,7 +4696,7 @@ Decay B-
 0.000050000   a_1-  a_10                                   PHSP;
 
 
-#   B -> cc= s          sum = 1.92%
+# B -> cc= s          sum = 1.92%
 #
 0.001005560   J/psi  K-                                    SVS; #[BF update - PG 09/2020]
 
@@ -4821,7 +4818,7 @@ Decay B-
 # hc(1P) mode
 0.000037000   h_c  K-                                      PHSP; #[BF update - PG 09/2020]
 
-#   b -> c (sc=) -> D Ds X    Sum = 10%
+# b -> c (sc=) -> D Ds X    Sum = 10%
 #
 0.009009770   D0  D_s-                                     PHSP; #[BF update - PG 09/2020]
 0.008218450   D*0  D_s-                                    SVS;  #[BF update - PG 09/2020]
@@ -4846,7 +4843,7 @@ Decay B-
 0.003300000   D_s*-  D0  pi-  pi+                          PHSP;
 0.000800000   D_s*-  D0  pi0  pi0                          PHSP;
 
-#  b -> c (sc=) -> D D= K X    Sum = 8%
+# b -> c (sc=) -> D D= K X    Sum = 8%
 # update: Ref.[B1] October 26, 2004
 #
 # External W-emission amplitude
@@ -4886,7 +4883,7 @@ Decay B-
 0.000630000   D*0  D-                                      SVS; 
 0.000810000   D*0  D*-                                     SVV_HELAMP 0.47 0.0 0.96 0.0 0.56 0.0; 
 
-#  B -> D(*) X  Exclusive Modes
+# B -> D(*) X  Exclusive Modes
 #
 # 1-pi
 0.004675170   D0  pi-                                      PHSP; #[BF update - PG 09/2020]

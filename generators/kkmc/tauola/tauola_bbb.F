@@ -2667,14 +2667,14 @@ C      DGAMT=PHSPAC
       DO I=1,4
          IF (JNPI.EQ.3.OR.JNPI.EQ.4) THEN ! eee or mumumu
             PMULT(I,1)=PIM1(I)
+            PMULT(I,3)=PIPL(I)
             IF (RRR(11).GT.0.5) THEN
                PMULT(I,2)=PIM2(I)
-               PMULT(I,3)=PIPL(I)
+               PMULT(I,4)=PIZ (I)
             ELSE
-               PMULT(I,2)=PIPL(I)
-               PMULT(I,3)=PIM2(I)
+               PMULT(I,2)=PIZ (I)
+               PMULT(I,4)=PIM2(I)
             ENDIF
-            PMULT(I,4)=PIZ (I)
          ELSE
             PMULT(I,1)=PIM1(I)
             PMULT(I,2)=PIM2(I)
@@ -4138,14 +4138,27 @@ C            4- default ME wrapped curr., 5- wrapped ME
       RETURN
       END
 
-      SUBROUTINE DAM3PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4)
+      SUBROUTINE DAM3PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,AMPLIT1,HV)
+      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4), FPI, VUD, CE
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       EXTERNAL eepi, mumupi
       IF (MNUM.EQ.47) THEN
-         CALL eepi(PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
+         CALL eepi(AMEL,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
       ELSE IF (MNUM.EQ.48) THEN
-         CALL mumupi(PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
+         CALL mumupi(AMMU,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
       ENDIF
+      FPI = 0.0922
+      VUD = 0.9742
+      CE = 16.*GFERMI * GFERMI * AMTAU * AMTAU * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
+      AMPLIT1 = AMPLIT * CE
       RETURN
       END
 
@@ -4155,11 +4168,21 @@ C            4- default ME wrapped curr., 5- wrapped ME
       RETURN
       END
 
-      SUBROUTINE DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
+      SUBROUTINE DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT1,HV)
       REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4),PIM4(4)
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       EXTERNAL eemu
       IF (MNUM.GE.3.AND.MNUM.LE.6) THEN
-         CALL eemu(PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
+         CALL eemu(AMTAU,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
+         AMPLIT1=AMPLIT* 32.*(GFERMI * GFERMI / 2.0)*4.*(16.*ACOS(-1.) * ACOS(-1.) / 137. / 137.);
       ENDIF
       RETURN
       END

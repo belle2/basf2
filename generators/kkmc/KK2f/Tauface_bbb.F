@@ -469,8 +469,8 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
 
       DATA NOPIK4 / -1,-1, 1, 2, 0, 0,3*0,     2, 2, 2,-1, 0, 0,3*0,                      ! 2
-     a              12,-11,-11,11, 0, 0,3*0,  14,-13,-13,13, 0, 0,3*0,   ! new (may 2004) ! 4
-     b              12,-11,-13,13, 0, 0,3*0,  14,-13,-11,11, 0, 0,3*0,   ! new (may 2004) ! 6
+     a              12,-11,11,-11,0,0,3*0,    14,-13,13,-13,0,0,3*0,     ! new (may 2004) ! 4
+     b              12,-11,13,-13,0,0,3*0,    14,-13,11,-11,0,0,3*0,     ! new (may 2004) ! 6
      c              -3, 2, 2, 2, 0, 0,3*0,     2, 2, 9,-3, 0, 0,3*0,     ! new (may 2004) ! 8
      d               2, 2, 4,-1, 0, 0,3*0,     2, 4, 9,-1, 0, 0,3*0,     ! new (may 2004) ! 10
      e               2,-1, 1,-3, 0, 0,3*0,     4,-1, 1,-1, 0, 0,3*0,     ! new (may 2004) ! 12
@@ -1387,7 +1387,7 @@ C      CALL INIOFC ! dummy for now anyway
             KSUM=KSUM+1
          ENDIF
       ENDDO
-      WRITE(6,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
+      WRITE(IOUT,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
 
       IF(IFEQUALBR.EQ.1) THEN   ! uniform  initialization useful for some tests only
          DO K=1,NCHAN
@@ -1405,7 +1405,7 @@ C      CALL INIOFC ! dummy for now anyway
                ENDIF
             ENDIF
          ENDDO
-         WRITE(6,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
       ENDIF
 
       IF(IFEQUALBR.EQ.2) THEN   ! uniform  initialization useful for some tests only
@@ -1419,49 +1419,49 @@ C      CALL INIOFC ! dummy for now anyway
                IF (KEY0(K).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K)
+                  WRITE (IOUT,*) '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4) THEN
                IF (KEY4(K-NLT).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '4 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '4 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5) THEN
                IF (KEY5(K-NLT-NM4).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '5 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '5 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6) THEN
                IF (KEY6(K-NLT-NM4-NM5).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '6 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '6 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3) THEN
                IF (KEY3(K-NLT-NM4-NM5-NM6).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '3 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '3 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3+NM2) THEN
                IF (KEY2(K-NLT-NM4-NM5-NM6-NM3).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '2 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '2 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3+NM2+NM1) THEN
                IF (KEY1(K-NLT-NM4-NM5-NM6-NM3-NM2).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '1 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '1 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ENDIF
@@ -1471,7 +1471,7 @@ C      CALL INIOFC ! dummy for now anyway
                GAMPRT(K) = 1.0D0/KSUM
             ENDIF
          ENDDO
-         WRITE(6,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
       ENDIF
       
       WRITE(iout,bxope)

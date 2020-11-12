@@ -27,6 +27,7 @@ KLMDQMModule::KLMDQMModule() :
   m_SectorArrayIndex(&(KLMSectorArrayIndex::Instance())),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_DAQInclusion(nullptr),
   m_TimeRPC(nullptr),
   m_TimeScintillatorBKLM(nullptr),
   m_TimeScintillatorEKLM(nullptr),
@@ -68,6 +69,11 @@ void KLMDQMModule::defineHisto()
   oldDirectory = gDirectory;
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
   newDirectory->cd();
+  /* DAQ inclusion. */
+  m_DAQInclusion = new TH1F("daq_inclusion", "Is KLM included in DAQ?", 2, 0.0, 2.0);
+  m_DAQInclusion->GetXaxis()->SetBinLabel(1, "No");
+  m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
+  m_DAQInclusion->SetOption("LIVE");
   /* Time histograms. */
   m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
@@ -188,13 +194,20 @@ void KLMDQMModule::defineHisto()
 void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM;
-  m_Digits.isRequired();
+  m_RawKlms.isOptional();
+  m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
   m_BklmHit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()
 {
+  /* DAQ inclusion. */
+  m_DAQInclusion->Reset();
+  if (m_RawKlms.isValid())
+    m_DAQInclusion->Fill("Yes", 1);
+  else
+    m_DAQInclusion->Fill("No", 1);
   /* Time. */
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();

@@ -23,6 +23,7 @@
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
@@ -99,6 +100,9 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
 
+    /** Raw KLM. */
+    StoreArray<RawKLM> m_RawKlms;
+
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 
@@ -107,6 +111,9 @@ namespace Belle2 {
 
     /** BKLM 2d hits. */
     StoreArray<BKLMHit2d> m_BklmHit2ds;
+
+    /** KLM DAQ inclusion. */
+    TH1F* m_DAQInclusion;
 
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;

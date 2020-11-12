@@ -58,6 +58,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        *  @param prefix Name prefix to apply to all variable names.
+       *  @return returns empty vector
        */
       virtual std::vector<Named<Float_t*> > getNamedVariables(const std::string& prefix __attribute__((unused)))
       {

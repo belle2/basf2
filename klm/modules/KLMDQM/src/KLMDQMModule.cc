@@ -23,21 +23,21 @@ REG_MODULE(KLMDQM)
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),
-  m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
-  m_SectorArrayIndex(&(KLMSectorArrayIndex::Instance())),
-  m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
-  m_DAQInclusion(nullptr),
-  m_TimeRPC(nullptr),
-  m_TimeScintillatorBKLM(nullptr),
-  m_TimeScintillatorEKLM(nullptr),
-  m_PlaneBKLMPhi(nullptr),
-  m_PlaneBKLMZ(nullptr),
-  m_PlaneEKLM(nullptr),
-  m_MaskedChannelsPerSector(nullptr),
-  m_bklmHit2dsZ(nullptr),
-  m_BklmDigitsNumber(nullptr),
-  m_KlmDigitsNumber(nullptr)
+  m_DAQInclusion{nullptr},
+  m_TimeRPC{nullptr},
+  m_TimeScintillatorBKLM{nullptr},
+  m_TimeScintillatorEKLM{nullptr},
+  m_PlaneBKLMPhi{nullptr},
+  m_PlaneBKLMZ{nullptr},
+  m_PlaneEKLM{nullptr},
+  m_MaskedChannelsPerSector{nullptr},
+  m_bklmHit2dsZ{nullptr},
+  m_BklmDigitsNumber{nullptr},
+  m_KlmDigitsNumber{nullptr},
+  m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
+  m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
+  m_ElementNumbers{&(KLMElementNumbers::Instance())},
+  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);

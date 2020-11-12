@@ -12,6 +12,7 @@
 
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/reconstruction_cpp/PhotonState.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
 #include <vector>
 #include <TVector3.h>
 
@@ -58,29 +59,6 @@ namespace Belle2 {
 
 
       /**
-       * Sine and cosine of track polar and azimuthal angles at photon emission
-       */
-      struct TrackAngles {
-        double cosTh = 0; /**< cosine of polar angle */
-        double sinTh = 0; /**< sine of polar angle */
-        double cosFi = 0; /**< cosine of azimuthal angle */
-        double sinFi = 0; /**< sine of azimuthal angle */
-
-        /**
-         * Default constructor
-         */
-        TrackAngles()
-        {}
-
-        /**
-         * Constructor from direction vector
-         * @param direction track direction at photon emission (must be unit vector)
-         */
-        TrackAngles(const TVector3& direction);
-      };
-
-
-      /**
        * Solution of inverse ray-tracing
        */
       struct Solution {
@@ -109,7 +87,7 @@ namespace Belle2 {
          * @param cer sine and cosine of Cerenkov angle
          * @param trk sine and cosine of track polar and azimuthal angles at photon emission
          */
-        void setDirection(const CerenkovAngle& cer, const TrackAngles& trk);
+        void setDirection(const CerenkovAngle& cer, const TOPTrack::TrackAngles& trk);
 
         /**
          * Sets total reflection status for direct photon
@@ -163,14 +141,13 @@ namespace Belle2 {
        * Solve inverse ray-tracing for direct photon.
        * @param xD unfolded position in x of photon at detection plane
        * @param zD position of detection plane
-       * @param emiPoint point of photon emission
+       * @param assumedEmission photon emission position and track angles
        * @param cer sine and cosine of Cerenkov angle
-       * @param trk sine and cosine of track polar and azimuthal angles at photon emission
        * @param step step for numerical derivative calculation
        * @return size of solution vector or ErrorCode on fail
        */
-      int solveDirect(double xD, double zD, const TVector3& emiPoint, const CerenkovAngle& cer,
-                      const TrackAngles& trk, double step = 0) const;
+      int solveDirect(double xD, double zD, const TOPTrack::AssumedEmission& assumedEmission,
+                      const CerenkovAngle& cer, double step = 0) const;
 
       /**
        * Solve inverse ray-tracing for reflected photon.
@@ -179,15 +156,14 @@ namespace Belle2 {
        * @param Nxm signed number of reflections before mirror
        * @param xmMin lower limit for the reflection point search range
        * @param xmMax upper limit for the reflection point search range
-       * @param emiPoint point of photon emission
+       * @param assumedEmission photon emission position and track angles
        * @param cer sine and cosine of Cerenkov angle
-       * @param trk sine and cosine of track polar and azimuthal angles at photon emission
        * @param step step for numerical derivative calculation
        * @return size of solution vector or ErrorCode on fail
        */
       int solveReflected(double xD, double zD, int Nxm, double xmMin, double xmMax,
-                         const TVector3& emiPoint, const CerenkovAngle& cer,
-                         const TrackAngles& trk, double step = 0) const;
+                         const TOPTrack::AssumedEmission& assumedEmission,
+                         const CerenkovAngle& cer, double step = 0) const;
 
       /**
        * Returns the solutions of inverse ray-tracing
@@ -241,7 +217,7 @@ namespace Belle2 {
        * @param trk sine and cosine of track polar and azimuthal angles at photon emission
        * @return true if solutions exits
        */
-      bool solve(double dxdz, const CerenkovAngle& cer, const TrackAngles& trk) const;
+      bool solve(double dxdz, const CerenkovAngle& cer, const TOPTrack::TrackAngles& trk) const;
 
 
       /**
@@ -294,7 +270,7 @@ namespace Belle2 {
       mutable bool m_ok[2] = {false, false}; /**< overall status of solutions */
       mutable TVector3 m_emiPoint; /**< emission point at first call after clear */
       mutable CerenkovAngle m_cer; /**< Cerenkov angle at first call after clear */
-      mutable TrackAngles m_trk;   /**< track polar and azimuthal angles at first call after clear */
+      mutable TOPTrack::TrackAngles m_trk;   /**< track polar and azimuthal angles at first call after clear */
 
       static double s_maxLen; /**< maximal allowed propagation length */
 

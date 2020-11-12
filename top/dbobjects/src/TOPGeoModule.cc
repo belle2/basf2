@@ -18,6 +18,76 @@ using namespace std;
 
 namespace Belle2 {
 
+  TOPGeoModule::TOPGeoModule(const TOPGeoModule& module): TOPGeoBase(module.getName())
+  {
+    *this = module;
+    m_rotation = 0;
+    m_rotationInverse = 0;
+    m_translation = 0;
+    m_rotationNominal = 0;
+    m_rotationNominalInverse = 0;
+    m_translationNominal = 0;
+  }
+
+  TOPGeoModule& TOPGeoModule::operator=(const TOPGeoModule& module)
+  {
+    if (this != &module) {
+      TOPGeoBase::operator=(module);
+      m_moduleID = module.getModuleID();
+      m_radius = module.getRadius();
+      m_phi = module.getPhi();
+      m_backwardZ = module.getBackwardZ();
+      m_moduleCNumber = module.getModuleCNumber();
+      m_bar1 = module.getBarSegment1();
+      m_bar2 = module.getBarSegment2();
+      m_mirror = module.getMirrorSegment();
+      m_prism = module.getPrism();
+      m_pmtArray = module.getPMTArray();
+      m_arrayDisplacement = module.getPMTArrayDisplacement();
+      m_moduleDisplacement = module.getModuleDisplacement();
+      if (m_rotation) delete m_rotation;
+      if (m_rotationInverse) delete m_rotationInverse;
+      if (m_translation) delete m_translation;
+      if (m_rotationNominal) delete m_rotationNominal;
+      if (m_rotationNominalInverse) delete m_rotationNominalInverse;
+      if (m_translationNominal) delete m_translationNominal;
+      m_rotation = 0;
+      m_rotationInverse = 0;
+      m_translation = 0;
+      m_rotationNominal = 0;
+      m_rotationNominalInverse = 0;
+      m_translationNominal = 0;
+    }
+    return *this;
+  }
+
+  TOPGeoModule::~TOPGeoModule()
+  {
+    if (m_rotation) delete m_rotation;
+    if (m_rotationInverse) delete m_rotationInverse;
+    if (m_translation) delete m_translation;
+    if (m_rotationNominal) delete m_rotationNominal;
+    if (m_rotationNominalInverse) delete m_rotationNominalInverse;
+    if (m_translationNominal) delete m_translationNominal;
+  }
+
+  void TOPGeoModule::setTransformation() const
+  {
+    TRotation Rphi;
+    Rphi.RotateZ(m_phi - M_PI / 2);
+    TVector3 translation(0, m_radius, getZc() * s_unit);
+    m_rotationNominal =  new TRotation(Rphi);
+    m_rotationNominalInverse = new TRotation(Rphi.Inverse());
+    m_translationNominal = new TVector3(Rphi * translation);
+
+    TRotation Rot = Rphi * m_moduleDisplacement.getRotation();
+    translation += m_moduleDisplacement.getTranslation();
+    m_rotation =  new TRotation(Rot);
+    m_rotationInverse = new TRotation(Rot.Inverse());
+    m_translation = new TVector3(Rphi * translation);
+  }
+
+
   void TOPGeoModule::setBrokenGlue(int glueID, double fraction, double angle,
                                    const std::string& material)
   {
@@ -71,20 +141,29 @@ namespace Belle2 {
     return (*m_rotationInverse) * momentum;
   }
 
-  void TOPGeoModule::setTransformation() const
+  TVector3 TOPGeoModule::pointNominalToGlobal(const TVector3& point) const
   {
-
-    TRotation Rphi;
-    Rphi.RotateZ(m_phi - M_PI / 2);
-    TVector3 translation(0, m_radius, getZc() * s_unit);
-
-    TRotation Rot = Rphi * m_moduleDisplacement.getRotation();
-    translation += m_moduleDisplacement.getTranslation();
-    m_rotation =  new TRotation(Rot);
-    m_rotationInverse = new TRotation(Rot.Inverse());
-    m_translation = new TVector3(Rphi * translation);
+    if (!m_rotation) setTransformation();
+    return (*m_rotationNominal) * point + (*m_translationNominal);
   }
 
+  TVector3 TOPGeoModule::momentumNominalToGlobal(const TVector3& momentum) const
+  {
+    if (!m_rotation) setTransformation();
+    return (*m_rotationNominal) * momentum;
+  }
+
+  TVector3 TOPGeoModule::pointGlobalToNominal(const TVector3& point) const
+  {
+    if (!m_rotation) setTransformation();
+    return (*m_rotationNominalInverse) * (point - (*m_translationNominal));
+  }
+
+  TVector3 TOPGeoModule::momentumGlobalToNominal(const TVector3& momentum) const
+  {
+    if (!m_rotation) setTransformation();
+    return (*m_rotationNominalInverse) * momentum;
+  }
 
   bool TOPGeoModule::isConsistent() const
   {

@@ -23,17 +23,12 @@ namespace Belle2 {
     {}
 
 
-    InverseRaytracer::TrackAngles::TrackAngles(const TVector3& dir):
-      cosTh(dir.Z()), sinTh(sqrt(1 - cosTh * cosTh)), cosFi(dir.X() / sinTh), sinFi(dir.Y() / sinTh)
-    {}
-
-
     InverseRaytracer::Solution::Solution(double cfi, double sfi):
       cosFic(cfi), sinFic(sfi)
     {}
 
 
-    void InverseRaytracer::Solution::setDirection(const CerenkovAngle& cer, const TrackAngles& trk)
+    void InverseRaytracer::Solution::setDirection(const CerenkovAngle& cer, const TOPTrack::TrackAngles& trk)
     {
       double a = trk.cosTh * cer.sinThc * cosFic + trk.sinTh * cer.cosThc;
       double b = cer.sinThc * sinFic;
@@ -69,9 +64,12 @@ namespace Belle2 {
       m_ok[1] = false;
     }
 
-    int InverseRaytracer::solveDirect(double xD, double zD, const TVector3& emiPoint,
-                                      const CerenkovAngle& cer, const TrackAngles& trk, double step) const
+    int InverseRaytracer::solveDirect(double xD, double zD,
+                                      const TOPTrack::AssumedEmission& assumedEmission,
+                                      const CerenkovAngle& cer, double step) const
     {
+      const auto& emiPoint = assumedEmission.position;
+      const auto& trk = assumedEmission.trackAngles;
       bool first = m_solutions[0].empty();
       if (first) {
         m_emiPoint = emiPoint;
@@ -111,9 +109,11 @@ namespace Belle2 {
 
 
     int InverseRaytracer::solveReflected(double xD, double zD, int Nxm, double xmMin, double xmMax,
-                                         const TVector3& emiPoint, const CerenkovAngle& cer,
-                                         const TrackAngles& trk, double step) const
+                                         const TOPTrack::AssumedEmission& assumedEmission,
+                                         const CerenkovAngle& cer, double step) const
     {
+      const auto& emiPoint = assumedEmission.position;
+      const auto& trk = assumedEmission.trackAngles;
       bool first = m_solutions[0].empty();
       if (first) {
         m_emiPoint = emiPoint;
@@ -191,7 +191,7 @@ namespace Belle2 {
     }
 
 
-    bool InverseRaytracer::solve(double dxdz, const CerenkovAngle& cer, const TrackAngles& trk) const
+    bool InverseRaytracer::solve(double dxdz, const CerenkovAngle& cer, const TOPTrack::TrackAngles& trk) const
     {
       double a = (dxdz * trk.cosTh - trk.cosFi * trk.sinTh) * cer.cosThc;
       double b = (dxdz * trk.sinTh + trk.cosFi * trk.cosTh) * cer.sinThc;

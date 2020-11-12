@@ -8,130 +8,67 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <iostream>
-#include <iomanip>
-#include <math.h>
-#include <stdlib.h>
-#include <TRandom.h>
-// top
-#include <top/reconstruction/TOPtrack.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/geometry/TOPGeometryPar.h>
-// framework aux
-#include <framework/gearbox/Const.h>
+#include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
-// DataStore classes
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPBarHit.h>
-
-extern "C" {
-  void track2top_(float*, float*, float*, float*, int*); // from top_geo.F
-}
+#include <cmath>
+#include <vector>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TOP {
 
-    TOPtrack::TOPtrack(double x, double y, double z,
-                       double px, double py, double pz,
-                       double Tlen, int Q, int pdg):
-      m_valid(true), m_position(x, y, z), m_momentum(px, py, pz),
-      m_trackLength(Tlen), m_charge(Q), m_pdg(pdg),
-      m_atTop(false), m_moduleID(0),
-      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
+    TOPTrack::TrackAngles::TrackAngles(const TVector3& dir):
+      cosTh(dir.Z()), sinTh(sqrt(1 - cosTh * cosTh)), cosFi(dir.X() / sinTh), sinFi(dir.Y() / sinTh)
+    {}
+
+
+    TOPTrack::TOPTrack(const Track& track, const Const::ChargedStable& chargedStable)
     {
-      m_moduleID = findModule();
-    }
+      // require fitResult
 
-
-    TOPtrack::TOPtrack(const Track* track,
-                       const Const::ChargedStable& chargedStable)
-    {
-
-      if (!track) return;
-
-      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-      if (!fitResult) {
-        B2ERROR("No TrackFitResult available."
+      const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
+      if (not fitResult) {
+        B2ERROR("No TrackFitResult available for: "
                 << LogVar("PDG code", chargedStable.getPDGCode()));
         return;
       }
 
       // require hits in CDC
+
       if (fitResult->getHitPatternCDC().getNHits() == 0) return;
 
-      // set pointers first
+      // find extHit and set pointers
 
-      m_track = track;
+      m_track = &track;
 
       Const::EDetector myDetID = Const::EDetector::TOP;
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       int numModules = geo->getNumModules();
       int pdgCode = abs(chargedStable.getPDGCode());
 
-      RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
-      double tmin = 1e10; // some large time
-      for (unsigned i = 0; i < extHits.size(); i++) {
-        const ExtHit* extHit = extHits[i];
-        if (abs(extHit->getPdgCode()) != pdgCode) continue;
-        if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() < 1 or extHit->getCopyID() > numModules) continue;
-        if (extHit->getTOF() < tmin) {
-          tmin = extHit->getTOF();
-          m_extHit = extHit;
-        }
-      }
-      if (!m_extHit) return;
-
-      m_mcParticle = track->getRelated<MCParticle>();
-      if (m_mcParticle) {
-        const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
-        for (const auto& barHit : barHits) {
-          if (barHit.getModuleID() == m_extHit->getCopyID()) m_barHit = &barHit;
-        }
-      }
-
-      // set track parameters
-
-      m_position = m_extHit->getPosition();
-      m_momentum = m_extHit->getMomentum();
-      setTrackLength(m_extHit->getTOF(), chargedStable);
-      m_charge = fitResult->getChargeSign();
-      if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
-      m_moduleID = m_extHit->getCopyID();
-      m_valid = true;
-    }
-
-
-    TOPtrack::TOPtrack(const Track* track, int moduleID,
-                       const Const::ChargedStable& chargedStable)
-    {
-
-      if (!track) return;
-
-      // set pointers first
-
-      m_track = track;
-
-      Const::EDetector myDetID = Const::EDetector::TOP;
-      int pdgCode = abs(chargedStable.getPDGCode());
-
-      RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
+      RelationVector<ExtHit> extHits = track.getRelationsWith<ExtHit>();
       double tmin = 1e10; // some large time
       for (const auto& extHit : extHits) {
         if (abs(extHit.getPdgCode()) != pdgCode) continue;
         if (extHit.getDetectorID() != myDetID) continue;
-        if (extHit.getCopyID() != moduleID) continue;
+        if (extHit.getCopyID() < 1 or extHit.getCopyID() > numModules) continue;
         if (extHit.getTOF() < tmin) {
           tmin = extHit.getTOF();
           m_extHit = &extHit;
         }
       }
-      if (!m_extHit) return;
+      if (not m_extHit) return;
 
-      m_mcParticle = track->getRelated<MCParticle>();
+      m_mcParticle = track.getRelated<MCParticle>();
       if (m_mcParticle) {
         const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
         for (const auto& barHit : barHits) {
@@ -139,124 +76,128 @@ namespace Belle2 {
         }
       }
 
-      // set track parameters
-      m_position = m_extHit->getPosition();
-      m_momentum = m_extHit->getMomentum();
-      setTrackLength(m_extHit->getTOF(), chargedStable);
-      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-      if (!fitResult) {
-        B2ERROR("No TrackFitResult available."
-                << LogVar("PDG code", chargedStable.getPDGCode()));
-        return;
-      }
+      // set track parameters and helix
+
+      m_moduleID = m_extHit->getCopyID();
+      m_momentum = m_extHit->getMomentum().Mag();
       m_charge = fitResult->getChargeSign();
-      if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
-      m_moduleID = moduleID;
-      m_valid = true;
+      m_TOFLength = m_extHit->getTOF() * Const::speedOfLight * getBeta(chargedStable);
+      m_valid = setHelix(m_alignment->getRotation(m_moduleID), m_alignment->getTranslation(m_moduleID));
     }
 
-
-    double TOPtrack::getTOF(double mass) const
+    bool TOPTrack::setHelix(const TRotation& rotation, const TVector3& translation)
     {
-      double pmom = getP();
-      double beta = pmom / sqrt(pmom * pmom + mass * mass);
-      return m_trackLength / beta / Const::speedOfLight;
-    }
+      m_emissionPoints.clear();
 
-    void TOPtrack::setTrackLength(double tof, double mass)
-    {
-      double pmom = getP();
-      double beta = pmom / sqrt(pmom * pmom + mass * mass);
-      m_trackLength = tof * Const::speedOfLight * beta;
-    }
+      // helix in module nominal frame (z-axis still parallel to magnetic field)
 
-    int TOPtrack::getHypID() const
-    {
-      int lundc[6] = {11, 13, 211, 321, 2212, 1000010020};
-      for (int i = 0; i < 6; i++) {
-        if (abs(m_pdg) == lundc[i]) return i + 1;
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& module = geo->getModule(m_moduleID);
+      auto globalPosition = m_extHit->getPosition();
+      auto position = module.pointGlobalToNominal(globalPosition);
+      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentum());
+      double Bz = BFieldManager::getField(globalPosition).Z();
+      m_helix.set(position, momentum, m_charge, Bz);
+      m_helix.setTransformation(rotation, translation);
+
+      // geometry data
+
+      const RaytracerBase::BarSegment bar(module);
+      const RaytracerBase::Mirror mirror(module);
+
+      // bar surfaces in module nominal frame
+
+      std::vector<TVector3> points;
+      std::vector<TVector3> normals;
+      points.push_back(rotation * TVector3(0, -bar.B / 2, 0) + translation); // lower
+      normals.push_back(rotation * TVector3(0, -1, 0));
+
+      points.push_back(rotation * TVector3(0, bar.B / 2, 0) + translation); // upper
+      normals.push_back(rotation * TVector3(0, 1, 0));
+
+      points.push_back(rotation * TVector3(-bar.A / 2, 0, 0) + translation); // left side
+      normals.push_back(rotation * TVector3(-1, 0, 0));
+
+      points.push_back(rotation * TVector3(bar.A / 2, 0, 0) + translation); // right side
+      normals.push_back(rotation * TVector3(1, 0, 0));
+
+      // intersection with quartz bar
+
+      std::vector<double> lengths; // w.r.t extHit position
+      std::vector<TVector3> positions; // in module local frame
+      for (size_t i = 0; i < 2; i++) {
+        double t = m_helix.getDistanceToPlane(points[i], normals[i]);
+        if (isnan(t)) return false;
+        auto r = m_helix.getPosition(t);
+        if (abs(r.X()) > bar.A / 2) {
+          auto k = (r.X() > bar.A / 2) ? 3 : 2;
+          t = m_helix.getDistanceToPlane(points[k], normals[k]);
+          if (isnan(t)) return false;
+          r = m_helix.getPosition(t);
+          if (abs(r.Y()) > bar.B / 2) return false;
+        }
+        lengths.push_back(t);
+        positions.push_back(r);
       }
-      return 0;
+      if (lengths.size() != 2) return false;
+
+      // crossing prism?
+
+      if (positions[0].Z() < bar.zL or positions[1].Z() < bar.zL) {
+        // TODO: track crossing prism needs special treatment
+        return false;
+      }
+
+      // crossing mirror surface?
+
+      std::vector<bool> outOfBar;
+      TVector3 rc(mirror.xc, mirror.yc, mirror.zc);
+      double Rsq = mirror.R * mirror.R;
+      for (const auto& r : positions) {
+        outOfBar.push_back((r - rc).Mag2() > Rsq);
+      }
+      if (outOfBar[0] and outOfBar[1]) return false;
+
+      if (outOfBar[0] or outOfBar[1]) { // track crosses mirror surface, where?
+        if (outOfBar[0]) std::reverse(lengths.begin(), lengths.end());
+        double t1 = lengths[0];
+        double t2 = lengths[1];
+        for (int i = 0; i < 20; i++) {
+          double t = (t1 + t2) / 2;
+          auto r = m_helix.getPosition(t);
+          if ((r - rc).Mag2() > Rsq) {
+            t2 = t;
+          } else {
+            t1 = t;
+          }
+        }
+        lengths[1] = (t1 + t2) / 2;
+      }
+
+      // set track length in quartz and full length from IP to the average emission point
+
+      m_length = abs(lengths[1] - lengths[0]);
+      double length = (lengths[0] + lengths[1]) / 2;
+      m_trackLength = m_TOFLength + length;
+
+      // finally move reference position to average emission point
+
+      m_helix.moveReferencePosition(length);
+
+      return true;
     }
 
-    int TOPtrack::toTop()
+    const TOPTrack::AssumedEmission& TOPTrack::getEmissionPoint(double dL) const
     {
-      if (m_atTop) return m_moduleID;
-
-      float r[3] = {(float) m_position.X(),
-                    (float) m_position.Y(),
-                    (float) m_position.Z()
-                   };
-      float p[3] = {(float) m_momentum.X(),
-                    (float) m_momentum.Y(),
-                    (float) m_momentum.Z()
-                   };
-      float q = (float) m_charge;
-      float t; int m;
-      track2top_(r, p, &q, &t, &m);
-      m_position.SetXYZ(r[0], r[1], r[2]);
-      m_momentum.SetXYZ(p[0], p[1], p[2]);
-      m_trackLength += t * Const::speedOfLight;
-      m_atTop = true;
-      m_moduleID = m + 1;
-      return m_moduleID;
+      auto& emissionPoint = m_emissionPoints[dL];
+      if (not emissionPoint.isSet) {
+        emissionPoint.position = m_helix.getPosition(dL);
+        emissionPoint.trackAngles = TrackAngles(m_helix.getDirection(dL));
+        emissionPoint.isSet = true;
+      }
+      return emissionPoint;
     }
 
-    void TOPtrack::smear(double sig_x, double sig_z,
-                         double sig_theta, double sig_phi)
-    {
-      double p = getP();
-      if (p == 0) return;
-      double theta = getTheta() + gRandom->Gaus(0., sig_theta);
-      double phi = getPhi() + gRandom->Gaus(0., sig_phi);
-      m_momentum.SetX(p * cos(phi) * sin(theta));
-      m_momentum.SetY(p * sin(phi) * sin(theta));
-      m_momentum.SetZ(p * cos(theta));
-
-      double rho = gRandom->Gaus(0., sig_x);
-      if (m_position.Perp() != 0) phi = atan2(m_position.Y(), m_position.X());
-      double x = m_position.X() + rho * sin(phi);
-      double y = m_position.Y() - rho * cos(phi);
-      double z = m_position.Z() + gRandom->Gaus(0., sig_z);
-      m_position.SetXYZ(x, y, z);
-
-    }
-
-    void TOPtrack::dump() const
-    {
-      double pi = 4 * atan(1);
-      using namespace std;
-      cout << "TOPtrack::dump(): ";
-      cout << " PDG=" << m_pdg;
-      cout << " charge=" << m_charge << endl;
-      cout << "  p=" << setprecision(3) << getP() << " GeV/c";
-      cout << "  theta=" << setprecision(3) << getTheta() / pi * 180;
-      cout << "  phi=" << setprecision(3) << getPhi() / pi * 180 << endl;
-      cout << "  x=" << getX() << " cm";
-      cout << "  y=" << getY() << " cm";
-      cout << "  z=" << getZ() << " cm\n";
-      cout << "  trackLength=" << setprecision(4) << m_trackLength << " cm";
-      cout << "  atTop=" << m_atTop;
-      cout << "  moduleID=" << m_moduleID;
-      cout << endl;
-    }
-
-    int TOPtrack::findModule()
-    {
-      float r[3] = {(float) m_position.X(),
-                    (float) m_position.Y(),
-                    (float) m_position.Z()
-                   };
-      float p[3] = {(float) m_momentum.X(),
-                    (float) m_momentum.Y(),
-                    (float) m_momentum.Z()
-                   };
-      float q = (float) m_charge;
-      float t;
-      int m;
-      track2top_(r, p, &q, &t, &m);
-      return m + 1;
-    }
 
   } // end top namespace
 } // end Belle2 namespace

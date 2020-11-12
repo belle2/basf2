@@ -14,7 +14,6 @@
 #pragma link C++ class Belle2::TOP::FastRaytracer-;
 #pragma link C++ class Belle2::TOP::InverseRaytracer-;
 #pragma link C++ class Belle2::TOP::InverseRaytracer::CerenkovAngle-;
-#pragma link C++ class Belle2::TOP::InverseRaytracer::TrackAngles-;
 #pragma link C++ class Belle2::TOP::InverseRaytracer::Solution-;
 #pragma link C++ class Belle2::TOP::PixelPositions-;
 #pragma link C++ class Belle2::TOP::PixelPositions::PixelData-;
@@ -25,4 +24,8 @@
 #pragma link C++ class Belle2::TOP::YScanner::Table-;
 #pragma link C++ class Belle2::TOP::YScanner::PixelProjection-;
 #pragma link C++ class Belle2::TOP::YScanner::Result-;
+#pragma link C++ class Belle2::TOP::TOPTrack-;
+#pragma link C++ class Belle2::TOP::TOPTrack::TrackAngles-;
+#pragma link C++ class Belle2::TOP::TOPTrack::AssumedEmission-;
+#pragma link C++ class Belle2::TOP::HelixSwimmer-;
 #endif

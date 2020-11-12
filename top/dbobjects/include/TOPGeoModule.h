@@ -50,52 +50,17 @@ namespace Belle2 {
     /**
      * Copy constructor
      */
-    TOPGeoModule(const TOPGeoModule& module): TOPGeoBase(module.getName())
-    {
-      *this = module;
-      m_rotation = 0;
-      m_rotationInverse = 0;
-      m_translation = 0;
-    }
+    TOPGeoModule(const TOPGeoModule& module);
 
     /**
      * Assignment operator
      */
-    TOPGeoModule& operator=(const TOPGeoModule& module)
-    {
-      if (this != &module) {
-        TOPGeoBase::operator=(module);
-        m_moduleID = module.getModuleID();
-        m_radius = module.getRadius();
-        m_phi = module.getPhi();
-        m_backwardZ = module.getBackwardZ();
-        m_moduleCNumber = module.getModuleCNumber();
-        m_bar1 = module.getBarSegment1();
-        m_bar2 = module.getBarSegment2();
-        m_mirror = module.getMirrorSegment();
-        m_prism = module.getPrism();
-        m_pmtArray = module.getPMTArray();
-        m_arrayDisplacement = module.getPMTArrayDisplacement();
-        m_moduleDisplacement = module.getModuleDisplacement();
-        if (m_rotation) delete m_rotation;
-        if (m_rotationInverse) delete m_rotationInverse;
-        if (m_translation) delete m_translation;
-        m_rotation = 0;
-        m_rotationInverse = 0;
-        m_translation = 0;
-      }
-      return *this;
-    }
+    TOPGeoModule& operator=(const TOPGeoModule& module);
 
     /**
      * Destructor
      */
-    ~TOPGeoModule()
-    {
-      if (m_rotation) delete m_rotation;
-      if (m_rotationInverse) delete m_rotationInverse;
-      if (m_translation) delete m_translation;
-    }
+    ~TOPGeoModule();
 
     /**
      * Sets module construction number (0 = ideal module = default)
@@ -341,32 +306,60 @@ namespace Belle2 {
     double getInnerRadius() const {return getRadius() - getBarThickness() / 2;}
 
     /**
-     * Transforms 3D point from Belle II to module internal frame
+     * Transforms 3D point from Belle II to module internal (= nominal & displaced) frame
      * @param point 3D point in Belle II frame (basf2 units!)
      * @return 3D point in module internal frame (basf2 units!)
      */
     TVector3 pointToLocal(const TVector3& point) const;
 
     /**
-     * Transforms momentum vector from Belle II to module internal frame
+     * Transforms momentum vector from Belle II to module internal (= nominal & displaced) frame
      * @param momentum momentum vector in Belle II frame
      * @return momentum vector in module internal frame
      */
     TVector3 momentumToLocal(const TVector3& momentum) const;
 
     /**
-     * Transforms 3D point from module internal frame to Belle II frame
+     * Transforms 3D point from module internal (= nominal & displaced) frame to Belle II frame
      * @param point 3D point in module internal frame (basf2 units!)
      * @return 3D point in Belle II frame (basf2 units!)
      */
     TVector3 pointToGlobal(const TVector3& point) const;
 
     /**
-     * Transforms momentum vector from module internal frame to Belle II frame
+     * Transforms momentum vector from module internal (= nominal & displaced) frame to Belle II frame
      * @param momentum momentum vector in module internal frame
      * @return momentum vector in Belle II frame
      */
     TVector3 momentumToGlobal(const TVector3& momentum) const;
+
+    /**
+     * Transforms 3D point from Belle II to module nominal frame
+     * @param point 3D point in Belle II frame (basf2 units!)
+     * @return 3D point in module nominal frame (basf2 units!)
+     */
+    TVector3 pointGlobalToNominal(const TVector3& point) const;
+
+    /**
+     * Transforms momentum vector from Belle II to module nominal frame
+     * @param momentum momentum vector in Belle II frame
+     * @return momentum vector in module nominal frame
+     */
+    TVector3 momentumGlobalToNominal(const TVector3& momentum) const;
+
+    /**
+     * Transforms 3D point from module nominal frame to Belle II frame
+     * @param point 3D point in module nominal frame (basf2 units!)
+     * @return 3D point in Belle II frame (basf2 units!)
+     */
+    TVector3 pointNominalToGlobal(const TVector3& point) const;
+
+    /**
+     * Transforms momentum vector from module nominal frame to Belle II frame
+     * @param momentum momentum vector in module nominal frame
+     * @return momentum vector in Belle II frame
+     */
+    TVector3 momentumNominalToGlobal(const TVector3& momentum) const;
 
     /**
      * Check for consistency of data members
@@ -402,12 +395,19 @@ namespace Belle2 {
     TOPGeoPMTArrayDisplacement m_arrayDisplacement;  /**< PMT array displacement */
     TOPGeoModuleDisplacement m_moduleDisplacement;   /**< module displacement */
 
-    /** cache for rotation matrix (from internal to Belle II frame) */
-    mutable TRotation* m_rotation = 0;    //!
+    /** cache for rotation matrix from internal (= nominal & displaced) to Belle II frame */
+    mutable TRotation* m_rotation = 0;    //! do not write out
     /** cache for inverse rotation matrix */
-    mutable TRotation* m_rotationInverse = 0;    //!
-    /** cache for translation vector (from internal to Belle II frame) */
-    mutable TVector3* m_translation = 0;  //!
+    mutable TRotation* m_rotationInverse = 0;    //! do not write out
+    /** cache for translation vector from internal (= nominal & displaced) to Belle II frame */
+    mutable TVector3* m_translation = 0;  //! do not write out
+
+    /** cache for rotation matrix from nominal to Belle II frame */
+    mutable TRotation* m_rotationNominal = 0;    //! do not write out
+    /** cache for inverse rotation matrix */
+    mutable TRotation* m_rotationNominalInverse = 0;    //! do not write out
+    /** cache for translation vector from nominal to Belle II frame */
+    mutable TVector3* m_translationNominal = 0;  //! do not write out
 
     ClassDefOverride(TOPGeoModule, 3); /**< ClassDef */
 

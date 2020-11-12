@@ -183,6 +183,7 @@ namespace Belle2 {
         double Dy = 0; /**< size in y of clipped pixel projection */
         const EnergyMask* mask = 0; /**< the corresponding energy mask */
 
+        /** operator "less than" needed for sorting */
         bool operator<(const PixelProjection& other) const {return yc < other.yc;}
       };
 

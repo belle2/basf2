@@ -942,7 +942,7 @@ IMAGE_PATH             = build/module_io
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-INPUT_FILTER           = ./doxygen_filter.py
+INPUT_FILTER           = site_scons/doxygen/doxygen_filter.py
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis. Doxygen will compare the file name with each pattern and apply the

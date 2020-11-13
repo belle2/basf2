@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # favourite test udst file from https://questions.belle2.org/question/9758/
     main = basf2.create_path()
     main.add_module(
-        "RootInput", inputFileName=basf2.find_file("analysis/tests/udst-v04-01-04.root")
+        "RootInput", inputFileName=basf2.find_file("analysis/tests/udst-v04-02-04.root")
     )
     main.add_module("EventInfoPrinter")
 

@@ -17,7 +17,8 @@ if __name__ == '__main__':
 
     # Test b2klm-create-dqm (it also tests b2klm-mask-dqm and b2klm-execute-masking)
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-        basf2.B2INFO('Skipping the b2klm-create-dqm test.')
+        # Silently skip the test, otherwise the test fails on the buildbot.
+        pass
     else:
         globaltags = ' '.join(vgt.get_validation_globaltags())
         input_files = glob.glob(os.environ['BELLE2_VALIDATION_DATA_DIR'] + '/rawdata/*HLT?.*.root')

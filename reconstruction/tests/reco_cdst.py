@@ -43,8 +43,8 @@ def steer_this(steering_file, rawdata_file):
         basf2.B2INFO('Not a "cosmic" neither a "physics" run, skipping it.')
         return 0
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     # Skip this test if needed.
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
         b2u.skip_test('BELLE2_VALIDATION_DATA_DIR environment variable not set, skipping the test.')

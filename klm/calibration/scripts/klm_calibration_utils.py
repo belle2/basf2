@@ -140,13 +140,12 @@ def get_time_pre_collector_path(muon_list_name, entry_sequence="", raw_format=Tr
                         entrySequences=[entry_sequence])
     if raw_format:
         prepare_cdst_analysis(main)
+        # Disable the time window in muid module by setting it to 1 second.
+        # This is necessary because we are running now the time calibration.
+        basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
     else:
         main.add_module('Gearbox')
         main.add_module('Geometry')
-
-    # Disable the time window in muid module by setting it to 1 second.
-    # This is necessary because we are running now the time calibration.
-    basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
 
     # Fill muon particle list
     ma.fillParticleList(f'mu+:{muon_list_name}',

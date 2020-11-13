@@ -1,0 +1,1025 @@
+[INFO] Steering file: udst_compatibility-v04-02-04.py
+[INFO] The random number seed is set to "1"
+[INFO] Starting event processing, random seed is set to '1'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/udst-v04-01-04.root
+Untested method Particle::appendDaughter
+Untested method Particle::forEachDaughter
+Untested method Particle::getArrayPointer
+Untested method Particle::getECLClusterEnergy
+Untested method Particle::getParticleFromGeneralizedIndexString
+Untested method Particle::isCopyOf
+Untested method Particle::overlapsWith
+Untested method Particle::removeDaughter
+Untested method Particle::removeExtraInfo
+Untested method Particle::set4Vector
+Untested method Particle::setExtraInfo
+Untested method Particle::setMomentumVertexErrorMatrix
+Untested method Particle::setPValue
+Untested method Particle::setProperty
+Untested method Particle::setVertex
+Untested method Particle::updateMomentum
+Untested method Particle::writeExtraInfo
+Untested method EventExtraInfo::removeExtraInfo
+Untested method EventExtraInfo::setExtraInfo
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:     1003        RUN:        0        EVT: 30480021
+Particle#0:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (-0.04791,0.104945,0.120478,0.217494)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2
+	name = pi-
+	# of daughters = 0
+  getAcoplanarity(): nan
+  getCharge(): -1
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_release-04, mc_production_MC13a_rev1, release-04-00-03
+  getCosHelicity(): nan
+[ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
+	name = pi-
+	iDaughter = 0
+  getCosHelicityDaughter(0): nan
+  getDaughter(0): -> NULL
+  getDaughter(1): -> NULL
+  getDaughterIndices(): size(0)
+  getDaughters(): size(0)
+  getECLCluster(): -> NULL
+  getECLClusterEHypothesisBit(): 16
+  getEnergy(): 0.217494
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 0
+  getExtraInfoNames(): size(7)
+    SignalProbability
+    decayModeID
+    foo
+    mcErrors
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 8
+  getFinalStateDaughters(): size(1)
+    -> Particles#0
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=-211 <b>Charge</b>=-1 <b>PDGMass</b>=0.1396<br> <b>flavorType</b>=1 <b>particleType</b>=1 <b>particleTypeUsedForFit</b>=211<br> <b>mdstIndex</b>=0 <b>arrayIndex</b>=0 <b>identifier</b>=0 <b>daughterIndices</b>:  (none)<br> <b>mass</b>=0.1396<br> <b>momentum</b>=(-0.05, 0.10, 0.12) <b>p</b>=0.1668<br> <b>position</b>=(-0.00, -0.00, 0.01)<br> <b>p-value of fit</b> (if done): 0.3196<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=fffefe>    2.4e-06</td><td align=right bgcolor=fffefe>    2.4e-07</td><td align=right bgcolor=fffefe>    3.6e-07</td><td align=right bgcolor=fdffff>   -2.1e-07</td><td align=right bgcolor=56ffff>   -1.9e-05</td><td align=right bgcolor=b2ffff>   -8.7e-06</td><td align=right bgcolor=a3ffff>     -1e-05</td></tr><tr><td align=right bgcolor=fffefe>    2.4e-07</td><td align=right bgcolor=fffefe>    1.7e-06</td><td align=right bgcolor=f8ffff>   -7.3e-07</td><td align=right bgcolor=fffefe>    3.8e-07</td><td align=right bgcolor=b7ffff>   -8.2e-06</td><td align=right bgcolor=deffff>   -3.7e-06</td><td align=right bgcolor=fff6f6>    2.1e-05</td></tr><tr><td align=right bgcolor=fffefe>    3.6e-07</td><td align=right bgcolor=f8ffff>   -7.3e-07</td><td align=right bgcolor=fffefe>    1.6e-06</td><td align=right bgcolor=fffefe>    4.5e-07</td><td align=right bgcolor=feffff>   -9.4e-08</td><td align=right bgcolor=feffff>   -4.2e-08</td><td align=right bgcolor=37ffff>   -2.3e-05</td></tr><tr><td align=right bgcolor=fdffff>   -2.1e-07</td><td align=right bgcolor=fffefe>    3.8e-07</td><td align=right bgcolor=fffefe>    4.5e-07</td><td align=right bgcolor=fffefe>    4.8e-07</td><td align=right bgcolor=fffefe>    2.1e-07</td><td align=right bgcolor=fffefe>    9.7e-08</td><td align=right bgcolor=feffff>   -3.4e-09</td></tr><tr><td align=right bgcolor=56ffff>   -1.9e-05</td><td align=right bgcolor=b7ffff>   -8.2e-06</td><td align=right bgcolor=feffff>   -9.4e-08</td><td align=right bgcolor=fffefe>    2.1e-07</td><td align=right bgcolor=ffb7b7>    0.00018</td><td align=right bgcolor=ffdede>    8.2e-05</td><td align=right bgcolor=fffefe>    2.2e-06</td></tr><tr><td align=right bgcolor=b2ffff>   -8.7e-06</td><td align=right bgcolor=deffff>   -3.7e-06</td><td align=right bgcolor=feffff>   -4.2e-08</td><td align=right bgcolor=fffefe>    9.7e-08</td><td align=right bgcolor=ffdede>    8.2e-05</td><td align=right bgcolor=fff0f0>    3.7e-05</td><td align=right bgcolor=fffefe>    9.8e-07</td></tr><tr><td align=right bgcolor=a3ffff>     -1e-05</td><td align=right bgcolor=fff6f6>    2.1e-05</td><td align=right bgcolor=37ffff>   -2.3e-05</td><td align=right bgcolor=feffff>   -3.4e-09</td><td align=right bgcolor=fffefe>    2.2e-06</td><td align=right bgcolor=fffefe>    9.8e-07</td><td align=right bgcolor=ff4b4b>    0.00045</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.931 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=3 preCut_rank=3 uniqueSignal=1 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#9
+  getMass(): 0.13957
+  getMdstArrayIndex(): 0
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(1)
+    0
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 16777216
+  getMomentum(): (-0.04791,0.104945,0.120478)
+  getMomentumErrorMatrix(): 
+     2.384876e-06  2.423749e-07  3.630041e-07 -2.073125e-07 
+     2.423749e-07  1.742051e-06 -7.313290e-07  3.820723e-07 
+     3.630041e-07 -7.313290e-07  1.598647e-06  4.527068e-07 
+    -2.073125e-07  3.820723e-07  4.527068e-07  4.807957e-07 
+  getMomentumMagnitude(): 0.166805
+  getMomentumVertexErrorMatrix(): 
+     2.384876e-06  2.423749e-07  3.630041e-07 -2.073125e-07 -1.911990e-05 -8.666140e-06 -1.041517e-05 
+     2.423749e-07  1.742051e-06 -7.313290e-07  3.820723e-07 -8.177499e-06 -3.707214e-06  2.134244e-05 
+     3.630041e-07 -7.313290e-07  1.598647e-06  4.527068e-07 -9.404928e-08 -4.220547e-08 -2.273864e-05 
+    -2.073125e-07  3.820723e-07  4.527068e-07  4.807957e-07  2.138638e-07  9.680962e-08 -3.375135e-09 
+    -1.911990e-05 -8.177499e-06 -9.404928e-08  2.138638e-07  1.808727e-04  8.199990e-05  2.191461e-06 
+    -8.666140e-06 -3.707214e-06 -4.220547e-08  9.680962e-08  8.199990e-05  3.717528e-05  9.836144e-07 
+    -1.041517e-05  2.134244e-05 -2.273864e-05 -3.375135e-09  2.191461e-06  9.836144e-07  4.527086e-04 
+  getNDaughters(): 0
+  getName(): pi-
+  getP(): 0.166805
+  getPDGCode(): -211
+  getPDGCodeUsedForFit(): 211
+  getPDGMass(): 0.13957
+  getPIDLikelihood(): -> PIDLikelihoods#0
+  getPValue(): 0.319611
+  getParticleType(): 1
+  getProperty(): 0
+  getPx(): -0.04791
+  getPy(): 0.104945
+  getPz(): 0.120478
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#9 (weight: 0.982143)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(1)
+    -> PIDLikelihoods#0 (weight: 1)
+  getTrack(): -> Tracks#0
+  getVertex(): (-0.00263049,-0.00120088,0.0113142)
+  getVertexErrorMatrix(): 
+     1.808727e-04  8.199990e-05  2.191461e-06 
+     8.199990e-05  3.717528e-05  9.836144e-07 
+     2.191461e-06  9.836144e-07  4.527086e-04 
+  getX(): -0.00263049
+  getY(): -0.00120088
+  getZ(): 0.0113142
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=-211 Charge=-1 PDGMass=0.1396
+ flavorType=1 particleType=1 particleTypeUsedForFit=211
+ mdstIndex=0 arrayIndex=0 identifier=0 daughterIndices:  (none)
+ mass=0.1396
+ momentum=(-0.05, 0.10, 0.12) p=0.1668
+ position=(-0.00, -0.00, 0.01)
+ p-value of fit (if done): 0.3196
+ error matrix (px, py, pz, E, x, y ,z):
+    2.4e-06    2.4e-07    3.6e-07   -2.1e-07   -1.9e-05   -8.7e-06     -1e-05
+    2.4e-07    1.7e-06   -7.3e-07    3.8e-07   -8.2e-06   -3.7e-06    2.1e-05
+    3.6e-07   -7.3e-07    1.6e-06    4.5e-07   -9.4e-08   -4.2e-08   -2.3e-05
+   -2.1e-07    3.8e-07    4.5e-07    4.8e-07    2.1e-07    9.7e-08   -3.4e-09
+   -1.9e-05   -8.2e-06   -9.4e-08    2.1e-07    0.00018    8.2e-05    2.2e-06
+   -8.7e-06   -3.7e-06   -4.2e-08    9.7e-08    8.2e-05    3.7e-05    9.8e-07
+     -1e-05    2.1e-05   -2.3e-05   -3.4e-09    2.2e-06    9.8e-07    0.00045
+
+ extra info=( SignalProbability=0.931 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=3 preCut_rank=3 uniqueSignal=1 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): True
+Particle#1:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (-0.222256,-0.401876,0.129541,0.686585)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2
+	name = K-
+	# of daughters = 0
+  getAcoplanarity(): nan
+  getCharge(): -1
+  getCosHelicity(): nan
+[ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
+	name = K-
+	iDaughter = 0
+  getCosHelicityDaughter(0): nan
+  getDaughter(0): -> NULL
+  getDaughter(1): -> NULL
+  getDaughterIndices(): size(0)
+  getDaughters(): size(0)
+  getECLCluster(): -> ECLClusters#9
+  getECLClusterEHypothesisBit(): 16
+  getEnergy(): 0.686585
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 0
+  getExtraInfoNames(): size(7)
+    SignalProbability
+    decayModeID
+    foo
+    mcErrors
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 8
+  getFinalStateDaughters(): size(1)
+    -> Particles#1
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=-321 <b>Charge</b>=-1 <b>PDGMass</b>=0.4937<br> <b>flavorType</b>=1 <b>particleType</b>=1 <b>particleTypeUsedForFit</b>=321<br> <b>mdstIndex</b>=1 <b>arrayIndex</b>=1 <b>identifier</b>=1 <b>daughterIndices</b>:  (none)<br> <b>mass</b>=0.4937<br> <b>momentum</b>=(-0.22, -0.40, 0.13) <b>p</b>=0.4772<br> <b>position</b>=(-0.02, 0.01, 0.03)<br> <b>p-value of fit</b> (if done): 0.4996<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffe4e4>    1.8e-06</td><td align=right bgcolor=f1ffff>   -3.3e-07</td><td align=right bgcolor=fffdfd>    1.1e-07</td><td align=right bgcolor=efffff>   -3.9e-07</td><td align=right bgcolor=68ffff>   -3.6e-06</td><td align=right bgcolor=ffe3e3>    1.9e-06</td><td align=right bgcolor=e3ffff>   -6.7e-07</td></tr><tr><td align=right bgcolor=f1ffff>   -3.3e-07</td><td align=right bgcolor=ffe9e9>    1.5e-06</td><td align=right bgcolor=fffcfc>    1.9e-07</td><td align=right bgcolor=e0ffff>   -7.4e-07</td><td align=right bgcolor=ffe1e1>    2.1e-06</td><td align=right bgcolor=d1ffff>   -1.1e-06</td><td align=right bgcolor=cdffff>   -1.2e-06</td></tr><tr><td align=right bgcolor=fffdfd>    1.1e-07</td><td align=right bgcolor=fffcfc>    1.9e-07</td><td align=right bgcolor=ffe2e2>      2e-06</td><td align=right bgcolor=fffbfb>    2.4e-07</td><td align=right bgcolor=fdffff>     -4e-08</td><td align=right bgcolor=fffefe>    2.2e-08</td><td align=right bgcolor=37ffff>   -4.8e-06</td></tr><tr><td align=right bgcolor=efffff>   -3.9e-07</td><td align=right bgcolor=e0ffff>   -7.4e-07</td><td align=right bgcolor=fffbfb>    2.4e-07</td><td align=right bgcolor=fff6f6>      6e-07</td><td align=right bgcolor=fdffff>   -4.2e-08</td><td align=right bgcolor=fffefe>    2.2e-08</td><td align=right bgcolor=feffff>   -7.6e-11</td></tr><tr><td align=right bgcolor=68ffff>   -3.6e-06</td><td align=right bgcolor=ffe1e1>    2.1e-06</td><td align=right bgcolor=fdffff>     -4e-08</td><td align=right bgcolor=fdffff>   -4.2e-08</td><td align=right bgcolor=ff8383>    8.7e-06</td><td align=right bgcolor=3effff>   -4.6e-06</td><td align=right bgcolor=fffdfd>    9.4e-08</td></tr><tr><td align=right bgcolor=ffe3e3>    1.9e-06</td><td align=right bgcolor=d1ffff>   -1.1e-06</td><td align=right bgcolor=fffefe>    2.2e-08</td><td align=right bgcolor=fffefe>    2.2e-08</td><td align=right bgcolor=3effff>   -4.6e-06</td><td align=right bgcolor=ffdbdb>    2.5e-06</td><td align=right bgcolor=fcffff>   -5.2e-08</td></tr><tr><td align=right bgcolor=e3ffff>   -6.7e-07</td><td align=right bgcolor=cdffff>   -1.2e-06</td><td align=right bgcolor=37ffff>   -4.8e-06</td><td align=right bgcolor=feffff>   -7.6e-11</td><td align=right bgcolor=fffdfd>    9.4e-08</td><td align=right bgcolor=fcffff>   -5.2e-08</td><td align=right bgcolor=ff4b4b>    1.3e-05</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.963 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=2 preCut_rank=1 uniqueSignal=1 ) <br>
+  getKLMCluster(): -> KLMClusters#0
+  getMCParticle(): -> MCParticles#33
+  getMass(): 0.493677
+  getMdstArrayIndex(): 1
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(1)
+    1
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 16777217
+  getMomentum(): (-0.222256,-0.401876,0.129541)
+  getMomentumErrorMatrix(): 
+     1.849829e-06 -3.299135e-07  1.058859e-07 -3.857265e-07 
+    -3.299135e-07  1.507162e-06  1.877263e-07 -7.399638e-07 
+     1.058859e-07  1.877263e-07  2.011676e-06  2.353927e-07 
+    -3.857265e-07 -7.399638e-07  2.353927e-07  6.023958e-07 
+  getMomentumMagnitude(): 0.477161
+  getMomentumVertexErrorMatrix(): 
+     1.849829e-06 -3.299135e-07  1.058859e-07 -3.857265e-07 -3.624772e-06  1.926431e-06 -6.652429e-07 
+    -3.299135e-07  1.507162e-06  1.877263e-07 -7.399638e-07  2.063310e-06 -1.096318e-06 -1.189123e-06 
+     1.058859e-07  1.877263e-07  2.011676e-06  2.353927e-07 -4.021685e-08  2.216228e-08 -4.830812e-06 
+    -3.857265e-07 -7.399638e-07  2.353927e-07  6.023958e-07 -4.191457e-08  2.227578e-08 -7.628387e-11 
+    -3.624772e-06  2.063310e-06 -4.021685e-08 -4.191457e-08  8.734275e-06 -4.646990e-06  9.374312e-08 
+     1.926431e-06 -1.096318e-06  2.216228e-08  2.227578e-08 -4.646990e-06  2.472499e-06 -5.155154e-08 
+    -6.652429e-07 -1.189123e-06 -4.830812e-06 -7.628387e-11  9.374312e-08 -5.155154e-08  1.268757e-05 
+  getNDaughters(): 0
+  getName(): K-
+  getP(): 0.477161
+  getPDGCode(): -321
+  getPDGCodeUsedForFit(): 321
+  getPDGMass(): 0.493677
+  getPIDLikelihood(): -> PIDLikelihoods#1
+  getPValue(): 0.499614
+  getParticleType(): 1
+  getProperty(): 0
+  getPx(): -0.222256
+  getPy(): -0.401876
+  getPz(): 0.129541
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#33 (weight: 0.967213)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(1)
+    -> PIDLikelihoods#1 (weight: 1)
+  getTrack(): -> Tracks#1
+  getVertex(): (-0.0154703,0.0085558,0.0317676)
+  getVertexErrorMatrix(): 
+     8.734275e-06 -4.646990e-06  9.374312e-08 
+    -4.646990e-06  2.472499e-06 -5.155154e-08 
+     9.374312e-08 -5.155154e-08  1.268757e-05 
+  getX(): -0.0154703
+  getY(): 0.0085558
+  getZ(): 0.0317676
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=-321 Charge=-1 PDGMass=0.4937
+ flavorType=1 particleType=1 particleTypeUsedForFit=321
+ mdstIndex=1 arrayIndex=1 identifier=1 daughterIndices:  (none)
+ mass=0.4937
+ momentum=(-0.22, -0.40, 0.13) p=0.4772
+ position=(-0.02, 0.01, 0.03)
+ p-value of fit (if done): 0.4996
+ error matrix (px, py, pz, E, x, y ,z):
+    1.8e-06   -3.3e-07    1.1e-07   -3.9e-07   -3.6e-06    1.9e-06   -6.7e-07
+   -3.3e-07    1.5e-06    1.9e-07   -7.4e-07    2.1e-06   -1.1e-06   -1.2e-06
+    1.1e-07    1.9e-07      2e-06    2.4e-07     -4e-08    2.2e-08   -4.8e-06
+   -3.9e-07   -7.4e-07    2.4e-07      6e-07   -4.2e-08    2.2e-08   -7.6e-11
+   -3.6e-06    2.1e-06     -4e-08   -4.2e-08    8.7e-06   -4.6e-06    9.4e-08
+    1.9e-06   -1.1e-06    2.2e-08    2.2e-08   -4.6e-06    2.5e-06   -5.2e-08
+   -6.7e-07   -1.2e-06   -4.8e-06   -7.6e-11    9.4e-08   -5.2e-08    1.3e-05
+
+ extra info=( SignalProbability=0.963 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=2 preCut_rank=1 uniqueSignal=1 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): True
+Particle#2:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (-0.348152,1.13064,1.22969,1.77635)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2
+	name = K+
+	# of daughters = 0
+  getAcoplanarity(): nan
+  getCharge(): 1
+  getCosHelicity(): nan
+[ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
+	name = K+
+	iDaughter = 0
+  getCosHelicityDaughter(0): nan
+  getDaughter(0): -> NULL
+  getDaughter(1): -> NULL
+  getDaughterIndices(): size(0)
+  getDaughters(): size(0)
+  getECLCluster(): -> ECLClusters#0
+  getECLClusterEHypothesisBit(): 16
+  getEnergy(): 1.77635
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 0
+  getExtraInfoNames(): size(7)
+    SignalProbability
+    decayModeID
+    foo
+    mcErrors
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 8
+  getFinalStateDaughters(): size(1)
+    -> Particles#2
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=321 <b>Charge</b>=1 <b>PDGMass</b>=0.4937<br> <b>flavorType</b>=1 <b>particleType</b>=1 <b>particleTypeUsedForFit</b>=321<br> <b>mdstIndex</b>=4 <b>arrayIndex</b>=2 <b>identifier</b>=4 <b>daughterIndices</b>:  (none)<br> <b>mass</b>=0.4937<br> <b>momentum</b>=(-0.35, 1.13, 1.23) <b>p</b>=1.706<br> <b>position</b>=(0.00, 0.00, 0.02)<br> <b>p-value of fit</b> (if done): 0.3619<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffdcdc>    2.3e-06</td><td align=right bgcolor=88ffff>   -1.4e-06</td><td align=right bgcolor=80ffff>   -1.5e-06</td><td align=right bgcolor=37ffff>   -2.4e-06</td><td align=right bgcolor=69ffff>   -1.8e-06</td><td align=right bgcolor=d0ffff>   -5.6e-07</td><td align=right bgcolor=c7ffff>   -6.7e-07</td></tr><tr><td align=right bgcolor=88ffff>   -1.4e-06</td><td align=right bgcolor=ff9898>    6.7e-06</td><td align=right bgcolor=ffafaf>    5.2e-06</td><td align=right bgcolor=ff8282>    8.1e-06</td><td align=right bgcolor=ccffff>     -6e-07</td><td align=right bgcolor=efffff>   -1.9e-07</td><td align=right bgcolor=ffe0e0>      2e-06</td></tr><tr><td align=right bgcolor=80ffff>   -1.5e-06</td><td align=right bgcolor=ffafaf>    5.2e-06</td><td align=right bgcolor=ff8b8b>    7.5e-06</td><td align=right bgcolor=ff7777>    8.8e-06</td><td align=right bgcolor=f5ffff>   -1.2e-07</td><td align=right bgcolor=fcffff>   -3.6e-08</td><td align=right bgcolor=55ffff>     -2e-06</td></tr><tr><td align=right bgcolor=37ffff>   -2.4e-06</td><td align=right bgcolor=ff8282>    8.1e-06</td><td align=right bgcolor=ff7777>    8.8e-06</td><td align=right bgcolor=ff4b4b>    1.2e-05</td><td align=right bgcolor=f5ffff>   -1.1e-07</td><td align=right bgcolor=fcffff>   -3.5e-08</td><td align=right bgcolor=feffff>     -9e-09</td></tr><tr><td align=right bgcolor=69ffff>   -1.8e-06</td><td align=right bgcolor=ccffff>     -6e-07</td><td align=right bgcolor=f5ffff>   -1.2e-07</td><td align=right bgcolor=f5ffff>   -1.1e-07</td><td align=right bgcolor=ffd9d9>    2.4e-06</td><td align=right bgcolor=fff3f3>    7.5e-07</td><td align=right bgcolor=fffbfb>    2.1e-07</td></tr><tr><td align=right bgcolor=d0ffff>   -5.6e-07</td><td align=right bgcolor=efffff>   -1.9e-07</td><td align=right bgcolor=fcffff>   -3.6e-08</td><td align=right bgcolor=fcffff>   -3.5e-08</td><td align=right bgcolor=fff3f3>    7.5e-07</td><td align=right bgcolor=fffbfb>    2.3e-07</td><td align=right bgcolor=fffefe>    6.4e-08</td></tr><tr><td align=right bgcolor=c7ffff>   -6.7e-07</td><td align=right bgcolor=ffe0e0>      2e-06</td><td align=right bgcolor=55ffff>     -2e-06</td><td align=right bgcolor=feffff>     -9e-09</td><td align=right bgcolor=fffbfb>    2.1e-07</td><td align=right bgcolor=fffefe>    6.4e-08</td><td align=right bgcolor=ffaeae>    5.2e-06</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.9896 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=1 preCut_rank=2 uniqueSignal=1 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#17
+  getMass(): 0.493677
+  getMdstArrayIndex(): 4
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(1)
+    4
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 16777220
+  getMomentum(): (-0.348152,1.13064,1.22969)
+  getMomentumErrorMatrix(): 
+     2.261926e-06 -1.425377e-06 -1.522034e-06 -2.404209e-06 
+    -1.425377e-06  6.704538e-06  5.193464e-06  8.141998e-06 
+    -1.522034e-06  5.193464e-06  7.544051e-06  8.826362e-06 
+    -2.404209e-06  8.141998e-06  8.826362e-06  1.176368e-05 
+  getMomentumMagnitude(): 1.70637
+  getMomentumVertexErrorMatrix(): 
+     2.261926e-06 -1.425377e-06 -1.522034e-06 -2.404209e-06 -1.800183e-06 -5.597088e-07 -6.697425e-07 
+    -1.425377e-06  6.704538e-06  5.193464e-06  8.141998e-06 -6.045282e-07 -1.880381e-07  1.991428e-06 
+    -1.522034e-06  5.193464e-06  7.544051e-06  8.826362e-06 -1.161351e-07 -3.598890e-08 -2.033639e-06 
+    -2.404209e-06  8.141998e-06  8.826362e-06  1.176368e-05 -1.123529e-07 -3.490037e-08 -9.002065e-09 
+    -1.800183e-06 -6.045282e-07 -1.161351e-07 -1.123529e-07  2.425264e-06  7.526690e-07  2.063420e-07 
+    -5.597088e-07 -1.880381e-07 -3.598890e-08 -3.490037e-08  7.526690e-07  2.335907e-07  6.370480e-08 
+    -6.697425e-07  1.991428e-06 -2.033639e-06 -9.002065e-09  2.063420e-07  6.370480e-08  5.229689e-06 
+  getNDaughters(): 0
+  getName(): K+
+  getP(): 1.70637
+  getPDGCode(): 321
+  getPDGCodeUsedForFit(): 321
+  getPDGMass(): 0.493677
+  getPIDLikelihood(): -> PIDLikelihoods#4
+  getPValue(): 0.361926
+  getParticleType(): 1
+  getProperty(): 0
+  getPx(): -0.348152
+  getPy(): 1.13064
+  getPz(): 1.22969
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#17 (weight: 0.940298)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(1)
+    -> PIDLikelihoods#4 (weight: 1)
+  getTrack(): -> Tracks#4
+  getVertex(): (0.00334219,0.00102914,0.0216711)
+  getVertexErrorMatrix(): 
+     2.425264e-06  7.526690e-07  2.063420e-07 
+     7.526690e-07  2.335907e-07  6.370480e-08 
+     2.063420e-07  6.370480e-08  5.229689e-06 
+  getX(): 0.00334219
+  getY(): 0.00102914
+  getZ(): 0.0216711
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=321 Charge=1 PDGMass=0.4937
+ flavorType=1 particleType=1 particleTypeUsedForFit=321
+ mdstIndex=4 arrayIndex=2 identifier=4 daughterIndices:  (none)
+ mass=0.4937
+ momentum=(-0.35, 1.13, 1.23) p=1.706
+ position=(0.00, 0.00, 0.02)
+ p-value of fit (if done): 0.3619
+ error matrix (px, py, pz, E, x, y ,z):
+    2.3e-06   -1.4e-06   -1.5e-06   -2.4e-06   -1.8e-06   -5.6e-07   -6.7e-07
+   -1.4e-06    6.7e-06    5.2e-06    8.1e-06     -6e-07   -1.9e-07      2e-06
+   -1.5e-06    5.2e-06    7.5e-06    8.8e-06   -1.2e-07   -3.6e-08     -2e-06
+   -2.4e-06    8.1e-06    8.8e-06    1.2e-05   -1.1e-07   -3.5e-08     -9e-09
+   -1.8e-06     -6e-07   -1.2e-07   -1.1e-07    2.4e-06    7.5e-07    2.1e-07
+   -5.6e-07   -1.9e-07   -3.6e-08   -3.5e-08    7.5e-07    2.3e-07    6.4e-08
+   -6.7e-07      2e-06     -2e-06     -9e-09    2.1e-07    6.4e-08    5.2e-06
+
+ extra info=( SignalProbability=0.9896 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=1 preCut_rank=2 uniqueSignal=1 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): True
+Particle#3:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (1.18827,-1.55479,-0.0139671,1.95978)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2
+	name = mu+
+	# of daughters = 0
+  getAcoplanarity(): nan
+  getCharge(): 1
+  getCosHelicity(): nan
+[ERROR] No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle
+	name = mu+
+	iDaughter = 0
+  getCosHelicityDaughter(0): nan
+  getDaughter(0): -> NULL
+  getDaughter(1): -> NULL
+  getDaughterIndices(): size(0)
+  getDaughters(): size(0)
+  getECLCluster(): -> ECLClusters#11
+  getECLClusterEHypothesisBit(): 16
+  getEnergy(): 1.95978
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 0
+  getExtraInfoNames(): size(7)
+    SignalProbability
+    decayModeID
+    foo
+    mcErrors
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 8
+  getFinalStateDaughters(): size(1)
+    -> Particles#3
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=-13 <b>Charge</b>=1 <b>PDGMass</b>=0.1057<br> <b>flavorType</b>=1 <b>particleType</b>=1 <b>particleTypeUsedForFit</b>=211<br> <b>mdstIndex</b>=6 <b>arrayIndex</b>=3 <b>identifier</b>=6 <b>daughterIndices</b>:  (none)<br> <b>mass</b>=0.1057<br> <b>momentum</b>=(1.19, -1.55, -0.01) <b>p</b>=1.957<br> <b>position</b>=(0.00, 0.00, 0.02)<br> <b>p-value of fit</b> (if done): 0.2923<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffb5b5>      9e-06</td><td align=right bgcolor=8fffff>   -9.8e-06</td><td align=right bgcolor=feffff>   -7.7e-08</td><td align=right bgcolor=ff9393>    1.3e-05</td><td align=right bgcolor=f6ffff>   -7.9e-07</td><td align=right bgcolor=f8ffff>     -6e-07</td><td align=right bgcolor=fffefe>    1.8e-08</td></tr><tr><td align=right bgcolor=8fffff>   -9.8e-06</td><td align=right bgcolor=ff8686>    1.5e-05</td><td align=right bgcolor=fffefe>    1.1e-07</td><td align=right bgcolor=37ffff>   -1.8e-05</td><td align=right bgcolor=f5ffff>   -8.2e-07</td><td align=right bgcolor=f7ffff>   -6.2e-07</td><td align=right bgcolor=feffff>   -1.9e-08</td></tr><tr><td align=right bgcolor=feffff>   -7.7e-08</td><td align=right bgcolor=fffefe>    1.1e-07</td><td align=right bgcolor=fff0f0>    1.8e-06</td><td align=right bgcolor=fdffff>   -1.4e-07</td><td align=right bgcolor=fffefe>    1.3e-09</td><td align=right bgcolor=fffefe>    9.8e-10</td><td align=right bgcolor=ebffff>   -1.8e-06</td></tr><tr><td align=right bgcolor=ff9393>    1.3e-05</td><td align=right bgcolor=37ffff>   -1.8e-05</td><td align=right bgcolor=fdffff>   -1.4e-07</td><td align=right bgcolor=ff4b4b>    2.2e-05</td><td align=right bgcolor=fffdfd>    1.7e-07</td><td align=right bgcolor=fffdfd>    1.3e-07</td><td align=right bgcolor=fffefe>    3.8e-08</td></tr><tr><td align=right bgcolor=f6ffff>   -7.9e-07</td><td align=right bgcolor=f5ffff>   -8.2e-07</td><td align=right bgcolor=fffefe>    1.3e-09</td><td align=right bgcolor=fffdfd>    1.7e-07</td><td align=right bgcolor=fff3f3>    1.4e-06</td><td align=right bgcolor=fff6f6>      1e-06</td><td align=right bgcolor=feffff>   -3.2e-09</td></tr><tr><td align=right bgcolor=f8ffff>     -6e-07</td><td align=right bgcolor=f7ffff>   -6.2e-07</td><td align=right bgcolor=fffefe>    9.8e-10</td><td align=right bgcolor=fffdfd>    1.3e-07</td><td align=right bgcolor=fff6f6>      1e-06</td><td align=right bgcolor=fff8f8>    7.9e-07</td><td align=right bgcolor=feffff>   -2.4e-09</td></tr><tr><td align=right bgcolor=fffefe>    1.8e-08</td><td align=right bgcolor=feffff>   -1.9e-08</td><td align=right bgcolor=ebffff>   -1.8e-06</td><td align=right bgcolor=fffefe>    3.8e-08</td><td align=right bgcolor=feffff>   -3.2e-09</td><td align=right bgcolor=feffff>   -2.4e-09</td><td align=right bgcolor=ffe1e1>    3.6e-06</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.9633 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=1 preCut_rank=1 uniqueSignal=1 ) <br>
+  getKLMCluster(): -> KLMClusters#0
+  getMCParticle(): -> MCParticles#4
+  getMass(): 0.105658
+  getMdstArrayIndex(): 6
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(1)
+    6
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 16777222
+  getMomentum(): (1.18827,-1.55479,-0.0139671)
+  getMomentumErrorMatrix(): 
+     8.986522e-06 -9.830403e-06 -7.669640e-08  1.324831e-05 
+    -9.830403e-06  1.480601e-05  1.053252e-07 -1.770759e-05 
+    -7.669640e-08  1.053252e-07  1.834669e-06 -1.431387e-07 
+     1.324831e-05 -1.770759e-05 -1.431387e-07  2.208220e-05 
+  getMomentumMagnitude(): 1.95693
+  getMomentumVertexErrorMatrix(): 
+     8.986522e-06 -9.830403e-06 -7.669640e-08  1.324831e-05 -7.911527e-07 -6.021885e-07  1.787640e-08 
+    -9.830403e-06  1.480601e-05  1.053252e-07 -1.770759e-05 -8.177478e-07 -6.224944e-07 -1.903179e-08 
+    -7.669640e-08  1.053252e-07  1.834669e-06 -1.431387e-07  1.274681e-09  9.805400e-10 -1.750378e-06 
+     1.324831e-05 -1.770759e-05 -1.431387e-07  2.208220e-05  1.690526e-07  1.287248e-07  3.841266e-08 
+    -7.911527e-07 -8.177478e-07  1.274681e-09  1.690526e-07  1.364103e-06  1.040170e-06 -3.184159e-09 
+    -6.021885e-07 -6.224944e-07  9.805400e-10  1.287248e-07  1.040170e-06  7.931642e-07 -2.427975e-09 
+     1.787640e-08 -1.903179e-08 -1.750378e-06  3.841266e-08 -3.184159e-09 -2.427975e-09  3.627428e-06 
+  getNDaughters(): 0
+  getName(): mu+
+  getP(): 1.95693
+  getPDGCode(): -13
+  getPDGCodeUsedForFit(): 211
+  getPDGMass(): 0.105658
+  getPIDLikelihood(): -> PIDLikelihoods#6
+  getPValue(): 0.292314
+  getParticleType(): 1
+  getProperty(): 0
+  getPx(): 1.18827
+  getPy(): -1.55479
+  getPz(): -0.0139671
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#4 (weight: 1)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(1)
+    -> PIDLikelihoods#6 (weight: 1)
+  getTrack(): -> Tracks#6
+  getVertex(): (0.00259702,0.00198481,0.0223853)
+  getVertexErrorMatrix(): 
+     1.364103e-06  1.040170e-06 -3.184159e-09 
+     1.040170e-06  7.931642e-07 -2.427975e-09 
+    -3.184159e-09 -2.427975e-09  3.627428e-06 
+  getX(): 0.00259702
+  getY(): 0.00198481
+  getZ(): 0.0223853
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=-13 Charge=1 PDGMass=0.1057
+ flavorType=1 particleType=1 particleTypeUsedForFit=211
+ mdstIndex=6 arrayIndex=3 identifier=6 daughterIndices:  (none)
+ mass=0.1057
+ momentum=(1.19, -1.55, -0.01) p=1.957
+ position=(0.00, 0.00, 0.02)
+ p-value of fit (if done): 0.2923
+ error matrix (px, py, pz, E, x, y ,z):
+      9e-06   -9.8e-06   -7.7e-08    1.3e-05   -7.9e-07     -6e-07    1.8e-08
+   -9.8e-06    1.5e-05    1.1e-07   -1.8e-05   -8.2e-07   -6.2e-07   -1.9e-08
+   -7.7e-08    1.1e-07    1.8e-06   -1.4e-07    1.3e-09    9.8e-10   -1.8e-06
+    1.3e-05   -1.8e-05   -1.4e-07    2.2e-05    1.7e-07    1.3e-07    3.8e-08
+   -7.9e-07   -8.2e-07    1.3e-09    1.7e-07    1.4e-06      1e-06   -3.2e-09
+     -6e-07   -6.2e-07    9.8e-10    1.3e-07      1e-06    7.9e-07   -2.4e-09
+    1.8e-08   -1.9e-08   -1.8e-06    3.8e-08   -3.2e-09   -2.4e-09    3.6e-06
+
+ extra info=( SignalProbability=0.9633 decayModeID=0 foo=1337 mcErrors=0 postCut_rank=1 preCut_rank=1 uniqueSignal=1 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): False
+Particle#4:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (-0.572368,0.729556,1.35802,2.46299)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2
+	name = D0
+	# of grand daughters of first daughter = 0
+	# of grand daughters of second daughter = 0
+  getAcoplanarity(): nan
+  getCharge(): 0
+  getCosHelicity(): -0.70359
+[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+	name = D0
+	iDaughter = 0
+	iGrandDaughter = 0
+  getCosHelicityDaughter(0): nan
+  getDaughter(0): -> Particles#1
+  getDaughter(1): -> Particles#2
+  getDaughterIndices(): size(2)
+    1
+    2
+  getDaughters(): size(2)
+    -> Particles#1
+    -> Particles#2
+  getECLCluster(): -> NULL
+  getECLClusterEHypothesisBit(): 1
+  getEnergy(): 2.46299
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 4
+  getExtraInfoNames(): size(8)
+    SignalProbability
+    chiSquared
+    decayModeID
+    foo
+    ndf
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 9
+  getFinalStateDaughters(): size(2)
+    -> Particles#1
+    -> Particles#2
+  getFlavorType(): 0
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=421 <b>Charge</b>=0 <b>PDGMass</b>=1.865<br> <b>flavorType</b>=0 <b>particleType</b>=5 <b>particleTypeUsedForFit</b>=0<br> <b>mdstIndex</b>=0 <b>arrayIndex</b>=4 <b>identifier</b>=-1 <b>daughterIndices</b>: 1, 2, <br> <b>daughter PDGCodes</b>: -321, 321, <br> <b>mass</b>=1.834<br> <b>momentum</b>=(-0.57, 0.73, 1.36) <b>p</b>=1.644<br> <b>position</b>=(-0.00, 0.01, 0.03)<br> <b>p-value of fit</b> (if done): 0.0009724<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffc8c8>    3.8e-06</td><td align=right bgcolor=abffff>   -1.6e-06</td><td align=right bgcolor=aaffff>   -1.6e-06</td><td align=right bgcolor=6fffff>   -2.8e-06</td><td align=right bgcolor=7cffff>   -2.5e-06</td><td align=right bgcolor=fff2f2>    8.2e-07</td><td align=right bgcolor=fff7f7>      5e-07</td></tr><tr><td align=right bgcolor=abffff>   -1.6e-06</td><td align=right bgcolor=ff8888>    8.1e-06</td><td align=right bgcolor=ffafaf>    5.5e-06</td><td align=right bgcolor=ff9393>    7.4e-06</td><td align=right bgcolor=fff9f9>    3.7e-07</td><td align=right bgcolor=67ffff>   -2.9e-06</td><td align=right bgcolor=d0ffff>   -9.1e-07</td></tr><tr><td align=right bgcolor=aaffff>   -1.6e-06</td><td align=right bgcolor=ffafaf>    5.5e-06</td><td align=right bgcolor=ff7575>    9.4e-06</td><td align=right bgcolor=ff7b7b>    9.1e-06</td><td align=right bgcolor=fffcfc>    1.6e-07</td><td align=right bgcolor=aeffff>   -1.6e-06</td><td align=right bgcolor=37ffff>   -3.9e-06</td></tr><tr><td align=right bgcolor=6fffff>   -2.8e-06</td><td align=right bgcolor=ff9393>    7.4e-06</td><td align=right bgcolor=ff7b7b>    9.1e-06</td><td align=right bgcolor=ff4b4b>    1.2e-05</td><td align=right bgcolor=f9ffff>     -1e-07</td><td align=right bgcolor=fdffff>   -3.2e-08</td><td align=right bgcolor=fffefe>    3.2e-09</td></tr><tr><td align=right bgcolor=7cffff>   -2.5e-06</td><td align=right bgcolor=fff9f9>    3.7e-07</td><td align=right bgcolor=fffcfc>    1.6e-07</td><td align=right bgcolor=f9ffff>     -1e-07</td><td align=right bgcolor=ffd9d9>    2.6e-06</td><td align=right bgcolor=c5ffff>   -1.1e-06</td><td align=right bgcolor=beffff>   -1.2e-06</td></tr><tr><td align=right bgcolor=fff2f2>    8.2e-07</td><td align=right bgcolor=67ffff>   -2.9e-06</td><td align=right bgcolor=aeffff>   -1.6e-06</td><td align=right bgcolor=fdffff>   -3.2e-08</td><td align=right bgcolor=c5ffff>   -1.1e-06</td><td align=right bgcolor=ff9292>    7.5e-06</td><td align=right bgcolor=ffb3b3>    5.2e-06</td></tr><tr><td align=right bgcolor=fff7f7>      5e-07</td><td align=right bgcolor=d0ffff>   -9.1e-07</td><td align=right bgcolor=37ffff>   -3.9e-06</td><td align=right bgcolor=fffefe>    3.2e-09</td><td align=right bgcolor=beffff>   -1.2e-06</td><td align=right bgcolor=ffb3b3>    5.2e-06</td><td align=right bgcolor=ff9494>    7.3e-06</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.003549 chiSquared=10.88 decayModeID=12 foo=1337 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#0
+  getMass(): 1.83364
+  getMdstArrayIndex(): 0
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(2)
+    1
+    4
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 83886080
+  getMomentum(): (-0.572368,0.729556,1.35802)
+  getMomentumErrorMatrix(): 
+     3.768110e-06 -1.621375e-06 -1.638378e-06 -2.786382e-06 
+    -1.621375e-06  8.142522e-06  5.459933e-06  7.400577e-06 
+    -1.638378e-06  5.459933e-06  9.420245e-06  9.063551e-06 
+    -2.786382e-06  7.400577e-06  9.063551e-06  1.236567e-05 
+  getMomentumMagnitude(): 1.64441
+  getMomentumVertexErrorMatrix(): 
+     3.768110e-06 -1.621375e-06 -1.638378e-06 -2.786382e-06 -2.522560e-06  8.245046e-07  5.031475e-07 
+    -1.621375e-06  8.142522e-06  5.459933e-06  7.400577e-06  3.686112e-07 -2.931616e-06 -9.050960e-07 
+    -1.638378e-06  5.459933e-06  9.420245e-06  9.063551e-06  1.610251e-07 -1.565490e-06 -3.880311e-06 
+    -2.786382e-06  7.400577e-06  9.063551e-06  1.236567e-05 -1.033983e-07 -3.179565e-08  3.232601e-09 
+    -2.522560e-06  3.686112e-07  1.610251e-07 -1.033983e-07  2.564438e-06 -1.118812e-06 -1.249373e-06 
+     8.245046e-07 -2.931616e-06 -1.565490e-06 -3.179565e-08 -1.118812e-06  7.479617e-06  5.155744e-06 
+     5.031475e-07 -9.050960e-07 -3.880311e-06  3.232601e-09 -1.249373e-06  5.155744e-06  7.312783e-06 
+  getNDaughters(): 2
+  getName(): D0
+  getP(): 1.64441
+  getPDGCode(): 421
+  getPDGCodeUsedForFit(): 0
+  getPDGMass(): 1.86484
+  getPIDLikelihood(): -> NULL
+  getPValue(): 0.000972417
+  getParticleType(): 5
+  getProperty(): 6
+  getPx(): -0.572368
+  getPy(): 0.729556
+  getPz(): 1.35802
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#0 (weight: 1)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(0)
+  getTrack(): -> NULL
+  getVertex(): (-0.00248757,0.0143509,0.034328)
+  getVertexErrorMatrix(): 
+     2.564438e-06 -1.118812e-06 -1.249373e-06 
+    -1.118812e-06  7.479617e-06  5.155744e-06 
+    -1.249373e-06  5.155744e-06  7.312783e-06 
+  getX(): -0.00248757
+  getY(): 0.0143509
+  getZ(): 0.034328
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=421 Charge=0 PDGMass=1.865
+ flavorType=0 particleType=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=4 identifier=-1 daughterIndices: 1, 2, 
+ daughter PDGCodes: -321, 321, 
+ mass=1.834
+ momentum=(-0.57, 0.73, 1.36) p=1.644
+ position=(-0.00, 0.01, 0.03)
+ p-value of fit (if done): 0.0009724
+ error matrix (px, py, pz, E, x, y ,z):
+    3.8e-06   -1.6e-06   -1.6e-06   -2.8e-06   -2.5e-06    8.2e-07      5e-07
+   -1.6e-06    8.1e-06    5.5e-06    7.4e-06    3.7e-07   -2.9e-06   -9.1e-07
+   -1.6e-06    5.5e-06    9.4e-06    9.1e-06    1.6e-07   -1.6e-06   -3.9e-06
+   -2.8e-06    7.4e-06    9.1e-06    1.2e-05     -1e-07   -3.2e-08    3.2e-09
+   -2.5e-06    3.7e-07    1.6e-07     -1e-07    2.6e-06   -1.1e-06   -1.2e-06
+    8.2e-07   -2.9e-06   -1.6e-06   -3.2e-08   -1.1e-06    7.5e-06    5.2e-06
+      5e-07   -9.1e-07   -3.9e-06    3.2e-09   -1.2e-06    5.2e-06    7.3e-06
+
+ extra info=( SignalProbability=0.003549 chiSquared=10.88 decayModeID=12 foo=1337 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): False
+Particle#5:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (-0.621085,0.834529,1.47818,2.6805)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2
+	name = D*-
+	# of grand daughters of first daughter = 2
+	# of grand daughters of second daughter = 0
+  getAcoplanarity(): nan
+  getCharge(): -1
+  getCosHelicity(): 0.953376
+  getCosHelicityDaughter(0): -0.997821
+  getDaughter(0): -> Particles#4
+  getDaughter(1): -> Particles#0
+  getDaughterIndices(): size(2)
+    4
+    0
+  getDaughters(): size(2)
+    -> Particles#4
+    -> Particles#0
+  getECLCluster(): -> NULL
+  getECLClusterEHypothesisBit(): 1
+  getEnergy(): 2.6805
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 4
+  getExtraInfoNames(): size(8)
+    SignalProbability
+    chiSquared
+    decayModeID
+    foo
+    ndf
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 9
+  getFinalStateDaughters(): size(3)
+    -> Particles#1
+    -> Particles#2
+    -> Particles#0
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=-413 <b>Charge</b>=-1 <b>PDGMass</b>=2.01<br> <b>flavorType</b>=1 <b>particleType</b>=5 <b>particleTypeUsedForFit</b>=0<br> <b>mdstIndex</b>=0 <b>arrayIndex</b>=5 <b>identifier</b>=-1 <b>daughterIndices</b>: 4, 0, <br> <b>daughter PDGCodes</b>: 421, -211, <br> <b>mass</b>=1.979<br> <b>momentum</b>=(-0.62, 0.83, 1.48) <b>p</b>=1.808<br> <b>position</b>=(-0.00, 0.01, 0.03)<br> <b>p-value of fit</b> (if done): 0.5538<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=fffefe>    4.4e-06</td><td align=right bgcolor=feffff>   -1.4e-06</td><td align=right bgcolor=feffff>   -1.8e-06</td><td align=right bgcolor=feffff>   -2.4e-06</td><td align=right bgcolor=fdffff>   -8.8e-06</td><td align=right bgcolor=fffefe>    8.5e-06</td><td align=right bgcolor=fffefe>    1.5e-05</td></tr><tr><td align=right bgcolor=feffff>   -1.4e-06</td><td align=right bgcolor=fffefe>    9.8e-06</td><td align=right bgcolor=fffefe>    4.8e-06</td><td align=right bgcolor=fffefe>    6.2e-06</td><td align=right bgcolor=fbffff>   -2.2e-05</td><td align=right bgcolor=fffdfd>    2.6e-05</td><td align=right bgcolor=fffbfb>    5.3e-05</td></tr><tr><td align=right bgcolor=feffff>   -1.8e-06</td><td align=right bgcolor=fffefe>    4.8e-06</td><td align=right bgcolor=fffefe>    1.1e-05</td><td align=right bgcolor=fffefe>    7.7e-06</td><td align=right bgcolor=fffdfd>    1.8e-05</td><td align=right bgcolor=fbffff>   -2.5e-05</td><td align=right bgcolor=f7ffff>   -4.7e-05</td></tr><tr><td align=right bgcolor=feffff>   -2.4e-06</td><td align=right bgcolor=fffefe>    6.2e-06</td><td align=right bgcolor=fffefe>    7.7e-06</td><td align=right bgcolor=fffefe>    6.7e-06</td><td align=right bgcolor=fffefe>    7.7e-07</td><td align=right bgcolor=feffff>   -1.9e-06</td><td align=right bgcolor=feffff>   -2.5e-06</td></tr><tr><td align=right bgcolor=fdffff>   -8.8e-06</td><td align=right bgcolor=fbffff>   -2.2e-05</td><td align=right bgcolor=fffdfd>    1.8e-05</td><td align=right bgcolor=fffefe>    7.7e-07</td><td align=right bgcolor=ffdfdf>    0.00054</td><td align=right bgcolor=92ffff>   -0.00069</td><td align=right bgcolor=37ffff>    -0.0013</td></tr><tr><td align=right bgcolor=fffefe>    8.5e-06</td><td align=right bgcolor=fffdfd>    2.6e-05</td><td align=right bgcolor=fbffff>   -2.5e-05</td><td align=right bgcolor=feffff>   -1.9e-06</td><td align=right bgcolor=92ffff>   -0.00069</td><td align=right bgcolor=ffcaca>    0.00089</td><td align=right bgcolor=ff9d9d>     0.0016</td></tr><tr><td align=right bgcolor=fffefe>    1.5e-05</td><td align=right bgcolor=fffbfb>    5.3e-05</td><td align=right bgcolor=f7ffff>   -4.7e-05</td><td align=right bgcolor=feffff>   -2.5e-06</td><td align=right bgcolor=37ffff>    -0.0013</td><td align=right bgcolor=ff9d9d>     0.0016</td><td align=right bgcolor=ff4b4b>      0.003</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.07342 chiSquared=0.3506 decayModeID=0 foo=1337 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#0
+  getMass(): 1.97936
+  getMdstArrayIndex(): 0
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(3)
+    1
+    4
+    0
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 83886080
+  getMomentum(): (-0.621085,0.834529,1.47818)
+  getMomentumErrorMatrix(): 
+     4.398714e-06 -1.430520e-06 -1.836367e-06 -2.423175e-06 
+    -1.430520e-06  9.752373e-06  4.829331e-06  6.182711e-06 
+    -1.836367e-06  4.829331e-06  1.073682e-05  7.659213e-06 
+    -2.423175e-06  6.182711e-06  7.659213e-06  6.688197e-06 
+  getMomentumMagnitude(): 1.80754
+  getMomentumVertexErrorMatrix(): 
+     4.398714e-06 -1.430520e-06 -1.836367e-06 -2.423175e-06 -8.789153e-06  8.479720e-06  1.481856e-05 
+    -1.430520e-06  9.752373e-06  4.829331e-06  6.182711e-06 -2.241507e-05  2.609423e-05  5.318936e-05 
+    -1.836367e-06  4.829331e-06  1.073682e-05  7.659213e-06  1.840286e-05 -2.494199e-05 -4.740150e-05 
+    -2.423175e-06  6.182711e-06  7.659213e-06  6.688197e-06  7.702710e-07 -1.904466e-06 -2.481333e-06 
+    -8.789153e-06 -2.241507e-05  1.840286e-05  7.702710e-07  5.360969e-04 -6.865647e-04 -1.268814e-03 
+     8.479720e-06  2.609423e-05 -2.494199e-05 -1.904466e-06 -6.865647e-04  8.880195e-04  1.633564e-03 
+     1.481856e-05  5.318936e-05 -4.740150e-05 -2.481333e-06 -1.268814e-03  1.633564e-03  3.018686e-03 
+  getNDaughters(): 2
+  getName(): D*-
+  getP(): 1.80754
+  getPDGCode(): -413
+  getPDGCodeUsedForFit(): 0
+  getPDGMass(): 2.01026
+  getPIDLikelihood(): -> NULL
+  getPValue(): 0.553795
+  getParticleType(): 5
+  getProperty(): 6
+  getPx(): -0.621085
+  getPy(): 0.834529
+  getPz(): 1.47818
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#0 (weight: 1)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(0)
+  getTrack(): -> NULL
+  getVertex(): (-0.00128892,0.0126959,0.0312395)
+  getVertexErrorMatrix(): 
+     5.360969e-04 -6.865647e-04 -1.268814e-03 
+    -6.865647e-04  8.880195e-04  1.633564e-03 
+    -1.268814e-03  1.633564e-03  3.018686e-03 
+  getX(): -0.00128892
+  getY(): 0.0126959
+  getZ(): 0.0312395
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=-413 Charge=-1 PDGMass=2.01
+ flavorType=1 particleType=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=5 identifier=-1 daughterIndices: 4, 0, 
+ daughter PDGCodes: 421, -211, 
+ mass=1.979
+ momentum=(-0.62, 0.83, 1.48) p=1.808
+ position=(-0.00, 0.01, 0.03)
+ p-value of fit (if done): 0.5538
+ error matrix (px, py, pz, E, x, y ,z):
+    4.4e-06   -1.4e-06   -1.8e-06   -2.4e-06   -8.8e-06    8.5e-06    1.5e-05
+   -1.4e-06    9.8e-06    4.8e-06    6.2e-06   -2.2e-05    2.6e-05    5.3e-05
+   -1.8e-06    4.8e-06    1.1e-05    7.7e-06    1.8e-05   -2.5e-05   -4.7e-05
+   -2.4e-06    6.2e-06    7.7e-06    6.7e-06    7.7e-07   -1.9e-06   -2.5e-06
+   -8.8e-06   -2.2e-05    1.8e-05    7.7e-07    0.00054   -0.00069    -0.0013
+    8.5e-06    2.6e-05   -2.5e-05   -1.9e-06   -0.00069    0.00089     0.0016
+    1.5e-05    5.3e-05   -4.7e-05   -2.5e-06    -0.0013     0.0016      0.003
+
+ extra info=( SignalProbability=0.07342 chiSquared=0.3506 decayModeID=0 foo=1337 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): False
+Particle#6:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (0.567844,-0.719347,1.46426,4.64059)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2
+	name = B0
+	# of grand daughters of first daughter = 2
+	# of grand daughters of second daughter = 0
+  getAcoplanarity(): nan
+  getCharge(): 0
+  getCosHelicity(): -0.64592
+  getCosHelicityDaughter(0): -0.442572
+  getDaughter(0): -> Particles#5
+  getDaughter(1): -> Particles#3
+  getDaughterIndices(): size(2)
+    5
+    3
+  getDaughters(): size(2)
+    -> Particles#5
+    -> Particles#3
+  getECLCluster(): -> NULL
+  getECLClusterEHypothesisBit(): 1
+  getEnergy(): 4.64059
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 2
+  getExtraInfoNames(): size(13)
+    SignalProbability
+    chiSquared
+    decayModeID
+    foo
+    looseMCMotherIndex
+    looseMCMotherPDG
+    looseMCWrongDaughterBiB
+    looseMCWrongDaughterN
+    looseMCWrongDaughterPDG
+    ndf
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 14
+  getFinalStateDaughters(): size(4)
+    -> Particles#1
+    -> Particles#2
+    -> Particles#0
+    -> Particles#3
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=511 <b>Charge</b>=0 <b>PDGMass</b>=5.28<br> <b>flavorType</b>=1 <b>particleType</b>=5 <b>particleTypeUsedForFit</b>=0<br> <b>mdstIndex</b>=0 <b>arrayIndex</b>=6 <b>identifier</b>=-1 <b>daughterIndices</b>: 5, 3, <br> <b>daughter PDGCodes</b>: -413, -13, <br> <b>mass</b>=4.307<br> <b>momentum</b>=(0.57, -0.72, 1.46) <b>p</b>=1.727<br> <b>position</b>=(0.00, 0.01, 0.02)<br> <b>p-value of fit</b> (if done): 0.1809<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffacac>    1.3e-05</td><td align=right bgcolor=3effff>   -1.1e-05</td><td align=right bgcolor=dcffff>     -2e-06</td><td align=right bgcolor=ffbcbc>    1.1e-05</td><td align=right bgcolor=d9ffff>   -2.2e-06</td><td align=right bgcolor=fffafa>    6.5e-07</td><td align=right bgcolor=fffefe>    3.9e-08</td></tr><tr><td align=right bgcolor=3effff>   -1.1e-05</td><td align=right bgcolor=ff6767>    2.4e-05</td><td align=right bgcolor=ffe0e0>    4.8e-06</td><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=fffbfb>    5.1e-07</td><td align=right bgcolor=c7ffff>   -3.3e-06</td><td align=right bgcolor=feffff>   -2.9e-08</td></tr><tr><td align=right bgcolor=dcffff>     -2e-06</td><td align=right bgcolor=ffe0e0>    4.8e-06</td><td align=right bgcolor=ffb0b0>    1.3e-05</td><td align=right bgcolor=ffcece>    7.7e-06</td><td align=right bgcolor=f1ffff>   -7.7e-07</td><td align=right bgcolor=fff8f8>    9.6e-07</td><td align=right bgcolor=e1ffff>   -1.7e-06</td></tr><tr><td align=right bgcolor=ffbcbc>    1.1e-05</td><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=ffcece>    7.7e-06</td><td align=right bgcolor=ff4b4b>    2.9e-05</td><td align=right bgcolor=fdffff>   -6.5e-08</td><td align=right bgcolor=fffefe>      1e-07</td><td align=right bgcolor=fffefe>    4.3e-08</td></tr><tr><td align=right bgcolor=d9ffff>   -2.2e-06</td><td align=right bgcolor=fffbfb>    5.1e-07</td><td align=right bgcolor=f1ffff>   -7.7e-07</td><td align=right bgcolor=fdffff>   -6.5e-08</td><td align=right bgcolor=ffeeee>    2.7e-06</td><td align=right bgcolor=d9ffff>   -2.2e-06</td><td align=right bgcolor=e4ffff>   -1.6e-06</td></tr><tr><td align=right bgcolor=fffafa>    6.5e-07</td><td align=right bgcolor=c7ffff>   -3.3e-06</td><td align=right bgcolor=fff8f8>    9.6e-07</td><td align=right bgcolor=fffefe>      1e-07</td><td align=right bgcolor=d9ffff>   -2.2e-06</td><td align=right bgcolor=ffdfdf>      5e-06</td><td align=right bgcolor=fff2f2>    2.1e-06</td></tr><tr><td align=right bgcolor=fffefe>    3.9e-08</td><td align=right bgcolor=feffff>   -2.9e-08</td><td align=right bgcolor=e1ffff>   -1.7e-06</td><td align=right bgcolor=fffefe>    4.3e-08</td><td align=right bgcolor=e4ffff>   -1.6e-06</td><td align=right bgcolor=fff2f2>    2.1e-06</td><td align=right bgcolor=ffe8e8>    3.7e-06</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.1503 chiSquared=1.79 decayModeID=3 foo=1337 looseMCMotherIndex=1 looseMCMotherPDG=511 looseMCWrongDaughterBiB=0 looseMCWrongDaughterN=1 looseMCWrongDaughterPDG=-321 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#0
+  getMass(): 4.3071
+  getMdstArrayIndex(): 0
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(4)
+    1
+    4
+    0
+    6
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 83886080
+  getMomentum(): (0.567844,-0.719347,1.46426)
+  getMomentumErrorMatrix(): 
+     1.327345e-05 -1.140316e-05 -2.038258e-06  1.063043e-05 
+    -1.140316e-05  2.430473e-05  4.830087e-06 -1.185397e-05 
+    -2.038258e-06  4.830087e-06  1.257017e-05  7.699532e-06 
+     1.063043e-05 -1.185397e-05  7.699532e-06  2.881040e-05 
+  getMomentumMagnitude(): 1.72742
+  getMomentumVertexErrorMatrix(): 
+     1.327345e-05 -1.140316e-05 -2.038258e-06  1.063043e-05 -2.248525e-06  6.476234e-07  3.854928e-08 
+    -1.140316e-05  2.430473e-05  4.830087e-06 -1.185397e-05  5.103469e-07 -3.304961e-06 -2.918229e-08 
+    -2.038258e-06  4.830087e-06  1.257017e-05  7.699532e-06 -7.714235e-07  9.613560e-07 -1.744609e-06 
+     1.063043e-05 -1.185397e-05  7.699532e-06  2.881040e-05 -6.454313e-08  1.013097e-07  4.301987e-08 
+    -2.248525e-06  5.103469e-07 -7.714235e-07 -6.454313e-08  2.712256e-06 -2.215407e-06 -1.571178e-06 
+     6.476234e-07 -3.304961e-06  9.613560e-07  1.013097e-07 -2.215407e-06  5.017958e-06  2.079720e-06 
+     3.854928e-08 -2.918229e-08 -1.744609e-06  4.301987e-08 -1.571178e-06  2.079720e-06  3.670911e-06 
+  getNDaughters(): 2
+  getName(): B0
+  getP(): 1.72742
+  getPDGCode(): 511
+  getPDGCodeUsedForFit(): 0
+  getPDGMass(): 5.27958
+  getPIDLikelihood(): -> NULL
+  getPValue(): 0.180944
+  getParticleType(): 5
+  getProperty(): 6
+  getPx(): 0.567844
+  getPy(): -0.719347
+  getPz(): 1.46426
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#0 (weight: 1)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(0)
+  getTrack(): -> NULL
+  getVertex(): (0.00117694,0.00573621,0.0223913)
+  getVertexErrorMatrix(): 
+     2.712256e-06 -2.215407e-06 -1.571178e-06 
+    -2.215407e-06  5.017958e-06  2.079720e-06 
+    -1.571178e-06  2.079720e-06  3.670911e-06 
+  getX(): 0.00117694
+  getY(): 0.00573621
+  getZ(): 0.0223913
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleType=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=6 identifier=-1 daughterIndices: 5, 3, 
+ daughter PDGCodes: -413, -13, 
+ mass=4.307
+ momentum=(0.57, -0.72, 1.46) p=1.727
+ position=(0.00, 0.01, 0.02)
+ p-value of fit (if done): 0.1809
+ error matrix (px, py, pz, E, x, y ,z):
+    1.3e-05   -1.1e-05     -2e-06    1.1e-05   -2.2e-06    6.5e-07    3.9e-08
+   -1.1e-05    2.4e-05    4.8e-06   -1.2e-05    5.1e-07   -3.3e-06   -2.9e-08
+     -2e-06    4.8e-06    1.3e-05    7.7e-06   -7.7e-07    9.6e-07   -1.7e-06
+    1.1e-05   -1.2e-05    7.7e-06    2.9e-05   -6.5e-08      1e-07    4.3e-08
+   -2.2e-06    5.1e-07   -7.7e-07   -6.5e-08    2.7e-06   -2.2e-06   -1.6e-06
+    6.5e-07   -3.3e-06    9.6e-07      1e-07   -2.2e-06      5e-06    2.1e-06
+    3.9e-08   -2.9e-08   -1.7e-06    4.3e-08   -1.6e-06    2.1e-06    3.7e-06
+
+ extra info=( SignalProbability=0.1503 chiSquared=1.79 decayModeID=3 foo=1337 looseMCMotherIndex=1 looseMCMotherPDG=511 looseMCWrongDaughterBiB=0 looseMCWrongDaughterN=1 looseMCWrongDaughterPDG=-321 ndf=1 postCut_rank=1 preCut_rank=1 uniqueSignal=0 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): False
+Particle#7:
+  addExtraInfo(foo,1337): None
+  get4Vector(): (0.567647,-0.719983,1.46483,4.64076)
+[ERROR] Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2
+	name = B0
+	# of daughters = 3
+  getAcoplanarity(): nan
+  getCharge(): 0
+  getCosHelicity(): -0.294538
+  getCosHelicityDaughter(0): -0.998412
+  getDaughter(0): -> Particles#4
+  getDaughter(1): -> Particles#0
+  getDaughterIndices(): size(3)
+    4
+    0
+    3
+  getDaughters(): size(3)
+    -> Particles#4
+    -> Particles#0
+    -> Particles#3
+  getECLCluster(): -> NULL
+  getECLClusterEHypothesisBit(): 1
+  getEnergy(): 4.64076
+  getExtraInfo(foo): 1337
+  getExtraInfoMap(): 2
+  getExtraInfoNames(): size(13)
+    SignalProbability
+    chiSquared
+    decayModeID
+    foo
+    looseMCMotherIndex
+    looseMCMotherPDG
+    looseMCWrongDaughterBiB
+    looseMCWrongDaughterN
+    looseMCWrongDaughterPDG
+    ndf
+    postCut_rank
+    preCut_rank
+    uniqueSignal
+  getExtraInfoSize(): 14
+  getFinalStateDaughters(): size(4)
+    -> Particles#1
+    -> Particles#2
+    -> Particles#0
+    -> Particles#3
+  getFlavorType(): 1
+  getInfoHTML(): <b>collection</b>=Particles<br> <b>PDGCode</b>=511 <b>Charge</b>=0 <b>PDGMass</b>=5.28<br> <b>flavorType</b>=1 <b>particleType</b>=5 <b>particleTypeUsedForFit</b>=0<br> <b>mdstIndex</b>=0 <b>arrayIndex</b>=7 <b>identifier</b>=-1 <b>daughterIndices</b>: 4, 0, 3, <br> <b>daughter PDGCodes</b>: 421, -211, -13, <br> <b>mass</b>=4.307<br> <b>momentum</b>=(0.57, -0.72, 1.46) <b>p</b>=1.728<br> <b>position</b>=(0.00, 0.01, 0.02)<br> <b>p-value of fit</b> (if done): 0.4636<br> <b>error matrix</b> (px, py, pz, E, x, y ,z):<br><table padding=0><tr><td align=right bgcolor=ffabab>    1.3e-05</td><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=e0ffff>   -1.8e-06</td><td align=right bgcolor=ffbbbb>    1.1e-05</td><td align=right bgcolor=d7ffff>   -2.3e-06</td><td align=right bgcolor=fff9f9>    8.6e-07</td><td align=right bgcolor=fffefe>    5.8e-08</td></tr><tr><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=ff6b6b>    2.4e-05</td><td align=right bgcolor=ffdbdb>    5.6e-06</td><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=fffdfd>      2e-07</td><td align=right bgcolor=d6ffff>   -2.4e-06</td><td align=right bgcolor=fffefe>    3.5e-08</td></tr><tr><td align=right bgcolor=e0ffff>   -1.8e-06</td><td align=right bgcolor=ffdbdb>    5.6e-06</td><td align=right bgcolor=ffb5b5>    1.2e-05</td><td align=right bgcolor=ffd0d0>    7.4e-06</td><td align=right bgcolor=f7ffff>   -4.5e-07</td><td align=right bgcolor=fffefe>    9.2e-08</td><td align=right bgcolor=dfffff>   -1.8e-06</td></tr><tr><td align=right bgcolor=ffbbbb>    1.1e-05</td><td align=right bgcolor=37ffff>   -1.2e-05</td><td align=right bgcolor=ffd0d0>    7.4e-06</td><td align=right bgcolor=ff4b4b>    2.9e-05</td><td align=right bgcolor=fffefe>    2.9e-08</td><td align=right bgcolor=fbffff>     -2e-07</td><td align=right bgcolor=fffefe>    3.2e-08</td></tr><tr><td align=right bgcolor=d7ffff>   -2.3e-06</td><td align=right bgcolor=fffdfd>      2e-07</td><td align=right bgcolor=f7ffff>   -4.5e-07</td><td align=right bgcolor=fffefe>    2.9e-08</td><td align=right bgcolor=ffefef>    2.5e-06</td><td align=right bgcolor=dfffff>   -1.8e-06</td><td align=right bgcolor=e4ffff>   -1.5e-06</td></tr><tr><td align=right bgcolor=fff9f9>    8.6e-07</td><td align=right bgcolor=d6ffff>   -2.4e-06</td><td align=right bgcolor=fffefe>    9.2e-08</td><td align=right bgcolor=fbffff>     -2e-07</td><td align=right bgcolor=dfffff>   -1.8e-06</td><td align=right bgcolor=ffe5e5>      4e-06</td><td align=right bgcolor=fff2f2>      2e-06</td></tr><tr><td align=right bgcolor=fffefe>    5.8e-08</td><td align=right bgcolor=fffefe>    3.5e-08</td><td align=right bgcolor=dfffff>   -1.8e-06</td><td align=right bgcolor=fffefe>    3.2e-08</td><td align=right bgcolor=e4ffff>   -1.5e-06</td><td align=right bgcolor=fff2f2>      2e-06</td><td align=right bgcolor=ffe7e7>    3.7e-06</td></tr></table><br> <b>extra info</b>=( SignalProbability=0.0184 chiSquared=2.565 decayModeID=5 foo=1337 looseMCMotherIndex=1 looseMCMotherPDG=511 looseMCWrongDaughterBiB=0 looseMCWrongDaughterN=1 looseMCWrongDaughterPDG=-321 ndf=3 postCut_rank=3 preCut_rank=2 uniqueSignal=0 ) <br>
+  getKLMCluster(): -> NULL
+  getMCParticle(): -> MCParticles#0
+  getMass(): 4.30701
+  getMdstArrayIndex(): 0
+  getMdstArrayIndices(0): size(0)
+  getMdstArrayIndices(1): size(4)
+    1
+    4
+    0
+    6
+  getMdstArrayIndices(2): size(0)
+  getMdstArrayIndices(3): size(0)
+  getMdstArrayIndices(4): size(0)
+  getMdstArrayIndices(5): size(0)
+  getMdstArrayIndices(6): size(0)
+  getMdstSource(): 83886080
+  getMomentum(): (0.567647,-0.719983,1.46483)
+  getMomentumErrorMatrix(): 
+     1.322666e-05 -1.162199e-05 -1.796625e-06  1.072781e-05 
+    -1.162199e-05  2.352751e-05  5.643675e-06 -1.157117e-05 
+    -1.796625e-06  5.643675e-06  1.177245e-05  7.373373e-06 
+     1.072781e-05 -1.157117e-05  7.373373e-06  2.866858e-05 
+  getMomentumMagnitude(): 1.7281
+  getMomentumVertexErrorMatrix(): 
+     1.322666e-05 -1.162199e-05 -1.796625e-06  1.072781e-05 -2.304678e-06  8.589848e-07  5.818121e-08 
+    -1.162199e-05  2.352751e-05  5.643675e-06 -1.157117e-05  2.019270e-07 -2.374180e-06  3.532256e-08 
+    -1.796625e-06  5.643675e-06  1.177245e-05  7.373373e-06 -4.521152e-07  9.242548e-08 -1.808366e-06 
+     1.072781e-05 -1.157117e-05  7.373373e-06  2.866858e-05  2.858180e-08 -2.020239e-07  3.166479e-08 
+    -2.304678e-06  2.019270e-07 -4.521152e-07  2.858180e-08  2.544885e-06 -1.842471e-06 -1.548801e-06 
+     8.589848e-07 -2.374180e-06  9.242548e-08 -2.020239e-07 -1.842471e-06  4.018159e-06  2.012369e-06 
+     5.818121e-08  3.532256e-08 -1.808366e-06  3.166479e-08 -1.548801e-06  2.012369e-06  3.667022e-06 
+  getNDaughters(): 3
+  getName(): B0
+  getP(): 1.7281
+  getPDGCode(): 511
+  getPDGCodeUsedForFit(): 0
+  getPDGMass(): 5.27958
+  getPIDLikelihood(): -> NULL
+  getPValue(): 0.46358
+  getParticleType(): 5
+  getProperty(): 6
+  getPx(): 0.567647
+  getPy(): -0.719983
+  getPz(): 1.46483
+  getRelationsWith(MCParticles): size(1)
+    -> MCParticles#0 (weight: 1)
+  getRelationsWith(TrackFitResults): size(0)
+  getRelationsWith(PIDLikelihoods): size(0)
+  getTrack(): -> NULL
+  getVertex(): (0.000968523,0.00636536,0.0224382)
+  getVertexErrorMatrix(): 
+     2.544885e-06 -1.842471e-06 -1.548801e-06 
+    -1.842471e-06  4.018159e-06  2.012369e-06 
+    -1.548801e-06  2.012369e-06  3.667022e-06 
+  getX(): 0.000968523
+  getY(): 0.00636536
+  getZ(): 0.0224382
+  hasExtraInfo(foo): True
+  hasExtraInfo(bar): False
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleType=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=7 identifier=-1 daughterIndices: 4, 0, 3, 
+ daughter PDGCodes: 421, -211, -13, 
+ mass=4.307
+ momentum=(0.57, -0.72, 1.46) p=1.728
+ position=(0.00, 0.01, 0.02)
+ p-value of fit (if done): 0.4636
+ error matrix (px, py, pz, E, x, y ,z):
+    1.3e-05   -1.2e-05   -1.8e-06    1.1e-05   -2.3e-06    8.6e-07    5.8e-08
+   -1.2e-05    2.4e-05    5.6e-06   -1.2e-05      2e-07   -2.4e-06    3.5e-08
+   -1.8e-06    5.6e-06    1.2e-05    7.4e-06   -4.5e-07    9.2e-08   -1.8e-06
+    1.1e-05   -1.2e-05    7.4e-06    2.9e-05    2.9e-08     -2e-07    3.2e-08
+   -2.3e-06      2e-07   -4.5e-07    2.9e-08    2.5e-06   -1.8e-06   -1.5e-06
+    8.6e-07   -2.4e-06    9.2e-08     -2e-07   -1.8e-06      4e-06      2e-06
+    5.8e-08    3.5e-08   -1.8e-06    3.2e-08   -1.5e-06      2e-06    3.7e-06
+
+ extra info=( SignalProbability=0.0184 chiSquared=2.565 decayModeID=5 foo=1337 looseMCMotherIndex=1 looseMCMotherPDG=511 looseMCWrongDaughterBiB=0 looseMCWrongDaughterN=1 looseMCWrongDaughterPDG=-321 ndf=3 postCut_rank=3 preCut_rank=2 uniqueSignal=0 ) 
+
+  print(): None
+  updateMass(13): None
+  wasExactFitHypothesisUsed(): False
+ParticleExtraInfoMap:
+  getIndex(0,foo): 7
+  getIndex(0,bar): 0
+  getMap(0): size(7)
+    pair
+      SignalProbability
+      3
+    pair
+      decayModeID
+      1
+    pair
+      foo
+      7
+    pair
+      mcErrors
+      4
+    pair
+      postCut_rank
+      6
+    pair
+      preCut_rank
+      2
+    pair
+      uniqueSignal
+      5
+  getMapForNewVar(foo): 5
+  getMapForNewVar(bar): 6
+  getNMaps(): 7
+EventExtraInfo:
+  addExtraInfo(foo,1337): None
+  getExtraInfo(foo): 1337
+  getInfoHTML(): foo = 1337.000000<br />
+  getNames(): size(1)
+    foo
+  hasExtraInfo(foo): True
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 0
+[INFO] ========================================================================

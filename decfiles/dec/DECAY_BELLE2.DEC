@@ -319,6 +319,7 @@ Enddecay
 
 
 
+
 ##################################################################################
 ##########                                                              ##########
 ##########                         B0  anti-B0                          ##########
@@ -1225,8 +1226,8 @@ Decay B0
 0.000210000   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000860000   J/psi  K*0T                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 
-0.000303330   J/psi  K+  pi-                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[Comment - PG 09/2020] #[BF update - PG 09/2020]
-0.000303330   J/psi  K0  pi0                               PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
+0.000303330   J/psi  K+  pi-                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
+0.000151660   J/psi  K0  pi0                               PHSP; #No PDGLive value. Assume BF(J/psi K0 pi0) = BF(J/psi K+ pi-) / 2. #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000025450   J/psi  rho0                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
@@ -1263,7 +1264,7 @@ Decay B0
 0.000392000   psi(2S)  K*0T                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 
 0.000186800   psi(2S)  K+  pi-                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000186800   psi(2S)  K0  pi0                             PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
+0.000093400   psi(2S)  K0  pi0                             PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
 0.000200000   psi(2S)  K0  pi-  pi+                        PHSP;
 0.000100000   psi(2S)  K0  pi0  pi0                        PHSP;
 0.000100000   psi(2S)  K+  pi-  pi0                        PHSP;
@@ -2523,8 +2524,8 @@ Decay anti-B0
 0.000210000   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000860000   J/psi  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
-0.000303330   J/psi  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[Comment - PG 09/2020] #[BF update - PG 09/2020]
-0.000303330   J/psi  anti-K0  pi0                          PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
+0.000303330   J/psi  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
+0.000151660   J/psi  anti-K0  pi0                          PHSP; #No PDGLive value. Assume BF(J/psi K0 pi0) = BF(J/psi K+ pi-) / 2. #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000025450   J/psi  rho0                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
@@ -2561,7 +2562,7 @@ Decay anti-B0
 0.000392000   psi(2S)  anti-K*0T                           SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
 0.000186800   psi(2S)  K-  pi+                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000186800   psi(2S)  anti-K0  pi0                        PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
+0.000093400   psi(2S)  anti-K0  pi0                        PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
 0.000200000   psi(2S)  anti-K0  pi+  pi-                   PHSP;
 0.000100000   psi(2S)  anti-K0  pi0  pi0                   PHSP;
 0.000100000   psi(2S)  K-  pi+  pi0                        PHSP;

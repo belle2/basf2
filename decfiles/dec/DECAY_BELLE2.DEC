@@ -589,7 +589,7 @@ Decay B0
 0.000000000   rho(2S)-  pi+                                SVS;
 0.000000000   rho(3S)+  pi-                                SVS;
 0.000000000   rho(3S)-  pi+                                SVS;
-0.000000000   pi+  pi-  pi0                                PHSP; #Here I assume the model generates NR decays. #[BF update - PG 09/2020]
+0.000000000   pi+  pi-  pi0                                PHSP; #Here I assume the BTO3PI_CP dm model above generates NR decays. #[BF update - PG 09/2020]
 
 0.000002350   rho0  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000002350   rho0  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  
@@ -1221,24 +1221,25 @@ Decay B0
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  
 
-0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #[w/CPV - BO 09/2017]
+0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000210000   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000860000   J/psi  K*0T                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
+
+0.000303330   J/psi  K+  pi-                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[Comment - PG 09/2020] #[BF update - PG 09/2020]
+0.000303330   J/psi  K0  pi0                               PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000025450   J/psi  rho0                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
 0.000017700   J/psi  omega                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
 
-0.000100000   J/psi  K0  pi0                               PHSP;
 0.000434530   J/psi  K0  pi-  pi+                          PHSP; #[BF update - PG 09/2020]
-#0.000350000   J/psi  K0  pi0  pi0                          PHSP; Not in PDGLive. Keep commented out. #[Comment - PG 09/2020]
-#0.000350000   J/psi  K+  pi-  pi0                          PHSP; Not in PDGLive. Keep commented out. #[Comment - PG 09/2020]
+#0.000350000   J/psi  K0  pi0  pi0                          PHSP; #No PDGLive value. Keep commented out. #[Comment - PG 09/2020]
+#0.000350000   J/psi  K+  pi-  pi0                          PHSP; #No PDGLive value. Keep commented out. #[Comment - PG 09/2020]
 
 0.001300000   J/psi  K_10                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000100000   J/psi  K'_10                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*0                                 PHSP;
 0.000048680   J/psi  K0  phi                               PHSP; #[BF update - PG 09/2020]
-0.001150050   J/psi  K+  pi-                               PHSP; #[BF update - PG 09/2020]
 
 0.000108000   J/psi  eta  K0                               PHSP;
 0.000230000   J/psi  omega  K0                             PHSP;
@@ -1257,12 +1258,12 @@ Decay B0
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #[w/CPV - BO 09/2017]
+0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #psi(2S) K*0 is Gamma_257 PDGLive = 5.9e-4. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000098000   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000392000   psi(2S)  K*0T                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 
-0.000580000   psi(2S)  K+  pi-                             PHSP; #[BF update - PG 09/2020]
-0.000200000   psi(2S)  K0  pi0                             PHSP;
+0.000186800   psi(2S)  K+  pi-                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
+0.000186800   psi(2S)  K0  pi0                             PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
 0.000200000   psi(2S)  K0  pi-  pi+                        PHSP;
 0.000100000   psi(2S)  K0  pi0  pi0                        PHSP;
 0.000100000   psi(2S)  K+  pi-  pi0                        PHSP;
@@ -1460,7 +1461,7 @@ Decay B0
 0.000500000   D-  pi+  pi0                                 PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 
 0.006798790   rho+  D*-                                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Parameters taken from ICHEP 98-852. Gamma_51 PDGLive. #[BF update - PG 09/2020]
-0.015157710   D*-  pi+  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710. This Includes rho+ D*-. Need to subtract? #[BF update - PG 09/2020]
+0.010625180   D*-  pi+  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho+. Subtract rho+ component: BF(D*- pi+ pi0) = 0.015157710 - 2/3 * 0.006798790. #[BF update - PG 09/2020]
 
 0.000880260   anti-D0  pi-  pi+                            PHSP; #[BF update - PG 09/2020]
 0.000620000   anti-D*0  pi-  pi+                           PHSP;
@@ -1472,7 +1473,7 @@ Decay B0
 0.003900000   D-  pi-  pi+  pi+                            PHSP; #Gamma_47 PDGLive => Nonresonant BF. #[BF update - PG 09/2020]
 
 0.001100000   D-  rho+  pi0                                PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
-0.001000000   D-  pi0  pi+  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
+0.001000000   D-  pi0  pi+  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. Do not appear in data (FEI studies); BF too high here? #[Comment - PG 09/2020]
 
 0.001000000   anti-D0  pi-  pi+  pi0                       PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 0.000100000   anti-D0  pi0  pi0  pi0                       PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
@@ -1482,7 +1483,7 @@ Decay B0
 0.000000000   D*-  pi-  pi+  pi+                           PHSP; #Gamma_58 PDGLive => Nonresonant BF = 0. Use 0 or estimate? #[BF update - PG 09/2020]
 
 0.001000000   D*-  rho+  pi0                               PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
-0.001000000   D*-  pi0  pi+  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
+0.001000000   D*-  pi0  pi+  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. Do not appear in data (FEI studies); BF too high here? #[Comment - PG 09/2020]
 
 0.001000000   anti-D*0  pi-  pi+  pi0                      PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 0.000100000   anti-D*0  pi0  pi0  pi0                      PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
@@ -1886,7 +1887,7 @@ Decay anti-B0
 0.000000000   rho(2S)+  pi-                                SVS;
 0.000000000   rho(3S)-  pi+                                SVS;
 0.000000000   rho(3S)+  pi-                                SVS;
-0.000000000   pi-  pi+  pi0                                PHSP; #Here I assume the model generates NR decays. #[BF update - PG 09/2020]
+0.000000000   pi-  pi+  pi0                                PHSP; #Here I assume the BTO3PI_CP dm model above model generates NR decays. #[BF update - PG 09/2020]
 
 0.000002350   rho0  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000002350   rho0  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  
@@ -2518,24 +2519,25 @@ Decay anti-B0
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  
 
-0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[w/CPV - BO 09/2017]
+0.000210000   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000210000   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000860000   J/psi  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
+
+0.000303330   J/psi  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[Comment - PG 09/2020] #[BF update - PG 09/2020]
+0.000303330   J/psi  anti-K0  pi0                          PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
 0.000025450   J/psi  rho0                                  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
 0.000017700   J/psi  omega                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
 
-0.000100000   J/psi  anti-K0  pi0                          PHSP;
 0.000434530   J/psi  anti-K0  pi+  pi-                     PHSP; #[BF update - PG 09/2020]
-#0.000350000   J/psi  anti-K0  pi0  pi0                     PHSP; Not in PDGLive. Keep commented out. #[Comment - PG 09/2020]
-#0.000350000   J/psi  K-  pi+  pi0                          PHSP; Not in PDGLive. Keep commented out. #[Comment - PG 09/2020]
+#0.000350000   J/psi  anti-K0  pi0  pi0                     PHSP; #No PDGLive value. Keep commented out. #[Comment - PG 09/2020]
+#0.000350000   J/psi  K-  pi+  pi0                          PHSP; #No PDGLive value. Keep commented out. #[Comment - PG 09/2020]
 
 0.001300000   J/psi  anti-K_10                             SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000100000   J/psi  anti-K'_10                            SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  anti-K_2*0                            PHSP;
 0.000048680   J/psi  anti-K0  phi                          PHSP; #[BF update - PG 09/2020]
-0.001150050   J/psi  K-  pi+                               PHSP; #[BF update - PG 09/2020]
 
 0.000108000   J/psi  eta  anti-K0                          PHSP;
 0.000230000   J/psi  omega  anti-K0                        PHSP;
@@ -2554,12 +2556,12 @@ Decay anti-B0
 0.000290000   psi(2S)  K_S0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
 0.000290000   psi(2S)  K_L0                                SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #[w/CPV - BO 09/2017]
+0.000098000   psi(2S)  K*S                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #psi(2S) K*0 is Gamma_257 PDGLive = 5.9e-4. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000098000   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      
 0.000392000   psi(2S)  anti-K*0T                           SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; 
 
-0.000580000   psi(2S)  K-  pi+                             PHSP; #[BF update - PG 09/2020]
-0.000200000   psi(2S)  anti-K0  pi0                        PHSP;
+0.000186800   psi(2S)  K-  pi+                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
+0.000186800   psi(2S)  anti-K0  pi0                        PHSP; #No PDGLive value. Assume same value as K+ pi-. #[BF update - PG 09/2020]
 0.000200000   psi(2S)  anti-K0  pi+  pi-                   PHSP;
 0.000100000   psi(2S)  anti-K0  pi0  pi0                   PHSP;
 0.000100000   psi(2S)  K-  pi+  pi0                        PHSP;
@@ -2757,7 +2759,7 @@ Decay anti-B0
 0.000500000   D+  pi-  pi0                                 PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 
 0.006798790   rho-  D*+                                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Parameters taken from ICHEP 98-852. #[BF update - PG 09/2020]
-0.015157710   D*+  pi-  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710. This Includes rho+ D*-. Need to subtract? #[BF update - PG 09/2020]
+0.010625180   D*+  pi-  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho+. Subtract rho+ component: BF(D*- pi+ pi0) = 0.015157710 - 2/3 * 0.006798790. #[BF update - PG 09/2020]
 
 0.000880260   D0  pi+  pi-                                 PHSP; #[BF update - PG 09/2020]
 0.000620000   D*0  pi+  pi-                                PHSP;
@@ -2769,7 +2771,7 @@ Decay anti-B0
 0.003900000   D+  pi+  pi-  pi-                            PHSP; #Gamma_47 PDGLive => Nonresonant BF. #[BF update - PG 09/2020]
 
 0.001100000   D+  rho-  pi0                                PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
-0.001000000   D+  pi0  pi-  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
+0.001000000   D+  pi0  pi-  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. Do not appear in data (FEI studies); BF too high here? #[Comment - PG 09/2020]
 
 0.001000000   D0  pi+  pi-  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 0.000100000   D0  pi0  pi0  pi0                            PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
@@ -2779,7 +2781,7 @@ Decay anti-B0
 0.000000000   D*+  pi+  pi-  pi-                           PHSP; #Gamma_58 PDGLive => Nonresonant BF = 0. Use 0 or estimate? #[BF update - PG 09/2020]
 
 0.001000000   D*+  rho-  pi0                               PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
-0.001000000   D*+  pi0  pi-  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
+0.001000000   D*+  pi0  pi-  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. Do not appear in data (FEI studies); BF too high here? #[Comment - PG 09/2020]
 
 0.001000000   D*0  pi+  pi-  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 0.000100000   D*0  pi0  pi0  pi0                           PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]

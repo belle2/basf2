@@ -32,7 +32,7 @@ using namespace Belle2;
 using namespace ROOT::Math;
 
 KLMTimeAlgorithm::KLMTimeAlgorithm() :
-  CalibrationAlgorithm("KLMTimeCalibrationCollector"),
+  CalibrationAlgorithm("KLMTimeCollector"),
   ev(),
   t_tin{nullptr},
   m_time_channelAvg_rpc{0.0},

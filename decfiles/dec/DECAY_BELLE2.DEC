@@ -6073,8 +6073,8 @@ CDecay D*-
 
 # D*0
 Decay D*0
-0.619000000   D0  pi0                                      VSS;
-0.381000000   D0  gamma                                    VSP_PWAVE;
+0.647000000   D0  pi0                                      VSS; #[PDG2020]
+0.353000000   D0  gamma                                    VSP_PWAVE; #[PDG2020]
 Enddecay
 
 CDecay anti-D*0
@@ -6223,10 +6223,10 @@ Decay D+
 0.001102000   anti-K*0  rho0  pi+                          PHSP;
 0.003851000   anti-K*0  omega  pi+                         PHSP;
 
-0.008473000   K-  pi+  pi+  pi0                            PHSP;
+0.062500000   K-  pi+  pi+  pi0                            PHSP; # [PDG2020]
 
-0.002473000   K_S0  pi+  pi+  pi-                          PHSP;
-0.002473000   K_L0  pi+  pi+  pi-                          PHSP;
+0.031000000   K_S0  pi+  pi+  pi-                          PHSP; # [PDG2020]
+0.031000000   K_L0  pi+  pi+  pi-                          PHSP; # copied K_S0 pi+ pi+ pi-, best estimate
 0.000000000   anti-K0  pi+  pi+  pi-                       PHSP;
 
 0.001900000   K_S0  eta'  pi+                              PHSP; # [New mode added - PDG2019]
@@ -6426,10 +6426,10 @@ Decay D-
 0.001102000   K*0  rho0  pi-                               PHSP;
 0.003851000   K*0  omega  pi-                              PHSP;
 
-0.008473000   K+  pi-  pi-  pi0                            PHSP;
+0.062500000   K+  pi-  pi-  pi0                            PHSP; # [PDG2020]
 
-0.002473000   K_S0  pi+  pi-  pi-                          PHSP;
-0.002473000   K_L0  pi+  pi-  pi-                          PHSP;
+0.031000000   K_S0  pi+  pi-  pi-                          PHSP; # [PDG2020]
+0.031000000   K_L0  pi+  pi-  pi-                          PHSP; # copied K_S0 pi+ pi- pi-, best estimate
 0.000000000   K0  pi+  pi-  pi-                            PHSP;
 
 0.001900000   K_S0  eta'  pi-                              PHSP; # [New mode added - PDG2019]
@@ -6655,7 +6655,7 @@ Decay D0
 0.019000000   K-  omega  pi+                               PHSP;
 0.009202000   K-  eta  pi+                                 PHSP;
 0.007500000   K-  eta'  pi+                                PHSP;
-0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.082300000   K-  pi+  pi+  pi-                            PHSP; # [PDG2020]
 
 0.035300000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract K_S0 eta, omega K_S0, anti-K*0 pi+ pi-, and K*- pi+ pi0 BFs from PDG value of 0.052
 0.035300000   K_L0  pi+  pi-  pi0                          PHSP;

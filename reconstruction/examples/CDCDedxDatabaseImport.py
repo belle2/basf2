@@ -13,8 +13,6 @@
 #
 ########################################################
 
-from basf2 import *
-import ROOT
 from ROOT.Belle2 import CDCDedxDatabaseImporter
 
 dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")

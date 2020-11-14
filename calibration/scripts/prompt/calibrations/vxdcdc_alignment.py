@@ -257,21 +257,26 @@ def get_calibrations(input_data, **kwargs):
         import ROOT
         import os
 
-        print("Now fixing .mille binary paths in CollectorOutput.root files. Works only if granularity=all - will crash otherwise")
+        print("Now fixing .mille binary paths in CollectorOutput.root files")
 
         for path in algorithm.getInputFileNames():
             file = ROOT.TFile(path, "UPDATE")
-            milleData = file.Get("MillepedeCollector/mille/mille_-1.-1/mille_1")
 
-            dirname = os.path.dirname(path)
-            fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
+            runRange = file.Get("MillepedeCollector/RunRange")
+            runSet = [(-1, -1)] if runRange.getGranularity() == "all" else [(e, r) for e, r in runRange.getExpRunSet()]
 
-            milleData.clear()
-            for f in fixed_milleFiles:
-                milleData.addFile(f)
+            for exp, run in runSet:
+                milleData = file.Get(f"MillepedeCollector/mille/mille_{exp}.{run}/mille_1")
 
-            file.cd("MillepedeCollector/mille/mille_-1.-1/")
-            milleData.Write("", ROOT.TObject.kOverwrite)
+                dirname = os.path.dirname(path)
+                fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
+
+                milleData.clear()
+                for f in fixed_milleFiles:
+                    milleData.addFile(f)
+
+                file.cd(f"MillepedeCollector/mille/mille_{exp}.{run}/")
+                milleData.Write("", ROOT.TObject.kOverwrite)
             file.Write()
             file.Close()
 

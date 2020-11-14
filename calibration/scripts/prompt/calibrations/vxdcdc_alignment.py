@@ -250,41 +250,9 @@ def get_calibrations(input_data, **kwargs):
             'RootInput',
             entrySequences=[f'0:{max_processed_events_per_file}'])
 
-    # start: Bugfix for Condor ----------------------------------------------------------------
-    prev_prealgo = cal.algorithms[0].pre_algorithm
-
-    def fixMillePaths(algorithm, iteration):
-        import ROOT
-        import os
-
-        print("Now fixing .mille binary paths in CollectorOutput.root files")
-
-        for path in algorithm.getInputFileNames():
-            file = ROOT.TFile(path, "UPDATE")
-
-            runRange = file.Get("MillepedeCollector/RunRange")
-            runSet = [(-1, -1)] if runRange.getGranularity() == "all" else [(e, r) for e, r in runRange.getExpRunSet()]
-
-            for exp, run in runSet:
-                milleData = file.Get(f"MillepedeCollector/mille/mille_{exp}.{run}/mille_1")
-
-                dirname = os.path.dirname(path)
-                fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
-
-                milleData.clear()
-                for f in fixed_milleFiles:
-                    milleData.addFile(f)
-
-                file.cd(f"MillepedeCollector/mille/mille_{exp}.{run}/")
-                milleData.Write("", ROOT.TObject.kOverwrite)
-            file.Write()
-            file.Close()
-
-        # Run the previously set pre-algorithm
-        prev_prealgo(algorithm, iteration)
-
-    cal.algorithms[0].pre_algorithm = fixMillePaths
-    # end: Bugfix for Condor -----------------------------------------------------------
+    # Bugfix for Condor:
+    from alignment.prompt_utils import fix_mille_paths_for_algo
+    fix_mille_paths_for_algo(mp2_beamspot.algorithms[0])
 
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     cal.max_iterations = cfg['max_iterations']

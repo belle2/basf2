@@ -21,10 +21,11 @@ def fix_mille_paths_for_algo(algo):
         import ROOT
         import os
 
-        print("Now fixing .mille binary paths in CollectorOutput.root files. Works only if granularity=all - will crash otherwise")
+        print("Now fixing .mille binary paths in CollectorOutput.root files")
 
         for path in algorithm.getInputFileNames():
             file = ROOT.TFile(path, "UPDATE")
+            dirname = os.path.dirname(path)
 
             runRange = file.Get("MillepedeCollector/RunRange")
             runSet = [(-1, -1)] if runRange.getGranularity() == "all" else [(e, r) for e, r in runRange.getExpRunSet()]
@@ -32,7 +33,6 @@ def fix_mille_paths_for_algo(algo):
             for exp, run in runSet:
                 milleData = file.Get(f"MillepedeCollector/mille/mille_{exp}.{run}/mille_1")
 
-                dirname = os.path.dirname(path)
                 fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
 
                 milleData.clear()

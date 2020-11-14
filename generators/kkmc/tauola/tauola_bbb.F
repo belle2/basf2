@@ -4139,7 +4139,7 @@ C            4- default ME wrapped curr., 5- wrapped ME
       END
 
       SUBROUTINE DAM3PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,AMPLIT1,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4), FPI, VUD, CE
+      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4), FPI, FPIc, VUD, CE
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -4150,13 +4150,14 @@ C
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       EXTERNAL eepi, mumupi
+      DATA  FPIc /93.3E-3/ 
       IF (MNUM.EQ.47) THEN
          CALL eepi(AMEL,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
       ELSE IF (MNUM.EQ.48) THEN
          CALL mumupi(AMMU,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
       ENDIF
-      FPI = 0.0922
-      VUD = 0.9742
+      FPI = FPIc
+      VUD = CCABIB 
       CE = 16.*GFERMI * GFERMI * AMTAU * AMTAU * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
       AMPLIT1 = AMPLIT * CE
       RETURN

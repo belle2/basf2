@@ -250,6 +250,37 @@ def get_calibrations(input_data, **kwargs):
             'RootInput',
             entrySequences=[f'0:{max_processed_events_per_file}'])
 
+    # start: Bugfix for Condor ----------------------------------------------------------------
+    prev_prealgo = cal.algorithms[0].pre_algorithm
+
+    def fixMillePaths(algorithm, iteration):
+        import ROOT
+        import os
+
+        print("Now fixing .mille binary paths in CollectorOutput.root files. Works only if granularity=all - will crash otherwise")
+
+        for path in algorithm.getInputFileNames():
+            file = ROOT.TFile(path, "UPDATE")
+            milleData = file.Get("MillepedeCollector/mille/mille_-1.-1/mille_1")
+
+            dirname = os.path.dirname(path)
+            fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
+
+            milleData.clear()
+            for f in fixed_milleFiles:
+                milleData.addFile(f)
+
+            file.cd("MillepedeCollector/mille/mille_-1.-1/")
+            milleData.Write("", ROOT.TObject.kOverwrite)
+            file.Write()
+            file.Close()
+
+        # Run the previously set pre-algorithm
+        prev_prealgo(algorithm, iteration)
+
+    cal.algorithms[0].pre_algorithm = fixMillePaths
+    # end: Bugfix for Condor -----------------------------------------------------------
+
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     cal.max_iterations = cfg['max_iterations']
 

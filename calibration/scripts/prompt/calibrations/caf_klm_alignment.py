@@ -231,6 +231,38 @@ def get_calibrations(input_data, **kwargs):
 
     cal_klm.algorithms = [millepede.algo]
 
+    # start: Bugfix for Condor ----------------------------------------------------------------
+    def fixMillePaths(algorithm, iteration):
+        import ROOT
+        import os
+
+        print("Now fixing .mille binary paths in CollectorOutput.root files")
+
+        for path in algorithm.getInputFileNames():
+            file = ROOT.TFile(path, "UPDATE")
+
+            runRange = file.Get("MillepedeCollector/RunRange")
+            runSet = [(-1, -1)] if runRange.getGranularity() == "all" else [(e, r) for e, r in runRange.getExpRunSet()]
+
+            for exp, run in runSet:
+                milleData = file.Get(f"MillepedeCollector/mille/mille_{exp}.{run}/mille_1")
+
+                dirname = os.path.dirname(path)
+                fixed_milleFiles = [os.path.join(dirname, os.path.basename(milleFile)) for milleFile in milleData.getFiles()]
+
+                milleData.clear()
+                for f in fixed_milleFiles:
+                    milleData.addFile(f)
+
+                file.cd(f"MillepedeCollector/mille/mille_{exp}.{run}/")
+                milleData.Write("", ROOT.TObject.kOverwrite)
+            file.Write()
+            file.Close()
+
+    for algorithm in cal_klm.algorithms:
+        algorithm.pre_algorithm = fixMillePaths
+    # end: Bugfix for Condor -----------------------------------------------------------
+
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = SequentialRunByRun
         algorithm.params = {"iov_coverage": output_iov}

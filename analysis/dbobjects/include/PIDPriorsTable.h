@@ -172,6 +172,7 @@ namespace Belle2 {
 
     /**
      * Checks is a values is withing the range of an array
+     * @param text text to display in the warning message
      * @param val the value
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value

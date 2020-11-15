@@ -428,7 +428,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
   }
 #endif
-
+  // cppcheck-suppress unreadVariable
   int status = 0;
 
   if (!enough) {
@@ -439,12 +439,15 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
+      // cppcheck-suppress unreadVariable
       status = 4;
     } else if (fabs(data - 30) > 15. || diff > 8) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
+      // cppcheck-suppress unreadVariable
       status = 3;
     } else {
       m_cCharge->Pad()->SetFillColor(kGreen);// Green
+      // cppcheck-suppress unreadVariable
       status = 2;
     }
 

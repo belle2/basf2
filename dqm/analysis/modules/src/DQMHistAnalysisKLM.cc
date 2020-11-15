@@ -368,10 +368,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
-  while ((obj = static_cast<TObject*>(nextkey()))) {
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvasName)
-        return static_cast<TCanvas*>(obj);
+        return dynamic_cast<TCanvas*>(obj);
     }
   }
   return nullptr;

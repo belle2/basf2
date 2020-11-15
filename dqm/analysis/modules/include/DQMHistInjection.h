@@ -56,6 +56,7 @@ namespace Belle2 {
     std::string m_pvPrefix;
 
     //! Clean up PVs
+    // cppcheck-suppress unusedPrivateFunction
     void cleanPVs(void);
 
     //! PXD Hits

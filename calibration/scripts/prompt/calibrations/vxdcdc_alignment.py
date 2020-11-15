@@ -252,7 +252,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Bugfix for Condor:
     from alignment.prompt_utils import fix_mille_paths_for_algo
-    fix_mille_paths_for_algo(mp2_beamspot.algorithms[0])
+    fix_mille_paths_for_algo(cal.algorithms[0])
 
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     cal.max_iterations = cfg['max_iterations']

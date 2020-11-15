@@ -48,6 +48,8 @@ namespace Belle2 {
       /*!
       This is the 'old' way of building the geometry from Gearbox (xml files). Expected to be deprecated in the future.
         \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      \param topVolume Geant4 logical top volume.
+      \param type Geometry type.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
@@ -66,7 +68,7 @@ namespace Belle2 {
       //! Creates a parameter object from the Gearbox XML parameters.
       /*! If more  than one object is created these could be assigned to members or you
        * could return a tuple.
-      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      \param param A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
        */
       COILGeometryPar readConfiguration(const GearDir& param);
 
@@ -76,7 +78,7 @@ namespace Belle2 {
       \param parameters A database object containing the geometry information
       \param topVolume A Geant4 volume where to place the item
       */
-      virtual void createGeometry(const COILGeometryPar& paramaters, G4LogicalVolume& topVolume, geometry::GeometryTypes);
+      virtual void createGeometry(const COILGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes);
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;

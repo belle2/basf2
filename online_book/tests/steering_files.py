@@ -59,6 +59,7 @@ class SteeringFileTest(unittest.TestCase):
         "Test data files not found."
     )
     def test_lessons_1_to_5(self):
+        #: Directory for test examples.
         self._test_examples_dir(
             "online_book/basf2/steering_files", additional_arguments=["1"]
         )

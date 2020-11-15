@@ -367,8 +367,7 @@ namespace Belle2 {
   }
 
   // cppcheck-suppress operatorEqToSelf
-  TRGState&
-  TRGState::operator=(const TRGState& a)
+  TRGState& TRGState::operator=(const TRGState& a)
   {
     if (_state)
       free(_state);

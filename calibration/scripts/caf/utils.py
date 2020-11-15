@@ -718,7 +718,7 @@ def find_absolute_file_paths(file_path_patterns):
     """
     existing_file_paths = set()
     for file_pattern in file_path_patterns:
-        file_pattern_uri = urlparse(file_pattern, scheme="file", allow_fragments=False)
+        file_pattern_uri = parse_file_uri(file_pattern)
         if file_pattern_uri.scheme == "file":
             input_files = glob.glob(file_pattern_uri.path)
             if not input_files:
@@ -808,6 +808,19 @@ def find_int_dirs(dir_path):
         except ValueError as err:
             pass
     return paths
+
+
+def parse_file_uri(file_uri):
+    """
+    A central function for parsing file URI strings. Just so we only have to change it in one place later.
+
+    Parameters:
+        file_uri (str)
+
+    Returns:
+        urllib.parse.ParseResult
+    """
+    return urlparse(file_uri, scheme="file", allow_fragments=False)
 
 
 UNBOUND_EXPRUN = ExpRun(-1, -1)

@@ -15,7 +15,6 @@ from time import sleep
 from pathlib import Path
 import shutil
 from glob import glob
-from urllib.parse import urlparse
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import find_file
@@ -23,21 +22,23 @@ from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
 
-from .utils import B2INFO_MULTILINE
-from .utils import past_from_future_dependencies
-from .utils import topological_sort
-from .utils import all_dependencies
-from .utils import method_dispatch
-from .utils import temporary_workdir
-from .utils import find_int_dirs
-from .utils import LocalDatabase
-from .utils import CentralDatabase
+import caf
+from caf.utils import B2INFO_MULTILINE
+from caf.utils import past_from_future_dependencies
+from caf.utils import topological_sort
+from caf.utils import all_dependencies
+from caf.utils import method_dispatch
+from caf.utils import temporary_workdir
+from caf.utils import find_int_dirs
+from caf.utils import LocalDatabase
+from caf.utils import CentralDatabase
+from caf.utils import parse_file_uri
 
-from caf import strategies
-from caf import runners
-import caf.backends
+import caf.strategies as strategies
+import caf.runners as runners
+from caf import backends
 from caf.backends import MaxSubjobsSplitter, MaxFilesSplitter
-from .state_machines import CalibrationMachine, ConditionError, MachineError
+from caf.state_machines import CalibrationMachine, ConditionError, MachineError
 from caf.database import CAFDB
 
 
@@ -202,11 +203,11 @@ This script will be copied into subjob directories as part of the input sandbox.
             list: A list of the URIs found from the initial string.
         """
         # By default we assume it is a local file path if no "scheme" is given
-        uri = urlparse(input_file, scheme="file", allow_fragments=False)
+        uri = parse_file_uri(input_file)
         if uri.scheme == "file":
             # For local files we also perform a glob just in case it is a wildcard pattern.
             # That way we will have all the uris of files separately
-            uris = [urlparse(f, scheme="file", allow_fragments=False).geturl() for f in glob(input_file)]
+            uris = [parse_file_uri(f).geturl() for f in glob(input_file)]
         else:
             # Just let everything else through and hop the backend can figure it out
             uris = [input_file]

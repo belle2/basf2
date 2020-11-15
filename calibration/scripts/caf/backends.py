@@ -16,11 +16,11 @@ import time
 from datetime import datetime, timedelta
 import subprocess
 import multiprocessing as mp
-from urllib.parse import urlparse
 
-from .utils import method_dispatch
-from .utils import decode_json_string
-from .utils import grouper
+from caf.utils import method_dispatch
+from caf.utils import decode_json_string
+from caf.utils import grouper
+from caf.utils import parse_file_uri
 
 
 __all__ = ["Job", "SubJob", "Backend", "Local", "Batch", "LSF", "PBS", "HTCondor", "get_input_data"]
@@ -556,7 +556,7 @@ class Job:
         """
         existing_input_files = []  # We use a list instead of set to avoid losing any ordering of files
         for file_path in self.input_files:
-            file_uri = urlparse(file_path, scheme="file", allow_fragments=False)
+            file_uri = parse_file_uri(file_path)
             if file_uri.scheme == "file":
                 p = Path(file_uri.path)
                 if p.is_file():

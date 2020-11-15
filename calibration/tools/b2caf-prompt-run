@@ -24,7 +24,6 @@ import json
 from pathlib import Path
 from collections import OrderedDict
 import shutil
-from urllib.parse import urlparse
 
 from caf.utils import IoV
 from caf import backends
@@ -73,7 +72,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
         B2INFO(f"Gathering files for '{input_name}' from {input_data_path.as_posix()}")
         file_to_iov = OrderedDict()
         for run_path, exp_run in run_list:
-            run_path_uri = urlparse(run_path, scheme="file", allow_fragments=False)
+            run_path_uri = backends.parse_file_uri(run_path)
             # For local paths we want to possibly do pattern matching
             if run_path_uri.scheme == "file":
                 # This is a local directory or file, so first make sure it is absolute

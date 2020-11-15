@@ -121,11 +121,13 @@ namespace Belle2 {
 
     /** for all particles, save chi values into 'chi'.
      *
-     * @param chi   array of chi values to be modified
-     * @param p     track momentum valid in the cdc
-     * @param dedx  dE/dx value
-     * @param sin   track sin(theta)
-     * @param nhit  number of hits used for this track
+     * @param chi       array of chi values to be modified
+     * @param predmean  prediceted mean for each hypothesis
+     * @param predres   predicted resolution for each hypothesis
+     * @param p         track momentum valid in the cdc
+     * @param dedx      dE/dx value
+     * @param sin       track sin(theta)
+     * @param nhit      number of hits used for this track
      * */
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
                       double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;

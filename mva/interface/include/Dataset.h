@@ -188,7 +188,8 @@ namespace Belle2 {
        * @param general_options which defines e.g. number of variables
        * @param input feature values of the single event
        * @param spectators spectator values of the single event
-       * @param target target value of the single event (defaults to 1, because often this is not known if one wants to apply an expert)
+       * @param targets target values of the single event (defaults to 1, because often this is not known if one wants to apply an expert)
+       * @param weights weights assigned to the input feature values
        */
       MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& input,
                    const std::vector<std::vector<float>>& spectators,

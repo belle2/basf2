@@ -39,13 +39,13 @@ namespace Belle2 {
      * @param PDG the PDG code of the particle
      * @param trackID the trackID of the track
      * @param position the position of the hit
-     * @param the momentum of particle at the time of the hit
+     * @param momentum the momentum of particle at the time of the hit
      * @param t time at which the hit occured
      * @param E_start the energy of the particle at the entrance to the volume
      * @param E_end the energy of the particle at the exit of the volume
      * @param eDep the energy deposited in the volume
      * @param trackLength the length of the track in the volume
-     * @param nutronWeight the effective neutron weigth
+     * @param nWeight the effective neutron weigth
      */
     BeamBackHit(int subDet, int iden, int PDG, int trackID, TVector3 position,
                 TVector3 momentum, double t, double E_start, double E_end,

@@ -55,12 +55,13 @@ namespace Belle2 {
      * Get all useable tracks for particles
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param addVertexPoint flag for adding the vertex point
      */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint = true);
 
     /** Fit given RecoTrack with GBL
      *
-     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param recoTrack A RecoTrack object to be fitted
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
      *
      * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)

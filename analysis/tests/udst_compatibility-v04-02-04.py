@@ -33,7 +33,7 @@ if __name__ == "__main__":
     udst.add_udst_dump(main, True)
 
     # also dump some variables just in case the DataStorePrinter hides some
-    # problems (like has happened once: PR #7525).
+    # problems (like has happened once: PR #7525 / BII-7148).
     sanity_check_variables = [
         "mcPDG",
         "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)
@@ -45,4 +45,6 @@ if __name__ == "__main__":
     ]
     main.add_module(
         "ParticlePrinter", listName="B0:semileptonic", variables=sanity_check_variables)
-    basf2.process(main)
+
+    # only 3 events in the file, but set explicitly case this test script gets copied
+    basf2.process(main, 3)

@@ -6073,8 +6073,8 @@ CDecay D*-
 
 # D*0
 Decay D*0
-0.619000000   D0  pi0                                      VSS;
-0.381000000   D0  gamma                                    VSP_PWAVE;
+0.647000000   D0  pi0                                      VSS; #[PDG2020]
+0.353000000   D0  gamma                                    VSP_PWAVE; #[PDG2020]
 Enddecay
 
 CDecay anti-D*0
@@ -6226,7 +6226,7 @@ Decay D+
 0.008473000   K-  pi+  pi+  pi0                            PHSP;
 
 0.002473000   K_S0  pi+  pi+  pi-                          PHSP;
-0.002473000   K_L0  pi+  pi+  pi-                          PHSP;
+0.002473000   K_L0  pi+  pi+  pi-                          PHSP; # copied K_S0 pi+ pi+ pi-, best estimate
 0.000000000   anti-K0  pi+  pi+  pi-                       PHSP;
 
 0.001900000   K_S0  eta'  pi+                              PHSP; # [New mode added - PDG2019]
@@ -6429,7 +6429,7 @@ Decay D-
 0.008473000   K+  pi-  pi-  pi0                            PHSP;
 
 0.002473000   K_S0  pi+  pi-  pi-                          PHSP;
-0.002473000   K_L0  pi+  pi-  pi-                          PHSP;
+0.002473000   K_L0  pi+  pi-  pi-                          PHSP; # copied K_S0 pi+ pi- pi-, best estimate
 0.000000000   K0  pi+  pi-  pi-                            PHSP;
 
 0.001900000   K_S0  eta'  pi-                              PHSP; # [New mode added - PDG2019]

@@ -70,6 +70,7 @@ namespace Belle2 {
 
     /** Set the branch address of the specified leafes to the data members
      * @param t: tree for which the Branch addresses will be set
+     * @param branchName: name of the branch
      * @param variableName: specifier for the branch name
     */
     void setBranchAddress(TTree* t, const std::string& branchName,

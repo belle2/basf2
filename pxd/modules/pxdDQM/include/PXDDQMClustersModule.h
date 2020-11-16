@@ -60,13 +60,13 @@ namespace Belle2 {
 
 
     /** Hitmaps of Digits */
-    TH1I* m_hitMapCounts = {};
+    TH1D* m_hitMapCounts = {};
     /** Hitmaps of Clusters*/
-    TH1I* m_hitMapClCounts = {};
+    TH1D* m_hitMapClCounts = {};
     /** Hitmaps of digits on chips */
-    TH1I* m_hitMapCountsChip = {};
+    TH1D* m_hitMapCountsChip = {};
     /** Hitmaps of clusters on chips */
-    TH1I* m_hitMapClCountsChip = {};
+    TH1D* m_hitMapClCountsChip = {};
     /** Fired pixels per event */
     TH1F** m_fired = {};
     /** Clusters per event */

@@ -27,7 +27,6 @@ _ROOT_kIsConstMethod = 0x10000000
 
 class _TObjectConstWrapper:
     """Empty class to check whether an instance is already const wrapped"""
-    pass
 
 
 def _make_tobject_nonconst(obj):

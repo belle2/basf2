@@ -158,6 +158,12 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
+
+    .. warning::
+
+        This functon is kept for backward-compatibility.
+        Better to use `mdst.add_mdst_output` directly.
+
     """
 
     import mdst
@@ -166,105 +172,20 @@ def outputMdst(filename, path):
 
 def outputUdst(filename, particleLists=None, includeArrays=None, path=None, dataDescription=None):
     """
-    Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
+    Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Note that this does not reduce the amount of Particle objects saved,
-    see skimOutputUdst() for a function that does.
+    Note:
+        This does not reduce the amount of Particle objects saved,
+        see `udst.add_skimmed_udst_output` for a function that does.
+
     """
-
-    import mdst
-    import pdg
-
-    if particleLists is None:
-        particleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # also add anti-particle lists
-    plSet = set(particleLists)
-    for List in particleLists:
-        name, label = List.split(':')
-        plSet.add(pdg.conjugate(name) + ':' + label)
-
-    partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + includeArrays + list(plSet)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("dataLevel", "udst")
-
-    return mdst.add_mdst_output(path, mc=True, filename=filename,
-                                additionalBranches=partBranches,
-                                dataDescription=dataDescription)
-
-
-def skimOutputUdst(skimDecayMode, skimParticleLists=None, outputParticleLists=None,
-                   includeArrays=None, path=None, *,
-                   outputFile=None, dataDescription=None):
-    """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a udst file, saving only particles from skimParticleLists
-    and from outputParticleLists.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
-
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
-    """
-
-    from basf2 import AfterConditionPath
-
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
-
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".udst.root"):
-        outputFile += ".udst.root"
-
-    skimfilter = register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = create_path()
-    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
-               dataDescription=dataDescription)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+    import udst
+    udst.add_udst_output(
+        path=path, filename=filename, particleLists=particleLists,
+        additionalBranches=includeArrays, dataDescription=dataDescription)
 
 
 def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
@@ -2614,8 +2535,6 @@ def writePi0EtaVeto(
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
     """
-
-    import basf2_mva
 
     renameSuffix = False
 

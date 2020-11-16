@@ -9,6 +9,7 @@ from SCons.Script import GetOption
 # copy   : purple
 # map    : cyan
 # dict   : yellow
+# doc    : gray
 # cleanup: black/white
 # strip  : black/white
 
@@ -20,6 +21,7 @@ color_map_none = {
     'copy': '',
     'map': '',
     'dict': '',
+    'doc': '',
     'cleanup': '',
     'strip': '',
 }
@@ -31,6 +33,7 @@ color_map_light = {
     'copy': '\033[95m',
     'map': '\033[96m',
     'dict': '\033[93m',
+    'doc': '\033[37m',
     'cleanup': '\033[37m',
     'strip': '\033[37m',
 }
@@ -42,6 +45,7 @@ color_map_dark = {
     'copy': '\033[2m\033[35m',
     'map': '\033[2m\033[36m',
     'dict': '\033[2m\033[33m',
+    'doc': '\033[90m',
     'cleanup': '\033[30m',
     'strip': '\033[30m',
 }
@@ -72,6 +76,9 @@ def generate(env):
             COPYCOMSTR=color_map['copy'] + '*** copying    : ${TARGET}' + color_map['end'],
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}' + color_map['end'],
             ROOTCLINGCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
+            CLASSVERSIONCOMSTR=color_map['dict'] + '*** checking   : ${SOURCE}' + color_map['end'],
+            MODULEIOCOMSTR=color_map['doc'] + '*** module-io  : ${TARGET}' + color_map['end'],
+            DOXYGENCOMSTR=color_map['doc'] + '*** doxygen    : ${TARGET}' + color_map['end'],
             STRIPCOMSTR=color_map['strip'] + '*** stripping  : ${TARGET}' + color_map['end'],
         )
 

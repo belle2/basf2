@@ -1,10 +1,7 @@
-import basf2
 
 import ROOT
 from ROOT import Belle2
 
-import math
-import warnings
 
 import numpy as np
 

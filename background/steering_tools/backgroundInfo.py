@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 # -----------------------------------------------------------
@@ -10,7 +10,7 @@ from ROOT import Belle2
 # -----------------------------------------------------------
 
 
-class printBGInfo(Module):
+class printBGInfo(b2.Module):
 
     '''
     Print BackgroundInfo stored in the root file
@@ -40,16 +40,16 @@ class printBGInfo(Module):
         evtMetaData.obj().setEndOfData()
 
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # print info
 main.add_module(printBGInfo())
 
-process(main)
+b2.process(main)

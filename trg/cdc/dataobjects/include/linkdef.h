@@ -1,3 +1,4 @@
+
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -7,6 +8,8 @@
 
 
 // ROOT dictionaries will be build for all classes mentioned this way
+#pragma link C++ class bitset <639>+;
+#pragma link C++ class bitset <256>+;
 #pragma link C++ class Belle2::CDCTriggerSegmentHit+;
 #pragma link C++ class Belle2::CDCTriggerTrack+;
 #pragma link C++ class Belle2::CDCTriggerMLP+;

@@ -13,7 +13,7 @@ import basf2
 from ROOT import Belle2
 
 import tracking
-from tracking.harvest.peelers import peel_reco_track_hit_content, peel_mc_particle, peel_fit_status
+from tracking.harvest.peelers import peel_mc_particle, peel_reco_track_hit_content
 
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners

@@ -37,9 +37,7 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   fdEdxMin(0.0),
   fdEdxMax(5.0),
   fTrucMin(0.05),
-  fTrucMax(0.75),
-  fTrucLbin(1),
-  fTrucHbin(1)
+  fTrucMax(0.75)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");

@@ -45,8 +45,9 @@ namespace Belle2 {
   protected:
 
     /** Loops recursively over the MCParticle list and prints information about each particle.
-     * @param mc Reference to the MCParticle whose information should be printed and whose daughters should be visited.
+     * @param particles Reference to the MCParticle whose information should be printed and whose daughters should be visited.
      * @param level The current level of the recursive call of the method.
+     * @param indent String to be used for indentation.
      */
     void printTree(const std::vector<MCParticle*>& particles, int level = 1, const std::string& indent = "");
 

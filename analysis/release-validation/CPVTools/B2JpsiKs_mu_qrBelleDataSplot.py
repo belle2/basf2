@@ -18,14 +18,12 @@
 #                                                                                          *
 # ******************************************************************************************
 
-import random
 import math
 import glob
 import sys
-import pylab
 from array import array
 import matplotlib.pyplot as plt
-from defaultEvaluationParameters import categories, rbins, r_subsample, r_size
+from defaultEvaluationParameters import r_size, r_subsample, rbins
 import ROOT
 import numpy as np
 import matplotlib as mpl

@@ -1,5 +1,3 @@
-import ROOT
-from ROOT import Belle2
 
 from b2test_utils import get_object_with_name, get_streamer_checksums
 

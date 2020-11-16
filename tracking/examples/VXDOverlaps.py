@@ -3,7 +3,7 @@ import ROOT
 import numpy
 import root_numpy
 from array import array
-from ROOT import TCanvas, TH2F, TH1F, TH1D, TDirectory, TLine
+from ROOT import TCanvas, TH1F, TLine
 
 
 '''Takes the output of combined OverlapResiduals and HistoManager modules,

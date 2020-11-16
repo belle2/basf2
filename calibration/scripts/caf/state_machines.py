@@ -15,26 +15,18 @@ import os
 import json
 
 from basf2 import create_path
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
 
-import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+from ROOT.Belle2 import CalibrationAlgorithm
 
 from .utils import create_directories
 from .utils import method_dispatch
-from .utils import merge_local_databases
-from .utils import decode_json_string
 from .utils import iov_from_runs
 from .utils import IoV_Result
-from .utils import IoV
-from .utils import AlgResult
 from .utils import get_iov_from_file
 from .utils import find_absolute_file_paths
-from .utils import runs_overlapping_iov
-from .utils import runs_from_vector
-from .utils import B2INFO_MULTILINE
 from .backends import Job
 from .backends import LSF
 from .backends import PBS
@@ -1109,18 +1101,15 @@ class MachineError(Exception):
     """
     Base exception class for this module.
     """
-    pass
 
 
 class ConditionError(MachineError):
     """
     Exception for when conditions fail during a transition.
     """
-    pass
 
 
 class TransitionError(MachineError):
     """
     Exception for when transitions fail.
     """
-    pass

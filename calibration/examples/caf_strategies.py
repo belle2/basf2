@@ -3,17 +3,15 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
-from caf.utils import IoV
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 # add time stamp to all INFO messages
 # currentInfo = logging.get_info(LogLevel.INFO)
 # logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
@@ -43,7 +41,7 @@ def main(argv):
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
+    from caf.strategies import SequentialRunByRun
     # The default value is SingleIOV, you don't have to set this, it is done automatically.
     # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
     # You can use granularity='run' or granularity='all' for the collector when using this strategy.

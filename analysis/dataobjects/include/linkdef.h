@@ -43,13 +43,18 @@
 // ----------------------------------------------------------------------------
 // Particle evolution
 // In version 12 the member m_particleType has been renamed to m_particleSource.
-#pragma read                                                      \
-  sourceClass="Belle2::Particle"                                  \
-  source="Belle2::Particle::EParticleSourceObject m_particleType" \
-  version="[-11]"                                                 \
-  targetClass="Belle2::Particle"                                  \
-  target="m_particleSource"                                       \
-  code="{m_particleSource = onfile.m_particleType;}"              \
+#pragma read                                                                          \
+  sourceClass="Belle2::Particle"                                                      \
+  source="Belle2::Particle::EParticleSourceObject m_particleType"                     \
+  version="[-11]"                                                                     \
+  targetClass="Belle2::Particle"                                                      \
+  target="m_particleSource"                                                           \
+  code="{if (onfile.m_particleType == 4)                                              \
+           m_particleSource = Belle2::Particle::EParticleSourceObject::c_MCParticle;  \
+         else if (onfile.m_particleType == 5)                                         \
+           m_particleSource = Belle2::Particle::EParticleSourceObject::c_Composite;   \
+         else m_particleSource = onfile.m_particleType;                               \
+       }"                                                                             \
 
 // ----------------------------------------------------------------------------
 // TagVertex evolution

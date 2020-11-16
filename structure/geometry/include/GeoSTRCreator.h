@@ -47,6 +47,8 @@ namespace Belle2 {
       /*!
       This is the 'old' way of building the geometry from Gearbox (xml files). Expected to be deprecated in the future.
         \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      \param topVolume Geant4 logical top volume.
+      \param type Geometry type.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {

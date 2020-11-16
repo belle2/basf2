@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BEAMBACKHIT_H
-#define BEAMBACKHIT_H
+#pragma once
 
 #include <TObject.h>
 #include <TVector3.h>
@@ -45,7 +44,7 @@ namespace Belle2 {
      * @param E_end the energy of the particle at the exit of the volume
      * @param eDep the energy deposited in the volume
      * @param trackLength the length of the track in the volume
-     * @param nWeight the effective neutron weigth
+     * @param nWeight the effective neutron weight
      */
     BeamBackHit(int subDet, int iden, int PDG, int trackID, TVector3 position,
                 TVector3 momentum, double t, double E_start, double E_end,
@@ -167,5 +166,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

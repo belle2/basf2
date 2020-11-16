@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLETRAJECTORY_H
-#define MCPARTICLETRAJECTORY_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <simulation/dataobjects/MCTrajectoryPoint.h>
@@ -49,8 +48,8 @@ namespace Belle2 {
      * @param y y coordinate of position
      * @param z z coordinate of position
      * @param px x coordinate of momentum
-     * @param py z coordinate of momentum
-     * @param px z coordinate of momentum
+     * @param py y coordinate of momentum
+     * @param pz z coordinate of momentum
      */
     void addPoint(float x, float y, float z, float px, float py, float pz)
     {
@@ -73,4 +72,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif

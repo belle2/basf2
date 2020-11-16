@@ -50,11 +50,13 @@ void ECLClusterPropertiesModule::event()
 {
   for (auto& shower : m_eclShowers) {
     // compute the distance from shower COG and the closest extrapolated track
-    double dist = computeTrkMinDistance(shower, m_tracks);
+    unsigned short trackID = std::numeric_limits<unsigned short>::max();
+    double dist = computeTrkMinDistance(shower, m_tracks, trackID);
     shower.setMinTrkDistance(dist);
     ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
     if (cluster != nullptr) {
       cluster->setMinTrkDistance(float(dist));
+      cluster->setMinTrkDistanceID(trackID);
       // compute path lenghts on the energy weighted average crystals
       // direction and on the extrapolated track direction corresponding to
       // the minimum distance among the two lines. if more than one track is
@@ -71,7 +73,8 @@ void ECLClusterPropertiesModule::event()
   }
 }
 
-double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks) const
+double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks,
+                                                         unsigned short& trackID) const
 {
   double minDist(10000);
   TVector3 cryCenter;
@@ -86,7 +89,10 @@ double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower
       if (extHit.getCopyID() == -1) continue;
       trkpos = extHit.getPosition();
       double distance = (cryCenter - trkpos).Mag();
-      if (distance < minDist) minDist = distance;
+      if (distance < minDist) {
+        trackID = track.getArrayIndex();
+        minDist = distance;
+      }
     }
   }
   if (minDist > 9999) minDist = -1;

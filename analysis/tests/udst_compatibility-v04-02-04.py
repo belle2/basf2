@@ -21,7 +21,7 @@ if __name__ == "__main__":
     b2test_utils.configure_logging_for_tests()
     basf2.set_random_seed(1)
 
-    # configure processing path - input file is the first event from the Phil's
+    # configure processing path - input file is the first 3 events from Phil's
     # favourite test udst file from https://questions.belle2.org/question/9758/
     main = basf2.create_path()
     main.add_module(
@@ -32,4 +32,17 @@ if __name__ == "__main__":
     # this function does the hard work
     udst.add_udst_dump(main, True)
 
-    basf2.process(main, 1)
+    # also dump some variables just in case the DataStorePrinter hides some
+    # problems (like has happened once: PR #7525).
+    sanity_check_variables = [
+        "mcPDG",
+        "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)
+        "Mbc", "InvM", "deltaE",
+        "daughter(1, pionID)",  # check the PIDLikelihoods <--> Particle relation
+        "daughter(1, kaonID)",
+        "daughter(1, clusterE)",  # check the ECLCluster <--> Particle relation (or array index lookup)
+        "daughter(1, klmClusterLayers)",  # check the KLMCluster <--> Particle relation (or array index lookup)
+    ]
+    main.add_module(
+        "ParticlePrinter", listName="B0:semileptonic", variables=sanity_check_variables)
+    basf2.process(main)

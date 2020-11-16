@@ -73,8 +73,8 @@ namespace Belle2 {
     /**
     * Adds all particles from input particle lists that are not used in reconstruction of given particle.
     *
-    * @param reconstructed particle for which RestOfEvent is determined
-    * @param pointer to the RestOfEvent to be filled with remaining tracks
+    * @param particle particle for which RestOfEvent is determined
+    * @param roe pointer to the RestOfEvent to be filled with remaining tracks
     */
     void addRemainingParticles(const Particle* particle, RestOfEvent* roe);
 

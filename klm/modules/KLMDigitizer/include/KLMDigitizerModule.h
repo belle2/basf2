@@ -13,7 +13,6 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
@@ -132,9 +131,6 @@ namespace Belle2 {
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
-
-    /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Simulation mode. */
     std::string m_SimulationMode;

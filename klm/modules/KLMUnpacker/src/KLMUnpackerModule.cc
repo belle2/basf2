@@ -30,8 +30,7 @@ REG_MODULE(KLMUnpacker)
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_triggerCTimeOfPreviousEvent(0),
-  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
+  m_triggerCTimeOfPreviousEvent(0)
 {
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);

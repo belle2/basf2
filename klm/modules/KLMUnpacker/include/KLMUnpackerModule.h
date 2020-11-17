@@ -11,7 +11,6 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
@@ -194,11 +193,6 @@ namespace Belle2 {
 
     /** Trigger ctime of the previous event. */
     unsigned int m_triggerCTimeOfPreviousEvent;
-
-    /* Other EKLM variables. */
-
-    /** Element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

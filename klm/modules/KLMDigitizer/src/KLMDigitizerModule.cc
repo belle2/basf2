@@ -30,7 +30,6 @@ REG_MODULE(KLMDigitizer)
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_ChannelSpecificSimulation(false),
   m_EfficiencyMode(c_Plane),
   m_Fitter(nullptr)

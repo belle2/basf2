@@ -104,6 +104,8 @@ void PXDDAQDQMModule::defineHisto()
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
 
+  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 4, 0, 4);
+
   // cd back to root directory
   oldDir->cd();
 }
@@ -113,6 +115,7 @@ void PXDDAQDQMModule::initialize()
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
   m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  m_rawSVD.isOptional(); /// just for checking EODB / Hlt rejections
 }
 
 void PXDDAQDQMModule::beginRun()
@@ -134,10 +137,12 @@ void PXDDAQDQMModule::beginRun()
   if (hCM63AfterInjHER) hCM63AfterInjHER->Reset();
   if (hTruncAfterInjLER) hTruncAfterInjLER->Reset();
   if (hTruncAfterInjHER) hTruncAfterInjHER->Reset();
+  hDAQStat->Reset();
 }
 
 void PXDDAQDQMModule::event()
 {
+  hDAQStat->Fill(-1); // to normalize to the number of events
   hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   hDAQErrorDHC->Fill(-1, -1); // to normalize to the number of events
   hDAQErrorDHE->Fill(-1, -1); // to normalize to the number of events
@@ -241,4 +246,19 @@ void PXDDAQDQMModule::event()
     }
     break;
   }
+
+  // make some nice statistics
+  if (truncFlag) {
+    hDAQStat->Fill(1);
+    if (hTruncAfterInjHER) hDAQStat->Fill(2);
+    if (hTruncAfterInjLER) hDAQStat->Fill(3);
+  }
+  if (cm63Flag) {
+    hDAQStat->Fill(4);
+    if (hCM63AfterInjHER) hDAQStat->Fill(5);
+    if (hCM63AfterInjLER) hDAQStat->Fill(6);
+  }
+
+  // Check Event-of-doom-busted or otherwise HLT rejected events
+  if (m_rawSVD.getEntries() == 0) hDAQStat->Fill(0);
 }

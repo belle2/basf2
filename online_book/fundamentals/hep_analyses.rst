@@ -445,7 +445,8 @@ A given data event is therefore uniquely identified by the experiment/run/event 
         counters are *set* by the generation.
 
         For official MC samples these reset for every *production*, therefore 
-        this counter is also required to uniquely identify a simulated event.
+        this counter is additionally required to uniquely identify a simulated
+        event.
 
         I.e. experiment/run/event/production
 
@@ -458,10 +459,10 @@ A given data event is therefore uniquely identified by the experiment/run/event 
 .. note:: 
 
         The numbering of "experiment" is rather unique to Belle and Belle II. 
-        LHC eperiments, for example, simply count run and experiment number.
+        LHC experiments, for example, simply count run and event number.
 
-        The use of "experiment" is partly informed our ablity to switch the
-        accelerator at different operating energies and change conditions.
+        This use of "experiment number" is due to our ability to switch the
+        accelerator to different operating energies and change conditions.
 
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------

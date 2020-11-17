@@ -183,8 +183,10 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->addRelationTo(simHit);
     } else {
       if (m_ChannelSpecificSimulation) {
-        uint16_t channel = m_ElementNumbers->channelNumber(KLMElementNumbers::c_EKLM, simHit->getSection(), simHit->getSector(),
-                                                           simHit->getLayer(), simHit->getPlane(), simHit->getStrip());
+        uint16_t channel = m_ElementNumbers->channelNumberBKLM(
+                             simHit->getSection(), simHit->getSector(),
+                             simHit->getLayer(), simHit->getPlane(),
+                             simHit->getStrip());
         FEEData = m_FEEPar->getFEEData(channel);
         if (FEEData == nullptr)
           B2FATAL("Incomplete KLM scintillator FEE data.");
@@ -241,8 +243,10 @@ void KLMDigitizerModule::digitizeEKLM()
         continue;
     }
     if (m_ChannelSpecificSimulation) {
-      uint16_t channel = m_ElementNumbers->channelNumber(KLMElementNumbers::c_EKLM, simHit->getSection(), simHit->getSector(),
-                                                         simHit->getLayer(), simHit->getPlane(), simHit->getStrip());
+      uint16_t channel = m_ElementNumbers->channelNumberEKLM(
+                           simHit->getSection(), simHit->getSector(),
+                           simHit->getLayer(), simHit->getPlane(),
+                           simHit->getStrip());
       FEEData = m_FEEPar->getFEEData(channel);
       if (FEEData == nullptr)
         B2FATAL("Incomplete KLM scintillator FEE data.");

@@ -104,7 +104,7 @@ void PXDDAQDQMModule::defineHisto()
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
 
-  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 4, 0, 4);
+  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 10, 0, 10);
 
   // cd back to root directory
   oldDir->cd();

@@ -14,7 +14,7 @@
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
-#include <klm/dbobjects/KLMScintillatorFEEParameters.h>
+#include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {

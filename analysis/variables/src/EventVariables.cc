@@ -579,7 +579,16 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
-    REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
+    REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
+[Eventbased] Production identifier.
+Uniquely identifies an MC sample by the (grid-jargon) production ID. 
+This is useful when analysing large MC samples split between more than one production or combining different MC samples (e.g. combining all contunuum samples).
+In such cases the event numbers are sequential *only within a production*, so experiment/run/event will restart with every new sample analysed.
+
+.. tip:: Experiment/run/event/production is unique for all MC samples. Experiment/run/event is unique for data.
+
+.. seealso:: `Where can I rely on uniqueness of the ['__experiment__', '__run__', '__event__', '__candidate__'] combination? <https://questions.belle2.org/question/9704>`__
+)DOC");
 
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");

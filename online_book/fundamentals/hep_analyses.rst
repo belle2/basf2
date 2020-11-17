@@ -423,6 +423,46 @@ KLM
 
     * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
 
+Data taking: numbering
+----------------------
+
+At Belle II (and Belle), data are identified by three counters: **experiment**, 
+**run**, and **event**.
+The coarsest counter is experiment, which denotes:
+
+        *A period of data taking typically lasting for several weeks, during 
+        which it is expected that there will be no major changes in Belle II 
+        or SuperKEKB operating conditions.*
+
+A run is a much shorter period of data-taking, lasting anywhere from minutes to
+several hours.
+Events are numbered sequentially within a run.
+A given data event is therefore uniquely identified by the experiment/run/event numbers.
+
+.. note:: 
+
+        In simulation (which will be discussed later), the experiment/run/event
+        counters are *set* by the generation.
+
+        For official MC samples these reset for every *production*, therefore 
+        this counter is also required to uniquely identify a simulated event.
+
+        I.e. experiment/run/event/production
+
+.. seealso:: 
+
+        `Where can I rely on uniqueness of the ['__experiment__', '__run__',
+        '__event__', '__candidate__'] combination?
+        <https://questions.belle2.org/question/9704>`__
+
+.. note:: 
+
+        The numbering of "experiment" is rather unique to Belle and Belle II. 
+        LHC eperiments, for example, simply count run and experiment number.
+
+        The use of "experiment" is partly informed our ablity to switch the
+        accelerator at different operating energies and change conditions.
+
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
 

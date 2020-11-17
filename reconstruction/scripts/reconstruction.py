@@ -31,10 +31,17 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
+def default_event_abort(module, condition, error_flag):
+    """Default event abort outside of HLT: Ignore the error flag and just stop
+    processing by giving an empty path"""
+    p = basf2.Path()
+    module.if_value(condition, p, basf2.AfterConditionPath.END)
+
+
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       abort_path=None, use_random_numbers_for_hlt_prescale=True):
+                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -57,7 +64,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
+    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
+        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
+        but just remove all data except for the event information.
     :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
         generated numbers, otherwise are applied using an internal counter.)
     """
@@ -66,12 +75,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     check_components(components)
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    if abort_path is None:
-        abort_path = basf2.create_path()
-    doom = path.add_module('EventsOfDoomBuster')
-    doom.if_true(abort_path, basf2.AfterConditionPath.END)
-    abort_path.add_module('EventErrorFlag',
-                          errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
+    doom = path.add_module("EventsOfDoomBuster")
+    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,

@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Set scintillator FEE data.
      * @param[in] strip Strip (channel) number.
-     * @param[in] dats  Scintillator FEE data.
+     * @param[in] data  Scintillator FEE data.
      */
     void setFEEData(uint16_t strip, KLMScintillatorFEEData* data);
 

@@ -16,9 +16,8 @@
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
-#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
+#include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 
 /* Belle 2 headers. */
@@ -159,19 +158,16 @@ namespace Belle2 {
 
     /* BKLM parameters. */
 
-    /** The flag to keep the even packages. */
+    /** Flag to keep the even packages. */
     bool m_keepEvenPackages = false;
-
-    /** Load threshold from DataBase (true) or not (false). */
-    bool m_loadThresholdFromDB = true;
-
-    /** Threshold for the scintillator NPhotoelectrons .*/
-    double m_scintThreshold = 140;
 
     /* Common database objects. */
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Scintillator FEE parameters. */
+    DBObjPtr<KLMScintillatorFEEParameters> m_FEEParameters;
 
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;
@@ -190,16 +186,6 @@ namespace Belle2 {
 
     /** Raw digits. */
     StoreArray<KLMDigitRaw> m_klmDigitRaws;
-
-    /* EKLM database objects. */
-
-    /** Channels. */
-    DBObjPtr<EKLMChannels> m_eklmChannels;
-
-    /* BKLM database objects. */
-
-    /** ADC offset and threshold read from database. */
-    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /* Other common variables. */
 

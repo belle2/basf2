@@ -31,10 +31,12 @@ class BtoPi0Pi0(BaseSkim):
     Reconstructed decay modes:
 
     * :math:`\\B^0 -> \\pi^0 \\pi^0`
+
     Cuts applied:
 
     * ``5.24 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Francis Pham", "Benedikt Wach"]
     __description__ = "Skim list definitions for neutral B to two neutral pions."
@@ -85,12 +87,12 @@ class BtoHadTracks(BaseSkim):
     * :math:`\\B^+ -> K^{*+} \\pi^- \\pi^+`
     * :math:`\\B^+ -> K^{*+} K^+ \\pi^-`
 
-
     Cuts applied:
 
     * ``nTracks >= 2 (event level)``
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
+
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list definitions for all B to charmless modes with tracks only in the final state."
@@ -166,6 +168,7 @@ class BtoHad1Pi0(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for B to charmless modes including 1 pi0 in the final state."
@@ -216,6 +219,7 @@ class BtoHad3Tracks1Pi0(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for all charged B to charmless modes with 3 tracks and 1 Pi0."

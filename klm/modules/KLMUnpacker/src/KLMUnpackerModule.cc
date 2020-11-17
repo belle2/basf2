@@ -125,7 +125,7 @@ void KLMUnpackerModule::createDigit(
     double time = m_TimeConversion->getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
-    uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, layer, sector, plane, strip);
+    uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     const KLMScintillatorFEEData* FEEData =
       m_FEEParameters->getFEEData(channelNumber);
     if (FEEData == nullptr)

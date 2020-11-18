@@ -104,8 +104,27 @@ void PXDDAQDQMModule::defineHisto()
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
 
-  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 10, 0, 10);
-
+  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 16, 0, 16);
+  auto xa = hDAQStat->GetXaxis();
+  if (xa) {
+    // underflow: number of events -> for normalize
+    xa->SetBinLabel(0 + 1, "EODB/HLT rej"); // event of doom or rejected
+    xa->SetBinLabel(1 + 1, "Trunc 8%");
+    xa->SetBinLabel(2 + 1, "HER Trunc");
+    xa->SetBinLabel(3 + 1, "LER Trunc");
+    xa->SetBinLabel(4 + 1, "CM63");
+    xa->SetBinLabel(5 + 1, "HER CM63");
+    xa->SetBinLabel(6 + 1, "LER CM63");
+    xa->SetBinLabel(7 + 1, "HER CM63>1ms");
+    xa->SetBinLabel(8 + 1, "LER CM63>1ms");
+    xa->SetBinLabel(9 + 1, "HER Trunc>1ms");
+    xa->SetBinLabel(10 + 1, "LER Trunc>1ms");
+    xa->SetBinLabel(11 + 1, "MissFrame");
+    xa->SetBinLabel(12 + 1, "Timeout");
+    xa->SetBinLabel(13 + 1, "Link Down");
+    xa->SetBinLabel(14 + 1, "Mismatch");
+    xa->SetBinLabel(15 + 1, "unused");
+  }
   // cd back to root directory
   oldDir->cd();
 }
@@ -153,6 +172,10 @@ void PXDDAQDQMModule::event()
   /// of-doom-buster, we might count anyhow broken events as broken from PXD
 
   bool truncFlag = false; // flag events which are DHE truncated
+  bool nolinkFlag = false; // flag events which are DHE truncated
+  bool missingFlag = false; // flag events where frame is missing
+  bool timeoutFlag = false; // flag events where frame timeout
+  bool mismatchFlag = false; // flag events where trig mismatched
   bool cm63Flag = false; // flag event which are CM63 truncated
 
   B2DEBUG(20, "Iterate PXD DAQ Status");
@@ -201,11 +224,17 @@ void PXDDAQDQMModule::event()
           if ((dhe.getDHPFoundMask() & (1 << i)) == 0) hDAQDHPDataMissing->Fill(dhe.getDHEID() + i * 0.25);
         }
         unsigned int emask = dhe.getEndErrorInfo();
-        truncFlag |= emask != 0; // lets make it simple, catch any DHE SM error
+        // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {
           auto sm = (emask >> i * 4) & 0xF;
           if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
           if (sm > 0) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i * 8 + sm); // we dont want to fill noerror=0
+          missingFlag |= sm == 0x1; // missing
+          timeoutFlag |= sm == 0x2; // timeout
+          nolinkFlag |= sm == 0x3; // link down
+          // 4 is DHP masked
+          mismatchFlag |= sm == 0x5; // start/end mismatch
+          truncFlag |= sm == 0x6; // trunc because of size
         }
 
         if (hDAQDHETriggerGate[dhe.getSensorID()]) hDAQDHETriggerGate[dhe.getSensorID()]->Fill(dhe.getTriggerGate());
@@ -225,7 +254,7 @@ void PXDDAQDQMModule::event()
     }
   }
   // Now fill the histograms which need flags set above
-  // the code is unluckily a copy of whats in PXDInjection Module, but therewe dont have the DAQ flags :-/
+  // the code is unluckily a copy of whats in PXDInjection Module, but there we dont have the DAQ flags :-/
   for (auto& it : m_rawTTD) {
 //     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
@@ -239,29 +268,37 @@ void PXDDAQDQMModule::event()
       if (it.GetIsHER(0)) {
         if (cm63Flag) {
           hDAQStat->Fill(5); // sum CM63 after HER
+          if (diff2 > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
           if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(diff2);
         }
         if (truncFlag) {
           hDAQStat->Fill(2); // sum truncs after HER
+          if (diff2 > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
           if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(diff2);
         }
       } else {
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
+          if (diff2 > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
           if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(diff2);
         }
         if (truncFlag) {
           hDAQStat->Fill(3); // sum truncs after LER
+          if (diff2 > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
           if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(diff2);
         }
       }
     }
-    break;
+    break; // only first TTD packet
   }
 
   // make some nice statistics
   if (truncFlag) hDAQStat->Fill(1);
   if (cm63Flag) hDAQStat->Fill(4);
+  if (missingFlag) hDAQStat->Fill(11);
+  if (timeoutFlag) hDAQStat->Fill(12);
+  if (nolinkFlag) hDAQStat->Fill(13);
+  if (mismatchFlag) hDAQStat->Fill(14);
 
   // Check Event-of-doom-busted or otherwise HLT rejected events
   if (m_rawSVD.getEntries() == 0) hDAQStat->Fill(0);

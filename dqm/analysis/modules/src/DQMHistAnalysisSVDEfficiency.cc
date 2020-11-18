@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.cc
-// Description : Description: module for DQM histogram analysis of SVD sensors efficiencies
+// Description : module for DQM histogram analysis of SVD sensors efficiencies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20190428
@@ -32,7 +32,7 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
 
-  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
+  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));

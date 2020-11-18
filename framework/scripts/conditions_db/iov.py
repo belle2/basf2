@@ -241,6 +241,16 @@ class IntervalOfValidity:
         # no union possible: not directly connected and not overlapping
         return None
 
+    def contains(self, exp, run):
+        """Check if a run is part of the validtiy"""
+        return self.first <= (exp, run) <= self.final
+
+    @property
+    def is_open(self):
+        """Check whether the iov is valid until infinity"""
+        #: Doxygen complains without this string.
+        return self.final == (math.inf, math.inf)
+
     @property
     def tuple(self):
         """Return the iov as a tuple with experiment/run numbers replaced with -1

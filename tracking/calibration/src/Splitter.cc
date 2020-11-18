@@ -35,7 +35,7 @@ using namespace std;
 namespace Belle2 {
 
 
-  // Slice the vector to contain only elements with indeces s .. e (included)
+  /// Slice the vector to contain only elements with indeces s .. e (included)
   static vector<pair<double, double>> slice(vector<pair<double, double>> vec, int s, int e)
   {
     return vector<pair<double, double>>(vec.begin() + s, vec.begin() + e + 1);
@@ -62,7 +62,7 @@ namespace Belle2 {
   }
 
 
-  // plot runs on time axis
+  /// plot runs on time axis
   void plotRuns(vector<pair<double, double>>  runs)
   {
     TGraphErrors* gr = new TGraphErrors();
@@ -88,7 +88,7 @@ namespace Belle2 {
 
   }
 
-  // get the range of interval with nIntervals and breaks stored in a vector
+  /// get the range of interval with nIntervals and breaks stored in a vector
   static pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
   {
     B2ASSERT("There must be at least one interval", nIntervals >= 1);
@@ -99,7 +99,7 @@ namespace Belle2 {
     return {s, e};
   }
 
-  // plot clusters or runs on time axis
+  /// plot clusters or runs on time axis
   void plotSRuns(vector<pair<double, double>>  runs, vector<int> breaks, int offset = 2)
   {
     TGraphErrors* gr = new TGraphErrors();
@@ -124,7 +124,7 @@ namespace Belle2 {
   }
 
 
-  // print sorted lenghts of the runs
+  /// print sorted lenghts of the runs
   void printBySize(vector<pair<double, double>>  runs)
   {
     vector<double> dist;
@@ -140,7 +140,7 @@ namespace Belle2 {
 
   }
 
-  // the lossFunction formula (it can be modified according to the user's taste)
+  /// the lossFunction formula (it can be modified according to the user's taste)
   double Splitter::lossFunction(const vector<pair<double, double>>&  vec, int s, int e) const
   {
 

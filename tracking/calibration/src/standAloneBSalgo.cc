@@ -629,7 +629,7 @@ namespace Belle2 {
     return files;
   }
 
-// read events from TTree to std::vector
+/// read events from TTree to std::vector
   vector<Event> getEvents(TTree* tr)
   {
 

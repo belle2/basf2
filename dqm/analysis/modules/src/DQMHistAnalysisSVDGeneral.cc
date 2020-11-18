@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDGeneral.cc
-// Description :
+// Description : module for DQM histogram analysis of SVD sensors occupancies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI), Luigi Corona (PI)
 // Date : 20181127
@@ -68,7 +68,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
     TH1F* ref_occ = (TH1F*)m_refFile->Get("refOccupancy");
     if (!ref_occ)
-      B2WARNING("SVD DQMHistAnalysis: Occupancy Level Refence not found! using module parameters");
+      B2WARNING("SVD DQMHistAnalysis: Occupancy Level Reference not found! using module parameters");
     else {
       m_occEmpty = ref_occ->GetBinContent(1);
       m_occWarning = ref_occ->GetBinContent(2);
@@ -77,7 +77,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
     TH1F* ref_onlineOcc = (TH1F*)m_refFile->Get("refOnlineOccupancy");
     if (!ref_onlineOcc)
-      B2WARNING("SVD DQMHistAnalysis: OnlineOccupancy Level Refence not found! using module parameters");
+      B2WARNING("SVD DQMHistAnalysis: OnlineOccupancy Level Reference not found! using module parameters");
     else {
       m_onlineOccEmpty = ref_onlineOcc->GetBinContent(1);
       m_onlineOccWarning = ref_onlineOcc->GetBinContent(2);
@@ -221,6 +221,15 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetTitle("ladder number");
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
+
+  // add MonitoringObject and canvases
+  m_monObj = getMonitoringObject("svd");
+
+  m_c_avg_maxBin_UV = new TCanvas("avg_maxBin_UV");
+
+  // add canvases to MonitoringObject
+  m_monObj->addCanvas(m_c_avg_maxBin_UV);
+
 }
 
 
@@ -651,6 +660,66 @@ void DQMHistAnalysisSVDGeneralModule::event()
 void DQMHistAnalysisSVDGeneralModule::endRun()
 {
   B2INFO("DQMHistAnalysisSVDGeneral:  endRun called");
+
+  // get existing histograms produced by DQM modules
+
+  // average maxBin
+  TH1F* h_maxBinU = (TH1F*)findHist("SVDDQM_StripMaxBinUAll");
+  TH1F* h_maxBinV = (TH1F*)findHist("SVDDQM_StripMaxBinVAll");
+
+  m_c_avg_maxBin_UV->Clear();
+  m_c_avg_maxBin_UV->Divide(2, 1);
+  m_c_avg_maxBin_UV->cd(1);
+  if (h_maxBinU) h_maxBinU->Draw();
+  m_c_avg_maxBin_UV->cd(2);
+  if (h_maxBinV) h_maxBinV->Draw();
+
+  if (h_maxBinU == NULL) {
+    B2INFO("Histogram needed for Average MaxBin on U side is not found");
+    m_monObj->setVariable("avgMaxBinU", -1);
+  } else {
+    double avgMaxBinU = 1.*h_maxBinU->GetMean();
+    m_monObj->setVariable("avgMaxBinU", avgMaxBinU);
+  }
+
+  if (h_maxBinV == NULL) {
+    B2INFO("Histogram needed for Average MaxBin on V side is not found");
+    m_monObj->setVariable("avgMaxBinV", -1);
+  } else {
+    double avgMaxBinV = 1.*h_maxBinV->GetMean();
+    m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
+  }
+
+
+  // offline occupancy - integrated number of ZS5 fired strips
+  TH1F* h_zs5countsU = (TH1F*)findHist("SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
+  TH1F* h_zs5countsV = (TH1F*)findHist("SVDDQM_StripCountsV");
+  TH1F* h_events = (TH1F*)findHist("SVDDQM_nEvents");
+
+  int nEvents = h_events->GetEntries();
+  double avgOffOccL3U = 0.0;
+  double avgOffOccL3V = 0.0;
+  for (int bin = 1; bin < 14 + 1; bin++) {
+    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) / 768 * 100; // 768 strips
+    avgOffOccL3V += h_zs5countsV->GetBinContent(bin) / 768 * 100;
+  }
+  avgOffOccL3U /= (14 * nEvents); // 14 sensors
+  avgOffOccL3V /= (14 * nEvents;
+
+  if (h_zs5countsU == NULL || h_events == NULL) {
+  B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
+    m_monObj->setVariable("avgOffOccL3U", -1);
+  } else {
+    m_monObj->setVariable("avgOffOccL3U", avgOffOccL3U);
+  }
+
+  if (h_zs5countsV == NULL || h_events == NULL) {
+  B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
+    m_monObj->setVariable("avgOffOccL3V", -1);
+  } else {
+    m_monObj->setVariable("avgOffOccL3V", avgOffOccL3V);
+  }
+
 }
 
 
@@ -692,6 +761,7 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
 
   delete m_cStripOccupancyU;
   delete m_cStripOccupancyV;
+
 }
 
 

@@ -57,20 +57,16 @@ Likelihood extraction
 
  .. _LongitudinalPdfs:
 
- .. figure:: figures/test.png
-    :width: 30em
+ .. figure:: figures/Longitudinal-PDFs-MuonPion.png
+    :width: 80 %
     :align: center
 
     Sample longitudinal-profile PDFs for energetic positevely-charged muons (left) and pions (right), for the barrel (top), forward endcap (middle) and a selected barrel-endcap-overlap (bottom). Barrel (endcap) layers are numbered 0-14 (15-28).
 
- .. figure:: figures/test.jpg
-    :width: 30em
-    :align: center 
-
  .. _rchiSquared:
 
  .. figure:: figures/rchisquared-MuonPlus-PionPlus-ndof.png
-    :width: 30em
+    :width: 80 %
     :align: center
 
     Sample transverse-profile (reduced :math:`\chi^{2}`) distributions for positively charged muons (left) and pions (right) for 2-12 degrees of freedom. In each panel the red curve is the fit to the upper tail of the histogram, starting at the given cutoff.
@@ -98,7 +94,7 @@ Muon Efficiency and Pion Fake Rate
 .. _LogLikelihood:
 
 .. figure:: figures/Log-Likelihood-MuonPion.png
-   :width: 30em
+   :width: 80 %
    :align: center
 
    Log-likelihood difference between muon and pion hypoteses for true muons (left) and pions (right) as a function of the track momentum in GeV/c. In each plot five features are shown: (1) minimum and maximum values (bounden by the dashed vertical line); (3) the lower and upper quartiles (below or above the rectangular box); (4)the median (the thick horizontal line segment); (5) and the mean (circle).
@@ -106,7 +102,7 @@ Muon Efficiency and Pion Fake Rate
 .. _MuonEffPionFakeRate:
 
 .. figure:: figures/MuonEff-PionFakeRate.png
-   :width: 30em
+   :width: 80 %
    :align: center
 
    Muon efficiency (solid) and pion fake rate scaled by 10 (dashed) for three values of the log-likelihood-difference cut: :math:`\Delta_{min}` = 0 (black), 10 (blue), and 20 (red) as a function of momentum (top- left), polar angle (top-right), and azimuthal angle (bototm left). Muon inefficiency as a function of :math:`\phi` vs :math:`\theta` (bottom right), illustrating the geometric inefficiencies at the sector boundaries and in the vicinity of the solenoid chimney.

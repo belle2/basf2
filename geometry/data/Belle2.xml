@@ -71,7 +71,7 @@
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
 
-
+  <!-- phase 2 specific subdetectors -->
   <DetectorComponent name="BeamPipe-phase2" isDefault="false">
     <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>

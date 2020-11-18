@@ -71,7 +71,7 @@
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
 
-  <!-- phase 2 specific subdetectors -->
+
   <DetectorComponent name="BeamPipe-phase2" isDefault="false">
     <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
@@ -118,6 +118,21 @@
   <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
     <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+
+  <!-- early phase 3 and phase3 Beast system -->
+  <DetectorComponent name="MICROTPC" isDefault="false">
+    <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="BEAMABORT" isDefault="false">
+    <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="HE3TUBE" isDefault="false">
+    <xi:include href="../beast/he3tube/HE3TUBE.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="CLAWS" isDefault="false">
+    <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
 
   <!-- MUID muon identification -->
   <Muid>

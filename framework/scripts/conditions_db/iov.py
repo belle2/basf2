@@ -248,6 +248,7 @@ class IntervalOfValidity:
     @property
     def is_open(self):
         """Check whether the iov is valid until infinity"""
+        #: Doxygen complains without this string.
         return self.final == (math.inf, math.inf)
 
     @property

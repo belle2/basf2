@@ -6,11 +6,10 @@
 # Valid for Phase 2, Phase 3 Early and Phase 3 regular as well as for testbeams
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
 import argparse
 parser = argparse.ArgumentParser(
@@ -40,7 +39,7 @@ if (args.ExperimentType is 3):
     output_filename = "RootOutput_Phase3.root"
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 if (args.ExperimentType is 1):
     # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
@@ -87,5 +86,5 @@ trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

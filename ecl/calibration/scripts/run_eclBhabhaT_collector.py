@@ -27,10 +27,9 @@
 #   And then call
 #   basf2 EclBhabhaTCollector.py
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import glob
-import sys
 import tracking
 import rawdata
 import reconstruction
@@ -88,7 +87,7 @@ MAX_CRYSTAL = 8736
 components = ['CDC', 'ECL']
 
 # == Create path
-main = create_path()
+main = b2.create_path()
 
 add_unpackers = False
 
@@ -121,7 +120,7 @@ ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME
                                           minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
                                           saveTree=SAVE_TREE)
 
-ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)  # OR: LogLevel.DEBUG
+ECLBhabhaTCollectorInfo.set_log_level(b2.LogLevel.INFO)  # OR: LogLevel.DEBUG
 ECLBhabhaTCollectorInfo.set_debug_level(36)
 
 
@@ -129,28 +128,28 @@ ECLBhabhaTCollectorInfo.set_debug_level(36)
 main.add_module('Progress')
 
 # set_log_level(LogLevel.DEBUG)
-set_log_level(LogLevel.INFO)
-set_debug_level(100)
+b2.set_log_level(b2.LogLevel.INFO)
+b2.set_debug_level(100)
 
 # == Configure database
-reset_database()
-use_database_chain()
+b2.reset_database()
+b2.use_database_chain()
 
 # Read in any required central databases
 # use_central_database("online")
 
 # 2 GT required for making proc 10
-use_central_database("data_reprocessing_proc10")
-use_central_database("data_reprocessing_prompt_rel4_patchb")
+b2.use_central_database("data_reprocessing_proc10")
+b2.use_central_database("data_reprocessing_prompt_rel4_patchb")
 
 # Read in any required local databases.  This may be required when doing crystal/crate iterations
-use_local_database("localdb/database.txt")
+b2.use_local_database("localdb/database.txt")
 
 
 # == Process events
 # process(main, max_event=350000)  # reasonable stats for one crate
 # process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
 # process(main, max_event=3000)    # reasonable stats and speed for a quick test
-process(main)                      # process all events
+b2.process(main)                      # process all events
 
-print(statistics)
+print(b2.statistics)

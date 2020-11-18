@@ -88,7 +88,6 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
     for local_db in local_dbs:
         cal.use_local_database(local_db)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     # Run type dependent configurations

@@ -81,13 +81,11 @@ namespace Belle2 {
      * (so it is calculated only once per candidate).
      *
      * @param particle pointer to the particle. setMCTruth() must have been called previously (usually via the MCMatching module)!
-     * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
-     * @param option to ignore corresponding flags with PropertyFlags of particle which are set by decaystring grammar.
+     * @param mcParticle pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
      *
      * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */
-    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr,
-                           const bool honorProperty = true);
+    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
 
 
     /** Sets error flags in extra-info (also returns it).
@@ -99,7 +97,8 @@ namespace Belle2 {
     /**
      * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
      *
-     * @param pointer to the MCParticle
+     * @param mcP pointer to the MCParticle
+     * @param genMCPMothers pointer to the generator ancestors MCParticle
      * @param reference to the vector of integers to hold the results
      */
     static void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);

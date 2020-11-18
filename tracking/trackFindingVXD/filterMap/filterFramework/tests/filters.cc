@@ -436,7 +436,6 @@ namespace VXDTFfilterTest {
     );
 
     spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(1.0f , 0.0f, 0.0f);
     spacePoint x3(2.0f , 0.0f, 0.0f);
 
     counter< SquaredDistance3D   >::N = 0;

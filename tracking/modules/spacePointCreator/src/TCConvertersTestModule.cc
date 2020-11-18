@@ -103,13 +103,13 @@ void TCConvertersTestModule::event()
     const genfit::TrackCand* convertedTC = trackCand->getRelatedTo<genfit::TrackCand>(m_genfitTCNames[1]);
 
     // check if both trackCands are present (this should never happen, if the relations work correctly!)
-    if (genfitTC == NULL) {
+    if (genfitTC == nullptr) {
       B2DEBUG(50, "Found no original genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << \
               " from Array " << trackCand->getArrayName());
       ++m_failedNoRelationOrig;
       continue;
     }
-    if (convertedTC == NULL) {
+    if (convertedTC == nullptr) {
       B2DEBUG(50, "Found no converted genfit::TrackCand related from SpacePointTrackCand " << trackCand->getArrayIndex() << \
               " from Array " << trackCand->getArrayName());
       ++m_failedNoRelationConv;

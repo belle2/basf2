@@ -17,9 +17,7 @@ Author: Leonid Burmistrov (Fri Jun 15 14:58:32 JST 2018)
 ---------------------------------------------------------------------------
 """
 
-import os
-import sys
-from optparse import Option, OptionValueError, OptionParser
+from optparse import OptionParser
 import numpy as np
 
 parser = OptionParser()

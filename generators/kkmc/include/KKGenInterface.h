@@ -8,15 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KKGENINTERFACE_H
-#define KKGENINTERFACE_H
+#pragma once
 
+/* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
 
+/* C++ headers. */
 #include <string>
 #include <unordered_map>
 
 #define nmxhep 4000
+
+/**
+ *HEPEVT common block of PYTHIA6.
+ */
 struct hepevt_type {
   int nevhep;               /**< serial number. */
   int nhep;                 /**< number of particles. */
@@ -26,20 +31,22 @@ struct hepevt_type {
   int jdahep[nmxhep][2];    /**< childreen particles. */
   double phep[nmxhep][5];   /**< four-momentum, mass [GeV]. */
   double vhep[nmxhep][4];   /**<  vertex [mm]. */
-}; /**< /HEPEVT/ common block of PYTHIA6. */
+};
 
+/**
+ * PYDAT2 common block of PYTHIA6.
+ */
 struct pydat2_type {
   int KCHG[4][500];  /**< particle information such as spin, charge... */
   double PMAS[4][500]; /**< particle information such as mass, width... */
   double PARF[2000]; /**< parametrization of dd-uu-ss flavor mixing. */
   double VCKM[4][4]; /**< squared CKM matrix elements. */
-}; /**< /PYDAT2/ common block of PYTHIA6. */
+};
 
 extern hepevt_type hepevt_;
 extern pydat2_type pydat2_;
 
 extern "C" {
-
   void kk_init_(const char*, const char*, const char*, int*, const char*);
   void kk_begin_run_(double*);
   void kk_init_seed_();
@@ -55,17 +62,17 @@ extern "C" {
 
 namespace Belle2 {
 
-  //! Module for using KKMC generator
+  /**
+   * Interface class for using the KKMC generator.
+   */
   class KKGenInterface {
 
   public:
 
-    //Define exceptions
-
     /**
      * Constructor.
      */
-    KKGenInterface();
+    KKGenInterface() {}
 
     /**
      * Destructor.
@@ -73,40 +80,55 @@ namespace Belle2 {
     ~KKGenInterface() {}
 
     /**
-     * Copy constructor, explicitly forbidden (for cppcheck).
+     * Copy constructor, explicitly deleted.
      */
     KKGenInterface(const KKGenInterface& m) = delete;
 
     /**
-     * Assignment operator (for cppcheck).
+     * Assignment operator, explicitly deleted.
      */
     KKGenInterface& operator= (const KKGenInterface& m) = delete;
 
+    /**
+     * Setup for KKMC and TAUOLA.
+     */
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
-              const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
-
-    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
-                       double Espread_HER); /**< Setup for beam inforamtion to KKMC */
-
-    int simulateEvent(MCParticleGraph& graph, TVector3 vertex); /**< MC simulation function */
+              const std::string& KKMCOutputFileName);
 
     /**
-    * Terminates the generator.
-    */
+     * Setup for beams information.
+     */
+    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
+                       double Espread_HER);
+
+    /**
+     * Simulate the events.
+     */
+    int simulateEvent(MCParticleGraph& graph, TVector3 vertex);
+
+    /**
+     * Terminate the generator.
+     */
     void term();
 
-
   private:
-    int addParticles2Graph(MCParticleGraph& graph, TVector3 vertex);  /**< Function to add particle decays */
-    void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle,
-                             TVector3 vertex);  /**< Function to update particle decays */
-    // bool getPythiaCharge(int, double&); /**< Function to get charge from Pythia ID. */
-    // int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
 
-  protected:
-    std::unordered_map<int, int> m_mapPythiaIDtoPDG; /**< mapping of PYTHIA id to PDG codes*/
+    /**
+     * Add particles to the MCParticleGraph.
+     */
+    int addParticles2Graph(MCParticleGraph& graph, TVector3 vertex);
+
+    /**
+     * Update the MCParticleGraph.
+     */
+    void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle,
+                             TVector3 vertex);
+
+    /**
+     * Map between PYTHIA id and PDG codes.
+     */
+    std::unordered_map<int, int> m_mapPythiaIDtoPDG;
+
   };
 
 }
-
-#endif //KKGENINTERFACE_H

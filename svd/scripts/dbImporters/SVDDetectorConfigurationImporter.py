@@ -6,18 +6,12 @@ SVD Detector Configuration Importer.
 Script to the configuration parameters, Local and Global, into a local DB
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import SVDDetectorConfigurationImporter
-from ROOT.Belle2 import FileSystem
-import os
 import sys
-import glob
-import subprocess
-import interactive
 import argparse
-from fnmatch import fnmatch
 from termcolor import colored
+from basf2 import conditions as b2conditions
 
 parser = argparse.ArgumentParser(description="SVD Detector Configuration Importer")
 parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
@@ -64,21 +58,13 @@ if not str(proceed) == 'y':
     print(colored(str(proceed) + ' != y, therefore we exit now', 'red'))
     exit(1)
 
-reset_database()
-use_database_chain()
-# central DB needed for the channel mapping DB object
-# GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "svd_Belle2_20181221"
-use_central_database(GLOBAL_TAG)
-use_local_database("localDB_test/database.txt", "localDB_test", invertLogging=True)
+b2conditions.prepend_globaltag("svd_basic")
 
-# local tag and database needed for commissioning
-
-main = create_path()
+main = b2.create_path()
 
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run})
 main.add_module(eventinfosetter)
 
@@ -88,7 +74,7 @@ main.add_module("Gearbox")
 run = int(run)
 
 
-class configImporterToDBModule(Module):
+class configImporterToDBModule(b2.Module):
     '''detector configuration importer'''
 
     def beginRun(self):
@@ -109,6 +95,6 @@ class configImporterToDBModule(Module):
 
 main.add_module(configImporterToDBModule())
 
-process(main)
+b2.process(main)
 
 print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")

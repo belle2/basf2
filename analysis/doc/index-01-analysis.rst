@@ -1,3 +1,5 @@
+.. _analysis:
+
 ========
 Analysis
 ========
@@ -13,15 +15,17 @@ Examples of analysis steering files can be found in tutorial directory of analys
 
         ls $BELLE2_RELEASE_DIR/analysis/examples/tutorials
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
 
-.. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
+.. _Particle: https://software.belle2.org/|release|/classBelle2_1_1Particle.html
 
+
+.. _analysis_particles:
 
 Particles
 =========
 
-Particles in basf2 are created from mdst dataobjects: Tracks, tracking vertices (V0s) ECLClusters, and KLMClusters. 
+Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s), ECLClusters, and KLMClusters. 
 The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as phsical particles.
 All of the `Particle`_ s in an event that fall within certain criteria are collected into `ParticleList`_ s.
 
@@ -54,6 +58,7 @@ There are also some more specialised python wrapper functions for vertex-fitting
 .. toctree:: Vertex
 .. toctree:: PhotonWrappers
 
+.. _analysis_variables:
 
 Variables
 =========
@@ -77,6 +82,14 @@ You can save information from analysis jobs directly from the ``VariableManager`
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
+
+(Advanced) user mDST files
+--------------------------
+
+You can also save events to your own mDST or user-defined dst (uDST) output files.
+These files are also created by the :ref:`skim` but the functional code is part of :ref:`analysis`.
+
+.. toctree:: UdstOutput
 
 Event-based analysis
 ====================
@@ -132,7 +145,7 @@ Typical physics analysis performed at B factories can be separated into well def
 #. write out all relevant info to ntuple for offline analysis.
 
 
-A measurement of time-dependent CP violation in B0 decays to a different final state, e.g. :math:`J/\psi K_S^0,\ D^+D^−` or :math:`K^{*0}\gamma`, would consist of conceptually identical analysis actions. Even within the same analysis sequence the same analysis action can appear several times. In the example above, the actions 2 and 4 are conceptually the same. In both cases new particle is created by combining others. The only difference is in the input. The only difference between differnet decay modes mentioned above is in the intermediate and final state particles. All other steps, like 5, 6, 7, 8, and 9 are in principle the same. The input is of course different, but the result is the same. Therefore, commonly used analysis tools need to be prepared in order to enable efficient and accurate data analysis. Each analysis action can then be performed by a separate analysis module, combined into an analysis sequence steered by a python script.
+A measurement of time-dependent CP violation in B0 decays to a different final state, e.g. :math:`J/\psi K_S^0,\ D^+D^−` or :math:`K^{*0}\gamma`, would consist of conceptually identical analysis actions. Even within the same analysis sequence the same analysis action can appear several times. In the example above, the actions 2 and 4 are conceptually the same. In both cases new particle is created by combining others. The only difference is in the input. The only difference between different decay modes mentioned above is in the intermediate and final state particles. All other steps, like 5, 6, 7, 8, and 9 are in principle the same. The input is of course different, but the result is the same. Therefore, commonly used analysis tools need to be prepared in order to enable efficient and accurate data analysis. Each analysis action can then be performed by a separate analysis module, combined into an analysis sequence steered by a python script.
 
 
 

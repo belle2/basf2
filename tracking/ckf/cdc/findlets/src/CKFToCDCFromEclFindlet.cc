@@ -77,7 +77,7 @@ void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit
 
   // find the paths
   for (const auto& seed : m_seeds) {
-    B2DEBUG(100, "Starting new seed");
+    B2DEBUG(29, "Starting new seed");
     m_paths.clear();
     m_paths.push_back(seed);
     m_treeSearcher.apply(m_paths, wireHitPtrs);

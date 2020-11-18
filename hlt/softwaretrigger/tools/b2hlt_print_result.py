@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-PyConfig.StartGuiThread = False
+PyConfig.IgnoreCommandLineOptions = True  # noqa
+PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.input:
-        # The prescales are only valid when using the online database!
+        # For data, the prescales are only valid when using the online database!
         basf2.reset_database()
         if args.local_db_path is not None:
             basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]

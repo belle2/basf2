@@ -146,21 +146,17 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0, smin = 1e9, smax = -1e9;
         for (int i = 0; i < 4; i++) {
           for (int j = i + 1; j < 4; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;
-            //  cout<<i<<" "<<j<<" "<<s<<endl;
           }
         }
         double ave = sum / 6;
-        //    double rms = sqrt(sum2/6 - ave*ave);
-        //    cout<<sum<<" +- "<<rms<<" "<<rms/sum*100<<" "<<60*(smin-ave)<<" "<<60*(smax-ave)<<endl;
 
         double scale = ave;
         G4TwoVector off1(0, 0), off2(scale * p1[0].x() - p2[0].x(), scale * p1[0].y() - p2[0].y());
@@ -449,7 +445,7 @@ namespace Belle2 {
 
       G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
-        if (nshape != 36) return NULL; // only one crystal has pentagon shape
+        if (nshape != 36) return nullptr; // only one crystal has pentagon shape
 
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -498,23 +494,19 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0, smin = 1e9, smax = -1e9;
         int count = 0;
         for (int i = 0; i < 5; i++) {
           for (int j = i + 1; j < 5; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;
-            //  cout<<i<<" "<<j<<" "<<s<<endl;
             count++;
           }
         }
         double ave = sum / count;
-        //    double rms = sqrt(sum2/count - ave*ave);
-        //    cout<<sum<<" +- "<<rms<<" "<<rms/sum*100<<" "<<60*(smin-ave)<<" "<<60*(smax-ave)<<endl;
 
         double scale = ave;
         G4TwoVector off1(0, 0), off2(scale * p1[0].x() - p2[0].x(), scale * p1[0].y() - p2[0].y());
@@ -524,7 +516,7 @@ namespace Belle2 {
 
       G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const override
       {
-        if (nshape != 36) return NULL; // only one crystal has pentagon shape
+        if (nshape != 36) return nullptr; // only one crystal has pentagon shape
 
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -628,7 +620,7 @@ namespace Belle2 {
         vector<string> t;
         copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
         if (t.size() > 0) {
-          shape_t* shape = NULL;
+          shape_t* shape = nullptr;
           if (t.size() == 21) {
             shape = new quadrilateral_endcap_t();
             quadrilateral_endcap_t& trap = static_cast<quadrilateral_endcap_t&>(*shape);
@@ -754,7 +746,7 @@ namespace Belle2 {
         vector<string> t;
         copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
         if (t.size() > 0) {
-          shape_t* shape = NULL;
+          shape_t* shape = nullptr;
           if (t.size() == 21) {
             shape = new quadrilateral_endcap_t();
             quadrilateral_endcap_t& trap = static_cast<quadrilateral_endcap_t&>(*shape);

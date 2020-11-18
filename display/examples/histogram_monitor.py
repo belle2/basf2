@@ -5,17 +5,14 @@
 # Doubleclicking them will show them in the current canvas (added on
 # the right side of the screen) and keep them updated each event.
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 
 from ROOT import Belle2
 from ROOT import TH1F
 from ROOT import TH3F
-from ROOT import TVector3
 
 
-class GenerateHist(Module):
+class GenerateHist(b2.Module):
     """Generate some histograms to pass to the display."""
 
     #: histogram for SimHit energy deposition
@@ -48,24 +45,24 @@ class GenerateHist(Module):
 
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
 
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['CDC', 'MagneticField'])
 
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 
 # simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
+g4sim.logging.log_level = b2.LogLevel.ERROR
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
@@ -78,8 +75,8 @@ main.add_module(g4sim)
 main.add_module(GenerateHist())
 
 # default parameters
-display = register_module('Display')
+display = b2.register_module('Display')
 main.add_module(display)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -14,9 +14,6 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventKinematics.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -42,6 +39,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
+  addParam("usingMC", m_usingMC, "is built using generated particles", false);
 
 }
 
@@ -49,42 +47,33 @@ EventKinematicsModule::~EventKinematicsModule() = default;
 
 void EventKinematicsModule::initialize()
 {
-  StoreObjPtr<EventKinematics> evtKinematics;
-  evtKinematics.registerInDataStore();
+  auto arrayName = (!m_usingMC) ? "EventKinematics" : "EventKinematicsFromMC";
+  m_eventKinematics.registerInDataStore(arrayName);
 
-}
-
-void EventKinematicsModule::beginRun()
-{
 }
 
 void EventKinematicsModule::event()
 {
-  StoreObjPtr<EventKinematics> eventKinematics;
-  if (!eventKinematics) eventKinematics.create();
+  if (!m_eventKinematics) m_eventKinematics.construct(m_usingMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
   TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
-  eventKinematics->addMissingMomentum(missingMomentum);
+  m_eventKinematics->addMissingMomentum(missingMomentum);
 
   TVector3 missingMomentumCMS = EventKinematicsModule::getMissingMomentumCMS();
-  eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
+  m_eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
 
   float missingEnergyCMS = EventKinematicsModule::getMissingEnergyCMS();
-  eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
+  m_eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
 
   float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.Mag() * missingMomentumCMS.Mag();
-  eventKinematics->addMissingMass2(missingMass2);
+  m_eventKinematics->addMissingMass2(missingMass2);
 
   float visibleEnergyCMS = EventKinematicsModule::getVisibleEnergyCMS();
-  eventKinematics->addVisibleEnergyCMS(visibleEnergyCMS);
+  m_eventKinematics->addVisibleEnergyCMS(visibleEnergyCMS);
 
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
-  eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
-}
-
-void EventKinematicsModule::endRun()
-{
+  m_eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
 }
 
 void EventKinematicsModule::terminate()
@@ -109,11 +98,18 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
+      if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle and !m_usingMC) {
+        B2FATAL("EventKinematics received MCParticles as an input, but usingMC flag is false");
+      }
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle and m_usingMC) {
+        B2FATAL("EventKinematics received reconstructed Particles as an input, but usingMC flag is true");
+      }
 
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
-      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster)
+      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster or
+           part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle)
           and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 

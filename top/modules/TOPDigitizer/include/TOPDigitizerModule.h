@@ -19,6 +19,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <simulation/dataobjects/SimClockState.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPSampleTimes.h>
@@ -127,6 +128,7 @@ namespace Belle2 {
     StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
     StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simuated cal pulses */
     StoreArray<MCParticle> m_mcParticles;   /**< collection of MC particles */
+    StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     StoreArray<TOPRawWaveform> m_waveforms; /**< collection of waveforms */
     StoreArray<TOPRawDigit> m_rawDigits;    /**< collection of raw digits */
     StoreArray<TOPDigit> m_digits;          /**< collection of digits */

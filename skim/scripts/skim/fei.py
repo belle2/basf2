@@ -16,9 +16,8 @@ from functools import lru_cache, wraps
 import basf2 as b2
 import fei
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header, _sphinxify_decay
+from skimExpertFunctions import BaseSkim, _sphinxify_decay, fancy_skim_header
 from variables import variables as vm
-
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
@@ -108,9 +107,9 @@ class BaseFEISkim(BaseSkim):
 
     MergeDataStructures = {"FEIChannelArgs": _merge_boolean_dicts}
 
-    RequiredStandardLists = None
-
     NoisyModules = ["ParticleCombiner"]
+
+    ApplyHLTHadronCut = True
 
     @staticmethod
     @lru_cache()

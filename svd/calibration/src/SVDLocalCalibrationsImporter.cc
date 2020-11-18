@@ -181,7 +181,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
                     // ||
                     // test on the sensor != f( hybrid) anr apv perhaps
                    )
-                  B2ERROR("Inconsistency among maps: xml files tells \n" <<
+                  B2FATAL("Inconsistency among maps: xml files tells \n" <<
                           "layer " << layerId << " ladder " << ladderId <<
                           " hybridID " << hybridId << "\n" <<
                           "while the BASF2 map tells \n" <<

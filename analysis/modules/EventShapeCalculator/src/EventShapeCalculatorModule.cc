@@ -14,9 +14,6 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventShapeContainer.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 
@@ -48,6 +45,7 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
 {
   // Set module properties
   setDescription("Module to compute event shape attributes starting from particlelists. The core algorithms are not implemented in this module, but in dedicated basf2 classes.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleListNames", m_particleListNames, "List of the ParticleLists to be used for the calculation of the EventShapes.",
            vector<string>());
@@ -67,8 +65,7 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
 
 void EventShapeCalculatorModule::initialize()
 {
-  StoreObjPtr<EventShapeContainer> evtShapeContainer;
-  evtShapeContainer.registerInDataStore();
+  m_eventShapeContainer.registerInDataStore();
 }
 
 
@@ -78,8 +75,7 @@ void EventShapeCalculatorModule::event()
   PCmsLabTransform T;
   double sqrtS = T.getCMSEnergy();
 
-  StoreObjPtr<EventShapeContainer> eventShapeContainer;
-  if (!eventShapeContainer) eventShapeContainer.create();
+  if (!m_eventShapeContainer) m_eventShapeContainer.create();
 
   parseParticleLists(m_particleListNames);
 
@@ -92,12 +88,12 @@ void EventShapeCalculatorModule::event()
     if (m_enableAllMoments) {
       fw.calculateAllMoments();
       for (short i = 0; i < 9; i++) {
-        eventShapeContainer->setFWMoment(i, fw.getH(i));
+        m_eventShapeContainer->setFWMoment(i, fw.getH(i));
       }
     } else {
       fw.calculateBasicMoments();
       for (short i = 0; i < 5; i++) {
-        eventShapeContainer->setFWMoment(i, fw.getH(i));
+        m_eventShapeContainer->setFWMoment(i, fw.getH(i));
       }
     }
   }
@@ -113,8 +109,8 @@ void EventShapeCalculatorModule::event()
       B2WARNING("Eigenvalues not ordered!!!!!!!!!!");
 
     for (short i = 0; i < 3; i++) {
-      eventShapeContainer->setSphericityEigenvalue(i, Sph.getEigenvalue(i));
-      eventShapeContainer->setSphericityEigenvector(i, Sph.getEigenvector(i));
+      m_eventShapeContainer->setSphericityEigenvalue(i, Sph.getEigenvalue(i));
+      m_eventShapeContainer->setSphericityEigenvector(i, Sph.getEigenvector(i));
     }
   }
 
@@ -126,8 +122,8 @@ void EventShapeCalculatorModule::event()
     TVector3 thrust = Thrust::calculateThrust(m_p3List);
     float thrustVal = thrust.Mag();
     thrust = (1. / thrustVal) * thrust;
-    eventShapeContainer->setThrustAxis(thrust);
-    eventShapeContainer->setThrust(thrustVal);
+    m_eventShapeContainer->setThrustAxis(thrust);
+    m_eventShapeContainer->setThrust(thrustVal);
 
     // --- If required, calculates the HarmonicMoments ---
     if (m_enableHarmonicMoments) {
@@ -136,13 +132,13 @@ void EventShapeCalculatorModule::event()
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentThrust(i, moment);
+          m_eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentThrust(i, moment);
+          m_eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       }
     }
@@ -159,7 +155,7 @@ void EventShapeCalculatorModule::event()
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
-        eventShapeContainer->setCleoConeThrust(i, cones[i]);
+        m_eventShapeContainer->setCleoConeThrust(i, cones[i]);
       }
     } // end of if m_enableCleoCones
 
@@ -174,8 +170,8 @@ void EventShapeCalculatorModule::event()
         else
           p4BKW += p4;
       }
-      eventShapeContainer->setForwardHemisphere4Momentum(p4FWD);
-      eventShapeContainer->setBackwardHemisphere4Momentum(p4BKW);
+      m_eventShapeContainer->setForwardHemisphere4Momentum(p4FWD);
+      m_eventShapeContainer->setBackwardHemisphere4Momentum(p4BKW);
     } // end of if m_enableJets
   }// end of if m_enableThrust
 
@@ -194,7 +190,7 @@ void EventShapeCalculatorModule::event()
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
-        eventShapeContainer->setCleoConeCollision(i, cones[i]);
+        m_eventShapeContainer->setCleoConeCollision(i, cones[i]);
       }
     }
 
@@ -205,13 +201,13 @@ void EventShapeCalculatorModule::event()
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentCollision(i, moment);
+          m_eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentCollision(i, moment);
+          m_eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       }
     } // end of m_enableHarmonicMoments
@@ -265,7 +261,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (!isDuplicate) {
         TLorentzVector p4CMS = T.rotateLabToCms() * part->get4Vector();
-        // it need to fill an std::vector of TVector3 to use the current FW rutines.
+        // it need to fill an std::vector of TVector3 to use the current FW routines.
         // It will hopefully change in release 3
         m_p4List.push_back(p4CMS);
         m_p3List.push_back(p4CMS.Vect());

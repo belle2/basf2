@@ -19,8 +19,8 @@
 """
 
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mc_reconstruction
-from basf2 import *
+from reconstruction import add_reconstruction
+import basf2 as b2
 import glob
 import os
 import sys
@@ -122,7 +122,7 @@ def run_simulation(path, pt_value, output_filename=''):
     """Add needed modules to the path and set parameters and start it"""
 
     # evt meta
-    eventinfosetter = register_module('EventInfoSetter')
+    eventinfosetter = b2.register_module('EventInfoSetter')
 
     # generate one event
     eventinfosetter.param('expList', [0])
@@ -131,11 +131,11 @@ def run_simulation(path, pt_value, output_filename=''):
 
     path.add_module(eventinfosetter)
 
-    progress = register_module('Progress')
+    progress = b2.register_module('Progress')
     path.add_module(progress)
 
     # ParticleGun
-    pgun = register_module('ParticleGun')
+    pgun = b2.register_module('ParticleGun')
     # choose the particles you want to simulate
     param_pgun = {
         'pdgCodes': [get_generated_pdg_code(), -get_generated_pdg_code()],
@@ -169,28 +169,28 @@ def run_simulation(path, pt_value, output_filename=''):
     additional_options(path)
     # write output root file
     if output_filename != '':
-        root_output = register_module('RootOutput')
+        root_output = b2.register_module('RootOutput')
         root_output.param('outputFileName', output_filename)
         path.add_module(root_output)
 
 
 def run_reconstruction(path, output_file_name, input_file_name=''):
     if input_file_name != '':
-        root_input = register_module('RootInput')
+        root_input = b2.register_module('RootInput')
         root_input.param('inputFileNames', input_file_name)
         path.add_module(root_input)
 
-        gearbox = register_module('Gearbox')
+        gearbox = b2.register_module('Gearbox')
         path.add_module(gearbox)
 
-        geometry = register_module('Geometry')
+        geometry = b2.register_module('Geometry')
         geometry.param("useDB", True)
         path.add_module(geometry)
 
     add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
     # add_mc_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
 
-    tracking_efficiency = register_module('StandardTrackingPerformance')
+    tracking_efficiency = b2.register_module('StandardTrackingPerformance')
     # tracking_efficiency.logging.log_level = LogLevel.DEBUG
     tracking_efficiency.param('outputFileName', output_file_name)
     path.add_module(tracking_efficiency)

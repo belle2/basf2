@@ -9,16 +9,17 @@ This modules contains some utility functions used by basf2, mainly for printing
 things.
 """
 
-import pybasf2
 import inspect as _inspect
+from shutil import get_terminal_size as _get_terminal_size
+import textwrap as _textwrap
+import pybasf2
 
 
 def get_terminal_width():
     """
     Returns width of terminal in characters, or 80 if unknown.
     """
-    from shutil import get_terminal_size
-    return get_terminal_size(fallback=(80, 24)).columns
+    return _get_terminal_size(fallback=(80, 24)).columns
 
 
 def pretty_print_table(table, column_widths, first_row_is_heading=True, transform=None, min_flexible_width=10, *,
@@ -50,6 +51,9 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
           use all available space but at least the actual width. Only useful
           to make the table span the full width of the terminal
 
+        The column width can also start with ``>``, ``<`` or ``^`` in which case
+        it will be right, left or center aligned.
+
       first_row_is_heading: header specifies if we should take the first row
           as table header and offset it a bit
 
@@ -73,9 +77,10 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
 
           If argument is not given or given as None the default of printing '-'
           signs are printed over the whole table width is used.
-    """
 
-    import textwrap
+    .. versionchanged:: after release 5
+       Added support for column alignment
+    """
 
     # figure out how much space we need for each column (without separators)
     act_column_widths = [len(cell) for cell in table[0]]
@@ -86,7 +91,21 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
     # adjust act_column_widths to comply with user-specified widths
     total_used_width = 0
     long_columns = []  # index of * column, if found
+    # alignment character of the column following str.format
+    align = []
     for (col, opt) in enumerate(column_widths):
+        # check if our column is aligned
+        if isinstance(opt, str) and opt[0] in "<>^":
+            align.append(opt[0])
+            opt = opt[1:]
+        else:
+            align.append('')
+        # and try to convert option to an int
+        try:
+            opt = int(opt)
+        except ValueError:
+            pass
+
         if opt == '*':
             # handled after other fields are set
             long_columns.append(col)
@@ -133,10 +152,12 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
 
         total_used_width += remaining_space
 
-    format_string = ' '.join(['%%-%ss' % length for length in
-                              act_column_widths[:-1]])
-    # don't print extra spaces at end of each line
-    format_string += ' %s'
+    format_string = ' '.join(['{:%s%d}' % opt for opt in zip(align, act_column_widths[:-1])])
+    # don't print extra spaces at end of each line unless it's specifically aligned
+    if not align[-1]:
+        format_string += ' {}'
+    else:
+        format_string += ' {:%s%d}' % (align[-1], act_column_widths[-1])
 
     if hline_formatter is not None:
         hline = hline_formatter(total_used_width)
@@ -150,7 +171,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
     header_shown = False
     for row in table:
         # use automatic word wrapping on module description (last field)
-        wrapped_row = [textwrap.wrap(str(row[i]), width) for (i, width) in
+        wrapped_row = [_textwrap.wrap(str(row[i]), width) for (i, width) in
                        enumerate(act_column_widths)]
         max_lines = max([len(col) for col in wrapped_row])
         for line in range(max_lines):
@@ -159,7 +180,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
                     row[i] = wrapped_row[i][line]
                 else:
                     row[i] = ''
-            line = format_string % tuple(row)
+            line = format_string.format(*row)
             if transform is not None:
                 line = transform(row, act_column_widths, line)
             print(line)
@@ -178,9 +199,8 @@ def pretty_print_description_list(rows):
     # indentation width
     module_width = 24
     # text wrapper class to format description to terminal width
-    import textwrap
-    wrapper = textwrap.TextWrapper(width=term_width, initial_indent="",
-                                   subsequent_indent=" " * (module_width))
+    wrapper = _textwrap.TextWrapper(width=term_width, initial_indent="",
+                                    subsequent_indent=" " * (module_width))
 
     useColors = pybasf2.LogPythonInterface.terminal_supports_colors()
 
@@ -226,7 +246,7 @@ def print_all_modules(moduleList, package=''):
     fail = False
 
     modules = []
-    for (moduleName, sharedLib) in sorted(moduleList.items()):
+    for moduleName in moduleList:
         try:
             current_module = pybasf2._register_module(moduleName)
             if package == '' or current_module.package() == package:
@@ -235,7 +255,7 @@ def print_all_modules(moduleList, package=''):
             pybasf2.B2ERROR('The module {} could not be loaded.'.format(moduleName))
             fail = True
         except Exception as e:
-            pybasf2.B2ERROR('An exception occured when trying to load the module {}: {}'.format(moduleName, e))
+            pybasf2.B2ERROR('An exception occurred when trying to load the module {}: {}'.format(moduleName, e))
             fail = True
 
     table = []
@@ -379,7 +399,7 @@ def list_functions(mod):
     return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
 
 
-def pretty_print_module(module, module_name, replacements={}):
+def pretty_print_module(module, module_name, replacements=None):
     """Pretty print the contents of a python module.
     It will print all the functions defined in the given module to the console
 
@@ -388,11 +408,14 @@ def pretty_print_module(module, module_name, replacements={}):
             `sys.modules`
         module_name: readable module name
         replacements (dict): dictionary containing text replacements: Every
-            occurence of any key in the function signature will be replaced by
+            occurrence of any key in the function signature will be replaced by
             its value
     """
     from terminal_utils import Pager
     desc_list = []
+
+    if replacements is None:
+        replacements = {}
 
     # allow mod to be just the name of the module
     if isinstance(module, str):

@@ -69,11 +69,11 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi0(self):
         """Check stdXi0"""
-        for gammatype, b2bii in product(['eff20', 'eff30', 'eff40', 'eff50', 'eff60'], [True, False]):
+        for gamma_efficiency, b2bii in product(['eff20', 'eff30', 'eff40', 'eff50', 'eff60'], [True, False]):
             self.assertTrue(
                 self._check_list(
                     lambda path: stdXi0(
-                        gammatype=gammatype,
+                        gammatype=gamma_efficiency,
                         b2bii=b2bii,
                         path=path),
                     expected_lists=['Xi0:std']))
@@ -93,17 +93,35 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodXi lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi(fitter='TreeFit', b2bii=False, path=path)
                 goodXi(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi-:std', f'Xi-:{xitype}']))
             # Should be no 'Xi' list. Make sure we did not make typos.
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
 
-    def test_goodX0(self):
+    def test_goodXi_with_std_added_before(self):
+        """Check goodXi lists: veryloose, loose, tight. Test behavior if std list was already added before."""
+        for xitype in ['veryloose', 'loose', 'tight']:
+            def create_list(path):
+                stdXi(path=path)
+                goodXi(xitype, path)
+            self.assertTrue(self._check_list(create_list, expected_lists=['Xi-:std', f'Xi-:{xitype}']))
+            # Should be no 'Xi' list. Make sure we did not make typos.
+            self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
+
+    def test_goodXi0(self):
         """Check goodXi0 lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi0(gammatype='eff50', b2bii=False, path=path)
+                goodXi0(xitype, path)
+            self.assertTrue(self._check_list(create_list, expected_lists=['Xi0:std', f'Xi0:{xitype}']),
+                            f"xitype = {xitype}")
+            self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
+
+    def test_goodXi0_with_std_added_before(self):
+        """Check goodXi0 lists: veryloose, loose, tight. Test behavior if std list was already added before."""
+        for xitype in ['veryloose', 'loose', 'tight']:
+            def create_list(path):
+                stdXi0(path=path)
                 goodXi0(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi0:std', f'Xi0:{xitype}']),
                             f"xitype = {xitype}")
@@ -113,10 +131,19 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodOmega lists: veryloose, loose, tight"""
         for omegatype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdOmega(fitter='TreeFit', b2bii=False, path=path)
                 goodOmega(omegatype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Omega-:std', f'Omega-:{omegatype}']))
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Omega:{omegatype}']))
+
+    def test_goodOmega_with_std_added_before(self):
+        """Check goodOmega lists: veryloose, loose, tight. Test behavior if std list was already added before."""
+        for omegatype in ['veryloose', 'loose', 'tight']:
+            def create_list(path):
+                stdOmega(path=path)
+                goodOmega(omegatype, path)
+            self.assertTrue(self._check_list(create_list, expected_lists=['Omega-:std', f'Omega-:{omegatype}']))
+            self.assertFalse(self._check_list(create_list, expected_lists=[f'Omega:{omegatype}']))
+
 
 if __name__ == '__main__':
     unittest.main()

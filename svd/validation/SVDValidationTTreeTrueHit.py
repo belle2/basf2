@@ -10,7 +10,7 @@
     </description>
 </header>
 """
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -27,10 +27,10 @@ gROOT.ProcessLine('struct EventDataTrueHit {\
     int strip_dir;\
     };')
 
-from ROOT import EventDataTrueHit
+from ROOT import EventDataTrueHit  # noqa
 
 
-class SVDValidationTTreeTrueHit(Module):
+class SVDValidationTTreeTrueHit(b2.Module):
     '''class to create the true hit ttree'''
 
     def __init__(self):

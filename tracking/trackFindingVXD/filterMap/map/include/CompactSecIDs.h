@@ -106,9 +106,11 @@ namespace Belle2 {
     }
 
 
-    /// Returns the compact id of the FullSecID @param fullID.
-    /// It return 0 if @paam fullID is unknown.
-    /// It does not throw exceptions (at least it should not).
+    /** Returns the compact id of the FullSecID
+      @param fullID: the FullSecID
+      @return 0 if @param fullID is unknown.
+        It does not throw exceptions (at least it should not).
+    */
     sectorID_t getCompactID(const FullSecID& fullID) const
     {
 
@@ -308,8 +310,10 @@ namespace Belle2 {
     int nOfLayers(void) const
     { return m_compactSectorsIDMap.size(); }
 
-    /// get the number of ladders on @param layer.
-    /// 0 if the the layer is out of bounds
+    /** get the number of ladders on
+      @param layer: the layer
+      @return 0 if the the layer is out of bounds
+    */
     int nOfLadders(int layer) const
     {
       if (layer < 0 || layer >= nOfLayers())
@@ -317,8 +321,11 @@ namespace Belle2 {
       return m_compactSectorsIDMap[layer].size();
     }
 
-    /// get the number of sensors on @param layer @param ladder.
-    /// 0 if the layer os ladder is out of bounds.
+    /** get the number of sensors on
+      @param layer: the layer
+      @param ladder: the ladder
+      @return 0 if the layer or ladder is out of bounds.
+    */
     int nOfSensors(int layer, int ladder) const
     {
       if (ladder < 0 || ladder >= nOfLadders(layer))

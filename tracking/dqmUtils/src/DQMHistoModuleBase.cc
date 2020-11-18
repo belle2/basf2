@@ -583,7 +583,7 @@ void DQMHistoModuleBase::ComputeMean(TH1F* output, TH2F* input, bool onX)
   }
 }
 
-void DQMHistoModuleBase::ProcessHistogramParameterChange(string name, string parameter, string value)
+void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, const string& parameter, const string& value)
 {
   TH1* histogram;
   bool found = false;
@@ -611,7 +611,7 @@ void DQMHistoModuleBase::ProcessHistogramParameterChange(string name, string par
   }
 }
 
-void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, string parameter, string value)
+void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const string& parameter, string value)
 {
   if (parameter == "title") {
     histogram->SetTitle(value.c_str());

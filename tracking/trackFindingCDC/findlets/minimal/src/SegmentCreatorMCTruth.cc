@@ -78,13 +78,13 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
                                                        mcTrackStore.getMCSegmentsByMCParticleIdx();
 
   std::size_t nSegments = 0;
-  for (const std::pair<ITrackType, std::vector<CDCHitVector>>& mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector>> mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
     nSegments += mcSegments.size();
   }
 
   outputSegments.reserve(outputSegments.size() + nSegments);
-  for (const std::pair<ITrackType, std::vector<CDCHitVector>>& mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector>> mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {
 
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
     for (const CDCHitVector& mcSegment : mcSegments) {

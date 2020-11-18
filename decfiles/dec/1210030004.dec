@@ -15,12 +15,12 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-0.0000094   f_0      K+              PHSP; 
-0.00000009  omega    K+               SVS;
-0.000016    K+       pi-     pi+     PHSP;
-0.00000084  f_2      K+              PHSP;
-0.0000037   rho0     K+               SVS;
-0.000018    K_0*0    pi+             PHSP;
+0.0000046      f_0      K+              PHSP; 
+0.00000010251  omega    K+               SVS;
+0.000016       K+       pi-     pi+     PHSP;
+0.00000060455  f_2      K+              PHSP;
+0.000003696    rho0     K+               SVS;
+0.0000300015   K_0*0    pi+             PHSP;
 Enddecay
 CDecay B-sig
 
@@ -45,4 +45,3 @@ Decay K_0*0
 Enddecay
 
 End
-

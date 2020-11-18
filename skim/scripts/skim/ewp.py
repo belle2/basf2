@@ -15,8 +15,9 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdMu, stdPi
+from stdPhotons import stdPhotons
 from variables import variables
-
 
 __liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
 
@@ -32,12 +33,12 @@ class BtoXgamma(BaseSkim):
 
     * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-    * :math:`n_{\\text{tracks}} >= 3`
+    * :math:`n_{\\text{tracks}} \\geq 3`
 
     Cuts on photons:
 
     * :math:`\\text{clusterE9E21}>0.9`
-    * :math:`1.4\\,\\text{GeV}<\\text{E_{\\gamma}}<3.4\\,\\text{GeV}` in CMS frame
+    * :math:`1.4\\,\\text{GeV}<\\E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
     """
 
     __authors__ = ["Trevor Shillington"]
@@ -45,17 +46,13 @@ class BtoXgamma(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all", "loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
-        """Build the skim list for :math:`B \\to X_{(s,d)}\\gamma` decays."""
+        """Build the skim list for :math:`B \\to X\\gamma` decays."""
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
@@ -98,19 +95,19 @@ class BtoXll(BaseSkim):
 
       * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
         :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-      * :math:`n_{\\text{tracks}} >= 3`
+      * :math:`n_{\\text{tracks}} \\geq 3`
 
       Cuts on electrons:
 
       * :math:`\\text{electronID} > 0.1`
       * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:'dr<0.5 and abs(dz)<2'
+      * :math:`dr<0.5 and abs(dz)<2`
 
       Cuts on muons:
 
       * :math:`\\text{muonID} > 0.5`
       * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:'dr<0.5 and abs(dz)<2'
+      * :math:`dr<0.5 and abs(dz)<2`
 
 
       Cut on dilepton energy:
@@ -123,16 +120,11 @@ class BtoXll(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-            "stdCharged": {
-                "stdE": ["all"],
-                "stdMu": ["all"],
-                "stdPi": ["all"],
-            },
-            "stdPhotons": {
-                "stdPhotons": ["all"],
-            },
-        }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
@@ -193,19 +185,19 @@ class BtoXll_LFV(BaseSkim):
 
     * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-    * :math:`n_{\\text{tracks}} >= 3`
+    * :math:`n_{\\text{tracks}} \\geq 3`
 
     Cuts on electrons:
 
     * :math:`\\text{electronID} > 0.1`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:'dr<0.5 and abs(dz)<2'
+    * :math:`dr<0.5 and abs(dz)<2`
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:'dr<0.5 and abs(dz)<2'
+    * :math:`dr<0.5 and abs(dz)<2`
 
 
     Cut on dilepton energy:
@@ -218,16 +210,11 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
@@ -280,22 +267,22 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     * :math:`B^+ \\to K\\nu\\nu` inclusive
 
     Track cleanup:
-    * :math:'p_t>0.1'
-    * :math:'thetaInCDCAcceptance'
-    * :math:'dr<0.5 and abs(dz)<3.0'
+    * :math:`p_t > 0.1`
+    * :math:`thetaInCDCAcceptance`
+    * :math:`dr<0.5 and abs(dz)<3.0`
 
     Event cleanup:
     * :math:`3 < nCleanedTracks < 11`
 
     Kaon cuts:
-    * :math:'track cleanup + event cleanup + nPXDHits>0'
-    * :math:'p_t rank=1'
-    * :math:'kaonID>0.01'
+    * :math:`track cleanup + event cleanup + nPXDHits > 0`
+    * :math:`p_t rank=1`
+    * :math:`kaonID>0.01`
 
     MVA info and cuts:
     * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
     * Global Tag: mva_inclusiveBplusToKplusNuNu
-    * :math:'mva\\_identifier>0.5'
+    * :math:`mva\\_identifier > 0.5`
     """
 
     __authors__ = ["Cyrille Praz"]
@@ -304,8 +291,6 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     NoisyModules = ["ParticleCombiner"]
-
-    RequiredStandardLists = None
 
     def build_lists(self, path):
 

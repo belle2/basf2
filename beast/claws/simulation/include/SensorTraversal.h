@@ -24,8 +24,9 @@ namespace Belle2 {
     public:
       /** add a new step
        * @param position position of the step
-       * @param momentum momentum of the step
-       * @param electrons number of deposited electrons during step
+       * @param depEnergy energy deposition
+       * @param visibleEnergy visible energy deposition
+       * @param length flight length so far
        */
       void add(const G4ThreeVector& position, double depEnergy, double visibleEnergy, double length)
       {

@@ -78,6 +78,7 @@ namespace Belle2 {
       /// Sort the recoHits according to their perpS information
       void sortByArcLength2D()
       {
+        // cppcheck-suppress constParameter
         std::stable_sort(this->begin(), this->end(), [](const T & recoHit, const T & otherRecoHit) {
           return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
         });

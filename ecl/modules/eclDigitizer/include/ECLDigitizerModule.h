@@ -17,6 +17,7 @@
 
 //Framework
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
@@ -139,7 +140,7 @@ namespace Belle2 {
      *  is an even number from 0 to 142, so here it is stored as
      *  numbers from 0 to 71 inclusive.
      */
-    unsigned char m_ttime[ECL::ECL_CRATES];
+    unsigned char m_ttime[ECL::ECL_CRATES] = {};
 
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
@@ -163,6 +164,9 @@ namespace Belle2 {
     void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
     /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
     void makeElectronicNoiseAndPedestal(int j, int* FitA);
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /** input arrays */
     StoreArray<ECLHit>    m_eclHits;  /**< hits array  */

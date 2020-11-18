@@ -237,27 +237,31 @@ void PXDDAQDQMModule::event()
     if (difference != 0x7FFFFFFF) {
       float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
-        if (hCM63AfterInjHER && cm63Flag) hCM63AfterInjHER->Fill(diff2);
-        if (hTruncAfterInjHER && truncFlag) hTruncAfterInjHER->Fill(diff2);
+        if (cm63Flag) {
+          hDAQStat->Fill(5); // sum CM63 after HER
+          if (hCM63AfterInjHER) hCM63AfterInjHER->Fill(diff2);
+        }
+        if (truncFlag) {
+          hDAQStat->Fill(2); // sum truncs after HER
+          if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(diff2);
+        }
       } else {
-        if (hCM63AfterInjLER && cm63Flag) hCM63AfterInjLER->Fill(diff2);
-        if (hTruncAfterInjLER && truncFlag) hTruncAfterInjLER->Fill(diff2);
+        if (cm63Flag) {
+          hDAQStat->Fill(6); // sum CM63 after LER
+          if (hCM63AfterInjLER) hCM63AfterInjLER->Fill(diff2);
+        }
+        if (truncFlag) {
+          hDAQStat->Fill(3); // sum truncs after LER
+          if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(diff2);
+        }
       }
     }
     break;
   }
 
   // make some nice statistics
-  if (truncFlag) {
-    hDAQStat->Fill(1);
-    if (hTruncAfterInjHER) hDAQStat->Fill(2);
-    if (hTruncAfterInjLER) hDAQStat->Fill(3);
-  }
-  if (cm63Flag) {
-    hDAQStat->Fill(4);
-    if (hCM63AfterInjHER) hDAQStat->Fill(5);
-    if (hCM63AfterInjLER) hDAQStat->Fill(6);
-  }
+  if (truncFlag) hDAQStat->Fill(1);
+  if (cm63Flag) hDAQStat->Fill(4);
 
   // Check Event-of-doom-busted or otherwise HLT rejected events
   if (m_rawSVD.getEntries() == 0) hDAQStat->Fill(0);

@@ -225,7 +225,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   // add MonitoringObject and canvases
   m_monObj = getMonitoringObject("svd");
 
-  m_c_avg_maxBin_UV = new TCanvas("avg_maxBin_UV");
+  m_c_avg_maxBin_UV = new TCanvas("svd_avg_maxBin_UV");
 
   // add canvases to MonitoringObject
   m_monObj->addCanvas(m_c_avg_maxBin_UV);
@@ -696,6 +696,7 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
   TH1F* h_zs5countsV = (TH1F*)findHist("SVDDQM_StripCountsV");
   TH1F* h_events = (TH1F*)findHist("SVDDQM_nEvents");
 
+  // average occupancies for 3rd layer
   int nEvents = h_events->GetEntries();
   double avgOffOccL3U = 0.0;
   double avgOffOccL3V = 0.0;

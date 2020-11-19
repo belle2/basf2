@@ -605,7 +605,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -615,7 +615,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -631,7 +631,7 @@ class TestPostReconstruction(unittest.TestCase):
                         extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
@@ -652,7 +652,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -662,7 +662,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -678,7 +678,7 @@ class TestPostReconstruction(unittest.TestCase):
                         extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
@@ -712,7 +712,7 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA_pi+:generic ==> pi+:FSP.root')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
                                                                  'extraInfo(SignalProbability)',
@@ -766,7 +766,7 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
                         fileName='Monitor_PostReconstruction_AfterMVA_K+:generic ==> K+:FSP.root')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='K+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
                                                                  'extraInfo(SignalProbability)',
@@ -838,7 +838,7 @@ class TestPostReconstruction(unittest.TestCase):
                         fileName='Monitor_PostReconstruction_AfterMVA_D0:generic ==> pi-:generic pi+:generic.root')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('VariablesToHistogram', particleList='D0:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',

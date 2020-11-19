@@ -125,8 +125,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   // add MonitoringObject and canvases
   m_monObj = getMonitoringObject("svd");
 
-  m_c_found_tracks_UV = new TCanvas("found_tracks_UV");
-  m_c_matched_clusters_UV = new TCanvas("matched_clusters_UV");
+  m_c_found_tracks_UV = new TCanvas("svd_found_tracks_UV");
+  m_c_matched_clusters_UV = new TCanvas("svd_matched_clusters_UV");
 
   // add canvases to MonitoringObject
   m_monObj->addCanvas(m_c_found_tracks_UV);
@@ -358,16 +358,16 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
   m_c_found_tracks_UV->Clear();
   m_c_found_tracks_UV->Divide(2, 1);
   m_c_found_tracks_UV->cd(1);
-  if (h_found_tracksU) h_found_tracksU->Draw();
+  if (h_found_tracksU) h_found_tracksU->Draw("colz");
   m_c_found_tracks_UV->cd(2);
-  if (h_found_tracksV) h_found_tracksV->Draw();
+  if (h_found_tracksV) h_found_tracksV->Draw("colz");
 
   m_c_matched_clusters_UV->Clear();
   m_c_matched_clusters_UV->Divide(2, 1);
   m_c_matched_clusters_UV->cd(1);
-  if (h_matched_clusU) h_matched_clusU->Draw();
+  if (h_matched_clusU) h_matched_clusU->Draw("colz");
   m_c_matched_clusters_UV->cd(2);
-  if (h_matched_clusV) h_matched_clusV->Draw();
+  if (h_matched_clusV) h_matched_clusV->Draw("colz");
 
   // add variables for run dependent monitoring
 

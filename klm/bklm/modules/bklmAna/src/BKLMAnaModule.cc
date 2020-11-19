@@ -175,12 +175,14 @@ void BKLMAnaModule::event()
   int nExtHit = 0;
   for (int t = 0; t < extHits.getEntries(); t++) {
     ExtHit* exthit =  extHits[t];
-    if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
+    if (exthit->getDetectorID() != Const::EDetector::BKLM)
+      continue;
     m_extx[nExtHit] = exthit->getPosition()[0];
     m_exty[nExtHit] = exthit->getPosition()[1];
     m_extz[nExtHit] = exthit->getPosition()[2];
     nExtHit++;
-    if (nExtHit > 199) break;
+    if (nExtHit > 199)
+      break;
   }
   m_run = runNumber;
   m_nExtHit = nExtHit;
@@ -196,22 +198,27 @@ void BKLMAnaModule::event()
     TLorentzVector p4 = fitres->get4Momentum();
     double trkphi = p4.Vect().Phi() * 180.0 / CLHEP::pi;
     double trktheta = p4.Vect().Theta() * 180.0 / CLHEP::pi;
-    if (trkphi < 0) trkphi =  trkphi + 360.0;
+    if (trkphi < 0)
+      trkphi =  trkphi + 360.0;
     RelationVector<BKLMHit2d> relatedHit2D = track->getRelationsTo<BKLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
-      if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
+      if (exthit->getDetectorID() != Const::EDetector::BKLM)
+        continue;
       int module = exthit->getCopyID();
       int section = BKLMElementNumbers::getSectionByModule(module);
       int sector = BKLMElementNumbers::getSectorByModule(module);
       int layer = BKLMElementNumbers::getLayerByModule(module);
       bool crossed = false; // should be only once ?
       KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
-      if (!muid) continue;
+      if (!muid)
+        continue;
       int extPattern = muid->getExtLayerPattern();
-      if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
-      if (!crossed) continue;
+      if ((extPattern & (1 << (layer - 1))) != 0)
+        crossed = true;
+      if (!crossed)
+        continue;
 
       TVector3 extMom = exthit->getMomentum();
       TVector3 extVec = exthit->getPosition();
@@ -220,7 +227,8 @@ void BKLMAnaModule::event()
       m_totalYZ->Fill(extVec[2], extVec[1]);
       float phi = extVec.Phi() * 180.0 / CLHEP::pi;
       float theta = extVec.Theta() * 180.0 / CLHEP::pi;
-      if (phi < 0) phi =  phi + 360.0;
+      if (phi < 0)
+        phi =  phi + 360.0;
       m_totalThephi[layer - 1]->Fill(phi, theta);
       m_totalTrkThephi[layer - 1]->Fill(trkphi, trktheta);
       m_totalMom->Fill(mom);
@@ -230,17 +238,22 @@ void BKLMAnaModule::event()
       for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
         BKLMHit2d* hit = hits2D[mHit];
         //if(!hit->inRPC()) continue;
-        if (hit->getSection() != section) continue;
-        if (hit->getSector() != sector) continue;
-        if (hit->getLayer() != layer) continue;
+        if (hit->getSection() != section)
+          continue;
+        if (hit->getSector() != sector)
+          continue;
+        if (hit->getLayer() != layer)
+          continue;
         TVector3 position = hit->getGlobalPosition();
         TVector3 distance =  extVec - position;
         //on same track, same sector, same layer, we should believe extHit and BKLMHit2d are matched.
         //let's record the distance to check, should be small
         m_hdistance->Fill(distance.Mag());
-        if (distance.Mag() < 20) matched = true;
+        if (distance.Mag() < 20)
+          matched = true;
         //m_pointUsed.insert(m);
-        if (matched) break;
+        if (matched)
+          break;
       }
       if (matched) {
         m_passYX->Fill(extVec[0], extVec[1]);

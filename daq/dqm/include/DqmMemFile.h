@@ -32,6 +32,7 @@ namespace Belle2 {
     // Sender function
     TMemFile* GetMemFile();
     int UpdateSharedMem();
+    int ClearSharedMem();
     TMemFile* LoadMemFile();
 
     // Receiver functions

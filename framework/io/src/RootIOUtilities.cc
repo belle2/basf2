@@ -13,6 +13,8 @@
 
 #include <wordexp.h>
 
+#include <queue>
+
 using namespace Belle2;
 
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
@@ -78,6 +80,28 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
   out.insert(relations.begin(), relations.end());
   return out;
+}
+
+size_t RootIOUtilities::setBranchStatus(TBranch* branch, bool process)
+{
+  size_t found{0};
+  std::queue<TBranch*> branches;
+  branches.emplace(branch);
+  while (!branches.empty()) {
+    ++found;
+    auto* current = branches.front();
+    branches.pop();
+    // set the flag we need
+    if (process) current->ResetBit(kDoNotProcess);
+    else current->SetBit(kDoNotProcess);
+    // add all children to the queue
+    auto* children = current->GetListOfBranches();
+    const auto nchildren = children->GetEntriesFast();
+    for (int i = 0; i < nchildren; ++i) {
+      branches.emplace(dynamic_cast<TBranch*>(children->UncheckedAt(i)));
+    }
+  }
+  return found;
 }
 
 std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector<std::string>& filenames)

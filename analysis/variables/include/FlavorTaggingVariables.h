@@ -129,7 +129,7 @@ namespace Belle2 {
     double isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
-     * Returns the MC flavor (+-1) of the accompaning tag-side B meson if the given particle is a correctly MC-matched B candidate.
+     * Returns the MC flavor (+-1) of the accompanying tag-side B meson if the given particle is a correctly MC-matched B candidate.
      * It returns 0 else. */
     double mcFlavorOfOtherB(const Particle* particle);
 
@@ -146,7 +146,7 @@ namespace Belle2 {
     /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the flavor tagging variables corresponding to the KaonPion category.
      * The Possibilities are:
-     * HaveOpositeCharges: 1 if the particles selected as target kaon and slow pion in the respective flavour tagging categories have oposite charges, 0 else.
+     * HaveOpositeCharges: 1 if the particles selected as target kaon and slow pion in the respective flavour tagging categories have opposite charges, 0 else.
      * cosKaonPion: Cosine of angle between kaon and slow pion momenta, i.e. between the momenta of the particles selected as target kaon and slow pion.
      */
     Manager::FunctionPtr KaonPionVariables(const std::vector<std::string>& arguments);

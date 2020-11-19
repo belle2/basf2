@@ -1,20 +1,31 @@
-from itertools import islice
-from tracking import add_tracking_reconstruction
-import rawdata as raw
-from prompt.utils import events_in_basf2_file
-from caf.utils import IoV
-from caf import strategies
-from prompt import CalibrationSettings
-from caf.framework import Calibration
-from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
-from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-from random import choice
-import datetime
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+'''
+Script to perform the svd time calibration with the CoG6, CoG3 and ELS3 algorithms
+'''
+
 import sys
+import datetime
+import random
+
+from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
+
 import basf2 as b2
+
+import rawdata as raw
+from tracking import add_tracking_reconstruction
+
+from caf.framework import Calibration
+from caf import strategies
+from caf.utils import IoV
+from prompt import CalibrationSettings
+from prompt.utils import filter_by_max_events_per_run
+
 b2.set_log_level(b2.LogLevel.INFO)
 
+random.seed(42)
 
 now = datetime.datetime.now()
 isMC = False
@@ -26,10 +37,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                input_data_names=["hlt_hadron"],
                                depends_on=[],
                                expert_config={
-                                   "max_files_per_run": 20,
-                                   "min_events_per_run": 10000,
-                                   "min_events_per_file": 2000,
-                                   "max_events_per_file": 5000
+                                   "max_events_per_run": 10000,
                                })
 
 ##################################################################
@@ -113,106 +121,6 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
-def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
-    """
-    Selects the input files per run to use for the calibration, starting from the minimum number of events per run that we need.
-    It takes as input:
-    1) an object that cointains the list of all input files and their IoV
-    2) the minimum number of events per run we need
-    3) the maximum number of events per file that at least we want, but there can be more or less events in a selected file.
-       This number is useful to select enough files from each run as input.
-
-    It loops on all input files, read the experiment and the run number,
-    and splits the list in more lists depending on the run and experiment numbers.
-    Then it loops on the lists obtained for each run and select the number of needed files per run,
-    depending on the minimun number of events (min_events) and max_events_per_each_file we set.
-
-    It is absolutely necessary to have enough events per run,
-    since we need to check the distributions of each run to find the right IoVs for the payloads.
-
-    Returns a list of file:
-        selected_files
-    """
-    all_input_files = list(reduced_file_to_iov.keys())
-    exp_list = [i.exp_low for i in reduced_file_to_iov.values()]
-    run_list = [i.run_low for i in reduced_file_to_iov.values()]
-    check_run = 0
-    check_exp = 0
-    size_for_run = []
-    size_list = 0
-    for item, nRun in enumerate(run_list):
-        if item == 0:
-            check_run = nRun
-            check_exp = exp_list[item]
-            size_list += 1
-        elif item > 0:
-            nExp = exp_list[item]
-            if nRun == check_run and nExp == check_exp:
-                size_list += 1
-            else:
-                check_run = nRun
-                check_exp = nExp
-                size_for_run.append(size_list)
-                size_list = 1
-        if item == len(run_list) - 1:
-            size_for_run.append(size_list)
-    iter_all_input_files = iter(all_input_files)
-    iter_exp_list = iter(exp_list)
-    iter_run_list = iter(run_list)
-    splitted_all_input_files = [
-        list(
-            islice(
-                iter_all_input_files,
-                elem)) for elem in size_for_run]
-    splitted_exp_list = [list(islice(iter_exp_list, elem))
-                         for elem in size_for_run]
-    splitted_run_list = [list(islice(iter_run_list, elem))
-                         for elem in size_for_run]
-
-    selected_files = []
-    selected_files_per_run = []
-    total_events = 0
-    total_events_per_run = 0
-    for item2, list_of_file in enumerate(splitted_all_input_files):
-        while total_events_per_run < min_events:
-            if not all_input_files:
-                b2.B2INFO(f"No Input files found.")
-                break
-            # Randomly selects one file from all_input_files list
-            this_file = choice(list_of_file)
-            # Removes the file from the list to not be choosen again
-            list_of_file.remove(this_file)
-            # Returns the number of events in the file
-            events_in_file = events_in_basf2_file(this_file)
-            if not events_in_file:
-                continue
-            events_counter = 0
-            # Append the file to the list of selected files
-            selected_files.append(this_file)
-            selected_files_per_run.append(this_file)
-            if events_in_file < max_events_per_each_file:
-                events_counter = events_in_file
-            else:
-                events_counter = max_events_per_each_file
-            total_events += events_counter
-            total_events_per_run += events_counter
-        b2.B2INFO(
-            f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
-        b2.B2INFO(
-            f"Total chosen files per run = {len(selected_files_per_run)}")
-        b2.B2INFO(
-            f"Total events in chosen files per run = {total_events_per_run}")
-        if total_events < min_events:
-            b2.B2ERROR(
-                f"Not enough files for the calibration when max_events_per_each_file={max_events_per_each_file}.")
-        selected_files_per_run.clear()
-        total_events_per_run = 0
-    b2.B2INFO(f"Total chosen files = {len(selected_files)}")
-    b2.B2INFO(f"Total events in chosen files = {total_events}")
-
-    return selected_files
-
-
 def create_pre_collector_path(clusterizers):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
@@ -244,11 +152,7 @@ def create_pre_collector_path(clusterizers):
     # run tracking reconstruction
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
-
-    for moda in path.modules():
-        if moda.name() == "SVDCoGTimeEstimator":
-            moda.param("CalibrationWithEventT0", False)
-
+    b2.set_module_parameters(path, 'SVDCoGTimeEstimator', CalibrationWithEventT0=False)
     path.add_module("SVDShaperDigitsFromTracks")
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
@@ -262,12 +166,10 @@ def create_pre_collector_path(clusterizers):
     for cluster in clusterizers:
         path.add_module(cluster)
 
-    for moda in path.modules():
-        if moda.name() == "CoGReconstruction":
-            moda.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
-            moda.param("RecoDigits", NEW_RECO_DIGITS_NAME)
-            moda.param("CalibrationWithEventT0", False)
-
+    b2.set_module_parameters(path, 'CoGReconstruction',
+                             ShaperDigits=NEW_SHAPER_DIGITS_NAME,
+                             RecoDigits=NEW_RECO_DIGITS_NAME,
+                             CalibrationWithEventT0=False)
     path = remove_module(path, "SVDMissingAPVsClusterCreator")
 
     return path
@@ -277,29 +179,13 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hlt_hadron"]
     expert_config = kwargs.get("expert_config")
-    # This number should be setted from the biginning
-    max_files_per_run = expert_config["max_files_per_run"]
-    # Minimum number of events selected per each run
-    min_events_per_run = expert_config["min_events_per_run"]
-    # Files with less events will be discarded
-    min_events_per_file = expert_config["min_events_per_file"]
-    # Nominal max number of events selected per file. The events in the file
-    # can be more.
-    max_events_selected_per_file = expert_config["max_events_per_file"]
+    max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
 
-    from prompt.utils import filter_by_max_files_per_run
+    reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
+                                                               max_events_per_run, random_select=True)
+    good_input_files = list(reduced_file_to_iov_physics.keys())
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(
-        file_to_iov_physics, max_files_per_run, min_events_per_file)
-    good_input_files = select_files(
-        reduced_file_to_iov_physics,
-        min_events_per_run,
-        max_events_selected_per_file)
-
-    b2.B2INFO(
-        f"Total number of files before selection = {max_files_per_run}")
-    b2.B2INFO(
-        f"Total number of files actually used as input = {len(good_input_files)}")
+    b2.B2INFO(f"Total number of files used as input = {len(good_input_files)}")
 
     exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]
     runs = sorted([i.run_low for i in reduced_file_to_iov_physics.values()])

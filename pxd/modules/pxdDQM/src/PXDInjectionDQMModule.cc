@@ -53,8 +53,8 @@ void PXDInjectionDQMModule::defineHisto()
   if (m_offlineStudy) {
     hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
     hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
-    hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
-    hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hEOccAfterInjLER  = new TH1I("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
+    hEOccAfterInjHER  = new TH1I("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
     if (m_createMaxHist) {
       hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0,
                                      50000);
@@ -68,8 +68,8 @@ void PXDInjectionDQMModule::defineHisto()
   } else {
     hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
     hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-    hEOccAfterInjLER  = new TH1F("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-    hEOccAfterInjHER  = new TH1F("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+    hEOccAfterInjLER  = new TH1I("PXDEOccInjLER", "PXDEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+    hEOccAfterInjHER  = new TH1I("PXDEOccInjHER", "PXDEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
     if (m_createMaxHist) {
       hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
       hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);

@@ -2,7 +2,6 @@ import logging
 from tracking.validation.utilities import prob
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import gSystem
-import basf2
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random

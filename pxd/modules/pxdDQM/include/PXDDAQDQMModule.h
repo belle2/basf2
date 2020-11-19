@@ -11,11 +11,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
@@ -42,6 +43,9 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
+      /** Input array for TTD/FTSW */
+      StoreArray<RawFTSW> m_rawTTD;
+
       /** the geometry */
       VXD::GeoCache& m_vxdGeometry;
 
@@ -62,6 +66,11 @@ namespace Belle2 {
       std::map<VxdID, TH2D*> hDAQCM;/**< Common Mode per DHE to gate and DHP level */
       std::map<VxdID, TH1D*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
       std::map<int, TH1D*> hDAQDHCReduction;/**< DHC data reduction  */
+
+      TH1I* hCM63AfterInjLER{};          /**< Histogram of CM63 after LER injection */
+      TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
+      TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
+      TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
 
       void initialize() override final;
 

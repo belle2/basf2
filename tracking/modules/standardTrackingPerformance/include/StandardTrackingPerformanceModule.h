@@ -120,7 +120,7 @@ namespace Belle2 {
 
     /**
      * Remove all photons from a MCParticle vector.
-     * @param daughters: vector is taken and photons returned
+     * @param in_daughters: vector is taken and photons returned
      * @return: MCParticle vector with no photons
      */
     std::vector<MCParticle*> removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters);

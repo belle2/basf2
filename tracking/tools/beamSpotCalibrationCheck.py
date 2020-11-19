@@ -9,7 +9,6 @@ usage:
 """
 
 import basf2
-import ROOT
 import sys
 from basf2 import conditions as b2conditions
 

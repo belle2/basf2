@@ -75,6 +75,8 @@ namespace Belle2 {
       TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
       TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
       TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
+      TH1I* hMissAfterInjLER{};          /**< Histogram MissFrame after LER injection */
+      TH1I* hMissAfterInjHER{};          /**< Histogram MissFrame after HER injection */
       TH1D* hDAQStat{};                 /**< Histogram for Truncation etc Stats */
 
       void initialize() override final;

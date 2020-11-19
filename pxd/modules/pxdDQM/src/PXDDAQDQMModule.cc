@@ -103,8 +103,10 @@ void PXDDAQDQMModule::defineHisto()
   hCM63AfterInjHER  = new TH1I("PXDCM63InjHER", "PXDCM63InjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hMissAfterInjLER  = new TH1I("PXDMissInjLER", "PXDMissInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hMissAfterInjHER  = new TH1I("PXDMissInjHER", "PXDMissInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
 
-  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 16, 0, 16);
+  hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 20, 0, 20);
   auto xa = hDAQStat->GetXaxis();
   if (xa) {
     // underflow: number of events -> for normalize
@@ -123,7 +125,11 @@ void PXDDAQDQMModule::defineHisto()
     xa->SetBinLabel(12 + 1, "Timeout");
     xa->SetBinLabel(13 + 1, "Link Down");
     xa->SetBinLabel(14 + 1, "Mismatch");
-    xa->SetBinLabel(15 + 1, "unused");
+    xa->SetBinLabel(15 + 1, "HER MissFrame");
+    xa->SetBinLabel(16 + 1, "LER MissFrame");
+    xa->SetBinLabel(17 + 1, "HER MissFrame>1ms");
+    xa->SetBinLabel(18 + 1, "LER MissFrame>1ms");
+    xa->SetBinLabel(19 + 1, "unused");
   }
   // cd back to root directory
   oldDir->cd();
@@ -156,6 +162,8 @@ void PXDDAQDQMModule::beginRun()
   if (hCM63AfterInjHER) hCM63AfterInjHER->Reset();
   if (hTruncAfterInjLER) hTruncAfterInjLER->Reset();
   if (hTruncAfterInjHER) hTruncAfterInjHER->Reset();
+  if (hMissAfterInjLER) hMissAfterInjLER->Reset();
+  if (hMissAfterInjHER) hMissAfterInjHER->Reset();
   hDAQStat->Reset();
 }
 
@@ -276,6 +284,11 @@ void PXDDAQDQMModule::event()
           if (diff2 > 1000) hDAQStat->Fill(9); // sum truncs after HER, but outside injections, 1ms
           if (hTruncAfterInjHER) hTruncAfterInjHER->Fill(diff2);
         }
+        if (missingFlag) {
+          hDAQStat->Fill(15); // sum missframe after HER
+          if (diff2 > 1000) hDAQStat->Fill(17); // sum missframe after HER, but outside injections, 1ms
+          if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
+        }
       } else {
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
@@ -286,6 +299,11 @@ void PXDDAQDQMModule::event()
           hDAQStat->Fill(3); // sum truncs after LER
           if (diff2 > 1000) hDAQStat->Fill(10); // sum truncs after LER, but outside injections, 1ms
           if (hTruncAfterInjLER) hTruncAfterInjLER->Fill(diff2);
+        }
+        if (missingFlag) {
+          hDAQStat->Fill(16); // sum missframe after LER
+          if (diff2 > 1000) hDAQStat->Fill(18); // sum missframe after LER, but outside injections, 1ms
+          if (hMissAfterInjLER) hMissAfterInjLER->Fill(diff2);
         }
       }
     }

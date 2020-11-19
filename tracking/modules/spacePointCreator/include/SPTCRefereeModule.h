@@ -178,7 +178,9 @@ namespace Belle2 {
     /** get the direction of flight for a SpacePoint by using information from the underlying TrueHit
      * NOTE: this method assumes that there are already registered relations to a TrueHit for each SpacePoint
      * (if there are more only the first in the RelationVector will be used!)
+     * @param spacePoint pointer to the SpacePoint of interest
      * @param origin the assumed interaction point
+     * @return result of internally called function getDirOfFlightPosMom
      */
     template <typename TrueHitType>
     bool getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoint, B2Vector3F origin);

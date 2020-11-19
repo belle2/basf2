@@ -250,6 +250,7 @@ namespace Belle2 {
        *  @param classMnemomic Short name of the value type that is stored in the vector
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2  are supported.
        *  @param input Should the parameter name state that this is an input.
+       *  @return rname of the StoreVector
        */
       std::string
       getStoreVectorParameterName(std::string classMnenomic, int order, bool input) const
@@ -278,6 +279,7 @@ namespace Belle2 {
        *  @param classMnemomic Short name of the value type that is stored in the vector
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
+       *  @return description for the StoreVector
        */
       std::string getStoreVectorParameterDescription(const std::string& classMnenomic, int order, bool input) const
       {

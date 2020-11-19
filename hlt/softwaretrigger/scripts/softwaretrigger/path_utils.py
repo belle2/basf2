@@ -159,7 +159,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
 
-def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
+def add_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -178,7 +178,7 @@ def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            abort_path=abort_path,
+            event_abort=hlt_event_abort,
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
@@ -212,3 +212,14 @@ def add_post_filter_reconstruction(path, run_type, components):
         pass
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+
+def hlt_event_abort(module, condition, error_flag):
+    """
+    Create a discard path suitable for HLT processing, i.e. set an error flag and
+    keep only the metadata.
+    """
+    p = basf2.Path()
+    p.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(p)
+    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)

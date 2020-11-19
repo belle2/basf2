@@ -8,7 +8,6 @@ performed before in the same process.
 
 import os
 import tempfile
-import shutil
 from ROOT import Belle2
 
 evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen.py_noexec')

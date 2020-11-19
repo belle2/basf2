@@ -136,6 +136,7 @@ global_env = Environment(
     ],
     # scripts and python modules that have to be installed before we can run b2code-classversion-check
     REQUIRED_TOOLS=[os.path.join('$BINDIR', 'b2code-classversion-check'),
+        os.path.join('$BINDIR', 'b2code-classversion-update'),
         os.path.join('$LIBDIR', 'b2test_utils', 'classversion.py'),
         os.path.join('$LIBDIR', 'pybasf2.so'),
         os.path.join('$DATADIR', 'framework', 'particledb', 'evt.pdl')]

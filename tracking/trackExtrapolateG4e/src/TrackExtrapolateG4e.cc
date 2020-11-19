@@ -66,14 +66,14 @@
 #define DEPTH_RPC 9
 #define DEPTH_SCINT 11
 
-using namespace std;
 using namespace Belle2;
 
 TrackExtrapolateG4e* TrackExtrapolateG4e::m_Singleton = nullptr;
 
 TrackExtrapolateG4e* TrackExtrapolateG4e::getInstance()
 {
-  if (m_Singleton == nullptr) m_Singleton = new TrackExtrapolateG4e;
+  if (m_Singleton == nullptr)
+    m_Singleton = new TrackExtrapolateG4e;
   return m_Singleton;
 }
 
@@ -151,8 +151,8 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert user cutoff values to geant4 units
-  m_MinPt = max(0.0, minPt) * CLHEP::GeV;
-  m_MinKE = max(0.0, minKE) * CLHEP::GeV;
+  m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
+  m_MinKE = std::max(0.0, minKE) * CLHEP::GeV;
 
   // Save pointer to the list of particle hypotheses for EXT extrapolation
   m_HypothesesExt = &hypotheses;
@@ -230,10 +230,10 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;
 
   // Convert user cutoff values to geant4 units
-  m_MaxKLMTrackClusterDistance = max(0.0, maxKLMTrackClusterDistance) * CLHEP::cm;
-  m_MaxECLTrackClusterDistance = max(0.0, maxECLTrackClusterDistance) * CLHEP::cm;
-  m_MinPt = max(0.0, minPt) * CLHEP::GeV;
-  m_MinKE = max(0.0, minKE) * CLHEP::GeV;
+  m_MaxKLMTrackClusterDistance = std::max(0.0, maxKLMTrackClusterDistance) * CLHEP::cm;
+  m_MaxECLTrackClusterDistance = std::max(0.0, maxECLTrackClusterDistance) * CLHEP::cm;
+  m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
+  m_MinKE = std::max(0.0, minKE) * CLHEP::GeV;
 
   // Save pointer to the list of particle hypotheses for EXT extrapolation
   m_HypothesesMuid = &hypotheses;
@@ -391,7 +391,8 @@ void TrackExtrapolateG4e::event(bool byMuid)
     for (auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesMuid) {
         int pdgCode = hypothesis.getPDGCode();
-        if (hypothesis == Const::electron || hypothesis == Const::muon) pdgCode = -pdgCode;
+        if (hypothesis == Const::electron || hypothesis == Const::muon)
+          pdgCode = -pdgCode;
         G4ErrorFreeTrajState g4eState("g4e_mu+", G4ThreeVector(), G4ThreeVector()); // will be updated
         ExtState extState = getStartPoint(b2track, pdgCode, g4eState);
         swim(extState, g4eState, &eclClusterInfo, &klmClusterInfo, &bklmHitUsed);
@@ -418,7 +419,8 @@ void TrackExtrapolateG4e::endRun(bool)
 
 void TrackExtrapolateG4e::terminate(bool byMuid)
 {
-  if (m_DefaultHypotheses != nullptr) { delete m_DefaultHypotheses; }
+  if (m_DefaultHypotheses != nullptr)
+    delete m_DefaultHypotheses;
   if (byMuid) {
     delete m_TargetMuid;
     for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
@@ -449,7 +451,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
     // The default values are taken from the EXT module's parameter definitions.
     Simulation::ExtManager* extMgr = Simulation::ExtManager::GetManager();
-    extMgr->Initialize("Ext", "default", 0.0, 0.25, false, 0, vector<string>());
+    extMgr->Initialize("Ext", "default", 0.0, 0.25, false, 0, std::vector<std::string>());
     // Redefine geant4e step length, magnetic field step limitation (fraction of local curvature radius),
     // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
     // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
@@ -474,7 +476,8 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
   // cppcheck-suppress knownConditionTrueFalse
-  if (isCosmic) momentumG4e = -momentumG4e;
+  if (isCosmic)
+    momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
@@ -497,7 +500,7 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     // No EXT nor MUID module in analysis path ==> mimic ext::initialize() with reasonable defaults.
     // The default values are taken from the MUID module's parameter definitions.
     Simulation::ExtManager* extMgr = Simulation::ExtManager::GetManager();
-    extMgr->Initialize("Muid", "default", 0.0, 0.25, false, 0, vector<string>());
+    extMgr->Initialize("Muid", "default", 0.0, 0.25, false, 0, std::vector<std::string>());
     // Redefine geant4e step length, magnetic field step limitation (fraction of local curvature radius),
     // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
     // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
@@ -521,7 +524,8 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  if (isCosmic) momentumG4e = -momentumG4e;
+  if (isCosmic)
+    momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
@@ -538,9 +542,12 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
                                const std::vector<std::pair<KLMCluster*, G4ThreeVector> >* klmClusterInfo,
                                std::vector<std::map<const Track*, double> >* bklmHitUsed)
 {
-  if (extState.pdgCode == 0) return;
-  if (g4eState.GetMomentum().perp() <= m_MinPt) return;
-  if (m_TargetMuid->GetDistanceFromPoint(g4eState.GetPosition()) < 0.0) return;
+  if (extState.pdgCode == 0)
+    return;
+  if (g4eState.GetMomentum().perp() <= m_MinPt)
+    return;
+  if (m_TargetMuid->GetDistanceFromPoint(g4eState.GetPosition()) < 0.0)
+    return;
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(extState.pdgCode);
   double mass = particle->GetPDGMass();
   double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
@@ -563,7 +570,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   }
   KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(); // rest of this object will be filled later
   klmMuidLikelihood->setPDGCode(extState.pdgCode);
-  if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidLikelihood); }
+  if (extState.track != nullptr)
+    extState.track->addRelationTo(klmMuidLikelihood);
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
   while (true) {
@@ -739,9 +747,12 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
 // Swim one track for EXT until it stops or leaves the ECL-bounding  cylinder
 void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eState)
 {
-  if (extState.pdgCode == 0) return;
-  if (g4eState.GetMomentum().perp() <= m_MinPt) return;
-  if (m_TargetExt->GetDistanceFromPoint(g4eState.GetPosition()) < 0.0) return;
+  if (extState.pdgCode == 0)
+    return;
+  if (g4eState.GetMomentum().perp() <= m_MinPt)
+    return;
+  if (m_TargetExt->GetDistanceFromPoint(g4eState.GetPosition()) < 0.0)
+    return;
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(extState.pdgCode);
   double mass = particle->GetPDGMass();
   double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
@@ -760,7 +771,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     G4ThreeVector      pos           = track->GetPosition(); // this is at postStepPoint
     G4ThreeVector      mom           = track->GetMomentum(); // ditto
     // First step on this track?
-    if (extState.isCosmic) mom = -mom;
+    if (extState.isCosmic)
+      mom = -mom;
     if (preStatus == fUndefined) {
       if (m_EnterExit->find(pVol) != m_EnterExit->end()) {
         createExtHit(EXT_FIRST, extState, g4eState, preStepPoint, preTouch);
@@ -816,64 +828,56 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
 // Register the list of volumes for which entry/exit point is to be saved during extrapolation
 void TrackExtrapolateG4e::registerVolumes()
 {
-
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
     B2FATAL("No geometry defined. Please create the geometry first.");
   }
-
-  if (m_EnterExit != nullptr) { return; } // Only do this once
-
-  m_EnterExit = new map<G4VPhysicalVolume*, enum VolTypes>;
-  m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
-  for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
+  if (m_EnterExit != nullptr) // Only do this once
+    return;
+  m_EnterExit = new std::map<G4VPhysicalVolume*, enum VolTypes>;
+  m_BKLMVolumes = new std::vector<G4VPhysicalVolume*>;
+  for (std::vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
-
-    // CDC volumes have "CDC" in the name
-    if (name.find("CDC") != string::npos) {
-      // DO NOT STORE CDC HITS
-      //  (*m_EnterExit)[*iVol] = VOLTYPE_CDC;
-    }
+    // Do not store ExtHits in CDC, so let's start from TOP and ARICH.
     // TOP doesn't have one envelope; it has 16 "TOPModule"s
-    else if (name.find("TOPModule") != string::npos) {
+    if (name.find("TOPModule") != std::string::npos) {
       (*m_EnterExit)[*iVol] = VOLTYPE_TOP1;
     }
     // TOP quartz bar (=sensitive)
-    else if (name.find("_TOPPrism_") != string::npos ||
-             name.find("_TOPBarSegment") != string::npos ||
-             name.find("_TOPMirrorSegment") != string::npos) {
+    else if (name.find("_TOPPrism_") != std::string::npos ||
+             name.find("_TOPBarSegment") != std::string::npos ||
+             name.find("_TOPMirrorSegment") != std::string::npos) {
       (*m_EnterExit)[*iVol] = VOLTYPE_TOP2;
     }
     // TOP quartz glue (not sensitive?)
-    else if (name.find("TOPBarSegment1Glue") != string::npos ||
-             name.find("TOPBarSegment2Glue") != string::npos ||
-             name.find("TOPMirrorSegmentGlue") != string::npos) {
+    else if (name.find("TOPBarSegment1Glue") != std::string::npos ||
+             name.find("TOPBarSegment2Glue") != std::string::npos ||
+             name.find("TOPMirrorSegmentGlue") != std::string::npos) {
       (*m_EnterExit)[*iVol] = VOLTYPE_TOP3;
       // ARICH volumes
     } else if (name == "ARICH.AerogelSupportPlate") {
       (*m_EnterExit)[*iVol] = VOLTYPE_ARICH1;
     } else if (name == "ARICH.AerogelImgPlate") {
       (*m_EnterExit)[*iVol] = VOLTYPE_ARICH2;
-    } else if (name.find("ARICH.HAPDWindow") != string::npos) {
+    } else if (name.find("ARICH.HAPDWindow") != std::string::npos) {
       (*m_EnterExit)[*iVol] = VOLTYPE_ARICH3;
     }
-
     // ECL crystal
-    else if (name.find("lv_barrel_crystal_") != string::npos ||
-             name.find("lv_forward_crystal_") != string::npos ||
-             name.find("lv_backward_crystal_") != string::npos) {
+    else if (name.find("lv_barrel_crystal_") != std::string::npos ||
+             name.find("lv_forward_crystal_") != std::string::npos ||
+             name.find("lv_backward_crystal_") != std::string::npos) {
       (*m_EnterExit)[*iVol] = VOLTYPE_ECL;
     }
     // Barrel KLM: BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
     //             BKLM.ScintActiveType*Physical for scintillator strips
     else if (name.compare(0, 5, "BKLM.") == 0) {
-      if (name.find("GasPhysical") != string::npos) {
+      if (name.find("GasPhysical") != std::string::npos) {
         (*m_EnterExit)[*iVol] = VOLTYPE_BKLM1;
-      } else if (name.find("ScintActiveType") != string::npos) {
+      } else if (name.find("ScintActiveType") != std::string::npos) {
         (*m_EnterExit)[*iVol] = VOLTYPE_BKLM2;
-      } else if ((name.find("ScintType") != string::npos) ||
-                 (name.find("ElectrodePhysical") != string::npos)) {
+      } else if ((name.find("ScintType") != std::string::npos) ||
+                 (name.find("ElectrodePhysical") != std::string::npos)) {
         m_BKLMVolumes->push_back(*iVol);
       }
     }
@@ -895,7 +899,8 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
   G4VPhysicalVolume* pv = touch->GetVolume(0);
   std::map<G4VPhysicalVolume*, enum VolTypes>::iterator it = m_EnterExit->find(pv);
-  if (it == m_EnterExit->end()) { return; }
+  if (it == m_EnterExit->end())
+    return;
 
   switch (it->second) {
     case VOLTYPE_CDC:
@@ -908,11 +913,13 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_TOP2:
       detID = Const::EDetector::TOP;
-      if (touch->GetHistoryDepth() >= 1) copyID = touch->GetVolume(1)->GetCopyNo();
+      if (touch->GetHistoryDepth() >= 1)
+        copyID = touch->GetVolume(1)->GetCopyNo();
       return;
     case VOLTYPE_TOP3:
       detID = Const::EDetector::TOP;
-      if (touch->GetHistoryDepth() >= 2) copyID = touch->GetVolume(2)->GetCopyNo();
+      if (touch->GetHistoryDepth() >= 2)
+        copyID = touch->GetVolume(2)->GetCopyNo();
       return;
     case VOLTYPE_ARICH1:
       detID = Const::EDetector::ARICH;
@@ -924,7 +931,8 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_ARICH3:
       detID = Const::EDetector::ARICH;
-      if (touch->GetHistoryDepth() >= 2) copyID = touch->GetVolume(2)->GetCopyNo();
+      if (touch->GetHistoryDepth() >= 2)
+        copyID = touch->GetVolume(2)->GetCopyNo();
       return;
     case VOLTYPE_ECL:
       detID = Const::EDetector::ECL;
@@ -1216,21 +1224,21 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
                                        const G4ErrorFreeTrajState& g4eState,
                                        const G4StepPoint* stepPoint, const G4TouchableHandle& touch)
 {
-
   Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(touch, detID, copyID);
   G4ThreeVector pos(stepPoint->GetPosition() / CLHEP::cm);
   G4ThreeVector mom(stepPoint->GetMomentum() / CLHEP::GeV);
-  if (extState.isCosmic) mom = -mom;
+  if (extState.isCosmic)
+    mom = -mom;
   G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
   ExtHit* extHit = m_extHits.appendNew(extState.pdgCode, detID, copyID, status,
                                        extState.isCosmic, extState.tof,
                                        pos, mom, covariance);
   // If called standalone, there will be no associated track
-  if (extState.track != nullptr) { extState.track->addRelationTo(extHit); }
-
+  if (extState.track != nullptr)
+    extState.track->addRelationTo(extHit);
 }
 
 // Write another volume-entry point on track.
@@ -1280,7 +1288,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
       } else {
         // Record a no-hit track crossing if this step is strictly within a barrel sensitive volume
-        vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
+        std::vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(),
+                                                           g4eState.GetG4Track()->GetVolume());
         if (j != m_BKLMVolumes->end()) {
           bool isDead = true; // by default, the nearest orthogonal strips are dead
           int section = intersection.isForward ?
@@ -1435,23 +1444,21 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
 
 bool TrackExtrapolateG4e::findBarrelIntersection(ExtState& extState, const G4ThreeVector& oldPosition, Intersection& intersection)
 {
-
   // Be generous: allow outward-moving intersection to be in the dead space between
   // largest sensitive-volume Z and m_BarrelHalfLength, not necessarily in a geant4 sensitive volume
-
-  if (std::fabs(intersection.position.z() - m_OffsetZ) > m_BarrelHalfLength) return false;
-
+  if (std::fabs(intersection.position.z() - m_OffsetZ) > m_BarrelHalfLength)
+    return false;
   double phi = intersection.position.phi();
-  if (phi < 0.0) { phi += TWOPI; }
-  if (phi > TWOPI - PI_8) { phi -= TWOPI; }
+  if (phi < 0.0)
+    phi += TWOPI;
+  if (phi > TWOPI - PI_8)
+    phi -= TWOPI;
   int sector = (int)((phi + PI_8) / M_PI_4);
   int section = intersection.position.z() > m_OffsetZ ?
                 BKLMElementNumbers::c_ForwardSection :
                 BKLMElementNumbers::c_BackwardSection;
-
   double oldR = oldPosition * m_BarrelSectorPerp[sector];
   double newR = intersection.position * m_BarrelSectorPerp[sector];
-
   for (int layer = extState.firstBarrelLayer; layer <= m_OutermostActiveBarrelLayer; ++layer) {
     if (newR <  m_BarrelModuleMiddleRadius[section][sector][layer]) break;
     if (oldR <= m_BarrelModuleMiddleRadius[section][sector][layer]) {
@@ -1464,32 +1471,30 @@ bool TrackExtrapolateG4e::findBarrelIntersection(ExtState& extState, const G4Thr
       return true;
     }
   }
-
   return false;
-
 }
 
 bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4ThreeVector& oldPosition, Intersection& intersection)
 {
-
   // Be generous: allow intersection to be in the dead space between m_EndcapMinR and innermost
   // sensitive-volume radius or between outermost sensitive-volume radius and m_EndcapMaxR,
   // not necessarily in a geant4 sensitive volume
-
-  if (oldPosition.perp() > m_EndcapMaxR) return false;
-  if (intersection.position.perp() < m_EndcapMinR) return false;
-
+  if (oldPosition.perp() > m_EndcapMaxR)
+    return false;
+  if (intersection.position.perp() < m_EndcapMinR)
+    return false;
   double oldZ = std::fabs(oldPosition.z() - m_OffsetZ);
   double newZ = std::fabs(intersection.position.z() - m_OffsetZ);
   bool isForward = intersection.position.z() > m_OffsetZ;
   int outermostLayer = isForward ? m_OutermostActiveForwardEndcapLayer
                        : m_OutermostActiveBackwardEndcapLayer;
-
   for (int layer = extState.firstEndcapLayer; layer <= outermostLayer; ++layer) {
-    if (newZ <  m_EndcapModuleMiddleZ[layer]) break;
+    if (newZ <  m_EndcapModuleMiddleZ[layer])
+      break;
     if (oldZ <= m_EndcapModuleMiddleZ[layer]) {
       extState.firstEndcapLayer = layer + 1; // ratchet outward for next call's loop starting value
-      if (extState.firstEndcapLayer > outermostLayer) extState.escaped = true;
+      if (extState.firstEndcapLayer > outermostLayer)
+        extState.escaped = true;
       intersection.inBarrel = false;
       intersection.isForward = isForward;
       intersection.layer = layer;
@@ -1498,9 +1503,7 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
       return true;
     }
   }
-
   return false;
-
 }
 
 bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, const Track* track)
@@ -1513,9 +1516,12 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
   G4ThreeVector n(m_BarrelSectorPerp[intersection.sector]);
   for (int h = 0; h < m_bklmHit2ds.getEntries(); ++h) {
     BKLMHit2d* hit = m_bklmHit2ds[h];
-    if (hit->getLayer() != matchingLayer) continue;
-    if (hit->isOutOfTime()) continue;
-    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
+    if (hit->getLayer() != matchingLayer)
+      continue;
+    if (hit->isOutOfTime())
+      continue;
+    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt)
+      continue;
     G4ThreeVector diff(hit->getGlobalPositionX() - intersection.position.x(),
                        hit->getGlobalPositionY() - intersection.position.y(),
                        hit->getGlobalPositionZ() - intersection.position.z());
@@ -1530,10 +1536,12 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       }
     } else {
       // Accept a nearby hit in adjacent sector
-      if (std::fabs(dn) > 50.0) continue;
+      if (std::fabs(dn) > 50.0)
+        continue;
       int sector = hit->getSector() - 1;
       int dSector = abs(intersection.sector - sector);
-      if ((dSector != +1) && (dSector != m_BarrelNSector - 1)) continue;
+      if ((dSector != +1) && (dSector != m_BarrelNSector - 1))
+        continue;
       // Use the normal vector of the adjacent (hit's) sector
       G4ThreeVector nHit(m_BarrelSectorPerp[sector]);
       int section = intersection.isForward ?
@@ -1541,13 +1549,16 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
                     BKLMElementNumbers::c_BackwardSection;
       double dn2 = intersection.position * nHit - m_BarrelModuleMiddleRadius[section][sector][intersection.layer];
       dn = diff * nHit + dn2;
-      if (std::fabs(dn) > 1.0) continue;
+      if (std::fabs(dn) > 1.0)
+        continue;
       // Project extrapolated track to the hit's plane in the adjacent sector
       G4ThreeVector extDir(intersection.momentum.unit());
       double extDirA = extDir * nHit;
-      if (std::fabs(extDirA) < 1.0E-6) continue;
+      if (std::fabs(extDirA) < 1.0E-6)
+        continue;
       G4ThreeVector projection = extDir * (dn2 / extDirA);
-      if (projection.mag() > 15.0) continue;
+      if (projection.mag() > 15.0)
+        continue;
       diff += projection - nHit * dn;
       if (diff.mag2() < diffBestMagSq) {
         diffBestMagSq = diff.mag2();
@@ -1600,16 +1611,20 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   G4ThreeVector n(0.0, 0.0, (intersection.isForward ? 1.0 : -1.0));
   for (int h = 0; h < m_eklmHit2ds.getEntries(); ++h) {
     EKLMHit2d* hit = m_eklmHit2ds[h];
-    if (hit->getLayer() != matchingLayer) continue;
-    if (hit->getSection() != matchingEndcap) continue;
+    if (hit->getLayer() != matchingLayer)
+      continue;
+    if (hit->getSection() != matchingEndcap)
+      continue;
     // DIVOT no such function for EKLM!
     // if (hit->isOutOfTime()) continue;
-    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
+    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt)
+      continue;
     G4ThreeVector diff(hit->getPositionX() - intersection.position.x(),
                        hit->getPositionY() - intersection.position.y(),
                        hit->getPositionZ() - intersection.position.z());
     double dn = diff * n; // in cm
-    if (std::fabs(dn) > 2.0) continue;
+    if (std::fabs(dn) > 2.0)
+      continue;
     diff -= n * dn;
     if (diff.mag2() < diffBestMagSq) {
       diffBestMagSq = diff.mag2();
@@ -1648,34 +1663,30 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
 void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const double localVariance[2],
                                              const G4ThreeVector& hitPos, const G4ThreeVector& extPos0)
 {
+  // Use the gain matrix formalism to get the corrected track parameters.
+  // R. Fruhwirth, Application of Kalman Filtering, NIM A262 (1987) 444-450
+  // Equations (7)
+  // x_k^{k-1} = extPar[] 6 elements before filtering
+  // C_k^{k-1} = extCov[] 6x6 symmetric before filtering
+  // r_k^{k-1} = residual[] 2 elements before filtering
+  // h_k = 2x6 projects cartesian coordinates to measurement-plane coordinates
+  // H_k = @h_k/@x = jacobian[] 2x6 Jacobian of projection to measurement plane
+  // R_k^{k-1} = correction[] 2x2 before Invert()
+  // G_k = R^(-1) = correction[] 2x2 after Invert()
+  // K_k = gain[] 6x2 Kalman gain matrix
+  // x_k = extPar[] 6 elements after filtering
+  // C_k = extCov[] 6x6 symmetric after filtering
+  // r_k = residual[] 2 elements after filtering
+  // Use the relation K*H*C = (C*H^T*R^-1)*H*C = C*(H^T*R^-1*H)*C^T
 
-// Use the gain matrix formalism to get the corrected track parameters.
-// R. Fruhwirth, Application of Kalman Filtering, NIM A262 (1987) 444-450
-// Equations (7)
-// x_k^{k-1} = extPar[] 6 elements before filtering
-// C_k^{k-1} = extCov[] 6x6 symmetric before filtering
-// r_k^{k-1} = residual[] 2 elements before filtering
-// h_k = 2x6 projects cartesian coordinates to measurement-plane coordinates
-// H_k = @h_k/@x = jacobian[] 2x6 Jacobian of projection to measurement plane
-// R_k^{k-1} = correction[] 2x2 before Invert()
-// G_k = R^(-1) = correction[] 2x2 after Invert()
-// K_k = gain[] 6x2 Kalman gain matrix
-// x_k = extPar[] 6 elements after filtering
-// C_k = extCov[] 6x6 symmetric after filtering
-// r_k = residual[] 2 elements after filtering
-// Use the relation K*H*C = (C*H^T*R^-1)*H*C = C*(H^T*R^-1*H)*C^T
-
-// In most cases, extPos0 is the same as intersection.position.  They differ only when
-// the nearest BKLM hit is in the sector adjacent to that of intersection.position.
-
+  // In most cases, extPos0 is the same as intersection.position.  They differ only when
+  // the nearest BKLM hit is in the sector adjacent to that of intersection.position.
   G4ThreeVector extPos(extPos0);
   G4ThreeVector extMom(intersection.momentum);
   G4ThreeVector extDir(extMom.unit());
   G4ThreeVector diffPos(hitPos - extPos);
   G4ErrorSymMatrix extCov(intersection.covariance);
-
-// Track parameters (x,y,z,px,py,pz) before correction
-
+  // Track parameters (x,y,z,px,py,pz) before correction
   G4ErrorMatrix extPar(6, 1); // initialized to all zeroes
   extPar[0][0] = extPos.x();
   extPar[1][0] = extPos.y();
@@ -1683,7 +1694,6 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   extPar[3][0] = extMom.x();
   extPar[4][0] = extMom.y();
   extPar[5][0] = extMom.z();
-
   G4ThreeVector nA;  // unit vector normal to the readout plane
   G4ThreeVector nB;  // unit vector along phi- or x-readout direction (for barrel or endcap)
   G4ThreeVector nC;  // unit vector along z- or y-readout direction (for barrel or endcap)
@@ -1697,24 +1707,19 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
     nB = G4ThreeVector(out, 0.0, 0.0);
     nC = G4ThreeVector(0.0, out, 0.0);
   }
-
-// Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
-
+  // Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
   double extDirA = extDir * nA;
-  if (std::fabs(extDirA) < 1.0E-6) return;
+  if (std::fabs(extDirA) < 1.0E-6)
+    return;
   double extDirBA = extDir * nB / extDirA;
   double extDirCA = extDir * nC / extDirA;
-
-// Move the extrapolated coordinate (at most a tiny amount!) to the plane of the hit.
-// If the moved point is outside the KLM, don't do Kalman filtering.
-
+  // Move the extrapolated coordinate (at most a tiny amount!) to the plane of the hit.
+  // If the moved point is outside the KLM, don't do Kalman filtering.
   G4ThreeVector move = extDir * ((diffPos * nA) / extDirA);
   extPos += move;
   diffPos -= move;
   intersection.positionAtHitPlane = extPos;
-
-// Projection jacobian onto the nB-nC measurement plane
-
+  // Projection jacobian onto the nB-nC measurement plane
   G4ErrorMatrix jacobian(2, 6); // initialized to all zeroes
   jacobian[0][0] = nB.x()  - nA.x() * extDirBA;
   jacobian[0][1] = nB.y()  - nA.y() * extDirBA;
@@ -1722,15 +1727,11 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   jacobian[1][0] = nC.x()  - nA.x() * extDirCA;
   jacobian[1][1] = nC.y()  - nA.y() * extDirCA;
   jacobian[1][2] = nC.z()  - nA.z() * extDirCA;
-
-// Residuals of EXT track and KLM hit on the nB-nC measurement plane
-
+  // Residuals of EXT track and KLM hit on the nB-nC measurement plane
   G4ErrorMatrix residual(2, 1); // initialized to all zeroes
   residual[0][0] = diffPos.x() * jacobian[0][0] + diffPos.y() * jacobian[0][1] + diffPos.z() * jacobian[0][2];
   residual[1][0] = diffPos.x() * jacobian[1][0] + diffPos.y() * jacobian[1][1] + diffPos.z() * jacobian[1][2];
-
-// Measurement errors in the detector plane
-
+  // Measurement errors in the detector plane
   G4ErrorSymMatrix hitCov(2, 0); // initialized to all zeroes
   hitCov[0][0] = localVariance[0];
   hitCov[1][1] = localVariance[1];
@@ -1739,67 +1740,55 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
     hitCov[0][0] *= 10.0;
     hitCov[1][1] *= 10.0;
   }
-
-// Now get the correction matrix: combined covariance of EXT and KLM hit.
-// 1st dimension = nB, 2nd dimension = nC.
-
+  // Now get the correction matrix: combined covariance of EXT and KLM hit.
+  // 1st dimension = nB, 2nd dimension = nC.
   G4ErrorSymMatrix correction(extCov.similarity(jacobian) + hitCov);
-
-// Ignore the best hit if it is too far from the extrapolated-track intersection in the hit's plane
-
-  if (residual[0][0] * residual[0][0] > correction[0][0] * m_MaxDistSqInVariances) return;
-  if (residual[1][0] * residual[1][0] > correction[1][1] * m_MaxDistSqInVariances) return;
-
+  // Ignore the best hit if it is too far from the extrapolated-track intersection in the hit's plane
+  if (residual[0][0] * residual[0][0] > correction[0][0] * m_MaxDistSqInVariances)
+    return;
+  if (residual[1][0] * residual[1][0] > correction[1][1] * m_MaxDistSqInVariances)
+    return;
   int fail = 0;
   correction.invert(fail);
-  if (fail != 0) return;
-
-// Matrix inversion succeeeded and is reasonable.
-// Evaluate chi-squared increment assuming that the Kalman filter
-// won't be able to adjust the extrapolated track's position (fall-back).
-
+  if (fail != 0)
+    return;
+  // Matrix inversion succeeeded and is reasonable.
+  // Evaluate chi-squared increment assuming that the Kalman filter
+  // won't be able to adjust the extrapolated track's position (fall-back).
   intersection.chi2 = (correction.similarityT(residual))[0][0];
-
-// Do the Kalman filtering
-
+  // Do the Kalman filtering
   G4ErrorMatrix gain((extCov * jacobian.T()) * correction);
   G4ErrorSymMatrix HRH(correction.similarityT(jacobian));
-
   extCov -= HRH.similarity(extCov);
   extPar += gain * residual;
   extPos.set(extPar[0][0], extPar[1][0], extPar[2][0]);
   extMom.set(extPar[3][0], extPar[4][0], extPar[5][0]);
-
-// Calculate the chi-squared increment using the Kalman-filtered state
-
+  // Calculate the chi-squared increment using the Kalman-filtered state
   correction = hitCov - extCov.similarity(jacobian);
   correction.invert(fail);
-  if (fail != 0) return;
-
+  if (fail != 0)
+    return;
   diffPos = hitPos - extPos;
   residual[0][0] = diffPos.x() * jacobian[0][0] + diffPos.y() * jacobian[0][1] + diffPos.z() * jacobian[0][2];
   residual[1][0] = diffPos.x() * jacobian[1][0] + diffPos.y() * jacobian[1][1] + diffPos.z() * jacobian[1][2];
   intersection.chi2 = (correction.similarityT(residual))[0][0];
-
-// Update the position, momentum and covariance of the point
-// Project the corrected extrapolation to the plane of the original
-// extrapolation's intersection.position. (Note: intersection.position is the same as
-// extPos0 in all cases except when nearest BKLM hit is in adjacent
-// sector, for which extPos0 is a projected position to the hit's plane.)
-// Also, leave the momentum magnitude unchanged.
-
+  // Update the position, momentum and covariance of the point
+  // Project the corrected extrapolation to the plane of the original
+  // extrapolation's intersection.position. (Note: intersection.position is the same as
+  // extPos0 in all cases except when nearest BKLM hit is in adjacent
+  // sector, for which extPos0 is a projected position to the hit's plane.)
+  // Also, leave the momentum magnitude unchanged.
   intersection.position = extPos + extDir * (((intersection.position - extPos) * nA) / extDirA);
   intersection.momentum = intersection.momentum.mag() * extMom.unit();
   intersection.covariance = extCov;
-
 }
 
 void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)
 {
   /* Done with this track: compute KLM likelihoods and fill the relative dataobject. */
   int lastExtLayer = extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1;
-  unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, extState.escaped, extState.lastBarrelExtLayer,
-                         extState.lastEndcapExtLayer);
+  unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(
+                           isForward, extState.escaped, extState.lastBarrelExtLayer, extState.lastEndcapExtLayer);
   klmMuidLikelihood->setOutcome(outcome);
   klmMuidLikelihood->setIsForward(isForward);
   klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);

@@ -1267,7 +1267,7 @@ namespace Belle2 {
               const auto& ts = trk2D.ts[iAx];
               if (ts[3] > 0) {
                 CDCTriggerSegmentHit* hit =
-                  addTSHit(ts, 2 * iAx, iTracker, tsHits, iclock);
+                  addTSHit(ts, 2 * iAx, iTracker, tsHitsAll, iclock);
                 unsigned iTS = TSIDInSL(ts[0], iAx * 2, iTracker);
                 tsstr += "(SL" + std::to_string(iAx * 2) + ", " + std::to_string(iTS) + ", " + std::to_string(ts[1]) + ", " + std::to_string(
                            ts[2]) + ", " + std::to_string(ts[3]) + "),";
@@ -1375,11 +1375,13 @@ namespace Belle2 {
                   // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
                     hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
-                    // if (sim13dt) {
                     //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
                     // }
                   }
                   trackNN->addRelationTo(hit);
+                  if (iSL % 2 == 0) {
+                    track2D->addRelationTo(hit);
+                  }
                 }
               }
             }

@@ -700,21 +700,21 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
   double avgOffOccL3U = 0.0;
   double avgOffOccL3V = 0.0;
   for (int bin = 1; bin < 14 + 1; bin++) {
-    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) / 768 * 100; // 768 strips
+    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) / 768 * 100; // 768 strips for u side
     avgOffOccL3V += h_zs5countsV->GetBinContent(bin) / 768 * 100;
   }
-  avgOffOccL3U /= (14 * nEvents); // 14 sensors
-  avgOffOccL3V /= (14 * nEvents;
+  avgOffOccL3U /= (14 * nEvents); // 14 sensors in 3rd layer
+  avgOffOccL3V /= (14 * nEvents);
 
   if (h_zs5countsU == NULL || h_events == NULL) {
-  B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
+    B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
     m_monObj->setVariable("avgOffOccL3U", -1);
   } else {
     m_monObj->setVariable("avgOffOccL3U", avgOffOccL3U);
   }
 
   if (h_zs5countsV == NULL || h_events == NULL) {
-  B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
+    B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
     m_monObj->setVariable("avgOffOccL3V", -1);
   } else {
     m_monObj->setVariable("avgOffOccL3V", avgOffOccL3V);

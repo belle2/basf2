@@ -1424,8 +1424,8 @@ Decay B0
 
 # External+internal W-emission amplitude
 0.000750000   D-  D+  K0                                   PHSP; #Gamma_176 PDGLive. #[BF update - PG 09/2020]
-0.003200000   D*-  D+  K0                                  PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Divide by 2. #[BF update - PG 09/2020]
-0.003200000   D-  D*+  K0                                  PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Divide by 2. #[BF update - PG 09/2020]
+0.001800000   D*-  D+  K0                                  PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Keep original value; not sure how determined. #[Comment - PG 09/2020]
+0.004700000   D-  D*+  K0                                  PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Keep original value; not sure how determined. #[Comment - PG 09/2020]
 0.008109240   D*-  D*+  K0                                 PHSP; #Gamma_178 PDGLive. #[BF update - PG 09/2020]
 
 # Internal W-emission amplitude (color suppressed modes)
@@ -2722,8 +2722,8 @@ Decay anti-B0
 
 # External+internal W-emission amplitude
 0.000750000   D+  D-  anti-K0                              PHSP; #Gamma_176 PDGLive. #[BF update - PG 09/2020]
-0.003200000   D*+  D-  anti-K0                             PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Divide by 2. #[BF update - PG 09/2020]
-0.003200000   D+  D*-  anti-K0                             PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Divide by 2. #[BF update - PG 09/2020]
+0.001800000   D*+  D-  anti-K0                             PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Keep original value; not sure how determined. #[Comment - PG 09/2020]
+0.004700000   D+  D*-  anti-K0                             PHSP; #Gamma_177 PDGLive => (D*-  D+  K0  +  D-  D*+  K0) = 0.0064. Keep original value; not sure how determined. #[Comment - PG 09/2020]
 0.008109240   D*+  D*-  anti-K0                            PHSP; #Gamma_178 PDGLive. #[BF update - PG 09/2020]
 
 # Internal W-emission amplitude (color suppressed modes)

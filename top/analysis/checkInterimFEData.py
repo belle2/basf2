@@ -6,11 +6,11 @@
 # usage: basf2 checkInterimFEData.py -i <file_name.sroot> [-n <num_of_events_to_process>]
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
-class InspectRawTOP(Module):
+class InspectRawTOP(b2.Module):
     ''' Print summary of raw data given in Interim FE format '''
 
     def swap32(self, x):
@@ -79,15 +79,15 @@ class InspectRawTOP(Module):
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 # roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
-converter = register_module('Convert2RawDet')
+converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
 # event info printer
@@ -97,4 +97,4 @@ main.add_module('EventInfoPrinter')
 main.add_module(InspectRawTOP())
 
 # Process events
-process(main)
+b2.process(main)

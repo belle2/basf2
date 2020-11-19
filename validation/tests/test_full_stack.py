@@ -178,7 +178,8 @@ def main():
     # tests which don't use splinter, there are currently some connection
     # problems to the test webserver on the central build system
     try:
-        import splinter
+        import splinter  # noqa
+        pass
     except ImportError:
         print("TEST SKIPPED: The splinter package is required to run this test." +
               "Run 'pip3 install splinter' to install", file=sys.stderr)

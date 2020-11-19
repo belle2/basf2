@@ -20,6 +20,6 @@ path = b2.Path()
 fileList = ['../BtoDh_hh.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = BtoDh_hh()
+skim = BtoD0h_hh()
 skim(path)
 b2.process(path)

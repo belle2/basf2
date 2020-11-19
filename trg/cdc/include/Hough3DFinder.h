@@ -35,6 +35,10 @@ namespace Belle2 {
     TRGCDCHough3DFinder(const TRGCDC&, bool makeRootFile, int finderMode);
     /// Destructor
     ~TRGCDCHough3DFinder();
+    /// Copy constructor, deleted
+    TRGCDCHough3DFinder(TRGCDCHough3DFinder&) = delete;
+    /// Assignment operator, deleted
+    TRGCDCHough3DFinder& operator=(TRGCDCHough3DFinder&) = delete;
     /// Member functions.
     /// Finds tracks using tracklist2D and outputs to trackList3D. Has parameter to choose between perfect and original finder.
     void doit(std::vector<TRGCDCTrack*> const& trackList2D, std::vector<TRGCDCTrack*>& trackList3D);

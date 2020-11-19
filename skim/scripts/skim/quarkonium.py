@@ -11,7 +11,7 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu, stdPi
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
@@ -168,19 +168,53 @@ class CharmoniumPsi(BaseSkim):
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdE("loosepid", path=path)
-        stdMu("loosepid", path=path)
+        stdE('loosepid', path=path)
+        stdMu('loosepid', path=path)
+        stdPhotons('all', path=path)
 
     def build_lists(self, path):
 
+        # Mass cuts.
+        jpsi_mass_cut = '2.85 < M < 3.3'
+        psi2s_mass_cut = '3.45 < M < 3.9'
+
+        # Electrons with bremsstrahlung correction.
+        # Use both correction algorithms as well as uncorrected electrons
+        # to allow for algorithm comparison in analysis.
+        # The recommeneded list for further reconstruction is J/psi:eebrems.
+        # The estimated ratio of efficiencies in B decays in release 5.1.5 is
+        # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid', 'gamma:all',
+                             minimumEnergy=0.001, angleThreshold=0.05,
+                             path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid', 'gamma:all', path=path)
+
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay("J/psi:ee -> e+:loosepid e-:loosepid",
-                            "2.7 < M < 4", path=path)
-        ma.reconstructDecay("J/psi:mumu -> mu+:loosepid mu-:loosepid",
-                            "2.7 < M < 4", path=path)
+        ma.reconstructDecay('J/psi:ee -> e+:loosepid e-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):ee -> e+:loosepid e-:loosepid',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems -> e+:brems e-:brems',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:eebrems2 -> e+:brems2 e-:brems2',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:mumu -> mu+:loosepid mu-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):mumu -> mu+:loosepid mu-:loosepid',
+                            psi2s_mass_cut, path=path)
 
         # Return the lists.
-        self.SkimLists = ["J/psi:ee", "J/psi:mumu"]
+        self.SkimLists = ['J/psi:ee', 'psi(2S):ee',
+                          'J/psi:eebrems', 'psi(2S):eebrems',
+                          'J/psi:eebrems2', 'psi(2S):eebrems2',
+                          'J/psi:mumu', 'psi(2S):mumu']
 
 
 @fancy_skim_header

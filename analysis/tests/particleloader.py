@@ -34,6 +34,10 @@ for mcp in mcps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(mcp, '')],
                         useMCParticles=True)
 
+# load photons from KLMCluster
+testpath.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:fromKLM', 'isFromKLM')],
+                    loadPhotonsFromKLM=True)
+
 # add RestOfEvents
 signal_side = 'K_S0'
 roe_side = 'Upsilon(4S)'
@@ -45,10 +49,12 @@ testpath.add_module('ParticleLoader', decayStringsWithCuts=[(roe_side, '')],
 
 testpath.add_module('ParticleStats', particleLists=fsps)
 testpath.add_module('ParticleStats', particleLists=mcps)
+testpath.add_module('ParticleStats', particleLists=['gamma:fromKLM'])
 testpath.add_module('ParticleStats', particleLists=[roe_side])
 process(testpath)
 
 # process the first event (again) with the verbose ParticlePrinter
 for fsp in fsps:
     testpath.add_module('ParticlePrinter', listName=fsp, fullPrint=True)
+testpath.add_module('ParticlePrinter', listName='gamma:fromKLM', fullPrint=True)
 process(testpath, 1)

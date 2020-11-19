@@ -91,7 +91,7 @@ namespace Belle2 {
      */
     void createDigit(
       const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
-      KLMDigitEventInfo* klmDigitEventInfo, int Subdetector, int section,
+      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
       int sector, int layer, int plane, int strip, int lastStrip);
 
     /**

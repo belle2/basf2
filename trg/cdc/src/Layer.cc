@@ -105,7 +105,7 @@ namespace Belle2 {
   {
     if (_nCells == 0) {
       cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
-      return * (TRGCDCCell*)(TRGCDCUndefinedLayer);
+      return * dynamic_cast<const TRGCDCCell*>(TRGCDCUndefinedLayer);
     }
 
     if (id < 0)

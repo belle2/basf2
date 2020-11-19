@@ -66,7 +66,6 @@ from fei import config
 
 # Standard python modules
 import collections
-import argparse
 import os
 import shutil
 import typing

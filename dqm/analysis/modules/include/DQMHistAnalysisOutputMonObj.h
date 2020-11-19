@@ -55,7 +55,7 @@ namespace Belle2 {
     std::string m_runtype;
 
 
-    DQMFileMetaData* m_metaData = NULL; /**< output file meta data */
+    DQMFileMetaData* m_metaData = nullptr; /**< output file meta data */
   };
 } // end namespace Belle2
 

@@ -20,7 +20,7 @@ v.addAlias('sigProb', 'extraInfo(SignalProbability)')
 var = v.getVariable('sigProb')
 assert 'extraInfo(SignalProbability)' == var.name
 
-assert (v.evaluate('constant(123)', None) - 123) < 0.001
+assert (v.evaluate('constant(123)', ROOT.nullptr) - 123) < 0.001
 
 v.addAlias('anotherAlias', 'daughter(1, p)')
 

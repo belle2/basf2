@@ -108,33 +108,25 @@ namespace Belle2 {
   protected:
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
-    //TCanvas* m_cBadWire = nullptr; /**< bad wire panel */
     TCanvas* m_cADC = nullptr; /**< main panel */
     TCanvas* m_cTDC = nullptr; /**< bad wire panel */
     TCanvas* m_cHit = nullptr; /**< main panel */
-    // TCanvas* m_cADCs[300] = {};
-    // TCanvas* m_cTDCs[300] = {};
-    //    TCanvas* m_cADCs = nullptr;
-    //TCanvas* m_cTDCs = nullptr;
-    //TCanvas* m_cHitL = nullptr;
-    //TCanvas* m_cADC1000 = nullptr;
 
-    // std::string m_filename; /**< output file name */
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
-    TH1F* m_hNEvent = nullptr; /**< Histogram of num. event */
+    TH1F* m_hfastTDC = nullptr; /**< Histogram of num. event */
     TH2F* m_hADC = nullptr; /**< Summary of ADC histograms  */
     TH2F* m_hADCTOTCut = nullptr; /**< Summary of ADC histograms with tot cut*/
     TH2F* m_hTDC = nullptr; /**< Summary of TDC histograms */
     TH2F* m_hHit = nullptr; /**< Summary of hit histograms */
-    TH1D* m_hADCs[300] = {}; /**< ADC histograms for each board (0-299) */
-    TH1D* m_hADCTOTCuts[300] = {}; /**< ADC histograms with tot cut for each board (0-299) */
-    TH1D* m_hTDCs[300] = {}; /**< TDC histograms for each board (0-299) */
-    TH1D* m_hHits[56] = {}; /**< hit histograms for each layer (0-55) */
+    TH1D* m_hADCs[300]; /**< ADC histograms for each board (0-299) */
+    TH1D* m_hADCTOTCuts[300]; /**< ADC histograms with tot cut for each board (0-299) */
+    TH1D* m_hTDCs[300]; /**< TDC histograms for each board (0-299) */
+    TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
 
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */
     std::map<WireID, std::pair<int, int>> m_chMap = {}; /**< Channel map retrieved  */
-    DBArray<CDCChannelMap>* m_channelMapFromDB; /**< Channel map retrieved from DB. */
+    DBArray<CDCChannelMap>* m_channelMapFromDB = nullptr; /**< Channel map retrieved from DB. */
     float m_senseR[56] = {}; /**< Radius of sense (+field) layer.  */
     float m_fieldR[57] = {}; /**< Radius of field layer.  */
     float m_offset[56] = {}; /**< Offset of sense layer  */

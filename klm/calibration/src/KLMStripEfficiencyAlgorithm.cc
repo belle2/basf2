@@ -57,7 +57,8 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() :
 
 KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
-  delete m_StripEfficiency;
+  if (m_StripEfficiency != nullptr)
+    delete m_StripEfficiency;
 }
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()

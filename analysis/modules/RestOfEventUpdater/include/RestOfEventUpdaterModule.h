@@ -36,10 +36,10 @@ namespace Belle2 {
      */
     RestOfEventUpdaterModule();
 
-    /** Overriden initialize method */
+    /** Overridden initialize method */
     virtual void initialize() override;
 
-    /** Overriden event method */
+    /** Overridden event method */
     virtual void event() override;
 
 
@@ -60,16 +60,16 @@ namespace Belle2 {
     // Methods:
     /**
      * Update ROE masks by excluding or keeping particles
-     * @param Pointer to RestOfEvent object for update
-     * @param Reference to particle collection
-     * @param ParticleType of the collection
+     * @param roe Pointer to RestOfEvent object for update
+     * @param particlesToUpdate Reference to particle collection
+     * @param listType ParticleType of the collection
      */
     void updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate,
                                   Particle::EParticleSourceObject listType);
     /**
      * Update ROE masks with provided composite particle collection
-     * @param Pointer to RestOfEvent object for update
-     * @param Reference to composite particle collection
+     * @param roe Pointer to RestOfEvent object for update
+     * @param particlesToUpdate Reference to composite particle collection
      */
     void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate);
   };

@@ -172,7 +172,7 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
 try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters, get_log_file_dir, create_output_dirs
-    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task, HaddTask
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
     from b2luigi.core.task import Task, ExternalTask
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
@@ -360,15 +360,16 @@ class GenerateSimTask(Basf2PathTask):
     evaluation/validation tasks.
     """
 
-    #: Number of events to generate.
+    # : Number of events to generate.
     n_events = b2luigi.IntParameter()
-    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    # : Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # : Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
-    #: Directory with overlay background root files
+    # : Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    # : name of the queue to be used
     queue = 'l'
 
     #: Name of the ROOT output file with generated and simulated events.
@@ -486,6 +487,7 @@ class SplitNMergeSimTask(Basf2Task):
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    # name of the queue to be used
     queue = 'sx'
 
     #: Name of the ROOT output file with generated and simulated events.
@@ -504,6 +506,9 @@ class SplitNMergeSimTask(Basf2Task):
         yield self.add_to_output(self.output_file_name())
 
     def requires(self):
+        """
+        Generates simulation tasks
+        """
         n_events_per_task = MasterTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
         for i in range(quotient):
@@ -525,6 +530,9 @@ class SplitNMergeSimTask(Basf2Task):
 
     @b2luigi.on_temporary_files
     def process(self):
+        """
+        starts processing
+        """
         create_output_dirs(self)
 
         file_list = []
@@ -550,6 +558,9 @@ class CheckExistingFile(ExternalTask):
     filename = b2luigi.Parameter()
 
     def output(self):
+        """
+        generates output (maybe?)
+        """
         from luigi import LocalTarget
         return LocalTarget(self.filename)
 
@@ -569,6 +580,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
     # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    # name of the queue to be used
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
@@ -589,6 +601,9 @@ class VXDQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        returns a list of input files
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -697,6 +712,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
     # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
+    # name of the queue to be used
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
@@ -717,6 +733,9 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        generates a list of input file
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -819,6 +838,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    # name of the queue to be used
     queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
@@ -841,6 +861,9 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             return 'qe_records_N' + str(n_events) + '_' + random_seed + '_' + recotrack_option + '.root'
 
     def get_input_files(self, n_events=None, random_seed=None):
+        """
+        generates a list of input files
+        """
         if n_events is None:
             n_events = self.n_events
         if random_seed is None:
@@ -2286,6 +2309,7 @@ class MasterTask(b2luigi.WrapperTask):
     n_events_per_task = b2luigi.get_setting("n_events_per_task", default=100)
     #: Number of basf2 processes to use in Basf2PathTasks
     num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
+    #: data files
     datafiles = b2luigi.get_setting("datafiles")
     #: Dictionary with experiment numbers as keys and background directory paths as values
     bkgfiles_by_exp = b2luigi.get_setting("bkgfiles_by_exp")

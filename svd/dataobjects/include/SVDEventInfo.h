@@ -11,6 +11,7 @@
 #pragma once
 #include <TObject.h>
 #include <string>
+#include <cmath>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
 
@@ -100,16 +101,20 @@ namespace Belle2 {
     int getNSamples() const
     { return m_nAPVsamples; }
 
-    /** getRelativeShiftInNs
-     * returns the relative shift of the latency, in ns, in data taken in 3/6 samples.
-     * A number between 0 and 15 (in xml) -> shift is 0*7.9 .... 15*7.9 in ns.
-     * It returns the correct value in ns only if data have been collected in 3-sample DAQmode,
-     * otherwise it returns 0
+    /** getSamplingDelayInNs()
+     * returns the delay of the sampling with respect to the
+     * sampling of the 6-sample DAQ mode
+     * For 6-sample event it returns 0, for 3-sample events computes
+     * the delay using the relativeShift information
      */
-    float getRelativeShiftInNs() const
+    float getSamplingDelayInNs() const
     {
-      if (m_nAPVsamples == 3)
-        return m_relativeTimeShift * 4000. / 509.;
+      if (m_nAPVsamples == 3) {
+
+        int nTriggerClocks = SVDModeByte(m_modeByte).getTriggerBin() + m_relativeTimeShift;
+
+        return floor(nTriggerClocks / 4) * 16000. / 509.;
+      }
 
       return 0;
     }
@@ -119,7 +124,9 @@ namespace Belle2 {
      * A number between 0 and 15 as written in the xml file
      */
     int getRelativeShift() const
-    {return m_relativeTimeShift;}
+    {
+      return m_relativeTimeShift;
+    }
 
     /** getTimeInFTSWReference
      * it takes the cluster time in SVD reference (in either 3 or 6-sample DAQ mode)
@@ -128,10 +135,9 @@ namespace Belle2 {
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- o 6-sample DAQ mode
 
      */
-    double getTimeInFTSWReference(double time, int firstFrame) const
+    double getTimeInFTSWReference(double time_in_SVD, int firstFrame) const
     {
-      double time_in_FTSW = time + getRelativeShiftInNs() + getSVD2FTSWTimeShift(firstFrame);
-      return time_in_FTSW;
+      return time_in_SVD + getSamplingDelayInNs() + getSVD2FTSWTimeShift(firstFrame);
     }
 
 
@@ -142,8 +148,7 @@ namespace Belle2 {
      */
     double getTimeInSVDReference(double time_in_FTSW, int firstFrame) const
     {
-      double time = time_in_FTSW - getRelativeShiftInNs() - getSVD2FTSWTimeShift(firstFrame);
-      return time;
+      return time_in_FTSW - getSamplingDelayInNs() - getSVD2FTSWTimeShift(firstFrame);
     }
 
     /** SVDTriggerType getter
@@ -167,7 +172,8 @@ namespace Belle2 {
       bool thisModeMatch(m_ModeByteMatch);
       bool thisTriggerMatch(m_TriggerTypeMatch);
       bool thisXtalk(m_Xtalk);
-      bool thisRelativeShift(m_relativeTimeShift);
+      int thisRelativeShift(m_relativeTimeShift);
+      int thisNsamples(m_nAPVsamples);
 
       std::ostringstream os;
 
@@ -180,6 +186,7 @@ namespace Belle2 {
       os << " TriggerType Match: " << thisTriggerMatch << std::endl;
       os << " Cross Talk: " << (thisXtalk ? "true" : "false") << std::endl;
       os << " Relative Shift 3/6: " << (unsigned int)thisRelativeShift << std::endl;
+      os << " Number of APV samples: " << (unsigned int)thisNsamples << std::endl;
       return os.str();
     }
 

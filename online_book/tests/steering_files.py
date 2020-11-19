@@ -12,7 +12,7 @@ import glob
 
 # basf2
 from basf2 import find_file
-from b2test_utils import clean_working_directory, skip_test_if_light
+from b2test_utils import clean_working_directory
 
 
 class SteeringFileTest(unittest.TestCase):
@@ -27,6 +27,8 @@ class SteeringFileTest(unittest.TestCase):
             path_to_glob (str): the path to search for scripts
             broken (list(str)): (optional) scripts that are known to be broken
                 and can be skipped
+            additional_arguments (list(str)): (optional) additional arguments
+                for basf2 to be passed when testing the scripts
         """
         if additional_arguments is None:
             additional_arguments = []
@@ -59,6 +61,7 @@ class SteeringFileTest(unittest.TestCase):
         "Test data files not found."
     )
     def test_lessons_1_to_5(self):
+        """Test lesson on basf2 basics."""
         self._test_examples_dir(
             "online_book/basf2/steering_files", additional_arguments=["1"]
         )

@@ -9,13 +9,10 @@ The actual processing code is mostly in the `caf.state_machines` module.
 
 __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 
-import basf2
 import os
-import sys
 from threading import Thread
 from time import sleep
 from pathlib import Path
-import sqlite3
 import shutil
 from glob import glob
 
@@ -24,19 +21,13 @@ from basf2 import find_file
 from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
-import ROOT
 
 from .utils import B2INFO_MULTILINE
 from .utils import past_from_future_dependencies
 from .utils import topological_sort
 from .utils import all_dependencies
-from .utils import decode_json_string
 from .utils import method_dispatch
-from .utils import find_sources
-from .utils import AlgResult
 from .utils import temporary_workdir
-from .utils import IoV
-from .utils import IoV_Result
 from .utils import find_int_dirs
 from .utils import LocalDatabase
 from .utils import CentralDatabase
@@ -45,7 +36,7 @@ from caf import strategies
 from caf import runners
 import caf.backends
 from caf.backends import MaxSubjobsSplitter, MaxFilesSplitter
-from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from .state_machines import CalibrationMachine, ConditionError, MachineError
 from caf.database import CAFDB
 
 
@@ -335,7 +326,6 @@ class CalibrationBase(ABC, Thread):
         The most important method. Runs inside a new Thread and is called from `CalibrationBase.start`
         once the dependencies of this `CalibrationBase` have returned with state == end_state i.e. "completed".
         """
-        pass
 
     @abstractmethod
     def is_valid(self):
@@ -343,7 +333,6 @@ class CalibrationBase(ABC, Thread):
         A simple method you should implement that will return True or False depending on whether
         the Calibration has been set up correctly and can be run safely.
         """
-        pass
 
     def depends_on(self, calibration):
         """

@@ -828,6 +828,15 @@ documentation.
     .. literalinclude:: steering_files/015_first_steering_file.py
         :linenos:
 
+.. hint::
+
+    If you have trouble to understand what we are doing with the ``b_vars``
+    list, simply add a couple of ``print(b_vars)`` between the definition and
+    the operations on it. You might also want to take another look at `your
+    training on lists
+    <https://swcarpentry.github.io/python-novice-inflammation/05-lists/index.html>`_.
+
+
 Variable aliases
 ----------------
 
@@ -921,6 +930,12 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :linenos:
 
+.. hint::
+
+    To get more information about the aliases that we are creating, simply use
+    `VariableManager.printAliases` (``vm.printAliases()``) just before
+    processing your path.
+
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
@@ -941,6 +956,8 @@ or `matchedMC`.
     * ``matchMCTruth`` matches MC
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
+
+.. include:: ../survey.rst
 
 .. topic:: Authors of this lesson
 

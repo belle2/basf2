@@ -47,6 +47,9 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCTrackBase();
 
+    /// Assignment operator, deleted
+    TRGCDCTrackBase& operator=(TRGCDCTrackBase&) = delete;
+
   public:
 
     /// returns name.

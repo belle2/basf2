@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 
 # ---------------------------------------------------------------
 # Simulation of the laser system including a double pulse

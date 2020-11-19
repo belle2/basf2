@@ -7,9 +7,7 @@ import b2test_utils
 import modularAnalysis as ma
 from variables import variables
 from vertex import kFit
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestAllParticleCombiner(unittest.TestCase):

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from rawdata import add_unpackers
-from reconstruction import add_reconstruction, add_mdst_output
+import basf2 as b2
+from reconstruction import add_mdst_output
 from softwaretrigger.constants import SoftwareTriggerModes
 from softwaretrigger.processing import add_hlt_processing
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # input
 main.add_module('RootInput')
@@ -26,5 +25,5 @@ add_hlt_processing(main, softwaretrigger_mode=SoftwareTriggerModes.monitor, prun
 add_mdst_output(main)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

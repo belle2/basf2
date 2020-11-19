@@ -17,7 +17,6 @@ Usage:
 Just import the module to use it.
 """
 
-import math
 import numpy as np
 import pandas as pd
 from scipy.stats import norm, uniform

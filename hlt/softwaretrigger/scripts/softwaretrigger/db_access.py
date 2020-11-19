@@ -1,25 +1,31 @@
-def list_to_vector(l):
+def list_to_vector(lst):
     """
     Helper function to convert a python list into a std::vector of the same type.
     Is not a very general and good method, but works for the different use cases in
     the STM.
-    :param l: The list to convert
+    :param lst: The list to convert
     :return: A std::vector with the same content as the input list.
     """
     from ROOT import std
-    type_of_first_element = type(l[0]).__name__
+    type_of_first_element = type(lst[0]).__name__
     if type_of_first_element == "str":
         type_of_first_element = "string"
 
     vec = std.vector(type_of_first_element)()
 
-    for x in l:
+    for x in lst:
         vec.push_back(x)
 
     return vec
 
 
-def upload_cut_to_db(cut_string, base_identifier, cut_identifier, prescale_factor=1, reject_cut=False, iov=None):
+def upload_cut_to_db(
+        cut_string,
+        base_identifier,
+        cut_identifier,
+        prescale_factor=1,
+        reject_cut=False,
+        iov=None):
     """
     Python function to upload the given software trigger cut to the database.
     Additional to the software trigger cut, the base- as well as the cut identifier
@@ -32,16 +38,25 @@ def upload_cut_to_db(cut_string, base_identifier, cut_identifier, prescale_facto
         iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
     if isinstance(prescale_factor, list):
-        raise AttributeError("The only allowed type for the prescaling is a single factor")
+        raise AttributeError(
+            "The only allowed type for the prescaling is a single factor")
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
     software_trigger_cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile(
         cut_string, prescale_factor, reject_cut)
 
-    db_handler.upload(software_trigger_cut, base_identifier, cut_identifier, iov)
+    db_handler.upload(
+        software_trigger_cut,
+        base_identifier,
+        cut_identifier,
+        iov)
 
 
-def upload_trigger_menu_to_db(base_identifier, cut_identifiers, accept_mode=False, iov=None):
+def upload_trigger_menu_to_db(
+        base_identifier,
+        cut_identifiers,
+        accept_mode=False,
+        iov=None):
     """
     Python function to upload the given software trigger enu to the database.
     Additional to the software trigger menu, the base identifier
@@ -56,7 +71,11 @@ def upload_trigger_menu_to_db(base_identifier, cut_identifiers, accept_mode=Fals
     cut_identifiers = list_to_vector(cut_identifiers)
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
-    db_handler.uploadTriggerMenu(base_identifier, cut_identifiers, accept_mode, iov)
+    db_handler.uploadTriggerMenu(
+        base_identifier,
+        cut_identifiers,
+        accept_mode,
+        iov)
 
 
 def download_cut_from_db(base_name, cut_name, do_set_event_number=True):
@@ -118,7 +137,8 @@ def set_event_number(evt_number, run_number, exp_number):
     """
     from ROOT import Belle2
 
-    event_meta_data_pointer = Belle2.PyStoreObj(Belle2.EventMetaData.Class(), "EventMetaData")
+    event_meta_data_pointer = Belle2.PyStoreObj(
+        Belle2.EventMetaData.Class(), "EventMetaData")
 
     Belle2.DataStore.Instance().setInitializeActive(True)
 
@@ -133,12 +153,16 @@ def set_event_number(evt_number, run_number, exp_number):
 
 def get_all_cuts():
     for base_identifier in ["filter", "skim"]:
-        menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
+        menu = download_trigger_menu_from_db(
+            base_name=base_identifier, do_set_event_number=False)
         if not menu:
             continue
         cuts = menu.getCutIdentifiers()
         for cut_identifier in cuts:
-            cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)
+            cut = download_cut_from_db(
+                base_name=base_identifier,
+                cut_name=cut_identifier,
+                do_set_event_number=False)
             yield {
                 "Base Identifier": base_identifier,
                 "Reject Menu": menu.isAcceptMode(),

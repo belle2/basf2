@@ -22,6 +22,8 @@ Changes since release-05
 Fixed the issue where PHOTOS photons were not correctly flagged in continuum events, e.g., charm decays (:issue:`BII-5934`).
 This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
+.. include:: analysis/doc/whatsnew-since/release-05-01.txt
+
 .. include:: analysis/doc/whatsnew-since/release-05-00.txt
 
 Changes since release-04

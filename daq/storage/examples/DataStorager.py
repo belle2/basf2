@@ -17,7 +17,7 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 import sys
 argv = sys.argv
 
@@ -36,7 +36,7 @@ argv = sys.argv
 # roipayload = register_module('ROIPayloadAssembler')
 
 # Modules
-deserializer = register_module('StorageDeserializer')
+deserializer = b2.register_module('StorageDeserializer')
 deserializer.param('InputBufferName', argv[1])
 deserializer.param('InputBufferSize', int(argv[2]))
 if len(argv) >= 6:
@@ -44,18 +44,18 @@ if len(argv) >= 6:
     deserializer.param('NodeID', int(argv[6]))
     deserializer.param('UseShmFlag', int(argv[7]))
     deserializer.param('EB2', int(argv[8]))
-output = register_module('StorageSerializer')
+output = b2.register_module('StorageSerializer')
 output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))
 output.param('NodeID', int(argv[6]))
 output.param('compressionLevel', 0)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(deserializer)
 main.add_module(output)
 
 # Process all events
-process(main)
+b2.process(main)

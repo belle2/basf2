@@ -1,23 +1,17 @@
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
-from ROOT import Belle2
 
-from caf.framework import Calibration, CAF
+from caf.framework import CAF
 from caf import backends
 
-import basf2
 from reconstruction import add_cosmics_reconstruction
-from ROOT import Belle2
-import cdc.cr as gcr
 
-from alignment import MillepedeCalibration
 from alignment import setups
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -34,7 +28,7 @@ def main(argv):
     print('Input DST files:')
     print(inputFiles)
 
-    reco_path = basf2.create_path()
+    reco_path = b2.create_path()
     reco_path.add_module('Progress')
     reco_path.add_module('Gearbox')
     reco_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])

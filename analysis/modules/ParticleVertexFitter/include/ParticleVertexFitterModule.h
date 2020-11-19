@@ -96,6 +96,8 @@ namespace Belle2 {
     /**
      * Unconstrained vertex fit using KFit
      * @param p pointer to particle
+     * @param ipProfileConstraint flag for IP profile constraint
+     * @param ipTubeConstraint flag for IP tube constraint
      * @return true for successful fit
      */
     bool doKVertexFit(Particle* p, bool ipProfileConstraint, bool ipTubeConstraint);

@@ -11,6 +11,7 @@
 from basf2 import B2INFO, B2FATAL
 import basf2
 import basf2_mva
+import inspect
 import modularAnalysis as ma
 from variables import utils
 from ROOT import Belle2
@@ -1035,7 +1036,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
 
 def flavorTagger(
-    particleLists=[],
+    particleLists=None,
     mode='Expert',
     weightFiles='B2nunubarBGx1',
     workingDirectory='.',

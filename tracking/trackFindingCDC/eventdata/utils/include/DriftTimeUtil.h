@@ -112,6 +112,7 @@ namespace Belle2 {
        *  Returns the time measured at the readout board
        *  @param wireID   wire id
        *  @param tdcCount TDC count
+       *  @param smear    if true result will be varied randomly
        *  @return         measured time (in ns)
        */
       static double getMeasuredTime(const WireID& wireID, unsigned short tdcCount, bool smear)

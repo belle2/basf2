@@ -5,7 +5,6 @@
 
 import sys
 import basf2
-import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, KLMTimeConversion
 
 basf2.set_log_level(basf2.LogLevel.INFO)

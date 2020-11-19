@@ -97,7 +97,8 @@ namespace Belle2 {
     /**
      * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
      *
-     * @param pointer to the MCParticle
+     * @param mcP pointer to the MCParticle
+     * @param genMCPMothers pointer to the generator ancestors MCParticle
      * @param reference to the vector of integers to hold the results
      */
     static void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);

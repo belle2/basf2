@@ -8,7 +8,7 @@
 #
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 import sys
 argvs = sys.argv
 if len(argvs) != 4:
@@ -16,12 +16,12 @@ if len(argvs) != 4:
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Modules
-receiver = register_module('DeSerializerPC')
-dump = register_module('SeqRootOutput')
-converter = register_module('Convert2RawDet')
+receiver = b2.register_module('DeSerializerPC')
+dump = b2.register_module('SeqRootOutput')
+converter = b2.register_module('Convert2RawDet')
 
 # Receiver
 receiver.param('NodeID', 3)  # ROPC node ID (only used for Run control)
@@ -39,12 +39,12 @@ receiver.param('UseShmFlag', use_shm_flag)
 dump.param('outputFileName', 'root_output.sroot')
 
 # Sender
-sender = register_module('Serializer')
+sender = b2.register_module('Serializer')
 sender.param('DestPort', 36000)
 sender.param('LocalHostName', 'localhost')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(receiver)
@@ -53,4 +53,4 @@ main.add_module(dump)
 # main.add_module(sender)
 
 # Process all events
-process(main)
+b2.process(main)

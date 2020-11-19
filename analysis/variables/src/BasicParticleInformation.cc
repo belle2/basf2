@@ -35,6 +35,11 @@ namespace Belle2 {
       return (part->getParticleSource() == Particle::EParticleSourceObject::c_V0);
     }
 
+    double particleSource(const Particle* part)
+    {
+      return part->getParticleSource();
+    }
+
     double particleMdstArrayIndex(const Particle* part)
     {
       return part->getMdstArrayIndex();
@@ -76,6 +81,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns 1.0 if this particle was created from a KLMCluster, 0 otherwise.");
     REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns 1.0 if this particle was created from a track, 0 otherwise.");
     REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns 1.0 if this particle was created from a V0, 0 otherwise.");
+    REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
+      Returns mdst source used to create the particle. The meaning of the values are
+
+      * 0: undefined
+      * 1: created from track
+      * 2: created from ECL cluster
+      * 3: created from KLM cluster
+      * 4: created from V0
+      * 5: MC particle
+      * 6: composite particle
+
+      )DOC");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, R"DOC(
 Store array index (0 - based) of the MDST object from which the Particle was created. 
 It's 0 for composite particles.

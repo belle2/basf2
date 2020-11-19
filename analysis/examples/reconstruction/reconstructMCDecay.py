@@ -11,7 +11,7 @@ __authors__ = "Yo Sato"
 
 import basf2
 from ROOT import Belle2
-from modularAnalysis import inputMdst, fillParticleListFromMC, variablesToNtuple, reconstructMCDecay, fillParticleList
+from modularAnalysis import fillParticleListFromMC, inputMdst, reconstructMCDecay, variablesToNtuple
 from variables import variables as vm  # shorthand for the variable manager instance
 
 basf2.set_log_level(basf2.LogLevel.DEBUG)

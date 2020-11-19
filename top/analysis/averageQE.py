@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TFile, TProfile
@@ -14,7 +14,7 @@ from ROOT import TH1F, TH2F, TFile, TProfile
 # --------------------------------------------------------------------
 
 
-class AverageQE(Module):
+class AverageQE(b2.Module):
     ''' determination of average quantum and collection efficiency from TOPPmtQEs '''
 
     def initialize(self):
@@ -22,12 +22,12 @@ class AverageQE(Module):
 
         dbarray = Belle2.PyDBArray('TOPPmtQEs')
         if dbarray.getEntries() == 0:
-            B2ERROR("No entries in TOPPmtQEs")
+            b2.B2ERROR("No entries in TOPPmtQEs")
             return
 
         geo = Belle2.PyDBObj('TOPGeometry')
         if not geo:
-            B2ERROR("No TOPGeometry")
+            b2.B2ERROR("No TOPGeometry")
             return
 
         Bfield_on = True  # use collection efficiencies for 1.5 T
@@ -94,13 +94,13 @@ class AverageQE(Module):
 # Central database
 argvs = sys.argv
 if len(argvs) == 2:
-    use_central_database(argvs[1])
+    b2.use_central_database(argvs[1])
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1]})
 main.add_module(eventinfosetter)
 
@@ -108,4 +108,4 @@ main.add_module(eventinfosetter)
 main.add_module(AverageQE())
 
 # Process events
-process(main)
+b2.process(main)

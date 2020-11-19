@@ -1,7 +1,4 @@
-import atexit
-import os
 from pathlib import Path
-from time import sleep
 from unittest import main
 import basf2
 
@@ -52,6 +49,7 @@ class WorkerTestCase(HLTZMQTestCase):
 
 class NormalWorkerTestCase(WorkerTestCase):
     """Tests for normal worker behavior"""
+
     def testInitialization(self):
         """test function"""
         self.start()

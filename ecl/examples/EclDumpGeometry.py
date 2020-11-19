@@ -15,7 +15,6 @@
 
 import basf2 as b2
 from modularAnalysis import inputMdst
-from basf2 import conditions
 
 # ..path
 mypath = b2.create_path()

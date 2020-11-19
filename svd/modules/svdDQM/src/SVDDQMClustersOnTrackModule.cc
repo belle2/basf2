@@ -305,7 +305,7 @@ void SVDDQMClustersOnTrackModule::event()
 
   BOOST_FOREACH(Track & track, m_storeTracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!tfr) continue;
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);

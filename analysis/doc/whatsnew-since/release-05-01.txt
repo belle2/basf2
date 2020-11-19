@@ -22,7 +22,7 @@ Variables
  * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
    region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
- * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
+ * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection,
    collections of ROE and recoil variables have been expanded
  * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
    binary PID variables have been added to the PID variable collection.
@@ -37,6 +37,10 @@ Variables
    during the calculation.
  * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
  * Added new variables :b2:var:`exp` and :b2:var:`log`.
+ * Added special hadron ID variables :b2:var:`pionID_SVD`, :b2:var:`kaonID_SVD`, :b2:var:`protonID_SVD`, :b2:var:`binaryPID_SVD` which include SVD PDFs for pions, kaons and protons only. For hadron ID, users should **no longer** rely on the standard variables :b2:var:`pionID`, :b2:var:`kaonID`, :b2:var:`protonID`, :b2:var:`binaryPID` for the time being. For lepton identification instead, the :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`binaryPID` variables, which do not contain SVD PDF info yet, are still recommended.
+
+ * Added the variable `particleSource`, which returns the mdst source, i.e. whether the particle was created from a track, an ECL
+   cluster, or a KLM cluster, is a V0 object, an MC particle, or a composite particle.
 
 Modules
 +++++++
@@ -48,7 +52,7 @@ Modules
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
  * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
    download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
-   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon. 
+   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon.
    Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
    ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
  * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
@@ -59,7 +63,7 @@ Modules
  * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
    has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
    much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
- 
+
  * The :b2:mod:`ParticleLoader` now creates photon candidates from KLMCluster if the parameter ``loadPhotonsFromKLM`` is set to
    true. It is off by default.
 

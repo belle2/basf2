@@ -6,7 +6,6 @@ import numpy as np
 import tensorflow as tf
 import basf2_mva
 import basf2_mva_util
-import pandas
 import time
 
 from basf2_mva_python_interface.tensorflow import State

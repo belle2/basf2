@@ -12,7 +12,6 @@
 
 import reconstruction
 from tracking.validation.run import TrackingValidationRun
-import tracking
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation_expert.root'

@@ -25,6 +25,7 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -1645,12 +1646,11 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
       if (track != nullptr) {
-        RelationVector<EKLMAlignmentHit> eklmAlignmentHits = hit->getRelationsFrom<EKLMAlignmentHit>();
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
-          for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
-            recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
+          for (const EKLMAlignmentHit& alignmentHit : hit->getRelationsFrom<EKLMAlignmentHit>()) {
+            recoTrack->addEKLMHit(&alignmentHit, recoTrack->getNumberOfTotalHits() + 1);
           }
         }
       }

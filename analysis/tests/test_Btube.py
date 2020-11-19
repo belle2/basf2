@@ -44,7 +44,7 @@ variables.addAlias('mcECms', 'useCMSFrame(mcE)')
 variables.addAlias('tube_dir_X', 'extraInfo(TubeDirX)')
 variables.addAlias('tube_dir_Y', 'extraInfo(TubeDirY)')
 variables.addAlias('tube_dir_Z', 'extraInfo(TubeDirZ)')
-variables.addAlias('tube_B_aparent_Momentum_from_creatorB', 'extraInfo(TubeB_MomMag)')
+variables.addAlias('tube_B_aparent_Momentum_from_creatorB', 'extraInfo(TubeB_p_estimated)')
 
 variables.addAlias('truex', 'matchedMC(x)')
 variables.addAlias('truey', 'matchedMC(y)')

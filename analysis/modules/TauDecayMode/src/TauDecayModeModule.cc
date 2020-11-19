@@ -200,7 +200,7 @@ void TauDecayModeModule::event()
 
   }
   //
-  if (m_printmode > 10) {
+  if (m_printmode > 1) {
     B2INFO("TauDecayMode:: vec_nut.size()  = " << vec_nut.size());
     B2INFO("TauDecayMode:: vec_anut.size() = " << vec_anut.size());
     B2INFO("TauDecayMode:: vec_em.size()   = "  << vec_em.size());
@@ -212,6 +212,8 @@ void TauDecayModeModule::event()
 // test for extra particles
     B2INFO("TauDecayMode:: vec_K0.size()  = " << vec_K0.size());
     B2INFO("TauDecayMode:: vec_K0_br.size()  = " << vec_K0_br.size());
+    B2INFO("TauDecayMode:: vec_k0s.size()  = " << vec_k0s.size());
+    B2INFO("TauDecayMode:: vec_k0l.size()  = " << vec_k0l .size());
     B2INFO("TauDecayMode:: vec_eta.size()  = " << vec_eta.size());
     B2INFO("TauDecayMode:: vec_omega.size()  = " << vec_omega.size());
     B2INFO("TauDecayMode:: vec_kstarm.size()  = " << vec_kstarm.size());
@@ -753,7 +755,7 @@ int TauDecayModeModule::getRecursiveMotherCharge(const MCParticle* p)
   const MCParticle* mother = p->getMother();
   if (mother == nullptr) {
     return 0;
-  } else if (p->getPDG() == 22 && mother->getPDG() == 111) {
+  } else if (p->getPDG() == 22 && (mother->getPDG() == 111)) {
     return 0;
   } else if (abs(p->getPDG()) == 11 && mother->getPDG() == 111) {
     return 0;
@@ -765,7 +767,7 @@ int TauDecayModeModule::getRecursiveMotherCharge(const MCParticle* p)
     return getRecursiveMotherCharge(mother);
   }
 }
-//pdg(11)=e- pdg(22)=gamma pdg(111)=pi0 pdg(15)=tau-
+//pdg(11)=e- pdg(22)=gamma pdg(111)=pi0 pdg(15)=tau-  || mother->getPDG() == 221
 
 int TauDecayModeModule::getRecursiveMother(const MCParticle* p)
 {
@@ -826,7 +828,7 @@ int TauDecayModeModule::TauBBBmode(string state, map<string, int> tau_map)
   string dem = ".";
   std::vector<std::string> x = parseString(state, dem);
   int r = x.size();
-  int i = 0;
+  int i;
   map<string, int>::iterator itr = mode_decay.begin();
   for (itr =  mode_decay.begin(); itr !=  mode_decay.end(); ++itr) {
     string mode = itr-> first;
@@ -835,20 +837,31 @@ int TauDecayModeModule::TauBBBmode(string state, map<string, int> tau_map)
     std::set<std::string> const uniques(x.begin(), x.end());
     x.assign(uniques.begin(), uniques.end());
     int count = 0;
+    int nein = 0;
     for (i = 0 ; i != x.size(); ++i) {
       int pos = 0;
       int index;
-      while ((index = mode.find(x[i], pos)) != string::npos) {
-        if (x[i] != "") {count = count + 1;}
-        pos = index + 1;
+
+      if ((index = mode.find(x[i], pos)) == string::npos) {
+        nein = nein + 1;
+      } else {
+        while ((index = mode.find(x[i], pos)) != string::npos) {
+          if (x[i] != "") {count = count + 1;}
+
+          if ((index = mode.find(x[i], pos)) == string::npos) {
+            break;
+          }
+          pos = index + 1;
+        }
       }
     }
-    if ((b == r) & (b - 1 == count)) {
+    if ((b == r) & (b - 1 == count) & (nein == 0)) {
       return itr -> second;
       break;
-    } else {
-      continue;
     }
+    // else{
+    //     continue;
+    // }
   }
   return 0;
 

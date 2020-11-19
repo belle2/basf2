@@ -429,7 +429,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 #endif
 
-  int status;
+  int status = 0;
 
   if (!enough) {
     // not enough Entries

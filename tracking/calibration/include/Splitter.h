@@ -158,8 +158,8 @@ namespace Belle2 {
                                                                double intSize = 1. / 60);
 
 
-    double tBest;      //< target calib. interval time in hours
-    double gapPenalty; //< in relative units (higher -> less gaps)
+    double tBest;      ///< target calib. interval time in hours
+    double gapPenalty; ///< in relative units (higher -> less gaps)
 
     /** cache used by the clustering algorithm (has to be reset every time) */
     std::vector<std::pair<double, std::vector<int>>> cache;

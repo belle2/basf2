@@ -133,6 +133,9 @@ Muon efficiency and pion fake rate are shown in :numref:`MuonEffPionFakeRate` as
 
 .. seealso:: `"Track extrapolation and muon identification using GEANT4E in event reconstruction in the Belle II experiment" <https://docs.belle2.org/record/502/files/BELLE2-TALK-CONF-2017-026.pdf>`_
 
+.. seealso:: `"Description and performances of the μID" <https://docs.belle2.org/record/1818?ln=en>`_
+
+
 
 
 Calibration

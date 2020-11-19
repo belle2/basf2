@@ -28,7 +28,11 @@ REG_MODULE(DQMHistAnalysisKLM)
 
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
-    m_eklmStripLayer{nullptr}
+    m_ProcessedEvents{0},
+    m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
+    m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
+    m_ElementNumbers{&(KLMElementNumbers::Instance())},
+    m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("Module used to analyze KLM DQM histograms.");
   addParam("ThresholdForMasked", m_ThresholdForMasked,
@@ -42,11 +46,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number of processed events required to print error messages", 10000.);
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
-  m_ProcessedEvents = 0.;
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
-  m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -333,7 +332,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       if (layerGlobal < maximalLayer)
         m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
       int section, layer;
-      m_eklmElementNumbers->layerNumberToElementNumbers(
+      m_EklmElementNumbers->layerNumberToElementNumbers(
         layerGlobal, &section, &layer);
       if (section == EKLMElementNumbers::c_BackwardSection)
         name = "B";
@@ -380,6 +379,14 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
+  int isKlmIncluded = 1;
+  /* If KLM is not included, stop here and return. */
+  TH1* daqInclusion = findHist("KLM/daq_inclusion");
+  if (not(daqInclusion == nullptr)) {
+    isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
+    if (isKlmIncluded == 0)
+      return;
+  }
   /* Make sure that the vectors are cleared at each DQM refresh. */
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();

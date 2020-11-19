@@ -18,12 +18,13 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -127,6 +128,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
     m_BarrelSectorPhi[s] = G4ThreeVector(0.0, 0.0, 0.0);
   }
   m_klmElementNumbers = &(KLMElementNumbers::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 TrackExtrapolateG4e::~TrackExtrapolateG4e()
@@ -293,8 +295,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_EndcapScintVariance = width * width / 12.0;
   width = bklmGeometry->getScintHalfWidth() * 2.0;                        // in G4e units (cm)
   m_BarrelScintVariance = width * width / 12.0;
-  int nBarrelLayers = bklmGeometry->getNLayer();
-  for (int layer = 1; layer <= nBarrelLayers; ++layer) {
+  for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); ++layer) {
     const bklm::Module* module =
       bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
     width = module->getPhiStripWidth(); // in G4e units (cm)
@@ -304,31 +305,29 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   }
 
   // KLM geometry (for associating KLM hit with extrapolated crossing point)
-  m_OutermostActiveBarrelLayer = nBarrelLayers - 1; // zero-based counting
-  for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
-    for (int sector = 1; sector <= m_BarrelNSector; ++sector) {
-      for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-        m_BarrelModuleMiddleRadius[section][sector - 1][layer - 1] =
-          bklmGeometry->getActiveMiddleRadius(section, sector, layer); // in G4e units (cm)
-      }
-    }
+  m_OutermostActiveBarrelLayer = BKLMElementNumbers::getMaximalLayerNumber() - 1; // zero-based counting
+  for (int sector = 1; sector <= BKLMElementNumbers::getMaximalSectorNumber(); ++sector) {
+    double phi = M_PI_4 * (sector - 1);
+    m_BarrelSectorPerp[sector - 1].set(std::cos(phi), std::sin(phi), 0.0);
+    m_BarrelSectorPhi[sector - 1].set(-std::sin(phi), std::cos(phi), 0.0);
+  }
+  KLMChannelIndex klmLayers(KLMChannelIndex::c_IndexLevelLayer);
+  for (KLMChannelIndex& klmLayer : klmLayers) {
+    if (klmLayer.getSubdetector() == KLMElementNumbers::c_BKLM)
+      m_BarrelModuleMiddleRadius[klmLayer.getSection()][klmLayer.getSector() - 1][klmLayer.getLayer() - 1] =
+        bklmGeometry->getActiveMiddleRadius(klmLayer.getSection(), klmLayer.getSector(), klmLayer.getLayer()); // in G4e units (cm)
   }
   double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
   double z0((eklmGeometry.getSectionPosition()->getZ()
              + eklmGeometry.getLayerShiftZ()
              - 0.5 * eklmGeometry.getSectionPosition()->getLength()
              - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
-  int nEndcapLayers = eklmGeometry.getNLayers();
-  m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting
-  m_OutermostActiveBackwardEndcapLayer = eklmGeometry.getNDetectorLayers(1) - 1; // zero-based counting
-
-  for (int layer = 1; layer <= nEndcapLayers; ++layer) {
+  m_OutermostActiveForwardEndcapLayer = m_eklmElementNumbers->getMaximalDetectorLayerNumber(EKLMElementNumbers::c_ForwardSection) -
+                                        1; // zero-based counting
+  m_OutermostActiveBackwardEndcapLayer = m_eklmElementNumbers->getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection) -
+                                         1; // zero-based counting
+  for (int layer = 1; layer <= EKLMElementNumbers::getMaximalLayerNumber(); ++layer) {
     m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1); // in G4e units (cm)
-  }
-  for (int sector = 1; sector <= 8; ++sector) {
-    double phi = M_PI_4 * (sector - 1);
-    m_BarrelSectorPerp[sector - 1].set(std::cos(phi), std::sin(phi), 0.0);
-    m_BarrelSectorPhi[sector - 1].set(-std::sin(phi), std::cos(phi), 0.0);
   }
 
   m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
@@ -1259,13 +1258,13 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       if (findMatchingBarrelHit(intersection, extState.track)) {
         (*bklmHitUsed)[intersection.hit].insert(std::pair<const Track*, double>(extState.track, intersection.chi2));
         extState.extLayerPattern |= (0x00000001 << intersection.layer);
-        //efficiency implementation
-        float phiBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                    intersection.layer + 1, 1, 1);
-        float zBarrelEfficiency = m_klmStripEfficiency->getBarrelEfficiency((intersection.isForward ? 1 : 0), intersection.sector + 1,
-                                  intersection.layer + 1, 0, 1);
-        klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
-
+        float layerBarrelEfficiency = 1.;
+        for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+          layerBarrelEfficiency *= m_klmStripEfficiency->getBarrelEfficiency(
+                                     intersection.isForward ? BKLMElementNumbers::c_ForwardSection : BKLMElementNumbers::c_BackwardSection,
+                                     intersection.sector + 1, intersection.layer + 1, plane, 1);
+        }
+        klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, layerBarrelEfficiency);
         if (extState.lastBarrelExtLayer < intersection.layer) {
           extState.lastBarrelExtLayer = intersection.layer;
         }
@@ -1319,15 +1318,13 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           }
           if (!isDead) {
             extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-            float phiBarrelEfficiency =
-              m_klmStripEfficiency->getBarrelEfficiency(
-                (intersection.isForward ? 1 : 0), intersection.sector + 1,
-                intersection.layer + 1, BKLMElementNumbers::c_PhiPlane, 1);
-            float zBarrelEfficiency =
-              m_klmStripEfficiency->getBarrelEfficiency(
-                (intersection.isForward ? 1 : 0), intersection.sector + 1,
-                intersection.layer + 1, BKLMElementNumbers::c_ZPlane, 1);
-            klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, phiBarrelEfficiency * zBarrelEfficiency);
+            float layerBarrelEfficiency = 1.;
+            for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+              layerBarrelEfficiency *= m_klmStripEfficiency->getBarrelEfficiency(
+                                         intersection.isForward ? BKLMElementNumbers::c_ForwardSection : BKLMElementNumbers::c_BackwardSection,
+                                         intersection.sector + 1, intersection.layer + 1, plane, 1);
+            }
+            klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, layerBarrelEfficiency);
           } else {
             klmMuidLikelihood->setExtBKLMEfficiencyValue(intersection.layer, 0);
           }
@@ -1346,14 +1343,13 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
       fromG4eToPhasespace(g4eState, intersection.covariance);
       if (findMatchingEndcapHit(intersection, extState.track)) {
         extState.extLayerPattern |= (0x00008000 << intersection.layer);
-        //efficiency implementation
         float layerEndcapEfficiency = 1.;
         for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-          layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
-                                   intersection.layer + 1, plane, 1);
+          layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency(
+                                     intersection.isForward ? EKLMElementNumbers::c_ForwardSection : EKLMElementNumbers::c_BackwardSection,
+                                     intersection.sector + 1, intersection.layer + 1, plane, 1);
         }
         klmMuidLikelihood->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
-
         if (extState.lastEndcapExtLayer < intersection.layer) {
           extState.lastEndcapExtLayer = intersection.layer;
         }
@@ -1389,8 +1385,9 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
           float layerEndcapEfficiency = 1.;
           for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-            layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency((intersection.isForward ? 1 : 0) + 1, intersection.sector + 1,
-                                     intersection.layer + 1, plane, 1);
+            layerEndcapEfficiency *= m_klmStripEfficiency->getEndcapEfficiency(
+                                       intersection.isForward ? EKLMElementNumbers::c_ForwardSection : EKLMElementNumbers::c_BackwardSection,
+                                       intersection.sector + 1, intersection.layer + 1, plane, 1);
           }
           klmMuidLikelihood->setExtEKLMEfficiencyValue(intersection.layer, layerEndcapEfficiency);
         } else {

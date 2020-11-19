@@ -23,6 +23,7 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
@@ -434,6 +435,9 @@ namespace Belle2 {
 
     //! PDF for the charged final state particle hypotheses
     std::map<int, MuidBuilder*> m_MuidBuilderMap;
+
+    //! EKLM element numbers.
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;

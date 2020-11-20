@@ -206,71 +206,73 @@ void DQMHistAnalysisPXDDAQModule::event()
   double data_LER_Miss = 0.0;
   double data_HER_Miss_1ms = 0.0;
   double data_LER_Miss_1ms = 0.0;
+  // cppcheck-suppress unreadVariable
+  // cppcheck-suppress variableScope
   double data_unused = 0.0;
-  {
-    // Stat histogram
-    if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
 
-    std::string name = "PXDDAQStat";
+  // Stat histogram
+  if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    m_cStatistic->cd();
-    if (hh1) {
-      m_hStatistic = (TH1F*)hh1->DrawClone("text");
-      if (m_hStatistic->GetBinContent(0)) {
-        m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
-        m_hStatistic->Draw("text");
-      }
-      double scale = hh1->GetBinContent(0);// underflow is event counter
-      if (scale != 0.0) scale = 1.0 / scale; // just avoid dive by zero
-      data_HLTRej = hh1->GetBinContent(1 + 0) * scale;
-      data_Trunc = hh1->GetBinContent(1 + 1) * scale;
-      data_HER_Trunc = hh1->GetBinContent(1 + 2) * scale;
-      data_LER_Trunc = hh1->GetBinContent(1 + 3) * scale;
-      data_CM63 = hh1->GetBinContent(1 + 4) * scale;
-      data_HER_CM63 = hh1->GetBinContent(1 + 5) * scale;
-      data_LER_CM63 = hh1->GetBinContent(1 + 6) * scale;
-      data_HER_CM63_1ms = hh1->GetBinContent(1 + 7) * scale;
-      data_LER_CM63_1ms = hh1->GetBinContent(1 + 8) * scale;
-      data_HER_Trunc_1ms = hh1->GetBinContent(1 + 9) * scale;
-      data_LER_Trunc_1ms = hh1->GetBinContent(1 + 10) * scale;
-      data_MissFrame = hh1->GetBinContent(1 + 11) * scale;
-      data_Timeout = hh1->GetBinContent(1 + 12) * scale;
-      data_LinkDown = hh1->GetBinContent(1 + 13) * scale;
-      data_Mismatch = hh1->GetBinContent(1 + 14) * scale;
-      data_HER_Miss = hh1->GetBinContent(1 + 15) * scale;
-      data_LER_Miss = hh1->GetBinContent(1 + 16) * scale;
-      data_HER_Miss_1ms = hh1->GetBinContent(1 + 17) * scale;
-      data_LER_Miss_1ms = hh1->GetBinContent(1 + 18) * scale;
-      data_unused = hh1->GetBinContent(1 + 19) * scale;
-    }
+  std::string name = "PXDDAQStat";
 
-    m_monObj->setVariable("HLTReject", data_HLTRej);
-    m_monObj->setVariable("Trunc", data_Trunc);
-    m_monObj->setVariable("HER_Trunc",      data_HER_Trunc);
-    m_monObj->setVariable("LER_Trunc",      data_LER_Trunc);
-    m_monObj->setVariable("CM63", data_CM63);
-    m_monObj->setVariable("HER_CM63", data_HER_CM63);
-    m_monObj->setVariable("LER_CM63", data_LER_CM63);
-    m_monObj->setVariable("HER_CM63_1ms", data_HER_CM63_1ms);
-    m_monObj->setVariable("LER_CM63_1ms", data_LER_CM63_1ms);
-    m_monObj->setVariable("HER_Trunc_1ms", data_HER_Trunc_1ms);
-    m_monObj->setVariable("LER_Trunc_1ms", data_LER_Trunc_1ms);
-    m_monObj->setVariable("MissFrame", data_MissFrame);
-    m_monObj->setVariable("Timeout", data_Timeout);
-    m_monObj->setVariable("LinkDown", data_LinkDown);
-    m_monObj->setVariable("Mismatch", data_Mismatch);
-    m_monObj->setVariable("HER_Miss", data_HER_Miss);
-    m_monObj->setVariable("LER_Miss", data_LER_Miss);
-    m_monObj->setVariable("HER_Miss_1ms", data_HER_Miss_1ms);
-    m_monObj->setVariable("LER_Miss_1ms", data_LER_Miss_1ms);
-
-    m_cStatistic->Modified();
-    m_cStatistic->Update();
+  TH1* hh1 = findHist(name);
+  if (hh1 == NULL) {
+    hh1 = findHist(m_histogramDirectoryName, name);
   }
+  m_cStatistic->cd();
+  if (hh1) {
+    m_hStatistic = (TH1F*)hh1->DrawClone("text");
+    if (m_hStatistic->GetBinContent(0)) {
+      m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
+      m_hStatistic->Draw("text");
+    }
+    double scale = hh1->GetBinContent(0);// underflow is event counter
+    if (scale != 0.0) scale = 1.0 / scale; // just avoid dive by zero
+    data_HLTRej = hh1->GetBinContent(1 + 0) * scale;
+    data_Trunc = hh1->GetBinContent(1 + 1) * scale;
+    data_HER_Trunc = hh1->GetBinContent(1 + 2) * scale;
+    data_LER_Trunc = hh1->GetBinContent(1 + 3) * scale;
+    data_CM63 = hh1->GetBinContent(1 + 4) * scale;
+    data_HER_CM63 = hh1->GetBinContent(1 + 5) * scale;
+    data_LER_CM63 = hh1->GetBinContent(1 + 6) * scale;
+    data_HER_CM63_1ms = hh1->GetBinContent(1 + 7) * scale;
+    data_LER_CM63_1ms = hh1->GetBinContent(1 + 8) * scale;
+    data_HER_Trunc_1ms = hh1->GetBinContent(1 + 9) * scale;
+    data_LER_Trunc_1ms = hh1->GetBinContent(1 + 10) * scale;
+    data_MissFrame = hh1->GetBinContent(1 + 11) * scale;
+    data_Timeout = hh1->GetBinContent(1 + 12) * scale;
+    data_LinkDown = hh1->GetBinContent(1 + 13) * scale;
+    data_Mismatch = hh1->GetBinContent(1 + 14) * scale;
+    data_HER_Miss = hh1->GetBinContent(1 + 15) * scale;
+    data_LER_Miss = hh1->GetBinContent(1 + 16) * scale;
+    data_HER_Miss_1ms = hh1->GetBinContent(1 + 17) * scale;
+    data_LER_Miss_1ms = hh1->GetBinContent(1 + 18) * scale;
+    // cppcheck-suppress unreadVariable
+    data_unused = hh1->GetBinContent(1 + 19) * scale;
+  }
+
+  m_monObj->setVariable("HLTReject", data_HLTRej);
+  m_monObj->setVariable("Trunc", data_Trunc);
+  m_monObj->setVariable("HER_Trunc",      data_HER_Trunc);
+  m_monObj->setVariable("LER_Trunc",      data_LER_Trunc);
+  m_monObj->setVariable("CM63", data_CM63);
+  m_monObj->setVariable("HER_CM63", data_HER_CM63);
+  m_monObj->setVariable("LER_CM63", data_LER_CM63);
+  m_monObj->setVariable("HER_CM63_1ms", data_HER_CM63_1ms);
+  m_monObj->setVariable("LER_CM63_1ms", data_LER_CM63_1ms);
+  m_monObj->setVariable("HER_Trunc_1ms", data_HER_Trunc_1ms);
+  m_monObj->setVariable("LER_Trunc_1ms", data_LER_Trunc_1ms);
+  m_monObj->setVariable("MissFrame", data_MissFrame);
+  m_monObj->setVariable("Timeout", data_Timeout);
+  m_monObj->setVariable("LinkDown", data_LinkDown);
+  m_monObj->setVariable("Mismatch", data_Mismatch);
+  m_monObj->setVariable("HER_Miss", data_HER_Miss);
+  m_monObj->setVariable("LER_Miss", data_LER_Miss);
+  m_monObj->setVariable("HER_Miss_1ms", data_HER_Miss_1ms);
+  m_monObj->setVariable("LER_Miss_1ms", data_LER_Miss_1ms);
+
+  m_cStatistic->Modified();
+  m_cStatistic->Update();
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {

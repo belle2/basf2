@@ -379,11 +379,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
-  int isKlmIncluded = 1;
   /* If KLM is not included, stop here and return. */
   TH1* daqInclusion = findHist("KLM/daq_inclusion");
   if (not(daqInclusion == nullptr)) {
-    isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
+    int isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
     if (isKlmIncluded == 0)
       return;
   }

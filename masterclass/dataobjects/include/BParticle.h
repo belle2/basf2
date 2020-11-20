@@ -25,6 +25,7 @@ private:
 
 public:
   BParticle() {};
+  BParticle(const BParticle&) = default;
   BParticle(float px, float py, float pz, float e, float c, SIMPLEPID pid);
   ~BParticle() {};
 
@@ -42,6 +43,7 @@ public:
   void SetEnergyFromPid();
   void SetPid(SIMPLEPID pid) { m_pid = pid; };
   int  InMassRange(float mlower, float mupper) { float m = GetMass(); if (m >= mlower && m <= mupper) return 1; else return 0; };
+
   BParticle operator+(const BParticle& b)
   {
 
@@ -59,17 +61,14 @@ public:
 
   BParticle& operator=(const BParticle&  p)
   {
-    //if ( this != &p){
     m_px = p.px();
     m_py = p.py();
     m_pz = p.pz();
     m_e  = p.e();
     m_charge  = p.charge();
     m_pid  =  p.pid();
-    //}
     return *this;
   };
-
 
   ClassDef(BParticle, 1)    // Simple particle class
 };

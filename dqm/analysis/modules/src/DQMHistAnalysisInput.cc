@@ -235,9 +235,9 @@ void DQMHistAnalysisInputModule::endRun()
   TIter nextckey(gROOT->GetListOfCanvases());
   TObject* cobj = NULL;
 
-  while ((cobj = (TObject*)nextckey())) {
+  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      ((TCanvas*)cobj)->Clear();
+      (dynamic_cast<TCanvas*>(cobj))->Clear();
     }
   }
 }

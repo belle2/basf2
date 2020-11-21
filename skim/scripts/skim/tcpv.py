@@ -7,15 +7,20 @@ import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0_Kpi, loadStdD0_Kpipipi)
 from skim.standardlists.dileptons import (loadStdDiLeptons, loadStdJpsiToee,
-                                          loadStdJpsiTomumu)
-from skim.standardlists.lightmesons import (loadStdLightMesons,
-                                            loadStdPi0ForBToHadrons)
+                                          loadStdJpsiTomumu, loadStdpsi2s2mumu,
+                                          loadStdpsi2s2ee)
+from skim.standardlists.lightmesons import (loadStdAllPhi, loadStdAllEta,
+                                            loadStdAllEtaPrime, loadStdAllRho0,
+                                            loadStdAllOmega, loadStdAllF_0,
+                                            loadStdPi0ForBToHadrons, loadStdAllKstar0)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import loadStdSkimPhoton, stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm
+from stdKlongs import stdKlongs
+from vertex import raveFit
 
 __liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
 
@@ -29,7 +34,9 @@ class TCPV(BaseSkim):
 
     * ``B0 -> phi K_S0``
     * ``B0 -> eta K_S0``
-    * ``B0 -> eta K_S0``
+    * ``B0 -> eta' K_S0``
+    * ``B0 -> eta K*``
+    * ``B0 -> eta' K*``
     * ``B0 -> K_S0 K_S0 K_S0``
     * ``B0 -> pi0 K_S0``
     * ``B0 -> rho0 K_S0``
@@ -78,31 +85,34 @@ class TCPV(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdE("loose", path=path)
+        stdE("all", path=path)
         stdK("all", path=path)
-        stdK("loose", path=path)
-        stdMu("loose", path=path)
+        stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPi("loose", path=path)
-        stdPhotons("loose", path=path)
-        loadStdSkimPhoton(path=path)
+        stdPhotons("all", path=path)
         stdPi0s("eff40_Jan2020", path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        loadStdPi0ForBToHadrons(path=path)
-        loadStdLightMesons(path=path)
-        loadPiForBtoHadrons(path=path)
-        loadKForBtoHadrons(path=path)
-        loadStdD0_Kpi(path=path)
-        loadStdD0_Kpipipi(path=path)
-        loadStdDiLeptons(path=path)
         loadStdJpsiToee(path=path)
         loadStdJpsiTomumu(path=path)
+        loadStdpsi2s2mumu(path=path)
+        loadStdpsi2s2ee(path=path)
+        loadStdAllPhi(path=path)
+        loadStdAllEta(path=path)
+        loadStdAllEtaPrime(path=path)
+        loadStdAllRho0(path=path)
+        loadStdAllOmega(path=path)
+        loadStdAllF_0(path=path)
+        loadStdAllKstar0(path=path)
+        stdKlongs(listtype='allklm', path=path)
+        stdKlongs(listtype='allecl', path=path)
 
     def additional_setup(self, path):
         Kcut = "dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01"
         ma.fillParticleList('K+:1%', cut=Kcut, path=path)
-        ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
+        ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
+        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
+        ma.copyLists('K_L0:all', ['K_L0:allklm', 'K_L0:allecl'], writeOut=True, path=path)
 
     def build_lists(self, path):
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
@@ -113,34 +123,32 @@ class TCPV(BaseSkim):
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
         bd_qqs_Channels = [
-            'phi:loose K_S0:merged',
-            'eta\':loose K_S0:merged',
-            'eta:loose K_S0:merged',
+            'phi:all K_S0:merged',
+            'eta\':all K_S0:merged',
+            'eta:all K_S0:merged',
+            'eta\':all K*0:all',
+            'eta:all K*0:all',
             'K_S0:merged K_S0:merged K_S0:merged',
             'pi0:skim K_S0:merged',
-            'rho0:loose K_S0:merged',
-            'omega:loose K_S0:merged',
-            'f_0:loose K_S0:merged',
+            'rho0:all K_S0:merged',
+            'omega:all K_S0:merged',
+            'f_0:all K_S0:merged',
             'pi0:skim pi0:skim K_S0:merged',
-            'phi:loose K_S0:merged pi0:skim',
+            'phi:all K_S0:merged pi0:skim',
             'pi+:all pi-:all K_S0:merged',
             'pi+:all pi-:all K_S0:merged gamma:E15',
             'pi0:skim K_S0:merged gamma:E15',
         ]
 
-        bd_ccs_Channels = ['J/psi:eeLoose K_S0:merged',
-                           'J/psi:mumuLoose K_S0:merged',
-                           'psi(2S):eeLoose K_S0:merged',
-                           'psi(2S):mumuLoose K_S0:merged',
-                           'J/psi:eeLoose K*0:loose',
-                           'J/psi:mumuLoose K*0:loose']
+        bd_ccs_Channels = ['J/psi:ee K_S0:merged',
+                           'J/psi:mumu K_S0:merged',
+                           'psi(2S):ee K_S0:merged',
+                           'psi(2S):mumu K_S0:merged',
+                           'J/psi:ee K*0:all',
+                           'J/psi:mumu K*0:all']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:1%',
                                 'J/psi:ee K+:1%']
-
-        btoD_Channels = ['anti-D0:Kpipipi pi+:all',
-                         'anti-D0:Kpi pi+:all',
-                         ]
 
         bd_qqs_List = []
         for chID, channel in enumerate(bd_qqs_Channels):
@@ -153,6 +161,22 @@ class TCPV(BaseSkim):
             ma.reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
             ma.applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
             bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
+
+        bPlustoJPsiK_List = []
+
+        for chID, channel in enumerate(bPlustoJPsiK_Channel):
+            ma.reconstructDecay('B+:TCPV_JPsiK' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+            bPlustoJPsiK_List.append('B+:TCPV_JPsiK' + str(chID))
+
+        b0toJPsiKL_List = []
+        ma.reconstructMissingKlongDecayExpert('B0:TCPV_JPsiKL_mm -> J/psi:mumu K_L0:all',
+                                              btotcpvcuts, 1, True, path=path, recoList='_reco1')
+        raveFit('B0:TCPV_JPsiKL_mm', -1.0, decay_string='B0:TCPV_JPsiKL_mm -> J/psi:mumu K_L0:all', path=path, silence_warning=True)
+        ma.reconstructMissingKlongDecayExpert('B0:TCPV_JPsiKL_ee -> J/psi:ee K_L0:all',
+                                              btotcpvcuts, 1, True, path=path, recoList='_reco2')
+        raveFit('B0:TCPV_JPsiKL_ee', -1.0, decay_string='B0:TCPV_JPsiKL_ee -> J/psi:ee K_L0:all', path=path, silence_warning=True)
+        b0toJPsiKL_List.append('B0:TCPV_JPsiKL_mm')
+        b0toJPsiKL_List.append('B0:TCPV_JPsiKL_ee')
 
         ma.fillParticleList(decayString='pi+:TCPV_eventshape',
                             cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
@@ -182,21 +206,7 @@ class TCPV(BaseSkim):
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
-        bPlustoJPsiK_List = []
-        bMinustoJPsiK_List = []
-        for chID, channel in enumerate(bPlustoJPsiK_Channel):
-            ma.reconstructDecay('B+:TCPV_JPsiK' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            bPlustoJPsiK_List.append('B+:TCPV_JPsiK' + str(chID))
-            bMinustoJPsiK_List.append('B-:TCPV_JPsiK' + str(chID))
-
-        bPlustoD_List = []
-        bMinustoD_List = []
-        for chID, channel in enumerate(btoD_Channels):
-            ma.reconstructDecay('B+:TCPV_bToD' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            bPlustoD_List.append('B+:TCPV_bToD' + str(chID))
-            bMinustoD_List.append('B-:TCPV_bToD' + str(chID))
-
-        tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + bMinustoJPsiK_List + bMinustoD_List
+        tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + b0toJPsiKL_List
 
         self.SkimLists = tcpvLists
 

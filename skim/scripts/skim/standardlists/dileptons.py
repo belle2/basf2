@@ -20,6 +20,8 @@ def loadStdDiLeptons(persistent=True, path=None):
     loadStdLooseJpsi2ee(persistent, path)
     loadStdLoosepsi2s2mumu(persistent, path)
     loadStdLoosepsi2s2ee(persistent, path)
+    loadStdpsi2s2mumu(persistent, path)
+    loadStdpsi2s2ee(persistent, path)
 
 
 def loadStdLooseJpsi2mumu(persistent=True, path=None):
@@ -84,6 +86,17 @@ def loadStdJpsiTomumu(persistent=True, path=None):
     return 'J/psi:mumu'
 
 
+def loadStdpsi2s2mumu(persistent=True, path=None):
+    """
+    Load the 'psi(2S):mumu' list from 'mu-:all mu+:all', with :math:`3.2 < M < 4.1~GeV`
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    ma.reconstructDecay('psi(2S):mumu -> mu-:all mu+:all', '3.2 < M < 4.1', 2, persistent, path)
+    return 'psi(2S):mumu'
+
+
 def loadStdLoosepsi2s2mumu(persistent=True, path=None):
     """
     Load the 'psi(2S):mumuLoose' list from 'mu-:loose mu+:loose', with :math:`3.2 < M < 4.1~GeV`
@@ -93,6 +106,17 @@ def loadStdLoosepsi2s2mumu(persistent=True, path=None):
     """
     ma.reconstructDecay('psi(2S):mumuLoose -> mu-:loose mu+:loose', '3.2 < M < 4.1', 2, persistent, path)
     return 'psi(2S):mumuLoose'
+
+
+def loadStdpsi2s2ee(persistent=True, path=None):
+    """
+    Load the 'psi(2S):ee' list from 'e-:all e+:all', with :math:`3.2 < M < 4.1~GeV`
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    ma.reconstructDecay('psi(2S):ee -> e-:all e+:all', '3.2 < M < 4.1', 2, persistent, path)
+    return 'psi(2S):ee'
 
 
 def loadStdLoosepsi2s2ee(persistent=True, path=None):

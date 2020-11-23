@@ -35,7 +35,7 @@ using namespace std;
 namespace Belle2 {
 
 
-  // Slice the vector to contain only elements with indeces s .. e (included)
+  /// Slice the vector to contain only elements with indeces s .. e (included)
   static vector<pair<double, double>> slice(vector<pair<double, double>> vec, int s, int e)
   {
     return vector<pair<double, double>>(vec.begin() + s, vec.begin() + e + 1);
@@ -62,7 +62,7 @@ namespace Belle2 {
   }
 
 
-  // plot runs on time axis
+  /// plot runs on time axis
   void plotRuns(vector<pair<double, double>>  runs)
   {
     TGraphErrors* gr = new TGraphErrors();
@@ -88,7 +88,7 @@ namespace Belle2 {
 
   }
 
-  // get the range of interval with nIntervals and breaks stored in a vector
+  /// get the range of interval with nIntervals and breaks stored in a vector
   static pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
   {
     B2ASSERT("There must be at least one interval", nIntervals >= 1);
@@ -99,7 +99,7 @@ namespace Belle2 {
     return {s, e};
   }
 
-  // plot clusters or runs on time axis
+  /// plot clusters or runs on time axis
   void plotSRuns(vector<pair<double, double>>  runs, vector<int> breaks, int offset = 2)
   {
     TGraphErrors* gr = new TGraphErrors();
@@ -124,7 +124,7 @@ namespace Belle2 {
   }
 
 
-  // print sorted lenghts of the runs
+  /// print sorted lenghts of the runs
   void printBySize(vector<pair<double, double>>  runs)
   {
     vector<double> dist;
@@ -140,7 +140,7 @@ namespace Belle2 {
 
   }
 
-  // the lossFunction formula (it can be modified according to the user's taste)
+  /// the lossFunction formula (it can be modified according to the user's taste)
   double Splitter::lossFunction(const vector<pair<double, double>>&  vec, int s, int e) const
   {
 
@@ -245,7 +245,12 @@ namespace Belle2 {
   }
 
 
-  // Convert breaks to intervals, there is one more interval than #breakPoints
+  /** Convert breaks to intervals, notice that the count of the output intervals is one more than number of the input breaks.
+   *  I.e. this function merge non-divisible intervals defined in currVec into bigger clusters according to the integer indexes of the breaks.
+   * @param currVec: vector with time limits of the atoms (small non-divisible time intervals)
+   * @param breaks: integer indexes where to break the whole currVec. Notice that index 0 means break between first and second atom
+   * @return: Vector with times of the intervals, each intervals is defined by it's start- and end-time.
+   **/
   static vector<pair<double, double>> breaks2intervals(vector<pair<double, double>> currVec, vector<int> breaks)
   {
 
@@ -263,8 +268,11 @@ namespace Belle2 {
   }
 
 
-
-  //Get exp number + run number from time
+  /** Get exp number + run number from time
+   * @param runs: map, where key contain the exp-run number and value the start- and end-time of the run
+   * @param t: time of interest [hours]
+   * @return:  the exp-run number at the input time t
+   **/
   static ExpRun getRun(map<ExpRun, pair<double, double>> runs, double t)
   {
     ExpRun rFound(-1, -1);
@@ -282,9 +290,13 @@ namespace Belle2 {
   }
 
 
-  // Get intervals separated according the runs
-  // Output is a vector of calib. intervals, where each interval is
-  // a map with #exp/#run as key and time intervals as value
+
+  /** Get calibration intervals according to the indexes of the breaks
+   * @param runsMap: map defining the time ranges of the runs
+   * @param currVec: vector with time intervals of the atoms (small non-divisible time intervals)
+   * @param breaks: vector with integer indexes of the breaks
+   * @return: a vector of the calib. interwas where each interval is a map with exp-run as a key and start- end-time as a value
+   **/
   static vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(const map<ExpRun, pair<double, double>>& runsMap,
       const vector<pair<double, double>>& currVec, const vector<int>& breaks)
   {

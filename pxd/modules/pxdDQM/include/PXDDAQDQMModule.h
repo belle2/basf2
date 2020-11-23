@@ -16,6 +16,7 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
+#include <rawdata/dataobjects/RawSVD.h>
 
 #include <TH2.h>
 #include <TH1.h>
@@ -42,6 +43,9 @@ namespace Belle2 {
 
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
+
+      /** Input array for SVD/x-check HLT EODB . */
+      StoreArray<RawSVD> m_rawSVD;
 
       /** Input array for TTD/FTSW */
       StoreArray<RawFTSW> m_rawTTD;
@@ -71,6 +75,9 @@ namespace Belle2 {
       TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
       TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
       TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
+      TH1I* hMissAfterInjLER{};          /**< Histogram MissFrame after LER injection */
+      TH1I* hMissAfterInjHER{};          /**< Histogram MissFrame after HER injection */
+      TH1D* hDAQStat{};                 /**< Histogram for Truncation etc Stats */
 
       void initialize() override final;
 

@@ -152,7 +152,7 @@ void SVDTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
-      if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawTimeL3V")->Fill(clTime);}
+      if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawTimeL3V")->Fill(clTime_ftsw);}
     }
   };
 }

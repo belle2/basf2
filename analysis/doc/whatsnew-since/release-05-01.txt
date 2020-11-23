@@ -69,6 +69,8 @@ Modules
 
    .. warning:: Photons from KLMCluster should only be used in specific use-cases and after a thorough study of their effect.
 
+ * In :b2:mod:`BtubeCreator`, new extrtainfo "TubeB_p_estimated" was added. This returns magnitude of the extimated momentum of the B which should fly in the   direction of the Btube.
+
 Full Event Interpretation
 +++++++++++++++++++++++++
 

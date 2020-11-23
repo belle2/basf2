@@ -1902,7 +1902,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     import os
-    if not (os.environ.get("B2BII") == 'TRUE'):
+    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
@@ -2920,7 +2920,7 @@ def tagCurlTracks(particleLists,
     """
 
     import os
-    belle = (os.getenv("B2BII") == 'TRUE')
+    belle = os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string

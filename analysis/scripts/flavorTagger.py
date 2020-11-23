@@ -23,7 +23,7 @@ def getBelleOrBelle2():
     """
     Gets the global ModeCode.
     """
-    if os.environ.get("B2BII") == 'TRUE':
+    if os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
         return 'Belle'
     else:
         return 'Belle2'

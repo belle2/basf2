@@ -21,7 +21,7 @@ def stdXi(fitter='TreeFit', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
-    if not os.environ.get("B2BII") == 'TRUE':
+    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -83,7 +83,7 @@ def stdXi0(gammatype='eff40', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
-    if not os.environ.get("B2BII") == 'TRUE':
+    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
         cutAndCopyList(

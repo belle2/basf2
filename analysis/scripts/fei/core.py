@@ -175,7 +175,7 @@ class FSPLoader(object):
         """
         path = basf2.create_path()
 
-        if os.environ.get("B2BII") == 'TRUE':
+        if os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),

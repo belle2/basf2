@@ -61,7 +61,7 @@ def get_default_channels(
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
 
-    convertedFromBelle = (os.environ.get("B2BII") == 'TRUE')
+    convertedFromBelle = os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']
 
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID

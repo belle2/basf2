@@ -620,15 +620,15 @@ class Teacher(object):
                 if not basf2_mva.available(weightfile) and os.path.isfile(filename):
                     f = ROOT.TFile(filename)
                     if not f:
-                        B2WARNING(f"Training of MVC failed. Couldn't find ROOT file. "
-                                  "Ignoring channel {channel.label}.")
+                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
+                                  f"Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     keys = [m for m in f.GetListOfKeys()]
                     if not keys:
-                        B2WARNING(f"Training of MVC failed. ROOT file does not contain a tree. "
-                                  "Ignoring channel {channel.label}.")
+                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
+                                  f"Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -636,14 +636,14 @@ class Teacher(object):
                     nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                        B2WARNING("Training of MVC failed. "
+                                  f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     if nBg < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                        B2WARNING("Training of MVC failed. "
+                                  f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue

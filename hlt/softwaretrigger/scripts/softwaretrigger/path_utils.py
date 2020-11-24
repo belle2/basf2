@@ -58,7 +58,7 @@ def add_geometry_if_not_present(path):
         path.add_module('Geometry', useDB=True)
 
 
-def add_store_only_metadata_path(path):
+def add_store_only_metadata_path(path, additional_store_arrays_to_keep=None):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     things that are really needed, e.g. the event meta data and the results of the software trigger module.
@@ -66,10 +66,15 @@ def add_store_only_metadata_path(path):
     After this path was processed, you can not use the data store content any more to do reconstruction (because
     it is more or less empty), but can only output it to a (S)ROOT file.
     """
-    path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS).set_name("KeepMetaData")
+    entries_to_keep = constants.ALWAYS_SAVE_OBJECTS
+
+    if additional_store_arrays_to_keep:
+        entries_to_keep += additional_store_arrays_to_keep
+
+    path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepMetaData")
 
 
-def add_store_only_rawdata_path(path, additonal_store_arrays_to_keep=None):
+def add_store_only_rawdata_path(path, additional_store_arrays_to_keep=None):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     raw objects from the detector and things that are really needed, e.g. the event meta data and the results of the
@@ -80,8 +85,8 @@ def add_store_only_rawdata_path(path, additonal_store_arrays_to_keep=None):
     """
     entries_to_keep = constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS
 
-    if additonal_store_arrays_to_keep:
-        entries_to_keep += additonal_store_arrays_to_keep
+    if additional_store_arrays_to_keep:
+        entries_to_keep += additional_store_arrays_to_keep
 
     path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepRawData")
 
@@ -214,12 +219,12 @@ def add_post_filter_reconstruction(path, run_type, components):
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
 
-def hlt_event_abort(module, condition, error_flag):
+def hlt_event_abort(module, condition, error_flag, additional_store_arrays_to_keep=None):
     """
     Create a discard path suitable for HLT processing, i.e. set an error flag and
     keep only the metadata.
     """
-    p = basf2.Path()
-    p.add_module("EventErrorFlag", errorFlag=error_flag)
-    add_store_only_metadata_path(p)
-    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    path = basf2.Path()
+    path.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(path, additional_store_arrays_to_keep=additional_store_arrays_to_keep)
+    module.if_value(condition, path, basf2.AfterConditionPath.CONTINUE)

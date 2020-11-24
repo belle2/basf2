@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <framework/logging/Logger.h>
 
@@ -18,10 +19,11 @@ using namespace Belle2;
 
 void FlavorTaggerInfo::addMethodMap(const std::string& method)
 {
+  StoreArray<FlavorTaggerInfoMap> flavTagInfoMap;
   if (m_methodMap.find(method) == m_methodMap.end()) {
     // create FlavorTaggerInfoMap object
 
-    FlavorTaggerInfoMap* flavTagMap = m_flavTagInfoMap.appendNew();
+    FlavorTaggerInfoMap* flavTagMap = flavTagInfoMap.appendNew();
     m_methodMap.insert(std::pair<std::string, FlavorTaggerInfoMap*>(method, flavTagMap));
 
   } else {

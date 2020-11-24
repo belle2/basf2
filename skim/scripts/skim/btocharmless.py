@@ -237,15 +237,15 @@ class BtoHad3Tracks1Pi0(BaseSkim):
         BsigList = []
 
         channels = {
-
                     'B+:Charmless_b2K*KK_2': 'K*+:veryLoosePi0 K-:SkimVeryLoose K+:SkimVeryLoose',  # 1
                     'B+:Charmless_b2K*pipi_2': 'K*+:veryLoosePi0 pi-:SkimVeryLoose pi+:SkimVeryLoose',  # 2
                     'B+:Charmless_b2K*Kpi_2': 'K*+:veryLoosePi0 K+:SkimVeryLoose pi-:SkimVeryLoose',  # 3
                     }
-
         for chID, channel in enumerate(channels.keys()):
             ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
                                 cut=Bcuts, dmID=chID, path=path)
+            ma.rankByHighest(particleList=channel, variable="cos(mdstIndex)", numBest=3,
+                             outputVariable="cosMdstIndex_rank", path=path)
             BsigList.append(channel)
 
         self.SkimLists = BsigList

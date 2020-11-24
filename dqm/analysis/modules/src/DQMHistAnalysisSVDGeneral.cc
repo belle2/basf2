@@ -664,8 +664,8 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
   // get existing histograms produced by DQM modules
 
   // average maxBin
-  TH1F* h_maxBinU = (TH1F*)findHist("SVDDQM_StripMaxBinUAll");
-  TH1F* h_maxBinV = (TH1F*)findHist("SVDDQM_StripMaxBinVAll");
+  TH1F* h_maxBinU = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinUAll");
+  TH1F* h_maxBinV = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinVAll");
 
   m_c_avg_maxBin_UV->Clear();
   m_c_avg_maxBin_UV->Divide(2, 1);
@@ -692,9 +692,9 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
 
 
   // offline occupancy - integrated number of ZS5 fired strips
-  TH1F* h_zs5countsU = (TH1F*)findHist("SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
-  TH1F* h_zs5countsV = (TH1F*)findHist("SVDDQM_StripCountsV");
-  TH1F* h_events = (TH1F*)findHist("SVDDQM_nEvents");
+  TH1F* h_zs5countsU = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
+  TH1F* h_zs5countsV = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsV");
+  TH1F* h_events = (TH1F*)findHist("SVDExpReco/SVDDQM_nEvents");
 
   // average occupancies for 3rd layer
   int nEvents = h_events->GetEntries();

@@ -128,7 +128,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
-  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
+  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Integral and last-updated Efficiency per module;PXD Module;",
                                     m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 

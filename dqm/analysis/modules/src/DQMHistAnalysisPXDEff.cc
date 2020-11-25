@@ -73,14 +73,18 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-
-
   int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
   int nv = 1;
   //Have been promised that all modules have the same number of pixels, so just take from the first one
   if (m_PXDModules.size() == 0) {
     //This could as well be a B2FATAL, the module won't do anything useful if this happens
-    B2ERROR("No PXDModules found! Can't really do anything useful now...");
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.4.1", "2.4.2", "2.5.1", "2.5.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
     VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
@@ -306,7 +310,10 @@ void DQMHistAnalysisPXDEffModule::event()
 
   {
     m_cEffAll->cd();
+    m_cEffAll->cd(0);
     m_hEffAll->Paint("AP");
+    m_cEffAll->Clear();
+    m_cEffAll->cd(0);
 
     auto gr = m_hEffAll->GetPaintedGraph();
     if (gr) {
@@ -343,8 +350,6 @@ void DQMHistAnalysisPXDEffModule::event()
       gr->SetLineWidth(2);
       gr->SetMarkerStyle(8);
 
-      m_cEffAll->Clear();
-      m_cEffAll->cd(0);
       gr->Draw("AP");
 
       auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
@@ -364,6 +369,11 @@ void DQMHistAnalysisPXDEffModule::event()
           //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
         }
       }
+
+      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
+      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
+      m_cEffAll->Pad()->Modified();
+      m_cEffAll->Pad()->Update();
       m_line_warn->Draw();
       m_line_error->Draw();
     }
@@ -375,7 +385,19 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     m_cEffAllUpdate->cd();
     m_hEffAllUpdate->Paint("AP");
+    m_cEffAllUpdate->Clear();
+    m_cEffAllUpdate->cd(0);
+
     auto gr = m_hEffAllUpdate->GetPaintedGraph();
+    auto gr3 = (TGraphAsymmErrors*) m_hEffAll->GetPaintedGraph()->Clone();
+    if (gr3) {
+      for (int i = 0; i < gr3->GetN(); i++) {
+        Double_t x, y;
+        gr3->GetPoint(i, x, y);
+        gr3->SetPoint(i, x + 0.2, y);
+      }
+    }
+
     double scale_min = 1.0;
     if (gr) {
       for (int i = 0; i < gr->GetN(); i++) {
@@ -384,7 +406,7 @@ void DQMHistAnalysisPXDEffModule::event()
         // this has to be done first, as it will recalc Min/Max and destroy axis
         Double_t x, y;
         gr->GetPoint(i, x, y);
-        gr->SetPoint(i, x, y); // shift a bit if in same plot
+        gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
         if (i != 5) { // exclude 1.3.2
           /// check for val > 0.0) { would exclude all zero efficient modules!!!
@@ -399,26 +421,45 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-      gr->SetLineColor(kOrange);
-      gr->SetLineWidth(2);
+      gr->SetLineColor(kBlack);
+      gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
     } else scale_min = 0.0;
-    m_cEffAllUpdate->Clear();
-    m_cEffAllUpdate->cd(0);
-    gr->Draw("AP");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
+    if (gr) gr->Draw("AP");
+    if (gr3) gr3->Draw("P");
+    auto tt = new TLatex(5.5, scale_min + 0.15, "1.3.2 Module is excluded, please ignore");
+    tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
-    m_cEffAllUpdate->Modified();
-    m_cEffAllUpdate->Update();
+
+    if (all < 100.) {
+      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
+    } else {
+      if (error_flag) {
+        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
+      } else if (warn_flag) {
+        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
+      } else {
+        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
+        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
+      }
+    }
+    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
+    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
+    m_cEffAllUpdate->Pad()->Modified();
+    m_cEffAllUpdate->Pad()->Update();
+    m_line_warn->Draw();
+    m_line_error->Draw();
   }
+  m_cEffAllUpdate->Modified();
+  m_cEffAllUpdate->Update();
 
 
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;

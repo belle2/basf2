@@ -101,13 +101,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
+    buff.ReplaceAll(".", "_");
 #ifdef _BELLE2_EPICS
     if (m_useEpics) {
       auto& my = mychid_eff[aPXDModule];
-      SEVCHK(ca_create_channel((m_pvPrefix + (std::string)aPXDModule).data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+      B2WARNING(m_pvPrefix + (std::string)aPXDModule);
     }
 #endif
-    buff.ReplaceAll(".", "_");
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);

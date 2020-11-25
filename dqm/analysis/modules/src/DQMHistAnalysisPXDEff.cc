@@ -92,8 +92,21 @@ void DQMHistAnalysisPXDEffModule::initialize()
     nv = cellGetInfo.getVCells();
   }
 
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  }
+#endif
+
+
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
+#ifdef _BELLE2_EPICS
+    if (m_useEpics) {
+      auto& my = mychid_eff[aPXDModule];
+      SEVCHK(ca_create_channel((m_pvPrefix + (std::string)aPXDModule).data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+    }
+#endif
     buff.ReplaceAll(".", "_");
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
@@ -164,8 +177,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -427,6 +439,16 @@ void DQMHistAnalysisPXDEffModule::event()
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
+#ifdef _BELLE2_EPICS
+      if (m_useEpics) {
+        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+          Double_t x, y;// we assume that doubel and Double_t are same!
+          gr->GetPoint(i, x, y);
+          auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
+          SEVCHK(ca_put(DBR_DOUBLE, mychid_status, (void*)&my), "ca_set failure");
+        }
+      }
+#endif
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
@@ -469,7 +491,7 @@ void DQMHistAnalysisPXDEffModule::event()
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     double data = 0;
-    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid_status, (void*)&data), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

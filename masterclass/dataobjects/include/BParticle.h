@@ -66,7 +66,7 @@ public:
    */
   float GetMomentum() const { return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz); };
   /**
-   * Get the tranverse momentum of the particle
+   * Get the transverse momentum of the particle
    * @return transverse particle momentum
    */
   float GetTransverseMomentum() const { return sqrt(m_px * m_px + m_py * m_py); };

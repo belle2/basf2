@@ -20,7 +20,7 @@ class BEvent : public TObject {
 private:
   int m_evno; /*!< current event number */
   int m_nprt; /*!< number of particles in the event */
-  TClonesArray* m_particles; /*!< arraz of particles */
+  TClonesArray* m_particles; /*!< array of particles */
 
 public:
 
@@ -65,7 +65,7 @@ public:
   int NParticles();
 
   /**
-   * Returns the array of particlesr.
+   * Returns the array of particles.
    */
   TClonesArray* GetParticleList();
 

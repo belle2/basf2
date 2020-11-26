@@ -397,22 +397,41 @@ class BaseSkim(ABC):
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
         """
-        self.set_skim_logging(path)
-        self.load_standard_lists(path)
-        self.additional_setup(path)
-        # At this point, BaseSkim.skim_event_cuts may have been run, so pass
-        # self._ConditionalPath for the path if it is not None (otherwise just pass the
-        # regular path)
-        self.build_lists(self._ConditionalPath or path)
-        self.apply_hlt_hadron_cut(self._ConditionalPath or path)
+        self._MainPath = path
+
+        self.set_skim_logging(self.postskim_path)
+        self.load_standard_lists(self.postskim_path)
+        self.additional_setup(self.postskim_path)
+        self.build_lists(self.postskim_path)
+        self.apply_hlt_hadron_cut(self.postskim_path)
 
         if udstOutput:
-            self.output_udst(self._ConditionalPath or path)
+            self.output_udst(self.postskim_path)
 
         if validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
-            self.validation_histograms(self._ConditionalPath or path)
+            self.validation_histograms(self.postskim_path)
+
+    @property
+    def postskim_path(self):
+        """
+        Return the skim path.
+
+        * If `BaseSkim.skim_event_cuts` has been run, then the skim lists will only be
+          created on a conditional path, so subsequent modules should be added to the
+          conditional path.
+
+        * If `BaseSkim.skim_event_cuts` has not been run, then the main analysis path is
+          returned.
+        """
+
+        if not self._MainPath:
+            raise ValueError("Skim has not been added to the path yet!")
+        return self._ConditionalPath or self._MainPath
+
+    _MainPath = None
+    """Main analysis path."""
 
     _ConditionalPath = None
     """Conditional path to be set by `BaseSkim.skim_event_cuts` if event-level cuts are applied."""

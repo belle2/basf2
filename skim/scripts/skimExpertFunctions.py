@@ -331,16 +331,21 @@ class BaseSkim(ABC):
     def __contact__(self):
         pass
 
-    def __init__(self, *, OutputFileName=None):
+    def __init__(self, *, OutputFileName=None, outputUdst=True, validation=False):
         """Initialise the BaseSkim class.
 
         Parameters:
             OutputFileName (str): Name to give output uDST files. If none given, then
                 defaults to eight-number skim code.
+            udstOutput (bool): If True, add uDST output to the path.
+            validation (bool): If True, build lists and write validation histograms
+                instead of writing uDSTs.
         """
         self.name = self.__class__.__name__
         self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName
+        self._outputUdst = outputUdst
+        self._validation = validation
         self.SkimLists = []
 
     def load_standard_lists(self, path):
@@ -388,15 +393,28 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path, *, udstOutput=True, validation=False):
+    def __call__(self, path, *, udstOutput=None, validation=None):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
-            udstOutput (bool): If True, add uDST output to the path.
-            validation (bool): If True, build lists and write validation histograms
-                instead of writing uDSTs.
+            udstOutput (bool): [DEPRECATED ARGUMENT] If True, add uDST output to the path.
+            validation (bool): [DEPRECATED ARGUMENT] If True, build lists and write
+                validation histograms instead of writing uDSTs.
         """
+        # Deprecation warning. All configuration should be done during initialisation.
+        warning = (
+            "Passing the `{arg}` argument to `BaseSkim.__call__` is deprecated. "
+            "Please pass all configuration parameters to the initialisation of "
+            "the skim object."
+        )
+        if udstOutput is not None:
+            b2.WARNING(warning.format(arg="udstOutput"))
+            self._udstOutput = udstOutput
+        if validation is not None:
+            b2.WARNING(warning.format(arg="validation"))
+            self._validation = validation
+
         self._MainPath = path
 
         self.set_skim_logging(self.postskim_path)
@@ -405,10 +423,10 @@ class BaseSkim(ABC):
         self.build_lists(self.postskim_path)
         self.apply_hlt_hadron_cut(self.postskim_path)
 
-        if udstOutput:
+        if self._udstOutput:
             self.output_udst(self.postskim_path)
 
-        if validation:
+        if self._validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
             self.validation_histograms(self.postskim_path)

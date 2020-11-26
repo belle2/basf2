@@ -107,6 +107,13 @@ After ``skim(path)`` has been called, the skim list names are stored in the Pyth
     # Process full path
     b2.process(path)
 
+The above code snippet will produce both uDST and ntuple output. To only build the skim lists without writing to uDST, pass the configuration parameter ``outputUdst=False`` during initialisation of the skim object:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+
 
 .. tip::
 

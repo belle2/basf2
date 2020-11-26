@@ -78,7 +78,7 @@ MC13_uubarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/uubar_BGx0.mdst_000003_prod00009553_task10020000003.root
   total_input_files: 1606
   average_events_per_file: 200000
-
+#need to add input file size
 
 ## MC13 low multiplicity
 

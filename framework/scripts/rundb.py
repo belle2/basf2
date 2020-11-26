@@ -10,6 +10,7 @@ class RunDB:
     Simple api class to just get run information from the RunDB
     """
 
+    #: URL of where the rundb is hosted
     URL = "https://rundb.belle2.org"
 
     def __init__(self, apikey=None, username=None):

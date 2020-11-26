@@ -47,7 +47,7 @@ MC13_uubarBGx1:
 MC13_ccbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ccbar_BGx0.mdst_000001_prod00009559_task10020000001.root
   total_input_files: 1330
-  average_events_per_file: 200000
+  average_events_per_file: 195694
 
 MC13_chargedBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/charged_BGx0.mdst_000001_prod00009551_task10020000001.root
@@ -57,7 +57,7 @@ MC13_chargedBGx0:
 MC13_ddbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ddbar_BGx0.mdst_000001_prod00009555_task10020000001.root
   total_input_files: 402
-  average_events_per_file: 200000
+  average_events_per_file: 197697
 
 MC13_mixedBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/mixed_BGx0.mdst_000001_prod00009545_task10020000001.root
@@ -67,7 +67,7 @@ MC13_mixedBGx0:
 MC13_ssbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ssbar_BGx0.mdst_000023_prod00009557_task10020000023.root
   total_input_files: 384
-  average_events_per_file: 200000
+  average_events_per_file: 189241
 
 MC13_taupairBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/taupair_BGx0.mdst_000001_prod00009561_task10020000001.root
@@ -77,7 +77,7 @@ MC13_taupairBGx0:
 MC13_uubarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/uubar_BGx0.mdst_000003_prod00009553_task10020000003.root
   total_input_files: 1606
-  average_events_per_file: 200000
+  average_events_per_file: 197697
 #need to add input file size
 
 ## MC13 low multiplicity

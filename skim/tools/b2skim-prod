@@ -153,8 +153,11 @@ import re
 import sys
 import yaml
 
-from basf2 import B2ERROR, B2INFO, B2WARNING
+from jinja2 import Environment, FileSystemLoader
+
+from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
+from skimExpertFunctions import resolve_skim_modules
 from skim.registry import Registry
 
 
@@ -693,56 +696,30 @@ def make_combined_steering_file(
     # Retrieve the list of individual skims going into this combined skim
     SingleSkims = CombinedSkimDefinitions[SkimName]
 
-    # And then group them into the modules they belong to, so we can put together some
-    # nice import statements
-    modules = sorted({Registry.get_skim_module(skim) for skim in SingleSkims})
-    GroupedSkims = {
-        f"skim.{module}": [
-            skim for skim in SingleSkims if Registry.get_skim_module(skim) == module
-        ]
-        for module in modules
-    }
-
-    # Handle local override of skim script, in case we need to replace a skim module at production time
-    if LocalModule and len(modules) > 1:
+    try:
+        skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
+    except ValueError:
         B2ERROR(
             f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
             "        more than one skim module. Not sure what to do in this situation, so \n"
             f"        please modify {SteeringFile} yourself."
         )
-    elif LocalModule:
-        # Replace the normal module with the local one
-        LocalModule = LocalModule.rstrip(".py")
-        NormalModule = modules[0]
-        GroupedSkims[LocalModule] = GroupedSkims.pop(f"skim.{NormalModule}")
+        skims, modules = resolve_skim_modules(SingleSkims)
 
-    BasicImports = """import basf2 as b2
-import modularAnalysis as ma
-from skimExpertFunctions import CombinedSkim
-"""
-    if LocalModule:
-        BasicImports += "\n"
+    loader = FileSystemLoader(find_file("skim/tools/resources"))
+    env = Environment(loader=loader)
+    env.lstrip_blocks = True
 
-    SkimImports = "".join(
-        [
-            f"from {module} import {', '.join(skims)}\n"
-            for (module, skims) in GroupedSkims.items()
-        ]
+    template = env.get_template("skim_steering_file_template.jinja2")
+    CodeString = template.render(
+        skims=skims,
+        modules=modules,
+        stats=False,
+        hints=False,
     )
-    SkimObjects = [f"    {skim}(),\n" for skim in SingleSkims]
-    MainProcessing = f"""
-path = b2.Path()
-ma.inputMdstList("default", [], path=path)
-skim = CombinedSkim(
-{''.join(SkimObjects)})
-skim(path)
-b2.process(path)
-"""
-
-    SteeringFileCode = BasicImports + SkimImports + MainProcessing
 
     with open(SteeringFile, "w") as f:
-        f.write(SteeringFileCode)
+        f.write(CodeString)
 
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
 

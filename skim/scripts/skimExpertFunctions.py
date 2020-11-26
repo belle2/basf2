@@ -103,6 +103,49 @@ def get_eventN(fileName):
         b2.B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
+def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
+    """
+    Produce an ordered list of skims, by expanding any module names into a list of skims
+    in that module. Also produce a dict of skims grouped by module.
+
+    Raises:
+        RuntimeError: Raised if a skim is listed twice.
+        ValueError: Raised if ``LocalModule`` is passed and skims are normally expected
+            from more than one module.
+    """
+    skims = []
+
+    for name in SkimsOrModules:
+        if name in Registry.names:
+            skims.append(name)
+        elif name in Registry.modules:
+            skims.extend(Registry.get_skims_in_module(name))
+
+    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
+    if duplicates:
+        raise RuntimeError(
+            f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"
+        )
+
+    modules = sorted({Registry.get_skim_module(skim) for skim in skims})
+    if LocalModule:
+        if len(modules) > 1:
+            raise ValueError(
+                f"Local module {LocalModule} specified, but the combined skim expects "
+                "skims from more than one module. No steering file written."
+            )
+        modules = {LocalModule.rstrip(".py"): sorted(skims)}
+    else:
+        modules = {
+            f"skim.{module}": sorted(
+                [skim for skim in skims if Registry.get_skim_module(skim) == module]
+            )
+            for module in modules
+        }
+
+    return skims, modules
+
+
 def _sphinxify_decay(decay_string):
     """Format the given decay string by using LaTeX commands instead of plain-text.
     Output is formatted for use with Sphinx (ReStructured Text).

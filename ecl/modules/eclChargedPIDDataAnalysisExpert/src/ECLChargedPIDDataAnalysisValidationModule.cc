@@ -265,7 +265,7 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
     const auto mergeCharge = m_mergeChargeFlagByHypo[chargedStableSample];
 
     // If partcile/antiparticle merging is active for this hypo, the results are stored for the '+' particle only.
-    if (mergeCharge && chargedPdgId < 0) continue;
+    if (mergeCharge && chargedPdgId <= 0) continue;
 
     // Extract the sign of the charge.
     const auto chargeSign = static_cast<int>(chargedPdgId / std::abs(chargedPdgId));

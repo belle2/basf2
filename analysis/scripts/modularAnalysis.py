@@ -2656,30 +2656,19 @@ def writePi0EtaVeto(
 
 def getBeamBackgroundProbabilityMVA(
     particleList,
-    workingDirectory='.',
-    downloadFlag=True,
     path=path,
 ):
     """
     Assign a probability to each ECL cluster as being background like (0) or signal like (1)
     @param particleList     The input ParticleList, must be a photon list
-    @param workingDirectory The weight file directory
-    @param downloadFlag whether download default weight files or not
     @param path       modules are added to this path
     """
-
-    if not os.path.isfile(workingDirectory + '/BeamBackgroundMVA.root'):
-        if downloadFlag:
-            use_central_database('development')
-            basf2_mva.download('BeamBackgroundIdentifier', workingDirectory + '/BeamBackgroundMVA.root')
-            B2INFO('BeamBackgroundMVA.root has been downloaded from database to' + workingDirectory+'.')
 
     path.add_module(
         'MVAExpert',
         listNames=particleList,
-        extraInfoName=BeamBackgroundLikelihood,
-        identifier=workingDirectory +
-        '/BeamBackgroundMVA.root')
+        extraInfoName='beamBackgroundLikelihoodMVA',
+        identifier='BeamBackgroundMVA')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,

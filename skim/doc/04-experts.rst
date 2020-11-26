@@ -66,7 +66,7 @@ To write a new skim, please follow these steps:
 
        TestFiles = [get_test_file("MC13_ggBGx1")]
 
-8. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
+8. *[Mandatory]* Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
 With all of these steps followed, you will now be able to run your skim using the :ref:`skim command line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put into production, please also complete the following steps:
 
@@ -75,6 +75,12 @@ With all of these steps followed, you will now be able to run your skim using th
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
 10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+
+
+.. _skim-steering-file:
+
+Building skim lists in a steering file
+
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -88,7 +94,23 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     ma.inputMdstList("default", [], path=path)
     skim = MySkim()
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
-    path.process()
+    b2.process(path)
+
+After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``. There is a subtle but important technicality here: if `BaseSkim.skim_event_cuts` has been called, then the skim lists are not built for all events on the main path, but they are built for all events on a conditional path. After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to. However, the final call to `basf2.process` must be passed the main analysis path.
+
+.. code-block:: python
+
+    skim = MySkim()
+    skim(path)
+    # Add subsequent modules to skim.postskim_path
+    ma.variablesToNtuple(skim.SkimLists[0], ["pt", "E"], path=skim.postskim_path)
+    # Process full path
+    b2.process(path)
+
+
+.. tip::
+
+    The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims.
 
 
 .. _skim-running:
@@ -121,9 +143,10 @@ In the skim package, there are command-line tools available for running skims, d
 .................................................
 
 .. tip::
-   This tool is for special cases where this does not suffice (such as running on the grid). If you
-   just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. If you want to
-   test the performance of your skim, consider using the :ref:`b2skim-stats tools<testing-skims>`.
+   This tool is for cases where other tools does not suffice (such as running on the grid, or adding
+   additional modules to the path after adding a skim.). If you just want to run a skim on KEKCC,
+   consider using :ref:`b2skim-run<b2skim-run>`. If you want to test the performance of your skim,
+   consider using the :ref:`b2skim-stats tools<testing-skims>`.
 
 .. argparse::
    :filename: skim/tools/b2skim-generate

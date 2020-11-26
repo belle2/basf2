@@ -2656,7 +2656,7 @@ def writePi0EtaVeto(
 
 def getBeamBackgroundProbabilityMVA(
     particleList,
-    path=path,
+    path=None,
 ):
     """
     Assign a probability to each ECL cluster as being background like (0) or signal like (1)

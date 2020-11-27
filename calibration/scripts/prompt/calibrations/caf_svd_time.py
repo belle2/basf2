@@ -118,6 +118,7 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster.param("RecoDigits", reco_digits)
     cluster.param("ShaperDigits", shaper_digits)
     cluster.param("timeAlgorithm", time_algorithm)
+    cluster.param("Calibrate3SampleWithEventT0", False)
     return cluster
 
 

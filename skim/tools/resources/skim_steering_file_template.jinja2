@@ -16,7 +16,7 @@ from skimExpertFunctions import CombinedSkim
 {% endfor %}
 path = b2.Path()
 {% if skims|length == 1 -%}
-    skim = {{ skims[0] }}()
+    skim = {{ skims[0] }}(){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
@@ -29,6 +29,9 @@ skim(path)
 
 {%- if hints %}
 
+# The skim list names are contained in the Python list skim.SkimLists.
+# The attribute skim.flag is a variable indicating whether an event passed the skim.
+#
 # Add all subsequent modules to skim.postskim_path, but call b2.process on
 # the main path. For example...
 #

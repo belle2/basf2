@@ -80,7 +80,7 @@ With all of these steps followed, you will now be able to run your skim using th
 .. _skim-steering-file:
 
 Building skim lists in a steering file
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -114,10 +114,30 @@ The above code snippet will produce both uDST and ntuple output. To only build t
     skim = MySkim(udstOutput=False)
     skim(path)
 
-
 .. tip::
 
     The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims.
+
+
+.. _skim-flags:
+
+Skim flags
+..........
+
+When a skim is added to the path, an event-level variable is created (via an alias), which indicates whether an event passes the skim or not. It is of the form ``passes_<SKIMNAME>``, and can be accessed through the property ``BaseSkim.flag``.
+
+The same caveat from the previous section regarding ``postskim_path`` applies here. The skim flag is not guaranteed to work if used on the main path, because the skim lists may not be built for all events.
+
+In the below code snippet, we build the skim lists, skip the uDST output, and write an ntuple containing the skim flag and other event-level variables:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+    # Add subsequent modules to skim.postskim_path, including anything that uses skim.flag
+    ma.variablesToNtuple("", [skim.flag, "nTracks"], path=skim.postskim_path)
+    # Process full path
+    b2.process(path)
 
 
 .. _skim-running:

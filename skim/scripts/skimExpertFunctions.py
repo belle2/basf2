@@ -12,6 +12,7 @@ import udst
 import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
+from variables import variables as vm
 
 
 def _get_test_sample_info(sampleName):
@@ -331,7 +332,7 @@ class BaseSkim(ABC):
     def __contact__(self):
         pass
 
-    def __init__(self, *, OutputFileName=None, outputUdst=True, validation=False):
+    def __init__(self, *, OutputFileName=None, udstOutput=True, validation=False):
         """Initialise the BaseSkim class.
 
         Parameters:
@@ -344,7 +345,7 @@ class BaseSkim(ABC):
         self.name = self.__class__.__name__
         self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName
-        self._outputUdst = outputUdst
+        self._udstOutput = udstOutput
         self._validation = validation
         self.SkimLists = []
 
@@ -422,6 +423,8 @@ class BaseSkim(ABC):
         self.additional_setup(self.postskim_path)
         self.build_lists(self.postskim_path)
         self.apply_hlt_hadron_cut(self.postskim_path)
+
+        self.create_skim_flag()
 
         if self._udstOutput:
             self.output_udst(self.postskim_path)
@@ -504,6 +507,43 @@ class BaseSkim(ABC):
         eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
 
         return ConditionalPath
+
+    _flag = None
+
+    @property
+    def flag(self):
+        """
+        Event-level flag indication whether an event passes the skim or not. This
+
+        raises:
+            RuntimeError: Raised if skim flag has not been defined yet.
+        """
+        if self._flag is None:
+            raise RuntimeError(
+                "Skim flag has not been defined yet. Have you added the skim to the path?"
+            )
+        else:
+            return self._flag
+
+    def create_skim_flag(self):
+        """
+        Create a variable which checks that at least one skim list is non-empty.
+        """
+        if not self.SkimLists:
+            b2.B2FATAL(
+                "Cannot create skim flag, because skim has not been added to the path."
+            )
+        # Create a variable which checks that at least one skim list is non-empty
+        flag = f"passes_{self}"
+        cut = " or ".join(
+            f"[ countInList({SkimList})>0 ]" for SkimList in self.SkimLists
+        )
+        vm.addAlias(flag, f"passesEventCut({cut})")
+
+        self._flag = flag
+        b2.B2INFO(
+            f"Created event-level flag '{flag}' which is non-zero for events which pass skim {self}."
+        )
 
     def get_skim_list_names(self):
         """
@@ -734,6 +774,12 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self.Skims:
             skim.apply_hlt_hadron_cut(skim._ConditionalPath or path)
+
+    def create_skim_flag(self):
+        """
+        Undefined method, since the skim flag is not guaranteed to work for a combined skim.
+        """
+        return NotImplemented
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

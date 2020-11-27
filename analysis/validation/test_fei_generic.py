@@ -33,7 +33,7 @@ particles = fei.get_unittest_channels()
 path = b2.create_path()
 
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12
@@ -155,7 +155,7 @@ assert feistate.stage == 7
 
 path = b2.create_path()
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12

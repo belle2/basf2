@@ -21,6 +21,25 @@
 #include <TTree.h>
 
 namespace Belle2 {
+  //Create Structure for int/ext ladder branches
+  struct ladderBranches {
+    float deltaRes = 0.;
+    float svdRes = 0.;
+    float svdClPos = 0.;
+    float svdClPosErr = 0.;
+    float svdTruePos = 0.;
+    float svdClPhi = 0.;
+    float svdClZ = 0.;
+    std::vector<float> svdStripPosition = {0., 0., 0.};
+    float svdTrkPos = 0.;
+    float svdTrkPosErr = 0.;
+    float svdTrkQoP = 0.;
+    float svdTrkPrime = 0.;
+    unsigned int svdLayer = 0;
+    unsigned int svdLadder = 0;
+    unsigned int svdSensor = 0;
+    unsigned int svdSize = 0;
+  };
 
   /**The module studies VXD hits from overlapping sensors of a same VXD layer.
    * In particular, it computes residuals differences sensitive to possible detector misalignments.
@@ -177,6 +196,8 @@ namespace Belle2 {
                  extLadder_PXD = 0, /**< tree t_PXD branch extLadder_PXD/i */
                  extSensor_PXD = 0; /**< tree t_PXD branch extSensor_PXD/i */
     /* Branches of SVD u-clusters tree */
+    struct ladderBranches intBranch_SVD_U = {0., 0., 0.},
+    extBranch_SVD_U = {0., 0., 0.};
     float deltaRes_SVD_U = 0, /**< U difference between external and internal residual */
           intRes_SVD_U = 0,   /**< U internal residual computed by genfit */
           intClPos_SVD_U = 0,      /**< U internal cluster position */
@@ -206,7 +227,11 @@ namespace Belle2 {
                  extLadder_SVD_U = 0, /**< U external ladder */
                  extSensor_SVD_U = 0, /**< U external sensor */
                  extSize_SVD_U = 0; /**< U external size */
+    std::vector<float> intStripPosition_SVD_U = {0., 0., 0.},
+                       extStripPosition_SVD_U = {0., 0., 0.};
     /* Branches of SVD v-clusters tree */
+    struct ladderBranches intBranch_SVD_V,
+             extBranch_SVD_V;
     float deltaRes_SVD_V = 0, /**< V difference between external and internal residual */
           intRes_SVD_V = 0,   /**< V internal residual computed by genfit */
           intClPos_SVD_V = 0,      /**< V internal cluster position */
@@ -236,5 +261,7 @@ namespace Belle2 {
                  extLadder_SVD_V = 0, /**< V external ladder */
                  extSensor_SVD_V = 0, /**< V external sensor */
                  extSize_SVD_V = 0; /**< V external size */
+    std::vector<float> intStripPosition_SVD_V = {0., 0., 0.},
+                       extStripPosition_SVD_V = {0., 0., 0.};
   };
 }

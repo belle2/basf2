@@ -699,7 +699,7 @@ Decay B0
 0.000500000   D-  pi+  pi0                                 PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 
 0.006798790   rho+  D*-                                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Parameters taken from ICHEP 98-852. Gamma_51 PDGLive. #[BF update - PG 09/2020]
-0.010625180   D*-  pi+  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho+. Subtract rho+ component: BF(D*- pi+ pi0) = 0.015157710 - 2/3 * 0.006798790. #[BF update - PG 09/2020]
+0.008358920   D*-  pi+  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho+ D*-. Subtract resonant component: BF(D*- pi+ pi0) = 0.015157710 - 0.006798790. #[BF update - PG 09/2020]
 
 0.000880260   anti-D0  pi-  pi+                            PHSP; #[BF update - PG 09/2020]
 0.000620000   anti-D*0  pi-  pi+                           PHSP;
@@ -944,7 +944,6 @@ Decay B0
 
 # Color-suppressed modes. See above for reference.
 0.000000010   p+  anti-p-                                  PHSP; #[BF update - PG 09/2020]
-0.000052310   K0  rho0                                     PHSP;
 0.000011000   eta  K_0*0                                   PHSP;
 0.000009600   eta  K_2*0                                   PHSP;
 0.000016000   omega  K_0*0                                 PHSP;
@@ -1092,9 +1091,9 @@ Decay B0
 0.000001000   a_0+  pi-  pi0                               PHSP;
 
 #--- 4-body rho-K*, rho-pi-K, K*-pi-pi, pi-pi-pi-K -------------------
-0.000003880   rho0  K*0                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                              #[BF update - PG 09/2020]
-0.000002800   rho0  K+  pi-                                PHSP; #Gamma_326 PDGLive => Nonresonant BF.                                                                                       #[BF update - PG 09/2020]
-0.000052410   pi-  pi+  K*0                                PHSP; #Gamma_329 PDGLive => 0.00005500 includes rho0. Subtract rho0 component: BF(pi- pi+ K*0) = 0.000055000 - 2/3 * 0.000003880. #[BF update - PG 09/2020]
+0.000003880   rho0  K*0                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                            #[BF update - PG 09/2020]
+0.000002800   rho0  K+  pi-                                PHSP; #Gamma_326 PDGLive => Nonresonant BF.                                                                                     #[BF update - PG 09/2020]
+0.000051120   pi-  pi+  K*0                                PHSP; #Gamma_329 PDGLive => 0.00005500 includes rho0 K*0. Subtract rho0 component: BF(pi- pi+ K*0) = 0.000055000 - 0.000003880. #[BF update - PG 09/2020]
 
 0.000010300   rho-  K*+                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
 0.000006700   K*0  pi0  pi0                                PHSP;
@@ -1143,9 +1142,9 @@ Decay B0
 0.000000830   K*0  anti-K*0                                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
 0.000001000   K*+  K*-                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
-0.000000090   phi  rho0                                    SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Gamma_428 PDGLive => BF with 1.0sigma.                                                 #[BF update - PG 09/2020]
-0.000000120   phi  pi-  pi+                                PHSP; #Gamma_427 PDGLive => 0.000000180 includes rho0. Subtract rho0 component: BF(phi pi- pi+) = 0.000000180 - 2/3 * 0.000000090. #[BF update - PG 09/2020]
-0.000000100   K+  K-  rho0                                 PHSP; #No PDGLive value. Lower BF to 0(-7) due to value of phi pi- pi+ and phi rho0.                                               #[BF update - PG 09/2020]
+0.000000090   phi  rho0                                    SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Gamma_428 PDGLive => BF with 1.0sigma.                                               #[BF update - PG 09/2020]
+0.000000090   phi  pi-  pi+                                PHSP; #Gamma_427 PDGLive => 0.000000180 includes rho0 phi. Subtract rho0 component: BF(phi pi- pi+) = 0.000000180 - 0.000000090. #[BF update - PG 09/2020]
+0.000000100   K+  K-  rho0                                 PHSP; #No PDGLive value. Lower BF to 0(-7) due to value of phi pi- pi+ and phi rho0.                                             #[BF update - PG 09/2020]
 
 0.000001000   K0  anti-K0  rho0                            PHSP;
 0.000001000   K+  K-  omega                                PHSP;
@@ -1175,7 +1174,7 @@ Decay B0
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
 0.000010040   phi  K*0                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                           #[BF update - PG 09/2020]
-0.000020810   K-  K+  K*0                                  PHSP; #Gamma_363 PDGLive => 0.000027500 includes phi. Subtract phi component: BF(K- K+ K*0) = 0.000027500 - 2/3 * 0.000010040. #[BF update - PG 09/2020]
+0.000022480   K-  K+  K*0                                  PHSP; #Gamma_363 PDGLive => 0.000027500 includes phi. Subtract phi component: BF(K- K+ K*0) = 0.000027500 - 1/2 * 0.000010040. #[BF update - PG 09/2020]
 0.000010000   phi  K+  pi-                                 PHSP; #No PDGLive value. Keep original value in .DEC.                                                                          #[Comment - PG 09/2020]
 0.000005000   phi  K0  pi0                                 PHSP; #No PDGLive value. Assume BF(phi K0 pi0) = BF(phi K+ pi-) / 2.                                                           #[BF update - PG 09/2020]
 
@@ -1617,7 +1616,6 @@ Decay B0
 0.000019300   K'*0  pi0                                    PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  K0                                     PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
-0.000009000   rho(2S)0  K0                                 SVS;	 #[f'_0 K0]/[f'_0 K+]*[rho(2S)0 K+]
 0.000009000   rho(3S)0  K0                                 SVS;
 0.000003200   rho(2S)-  K+                                 SVS;	 #UL
 0.000001700   rho(3S)-  K+                                 SVS;	 #UL
@@ -2487,7 +2485,7 @@ Decay anti-B0
 0.000500000   D+  pi-  pi0                                 PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 
 0.006798790   rho-  D*+                                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Parameters taken from ICHEP 98-852. #[BF update - PG 09/2020]
-0.010625180   D*+  pi-  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho+. Subtract rho+ component: BF(D*- pi+ pi0) = 0.015157710 - 2/3 * 0.006798790. #[BF update - PG 09/2020]
+0.008358920   D*+  pi-  pi0                                PHSP; #Gamma_50 PDGLive => 0.015157710 includes rho- D*+. Subtract resonant component: BF(D*- pi+ pi0) = 0.015157710 - 0.006798790. #[BF update - PG 09/2020]
 
 0.000880260   D0  pi+  pi-                                 PHSP; #[BF update - PG 09/2020]
 0.000620000   D*0  pi+  pi-                                PHSP;
@@ -2732,7 +2730,6 @@ Decay anti-B0
 
 # Color-suppressed modes. See above for reference.
 0.000000010   p+  anti-p-                                  PHSP; #[BF update - PG 09/2020]
-0.000052310   anti-K0  rho0                                PHSP;
 0.000011000   eta  anti-K_0*0                              PHSP;
 0.000009600   eta  anti-K_2*0                              PHSP;
 0.000016000   omega  anti-K_0*0                            PHSP;
@@ -2880,9 +2877,9 @@ Decay anti-B0
 0.000001000   a_0+  pi-  pi0                               PHSP;
 
 #--- 4-body rho-K*, rho-pi-K, K*-pi-pi, pi-pi-pi-K -------------------
-0.000003880   rho0  anti-K*0                               SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                              #[BF update - PG 09/2020]
-0.000002800   rho0  K-  pi+                                PHSP; #Gamma_326 PDGLive => Nonresonant BF.                                                                                       #[BF update - PG 09/2020]
-0.000052410   pi-  pi+  anti-K*0                           PHSP; #Gamma_329 PDGLive => 0.00005500 includes rho0. Subtract rho0 component: BF(pi- pi+ K*0) = 0.000055000 - 2/3 * 0.000003880. #[BF update - PG 09/2020]
+0.000003880   rho0  anti-K*0                               SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                           #[BF update - PG 09/2020]
+0.000002800   rho0  K-  pi+                                PHSP; #Gamma_326 PDGLive => Nonresonant BF.                                                                                    #[BF update - PG 09/2020]
+0.000051120   pi-  pi+  anti-K*0                           PHSP; #Gamma_329 PDGLive => 0.00005500 includes rho0 K*0. Subtract rho component: BF(pi- pi+ K*0) = 0.000055000 - 0.000003880. #[BF update - PG 09/2020]
 
 0.000010300   rho+  K*-                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
 0.000006700   anti-K*0  pi0  pi0                           PHSP;
@@ -2931,9 +2928,9 @@ Decay anti-B0
 0.000000830   K*0  anti-K*0                                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[BF update - PG 09/2020]
 0.000001000   K*+  K*-                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
-0.000000090   phi  rho0                                    SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Gamma_428 PDGLive => BF with 1.0sigma.                                                 #[BF update - PG 09/2020]
-0.000000120   phi  pi-  pi+                                PHSP; #Gamma_427 PDGLive => 0.000000180 includes rho0. Subtract rho0 component: BF(phi pi- pi+) = 0.000000180 - 2/3 * 0.000000090. #[BF update - PG 09/2020]
-0.000000100   K+  K-  rho0                                 PHSP; #No PDGLive value. Lower BF to 0(-7) due to value of phi pi- pi+ and phi rho0.                                               #[BF update - PG 09/2020]
+0.000000090   phi  rho0                                    SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Gamma_428 PDGLive => BF with 1.0sigma.                                               #[BF update - PG 09/2020]
+0.000000090   phi  pi-  pi+                                PHSP; #Gamma_427 PDGLive => 0.000000180 includes rho0 phi. Subtract rho0 component: BF(phi pi- pi+) = 0.000000180 - 0.000000090. #[BF update - PG 09/2020]
+0.000000100   K+  K-  rho0                                 PHSP; #No PDGLive value. Lower BF to 0(-7) due to value of phi pi- pi+ and phi rho0.                                             #[BF update - PG 09/2020]
 
 0.000001000   K0  anti-K0  rho0                            PHSP;
 0.000001000   K+  K-  omega                                PHSP;
@@ -2963,7 +2960,7 @@ Decay anti-B0
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
 0.000010040   phi  anti-K*0                                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;                                                                                           #[BF update - PG 09/2020]
-0.000020810   K-  K+  anti-K*0                             PHSP; #Gamma_363 PDGLive => 0.000027500 includes phi. Subtract phi component: BF(K- K+ K*0) = 0.000027500 - 2/3 * 0.000010040. #[BF update - PG 09/2020]
+0.000022480   K-  K+  anti-K*0                             PHSP; #Gamma_363 PDGLive => 0.000027500 includes phi. Subtract phi component: BF(K- K+ K*0) = 0.000027500 - 1/2 * 0.000010040. #[BF update - PG 09/2020]
 0.000010000   phi  K-  pi+                                 PHSP; #No PDGLive value. Keep original value in .DEC.                                                                          #[Comment - PG 09/2020]
 0.000005000   phi  anti-K0  pi0                            PHSP; #No PDGLive value. Assume BF(phi K0 pi0) = BF(phi K+ pi-) / 2.                                                           #[BF update - PG 09/2020]
 
@@ -3405,7 +3402,6 @@ Decay anti-B0
 0.000019300   anti-K'*0  pi0                               PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  anti-K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  anti-K0                           PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
-0.000009000   rho(2S)0  anti-K0                            SVS;	 #[f'_0 K0]/[f'_0 K+]*[rho(2S)0 K+]
 0.000009000   rho(3S)0  anti-K0                            SVS;
 0.000003200   rho(2S)+  K-                                 SVS;	 #UL
 0.000001700   rho(3S)+  K-                                 SVS;	 #UL
@@ -4933,7 +4929,7 @@ Decay B+
 
 
 # The following channels are the remaining rare decays used in Belle:
-# /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/mixedrare.dec.
+# /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/chargedrare.dec.
 # These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   K+  nu_e  anti-nu_e                          PHSP; #K  nu nu = 5.2e-6
@@ -6442,7 +6438,7 @@ Decay B-
 
 
 # The following channels are the remaining rare decays used in Belle:
-# /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/mixedrare.dec.
+# /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/chargedrare.dec.
 # These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   K-  nu_e  anti-nu_e                          PHSP; #K  nu nu = 5.2e-6

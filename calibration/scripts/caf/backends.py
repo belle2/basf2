@@ -1147,8 +1147,8 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permission issues
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         job.copy_input_sandbox_files_to_working_dir()
@@ -1182,8 +1182,8 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permissions issue
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         # Check if we have any valid input files

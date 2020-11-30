@@ -544,9 +544,9 @@ To find information about a basf2 module, try:
 
 .. code-block:: bash
 
-    basf2 -m # this lists all of them
-    basf2 -m | grep "Particle"
-    basf2 -m ParticleCombiner
+    b2help-modules # this lists all of them
+    b2help-modules | grep "Particle"
+    b2help-modules ParticleCombiner
 
 Listing the basf2 variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

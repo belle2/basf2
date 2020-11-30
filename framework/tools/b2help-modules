@@ -7,7 +7,8 @@ You can run ``b2help-modules`` to list all available modules.
 import subprocess
 import argparse
 
-if __name__ == "__main__":
+
+def get_argument_parser():
     parser = argparse.ArgumentParser(description="""
 This returns either all available modules within basf2 or returs specific information about a module when requested.
 
@@ -17,7 +18,12 @@ Usage:
 """)
     parser.add_argument('module', nargs="?", default=None,
                         help='Get information specific to the requested module.')
-    args = parser.parse_args()
+    return parser
+
+
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
 
     if args.module is None:
         subprocess.call(["basf2", "-m"])

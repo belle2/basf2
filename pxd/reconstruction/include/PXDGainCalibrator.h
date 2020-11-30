@@ -35,7 +35,7 @@ namespace Belle2 {
       static PXDGainCalibrator& getInstance();
 
       /** Get gain correction
-       * @param is unique ID of the sensor
+       * @param id unique ID of the sensor
        * @param uid uCell of single pixel
        * @param vid vCell of single pixel
        * @return gain correction
@@ -43,7 +43,7 @@ namespace Belle2 {
       float getGainCorrection(VxdID id, unsigned int uid, unsigned int vid) const;
 
       /** Get conversion factor from ADU to energy
-       * @param is unique ID of the sensor
+       * @param id unique ID of the sensor
        * @param uid uCell of single pixel
        * @param vid vCell of single pixel
        * @return ADUToEnergy conversion factor

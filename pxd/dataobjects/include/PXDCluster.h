@@ -49,7 +49,6 @@ namespace Belle2 {
      * @param vSize number of pixel rows contributing to the cluster.
      * @param uStart Start column of the cluster.
      * @param vStart Start row of the cluster.
-     * @param clsKind ClusterKind of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
                float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,

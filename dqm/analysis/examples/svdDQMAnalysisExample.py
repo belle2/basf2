@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # illustrative run:
-# basf2 svdDQMAnalysisEfficiency.py dqm_e0014r000921.root
+# basf2 svdDQMAnalysisEfficiency.py dqm_e0014r000921.root 100
 
 from basf2 import *
 import sys
@@ -13,7 +13,7 @@ mypath = Path()
 inputFile = sys.argv[1]
 exp_nr = int(re.findall(r'\d+', inputFile)[0])
 run_nr = int(re.findall(r'\d+', inputFile)[1])
-nevt = sys.argv[2]  # number of events
+nevt = int(sys.argv[2])  # number of events
 
 # setup database
 b2conditions.reset()

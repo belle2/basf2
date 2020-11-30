@@ -21,3 +21,13 @@ Tools which will provide you help
     :prog: b2help-particles
     :nodefault:
     :nogroupsections:
+
+``b2help-variables``: List available variables in the analysis package
+----------------------------------------------------------------------
+
+.. argparse::
+    :filename: analysis/tools/b2help-variables
+    :func: get_argument_parser
+    :prog: b2help-variables
+    :nodefault:
+    :nogroupsections:

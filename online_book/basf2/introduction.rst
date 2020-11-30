@@ -561,8 +561,8 @@ To check the list of basf2 variables known to the :ref:`analysis_variablemanager
 
 .. code-block:: bash
 
-    basf2 variables.py
-    basf2 variables.py | grep "invariant"
+    b2help-variables
+    b2help-variables | grep "invariant"
 
 There is a :ref:`analysis_variables` section in this documentation which you might find
 more helpful than the big dump.

@@ -4,12 +4,26 @@
 """
 You can run ``b2help-variables`` to list all available variables.
 """
+import argparse
 from terminal_utils import Pager
-from variables import getCommandLineOptions
 from variables import printVars
 
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description="""
+This returns all variables which are available in the `analysis` package of basf2.
+
+Usage:
+    `b2help-variables`
+""")
+    parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
+                        help='Use a pager to show output or print to terminal.')
+    return parser
+
+
+
 if __name__ == "__main__":
-    args = getCommandLineOptions()
+    args = get_argument_parser().parse_args()
 
     warning = (
         "The following variables have been renamed since release-04:\n"

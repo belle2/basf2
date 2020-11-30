@@ -13,3 +13,10 @@ Tools for luminosity
     :nodefaultconst:
     :nogroupsections:
 
+.. argparse::
+    :filename: analysis/tools/b2info-luminosity
+    :func: argparser
+    :prog: b2info-luminosity
+    :nodefaultconst:
+    :nogroupsections:
+

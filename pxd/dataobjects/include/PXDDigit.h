@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDIGIT_H
-#define PXDDIGIT_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -121,5 +120,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

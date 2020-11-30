@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.         *
  **************************************************************************/
 
-#ifndef CDCSIMCONTROLPAR_H
-#define CDCSIMCONTROLPAR_H
+#pragma once
 
 namespace Belle2 {
   namespace CDC {
@@ -146,5 +145,3 @@ namespace Belle2 {
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

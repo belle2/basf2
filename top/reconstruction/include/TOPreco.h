@@ -219,6 +219,30 @@ namespace Belle2 {
                    float* logL);
 
       /**
+       * Return pixel log likelihoods and expected pixel signal photon counts for the
+       * last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sigma additional time smearing sigma
+       * @param logL return array of pixel log likelihood values (must be zeroed on input)
+       * @param sphot return array of pixel signal photon counts (must be zeroed on input)
+       */
+      void getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                   float* logL, float* sphot);
+
+      /**
+       * Return pixel signal photons for the last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sfot return array of pixel signal photon counts (must be zeroed on input)
+       */
+      void getSigPhot(double timeShift, double timeMin, double timeMax, float* sfot);
+
+      /**
        * Return track hit at the bar in Local or Global frame
        * @param LocGlob select Local or Global frame
        * @param R track spatial position
@@ -303,6 +327,9 @@ namespace Belle2 {
        * Returns k-th PDF peak for given pixel describing signal PDF
        * @param pixelID pixel ID (1-based)
        * @param k peak counter (in C++ sense - starts with 0)
+       * @param position pisition
+       * @param width width
+       * @param numPhotons number of photons
        */
       void getPDFPeak(int pixelID, int k,
                       float& position, float& width, float& numPhotons) const;

@@ -436,7 +436,6 @@ namespace Belle2 {
 
   private:
 
-    // ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
   };
 
 } // Belle2 namespace

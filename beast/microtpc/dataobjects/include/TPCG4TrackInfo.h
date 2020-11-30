@@ -34,7 +34,12 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param trackID track ID
+     * @param PDG PDG
+     * @param Mass mass
+     * @param Energy energy
+     * @param vtx production vertex
+     * @param mom momentum
      */
     TPCG4TrackInfo(int trackID, int PDG, float Mass, float Energy, const float* vtx, const float* mom):
       SimHitBase(), m_trackID(trackID), m_PDG(PDG), m_Mass(Mass), m_Energy(Energy)

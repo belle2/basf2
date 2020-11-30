@@ -15,12 +15,17 @@
 #                                                                                    *
 # ************************************************************************************
 
+from matplotlib.colors import colorConverter
+from matplotlib.collections import PolyCollection
+from ROOT import PyConfig
+import glob
+import sys
+import math
+import matplotlib.pyplot as plt
 import ROOT
-from ROOT import Belle2
 from basf2 import B2INFO
 import flavorTagger as ft
 from defaultEvaluationParameters import categories, Quiet, rbins
-import basf2_mva
 from array import array
 
 import numpy as np
@@ -29,20 +34,9 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import sys
-import glob
 
-from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
-from array import array
-import IPython
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.collections import PolyCollection
-from matplotlib.colors import colorConverter
 
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 

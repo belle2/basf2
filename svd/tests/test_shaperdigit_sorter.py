@@ -1,5 +1,3 @@
-import os
-import tempfile
 import basf2
 import ROOT
 from ROOT import Belle2

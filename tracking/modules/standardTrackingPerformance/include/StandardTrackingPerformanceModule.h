@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STANDARDTRACKINGPERFORMANCEMODULE_H_
-#define STANDARDTRACKINGPERFORMANCEMODULE_H_
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
@@ -120,7 +120,7 @@ namespace Belle2 {
 
     /**
      * Remove all photons from a MCParticle vector.
-     * @param daughters: vector is taken and photons returned
+     * @param in_daughters: vector is taken and photons returned
      * @return: MCParticle vector with no photons
      */
     std::vector<MCParticle*> removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters);
@@ -135,7 +135,3 @@ namespace Belle2 {
 
 
 } // end of namespace
-
-
-
-#endif /* STANDARDTRACKINGPERFORMANCEMODULE_H_ */

@@ -78,10 +78,10 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be nullptr if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
 
-    /** Get pointer to the Cluster used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the Cluster used when creating this RecoHit, can be nullptr if created from something else */
     const SVDCluster* getCluster() const { return m_cluster; }
 
     /** Is the coordinate u or v? */

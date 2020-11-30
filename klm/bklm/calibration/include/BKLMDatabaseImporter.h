@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~BKLMDatabaseImporter()
+    ~BKLMDatabaseImporter()
     {
     }
 

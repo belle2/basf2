@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTBEAMLINE_H
-#define BFIELDCOMPONENTBEAMLINE_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 #include <string>
@@ -76,7 +75,8 @@ namespace Belle2 {
 
     /**
      * Sets the filename of the magnetic field map.
-     * @param filename The filname of the magnetic field map.
+     * @param filename_her The filname of the HER magnetic field map.
+     * @param filename_ler The filname of the LER magnetic field map.
      */
     void setMapFilename(const std::string& filename_her, const std::string& filename_ler)
     {
@@ -149,5 +149,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTBEAMLINE_H */

@@ -109,9 +109,14 @@ rootcling = Builder(action='rootcling -f $TARGET $CLINGFLAGS -rmf "${TARGET.base
                     '$_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', emitter=linkdef_emitter, source_scanner=CScanner())
 rootcling.action.cmdstr = '${ROOTCLINGCOMSTR}'
 
+# define builder for class version check
+classversion = Builder(action='b2code-classversion-check --error-style gcc $SOURCE && touch $TARGET')
+classversion.action.cmdstr = '${CLASSVERSIONCOMSTR}'
+
 
 def generate(env):
     env['BUILDERS']['RootDict'] = rootcling
+    env['BUILDERS']['ClassVersionCheck'] = classversion
 
 
 def exists(env):

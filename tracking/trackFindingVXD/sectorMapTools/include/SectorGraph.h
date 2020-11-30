@@ -14,10 +14,13 @@
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraphID.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraph.h>
 
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <utility> // std::pair, std::move
+#include <TH1.h>
 
 
 namespace Belle2 {
@@ -156,6 +159,80 @@ namespace Belle2 {
       return nKilled;
     }
 
+    /** Get the absolute treshold (# nfound) given a relative threshold. */
+    int getAbsThreshold(int relThreshold)
+    {
+      if (relThreshold == 0) {return 0;}
+      B2INFO("Relative threshold : " << relThreshold << " %");
+      int xmax = 100000;
+
+      TH1D* h_nfound = new TH1D("h", "# times that subgraphs were found n_found times", xmax, 0, xmax);
+
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        h_nfound->Fill(graph.getFound());
+      }
+
+      if (h_nfound->GetEntries() == 0) {
+        B2ERROR("nfound histogram empty.");
+        delete h_nfound;
+        return 0;
+      }
+
+      TH1* hc_nfound = h_nfound->GetCumulative();
+      hc_nfound->Scale(1 / h_nfound->GetEntries());
+
+      for (int nfound = 1; nfound < hc_nfound->GetNbinsX(); nfound++) {
+        if (hc_nfound->GetBinContent(nfound) > relThreshold / 100.) {
+          B2INFO("Absolute threshold : remove every graph with nfound < " << nfound);
+          delete h_nfound;
+          delete hc_nfound;
+          return nfound;
+        }
+      }
+
+      // In case no value for nfound is found
+      B2ERROR("No nfound value found.");
+      delete h_nfound;
+      delete hc_nfound;
+      return 0;
+    }
+
+    /** returns removed occurances. */
+    unsigned pruneGraphBeforeTraining(int absThreshold)
+    {
+      if (absThreshold == 0) {return 0;}
+
+      int killed = 0;
+
+      std::vector<SubGraph<FilterType>*> deadBranches;
+
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        if (int(graph.getFound()) <= absThreshold) {
+          deadBranches.push_back(&graph);
+        }
+      }
+
+      for (auto& graph : deadBranches) {
+        m_subgraphs.erase(graph->getID());
+        killed ++;
+      }
+
+      return killed;
+    }
+
+    /** Output in a txt file id & nfound of subgraphs */
+    void output_nfound()
+    {
+      std::ofstream out;
+      out.open("output_nfound.txt");
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        out << graph.print() << std::endl;
+      }
+      out.close();
+    }
 
     /**
     * finds sectors having inner sectors in same layer and update them in the subGraph-ID.

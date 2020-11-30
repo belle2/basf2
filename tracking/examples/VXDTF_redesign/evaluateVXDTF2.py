@@ -15,11 +15,11 @@
 #####################################################################
 
 
-from basf2 import *
+import basf2 as b2
+import sys
 import argparse
 # Import custom module chain for VXDTF2
 from setup_modules import setup_VXDTF2
-from setup_modules import setup_Geometry
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
 # ---------------------------------------------------------------------------------------
@@ -44,30 +44,36 @@ setup_name = 'SVDOnlyDefault'
 if usePXD:
     setup_name = 'SVDPXDDefault'
 
-performFit = True
+performFit = False
 
 # Logging and Debug Levels
-set_log_level(LogLevel.ERROR)
-log_to_file('logVXDTF2Evaluation.log', append=False)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.log_to_file('logVXDTF2Evaluation.log', append=False)
 
 
 # ---------------------------------------------------------------------------------------
-path = create_path()
+path = b2.create_path()
 
 # Input
-rootInput = register_module('RootInput')
+rootInput = b2.register_module('RootInput')
 path.add_module(rootInput)
 
 # Event Info Module
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
-# puts gearbox and geometry into the path
-setup_Geometry(path)
+# Gearbox
+gearbox = b2.register_module('Gearbox')
+path.add_module(gearbox)
 
-# Event counter
-eventCounter = register_module('EventCounter')
-path.add_module(eventCounter)
+# puts gearbox and geometry into the path
+# Geometry
+geometry = b2.register_module('Geometry')
+geometry.param('components', ['BeamPipe',
+                              'MagneticFieldConstant4LimitedRSVD',
+                              'PXD',
+                              'SVD'])
+path.add_module(geometry)
 
 # VXDTF2: Including actual VXDTF2 Modul Chain
 setup_VXDTF2(path=path,
@@ -78,15 +84,15 @@ setup_VXDTF2(path=path,
              quality_estimator='circleFit')
 
 if performFit:
-    genFitExtrapolation = register_module('SetupGenfitExtrapolation')
+    genFitExtrapolation = b2.register_module('SetupGenfitExtrapolation')
     path.add_module(genFitExtrapolation)
 
-    fitter = register_module('DAFRecoFitter')
+    fitter = b2.register_module('DAFRecoFitter')
     path.add_module(fitter)
     path.add_module('TrackCreator', pdgCodes=[211, 13, 321, 2212])
 
 # Matching
-mcTrackMatcherModule = register_module('MCRecoTracksMatcher')
+mcTrackMatcherModule = b2.register_module('MCRecoTracksMatcher')
 mcTrackMatcherModule.param({
     'UseCDCHits': False,
     'UseSVDHits': True,
@@ -104,5 +110,6 @@ trackingValidationModule = CombinedTrackingValidationModule(
     expert_level=2)
 path.add_module(trackingValidationModule)
 
-process(path)
-print(statistics)
+path.add_module('Progress')
+b2.process(path)
+print(b2.statistics)

@@ -45,21 +45,22 @@ namespace Belle2 {
       _y(0),
       _scaleX(0), _scaleY(0),
       _winx(0), _winy(0), _winw(0), _winh(0), _wind(0),
-      _hp(0)
+      _hp(0),
+
+      _blue(Gdk::Color("blue")),
+      _red(Gdk::Color("red")),
+      _green(Gdk::Color("green")),
+      _black(Gdk::Color("black")),
+      _white(Gdk::Color("white")),
+      _gray(Gdk::Color("gray")),
+      _yellow(Gdk::Color("yellow")),
+
+      _gray0(Gdk::Color("gray90")),
+      _gray1(Gdk::Color("gray80")),
+      _gray2(Gdk::Color("gray70")),
+      _gray3(Gdk::Color("gray60"))
   {
 
-    _blue = Gdk::Color("blue");
-    _red = Gdk::Color("red");
-    _green = Gdk::Color("green");
-    _black = Gdk::Color("black");
-    _white = Gdk::Color("white");
-    _gray = Gdk::Color("gray");
-    _yellow = Gdk::Color("yellow");
-
-    _gray0 = Gdk::Color("gray90");
-    _gray1 = Gdk::Color("gray80");
-    _gray2 = Gdk::Color("gray70");
-    _gray3 = Gdk::Color("gray60");
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(_blue);

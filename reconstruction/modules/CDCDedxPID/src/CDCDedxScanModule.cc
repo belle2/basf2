@@ -114,7 +114,7 @@ void CDCDedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
                           1.0, 0, 0.0, 0.0, 0.0);
       }
     }

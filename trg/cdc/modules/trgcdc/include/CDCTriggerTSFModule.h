@@ -10,9 +10,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
 
 namespace Belle2 {
-
   typedef HepGeom::Point3D<double> Point3D;
 
   class TRGCDCLayer;
@@ -61,6 +62,10 @@ namespace Belle2 {
     /** filename for the table which contains the number of true left/right
      *  for each pattern in the outer super layers */
     std::string m_outerTrueLRTableFilename;
+    /** mask Dead channel or not. True:mask False:unmask */
+    bool m_deadchflag;
+    /** dbobject to store deadchannel */
+    DBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
 
   private:
     /** structure to hold pointers to all wires in the CDC */
@@ -75,11 +80,16 @@ namespace Belle2 {
     /** list of (# true right, # true left, # true background)
      *  for the outer super layers */
     std::vector<std::vector<unsigned>> outerTrueLRTable = {};
+    //** number of layers in Super layer**/
+    const static int MAX_N_LAYERS = 8;
+    /** bad channel mapping */
+    bool deadch_map[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS] = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;
     /** list of output track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+
   };
 
 } // namespace Belle2

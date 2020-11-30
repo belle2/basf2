@@ -33,6 +33,7 @@ namespace Belle2 {
 
     void dhc_frame_header_word0::print(void) const
     {
+      /* cppcheck-suppress variableScope */
       const char* dhc_type_name[16] = {
         (const char*)"DHP_RAW",
         (const char*)"FCE_RAW",
@@ -157,6 +158,13 @@ namespace Belle2 {
               " CRC $");
     };
 
+    unsigned short dhc_ghost_frame::getErrorBits(void) const
+    {
+      unsigned short value = (word0.data & 0xC) >> 2;  // lower two bits
+      if (word0.data & 0x0400) value |= 0x4; // high bit
+      return value;
+    };
+
     bool dhc_end_frame::isFakedData(void) const
     {
       if (word0.data != 0x6000) return false;
@@ -179,6 +187,39 @@ namespace Belle2 {
       word0.print();
       B2DEBUG(99, "DHC DHE End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsineventhi << "." <<
               wordsineventlo << " ERR $" << std::hex << errorinfo << " CRC " << std::hex << crc32);
+    };
+
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineDHP(int dhpid) const
+    {
+      switch (dhpid) {
+        case 0: return ((uint32_t)errorinfo >> 24) & 0xFF;
+        case 1: return ((uint32_t)errorinfo >> 16) & 0xFF;
+        case 2: return ((uint32_t)errorinfo >>  8) & 0xFF;
+        case 3: return errorinfo & 0xFF;
+        default: return 0;
+      }
+    };
+
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineStartDHP(int dhpid) const
+    {
+      switch (dhpid) {
+        case 0: return ((uint32_t)errorinfo >> 24) & 0xF;
+        case 1: return ((uint32_t)errorinfo >> 16) & 0xF;
+        case 2: return ((uint32_t)errorinfo >>  8) & 0xF;
+        case 3: return errorinfo & 0xF;
+        default: return 0;
+      }
+    };
+
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineEndDHP(int dhpid) const
+    {
+      switch (dhpid) {
+        case 0: return ((uint32_t)errorinfo >> 28) & 0xF;
+        case 1: return ((uint32_t)errorinfo >> 20) & 0xF;
+        case 2: return ((uint32_t)errorinfo >> 12) & 0xF;
+        case 3: return ((uint32_t)errorinfo >>  4) & 0xF;
+        default: return 0;
+      }
     };
 
     PXDError::PXDErrorFlags dhc_frames::check_padding(void)

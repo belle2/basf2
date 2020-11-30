@@ -218,7 +218,7 @@ void TRGGDLUnpackerModule::fillTreeGDLDB(int* buf, int evt)
 
 
     for (int _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
-      int wd = buf[clk * (nBits / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (nBits / 32) + _wd + nword_header];
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
           int bitIn640 = (nBits - 1) - _wd * 32 - bb;

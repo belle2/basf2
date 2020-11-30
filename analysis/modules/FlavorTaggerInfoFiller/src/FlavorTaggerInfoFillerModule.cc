@@ -10,14 +10,9 @@
 
 #include <analysis/modules/FlavorTaggerInfoFiller/FlavorTaggerInfoFillerModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <iostream>
 
@@ -52,16 +47,19 @@ void FlavorTaggerInfoFillerModule::initialize()
 
 void FlavorTaggerInfoFillerModule::event()
 {
-//   StoreObjPtr<FlavorTaggerInfo> flavorTaggerInfo;
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
-  StoreObjPtr<RestOfEvent> RestOfEvent("RestOfEvent");
-
-  auto* flavorTaggerInfo = RestOfEvent->getRelatedTo<FlavorTaggerInfo>();
+  if (!m_roe->isBuiltWithMostLikely()) {
+    B2ERROR("The ROE was not created with most-likely particle lists."
+            "The flavor tagger will not work properly.");
+  }
+  auto* flavorTaggerInfo = m_roe->getRelatedTo<FlavorTaggerInfo>();
 
   Variable::Manager& manager = Variable::Manager::Instance();
 
 
-  if (flavorTaggerInfo == nullptr) B2ERROR("flavorTaggerInfoFiller: FlavorTaggerInfo does not exist");
+  if (flavorTaggerInfo == nullptr) {
+    B2ERROR("flavorTaggerInfoFiller: FlavorTaggerInfo does not exist");
+    return;
+  }
 
   flavorTaggerInfo -> setUseModeFlavorTagger("Expert");
 
@@ -69,11 +67,11 @@ void FlavorTaggerInfoFillerModule::event()
     flavorTaggerInfo -> addMethodMap("FANN");
     FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
     // float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
-    float qrCombined = eventExtraInfo->getExtraInfo("qrCombinedFANN");
+    float qrCombined = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = eventExtraInfo->getExtraInfo("qrCombinedFANN");
-    float B0barProbability = 1 - eventExtraInfo->getExtraInfo("qrCombinedFANN");
+    float B0Probability = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
+    float B0barProbability = 1 - m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
     infoMapsFANN->setQrCombined(qrCombined);
     infoMapsFANN->setB0Probability(B0Probability);
     infoMapsFANN->setB0barProbability(B0barProbability);
@@ -83,11 +81,11 @@ void FlavorTaggerInfoFillerModule::event()
   FlavorTaggerInfoMap* infoMapsFBDT = flavorTaggerInfo -> getMethodMap("FBDT");
 
   if (m_TMVAfbdt) {
-    float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFBDT") - 0.5);
+    float qrCombined = 2 * (m_eventExtraInfo->getExtraInfo("qrCombinedFBDT") - 0.5);
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = eventExtraInfo->getExtraInfo("qrCombinedFBDT");
-    float B0barProbability = 1 - eventExtraInfo->getExtraInfo("qrCombinedFBDT");
+    float B0Probability = m_eventExtraInfo->getExtraInfo("qrCombinedFBDT");
+    float B0barProbability = 1 - m_eventExtraInfo->getExtraInfo("qrCombinedFBDT");
     infoMapsFBDT->setQrCombined(qrCombined);
     infoMapsFBDT->setB0Probability(B0Probability);
     infoMapsFBDT->setB0barProbability(B0barProbability);
@@ -128,13 +126,6 @@ void FlavorTaggerInfoFillerModule::event()
 
   if (m_qpCategories) {
 
-    bool mcFlag = false;
-
-    if (m_istrueCategories) {
-      StoreArray<MCParticle> mcparticles;
-      if (mcparticles.isValid()) mcFlag = true;
-    };
-
     for (auto& iTuple : m_eventLevelParticleLists) {
       string particleListName = get<0>(iTuple);
       string category = get<1>(iTuple);
@@ -147,7 +138,7 @@ void FlavorTaggerInfoFillerModule::event()
         if (particleList -> getListSize() == 0) {
           infoMapsFBDT -> setProbEventLevel(category, 0);
           infoMapsFBDT -> setQpCategory(category, 0);
-          if (m_istrueCategories and mcFlag) {
+          if (m_istrueCategories and m_mcparticles.isValid()) {
             infoMapsFBDT -> setHasTrueTarget(category, 0);
             infoMapsFBDT -> setIsTrueCategory(category, 0);
           }
@@ -163,7 +154,7 @@ void FlavorTaggerInfoFillerModule::event()
               float qpCategory =  manager.getVariable(qpCategoryVariable)-> function(iParticle);
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
               infoMapsFBDT -> setQpCategory(category, qpCategory);
-              if (m_istrueCategories and mcFlag) {
+              if (m_istrueCategories and m_mcparticles.isValid()) {
                 float isTrueTarget = manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr);
                 infoMapsFBDT -> setHasTrueTarget(category, isTrueTarget);
                 float isTrueCategory = manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr);

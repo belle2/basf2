@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kindo Haruki                                             *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -94,7 +94,7 @@ namespace Belle2 {
     /**
      * Get mean of ADC histgram excluding 0-th bin.
      */
-    float getHistMean(TH1F* h);
+    float getHistMean(TH1D* h);
 
     /**
      * Get board/channel from layer/wire.
@@ -108,14 +108,22 @@ namespace Belle2 {
   protected:
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
-    TCanvas* m_cBadWire = nullptr; /**< bad wire panel */
-    std::string m_filename; /**< output file name */
+    TCanvas* m_cADC = nullptr; /**< main panel */
+    TCanvas* m_cTDC = nullptr; /**< bad wire panel */
+    TCanvas* m_cHit = nullptr; /**< main panel */
+
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
-    TH1F* m_hADC[300] = {}; /**< ADC histograms for each board (0-299) */
-    TH1F* m_hTDC[300] = {}; /**< TDC histograms for each board (0-299) */
-    TH1F* m_hHit[56] = {}; /**< hit histograms for each layer (0-55) */
-    TH1F* m_hNEvent = nullptr; /**< Histogram of num. event */
+    TH1F* m_hfastTDC = nullptr; /**< Histogram of num. event */
+    TH2F* m_hADC = nullptr; /**< Summary of ADC histograms  */
+    TH2F* m_hADCTOTCut = nullptr; /**< Summary of ADC histograms with tot cut*/
+    TH2F* m_hTDC = nullptr; /**< Summary of TDC histograms */
+    TH2F* m_hHit = nullptr; /**< Summary of hit histograms */
+    TH1D* m_hADCs[300]; /**< ADC histograms for each board (0-299) */
+    TH1D* m_hADCTOTCuts[300]; /**< ADC histograms with tot cut for each board (0-299) */
+    TH1D* m_hTDCs[300]; /**< TDC histograms for each board (0-299) */
+    TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
+
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */
     std::map<WireID, std::pair<int, int>> m_chMap = {}; /**< Channel map retrieved  */
     DBArray<CDCChannelMap>* m_channelMapFromDB = nullptr; /**< Channel map retrieved from DB. */

@@ -1,20 +1,18 @@
-from basf2 import *
+import basf2 as b2
 import os
 import shutil
 import glob
 
-# show only Errors as we'll be setting off a lot of ugly deliberate warnings
-set_log_level(LogLevel.ERROR)
-
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
 
 from caf.framework import Calibration, CAF
-from caf.backends import Local
 
 import unittest
 from unittest import TestCase
+from pathlib import Path
+
+# show only Errors as we'll be setting off a lot of ugly deliberate warnings
+b2.set_log_level(b2.LogLevel.ERROR)
 
 
 class TestCalibrationClass_Configure(TestCase):
@@ -31,7 +29,12 @@ class TestCalibrationClass_Configure(TestCase):
         #: Calibration algorithm attribute for use in unittests
         self.alg2 = TestAlgo()
         #: Collector module attribute for use in unittests
-        self.col1 = register_module('CaTest')
+        self.col1 = b2.register_module('CaTest')
+        #: Path to an example file
+        self.example_file1 = Path("example1.root")
+        self.example_file2 = Path("example2.root")
+        self.example_file1.touch()
+        self.example_file2.touch()
 
     def test_1(self):
         """
@@ -72,7 +75,7 @@ class TestCalibrationClass_Configure(TestCase):
         cal = Calibration('TestCalibrationClass_Configure_test5')
         cal.collector = self.col1
         cal.algorithms = [self.alg1, self.alg2]
-        cal.input_files = '/path/to/file.root'
+        cal.input_files = self.example_file1.as_posix()
         self.assertTrue(cal.is_valid())
 
     def test_6(self):
@@ -82,8 +85,12 @@ class TestCalibrationClass_Configure(TestCase):
         cal = Calibration('TestCalibrationClass_Configure_test6')
         cal.collector = self.col1
         cal.algorithms = [self.alg1, self.alg2]
-        cal.input_files = ['/path/to/file.root', '/path/to/file2.root']
+        cal.input_files = [self.example_file1.as_posix(), self.example_file2.as_posix()]
         self.assertTrue(cal.is_valid())
+
+    def tearDown(self):
+        self.example_file1.unlink()
+        self.example_file2.unlink()
 
 
 class TestCalibrationClass_Args(TestCase):
@@ -100,22 +107,33 @@ class TestCalibrationClass_Args(TestCase):
         #: Calibration algorithm for use in unittests
         self.alg2 = TestAlgo()
         #: Collector module attribute for use in unittests
-        self.col1 = register_module('CaTest')
+        self.col1 = b2.register_module('CaTest')
         #: Calibration name for use in unittests
         self.name = 'TestCalibration'
+        #: Path to an example file
+        self.example_file1 = Path("example1.root")
+        self.example_file2 = Path("example2.root")
+        self.example_file1.touch()
+        self.example_file2.touch()
 
     def test_1(self):
         """
         Test whether or not calibration is valid with correct setup and if name is stored correctly
         """
-        cal = Calibration(self.name, collector=self.col1, algorithms=[self.alg1, self.alg2], input_files='path/to/file.root')
+        cal = Calibration(
+            self.name,
+            collector=self.col1,
+            algorithms=[
+                self.alg1,
+                self.alg2],
+            input_files=self.example_file2.as_posix())
         self.assertTrue(cal.is_valid() and cal.name == self.name)
 
     def test_2(self):
         """
         Test whether or not calibration is valid with alternative correct setup and if name is stored correctly
         """
-        cal = Calibration(self.name, 'CaTest', self.alg1, input_files='path/to/file.root')
+        cal = Calibration(self.name, 'CaTest', self.alg1, input_files=self.example_file1.as_posix())
         self.assertTrue(cal.is_valid() and cal.name == self.name)
 
     def test_3(self):
@@ -123,10 +141,14 @@ class TestCalibrationClass_Args(TestCase):
         Test that the default options are correctly applied to a calibration
         """
         defaults = {"max_iterations": 4}
-        cal1 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
+        cal1 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files=self.example_file1.as_posix())
         cal1._apply_calibration_defaults(defaults)
-        cal2 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
+        cal2 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files=self.example_file2.as_posix())
         self.assertTrue(cal1.max_iterations == 4 and not cal2.max_iterations)
+
+    def tearDown(self):
+        self.example_file1.unlink()
+        self.example_file2.unlink()
 
 
 class TestCAF(TestCase):
@@ -145,13 +167,16 @@ class TestCAF(TestCase):
         #: Calibration name for use in unittests
         self.name3 = 'TestCalibration3'
         alg = TestAlgo()
-        col = register_module('CaTest')
+        col = b2.register_module('CaTest')
+        #: Path to an example file
+        self.example_file1 = Path("example1.root")
+        self.example_file1.touch()
         #: Calibration attribute for use in unittests
-        self.cal1 = Calibration(self.name1, col, alg, 'path/to/file.root')
+        self.cal1 = Calibration(self.name1, col, alg, self.example_file1.as_posix())
         #: Calibration attribute for use in unittests
-        self.cal2 = Calibration(self.name2, col, alg, 'path/to/file.root')
+        self.cal2 = Calibration(self.name2, col, alg, self.example_file1.as_posix())
         #: Calibration attribute for use in unittests
-        self.cal3 = Calibration(self.name3, col, alg, 'path/to/file.root')
+        self.cal3 = Calibration(self.name3, col, alg, self.example_file1.as_posix())
 
     def test_add_calibration(self):
         """
@@ -169,33 +194,6 @@ class TestCAF(TestCase):
         self.cal1.depends_on(self.cal1)
         self.assertFalse(self.cal1.dependencies)
 
-#    def test_order_calibrations(self):
-#        """
-#        Test that dependencies can input and order calibrations correctly
-#        """
-#        fw = CAF()
-#        fw.add_calibration(self.cal1)
-#        fw.add_calibration(self.cal2)
-#        fw.add_calibration(self.cal3)
-#        fw.add_dependency(self.cal1.name, self.cal2.name)
-#        fw.add_dependency(self.cal1.name, self.cal3.name)
-#        fw.add_dependency(self.cal2.name, self.cal3.name)
-#        fw.order_calibrations()
-#        self.assertTrue(fw.order == ['TestCalibration3', 'TestCalibration2', 'TestCalibration1'])
-#
-#    def test_order_calibrations_cyclic(self):
-#        """
-#        Test that cyclic dependencies are correctly identified by the CAF
-#        """
-#        fw = CAF()
-#        fw.add_calibration(self.cal1)
-#        fw.add_calibration(self.cal2)
-#        fw.add_calibration(self.cal3)
-#        fw.add_dependency(self.cal1.name, self.cal2.name)
-#        fw.add_dependency(self.cal2.name, self.cal3.name)
-#        fw.add_dependency(self.cal3.name, self.cal1.name)
-#        self.assertFalse(fw.order_calibrations())
-
     def test_make_output_dir(self):
         """
         Test that output_dir directory is created correctly
@@ -204,17 +202,6 @@ class TestCAF(TestCase):
         fw.output_dir = 'testCAF_outputdir'
         fw._make_output_dir()
         self.assertTrue(os.path.isdir('testCAF_outputdir'))
-
-#    def test_make_collector_paths(self):
-#        """
-#        Test that collector paths can be serialized into a file
-#        """
-#        fw = CAF()
-#        fw.add_calibration(self.cal1)
-#        fw.output_dir = 'serialise_testCAF_outputdir'
-#        fw.backend = Local()
-#        fw.run()
-#        self.assertTrue(os.path.isfile(fw.output_dir+'/'+self.cal1.name+'/paths/CaTest.pickle'))
 
     def test_config_output_dir(self):
         """
@@ -227,6 +214,7 @@ class TestCAF(TestCase):
         """
         Removes files that were created during these tests
         """
+        self.example_file1.unlink()
         dirs = glob.glob('*testCAF_outputdir')
         for directory in dirs:
             shutil.rmtree(directory)

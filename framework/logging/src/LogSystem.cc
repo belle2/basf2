@@ -27,6 +27,9 @@ using namespace Belle2;
 using namespace std;
 
 
+bool LogSystem::s_debugEnabled = false;
+
+
 LogSystem& LogSystem::Instance()
 {
   static LogSystem instance;
@@ -201,6 +204,7 @@ void LogSystem::resetLogging()
   addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
   m_printErrorSummary = false;
+  s_debugEnabled = false;
 }
 
 void LogSystem::printErrorSummary()

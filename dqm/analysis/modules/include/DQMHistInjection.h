@@ -54,8 +54,11 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    //! whether to use EPICs
+    bool m_useEpics;
 
     //! Clean up PVs
+    // cppcheck-suppress unusedPrivateFunction
     void cleanPVs(void);
 
     //! PXD Hits

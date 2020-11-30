@@ -19,15 +19,11 @@
 ###########################################################################################
 
 
-from basf2 import B2INFO, B2FATAL
+from basf2 import B2FATAL
 import ROOT
-import numpy as np
-import pylab
 import sys
 import glob
 import math
-import random
-import array
 from operator import itemgetter
 
 if len(sys.argv) != 4:
@@ -322,14 +318,20 @@ for VXDReq in VXDReqs:
     Pad.Draw()
     Pad.cd()
     resFrame.Draw()
-    l = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # l.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    l.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(shift) + '}{    #pm ' + '{:4.2f}'.format(shiftErr) + ' ps}')
-    l.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(resolution) + '}{    #pm ' +
-               '{:4.2f}'.format(resolutionErr) + ' ps}')
-    l.SetTextSize(0.054)
-    l.SetFillColorAlpha(ROOT.kWhite, 0)
-    l.Draw()
+    legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    legend.AddEntry(
+        0,
+        '#splitline{#mu_{#Delta t} =' +
+        '{: 4.2f}'.format(shift) +
+        '}{    #pm ' +
+        '{:4.2f}'.format(shiftErr) +
+        ' ps}')
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(resolution) + '}{    #pm ' +
+                    '{:4.2f}'.format(resolutionErr) + ' ps}')
+    legend.SetTextSize(0.054)
+    legend.SetFillColorAlpha(ROOT.kWhite, 0)
+    legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaT" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
@@ -355,15 +357,15 @@ for VXDReq in VXDReqs:
     Pad.Draw()
     Pad.cd()
     resFrameDtErr.Draw()
-    l = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
-    # l.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    l.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(meanCBS.getVal()) + '}{    #pm ' +
-               '{:4.2f}'.format(meanCBS.getError()) + ' ps}')  # '{:>6}'.format(Shift)
-    l.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(sigmaCBS.getVal()) +
-               '}{    #pm ' + '{:4.2f}'.format(sigmaCBS.getError()) + ' ps}')  # '{:>4}'.format(Resol)
-    l.SetTextSize(0.054)
-    l.SetFillColorAlpha(ROOT.kWhite, 0)
-    # l.Draw()
+    legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
+    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(meanCBS.getVal()) + '}{    #pm ' +
+                    '{:4.2f}'.format(meanCBS.getError()) + ' ps}')  # '{:>6}'.format(Shift)
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(sigmaCBS.getVal()) +
+                    '}{    #pm ' + '{:4.2f}'.format(sigmaCBS.getError()) + ' ps}')  # '{:>4}'.format(Resol)
+    legend.SetTextSize(0.054)
+    legend.SetFillColorAlpha(ROOT.kWhite, 0)
+    # legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaTError" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
@@ -457,18 +459,18 @@ for VXDReq in VXDReqs:
     Pad.Draw()
     Pad.cd()
     resFrameSigZ.Draw()
-    l = ROOT.TLegend(0.63, 0.65, 0.9, 0.9)
+    legend = ROOT.TLegend(0.63, 0.65, 0.9, 0.9)
     # NumbrSigZ = '{:d}'.format(int((f1+f2)*fitDataSigZ.numEntries()))
-    # l.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrSigZ))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrSigZ))
 
-    l.AddEntry(
+    legend.AddEntry(
         0,
         '#splitline{#mu_{#Delta z} =' +
         '{: 1.1f}'.format(shiftSigZ) +
         '}{    #pm ' +
         '{:1.1f}'.format(shiftErrSigZ) +
         ' #mum}')
-    l.AddEntry(
+    legend.AddEntry(
         0,
         '#splitline{#sigma_{#Delta z} =' +
         '{: 1.1f}'.format(resolutionSigZ) +
@@ -476,9 +478,9 @@ for VXDReq in VXDReqs:
         '{:1.1f}'.format(resolutionErrSigZ) +
         ' #mum}')
 
-    l.SetTextSize(0.05)
-    l.SetFillColorAlpha(ROOT.kWhite, 0)
-    l.Draw()
+    legend.SetTextSize(0.05)
+    legend.SetFillColorAlpha(ROOT.kWhite, 0)
+    legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZsig" + VXDReq + ".pdf"
     cSig.SaveAs(nPlot)
@@ -579,17 +581,17 @@ for VXDReq in VXDReqs:
     Pad.Draw()
     Pad.cd()
     resFrameTagZ.Draw()
-    l = ROOT.TLegend(0.64, 0.65, 0.9, 0.9)
+    legend = ROOT.TLegend(0.64, 0.65, 0.9, 0.9)
     # NumbrTagZ = '{:d}'.format(int((f1+f2)*fitDataTagZ.numEntries()))
-    # l.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrTagZ))
+    # legend.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrTagZ))
 
-    l.AddEntry(0, '#splitline{#mu_{#Delta z} =' + '{: 1.1f}'.format(shiftTagZ) +
-               '}{  #pm ' + '{: 1.1f}'.format(shiftErrTagZ) + ' #mum}')
-    l.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + '{: 1.1f}'.format(resolutionTagZ) +
-               '}{  #pm ' + '{: 1.1f}'.format(resolutionErrTagZ) + ' #mum}')
-    l.SetTextSize(0.05)
-    l.SetFillColorAlpha(ROOT.kWhite, 0)
-    l.Draw()
+    legend.AddEntry(0, '#splitline{#mu_{#Delta z} =' + '{: 1.1f}'.format(shiftTagZ) +
+                    '}{  #pm ' + '{: 1.1f}'.format(shiftErrTagZ) + ' #mum}')
+    legend.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + '{: 1.1f}'.format(resolutionTagZ) +
+                    '}{  #pm ' + '{: 1.1f}'.format(resolutionErrTagZ) + ' #mum}')
+    legend.SetTextSize(0.05)
+    legend.SetFillColorAlpha(ROOT.kWhite, 0)
+    legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZtag" + VXDReq + ".pdf"
     cTag.SaveAs(nPlot)

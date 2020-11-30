@@ -5,6 +5,6 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Belle2::FilterBase+;
-#pragma link C++ class Belle2::AlwaysYesFilter+;
+#pragma link C++ class Belle2::FilterBase+; // checksum=0x8b56ab6f, version=1
+#pragma link C++ class Belle2::AlwaysYesFilter+; // checksum=0x667dc3ba, version=1
 

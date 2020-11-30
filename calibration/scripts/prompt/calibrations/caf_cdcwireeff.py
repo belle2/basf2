@@ -3,7 +3,7 @@
 """CDC Wire Efficiency and BadWire creator. Creates layer-by-layer and wire-by-wire efficiencies and returns bad wire list"""
 
 from prompt import CalibrationSettings
-from prompt.utils import events_in_basf2_file
+from caf.framework import Calibration
 
 
 #: Tells the automated system some details of this script
@@ -13,9 +13,6 @@ settings = CalibrationSettings(name="CDC bad wires",
                                input_data_formats=["raw"],
                                input_data_names=["hlt_mumu"],
                                depends_on=[])
-
-
-import basf2
 
 ################################################
 # Required function called by b2caf-prompt-run #
@@ -137,9 +134,6 @@ def wire_algo():
     from ROOT import Belle2
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     return algo
-
-
-from caf.framework import Calibration
 
 
 class CDCCalibration(Calibration):

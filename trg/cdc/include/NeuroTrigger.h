@@ -130,11 +130,11 @@ namespace Belle2 {
     void setConstants();
 
     /** set fixed point precision */
-    void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
+    void setPrecision(const std::vector<unsigned>& precision) { m_precision = precision; }
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
-    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, std::string et_option);
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, const std::string& et_option);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -214,6 +214,17 @@ namespace Belle2 {
      * @return super layer pattern of hits in the current track
      */
     unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get complete hit pattern of neurotrack. This does the same as
+     * the getInputPattern function, but also shows the axial hit bits.
+     * This function was made for the simulation of the hardware debug
+     * information "TSVector".
+     */
+    unsigned long getCompleteHitPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get the drift threshold bits, where the time of the TS was outside of the accepted time window and thus
+     * shifted to the allowed maximum within the borders. Note, that to get the same values as from the unpacker,
+     * this value has to be combined with the (complement of the) TSVector.
+     */
+    unsigned long getPureDriftThreshold(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
 
     /** Select hits for each super layer from the ones related to input track
      * @param isector              index of the MLP that will use the input
@@ -243,7 +254,7 @@ namespace Belle2 {
      * @param isector index of the MLP
      * @param input vector of input values
      * @return unscaled output values (z vertex in cm and/or theta in radian) */
-    std::vector<float> runMLP(unsigned isector, std::vector<float> input);
+    std::vector<float> runMLP(unsigned isector, const std::vector<float>& input);
 
     /** Run an expert MLP with fixed point arithmetic. */
     std::vector<float> runMLPFix(unsigned isector, std::vector<float> input);

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DISPLAYMODULE_H
-#define DISPLAYMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -116,5 +115,3 @@ namespace Belle2 {
     EVEVisualization* m_visualizer;
   };
 }
-
-#endif

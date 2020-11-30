@@ -300,7 +300,13 @@ dd_t ShaperDSP_t::ddShaperDSP(const shaperdspshift_t& t0) const
 
 void ShaperDSP_t::init(const double* s, double unitscale)
 {
-  Sv123_init(s[2], s[3], s[7], s[8], s[1], s[4]);
+  double t01 = s[2];
+  double tb1 = s[3];
+  double t02 = s[7];
+  double tb2 = s[8];
+  double td1 = s[1];
+  double ts1 = s[4];
+  Sv123_init(t01, tb1, t02, tb2, td1, ts1);
   _dt0 = 1 / s[6];
   _dt1 = 1 / s[2];
 
@@ -309,8 +315,6 @@ void ShaperDSP_t::init(const double* s, double unitscale)
   _w1   = 0.5 * s[9];
   _ccc  = s[5];
 
-  //  const double unitscale = 27.7221;
-  _ccc *= unitscale;
   _cs0 *= unitscale;
   _cc0 *= unitscale;
   _cs1 *= unitscale;

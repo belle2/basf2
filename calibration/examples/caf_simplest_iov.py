@@ -3,19 +3,19 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-# add time stamp to all INFO messages
-# currentInfo = logging.get_info(LogLevel.INFO)
-# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
+
+b2.set_log_level(b2.LogLevel.INFO)
+# add time stamp to all INFO messages
+# currentInfo = logging.get_info(LogLevel.INFO)
+# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 
 def main(argv):

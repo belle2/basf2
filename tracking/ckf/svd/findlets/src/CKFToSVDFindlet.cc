@@ -98,7 +98,7 @@ void CKFToSVDFindlet::apply()
   m_dataHandler.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
 
-  B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
+  B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");
 
   if (m_spacePointVector.empty() or m_cdcRecoTrackVector.empty()) {
     return;
@@ -108,10 +108,10 @@ void CKFToSVDFindlet::apply()
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
-  B2DEBUG(50, "Created " << m_relations.size() << " relations.");
+  B2DEBUG(29, "Created " << m_relations.size() << " relations.");
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
-  B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
+  B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");
 
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
@@ -120,7 +120,7 @@ void CKFToSVDFindlet::apply()
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 
-  B2DEBUG(50, "Having found " << m_filteredResults.size() << " results");
+  B2DEBUG(29, "Having found " << m_filteredResults.size() << " results");
 
   m_resultStorer.apply(m_filteredResults);
   m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);

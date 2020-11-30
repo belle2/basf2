@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 argv = sys.argv
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Modules
-input = register_module('DQMHistAnalysisInput')
+input = b2.register_module('DQMHistAnalysisInput')
 input.param('HistMemoryPath', argv[1])
 main.add_module(input)
 
@@ -22,7 +22,7 @@ main.add_module(input)
 # example.param("Function", "gaus(2)")
 # main.add_module(example)
 
-output = register_module('DQMHistAnalysisOutputRelayMsg')
+output = b2.register_module('DQMHistAnalysisOutputRelayMsg')
 main.add_module(output)
 
 # nsm = register_module('DQMHistAnalysisOutputNSM')
@@ -30,4 +30,4 @@ main.add_module(output)
 # main.add_module(nsm)
 
 # Process all events
-process(main)
+b2.process(main)

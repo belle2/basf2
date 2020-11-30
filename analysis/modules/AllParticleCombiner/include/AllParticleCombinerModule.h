@@ -12,8 +12,13 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -38,6 +43,10 @@ namespace Belle2 {
 
 
   private:
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
+    StoreObjPtr<ParticleList> m_outputList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_outputAntiList; /**< output anti-particle list */
 
     std::vector<std::string> m_inputListNames;  /**< List of ParticleLists which are supposed to be combined */
 

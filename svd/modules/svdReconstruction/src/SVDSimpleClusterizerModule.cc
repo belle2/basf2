@@ -66,7 +66,8 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            m_timeAlgorithm);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
-
+  addParam("SVDEventInfoName", m_svdEventInfoSet,
+           "Set the SVDEventInfo to use", string("SVDEventInfoSim"));
 
 }
 
@@ -120,6 +121,7 @@ void SVDSimpleClusterizerModule::initialize()
   B2DEBUG(1, " -->  Neighbour cut:      " << m_cutAdjacent);
   B2DEBUG(1, " -->  Seed cut:           " << m_cutSeed);
   B2DEBUG(1, " -->  Size HeadTail:      " << m_sizeHeadTail);
+  B2DEBUG(1, " -->  SVDEventInfoName:   " << m_svdEventInfoSet);
 }
 
 
@@ -253,7 +255,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
   std::string m_svdEventInfoName = "SVDEventInfo";
   if (!temp_eventinfo.isValid())
-    m_svdEventInfoName = "SVDEventInfoSim";
+    m_svdEventInfoName = m_svdEventInfoSet;
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
@@ -268,8 +270,9 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   // last step:
   // shift cluster time by TB time AND by FirstFrame ( FF = 0 for the 6-sample CoG Time)
-  // NOTE: this shift is removed in the SVDCogTimeCalibrationCollector in the CAF
-  time = caltime + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+  // the relative shift between 3- and 6-sample DAQ is also corrected
+  // NOTE: this shift is removed in the SVDTimeCalibrationCollector in the CAF
+  time = eventinfo->getTimeInFTSWReference(caltime, firstFrame);
 
   //  Store Cluster into Datastore
   m_storeClusters.appendNew(SVDCluster(

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEPROPERTIES_H_
-#define PARTICLEPROPERTIES_H_
+#pragma once
 
 namespace Belle2 {
   /** This struct is used by the StandardTrackingPerformanceModule to save information
@@ -109,6 +108,3 @@ namespace Belle2 {
   };
 
 }
-
-
-#endif /* PARTICLEPROPERTIES_H_ */

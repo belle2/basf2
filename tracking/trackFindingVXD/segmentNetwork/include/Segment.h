@@ -44,8 +44,8 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     Segment():
-      m_outerHit(NULL),
-      m_innerHit(NULL),
+      m_outerHit(nullptr),
+      m_innerHit(nullptr),
       m_outerSector(FullSecID()),
       m_innerSector(FullSecID()),
       m_identifier(-1)

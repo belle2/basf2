@@ -9,7 +9,7 @@
  * candidate will result in one shower/cluster in the end.                *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -116,7 +116,7 @@ namespace Belle2 {
     void makeLocalMaximum(const ECLConnectedRegion& aCR, const int cellId, const int lmId);
 
     /** Add energy to vector. */
-    void addToSignalEnergy(int& motherpdg, int& motherindex, int& pi0index, const double& weight);
+    void addToSignalEnergy(int motherpdg, int motherindex, int pi0index, double weight);
 
     /** Check if particle is produced outside of the ECL. */
     bool isEnteringECL(const B2Vector3D& vec);

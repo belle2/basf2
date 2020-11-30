@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import sys
 import datetime
-from basf2 import *
-from subprocess import call
+import basf2 as b2
 
 d = datetime.datetime.today()
 print((d.strftime('job start: %Y-%m-%d %H:%M:%S\n')))
@@ -20,10 +18,10 @@ outfile = str(sys.argv[4]) + "/" + str(sys.argv[2]) + "_" + str(sys.argv[3]) + "
 print(outfile)
 
 # Set the global log level
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 seed = str(sys.argv[5])
 print('seed: ', seed)
-set_random_seed(int(seed))
+b2.set_random_seed(int(seed))
 
 ethres = str(sys.argv[6])
 print('thres: ', ethres)
@@ -33,40 +31,40 @@ sampletime = str(sys.argv[8])
 print('sample time: ', sampletime)
 
 # Input
-simpleinput = register_module('RootInput')
+simpleinput = b2.register_module('RootInput')
 simpleinput.param('inputFileNames', inputs)
 
 # Output
-histo = register_module("HistoManager")  # Histogram Manager
+histo = b2.register_module("HistoManager")  # Histogram Manager
 histo.param('histoFileName', outfile)
 
 # suppress info messages during processing:
 # set_log_level(LogLevel.WARNING)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 
-detector = register_module('QcsmonitorStudy')
-detector.param('Ethres', double(ethres))
-detector.param('Erange', double(erange))
-detector.param('SampleTime', double(sampletime))
+detector = b2.register_module('QcsmonitorStudy')
+detector.param('Ethres', float(ethres))
+detector.param('Erange', float(erange))
+detector.param('SampleTime', float(sampletime))
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 # Register necessary modules
-main = create_path()
+main = b2.create_path()
 main.add_module(simpleinput)
 main.add_module(gearbox)
 main.add_module(detector)
 main.add_module(histo)
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

@@ -1,19 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from svd import *
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TCanvas, TH2F, TGraph, TMultiGraph, TH2D, TLegend, TROOT, gROOT, TF1, TMath
-import os
+import basf2 as b2
+from ROOT import Belle2, TFile, TTree, gROOT
 import numpy
-import math
-from array import array
-import basf2
 
-import simulation
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
@@ -26,12 +18,12 @@ svd_ClustersFromTracks = "SVDClustersFromTracks"
 svd_EventInfo = "SVDEventInfo"
 svd_EventMD = "EventMetaData"
 
-set_random_seed(11)
+b2.set_random_seed(11)
 
 gROOT.SetBatch(True)
 
 
-class svdCoGCalibrationAnalysisTool(basf2.Module):
+class svdCoGCalibrationAnalysisTool(b2.Module):
     """
     Class used to check the goodness of the CoG time calibration
     """
@@ -220,9 +212,10 @@ class svdCoGCalibrationAnalysisTool(basf2.Module):
 # conditions.override_globaltags()
 # conditions.globaltags = ["online"]
 
-main = create_path()
 
-rootinput = register_module('RootInput')
+main = b2.create_path()
+
+rootinput = b2.register_module('RootInput')
 rootinput.param('inputFileName', inputFile)
 main.add_module(rootinput)
 
@@ -232,8 +225,8 @@ main.add_module(rootinput)
 main.add_module(svdCoGCalibrationAnalysisTool())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

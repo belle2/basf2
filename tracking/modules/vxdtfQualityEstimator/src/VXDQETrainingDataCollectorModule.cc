@@ -32,6 +32,11 @@ VXDQETrainingDataCollectorModule::VXDQETrainingDataCollectorModule() : Module()
            "tripletFit, helixFit]",
            m_EstimationMethod);
 
+  addParam("MCInfo",
+           m_MCInfo,
+           "If true, MC information is used. Thus, to run over data, this needs to be set to false.",
+           m_MCInfo);
+
   addParam("SpacePointTrackCandsStoreArrayName",
            m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.",
@@ -97,8 +102,10 @@ void VXDQETrainingDataCollectorModule::initialize()
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
 
-  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator, m_mva_target);
-  B2ASSERT("QualityEstimatorMC could be initialized!", m_estimatorMC);
+  if (m_MCInfo) {
+    m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator, m_mva_target);
+    B2ASSERT("QualityEstimatorMC could be initialized!", m_estimatorMC);
+  }
 }
 
 void VXDQETrainingDataCollectorModule::beginRun()
@@ -106,7 +113,9 @@ void VXDQETrainingDataCollectorModule::beginRun()
   // BField is required by all QualityEstimators
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
-  m_estimatorMC->setMagneticFieldStrength(bFieldZ);
+  if (m_MCInfo) {
+    m_estimatorMC->setMagneticFieldStrength(bFieldZ);
+  }
 }
 
 void VXDQETrainingDataCollectorModule::event()
@@ -122,8 +131,10 @@ void VXDQETrainingDataCollectorModule::event()
       m_clusterInfoExtractor->extractVariables(sortedHits);
     }
     m_nSpacePoints = sortedHits.size();
-    const double mc_quality = m_estimatorMC->estimateQuality(sortedHits);
-    m_truth = float(mc_quality > 0);
+    if (m_MCInfo) {
+      const double mc_quality = m_estimatorMC->estimateQuality(sortedHits);
+      m_truth = float(mc_quality > 0);
+    }
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
     m_recorder->record();

@@ -17,7 +17,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 // utilities
@@ -62,6 +61,9 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
 
 void BtubeCreatorModule::initialize()
 {
+
+  m_plist.isRequired(m_listName);
+
   // magnetic field
   m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -70,8 +72,8 @@ void BtubeCreatorModule::initialize()
   m_beamSpotCov = m_beamSpotDB->getCovVertex();
   B2INFO("BtubeCreator : magnetic field = " << m_Bfield);
 
-  tubeArray.registerInDataStore();
-  particles.registerRelationTo(tubeArray);
+  m_tubeArray.registerInDataStore();
+  StoreArray<Particle>().registerRelationTo(m_tubeArray);
 
   bool valid = m_decaydescriptor.init(m_decayString);
   if (!valid)
@@ -83,19 +85,13 @@ void BtubeCreatorModule::initialize()
 
 void BtubeCreatorModule::event()
 {
-  StoreObjPtr<ParticleList> plist(m_listName);
-  if (!plist) {
-    B2ERROR("ParticleList " << m_listName << " not found");
-    return;
-  }
-
   analysis::RaveSetup::initialize(1, m_Bfield);
 
   std::vector<unsigned int> toRemove;
-  unsigned int n = plist->getListSize();
+  unsigned int n = m_plist->getListSize();
 
   for (unsigned i = 0; i < n; i++) {
-    Particle* particle = plist->getParticle(i);
+    Particle* particle = m_plist->getParticle(i);
 
     std::vector<Particle*> daughtervec = particle->getDaughters();
     std::vector<const Particle*> selParticles = m_decaydescriptor.getSelectionParticles(particle);
@@ -244,7 +240,7 @@ void BtubeCreatorModule::event()
 
         tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
 
-        Btube* tubeconstraint = tubeArray.appendNew(Btube());
+        Btube* tubeconstraint = m_tubeArray.appendNew(Btube());
         if (m_associateBtubeToBselected) {
           tubecreatorB->addRelationTo(tubeconstraint);
         } else {
@@ -264,7 +260,7 @@ void BtubeCreatorModule::event()
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }
-  plist->removeParticles(toRemove);
+  m_plist->removeParticles(toRemove);
 
   analysis::RaveSetup::getInstance()->reset();
 }
@@ -301,7 +297,8 @@ void BtubeCreatorModule::addextrainfos(Particle* daughter, Particle* copy, TMatr
   daughter->writeExtraInfo("TubeCov21", mat(2, 1));
   daughter->writeExtraInfo("TubeCov22", mat(2, 2));
 
-  daughter->writeExtraInfo("TubeDirX", TLV.Px());
-  daughter->writeExtraInfo("TubeDirY", TLV.Py());
-  daughter->writeExtraInfo("TubeDirZ", TLV.Pz());
+  daughter->writeExtraInfo("TubeDirX", (TLV.Px() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeDirY", (TLV.Py() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeDirZ", (TLV.Pz() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeB_p_estimated", TLV.Mag());
 }

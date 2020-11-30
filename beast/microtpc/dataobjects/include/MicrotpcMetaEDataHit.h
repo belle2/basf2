@@ -36,16 +36,31 @@ namespace Belle2 {
       m_ILER(0), m_PLER(0), m_tLER(0), m_flagLER(0) {}
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param detNb the TPC number
+     * @param pixNb the pixel number firing
+     * @param ts_nb the number of time stamp
+     * @param ts_start start readout time stamp
+     * @param ts_stop stop readout time stamp
+     * @param Temperature TPC temperature
+     * @param Pressure TPC pressure
+     * @param Flow TPC flow
+     * @param SetFlow TPC slow control set flow
+     * @param GetFlow TPC slow control get flow
+     * @param IHER HER current
+     * @param PHER HER average pressure
+     * @param tHER HER beam life time
+     * @param flagHER HER injection flag
+     * @param ILER LER current
+     * @param PLER LER average pressure
+     * @param tLER LER beam life time
+     * @param flagLER LER injection flag
      */
-
     /*
     MicrotpcMetaEDataHit(int column, int row, int BCID, int TOT, int detNb):
     m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb)
     {
     }
     */
-
     MicrotpcMetaEDataHit(int detNb, int pixNb,
                          int ts_nb, const double ts_start[10], const double ts_stop[10],
                          const float Temperature[4], const float Pressure[2], const float Flow[2], float SetFlow, float GetFlow,

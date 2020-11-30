@@ -2,7 +2,6 @@ import ROOT
 
 import math
 import numpy as np
-import array
 
 
 def TH2Hex(name,
@@ -161,6 +160,7 @@ def test():
 
     hex_histogram.Draw("colz")
     input()
+
 
 if __name__ == "__main__":
     test()

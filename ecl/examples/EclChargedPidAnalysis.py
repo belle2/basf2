@@ -1,42 +1,41 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-###############################################################
-# This steering file shows how to use ECLChargedPIDDataAnalysis
-# module to dump ECL related quantities in an ntuple
-# starting from dst root file.
-#
-# Author: The Belle II Collaboration
-# Contributor: Cate MacQueen
-# Contact: cmq.centaurus@gmail.com
-#
-###############################################################
+"""This steering file shows how to use 'ECLChargedPIDDataAnalysis'
+   module to dump ECL-related quantities in an ntuple.
 
-from basf2 import *
-from ROOT import Belle2
-from modularAnalysis import *
-import os.path
-import sys
+Input:
+    File with DST format
 
-particle_type = sys.argv[1]
-file_num = sys.argv[2]
+Output:
+    Ntuple with ECL-related quantities
 
-# Input File
-inputFile = register_module('RootInput')
-inputFile.param('inputFileName', './MDST_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
+Usage:
+    $ basf2 -i <path_to_input_file> -n <number_of_events>
+            EclChargedPidAnalysis.py
+"""
 
-# Create paths
-main = create_path()
+import basf2 as b2
 
-main.add_module(inputFile)
+__authors__ = ['Caitlin MacQueen', 'Marco Milesi']
+__copyright__ = 'Copyright 2018 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-# ECLChargedPIDDataAnalysis module
-eclchargedpid = register_module('ECLChargedPIDDataAnalysis')
-eclchargedpid.param(
-    'rootFileName',
-    './RootOut_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
 
-main.add_module(eclchargedpid)
+# Register and add 'RootInput' module
+inputFile = b2.register_module('RootInput')
+mainPath.add_module(inputFile)
 
-process(main)
-print(statistics)
+# Register and add 'ECLChargedPIDDataAnalysis' module
+eclChargedPIDDataAnalysis = b2.register_module('ECLChargedPIDDataAnalysis')
+eclChargedPIDDataAnalysis.param('rootFileName',
+                                'ECLChargedPIDDataAnalysis_Test.root')
+mainPath.add_module(eclChargedPIDDataAnalysis)
+
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

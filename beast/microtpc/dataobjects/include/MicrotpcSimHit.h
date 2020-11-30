@@ -36,7 +36,16 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param tkID track ID
+     * @param energyDep the energy deposition in electrons
+     * @param energyNiel the non-ionization energy in electrons
+     * @param tkPDG the PDG number of the track
+     * @param tkKEnergy the kinetic energy of the track
+     * @param detNb the TPC number
+     * @param GlTime the global time
+     * @param tkPos the track position
+     * @param tkMom the track momentum
+     * @param tkMomDir the track momentum direction
      */
     MicrotpcSimHit(int tkID, float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime,
                    const float* tkPos, const float* tkMom, const float* tkMomDir):

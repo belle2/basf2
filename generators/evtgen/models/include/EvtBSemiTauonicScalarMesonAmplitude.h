@@ -22,7 +22,7 @@ namespace Belle2 {
      *
      * @param parent a pointer to the parent particle.
      * @param amp a pointer to fill the calculated spin dependent amplitude.
-     * @param CalcHelAmp a pointer to the calculator of the helicity dependent amplitude.
+     * @param HelicityAmplitudeCalculator a pointer to the calculator of the helicity dependent amplitude.
      * The function calculate the spin dependent amplitude of the semi-tauonic decay to a scalar meson (D meson).
      */
     void CalcAmp(EvtParticle* parent, EvtAmp& amp,

@@ -341,7 +341,7 @@ namespace {
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
-    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack = myTracks.appendNew(mytrack);
@@ -367,7 +367,7 @@ namespace {
     //-----------------------------------------------------------------------
     // now add another track and mock up a V0 and a V0-based particle
     myResults.appendNew(position, momentum, cov6, charge * -1,
-                        Const::electron, pValue, bField, CDCValue, 16777215);
+                        Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track secondTrack;
     secondTrack.setTrackFitResultIndex(Const::electron, 1);
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
@@ -455,7 +455,7 @@ namespace {
       TMatrixDSym cov(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
       electron_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -463,7 +463,7 @@ namespace {
       TMatrixDSym cov1(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
       pion_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -496,6 +496,87 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  TEST_F(MCTruthVariablesTest, mcCosThetaBetweenParticleAndNominalB)
+  {
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for B- -> (D0 ->  K- e+ nu_e) pi-
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter2 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter3 = mcGraph.addParticle();
+
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+    graphParticleGranddaughter1.comesFrom(graphParticleDaughter1);
+    graphParticleGranddaughter2.comesFrom(graphParticleDaughter1);
+    graphParticleGranddaughter3.comesFrom(graphParticleDaughter1);
+
+    graphParticleMother.setPDG(-521);
+    graphParticleDaughter1.setPDG(421);
+    graphParticleDaughter2.setPDG(-211);
+    graphParticleGranddaughter1.setPDG(-321);
+    graphParticleGranddaughter2.setPDG(-11);
+    graphParticleGranddaughter3.setPDG(12);
+
+    // Create the two 4-vectors that will factor into calculation, and set a mass that corresponds
+    // to the length of the 4-vector
+    PCmsLabTransform T;
+    graphParticleMother.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 3.0, 4.0, 5.0, 18.0 }));
+    graphParticleGranddaughter3.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 0.0, 0.0, 5.0, 5.0 }));
+    graphParticleMother.setMass(16.55294535724685);
+
+    // The following masses and momenta do not factor into the calculation, but we will set them non-zero
+    TLorentzVector dummyP4(1, 2, 1, 5);
+    double dummyM = 4.3589;
+    graphParticleDaughter1.set4Vector(dummyP4);
+    graphParticleDaughter1.setMass(dummyM);
+    graphParticleDaughter2.set4Vector(dummyP4);
+    graphParticleDaughter2.setMass(dummyM);
+    graphParticleGranddaughter1.set4Vector(dummyP4);
+    graphParticleGranddaughter1.setMass(dummyM);
+    graphParticleGranddaughter2.set4Vector(dummyP4);
+    graphParticleGranddaughter2.setMass(dummyM);
+
+    mcGraph.generateList();
+
+    // Create mockup particles and add relations to MC particles
+    auto* pMother = particles.appendNew(dummyP4, -521);
+    pMother->addRelationTo(mcParticles[0]);
+
+    particles.appendNew(dummyP4, 421)->addRelationTo(mcParticles[1]);
+    particles.appendNew(dummyP4, -211)->addRelationTo(mcParticles[2]);
+    particles.appendNew(dummyP4, -321)->addRelationTo(mcParticles[3]);
+    particles.appendNew(dummyP4, -11)->addRelationTo(mcParticles[4]);
+    particles.appendNew(dummyP4, 12)->addRelationTo(mcParticles[5]);
+
+    double E_B = T.getCMSEnergy() / 2.0;
+    double M_B = pMother->getPDGMass();
+    double p_B = std::sqrt(E_B * E_B - M_B * M_B);
+
+    TLorentzVector p4_Y_CMS = T.rotateLabToCms() * (graphParticleMother.get4Vector() - graphParticleGranddaughter3.get4Vector());
+    double E_Y = p4_Y_CMS.E(); // E_Mother - E_Granddaughter3
+    double p_Y = p4_Y_CMS.Rho(); // |p_Mother - p_Granddaughter3|
+    double M_Y = p4_Y_CMS.M(); // sqrt((p4_Mother - p4_Granddaughter3)^2)
+
+    double expectedCosBY = (2 * E_B * E_Y - M_B * M_B - M_Y * M_Y) / (2 * p_B * p_Y);
+
+    const auto* mcCosBY = Manager::Instance().getVariable("mcCosThetaBetweenParticleAndNominalB");
+
+    EXPECT_NEAR(mcCosBY->function(pMother), expectedCosBY, 1e-4);
+  }
 
   TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
   {
@@ -530,342 +611,6 @@ namespace {
     EXPECT_FLOAT_EQ(weight->function(electron),     45.6);
     EXPECT_FLOAT_EQ(weight->function(pion),     45.6);
     EXPECT_FLOAT_EQ(weight->function(misid_photon), 45.6);
-  }
-
-  class ROEVariablesTest : public ::testing::Test {
-  protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
-    void SetUp() override
-    {
-
-      StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-      DataStore::Instance().setInitializeActive(true);
-      pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
-      StoreArray<ECLCluster> myECLClusters;
-      StoreArray<KLMCluster> myKLMClusters;
-      StoreArray<TrackFitResult> myTFRs;
-      StoreArray<Track> myTracks;
-      StoreArray<Particle> myParticles;
-      StoreArray<RestOfEvent> myROEs;
-      StoreArray<PIDLikelihood> myPIDLikelihoods;
-      myECLClusters.registerInDataStore();
-      myKLMClusters.registerInDataStore();
-      myTFRs.registerInDataStore();
-      myTracks.registerInDataStore();
-      myParticles.registerInDataStore();
-      myROEs.registerInDataStore();
-      myPIDLikelihoods.registerInDataStore();
-      myParticles.registerRelationTo(myROEs);
-      myTracks.registerRelationTo(myPIDLikelihoods);
-      DataStore::Instance().setInitializeActive(false);
-    }
-
-    /** clear datastore */
-    void TearDown() override
-    {
-      DataStore::Instance().reset();
-    }
-  };
-//
-// TODO: redo all ROE variable tests
-//
-
-  TEST_F(ROEVariablesTest, Variable)
-  {
-    Gearbox& gearbox = Gearbox::getInstance();
-    gearbox.setBackends({std::string("file:")});
-    gearbox.close();
-    gearbox.open("geometry/Belle2.xml", false);
-    StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-    StoreArray<ECLCluster> myECLClusters;
-    StoreArray<KLMCluster> myKLMClusters;
-    StoreArray<TrackFitResult> myTFRs;
-    StoreArray<Track> myTracks;
-    StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
-    StoreArray<PIDLikelihood> myPIDLikelihoods;
-
-    pi0ParticleList.create();
-    pi0ParticleList->initialize(111, "pi0:vartest");
-
-    // Neutral ECLCluster on reconstructed side
-    ECLCluster myECL;
-    myECL.setIsTrack(false);
-    float eclREC = 0.5;
-    myECL.setEnergy(eclREC);
-    myECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
-    ECLCluster* savedECL = myECLClusters.appendNew(myECL);
-
-    // Particle on reconstructed side from ECLCluster
-    Particle p(savedECL);
-    Particle* part = myParticles.appendNew(p);
-
-    // Create ECLCluster on ROE side
-    ECLCluster myROEECL;
-    myROEECL.setIsTrack(false);
-    float eclROE = 1.0;
-    myROEECL.setEnergy(eclROE);
-    myROEECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
-    ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
-    Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
-    // Create KLMCluster on ROE side
-    KLMCluster myROEKLM;
-    KLMCluster* savedROEKLM = myKLMClusters.appendNew(myROEKLM);
-    Particle* roeKLMParticle = myParticles.appendNew(savedROEKLM);
-
-    // Create Track on ROE side
-    // - create TFR
-
-    const float pValue = 0.5;
-    const float bField = 1.5;
-    const int charge = 1;
-    TMatrixDSym cov6(6);
-
-    TVector3 position(1.0, 0, 0);
-    TVector3 momentum(0, 1.0, 0);
-
-    auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-
-    myTFRs.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
-
-    // - create Track
-    Track myROETrack;
-    myROETrack.setTrackFitResultIndex(Const::muon, 0);
-    Track* savedROETrack = myTracks.appendNew(myROETrack);
-    // - create PID information, add relation
-    PIDLikelihood myPID;
-    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.15);
-    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.152);
-    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.154);
-    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.156);
-    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.158);
-    myPID.setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    myPID.setLogLikelihood(Const::ARICH, Const::pion, 0.52);
-    myPID.setLogLikelihood(Const::ECL, Const::pion, 0.54);
-    myPID.setLogLikelihood(Const::CDC, Const::pion, 0.56);
-    myPID.setLogLikelihood(Const::SVD, Const::pion, 0.58);
-    PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
-
-    savedROETrack->addRelationTo(savedPID);
-    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
-
-    // Create ROE object, append tracks, clusters, add relation to particle
-    //TODO: make particles
-    RestOfEvent roe;
-    vector<const Particle*> roeParticlesToAdd;
-    roeParticlesToAdd.push_back(roeTrackParticle);
-    roeParticlesToAdd.push_back(roeECLParticle);
-    roeParticlesToAdd.push_back(roeKLMParticle);
-    roe.addParticles(roeParticlesToAdd);
-    RestOfEvent* savedROE = myROEs.appendNew(roe);
-    /*
-    std::map<std::string, std::map<unsigned int, bool>> tMasks;
-    std::map<std::string, std::map<unsigned int, bool>> cMasks;
-    std::map<std::string, std::vector<double>> fracs;
-
-    std::map<unsigned int, bool> tMask1;
-    std::map<unsigned int, bool> tMask2;
-    tMask1[savedROETrack->getArrayIndex()] = true;
-    tMask2[savedROETrack->getArrayIndex()] = false;
-
-    std::map<unsigned int, bool> cMask1;
-    std::map<unsigned int, bool> cMask2;
-    cMask1[savedROEECL->getArrayIndex()] = true;
-    cMask2[savedROEECL->getArrayIndex()] = false;
-
-    std::vector<double> frac1 = {0, 0, 1, 0, 0, 0};
-    std::vector<double> frac2 = {1, 1, 1, 1, 1, 1};
-
-    tMasks["mask1"] = tMask1;
-    tMasks["mask2"] = tMask2;
-
-    cMasks["mask1"] = cMask1;
-    cMasks["mask2"] = cMask2;
-
-    fracs["mask1"] = frac1;
-    fracs["mask2"] = frac2;
-
-    savedROE->appendTrackMasks(tMasks);
-    savedROE->appendECLClusterMasks(cMasks);
-    savedROE->appendChargedStableFractionsSet(fracs);
-    */
-    savedROE->initializeMask("mask1", "test");
-    std::shared_ptr<Variable::Cut> trackSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
-    std::shared_ptr<Variable::Cut> eclSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
-    savedROE->updateMaskWithCuts("mask1");
-    savedROE->initializeMask("mask2", "test");
-    savedROE->updateMaskWithCuts("mask2",  trackSelection,  eclSelection);
-    part->addRelationTo(savedROE);
-
-    // ROE variables
-    PCmsLabTransform T;
-    float E0 = T.getCMSEnergy() / 2;
-    B2INFO("E0 is " << E0);
-    //*/
-    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + 1.0 /*momentum.Mag2()*/));
-    pTrack_ROE_Lab = roeTrackParticle->get4Vector();
-    TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
-    TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
-
-    TLorentzVector rec4vec;
-    rec4vec.SetE(pECL_REC_Lab.E());
-    rec4vec.SetVect(pECL_REC_Lab.Vect());
-
-    TLorentzVector roe4vec;
-    roe4vec.SetE(pTrack_ROE_Lab.E() + pECL_ROE_Lab.E());
-    roe4vec.SetVect(pTrack_ROE_Lab.Vect() + pECL_ROE_Lab.Vect());
-
-    TLorentzVector rec4vecCMS = T.rotateLabToCms() * rec4vec;
-    TLorentzVector roe4vecCMS = T.rotateLabToCms() * roe4vec;
-
-    TVector3 pB = - roe4vecCMS.Vect();
-    pB.SetMag(0.340);
-
-    TLorentzVector m4v0;
-    m4v0.SetE(2 * E0 - (rec4vecCMS.E() + roe4vecCMS.E()));
-    m4v0.SetVect(- (rec4vecCMS.Vect() + roe4vecCMS.Vect()));
-
-    TLorentzVector m4v1;
-    m4v1.SetE(E0 - rec4vecCMS.E());
-    m4v1.SetVect(- (rec4vecCMS.Vect() + roe4vecCMS.Vect()));
-
-    TLorentzVector m4v2;
-    m4v2.SetE(E0 - rec4vecCMS.E());
-    m4v2.SetVect(- rec4vecCMS.Vect());
-
-    TLorentzVector m4v3;
-    m4v3.SetE(E0 - rec4vecCMS.E());
-    m4v3.SetVect(pB - rec4vecCMS.Vect());
-
-    TLorentzVector neutrino4vecCMS;
-    neutrino4vecCMS.SetVect(- (roe4vecCMS.Vect() + rec4vecCMS.Vect()));
-    neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
-
-    TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
-    B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
-    // TESTS FOR ROE STRUCTURE
-    //EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
-    //EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
-    //double fArray[6];
-    //EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
-    EXPECT_B2FATAL(savedROE->updateMaskWithCuts("noSuchMask"));
-    EXPECT_B2FATAL(savedROE->updateMaskWithV0("noSuchMask", part));
-    EXPECT_B2FATAL(savedROE->hasParticle(part, "noSuchMask"));
-
-    // TESTS FOR ROE VARIABLES
-
-    const Manager::Var* var = Manager::Instance().getVariable("nROE_Charged(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_Charged(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_Charged(mask1, 13)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_Charged(mask1, 211)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_Photons(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_Photons(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_NeutralHadrons(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_Tracks(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_ECLClusters(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_ECLClusters(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_NeutralECLClusters(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("nROE_NeutralECLClusters(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROE_ParticlesInList(pi0:vartest)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("roeCharge(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 1.0);
-
-    var = Manager::Instance().getVariable("roeCharge(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("roeEextra(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
-
-    var = Manager::Instance().getVariable("roeEextra(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("roeDeltae(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4vecCMS.E() - E0);
-
-    var = Manager::Instance().getVariable("roeDeltae(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), -E0);
-
-    var = Manager::Instance().getVariable("roeMbc(mask1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - roe4vecCMS.Vect().Mag2()));
-
-    var = Manager::Instance().getVariable("roeMbc(mask2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0);
-
-    var = Manager::Instance().getVariable("weDeltae(mask1,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), corrRec4vecCMS.E() - E0);
-
-    var = Manager::Instance().getVariable("weDeltae(mask2,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), rec4vecCMS.E() + rec4vecCMS.Vect().Mag() - E0);
-
-    var = Manager::Instance().getVariable("weMbc(mask1,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()));
-
-    var = Manager::Instance().getVariable("weMbc(mask2,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0);
-
-    var = Manager::Instance().getVariable("weMissM2(mask1,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), m4v0.Mag2());
-
-    var = Manager::Instance().getVariable("weMissM2(mask2,0)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
-
   }
 
 
@@ -915,24 +660,24 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(exp->function(NULL), 1337.);
-    EXPECT_FLOAT_EQ(run->function(NULL), 12345.);
-    EXPECT_FLOAT_EQ(evt->function(NULL), 54321.);
-    EXPECT_FLOAT_EQ(date->function(NULL), 20101101.);
-    EXPECT_FLOAT_EQ(year->function(NULL), 2010.);
-    EXPECT_FLOAT_EQ(time->function(NULL), 1288569600);
+    EXPECT_FLOAT_EQ(exp->function(nullptr), 1337.);
+    EXPECT_FLOAT_EQ(run->function(nullptr), 12345.);
+    EXPECT_FLOAT_EQ(evt->function(nullptr), 54321.);
+    EXPECT_FLOAT_EQ(date->function(nullptr), 20101101.);
+    EXPECT_FLOAT_EQ(year->function(nullptr), 2010.);
+    EXPECT_FLOAT_EQ(time->function(nullptr), 1288569600);
   }
 
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(var->function(NULL), 0.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(var->function(NULL), 10.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 10.0);
 
     // TODO: add other counters nTracks etc in here
   }
@@ -1283,6 +1028,32 @@ namespace {
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+
+    // sin 30 = 0.5
+    var = Manager::Instance().getVariable("sin(0.5235987755983)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // sin 90 = 1
+    var = Manager::Instance().getVariable("sin(1.5707963267948966)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    // asin 1 = 90
+    var = Manager::Instance().getVariable("asin(1.0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
+    // cos 60 = 0.5
+    var = Manager::Instance().getVariable("cos(1.0471975511965976)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    // acos 0 = 90
+    var = Manager::Instance().getVariable("acos(0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+
   }
 
   TEST_F(MetaVariableTest, formula)
@@ -1489,13 +1260,13 @@ namespace {
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.4, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
@@ -2084,6 +1855,59 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
+
+
+  TEST_F(MetaVariableTest, mcDaughterDiffOf)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+    particles.registerRelationTo(mcParticles);
+    std::vector<int> daughterIndices;
+    DataStore::Instance().setInitializeActive(false);
+
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      newDaughters->addRelationTo(mcParticle);
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+  }
+
+
 
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
   {
@@ -3547,6 +3371,109 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, mcDaughterVariables)
+  {
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(true);
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      mcParticle->set4Vector(mom);
+      newDaughters->addRelationTo(mcParticle);
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+    auto* mcCompositeDau_1 = mcParticles.appendNew();
+    mcCompositeDau_1->setPDG(411);
+    mcCompositeDau_1->setStatus(MCParticle::c_PrimaryParticle);
+    mcCompositeDau_1->set4Vector(momentum_1);
+    compositeDau_1->addRelationTo(mcCompositeDau_1);
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      mcParticle->set4Vector(mom);
+      newDaughters->addRelationTo(mcParticle);
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+    auto* mcCompositeDau_2 = mcParticles.appendNew();
+    mcCompositeDau_2->setPDG(411);
+    mcCompositeDau_2->setStatus(MCParticle::c_PrimaryParticle);
+    mcCompositeDau_2->set4Vector(momentum_2);
+    compositeDau_2->addRelationTo(mcCompositeDau_2);
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test mcDaughterAngle
+    const Manager::Var* var = Manager::Instance().getVariable("mcDaughterAngle(0, 1)");
+    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("mcDaughterAngle(0:0, 1:0)");
+    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("mcDaughterAngle( 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    var = Manager::Instance().getVariable("mcDaughterAngle(1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    // Test mcDaughterDiffOf
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+
+
+    // Test mcDaughterDiffOfPhi
+    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    ASSERT_NE(var, nullptr);
+    v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
+
+  }
 
   TEST_F(MetaVariableTest, varForFirstMCAncestorOfType)
   {
@@ -3719,10 +3646,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3745,10 +3672,10 @@ namespace {
 
     // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
+    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
 
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
@@ -3767,8 +3694,7 @@ namespace {
     BList->addParticle(B_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
-
+    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
 
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");
@@ -4235,10 +4161,11 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* allTrack = tracks.appendNew(mytrack);
+    Track* allTrackNoSVD = tracks.appendNew(mytrack);
     Track* noPIDTrack = tracks.appendNew(mytrack);
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
@@ -4282,6 +4209,16 @@ namespace {
     lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
     lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
+    // All detectors but SVD
+    auto* lAllNoSVD = likelihood.appendNew();
+    std::vector<std::string> detectors_noSVD = {"CDC", "TOP", "ARICH", "ECL"};
+    Const::PIDDetectorSet detectorSetNoSVD = parseDetectors(detectors_noSVD);
+    for (size_t iDet(0); iDet < detectorSetNoSVD.size(); ++iDet) {
+      auto det = detectorSetNoSVD[iDet];
+      for (const auto& hypo : Const::chargedStableSet) {
+        lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
+      }
+    }
 
     // Likelihoods for a dEdx only case
     auto* ldEdx = likelihood.appendNew();
@@ -4305,43 +4242,59 @@ namespace {
 
 
     allTrack->addRelationTo(lAll);
+    allTrackNoSVD->addRelationTo(lAllNoSVD);
     dEdxTrack->addRelationTo(ldEdx);
 
     // Table with the sum(LogL) for several cases
-    //      All  dEdx
-    // e    0.7  0.22
-    // mu   2.7  1.14
-    // pi   1.2  0.54
-    // k    1.7  0.74
-    // p    2.2  0.94
-    // d    3.2  1.34
+    //      All  dEdx  AllNoSVD
+    // e    0.7  0.22  0.6
+    // mu   2.7  1.14  2.12
+    // pi   1.2  0.54  0.92
+    // k    1.7  0.74  1.32
+    // p    2.2  0.94  1.72
+    // d    3.2  1.34  2.52
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
+    auto* particleAllNoSVD = particles.appendNew(allTrackNoSVD, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
     double numsumexp = std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2);
+    double numsumexp_noSVD = std::exp(0.6) + std::exp(2.12) + std::exp(0.92) + std::exp(1.32) + std::exp(1.72) + std::exp(2.52);
 
     // Basic PID quantities. Currently just wrappers for global probability.
-    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.2) / numsumexp);
-    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
+    EXPECT_FLOAT_EQ(electronID(particleAllNoSVD), std::exp(0.6) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(muonID(particleAllNoSVD),     std::exp(2.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(pionID(particleAllNoSVD),     std::exp(0.92) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(kaonID(particleAllNoSVD),     std::exp(1.32) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(protonID(particleAllNoSVD),   std::exp(1.72) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(deuteronID(particleAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
 
     // smart PID that takes the hypothesis into account
-    auto* particleMuonAll = particles.appendNew(allTrack, Const::muon);
-    auto* particleKaonAll = particles.appendNew(allTrack, Const::kaon);
-    auto* particleElectronAll = particles.appendNew(allTrack, Const::electron);
-    auto* particleProtonAll = particles.appendNew(allTrack, Const::proton);
-    auto* particleDeuteronAll = particles.appendNew(allTrack, Const::deuteron);
-    EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.2) / numsumexp); // there's already a pion
-    EXPECT_FLOAT_EQ(particleID(particleMuonAll), std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleKaonAll), std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleElectronAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
+    auto* particleMuonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::muon);
+    auto* particleKaonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::kaon);
+    auto* particleElectronAllNoSVD = particles.appendNew(allTrackNoSVD, Const::electron);
+    auto* particleProtonAllNoSVD = particles.appendNew(allTrackNoSVD, Const::proton);
+    auto* particleDeuteronAllNoSVD = particles.appendNew(allTrackNoSVD, Const::deuteron);
+
+    EXPECT_FLOAT_EQ(particleID(particleAllNoSVD), std::exp(0.92) / numsumexp_noSVD); // there's already a pion
+    EXPECT_FLOAT_EQ(particleID(particleMuonAllNoSVD), std::exp(2.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleKaonAllNoSVD), std::exp(1.32) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleElectronAllNoSVD), std::exp(0.6) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleProtonAllNoSVD),   std::exp(1.72) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleDeuteronAllNoSVD), std::exp(2.52) / numsumexp_noSVD);
+
+    // Hadron ID vars w/ SVD info included. Only pi, K, p.
+    double numsumexp_had = std::exp(1.2) + std::exp(1.7) + std::exp(2.2);
+    EXPECT_FLOAT_EQ(pionID_SVD(particleAll), std::exp(1.2) / numsumexp_had);
+    EXPECT_FLOAT_EQ(kaonID_SVD(particleAll), std::exp(1.7) / numsumexp_had);
+    EXPECT_FLOAT_EQ(protonID_SVD(particleAll), std::exp(2.2) / numsumexp_had);
+    std::vector<double> v_pi_K {211., 321.};
+    std::vector<double> v_pi_p {211., 2212.};
+    std::vector<double> v_K_p {321., 2212.};
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_K), std::exp(1.2) / (std::exp(1.2) + std::exp(1.7)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_p), std::exp(1.2) / (std::exp(1.2) + std::exp(2.2)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_K_p), std::exp(1.7) / (std::exp(1.7) + std::exp(2.2)));
 
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -4403,8 +4356,6 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)
@@ -4429,7 +4380,7 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack1 = tracks.appendNew(mytrack);

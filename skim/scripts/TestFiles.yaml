@@ -47,38 +47,38 @@ MC13_uubarBGx1:
 MC13_ccbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ccbar_BGx0.mdst_000001_prod00009559_task10020000001.root
   total_input_files: 1330
-  average_events_per_file:
+  average_events_per_file: 195694
 
 MC13_chargedBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/charged_BGx0.mdst_000001_prod00009551_task10020000001.root
   total_input_files: 540
-  average_events_per_file:
+  average_events_per_file: 200000
 
 MC13_ddbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ddbar_BGx0.mdst_000001_prod00009555_task10020000001.root
   total_input_files: 402
-  average_events_per_file:
+  average_events_per_file: 197697
 
 MC13_mixedBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/mixed_BGx0.mdst_000001_prod00009545_task10020000001.root
   total_input_files: 510
-  average_events_per_file:
+  average_events_per_file: 200000
 
 MC13_ssbarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/ssbar_BGx0.mdst_000023_prod00009557_task10020000023.root
   total_input_files: 384
-  average_events_per_file:
+  average_events_per_file: 189241
 
 MC13_taupairBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/taupair_BGx0.mdst_000001_prod00009561_task10020000001.root
-  total_input_files:
-  average_events_per_file:
+  total_input_files: 920
+  average_events_per_file: 200000
 
 MC13_uubarBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/uubar_BGx0.mdst_000003_prod00009553_task10020000003.root
   total_input_files: 1606
-  average_events_per_file:
-
+  average_events_per_file: 197697
+#need to add input file size
 
 ## MC13 low multiplicity
 
@@ -87,13 +87,16 @@ MC13_uubarBGx0:
 
 MC13_eeeeBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx0.root
-
+  total_input_files: 2000
+  average_events_per_file: 1500000
 MC13_eemumuBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eemumuBGx0.root
-
+  total_input_files: 2000
+  average_events_per_file: 1200000
 MC13_mumuBGx0:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx0.root
-
+  total_input_files: 230
+  average_events_per_file: 1000000
 
 # MC13_eeBGx1:
 #   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeBGx1.root
@@ -117,6 +120,19 @@ MC13_mumuBGx1:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx1.root
   total_input_files: 2297
   average_events_per_file: 10000
+
+
+## phi-gamma neutral and charged MC
+
+phigamma_neutral:
+  location: /group/belle2/users/fnc/MC/phi_gamma_neutral_prod/phi_gamma_neutral_prod_mdst_00001.root
+  total_input_files: 600
+  average_events_per_file: 1000
+
+phigamma_charged:
+  location: /group/belle2/users/fnc/MC/phi_gamma_charged_prod/phi_gamma_charged_prod_mdst_00001.root
+  total_input_files: 500
+  average_events_per_file: 1000
 
 
 ## MC12 generic
@@ -239,7 +255,18 @@ MC12_mumuBGx1:
 #  |____/ \__,_|\__\__,_| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                             |_|
 
-# NOTE: proc11 samples are hlt_hadron skims
+bucket12_exp12_4S_offres:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket12_exp12_4S_offres.mdst.root
+
+bucket11_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket11_exp12.mdst.root
+
+bucket10_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket10_exp12.mdst.root
+
+bucket9_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket9_exp12.mdst.root
+
 proc11_exp10:
   location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp10.mdst.root
 

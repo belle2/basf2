@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *************************************************************************/
-#ifndef KLMExpertModule_H
-#define KLMExpertModule_H
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -145,6 +145,3 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-
-#endif

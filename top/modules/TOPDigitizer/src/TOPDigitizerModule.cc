@@ -100,6 +100,7 @@ namespace Belle2 {
     m_simHits.isRequired();
     m_simCalPulses.isOptional();
     m_mcParticles.isOptional();
+    m_simClockState.isOptional();
 
     // output to datastore
     m_rawDigits.registerInDataStore();
@@ -230,8 +231,13 @@ namespace Belle2 {
   void TOPDigitizerModule::event()
   {
 
-    // generate revo9 count
-    unsigned revo9cnt = gRandom->Integer(11520);
+    // get or generate revo9 count
+    unsigned revo9cnt = 0;
+    if (m_simClockState.isValid()) {
+      revo9cnt = m_simClockState->getRevo9Count();
+    } else {
+      revo9cnt = gRandom->Integer(11520);
+    }
 
     // from revo9 count determine trigger time offset and the number of offset windows
     double SSTfrac = (revo9cnt % 6) / 6.0;

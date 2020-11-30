@@ -88,7 +88,7 @@ namespace Belle2 {
     static ValueType& deref_if_needed(ValueType* t) { return *t; }
   public:
     /** Default constructor (not that you can dereference these). */
-    ArrayIterator(): m_array(NULL), m_index(-1) {}
+    ArrayIterator(): m_array(nullptr), m_index(-1) {}
 
     /** Constructor. */
     explicit ArrayIterator(const ArrayType* array, int index):

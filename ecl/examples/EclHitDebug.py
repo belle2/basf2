@@ -1,45 +1,63 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-#
-# Example steering file - 2016 Belle II Collaboration
-#
-# Modifications for release-00-08: Torben Ferber (ferber@physics.ubc.ca)
-#
-########################################################
+"""This steering file shows how to use 'ECLHitDebug'
+   module to dump ECL-related quantities in an ntuple.
 
+Input:
+    No file is required
 
-import os
-from basf2 import *
+Output:
+    Root file named 'Output.root'
+
+Usage:
+    $ basf2 EclHitDebug.py
+"""
+
+import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_tracking_reconstruction, add_ecl_modules
+from reconstruction import add_tracking_reconstruction
+from reconstruction import add_ecl_modules
 
-set_log_level(LogLevel.ERROR)
+__authors__ = ['Poyuan Chen', 'Benjamin Oberhof',
+               'Torben Ferber']
+__copyright__ = 'Copyright 2016 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-# Register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
-eventinfoprinter = register_module('EventInfoPrinter')
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
+
+b2.set_log_level(b2.LogLevel.ERROR)
+
+# Register and add 'EventInfoSetter' module and settings
+eventInfoSetter = b2.register_module('EventInfoSetter')
+eventInfoSetter.param({'evtNumList': [3],
+                       'runList': [1],
+                       'expList': [0]})  # one event
+mainPath.add_module(eventInfoSetter)
+
+# Register and add 'EventInfoPrinter' module
+eventInfoPrinter = b2.register_module('EventInfoPrinter')
+mainPath.add_module(eventInfoPrinter)
 
 # Create geometry
 # Geometry parameter loader
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
-# Geometry builder
-geometry = register_module('Geometry')
+# Register 'Geometry' module
+geometry = b2.register_module('Geometry')
 
-# Simulation
-g4sim = register_module('FullSim')
+# Register 'FullSim' module
+g4sim = b2.register_module('FullSim')
 
-# one event
-eventinfosetter.param({'evtNumList': [3], 'runList': [1]})
+# Random number for generation
+b2.set_random_seed(123456)
 
-import random
-intseed = random.randint(1, 10000000)
-
-pGun = register_module('ParticleGun')
-param_pGun = {
-    'pdgCodes': [22, 111],
+# Register and add 'ParticleGun' generator module and settings
+particleGun = b2.register_module('ParticleGun')
+param_particleGun = {
+    'pdgCodes': [22, 111],  # 22: photon, 111: pi0
     'nTracks': 6,
     'momentumGeneration': 'uniform',
     'momentumParams': [1., 2.],
@@ -52,29 +70,35 @@ param_pGun = {
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
 }
+particleGun.param(param_particleGun)
+mainPath.add_module(particleGun)
 
-pGun.param(param_pGun)
+# Register and add 'ECLDigitizer' module
+eclDigitizer = b2.register_module('ECLDigitizer')
+mainPath.add_module(eclDigitizer)
 
-eclDigi = register_module('ECLDigitizer')
-eclHit = register_module('ECLHitDebug')
+# Register and add 'ECLHitDebug' module
+eclHitDebug = b2.register_module('ECLHitDebug')
+mainPath.add_module(eclHitDebug)
 
-makeMatch = register_module('MCMatcherECLClusters')
+# Register 'MCMatcherECLClusters' module
+mcMatcherECLClusters = b2.register_module('MCMatcherECLClusters')
 
-# Create paths
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
-add_simulation(main)
+# Simulation
+add_simulation(mainPath)
 
-add_tracking_reconstruction(main)
-main.add_module(eclDigi)
-main.add_module(eclHit)
+# Tracking reconstruction
+add_tracking_reconstruction(mainPath)
 
-add_ecl_modules(main)
+# Add the ECL reconstruction modules to the path
+add_ecl_modules(mainPath)
 
-simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'Output.root')
-main.add_module(simpleoutput)
+# Register and add 'RootOutput' module
+outputFile = b2.register_module('RootOutput')
+outputFile.param('outputFileName', 'Output.root')
+mainPath.add_module(outputFile)
 
-process(main)
-print(statistics)
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

@@ -2,7 +2,7 @@ Import('env')
 
 env['SUBLIB'] = True
 
-env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'gfortran']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'gfortran']
 
 env.Append(FORTRANFLAGS = ['-O', '-finit-local-zero', '-g', '-fmerge-constants',  '-fno-second-underscore',  '-fno-automatic',  '-fno-f2c',  '-fPIC', '-ffixed-line-length-72'])
 env.Append(FORTRANPATH = ['generators/treps'])

@@ -78,9 +78,6 @@ namespace Belle2 {
       static CDCSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       //! Comparision of segments up to the super cluster id keeping them close together on sort
-      bool operator==(const CDCSegment2D& segment2D) const;
-
-      //! Comparision of segments up to the super cluster id keeping them close together on sort
       bool operator<(const CDCSegment2D& segment2D) const;
 
       //! Helper constructor to create a relation in python

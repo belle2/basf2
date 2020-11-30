@@ -5,11 +5,10 @@
 # Simple steering file to demonstrate how to run Track DQM on Phase2 geometry
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
 # background (collision) files
 # bg = glob.glob('./BG/*.root')
@@ -23,7 +22,7 @@ num_events = 100
 output_filename = "RootOutput_Phase2.root"
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
 # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
@@ -57,5 +56,5 @@ trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

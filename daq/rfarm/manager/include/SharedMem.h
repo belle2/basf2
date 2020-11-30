@@ -17,6 +17,7 @@ namespace Belle2 {
   public:
     SharedMem(const char* name, int size);
     SharedMem(int shm_id);
+    SharedMem(int shm_id, int sem_id, int size);
     ~SharedMem(void);
 
     void* ptr(void);

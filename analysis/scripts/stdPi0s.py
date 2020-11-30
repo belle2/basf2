@@ -16,17 +16,17 @@ from vertex import kFit
 from basf2 import B2WARNING
 
 
-def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
+def stdPi0s(listtype="eff60_Jan2020", path=None):
     """
     Function to prepare one of several standardized types of pi0 lists:
 
-    - 'pi0:all' using gamma:all
-    - 'pi0:eff10_Jan2020' gamma:pi0eff10_Jan2020, mass range selection, 10% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff20_Jan2020' gamma:pi0eff20_Jan2020, mass range selection, 20% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff30_Jan2020' gamma:pi0eff30_Jan2020, mass range selection, 30% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff40_Jan2020' gamma:pi0eff40_Jan2020, mass range selection, 40% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff50_Jan2020' gamma:pi0eff50_Jan2020, mass range selection, 50% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff60_Jan2020' gamma:pi0eff60_Jan2020, mass range selection, 60% pi0 efficiency list, optimized in January 2020
+    - 'all' using gamma:all
+    - 'eff10_Jan2020' gamma:pi0eff10_Jan2020, mass range selection, 10% pi0 efficiency list, optimized in January 2020
+    - 'eff20_Jan2020' gamma:pi0eff20_Jan2020, mass range selection, 20% pi0 efficiency list, optimized in January 2020
+    - 'eff30_Jan2020' gamma:pi0eff30_Jan2020, mass range selection, 30% pi0 efficiency list, optimized in January 2020
+    - 'eff40_Jan2020' gamma:pi0eff40_Jan2020, mass range selection, 40% pi0 efficiency list, optimized in January 2020
+    - 'eff50_Jan2020' gamma:pi0eff50_Jan2020, mass range selection, 50% pi0 efficiency list, optimized in January 2020
+    - 'eff60_Jan2020' gamma:pi0eff60_Jan2020, mass range selection, 60% pi0 efficiency list, optimized in January 2020
 
     You can also append "Fit" to the listtype which will run a mass fit and
     require that the fit did not fail. For example: "pi0:eff50_Jan2020Fit" is the 50%
@@ -47,7 +47,7 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     elif 'eff10_Jan2020' == listtype:
         stdPhotons('pi0eff10_Jan2020', path)
         ma.reconstructDecay('pi0:eff10_Jan2020 -> gamma:pi0eff10_Jan2020 gamma:pi0eff10_Jan2020',
-                            '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngleInBetween(0,1)<0.8',
+                            '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngle(0,1)<0.8',
                             1,
                             True,
                             path)
@@ -55,7 +55,7 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     elif 'eff20_Jan2020' == listtype:
         stdPhotons('pi0eff20_Jan2020', path)
         ma.reconstructDecay('pi0:eff20_Jan2020 -> gamma:pi0eff20_Jan2020 gamma:pi0eff20_Jan2020',
-                            '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngleInBetween(0,1)<0.9',
+                            '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngle(0,1)<0.9',
                             1,
                             True,
                             path)
@@ -63,7 +63,7 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     elif 'eff30_Jan2020' == listtype:
         stdPhotons('pi0eff30_Jan2020', path)
         ma.reconstructDecay('pi0:eff30_Jan2020 -> gamma:pi0eff30_Jan2020 gamma:pi0eff30_Jan2020',
-                            '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngleInBetween(0,1)<1.4',
+                            '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngle(0,1)<1.4',
                             1,
                             True,
                             path)
@@ -124,6 +124,8 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
         stdPi0s('eff60_Jan2020', path)
         ma.cutAndCopyList('pi0:eff60_Jan2020Fit', 'pi0:eff60_Jan2020', '', True, path)
         kFit('pi0:eff60_Jan2020Fit', 0.0, 'mass', path=path)
+    else:
+        raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of pi0 lists!")
 
 # pi0 list for skims (and ONLY for skims)
 

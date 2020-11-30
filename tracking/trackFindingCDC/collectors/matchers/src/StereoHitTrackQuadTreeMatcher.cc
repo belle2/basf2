@@ -158,7 +158,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     std::vector<CDCRecoHit3D> allHits;
     std::vector<CDCRecoHit3D> foundHits;
     // Turn vector of pairs into vector of first items
-    for (const CDCRecoHitWithRLPointer recoHitWithRL : recoHits) {
+    for (const CDCRecoHitWithRLPointer& recoHitWithRL : recoHits) {
       const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
       allHits.push_back(recoHit3D);
     }

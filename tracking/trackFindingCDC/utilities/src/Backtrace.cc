@@ -31,7 +31,7 @@ void TrackFindingCDC::printBacktrace(LogConfig::ELogLevel logLevel, int nFrames)
 
   traceLines = backtrace_symbols(rawBuffer, traceSize);
 
-  if (traceLines == NULL) {
+  if (traceLines == nullptr) {
     B2LOG(logLevel, 0, "no backtrace obtained");
   }
 

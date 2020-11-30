@@ -5,7 +5,6 @@ import math
 import collections
 import numpy as np
 
-import tracking.metamodules as metamodules
 from tracking.root_utils import root_save_name
 
 from .plot import ValidationPlot, compose_axis_label
@@ -26,10 +25,10 @@ import basf2
 import logging
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-
 import os
+
+ROOT.gSystem.Load("libtracking")
 
 
 class FilterProperties(object):

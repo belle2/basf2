@@ -1,14 +1,19 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# illustrative run:
+# basf2 svdDQMAnalysisEfficiency.py dqm_e0014r000921.root
+
 from basf2 import *
 import sys
+import re
 from basf2 import conditions as b2conditions
 
 mypath = Path()
 inputFile = sys.argv[1]
-outputFile = sys.argv[2]
-
+exp_nr = int(re.findall(r'\d+', inputFile)[0])
+run_nr = int(re.findall(r'\d+', inputFile)[1])
+nevt = sys.argv[2]  # number of events
 
 # setup database
 b2conditions.reset()
@@ -22,8 +27,10 @@ b2conditions.globaltags = [
 
 inroot = register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', inputFile)
-inroot.param('EventsList', [1])
 inroot.param('SelectHistograms', ['SVD*/*'])
+inroot.param('Experiment', exp_nr)
+inroot.param('RunList', [run_nr])
+inroot.param('EventsList', [nevt])
 mypath.add_module(inroot)
 
 mypath.add_module('Gearbox')
@@ -36,11 +43,14 @@ mypath.add_module(dqmEff)
 
 dqmGen = register_module('DQMHistAnalysisSVDGeneral')
 dqmGen.set_log_level(LogLevel.INFO)
+dqmGen.param("printCanvas", True)
 mypath.add_module(dqmGen)
 
 outroot = register_module('DQMHistAnalysisOutputMonObj')
 outroot.param('ProcID', 'online')  # set processing ID
-outroot.param('TreeFile', outputFile)
+outroot.param('exp', exp_nr)
+outroot.param('run', run_nr)
+outroot.param('nevt', nevt)
 mypath.add_module(outroot)
 
 # Process the events

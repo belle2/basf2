@@ -2,8 +2,6 @@
 // File : BEvent.h
 // Description : class to contain an event
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 28 - Jan - 2004
 //-
 
 #pragma once
@@ -13,7 +11,7 @@
 
 #include "BParticle.h"
 
-//! The Class for Masterclass simulation parameters
+//! The Class for Masterclass event parameters
 /*! This class provides the data structure to write out the data files used for Belle II Masterclass application.
 */
 class BEvent : public TObject {
@@ -60,12 +58,14 @@ public:
 
   /**
    * Get the number of particles in the event.
+   * @return number of particles in the event
    */
 
   int NParticles();
 
   /**
-   * Returns the array of particles.
+   * Get the array of particles in the event
+   * @return array of particles
    */
   TClonesArray* GetParticleList();
 

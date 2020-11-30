@@ -34,7 +34,7 @@ default_collection_heartbeat = 60
 from prompt import prompt_script_package
 
 
-def get_input_data(args):
+def get_caf_input_data(args):
     """Path to input data json file, used to find input files for the CAF job.
 Also to create the IoV for each run so the calibrations can use it if necessary.
 
@@ -75,7 +75,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
     return input_data_files
 
 
-def setup_caf(args, input_data_files, prompt_caf):
+def setup_caf(args, input_data_files, prompt_caf, permissive=False):
     """Path to config JSON file, used to set up the expert configuration, CAF and calibrations used
 in this CAF process.
 
@@ -89,7 +89,7 @@ Required format of JSON file:
      "backend_args" dict,     <- Optional as the backend default values and/or values in the prompt script will be used otherwise
      "requested_iov" array[4](int),
      "expert_config" dict,     <- Optional as the prompt script default will be used if this isn't set here.
-     "testing_payloads" str    <- Optional, by default do not add testing payloads
+     "testing_payloads" str    <- Optional, by default do not add testing payloads, possible only with --permissive
     }
 
 The backend_args dictionary will be used to set up the `caf.backends.Backend` class and overrides the defaults of that class.
@@ -110,7 +110,12 @@ Generally it is best not to set anything in the prompt script itself. Just use t
     # if for caf_script is given an full path import it from there, otherwise import it
     # from the prompt script package
 
-    if str(Path(caf_config["caf_script"])) == Path(caf_config["caf_script"]).name:
+    if permissive and str(Path(caf_config["caf_script"])) != Path(caf_config["caf_script"]).name:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("__main__."+Path(caf_config["caf_script"]).stem, Path(caf_config["caf_script"]))
+        cal_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cal_module)
+    else:
         import importlib
         module_name = prompt_script_package + Path(caf_config["caf_script"]).stem
         try:
@@ -118,11 +123,6 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         except ModuleNotFoundError:
             B2ERROR(f"Couldn't import {module_name}")
             return 1
-    else:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("__main__."+Path(caf_config["caf_script"]).stem, Path(caf_config["caf_script"]))
-        cal_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(cal_module)
 
 
     # Check if our input data contains at least all of the names required by the calibration script
@@ -173,7 +173,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         for global_tag in caf_config["database_chain"]:
             cal.use_central_database(global_tag)
         # Add testing payloads if required:
-        if "testing_payloads" in caf_config:
+        if permissive and "testing_payloads" in caf_config:
             cal.use_local_database(caf_config["testing_payloads"])
         # Heartbeat should be chosen by us, not the calibration setup function
         cal.heartbeat = args.heartbeat
@@ -225,7 +225,7 @@ def get_argparser():
 
     for subparser in subparsers:
         subparser.add_argument("caf_config", help=setup_caf.__doc__)
-        subparser.add_argument("input_data", help=get_input_data.__doc__)
+        subparser.add_argument("input_data", help=get_caf_input_data.__doc__)
 
         cli.add_basf2_options(subparser)
         cli.add_monitor_options(subparser, default_heartbeat=default_collection_heartbeat)
@@ -248,6 +248,8 @@ def get_argparser():
                                  "beginning the processing. This will delete the previous results! Only use if you want a clean "
                                  "start from the beginning again!"
                            )
+        subparser.add_argument("--permissive", action="store_true",
+                               help="Flags if the tool can run scripts also in generic paths and testing payloads")
 
         subparser.set_defaults(overwrite_db=False)
         subparser.set_defaults(overwrite_workdir=False)
@@ -268,7 +270,7 @@ def main():
 
     # Do the input data load
     try:
-        input_data = get_input_data(args)
+        input_data = get_caf_input_data(args)
     except FileNotFoundError as e:
         B2ERROR(str(e))
         return e.errno
@@ -281,7 +283,7 @@ def main():
     cal_fw = CAF()
     # Apply CAF settings and get the calibrations to process
     try:
-        exit_code = setup_caf(args, input_data, cal_fw)
+        exit_code = setup_caf(args, input_data, cal_fw, args.permissive)
     except FileNotFoundError as e:
         B2ERROR(str(e))
         return e.errno

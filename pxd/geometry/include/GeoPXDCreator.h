@@ -81,20 +81,20 @@ namespace Belle2 {
 
       /**
        * Create support structure for PXD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
-       * @param support Reference to the database containing the parameters
+       * that does not depend on layer or sensor alignment
+       * @param parameters Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createHalfShellSupport(const PXDGeometryPar& parameters);
 
       /**
        * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) override;
 
       /**
        * Read the sensor definitions from the gearbox
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       PXDSensorInfoPar* readSensorInfo(const GearDir& sensor);
 
@@ -109,8 +109,9 @@ namespace Belle2 {
 
       /**
        * Create support structure for VXD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
+       * that does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
+       * @param pxdGeometryPar PXD geometry
        */
       void readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar);
 

@@ -3111,6 +3111,30 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     path.add_module(incl_dstar)
 
 
+def scaleError(inputListName, outputListName,
+               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
+               minErrors=[0.00140, 0, 0, 0.00157, 0],
+               path=None):
+    '''
+    This module creates a new charged particle list.
+    The helix errors of the new particles are scaled by constant factors.
+    Lower bounds can be set so that helix errors are confined above the limit.
+    The scale factors and lower bounds are defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
+
+    @param inputListName Name of input charged particle list to be scaled
+    @param outputListName Name of output charged particle list with scaled error
+    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param minErrors Lower bound can be set for each helix error.
+    '''
+    scale_error = register_module("HelixErrorScaler")
+    scale_error.set_name('ScaleError_' + inputListName)
+    scale_error.param('inputListName', inputListName)
+    scale_error.param('outputListName', outputListName)
+    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('minErrors', minErrors)
+    path.add_module(scale_error)
+
+
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
     pretty_print_module(__name__, "modularAnalysis")

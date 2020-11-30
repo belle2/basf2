@@ -701,8 +701,8 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
   double avgOffOccL3U = 0.0;
   double avgOffOccL3V = 0.0;
   for (int bin = 1; bin < 14 + 1; bin++) {
-    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) / 768 * 100; // 768 strips for u side
-    avgOffOccL3V += h_zs5countsV->GetBinContent(bin) / 768 * 100;
+    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) * 1.0 / 768 * 100; // 768 strips for u side
+    avgOffOccL3V += h_zs5countsV->GetBinContent(bin) * 1.0 / 768 * 100;
   }
   avgOffOccL3U /= (14 * nEvents); // 14 sensors in 3rd layer
   avgOffOccL3V /= (14 * nEvents);

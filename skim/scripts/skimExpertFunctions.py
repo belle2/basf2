@@ -8,11 +8,9 @@ import re
 
 import yaml
 
-import udst
 import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
-from variables import variables as vm
 
 
 def _get_test_sample_info(sampleName):
@@ -106,8 +104,8 @@ def get_eventN(fileName):
 
 def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
     """
-    Produce an ordered list of skims, by expanding any module names into a list of skims
-    in that module. Also produce a dict of skims grouped by module.
+    Produce an ordered list of skims, by expanding any Python skim module names into a
+    list of skims in that module. Also produce a dict of skims grouped by Python module.
 
     Raises:
         RuntimeError: Raised if a skim is listed twice.
@@ -418,21 +416,24 @@ class BaseSkim(ABC):
 
         self._MainPath = path
 
-        self.set_skim_logging(self.postskim_path)
-        self.load_standard_lists(self.postskim_path)
-        self.additional_setup(self.postskim_path)
-        self.build_lists(self.postskim_path)
-        self.apply_hlt_hadron_cut(self.postskim_path)
+        self.set_skim_logging(path)
+        self.load_standard_lists(path)
+        self.additional_setup(path)
+        # At this point, BaseSkim.skim_event_cuts may have been run, so pass
+        # self._ConditionalPath for the path if it is not None (otherwise just pass the
+        # regular path)
+        self.build_lists(self._ConditionalPath or path)
+        self.apply_hlt_hadron_cut_if_required(self._ConditionalPath or path)
 
         self.create_skim_flag()
 
         if self._udstOutput:
-            self.output_udst(self.postskim_path)
+            self.output_udst(self._ConditionalPath or path)
 
         if self._validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
-            self.validation_histograms(self.postskim_path)
+            self.validation_histograms(self._ConditionalPath or path)
 
     @property
     def postskim_path(self):
@@ -529,6 +530,9 @@ class BaseSkim(ABC):
         """
         Create a variable which checks that at least one skim list is non-empty.
         """
+        # Keep this import here to avoid ROOT hijacking the argument parser
+        from variables import variables as vm  # noqa
+
         if not self.SkimLists:
             b2.B2FATAL(
                 "Cannot create skim flag, because skim has not been added to the path."
@@ -608,6 +612,9 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
         """
 
+        # Keep this import here to avoid ROOT hijacking the argument parser
+        import udst  # noqa
+
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
             b2.B2FATAL(
@@ -622,7 +629,7 @@ class BaseSkim(ABC):
         )
         summaryOfLists(self.SkimLists, path=path)
 
-    def apply_hlt_hadron_cut(self, path):
+    def apply_hlt_hadron_cut_if_required(self, path):
         """Apply the ``hlt_hadron`` selection if the property ``ApplyHLTHadronCut`` is True.
 
         Parameters:
@@ -697,7 +704,7 @@ class CombinedSkim(BaseSkim):
         self.load_standard_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
-        self.apply_hlt_hadron_cut(path)
+        self.apply_hlt_hadron_cut_if_required(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
 
@@ -766,14 +773,14 @@ class CombinedSkim(BaseSkim):
         for skim in self.Skims:
             skim.output_udst(skim._ConditionalPath or path)
 
-    def apply_hlt_hadron_cut(self, path):
-        """Run the `BaseSkim.apply_hlt_hadron_cut` function for each skim.
+    def apply_hlt_hadron_cut_if_required(self, path):
+        """Run the `BaseSkim.apply_hlt_hadron_cut_if_required` function for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self.Skims:
-            skim.apply_hlt_hadron_cut(skim._ConditionalPath or path)
+            skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
 
     def create_skim_flag(self):
         """

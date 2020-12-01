@@ -153,7 +153,7 @@ import re
 import sys
 import yaml
 
-from jinja2 import Environment, FileSystemLoader
+import jinja2
 
 from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
@@ -706,8 +706,8 @@ def make_combined_steering_file(
         )
         skims, modules = resolve_skim_modules(SingleSkims)
 
-    loader = FileSystemLoader(find_file("skim/tools/resources"))
-    env = Environment(loader=loader)
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
     env.lstrip_blocks = True
 
     template = env.get_template("skim_steering_file_template.jinja2")

@@ -10,7 +10,7 @@ doesn't cut it (such as if you are testing your skim on the grid).
 
 import argparse
 
-from jinja2 import Environment, FileSystemLoader
+import jinja2
 
 from basf2 import find_file
 from skimExpertFunctions import resolve_skim_modules
@@ -105,8 +105,8 @@ def main():
 
     skims, modules = resolve_skim_modules(args.skims, LocalModule=args.local_module)
 
-    loader = FileSystemLoader(find_file("skim/tools/resources"))
-    env = Environment(loader=loader)
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
     env.lstrip_blocks = True
 
     template = env.get_template("skim_steering_file_template.jinja2")

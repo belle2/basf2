@@ -96,7 +96,11 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
     b2.process(path)
 
-After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``. There is a subtle but important technicality here: if `BaseSkim.skim_event_cuts` has been called, then the skim lists are not built for all events on the main path, but they are built for all events on a conditional path. After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to. However, the final call to `basf2.process` must be passed the main analysis path.
+After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``.
+
+.. warning:: There is a subtle but important technicality here: if ``BaseSkim.skim_event_cuts`` has been called, then the skim lists are not built for all events on the path, but they are built for all events on a conditional path.
+
+After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to (*e.g.* performing further reconstruction using the skim candidates). However, the final call to `basf2.process` must be passed the original (main) path.
 
 .. code-block:: python
 
@@ -114,9 +118,19 @@ The above code snippet will produce both uDST and ntuple output. To only build t
     skim = MySkim(udstOutput=False)
     skim(path)
 
+Disabling uDST output may be useful to you if you want to do any of the following:
+
+* print the statistics of the skim without producing any output files,
+
+* build the skim lists and perform further reconstruction or fitting on the skim candidates before writing the ROOT output,
+
+* go directly from unskimmed MDST to analysis ntuples in a single steering file (but please consider first using the centrally-produce skimmed uDSTs), or
+
+* use the :ref:`skim flag<skim-flags>` to build the skim lists and write an event-level ntuple with information about which events pass the skim.
+
 .. tip::
 
-    The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims.
+    The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims. :ref:`b2skim-run<b2skim-run>` is preferable for quickly testing a skim during skim development. :ref:`b2skim-generate<b2skim-generate>` should be used as a starting point if you are doing anything more complicated than simply running a skim on an MDST file to produce a uDST file.
 
 
 .. _skim-flags:

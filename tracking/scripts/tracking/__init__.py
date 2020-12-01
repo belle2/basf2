@@ -131,7 +131,7 @@ def add_time_extraction(path, components=None):
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False):
+                                   merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -360,7 +360,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         if is_pxd_used(components):
             add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                      output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                     filter_cut=0.01)
+                                     filter_cut=0.03)
 
         if merge_tracks:
             # merge the tracks together

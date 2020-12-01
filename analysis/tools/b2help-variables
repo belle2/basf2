@@ -14,7 +14,7 @@ def get_argument_parser():
 This returns all variables which are available in the `analysis` package of basf2.
 
 Usage:
-    `b2help-variables`
+    ``b2help-variables``
 """)
     parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
                         help='Use a pager to show output or print to terminal.')

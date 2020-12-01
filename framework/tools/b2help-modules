@@ -13,8 +13,8 @@ def get_argument_parser():
 This returns either all available modules within basf2 or returs specific information about a module when requested.
 
 Usage:
-    `b2help-modules` will return the full list of available modules.
-    `b2help-modules MODULENAME` will return specific information about the module with the name MODULENAME.
+    ``b2help-modules`` will return the full list of available modules.
+    ``b2help-modules MODULENAME`` will return specific information about the module with the name MODULENAME.
 """)
     parser.add_argument('module', nargs="?", default=None,
                         help='Get information specific to the requested module.')

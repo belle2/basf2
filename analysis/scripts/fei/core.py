@@ -356,9 +356,7 @@ class PreReconstruction(object):
                 elif self.config.training:
                     ma.matchMCTruth(channel.name, path=path)
 
-                if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
-                    basf2.B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
-                elif self.config.b2bii and particle.name in ['pi0', 'K_S0', 'Lambda0']:
+                if self.config.b2bii and particle.name in ['K_S0', 'Lambda0', 'pi0']:
                     pvfit = basf2.register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
                     pvfit.param('listName', channel.name)
@@ -367,9 +365,11 @@ class PreReconstruction(object):
                     if particle.name == 'pi0':
                         pvfit.param('fitType', 'mass')
                     else:
-                        pvfit.param('fitType', 'massvertex')
+                        pvfit.param('fitType', 'vertex')
                     pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)
+                elif re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
+                    basf2.B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
                 elif len(channel.daughters) > 1:
                     pvfit = basf2.register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)

@@ -782,10 +782,28 @@ class CombinedSkim(BaseSkim):
         for skim in self.Skims:
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
 
+    @property
+    def postskim_path(self):
+        """
+        Undefined property, since no subsequent modules can be added to the path after a
+        combined skim.
+        """
+        b2.B2ERROR("Post-skim path not defined for combined skims.")
+        return NotImplemented
+
+    @property
+    def flag(self):
+        """
+        Undefined property, since the skim flag is not guaranteed to work for a combined skim.
+        """
+        b2.B2ERROR("Skim flags are not defined for combined skims.")
+        return NotImplemented
+
     def create_skim_flag(self):
         """
         Undefined method, since the skim flag is not guaranteed to work for a combined skim.
         """
+        b2.B2ERROR("Skim flags are not defined for combined skims.")
         return NotImplemented
 
     def merge_data_structures(self):

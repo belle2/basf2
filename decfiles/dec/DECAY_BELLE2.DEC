@@ -1596,7 +1596,6 @@ Decay B0
 
 # The following channels are the remaining rare decays used in Belle:
 # /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/mixedrare.dec.
-# These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   K0  nu_e  anti-nu_e                          PHSP; #K  nu nu = 5.2e-6
 0.000004330   K*0  nu_e  anti-nu_e                         PHSP; #K* nu nu = 1.3e-5
@@ -1610,15 +1609,15 @@ Decay B0
 
 # VP
 #
-0.000006300   K_2*+  pi-                                   STS;	 #UL
+0.000003650   K_2*+  pi-                                   STS;	 #[BF update - PG 09/2020]
 0.000003150   K_2*0  pi0                                   STS;
 0.000086000   K'*+  pi-                                    PHSP; #UL
 0.000019300   K'*0  pi0                                    PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  K0                                     PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
 0.000009000   rho(3S)0  K0                                 SVS;
-0.000003200   rho(2S)-  K+                                 SVS;	 #UL
-0.000001700   rho(3S)-  K+                                 SVS;	 #UL
+0.000002400   rho(2S)-  K+                                 SVS;	 #[BF update - PG 09/2020]
+0.000000600   rho(3S)-  K+                                 SVS;	 #[BF update - PG 09/2020]
 0.000025200   K_1+  pi-                                    SVS;	 #UL
 0.000021800   K'_1+  pi-                                   SVS;	 #UL
 
@@ -1812,7 +1811,7 @@ Decay B0
 0.000000580   a_2-  K+                                     STS;
 0.000000100   a_20  K0                                     STS;
 0.000000100   f'_2  K0                                     STS;
-0.000001300   K_2*0  eta'                                  STS;
+0.000013700   K_2*0  eta'                                  STS; #[BF update - PG 09/2020]
 0.000000100   K_2*0  eta(2S)                               STS;
 0.000000100   K_2*0  eta(1405)                             STS;
 
@@ -1921,9 +1920,9 @@ Decay B0
 0.000000600   anti-Xi+  Xi-  anti-K*0                      PHSP;
 0.000000600   anti-Xi0  Xi-  K*+                           PHSP;
 #
-#   Delta S=0
+# Delta S=0
 #
-0.000001500   anti-p-  p+  pi0                             PHSP;
+0.000000500   anti-p-  p+  pi0                             PHSP; #[BF update - PG 09/2020]
 0.000001500   anti-n0  n0  pi0                             PHSP;
 0.000001500   anti-Delta+  Delta-  pi0                     PHSP;
 0.000001500   anti-p-  n0  pi+                             PHSP;
@@ -2029,8 +2028,8 @@ Decay B0
 0.000058000   D_s*+  pi-  pi0                              PHSP;
 0.000094000   D_s*+  a_1-                                  SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 
-#  Exchange(Scattering) ssbar
-#  Ds- K+:hep-ex/0207077 Belle. Others assume that the ratio D-pi+/D-rho+ is the same as D_s-K+/D_s-K*+.
+# Exchange(Scattering) ssbar
+# Ds- K+:hep-ex/0207077 Belle. Others assume that the ratio D-pi+/D-rho+ is the same as D_s-K+/D_s-K*+.
 #
 0.000004000   D_s-  K+  pi0                                PHSP;
 0.000026000   D_s*-  K+  pi0                               PHSP;
@@ -2062,7 +2061,7 @@ Decay B0
 # Phys.Rev.Lett.78:3999-4002,1997;hep-ph/9701396.
 # Ds*D/Ds/D = D*0 anti-D0/D0anti-D0 is assumed.
 #
-0.000020000   D0  anti-D0                                  PHSP;
+0.000014000   D0  anti-D0                                  PHSP; #[BF update - PG 09/2020]
 0.000024000   D*0  anti-D0                                 SVS;
 0.000024000   anti-D*0  D0                                 SVS;
 0.000030000   D*0  anti-D*0                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
@@ -2083,11 +2082,11 @@ Decay B0
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
-#  Lam_c X  / Sigma_c X   4.0 %
+# Lam_c X  / Sigma_c X   4.0 %
 0.00948015    anti-cd_0  ud_0                              PYTHIA 23;
 0.01896038    anti-cd_1  ud_1                              PYTHIA 23;
 
-#  Xi_c X    2.5%
+# Xi_c X      2.5%
 0.00258552    anti-cs_0  ud_0                              PYTHIA 23;
 0.00517103    anti-cs_1  ud_1                              PYTHIA 23;
 
@@ -3382,7 +3381,6 @@ Decay anti-B0
 
 # The following channels are the remaining rare decays used in Belle:
 # /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/mixedrare.dec.
-# These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   anti-K0  nu_e  anti-nu_e                     PHSP; #K  nu nu = 5.2e-6
 0.000004330   anti-K*0  nu_e  anti-nu_e                    PHSP; #K* nu nu = 1.3e-5
@@ -3396,15 +3394,15 @@ Decay anti-B0
 
 # VP
 #
-0.000006300   K_2*-  pi+                                   STS;	 #UL
+0.000003650   K_2*-  pi+                                   STS;	 #[BF update - PG 09/2020]
 0.000003150   anti-K_2*0  pi0                              STS;
 0.000086000   K'*-  pi+                                    PHSP; #UL
 0.000019300   anti-K'*0  pi0                               PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  anti-K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  anti-K0                           PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
 0.000009000   rho(3S)0  anti-K0                            SVS;
-0.000003200   rho(2S)+  K-                                 SVS;	 #UL
-0.000001700   rho(3S)+  K-                                 SVS;	 #UL
+0.000002400   rho(2S)+  K-                                 SVS;	 #[BF update - PG 09/2020]
+0.000000600   rho(3S)+  K-                                 SVS;	 #[BF update - PG 09/2020]
 0.000025200   K_1-  pi+                                    SVS;	 #UL
 0.000021800   K'_1-  pi+                                   SVS;	 #UL
 
@@ -3598,7 +3596,7 @@ Decay anti-B0
 0.000000580   a_2+  K-                                     STS;
 0.000000100   a_20  anti-K0                                STS;
 0.000000100   f'_2  anti-K0                                STS;
-0.000001300   anti-K_2*0  eta'                             STS;
+0.000013700   anti-K_2*0  eta'                             STS; #[BF update - PG 09/2020]
 0.000000100   anti-K_2*0  eta(2S)                          STS;
 0.000000100   anti-K_2*0  eta(1405)                        STS;
 
@@ -3709,7 +3707,7 @@ Decay anti-B0
 #
 # Delta S=0
 #
-0.000001500   p+  anti-p-  pi0                             PHSP;
+0.000000500   p+  anti-p-  pi0                             PHSP; #[BF update - PG 09/2020]
 0.000001500   n0  anti-n0  pi0                             PHSP;
 0.000001500   Delta-  anti-Delta+  pi0                     PHSP;
 0.000001500   p+  anti-n0  pi-                             PHSP;
@@ -3848,7 +3846,7 @@ Decay anti-B0
 # Phys.Rev.Lett.78:3999-4002,1997;hep-ph/9701396.
 # Ds*D/Ds/D = D*0 anti-D0/D0anti-D0 is assumed.
 #
-0.000020000   D0  anti-D0                                  PHSP;
+0.000014000   D0  anti-D0                                  PHSP; #[BF update - PG 09/2020]
 0.000024000   D*0  anti-D0                                 SVS;
 0.000024000   anti-D*0  D0                                 SVS;
 0.000030000   D*0  anti-D*0                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
@@ -3869,11 +3867,11 @@ Decay anti-B0
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
-#  Lam_c X  / Sigma_c X   4.0 %
+# Lam_c X  / Sigma_c X   4.0 %
 0.00948015    cd_0  anti-ud_0                              PYTHIA 23;
 0.01896038    cd_1  anti-ud_1                              PYTHIA 23;
 
-#  Xi_c X     2.5%
+# Xi_c X      2.5%
 0.00258552    cs_0  anti-ud_0                              PYTHIA 23;
 0.00517103    cs_1  anti-ud_1                              PYTHIA 23;
 
@@ -4930,7 +4928,6 @@ Decay B+
 
 # The following channels are the remaining rare decays used in Belle:
 # /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/chargedrare.dec.
-# These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   K+  nu_e  anti-nu_e                          PHSP; #K  nu nu = 5.2e-6
 0.000004330   K*+  nu_e  anti-nu_e                         PHSP; #K* nu nu = 1.3e-5
@@ -5394,10 +5391,10 @@ Decay B+
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
-#  Lam_c X  / Sigma_c X   4.0 %
+# Lam_c X  / Sigma_c X   4.0 %
 0.02879144    anti-cd_1  uu_1                              PYTHIA 23;
 
-#  Xi_c X     2.4%
+# Xi_c X      2.4%
 0.00785225    anti-cs_1  uu_1                              PYTHIA 23;
 
 0.19653757    u  anti-d  anti-c  u                         PYTHIA         48;
@@ -6439,7 +6436,6 @@ Decay B-
 
 # The following channels are the remaining rare decays used in Belle:
 # /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/chargedrare.dec.
-# These channels have not been synchronized with PDG. [PG 09/2020]
 
 0.000001730   K-  nu_e  anti-nu_e                          PHSP; #K  nu nu = 5.2e-6
 0.000004330   K*-  nu_e  anti-nu_e                         PHSP; #K* nu nu = 1.3e-5
@@ -6903,10 +6899,10 @@ Decay B-
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
-#  Lam_c X  / Sigma_c X   4.0 %
+# Lam_c X  / Sigma_c X   4.0 %
 0.02879144    cd_1  anti-uu_1                              PYTHIA 23;
 
-#  Xi_c X     2.4%
+# Xi_c X      2.4%
 0.00785225    cs_1  anti-uu_1                              PYTHIA 23;
 
 0.19653757    anti-u  d  c  anti-u                         PYTHIA         48;

@@ -82,7 +82,7 @@ Charged PID priors
 
 User can provide prior expectations for the most probable mass hypothesis mentioned above. This is useful to suppress harmful mis-IDs, like charged pion 
 being reconstructed as a muon because of similarity of their PID likelihoods. 
-The priors are provided in the from of a list containing 6 float numbers, which correspond to 
+The priors are provided in the form of a list containing 6 float numbers, which correspond to 
 :math:`[ e^\mp, \mu^\mp, \pi^\mp K^\pm, p^\pm, d^\pm]`.
 
 Here is an example of the prior usage:

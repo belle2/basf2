@@ -21,17 +21,16 @@ from basf2.pickle_path import serialize_path
 
 from ROOT.Belle2 import CalibrationAlgorithm
 
-from .utils import create_directories
-from .utils import method_dispatch
-from .utils import iov_from_runs
-from .utils import IoV_Result
-from .utils import get_iov_from_file
-from .utils import find_absolute_file_paths
-from .backends import Job
-from .backends import LSF
-from .backends import PBS
-from .backends import Local
-from .runners import AlgorithmsRunner
+from caf.utils import create_directories
+from caf.utils import method_dispatch
+from caf.utils import iov_from_runs
+from caf.utils import IoV_Result
+from caf.utils import get_iov_from_file
+from caf.backends import Job
+from caf.backends import LSF
+from caf.backends import PBS
+from caf.backends import Local
+from caf.runners import AlgorithmsRunner
 
 
 class State():
@@ -523,12 +522,7 @@ class CalibrationMachine(Machine):
     def _resolve_file_paths(self):
         """
         """
-        if isinstance(self.collector_backend, Local) or \
-           isinstance(self.collector_backend, PBS) or \
-           isinstance(self.collector_backend, LSF):
-            B2INFO(f"Resolving absolute paths of input files for calibration: {self.calibration.name}.")
-            for collection in self.calibration.collections.values():
-                collection.input_files = [Path(p) for p in find_absolute_file_paths(collection.input_files)]
+        pass
 
     def _build_iov_dicts(self):
         """

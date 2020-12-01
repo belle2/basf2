@@ -72,7 +72,7 @@ void TrackQETrainingDataCollectorModule::initialize()
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_variableSet.emplace_back("matched", &m_matched);
+  m_variableSet.emplace_back("truth", &m_matched);
   m_variableSet.emplace_back("background", &m_background);
   m_variableSet.emplace_back("ghost", &m_ghost);
   m_variableSet.emplace_back("fake", &m_fake);

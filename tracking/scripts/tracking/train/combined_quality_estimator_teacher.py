@@ -1035,8 +1035,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         # (CDB payloads) to new weightfiles created by this b2luigi script
         if ('DATA' in self.random_seed or 'useCDC' in self.recotrack_option) and 'noCDC' not in self.recotrack_option:
             cdc_identifier = 'datafiles/' + \
-                             'cdc_mva_qe_nTrees350_nCuts6_nLevels5_shrin10_exp0.weights.xml'
-            # CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask, fast_bdt_option=self.fast_bdt_option)
+                             CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             if os.path.exists(cdc_identifier):
                 replace_cdc_qi = True
             elif 'useCDC' in self.recotrack_option:
@@ -2415,10 +2414,6 @@ class MasterTask(b2luigi.WrapperTask):
         "has_matching_segment",
         "size",
         "n_tracks",
-        "globalImpact",
-        "impact_helix",
-        "d0_helix",
-        "z0_helix",
         "avg_hit_dist",
         "cont_layer_mean",
         "cont_layer_variance",
@@ -2466,6 +2461,11 @@ class MasterTask(b2luigi.WrapperTask):
         'tripletFit_P_Mag', 'tripletFit_P_Eta', 'tripletFit_P_Phi', 'tripletFit_P_X', 'tripletFit_P_Y', 'tripletFit_P_Z']
     #: list of variables to exclude for the recotrack mva:
     exclude_variables_rec = [
+        'background',
+        'ghost',
+        'fake',
+        'clone',
+        'event_number',
         'N_RecoTracks',
         'N_PXDRecoTracks',
         'N_SVDRecoTracks',
@@ -2510,6 +2510,12 @@ class MasterTask(b2luigi.WrapperTask):
         'PXD_QI',
         'SVD_FitSuccessful',
         'CDC_FitSuccessful',
+        'pdg_id',
+        'pdg_id_mother',
+        'is_vzero_daughter',
+        'is_primary',
+        'z0',
+        'd0',
         'seed_Charge',
         'Fit_Charge',
         'weight_max',

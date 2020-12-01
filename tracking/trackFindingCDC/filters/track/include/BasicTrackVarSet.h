@@ -36,10 +36,6 @@ namespace Belle2 {
       "n_tracks",
 
       "sz_slope",
-      "globalImpact",
-      "impact_helix",
-      "d0_helix",
-      "z0_helix",
       "z0",
       "s_range",
       "avg_hit_dist",

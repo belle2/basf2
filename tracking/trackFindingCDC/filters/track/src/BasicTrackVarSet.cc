@@ -137,10 +137,6 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("n_tracks")>() = n_tracks;
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
-  var<named("globalImpact")>() = toFinite(trajectory2D.getGlobalImpact(), 0);
-  var<named("impact_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().impactXY(), 0);
-  var<named("d0_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().d0(), 0);
-  var<named("z0_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().z0(), 0);
   var<named("z0")>() = toFinite(trajectorySZ.getZ0(), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
   var<named("avg_hit_dist")>() = toFinite(avg_hit_dist, 0);

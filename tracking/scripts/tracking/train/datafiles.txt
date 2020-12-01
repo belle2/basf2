@@ -1,3 +1,0 @@
-"/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT1.f00001.root"
-"/group/belle2/dataprod/Data/Raw/e0012/r06373/sub00/physics.0012.06373.HLT3.f00000.root"
-"/group/belle2/dataprod/Data/Raw/e0012/r06424/sub00/physics.0012.06424.HLT1.f00022.root"

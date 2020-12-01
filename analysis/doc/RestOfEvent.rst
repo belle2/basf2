@@ -42,18 +42,17 @@ The ROE is formed by calling :func:`modularAnalysis.buildRestOfEvent` command:
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec', path = main_path)
    
 This code simply adds ``RestOfEvent`` objects, which are related to each ``B0:rec`` candidate.
 Now, it is possible to calculate simple ROE-based variables using target particle candidate,
 like the ROE momentum :b2:var:`roeP`, the ROE mass :b2:var:`roeM` or others. The full list of the ROE variables can be found
-by using command ``basf2 variables.py`` under the **Rest of Event** section.
+by using command ``b2help-variables`` under the **Rest of Event** section.
 
 .. warning:: 
   Names or behavior of the ROE variables may vary from release to release. 
-  Please recheck list of variables ``basf2 variables.py`` when switching between the releases.
+  Please recheck list of variables ``b2help-variables`` when switching between the releases.
 
 After reconstructing the ROE, one can use ROE-dependent modules, like :doc:`FlavorTagger`, `ContinuumSuppression`, :doc:`FullEventInterpretation` and other algorithms.
 
@@ -68,6 +67,7 @@ This can be changed by passing an additional argument to the builder method:
 .. code-block:: python
 
   import modularAnalysis as ma
+  # Suppose we have a signal B meson stored in a particle list 'B0:rec'
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, path = main_path)
 
@@ -81,7 +81,8 @@ Charged PID priors
 ------------------
 
 User can provide prior expectations for the most probable mass hypothesis mentioned above. This is useful to suppress harmful mis-IDs, like charged pion 
-being reconstructed as a muon because of similarity of their PID likelihoods. The priors are provided in from of a list containing 6 float numbers, which correspond to 
+being reconstructed as a muon because of similarity of their PID likelihoods. 
+The priors are provided in the from of a list containing 6 float numbers, which correspond to 
 :math:`[ e^\mp, \mu^\mp, \pi^\mp K^\pm, p^\pm, d^\pm]`.
 
 Here is an example of the prior usage:
@@ -89,6 +90,7 @@ Here is an example of the prior usage:
 .. code-block:: python
 
   import modularAnalysis as ma
+  # Suppose we have a signal B meson stored in a particle list 'B0:rec'
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, 
         chargedPIDPriors=[0.0, 0.0, 1.0, 1.0, 0.0, 0.0], path = main_path)
@@ -115,7 +117,6 @@ Nevertheless, there is an option to add particle lists manually:
   stdCharged.stdPr('good')
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec',['K+:good', 'p+:good','e+:good','mu+:good'], path = main_path)
 
@@ -127,7 +128,7 @@ The order of provided particle lists matters, so preferably, the particle lists 
 Changing charged particle hypothesis is important, as the charged particles have different mass, and it will 
 affect the computation of the ROE mass or energy.
 Also, this method allows to study the ROE particle composition by using :b2:var:`nROE_Charged` metavariable, 
-as well as :b2:var:`nROE_Photons` and :b2:var:`nROE_NeutralHadrons` metavariables, see ``basf2 variables.py``.
+as well as :b2:var:`nROE_Photons` and :b2:var:`nROE_NeutralHadrons` metavariables, see output of ``b2help-variables`` command.
 
 
 Accessing ROE particles
@@ -142,7 +143,6 @@ In basf2 this is realized by ``path.for_each`` functionality:
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # build the ROE object
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a path for ROE logic
@@ -185,7 +185,6 @@ over ROE objects related to a certain particle list:
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # build the ROE object
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a path for ROE logic
@@ -214,7 +213,6 @@ which have passed a selection criteria:
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a mask tuple:
@@ -247,7 +245,6 @@ These methods should be executed inside the ROE loop:
   import vertex as vtx
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # build the ROE object
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a mask tuple:
@@ -290,7 +287,6 @@ particles from host ROE object:
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # build the ROE object
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a mask tuple:
@@ -337,7 +333,6 @@ It is possible to load ROE as a particle, which can be manipulated as any other 
   import modularAnalysis as ma
   main_path = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = main_path)
   # build the ROE object
   ma.buildRestOfEvent('B0:rec', path = main_path)
   # Create a mask tuple:

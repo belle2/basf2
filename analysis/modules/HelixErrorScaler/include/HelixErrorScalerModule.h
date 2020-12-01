@@ -58,9 +58,9 @@ namespace Belle2 {
     int m_pdgCode;                /**< PDG code of the charged particle to be scaled */
     std::string m_decayString;   /**< Input DecayString specifying the input particle */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the charged particle */
-    StoreObjPtr<ParticleList>  m_inputparticleList; /**<StoreObjptr for input charged particlelist */
-    StoreObjPtr<ParticleList>  m_outputparticleList; /**<StoreObjptr for output particlelist */
-    StoreObjPtr<ParticleList>  m_outputAntiparticleList; /**<StoreObjptr for output antiparticlelist */
+    StoreObjPtr<ParticleList>  m_inputparticleList; /**< StoreObjptr for input charged particlelist */
+    StoreObjPtr<ParticleList>  m_outputparticleList; /**< StoreObjptr for output particlelist */
+    StoreObjPtr<ParticleList>  m_outputAntiparticleList; /**< StoreObjptr for output antiparticlelist */
     StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
     StoreArray<MCParticle> m_mcparticles; /**< StoreArray of MCParticle objects */
     StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihood objects */

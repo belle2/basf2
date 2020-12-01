@@ -13,7 +13,6 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/Track.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 
@@ -57,6 +56,8 @@ void HelixErrorScalerModule::initialize()
   // output particle
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
   m_pdgCode  = mother->getPDGCode();
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::invalidParticle)
+    B2ERROR("Invalid input ParticleList PDG code (must be ChargedStable): " << m_pdgCode);
   m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
 
   // get existing particle lists
@@ -95,9 +96,8 @@ void HelixErrorScalerModule::event()
     TrackFitResult* new_trkfit = getTrackFitResultWithScaledError(trkfit);
 
     Const::ChargedStable chargedtype(abs(charged->getPDGCode()));
-    const Track* track = charged->getTrack();
 
-    Particle new_charged(track->getArrayIndex(), new_trkfit, chargedtype);
+    Particle new_charged(charged->getMdstArrayIndex(), new_trkfit, chargedtype);
     Particle* newCharged = m_particles.appendNew(new_charged);
     const PIDLikelihood* pid = charged->getPIDLikelihood();
     const MCParticle* mcCharged = charged->getRelated<MCParticle>();

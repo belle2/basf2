@@ -28,6 +28,6 @@ if __name__ == "__main__":
     args = get_argument_parser().parse_args()
 
     if args.module is None:
-        subprocess.call(["basf2", "-m"])
+        basf2_cli.modules.print_module_list()
     else:
-        subprocess.call(["basf2", "-m", args.module])
+        basf2_cli.modules.print_module_list(args.module)

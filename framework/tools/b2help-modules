@@ -6,6 +6,7 @@ You can run ``b2help-modules`` to list all available modules.
 """
 import subprocess
 import argparse
+import basf2_cli.modules
 
 
 def get_argument_parser():
@@ -14,6 +15,7 @@ This returns either all available modules within basf2 or returs specific inform
 
 Usage:
     ``b2help-modules`` will return the full list of available modules.
+    ``b2help-modules PACKAGE`` will return a list of modules associated with the given PACKAGE name.
     ``b2help-modules MODULENAME`` will return specific information about the module with the name MODULENAME.
 """)
     parser.add_argument('module', nargs="?", default=None,

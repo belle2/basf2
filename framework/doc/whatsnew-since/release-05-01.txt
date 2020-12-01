@@ -1,0 +1,5 @@
+Changes in the framework package since release-05-01
+----------------------------------------------------
+
+* Added :ref:`b2help-modules` which behaves identical to ``basf2 -m`` but more in-keeping with the ``b2help-<something>`` theme. 
+

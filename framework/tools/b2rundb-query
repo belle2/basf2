@@ -45,7 +45,7 @@ Note that not all variables do necessarily have a value assigned to it.
             "hlt_mode"],
         choices=[
             "ler",
-            "her"
+            "her",
             "statistics",
             "detectors",
             "background",

@@ -6880,11 +6880,11 @@ Decay B-
 0.000000010   D_s-  K+  pi-                                PHSP;
 0.000000010   D_s-  K0  pi0                                PHSP;
 0.000000050   K*0  D_s-                                    SVS;
-0.000000040   D_s*-  K0                                    SVS;
 
 0.000000120   D_s*-  K+  pi-                               PHSP;
 0.000000040   D_s*-  K0  pi0                               PHSP;
 0.000000100   D_s*-  K*0                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.000000040   D_s*-  K0                                    SVS;
 
 # Anihilation radiative
 # hep-ph/9902369;Phys.Rev.D60:031302,1999 Grinstein Lebed.
@@ -6893,7 +6893,7 @@ Decay B-
 0.000000010   D*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;
 
 #_____________________________________________________________________
-# Decays to copy/paste into RARE.DEC after each update         - End
+# Decays to copy/paste into RARE.DEC after each update           - End
 #_____________________________________________________________________
 
 

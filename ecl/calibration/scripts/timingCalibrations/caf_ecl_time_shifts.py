@@ -80,30 +80,39 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics, max_events_per_run)
     input_files_physics = list(reduced_file_to_iov_physics.keys())
 
-    print("First/last files before sort:")
-    print(input_files_physics[0])
-    print(input_files_physics[-1])
-
-    intput_files_sort = sorted(input_files_physics)
-    # print(intput_files_sort)
-
-    input_files_first_last = [intput_files_sort[0], intput_files_sort[-1]]
-
-    print("List of files with only the lowest and highest run numbers:")
-    print(input_files_first_last)
-
     ###################################################
     import basf2
     from basf2 import register_module, create_path
     import ROOT
     from ROOT import Belle2
     from ROOT.Belle2 import TestCalibrationAlgorithm
+    from caf.framework import Collection
+
+    ###################################################
+    # Collector setup
+
+    # Set up the collector but with only one event per file
+    root_input = register_module('RootInput', entrySequences=['0:{}'.format(1)])
+
+    rec_path_bhabha = create_path()
+    rec_path_bhabha.add_module(root_input)
+    if 'Gearbox' not in rec_path_bhabha:
+        rec_path_bhabha.add_module('Gearbox')
+    if 'Geometry' not in rec_path_bhabha:
+        rec_path_bhabha.add_module('Geometry', useDB=True)
+
+    prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
+
+    col_bhabha = register_module('eclTimeShiftsPlottingCollector')
+    eclTCol = Collection(collector=col_bhabha,
+                         # input_files=input_files_first_last,
+                         input_files=input_files_physics,
+                         pre_collector_path=rec_path_bhabha,
+                         )
 
     ########################################################################
+    # Algorithm setup
     # Make plots of the crate time shifts as a function of the run number
-
-    # We use a dummy collector that barely outputs any data and we set the input files to
-    # just two input files so that we spawn only very fast jobs.
 
     from caf.framework import Calibration
 
@@ -123,13 +132,22 @@ def get_calibrations(input_data, **kwargs):
 
     # +-17ns range allows for four 8ns crate time jumps in one direction
     # +-10ns range allows for two 8ns crate time jumps in one direction
-    tShifts_alg.crysCrateShift_min = -10   # in ns
-    tShifts_alg.crysCrateShift_max = 10    # in ns
-    # tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
 
-    cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", collector="DummyCollector",
-                                     algorithms=[tShifts_alg], input_files=input_files_first_last)
-    # algorithms=[tShifts_alg],input_files=input_files_physics)
+    tShifts_alg.crysCrateShift_min = -30   # in ns
+    tShifts_alg.crysCrateShift_max = 30    # in ns
+
+    # Make the algorithm loop over the runs, not just the collector
+    # tShifts_alg.algorithmReadPayloads = True
+    tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
+
+    ###################################################
+    # "Calibration" setup
+    # Combine the collector and algorithm for execution
+
+    cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", algorithms=[tShifts_alg],
+                                     input_files=input_files_physics)
+    cal_ecl_timeShifts.add_collection(name="bhabha", collection=eclTCol)
+    cal_ecl_timeShifts.save_payloads = False
 
     ###################################################
     # Finalize all calibrations

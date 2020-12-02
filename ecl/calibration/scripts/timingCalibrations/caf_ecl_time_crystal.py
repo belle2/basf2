@@ -67,7 +67,7 @@ def get_calibrations(input_data, **kwargs):
     # set to a large number in case we want to introduce it later.
     # Also, keeping it allows the crystal calibrations code to look like the
     # crates calibration code.
-    max_files_per_run = 26
+    max_files_per_run = 2600
 
     # We filter addition files if there are more than [max_files_per_run] files per run.
     # The input data files are sorted alphabetically by b2caf-prompt-run
@@ -168,10 +168,11 @@ def get_calibrations(input_data, **kwargs):
 
     # --------------------------------------------------------------
     # ..Force the output iovs to be open
+    intermediate_iov = IoV(0, 0, -1, -1)
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     for algorithm in cal_crystals.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {"apply_iov": intermediate_iov}
     for algorithm in cal_ecl_merge.algorithms:
         algorithm.params = {"apply_iov": output_iov}
 

@@ -7,16 +7,16 @@ from argparse import ArgumentParser
 import pandas as pd
 from tabulate import tabulate
 
-if __name__ == "__main__":
 
+def get_argument_parser():
     parser = ArgumentParser(description="""
 This tool allows to perform simple queries to the rundb.
 
 This works in any python installation with python version >=3.5 and the requests
 package installed
-""")
+    """)
     parser.add_argument("--user", help="Username, corresponds to your DESY credentials.", required=False)
-    parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", default=8)
+    parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", default=7)
     parser.add_argument("--max-experiment", help="Only query entries before or equal the given experiment number.", default=99)
     parser.add_argument("--run-type", help="", choices=["null", "physics", "cosmic", "debug", "unknown"], required=False)
     parser.add_argument("--min-run", help="Only query entries after or equal the given run number.", default=1)
@@ -66,8 +66,12 @@ Note that not all variables do necessarily have a value assigned to it.
             "stop_reason",
             "hlt_mode",
             "roi_filtering"])
+    return parser
 
-    args = parser.parse_args()
+
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
 
     rundb = RunDB(username=args.user)
     # get the list of runs, all parameters are forwarded as get request

@@ -9,6 +9,14 @@ from terminal_utils import Pager
 
 
 def print_module_list(modName=None):
+    """
+    This wraps around the ``print_all_modules`` function but sanitizes potential command line arguments before doing so.
+
+    Parameters:
+      modName: Can be the name of a module or package. Prints more information about a specific module or reduces the output
+      to requested package.
+    """
+
     # Do not show INFO messages in module list (actually a problem of the module)
     set_log_level(pybasf2.LogLevel.WARNING)
 

@@ -22,6 +22,7 @@ Tools which will provide you help
     :nodefault:
     :nogroupsections:
 
+
 ``b2help-variables``: List available variables in the analysis package
 ----------------------------------------------------------------------
 

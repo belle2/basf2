@@ -802,7 +802,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
     for decayString, cut in decayStringWithCuts.items():
-        if "gamma" in decayString:
+        if decayString.startswith("gamma"):
             path.add_module(
                 'MVAExpert',
                 listNames=decayString,
@@ -875,7 +875,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    if "gamma" in decayString:
+    if decayString.startswith("gamma"):
         path.add_module(
             'MVAExpert',
             listNames=decayString,

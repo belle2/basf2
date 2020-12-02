@@ -7,6 +7,7 @@ This module defines wrapper functions around the analysis modules.
 
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+import basf2
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -720,7 +721,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -792,6 +793,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -802,7 +804,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
     for decayString, cut in decayStringWithCuts.items():
-        if decayString.startswith("gamma"):
+        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+            basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
             path.add_module(
                 'MVAExpert',
                 listNames=decayString,
@@ -811,7 +814,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -866,6 +869,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -875,7 +880,9 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    if decayString.startswith("gamma"):
+    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+
+        basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
         path.add_module(
             'MVAExpert',
             listNames=decayString,

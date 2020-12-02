@@ -721,7 +721,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -814,7 +814,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -2684,6 +2684,7 @@ def getBeamBackgroundProbabilityMVA(
     @param path       modules are added to this path
     """
 
+    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
     path.add_module(
         'MVAExpert',
         listNames=particleList,

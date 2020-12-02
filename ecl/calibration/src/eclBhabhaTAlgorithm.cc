@@ -83,6 +83,20 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   auto cutflow = getObjectPtr<TH1F>("cutflow");
 
 
+
+  // Define new plots to make
+
+  // New ts values minus ts values from previous iteration plotted as a function of the crystal or crate id
+  auto tsNew_MINUS_tsOld__cid = new TH1F("TsNew_MINUS_TsOld__cid", ";cell id; ts(new) - ts(old)  [ns]", 8736, 1, 8736 + 1);
+  auto tcrateNew_MINUS_tcrateOld__crateID = new TH1F("tcrateNew_MINUS_tcrateOld__crateID", ";crate id; ts(new) - ts(old)  [ns]", 52,
+                                                     1, 52 + 1);
+
+  // Histogram of the new time constant values minus values from previous iteration
+  auto tsNew_MINUS_tsOld = new TH1F("TsNew_MINUS_TsOld", ";ts(new) - ts(old)  [ns];Number of crystals", 201, -10.05, 10.05);
+  auto tcrateNew_MINUS_tcrateOld = new TH1F("tcrateNew_MINUS_tcrateOld", ";tcrate(new) - tcrate(old)  [ns];Number of crates", 201,
+                                            -10.05, 10.05);
+
+
   if (!TimevsCrysNoCalibrations) return c_Failure;
 
   /**-----------------------------------------------------------------------------------------------*/
@@ -155,8 +169,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // * crystal payload updating for iterating crystal and crate fits
   int eventNumberForCrates = 1;
 
-  //auto& conf = Conditions::Configuration::getInstance();
-
   StoreObjPtr<EventMetaData> evtPtr;
   // simulate the initialize() phase where we can register objects in the DataStore
   DataStore::Instance().setInitializeActive(true);
@@ -196,6 +208,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2INFO("ts: cellID " << ic + 1 << " " << currentValuesCrys[ic] << " +/- " << currentUncCrys[ic]);
     B2INFO("tcrate: cellID " << ic + 1 << " " << currentValuesCrate[ic] << " +/- " << currentUncCrate[ic]);
   }
+
+
 
 
   //------------------------------------------------------------------------
@@ -364,6 +378,14 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
   /* CRYSTAL CORRECTIONS */
+
+  /* Make a 1D histogram of the number of hits per crystal.  This will help with the validations
+     to make sure that all the crystals had enough hits and to look for problems.*/
+  TH1D* h_crysHits = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionX("h_crysHits");
+  h_crysHits->SetTitle("Hits per crystal;Crystal id");
+
+  histfile->WriteTObject(h_crysHits, "h_crysHits");
+
 
   // Loop over all the crystals for doing the crystal calibation
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
@@ -565,18 +587,43 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     for (int crate_id = 1; crate_id <= 52; crate_id++) {
       tsRefCID.push_back(t_offsets[ crystalIDReferenceForZeroTs[crate_id - 1] - 1 ]);
       B2INFO("crystal time [crystal = " << crystalIDReferenceForZeroTs[crate_id - 1] << ", crate = " << crate_id  << " (base 1)] = " <<
-             t_offsets[ crystalIDReferenceForZeroTs[crate_id - 1] - 1 ] << " ns");
+             t_offsets[ crystalIDReferenceForZeroTs[crate_id - 1] - 1 ] << " ticks");
     }
 
     B2INFO("crystal times after shift wrt reference crystal");
     for (int crys_id = 1; crys_id <= 8736; crys_id++) {
       int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
       B2INFO("crystal time before shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
-             t_offsets[ crys_id - 1 ] << " ns");
-      t_offsets[crys_id - 1] = t_offsets[crys_id - 1] - tsRefCID[crate_id_from_crystal - 1];
-      B2INFO("crystal time after shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
-             t_offsets[ crys_id - 1 ] << " ns");
+             t_offsets[crys_id - 1] << " +- " << t_offsets_unc[crys_id - 1] << " ticks");
+
+      /* Shift the crystal time constant by that of the reference crystal, but only if
+         there were values to shift.  If there were no entries, ts=0 and ts_unc=0, which
+         are special values so do not shift these crystals. */
+      if (t_offsets[crys_id - 1] == 0  && t_offsets_unc[crys_id - 1] == 0) {
+        B2INFO("crystal time after shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
+               t_offsets[crys_id - 1] << " ticks.  No change because ts=0 and ts_unc=0 (no entries).");
+      } else {
+        t_offsets[crys_id - 1] = t_offsets[crys_id - 1] - tsRefCID[crate_id_from_crystal - 1];
+        B2INFO("crystal time after shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
+               t_offsets[crys_id - 1] << " ticks");
+      }
+
+
+      // Fill histograms with the difference in the ts values between iterations
+      double tsDiff_ns = (t_offsets[crys_id - 1] - t_offsets_prev[crys_id - 1]) * TICKS_TO_NS;
+      B2INFO("Crystal " << crys_id << ": ts new - old = " << tsDiff_ns << " ns");
+      tsNew_MINUS_tsOld__cid->SetBinContent(crys_id, tsDiff_ns);
+      tsNew_MINUS_tsOld__cid->SetBinError(crys_id, 0);
+      tsNew_MINUS_tsOld__cid->ResetStats();
+
+      tsNew_MINUS_tsOld->Fill(tsDiff_ns);
+      tsNew_MINUS_tsOld->ResetStats();
+
     }
+
+    // Save the histograms to the output root file
+    histfile->WriteTObject(tsNew_MINUS_tsOld__cid, "tsNew_MINUS_tsOld__cid");
+    histfile->WriteTObject(tsNew_MINUS_tsOld, "tsNew_MINUS_tsOld");
   }
 
 
@@ -597,6 +644,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2DEBUG(30, "end of crystal start of crate corrections .....");
 
 
+  //==============================================================
   /* CRATE CORRECTIONS */
 
   hist_tmin = TimevsCrateNoCrateCalibPrevCrystCalib->GetYaxis()->GetXmin();
@@ -802,8 +850,27 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       t_offsets_crate[crys_id - 1] = tcrate_mean_prev[crate_id_from_crystal - 1];
       B2INFO("used old crate mean but zeroed uncertainty since not saved in root file");
     }
-
   }
+
+
+  // Fill histograms with the difference in the tcrate values
+  if (crateIDLo <= crateIDHi) {
+    for (int crate_id = crateIDLo; crate_id <= crateIDHi; crate_id++) {
+      double tCrateDiff_ns = (tcrate_mean_new[crate_id - 1] - tcrate_mean_prev[crate_id - 1]) * TICKS_TO_NS;
+      B2INFO("Crate " << crate_id << ": tcrate new - old = " << tCrateDiff_ns << " ns");
+      tcrateNew_MINUS_tcrateOld__crateID->SetBinContent(crate_id, tCrateDiff_ns);
+      tcrateNew_MINUS_tcrateOld__crateID->SetBinError(crate_id, 0);
+      tcrateNew_MINUS_tcrateOld__crateID->ResetStats();
+
+      tcrateNew_MINUS_tcrateOld->Fill(tCrateDiff_ns);
+      tcrateNew_MINUS_tcrateOld->ResetStats();
+    }
+
+    // Save the histograms to the output root file
+    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID, "tcrateNew_MINUS_tcrateOld__crateID");
+    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld, "tcrateNew_MINUS_tcrateOld");
+  }
+
 
   ECLCrystalCalib* BhabhaTCrateCalib = new ECLCrystalCalib();
   BhabhaTCrateCalib->setCalibVector(t_offsets_crate, t_offsets_crate_unc);

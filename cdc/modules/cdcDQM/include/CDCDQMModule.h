@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDQMMODULE_H
-#define CDCDQMMODULE_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 
@@ -101,5 +100,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

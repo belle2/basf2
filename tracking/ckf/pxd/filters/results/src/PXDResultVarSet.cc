@@ -48,6 +48,10 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
   for (const SpacePoint* spacePoint : spacePoints) {
     layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
   }
+  // Counting the occurences of 'true' rather counts the number of layers used,
+  // not the number of holes. But renaming this variable would break the MVA-based result filter.
+  // Could be renamed if the weight file for the MVA result filter was retrained afterwards and
+  // the new weight file was then uploaded to the DB and would replace the current one.
   var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), true);
 
   var<named("has_missing_layer_1")>() = layerUsed[1] == 0;
@@ -57,6 +61,10 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
   var<named("has_missing_layer_5")>() = layerUsed[5] == 0;
   var<named("has_missing_layer_6")>() = layerUsed[6] == 0;
 
+  // Since the vector layerUsed only contains bool values, there can be no number 2, so this
+  // variable is basically useless. But also here, just removing the variable would likely break
+  // the MVA-based result filter, so this could only be removed in case the MVA is retrained and
+  // the new weight file was uploaded to the DB.
   var<named("number_of_overlap_hits")>() = std::count(layerUsed.begin(), layerUsed.end(), 2);
 
   if (spacePoints.empty()) {

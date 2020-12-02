@@ -48,34 +48,39 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisKLMModule();
+    ~DQMHistAnalysisKLMModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   protected:
+
+    /**
+     * Get number of processed events.
+     */
+    double getProcessedEvents();
 
     /**
      * Analyse channel hit histogram.
@@ -92,7 +97,8 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the number of hits in plane.
-     * @param[in] histName  Histogram name.
+     * @param[in]  histName  Histogram name.
+     * @param[out] latex     TLatex to draw messages.
      */
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
@@ -109,8 +115,8 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
-    /** Electronics map. */
-    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+    /** Number of processed events. */
+    double m_ProcessedEvents;
 
     /** Threshold for masked channels. */
     int m_ThresholdForMasked;
@@ -121,6 +127,12 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
+    /** Input parameter for minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessagesInput;
+
+    /** Minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessages;
+
     /** Vector of dead barrel modules. */
     std::vector<uint16_t> m_DeadBarrelModules;
 
@@ -129,6 +141,12 @@ namespace Belle2 {
 
     /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
+
+    /** TLine for boundary in plane histograms. */
+    TLine m_PlaneLine;
+
+    /** TText for names in plane histograms. */
+    TText m_PlaneText;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
@@ -140,17 +158,10 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
+    const EKLMElementNumbers* m_EklmElementNumbers;
 
-    /** EKLM strip number within a layer. */
-    TCanvas* m_eklmStripLayer[
-      EKLMElementNumbers::getMaximalLayerGlobalNumber()];
-
-    /** TLine for boundary in plane histograms. */
-    TLine m_PlaneLine;
-
-    /** TText for names in plane histograms. */
-    TText m_PlaneText;
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
   };
 

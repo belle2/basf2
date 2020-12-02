@@ -15,8 +15,6 @@
 #include <tracking/dqmUtils/DQMEventProcessorBase.h>
 #include <tracking/modules/trackingDQM/TrackDQMModule.h>
 
-using namespace std;
-
 namespace Belle2 {
   /**
    * The purpose of this class is to process one event() in TrackDQMModule.
@@ -32,8 +30,9 @@ namespace Belle2 {
     /** Constructor.
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
-     * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
-    TrackDQMEventProcessor(TrackDQMModule* histoModule, string recoTracksStoreArrayName, string tracksStoreArrayName) :
+     * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written. */
+    TrackDQMEventProcessor(TrackDQMModule* histoModule, const std::string& recoTracksStoreArrayName,
+                           const std::string& tracksStoreArrayName) :
       DQMEventProcessorBase(histoModule, recoTracksStoreArrayName, tracksStoreArrayName) { }
 
   protected:

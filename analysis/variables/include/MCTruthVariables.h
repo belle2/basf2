@@ -10,6 +10,10 @@
 
 #pragma once
 
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <TLorentzVector.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -204,6 +208,16 @@ namespace Belle2 {
      * return total momentum of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchP(const Particle* particle);
+
+    /**
+     * Helper function: return total 4-momentum of all daughter neutrinos, recursively down decay tree
+     */
+    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle);
+
+    /**
+     * return cosThetaBetweenParticleAndNominalB using B momentum with all (grand^n)daughter neutrino momenta subtracted
+     */
+    double particleMCCosThetaBetweenParticleAndNominalB(const Particle* particle);
 
     /**
      * return recoiling mass against the particles appended as particle's daughters.

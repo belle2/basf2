@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DRIFTTIMETRANSLATORBASE_H
-#define DRIFTTIMETRANSLATORBASE_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -49,7 +48,7 @@ namespace Belle2 {
       virtual double getDriftLength(unsigned short tdcCount     = 0,
                                     const WireID& wireID        = WireID(),
                                     double timeOfFlightEstimator = 0.,
-                                    bool ambiguityDiscrimiator  = false,
+                                    bool ambiguityDiscriminator  = false,
                                     double z = 0,
                                     double alpha = 0,
                                     double theta = static_cast<double>(TMath::Pi() / 2.),
@@ -74,6 +73,7 @@ namespace Belle2 {
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
        *  @param driftLength             Output of the getDriftLength function.
+       *  @param wireID                  Encoded sense wire ID.
        *  @param ambiguityDiscriminator  Information to resolve left/right ambiguity.
        *  @param z                       z-position for determining the in-wire-propagation time.
        *  @param alpha                   Track incident angle in r-phi plane.
@@ -81,11 +81,10 @@ namespace Belle2 {
        */
       virtual double getDriftLengthResolution(double driftLength          = 0.,
                                               const WireID& wireID       = WireID(),
-                                              bool ambiguityDiscrimiator = false,
+                                              bool ambiguityDiscriminator = false,
                                               double z = 0,
                                               double alpha = 0,
                                               double theta = static_cast<double>(TMath::Pi() / 2.)) = 0;
     };
   }
 }
-#endif /* DRIFTTIMETRANSLATORBASE_H_ */

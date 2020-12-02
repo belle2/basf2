@@ -15,9 +15,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
@@ -39,10 +36,10 @@ namespace Belle2 {
 
   protected :
     //! hostname
-    string m_host_recv;
+    std::string m_host_recv;
 
     //! hostname
-    string m_host_send;
+    std::string m_host_send;
 
     //! port number
     int m_port_recv;

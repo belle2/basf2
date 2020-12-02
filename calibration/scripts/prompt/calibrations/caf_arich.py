@@ -64,7 +64,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from basf2 import create_path
     from ROOT.Belle2 import ARICHChannelMaskMaker
 

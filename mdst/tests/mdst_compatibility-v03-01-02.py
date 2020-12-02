@@ -16,9 +16,17 @@ CHANGES since release-03-01-02:
 - ECLCluster:
   + hasFailedFitTime
   + hasFailedTimeResolution
+- TrackFitResult:
+  + ndf
+  + chi2
+- TRGSummary:
+  * getTimQuality added
+- Particle masses:
+  * The particle masses have been updated to PDG 2020. As a result, the
+    energies corresponding to the measured momenta became slightly different.
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging
+from basf2 import create_path, process, set_random_seed, find_file
 from b2test_utils import configure_logging_for_tests
 from mdst import add_mdst_dump
 

@@ -47,32 +47,32 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMUnpackerModule();
+    ~KLMUnpackerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -107,21 +107,21 @@ namespace Belle2 {
                         KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
-     * To be used to map electronics address to module id.
-     *
-     * @param copperId
-     * Id of the copper board.
-     *
-     * @param finesseNum
-     * The Finesse slot on the copper boards.
-     *
-     * @param lane
-     * The lane number, giving for the rpcs the slot number in the crate.
-     *
-     * @param axis
-     * The axis bit in the datapacket.
+     * Map a PCIe40 channel to the old and corresponding (COPPER, HSLB) address.
+     * From Yamada-san, the map between (COPPER, HSLB) and PCIe40 is:
+     * cpr7001 a,b,c,d -> PCIe40 ch.   0-3
+     * cpr7002 a,b,c,d -> PCIe40 ch.   4-7
+     * cpr7003 a,b,c,d -> PCIe40 ch.  8-11
+     * cpr7004 a,b,c,d -> PCIe40 ch. 12-15
+     * cpr8001 a,b,c,d -> PCIe40 ch. 16-19
+     * cpr8002 a,b,c,d -> PCIe40 ch. 20-23
+     * cpr8003 a,b,c,d -> PCIe40 ch. 24-27
+     * cpr8004 a,b,c,d -> PCIe40 ch. 28-31
+     * @param[in] channel PCIe40 channel.
+     * @param[out] copper COPPER identifier.
+     * @param[out] hslb   HSLB identifier.
      */
-    int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
+    void convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const;
 
     /* Module parameters. */
 

@@ -10,6 +10,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
 
+#include <daq/slc/base/StringUtil.h>
 #include <TKey.h>
 #include <TROOT.h>
 
@@ -39,6 +40,7 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("EventsList", m_events_list, "Number of events for each run" , std::vector<unsigned int> {10u});
   addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
   addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms" , false);
+  addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -158,20 +160,22 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);
 
-      std::string name = dirname + "_" + hname;
-      if (m_cs.find(name) == m_cs.end()) {
-        TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-      }
+      if (m_autocanvas) {
+        std::string name = dirname + "_" + hname;
+        if (m_cs.find(name) == m_cs.end()) {
+          TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        }
 
-      TCanvas* c = m_cs[name];
-      c->cd();
-      if (h->GetDimension() == 1) {
-        h->Draw("hist");
-      } else if (h->GetDimension() == 2) {
-        h->Draw("colz");
+        TCanvas* c = m_cs[name];
+        c->cd();
+        if (h->GetDimension() == 1) {
+          h->Draw("hist");
+        } else if (h->GetDimension() == 2) {
+          h->Draw("colz");
+        }
+        c->Update();
       }
-      c->Update();
     }
     m_file->cd();
   }
@@ -203,20 +207,22 @@ void DQMHistAnalysisInputRootFileModule::event()
       hs.push_back(h);
       Double_t scale = 1.0 * m_count / m_events_list[m_run_idx];
       h->Scale(scale);
-      std::string name = h->GetName();
-      name.replace(name.find("/"), 1, "/c_");
-      if (m_cs.find(name) == m_cs.end()) {
-        TCanvas* c = new TCanvas(name.c_str(), name.c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      if (m_autocanvas) {
+        std::string name = h->GetName();
+        name.replace(name.find("/"), 1, "/c_");
+        if (m_cs.find(name) == m_cs.end()) {
+          TCanvas* c = new TCanvas(name.c_str(), name.c_str());
+          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        }
+        TCanvas* c = m_cs[name];
+        c->cd();
+        if (h->GetDimension() == 1) {
+          h->Draw("hist");
+        } else if (h->GetDimension() == 2) {
+          h->Draw("colz");
+        }
+        c->Update();
       }
-      TCanvas* c = m_cs[name];
-      c->cd();
-      if (h->GetDimension() == 1) {
-        h->Draw("hist");
-      } else if (h->GetDimension() == 2) {
-        h->Draw("colz");
-      }
-      c->Update();
     }
   }
 

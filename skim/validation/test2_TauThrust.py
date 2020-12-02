@@ -6,6 +6,7 @@ import modularAnalysis as ma
 from stdCharged import stdPi
 from stdPhotons import stdPhotons
 from skim.taupair import TauThrust
+from validation_tools.metadata import create_validation_histograms
 
 """
 <header>
@@ -25,28 +26,19 @@ stdPhotons('all', path=tauthrustskim)
 # set variables
 TauThrust().additional_setup(path=tauthrustskim)
 
-# the variables that are printed out are:
-ma.variablesToHistogram(
-    filename='TauThrust_Validation.root',
-    decayString='',
-    variables=[('nGoodTracksThrust', 7, 1, 8),
-               ('visibleEnergyOfEventCMS', 40, 0, 12),
-               ('thrust', 50, 0.75, 1)],
-    path=tauthrustskim
-)
-b2.process(tauthrustskim)
-print(b2.statistics)
-
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-import ROOT
+# the variables that are printed out are:
+create_validation_histograms(
+    rootfile='TauGeneric_Validation.root',
+    particlelist='',
+    variables_1d=[
+        ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
+        ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+        ('thrust', 50, 0.75, 1, '', contact, '', '')],
+    path=tauthrustskim)
 
-f = ROOT.TFile.Open('TauThrust_Validation.root', 'update')
-
-f.Get('nGoodTracksThrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
-f.Get('visibleEnergyOfEventCMS').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
-f.Get('thrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
-
-f.Write("", ROOT.TObject.kOverwrite)
-f.Close()
+# process
+b2.process(tauthrustskim)
+print(b2.statistics)

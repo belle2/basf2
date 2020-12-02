@@ -30,7 +30,6 @@ import variables.collections as vc
 import variables.utils as vu
 from ROOT import Belle2
 import argparse
-import sys
 import os
 
 
@@ -71,11 +70,11 @@ def getCommandLineOptions():
 
     if args.belleData == "BelleDataConv":
         if args.belleOrBelle2Flag != "Belle":
-            B2FATAL("BelleDataConv only for Belle Data.")
+            b2.B2FATAL("BelleDataConv only for Belle Data.")
         if args.mode != "Expert":
-            B2FATAL("BelleDataConv only in Expert mode.")
+            b2.B2FATAL("BelleDataConv only in Expert mode.")
         if args.mcType != "BGx1":
-            B2FATAL("When using BelleDataConv, mcType must be set to BGx1.")
+            b2.B2FATAL("When using BelleDataConv, mcType must be set to BGx1.")
 
     return args
 
@@ -227,7 +226,7 @@ def applyCPVTools(mode='Expert'):
             if decayChannel == "JPsiKs":
                 # vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
                 #         constraint='', path=cp_val_path)
-                vx.vertexTree(list_name='B0:sig', conf_level=-2, path=cp_val_path)
+                vx.treeFit(list_name='B0:sig', conf_level=-2, path=cp_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)
             print("TagV will be used")
 

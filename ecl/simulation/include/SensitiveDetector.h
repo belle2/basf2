@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSENSITIVEDETECTOR_H_
-#define ECLSENSITIVEDETECTOR_H_
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <simulation/dataobjects/BeamBackHit.h>
@@ -129,4 +128,3 @@ namespace Belle2 {
   } // end of namespace ecl
 } // end of namespace Belle2
 
-#endif /* ECLSENSITIVEDETECTOR_H_ */

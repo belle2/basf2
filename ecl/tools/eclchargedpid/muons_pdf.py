@@ -6,7 +6,6 @@ __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 __maintainer__ = "Marco Milesi"
 
-import os
 import ROOT
 from plotting_utils import draw_plots, get_ndf
 

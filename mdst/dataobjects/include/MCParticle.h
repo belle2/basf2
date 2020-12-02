@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLE_H
-#define MCPARTICLE_H
+#pragma once
 
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
@@ -580,11 +579,10 @@ namespace Belle2 {
 
   inline MCParticle* MCParticle::getMother() const
   {
-    if (m_mother == 0) return NULL;
+    if (m_mother == 0)
+      return nullptr;
     fixParticleList();
     return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }
 
 } // end namespace Belle2
-
-#endif

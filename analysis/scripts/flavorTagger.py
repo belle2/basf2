@@ -11,6 +11,7 @@
 from basf2 import B2INFO, B2FATAL
 import basf2
 import basf2_mva
+import inspect
 import modularAnalysis as ma
 from variables import utils
 from ROOT import Belle2
@@ -667,8 +668,8 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                         "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
-                                # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
-                                # sampling. The others are not needed and skipped
+                        # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                        # sampling. The others are not needed and skipped
                         if category != "SlowPion" and category != "Kaon":
                             continue
 
@@ -1035,7 +1036,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
 
 def flavorTagger(
-    particleLists=[],
+    particleLists=None,
     mode='Expert',
     weightFiles='B2nunubarBGx1',
     workingDirectory='.',

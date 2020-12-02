@@ -8,8 +8,8 @@
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
-#ifndef VXDTFFILTERS_HH
-#define VXDTFFILTERS_HH
+
+#pragma once
 
 #include <tracking/dataobjects/FullSecID.h>
 
@@ -261,7 +261,9 @@ namespace Belle2 {
       return m_compactSecIDsMap.getFullSecID(aSensorID, normalizedU, normalizedV);
     }
 
-    /// returns the FullSecId of @param compactSecId
+    /** returns the FullSecId of
+      @param compactSecID
+    */
     FullSecID getFullID(CompactSecIDs::sectorID_t compactSecID) const
     {
       return m_staticSectors.at(compactSecID)->getFullSecID();
@@ -638,6 +640,3 @@ namespace Belle2 {
   };
 
 }
-
-
-#endif

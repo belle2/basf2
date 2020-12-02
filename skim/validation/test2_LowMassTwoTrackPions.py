@@ -11,7 +11,6 @@
 
 import basf2
 from modularAnalysis import inputMdst
-from skim import lowMulti
 from variables import variables
 from modularAnalysis import variablesToHistogram
 

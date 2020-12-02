@@ -70,7 +70,7 @@ namespace Belle2 {
       /**
        * Check whether hit belongs to the quadtree node:
        * @param node quadtree node
-       * @param hit hit being checked
+       * @param wireHit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
       bool isInNode(QuadTree* node, const CDCWireHit* wireHit) const final;
@@ -79,7 +79,7 @@ namespace Belle2 {
       /**
        * Check derivative of the sinogram.
        * @param node QuadTree node
-       * @param hit pointer to the hit to check
+       * @param wireHit pointer to the hit to check
        * @return returns true in cases:
        * @return    - positive derivative and no extremum in the node's ranges or
        * @return    - extremum located in the node's ranges
@@ -91,7 +91,7 @@ namespace Belle2 {
       /**
        * Checks whether extremum point is located whithin QuadTree node's ranges
        * @param node QuadTree node
-       * @param hit hit to check
+       * @param wireHit hit to check
        * @return true or false
        */
       bool checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const;

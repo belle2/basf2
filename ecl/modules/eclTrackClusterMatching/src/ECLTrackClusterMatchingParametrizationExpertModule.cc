@@ -232,7 +232,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
 
 void ECLTrackClusterMatchingParametrizationExpertModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_tree->Write();
     delete m_tree;

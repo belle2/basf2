@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTCONSTANT_H
-#define BFIELDCOMPONENTCONSTANT_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
@@ -43,6 +42,9 @@ namespace Belle2 {
      * @param x The x component of the magnetic field vector.
      * @param y The y component of the magnetic field vector.
      * @param z The z component of the magnetic field vector.
+     * @param rmax Maximum radial coordinate.
+     * @param zmin Minimum z coordinate.
+     * @param zmax Maximum z coordinate.
      */
     void setMagneticFieldValues(double x, double y, double z, double rmax, double zmin, double zmax);
 
@@ -59,5 +61,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTCONSTANT_H */

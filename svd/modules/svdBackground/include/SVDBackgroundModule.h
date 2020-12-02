@@ -147,6 +147,7 @@ namespace Belle2 {
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);
       /** Get total number of sensors */
+      // cppcheck-suppress unusedPrivateFunction
       inline int getTotalSensors();
 
       // Output directory

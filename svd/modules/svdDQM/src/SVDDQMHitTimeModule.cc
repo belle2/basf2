@@ -10,7 +10,7 @@
 
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
 #include <framework/core/HistoModule.h>
-
+#include <mdst/dataobjects/TRGSummary.h>
 #include <TDirectory.h>
 
 using namespace Belle2;
@@ -23,9 +23,7 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
-  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
-           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
 
 }
 
@@ -40,13 +38,9 @@ void SVDDQMHitTimeModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("SVDHitTime")->cd();
 
-  int nBins = 200 ;
-  double minT0 = -60 ;
-  double maxT0 =  140 ;
-  if (m_isSVDTimeCalibrated) {
-    minT0 = -100 ;
-    maxT0 =  100 ;
-  }
+  int nBins = 300 ;
+  double minT0 = -150 ;
+  double maxT0 =  150 ;
 
   TString refFrame = "in FTSW reference";
   if (m_desynchSVDTime)
@@ -175,12 +169,12 @@ void SVDDQMHitTimeModule::event()
 
   bool Is_ECL_L1TriggerSource = false ;
   bool Is_CDC_L1TriggerSource = false ;
-  if (m_L1TimingSrc == 0) {            // for L1 timing source is "ecl trigger"
+  if (m_L1TimingSrc == TRGSummary::ETimingType::TTYP_ECL) {            // for L1 timing source is "ecl trigger"
     Is_ECL_L1TriggerSource = true ;
-  } else if (m_L1TimingSrc == 3) {     // for L1 timing source is "cdc trigger"
+  } else if (m_L1TimingSrc == TRGSummary::ETimingType::TTYP_CDC) {     // for L1 timing source is "cdc trigger"
     Is_CDC_L1TriggerSource = true ;
   }
-  // else if(m_L1TimingSrc==5){  // for L1 timing source is "delayed Bhabha" }
+  // else if(m_L1TimingSrc==ETimingType::TTYP_DPHY){  // for L1 timing source is "delayed Bhabha" }
   B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
   B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
 

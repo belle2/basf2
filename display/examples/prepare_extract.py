@@ -28,14 +28,13 @@
 #       the Display UI. But using the parameters in this script can save you from
 #       lot of tedious work of destroying hundreds of volumes by hand
 
+
+import basf2 as b2
+
 # Change between Phase3 (phase2=False) and Phase2 geometry (phase2=True)
 phase2 = False
-
-from basf2 import *
-from ROOT import Belle2
-
 # create paths
-main = create_path()
+main = b2.create_path()
 
 # Use RootInput instead EventInfoSetter (not both!) if you want
 # to load some event data from a ROOT file
@@ -52,7 +51,7 @@ else:
     main.add_module('Gearbox')
     main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'])
 
-display = register_module('Display')
+display = b2.register_module('Display')
 
 # Has to be True to show the full TGeo geometry instead of simplified extract
 # which you want to prepare with this script
@@ -154,5 +153,5 @@ display.param('customGeometryExtractPath', 'geometry_extract.root')
 
 main.add_module(display)
 
-process(main)
+b2.process(main)
 # print(statistics(statistics.INIT))

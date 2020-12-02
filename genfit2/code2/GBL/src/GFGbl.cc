@@ -274,6 +274,7 @@ void getScattererFromMatList(double& length, double& theta, double& s, double& d
   // (part of) second moment / variance (non-normalized)
   double sumx3x3 = 0.;
   
+  // cppcheck-suppress unreadVariable
   double xmin = 0.;
   double xmax = 0.;
   
@@ -323,7 +324,7 @@ void getScattererFromMatList(double& length, double& theta, double& s, double& d
 }
 
 
-void GFGbl::processTrackWithRep(Track* trk, const AbsTrackRep* rep, bool resortHits)
+void GFGbl::processTrackWithRep(Track* trk, const AbsTrackRep* rep, bool /*resortHits*/)
 {
   // Flag used to mark error in raw measurement combination
   // measurement won't be considered, but scattering yes

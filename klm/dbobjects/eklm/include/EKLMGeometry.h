@@ -1662,7 +1662,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~EKLMGeometry();
+    ~EKLMGeometry();
 
     /**
      * Operator =.

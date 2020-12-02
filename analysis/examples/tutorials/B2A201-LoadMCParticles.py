@@ -13,6 +13,12 @@
 # have interfaces for ParticleLists so this step is
 # necessary if analysis tools are to be used.
 #
+# NOTE: If you run into problems with the file
+# B2pi0D_D2hh_D2hhh_B2munu.root not being found, then basf2
+# can't find your examples data dir (or you don't have it).
+# Please take a look into the readme of /analysis/examples/
+# for how to debug this.
+#
 # Contributors: A. Zupanc (June 2014) I.Komarov(Sep 2018)
 #
 #######################################################

@@ -197,7 +197,7 @@ void SVDClusterCalibrationsMonitorModule::endRun()
   else
     B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

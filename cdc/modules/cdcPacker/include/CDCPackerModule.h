@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCPACKERMODULE_H
-#define CDCPACKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -95,7 +94,7 @@ namespace Belle2 {
       /**
        * Getter for Front End Electronics ID.
        * @param copper_id Copper ID.
-       * @param slod_id FINNES slot ID (0-3).
+       * @param slot_id FINNES slot ID (0-3).
        */
       int getFEEID(int copper_id, int slot_id);
 
@@ -292,6 +291,4 @@ namespace Belle2 {
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCPackerModule_H
 

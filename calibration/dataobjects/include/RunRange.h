@@ -86,7 +86,7 @@ namespace Belle2 {
     }
 
     /// Set the m_granularity to an allowed value
-    void setGranularity(std::string& granularity)
+    void setGranularity(const std::string& granularity)
     {
       if (granularity == "all" || granularity == "run") {
         m_granularity = granularity;

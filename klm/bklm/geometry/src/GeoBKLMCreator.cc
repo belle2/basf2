@@ -959,7 +959,9 @@ void GeoBKLMCreator::putScintsInInterior(G4LogicalVolume* interiorLogical, int s
                             (containerHalfSizeZ - airHalfSize.y()) * envelopeOffsetSign,
                             airHalfSize.z() + stationPosition
                            ) * G4RotateX3D(M_PI_2 * envelopeOffsetSign);
-      if (fabs(xform.getTranslation().z()) > airHalfSize.z()) continue; // don't place all z-readout stations in chimney module
+      // Don't place all z-readout stations in chimney module.
+      if (fabs(xform.getTranslation().z()) > airHalfSize.z())
+        continue;
     }
     sprintf(name, "BKLM.ReadoutContainer%dLayer%02d%sPhysical", station, layer, (hasChimney ? "Chimney" : ""));
     new G4PVPlacement(xform,

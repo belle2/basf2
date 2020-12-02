@@ -4,9 +4,18 @@
 """"""
 
 import modularAnalysis as ma
+from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
+                                      loadStdD0_Kpi, loadStdD0_Kpipipi)
+from skim.standardlists.dileptons import (loadStdDiLeptons, loadStdJpsiToee,
+                                          loadStdJpsiTomumu)
+from skim.standardlists.lightmesons import (loadStdLightMesons,
+                                            loadStdPi0ForBToHadrons)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPi0s import loadStdSkimPi0, stdPi0s
+from stdV0s import stdKshorts
 from variables import variables as vm
-
 
 __liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
 
@@ -66,40 +75,29 @@ class TCPV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, TCPV"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["loose"],
-            "stdK": ["all", "loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["all", "loose"]
-        },
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-            "loadStdSkimPhoton": []
-        },
-        "stdPi0s": {
-            "stdPi0s": ["eff40_Jan2020"],
-            "loadStdSkimPi0": [],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdLightMesons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpi": [],
-            "loadStdD0_Kpipipi": [],
-        },
-        "skim.standardlists.dileptons": {
-            "loadStdDiLeptons": [],
-            "loadStdJpsiToee": [],
-            "loadStdJpsiTomumu": [],
-        },
-    }
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdE("loose", path=path)
+        stdK("all", path=path)
+        stdK("loose", path=path)
+        stdMu("loose", path=path)
+        stdPi("all", path=path)
+        stdPi("loose", path=path)
+        stdPhotons("loose", path=path)
+        loadStdSkimPhoton(path=path)
+        stdPi0s("eff40_Jan2020", path=path)
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdLightMesons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDiLeptons(path=path)
+        loadStdJpsiToee(path=path)
+        loadStdJpsiTomumu(path=path)
 
     def additional_setup(self, path):
         Kcut = "dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01"

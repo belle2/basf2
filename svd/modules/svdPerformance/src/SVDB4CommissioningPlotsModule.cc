@@ -177,7 +177,7 @@ void SVDB4CommissioningPlotsModule::event()
   }
   BOOST_FOREACH(Track & track, m_Tracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());
@@ -277,7 +277,7 @@ void SVDB4CommissioningPlotsModule::endRun()
 {
   B2INFO("SVDB4CommissioningPlotsModule::endRun(), writing the histograms");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

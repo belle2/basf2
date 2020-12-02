@@ -1,7 +1,5 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
 import numpy as np
@@ -11,6 +9,7 @@ import tracking.validation.utilities as utilities
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.peelers as peelers
+ROOT.gSystem.Load("libtracking")
 
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
@@ -322,6 +321,72 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         y='hit efficiency',
         y_binary=True,
         filter_on="is_primary",
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of finding efficiency versus pt, tan(lambda)
+    save_finding_efficiency_by_pt_profiles_groupbyCharge = refiners.save_profiles(
+        above_expert_level=default_expert_level - 1,
+        select={
+            'is_matched': 'finding efficiency',
+            'pt_truth': 'p_{t}',
+        },
+        y='finding efficiency',
+        y_binary=True,
+        filter_on="is_primary",
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        allow_discrete=True,
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of finding efficiency versus pt, tan(lambda)
+    save_finding_efficiency_by_tan_lambda_profiles_groupbyCharge = refiners.save_profiles(
+        above_expert_level=default_expert_level - 1,
+        select={
+            'is_matched': 'finding efficiency',
+            'tan_lambda_truth': 'tan #lambda'
+        },
+        y='finding efficiency',
+        y_binary=True,
+        filter_on="is_primary",
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of finding efficiency versus pt, tan(lambda)
+    save_hit_efficiency_by_pt_profiles_groupbyCharge = refiners.save_profiles(
+        above_expert_level=default_expert_level - 1,
+        select={
+            'hit_efficiency': 'hit efficiency',
+            'pt_truth': 'p_{t}',
+        },
+        y='hit efficiency',
+        y_binary=True,
+        filter_on="is_primary",
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        allow_discrete=True,
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of finding efficiency versus pt, tan(lambda)
+    save_hit_efficiency_by_tan_lambda_profiles_groupbyCharge = refiners.save_profiles(
+        above_expert_level=default_expert_level - 1,
+        select={
+            'hit_efficiency': 'hit efficiency',
+            'tan_lambda_truth': 'tan #lambda',
+        },
+        y='hit efficiency',
+        y_binary=True,
+        filter_on="is_primary",
+        groupby=[("charge_truth", [0.])],
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,

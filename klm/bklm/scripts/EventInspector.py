@@ -9,9 +9,8 @@
 import basf2
 import bklmDB
 import math
-import ctypes
 import ROOT
-from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
+from ROOT import Belle2
 
 
 class EventInspector(basf2.Module):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
@@ -7,6 +6,7 @@ import basf2_mva
 import hep_ml
 import hep_ml.losses
 import hep_ml.gradientboosting
+from basf2_mva_python_interface.hep_ml import State
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):

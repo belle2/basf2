@@ -3,7 +3,7 @@
 
 ##
 ##
-## Feynrules Header
+# Feynrules Header
 ##
 ##
 ##
@@ -54,7 +54,7 @@ class UFOBaseClass(object):
         """ return string with the full information """
 
         return '\n'.join(['%s \t: %s' % (name, value) for (name, value) in
-                         self.__dict__.items()])
+                          self.__dict__.items()])
 
     def __repr__(self):
         replacements = [
@@ -65,7 +65,7 @@ class UFOBaseClass(object):
             ('?', '__quest__'),
             ('*', '__star__'),
             ('~', '__tilde__'),
-            ]
+        ]
         text = self.name
         for (orig, sub) in replacements:
             text = text.replace(orig, sub)
@@ -90,7 +90,7 @@ class Particle(UFOBaseClass):
         'texname',
         'antitexname',
         'charge',
-        ]
+    ]
 
     require_args_all = [
         'pdg_code',
@@ -108,7 +108,7 @@ class Particle(UFOBaseClass):
         'propagating',
         'goldstoneboson',
         'propagator',
-        ]
+    ]
 
     def __init__(
         self,
@@ -128,7 +128,7 @@ class Particle(UFOBaseClass):
         goldstoneboson=False,
         propagator=None,
         **options
-        ):
+    ):
 
         args = (
             pdg_code,
@@ -141,7 +141,7 @@ class Particle(UFOBaseClass):
             texname,
             antitexname,
             float(charge),
-            )
+        )
 
         UFOBaseClass.__init__(self, *args, **options)
 
@@ -221,7 +221,7 @@ class Particle(UFOBaseClass):
             self.propagating,
             self.goldstoneboson,
             **outdic
-            )
+        )
 
 
 all_parameters = []
@@ -240,7 +240,7 @@ class Parameter(UFOBaseClass):
         texname,
         lhablock=None,
         lhacode=None,
-        ):
+    ):
 
         args = (name, nature, type, value, texname)
 
@@ -253,7 +253,7 @@ class Parameter(UFOBaseClass):
 
         if (lhablock is None or lhacode is None) and nature == 'external':
             raise Exception('Need LHA information for external parameter "%s".'
-                             % name)
+                            % name)
         self.lhablock = lhablock
         self.lhacode = lhacode
 
@@ -271,7 +271,7 @@ class CTParameter(UFOBaseClass):
         type,
         value,
         texname,
-        ):
+    ):
 
         args = (name, 'internal', type, value, texname)
 
@@ -312,7 +312,7 @@ class Vertex(UFOBaseClass):
         lorentz,
         couplings,
         **opt
-        ):
+    ):
 
         args = (name, particles, color, lorentz, couplings)
 
@@ -337,7 +337,7 @@ class CTVertex(UFOBaseClass):
         'couplings',
         'type',
         'loop_particles',
-        ]
+    ]
 
     def __init__(
         self,
@@ -349,7 +349,7 @@ class CTVertex(UFOBaseClass):
         type,
         loop_particles,
         **opt
-        ):
+    ):
 
         args = (
             name,
@@ -359,7 +359,7 @@ class CTVertex(UFOBaseClass):
             couplings,
             type,
             loop_particles,
-            )
+        )
 
         UFOBaseClass.__init__(self, *args, **opt)
 
@@ -370,7 +370,7 @@ class CTVertex(UFOBaseClass):
             couplings,
             type,
             loop_particles,
-            )
+        )
 
         global all_CTvertices
         all_CTvertices.append(self)
@@ -392,7 +392,7 @@ class Coupling(UFOBaseClass):
         value,
         order,
         **opt
-        ):
+    ):
 
         args = (name, value, order)
         UFOBaseClass.__init__(self, *args, **opt)
@@ -421,11 +421,9 @@ class Coupling(UFOBaseClass):
                 if not CTparam:
                     CTparam = param
                 else:
-                    raise UFOError, \
-                        'UFO does not support yet more than one occurence of CTParameters in the couplings values.'
+                    raise UFOError('UFO does not support yet more than one occurence of CTParameters in the couplings values.')
             elif numberOfMatches > 1:
-                raise UFOError, \
-                    'UFO does not support yet more than one occurence of CTParameters in the couplings values.'
+                raise UFOError('UFO does not support yet more than one occurence of CTParameters in the couplings values.')
 
         if not CTparam:
             if x == 0:
@@ -460,7 +458,7 @@ class Lorentz(UFOBaseClass):
         spins,
         structure='external',
         **opt
-        ):
+    ):
 
         args = (name, spins, structure)
         UFOBaseClass.__init__(self, *args, **opt)
@@ -479,7 +477,7 @@ class Function(object):
         name,
         arguments,
         expression,
-        ):
+    ):
 
         global all_functions
         all_functions.append(self)
@@ -507,7 +505,7 @@ class CouplingOrder(object):
         expansion_order,
         hierarchy,
         perturbative_expansion=0,
-        ):
+    ):
 
         global all_orders
         all_orders.append(self)
@@ -530,7 +528,7 @@ class Decay(UFOBaseClass):
         particle,
         partial_widths,
         **opt
-        ):
+    ):
 
         args = (particle, partial_widths)
         UFOBaseClass.__init__(self, *args, **opt)
@@ -555,7 +553,7 @@ class FormFactor(UFOBaseClass):
         type,
         value,
         **opt
-        ):
+    ):
 
         args = (name, type, value)
         UFOBaseClass.__init__(self, *args, **opt)
@@ -577,12 +575,10 @@ class Propagator(UFOBaseClass):
         numerator,
         denominator=None,
         **opt
-        ):
+    ):
 
         args = (name, numerator, denominator)
         UFOBaseClass.__init__(self, *args, **opt)
 
         global all_propagators
         all_propagators.append(self)
-
-

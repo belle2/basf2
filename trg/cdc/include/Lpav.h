@@ -81,7 +81,7 @@ namespace Belle2 {
     // static member functions
 
     /// assignment operator(s)
-    inline const TRGCDCLpav& operator=(const TRGCDCLpav&);
+    inline TRGCDCLpav& operator=(const TRGCDCLpav&);
     /// assignment operator(s)
     const TRGCDCLpav& operator=(const TRGCDCLpar&);
     /// assignment operator(s)
@@ -183,7 +183,7 @@ namespace Belle2 {
   };
 
 /// inline function definitions
-  inline const TRGCDCLpav& TRGCDCLpav::operator=(const TRGCDCLpav& lp)
+  inline TRGCDCLpav& TRGCDCLpav::operator=(const TRGCDCLpav& lp)
   {
     TRGCDCLpar::operator=(lp);
     m_wsum = lp.m_wsum;

@@ -5,7 +5,6 @@
 You can run ``basf2 variables.py`` to list all available variables.
 """
 from terminal_utils import Pager
-import argparse
 from variables import getCommandLineOptions
 from variables import printVars
 

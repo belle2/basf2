@@ -57,6 +57,7 @@ void InfoWidget::update()
   //check if the object given by lastURI exists in the new event, too.
   //array pages are ok, too
   if (lastURI != "") {
+    // cppcheck-suppress unreadVariable
     URI parsedURI(lastURI);
     if (!parsedURI.object and !lastURI.EndsWith("/")) {
       //doesn't exist, go to main page

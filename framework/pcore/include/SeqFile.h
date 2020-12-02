@@ -19,13 +19,16 @@ namespace Belle2 {
   public:
     /** Constructor.
      *
+     * @param filename name of the file
      * @param rwflag should probably be r or rw
+     * @param streamerinfo String containing the streamer info
+     * @param streamerinfo_size Size of the string containing the streamer info
      * @param filenameIsPattern if true interpret the filename as a
      *     boost::format pattern which takes the sequence number as argument
      *     instead of producing .sroot-N files
      */
     SeqFile(const std::string& filename, const std::string& rwflag,
-            char* streamerinfo = NULL, int streamerinfo_size = 0,
+            char* streamerinfo = nullptr, int streamerinfo_size = 0,
             bool filenameIsPattern = false);
     /** Destructor */
     ~SeqFile();

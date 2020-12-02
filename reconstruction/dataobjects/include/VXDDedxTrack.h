@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXTRACK_H
-#define VXDDEDXTRACK_H
+#pragma once
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
@@ -160,4 +159,3 @@ namespace Belle2 {
     ClassDef(VXDDedxTrack, 2); /**< Debug output for VXDDedxPID module. */
   };
 }
-#endif

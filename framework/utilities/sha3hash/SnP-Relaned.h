@@ -13,8 +13,7 @@ and related or neighboring rights to the source code in this file.
 http://creativecommons.org/publicdomain/zero/1.0/
 */
 
-#ifndef _SnP_Relaned_h_
-#define _SnP_Relaned_h_
+#pragma once
 
 #define SnP_AddBytes(state, data, offset, length, SnP_AddLanes, SnP_AddBytesInLane, SnP_laneLengthInBytes) \
   { \
@@ -131,4 +130,4 @@ http://creativecommons.org/publicdomain/zero/1.0/
     } \
   }
 
-#endif
+

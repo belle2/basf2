@@ -60,7 +60,7 @@ int Hough3DFinder::getMode(void)
   return m_mode;
 }
 
-void Hough3DFinder::initialize(TVectorD& geometryVariables, vector<float >& initVariables)
+void Hough3DFinder::initialize(const TVectorD& geometryVariables, vector<float >& initVariables)
 {
 
   m_findRhoMax = -9999;
@@ -125,7 +125,8 @@ void Hough3DFinder::destruct(void)
   }
 }
 
-void Hough3DFinder::runFinder(std::vector<double>& trackVariables, vector<vector<double> >& stTSs,  vector<vector<int> >& stTSDrift)
+void Hough3DFinder::runFinder(const std::vector<double>& trackVariables, vector<vector<double> >& stTSs,
+                              const vector<vector<int> >& stTSDrift)
 {
 
   // Clear best TS
@@ -170,7 +171,7 @@ void Hough3DFinder::runFinder(std::vector<double>& trackVariables, vector<vector
 
 }
 
-void Hough3DFinder::initVersion1(vector<float >& initVariables)
+void Hough3DFinder::initVersion1(const vector<float >& initVariables)
 {
   // Hough Variables.
   m_cotStart = (int)initVariables[0];
@@ -252,7 +253,7 @@ void Hough3DFinder::initVersion3(vector<float >& initVariables)
   m_mBool["fVerbose"] = 0;
 }
 
-void Hough3DFinder::setInputFileName(string inputFileName)
+void Hough3DFinder::setInputFileName(const string& inputFileName)
 {
   m_inputFileName = inputFileName;
 }
@@ -318,8 +319,9 @@ void Hough3DFinder::destVersion3()
 }
 
 // Hough 3D finder
-void Hough3DFinder::runFinderVersion1(vector<double>& trackVariables, vector<vector<double> >& stTSs, vector<double>& tsArcS,
-                                      vector<vector<double> >& tsZ)
+void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, const vector<vector<double> >& stTSs,
+                                      const vector<double>& tsArcS,
+                                      const vector<vector<double> >& tsZ)
 {
 
   int charge = (int)trackVariables[0];
@@ -513,8 +515,8 @@ void Hough3DFinder::runFinderVersion1(vector<double>& trackVariables, vector<vec
 
 }
 
-void Hough3DFinder::runFinderVersion2(vector<double>& trackVariables, vector<vector<double> >& stTSs,
-                                      std::vector<std::vector<int> >& stTSDrift)
+void Hough3DFinder::runFinderVersion2(const vector<double>& trackVariables, vector<vector<double> >& stTSs,
+                                      const std::vector<std::vector<int> >& stTSDrift)
 {
 
   // Clear m_geoCandidatesIndex
@@ -614,8 +616,8 @@ void Hough3DFinder::runFinderVersion2(vector<double>& trackVariables, vector<vec
 
 }
 
-void Hough3DFinder::runFinderVersion3(vector<double>& trackVariables, vector<vector<double> >& stTSs,
-                                      vector<vector<int> >& stTSDrift)
+void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vector<vector<double> >& stTSs,
+                                      const vector<vector<int> >& stTSDrift)
 {
 
   int m_verboseFlag = m_mBool["fVerbose"];
@@ -784,7 +786,7 @@ void Hough3DFinder::runFinderVersion3(vector<double>& trackVariables, vector<vec
     string t_maxName = "phiAxMax_" + to_string(iSt);
     string t_invMinName = "invPhiAxMin_" + to_string(iSt);
     string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
-    if (m_mLutStorage.find(t_valueName) == m_mLutStorage.end()) {
+    if (!m_mLutStorage.count(t_valueName)) {
       m_mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
       double t_parameter = mConstV.at("rr3D")[iSt];

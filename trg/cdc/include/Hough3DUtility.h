@@ -16,6 +16,10 @@ public:
   Hough3DFinder(void);
   /// 3D finder destructor.
   ~Hough3DFinder(void);
+  /// Copy constructor, deleted.
+  Hough3DFinder(Hough3DFinder&) = delete;
+  /// Assignment operator, deleted.
+  Hough3DFinder& operator=(Hough3DFinder&) = delete;
   /// Sets which 3D finder to use.
   void setMode(int mode);
   /// Gets which 3D finder is used.
@@ -23,23 +27,23 @@ public:
   /// Geometry variables. [rr0, rr1, rr2, rr3, anglest0, anglest1, anglest2, anglest3, ztostraw0, ztostraw1, ztostraw2, ztostraw3]
   /// Init variables. [cotStart, cotEnd, z0Start, z0End, nCotSteps, nZ0Steps]
   /// Initializes the 3D finder.
-  void initialize(TVectorD& geometryVariables , std::vector<float >& initVariables);
+  void initialize(const TVectorD& geometryVariables , std::vector<float >& initVariables);
   /// Destructs the 3D finder.
   void destruct(void);
   /// Track variables. [charge, rho, phi0]
   /// Stereo TS candidates[layer][TS ID]
   /// Uses the 3D finder.
-  void runFinder(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                 std::vector<std::vector<int> >& stTSDrift);
+  void runFinder(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                 const std::vector<std::vector<int> >& stTSDrift);
   /// Init variables. [cotStart, cotEnd, z0Start, z0Ent, nCotSteps, nZ0Steps]
   /// Initializes the 3D finder for mode 1.
-  void initVersion1(std::vector<float >& initVariables);
+  void initVersion1(const std::vector<float >& initVariables);
   /// Initializes the 3D finder for mode 2.
   void initVersion2(std::vector<float >& initVariables);
   /// Initializes the 3D finder for mode 3.
   void initVersion3(std::vector<float >& initVariables);
   /// Sets the config file for the GeoFinder.
-  void setInputFileName(std::string inputFileName);
+  void setInputFileName(const std::string& inputFileName);
   /// Destructs the 3D finder for mode 1.
   void destVersion1(void);
   /// Destructs the 3D finder for mode 2.
@@ -47,14 +51,15 @@ public:
   /// Destructs the 3D finder for mode 3.
   void destVersion3(void);
   /// Uses the 3D finder for mode 1.
-  void runFinderVersion1(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs, std::vector<double>& tsArcS,
-                         std::vector<std::vector<double> >& tsZ);
+  void runFinderVersion1(const std::vector<double>& trackVariables, const std::vector<std::vector<double> >& stTSs,
+                         const std::vector<double>& tsArcS,
+                         const std::vector<std::vector<double> >& tsZ);
   /// Uses the 3D finder for mode 2.
-  void runFinderVersion2(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                         std::vector<std::vector<int> >& stTSDrift);
+  void runFinderVersion2(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                         const std::vector<std::vector<int> >& stTSDrift);
   /// Uses the 3D finder for mode 3.
-  void runFinderVersion3(std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
-                         std::vector<std::vector<int> >& stTSDrift);
+  void runFinderVersion3(const std::vector<double>& trackVariables, std::vector<std::vector<double> >& stTSs,
+                         const std::vector<std::vector<int> >& stTSDrift);
   /// Gets results from the 3D finder.
   void getValues(const std::string& input, std::vector<double>& result);
   /// Gets the Hough plane for the 3D finder.

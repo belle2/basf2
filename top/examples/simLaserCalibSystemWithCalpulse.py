@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 
 # ---------------------------------------------------------------
 # Simulation of the laser system including a double pulse
@@ -39,6 +38,7 @@ def addSource(x, angle, slotID, path):
                     # angularDistribution='(40-x)*TMath::Sin(x)'
 
                     )
+
 
 # Create path
 main = b2.create_path()

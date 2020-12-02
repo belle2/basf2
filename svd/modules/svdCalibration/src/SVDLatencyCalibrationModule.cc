@@ -84,7 +84,7 @@ void SVDLatencyCalibrationModule::event()
 void SVDLatencyCalibrationModule::endRun()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();

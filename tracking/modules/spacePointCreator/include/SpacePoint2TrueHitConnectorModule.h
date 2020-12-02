@@ -265,7 +265,7 @@ namespace Belle2 {
     /** Number of SpacePoints that contained a Cluster to which no TrueHit could be found (i.e. counts how many times the NoTrueHitToCluster exception gets thrown) */
     std::vector<unsigned int> m_noTrueHitCtr;
 
-    /** Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned NULL) */
+    /** Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned nullptr) */
     std::vector<unsigned int> m_rejectedRelsCtr;
 
     unsigned int m_weightTooSmallCtr; /**< Count the omitted relations because of a too small weight */
@@ -306,7 +306,7 @@ namespace Belle2 {
      * + if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights (.second = 2)
      * + if there are only TrueHits with one weight associated, return the one with the biggest weight ONLY if the SpacePoint is related to only one Cluster (e.g. PXD). .second is either 1 (PXD), 11 or 21 (U-/V-cluster SP)
      * NOTE: as this method is rather specific, it is not very much templated!
-     * NOTE: the possible return of a NULL pointer has to be handled!
+     * NOTE: the possible return of a nullptr pointer has to be handled!
      */
     template <typename MapType, typename TrueHitType>
     std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits,
@@ -323,8 +323,10 @@ namespace Belle2 {
      * MapType has to have key value pairs of pair<int,TrueHitInfo>
      * throws: + NoTrueHitToCluster
      *         + NoSpacePointToCluster
+     * @param spacePoint:  pointer to the SpacePoint of interest
      * @param clusterName: Name of the StoreArray of Clusters to be searched (defaults to "ALL")
      * @param trueHitName: Name of the StoreArray of TrueHits to be searched (defaults to "ALL")
+     * @return multimap containing the related TrueHitInfos
      */
     template<typename MapType, typename ClusterType, typename TrueHitType>
     MapType getRelatedTrueHits(Belle2::SpacePoint* spacePoint, std::string clusterName = "ALL", std::string trueHitName = "ALL");

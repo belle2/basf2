@@ -48,11 +48,16 @@ namespace Belle2 {
         outErr = std::numeric_limits<float>::quiet_NaN();
         return std::numeric_limits<float>::quiet_NaN();
       }
+      // check if the particle source is a composite particle
       if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) ||
           !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite)) {
-        B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
-        outErr = std::numeric_limits<float>::quiet_NaN();
-        return std::numeric_limits<float>::quiet_NaN();
+        // check if the particle source is a V0
+        if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) ||
+            !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0)) {
+          B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
+          outErr = std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<float>::quiet_NaN();
+        }
       }
       if (!(mode == "distance") && !(mode == "time")) {
         B2WARNING("FlightInfo helper function called with mode '" << mode
@@ -649,7 +654,7 @@ namespace Belle2 {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
@@ -662,7 +667,7 @@ namespace Belle2 {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
@@ -699,13 +704,13 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
-          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
+          const MCParticle*  daughter = daughterReco->getMCParticle();
 
           double flightDistanceMC =  std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
             // Compute value between mother and granddaughter
-            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
 
             if (gdaughter != nullptr)
               flightDistanceMC = getMCFlightInfoBtw(gdaughter, "distance");
@@ -750,13 +755,13 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
-          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
+          const MCParticle*  daughter = daughterReco->getMCParticle();
           // daughter MOMENTUM
 
           double flightTimeMC = std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
-            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
             if (gdaughter != nullptr)
               flightTimeMC = getMCFlightInfoBtw(gdaughter, "time");
           } else  {

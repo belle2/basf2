@@ -34,10 +34,10 @@ void RelationFromSVDTracksCreator::exposeParameters(ModuleParamList* moduleParam
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vxdTracksStoreArrayName"),
                                 m_param_vxdTracksStoreArrayName,
-                                "Store Array name coming from VXDTF2.");
+                                "Store Array name for tracks coming from VXDTF2.");
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cdcTracksStoreArrayName"),
                                 m_param_cdcTracksStoreArrayName,
-                                "Store Array name coming from CDCTF.");
+                                "Store Array name for tracks coming from CDCTF.");
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "spacePointTrackCandidatesName"),
                                 m_param_spacePointTrackCandidateName,
@@ -46,7 +46,7 @@ void RelationFromSVDTracksCreator::exposeParameters(ModuleParamList* moduleParam
 }
 
 void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates, std::vector<CKFToSVDState>& states,
-                                         std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToSVDState>>& relations)
+                                         std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>>& relations)
 {
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     if (vxdRecoTrack.getRelated<RecoTrack>(m_param_cdcTracksStoreArrayName)) {
@@ -77,7 +77,6 @@ void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates,
       } else {
         for (CKFToSVDState& seedState : seedStates) {
           // We are not setting the related SVD track of the first state!
-          // cppcheck-suppress useStlAlgorithm
           relations.emplace_back(&seedState, NAN, &nextState);
         }
       }

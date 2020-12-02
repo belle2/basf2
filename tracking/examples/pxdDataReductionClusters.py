@@ -1,33 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-from basf2 import *
-from tracking import *
+import basf2 as b2
+from tracking import add_tracking_reconstruction
 from simulation import add_simulation
-from simulation import add_roiFinder
-from svd import add_svd_reconstruction
-from tracking import add_tracking_for_PXDDataReduction_simulation
-from ROOT import Belle2
 
 numEvents = 100
 
 # first register the modules
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.INFO
+evtgeninput = b2.register_module('EvtGenInput')
+evtgeninput.logging.log_level = b2.LogLevel.INFO
 
-pxdROIFinder = register_module('PXDROIFinder')
-pxdROIFinder.logging.log_level = LogLevel.DEBUG
+pxdROIFinder = b2.register_module('PXDROIFinder')
+pxdROIFinder.logging.log_level = b2.LogLevel.DEBUG
 # pxdROIFinder.logging.debug_level = 2
 param_pxdROIFinder = {
     'recoTrackListName': 'RecoTracks',
@@ -53,15 +48,15 @@ param_pxdROIFinder = {
 pxdROIFinder.param(param_pxdROIFinder)
 
 # PXD digitization module
-PXDDIGI = register_module('PXDDigitizer')
+PXDDIGI = b2.register_module('PXDDigitizer')
 # PXD clusterizer
-PXDCLUST = register_module('PXDClusterizer')
+PXDCLUST = b2.register_module('PXDClusterizer')
 
-pxdClusterFilter = register_module('PXDclusterFilter')
+pxdClusterFilter = b2.register_module('PXDclusterFilter')
 pxdClusterFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True, 'overrideDB': True, 'enableFiltering': True})
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Add modules to paths
 main.add_module(eventinfosetter)
@@ -79,6 +74,6 @@ main.add_module(pxdClusterFilter)
 main.add_module('RootOutput')
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

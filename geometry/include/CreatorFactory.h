@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CREATORFACTORY_H
-#define CREATORFACTORY_H
+#pragma once
 
 #include <geometry/CreatorManager.h>
 
@@ -46,5 +45,3 @@ namespace Belle2 {
 
   }
 } //end of namespace Belle2
-
-#endif /* CREATORFACTORY_H */

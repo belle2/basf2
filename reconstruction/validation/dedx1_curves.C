@@ -3,71 +3,131 @@
   <input>EvtGenSimRec_dedx.root</input>
   <contact>jkumar@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
-</header>
+  </header>
 */
 
 #include <TFile.h>
-#include <TMath.h>
 #include <TTree.h>
-#include <TF1.h>
-#include <TH2F.h>
-#include <TApplication.h>
-#include <TROOT.h>
 #include <TSystem.h>
-
+#include <TROOT.h>
+#include <TH1D.h>
+#include <TParticlePDG.h>
+#include <TDatabasePDG.h>
 #include <iostream>
 #include <cstdlib>
 
+TH1D *GetBandPlot(TFile *file, TTree *tree, TString det="temp", Int_t ipart=0){
+  
+  TString pname="";
+  if(ipart!=0){
+    const TParticlePDG *pdgname= TDatabasePDG::Instance()->GetParticle(ipart);
+    pname =  pdgname->GetName();
+  }else{
+    pname =  "all charged";
+  }
+  
+  TString name = TString::Format("dedx_p_%s_%d", det.Data(), ipart);
+  TString hname = "", proj = "", cut = "";
+  TString varY, varX;
+  
+  const double dedx_cutoff[] = { 10e3, 5.e6, 10.0 };
+  const double p_cutoff[] = { 3.0, 3.0, 3.0 };
+  
+  if(det=="SVD"){
+    varY = "VXDDedxTracks.m_dedxAvgTruncated[][1]";
+    varX = "VXDDedxTracks.m_p";
+    hname = TString::Format("%s(500,0.01,%0.01f,500,2.e2,%0.01f)",name.Data(), p_cutoff[1],dedx_cutoff[1]);
+    proj = TString::Format("%s:%s", varY.Data(),varX.Data());
+    if(ipart==0)cut = TString::Format("%s < %0.01f && %s < %0.01f", varX.Data(), p_cutoff[1], varY.Data(), dedx_cutoff[1]);
+    else cut = TString::Format("%s < %0.01f && %s < %0.01f && abs(VXDDedxTracks.m_pdg) == %d ", varX.Data(), p_cutoff[1], varY.Data(), dedx_cutoff[1],ipart);
+  }else if(det=="CDC"){
+    varY = "CDCDedxTracks.m_dedxAvgTruncated";
+    varX = "CDCDedxTracks.m_pCDC";
+    hname = TString::Format("%s(500,0.01,%0.01f,500,0.3,%0.01f)",name.Data(), p_cutoff[2],dedx_cutoff[2]);
+    proj = TString::Format("%s:%s", varY.Data(),varX.Data());
+    if(ipart==0)cut = TString::Format("%s < %0.01f && %s < %0.01f", varX.Data(), p_cutoff[2], varY.Data(), dedx_cutoff[2]);
+    else cut = TString::Format("%s < %0.01f && %s < %0.01f && abs(CDCDedxTracks.m_pdg) == %d ", varX.Data(), p_cutoff[2], varY.Data(), dedx_cutoff[2],ipart);
+  }
+  
+  file->cd();
+  tree->Project(TString::Format("%s", hname.Data()), TString::Format("%s", proj.Data()), TString::Format("%s", cut.Data()));
+  
+  TH1D* hist = (TH1D*)file->Get(TString::Format("%s", name.Data()));
+  if(hist)std::cout << "histogram created as : " << hist->GetName() << std::endl;
+  hist->SetTitle(TString::Format("dE/dx curve for %s (%s w/ CC); p [GeV/c]; %s dE/dx", det.Data(), pname.Data(), det.Data()));
+  hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+  if(ipart==0){
+    hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1 GeV. Some misreconstructed tracks at very low dE/dx values"));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,nostats,colz"));
+  }else {
+    hist->GetListOfFunctions()->Add(new TNamed("Check", "Individual particle band plot. Report if band spread is too-wide wrt reference"));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  }
+  return hist;
+}
 
+//--------------
 void plot(const TString &input_filename)
 {
   gSystem->Load("libreconstruction_dataobjects");
-
-  TFile *f = new TFile(input_filename, "READ");
+  
+  TFile *f = new TFile(input_filename,"READ");
   if(!f) {
     std::cerr << "Couldn't read file!\n";
     exit(1);
   }
+  
   TTree *tree = (TTree*)f->Get("tree");
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
   }
-  if(tree->GetEntries() == 0 || tree->GetBranch("CDCDedxTracks.m_p") == 0) {
+  
+  if(tree->GetEntries() == 0) {
     std::cerr << "Input file doesn't contain dE/dx data, aborting!\n";
     exit(1);
   }
-
-  TFile *output_file = new TFile("dedx_curves.root", "RECREATE");
-  output_file->cd();
-
-  const int num_detectors = 3;
-  const char* detectors[] = { "PXD", "SVD", "CDC" };
-  const double dedx_cutoff[] = { 10e3, 5.e6, 10.0 };
-  for(int idet = 1; idet < num_detectors; idet++) { //PXD not in input file, anyway
-    if( idet == 1 )
-      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("VXDDedxTracks.m_dedxAvgTruncated[][%d]:VXDDedxTracks.m_p", idet), TString::Format("VXDDedxTracks.m_p < 3 && VXDDedxTracks.m_dedxAvgTruncated[][%d] < %f ", idet, dedx_cutoff[idet]));
-    else
-      tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("CDCDedxTracks.m_dedxAvgTruncated[][%d]:CDCDedxTracks.m_pCDC", idet), TString::Format("CDCDedxTracks.m_pCDC < 3 && CDCDedxTracks.m_dedxAvgTruncated[][%d] < %f ", idet, dedx_cutoff[idet]));
-    TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));
-    hist->SetTitle(TString::Format("dE/dx curve for %s; p [GeV]; dE/dx", detectors[idet]));
-    hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
-    if (idet == 2) { //CDC
-      hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, relativistic rise visible . Some misreconstructed tracks at very low dE/dx values."));
-    } else { //PXD/SVD
-      hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, minimal ionisation for higher p. Some misreconstructed tracks at very low dE/dx values."));
-    }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
-    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
-    hist->Write();
-
+  
+  if(tree->GetBranch("CDCDedxTracks.m_pCDC") == 0 || tree->GetBranch("CDCDedxTracks.m_dedxAvgTruncated") == 0) {
+    std::cerr << "Input file doesn't contain CDC dE/dx data, aborting!\n";
+    exit(1);
   }
+  
+  if(tree->GetBranch("VXDDedxTracks.m_p") == 0 || tree->GetBranch("VXDDedxTracks.m_dedxAvgTruncated[2]") == 0) {
+    std::cerr << "Input file doesn't contain SVD dE/dx data, aborting!\n";
+    exit(1);
+  }
+  
+  int count=-1;
+  TH1D *hSVD[7], *hCDC[7];
+  TFile *output_file = new TFile("dedx_curves.root", "RECREATE");
+  for ( auto pdg : { 0,11,13,211,321,2212,1000010020}) {
+    count++;
+    //prepare CDC/SVD plots
+    hSVD[count] = (TH1D*)GetBandPlot(f,tree,"SVD",pdg); //0 for all
+    hCDC[count] = (TH1D*)GetBandPlot(f,tree,"CDC",pdg); //0 for all
+    //add SVD plots to file
+    Color_t color = count+1;
+    if(count==4) color = kGreen+3;
+    if(count==6) color = kBlack;
+    hSVD[count]->SetMarkerColor(color);
+    hCDC[count]->SetMarkerColor(color);
+    output_file->cd();
+    hSVD[count]->Write();
+  }
+  
+  //add CDC plots now
+  for (int i=0; i<7; i++) {
+    output_file->cd();
+    hCDC[i]->Write();
+  }
+  
   output_file->Close();
 }
 
 void dedx1_curves()
 {
   gROOT->SetStyle("Plain");
-
   plot("../EvtGenSimRec_dedx.root");
 }

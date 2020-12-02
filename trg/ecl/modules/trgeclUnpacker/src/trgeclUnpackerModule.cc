@@ -98,7 +98,7 @@ void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn)
     etm_version = ((rdat[0] >> 16) & 0xffff);
     if (etm_version > 136) {
       checkBuffer(rdat, nnn);
-    } else if (etm_version <= 136) {
+    } else  {
       checkBuffer_v136(rdat, nnn);
     }
   }
@@ -159,8 +159,8 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int conv_tc_t         =     0;
   int win3_revo         = -9999;
 
-  vector<int> sum_data;
-  vector<vector<int>> sum_info;
+  vector<unsigned> sum_data;
+  vector<vector<unsigned>> sum_info;
 
   vector<int> tc_data;
   vector<vector<int>> tc_info;
@@ -900,8 +900,8 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int conv_tc_t         =     0;
   int win3_revo         = -9999;
 
-  vector<int> sum_data;
-  vector<vector<int>> sum_info;
+  vector<unsigned> sum_data;
+  vector<vector<unsigned>> sum_info;  //TODO can these be unsigned? (required for bit shifts shifts)
 
   vector<int> tc_data;
   vector<vector<int>> tc_info;

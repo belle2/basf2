@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMETRYMANAGER_H
-#define GEOMETRYMANAGER_H
+#pragma once
 
 #include <vector>
 #include <set>
@@ -200,4 +199,3 @@ namespace Belle2 {
   }
 
 } //Belle2 namespace
-#endif //GEOMETRYMANAGER_H

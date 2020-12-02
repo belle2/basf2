@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCRTestModule_H_
-#define CDCCRTestModule_H_
+#pragma once
 
 #include <framework/core/HistoModule.h>
 
@@ -309,4 +308,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

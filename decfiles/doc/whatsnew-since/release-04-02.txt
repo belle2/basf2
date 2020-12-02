@@ -4,7 +4,7 @@ Changes in the decfiles package since release-04-02
   .. note:: The decfiles directory was part of the analysis package until release-03-02. For documentation on earlier changes, please refer to the comments at the top of DECAY_BELLE2.DEC.
 
 Changes to DECAY_BELLE2.DEC
-++++++++++++++++++++++++++
++++++++++++++++++++++++++++
 
   .. note:: All changes listed below are documented in BELLE2-NOTE-PH-2020-008 - please refer to this note for a more detailed and specific description of updates.
 

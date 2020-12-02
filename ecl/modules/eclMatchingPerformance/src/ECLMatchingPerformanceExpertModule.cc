@@ -11,9 +11,6 @@
 #include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceExpertModule.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <root/TFile.h>
@@ -65,10 +62,9 @@ void ECLMatchingPerformanceExpertModule::initialize()
 
 void ECLMatchingPerformanceExpertModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  m_iEvent = eventMetaData->getEvent();
-  m_iRun = eventMetaData->getRun();
-  m_iExperiment = eventMetaData->getExperiment();
+  m_iEvent = m_EventMetaData->getEvent();
+  m_iRun = m_EventMetaData->getRun();
+  m_iExperiment = m_EventMetaData->getExperiment();
   m_trackMultiplicity = m_tracks.getEntries();
 
   double distance;
@@ -249,7 +245,7 @@ void ECLMatchingPerformanceExpertModule::terminate()
 
 void ECLMatchingPerformanceExpertModule::setupTree()
 {
-  if (m_dataTree == NULL) {
+  if (m_dataTree == nullptr) {
     B2FATAL("Data tree was not created.");
   }
   addVariableToTree("expNo", m_iExperiment);
@@ -319,7 +315,7 @@ void ECLMatchingPerformanceExpertModule::setupTree()
 
 void ECLMatchingPerformanceExpertModule::writeData()
 {
-  if (m_dataTree != NULL) {
+  if (m_dataTree != nullptr) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
@@ -327,7 +323,7 @@ void ECLMatchingPerformanceExpertModule::writeData()
     oldDir->cd();
     delete m_dataTree;
   }
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->Close();
     delete m_outputFile;
   }
@@ -394,7 +390,7 @@ void ECLMatchingPerformanceExpertModule::addVariableToTree(const std::string& va
 void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
     int& matchedToNeighbours, const int& cell)
 {
-  auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
+  const auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
   for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
     const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
     [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > m_minCalDigitEnergy); }

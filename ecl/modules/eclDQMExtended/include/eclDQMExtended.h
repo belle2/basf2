@@ -25,11 +25,15 @@
 //FRAMEWORK
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 //ECL
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dbobjects/ECLDspData.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
 
 class TH1F;
@@ -75,6 +79,8 @@ namespace Belle2 {
     std::string m_RunName;
     /** Save detailed fit data for failed fits */
     bool m_SaveDetailedFitData;
+    /** */
+    bool m_adjusted_timing;
 
     /** DBArray for payload 'ECLDSPPars0'. */
     DBArray<ECLDspData> m_ECLDspDataArray0;
@@ -82,6 +88,15 @@ namespace Belle2 {
     DBArray<ECLDspData> m_ECLDspDataArray1;
     /** DBArray for payload 'ECLDSPPars2'. */
     DBArray<ECLDspData> m_ECLDspDataArray2;
+
+    /** ECL digits. */
+    StoreArray<ECLDigit> m_ECLDigits;
+
+    /** ECL trigger data. */
+    StoreArray<ECLTrig> m_ECLTrigs;
+
+    /** ECL DSP data. */
+    StoreArray<ECLDsp> m_ECLDsps;
 
     /** Low amplitude threshold. */
     DBObjPtr<ECLCrystalCalib> m_calibrationThrA0;

@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_SENSITIVEDETECTOR_H_
-#define PXD_SENSITIVEDETECTOR_H_
+#pragma once
 
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -23,5 +22,3 @@ namespace Belle2 {
     typedef VXD::SensitiveDetector<PXDSimHit, PXDTrueHit> SensitiveDetector;
   } //end of namespace PXD
 } // end of namespace Belle2
-
-#endif /* PXD_SENSITIVEDETECTOR_H_ */

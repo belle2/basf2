@@ -60,7 +60,7 @@ namespace Belle2 {
     m_CDCSimHits.registerInDataStore();
     m_MCParticles.registerRelationTo(m_CDCSimHits);
 
-    CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
+    const CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
 
     m_thresholdEnergyDeposit = cntlp.getThresholdEnergyDeposit();
     m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)

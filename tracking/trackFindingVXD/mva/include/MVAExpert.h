@@ -34,7 +34,7 @@ namespace Belle2 {
      *  Construct the Expert with the specified weight folder and
      *  the name of the training that was used in the teacher run.
      *  @param identifier       A database identifier or local file name.
-     *  @param variableSet      The names and pointers to the variables to be fed to the mva method
+     *  @param namedVariables   The names and pointers to the variables to be fed to the mva method
      */
     MVAExpert(const std::string& identifier, std::vector<Named<float*>> namedVariables);
 

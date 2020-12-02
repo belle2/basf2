@@ -1,16 +1,14 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
-import math
 import numpy as np
 
 import tracking.validation.utilities as utilities
 
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
+ROOT.gSystem.Load("libtracking")
 
 
 class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
@@ -156,14 +154,14 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         )
 
     # Refiners to be executed on terminate #
-    # #################################### #
+    # ==================================== #
 
-    #: Save a tree of all collected variables in a sub folder
+    # : Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="event_tree",
                                    name="event_tree",
                                    above_expert_level=default_expert_level)
 
-    #: Save selected hit counters
+    # : Save selected hit counters
     save_clone_rate = refiners.save_fom(
         name="{module.id}_hit_figures_of_merit",
         title="Hit sums in {module.title}",

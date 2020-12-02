@@ -33,6 +33,7 @@ namespace Belle2 {
 
 
     bool merge();
+    void clear();
 
   private:
     // List to handle histograms sent from different nodes

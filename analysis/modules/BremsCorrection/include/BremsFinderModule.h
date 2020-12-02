@@ -12,9 +12,14 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <string>
 
@@ -30,7 +35,7 @@ namespace Belle2 {
    *
    * The eclTrackBremFinder module uses the lepton track PXD and SVD hits and extrapolates them to the ECL; then looks for ECL clusters with energies between 0.2 and 1
    * times the track energy and without associated tracks, and checks if the distance between these clusters and the extrapolated tracks is smaller than 0.05.
-   * If it is, the cluster is marked as a bremsstrahlung, and a weighted relation between the track and the cluster is stablished. The weight is determined by the maximum
+   * If it is, the cluster is marked as a bremsstrahlung, and a weighted relation between the track and the cluster is established. The weight is determined by the maximum
    * between two values:
    *
    *    1. The difference in phi divided by the sum of the errors in the measurements of the cluster and the hit phi coordinate
@@ -70,6 +75,9 @@ namespace Belle2 {
     StoreObjPtr<ParticleList>  m_gammaList; /**<StoreObjptr for gamma list */
     StoreObjPtr<ParticleList>  m_outputList; /**<StoreObjptr for output particlelist */
     StoreObjPtr<ParticleList>  m_outputAntiList; /**<StoreObjptr for output antiparticlelist */
+    StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
+    StoreArray<MCParticle> m_mcParticles; /**< StoreArray of MCParticle objects */
+    StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihood objects */
     double m_maximumAcceptance =
       3.0f;  /**< photons whose clusters have relation weights higher than this will not be used for bremsstrahlung correction of the track */
     bool m_addMultiplePhotons =

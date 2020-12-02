@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
 import os
 # Options from command line
@@ -17,40 +17,40 @@ nevents = int(options.nevents)
 debugLevel = int(options.debugLevel)
 seed = int(options.seed)
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 home = os.environ['BELLE2_LOCAL_DIR']
 # cosmic test local DB folder
-use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-                   home + "/arich/database/cosmicTest_payloads")
+b2.use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
+                      home + "/arich/database/cosmicTest_payloads")
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Create Event information
-main.add_module('EventInfoSetter', evtNumList=nevents, logLevel=LogLevel.DEBUG)
+main.add_module('EventInfoSetter', evtNumList=nevents, logLevel=b2.LogLevel.DEBUG)
 
 # Histogram manager module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', options.filename)  # File to save histograms
 main.add_module(histo)
 
 
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['ARICH'])
 # build from DB
 geometry.param('useDB', 1)
 main.add_module(geometry)
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Setting the random seed for particle generation:
-set_random_seed(seed)
+b2.set_random_seed(seed)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [11])
 # Setting the number of tracks to be generated per event:
@@ -74,13 +74,13 @@ particlegun.param('xVertexParams', [-43.88])
 particlegun.param('yVertexParams', [10.0])
 particlegun.param('zVertexParams', [-40.0])
 # Print the parameters of the particle gun
-print_params(particlegun)
+b2.print_params(particlegun)
 main.add_module(particlegun)
 
 # ============================================================================
 
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 simulation.param('StoreOpticalPhotons', True)
 # by default only 35% of photons are propagated, which is below QE of some HAPDs! change fraction to 45% here.
 # -> change the default fraction for the release!
@@ -88,16 +88,16 @@ simulation.param('PhotonFraction', 0.45)
 main.add_module(simulation)
 
 # ARICH digitization module
-arichDIGI = register_module('ARICHDigitizer')
+arichDIGI = b2.register_module('ARICHDigitizer')
 arichDIGI.param('BackgroundHits', 0)
 main.add_module(arichDIGI)
 
 # fill ARICHHits from ARICHDigits
-arichHits = register_module('ARICHFillHits')
+arichHits = b2.register_module('ARICHFillHits')
 main.add_module(arichHits)
 
 # add ARICH DQM module
-arichDQM = register_module('ARICHDQM')
+arichDQM = b2.register_module('ARICHDQM')
 main.add_module(arichDQM)
 
 # add display module
@@ -115,14 +115,14 @@ main.add_module(arichDQM)
 # main.add_module(output)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)
 
 # plot DQM histograms
 com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotDQM.C'

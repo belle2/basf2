@@ -151,10 +151,12 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
   BKLMTrackFitter* m_fitter = new BKLMTrackFitter();
   BKLMTrackFinder*  m_finder = new BKLMTrackFinder();
   m_finder->setGlobalFit(m_globalFit);
-  if (mode == 1) m_finder->setGlobalFit(false);
+  if (mode == 1)
+    m_finder->setGlobalFit(false);
   m_finder->registerFitter(m_fitter);
 
-  if (hits2D.getEntries() < 1) return;
+  if (hits2D.getEntries() < 1)
+    return;
   if (mode == 1) { //efficieny study
     for (int j = 0; j < hits2D.getEntries(); j++) {
       hits2D[j]->isOnStaTrack(false);
@@ -163,16 +165,24 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
 
-    if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi])) continue;
-    if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hi])) continue;
-    if (hits2D[hi]->isOnStaTrack()) continue;
-    if (hits2D[hi]->isOutOfTime()) continue;
+    if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi]))
+      continue;
+    if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hi]))
+      continue;
+    if (hits2D[hi]->isOnStaTrack())
+      continue;
+    if (hits2D[hi]->isOutOfTime())
+      continue;
     for (int hj = hi + 1; hj < hits2D.getEntries(); ++hj) {
 
-      if (hits2D[hj]->isOnStaTrack()) { continue; }
-      if (hits2D[hj]->isOutOfTime()) continue;
-      if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj])) { continue; }
-      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3) { continue;}
+      if (hits2D[hj]->isOnStaTrack())
+        continue;
+      if (hits2D[hj]->isOutOfTime())
+        continue;
+      if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj]))
+        continue;
+      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
+        continue;
 
       std::list<BKLMHit2d*> sectorHitList;
       //sectorHitList.push_back(hits2D[hi]);
@@ -184,20 +194,29 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
 
       for (int ho = 0; ho < hits2D.getEntries(); ++ho) {
 
-        if (ho == hi || ho == hj) continue; //exclude seed hits
-        if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hj])) continue;
-        if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hj])) continue;
-        if (hits2D[ho]->isOnStaTrack()) continue;
-        if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi])) continue;
-        // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
-        if (hits2D[ho]->isOutOfTime()) continue;
+        // Exclude seed hits.
+        if (ho == hi || ho == hj)
+          continue;
+        if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hj]))
+          continue;
+        if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hj]))
+          continue;
+        if (hits2D[ho]->isOnStaTrack())
+          continue;
+        if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi]))
+          continue;
+        // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer())
+        //   continue;
+        if (hits2D[ho]->isOutOfTime())
+          continue;
         sectorHitList.push_back(hits2D[ho]);
       }
 
       /* Require at least four hits (minimum for good track, already two as seed, so here we require 2) but
        * no more than 60 (most likely noise, 60 would be four good tracks).
        */
-      if (sectorHitList.size() < 2 || sectorHitList.size() > 60) continue;
+      if (sectorHitList.size() < 2 || sectorHitList.size() > 60)
+        continue;
 
       std::list<BKLMHit2d*> m_hits;
       if (m_finder->filter(seed, sectorHitList, m_hits)) {
@@ -299,7 +318,8 @@ void BKLMTrackingModule::terminate()
 
 bool BKLMTrackingModule::sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2)
 {
-  if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector()) return true;
+  if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector())
+    return true;
   else return false;
 }
 
@@ -310,8 +330,14 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   //StoreArray<RecoTrack> recoTracks;
   RelationVector<BKLMHit2d> bklmHits = bklmTrk->getRelationsTo<BKLMHit2d> ();
 
-  if (bklmHits.size() < 1) { B2INFO("BKLMTrackingModule::something is wrong! there is BKLMTrack but no bklmHits"); return false;}
-  if (recoTracks.getEntries() < 1) { B2INFO("BKLMTrackingModule::there is no recoTrack"); return false;}
+  if (bklmHits.size() < 1) {
+    B2INFO("BKLMTrackingModule::something is wrong! there is BKLMTrack but no bklmHits");
+    return false;
+  }
+  if (recoTracks.getEntries() < 1) {
+    B2INFO("BKLMTrackingModule::there is no recoTrack");
+    return false;
+  }
   double oldDistance = INFINITY;
   double oldAngle = INFINITY;
   closestTrack = nullptr;
@@ -363,7 +389,8 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   // can not find matched RecoTrack
   // problem here is the errors of the track parameters are not considered!
   // best way is the positon or vector direction are required within 5/10 sigma ?
-  if (oldAngle > m_maxAngleRequired) return false;
+  if (oldAngle > m_maxAngleRequired)
+    return false;
   // found matched RecoTrack
   else return true;
 }
@@ -373,7 +400,8 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 
   set<int> m_pointUsed;
   m_pointUsed.clear();
-  if (m_storeTracks.getEntries() < 1) return;
+  if (m_storeTracks.getEntries() < 1)
+    return;
 
   for (int it = 0; it < m_storeTracks.getEntries(); it++) {
     //if(m_storeTracks[it]->getTrackChi2()>10) continue;
@@ -383,12 +411,16 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 
     RelationVector<BKLMHit2d> relatedHit2D = m_storeTracks[it]->getRelationsTo<BKLMHit2d>();
     for (const BKLMHit2d& hit2D : relatedHit2D) {
-      if (hit2D.getLayer() > iLayer + 1) cnt1 ++;
-      if (hit2D.getLayer() < iLayer + 1) cnt2 ++;
+      if (hit2D.getLayer() > iLayer + 1)
+        cnt1++;
+      if (hit2D.getLayer() < iLayer + 1)
+        cnt2++;
     }
 
-    if (iLayer != 0 && cnt2 < 1) return;
-    if (iLayer != 14 && cnt1 < 1) return;
+    if (iLayer != 0 && cnt2 < 1)
+      return;
+    if (iLayer != 14 && cnt1 < 1)
+      return;
     m_GeoPar = GeometryPar::instance();
     const bklm::Module* module = m_GeoPar->findModule(iSection, iSector + 1, iLayer + 1);
     int minPhiStrip = module->getPhiStripMin();
@@ -400,16 +432,30 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
     CLHEP::Hep3Vector local2 = module->getLocalPosition(maxPhiStrip, maxZStrip);
     float minLocalY, maxLocalY;
     float minLocalZ, maxLocalZ;
-    if (local[1] > local2[1]) { maxLocalY = local[1]; minLocalY = local2[1]; } else { maxLocalY = local2[1]; minLocalY = local[1];}
-    if (local[2] > local2[2]) { maxLocalZ = local[2]; minLocalZ = local2[2]; } else { maxLocalZ = local2[2]; minLocalZ = local[2];}
+    if (local[1] > local2[1]) {
+      maxLocalY = local[1];
+      minLocalY = local2[1];
+    } else {
+      maxLocalY = local2[1];
+      minLocalY = local[1];
+    }
+    if (local[2] > local2[2]) {
+      maxLocalZ = local[2];
+      minLocalZ = local2[2];
+    } else {
+      maxLocalZ = local2[2];
+      minLocalZ = local[2];
+    }
 
     TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
 
     //first layer is the reference layer
-    //if (iSection == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1)<<endl;
+    //if (iSection == 1 && (iSector + 1 ) == 5)
+    //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
     float reflocalX = fabs(m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1,
                                                            iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1));
-    //if (iSection == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1)<<endl;
+    //if (iSection == 1 && (iSector + 1 ) == 5)
+    //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
 
     float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
     float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
@@ -436,15 +482,19 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
       m_totalYZ->Fill(global[2], global[1]);
 
       for (int he = 0; he < hits2D.getEntries(); ++he) {
-        if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he])) continue;
-        if (hits2D[he]->isOutOfTime()) continue;
+        if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he]))
+          continue;
+        if (hits2D[he]->isOutOfTime())
+          continue;
         //if alreday used, skip
-        if (m_pointUsed.find(he) != m_pointUsed.end()) continue;
+        if (m_pointUsed.find(he) != m_pointUsed.end())
+          continue;
 
         double error, sigma;
         float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
 
-        if (distance < 10 && sigma < 5) { m_iffound = true; }
+        if (distance < 10 && sigma < 5)
+          m_iffound = true;
         if (m_iffound) {
           m_pointUsed.insert(he);
           //global[0] = hits2D[he]->getGlobalPosition()[0];
@@ -479,13 +529,15 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1)
+    return true;
   else return false;
 }
 
 bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit)
 {
-  if (hit->getSection() == section && hit->getSector() == iSector + 1) return true;
+  if (hit->getSection() == section && hit->getSector() == iSector + 1)
+    return true;
   else return false;
 }
 

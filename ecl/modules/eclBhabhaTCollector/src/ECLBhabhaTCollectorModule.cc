@@ -416,6 +416,9 @@ void ECLBhabhaTCollectorModule::collect()
     getObjectPtr<TH1F>("TcrateUncDatabase")->SetBinContent(crysID + 0.001, m_CrateTimeUnc[crysID - 1]);
   }
   if (m_storeCalib) {
+    B2INFO("ECLBhabhaTCollector:: ECLCrystalTimeOffset from the database information:"
+           << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
+           << LogVar("Revision", m_PreviousCrystalTimeDB.getRevision()));
     B2INFO("First event so print out previous ts values");
     for (int crysID = 1; crysID <= 8736; crysID++) {
       B2INFO("cid = " << crysID << ", Ts previous = " << m_PreviousCrystalTime[crysID - 1]);

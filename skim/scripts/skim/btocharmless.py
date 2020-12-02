@@ -191,7 +191,6 @@ class BtoHad1Pi0(BaseSkim):
                     'B+:Charmless_b2Kpi0': 'K+:SkimVeryLoose pi0:charmlessFit',  # 2
                     'B0:Charmless_b2pipipi0': 'pi+:SkimVeryLoose pi-:SkimVeryLoose pi0:charmlessFit',  # 1
                     'B0:Charmless_b2Kpipi0_0': 'K+:SkimVeryLoose pi-:SkimVeryLoose pi0:charmlessFit',  # 2
-                    'B0:Charmless_b2Kpipi0_1': 'K-:SkimVeryLoose pi+:SkimVeryLoose pi0:charmlessFit',  # 3
                     'B0:Charmless_b2KKpi0': 'K+:SkimVeryLoose K-:SkimVeryLoose pi0:charmlessFit',  # 4
                     'B0:Charmless_b2Kspi0': 'K_S0:merged pi0:charmlessFit',  # 5
                     'B+:Charmless_b2Kspipi0': 'K_S0:merged pi+:SkimVeryLoose pi0:charmlessFit',  # 6
@@ -247,5 +246,5 @@ class BtoHad3Tracks1Pi0(BaseSkim):
             ma.rankByHighest(particleList=channel, variable="cos(mdstIndex)", numBest=3,
                              outputVariable="cosMdstIndex_rank", path=path)
             BsigList.append(channel)
-
+        path = self.skim_event_cuts("nTracks >= 2", path=path)
         self.SkimLists = BsigList

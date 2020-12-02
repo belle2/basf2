@@ -288,6 +288,10 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
         reverse_seed = False
 
     if use_mc_truth:
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
+
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",

@@ -16,8 +16,8 @@ This works in any python installation with python version >=3.5 and the requests
 package installed
 """)
     parser.add_argument("--user", help="Username, corresponds to your DESY credentials.", required=False)
-    parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", required=False)
-    parser.add_argument("--max-experiment", help="Only query entries before or equal the given experiment number.", required=False)
+    parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", default=8)
+    parser.add_argument("--max-experiment", help="Only query entries before or equal the given experiment number.", default=99)
     parser.add_argument("--run-type", help="", choices=["null", "physics", "cosmic", "debug", "unknown"], required=False)
     parser.add_argument("--min-run", help="Only query entries after or equal the given run number.", default=1)
     parser.add_argument("--max-run", help="Only query entries before or equal the given run number.", default=9999)

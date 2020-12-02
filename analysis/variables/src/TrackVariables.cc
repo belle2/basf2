@@ -464,12 +464,12 @@ For mdst versions < 5.1, returns quiet_NaN().)DOC");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
     REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track");
     REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA");
-    REGISTER_VARIABLE("tanlambda", trackTanLambda, "Slope of the track in the r-z plane");
+    REGISTER_VARIABLE("tanLambda", trackTanLambda, "Slope of the track in the r-z plane");
     REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane");
     REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track");
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
-    REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
+    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit");
     REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,

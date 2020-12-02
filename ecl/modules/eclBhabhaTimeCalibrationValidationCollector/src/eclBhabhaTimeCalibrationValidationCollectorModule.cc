@@ -152,6 +152,12 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   int nbins = nBinsNeg * 2 + 1; // number of negative time bins + t=0 bin + number of positive time bins
   double max_t = min_t + nbins * binSize; // upper edge value of right most bin
 
+  /* Variable bin width information for the time information vs energy since
+     the time width should vary as a function of 1/E */
+  const Int_t N_E_BIN_EDGES = 64;
+  const Int_t N_E_BINS = N_E_BIN_EDGES - 1;
+  Double_t energyBinEdges[N_E_BIN_EDGES] = {0, 0.05, 0.051, 0.052, 0.053, 0.054, 0.055, 0.056, 0.057, 0.058, 0.059, 0.06, 0.062, 0.064, 0.066, 0.068, 0.07, 0.075, 0.08, 0.085, 0.09, 0.095, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.25, 2.5, 2.8, 3.2, 3.6, 4, 4.4, 4.8, 5.2, 5.6, 6, 6.4, 6.8, 7.2, 7.6, 8};
+
 
   auto cutflow = new TH1F("cutflow", " ;Cut label number ;Number of events passing cut", 10, 0, 10) ;
   registerObject<TH1F>("cutflow", cutflow) ;
@@ -169,11 +175,13 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
 
 
   auto clusterTimeClusterE = new TH2F("clusterTimeClusterE",
-                                      ";Electron cluster energy [GeV];Electron cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
+                                      ";Electron cluster energy [GeV];Electron cluster time [ns]", N_E_BINS, energyBinEdges, nbins, min_t, max_t) ;
+  //";Electron cluster energy [GeV];Electron cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTimeClusterE", clusterTimeClusterE) ;
 
   auto dt99_clusterE = new TH2F("dt99_clusterE",
-                                ";Electron cluster energy [GeV];dt99 [ns]", 100, 0, 10.0, nbins, 0, max_t) ;
+                                ";Electron cluster energy [GeV];dt99 [ns]", N_E_BINS, energyBinEdges, nbins, 0, max_t) ;
+  //";Electron cluster energy [GeV];dt99 [ns]", 1600, 0, 8.0, nbins, 0, max_t) ;
   registerObject<TH2F>("dt99_clusterE", dt99_clusterE) ;
 
 

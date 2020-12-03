@@ -33,7 +33,6 @@ namespace Belle2 {
       "pt",
       "size",
       "hits_per_layer",
-      "n_tracks",
 
       "sz_slope",
       "z0",

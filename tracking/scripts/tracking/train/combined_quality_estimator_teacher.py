@@ -2413,7 +2413,7 @@ class MasterTask(b2luigi.WrapperTask):
     exclude_variables_cdc = [
         "has_matching_segment",
         "size",
-        "n_tracks",
+        "n_tracks",  # not written out per default anyway
         "avg_hit_dist",
         "cont_layer_mean",
         "cont_layer_variance",

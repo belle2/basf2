@@ -87,9 +87,8 @@ void SVDTimeValidationCollectorModule::prepare()
 
 void SVDTimeValidationCollectorModule::collect()
 {
-  float eventT0 = 0;
   if (m_eventT0->hasEventT0()) {
-    eventT0 = m_eventT0->getEventT0();
+    float eventT0 = m_eventT0->getEventT0();
     getObjectPtr<TH1F>("hEventT0")->Fill(eventT0);
 
     // Fill histograms clusters on tracks

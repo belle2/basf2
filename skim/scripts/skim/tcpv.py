@@ -7,8 +7,8 @@ import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0_Kpi, loadStdD0_Kpipipi)
 from skim.standardlists.dileptons import (loadStdDiLeptons, loadStdJpsiToee,
-                                          loadStdJpsiTomumu, loadStdpsi2s2mumu,
-                                          loadStdpsi2s2ee)
+                                          loadStdJpsiTomumu, loadStdPsi2s2mumu,
+                                          loadStdPsi2s2ee)
 from skim.standardlists.lightmesons import (loadStdAllPhi, loadStdAllEta,
                                             loadStdAllEtaPrime, loadStdAllRho0,
                                             loadStdAllOmega, loadStdAllF_0,
@@ -77,7 +77,7 @@ class TCPV(BaseSkim):
     * ``abs(deltaE) < 0.5``
     """
 
-    __authors__ = ["Reem Rasheed"]
+    __authors__ = ["Reem Rasheed", "Chiara La Licata"]
     __description__ = "Skim for time-dependent CP violation analysis."
     __contact__ = __liaison__
     __category__ = "physics, TCPV"
@@ -95,8 +95,8 @@ class TCPV(BaseSkim):
         stdKshorts(path=path)
         loadStdJpsiToee(path=path)
         loadStdJpsiTomumu(path=path)
-        loadStdpsi2s2mumu(path=path)
-        loadStdpsi2s2ee(path=path)
+        loadStdPsi2s2mumu(path=path)
+        loadStdPsi2s2ee(path=path)
         loadStdAllPhi(path=path)
         loadStdAllEta(path=path)
         loadStdAllEtaPrime(path=path)
@@ -121,6 +121,7 @@ class TCPV(BaseSkim):
         vm.addAlias('E_ECL_TCPV', 'formula(E_ECL_pi_TCPV+E_ECL_gamma_TCPV)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        btotcpvcuts_KL = '5.05 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
         bd_qqs_Channels = [
             'phi:all K_S0:merged',
@@ -170,11 +171,9 @@ class TCPV(BaseSkim):
 
         b0toJPsiKL_List = []
         ma.reconstructMissingKlongDecayExpert('B0:TCPV_JPsiKL_mm -> J/psi:mumu K_L0:all',
-                                              btotcpvcuts, 1, True, path=path, recoList='_reco1')
-        raveFit('B0:TCPV_JPsiKL_mm', -1.0, decay_string='B0:TCPV_JPsiKL_mm -> J/psi:mumu K_L0:all', path=path, silence_warning=True)
+                                              btotcpvcuts_KL, 1, True, path=path, recoList='_reco1')
         ma.reconstructMissingKlongDecayExpert('B0:TCPV_JPsiKL_ee -> J/psi:ee K_L0:all',
-                                              btotcpvcuts, 1, True, path=path, recoList='_reco2')
-        raveFit('B0:TCPV_JPsiKL_ee', -1.0, decay_string='B0:TCPV_JPsiKL_ee -> J/psi:ee K_L0:all', path=path, silence_warning=True)
+                                              btotcpvcuts_KL, 1, True, path=path, recoList='_reco2')
         b0toJPsiKL_List.append('B0:TCPV_JPsiKL_mm')
         b0toJPsiKL_List.append('B0:TCPV_JPsiKL_ee')
 

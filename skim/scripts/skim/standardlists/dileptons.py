@@ -7,7 +7,7 @@ import modularAnalysis as ma
 def loadStdDiLeptons(persistent=True, path=None):
     """
     Create the following lists of di-leptons:
-      - 'J/psi:mumuLoose'
+      - 'J/psi:mumuLoose'Psi2s
       - 'J/psi:eeLoose'
       - 'psi(2S):mumuLoose'
       - 'psi(2S):eeLoose'
@@ -18,10 +18,10 @@ def loadStdDiLeptons(persistent=True, path=None):
 
     loadStdLooseJpsi2mumu(persistent, path)
     loadStdLooseJpsi2ee(persistent, path)
-    loadStdLoosepsi2s2mumu(persistent, path)
-    loadStdLoosepsi2s2ee(persistent, path)
-    loadStdpsi2s2mumu(persistent, path)
-    loadStdpsi2s2ee(persistent, path)
+    loadStdLoosePsi2s2mumu(persistent, path)
+    loadStdLoosePsi2s2ee(persistent, path)
+    loadStdPsi2s2mumu(persistent, path)
+    loadStdPsi2s2ee(persistent, path)
 
 
 def loadStdLooseJpsi2mumu(persistent=True, path=None):
@@ -86,7 +86,7 @@ def loadStdJpsiTomumu(persistent=True, path=None):
     return 'J/psi:mumu'
 
 
-def loadStdpsi2s2mumu(persistent=True, path=None):
+def loadStdPsi2s2mumu(persistent=True, path=None):
     """
     Load the 'psi(2S):mumu' list from 'mu-:all mu+:all', with :math:`3.2 < M < 4.1~GeV`
 
@@ -97,7 +97,7 @@ def loadStdpsi2s2mumu(persistent=True, path=None):
     return 'psi(2S):mumu'
 
 
-def loadStdLoosepsi2s2mumu(persistent=True, path=None):
+def loadStdLoosePsi2s2mumu(persistent=True, path=None):
     """
     Load the 'psi(2S):mumuLoose' list from 'mu-:loose mu+:loose', with :math:`3.2 < M < 4.1~GeV`
 
@@ -108,7 +108,7 @@ def loadStdLoosepsi2s2mumu(persistent=True, path=None):
     return 'psi(2S):mumuLoose'
 
 
-def loadStdpsi2s2ee(persistent=True, path=None):
+def loadStdPsi2s2ee(persistent=True, path=None):
     """
     Load the 'psi(2S):ee' list from 'e-:all e+:all', with :math:`3.2 < M < 4.1~GeV`
 
@@ -119,7 +119,7 @@ def loadStdpsi2s2ee(persistent=True, path=None):
     return 'psi(2S):ee'
 
 
-def loadStdLoosepsi2s2ee(persistent=True, path=None):
+def loadStdLoosePsi2s2ee(persistent=True, path=None):
     """
     Load the 'psi(2S):eeLoose' list from 'e-:loose e+:loose', with :math:`3.2 < M < 4.1~GeV`
 

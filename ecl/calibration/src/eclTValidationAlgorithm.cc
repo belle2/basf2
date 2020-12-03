@@ -177,7 +177,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
     olderBucketExpNum = minExpNum ;
   } else if (minExpNum > 0) {
     olderBucketExpNum = minExpNum - 1 ;
-    olderBucketRunNum = 5000;
+    olderBucketRunNum = 99999;
   }
 
 

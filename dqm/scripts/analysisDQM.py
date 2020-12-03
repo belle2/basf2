@@ -11,7 +11,7 @@ import modularAnalysis as ma
 
 
 def add_analysis_dqm(path):
-    ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
+    ma.fillParticleList('gamma:physDQM', 'E > 0.15', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)

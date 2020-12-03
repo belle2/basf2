@@ -1,0 +1,6 @@
+Changes in the framework package since release-05-01
+----------------------------------------------------
+
+* Added ``b2rundb-query`` to perform simple rundb queries from the command line.
+* Added a RunDB class which makes writing scripts using the rundb more straightforward.
+

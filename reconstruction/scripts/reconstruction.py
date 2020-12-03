@@ -31,11 +31,11 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
-def default_event_abort(module, condition, error_flag, additional_store_arrays_to_keep):
-    """Default event abort outside of HLT: Ignore the error flag and the additional store arrays
-    and just stop processing by giving an empty path"""
-    path = basf2.Path()
-    module.if_value(condition, path, basf2.AfterConditionPath.END)
+def default_event_abort(module, condition, error_flag):
+    """Default event abort outside of HLT: Ignore the error flag and just stop
+    processing by giving an empty path"""
+    p = basf2.Path()
+    module.if_value(condition, p, basf2.AfterConditionPath.END)
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
@@ -76,7 +76,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     doom = path.add_module("EventsOfDoomBuster")
-    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort, ['RawFTSWs'])
+    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,

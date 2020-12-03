@@ -64,6 +64,9 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
   addParam("timeAlgorithm", m_timeAlgorithm,
            " int to choose time algorithm:  0 = 6-sample CoG (default for 6-sample acquisition mode), 1 = 3-sample CoG (default for 3-sample acquisition mode),  2 = 3-sample ELS",
            m_timeAlgorithm);
+  addParam("Calibrate3SampleWithEventT0", m_calibrate3SampleWithEventT0,
+           " if true returns the calibrated time instead of the raw time for 3-sample time algorithms",
+           m_calibrate3SampleWithEventT0);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
   addParam("SVDEventInfoName", m_svdEventInfoSet,
@@ -262,10 +265,12 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   //depending on the algorithm, time contains different information:
   //6-sample CoG (0): this is the calibrated time already
   //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
+  //It is possile to get the uncalibrated 3-sample raw time here
+  //to get the 6-sample raw time there is an option in SVDCoGTimeEstimatorModule
   float caltime = time;
-  if (m_timeAlgorithm == 1)
+  if (m_timeAlgorithm == 1 and m_calibrate3SampleWithEventT0)
     caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
-  else if (m_timeAlgorithm == 2)
+  else if (m_timeAlgorithm == 2 and m_calibrate3SampleWithEventT0)
     caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
 
   // last step:
@@ -327,4 +332,3 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }
-

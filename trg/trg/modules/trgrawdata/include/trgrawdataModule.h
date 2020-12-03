@@ -212,7 +212,7 @@ namespace Belle2 {
     int m_hdr_nwd_sl4 = intNaN;
     int m_hdr_nwd_sl5 = intNaN;
     int m_hdr_nwd_sl6 = intNaN;
-    int m_hdr_nwd_sl7 = intNaN;
+    //int m_hdr_nwd_sl7 = intNaN;
     int m_hdr_nwd_sl8 = intNaN;
     int m_hdr_nwd_2d0 = intNaN;
     int m_hdr_nwd_2d1 = intNaN;
@@ -257,6 +257,7 @@ namespace Belle2 {
     int m_cpr_grl = intNaN;
     unsigned m_cpr_top = intNaN;
 
+    /*
     int m_hslb_sl0 = intNaN;
     int m_hslb_sl1 = intNaN;
     int m_hslb_sl2 = intNaN;
@@ -282,6 +283,7 @@ namespace Belle2 {
     int m_hslb_etf = intNaN;
     int m_hslb_grl = intNaN;
     int m_hslb_top = intNaN;
+    */
 
     int m_fmid_sl0 = intNaN;
     int m_fmid_sl1 = intNaN;

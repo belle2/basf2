@@ -23,8 +23,11 @@ class Constraint():
         value : float
           The constant term of the constraint: sum(c_i * par_i) = value
         """
+        #: Value
         self.value = value
+        #: Comment
         self.comment = comment
+        #: Data
         self.data = []
 
     def add(self, label, coeff):
@@ -61,6 +64,7 @@ class Constraints():
         filename : str
           Desired filename for the constraint file
         """
+        #: File name
         self.filename = filename
 
     def generate(self):
@@ -139,8 +143,11 @@ class VXDHierarchyConstraints(Constraints):
 
         #  TODO: cannot currently change the filename in collector, so fixed here
         super(VXDHierarchyConstraints, self).__init__("constraints.txt")
+        #: Constraint type
         self.type = type
+        #: Flag for PXD
         self.pxd = pxd
+        #: Flag for SVD
         self.svd = svd
 
     def configure_collector(self, collector):
@@ -195,9 +202,13 @@ class CDCLayerConstraints(Constraints):
           Constraint for Z-scale
         """
         super(CDCLayerConstraints, self).__init__(filename)
+        #: 6D CDC constraints
         self.rigid = rigid
+        #: Constraint for z-offset
         self.z_offset = z_offset
+        #: Constraint for r-scale
         self.r_scale = r_scale
+        #: Constraint for z-scale
         self.z_scale = z_scale
         pass
 
@@ -528,10 +539,15 @@ class CDCWireConstraints(Constraints):
 # ------------ Main: Generate some constraint files with default config (no time-dependence, default global tags) ------
 
 if __name__ == '__main__':
+    #: 6D CDC constraints
     consts6 = CDCLayerConstraints('cdc-layer-constraints-6D.txt', rigid=True, z_offset=False, r_scale=False, z_scale=False)
+    #: 7D CDC constraints
     consts7 = CDCLayerConstraints('cdc-layer-constraints-7D.txt', rigid=True, z_offset=True, r_scale=False, z_scale=False)
+    #: 10D CD constraints
     consts10 = CDCLayerConstraints('cdc-layer-constraints-10D.txt', rigid=True, z_offset=True, r_scale=True, z_scale=True)
+    #: CDC EventT0 constraint
     cdcT0 = CDCTimeZerosConstraint()
+    #: CDC wire constraints
     cdcWires = CDCWireConstraints()
 
     # phase 2
@@ -540,9 +556,11 @@ if __name__ == '__main__':
     # timedep = [([], [(0, 0, 1003)])]
 
     # final detector (phase 3)
+    #: Time dependency
     timedep = []  # [([], [(0, 0, 0)])]
+    #: Initial event
     init_event = (0, 0, 0)
-
+    #: Files
     files = generate_constraints(
       [
         consts6,

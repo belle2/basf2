@@ -8,8 +8,9 @@ import re
 
 import yaml
 
+import udst
 import basf2 as b2
-from modularAnalysis import applyCuts, skimOutputUdst, summaryOfLists
+from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 
 
@@ -493,7 +494,7 @@ class BaseSkim(ABC):
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
-        skimOutputUdst(
+        udst.add_skimmed_udst_output(
             skimDecayMode=self.code,
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,

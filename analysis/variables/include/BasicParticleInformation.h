@@ -40,6 +40,11 @@ namespace Belle2 {
     double particleIsFromV0(const Particle* part);
 
     /**
+     * returns the mdst source used to create the particle
+     */
+    double particleSource(const Particle* part);
+
+    /**
      * returns StoreArray index (0-based) of the MDST object from which the Particle was created
      */
     double particleMdstArrayIndex(const Particle* part);

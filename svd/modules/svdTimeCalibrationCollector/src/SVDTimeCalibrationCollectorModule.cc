@@ -60,7 +60,7 @@ void SVDTimeCalibrationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0FromCDC", m_hEventT0FromCDC);
   m_hEventT0FromCDCSync = new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100);
   registerObject<TH1F>("hEventT0FromCDCSync", m_hEventT0FromCDCSync);
-  m_hRawTimeL3V = new TH1F("hRawTimeL3V", "RawCoGTimeL3V", 200, -100, 100);
+  m_hRawTimeL3V = new TH1F("hRawTimeL3V", "RawCoGTimeL3V", 300, -150, 150);
   registerObject<TH1F>("hRawTimeL3V", m_hRawTimeL3V);
 
   m_svdCls.isRequired(m_svdClusters);
@@ -152,7 +152,7 @@ void SVDTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
-      if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawTimeL3V")->Fill(clTime);}
+      if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawTimeL3V")->Fill(clTime_ftsw);}
     }
   };
 }

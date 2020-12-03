@@ -64,7 +64,7 @@ struct CalibrationData {
   vector<TMatrixDSym> ipsUnc; ///< vector of BS positions uncs. for each BS-pos calib. interval
   TMatrixDSym  sizeMat; ///< BS size CovMatrix
 
-  bool isCalibrated = false;
+  bool isCalibrated = false; ///< true if calibration run was successful
 
 };
 

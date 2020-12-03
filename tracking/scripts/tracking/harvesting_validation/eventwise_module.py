@@ -154,7 +154,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         )
 
     # Refiners to be executed on terminate #
-    # #################################### #
+    # ==================================== #
 
     #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="event_tree",

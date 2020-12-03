@@ -3,7 +3,6 @@
 
 import ROOT
 from ROOT import Belle2
-import sys
 
 """
 Create and fill ECLChannelMap class.

@@ -179,6 +179,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   unsigned int errorCountEvent = 0;
 
   // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
+  // cppcheck-suppress variableScope
   int t0CombinedDecisionLast = -1;
 
   bool performBufferAnalysis = true;

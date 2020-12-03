@@ -31,10 +31,17 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
+def default_event_abort(module, condition, error_flag):
+    """Default event abort outside of HLT: Ignore the error flag and just stop
+    processing by giving an empty path"""
+    p = basf2.Path()
+    module.if_value(condition, p, basf2.AfterConditionPath.END)
+
+
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       abort_path=None, use_random_numbers_for_hlt_prescale=True):
+                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -57,21 +64,19 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
+    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
+        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
+        but just remove all data except for the event information.
     :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
-        generated numbers, otherwise are applied using an internal counter.)
+        generated numbers, otherwise are applied using an internal counter.
     """
 
     # Check components.
     check_components(components)
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    if abort_path is None:
-        abort_path = basf2.create_path()
-    doom = path.add_module('EventsOfDoomBuster')
-    doom.if_true(abort_path, basf2.AfterConditionPath.END)
-    abort_path.add_module('EventErrorFlag',
-                          errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
+    doom = path.add_module("EventsOfDoomBuster")
+    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -381,18 +386,21 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
-    rawFormat=False
+    rawFormat=False,
+    ignoreInputModulesCheck=False
 ):
     """
-    This function add the rootOutput module with the settings needed to produce a cdst to a path,
+    This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
 
-    @param path Path to add modules to
+    @param path Path to add modules to.
     @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     @param rawFormat saves the cdsts in the raw+tracking format.
+    @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
+           Needed when a conditional path is passed as input.
     """
 
     branches = [
@@ -492,8 +500,8 @@ def add_cdst_output(
             'VXDDedxLikelihoods'
             ]
 
-        if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
+        if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
+            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
 
     if dataDescription is None:
         dataDescription = {}
@@ -600,13 +608,13 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
                         addHitsToRecoTrack=add_hits_to_reco_track)
     if components is not None and 'CDC' in components:
         if ('ECL' not in components and 'KLM' in components):
-            B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
-                      'for correct muonID computation, will not be added to your reconstruction path. '
-                      'Make sure that this is fine for your purposes, otherwise please include also ECL.')
+            basf2.B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
+                            'for correct muonID computation, will not be added to your reconstruction path. '
+                            'Make sure that this is fine for your purposes, otherwise please include also ECL.')
         if ('ECL' in components and 'KLM' not in components):
-            B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
-                      'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
-                      ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
+            basf2.B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
+                            'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
+                            ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
 def add_ecl_modules(path, components=None):

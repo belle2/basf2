@@ -220,8 +220,8 @@ namespace Belle2 {
     /** Getter function for the DATCONSVDClusters assigned to this DATCONSVDSpacePoint */
     std::vector<SVDCluster> getAssignedDATCONSVDClusters() { return m_assignedDATCONSVDClusters; }
 
-    /** Enforce  @param value in the  range [ @param lower, @param higher ].
-    * param = min ( max( param,lower)  ,higher )
+    /** Enforce 'value' in the range ['lower', 'higher'].
+    * param = min(max(param,lower),higher)
     * @param value is the coordinate that must be constrained in the range
     * @param otherValue is for debugging and logging purposes
     * @param lower is the lower limit of the prescribed range

@@ -38,7 +38,9 @@ namespace Belle2 {
     } // return unit: cm
 
     /** helper function with calculates the average distance in XY from the given center
-    @param a, @param b, @param c points for which the distance is evaluated
+    @param a: first point for which the distance is evaluated
+    @param b: second point for which the distance is evaluated
+    @param c: third point for which the distance is evaluated
     @param center: the center from which the relative distance is evaluated
     TODO: think about a better place to put this helper! Maybe own class but where to put the class?
     */

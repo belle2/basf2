@@ -227,8 +227,8 @@ namespace Belle2 {
 
     }
 
-    /// Uses the values coded by the Sector Pair ID @param pair_id
-    /// and sets the three compact Sector id @param id1, @param id2 @param id3
+    /// Uses the values coded by the Sector Pair ID @param triplet_id
+    /// and sets the three compact Sector id @param id1 @param id2 @param id3
     static void extractCompactID(secTripletID_t triplet_id, sectorID_t& id1, sectorID_t& id2, sectorID_t& id3)
     {
       id1 = triplet_id & 0xffff;

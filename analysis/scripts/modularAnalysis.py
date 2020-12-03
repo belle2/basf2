@@ -3111,7 +3111,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     path.add_module(incl_dstar)
 
 
-def scaleError(inputListName, outputListName,
+def scaleError(outputListName, inputListName,
                scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
                minErrors=[0.00140, 0, 0, 0.00157, 0],
                path=None):

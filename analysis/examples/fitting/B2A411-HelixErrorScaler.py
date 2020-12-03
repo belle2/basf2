@@ -43,7 +43,7 @@ stdMu('loose', path=my_path)
 stdKshorts(path=my_path)
 
 # create a new list of mu with scaled error
-ma.scaleError('mu+:loose', 'mu+:scaled', path=my_path)
+ma.scaleError('mu+:scaled', 'mu+:loose', path=my_path)
 
 # reconstruct B0 -> J/psi K_S0 decay
 ma.reconstructDecay('J/psi:default -> mu+:loose mu-:loose', '3.05 < M < 3.15', path=my_path)

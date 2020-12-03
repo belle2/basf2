@@ -40,7 +40,8 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
   if (hEventT0) {
     eventT0_mean = hEventT0->GetMean();
     eventT0_rms = hEventT0->GetRMS();
-  }
+  } else
+    B2ERROR("Histogram with Event T0 not found");
 
   B2DEBUG(27, "Histogram: " << hEventT0->GetName() <<
           " Entries (n. clusters): " << hEventT0->GetEntries() <<
@@ -61,6 +62,8 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           float clsTimeOnTracks_mean = 0.;
           if (hClsTimeOnTracks)
             clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
+          else
+            B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
 
           B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<

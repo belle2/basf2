@@ -40,6 +40,7 @@ namespace Belle2 {
 
       /**
        *  Main method that extracts the variable values from the complex object.
+       *  @param __attribute__ not used in base class
        *  @returns  Indication whether the extraction could be completed successfully.
        *            Base implementation returns always true.
        */
@@ -57,6 +58,7 @@ namespace Belle2 {
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
+       *  @param __attribute__ not used in base class
        *  @param prefix Name prefix to apply to all variable names.
        *  @return returns empty vector
        */

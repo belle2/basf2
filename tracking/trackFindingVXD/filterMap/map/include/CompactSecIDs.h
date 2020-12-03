@@ -195,8 +195,8 @@ namespace Belle2 {
 
     }
 
-    /// Sets the two compact Sector id @param id1 and @param @id2 to
-    /// the values coded by the Sector Pair ID @param pair_id
+    /// Uses the values coded by the Sector Pair ID @param pair_id
+    /// and sets the two compact Sector id @param id1 and @param id2
     static void extractCompactID(secPairID_t pair_id, sectorID_t& id1, sectorID_t& id2)
     {
       id1 = pair_id & 0xffff;
@@ -227,8 +227,8 @@ namespace Belle2 {
 
     }
 
-    /// Sets the three compact Sector id @param id1 , @param @id2 @param id3to
-    /// the values coded by the Sector Pair ID @param pair_id
+    /// Uses the values coded by the Sector Pair ID @param pair_id
+    /// and sets the three compact Sector id @param id1, @param id2 @param id3
     static void extractCompactID(secTripletID_t triplet_id, sectorID_t& id1, sectorID_t& id2, sectorID_t& id3)
     {
       id1 = triplet_id & 0xffff;

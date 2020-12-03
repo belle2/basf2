@@ -169,7 +169,11 @@ namespace Belle2 {
     const std::vector<bool> getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo);
 
     /** split a curling SpacePointTrackCand into TrackStubs.
+     * @param trackCand the SpacePointTrackCand that has to be split
+     * @param splitIndices indices where to split it
      * @param onlyFirstPart return only the TrackStub that holds the SpacePoint from the first to the first entry of splitIndices (not included in returned SpacePointTrackCand)
+     * @param prevChecksInfo determine and set the referee status of the trackStub based upon the information from the previous tests
+     * @param removedHits SpacePoints were removed from this SPTC
      */
     std::vector<Belle2::SpacePointTrackCand>
     splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart,

@@ -235,7 +235,8 @@ namespace {
       if (property & Particle::PropertyFlags::c_IsIgnoreIntermediate)
         return true;
     } else if (absPDG == Const::photon.getPDGCode()) { // gamma
-      if (mcDaug->hasStatus(MCParticle::c_IsFSRPhoton) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
+      if (MCMatching::isFSR(mcDaug) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)
+          or (AnalysisConfiguration::instance()->useLegacyMCMatching() and MCMatching::isFSRLegacy(mcDaug))) {
         if (property & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons)
           return true;
       } else {

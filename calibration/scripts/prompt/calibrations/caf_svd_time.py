@@ -28,7 +28,6 @@ b2.set_log_level(b2.LogLevel.INFO)
 random.seed(42)
 
 now = datetime.datetime.now()
-isMC = False
 
 settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
@@ -38,6 +37,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "max_events_per_run": 10000,
+                                   "isMC": False,
                                })
 
 ##################################################################
@@ -95,7 +95,7 @@ def create_algorithm(unique_id, prefix="", min_entries=10000):
         algorithm = SVD3SampleELSTimeCalibrationAlgorithm(unique_id)
     if prefix:
         algorithm.setPrefix(prefix)
-    algorithm.setMinEntries(10000)
+    algorithm.setMinEntries(min_entries)
 
     return algorithm
 
@@ -118,10 +118,11 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster.param("RecoDigits", reco_digits)
     cluster.param("ShaperDigits", shaper_digits)
     cluster.param("timeAlgorithm", time_algorithm)
+    cluster.param("Calibrate3SampleWithEventT0", False)
     return cluster
 
 
-def create_pre_collector_path(clusterizers):
+def create_pre_collector_path(clusterizers, isMC=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.
@@ -180,6 +181,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["hlt_hadron"]
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
+    isMC = expert_config["isMC"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
                                                                max_events_per_run, random_select=True)
@@ -291,7 +293,8 @@ def get_calibrations(input_data, **kwargs):
     ####
 
     pre_collector_path = create_pre_collector_path(
-        clusterizers=[cog6, cog3, els3])
+        clusterizers=[cog6, cog3, els3],
+        isMC=isMC)
     pre_collector_path.add_module(coll_cog6)
     pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF

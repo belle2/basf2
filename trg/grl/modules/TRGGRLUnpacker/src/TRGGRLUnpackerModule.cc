@@ -107,7 +107,7 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
   //}
 
   for (int _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
-    int wd = buf[0 * (nBits / 32) + _wd + nword_header];
+    unsigned wd = buf[0 * (nBits / 32) + _wd + nword_header];
     for (int bb = 0; bb < 32; bb++) { // bit by bit
       if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
         int bitPosition = (nBits - 1) - _wd * 32 - bb;
@@ -161,8 +161,8 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
 //----------
 
   for (int i = 0; i < 32; i++) {
-    evtinfo->m_phi_i[i] = ((rawstore->m_phi_i_int[0] & (1 << i)) != 0);
-    evtinfo->m_phi_CDC[i] = ((rawstore->m_phi_CDC_int[0] & (1 << i)) != 0);
+    evtinfo->m_phi_i[i] = ((rawstore->m_phi_i_int[0] & (1u << i)) != 0);
+    evtinfo->m_phi_CDC[i] = ((rawstore->m_phi_CDC_int[0] & (1u << i)) != 0);
   }
   for (int i = 32; i < 36; i++) {
     evtinfo->m_phi_i[i] = ((rawstore->m_phi_i_int[1] & (1 << (i - 32))) != 0);
@@ -180,24 +180,24 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
   }
 
   for (int i = 0; i < 32; i++) {
-    evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[0] & (1 << i)) != 0);
-    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[0] & (1 << i)) != 0);
+    evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[0] & (1u << i)) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[0] & (1u << i)) != 0);
   }
   for (int i = 32; i < 64; i++) {
-    evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[1] & (1 << (i - 32))) != 0);
-    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[1] & (1 << (i - 32))) != 0);
+    evtinfo->m_map_ST[i] = ((rawstore->m_map_ST_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_ST2[i] = ((rawstore->m_map_ST2_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_veto[i] = ((rawstore->m_map_veto_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_TSF0[i] = ((rawstore->m_map_TSF0_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_TSF2[i] = ((rawstore->m_map_TSF2_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_TSF4[i] = ((rawstore->m_map_TSF4_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_TSF1[i] = ((rawstore->m_map_TSF1_int[1] & (1u << (i - 32))) != 0);
+    evtinfo->m_map_TSF3[i] = ((rawstore->m_map_TSF3_int[1] & (1u << (i - 32))) != 0);
   }
 
 

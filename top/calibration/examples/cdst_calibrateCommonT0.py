@@ -9,7 +9,7 @@
 #   job: bsub -q s "basf2 cdst_calibrateCommonT0.py experiment run"
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TFile, TTree, TF1
 from array import array
@@ -48,7 +48,7 @@ for typ in ['4S', 'Continuum', 'Scan']:
     folder = data_dir + '/' + expNo + '/' + typ + '/' + runNo + '/' + skim_dir
     files += glob.glob(folder + '/cdst.*.root')
 if len(files) == 0:
-    B2ERROR('No cdst files found')
+    b2.B2ERROR('No cdst files found')
     sys.exit()
 
 # Output folder
@@ -62,7 +62,7 @@ fileName = output_folder + '/commonT0-' + expNo + '-' + runNo + '.root'
 print('Output file:', fileName)
 
 
-class Mask_BS13d(Module):
+class Mask_BS13d(b2.Module):
     ''' exclude (mask-out) BS 13d '''
 
     def event(self):
@@ -73,7 +73,7 @@ class Mask_BS13d(Module):
                 digit.setHitQuality(Belle2.TOPDigit.c_Junk)
 
 
-class calibrateGlobalT0Offline(Module):
+class calibrateGlobalT0Offline(b2.Module):
     """
     ** Description **
     Module to calculate the commont time offset of the TOP detector.
@@ -104,7 +104,7 @@ class calibrateGlobalT0Offline(Module):
 
         geo = Belle2.PyDBObj('TOPGeometry')
         if not geo.isValid():
-            B2FATAL('TOP geometry not available in database')
+            b2.B2FATAL('TOP geometry not available in database')
 
         #: bunch separation time
         self.bunchTimeSep = geo.getNominalTDC().getSyncTimeBase() / 24
@@ -157,11 +157,11 @@ class calibrateGlobalT0Offline(Module):
             if commonT0.isCalibrated():
                 self.t0 = commonT0.getT0()
                 self.t0Err = commonT0.getT0Error()
-                B2INFO('Common T0 used in data processing: ' + str(self.t0))
+                b2.B2INFO('Common T0 used in data processing: ' + str(self.t0))
             else:
-                B2INFO('No common T0 calibration done yet')
+                b2.B2INFO('No common T0 calibration done yet')
         else:
-            B2ERROR('Common T0 not available in database')
+            b2.B2ERROR('Common T0 not available in database')
 
     def event(self):
         """
@@ -273,30 +273,30 @@ class calibrateGlobalT0Offline(Module):
         self.h2b.Write()
         self.file.Close()
 
-        B2RESULT('Calibration for exp' + str(self.expNo) + '-run' + self.run)
+        b2.B2RESULT('Calibration for exp' + str(self.expNo) + '-run' + self.run)
         if self.t0Err > 0:
-            B2RESULT('Old common T0 [ns]: ' + str(round(self.t0, 3)) + ' +- ' +
-                     str(round(self.t0Err, 3)))
+            b2.B2RESULT('Old common T0 [ns]: ' + str(round(self.t0, 3)) + ' +- ' +
+                        str(round(self.t0Err, 3)))
         else:
-            B2RESULT('Old common T0 [ns]: -- not calibrated -- ')
-        B2RESULT('New common T0 [ns]: ' + str(round(offset[0], 3)) + ' +- ' +
-                 str(round(offsetErr[0], 3)))
-        B2RESULT("Output written to " + fileName)
+            b2.B2RESULT('Old common T0 [ns]: -- not calibrated -- ')
+        b2.B2RESULT('New common T0 [ns]: ' + str(round(offset[0], 3)) + ' +- ' +
+                    str(round(offsetErr[0], 3)))
+        b2.B2RESULT("Output written to " + fileName)
 
 
 # Database
-use_central_database(globalTag)
+b2.use_central_database(globalTag)
 for tag in stagingTags:
-    use_central_database(tag)
+    b2.use_central_database(tag)
 for db in localDB:
     if os.path.isfile(db):
-        use_local_database(db, invertLogging=True)
+        b2.use_local_database(db, invertLogging=True)
     else:
-        B2ERROR(db + ": local database not found")
+        b2.B2ERROR(db + ": local database not found")
         sys.exit()
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input (cdst files)
 main.add_module('RootInput', inputFileNames=files)
@@ -322,15 +322,15 @@ if method == 'BF':
 elif method == 'LL':
     main.add_module('TOPCommonT0Calibrator', sample=sampleType, outputFileName=fileName)
 else:
-    B2ERROR('unknown method ' + method)
+    b2.B2ERROR('unknown method ' + method)
     sys.exit()
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

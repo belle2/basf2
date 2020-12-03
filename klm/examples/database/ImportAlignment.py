@@ -5,7 +5,6 @@
 
 import sys
 import basf2
-import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
                         EKLMSegmentAlignment, KLMAlignmentData, \
                         KLMElementNumbers, KLMChannelIndex

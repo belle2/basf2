@@ -16,12 +16,10 @@
 #############################################################
 
 import sys
-import os
-from basf2 import *
+import basf2 as b2
 import svd.overlay_utils as svdou
 import simulation as simu
 import glob
-import basf2
 
 tag = "unused"
 if len(sys.argv) == 2:
@@ -45,19 +43,19 @@ if len(sys.argv) == 2:
 filelist=glob.glob(location)
 # print(filelist)
 for inputfile in filelist:
-    main = create_path()
+    main = b2.create_path()
 #    svdou.prepare_svd_overlay(main, [inputfile],"ZS3")
     svdou.prepare_svd_overlay(main, [inputfile],"overlay")
 #    svdou.prepare_svd_overlay(main, [inputfile],"overlayZS5")
 '''
 
 # EXAMPLE OF OVERLAY
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 # set the exp/run event informations
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [10])
@@ -73,7 +71,7 @@ main.add_module('EvtGenInput')
 bkgDir = '/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-00a/overlay/phase31/BGx1/set0/*.root'
 bg = glob.glob(bkgDir)
 if len(bg) == 0:
-    B2ERROR('No files found in ', bkgDir)
+    b2.B2ERROR('No files found in ', bkgDir)
     sys.exit()
 simu.add_simulation(main, bkgfiles=bg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
@@ -92,8 +90,8 @@ main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

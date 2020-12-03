@@ -1,0 +1,63 @@
+import basf2
+import validation_gt as vgt
+import rawdata as raw
+import reconstruction as rec
+import b2test_utils as b2u
+import sys
+import multiprocessing as mp
+
+# Use the validation Global Tags for the entire test.
+basf2.conditions.override_globaltags(vgt.get_validation_globaltags())
+
+
+def store_cdst(rawdata_file_name, cdst_file_name, data_type, number_of_events):
+
+    # Unpack and reconstruct some raw data and store the output using the cDST raw-format.
+    child = basf2.Path()
+    child.add_module('RootInput',
+                     inputFileName=rawdata_file_name)
+    raw.add_unpackers(path=child)
+    if data_type == 'cosmic':
+        rec.add_cosmics_reconstruction(path=child,
+                                       reconstruct_cdst=True)
+    else:
+        rec.add_reconstruction(path=child,
+                               reconstruct_cdst='rawFormat')
+    rec.add_cdst_output(path=child,
+                        mc=False,
+                        filename=cdst_file_name,
+                        rawFormat=True)
+    basf2.process(path=child,
+                  max_event=number_of_events)
+
+
+if __name__ == "__main__":
+
+    rawdata_file_name = str(sys.argv[1])
+    cdst_file_name = 'cdst.root'
+    data_type = str(sys.argv[2])
+    number_of_events = 10
+
+    # Use a clean directory: the files produced here are automatically deleted at the end of the test.
+    with b2u.clean_working_directory():
+
+        # Produce the cDST in a child job using multiprocessing.
+        child = mp.Process(target=store_cdst,
+                           args=(rawdata_file_name, cdst_file_name, data_type, number_of_events,))
+        child.start()
+        child.join()
+        if child.exitcode != 0:
+            basf2.B2FATAL(f'The child process failed with exit code {child.exitcode}.')
+
+        # Check if the file contains the expected number of events
+        metadata = basf2.get_file_metadata(cdst_file_name)
+        if not (metadata.getNEvents() == number_of_events):
+            basf2.B2FATAL(f'The cDST file produced by the child process contains {metadata.getNEvents()} events '
+                          f'instead of {nummber_of_events}.')
+
+        # If everything is OK, reconstruct the cDST file.
+        main = basf2.Path()
+        main.add_module('RootInput',
+                        inputFileName=cdst_file_name)
+        rec.prepare_cdst_analysis(path=main)
+        basf2.process(path=main)

@@ -38,7 +38,8 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 100.);
   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
@@ -47,7 +48,9 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -55,13 +58,12 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
 
-  m_monObj = getMonitoringObject("pxd");
-
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
   }
 
+  m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
@@ -146,12 +148,14 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  mychid.resize(3);
-  SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    mychid.resize(3);
+    SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -213,7 +217,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -384,7 +388,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
   {
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -419,8 +423,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  }
 #endif
 
   int status = 0;
@@ -428,17 +434,21 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    // cppcheck-suppress unreadVariable
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
+      // cppcheck-suppress unreadVariable
       status = 4;
     } else if (fabs(data - 30) > 15. || diff > 8) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
+      // cppcheck-suppress unreadVariable
       status = 3;
     } else {
       m_cCharge->Pad()->SetFillColor(kGreen);// Green
+      // cppcheck-suppress unreadVariable
       status = 2;
     }
 
@@ -448,8 +458,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 
 }
@@ -465,8 +477,10 @@ void DQMHistAnalysisPXDTrackChargeModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: terminate called");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   if (m_refFile) delete m_refFile;
 

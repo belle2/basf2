@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
-# The mva package has a builtin sideband substraction mechanism.
+# The mva package has a builtin sideband subtraction mechanism.
 # If your data and mc do not match, you can use the MetaOptions to do a meta-training.
 # Using 'm_use_sideband_substraction = True' the mva package will train
 #  * signal
@@ -22,13 +21,11 @@
 # from which the number of signal events in the different regions can be estimated.
 # This is the only information which is used from MC during the training.
 
-# For the sideband substraction it is important that the used features
+# For the sideband subtraction it is important that the used features
 # are independent of the variable used to define the sidebands.
 # Otherwise the classification quality will be poor.
 
 import basf2_mva
-from basf2 import *
-from modularAnalysis import *
 
 if __name__ == "__main__":
     variables = ['p', 'pt', 'pz', 'phi',

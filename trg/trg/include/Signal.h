@@ -39,14 +39,14 @@ namespace Belle2 {
     TRGSignal(const TRGClock& c, double t0, double t1);
 
     /// Constructor with name.
-    TRGSignal(const std::string& name,
-              const TRGClock& = Belle2_GDL::GDLSystemClock);
+    explicit TRGSignal(const std::string& name,
+                       const TRGClock& = Belle2_GDL::GDLSystemClock);
 
     /// Copy constructor.
     TRGSignal(const TRGSignal&);
 
     /// Constructor.
-    TRGSignal(const TRGTime&);
+    explicit TRGSignal(const TRGTime&);
 
     /// Default assignment operator
     TRGSignal& operator=(const TRGSignal&) = default;

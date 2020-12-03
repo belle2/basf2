@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
-import math
+import basf2 as b2
 
 # ----------------------------------------------------------------------------
 # Example of generating double calibration pulses with TOPDoublePulseGenerator
 # ----------------------------------------------------------------------------
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # pulse generator
-calpulse = register_module('TOPDoublePulseGenerator')
+calpulse = b2.register_module('TOPDoublePulseGenerator')
 calpulse.param('asicChannels', [0])
 calpulse.param('moduleIDs', [1])
 # intervals = [math.exp(-float(i)/99.0)+1 for i in range(128)]
@@ -42,11 +40,11 @@ main.add_module(calpulse)
 main.add_module('RootOutput')
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

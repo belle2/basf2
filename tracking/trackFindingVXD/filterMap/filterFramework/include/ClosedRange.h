@@ -69,6 +69,7 @@ namespace Belle2 {
 
     /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain oder for
      * @param t: the tree of the which the branch addresses need to be set
+     * @param branchName: name of the branch
      * @param variableName: specifier for the leafs
     */
     void setBranchAddress(TTree* t, const std::string& branchName,
@@ -86,9 +87,9 @@ namespace Belle2 {
 
 
     /** generates a "name" and fills the vector with the variable references
-    @param filtername: optional name of the filter this range is attached to make the output look nicer
-    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
-      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+      @param varname: pointer to vector which contains a pair of char which indicates the type object pointed to
+        and the actual pointers to the bounds, if equal to nullptr it will not be filled
+      @param pointers: optional name of the filter this range is attached to make the output look nicer
     **/
     std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr,
                                     const std::string& varname = "X")

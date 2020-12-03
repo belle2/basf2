@@ -77,9 +77,9 @@ namespace Belle2 {
     InfType getInf(void) const { return m_inf; } ;
 
     /** generates a "name" and fills the vector with the variable references
-    @param filtername: optional name of the filter this range is attached to make the output look nicer
-    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
-      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+      @param pointers: pointer to vector which contains a pair of char which indicates the type object pointed to
+        and the actual pointers to the bounds, if equal to nullptr it will not be filled
+      @param varname: optional name of the filter this range is attached to make the output look nicer
     **/
     std::string getNameAndReference(std::vector<std::pair<char, void*>>* pointers = nullptr, const std::string& varname = "X")
     {

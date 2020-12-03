@@ -34,6 +34,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -224,7 +225,7 @@ namespace Belle2 {
         return result;
 
       // check if mc match exists
-      const MCParticle* mcp = part->getRelated<MCParticle>();
+      const MCParticle* mcp = part->getMCParticle();
       if (mcp == nullptr)
         return result;
 
@@ -396,24 +397,16 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      double px = particle->getPx();
-      double py = particle->getPy();
+      TVector3 mom = particle->getMomentum();
 
-      if (py == py && px == px) {
+      TVector3 r = particle->getVertex() - beamSpotDB->getIPPosition();
 
-        double x = particle->getX() - (beamSpotDB->getIPPosition()).X();
-        double y = particle->getY() - (beamSpotDB->getIPPosition()).Y();
+      TVector3 Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
-        double pt = sqrt(px * px + py * py);
+      TVector3 curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
 
-//       const TVector3 m_BeamSpotCenter = TVector3(0., 0., 0.);
-//       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
-
-        double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
-        double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
-
-        return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
-      } else return std::numeric_limits<double>::quiet_NaN();
+      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
@@ -660,7 +653,7 @@ namespace Belle2 {
         s << "    ";
       }
       s << p->getPDGCode();
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int flags = MCMatching::getMCErrors(p, mcp);
         s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << flags << " ("
@@ -686,7 +679,7 @@ namespace Belle2 {
     double particleMCMomentumTransfer2(const Particle* part)
     {
       // for B meson MC particles only
-      const MCParticle* mcB = part->getRelated<MCParticle>();
+      const MCParticle* mcB = part->getMCParticle();
 
       if (!mcB)
         return std::numeric_limits<double>::quiet_NaN();
@@ -838,7 +831,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      auto* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<double>::quiet_NaN();

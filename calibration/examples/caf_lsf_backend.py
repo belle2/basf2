@@ -5,18 +5,16 @@
 
 # Not all of the configuration is strictly necessary, it's just to show some options
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -32,13 +30,13 @@ def main(argv):
     # We'll use the same data for all calibrations but this is not a requirement in general.
     input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
-    from caf.strategies import SequentialRunByRun, SingleIOV
+    from caf.strategies import SequentialRunByRun
     ###################################################
     # Test Calibration Setup
     # Make a bunch of test calibrations
     calibrations = []
     for i in range(1, 3):
-        col_test = register_module('CaTest')
+        col_test = b2.register_module('CaTest')
         col_test.set_name('Test{}'.format(i))  # Sets the prefix of the collected data in the datastore
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
         col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV
@@ -65,10 +63,10 @@ def main(argv):
         # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
         # No point spamming it
         cal_test.heartbeat = 15
-        # The interval in seconds between full updates of the remaining collector jobs, default = 300
+        # The interval in seconds between full updates of the remaining collector jobs, default = 30
         # Checking every subjob can be a long process when you have a lot of them so it's best not to do it too often
         # After this interval the finished/remaining collector jobs will be printed
-        cal_test.collector_full_update_interval = 60
+        cal_test.collector_full_update_interval = 30
         # Choosing an AlgorithmStrategy for each algorithm (here we just use the same for all of them)
         cal_test.strategies = SequentialRunByRun
         # The collector output file patterns you want to make sure are tracked by the CAF. By default only CollectorOutput.root
@@ -83,7 +81,7 @@ def main(argv):
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-    # Use the default LSF backend setup, can view the default options in calibration/data/backends.cfg
+
     cal_fw.backend = backends.LSF()
     # Start running
     cal_fw.run()

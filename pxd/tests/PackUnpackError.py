@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # to run the framework the used modules need to be registered
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Setting the option for all non-hepevt reader modules:
 eventinfosetter.param('evtNumList', [80])  # we want to process nr defined error events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
-packer = register_module('PXDPackerErr')
+packer = b2.register_module('PXDPackerErr')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhe_to_dhc', [
@@ -30,25 +30,25 @@ packer.param('dhe_to_dhc', [
 # [7, 15, 17, 53, 55, 57],
 # ])
 
-unpacker = register_module('PXDUnpacker')
+unpacker = b2.register_module('PXDUnpacker')
 unpacker.param('ContinueOnError', True)
 
-packercheck = register_module('PXDPackerErr')
+packercheck = b2.register_module('PXDPackerErr')
 packercheck.param('dhe_to_dhc', [
     [0, 2]
 ])
 
-logging.enable_summary(False)
+b2.logging.enable_summary(False)
 
 # creating minimal path for test
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(packer)
-unpacker.set_log_level(LogLevel.WARNING)  # this does not work yet, will fall back to ERROR
+unpacker.set_log_level(b2.LogLevel.WARNING)  # this does not work yet, will fall back to ERROR
 main.add_module(unpacker)
-packercheck.set_log_level(LogLevel.INFO)  # tell us more in the log in case of any problem
+packercheck.set_log_level(b2.LogLevel.INFO)  # tell us more in the log in case of any problem
 main.add_module(packercheck, Check=True)
 
-process(main)
+b2.process(main)
 
 # EOF.

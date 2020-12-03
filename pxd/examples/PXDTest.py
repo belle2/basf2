@@ -11,35 +11,35 @@
 #
 ##############################################################################
 
-from basf2 import *
+import basf2 as b2
 
 # show warnings during processing
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # Register modules
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # PXD digitization module
-PXDDIGI = register_module('PXDDigitizer')
+PXDDIGI = b2.register_module('PXDDigitizer')
 # PXD clusterizer
-PXDCLUST = register_module('PXDClusterizer')
+PXDCLUST = b2.register_module('PXDClusterizer')
 # Save output of simulation
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # ============================================================================
 # Set a fixed random seed for particle generation:
-set_random_seed(1028307)
+b2.set_random_seed(1028307)
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles
@@ -59,14 +59,14 @@ output.param('outputFileName', 'PXDTestOutput.root')
 # Select subdetectors to be built
 geometry.param('components', ['MagneticField', 'PXD'])
 
-PXDDIGI.set_log_level(LogLevel.INFO)
+PXDDIGI.set_log_level(b2.LogLevel.INFO)
 
-PXDCLUST.set_log_level(LogLevel.INFO)
+PXDCLUST.set_log_level(b2.LogLevel.INFO)
 
 # ============================================================================
 # Do the simulation
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
@@ -79,8 +79,8 @@ main.add_module(PXDCLUST)
 main.add_module(output)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)
 #

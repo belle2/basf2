@@ -167,7 +167,7 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     default:                 ss << "] [UNKNOWN] "; break;
   }
   static char* s = new char[1024 * 1024 * 5];
-  vsprintf(s, msg.c_str(), ap);
+  vsnprintf(s, 1024 * 1024 * 5, msg.c_str(), ap);
   ss << s << std::endl;
   std::string str = ss.str();
   std::cerr << color << str << "\x1b[49m\x1b[39m";

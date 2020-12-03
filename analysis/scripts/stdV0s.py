@@ -47,10 +47,8 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
         vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
-    if prioritiseV0:
-        ma.copyLists('K_S0:merged', ['K_S0:V0', 'K_S0:RD'], False, path=path)
-    else:
-        ma.copyLists('K_S0:merged', ['K_S0:RD', 'K_S0:V0'], False, path=path)
+    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0', 'K_S0:RD'],
+                                   variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
 def goodBelleKshort(path):
@@ -114,7 +112,5 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)
     ma.applyCuts('Lambda0:RD', 'extraInfo(highQualityVertex)', path=path)
-    if prioritiseV0:
-        ma.copyLists('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'], False, path=path)
-    else:
-        ma.copyLists('Lambda0:merged', ['Lambda0:RD', 'Lambda0:V0'], False, path=path)
+    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'],
+                                   variable='particleSource', preferLowest=prioritiseV0, path=path)

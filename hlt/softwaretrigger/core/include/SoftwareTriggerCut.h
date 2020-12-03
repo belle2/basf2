@@ -13,6 +13,7 @@
 #include <framework/utilities/GeneralCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <stdint.h>
 
 namespace Belle2 {
 
@@ -97,7 +98,8 @@ namespace Belle2 {
        * use the checkPreScaled function.
        * Returns a pair [prescaled, non-prescaled]
        */
-      std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> check(const SoftwareTriggerVariableManager::Object& prefilledObject)
+      std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> check(const SoftwareTriggerVariableManager::Object& prefilledObject,
+          uint32_t* counter = nullptr)
       const;
 
     private:

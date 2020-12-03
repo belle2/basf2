@@ -47,7 +47,7 @@ namespace Belle2 {
       bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
       bool m_createGateHist{false};///< create per gate hits 2d histogram
 
-      /** Input array for DAQ Status. */
+      /** Input array for TTD/FTSW */
       StoreArray<RawFTSW> m_rawTTD;
 
       /** Input array for PXD Raw Hits. */
@@ -65,8 +65,8 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hOccModAfterInjLER; /**< Histogram Occupancy after LER injection */
       std::map<VxdID, TH1F*> hOccModAfterInjHER; /**< Histogram Occupancy after HER injection */
 
-      TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+      TH1I* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1I* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
       TH1F* hMaxOccAfterInjLER{};          /**< Histogram Max Occupancy after LER injection */
       TH1F* hMaxOccAfterInjHER{};          /**< Histogram Max Occupancy after HER injection */

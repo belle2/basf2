@@ -15,12 +15,10 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
 import tracking as trk
 import rawdata as raw
-import svd as svd
 import daqdqm.commondqm as cdqm
 
 # needed for some temporary issues with BKLMDisplacement payload
@@ -29,7 +27,7 @@ b2conditions.globaltags = ['data_reprocessing_prompt', 'online_bucket10', 'Reco_
 # b2conditions.globaltags = ['online']
 
 # main main
-main = create_path()
+main = b2.create_path()
 
 # RAW
 files = ['/group/belle2/dataprod/Data/PromptSkim/e0012/4S/r02874/skim/hadron/raw/sub00/physics.*.root']
@@ -63,9 +61,9 @@ cdqm.add_common_dqm(main, components=['SVD'])
 # == Show progress
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

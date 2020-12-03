@@ -263,6 +263,10 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
+    //! Get the max number of channels in a readout board
+    /* cppcheck-suppress missingOverride */
+    int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
+
     enum {
       DATA_FORMAT_VERSION = 0
     };
@@ -674,7 +678,10 @@ namespace Belle2 {
     return ;
   }
 
-
+  inline int RawCOPPERFormat_v0::GetMaxNumOfCh(int/* n */)
+  {
+    return MAX_COPPER_CH;
+  }
 
 }
 

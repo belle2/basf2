@@ -75,6 +75,8 @@ class TCPV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, TCPV"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdE("loose", path=path)
         stdK("all", path=path)

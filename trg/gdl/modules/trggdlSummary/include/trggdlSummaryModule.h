@@ -43,6 +43,7 @@ namespace Belle2 {
     int LeafBitMap[320] = {0};
     char LeafNames[320][100] = {{""}};
     int _e_timtype = 0;
+    int _e_rvcout  = 0;
     int ee_psn[10] = {0};
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};

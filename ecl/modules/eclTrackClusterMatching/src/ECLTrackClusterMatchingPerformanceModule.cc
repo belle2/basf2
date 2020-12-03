@@ -10,9 +10,6 @@
 
 #include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingPerformanceModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
@@ -63,10 +60,9 @@ void ECLTrackClusterMatchingPerformanceModule::initialize()
 
 void ECLTrackClusterMatchingPerformanceModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  m_iEvent = eventMetaData->getEvent();
-  m_iRun = eventMetaData->getRun();
-  m_iExperiment = eventMetaData->getExperiment();
+  m_iEvent = m_EventMetaData->getEvent();
+  m_iRun = m_EventMetaData->getRun();
+  m_iExperiment = m_EventMetaData->getExperiment();
 
   for (const ECLCluster& eclCluster : m_eclClusters) {
     setClusterVariablesToDefaultValue();

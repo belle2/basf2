@@ -10,13 +10,15 @@ __authors__ = [
     "Yuji Kato"
 ]
 
+import basf2 as b2
 import modularAnalysis as ma
+import variables as va
 import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
@@ -532,33 +534,23 @@ class SystematicsRadEE(BaseSkim):
 
 @fancy_skim_header
 class SystematicsLambda(BaseSkim):
-    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Jake Bennett"]
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    def build_lists(self, path):
-        LambdaCuts = "M < 1.2"
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
 
-        ma.fillParticleList("p+:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        ma.fillParticleList("pi-:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
+    def build_lists(self, path):
+        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
+        va.variables.addAlias("pMom", "daughter(0,p)")
+        va.variables.addAlias("piMom", "daughter(1,p)")
+        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
-        for chID, channel in enumerate(LambdaChannel):
-            ma.reconstructDecay("Lambda0:syst" + str(chID) + " -> " + channel, LambdaCuts, chID, path=path)
-            vertex.kFit("Lambda0:syst" + str(chID), 0.002, path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "1.10<M<1.13", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*x+y*y)>0.0225", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*px+y*py)>0", path=path)
-            ma.applyCuts(
-                "Lambda0:syst" +
-                str(chID),
-                "formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009",
-                path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "p>0.2", path=path)
-            ma.matchMCTruth("Lambda0:syst0", path=path)
-            LambdaList.append("Lambda0:syst" + str(chID))
+        ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
+        LambdaList.append("Lambda0:syst0")
 
         self.SkimLists = LambdaList
 
@@ -588,7 +580,7 @@ class SystematicsPhiGamma(BaseSkim):
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
-        stdKshorts("merged", path=path)
+        stdKshorts(path=path)
 
     TestFiles = [get_test_file("phigamma_neutral")]
 
@@ -605,3 +597,47 @@ class SystematicsPhiGamma(BaseSkim):
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         self.SkimLists = ["gamma:PhiSystematics"]
+
+
+@fancy_skim_header
+class Random(BaseSkim):
+    __authors__ = "Phil Grace"
+    __contact__ = "Phil Grace <philip.grace@adelaide.edu.au>"
+    __description__ = "Random skim to select a fixed fraction of events."
+    __category__ = "systematics, random"
+
+    def __init__(self, KeepPercentage=10, seed=None, **kwargs):
+        """
+        Parameters:
+            KeepPercentage (float): Percentage of events to be kept.
+            seed (int): Set random seed to given number. If this argument is not given,
+                this skim will not alter the random seed.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        super().__init__(**kwargs)
+        self.KeepPercentage = KeepPercentage
+        self.seed = seed
+
+    def additional_setup(self, path):
+        if self.seed is not None:
+            b2.set_random_seed(int(self.seed))
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+        # Select one photon/track per event with no other cuts, so that all events are
+        # captured in the skim list if KeepPercentage=100.
+        label = "RandomSkim"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.copyList(f"gamma:{label}", "gamma:all", path=path)
+        ma.applyRandomCandidateSelection(f"pi+:{label}", path=path)
+        ma.applyRandomCandidateSelection(f"gamma:{label}", path=path)
+
+        # Select fraction of events
+        path = self.skim_event_cuts(
+            f"eventRandom <= {self.KeepPercentage/100}", path=path
+        )
+
+        self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]

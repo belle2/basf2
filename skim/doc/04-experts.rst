@@ -142,7 +142,7 @@ A Jupyter notebook skimming tutorial can be found in ``skim/tutorial/Skimming_Tu
 Skim registry
 ~~~~~~~~~~~~~
 
-All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in `skim.registry.RegisteredSkims` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
+All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in ``skim/scripts/skim/registry.py`` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
 The skim numbering convention is defined on the `Confluence skim page`_.
 
@@ -244,5 +244,18 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :filename: skim/tools/b2skim-prod
    :func: get_argument_parser
    :prog: b2skim-prod
+   :nodefaultconst:
+   :nogroupsections:
+
+
+.. _lpns2yaml:
+
+``lpns2yaml.py``: Convert lists of LPNs to format expected by ``b2skim-prod``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/lpns2yaml.py
+   :func: get_argument_parser
+   :prog: lpns2yaml.py
    :nodefaultconst:
    :nogroupsections:

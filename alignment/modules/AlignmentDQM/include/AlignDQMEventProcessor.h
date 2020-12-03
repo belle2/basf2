@@ -28,9 +28,9 @@ namespace Belle2 {
 
   public:
     /** Constructor.
-     * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
-     * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
-     * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
+     * @param histoModule DQMHistoModuleBase or derived module on which the Fill- functions are called.
+     * @param recoTracksStoreArrayName StoreArray name where the merged RecoTracks are written.
+     * @param tracksStoreArrayName StoreArray name where the merged Tracks are written. */
     AlignDQMEventProcessor(AlignDQMModule* histoModule, const std::string& tracksStoreArrayName,
                            const std::string& recoTracksStoreArrayName) :
       DQMEventProcessorBase(histoModule, recoTracksStoreArrayName, tracksStoreArrayName) { }

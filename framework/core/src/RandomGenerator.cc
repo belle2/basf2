@@ -34,10 +34,10 @@ namespace {
   }
 };
 
-RandomGenerator::RandomGenerator(): TRandom(), m_state{0}, m_index(0), m_barrier(0),
+RandomGenerator::RandomGenerator(const std::string& name): TRandom(), m_state{0}, m_index(0), m_barrier(0),
   m_mode(c_independent)
 {
-  SetName("B2Random");
+  SetName(name.c_str());
   SetTitle("Belle2 Random Generator");
 }
 
@@ -96,7 +96,7 @@ void RandomGenerator::setState(int barrier)
 #ifndef LOG_NO_B2DEBUG
   if (Belle2::LogSystem::Instance().isLevelEnabled(Belle2::LogConfig::c_Debug, 200, PACKAGENAME())) {
     std::stringstream info;
-    info << "Random Generator State info:\n";
+    info << "Random Generator '" << GetName() << "' State info:\n";
     info << "  seed (" << std::dec << m_seed.size() << "):\n    ";
     for (auto c : m_seed) { info << std::setw(2) << std::setfill('0') << std::hex << (int)c << " "; }
     info << "\n  event info (mode=" << m_mode << "): \n";

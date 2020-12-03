@@ -75,10 +75,10 @@ namespace Belle2 {
     template <typename INT>
     ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
                        INT* fg43, INT* fg31, INT* fg32,
-                       INT* fg33, int* y, int& ttrig2, int& la_thr,
-                       int& hit_thr, int& skip_thr, int& k_a, int& k_b,
-                       int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                       int& chi_thres, bool adjusted_timing = false);
+                       INT* fg33, int* y, int ttrig2, int la_thr,
+                       int hit_thr, int skip_thr, int k_a, int k_b,
+                       int k_c, int k_16, int k1_chi, int k2_chi,
+                       int chi_thres, bool adjusted_timing = false);
 
   }
 }

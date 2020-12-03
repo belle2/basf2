@@ -11,11 +11,8 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-import os
 import sys
 import glob
-from basf2 import *
-import ROOT
 from ROOT import Belle2
 
 # Usage: basf2 run_eclMuMuE_algorithm.py

@@ -45,7 +45,7 @@ def stdPhotons(listtype='loose', path=None):
             'theta > 0.296706 and theta < 2.61799',
             True,
             path)
-    # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficienct cut
+    # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
         stdPhotons('cdc', path)
@@ -94,6 +94,8 @@ def stdPhotons(listtype='loose', path=None):
             '[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]',
             True,
             path)
+    else:
+        raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of photon lists!")
 
 # Used in skimming code
 

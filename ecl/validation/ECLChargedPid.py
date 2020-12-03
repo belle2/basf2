@@ -24,6 +24,14 @@ for idx in range(len(Belle2.Const.chargedStableSet)):
     pdgId = particle.getPDGCode()
     chargedStableList.extend([pdgId, -pdgId])
 
+
+# Merge particles and antiparticles in the same plots for these hypotheses.
+mergeChargeOfPdgIds = [
+    Belle2.Const.pion.getPDGCode(),
+    Belle2.Const.kaon.getPDGCode(),
+    Belle2.Const.proton.getPDGCode()
+]
+
 # Create path.
 main = basf2.create_path()
 
@@ -40,7 +48,11 @@ main.add_module("Geometry")
 add_reconstruction(main)
 
 # Dump validation plots.
-main.add_module("ECLChargedPIDDataAnalysisValidation", outputFileName="ECLChargedPid", inputPdgIdList=chargedStableList)
+main.add_module(
+    "ECLChargedPIDDataAnalysisValidation",
+    outputFileName="ECLChargedPid",
+    inputPdgIdList=chargedStableList,
+    mergeChargeOfPdgIds=mergeChargeOfPdgIds)
 
 # Show progress of processing.
 main.add_module("ProgressBar")

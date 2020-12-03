@@ -2,6 +2,7 @@ import basf2
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
+import vertex
 from geometry import check_components
 import reconstruction
 
@@ -85,7 +86,9 @@ def add_store_only_rawdata_path(path, additonal_store_arrays_to_keep=None):
     path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepRawData")
 
 
-def add_filter_software_trigger(path, store_array_debug_prescale=0):
+def add_filter_software_trigger(path,
+                                store_array_debug_prescale=0,
+                                use_random_numbers_for_prescale=True):
     """
     Add the SoftwareTrigger for the filter cuts to the given path.
 
@@ -95,10 +98,14 @@ def add_filter_software_trigger(path, store_array_debug_prescale=0):
     :param path: The path to which the module should be added.
     :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
+    :param use_random_numbers_for_prescale: If True, the prescales are applied using randomly generated numbers,
+     otherwise are applied using an internal counter.
     :return: the software trigger module
     """
-    hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="filter",
-                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
+    hlt_cut_module = path.add_module("SoftwareTrigger",
+                                     baseIdentifier="filter",
+                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
+                                     useRandomNumbersForPreScale=use_random_numbers_for_prescale)
 
     return hlt_cut_module
 
@@ -120,12 +127,39 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    stdV0s.stdLambdas(path=path)
+    modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("gamma:loose", 'theta > 0.296706 and theta < 2.61799 and \
+    [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
+    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ', path=path)
+    modularAnalysis.reconstructDecay('pi0:loose -> gamma:loose gamma:loose', '0.075 < M < 0.175', 1, True, path=path)
+    modularAnalysis.cutAndCopyList('pi0:veryLooseFit', 'pi0:loose', '', True, path=path)
+    vertex.kFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
+    D0_Cut = '1.7 < M < 2.1'
+    D0_Ch = ['K-:dstSkim pi+:dstSkim',
+             'K-:dstSkim pi+:dstSkim pi0:veryLooseFit',
+             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim']
+
+    for chID, channel in enumerate(D0_Ch):
+        chID += 1
+        modularAnalysis.reconstructDecay('D0:ch' + str(chID) + ' -> ' + str(channel), D0_Cut, dmID=chID, path=path)
+
+    Dst_Cut = 'useCMSFrame(p) > 2.2 and massDifference(0) < 0.16'
+    Dst_List = []
+
+    for chID, channel in enumerate(D0_Ch):
+        chID += 1
+        modularAnalysis.reconstructDecay('D*+:ch' + str(chID) + ' -> D0:ch' + str(chID) + ' pi+:all', Dst_Cut, dmID=chID, path=path)
+        Dst_List.append('D*+:ch' + str(chID))
+    modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
+    modularAnalysis.fillParticleList("pi+:offip", '[abs(d0) > 1 and abs(z0) > 2] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
 
-def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
+def add_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -144,7 +178,7 @@ def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            abort_path=abort_path,
+            event_abort=hlt_event_abort,
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
@@ -178,3 +212,14 @@ def add_post_filter_reconstruction(path, run_type, components):
         pass
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+
+def hlt_event_abort(module, condition, error_flag):
+    """
+    Create a discard path suitable for HLT processing, i.e. set an error flag and
+    keep only the metadata.
+    """
+    p = basf2.Path()
+    p.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(p)
+    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)

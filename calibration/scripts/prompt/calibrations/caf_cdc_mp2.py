@@ -4,6 +4,8 @@
 
 from prompt import CalibrationSettings
 from prompt.utils import events_in_basf2_file
+import basf2
+from random import choice
 
 
 #: Tells the automated system some details of this script
@@ -13,10 +15,6 @@ settings = CalibrationSettings(name="CDC T0 Calibration with MP2",
                                input_data_formats=["raw"],
                                input_data_names=["hlt_mumu", "hlt_hadron"],
                                depends_on=[])
-
-
-import basf2
-from random import choice, seed
 
 
 def fix_tw_param():

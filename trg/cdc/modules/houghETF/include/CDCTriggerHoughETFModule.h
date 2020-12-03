@@ -172,9 +172,13 @@ namespace Belle2 {
     void selectHits(std::vector<unsigned>& list, std::vector<unsigned>& selected,
                     std::vector<unsigned>& unselected);
 
-    float calcEventTiming();
+    int getSector(int id, int sl);
+    std::vector<int> sectorTimingList();
+    std::vector<int> highPassTimingList();
+    int calcEventTiming();
     int median(std::vector<int> v);
     int medianInTimeWindow(std::vector<int> v);
+
 
 
   protected:
@@ -191,6 +195,8 @@ namespace Belle2 {
     std::vector<std::vector<CDCTriggerSegmentHit*>> associatedTSHitsList;
     /** Switch to use priority timing instead of fastest timing */
     bool m_usePriorityTiming;
+    /** Use associated fastest timings track-by-track */
+    bool m_useHighPassTimingList;
     /** Switch method to determine the event timing */
     unsigned m_t0CalcMethod;
     /** arrival order of fastest timing used as t0
@@ -198,7 +204,7 @@ namespace Belle2 {
     unsigned m_arrivalOrder;
     /** Start time of time window relative to median. (in ns)
      *  (effective when t0CalcMEthod == 2) */
-    short m_timeWindowStart;
+    short m_timeWindowBegin;
     /** End time of time window relative to median. (in ns)
      *  (effective when t0CalcMEthod == 2) */
     short m_timeWindowEnd;
@@ -290,6 +296,12 @@ namespace Belle2 {
     double radius[9][2] = {{0.}};
     /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
     unsigned TSoffset[10] = {0};
+    /** Number of track segments in each super layers*/
+    const int NTS  [9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+    /** Number of sector in each super layer*/
+    const int NSEC [9] = {16, 0, 16, 0, 16, 0, 8, 0, 8};
+    /** Number of sector offset of each super layer*/
+    int NSecOffset [9] = {0};
 
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

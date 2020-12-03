@@ -84,24 +84,6 @@ void SVDTimeValidationCollectorModule::prepare()
   }
 }
 
-void SVDTimeValidationCollectorModule::startRun()
-{
-  // Probably not needed, see discussion in https://stash.desy.de/projects/B2/repos/software/pull-requests/7162/overview
-
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-
-  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto ladder : geoCache.getLadders(layer)) {
-      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
-        for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
-          getObjectPtr<TH1F>(m_hClsTimeOnTracks->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hClsTimeAll->getHistogram(sensor, view)->GetName())->Reset();
-          getObjectPtr<TH1F>(m_hClsDiffTimeOnTracks->getHistogram(sensor, view)->GetName())->Reset();
-        }
-      }
-    }
-  }
-}
 
 void SVDTimeValidationCollectorModule::collect()
 {

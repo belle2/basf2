@@ -35,8 +35,12 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
   gROOT->SetBatch(true);
 
   auto hEventT0 = getObjectPtr<TH1F>("hEventT0");
-  auto eventT0_mean = hEventT0->GetMean();
-  auto eventT0_rms = hEventT0->GetRMS();
+  float eventT0_mean = 0;
+  float eventT0_rms = 0;
+  if (hEventT0) {
+    eventT0_mean = hEventT0->GetMean();
+    eventT0_rms = hEventT0->GetRMS();
+  }
 
   B2DEBUG(27, "Histogram: " << hEventT0->GetName() <<
           " Entries (n. clusters): " << hEventT0->GetEntries() <<
@@ -54,7 +58,9 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
           auto ladder_num = sensor.getLadderNumber();
           auto sensor_num = sensor.getSensorNumber();
           auto hClsTimeOnTracks = getObjectPtr<TH1F>(Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          auto clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
+          float clsTimeOnTracks_mean = 0.;
+          if (hClsTimeOnTracks)
+            clsTimeOnTracks_mean = hClsTimeOnTracks->GetMean();
           auto deviation = (clsTimeOnTracks_mean - eventT0_mean) / eventT0_rms;
 
           B2DEBUG(27, "Histogram: " << hClsTimeOnTracks->GetName() <<

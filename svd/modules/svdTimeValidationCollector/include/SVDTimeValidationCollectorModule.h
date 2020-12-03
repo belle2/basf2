@@ -46,11 +46,6 @@ namespace Belle2 {
     void prepare() override final;
 
     /**
-     * Called when entering a new run
-     */
-    void startRun() override final;
-
-    /**
      * Event processor
      */
     void collect() override final;

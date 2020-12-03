@@ -53,7 +53,7 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'EKLMHit2ds', 'SoftwareTriggerResult']
 
 #: List of DataStore names that are present when data enters the HLT.
-HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
+HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData", "RawFTSWs"]
 HLT_INPUT_OBJECTS.remove("ROIs")
 
 #: List of DataStore names that are present when data enters the expressreco

@@ -208,7 +208,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     b2.set_module_parameters(path, 'CoGReconstruction',
                              ShaperDigits=NEW_SHAPER_DIGITS_NAME,
                              RecoDigits=NEW_RECO_DIGITS_NAME,
-                             CalibrationWithEventT0=False)
+                             CalibrationWithEventT0=is_validation)
 
     for cluster in clusterizers:
         path.add_module(cluster)

@@ -61,7 +61,7 @@ namespace Belle2 {
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation
        * @param seedLevel first level to be filled, effectively skip forward to this higher granularity level
-       * @param setUsedFlag Set the used flag after every lambda function call
+       * @param xySpans pair of spans describing the span of a node
        * @param debugOutput enable debug output
        */
       QuadTreeProcessor(int lastLevel,

@@ -803,14 +803,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    for decayString, cut in decayStringWithCuts.items():
+    for decayString, cut in decayStringsWithCuts.items():
         if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-            basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
-            path.add_module(
-                'MVAExpert',
-                listNames=decayString,
-                extraInfoName='beamBackgroundLikelihoodMVA',
-                identifier='BeamBackgroundMVA')
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
@@ -881,13 +876,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
     if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-
-        basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
-        path.add_module(
-            'MVAExpert',
-            listNames=decayString,
-            extraInfoName='beamBackgroundLikelihoodMVA',
-            identifier='BeamBackgroundMVA')
+        getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,

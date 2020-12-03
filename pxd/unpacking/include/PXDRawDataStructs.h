@@ -98,9 +98,10 @@ namespace Belle2 {
 
       /// isFakedData
       bool isFakedData(void) const;
+      /// get fixed size (byte)
       inline unsigned int getFixedSize(void) const
       {
-        return 20;// bytes
+        return 20;
       };
       ///print
       void print(void) const;
@@ -440,7 +441,7 @@ namespace Belle2 {
       {
         return (word0.getMisc()) & 0x3;
       };
-      // get Error Bits
+      /// get Error Bits
       unsigned short getErrorBits(void) const;
     };
 

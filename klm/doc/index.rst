@@ -65,8 +65,8 @@ Likelihood extraction
  * - .. image:: pdf_figures/Muid-MuonPlus-Endcap13-exit-styled.pdf
         :align: center 
 
- * - .. image:: pdf_figures/Muid-MuonPlus-B4+E3-exit-styled.pdf
-        :align: center
+# * - .. image:: pdf_figures/Muid-MuonPlus-B4+E3-exit-styled.pdf
+ #       :align: center
 
     Sample longitudinal-profile PDFs for energetic positevely-charged muons (top) and pions (bottom), for the barrel (left), forward endcap (middle) and a selected barrel-endcap-overlap (right). Barrel (endcap) layers are numbered 0-14 (15-28).
 

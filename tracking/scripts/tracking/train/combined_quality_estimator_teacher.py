@@ -2575,30 +2575,30 @@ class MasterTask(b2luigi.WrapperTask):
             if b2luigi.get_setting("test_selected_task", default=False):
                 # for process_type in ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU', 'UUBAR', \
                 #    'DDBAR', 'CCBAR', 'SSBAR', 'BBBAR', 'V0BBBAR', 'V0STUDY']:
-                # for cut in ['000', '070', '090', '095']:
-                #    yield RecoTrackQEDataCollectionTask(
-                #        num_processes=self.num_processes,
-                #        n_events=self.n_events_testing,
-                #        experiment_number=experiment_number,
-                #        random_seed=self.process_type + '_test',
-                #        recotrack_option='useCDC_noVXD_deleteCDCQI'+cut,
-                #        cdc_training_target=cdc_training_target,
-                #        fast_bdt_option=fast_bdt_option,
-                #    )
+                for cut in ['000', '070', '090', '095']:
+                    yield RecoTrackQEDataCollectionTask(
+                        num_processes=self.num_processes,
+                        n_events=self.n_events_testing,
+                        experiment_number=experiment_number,
+                        random_seed=self.process_type + '_test',
+                        recotrack_option='useCDC_noVXD_deleteCDCQI'+cut,
+                        cdc_training_target=cdc_training_target,
+                        fast_bdt_option=fast_bdt_option,
+                    )
                 yield CDCQEDataCollectionTask(
                     num_processes=self.num_processes,
                     n_events=self.n_events_testing,
                     experiment_number=experiment_number,
                     random_seed=self.process_type + '_test',
                 )
-                # yield CDCQETeacherTask(
-                #    n_events_training=self.n_events_training,
-                #    process_type=self.process_type,
-                #    experiment_number=experiment_number,
-                #    exclude_variables=self.exclude_variables_cdc,
-                #    training_target=cdc_training_target,
-                #    fast_bdt_option=fast_bdt_option,
-                # )
+                yield CDCQETeacherTask(
+                    n_events_training=self.n_events_training,
+                    process_type=self.process_type,
+                    experiment_number=experiment_number,
+                    exclude_variables=self.exclude_variables_cdc,
+                    training_target=cdc_training_target,
+                    fast_bdt_option=fast_bdt_option,
+                )
             else:
                 # if data shall be processed, it can neither be trained nor evaluated
                 if 'DATA' in self.process_type:

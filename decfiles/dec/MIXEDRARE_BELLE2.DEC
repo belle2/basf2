@@ -1,0 +1,49 @@
+# BelleII collaboration mixedrare DECAY.DEC
+# Based on EvtGen DECAY.DEC and Belle mixedrare DECAY.DEC
+#
+# Changes
+#
+# Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
+#   First commit.
+#   Includes rare decays in DECAY_BELLE2.DEC.
+#   https://agira.desy.de/browse/BII-7607
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview
+#   Channels with BFs reported by PDG have been updated to the PDGLive value.
+
+
+Alias B0Rare B0
+Alias anti-B0Rare anti-B0
+ChargeConj B0Rare anti-B0Rare
+
+Decay Upsilon(4S)
+1.000000000   B0  anti-B0  B0Rare  anti-B0Rare             VSS_BMIX dm;
+Enddecay
+
+
+Decay B0Rare
+
+# b -> u hadronic  (Ref. [B1])
+#
+# Lange Nov14,2004 (flip D_s K --opposite of D_s pi)
+0.000021600   D_s+  pi-                                    PHSP; #[BF update - PG 09/2020]
+0.000027480   D_s-  K+                                     PHSP; #[BF update - PG 09/2020]
+0.000021000   D_s*+  pi-                                   SVS;
+0.000021900   D_s*-  K+                                    SVS;
+
+Enddecay
+
+
+Decay anti-B0Rare
+
+# b -> u hadronic  (Ref. [B1])
+#
+# Lange Nov 14, 2004  (flip D_s K -- is opposite of D_s pi)
+0.000021600   D_s-  pi+                                    PHSP; #[BF update - PG 09/2020]
+0.000027480   D_s+  K-                                     PHSP; #[BF update - PG 09/2020]
+0.000021000   D_s*-  pi+                                   SVS;
+0.000021900   D_s*+  K-                                    SVS;
+
+Enddecay
+
+
+End

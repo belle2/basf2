@@ -16,19 +16,19 @@ import getpass
 
 class RunDB:
     """
-    Simple API class to just get run information from the RunDB
+    Simple API class to just get run information from the RunDB.
+
+    Parameters:
+        apikey (str): RunDB API key (see `here <https://questions.belle2.org/question/9847/obtaining-api-key-for-rundb/>`_
+                      how to get one)
+        username (str): DESY username
     """
 
-    #: URL of where the rundb is hosted
+    #: URL of where the RunDB is hosted
     URL = "https://rundb.belle2.org"
 
     def __init__(self, apikey=None, username=None):
-        """Create an object and setup authentication
-
-        Parameters:
-            apikey (str): a Stash API key
-            username (str): a Stash username
-        """
+        """Create an object and setup authentication."""
         self._session = requests.Session()
         if apikey is None:
             # If no specific username use the local system username
@@ -46,10 +46,7 @@ class RunDB:
         """Deal with API pagination of an initial request to the API.
 
         It will return all the objects from all pages lazily requesting new pages
-        as objects are consumed. Will work for all list requests to the server
-
-        Parameters:
-            request (requests.Request): A get request to paginate through the results
+        as objects are consumed. Will work for all list requests to the server.
         """
         while True:
             # check the return value and raise exception on error

@@ -1,20 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+'''
+rundb - Helper classes for retrieving information from the RunDB
+----------------------------------------------------------------
+
+This modules contains classes useful to deal with the RunDB:
+
+* `RunDB`, a simple API class to just get run information from the RunDB
+'''
+
 import requests
 import getpass
 
 
 class RunDB:
     """
-    Simple api class to just get run information from the RunDB
+    Simple API class to just get run information from the RunDB
     """
 
     #: URL of where the rundb is hosted
     URL = "https://rundb.belle2.org"
 
     def __init__(self, apikey=None, username=None):
-        """Create an object and setup authentication"""
+        """Create an object and setup authentication
+
+        Parameters:
+            apikey (str): a Stash API key
+            username (str): a Stash username
+        """
         self._session = requests.Session()
         if apikey is None:
             # If no specific username use the local system username
@@ -29,7 +43,7 @@ class RunDB:
         self._session.headers.update({'Content-Type': 'application/json'})
 
     def _pagination(self, request):
-        """Deal with api pagination of an initial request to the api.
+        """Deal with API pagination of an initial request to the API.
 
         It will return all the objects from all pages lazily requesting new pages
         as objects are consumed. Will work for all list requests to the server
@@ -55,10 +69,10 @@ class RunDB:
     def get_run_info(self, **search_params):
         """Return the run information from the run registry.
 
-        All arguments are forwarded to the run registry `/run/` method
-        documented at https://rundb.belle2.org/rest/v1/swagger/. Please check
-        there for up to date documentation, at the time of this writing the
-        supported arguments are
+        All arguments are forwarded to the run registry ``/run/`` method
+        documented at the following `link <https://rundb.belle2.org/rest/v1/swagger/>`_.
+        Please check there for up to date documentation, at the time of
+        this writing the supported arguments are:
 
           * min_experiment (int)
           * min_run (int)
@@ -70,9 +84,9 @@ class RunDB:
           * expand (bool): If true return full run objects, not just a summary
             links to the run objects
 
-        If expand=False you can request the full objects for each run by calling
+        If ``expand=False`` you can request the full objects for each run by calling
         `get_details` with the returned run summary object as argument.
-        `expand=False` is much faster if no further details are needed but
+        ``expand=False`` is much faster if no further details are needed but
         getting the details in a separate step for many many runs will be slow
         so depending on how many runs are selected one or the other may be
         faster.
@@ -83,7 +97,10 @@ class RunDB:
     def get_details(self, run_summary):
         """
         Return details for a run summary object returned from `get_run_info`
-        if `expand` was not set to True
+        if ``expand`` was not set to True
+
+        Parameters:
+            run_summary: a run summary object returned from `get_run_info`
         """
         # Get the url object
         req = self._session.get(run_summary['url'])

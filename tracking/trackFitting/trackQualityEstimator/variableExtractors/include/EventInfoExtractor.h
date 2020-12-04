@@ -26,7 +26,9 @@ namespace Belle2 {
     explicit EventInfoExtractor(std::vector<Named<float*>>& variableSet):
       VariableExtractor()
     {
-      addVariable("event_number", variableSet);
+      addVariable("__experiment__", variableSet);
+      addVariable("__run__", variableSet);
+      addVariable("__event__", variableSet);
       addVariable("N_RecoTracks", variableSet);
       addVariable("N_PXDRecoTracks", variableSet);
       addVariable("N_SVDRecoTracks", variableSet);
@@ -83,7 +85,9 @@ namespace Belle2 {
 
       StoreObjPtr<EventMetaData> m_eventMetaData;
 
-      m_variables.at("event_number") = m_eventMetaData->getEvent();
+      m_variables.at("__experiment__") = m_eventMetaData->getExperiment();
+      m_variables.at("__run__") = m_eventMetaData->getRun();
+      m_variables.at("__event__") = m_eventMetaData->getEvent();
       m_variables.at("N_PXDRecoTracks") = n_pxdRecoTracks;
       m_variables.at("N_SVDRecoTracks") = n_svdRecoTracks;
       m_variables.at("N_CDCRecoTracks") = n_cdcRecoTracks;

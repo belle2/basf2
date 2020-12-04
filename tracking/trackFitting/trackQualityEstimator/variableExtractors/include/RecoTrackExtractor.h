@@ -30,10 +30,10 @@ namespace Belle2 {
     explicit RecoTrackExtractor(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
-      addVariable(prefix + "pdg_id", variableSet);
-      addVariable(prefix + "pdg_id_mother", variableSet);
-      addVariable(prefix + "is_vzero_daughter", variableSet);
-      addVariable(prefix + "is_primary", variableSet);
+      addVariable(prefix + "pdg_ID", variableSet);
+      addVariable(prefix + "pdg_ID_Mother", variableSet);
+      addVariable(prefix + "is_Vzero_Daughter", variableSet);
+      addVariable(prefix + "is_Primary", variableSet);
 
       addVariable(prefix + "z0", variableSet);
       addVariable(prefix + "d0", variableSet);
@@ -82,19 +82,19 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(const RecoTrack& recoTrack)
     {
-      float pdg_id = 0;
-      float pdg_id_mother = 0;
-      float is_vzero_daughter = -1;
-      float is_primary = -1;
+      float pdgID = 0;
+      float pdgIDMother = 0;
+      float isVzeroDaughter = -1;
+      float isPrimary = -1;
       auto mcparticle = recoTrack.getRelated<MCParticle>();
       if (mcparticle) {
-        pdg_id = static_cast<float>(mcparticle->getPDG());
-        pdg_id_mother = static_cast<float>(mcparticle->getMother()->getPDG());
-        is_primary = static_cast<float>(mcparticle->isPrimaryParticle());
-        if (abs(pdg_id_mother) == 310 || abs(pdg_id_mother) == 3122) {
-          is_vzero_daughter = 1;
+        pdgID = static_cast<float>(mcparticle->getPDG());
+        pdgIDMother = static_cast<float>(mcparticle->getMother()->getPDG());
+        isPrimary = static_cast<float>(mcparticle->isPrimaryParticle());
+        if (abs(pdgIDMother) == 310 || abs(pdgIDMother) == 3122) {
+          isVzeroDaughter = 1;
         } else {
-          is_vzero_daughter = 0;
+          isVzeroDaughter = 0;
         }
       }
       float z0 = -999;
@@ -107,10 +107,10 @@ namespace Belle2 {
           d0 = trackFitResult->getD0();
         }
       }
-      m_variables.at(m_prefix + "pdg_id") = pdg_id;
-      m_variables.at(m_prefix + "pdg_id_mother") = pdg_id_mother;
-      m_variables.at(m_prefix + "is_vzero_daughter") = is_vzero_daughter;
-      m_variables.at(m_prefix + "is_primary") = is_primary;
+      m_variables.at(m_prefix + "pdg_ID") = pdgID;
+      m_variables.at(m_prefix + "pdg_ID_Mother") = pdgIDMother;
+      m_variables.at(m_prefix + "is_Vzero_Daughter") = isVzeroDaughter;
+      m_variables.at(m_prefix + "is_Primary") = isPrimary;
 
       m_variables.at(m_prefix + "z0") = z0;
       m_variables.at(m_prefix + "d0") = d0;

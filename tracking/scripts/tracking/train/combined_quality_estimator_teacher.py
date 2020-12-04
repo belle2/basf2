@@ -202,11 +202,19 @@ if (
 
 
 def create_fbdt_option_string(fast_bdt_option):
+    """
+    returns a readable string created by the fast_bdt_option array
+    """
     return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
-                           str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
+        str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
 
 
 def createV0momenta(x, mu, beta):
+    """
+    Copied from Biancas K_S0 particle gun code: Returns a realistiv V0 momentum distribution
+    when running over x. Mu and Beta are properties of the function that define center and tails.
+    Used for the particle gun simulation code for K_S0 and Lambda_0
+    """
     return (1/beta)*np.exp(-(x - mu)/beta) * np.exp(-np.exp(-(x - mu) / beta))
 
 
@@ -403,8 +411,6 @@ class GenerateSimTask(Basf2PathTask):
         path = basf2.create_path()
         if self.experiment_number in [0, 1002, 1003]:
             runNo = 0
-        elif self.experiment_number == 12:
-            runNo = 0
         path.add_module(
             "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
         )
@@ -430,7 +436,7 @@ class GenerateSimTask(Basf2PathTask):
                     # I just made the lamdba values up, such that they peak at 0.35 and are slightly shifted to lower values
                     mu = 0.35
                     beta = 0.15  # if this is chosen higher, one needs to make sure not to get values >0 for 0
-                    pdgs = [3122, -3122]  # Lamdba0
+                    pdgs = [3122, -3122]  # Lambda0
                 else:
                     # also these values are made up
                     mu = 0.43
@@ -449,8 +455,6 @@ class GenerateSimTask(Basf2PathTask):
                 particlegun = basf2.register_module('ParticleGun')
                 particlegun.param('pdgCodes', pdg_list)
                 particlegun.param('nTracks', 8)  # number of particles (not tracks!) that is created in each event
-                # particlegun.param('momentumGeneration', 'uniformPt') #uniform
-                # particlegun.param('momentumParams', [0.05, 3.])
                 particlegun.param('momentumGeneration', 'polyline')
                 particlegun.param('momentumParams', polParams)
                 particlegun.param('thetaGeneration', 'uniformCos')
@@ -523,10 +527,9 @@ class GenerateSimTask(Basf2PathTask):
         )
         return path
 
+
 # I don't use the default MergeTask or similar because they only work if every input file is called the same.
 # Additionally, I want to add more features like deleting the original input to save storage space.
-
-
 class SplitNMergeSimTask(Basf2Task):
     """
     Generate simulated Monte Carlo with background overlay.
@@ -2465,7 +2468,9 @@ class MasterTask(b2luigi.WrapperTask):
         'ghost',
         'fake',
         'clone',
-        'event_number',
+        '__experiment__',
+        '__run__',
+        '__event__',
         'N_RecoTracks',
         'N_PXDRecoTracks',
         'N_SVDRecoTracks',
@@ -2510,10 +2515,10 @@ class MasterTask(b2luigi.WrapperTask):
         'PXD_QI',
         'SVD_FitSuccessful',
         'CDC_FitSuccessful',
-        'pdg_id',
-        'pdg_id_mother',
-        'is_vzero_daughter',
-        'is_primary',
+        'pdg_ID',
+        'pdg_ID_Mother',
+        'is_Vzero_Daughter',
+        'is_Primary',
         'z0',
         'd0',
         'seed_Charge',
@@ -2683,10 +2688,15 @@ class MasterTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    # from ROOT import Belle2
-    # environment = Belle2.Environment.Instance()
-    # environment.setNumberEventsOverride(40000)
+    # if n_events_test_on_data is specified to be different from -1 in the settings,
+    # then stop after N events (mainly useful to test data reconstruction):
+    nEventsTestOnData = b2luigi.get_setting("n_events_test_on_data", default=-1)
+    if nEventsTestOnData > 0 and 'DATA' in b2luigi.get_setting("process_type", default="BBBAR"):
+        from ROOT import Belle2
+        environment = Belle2.Environment.Instance()
+        environment.setNumberEventsOverride(nEventsTestOnData)
     # if global tags are specified in the settings, use them:
+    # e.g. for data use ["data_reprocessing_prompt", "online"]. Make sure to be up to date here
     globaltags = b2luigi.get_setting("globaltags", default=[])
     if len(globaltags) > 0:
         basf2.conditions.reset()

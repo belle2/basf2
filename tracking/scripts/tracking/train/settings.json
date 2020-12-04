@@ -4,6 +4,7 @@
     "n_events_training": 20000,
     "n_events_testing": 5000,
     "n_events_per_task": 100,
+    "n_events_test_on_data": -1,
     "workers": 500,
     "basf2_processes_per_worker": 0,
     "test_selected_task": false,

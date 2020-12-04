@@ -404,7 +404,7 @@ def get_calibrations(input_data, **kwargs):
         event_t0="EventT0")
 
     val_algo_cog6 = create_validation_algorithm(
-        prefix=coll_cog6.name(),
+        prefix=val_coll_cog6.name(),
         min_entries=10000)
 
     val_coll_cog3 = create_validation_collector(
@@ -415,7 +415,7 @@ def get_calibrations(input_data, **kwargs):
         event_t0="EventT0")
 
     val_algo_cog3 = create_validation_algorithm(
-        prefix=coll_cog3.name(),
+        prefix=val_coll_cog3.name(),
         min_entries=10000)
 
     val_coll_els3 = create_validation_collector(
@@ -426,7 +426,7 @@ def get_calibrations(input_data, **kwargs):
         event_t0="EventT0")
 
     val_algo_els3 = create_validation_algorithm(
-        prefix=coll_els3.name(),
+        prefix=val_coll_els3.name(),
         min_entries=10000)
 
     val_pre_collector_path = create_pre_collector_path(

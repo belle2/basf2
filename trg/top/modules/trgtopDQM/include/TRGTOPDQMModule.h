@@ -197,7 +197,7 @@ namespace Belle2 {
     TH1I* h_topNSlotsCombinedTimingTop[nskim_topdqm][nHistClasses] = {nullptr};
     TH1I* h_topNHitSum[nskim_topdqm][nHistClasses] = {nullptr};
     TH1I* h_topNHitBestSlot[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_topT0DecisionNumberBestSlot[nskim_topdqm][nHistClasses] = {nullptr};
+    //    TH1I* h_topT0DecisionNumberBestSlot[nskim_topdqm][nHistClasses] = {nullptr};
     TH1I* h_topLogLSum[nskim_topdqm][nHistClasses] = {nullptr};
 
     TH1I* h_gdl_ecltop_timing_diff_5ns[nskim_topdqm] = {nullptr};
@@ -265,6 +265,8 @@ namespace Belle2 {
 
     TH2I* h_gdl_ecltop_timing_diff_vs_grl_top_l1 = {nullptr};
     TH2I* h_gdl_top_l1_vs_grl_top_l1 = {nullptr};
+
+    TH2I* h_grl_ntopslots_vs_ncdcslots = {nullptr};
 
     //condition database for GDL unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;

@@ -596,10 +596,10 @@ void TRGTOPDQMModule::defineHisto()
                                                         "TOP combined t0 decision: N hits best slot", 200, 0, 200);
         h_topNHitBestSlot[iskim][histClass]->GetXaxis()->SetTitle("TOPTRG combined t0 decisions: N hits best slot");
 
-        h_topT0DecisionNumberBestSlot[iskim][histClass]  = new TH1I(Form("h_t0_decision_number_best_slot_%d_%s",  histClass,
-                                                                    skim_smap[iskim].c_str()),
-                                                                    "TOP combined t0 decision: combined t0 decision number best slot", 5, 1, 6);
-        h_topT0DecisionNumberBestSlot[iskim][histClass]->GetXaxis()->SetTitle("TOPTRG combined t0 decisions: combined t0 decision number best slot");
+        //        h_topT0DecisionNumberBestSlot[iskim][histClass]  = new TH1I(Form("h_t0_decision_number_best_slot_%d_%s",  histClass,
+        //                                                                    skim_smap[iskim].c_str()),
+        //                                                                    "TOP combined t0 decision: combined t0 decision number best slot", 5, 1, 6);
+        //        h_topT0DecisionNumberBestSlot[iskim][histClass]->GetXaxis()->SetTitle("TOPTRG combined t0 decisions: combined t0 decision number best slot");
 
         h_topLogLSum[iskim][histClass]  = new TH1I(Form("h_logl_per_slot_%d_%s",  histClass, skim_smap[iskim].c_str()),
                                                    "TOP combined t0 decision: log L per slot", 100, 0, 60000);
@@ -788,6 +788,10 @@ void TRGTOPDQMModule::defineHisto()
   h_gdl_top_l1_vs_grl_top_l1->GetXaxis()->SetTitle("GRL TOP rvc relative to GDL L1 (rvc)");
   h_gdl_top_l1_vs_grl_top_l1->GetYaxis()->SetTitle("GDL TOP rvc relative to GDL L1 (rvc)");
 
+  h_grl_ntopslots_vs_ncdcslots = new TH2I("h_grl_ntopslots_vs_ncdcslots", "GRL TOP slots vs CDC slots", 10, 0, 10, 10, 0, 10);
+  h_grl_ntopslots_vs_ncdcslots->GetXaxis()->SetTitle("GRL CDC sltos");
+  h_grl_ntopslots_vs_ncdcslots->GetYaxis()->SetTitle("GRL TOP sltos");
+
   //-------------------------------------------------------------------------------------------------------------------------------------------
 
   oldDir->cd();
@@ -941,7 +945,7 @@ void TRGTOPDQMModule::beginRun()
         h_topNSlotsCombinedTimingTop[iskim][histClass]->Reset();
         h_topNHitSum[iskim][histClass]->Reset();
         h_topNHitBestSlot[iskim][histClass]->Reset();
-        h_topT0DecisionNumberBestSlot[iskim][histClass]->Reset();
+        //        h_topT0DecisionNumberBestSlot[iskim][histClass]->Reset();
         h_topLogLSum[iskim][histClass]->Reset();
 
         h_gdl_ecltop_timing_diff_vs_slot_2ns[iskim][histClass]->Reset();
@@ -993,6 +997,8 @@ void TRGTOPDQMModule::beginRun()
 
   h_gdl_ecltop_timing_diff_vs_grl_top_l1->Reset();
   h_gdl_top_l1_vs_grl_top_l1->Reset();
+
+  h_grl_ntopslots_vs_ncdcslots->Reset();
 
   oldDir->cd();
 }
@@ -1076,22 +1082,19 @@ void TRGTOPDQMModule::endRun()
 void TRGTOPDQMModule::event()
 {
 
-  /* cppcheck-suppress variableScope */
-  //  static bool begin_run = true;
-
-  bool eclInfoAvailable = false;
   bool gdlInfoAvailable = false;
   bool grlInfoAvailable = false;
 
   // investigate GRL-TOP correlations if asked to do so
 
-  int grlTimeL1 = -1;
   int grlTOPL1 = -1;
 
   bool grlCDCSlots[16];
   bool grlTOPSlots[16];
 
   if (m_doGRLCorrelations) {
+
+    int grlTimeL1 = -1;
 
     StoreObjPtr<TRGGRLUnpackerStore> grlEventInfo("TRGGRLUnpackerStore");
 
@@ -1130,21 +1133,14 @@ void TRGTOPDQMModule::event()
     }
   }
 
-  //  cout << "DEBUG:  nCDCSlotsGRL, nTOPSlotsGRL, grlTimeL1, grlTOPL1 = " << nCDCSlotsGRL << ", " << nTOPSlotsGRL << ", " << grlTimeL1 << ", " << grlTOPL1 << endl;
-
   //  StoreArray<TRGECLUnpackerStore> trgeclHitArray;
 
   if (trgeclHitArray) {
-
-    eclInfoAvailable = true;
 
     bool barrelEcl = false;
     bool barrelEclB2B = false;
 
     if (m_doECLCorrelations) {
-
-      double HitEnergy = 0;
-      double HitTiming = 0;
 
       tcEclList.clear();
 
@@ -1152,12 +1148,13 @@ void TRGTOPDQMModule::event()
       TrgEclMapping trgEclMap;
 
       for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
+
         TRGECLUnpackerStore* aTRGECLUnpackerStore = trgeclHitArray[ii];
         int TCID = (aTRGECLUnpackerStore->getTCId());
 
         int hit_win =  aTRGECLUnpackerStore -> getHitWin();
-        HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
-        HitTiming    = aTRGECLUnpackerStore ->getTCTime();
+        double HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
+        double HitTiming    = aTRGECLUnpackerStore ->getTCTime();
 
         if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
         if (!(hit_win == 3 || hit_win == 4)) {continue;}
@@ -1179,7 +1176,7 @@ void TRGTOPDQMModule::event()
       if (tcEclList.size() >= 2) {
         vector<tcEcl>::const_iterator it = tcEclList.begin();
         const tcEcl& tc1 = *it;
-        it++;
+        ++it;
         const tcEcl& tc2 = *it;
         int tcId1 = tc1.tcId;
         int tcId2 = tc2.tcId;
@@ -1236,7 +1233,7 @@ void TRGTOPDQMModule::event()
       }
     }
 
-    if (m_doECLCorrelations && eclInfoAvailable) {
+    if (m_doECLCorrelations) {
       if (m_requireEclBarrel) {
         if (!barrelEcl) return;
       }
@@ -1252,6 +1249,8 @@ void TRGTOPDQMModule::event()
       if (nCDCSlotsGRL <= 0) return;
     }
   }
+
+  h_grl_ntopslots_vs_ncdcslots->Fill(nCDCSlotsGRL, nTOPSlotsGRL);
 
   /*
   cout << "DEBUG---------------------------------------------------------------------------------------------------------------------" << endl;
@@ -1442,9 +1441,11 @@ void TRGTOPDQMModule::event()
   int nT0Decisions = trgtopCombinedTimingArray.getEntries();
 
   int t0DecisionNumber = 0;
-  int nInTime = 0;
 
   if (gdlInfoAvailable) {
+
+    int nInTime = 0;
+
     for (const auto& t0Decision : trgtopCombinedTimingArray) {
       int topCombinedTimingTop = t0Decision.getCombinedTimingTop();
       int top_top_timing = (topCombinedTimingTop % 10240);
@@ -1620,20 +1621,21 @@ void TRGTOPDQMModule::event()
     //  where TOP timing in TOP data packet is the same as TOP timing in GDL data packet
     //
 
-    int slotSlotBest = 0;
-    int segmentSlotBest = 0;
-    int logLSlotBest = 0;
     int nHitsSlotBest = 0;
     int t0SlotBest = -1;
 
-    int slotSlotBest2 = 0;
-    int segmentSlotBest2 = 0;
-    int logLSlotBest2 = 0;
-    int nHitsSlotBest2 = 0;
-    int t0SlotBest2 = -1;
-
     // slotDecisionList should always be available
     if (slotDecisionList.size() > 0) {
+
+      int slotSlotBest = 0;
+      int segmentSlotBest = 0;
+      int logLSlotBest = 0;
+
+      int slotSlotBest2 = 0;
+      int segmentSlotBest2 = 0;
+      int logLSlotBest2 = 0;
+      int nHitsSlotBest2 = 0;
+      int t0SlotBest2 = -1;
 
       // sort slots according to their nHits
       sort(slotDecisionList.begin(), slotDecisionList.end(), largestNHits());
@@ -1648,7 +1650,7 @@ void TRGTOPDQMModule::event()
       t0SlotBest = slotDecisionBest.t0;
 
       if (slotDecisionList.size() > 1) {
-        it++;
+        ++it;
         const slotDecision& slotDecisionBest2 = *it;
 
         slotSlotBest2 = slotDecisionBest2.slot;
@@ -1727,12 +1729,11 @@ void TRGTOPDQMModule::event()
                       topRvcTopTimingDecisionNow + 1280;
 
     if (t0DecisionNumber == 0) {
+
       if (grlInfoAvailable) {
         h_gdl_top_l1_vs_grl_top_l1->Fill(grlTOPL1, topRvcDiff4);
       }
-    }
 
-    if (t0DecisionNumber == 0) {
       h_topCombinedTimingTopAll->Fill(topCombinedTimingTop);
       h_topNSlotsCombinedTimingTopAll->Fill(topNSlotsCombinedTimingTop);
       h_topNHitSumAll->Fill((int) hitsPerSlot);
@@ -1760,15 +1761,15 @@ void TRGTOPDQMModule::event()
 
     int ecl_gdl_top_timing_combined_diff = -1;
 
-    int top_top_timing_combined = -1;
-    int top_top_timing_best_slot = -1;
-
     int top_top_timing_combined_diff = -1;
 
     int ecl_top_top_timing_combined_diff = -1;
     int ecl_top_top_timing_best_slot_diff = -1;
 
     if (gdlInfoAvailable) {
+
+      int top_top_timing_combined = -1;
+      int top_top_timing_best_slot = -1;
 
       ecl_gdl_top_timing_combined_diff = gdl_ecl_timing >= gdl_top_timing ? gdl_ecl_timing - gdl_top_timing : gdl_ecl_timing -
                                          gdl_top_timing + 10240;
@@ -1879,7 +1880,7 @@ void TRGTOPDQMModule::event()
               h_top_ecltop_timing_combined_diff_2ns[skim[ifill]][histClass]->Fill(ecl_top_top_timing_combined_diff);
               h_top_ecltop_timing_best_slot_diff_2ns[skim[ifill]][histClass]->Fill(ecl_top_top_timing_best_slot_diff);
               h_topNHitBestSlot[skim[ifill]][histClass]->Fill(nHitsSlotBest);
-              h_topT0DecisionNumberBestSlot[skim[ifill]][histClass]->Fill(t0DecisionNumber + 1);
+              //              h_topT0DecisionNumberBestSlot[skim[ifill]][histClass]->Fill(t0DecisionNumber + 1);
             }
           }
 

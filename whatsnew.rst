@@ -26,6 +26,10 @@ This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
 .. include:: analysis/doc/whatsnew-since/release-05-00.txt
 
+.. List of changes for the framework package
+
+.. include:: framework/doc/whatsnew-since/release-05-01.txt
+
 Changes since release-04
 ========================
 
@@ -85,8 +89,6 @@ searches for New Physics.
 
 .. And then for framework as well. If something is more important we can always
    move it directly in here
-
-.. include:: framework/doc/whatsnew-since/release-05-01.txt
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
 

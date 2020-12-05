@@ -121,7 +121,7 @@ void HexDataPackerModule::event()
     }
     string strin;
     getline(m_ifs, strin);
-    sscanf(strin.c_str(), "%100s %100s %100s %100s",
+    sscanf(strin.c_str(), "%49s %49s %49s %49s",
            char1, char2, char3, char4);
     if (strcmp(char1, "data") == 0) {
       if (strcmp(char4, "Trailer") == 0) {
@@ -130,7 +130,7 @@ void HexDataPackerModule::event()
       if (strcmp(char2, "0") == 0) {
         continue;
       } else if (strcmp(char2, "7") == 0) {
-        sscanf(strin.c_str(), "%20s %u %20s %x %x %x %x %x %x %x %x",
+        sscanf(strin.c_str(), "%49s %u %49s %x %x %x %x %x %x %x %x",
                char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]));
         size = val[1];
         val[2] = val[2] | 0x00008000; // For data which was not reduced in FPGA

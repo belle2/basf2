@@ -55,9 +55,6 @@ namespace Belle2 {
 
     //    StoreArray<RawFTSW> raw_ftswarray;
 
-    //! # of events in a run
-    int max_nevt;
-
     //! Node ID
     //    int m_nodeid;
 

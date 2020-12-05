@@ -130,16 +130,16 @@ void HexDataPackerModule::event()
       if (strcmp(char2, "0") == 0) {
         continue;
       } else if (strcmp(char2, "7") == 0) {
-        sscanf(strin.c_str(), "%s %u %s %x %x %x %x %x %x %x %x",
-               char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]), 500);
+        sscanf(strin.c_str(), "%20s %u %20s %x %x %x %x %x %x %x %x",
+               char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]));
         size = val[1];
         val[2] = val[2] | 0x00008000; // For data which was not reduced in FPGA
         if (size < 0 || size > MAX_CPRBUF_WORDS) {
           B2FATAL("The size of an event =(" << size << ") is too large. Exiting...");
         }
       } else {
-        sscanf(strin.c_str(), "%s %u %s %x %x %x %x %x %x %x %x",
-               char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]), 500);
+        sscanf(strin.c_str(), "%20s %u %20s %x %x %x %x %x %x %x %x",
+               char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]));
       }
       if (size <= 0) {
         B2FATAL("The size of an event (=" << size << ") is too large. Exiting...");

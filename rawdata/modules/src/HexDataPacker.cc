@@ -121,7 +121,7 @@ void HexDataPackerModule::event()
     }
     string strin;
     getline(m_ifs, strin);
-    sscanf(strin.c_str(), "%s %s %s %s",
+    sscanf(strin.c_str(), "%100s %100s %100s %100s",
            char1, char2, char3, char4);
     if (strcmp(char1, "data") == 0) {
       if (strcmp(char4, "Trailer") == 0) {

@@ -22,21 +22,21 @@ namespace Belle2::KLM {
    *
    * This class has a ROOT dictionary, therefore it can be used in python modules:
    *
-     \code{.py}
-     import basf2
-     import ROOT
-
-     class KLMGeometryPrinter(basf2.Module):
-       def beginRun(self):
-         bklm = ROOT.Belle2.KLMGeometryPar.BarrelInstance()
-   if bklm:
-     print(bklm.getLayerInnerRadius(5))
-   eklm = ROOT.Belle2.KLMGeometryPar.EndcapInstance()
-   if eklm:
-     print(eklm.eklm.getStripLength(21))
-     \endcode
+   * @code{.py}
+   * import basf2
+   * import ROOT
    *
-   * \note In order to return something meaningful, the python module
+   * class KLMGeometryPrinter(basf2.Module):
+   *   def beginRun(self):
+   *     bklm = ROOT.Belle2.KLMGeometryPar.BarrelInstance()
+   *     if bklm:
+   *       print(bklm.getLayerInnerRadius(5))
+   *     eklm = ROOT.Belle2.KLMGeometryPar.EndcapInstance()
+   *     if eklm:
+   *       print(eklm.eklm.getStripLength(21))
+   * @endcode
+   *
+   * @note In order to return something meaningful, the python module
    *       has to be added to a path after the Gearbox and the Geometry modules.
    */
   class KLMGeometryPar {

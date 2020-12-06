@@ -99,9 +99,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
 
-    # There us no packer for these objects :-(
+    # There is no packer for the following objects :(
     branch_names.remove("RawTRGs")
-    branch_names.remove("RawFTSWs")
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 

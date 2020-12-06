@@ -98,7 +98,7 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
 
 After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``.
 
-.. warning:: There is a subtle but important technicality here: if ``BaseSkim.skim_event_cuts`` has been called, then the skim lists are not built for all events on the path, but they are built for all events on a conditional path.
+.. warning:: There is a subtle but important technicality here: if ``BaseSkim.skim_event_cuts`` has been called, then the skim lists are not built for all events on the path, but they are built for all events on a conditional path. A side-effect of this is that no post-skim path can be safely defined for the `CombinedSkim` class (since a combined skim of five skims may have up to five conditional paths).
 
 After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to (*e.g.* performing further reconstruction using the skim candidates). However, the final call to `basf2.process` must be passed the original (main) path.
 

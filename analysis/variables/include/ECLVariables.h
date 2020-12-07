@@ -27,11 +27,19 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
+     * return MVA output that uses shower shape variables to distinguish between true photon and beam background clusters
+     */
+    double beamBackgroundProbabilityMVA(const Particle* particle);
+    /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */
     double eclClusterNumberOfHadronDigits(const Particle* particle);
 
+    /**
+     * returns the output of the  MVA that uses shower shape variables to separate between beam background and true photon clusters
+     */
+    double eclBeamBackgroundProbabilityMVA(const Particle* particle);
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward

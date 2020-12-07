@@ -102,7 +102,6 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   B2INFO("Loaded 'ECLReferenceCrystalPerCrateCalib' calibration");
 
   vector<float> crateCalib = m_ECLCrateTimeOffset->getCalibVector();
-  vector<float> crateCalibUnc = m_ECLCrateTimeOffset->getCalibUncVector();
 
   B2INFO("Loaded 'ECLCrateTimeOffset' calibration");
 

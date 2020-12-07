@@ -304,9 +304,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   // Loop over all the crystals for doing the crystal calibation
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
-    mean = 0;
-    sigma = -1;
-
     double clusterTime_mean = 0;
     double clusterTime_mean_unc = 0;
 
@@ -533,9 +530,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   // Loop over all the energy bins
   for (long unsigned int x_bin = 0; x_bin < binProjectionLeft.size(); x_bin++) {
-    mean = 0;
-    sigma = -1;
-
     double clusterTime_mean = 0;
     double clusterTime_mean_unc = 0;
     double clusterTime_sigma = 0;

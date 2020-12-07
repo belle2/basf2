@@ -49,7 +49,7 @@ namespace Belle2 {
     protected:
 
       /**..Run algorithm on events */
-      virtual EResult calibrate();
+      virtual EResult calibrate() override;
 
     };
   }  // namespace ECL

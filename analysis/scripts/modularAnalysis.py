@@ -803,7 +803,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    for decayString, cut in decayStringsWithCuts.items():
+    for decayString, cut in decayStringsWithCuts:
         if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
             getBeamBackgroundProbabilityMVA(decayString, path)
 

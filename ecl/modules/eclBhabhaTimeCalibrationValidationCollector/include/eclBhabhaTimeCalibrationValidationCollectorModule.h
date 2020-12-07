@@ -48,13 +48,13 @@ namespace Belle2 {
     virtual ~eclBhabhaTimeCalibrationValidationCollectorModule() ;
 
     /** Replacement for defineHisto() in CalibrationCollector modules */
-    void inDefineHisto() ;
+    void inDefineHisto() override;
 
     /** Define histograms and read payloads from DB */
-    void prepare() ;
+    void prepare() override;
 
     /** Select events and crystals and accumulate histograms */
-    void collect() ;
+    void collect() override;
 
   private:
 

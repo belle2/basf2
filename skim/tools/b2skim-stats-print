@@ -371,11 +371,11 @@ def inputFileSize(skim, sample, TestingCombined):
         TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
-        mdstSize (float): Size (in MB) of the MDST file multiplied by fraction of events
+        mdstSize (float): Size (in kB) of the MDST file multiplied by fraction of events
             from file used in test.
     """
     filename = get_test_file(sample)
-    TotalFileSize = os.path.getsize(filename) / 1024 ** 2
+    TotalFileSize = os.path.getsize(filename) / 1024
     FractionOfEventsUsed = nInputEvents(
         skim, sample, TestingCombined
     ) / nTotalInputEvents(skim, sample, TestingCombined)

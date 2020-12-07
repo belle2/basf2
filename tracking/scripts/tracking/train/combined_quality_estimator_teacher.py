@@ -372,14 +372,14 @@ class GenerateSimTask(Basf2PathTask):
     evaluation/validation tasks.
     """
 
-    # : Number of events to generate.
+    #: Number of events to generate.
     n_events = b2luigi.IntParameter()
-    # : Experiment number of the conditions database, e.g. defines simulation geometry
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    # : Random basf2 seed. It is further used to read of the production process to preserve
+    #: Random basf2 seed. It is further used to read of the production process to preserve
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
-    # : Directory with overlay background root files
+    #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
     #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'

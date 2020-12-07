@@ -11,6 +11,8 @@ runs the fullsim w/ mixed in background, and dumps full output (*Digits containe
 </header>
 """
 
+# NB. Argument parsing is done *before* any import from the ROOT module, otherwise PyROOT will hijack the command-line options
+# in case of clashing option names. Most notably, this would happen with the '-h', '--help' option.
 import argparse
 
 parser = argparse.ArgumentParser(description=__doc__,

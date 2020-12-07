@@ -54,7 +54,7 @@ def __parse_iov(string):
 
     if iov[0] > iov[2]:
         raise argparse.ArgumentTypeError("first experiment cannot be larger than final experiment")
-    if (iov[0] == iov[2] and iov[1] > iov[3]):
+    if (iov[0] == iov[2] and iov[1] > iov[3] and iov[3] != -1):
         raise argparse.ArgumentTypeError("first run cannot be larger than final run")
     return iov
 
@@ -175,8 +175,16 @@ if __name__ == "__main__":
 
     #: beamspot object
     beamspot = Belle2.BeamSpot()
-    beamspot.setIP(beamparams.getVertex(), beamparams.getCovVertex())
-
+    vtx_cov = beamparams.getCovVertex()
+    # set error matrix for the vertex position to 0.1% of the beam spot size:
+    pos_cov = ROOT.TMatrixDSym(3)
+    for i in range(3):
+        for j in range(3):
+            pos_cov[i][j] = 1e-6 * vtx_cov[i][j]
+    
+    beamspot.setIP(beamparams.getVertex(), pos_cov)
+    beamspot.setSizeCovMatrix(vtx_cov)
+    
     #: invariant mass object
     invmass = Belle2.CollisionInvariantMass()
     invmass.setMass(energy_mean, energy_error, energy_spread)

@@ -286,7 +286,6 @@ void KLMTimeCollectorModule::collect()
 void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
 {
   setDescription("KLM time calibration collector. Used for collecting avaiable hits in EKLM range.");
-  B2INFO("Match EKLMHit and ExtHit.");
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;

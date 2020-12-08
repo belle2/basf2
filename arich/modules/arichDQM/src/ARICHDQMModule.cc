@@ -128,6 +128,8 @@ namespace Belle2 {
 
     h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
 
+    h_ARICHOccAfterInjLer = new TH1F("ARICHOccInjLER", " ARICHOccInjLER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHOccAfterInjHer = new TH1F("ARICHOccInjHER", " ARICHOccInjHER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");
@@ -205,7 +207,7 @@ namespace Belle2 {
     arichAeroHits.isOptional();
     StoreArray<ARICHLikelihood> likelihoods;
     likelihoods.isOptional();
-
+    m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
   }
 
   void ARICHDQMModule::beginRun()
@@ -244,6 +246,8 @@ namespace Belle2 {
       h_secHitsPerTrack[i]->Reset();
     }
 
+    h_ARICHOccAfterInjLer->Reset();
+    h_ARICHOccAfterInjHer->Reset();
   }
 
   void ARICHDQMModule::event()

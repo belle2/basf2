@@ -124,6 +124,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set minimal digit nuumber (total).
+     */
+    void setMinimalDigitNumber(int minimalDigitNumber)
+    {
+      m_MinimalDigitNumber = minimalDigitNumber;
+    }
+
+    /**
      * Set the lower number of hits collected on one sigle strip. If the hit
      * number is lower than the limit, the strip will not be calibrated and
      * set the average value of the calibration constant.
@@ -227,6 +235,9 @@ namespace Belle2 {
      * (EKLM scintillator part).
      */
     double m_etime_channelAvg_scint_end;
+
+    /** Minimal digit nuumber (total). */
+    int m_MinimalDigitNumber = 100000000;
 
     /** Lower limit of hits collected for on single channel. */
     int m_lower_limit_counts;

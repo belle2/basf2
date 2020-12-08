@@ -175,7 +175,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
   m_evts.clear();
 
-  for (int i = 0; i < t_tin->GetEntries(); ++i) {
+  int n = t_tin->GetEntries();
+  if (n < m_MinimalDigitNumber)
+    return CalibrationAlgorithm::c_NotEnoughData;
+  for (int i = 0; i < n; ++i) {
     t_tin->GetEntry(i);
     m_evts[ev.channelId].push_back(ev);
   }

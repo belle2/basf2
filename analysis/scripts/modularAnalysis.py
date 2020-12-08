@@ -2677,7 +2677,7 @@ def getBeamBackgroundProbabilityMVA(
     path.add_module(
         'MVAExpert',
         listNames=particleList,
-        extraInfoName='beamBackgroundLikelihoodMVA',
+        extraInfoName='beamBackgroundProbabilityMVA',
         identifier='BeamBackgroundMVA')
 
 

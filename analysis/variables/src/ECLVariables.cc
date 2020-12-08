@@ -39,12 +39,12 @@
 
 namespace Belle2 {
   namespace Variable {
-    double beamBackgroundProbability(const Particle* particle)
+    double beamBackgroundProbabilityMVA(const Particle* particle)
     {
-      if (particle->hasExtraInfo("beamBackgroundLikelihoodMVA")) {
-        return particle->getExtraInfo("beamBackgroundLikelihoodMVA");
+      if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
+        return particle->getExtraInfo("beamBackgroundProbabilityMVA");
       } else {
-        B2WARNING("The extraInfo beamBackgroundLikelihoodMVA is not registerted! \n"
+        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registerted! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
         return std::numeric_limits<float>::quiet_NaN();
       }

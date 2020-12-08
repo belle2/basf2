@@ -37,10 +37,6 @@ namespace Belle2 {
     double eclClusterNumberOfHadronDigits(const Particle* particle);
 
     /**
-     * returns the output of the  MVA that uses shower shape variables to separate between beam background and true photon clusters
-     */
-    double eclBeamBackgroundProbabilityMVA(const Particle* particle);
-    /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward
      * return 0 otherwise

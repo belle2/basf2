@@ -225,7 +225,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   // time form cluster on track for L456 V side
   m_hClusterOnTrackTime_L456V = new TH1F("clusterOnTrackTime_L456V", "clusterOnTrackTime_L456V", 80, 0, 160);
-  //m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
 
   // add MonitoringObject and canvases
   m_monObj = getMonitoringObject("svd");
@@ -333,11 +332,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_h->Copy(m_hClusterOnTrackTime_L456V);
     m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V->SetTitle("ClusterOnTrack Time L456V " + runID);
-    //check if number of errors is above the allowed limit
     bool hasError = false;
-    for (int un = 0; un < m_hClusterOnTrackTime_L456V->GetNcells(); un++)
-      if (fabs(m_hClusterOnTrackTime_L456V->GetMean()) > 4)
-        hasError = true;
+    if (fabs(m_hClusterOnTrackTime_L456V->GetMean()) > 4)
+      hasError = true;
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
       m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
@@ -694,44 +691,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOnlineOccupancyU->Print("c_SVDOnlineOccupancyU.pdf");
     m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
   }
-
-  // KA: update cluster time on track canvas
-  TH1F h_SVDTRK_ClusterTimeV456 = findHist("SVDClsTrk/c_SVDTRK_ClusterTimeV456");
-  // add frame ...
-  // test script on dqm_ tym co mam + tymi co były przesunięcia ... dqm_...
-
-
-
-  m_cOnlineOccupancyV->cd();
-  m_hOnlineOccupancyV->Draw("text");
-  m_yTitle->Draw("same");
-
-  if (m_onlineOccVstatus == 0) {
-    m_cOnlineOccupancyV->SetFillColor(kGreen);
-    m_cOnlineOccupancyV->SetFrameFillColor(10);
-    m_legOnNormal->Draw("same");
-  } else {
-    if (m_onlineOccVstatus == 3) {
-      m_cOnlineOccupancyV->SetFillColor(kRed);
-      m_cOnlineOccupancyV->SetFrameFillColor(10);
-      m_legOnProblem->Draw("same");
-    }
-    if (m_onlineOccVstatus == 2) {
-      m_cOnlineOccupancyV->SetFillColor(kOrange);
-      m_cOnlineOccupancyV->SetFrameFillColor(10);
-      m_legOnWarning->Draw("same");
-    }
-    if (m_onlineOccVstatus == 1) {
-      m_cOnlineOccupancyV->SetFillColor(kGray);
-      m_cOnlineOccupancyV->SetFrameFillColor(10);
-      m_legOnEmpty->Draw("same");
-    }
-  }
-
-  m_cOnlineOccupancyV->Draw();
-  m_cOnlineOccupancyV->Update();
-  m_cOnlineOccupancyV->Modified();
-  m_cOnlineOccupancyV->Update();
 
 }
 

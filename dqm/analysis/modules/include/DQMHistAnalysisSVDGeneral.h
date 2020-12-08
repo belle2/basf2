@@ -78,7 +78,7 @@ namespace Belle2 {
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
-    TH1F* m_hClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V histo*/
+    TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/

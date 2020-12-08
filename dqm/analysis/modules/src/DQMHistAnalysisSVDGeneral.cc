@@ -223,9 +223,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  // time form cluster on track for L456 V side
-  m_hClusterOnTrackTime_L456V = new TH1F("clusterOnTrackTime_L456V", "clusterOnTrackTime_L456V", 80, 0, 160);
-
   // add MonitoringObject and canvases
   m_monObj = getMonitoringObject("svd");
 
@@ -328,12 +325,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
   // cluster time for cluster of track
   TH1F* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
-    m_hClusterOnTrackTime_L456V->Clear();
-    m_h->Copy(*m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V->SetName("ClusterOnTrackTimeL456V");
-    m_hClusterOnTrackTime_L456V->SetTitle("ClusterOnTrack Time L456V " + runID);
+    m_hClusterOnTrackTime_L456V.Clear();
+    m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
+    m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
-    if (fabs(m_hClusterOnTrackTime_L456V->GetMean()) > 4)
+    if (fabs(m_hClusterOnTrackTime_L456V.GetMean()) > 4)
       hasError = true;
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
@@ -349,7 +346,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   }
 
   m_cClusterOnTrackTime_L456V->cd();
-  m_hClusterOnTrackTime_L456V->Draw();
+  m_hClusterOnTrackTime_L456V.Draw();
 
   m_cClusterOnTrackTime_L456V->Modified();
   m_cClusterOnTrackTime_L456V->Update();
@@ -800,7 +797,6 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cStripOccupancyV;
 
   delete m_cClusterOnTrackTime_L456V;
-  delete m_hClusterOnTrackTime_L456V;
 }
 
 

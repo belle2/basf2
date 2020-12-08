@@ -329,7 +329,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   TH1F* m_h = (TH1F*)findHist("SVDClsTrk/c_SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V->Clear();
-    m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_h->Copy(*m_hClusterOnTrackTime_L456V);
     m_hClusterOnTrackTime_L456V->SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V->SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;

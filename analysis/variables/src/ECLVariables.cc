@@ -1600,8 +1600,6 @@ Returns number of charged tracks matched to this cluster.
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.
 )DOC");
-
-
     REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
 Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
     - 1 for true photon clusters

@@ -184,7 +184,20 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   }
   B2INFO("Events packing finish.");
 
-  m_outFile = new TFile("histTimeCalibration.root", "recreate");
+  /* Choose non-existing file name. */
+  std::string name = "time_calibration.root";
+  int i = 1;
+  while (1) {
+    struct stat buffer;
+    if (stat(name.c_str(), &buffer) != 0)
+      break;
+    name = "time_calibration_" + std::to_string(i) + ".root";
+    i = i + 1;
+    /* Overflow. */
+    if (i < 0)
+      break;
+  }
+  m_outFile = new TFile(name.c_str(), "recreate");
   h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
   h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
 
@@ -533,7 +546,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       continue;
     m_evtsChannel = m_evts[channelId];
 
-    int n = m_evtsChannel.size();
+    n = m_evtsChannel.size();
     if (n < m_lower_limit_counts) {
       B2WARNING("Not enough calibration data collected." << LogVar("channel", channelId) << LogVar("number of digit", n));
       continue;

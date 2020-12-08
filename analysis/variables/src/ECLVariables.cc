@@ -1602,8 +1602,10 @@ thresholds for computing PSD variables.
 )DOC");
     REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
 Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
+
     - 1 for true photon clusters
     - 0 for beam background clusters
+
 The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
 clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(

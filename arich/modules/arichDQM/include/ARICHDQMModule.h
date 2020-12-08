@@ -17,6 +17,7 @@
 #include <TH2F.h>
 #include <TH3F.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
 namespace Belle2 {

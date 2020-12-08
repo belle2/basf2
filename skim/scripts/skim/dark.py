@@ -485,6 +485,53 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
+class radBhabhaV0Control(BaseSkim):
+
+    """
+    Control sample: :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    """
+
+    __authors__ = "Savino Longo"
+    __description__ = (
+        "iDM control sample skim. :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        # require Bhabha tracks are high p and E/p is consitent with e+/e-
+        BhabhaTrackCuts = 'abs(dr)<0.5 and abs(dz)<2 and pt>0.2 and 0.8<clusterEoP<1.2 and p>1.0 and clusterReg==2 and nCDCHits>4'
+        BhabhaSystemCuts = '4<M<10 and 0.5<pRecoilTheta<2.25'
+        V0TrackCuts = 'nCDCHits>4 and p<3.0'
+        V0Cuts = 'dr>0.5'
+        PhotonVetoCuts = 'p>1.0'  # event should have no high E photons
+
+        ma.cutAndCopyList("gamma:Veto", "gamma:all", PhotonVetoCuts, path=path)
+        ma.cutAndCopyList("e+:BhabhaTrack", "e+:all", BhabhaTrackCuts, path=path)
+        ma.cutAndCopyList("e+:V0Track", "e+:all", V0TrackCuts, path=path)
+
+        ma.reconstructDecay("vpho:BhabhaSysyem -> e+:BhabhaTrack e-:BhabhaTrack", BhabhaSystemCuts, path=path)
+
+        ma.reconstructDecay("vpho:V0System -> e+:V0TrackCuts e-:V0TrackCuts", '', path=path)
+        vertex.treeFit('vpho:V0System', conf_level=0.0, path=my_path)
+        ma.applyCuts('vpho:V0System', 'dr>0.5', path=my_path)
+
+        ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=my_path)
+
+        eventCuts = ('nParticlesInList(gamma:veto)<1 and '
+                     'nParticlesInList(vpho:Total)>0')
+
+        path = self.skim_event_cuts(eventCuts, path=path)
+
+        self.SkimLists = ["gamma:all", 'e-:all']
+
+
+@fancy_skim_header
 class InelasticDarkMatter(BaseSkim):
     """
     Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.

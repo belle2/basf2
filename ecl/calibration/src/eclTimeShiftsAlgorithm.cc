@@ -276,14 +276,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
   int experiment = minExpNum;
 
-  // Need to load information about the event/run/experiment to get the right database information
-  // Will be used for:
-  // * ECLChannelMapper (to map crystal to crates)
-  // * crystal payload updating for iterating crystal and crate fits
-  int eventNumberForCrates = 1;
-  int previousRevNum = -1 ;
-
-
 
   //------------------------------------------------------------------------
   //------------------------------------------------------------------------
@@ -361,6 +353,9 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     }
 
 
+
+    int previousRevNum = -1 ;   // To keep track if the run number has changed
+
     //------------------------------------------------------------------------
     /** Loop over all the experiments and runs and extract the crate times*/
     for (int run = minRunNum; run <= maxRunNum; run++) {
@@ -377,6 +372,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
         B2INFO("New run.  Starting to extract information");
       }
 
+      // Forloading database for a specific run
+      int eventNumberForCrates = 1;
 
       StoreObjPtr<EventMetaData> evtPtr;
       // simulate the initialize() phase where we can register objects in the DataStore
@@ -554,14 +551,11 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   tcratefile->cd();
   B2INFO("Debugging histograms written to " << fname);
 
-
-  TGraphErrors* g_tcrate_vs_runNum ;
-  TGraphErrors* g_crateCrystalTime_vs_runNum ;
-  TGraphErrors* g_crateCrystalTime_vs_runCounter ;
-
-
-  TCanvas* c1 = new TCanvas("c1", "");
   for (int i = 0; i < m_numCrates; i++) {
+    TGraphErrors* g_tcrate_vs_runNum ;
+    TGraphErrors* g_crateCrystalTime_vs_runNum ;
+    TCanvas* c1 = new TCanvas("c1", "");
+
     Double_t* single_crate_crate_times = &allCrates_crate_times[i][0] ;
     Double_t* single_crate_run_nums = &allCrates_run_nums[i][0] ;
     Double_t* single_crate_time_unc = &allCrates_time_unc[i][0] ;
@@ -688,6 +682,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
 
     if (numRunsWithCrateTimes > 0) {
+      TGraphErrors* g_crateCrystalTime_vs_runCounter ;
+
       // NULL for run number errors = 0 for all
       //g_crateCrystalTime_vs_runCounter = new TGraphErrors(numRunsWithCrateTimes, counterVec,
       g_crateCrystalTime_vs_runCounter = new TGraphErrors(numRunsWithCrateTimes, &counterVec[0],

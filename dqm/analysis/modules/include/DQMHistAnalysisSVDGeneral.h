@@ -78,13 +78,16 @@ namespace Belle2 {
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
+    TH1F m_hClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V histo*/
+    TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
-    TPaveText* m_legProblem = nullptr; /**< occupancy plot legend, problem */
-    TPaveText* m_legWarning = nullptr; /**< occupancy plot legend, warning */
-    TPaveText* m_legNormal = nullptr; /**< occupancy plot legend, normal */
-    TPaveText* m_legEmpty = nullptr; /**< occupancy plot legend, empty */
-    TPaveText* m_legError = nullptr; /**< occupancy plot legend, error*/
+    TPaveText* m_legProblem = nullptr; /**< OfflineOccupancy plot legend, problem */
+    TPaveText* m_legWarning = nullptr; /**< OfflineOccupancy plot legend, warning */
+    TPaveText* m_legNormal = nullptr; /**< OfflineOccupancy plot legend, normal */
+    TPaveText* m_legEmpty = nullptr; /**< OfflineOccupancy plot legend, empty */
+    TPaveText* m_legError = nullptr; /**< OfflineOccupancy plot legend, error*/
     TPaveText* m_legOnProblem = nullptr; /**< onlineOccupancy plot legend, problem */
     TPaveText* m_legOnWarning = nullptr; /**< onlineOccupancy plot legend, warning */
     TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */

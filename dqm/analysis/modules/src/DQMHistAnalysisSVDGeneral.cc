@@ -189,6 +189,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   //  m_cOnlineOccupancyU->SetGrid(1);
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
   //  m_cOnlineOccupancyV->SetGrid(1);
+  m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
 
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
@@ -222,6 +223,10 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
+  // time form cluster on track for L456 V side
+  m_hClusterOnTrackTime_L456V = new TH1F("clusterOnTrackTime_L456V", "clusterOnTrackTime_L456V", 80, 0, 160);
+  //m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
+
   // add MonitoringObject and canvases
   m_monObj = getMonitoringObject("svd");
 
@@ -246,6 +251,7 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
     m_cStripOccupancyU[i]->Clear();
     m_cStripOccupancyV[i]->Clear();
   }
+  m_cClusterOnTrackTime_L456V->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -295,7 +301,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   h->Draw("colztext");
   h->SetStats(0);
 
-
   m_cUnpacker->Modified();
   m_cUnpacker->Update();
 
@@ -320,6 +325,40 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   if (m_printCanvas)
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
+
+  // cluster time for cluster of track
+  TH1F* m_h = (TH1F*)findHist("SVDClsTrk/c_SVDTRK_ClusterTimeV456");
+  if (m_h != NULL) {
+    m_hClusterOnTrackTime_L456V.Clear();
+    m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
+    m_hClusterOnTrackTime_L456V->SetTitle("ClusterOnTrack Time L456V " + runID);
+    //check if number of errors is above the allowed limit
+    bool hasError = false;
+    for (int un = 0; un < m_hClusterOnTrackTime_L456V->GetNcells(); un++)
+      if (fabs(m_hClusterOnTrackTime_L456V->GetMean()) > 4)
+        hasError = true;
+    if (! hasError) {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    } else {
+      m_legError->Draw("same");
+      m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+  } else {
+    B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
+    m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+  }
+
+  m_cClusterOnTrackTime_L456V->cd();
+  m_hClusterOnTrackTime_L456V->Draw();
+
+  m_cClusterOnTrackTime_L456V->Modified();
+  m_cClusterOnTrackTime_L456V->Update();
+
+  if (m_printCanvas)
+    m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
 
 
   //check MODULE OCCUPANCY online & offline
@@ -655,6 +694,45 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOnlineOccupancyU->Print("c_SVDOnlineOccupancyU.pdf");
     m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
   }
+
+  // KA: update cluster time on track canvas
+  TH1F h_SVDTRK_ClusterTimeV456 = findHist("SVDClsTrk/c_SVDTRK_ClusterTimeV456");
+  // add frame ...
+  // test script on dqm_ tym co mam + tymi co były przesunięcia ... dqm_...
+
+
+
+  m_cOnlineOccupancyV->cd();
+  m_hOnlineOccupancyV->Draw("text");
+  m_yTitle->Draw("same");
+
+  if (m_onlineOccVstatus == 0) {
+    m_cOnlineOccupancyV->SetFillColor(kGreen);
+    m_cOnlineOccupancyV->SetFrameFillColor(10);
+    m_legOnNormal->Draw("same");
+  } else {
+    if (m_onlineOccVstatus == 3) {
+      m_cOnlineOccupancyV->SetFillColor(kRed);
+      m_cOnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnProblem->Draw("same");
+    }
+    if (m_onlineOccVstatus == 2) {
+      m_cOnlineOccupancyV->SetFillColor(kOrange);
+      m_cOnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnWarning->Draw("same");
+    }
+    if (m_onlineOccVstatus == 1) {
+      m_cOnlineOccupancyV->SetFillColor(kGray);
+      m_cOnlineOccupancyV->SetFrameFillColor(10);
+      m_legOnEmpty->Draw("same");
+    }
+  }
+
+  m_cOnlineOccupancyV->Draw();
+  m_cOnlineOccupancyV->Update();
+  m_cOnlineOccupancyV->Modified();
+  m_cOnlineOccupancyV->Update();
+
 }
 
 void DQMHistAnalysisSVDGeneralModule::endRun()

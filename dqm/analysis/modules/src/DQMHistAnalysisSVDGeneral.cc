@@ -328,9 +328,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
   // cluster time for cluster of track
   TH1F* m_h = (TH1F*)findHist("SVDClsTrk/c_SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
-    m_hClusterOnTrackTime_L456V.Clear();
+    m_hClusterOnTrackTime_L456V->Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
+    m_hClusterOnTrackTime_L456V->SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V->SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
     if (fabs(m_hClusterOnTrackTime_L456V->GetMean()) > 4)
@@ -356,7 +356,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   if (m_printCanvas)
     m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
-
 
   //check MODULE OCCUPANCY online & offline
 
@@ -800,6 +799,8 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cStripOccupancyU;
   delete m_cStripOccupancyV;
 
+  delete m_cClusterOnTrackTime_L456V;
+  delete m_hClusterOnTrackTime_L456V;
 }
 
 

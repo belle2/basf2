@@ -118,8 +118,8 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   int minNumEntries = 40;
 
-  double mean = 0;
-  double sigma = -1;
+  double mean;
+  double sigma;
 
 
   bool minRunNumBool = false;

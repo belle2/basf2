@@ -85,22 +85,22 @@ namespace Belle2 {
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evt_num ;    /**< Event number for debug TTree output*/
-    int m_tree_exp ;     /**< Experiment number for debug TTree output */
-    int m_tree_run ;     /**< Run number for debug TTree output */
-    int m_tree_cid ;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    double m_tree_dt99 ;  /**< dt99 for cluster */
-    double m_tree_time ; /**< Calibrated time */
+    int m_tree_evt_num = -1;    /**< Event number for debug TTree output*/
+    int m_tree_exp = -1;     /**< Experiment number for debug TTree output */
+    int m_tree_run = -1;     /**< Run number for debug TTree output */
+    int m_tree_cid = -1;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    double m_tree_dt99 = -1;  /**< dt99 for cluster */
+    double m_tree_time = -1; /**< Calibrated time */
 
-    double m_tree_time_fromE0 ; /**< Calibrated time - highest E cluster*/
-    double m_tree_time_fromE1 ; /**< Calibrated time - second highest E cluster*/
-    double m_tree_E0 ;   /**< Highest E cluster energy */
-    double m_tree_E1 ;   /**< second highest E cluster energy */
+    double m_tree_time_fromE0 = -1; /**< Calibrated time - highest E cluster*/
+    double m_tree_time_fromE1 = -1; /**< Calibrated time - second highest E cluster*/
+    double m_tree_E0 = -1;   /**< Highest E cluster energy */
+    double m_tree_E1 = -1;   /**< second highest E cluster energy */
 
-    double m_tree_t0 ;   /**< EventT0 (not from ECL) for debug TTree output */
-    double m_tree_t0_unc ;   /**< EventT0 uncertainty for debug TTree output */
+    double m_tree_t0 = -1;   /**< EventT0 (not from ECL) for debug TTree output */
+    double m_tree_t0_unc = -1;   /**< EventT0 uncertainty for debug TTree output */
 
-    int m_NtightTracks ;
+    int m_NtightTracks = -1;
 
 
     // for crate time plotting
@@ -108,9 +108,9 @@ namespace Belle2 {
     std::vector<float> m_CrateTime; /**< vector obtained from DB object */
     std::vector<float> m_CrateTimeUnc; /**< uncertainty vector obtained from DB object */
 
-    int     m_tree_crateid;            /**< Crate ID for debug TTree output */
-    double  m_tree_tcrate;             /**< Crate time for debug TTree output */
-    double  m_tree_tcrate_unc;         /**< Crate time uncertainty for debug TTree output */
+    int     m_tree_crateid = -1;            /**< Crate ID for debug TTree output */
+    double  m_tree_tcrate = -1;             /**< Crate time for debug TTree output */
+    double  m_tree_tcrate_unc = -1;         /**< Crate time uncertainty for debug TTree output */
     int     m_tree_PreviousRun = -1;   /**< Run number for the previous run for debug TTree output */
 
     /*** tree branches END ***/
@@ -126,7 +126,7 @@ namespace Belle2 {
     double m_looseTrkD0 ;
     double m_tightTrkD0 ;
 
-    double m_E_electron_clust ;
+    double m_E_electron_clust = -1 ;
 
     bool storeCalib = true ;
 

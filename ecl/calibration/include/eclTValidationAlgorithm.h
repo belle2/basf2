@@ -16,6 +16,7 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <string>
 
+using namespace std;
 
 namespace Belle2 {
   namespace ECL {
@@ -28,7 +29,7 @@ namespace Belle2 {
       eclTValidationAlgorithm();
 
       /**..Constructor - main one as it allows user to choose which collector data to analyse*/
-      eclTValidationAlgorithm(std::string physicsProcessCollectorName);
+      explicit eclTValidationAlgorithm(string physicsProcessCollectorName);
 
       /**..Destructor */
       virtual ~eclTValidationAlgorithm() {}
@@ -43,8 +44,7 @@ namespace Belle2 {
                                           Expand mask and apply to non-rebinned histogram. */
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclTValidationAlgorithm.root by default */
-      std::string debugFilenameBase;
-      //std::string collectorName;  /**< Name of the collector */
+      string debugFilenameBase;
 
     protected:
 

@@ -92,6 +92,10 @@ eclBhabhaTimeCalibrationValidationCollectorModule::~eclBhabhaTimeCalibrationVali
 void eclBhabhaTimeCalibrationValidationCollectorModule::inDefineHisto()
 {
 
+}
+
+void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
+{
   //=== Prepare TTree for debug output
   if (m_saveTree) {
     // Per electron cluster
@@ -130,10 +134,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::inDefineHisto()
     m_dbg_tree_run->SetAutoSave(10) ;
 
   }
-}
 
-void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
-{
+
   //=== MetaData
   StoreObjPtr<EventMetaData> evtMetaData ;
   B2INFO("eclBhabhaTimeCalibrationValidationCollector: Experiment = " << evtMetaData->getExperiment() <<
@@ -460,7 +462,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
      CODE ALLOWS FOR MORE THAN ONE CLUSTER PER TRACK.  THIS VALIDATION ALSO DOES NOT CUT ON THE
      NUMBER OF EXTRA CLUSTERS NOT ASSOCIATED TO THE 2 TRACKS, WHICH IS A LOOSER CUT THAN USED
      TO PERFORM THE CALIBRATION. */
-  int numGoodElectronClusters_cut = 2 ;
+  long unsigned int numGoodElectronClusters_cut = 2 ;
   if (goodClustTimes.size() != numGoodElectronClusters_cut) {
     return ;
   }

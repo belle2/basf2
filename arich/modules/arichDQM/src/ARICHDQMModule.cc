@@ -161,6 +161,8 @@ namespace Belle2 {
       h_secTheta[i]->SetOption("LIVE");
       h_secHitsPerTrack[i]->SetOption("LIVE");
     }
+    h_ARICHOccAfterInjLer->SetOption("LIVE");
+    h_ARICHOccAfterInjHer->SetOption("LIVE");
 
     //Set the minimum to 0
     h_chDigit->SetMinimum(0);

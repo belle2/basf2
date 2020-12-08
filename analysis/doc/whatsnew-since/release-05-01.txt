@@ -41,7 +41,8 @@ Variables
 
  * Added the variable `particleSource`, which returns the mdst source, i.e. whether the particle was created from a track, an ECL
    cluster, or a KLM cluster, is a V0 object, an MC particle, or a composite particle.
- * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true photons and beam backgrounds 
+ * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true photons
+   and beam backgrounds 
 Modules
 +++++++
 

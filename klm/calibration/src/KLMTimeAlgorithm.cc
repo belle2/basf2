@@ -15,7 +15,6 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
 /* Belle 2 headers. */
-#include <framework/core/Environment.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -77,7 +76,6 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
 {
   m_elementNum = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
-  m_mc = Environment::Instance().isMC();
   for (int ia = 0; ia < 2; ++ia) {
     h_timeF_rpc[ia] = nullptr;
     h_timeF_scint[ia] = nullptr;
@@ -208,7 +206,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   double lowEdge_scint_end = 0.0;
   double upEdge_scint_end = 10.0;
 
-  B2INFO("Sample Type" << LogVar("data or mc", m_mc));
   if (m_mc) {
     lowEdge_rpc = -10.0;
     upEdge_rpc = 10.0;

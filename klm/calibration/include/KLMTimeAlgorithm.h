@@ -107,12 +107,13 @@ namespace Belle2 {
     }
 
     /**
-     * If the input is MC sample.
-     * Different histogram scale of data and mc.
+     * Set flag indicating whether the input is MC sample. The histogram
+     * ranges are different for data and MC. This setting cannot be determined
+     * automatically, because the collector output does not contain metadata.
      */
-    void isMC()
+    void setMC(bool mc)
     {
-      m_mc = true;
+      m_mc = mc;
     }
 
     /**
@@ -264,7 +265,7 @@ namespace Belle2 {
     bool m_debug;
 
     /** MC or data. */
-    bool m_mc;
+    bool m_mc = false;
 
     /** Whether to use event T0 from CDC. */
     bool m_useEventT0;

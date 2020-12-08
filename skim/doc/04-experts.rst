@@ -216,11 +216,18 @@ This will read the output files of the test jobs, and produce tables of statisti
    :nodefaultconst:
    :nogroupsections:
 
-   .. note::
-      This tool uses the third-party package `tabulate <https://pypi.org/project/tabulate>`_, which
-      can be installed via ``pip``.
 
-      This will be included in a future version of the externals.
+.. _b2skim-stats-total:
+
+``b2skim-stats-total``: Produce summary statistics
+..................................................
+
+.. argparse::
+   :filename: skim/tools/b2skim-stats-total
+   :func: get_argument_parser
+   :prog: b2skim-stats-total
+   :nodefaultconst:
+   :nogroupsections:
 
 
 .. _skim-expert-functions:

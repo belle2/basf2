@@ -1,0 +1,345 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Tool for producing summary statistics of skims for the distributed computing group.
+The expected input is the JSON output of :ref`b2skim-stats-print<b2skim-stats-print>`.
+
+The estimates for event-based retention rate and filesize-based retention rate are
+averaged over the test samples, in the following way:
+
+* For data, the statistics are summed over skims, and then averaged over the data
+  samples. The standard deviation of the sum over skims is also calculated, and printed
+  as an uncertainty. This is done to take into account the variability of the test
+  results on the data runs used.
+
+* For MC, this script uses a weighted sum over the samples (that is, weighted by the
+  cross section of each process), and the results are summed over all skims. Only the
+  BGx1 value is displayed in the printed tables.
+
+Finally, for estimating the disk space per inverse attobarn, the calculations are:
+
+* For data, find the luminosity of each test data file using ``b2file-metadata-show``
+  and ``b2info-luminosity``, and use that to scale the file size up to one inverse
+  attobarn.
+
+* For MC, calculate the number of BBbar, qqbar and taupair events per inverse attobarn
+  (using the process cross sections) and multiply this number by the output file size
+  per input event (which is itself calculated as a cross section-weighted average).
+"""
+
+
+import argparse
+from functools import lru_cache
+import json
+import subprocess
+import pandas as pd
+from pathlib import Path
+
+from tabulate import tabulate
+
+from skimExpertFunctions import get_test_file
+from skim.registry import Registry
+
+
+def get_working_groups():
+    # Write out numbering explicitly, but return a list of keys
+    WGs = {
+        0: "Systematics",
+        1: "SL + Missing Energy",
+        2: "EWP",
+        3: "TCPV",
+        4: "B→charm",
+        5: "Bottomonium",
+        6: "Quarkonium",
+        7: "Charm",
+        8: "Dark, τ, low-multi",
+        9: "B→charmless",
+    }
+    return WGs
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    parser.add_argument(
+        "StatsJSON",
+        help="JSON file of stats produced by ``b2skim-stats-print``.",
+    )
+    parser.add_argument(
+        "-M",
+        "--markdown",
+        action="store_true",
+        help="If passed, print tables in Markdown format.",
+    )
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--requested-skims",
+        nargs="+",
+        metavar="SKIM",
+        choices=Registry.names,
+        help=(
+            "List of all skims that are requested for production. "
+            "This list will be used to produce resource usage estimates "
+            "based on the skims that are actually requested."
+        ),
+    )
+    group.add_argument(
+        "--requested-skims-file",
+        help=(
+            "File containing list of all skims that are requested for production. "
+            "This list will be used to produce resource usage estimates "
+            "based on the skims that are actually requested."
+        ),
+    )
+
+    return parser
+
+
+@lru_cache()
+def get_metadata(filename):
+    """
+    Use ``b2file-metadata-show`` to retrieve metadata JSON of file.
+    """
+    if not Path(filename).exists():
+        raise FileNotFoundError(f"Could not find file {filename}")
+
+    proc = subprocess.run(
+        ["b2file-metadata-show", "--json", str(filename)],
+        stdout=subprocess.PIPE,
+        check=True,
+    )
+    metadata = json.loads(proc.stdout.decode("utf-8"))
+    return metadata
+
+
+@lru_cache()
+def get_fraction_of_events_used(filename, nInputEvents):
+    """
+    Parameters:
+        filename (str): Filename to get metadata for.
+        nInputEvents (int): Number of events from file used.
+    """
+    metadata = get_metadata(filename)
+    return min(metadata["nEvents"], nInputEvents) / metadata["nEvents"]
+
+
+@lru_cache()
+def get_luminosity(filename):
+    """
+    Use ``b2info-luminosity`` to get luminosity of data file. Returns luminosity in
+    inverse femtobarns.
+    """
+    metadata = get_metadata(filename)
+
+    exp = metadata["experimentLow"], metadata["experimentHigh"]
+    runs = metadata["runLow"], metadata["runHigh"]
+
+    subprocess.run(
+        [
+            "b2info-luminosity",
+            "--exp",
+            "-".join(map(str, exp)),
+            "--run",
+            "-".join(map(str, runs)),
+            "--what",
+            "offline",
+            # Pass a dummy token so script does not ask for password.
+            # No password is required, since only using offline DB.
+            "--token",
+            "DUMMY_ARGUMENT",
+        ],
+        check=True,
+        stdout=subprocess.PIPE,
+        cwd="/tmp",  # place CSV output of b2info-luminosity in /tmp
+    )
+    with open("/tmp/dfruns.csv") as f:
+        df = pd.read_csv(f)
+
+    # If luminosity is found to be zero, return None
+    lumi = df["intLumi"].sum()
+    if lumi > 0:
+        return lumi
+
+
+def get_total_cross_section():
+    # The cross section (nb) of each process in e+e- collisions
+    processCrossSections = {
+        "mixed": 0.555,
+        "charged": 0.555,
+        "ccbar": 1.3,
+        "uubar": 1.61,
+        "ddbar": 0.40,
+        "ssbar": 0.38,
+        "taupair": 0.91,
+    }
+
+    return sum(processCrossSections.values())
+
+
+def get_nEvents_per_invab():
+    """
+    Calculate the number of e^+e^- events per inverse attobarn using the total process
+    cross section.
+    """
+    CrossSection_nb = get_total_cross_section()
+    CrossSection_ab = CrossSection_nb * 1e9
+
+    # NOTE: Written out explicitly N=σ.L
+    invab = 1  # 1/ab
+    return CrossSection_ab * invab
+
+
+def load_df(JSONPath, *, RequestedSkims):
+    InputFile = Path(JSONPath).expanduser()
+
+    with open(InputFile) as f:
+        StatsDict = json.load(f)["stats"]
+
+    # Read in the nested stats dict and concatenate into a single dataframe
+    dfs = {
+        skim: pd.DataFrame(stats).reset_index(level=0)
+        for (skim, stats) in StatsDict.items()
+    }
+    df = (
+        pd.concat(dfs)
+        .reset_index()
+        .rename(columns={"index": "Sample", "level_0": "Skim"})
+        .drop(columns="level_1")
+    )
+
+    # Infer working group from second digit of skim code
+    WGs = get_working_groups()
+    df["WorkingGroup"] = df["Skim"].apply(
+        lambda skim: WGs[int(Registry.encode_skim_name(skim)[1])]
+    )
+
+    # Add column to indicate whether the skim has been requested
+    df["Requested"] = df.apply(lambda row: row["Skim"] in RequestedSkims, axis=1)
+
+    # Filter into data and MC dataframes using sample labels
+    MCMask = df["Sample"] == "Combined MC BGx1"
+    DataMask = df["Sample"].str.contains("proc|bucket") & ~df["Sample"].str.contains(
+        "offres"
+    )
+
+    return df.loc[DataMask], df.loc[MCMask]
+
+
+def add_data_fields(df):
+    """
+    Add stats to dataframe for data samples.
+
+    In particular, add luminosity of full file and luminosity actually used in test.
+    """
+
+    # Add columns with info about input file
+    df["SampleFile"] = df["Sample"].apply(lambda sample: get_test_file(sample))
+    df["FractionOfEventsUsed"] = df.apply(
+        lambda row: get_fraction_of_events_used(row["SampleFile"], row["nInputEvents"]),
+        axis=1,
+    )
+
+    # Get luminosity associated with each
+    df["SampleIntLumi"] = df["SampleFile"].apply(
+        lambda SampleFile: get_luminosity(SampleFile)
+    )
+
+    # Remove rows for any data samples that the b2 tools couldn't get a luminosity for
+    df.dropna(subset=["SampleIntLumi"], inplace=True)
+
+    # Scale down luminosity using fraction of file used in test
+    df["SampleIntLumiUsed"] = df["SampleIntLumi"] * df["FractionOfEventsUsed"]
+
+    # udstSize in MB, SampleIntLumiUsed in 1/fb
+    df["OutputFileSize_MBPerInvfb"] = df["udstSize"] / df["SampleIntLumiUsed"]
+    df["OutputFileSize_TBPerInvab"] = df["OutputFileSize_MBPerInvfb"] / 1024
+
+    return df
+
+
+def add_mc_fields(df):
+    """
+    Add stats to dataframe for data samples.
+    """
+    df["OutputFileSize_TBPerInvab"] = (
+        df["udstSizePerInputEvent"] * get_nEvents_per_invab() / 1024 ** 3
+    )
+    return df
+
+
+def totals_table(x, xlabel, df_Data, df_MC, *, markdown):
+    headers = [xlabel, "Requested skims", "All skims"]
+
+    # Sum over skims and average over data samples
+    df_Data_SumsPerSample = df_Data.groupby(["Sample"], as_index=False).sum()[x]
+    df_ReqData_SumsPerSample = (
+        df_Data.query("Requested").groupby(["Sample"], as_index=False).sum()[x]
+    )
+
+    table = [
+        [
+            "Data",
+            f"{df_ReqData_SumsPerSample.mean():.1f} ± {df_ReqData_SumsPerSample.std():.1f}",
+            f"{df_Data_SumsPerSample.mean():.1f} ± {df_Data_SumsPerSample.std():.1f}",
+        ],
+        [
+            "MC",
+            f"{df_MC.query('Requested')[x].sum():.1f}",
+            f"{df_MC[x].sum():.1f}",
+        ],
+    ]
+
+    tablefmt = "pipe" if markdown else "fancy_grid"
+    print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")
+
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    # If just passed a list of skims, read that. If passed a filename, read list from file
+    if args.requested_skims:
+        RequestedSkims = args.requested_skims
+    else:
+        with open(args.requested_skims_file) as f:
+            RequestedSkims = list(filter(None, f.read().split("\n")))
+        # Check that all skims are valid
+        InvalidSkims = [skim for skim in RequestedSkims if skim not in Registry.names]
+        if InvalidSkims:
+            raise RuntimeError(
+                f"Invalid skim name/s in {args.requested_skims_file}: "
+                + ", ".join(InvalidSkims)
+            )
+
+    df_Data, df_MC = load_df(args.StatsJSON, RequestedSkims=RequestedSkims)
+
+    df_Data = add_data_fields(df_Data)
+    df_MC = add_mc_fields(df_MC)
+
+    totals_table(
+        "RetentionRate",
+        "Event-based total retention (%)",
+        df_Data,
+        df_MC,
+        markdown=args.markdown,
+    )
+    totals_table(
+        "FilesizeRetentionRate",
+        "Filesize-based total retention (%)",
+        df_Data,
+        df_MC,
+        markdown=args.markdown,
+    )
+    totals_table(
+        "OutputFileSize_TBPerInvab",
+        "uDST size (TB per 1/ab)",
+        df_Data,
+        df_MC,
+        markdown=args.markdown,
+    )
+
+
+if __name__ == "__main__":
+    main()

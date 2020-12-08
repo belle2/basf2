@@ -323,7 +323,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
   // cluster time for cluster of track
-  TH1F* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);

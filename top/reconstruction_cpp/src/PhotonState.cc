@@ -106,7 +106,8 @@ namespace Belle2 {
         if (len > s_maxLen) return;
       }
 
-      int nx = lround((m_x + len * m_kx) / bar.A);
+      double xm = m_x + len * m_kx;
+      int nx = lround(xm / bar.A);
       double ss = m_kx * m_kx + m_kz * m_kz;
       if (ss == 0) return;
       int i = 0;
@@ -121,14 +122,17 @@ namespace Belle2 {
         D = sqrt(D);
         len = (D - rdir) / ss;
         if (len < 0 or len > s_maxLen) return;
-        int nxx = lround((m_x + len * m_kx) / bar.A);
+        double xmm = m_x + len * m_kx;
+        int nxx = lround(xmm / bar.A);
         if (nxx == nx) break;
         i++;
         if (i == 10) {
+          if (abs(xmm - xm) < 0.001) break;
           B2WARNING("PhotonState::propagateSemiLinear: not converging");
           return;
         }
         nx = nxx;
+        xm = xmm;
       }
 
       m_propLen += len;
@@ -166,8 +170,10 @@ namespace Belle2 {
         if (len > s_maxLen) return;
       }
 
-      int nx = lround((m_x + len * m_kx) / bar.A);
-      int ny = lround((m_y + len * m_ky) / bar.B);
+      double xm = m_x + len * m_kx;
+      int nx = lround(xm / bar.A);
+      double ym = m_y + len * m_ky;
+      int ny = lround(ym / bar.B);
       int i = 0;
       while (true) {
         double xc = func::unfold(mirror.xc, nx, bar.A);
@@ -182,11 +188,14 @@ namespace Belle2 {
         D = sqrt(D);
         len = (D - rdir);
         if (len < 0 or len > s_maxLen) return;
-        int nxx = lround((m_x + len * m_kx) / bar.A);
-        int nyy = lround((m_y + len * m_ky) / bar.B);
+        double xmm = m_x + len * m_kx;
+        int nxx = lround(xmm / bar.A);
+        double ymm = m_y + len * m_ky;
+        int nyy = lround(ymm / bar.B);
         if (nxx == nx and nyy == ny) break;
         i++;
         if (i == 10) {
+          if (abs(xmm - xm) < 0.001 and abs(ymm - ym) < 0.001) break;
           B2WARNING("PhotonState::propagateExact: not converging");
           return;
         }

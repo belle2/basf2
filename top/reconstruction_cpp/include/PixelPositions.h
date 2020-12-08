@@ -31,6 +31,7 @@ namespace Belle2 {
         double yc = 0; /**< position of center in y */
         double Dx = 0; /**< size in x */
         double Dy = 0; /**< size in y */
+        unsigned pmtType = 0; /**< PMT type (see TOPPmtObsoleteData::EType for the defined types) */
 
         /**
          * default constructor

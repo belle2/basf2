@@ -14,16 +14,21 @@
 namespace Belle2 {
   namespace TOP {
 
-    void FastRaytracer::propagate(const PhotonState& photon) const
+    void FastRaytracer::clear() const
     {
-      m_status = false;
       m_photonStates.clear();
+      m_status = false;
       m_Nxm = 0;
       m_Nxb = 0;
       m_Nxe = 0;
       m_Nym = 0;
       m_Nyb = 0;
       m_Nye = 0;
+    }
+
+    void FastRaytracer::propagate(const PhotonState& photon) const
+    {
+      clear();
       m_photonStates.push_back(photon);
 
       int nbars = m_bars.size();

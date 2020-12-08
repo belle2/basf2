@@ -53,14 +53,15 @@ namespace Belle2 {
 
         /**
          * Constructor
-         * @param solutions a vector of solutions of inverse ray-tracing
-         * @param i0 index of central solution
-         * @param i_dx index of solution displaced by dx
-         * @param i_de index of solution displaced by de
-         * @param i_dL index of solution dispalced by dL
+         * @param sol central solution
+         * @param sol_dx solution displaced by dx
+         * @param sol_de solution displaced by de
+         * @param sol_dL solution dispalced by dL
          */
-        Derivatives(const std::vector<InverseRaytracer::Solution>& solutions,
-                    unsigned i0, unsigned i_dx, unsigned i_de, unsigned i_dL);
+        Derivatives(const InverseRaytracer::Solution& sol,
+                    const InverseRaytracer::Solution& sol_dx,
+                    const InverseRaytracer::Solution& sol_de,
+                    const InverseRaytracer::Solution& sol_dL);
 
         /**
          * Calculates the derivative of propagation length
@@ -129,6 +130,11 @@ namespace Belle2 {
          */
         Table()
         {}
+
+        /**
+         * Clear the content entirely
+         */
+        void clear();
 
         /**
          * Sets the first x and the step, and clears the entries
@@ -219,7 +225,6 @@ namespace Belle2 {
        */
       explicit YScanner(int moduleID, unsigned N = 64);
 
-
       /**
        * Sets parameters for selection between expand methods.
        * @param maxReflections maximal number of reflections in y to perform scan
@@ -229,17 +234,26 @@ namespace Belle2 {
         s_maxReflections = maxReflections;
       }
 
+      /**
+       * Clear mutable variables
+       */
+      void clear() const;
 
       /**
        * Prepare for the PDF expansion in y for a given track mass hypothesis.
-       * Sets photon energy and quasy-energy distributions, mean and r.m.s of photon energy, and number of photons.
+       * Sets photon energy and quasy-energy distributions, mean and r.m.s of photon energy, number of photons
+       * and aboveThreshold flag.
        * @param momentum particle momentum
        * @param beta particle beta
        * @param length length of particle trajectory within the quartz
+       */
+      void prepare(double momentum, double beta, double length) const;
+
+      /**
+       * Returns above Cerenkov threshold flag which is set in the prepare method.
        * @return true, if beta is above the Cherenkov threshold for at least one PDE data point
        */
-      bool prepare(double momentum, double beta, double length) const;
-
+      bool isAboveThreshold() const {return m_aboveThreshold;}
 
       /**
        * Performs the PDF expansion in y for a given pixel column using scan or merge methods.
@@ -265,6 +279,12 @@ namespace Belle2 {
       const Table& getEfficiencies() const {return m_efficiency;}
 
       /**
+       * Returns cosine of total reflection angle
+       * @return cosine of total reflection angle at mean photon energy for beta = 1
+       */
+      double getCosTotal() const {return m_cosTotal;}
+
+      /**
        * Returns particle momentum
        * @return particle momentum
        */
@@ -280,7 +300,7 @@ namespace Belle2 {
        * Returns particle trajectory lenght inside quartz
        * @return particle trajectory lenght inside quartz
        */
-      double getTrackLength() const {return m_length;}
+      double getTrackLengthInQuartz() const {return m_length;}
 
       /**
        * Returns number of photons per Cerenkov azimuthal angle
@@ -299,6 +319,12 @@ namespace Belle2 {
        * @return r.m.s of photon energy
        */
       double getRMSEnergy() const {return m_rmsE;}
+
+      /**
+       * Returns r.m.s of multiple scattering angle in quartz converted to photon energy
+       * @return r.m.s of multiple scattering angle in quartz [eV]
+       */
+      double getSigmaScattering() const {return m_sigmaScat;}
 
       /**
        * Returns photon energy distribution
@@ -381,9 +407,9 @@ namespace Belle2 {
        */
       void merge(unsigned col, double dydz, int j1, int j2) const;
 
-
       PixelPositions m_pixelPositions; /**< positions and sizes of pixels */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
+      double m_cosTotal = 0; /**< cosine of total reflection angle */
 
       mutable double m_momentum = 0; /**< particle momentum magnitude */
       mutable double m_beta = 0; /**< particle beta */
@@ -391,6 +417,8 @@ namespace Belle2 {
       mutable double m_numPhotons = 0; /**< number of photons per Cerenkov azimuthal angle */
       mutable double m_meanE = 0; /**< mean photon energy */
       mutable double m_rmsE = 0; /**< r.m.s of photon energy */
+      mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */
+      mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
       mutable Table m_energyDistribution; /**< photon energy distribution */
       mutable Table m_quasyEnergyDistribution; /**< photon energy distribution convoluted with multiple scattering */
       mutable std::vector<Result> m_results;   /**< results of PDF expansion in y */
@@ -429,6 +457,13 @@ namespace Belle2 {
       } else {
         return -(sol1.cosFic - sol0.cosFic) / sol0.sinFic / sol1.step;
       }
+    }
+
+    inline void YScanner::Table::clear()
+    {
+      x0 = 0;
+      step = 0;
+      entries.clear();
     }
 
     inline void YScanner::Table::set(double X0, double Step)

@@ -28,4 +28,9 @@
 #pragma link C++ class Belle2::TOP::TOPTrack::TrackAngles-;
 #pragma link C++ class Belle2::TOP::TOPTrack::AssumedEmission-;
 #pragma link C++ class Belle2::TOP::HelixSwimmer-;
+#pragma link C++ class Belle2::TOP::SignalPDF-;
+#pragma link C++ class Belle2::TOP::SignalPDF::PDFPeak-;
+#pragma link C++ class Belle2::TOP::SignalPDF::PDFExtra-;
+#pragma link C++ class Belle2::TOP::TOPRecoManager-;
+#pragma link C++ class Belle2::TOP::PDFConstructor-;
 #endif

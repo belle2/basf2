@@ -150,6 +150,20 @@ namespace Belle2 {
        */
       double getGroupIndex(double energy) const;
 
+      /**
+       * Returns the derivative (dn/dE) of phase refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return derivative of phase refractive index
+       */
+      double getPhaseIndexDerivative(double energy) const;
+
+      /**
+       * Returns the derivative (dn_g/dE) of group refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return group refractive index
+       */
+      double getGroupIndexDerivative(double energy) const;
+
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
@@ -302,6 +316,20 @@ namespace Belle2 {
       static TOPGeometryPar* s_instance;  /**< Pointer to the class instance */
 
     };
+
+    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy) const
+    {
+      double dE = 0.01; // [eV]
+      return (getPhaseIndex(energy + dE / 2) - getPhaseIndex(energy - dE / 2)) / dE;
+    }
+
+    inline double TOPGeometryPar::getGroupIndexDerivative(double energy) const
+    {
+      double dE = 0.01; // [eV]
+      return (getGroupIndex(energy + dE / 2) - getGroupIndex(energy - dE / 2)) / dE;
+    }
+
+
 
   } // end of namespace TOP
 } // end of namespace Belle2

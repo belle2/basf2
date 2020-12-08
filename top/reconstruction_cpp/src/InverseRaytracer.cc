@@ -42,19 +42,17 @@ namespace Belle2 {
       totRefl = (abs(kx) < cosTotal or abs(xD) < A / 2) and (abs(ky) < cosTotal or abs(yB) < B / 2);
     }
 
-    void InverseRaytracer::Solution::setTotalReflStatus(double A, double B, double cosTotal,
-                                                        int Nxm, int Nym, double Kx, double Ky)
+    void InverseRaytracer::Solution::setTotalReflStatus(double A, double B, double cosTotal, double Kx, double Ky)
     {
       bool beforeMirror = (abs(kx) < cosTotal or Nxm == 0) and (abs(ky) < cosTotal or Nym == 0);
       bool afterMirror = (abs(Kx) < cosTotal or abs(xD) < A / 2) and (abs(Ky) < cosTotal or abs(yB) < B / 2);
       totRefl = beforeMirror and afterMirror;
     }
 
-    bool InverseRaytracer::Solution::getOverallStatus()
+    bool InverseRaytracer::Solution::getStatus() const
     {
-      return (totRefl and len > 0 and len < s_maxLen);
+      return (len > 0 and len < s_maxLen and totRefl);
     }
-
 
     void InverseRaytracer::clear() const
     {
@@ -79,7 +77,6 @@ namespace Belle2 {
 
       double dx = xD - emiPoint.X();
       double dz = zD - emiPoint.Z();
-      if (dz >= 0) return c_NoPhysicsSolution;
 
       double dxdz = dx / dz;
       bool ok = solve(dxdz, cer, trk);
@@ -98,13 +95,13 @@ namespace Belle2 {
           m_ok[i] = true;
           sol.setTotalReflStatus(m_bars[0].A, m_bars[0].B, m_cosTotal);
         }
-        if (not sol.getOverallStatus()) m_ok[i] = false;
+        if (not sol.getStatus()) m_ok[i] = false;
       }
 
       bool atLeastOne = m_ok[0] or m_ok[1];
       if (not atLeastOne) return c_NoPhysicsSolution;
 
-      return m_solutions[0].size();
+      return m_solutions[0].size() - 1;
     }
 
 
@@ -151,6 +148,7 @@ namespace Belle2 {
         sol.xD = xD;
         sol.zD = zD;
         sol.step = step;
+        sol.Nxm = Nxm;
 
         double len = (zM - emiPoint.Z()) / sol.kz;
         if (len < 0) {
@@ -176,20 +174,98 @@ namespace Belle2 {
 
         sol.yD = m_mirror.yc + len * ky;
         sol.yB = m_mirror.yc + (m_prism.zR - zM) / kz * ky;
+        sol.Nym = Nym;
 
         if (first) {
           m_ok[i] = true;
-          sol.setTotalReflStatus(A, B, m_cosTotal, Nxm, Nym, kx, ky);
+          sol.setTotalReflStatus(A, B, m_cosTotal, kx, ky);
         }
-        if (not sol.getOverallStatus()) m_ok[i] = false;
+        if (not sol.getStatus()) m_ok[i] = false;
       }
 
       bool atLeastOne = m_ok[0] or m_ok[1];
       if (not atLeastOne) return c_NoPhysicsSolution;
 
-      return m_solutions[0].size();
+      return m_solutions[0].size() - 1;
     }
 
+
+    int InverseRaytracer::solveForReflectionPoint(double xM, int Nxm,
+                                                  const TOPTrack::AssumedEmission& assumedEmission,
+                                                  const CerenkovAngle& cer) const
+    {
+      const auto& emiPoint = assumedEmission.position;
+      const auto& trk = assumedEmission.trackAngles;
+      bool first = m_solutions[0].empty();
+      if (first) {
+        m_emiPoint = emiPoint;
+        m_cer = cer;
+        m_trk = trk;
+      }
+
+      double A = m_bars[0].A;
+      double B = m_bars[0].B;
+
+      double zM = m_mirror.zc + sqrt(pow(m_mirror.R, 2) - pow(xM - m_mirror.xc, 2));
+      double dx = func::unfold(xM, Nxm, A) - emiPoint.X();
+      double dz = zM - emiPoint.Z();
+      double dxdz = dx / dz;
+
+      bool ok = solve(dxdz, cer, trk);
+      if (not ok) return c_NoEquationSolution;
+
+      double normX = (xM - m_mirror.xc) / m_mirror.R;
+      double normZ = (zM - m_mirror.zc) / m_mirror.R;
+      double zD = m_prism.zD;
+
+      for (int i = 0; i < 2; i++) {
+        auto& sol = m_solutions[i].back();
+        sol.zD = zD;
+        sol.Nxm = Nxm;
+
+        double len = (zM - emiPoint.Z()) / sol.kz;
+        if (len < 0) {
+          m_ok[i] = false;
+          continue;
+        }
+        sol.len = len;
+        int Nym = lround((emiPoint.Y() + len * sol.ky) / B);
+
+        double kx = func::unfold(sol.kx, Nxm);
+        double ky = func::unfold(sol.ky, Nym);
+        double kz = sol.kz;
+        double s = 2 * (kx * normX + kz * normZ);
+        kx -= s * normX;
+        kz -= s * normZ;
+
+        len = (zD - zM) / kz;
+        if (len < 0) {
+          m_ok[i] = false;
+          continue;
+        }
+        sol.len += len;
+
+        sol.xD = xM + len * kx;
+        sol.yD = m_mirror.yc + len * ky;
+        sol.yB = m_mirror.yc + (m_prism.zR - zM) / kz * ky;
+        sol.Nym = Nym;
+        m_ok[i] = sol.getStatus();
+      }
+
+      bool atLeastOne = m_ok[0] or m_ok[1];
+      if (not atLeastOne) return c_NoPhysicsSolution;
+
+      return m_solutions[0].size() - 1;
+    }
+
+    bool InverseRaytracer::isNymDifferent() const
+    {
+      for (int i = 0; i < 2; i++) {
+        const auto& solutions = m_solutions[i];
+        if (solutions.back().Nym != solutions.front().Nym) return true;
+      }
+      return false;
+    }
 
     bool InverseRaytracer::solve(double dxdz, const CerenkovAngle& cer, const TOPTrack::TrackAngles& trk) const
     {
@@ -204,26 +280,20 @@ namespace Belle2 {
         double cfic = a / b;
         if (abs(cfic) > 1) return false;
         double sfic = sqrt(1 - cfic * cfic);
-
         m_solutions[0].push_back(Solution(cfic, sfic));
-        m_solutions[0].back().setDirection(cer, trk);
-
         m_solutions[1].push_back(Solution(cfic, -sfic));
-        m_solutions[1].back().setDirection(cer, trk);
       } else {
         double D = B - a * a;
         if (D < 0) return false;
         D = d * sqrt(D);
         double ab = a * b;
-
         double cfic = (ab + D) / B;
         m_solutions[0].push_back(Solution(cfic, (b * cfic - a) / d));
-        m_solutions[0].back().setDirection(cer, trk);
-
         cfic = (ab - D) / B;
         m_solutions[1].push_back(Solution(cfic, (b * cfic - a) / d));
-        m_solutions[1].back().setDirection(cer, trk);
       }
+      m_solutions[0].back().setDirection(cer, trk);
+      m_solutions[1].back().setDirection(cer, trk);
 
       return true;
     }
@@ -286,12 +356,8 @@ namespace Belle2 {
     }
 
 
-    PhotonState InverseRaytracer::getReconstructedPhoton(unsigned i, double DFic) const
+    PhotonState InverseRaytracer::getReconstructedPhoton(const Solution& sol, double DFic) const
     {
-      const auto& solutions = m_solutions[i % 2];
-      if (solutions.empty()) return PhotonState();
-
-      const auto& sol = solutions[0];
       if (DFic == 0) {
         return PhotonState(m_emiPoint, sol.kx, sol.ky, sol.kz);
       } else {
@@ -307,70 +373,6 @@ namespace Belle2 {
         return PhotonState(m_emiPoint, kx, ky, kz);
       }
     }
-
-
-    // TODO: to be moved to other class ------------------------------------------------------------
-
-    double InverseRaytracer::getReflectedX_derivative(double x, double xe, double ze, double zd) const
-    {
-      double z = sqrt(1 - x * x);
-      double kx = (x - xe);
-      double kz = (z - ze);
-      double s = 2 * (kx * x + kz * z);
-      double qx = kx - s * x;
-      double qz = kz - s * z;
-
-      double der_z = -x / z;
-      double der_s = 2 * (kx + der_z * kz);
-      double der_qx = (1 - s) - der_s * x;
-      double der_qz = (1 - s) * der_z - der_s * z;
-
-      return 1 - der_z * qx / qz + (zd - z) * (der_qx * qz - der_qz * qx) / (qz * qz);
-    }
-
-
-    double InverseRaytracer::findReflectionExtreme(double xE, double zE, double zD, int Nxm, double A) const
-    {
-
-      if (Nxm % 2 == 0) {
-        xE = func::unfold(xE, -Nxm, A);
-      } else {
-        xE = func::unfold(xE, Nxm, A);
-      }
-
-      double xe = (xE - m_mirror.xc) / m_mirror.R;
-      double ze = (zE - m_mirror.zc) / m_mirror.R;
-      double zd = (zD - m_mirror.zc) / m_mirror.R;
-
-      double Ah = A / 2;
-
-      double x1 = (-Ah - m_mirror.xc) / m_mirror.R;
-      double y1 = getReflectedX_derivative(x1, xe, ze, zd);
-      if (y1 != y1 or abs(y1) == INFINITY) return -Ah;
-
-      double x2 = (Ah - m_mirror.xc) / m_mirror.R;
-      double y2 = getReflectedX_derivative(x2, xe, ze, zd);
-      if (y2 != y2 or abs(y2) == INFINITY) return -Ah;
-
-      if (y1 * y2 > 0) return -Ah; // no minimum or maximum
-
-      for (int i = 0; i < 50; i++) {
-        double x = (x1 + x2) / 2;
-        double y = getReflectedX_derivative(x, xe, ze, zd);
-        if (y != y or abs(y) == INFINITY) return -Ah;
-        if (y * y1 < 0) {
-          x2 = x;
-          y2 = y;
-        } else {
-          x1 = x;
-          y1 = y;
-        }
-      }
-      double x = (x1 + x2) / 2;
-
-      return x * m_mirror.R + m_mirror.xc;
-    }
-
 
 
   } //TOP

@@ -72,6 +72,19 @@ namespace Belle2 {
         return (j2 - j1 + 1 - abs(j1) % 2) / 2;
       }
 
+      /**
+       * Returns angle within 0 and 2PI
+       * @param angle angle
+       * @return angle within 0 and 2PI
+       */
+      inline double within2PI(double angle)
+      {
+        angle = fmod(angle, 2 * M_PI);
+        if (angle < 0) angle += 2 * M_PI;
+        return angle;
+      }
+
+
     } // func
   } // TOP
 } // Belle2

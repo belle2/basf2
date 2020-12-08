@@ -20,35 +20,11 @@ namespace Belle2 {
 
     int YScanner::s_maxReflections = 16;
 
-
-    YScanner::Derivatives::Derivatives(const std::vector<InverseRaytracer::Solution>& solutions,
-                                       unsigned i0, unsigned i_dx, unsigned i_de, unsigned i_dL)
+    YScanner::Derivatives::Derivatives(const InverseRaytracer::Solution& sol,
+                                       const InverseRaytracer::Solution& sol_dx,
+                                       const InverseRaytracer::Solution& sol_de,
+                                       const InverseRaytracer::Solution& sol_dL)
     {
-      if (i0 >= solutions.size()) {
-        B2ERROR("TOP::YScanner::Derivatives: index i0 out of range, i0 = " << i0);
-        return;
-      }
-
-      if (i_dx >= solutions.size()) {
-        B2ERROR("TOP::YScanner::Derivatives: index i_dx out of range, i_dx = " << i_dx);
-        return;
-      }
-
-      if (i_de >= solutions.size()) {
-        B2ERROR("TOP::YScanner::Derivatives: index i_de out of range, i_de = " << i_de);
-        return;
-      }
-
-      if (i_dL >= solutions.size()) {
-        B2ERROR("TOP::YScanner::Derivatives: index i_dL out of range, i_dL = " << i_dL);
-        return;
-      }
-
-      const auto& sol = solutions[i0];
-      const auto& sol_dx = solutions[i_dx];
-      const auto& sol_de = solutions[i_de];
-      const auto& sol_dL = solutions[i_dL];
-
       if (sol_dx.step == 0) B2ERROR("TOP::YScanner::Derivatives: step (dx) is zero");
       if (sol_de.step == 0) B2ERROR("TOP::YScanner::Derivatives: step (de) is zero");
       if (sol_dL.step == 0) B2ERROR("TOP::YScanner::Derivatives: step (dL) is zero");
@@ -81,7 +57,8 @@ namespace Belle2 {
 
       // set the table of nominal photon detection efficiencies (incl. wavelength filter)
 
-      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto* topgp = TOPGeometryPar::Instance();
+      const auto* geo = topgp->getGeometry();
       auto qe = geo->getNominalQE(); // get a copy
       qe.applyFilterTransmission(geo->getWavelengthFilter());
 
@@ -100,6 +77,104 @@ namespace Belle2 {
         double effi = qe.getEfficiency(lambda) * tdc.getEfficiency();
         m_efficiency.entries.push_back(TableEntry(effi, e, e * e));
       }
+
+      // set cosine of total reflection angle using photon mean energy for beta = 1
+
+      double s = 0;
+      double se = 0;
+      for (const auto& entry : m_efficiency.entries) {
+        double e = entry.x;
+        double p = entry.y * (1 - 1 / pow(topgp->getPhaseIndex(e), 2));
+        s += p;
+        se += p * e;
+      }
+      if (s == 0) return;
+      double meanE = se / s;
+      m_cosTotal = sqrt(1 - 1 / pow(topgp->getPhaseIndex(meanE), 2));
+    }
+
+
+    void YScanner::clear() const
+    {
+      m_momentum = 0;
+      m_beta = 0;
+      m_length = 0;
+      m_numPhotons = 0;
+      m_meanE = 0;
+      m_rmsE = 0;
+      m_sigmaScat = 0;
+      m_aboveThreshold = false;
+      m_energyDistribution.clear();
+      m_quasyEnergyDistribution.clear();
+      m_results.clear();
+      m_scanDone = false;
+    }
+
+
+    void YScanner::prepare(double momentum, double beta, double length) const
+    {
+      clear();
+
+      m_momentum = momentum;
+      m_beta = beta;
+      m_length = length;
+
+      // set photon energy distribution, and the mean and r.m.s of photon energy
+
+      auto area = setEnergyDistribution(beta);
+      if (area == 0) return;
+
+      // set number of Cerenkov photons per azimuthal angle
+
+      m_numPhotons = 370 * area * length / (2 * M_PI);
+
+      // set photon energy distribution convoluted with multiple scattering
+
+      const double radLength = 12.3; // quartz radiation length [cm]
+      double thetaScat = 13.6e-3 / beta / momentum * sqrt(length / 2 / radLength); // r.m.s of multiple scattering angle
+
+      const auto* topgp = TOPGeometryPar::Instance();
+      double n = topgp->getPhaseIndex(m_meanE);
+      if (beta * n < 1) {
+        B2ERROR("TOP::YScanner::prepare: beta * n < 1 ==> must be a bug!");
+        return;
+      }
+      double dndE = topgp->getPhaseIndexDerivative(m_meanE);
+      double dEdTheta = n * sqrt(pow(beta * n, 2) - 1) / dndE;
+      m_sigmaScat = abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle converted to photon energy
+
+      double step = m_energyDistribution.step;
+      int ng = lround(3 * m_sigmaScat / step);
+      std::vector<double> gaus;
+      for (int i = 0; i <= ng; i++) {
+        double x = step * i / m_sigmaScat;
+        gaus.push_back(exp(-0.5 * x * x));
+      }
+
+      m_quasyEnergyDistribution.set(m_energyDistribution.getX(-ng), step);
+      int N = m_energyDistribution.entries.size();
+      double sum = 0;
+      for (int k = -ng; k < N + ng; k++) {
+        double s = 0;
+        double se = 0;
+        double see = 0;
+        for (int i = -ng; i <= ng; i++) {
+          double p = gaus[abs(i)] * m_energyDistribution.getY(k - i);
+          double e = m_energyDistribution.getX(k - i);
+          s += p;
+          se += p * e;
+          see += p * e * e;
+        }
+        if (s > 0) {
+          se /= s;
+          see /= s;
+        }
+        m_quasyEnergyDistribution.entries.push_back(TableEntry(s, se, see));
+        sum += s;
+      }
+      for (auto& entry : m_quasyEnergyDistribution.entries) entry.y /= sum;
+
+      m_aboveThreshold = true;
     }
 
 
@@ -129,74 +204,6 @@ namespace Belle2 {
       m_rmsE = sqrt(see / s - m_meanE * m_meanE);
 
       return s * m_energyDistribution.step;
-    }
-
-
-    bool YScanner::prepare(double momentum, double beta, double length) const
-    {
-
-      m_results.clear();
-      m_momentum = momentum;
-      m_beta = beta;
-      m_length = length;
-
-      // set photon energy distribution, and the mean and r.m.s of photon energy
-
-      auto area = setEnergyDistribution(beta);
-      if (area == 0) return false;
-
-      // set number of Cerenkov photons per azimuthal angle
-
-      m_numPhotons = 370 * area * length / (2 * M_PI);
-
-      // set photon energy distribution convoluted with multiple scattering
-
-      const double radLength = 12.3; // quartz radiation length [cm]
-      double thetaScat = 13.6e-3 / beta / momentum * sqrt(length / 2 / radLength); // r.m.s of multiple scattering angle
-
-      const auto* topgp = TOPGeometryPar::Instance();
-      double n = topgp->getPhaseIndex(m_meanE);
-      if (beta * n < 1) {
-        B2ERROR("TOP::YScanner::prepare: beta * n < 1 ==> must be a bug");
-        return false;
-      }
-      const double dE = 0.1;
-      double dndE = (topgp->getPhaseIndex(m_meanE + dE / 2) - topgp->getPhaseIndex(m_meanE - dE / 2)) / dE;
-      double dEdTheta = n * sqrt(pow(beta * n, 2) - 1) / dndE;
-      double sigma = abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle in photon energy units
-
-      double step = m_energyDistribution.step;
-      int ng = lround(3 * sigma / step);
-      std::vector<double> gaus;
-      for (int i = 0; i <= ng; i++) {
-        double x = step * i / sigma;
-        gaus.push_back(exp(-0.5 * x * x));
-      }
-
-      m_quasyEnergyDistribution.set(m_energyDistribution.getX(-ng), step);
-      int N = m_energyDistribution.entries.size();
-      double sum = 0;
-      for (int k = -ng; k < N + ng; k++) {
-        double s = 0;
-        double se = 0;
-        double see = 0;
-        for (int i = -ng; i <= ng; i++) {
-          double p = gaus[abs(i)] * m_energyDistribution.getY(k - i);
-          double e = m_energyDistribution.getX(k - i);
-          s += p;
-          se += p * e;
-          see += p * e * e;
-        }
-        if (s > 0) {
-          se /= s;
-          see /= s;
-        }
-        m_quasyEnergyDistribution.entries.push_back(TableEntry(s, se, see));
-        sum += s;
-      }
-      for (auto& entry : m_quasyEnergyDistribution.entries) entry.y /= sum;
-
-      return true;
     }
 
 
@@ -230,7 +237,6 @@ namespace Belle2 {
         merge(col, dydz, j1, j2);
         m_scanDone = false;
       }
-
     }
 
 

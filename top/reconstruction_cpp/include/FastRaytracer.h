@@ -36,6 +36,11 @@ namespace Belle2 {
       {};
 
       /**
+       * Clear mutable variables
+       */
+      void clear() const;
+
+      /**
        * Propagate photon to photo-detector plane.
        * @param photon initial photon state
        */

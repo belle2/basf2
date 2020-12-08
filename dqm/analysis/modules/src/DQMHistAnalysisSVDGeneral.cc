@@ -799,8 +799,15 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cStripOccupancyU;
   delete m_cStripOccupancyV;
 
+  delete h_maxBinU;
+  delete h_maxBinV;
+  delete h_zs5countsU;
+  delete h_zs5countsV;
+  delete h_events;
+
   delete m_cClusterOnTrackTime_L456V;
   delete m_hClusterOnTrackTime_L456V;
+  delete m_h;
 }
 
 

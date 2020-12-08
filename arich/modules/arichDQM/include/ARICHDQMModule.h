@@ -111,8 +111,8 @@ namespace Belle2 {
     TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
     TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
 
-    TH1* h_TOPOccAfterInjLER = NULL; /**< Histogram Ndigits after LER injection */
-    TH1* h_TOPOccAfterInjHER = NULL; /**< Histogram Ndigits after HER injection */
+    TH1* h_ARICHOccAfterInjLER = NULL; /**< Histogram Ndigits after LER injection */
+    TH1* h_ARICHOccAfterInjHER = NULL; /**< Histogram Ndigits after HER injection */
 
     // dataobjects
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */

@@ -79,9 +79,7 @@ namespace Belle2 {
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
     TH1F* m_hClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V histo*/
-    TH1F* m_h = nullptr; /**< time for clusters on Track for L456V, temporary histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
-
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
@@ -108,11 +106,6 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
     TCanvas* m_c_avg_maxBin_UV = NULL; /**<Canvas with average max bin for U and V side*/
-    TH1F* h_maxBinU = NULL;
-    TH1F* h_maxBinV = NULL;
-    TH1F* h_zs5countsU = NULL;
-    TH1F* h_zs5countsV = NULL;
-    TH1F* h_events = NULL;
 
   };
 } // end namespace Belle2

@@ -326,7 +326,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
   // cluster time for cluster of track
-  TH1F* m_h = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  TH1F* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V->Clear();
     m_h->Copy(*m_hClusterOnTrackTime_L456V);
@@ -799,15 +799,8 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cStripOccupancyU;
   delete m_cStripOccupancyV;
 
-  delete h_maxBinU;
-  delete h_maxBinV;
-  delete h_zs5countsU;
-  delete h_zs5countsV;
-  delete h_events;
-
   delete m_cClusterOnTrackTime_L456V;
   delete m_hClusterOnTrackTime_L456V;
-  delete m_h;
 }
 
 

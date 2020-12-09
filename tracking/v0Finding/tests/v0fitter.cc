@@ -38,17 +38,11 @@ namespace Belle2 {
       trackFitResults.registerInDataStore();
 
       genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
-      // This is copied from genfit2/code2/gtest/TestConstField.cpp
-      const double bFieldZ = 20;  // kGauss. Is 1.5T
-      m_constField = new genfit::ConstField(0., 0., bFieldZ);
-      genfit::FieldManager::getInstance()->init(m_constField);
+      genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.));
     }
 
     std::string m_storeArrayNameOfRecoTracks; /**< name of recoTracks storeArray */
     std::string m_storeArrayNameOfTrackFitResults; /**< name of the TrackFitResults StoreArray */
-
-    genfit::ConstField* m_constField; /**< constant magnetic field for genfit::FieldManager */
   };
 
   /// Test getter for track hypotheses.

@@ -1,9 +1,5 @@
 #include <tracking/v0Finding/fitter/V0Fitter.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
 #include <genfit/FieldManager.h>
@@ -21,34 +17,14 @@ namespace Belle2 {
 
   /** Set up a few arrays and objects in the datastore */
   class V0FitterTest : public ::testing::Test {
-  protected:
-    /// Setup a "working environment" with store arrays for the hits and the correct relations.
-    void SetUp() override
-    {
-      /// Name of the RecoTrack store array.
-      m_storeArrayNameOfRecoTracks = "ILoveRecoTracks";
-      /// Name of the TrackFitResults store array.
-      m_storeArrayNameOfTrackFitResults = "TrackFitResultsAreTheBest";
-
-      //--- Setup -----------------------------------------------------------------------
-      DataStore::Instance().setInitializeActive(true);
-      StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
-      recoTracks.registerInDataStore();
-      StoreArray<TrackFitResult> trackFitResults(m_storeArrayNameOfTrackFitResults);
-      trackFitResults.registerInDataStore();
-
-      genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-      genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.));
-    }
-
-    std::string m_storeArrayNameOfRecoTracks; /**< name of recoTracks storeArray */
-    std::string m_storeArrayNameOfTrackFitResults; /**< name of the TrackFitResults StoreArray */
   };
 
   /// Test getter for track hypotheses.
   TEST_F(V0FitterTest, GetTrackHypotheses)
   {
-    V0Fitter v0Fitter(m_storeArrayNameOfTrackFitResults, "V0_one", "", m_storeArrayNameOfRecoTracks, "copies_one");
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.5));
+    V0Fitter v0Fitter;
     const auto kShortTracks = v0Fitter.getTrackHypotheses(Const::Kshort);
     const auto photonTracks = v0Fitter.getTrackHypotheses(Const::photon);
     const auto lambdaTracks = v0Fitter.getTrackHypotheses(Const::Lambda);
@@ -70,7 +46,9 @@ namespace Belle2 {
   /// Test initialization of cuts.
   TEST_F(V0FitterTest, InitializeCuts)
   {
-    V0Fitter v0Fitter(m_storeArrayNameOfTrackFitResults, "V0_two", "", m_storeArrayNameOfRecoTracks, "copies_two");
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.5));
+    V0Fitter v0Fitter;
     v0Fitter.initializeCuts(1.0, 52.);
     EXPECT_EQ(1.0, v0Fitter.m_beamPipeRadius);
     EXPECT_EQ(52., v0Fitter.m_vertexChi2CutOutside);

@@ -1253,7 +1253,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently int the batch system globally. Waiting until submission can continue...")
+                B2INFO(f"Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this

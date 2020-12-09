@@ -173,6 +173,7 @@ namespace Belle2 {
       OutputToken op1 = m_outputStack.top(); m_outputStack.pop();
       // and apply ...
 #ifndef __INTEL_COMPILER
+      // FIXME: Remove the masking of this code for the intel compiler when there is a version that supports it.
       m_outputStack.push(std::visit(Utils::VisitOverload {
         // eagerly apply operations if both operands are numbers
         [op](double a, double b) -> OutputToken { return OutputToken(applyOperator(op, a, b)); },
@@ -188,6 +189,7 @@ namespace Belle2 {
     void addVariable(const InputToken& var) override
     {
 #ifndef __INTEL_COMPILER
+      // FIXME: Remove the masking of this code for the intel compiler when there is a version that supports it.
       m_outputStack.push(std::visit(Utils::VisitOverload {
         // if the variable is a string its an identifier and we have to construct a variable from it
         [](const std::string & s) -> OutputToken { return VariableConstructor()(s); },

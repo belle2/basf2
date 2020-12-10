@@ -35,7 +35,6 @@
 #include <iostream>
 #include <rawdata/modules/HexDataPacker.h>
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -196,6 +195,4 @@ void HexDataPackerModule::event()
   printf("Event counter %8d\n", n_basf2evt); fflush(stdout);
   n_basf2evt++;
 
-
-  return;
 }

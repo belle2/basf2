@@ -5,7 +5,6 @@
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 14 - Jul - 2014
 //-
-
 #ifndef HEXDATAPACKER_H
 #define HEXDATAPACKER_H
 
@@ -25,21 +24,18 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawTRG.h>
 
-using namespace std;
-
-//#define MAX_CPRBU2F_WORDS 5000
-
 namespace Belle2 {
 
   /*! Module to store dummy data in RawCOPPER object */
-
   class HexDataPackerModule : public Module {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     HexDataPackerModule();
+
+    //! Destructor
     virtual ~HexDataPackerModule();
 
     //! initialization
@@ -50,22 +46,8 @@ namespace Belle2 {
 
 
   protected :
-    //! check data contents
-    //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
-
-    //    StoreArray<RawFTSW> raw_ftswarray;
-
-    //! Node ID
-    //    int m_nodeid;
-
     //! event counter
     int n_basf2evt;
-
-    //! Messaage handler
-    //    MsgHandler* m_msghandler;
-
-    /*     //! Compression Level */
-    /*     int m_compressionLevel; */
 
     //! Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

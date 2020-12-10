@@ -1637,9 +1637,9 @@
       <!-- for horizontal c. dy1=dy2, for vertical dx1=dx2 -->
 
       <Collimator type="horizontal" name="D01H5">
-	 <!-- use d1,2+0.5 here to account for tungsten head -->
-         <sec name="d1" unit="cm">-1.444</sec>
-         <sec name="d2" unit="cm">1.454</sec>
+         <sec name="d1" unit="cm">-0.944</sec>
+         <sec name="d2" unit="cm">0.954</sec>
+         <sec name="h" unit="cm">0.5</sec>
          <sec name="dx1" unit="cm">19.31</sec>
          <sec name="dx2" unit="cm">2.85</sec>
          <sec name="dy1" unit="cm">0.6</sec>
@@ -1666,9 +1666,9 @@
       </Collimator>
 
       <Collimator type="horizontal" name="D02H4">
-	 <!-- use d1,2+0.5 here to account for tungsten head -->
-         <sec name="d1" unit="cm">-1.362</sec>
-         <sec name="d2" unit="cm">1.435</sec>
+         <sec name="d1" unit="cm">-0.862</sec>
+         <sec name="d2" unit="cm">0.935</sec>
+         <sec name="h" unit="cm">0.5</sec>
          <sec name="dx1" unit="cm">19.31</sec>
          <sec name="dx2" unit="cm">2.85</sec>
          <sec name="dy1" unit="cm">0.6</sec>

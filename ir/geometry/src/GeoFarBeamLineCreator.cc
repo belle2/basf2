@@ -35,6 +35,9 @@
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 
+#include <fstream>
+#include <regex>
+
 using namespace std;
 using namespace boost;
 
@@ -623,10 +626,56 @@ namespace Belle2 {
       //------------------
       //-   Collimators
 
+      // read optional collimators displacements from file, use DB by default
+
+      double d01h5d1{1.0};
+      double d01h5d2{ -1.0};
+      double d02h4d1{1.0};
+      double d02h4d2{ -1.0};
+
+      ifstream collPosFile("collPos.cfg");
+      if (collPosFile.is_open()) {
+        string line;
+
+        while (getline(collPosFile, line)) {
+          // remove white space
+          line = regex_replace(line, regex("\\s+"), "");
+
+          // change to lower case
+          for (auto& ch : line)
+            ch = tolower(ch);
+
+          // check pattern
+          regex regexp(R"(^(d0\dh\d)[\[\.]?(d[12])\]?=(-?[\d\.]+)$)", std::regex::icase);
+          smatch matchResult;
+
+          if (regex_match(line, matchResult, regexp)) {
+            if (matchResult.size() == 4) {
+              string collName = matchResult[1].str();
+              string disName = matchResult[2].str();
+              double disValue = stod(matchResult[3].str());
+
+              if (collName == "d01h5") {
+                if (disName == "d1" && disValue < 0)
+                  d01h5d1 = disValue * unitFactor;
+                else if (disName == "d2" && disValue > 0)
+                  d01h5d2 = disValue * unitFactor;
+              } else if (collName == "d02h4") {
+                if (disName == "d1" && disValue < 0)
+                  d02h4d1 = disValue * unitFactor;
+                else if (disName == "d2" && disValue > 0)
+                  d02h4d2 = disValue * unitFactor;
+              }
+            }
+          }
+        }
+      }
+
       std::vector<std::string> collimators;
       boost::split(collimators, m_config.getParameterStr("Collimator"), boost::is_any_of(" "));
       for (const auto& name : collimators) {
-        //-   Collamators consist of two independent jaws (trapezoids), identical in shape but differently positioned
+        //-   Collamators consist of two independent jaws (trapezoids), identical in shape, positioned opposite to each other
+        //-   Each jaw consists of copper body and tungsten head
 
         prep = name + ".";
 
@@ -641,14 +690,42 @@ namespace Belle2 {
         elements[motherVolumeVacuum].transform.getDecomposition(scale, rotation, translation);
         double zz = rotation.zz();
 
+        // d1, d2 are collimator jaws displacements from beam center, d1<0, d2>0
+        // h is additional body displacement due to tungesten head
+        // dx1,2 dy1,2 dz are collimator trapezoid dimensions
+        // Z is collimator position inside its Mother Volume
         double collimator_d1 = m_config.getParameter(prep + "d1") * unitFactor;
         double collimator_d2 = m_config.getParameter(prep + "d2") * unitFactor;
+        double collimator_h = m_config.getParameter(prep + "h", 0.0) * unitFactor;
         double collimator_dx1 = m_config.getParameter(prep + "dx1") * unitFactor;
         double collimator_dx2 = m_config.getParameter(prep + "dx2") * unitFactor;
         double collimator_dy1 = m_config.getParameter(prep + "dy1") * unitFactor;
         double collimator_dy2 = m_config.getParameter(prep + "dy2") * unitFactor;
         double collimator_dz = m_config.getParameter(prep + "dz") * unitFactor;
         double collimator_Z = m_config.getParameter(prep + "Z") * unitFactor;
+
+        std::size_t d01h5 = prep.find("D01H5");
+        std::size_t d02h4 = prep.find("D02H4");
+        if (d01h5 != std::string::npos) {
+          if (d01h5d1 < 0) {
+            collimator_d1 = d01h5d1;
+            B2WARNING("Collimator D01H5 displacement d1 set to " << collimator_d1 << "mm");
+          }
+          if (d01h5d2 > 0) {
+            collimator_d2 = d01h5d2;
+            B2WARNING("Collimator D01H5 displacement d2 set to " << collimator_d2 << "mm");
+          }
+        }
+        if (d02h4 != std::string::npos) {
+          if (d02h4d1 < 0) {
+            collimator_d1 = d02h4d1;
+            B2WARNING("Collimator D02H4 displacement d1 set to " << collimator_d1 << "mm");
+          }
+          if (d02h4d2 > 0) {
+            collimator_d2 = d02h4d2;
+            B2WARNING("Collimator D02H4 displacement d2 set to " << collimator_d2 << "mm");
+          }
+        }
 
         // storable elements
         FarBeamLineElement collimator_jaw1;
@@ -662,18 +739,18 @@ namespace Belle2 {
 
         // rotate and move collimator jaws to their relative positions
         if (type == "vertical") {
-          collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(0.0, -collimator_dz + collimator_d1, 0.0);
+          collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(0.0, -collimator_dz + collimator_d1 - collimator_h, 0.0);
           collimator_jaw1.transform = collimator_jaw1.transform * G4RotateX3D(-M_PI / 2 / Unit::rad);
 
-          collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(0.0, collimator_dz + collimator_d2, 0.0);
+          collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(0.0, collimator_dz + collimator_d2 + collimator_h, 0.0);
           collimator_jaw2.transform = collimator_jaw2.transform * G4RotateX3D(M_PI / 2 / Unit::rad);
         } else {
           if (zz > 0) {
-            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz + collimator_d1, 0.0, 0.0);
-            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz + collimator_d2, 0.0, 0.0);
+            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz + collimator_d1 - collimator_h, 0.0, 0.0);
+            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz + collimator_d2 + collimator_h, 0.0, 0.0);
           } else {
-            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz - collimator_d2, 0.0, 0.0);
-            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz - collimator_d1, 0.0, 0.0);
+            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz - collimator_d2 - collimator_h, 0.0, 0.0);
+            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz - collimator_d1 + collimator_h, 0.0, 0.0);
           }
           collimator_jaw1.transform = collimator_jaw1.transform * G4RotateY3D(M_PI / 2 / Unit::rad);
           collimator_jaw2.transform = collimator_jaw2.transform * G4RotateY3D(-M_PI / 2 / Unit::rad);

@@ -78,13 +78,13 @@ void HexDataPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
-  raw_cprarray.registerInDataStore();
-  raw_svdarray.registerInDataStore();
-  raw_cdcarray.registerInDataStore();
-  raw_bpidarray.registerInDataStore();
-  raw_epidarray.registerInDataStore();
-  raw_eclarray.registerInDataStore();
-  raw_klmarray.registerInDataStore();
+  m_raw_cprarray.registerInDataStore();
+  m_raw_svdarray.registerInDataStore();
+  m_raw_cdcarray.registerInDataStore();
+  m_raw_bpidarray.registerInDataStore();
+  m_raw_epidarray.registerInDataStore();
+  m_raw_eclarray.registerInDataStore();
+  m_raw_klmarray.registerInDataStore();
 
   B2INFO("HexDataPacker: initialize() done.");
 
@@ -103,20 +103,20 @@ void HexDataPackerModule::initialize()
 
 void HexDataPackerModule::event()
 {
-  StoreArray<RawKLM> ary;
-
+  StoreArray<RawKLM> ary; // You need to change if you want to make a different Raw*** object.
+  const int MAX_CPRBUF_WORDS = 5000;
   int* evtbuf = new int[MAX_CPRBUF_WORDS];
   char char1[50], char2[50], char3[50], char4[50];
 
   unsigned int val[10];
   int size = 0;
-  int run_end = 0;
+  int runEnd = 0;
   int word_count = 0;
   int event_end = 0;
   while (true) {
 
     if (m_ifs.eof()) {
-      run_end = 1;
+      runEnd = 1;
       break;
     }
     string strin;
@@ -170,7 +170,7 @@ void HexDataPackerModule::event()
   }
 #endif
   StoreObjPtr<EventMetaData> evtmetadata;
-  if (run_end == 0) {
+  if (runEnd == 0) {
     (ary.appendNew())->SetBuffer(evtbuf, size, 1, 1, 1);
 
     //

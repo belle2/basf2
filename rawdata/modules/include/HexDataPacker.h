@@ -27,7 +27,7 @@
 
 using namespace std;
 
-#define MAX_CPRBUF_WORDS 5000
+//#define MAX_CPRBU2F_WORDS 5000
 
 namespace Belle2 {
 
@@ -71,28 +71,28 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     //! RawCOPPER array
-    StoreArray<RawCOPPER> raw_cprarray;
+    StoreArray<RawCOPPER> m_raw_cprarray;
 
     //! RawSVD array
-    StoreArray<RawSVD> raw_svdarray;
+    StoreArray<RawSVD> m_raw_svdarray;
 
     //! RawCDC array
-    StoreArray<RawCDC> raw_cdcarray;
+    StoreArray<RawCDC> m_raw_cdcarray;
 
     //! RawTOP array
-    StoreArray<RawTOP> raw_bpidarray;
+    StoreArray<RawTOP> m_raw_bpidarray;
 
     //! RawARICH array
-    StoreArray<RawARICH> raw_epidarray;
+    StoreArray<RawARICH> m_raw_epidarray;
 
     //! RawECL array
-    StoreArray<RawECL> raw_eclarray;
+    StoreArray<RawECL> m_raw_eclarray;
 
     //! RawKLM array
-    StoreArray<RawKLM> raw_klmarray;
+    StoreArray<RawKLM> m_raw_klmarray;
 
     //! RawARICH array
-    StoreArray<RawTRG> raw_trgarray;
+    StoreArray<RawTRG> m_raw_trgarray;
 
   private:
     //! input-file stream

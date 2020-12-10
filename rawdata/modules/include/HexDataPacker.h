@@ -78,10 +78,10 @@ namespace Belle2 {
 
   private:
     //! input-file stream
-    ifstream m_ifs;
+    std::ifstream m_ifs;
 
     //! input-file name
-    string m_fileName;
+    std::string m_fileName;
   };
 
 } // end namespace Belle2

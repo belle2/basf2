@@ -298,8 +298,9 @@ def process_dir(
                     env.Alias('module-io', module_io)
 
             # check class versions
-            for check_filename, linkdef_file in check_files:
-                env.ClassVersionCheck(check_filename, [linkdef_file, lib, debug] + env['REQUIRED_TOOLS'])
+            if 'BELLE2_ANALYSIS_DIR' not in os.environ:
+                for check_filename, linkdef_file in check_files:
+                    env.ClassVersionCheck(check_filename, [linkdef_file, lib, debug] + env['REQUIRED_TOOLS'])
 
             # define build target aliases
             env.Alias(lib_name, lib_files)

@@ -74,6 +74,7 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
   fcn_land{nullptr},
   m_outFile{nullptr}
 {
+  //m_EKLMGeometry = &(EKLM::GeometryData::Instance());
   m_elementNum = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
   for (int ia = 0; ia < 2; ++ia) {
@@ -514,6 +515,14 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
             ht = Form("Calibrated time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
+            hn = Form("time_length_eklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
+            m_HistTimeLengthEKLM[iF][iS][iL][iP][iC] =
+              new TH2F(hn.Data(),
+                       "Time versus propagation length; "
+                       "propagation distance[cm]; "
+                       "T_rec-T_0-T_fly-'T_calibration'[ns]",
+                       400, 0.0, 350.0,
+                       400, lowEdge_scint_end, upEdge_scint_end);
           }
         }
       }
@@ -658,7 +667,12 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           }
         }
       } else {
+        int iF = klmChannel.getSection() - 1;
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
+        int iC = klmChannel.getStrip() - 1;
+        m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
         if (iP) {
           hprf_scint_plane1_effC_end->Fill(distHit, timeHit);
         } else {
@@ -1149,6 +1163,7 @@ void KLMTimeAlgorithm::saveHist()
           for (int iC = 0; iC < 75; ++iC) {
             h_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
             hc_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
+            m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
             delete h_timeFSLPC_tc_end[iF][iS][iL][iP][iC];
           }
         }

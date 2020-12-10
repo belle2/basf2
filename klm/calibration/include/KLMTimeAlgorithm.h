@@ -15,6 +15,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
@@ -125,7 +126,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set minimal digit nuumber (total).
+     * Set minimal digit number (total).
      */
     void setMinimalDigitNumber(int minimalDigitNumber)
     {
@@ -237,7 +238,7 @@ namespace Belle2 {
      */
     double m_etime_channelAvg_scint_end;
 
-    /** Minimal digit nuumber (total). */
+    /** Minimal digit number (total). */
     int m_MinimalDigitNumber = 100000000;
 
     /** Lower limit of hits collected for on single channel. */
@@ -245,6 +246,9 @@ namespace Belle2 {
 
     /** Element number handler */
     const KLMElementNumbers* m_elementNum;
+
+    /** EKLM geometry data. */
+    const EKLM::GeometryData* m_EKLMGeometry;
 
     /** KLM ChannelIndex object. */
     KLMChannelIndex m_klmChannels;
@@ -521,6 +525,9 @@ namespace Belle2 {
 
     /** EKLM part. */
     TH1D* h_timeFSLPC_end[2][4][14][2][75];
+
+    /** Two-dimensional distribution of time versus propagation length. */
+    TH2F* m_HistTimeLengthEKLM[2][4][14][2][75];
 
     /* Histograms of time distribution of each channel after calibration. */
 

@@ -633,11 +633,11 @@ namespace Belle2 {
       double d02h4d1{1.0};
       double d02h4d2{ -1.0};
 
-      ifstream collPosFile("collPos.cfg");
-      if (collPosFile.is_open()) {
+      ifstream collApertFile("collApert.cfg");
+      if (collApertFile.is_open()) {
         string line;
 
-        while (getline(collPosFile, line)) {
+        while (getline(collApertFile, line)) {
           // remove white space
           line = regex_replace(line, regex("\\s+"), "");
 

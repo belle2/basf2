@@ -107,7 +107,11 @@ namespace Belle2 {
       m_mcPartCtr = std::vector<unsigned int>(nContainers, 0);
     }
 
-    /** create a root file with file name @param fileName and write option @param writeOption 'UPDATE' or 'RECREATE' */
+    /** create a root file with file name
+    @param fileName name of the file
+    @param writeOption root option for opening the file 'UPDATE' or 'RECREATE'
+    @param treeNames : list of names of the trees contained in the root file to be initialized
+    */
     void initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames);
     void getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables); /**< collect the values for root output */
 

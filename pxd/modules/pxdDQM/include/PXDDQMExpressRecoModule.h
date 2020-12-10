@@ -17,8 +17,7 @@
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include "TH1I.h"
-#include "TH1F.h"
+#include "TH1D.h"
 
 namespace Belle2 {
 
@@ -62,34 +61,34 @@ namespace Belle2 {
     StoreArray<PXDCluster> m_storePXDClusters;
 
     /** Hitmaps of Digits */
-    TH1I* m_hitMapCounts = {};
+    TH1D* m_hitMapCounts = {};
     /** Hitmaps of Clusters*/
-    TH1I* m_hitMapClCounts = {};
+    TH1D* m_hitMapClCounts = {};
     /** Hitmaps of digits on chips */
-    TH1I* m_hitMapCountsChip = {};
+    TH1D* m_hitMapCountsChip = {};
     /** Hitmaps of clusters on chips */
-    TH1I* m_hitMapClCountsChip = {};
+    TH1D* m_hitMapClCountsChip = {};
     /** Fired pixels per event */
-    TH1F** m_fired = {};
+    std::vector <TH1D*> m_fired = {};
     /** Clusters per event */
-    TH1F** m_clusters = {};
+    std::vector <TH1D*> m_clusters = {};
     // FIXME: Startrow related histos are expert debugging, not for shifter (-> remove this)
     /** Start row distribution */
-    //TH1F** m_startRow={};
+    //std::vector <TH1D*> m_startRow={};
     /** Cluster seed charge by distance from the start row */
-    //TH1F** m_chargStartRow={};
+    //std::vector <TH1D*> m_chargStartRow={};
     /** counter for Cluster seed charge by distance from the start row */
-    //TH1F** m_startRowCount={};
+    //std::vector <TH1D*> m_startRowCount={};
     /** Charge of clusters */
-    TH1F** m_clusterCharge = {};
+    std::vector <TH1D*> m_clusterCharge = {};
     /** Charge of pixels */
-    TH1F** m_pixelSignal = {};
+    std::vector <TH1D*> m_pixelSignal = {};
     /** u cluster size */
-    TH1F** m_clusterSizeU = {};
+    std::vector <TH1D*> m_clusterSizeU = {};
     /** v cluster size */
-    TH1F** m_clusterSizeV = {};
+    std::vector <TH1D*> m_clusterSizeV = {};
     /** Cluster size */
-    TH1F** m_clusterSizeUV = {};
+    std::vector <TH1D*> m_clusterSizeUV = {};
 
   };
 

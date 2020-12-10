@@ -63,7 +63,7 @@ def create_jobs(args):
     # Setup basf2 in the job the same way as our current basf2 environment
     j2.append_current_basf2_setup_cmds()
     j2.input_sandbox_files.append(test_basf2_script.absolute())
-    j2.input_files = sorted(Path(test_data).glob("*.root"))
+    j2.input_files = sorted(p.as_posix() for p in Path(test_data).glob("*.root"))
     if args.files_per_subjob:
         j2.max_files_per_subjob = args.files_per_subjob
     elif args.max_subjobs:

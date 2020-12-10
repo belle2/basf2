@@ -77,7 +77,15 @@ namespace Belle2 {
     /**
      * particle source enumerators
      */
-    enum EParticleSourceObject {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
+    enum EParticleSourceObject {
+      c_Undefined  = 0,
+      c_Track      = 1,
+      c_ECLCluster = 2,
+      c_KLMCluster = 3,
+      c_V0         = 4,
+      c_MCParticle = 5,
+      c_Composite  = 6
+    };
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -183,8 +191,8 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
-     * @param daughter particle properties
+     * @param properties particle property
+     * @param daughterProperties daughter particle properties
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,

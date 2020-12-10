@@ -27,6 +27,11 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
+     * return MVA output that uses shower shape variables to distinguish between true photon and beam background clusters
+     */
+    double beamBackgroundProbabilityMVA(const Particle* particle);
+
+    /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */

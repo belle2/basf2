@@ -136,6 +136,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 void DQMHistAnalysisPXDCMModule::event()
 {
   double all_outside = 0.0, all = 0.0;
+  // cppcheck-suppress unreadVariable
   double all_cm = 0.0;
   bool error_flag = false;
   bool warn_flag = false;
@@ -181,6 +182,7 @@ void DQMHistAnalysisPXDCMModule::event()
       all_outside += outside;
       all += current;
       double dhpc = hh1->GetBinContent(64);
+      // cppcheck-suppress unreadVariable
       all_cm += dhpc;
       if (current > 1) {
         error_flag |= (outside / current > 1e-5); /// TODO level might need adjustment
@@ -191,26 +193,32 @@ void DQMHistAnalysisPXDCMModule::event()
     }
   }
 
+  // cppcheck-suppress variableScope
   int status = 0;
   {
     m_cCommonMode->cd();
     // not enough Entries
     if (all < 100.) {
       m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
+      // cppcheck-suppress unreadVariable
       status = 0; // default
     } else {
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
       if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
         m_cCommonMode->Pad()->SetFillColor(kRed);// Red
+        // cppcheck-suppress unreadVariable
         status = 4;
       } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
+        // cppcheck-suppress unreadVariable
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
         m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
+        // cppcheck-suppress unreadVariable
         status = 2;
       } else { // between 0 and 50 ...
         m_cCommonMode->Pad()->SetFillColor(kWhite);// White
+        // cppcheck-suppress unreadVariable
         status = 1;
       }
     }

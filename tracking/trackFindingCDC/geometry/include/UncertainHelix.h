@@ -124,11 +124,11 @@ namespace Belle2 {
        *  Both circle and helix parameters and their covariance matrix are considered to be passed
        *  on the same origin.
        *
-       *  @param perigeeCircle1    First perigee circle
-       *  @param ambiguityMatrix1  Ambiguity matrix of the first perigee parameters with respect to
+       *  @param fromPerigeeCircle    First perigee circle
+       *  @param fromAmbiguity  Ambiguity matrix of the first perigee parameters with respect to
        * the helix parameters
-       *  @param perigeeCircle2    Second perigee circle
-       *  @param ambiguityMatrix2  Ambiguity matrix of the second perigee parameters with respect to
+       *  @param toPerigeeCircle    Second perigee circle
+       *  @param toAmbiguity  Ambiguity matrix of the second perigee parameters with respect to
        * the helix parameters
        *  @param szParameters      Reference sz parameters where the perigee circles have been
        * fitted.
@@ -175,10 +175,10 @@ namespace Belle2 {
        * on the same origin.
        *  The circle is considered to be fitted in the sz space defined by the given helix.
        *
-       *  @param perigeeCircle    Perigee circle to be incoorporated
-       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the
+       *  @param fromPerigeeCircle    Perigee circle to be incoorporated
+       *  @param fromAmbiguity  Ambiguity matrix of the perigee parameters with respect to the
        * helix parameters
-       *  @param helix            Second perigee circle
+       *  @param toHelix            Second perigee circle
        */
       static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
                                     const PerigeeHelixAmbiguity& fromAmbiguity,

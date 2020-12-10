@@ -259,7 +259,7 @@ void ECLGeometryPar::read()
   }
 
   {
-    m_ECLBackwardGlobalT = new G4Transform3D(G4RotateZ3D(M_PI) * getT("ECLBackwardPhysical"));
+    m_ECLBackwardGlobalT = new G4Transform3D(getT("ECLBackwardPhysical"));
     G4Transform3D T = getT("ECLBackwardCrystalSectorPhysical_0");
     G4String tnamef("ECLBackwardWrappedCrystal_Physical_");
     for (int i = 0; i < 60; i++) {
@@ -362,7 +362,7 @@ void ECLGeometryPar::InitCrystal(int cid)
     T = m_ECLBarrelGlobalT;
   } else {
     T = m_ECLBackwardGlobalT;
-    s = -s;
+    c = -c;
   }
   double xp = c * t.pos.x() - s * t.pos.y();
   double yp = s * t.pos.x() + c * t.pos.y();

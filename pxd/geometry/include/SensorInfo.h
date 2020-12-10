@@ -133,7 +133,7 @@ namespace Belle2 {
       double getHallFactor() const { return m_hallFactor; }
       /** Calculate electron mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-       * @param eField Electric field, V/cm
+       * @param E Electric field, V/cm
        * @return electron mobility, cm*2/V.ns
        */
       double getElectronMobility(double E) const;

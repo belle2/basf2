@@ -297,7 +297,8 @@ void BtubeCreatorModule::addextrainfos(Particle* daughter, Particle* copy, TMatr
   daughter->writeExtraInfo("TubeCov21", mat(2, 1));
   daughter->writeExtraInfo("TubeCov22", mat(2, 2));
 
-  daughter->writeExtraInfo("TubeDirX", TLV.Px());
-  daughter->writeExtraInfo("TubeDirY", TLV.Py());
-  daughter->writeExtraInfo("TubeDirZ", TLV.Pz());
+  daughter->writeExtraInfo("TubeDirX", (TLV.Px() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeDirY", (TLV.Py() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeDirZ", (TLV.Pz() / TLV.Mag()));
+  daughter->writeExtraInfo("TubeB_p_estimated", TLV.Mag());
 }

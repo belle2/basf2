@@ -9,15 +9,13 @@
  **************************************************************************/
 
 #pragma once
-
 #include <vector>
-
 
 namespace Belle2 {
   namespace TOP {
 
     /**
-     * Pixel positions and sizes in module local frame
+     * Pixel positions and dimensions in module local frame
      */
     class PixelPositions {
 
@@ -40,7 +38,7 @@ namespace Belle2 {
         {}
 
         /**
-         * full constructor
+         * almost full constructor
          * @param x position of center in x
          * @param y position of center in y
          * @param a size in x
@@ -53,13 +51,7 @@ namespace Belle2 {
 
 
       /**
-       * Class default constructor
-       */
-      PixelPositions()
-      {}
-
-      /**
-       * Class full constructor
+       * Class constructor
        * @param moduleID slot ID
        */
       explicit PixelPositions(int moduleID);
@@ -69,6 +61,12 @@ namespace Belle2 {
        * @return slot ID
        */
       int getModuleID() const {return m_moduleID;}
+
+      /**
+       * Returns number of pixels
+       * @return number of pixels
+       */
+      unsigned getNumPixels() const {return m_pixels.size();}
 
       /**
        * Returns the number of pixel rows
@@ -83,18 +81,20 @@ namespace Belle2 {
       unsigned getNumPixelColumns() const {return m_NColumns;}
 
       /**
-       * Returns pixel data of a given pixelID
+       * Returns pixel data for given pixelID
        * @param pixelID pixel ID (1-based)
+       * @return pixel data
        */
       const PixelData& get(int pixelID) const;
 
       /**
-       * Returns pixel data of a given pixel row and column
+       * Transforms pixel row and column to pixel ID
        * Note: for convenience pixel row and column numbering starts with 0 here!
        * @param row pixel row (0-based)
        * @param col pixel column (0-based)
+       * @return pixelID (1-based)
        */
-      const PixelData& get(unsigned row, unsigned col) const;
+      int pixelID(unsigned row, unsigned col) const {return col + row * m_NColumns + 1;}
 
     private:
 
@@ -105,6 +105,15 @@ namespace Belle2 {
       PixelData m_invalid; /**< invalid pixel data */
 
     };
+
+    //--- inline functions ------------------------------------------------------------
+
+    inline const PixelPositions::PixelData& PixelPositions::get(int pixelID) const
+    {
+      unsigned k = pixelID - 1;
+      if (k < m_pixels.size()) return m_pixels[k];
+      return m_invalid;
+    }
 
   } // namespace TOP
 } // namespace Belle2

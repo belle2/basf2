@@ -59,9 +59,7 @@ namespace Belle2 {
     void PDFConstructor::setSignalPDF()
     {
       const auto& pixelPositions = m_yScanner->getPixelPositions();
-      int numRows = pixelPositions.getNumPixelRows();
-      int numCols = pixelPositions.getNumPixelColumns();
-      int numPixels = numRows * numCols;
+      int numPixels = pixelPositions.getNumPixels();
 
       // prepare the memory for storing PDF parametrization
 
@@ -109,7 +107,7 @@ namespace Belle2 {
 
       for (int k = kmi; k <= kma; k++) {
         for (unsigned col = 0; col < pixelPositions.getNumPixelColumns(); col++) {
-          const auto& pixel = pixelPositions.get(0, col);
+          const auto& pixel = pixelPositions.get(col + 1);
           if (pixel.Dx == 0) continue;
           double xD = func::unfold(pixel.xc, k, bar.A);
           if (xD < xmi or xD > xma) continue;
@@ -178,7 +176,7 @@ namespace Belle2 {
 
       for (int k = kmi; k <= kma; k++) {
         for (unsigned col = 0; col < pixelPositions.getNumPixelColumns(); col++) {
-          const auto& pixel = pixelPositions.get(0, col);
+          const auto& pixel = pixelPositions.get(col + 1);
           if (pixel.Dx == 0) continue;
           double xD = func::unfold(pixel.xc, k, bar.A);
           if (xD < xmi or xD > xma) continue;
@@ -261,7 +259,7 @@ namespace Belle2 {
       double dt_dL = (D.dLen_dL + 1 / m_yScanner->getBeta() / m_groupIndex) / avSpeedOfLight; // parallax
       double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / avSpeedOfLight; // multiple scattering in quartz
 
-      const auto& pixel = m_yScanner->getPixelPositions().get(0, col);
+      const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
       double L = m_yScanner->getTrackLengthInQuartz();
       double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2)) / 12 + pow(sigmaScat, 2);
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
@@ -283,12 +281,10 @@ namespace Belle2 {
       double numPhotons = m_yScanner->getNumPhotons() * abs(D.dFic_dx * pixel.Dx);
       int nx = m_fastRaytracer->getNx();
       int ny = m_fastRaytracer->getNy();
-      unsigned numCols = m_yScanner->getPixelPositions().getNumPixelColumns();
       for (const auto& result : m_yScanner->getResults()) {
-        unsigned pixelID = col + result.row * numCols + 1;
-        double RQE = 1; // TODO: channel masking, rel. efficiency
+        double RQE = m_yScanner->getPixelEfficiencies().get(result.pixelID);
         if (RQE == 0) continue;
-        auto& signalPDF = m_signalPDFs[pixelID - 1];
+        auto& signalPDF = m_signalPDFs[result.pixelID - 1];
         double dE = result.e0 - m_yScanner->getMeanEnergy();
         double propLen = Len + D.dLen_de * dE;
         double speedOfLight = Const::speedOfLight / TOPGeometryPar::Instance()->getGroupIndex(result.e0);
@@ -336,11 +332,13 @@ namespace Belle2 {
       return true;
     }
 
-
-    double PDFConstructor::propagationLosses(double /*E*/, double /*propLen*/, int /*nx*/, int /*ny*/, SignalPDF::EPeakType /*type*/)
+    double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type)
     {
-      //TODO ...
-      return 1;
+      double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
+      double surf = m_yScanner->getBars().front().reflectivity;
+      double p = exp(-propLen / bulk) * pow(surf, abs(nx) + abs(ny));
+      if (type == SignalPDF::c_Reflected) p *= m_yScanner->getMirror().reflectivity;
+      return p;
     }
 
     bool PDFConstructor::rangeOfX(double z, double& xmi, double& xma)

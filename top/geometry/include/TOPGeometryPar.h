@@ -164,6 +164,13 @@ namespace Belle2 {
        */
       double getGroupIndexDerivative(double energy) const;
 
+      /**
+       * Returns bulk absorption lenght of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return bulk absorption lenght
+       */
+      double getAbsorptionLength(double energy) const;
+
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
@@ -329,7 +336,11 @@ namespace Belle2 {
       return (getGroupIndex(energy + dE / 2) - getGroupIndex(energy - dE / 2)) / dE;
     }
 
-
+    inline double TOPGeometryPar::getAbsorptionLength(double energy) const
+    {
+      double lambda = c_hc / energy;
+      return 15100 * pow(lambda / 405, 4); // Alan, 2013
+    }
 
   } // end of namespace TOP
 } // end of namespace Belle2

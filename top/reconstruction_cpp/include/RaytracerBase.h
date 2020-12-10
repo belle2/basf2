@@ -49,6 +49,7 @@ namespace Belle2 {
         double B = 0;  /**< thickness (dimension in y) */
         double zL = 0; /**< minimal z */
         double zR = 0; /**< maximal z */
+        double reflectivity = 0; /**< surface reflectivity */
 
         /**
          * default constructor
@@ -79,6 +80,7 @@ namespace Belle2 {
         double zc = 0; /**< center of curvature in z */
         double R = 0;  /**< radius */
         double zb = 0; /**< minimum of mirror surface in z */
+        double reflectivity = 0; /**< mirror reflectivity */
 
         /**
          * default constructor

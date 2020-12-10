@@ -17,6 +17,8 @@
 #pragma link C++ class Belle2::TOP::InverseRaytracer::Solution-;
 #pragma link C++ class Belle2::TOP::PixelPositions-;
 #pragma link C++ class Belle2::TOP::PixelPositions::PixelData-;
+#pragma link C++ class Belle2::TOP::PixelMasks-;
+#pragma link C++ class Belle2::TOP::PixelEfficiencies-;
 #pragma link C++ class Belle2::TOP::EnergyMask-;
 #pragma link C++ class Belle2::TOP::YScanner-;
 #pragma link C++ class Belle2::TOP::YScanner::Derivatives-;

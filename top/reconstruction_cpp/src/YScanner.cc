@@ -48,7 +48,9 @@ namespace Belle2 {
 
 
     YScanner::YScanner(int moduleID, unsigned N): RaytracerBase(moduleID, c_Unified, c_SemiLinear),
-      m_pixelPositions(PixelPositions(moduleID))
+      m_pixelPositions(PixelPositions(moduleID)),
+      m_pixelMasks(PixelMasks(moduleID)),
+      m_pixelEfficiencies(PixelEfficiencies(moduleID))
     {
       if (N < 2) {
         B2FATAL("TOP::YScanner: N must be > 1");
@@ -215,7 +217,7 @@ namespace Belle2 {
 
       double minE = m_quasyEnergyDistribution.getXmin();
       double maxE = m_quasyEnergyDistribution.getXmax();
-      double pixDx  = m_pixelPositions.get(0, col).Dx;
+      double pixDx  = m_pixelPositions.get(col + 1).Dx;
       double dely = (abs(D.dyB_dL) * m_length + abs(D.dyB_dx) * pixDx) / 2;
       double y1 = yB - dely;
       double y2 = yB + dely;
@@ -246,7 +248,10 @@ namespace Belle2 {
       std::map<int, EnergyMask*> masks;
       for (unsigned row = 0; row < m_pixelPositions.getNumPixelRows(); row++) {
 
-        const auto& pixel = m_pixelPositions.get(row, col);
+        int pixelID = m_pixelPositions.pixelID(row, col);
+        if (not m_pixelMasks.isActive(pixelID)) continue;
+
+        const auto& pixel = m_pixelPositions.get(pixelID);
         std::vector<PixelProjection> projections[2];
         PixelProjection proj;
         for (size_t k = 0; k < m_prism.unfoldedWindows.size(); k++) {
@@ -274,14 +279,14 @@ namespace Belle2 {
 
         double Ecp_old = 0;
         double wid_old = 1000;
-        m_results.push_back(Result(row));
+        m_results.push_back(Result(pixelID));
         for (int j = j1; j < j2; j++) {
           double ybar = j * m_bars.front().B - yB;
           for (const auto& projection : projections[abs(j) % 2]) {
             double Ecp = (ybar + projection.yc) / D.dyB_de + m_meanE;
             double wid = projection.mask->getFullWidth();
             if (abs(Ecp - Ecp_old) > (wid + wid_old) / 2 and m_results.back().sum > 0) {
-              m_results.push_back(Result(row));
+              m_results.push_back(Result(pixelID));
             }
             integrate(projection.mask, Ecp, m_results.back());
             Ecp_old = Ecp;
@@ -308,7 +313,10 @@ namespace Belle2 {
 
       for (unsigned row = 0; row < m_pixelPositions.getNumPixelRows(); row++) {
 
-        const auto& pixel = m_pixelPositions.get(row, col);
+        int pixelID = m_pixelPositions.pixelID(row, col);
+        if (not m_pixelMasks.isActive(pixelID)) continue;
+
+        const auto& pixel = m_pixelPositions.get(pixelID);
         double Dy0 = 0;
         double Dy1 = 0;
         PixelProjection proj;
@@ -321,7 +329,7 @@ namespace Belle2 {
         if (Dy0 == 0 and Dy1 == 0) continue;
 
         double Dy = (Dy0 * Neven + Dy1 * Nodd) / (Neven + Nodd);
-        Result result(row);
+        Result result(pixelID);
         result.sum = Dy / m_bars.front().B;
         result.e0 = m_meanE;
         result.sigsq = m_rmsE * m_rmsE;
@@ -401,8 +409,6 @@ namespace Belle2 {
       proj.yc = (y1 + y2) / 2;
       proj.Dy = y2 - y1;
     }
-
-
 
   } //TOP
 } //Belle2

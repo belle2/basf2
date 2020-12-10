@@ -13,6 +13,12 @@
 #include <top/reconstruction_cpp/InverseRaytracer.h>
 #include <top/reconstruction_cpp/FastRaytracer.h>
 #include <top/reconstruction_cpp/YScanner.h>
+#include <top/dbobjects/TOPCalChannelMask.h>
+#include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalTimebase.h>
+#include <framework/database/DBObjPtr.h>
+#include <top/dataobjects/TOPAsicMask.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -54,6 +60,31 @@ namespace Belle2 {
       {
         return TOPRecoManager::getInstance().yScanner(moduleID);
       }
+
+      /**
+       * Sets channel masks
+       * @param mask channel mask
+       * @param asicMask masked asics
+       */
+      static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 const TOPAsicMask& asicMask);
+
+      /**
+       * Sets uncalibrated channels off
+       * @param channelT0 channel T0 calibration
+       */
+      static void setUncalibratedChannelsOff(const DBObjPtr<TOPCalChannelT0>& channelT0);
+
+      /**
+       * Sets uncalibrated channels off
+       * @param timebase timebase calibration
+       */
+      static void setUncalibratedChannelsOff(const DBObjPtr<TOPCalTimebase>& timebase);
+
+      /**
+       * Sets relative efficiencies of pixels
+       */
+      static void setChannelEffi();
 
       /**
        * Returns instance of the class

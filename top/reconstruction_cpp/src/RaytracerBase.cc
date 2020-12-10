@@ -17,14 +17,14 @@ namespace Belle2 {
   namespace TOP {
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoBarSegment& bar, double zLeft):
-      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft)
+      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft), reflectivity(bar.getSurfaceReflectivity(3.0))
     {
       zR = zL + bar.getFullLength();
     }
 
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoModule& module):
-      A(module.getBarWidth()), B(module.getBarThickness())
+      A(module.getBarWidth()), B(module.getBarThickness()), reflectivity(module.getSurfaceReflectivity(3.0))
 
     {
       zL = -module.getBarLength() / 2;
@@ -34,7 +34,8 @@ namespace Belle2 {
 
     RaytracerBase::Mirror::Mirror(const TOPGeoModule& module):
       xc(module.getMirrorSegment().getXc()), yc(module.getMirrorSegment().getYc()),
-      zc(module.getMirrorSegment().getZc()), R(module.getMirrorSegment().getRadius())
+      zc(module.getMirrorSegment().getZc()), R(module.getMirrorSegment().getRadius()),
+      reflectivity(module.getMirrorSegment().getMirrorReflectivity(3.0))
     {
       zc += (module.getBarLength() - module.getMirrorSegment().getFullLength()) / 2;
       zb = zc + R;

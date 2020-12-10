@@ -80,28 +80,5 @@ namespace Belle2 {
 
     }
 
-
-    const PixelPositions::PixelData& PixelPositions::get(int pixelID) const
-    {
-      unsigned i = pixelID - 1;
-      if (i >= m_pixels.size()) {
-        B2ERROR("TOP::PixelPositions::get: invalid pixelID");
-        return m_invalid;
-      }
-      return m_pixels[i];
-    }
-
-
-    const PixelPositions::PixelData& PixelPositions::get(unsigned row, unsigned col) const
-    {
-      unsigned i = col + row * m_NColumns;
-      if (row >= m_NRows or col >= m_NColumns or i >= m_pixels.size()) {
-        B2ERROR("TOP::PixelPositions::get: invalid pixel row or column");
-        return m_invalid;
-      }
-      return m_pixels[i];
-    }
-
-
   } // TOP
 } // Belle2

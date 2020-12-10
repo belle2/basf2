@@ -13,6 +13,7 @@
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 #include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h> // new reconstruction code in C++
 
 using namespace std;
 
@@ -85,6 +86,7 @@ namespace Belle2 {
 
     if (pmtInstalled or pmtQEData or channelRQE or thresholdEff) {
       TOPreco::setChannelEffi();
+      TOPRecoManager::setChannelEffi();
     }
 
     // have asic masks changed?
@@ -110,8 +112,15 @@ namespace Belle2 {
         (m_maskUncalibratedTimebase and timebaseChanged)) {
 
       TOPreco::setChannelMask(m_channelMask, m_savedAsicMask);
-      if (m_maskUncalibratedChannelT0) TOPreco::setUncalibratedChannelsOff(m_channelT0);
-      if (m_maskUncalibratedTimebase) TOPreco::setUncalibratedChannelsOff(m_timebase);
+      TOPRecoManager::setChannelMask(m_channelMask, m_savedAsicMask);
+      if (m_maskUncalibratedChannelT0) {
+        TOPreco::setUncalibratedChannelsOff(m_channelT0);
+        TOPRecoManager::setUncalibratedChannelsOff(m_channelT0);
+      }
+      if (m_maskUncalibratedTimebase) {
+        TOPreco::setUncalibratedChannelsOff(m_timebase);
+        TOPRecoManager::setUncalibratedChannelsOff(m_timebase);
+      }
       if (m_printMask) TOPreco::printChannelMask();
     }
 

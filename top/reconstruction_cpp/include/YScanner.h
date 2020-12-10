@@ -13,6 +13,8 @@
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/reconstruction_cpp/InverseRaytracer.h>
 #include <top/reconstruction_cpp/PixelPositions.h>
+#include <top/reconstruction_cpp/PixelMasks.h>
+#include <top/reconstruction_cpp/PixelEfficiencies.h>
 #include <top/reconstruction_cpp/EnergyMask.h>
 #include <vector>
 #include <algorithm>
@@ -198,16 +200,16 @@ namespace Belle2 {
        * Single PDF peak data
        */
       struct Result {
-        unsigned row = 0; /**< pixel row number (0-based) */
+        int pixelID = 0;  /**< pixel ID (1-based) */
         double sum = 0;   /**< peak area proportional to number of photons */
         double e0 = 0;    /**< mean photon energy of the peak */
         double sigsq = 0; /**< width of the peak squared, in photon energy units */
 
         /**
-         * Constructor with pixel row number
-         * @param pixelRow row number (0-based)
+         * Constructor with pixel ID
+         * @param ID pixel ID (1-based)
          */
-        Result(unsigned pixelRow): row(pixelRow)
+        Result(int ID): pixelID(ID)
         {}
 
         /**
@@ -271,6 +273,18 @@ namespace Belle2 {
        * @return pixel positions and their sizes in module local frame
        */
       const PixelPositions& getPixelPositions() const {return m_pixelPositions;}
+
+      /**
+       * Returns pixel masks
+       * @return pixel masks
+       */
+      const PixelMasks& getPixelMasks() const {return m_pixelMasks;}
+
+      /**
+       * Returns pixel relative efficiencies
+       * @return pixel relative efficiencies
+       */
+      const PixelEfficiencies& getPixelEfficiencies() const {return m_pixelEfficiencies;}
 
       /**
        * Returns nominal photon detection efficiencies (PDE)
@@ -407,7 +421,21 @@ namespace Belle2 {
        */
       void merge(unsigned col, double dydz, int j1, int j2) const;
 
+      /**
+       * Returns non-const pixel masks
+       * @return pixel masks
+       */
+      PixelMasks& pixelMasks() {return m_pixelMasks;}
+
+      /**
+       * Returns non-const pixel relative efficiencies
+       * @return pixel relative efficiencies
+       */
+      PixelEfficiencies& pixelEfficiencies() {return m_pixelEfficiencies;}
+
       PixelPositions m_pixelPositions; /**< positions and sizes of pixels */
+      PixelMasks m_pixelMasks; /**< pixel masks */
+      PixelEfficiencies m_pixelEfficiencies; /**< pixel relative efficiencies */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
       double m_cosTotal = 0; /**< cosine of total reflection angle */
 
@@ -425,6 +453,8 @@ namespace Belle2 {
       mutable bool m_scanDone = false;  /**< true if scan performed, false if reflections just merged */
 
       static int s_maxReflections; /**< maximal number of reflections to perform scan */
+
+      friend class TOPRecoManager;
 
     };
 

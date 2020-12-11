@@ -6,7 +6,7 @@
 # Copyright(C) 2020 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
-# Contributors: Mikhail Remnev
+# Contributors: Ewan Hill
 #
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------

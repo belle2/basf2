@@ -763,9 +763,9 @@ Decay B0
 0.004700000   D*-  pi+  pi+  pi+  pi-  pi-                 PHSP; #Gamma_64  PDGLive => Inclusive BF.           #[Comment - PG 09/2020]
 
 
-#___________________________________________________________________________
-# Decays to copy/paste into MIXEDRARE_BELLE2.DEC after each update   - Begin
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B0Rare. Copy/paste into MIXEDRARE_BELLE2.DEC after each update.       --> Begin
+#______________________________________________________________________________________
 
 # b -> u l nu
 #
@@ -2050,9 +2050,9 @@ Decay B0
 0.000024000   D_s*-  D_s+                                  SVS;
 0.000030000   D_s*+  D_s*-                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 
-#___________________________________________________________________________
-# Decays to copy/paste into MIXEDRARE_BELLE2.DEC after each update     - End
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B0Rare. Copy/paste into MIXEDRARE_BELLE2.DEC after each update.         <-- End
+#______________________________________________________________________________________
 
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
@@ -2521,9 +2521,9 @@ Decay anti-B0
 0.004700000   D*+  pi-  pi-  pi-  pi+  pi+                 PHSP; #Gamma_64  PDGLive => Inclusive BF.           #[Comment - PG 09/2020]
 
 
-#___________________________________________________________________________
-# Decays to copy/paste into MIXEDRARE_BELLE2.DEC after each update   - Begin
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay anti-B0Rare. Copy/paste into MIXEDRARE_BELLE2.DEC after each update.  --> Begin
+#______________________________________________________________________________________
 
 # b -> u l nu
 #
@@ -3808,9 +3808,9 @@ Decay anti-B0
 0.000024000   D_s*-  D_s+                                  SVS;
 0.000030000   D_s*+  D_s*-                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 
-#___________________________________________________________________________
-# Decays to copy/paste into MIXEDRARE_BELLE2.DEC after each update     - End
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay anti-B0Rare. Copy/paste into MIXEDRARE_BELLE2.DEC after each update.    <-- End
+#______________________________________________________________________________________
 
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
@@ -4195,9 +4195,9 @@ Decay B+
 0.000009680   D_s-  K+  K+                                 PHSP; #[BF update - PG 09/2020]
 
 
-#___________________________________________________________________________
-# Decays to copy/paste into CHARGEDRARE_BELLE2.DEC after each update - Begin
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B+Rare. Copy/paste into CHARGEDRARE_BELLE2.DEC after each update.     --> Begin
+#______________________________________________________________________________________
 
 # b -> u l nu
 #
@@ -5332,9 +5332,9 @@ Decay B+
 0.000000200   D_s*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
 0.000000010   D*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;
 
-#___________________________________________________________________________
-# Decays to copy/paste into CHARGEDRARE_BELLE2.DEC after each update   - End
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B+Rare. Copy/paste into CHARGEDRARE_BELLE2.DEC after each update.       <-- End
+#______________________________________________________________________________________
 
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
@@ -5703,15 +5703,15 @@ Decay B-
 0.000009680   D_s+  K-  K-                                 PHSP; #[BF update - PG 09/2020]
 
 
-#___________________________________________________________________________
-# Decays to copy/paste into CHARGEDRARE_BELLE2.DEC after each update - Begin
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B-Rare. Copy/paste into CHARGEDRARE_BELLE2.DEC after each update.     --> Begin
+#______________________________________________________________________________________
 
 # b -> u l nu
 #
 # pi: FF values from HFLAV 2016.
-0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 0.000078000   pi0  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 0.000038000   eta  e-  anti-nu_e                           ISGW2; #[PDG2017]
 0.000038000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2017]
@@ -6840,9 +6840,9 @@ Decay B-
 0.000000200   D_s*-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
 0.000000010   D*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;
 
-#___________________________________________________________________________
-# Decays to copy/paste into CHARGEDRARE_BELLE2.DEC after each update   - End
-#___________________________________________________________________________
+#______________________________________________________________________________________
+# Decay B-Rare. Copy/paste into CHARGEDRARE_BELLE2.DEC after each update.       <-- End
+#______________________________________________________________________________________
 
 
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).

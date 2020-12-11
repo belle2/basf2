@@ -1177,8 +1177,8 @@ Decay B-Rare
 # b -> u l nu
 #
 # pi: FF values from HFLAV 2016.
-0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 0.000078000   pi0  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 
 0.000038000   eta  e-  anti-nu_e                           ISGW2; #[PDG2017]
 0.000038000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2017]

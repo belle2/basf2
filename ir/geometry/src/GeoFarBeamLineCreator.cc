@@ -646,11 +646,11 @@ namespace Belle2 {
             ch = tolower(ch);
 
           // check pattern
-          regex regexp(R"(^(d0\dh\d)[\[\.]?(d[12])\]?=(-?[\d\.]+)$)", std::regex::icase);
+          regex regexp(R"(^(d0\dh\d)\.?(d[12])=(-?[\d\.]+)(#.*)*$)");
           smatch matchResult;
 
           if (regex_match(line, matchResult, regexp)) {
-            if (matchResult.size() == 4) {
+            if (matchResult.size() >= 4) {
               string collName = matchResult[1].str();
               string disName = matchResult[2].str();
               double disValue = stod(matchResult[3].str());

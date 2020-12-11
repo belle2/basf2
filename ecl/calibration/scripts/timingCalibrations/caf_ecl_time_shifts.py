@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
+"""Plot the crate time jumps"""
 
 from prompt import CalibrationSettings
 from reconstruction import *

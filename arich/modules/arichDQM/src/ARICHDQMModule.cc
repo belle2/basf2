@@ -422,6 +422,22 @@ namespace Belle2 {
 
     h_trackPerEvent->Fill(ntrk);
 
+    for (auto& it : m_rawFTSW) {
+      B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+              (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+              it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+      auto difference = it.GetTimeSinceLastInjection(0);
+      if (difference != 0x7FFFFFFF) {
+        unsigned int nentries = arichDigits.getEntries();
+        float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+        if (it.GetIsHER(0)) {
+          h_ARICHOccAfterInjHer->Fill(diff2, nentries);
+        } else {
+          h_ARICHOccAfterInjLer->Fill(diff2, nentries);
+        }
+      }
+    }
+
   }
 
   void ARICHDQMModule::endRun()

@@ -178,7 +178,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status), "ca_create_channel failure");
+    // values per module, see above
+    mychid_status.resize(2);
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Overall").data(), NULL, NULL, 10, &mychid_status[1]), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -261,6 +265,7 @@ void DQMHistAnalysisPXDEffModule::event()
     }
   }//One-Module histos finished
 
+  double stat_data = 0;
   bool error_flag = false;
   bool warn_flag = false;
   double all = 0.0;
@@ -289,6 +294,7 @@ void DQMHistAnalysisPXDEffModule::event()
                               var_e);
       }
 
+      /// TODO: one value per module, and please change to the "delta" instead of integral
       all += ihit;
       m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
@@ -464,13 +470,18 @@ void DQMHistAnalysisPXDEffModule::event()
 
     if (all < 100.) {
       m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
+      stat_data = 0.;
     } else {
       if (error_flag) {
         m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
+        stat_data = 4.;
       } else if (warn_flag) {
         m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
+        stat_data = 3.;
       } else {
         m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
+        stat_data = 2.;
+        /// we wont use "white" =1 in this module
         //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
       }
     }
@@ -491,8 +502,8 @@ void DQMHistAnalysisPXDEffModule::event()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    double data = 0;
-    SEVCHK(ca_put(DBR_DOUBLE, mychid_status, (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -501,5 +512,12 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+#endif
 }
 

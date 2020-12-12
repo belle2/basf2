@@ -162,6 +162,9 @@ def run_test_ipynb(argument):
     except CellExecutionError as ce:
         result = False
         message = "Error while executing cell: {}".format(ce)
+    except TimeoutError as te:
+        result = False
+        message = f"{te}"
 
     time = timeit.default_timer() - time_start
 

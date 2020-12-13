@@ -75,6 +75,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_hadron = input_data["hlt_hadron"]
     file_to_iov_Bcosmics = input_data["Bcosmics"]
 
+    expert_config = kwargs.get("expert_config")
     max_files_per_run = expert_config["max_files_per_run"]
     min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_calibration = expert_config["max_events_per_calibration"]  # for t0, tw calib.

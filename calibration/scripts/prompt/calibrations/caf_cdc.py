@@ -17,12 +17,12 @@ settings = CalibrationSettings(name="CDC Tracking",
                                input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
                                depends_on=[],
                                expert_config={
-                                   max_files_per_run=10,
-                                   min_events_per_file=1000,
-                                   max_events_per_calibration=200000,
-                                   max_events_per_calibration_for_xt_sr=1000000,
-                                   max_events_per_file=5000,
-                                   max_events_per_file_hadron=2500
+                                   "max_files_per_run": 100000,
+                                   "min_events_per_file": 1,
+                                   "max_events_per_calibration": 200000,
+                                   "max_events_per_calibration_for_xt_sr": 1000000,
+                                   "max_events_per_file": 5000,
+                                   "max_events_per_file_hadron": 2500
                                })
 
 

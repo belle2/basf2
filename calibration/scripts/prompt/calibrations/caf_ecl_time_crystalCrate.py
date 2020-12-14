@@ -25,11 +25,8 @@ settings = CalibrationSettings(name="ECL crystal and crate time calibrations and
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_bhabha"],
                                depends_on=[],
-                               expert_config={
-                                              "crysCrateIterationLevel": 1
-                                             })
+                               expert_config={"numCrysCrateIterations": 1})
 
-##############################
 
 ##############################
 # REQUIRED FUNCTION #
@@ -61,6 +58,10 @@ def get_calibrations(input_data, **kwargs):
     """
     import basf2
     # Set up config options
+
+    from caf.strategies import SimpleRunByRun
+    from caf.strategies import SingleIOV
+    import numpy as np
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
@@ -105,8 +106,8 @@ def get_calibrations(input_data, **kwargs):
     # Determine how many iterations of the crystal calibrations and
     # crate calibrations to perform.
     expert_config = kwargs.get("expert_config")
-    crysCrateIterationLevel = expert_config["crysCrateIterationLevel"]
-    print("expert_config:  crysCrateIterationLevel = ", crysCrateIterationLevel)
+    numCrysCrateIterations = expert_config["numCrysCrateIterations"]
+    print("expert_config:  numCrysCrateIterations = ", numCrysCrateIterations)
 
     ###################################################
     from basf2 import register_module, create_path
@@ -177,204 +178,88 @@ def get_calibrations(input_data, **kwargs):
     eclTAlgCrystals.meanCleanCutMinFactor = 0.3
     eclTAlgCrystals.debugFilenameBase = "eclBhabhaTAlgorithm"
 
-    ###################################################
-    # Perform the calibration depending on the number
-    # of iterations user selected.
+    ####################################################
+    # Introduce the number of crate+crystal iterations
+    # requested by the user if the number of iterations
+    # requested is a valid number above 0. The default
+    # without a valid user input is to do 2 crate +
+    # 1 crystal calibrations.
 
-    if crysCrateIterationLevel == 2:
+    if numCrysCrateIterations > 0:
         ###################################################
-        # Do 3 crate and 3 crystal calibrations, validations,
-        # and plot the crate time jumps.
-        print("crysCrateIterationLevel == 2")
-        print("Performing these calibration iterations:  crate 1 -> crystal 1 -> crate 2 -> crystal 2 -> crate 3 -> crystal 3")
-
-        ###################################################
-        # Calibration setup for crates iteration 1
+        # Do multiple iterations as determined by the user
 
         from caf.framework import Calibration
+        print("Performing ", numCrysCrateIterations, " iterations of crate and crystal calibrations.")
 
-        cal_crates_1 = Calibration("ECLcrateTimeCalibration_physics_1")
-        cal_crates_1.add_collection(name="bhabha", collection=eclTCol)
-        cal_crates_1.algorithms = [eclTAlgCrates]
-        cal_crates_1.save_payloads = False
+        crysCalibBaseName = "ECLcrystalTimeCalibration_physics_"
+        crateCalibBaseName = "ECLcrateTimeCalibration_physics_"
+        mergeCalibBaseName = "ecl_t_merge_"
 
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SimpleRunByRun
-
-        # The SimpleRunByRun strategy executes your algorithm over runs
-        # individually to give you payloads for each one (if successful)
-        # It will not do any merging of runs which didn't contain enough data.
-        # So failure is expected if your algorithm requires a large amount of data compared to run length.
-        # You should only use granularity='run' for the collector when using this strategy.
-
-        cal_crates_1.strategies = SimpleRunByRun
-
-        # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
-        # So we don't bother setting them.
-
-        ###################################################
-        # Calibration setup for crystals iteration 1
-
-        cal_crystals_1 = Calibration("ECLcrystalTimeCalibration_physics_1")
-        cal_crystals_1.add_collection(name="bhabha", collection=eclTCol_crys)
-        cal_crystals_1.algorithms = [eclTAlgCrystals]
-
-        # Two payloads are created here:
-        #    * ECLCrystalTimeOffset
-        #    * ECLCrystalTimeOffsetBhabha
-        # We technically want to save ECLCrystalTimeOffsetBhabha to the GT but because we don't want
-        # ECLCrystalTimeOffset we save neither here and get the merging algorithm to save a copy
-        # of ECLCrystalTimeOffsetBhabha later.
-        cal_crystals_1.save_payloads = False
-
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
-
-        # The default value is SingleIOV, you don't have to set this, it is done automatically.
-        # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
-        # You can use granularity='run' or granularity='all' for the collector when using this strategy.
-
-        cal_crystals_1.strategies = SingleIOV
-
-        ###################################################
-        # Calibration setup for crates iteration 2
-        cal_crates_2 = Calibration("ECLcrateTimeCalibration_physics_2")
-        cal_crates_2.add_collection(name="bhabha", collection=eclTCol)
-        cal_crates_2.algorithms = [eclTAlgCrates]
-        cal_crates_2.strategies = SimpleRunByRun
-        cal_crates_2.save_payloads = False
-
-        ###################################################
-        # Calibration setup for crystals iteration 2
-
-        cal_crystals_2 = Calibration("ECLcrystalTimeCalibration_physics_2")
-        cal_crystals_2.add_collection(name="bhabha", collection=eclTCol_crys)
-        cal_crystals_2.algorithms = [eclTAlgCrystals]
-
-        # Two payloads are created here:
-        #    * ECLCrystalTimeOffset
-        #    * ECLCrystalTimeOffsetBhabha
-        # We technically want to save ECLCrystalTimeOffsetBhabha to the GT but because we don't want
-        # ECLCrystalTimeOffset we save neither here and get the merging algorithm to save a copy
-        # of ECLCrystalTimeOffsetBhabha later.
-        cal_crystals_2.save_payloads = False
-
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
-
-        # The default value is SingleIOV, you don't have to set this, it is done automatically.
-        # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
-        # You can use granularity='run' or granularity='all' for the collector when using this strategy.
-
-        cal_crystals_2.strategies = SingleIOV
-
-        ###################################################
-        # Calibration setup for crates iteration 3
-        cal_crates_3 = Calibration("ECLcrateTimeCalibration_physics_3")
-        cal_crates_3.add_collection(name="bhabha", collection=eclTCol)
-        cal_crates_3.algorithms = [eclTAlgCrates]
-        cal_crates_3.strategies = SimpleRunByRun
-
-        ###################################################
-        # Calibration setup for crystals iteration 3
-
-        cal_crystals_3 = Calibration("ECLcrystalTimeCalibration_physics_3")
-        cal_crystals_3.add_collection(name="bhabha", collection=eclTCol_crys)
-        cal_crystals_3.algorithms = [eclTAlgCrystals]
-
-        # Two payloads are created here:
-        #    * ECLCrystalTimeOffset
-        #    * ECLCrystalTimeOffsetBhabha
-        # We technically want to save ECLCrystalTimeOffsetBhabha to the GT but because we don't want
-        # ECLCrystalTimeOffset we save neither here and get the merging algorithm to save a copy
-        # of ECLCrystalTimeOffsetBhabha later.
-        cal_crystals_3.save_payloads = False
-
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
-
-        # The default value is SingleIOV, you don't have to set this, it is done automatically.
-        # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
-        # You can use granularity='run' or granularity='all' for the collector when using this strategy.
-
-        cal_crystals_3.strategies = SingleIOV
-
-        ###################################################
-        ###################################################
-        # Include a merging Calibration that doesn't require input data but instead creates a
-        # payload from the previous calibration payloads.
-
-        # We use a dummy collector that barely outputs any data and we set the input files to a single file so
-        # we spawn only one very fast job.
-        # It doesn't matter which input file we choose as the output is never used.
-
-        merging_alg_1 = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
-        cal_ecl_merge_1 = Calibration(name="ecl_t_merge_1", collector="DummyCollector", algorithms=[merging_alg_1],
-                                      input_files=input_files_bhabha[:1])
-
-        cal_ecl_merge_1.save_payloads = False
-
-        # ..Uses cdst data so it requires prepare_cdst_analysis
-        ecl_merge_pre_path_1 = basf2.create_path()
-        prepare_cdst_analysis(ecl_merge_pre_path_1, components=['ECL'])
-        ecl_merge_pre_path_1.pre_collector_path = ecl_merge_pre_path_1
-
-        ###################################################
-        # Include a merging Calibration that doesn't require input data but instead creates the "final"
-        # payload from the previous calibration payloads.  This one has a broad iov again so we don't
-        # have to worry about the user giving it the wrong iov.
-
-        # We use a dummy collector that barely outputs any data and we set the input files to a single file so
-        # we spawn only one very fast job.
-        # It doesn't matter which input file we choose as the output is never used.
-
-        merging_alg_2 = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
-        cal_ecl_merge_2 = Calibration(name="ecl_t_merge_2", collector="DummyCollector", algorithms=[merging_alg_2],
-                                      input_files=input_files_bhabha[:1])
-
-        cal_ecl_merge_2.save_payloads = False
-
-        # ..Uses cdst data so it requires prepare_cdst_analysis
-        ecl_merge_pre_path_2 = basf2.create_path()
-        prepare_cdst_analysis(ecl_merge_pre_path_2, components=['ECL'])
-        ecl_merge_pre_path_2.pre_collector_path = ecl_merge_pre_path_2
-
-        ###################################################
-        # Include a merging Calibration that doesn't require input data but instead creates the final
-        # payload from the final crystal calibration payloads.  This one has the final iov as
-        # defined by the user.
-
-        # We use a dummy collector that barely outputs any data and we set the input files to a single file so
-        # we spawn only one very fast job.
-        # It doesn't matter which input file we choose as the output is never used.
-
-        merging_alg_3 = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
-        cal_ecl_merge_3 = Calibration(name="ecl_t_merge_3", collector="DummyCollector", algorithms=[merging_alg_3],
-                                      input_files=input_files_bhabha[:1])
-
-        # ..Uses cdst data so it requires prepare_cdst_analysis
-        ecl_merge_pre_path_3 = basf2.create_path()
-        prepare_cdst_analysis(ecl_merge_pre_path_3, components=['ECL'])
-        ecl_merge_pre_path_3.pre_collector_path = ecl_merge_pre_path_3
+        calibs = []
 
         # --------------------------------------------------------------
-        # ..Force the output iovs to be open
+        # Interval of validity for the calibrations
         intermediate_iov = IoV(0, 0, -1, -1)
         requested_iov = kwargs.get("requested_iov", None)
         output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-        for algorithm in cal_crystals_1.algorithms:
-            algorithm.params = {"apply_iov": intermediate_iov}
-        for algorithm in cal_crystals_2.algorithms:
-            algorithm.params = {"apply_iov": intermediate_iov}
-        for algorithm in cal_ecl_merge_1.algorithms:
-            algorithm.params = {"apply_iov": intermediate_iov}
-        for algorithm in cal_ecl_merge_2.algorithms:
-            algorithm.params = {"apply_iov": intermediate_iov}
 
-        # the final crystal payload is given the user's iov
-        # cal_ecl_merge_3 is the same as cal_ecl_merge_2 except for the iov.
-        for algorithm in cal_ecl_merge_3.algorithms:
-            algorithm.params = {"apply_iov": output_iov}
+        # --------------------------------------------------------------
+        # Loop over all the iterations to set up the crate and crystal
+        # calibrations.
+
+        for i in range(numCrysCrateIterations):
+            crysCalibName = crysCalibBaseName + str(i)
+            crateCalibName = crateCalibBaseName + str(i)
+            mergeCalibName = mergeCalibBaseName + str(i)
+
+            print("iteration = ", i)
+            print("crysCalibName = ", crysCalibName)
+            print("crateCalibName = ", crateCalibName)
+
+            ###################################################
+            # Calibration setup for crates iteration
+            cal_crates_i = Calibration(crateCalibName)
+            cal_crates_i.add_collection(name="bhabha", collection=eclTCol)
+            cal_crates_i.algorithms = [eclTAlgCrates]
+            cal_crates_i.save_payloads = False
+            cal_crates_i.strategies = SimpleRunByRun
+
+            ###################################################
+            # Calibration setup for crystals iteration
+            cal_crystals_i = Calibration(crysCalibName)
+            cal_crystals_i.add_collection(name="bhabha", collection=eclTCol_crys)
+            cal_crystals_i.algorithms = [eclTAlgCrystals]
+            cal_crystals_i.save_payloads = False
+            cal_crystals_i.strategies = SingleIOV
+
+            ###################################################
+            # Setup for merging crystals payloads
+            merging_alg_i = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
+            cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector", algorithms=[merging_alg_i],
+                                          input_files=input_files_bhabha[:1])
+
+            cal_ecl_merge_i.save_payloads = False
+            ecl_merge_pre_path_i = basf2.create_path()
+            prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
+            ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
+
+            if i == numCrysCrateIterations - 1:
+                # The final crystal payload is given the user's iov
+                # cal_ecl_merge_3 is the same as cal_ecl_merge_2 except for the iov.
+                for algorithm in cal_ecl_merge_i.algorithms:
+                    algorithm.params = {"apply_iov": output_iov}
+            else:
+                # Force the output iovs to be open
+                for algorithm in cal_crystals_i.algorithms:
+                    algorithm.params = {"apply_iov": intermediate_iov}
+
+            # Fill the calibs array with all the "calibrations" that will be run
+            calibs = np.append(calibs, [cal_crates_i, cal_crystals_i, cal_ecl_merge_i])
+
+        # Make sure that the final paylaods get saved.
+        calibs[len(calibs)-3].save_payloads = True   # crates
+        calibs[len(calibs)-1].save_payloads = True   # crystals
 
         #############################################################
         #############################################################
@@ -405,8 +290,6 @@ def get_calibrations(input_data, **kwargs):
         eclValTAlgBhabha = Belle2.ECL.eclTValidationAlgorithm("eclBhabhaTimeCalibrationValidationCollector")
 
         # Define the CAF algorithm arguments
-        # eclValTAlgBhabha.cellIDLo= 3
-        # eclValTAlgBhabha.cellIDHi = 2
         eclValTAlgBhabha.meanCleanRebinFactor = 3
         eclValTAlgBhabha.meanCleanCutMinFactor = 0.4
         eclValTAlgBhabha.debugFilenameBase = "eclBhabhaTValidationAlgorithm"
@@ -420,14 +303,6 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
         valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
         valid_cal_bhabha.save_payloads = False
-
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
-
-        # The default value is SingleIOV, you don't have to set this, it is done automatically.
-        # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
-        # You can use granularity='run' or granularity='all' for the collector when using this strategy.
-
         valid_cal_bhabha.strategies = SingleIOV
 
         #############################################################
@@ -459,8 +334,6 @@ def get_calibrations(input_data, **kwargs):
         eclValTAlgHadronic = Belle2.ECL.eclTValidationAlgorithm("eclHadronTimeCalibrationValidationCollector")
 
         # Define the CAF algorithm arguments
-        # eclValTAlgHadronic.cellIDLo= 3
-        # eclValTAlgHadronic.cellIDHi = 2
         eclValTAlgHadronic.meanCleanRebinFactor = 3
         eclValTAlgHadronic.meanCleanCutMinFactor = 0.4
         eclValTAlgHadronic.debugFilenameBase = "eclHadronTValidationAlgorithm"
@@ -474,14 +347,6 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
         valid_cal_hadron.algorithms = [eclValTAlgHadronic]
         valid_cal_hadron.save_payloads = False
-
-        # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
-
-        # The default value is SingleIOV, you don't have to set this, it is done automatically.
-        # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
-        # You can use granularity='run' or granularity='all' for the collector when using this strategy.
-
         valid_cal_hadron.strategies = SingleIOV
 
         #######################################################################
@@ -527,52 +392,44 @@ def get_calibrations(input_data, **kwargs):
 
         cal_ecl_timeShifts.save_payloads = False
 
-        #######################################################################
-        #######################################################################
-        # Set up calibrations for crystals and crates to be executed in order
-        # to converge the calibrations.  Instead of a loop, just create the
-        # calibration instances manually with dependencies.  Once these are
-        # done, get the validations to execute.
+        ##################################################
+        # Set the dependencies to determine the order in
+        # which calibrations have to be performed.  The
+        # order determines the sequential order and
+        # which calibrations can be run in parallel.
 
-        # cal_crates_1 depends on the crystal payload values in the global tag
-        cal_crystals_1.depends_on(cal_crates_1)
-        cal_ecl_merge_1.depends_on(cal_crystals_1)
-        cal_crates_2.depends_on(cal_ecl_merge_1)
-        cal_crystals_2.depends_on(cal_crates_2)
-        cal_ecl_merge_2.depends_on(cal_crystals_2)
-        cal_crates_3.depends_on(cal_ecl_merge_2)
-        cal_crystals_3.depends_on(cal_crates_3)
+        # Make the crate and crytsal calibrations and the cerge crystal
+        # process occur in the order loaded into the array.
+        for i in range(len(calibs)-1):
+            calibs[i+1].depends_on(calibs[i])
 
-        # cal_ecl_merge_3 - uses user iov
-        cal_ecl_merge_3.depends_on(cal_crystals_3)
-
-        # The validations can run independently of each other but rely on the
-        # last calibration step
-        # valid_cal_bhabha.depends_on(cal_crystals_3)
-        # valid_cal_hadron.depends_on(cal_crystals_3)
-        valid_cal_bhabha.depends_on(cal_ecl_merge_3)
-        valid_cal_hadron.depends_on(cal_ecl_merge_3)
-
-        # Plotting
-        # cal_ecl_timeShifts.depends_on(cal_crystals_3)
-        cal_ecl_timeShifts.depends_on(cal_ecl_merge_3)  # CHANGE SO THAT I CAN COMPARE PAYLOADS FROM PREVIOUS BUCKETS
+        # The validations and plotting can run independently of each other
+        # but rely on the last calibration step
+        valid_cal_bhabha.depends_on(calibs[len(calibs)-1])
+        valid_cal_hadron.depends_on(calibs[len(calibs)-1])
+        cal_ecl_timeShifts.depends_on(calibs[len(calibs)-1])
 
         ###################################################
         # Finalize all calibrations
 
+        calibs = np.append(calibs, [valid_cal_bhabha, valid_cal_hadron, cal_ecl_timeShifts])
+
+        print("##############")
+        print("List of calibrations:")
+        for c in calibs:
+            print("  ", c.name, " depends on ", c.dependencies, ", save payloads = ", c.save_payloads)
+        print("##############")
+
         # You must return all calibrations you want to run in the prompt process, even if it's only one
         # Calibrations will be executed in this order as a result of the dependencies defined by the "dependes_on(...)".
-        return [cal_crates_1, cal_crystals_1, cal_ecl_merge_1,
-                cal_crates_2, cal_crystals_2, cal_ecl_merge_2,
-                cal_crates_3, cal_crystals_3, cal_ecl_merge_3,
-                valid_cal_bhabha, valid_cal_hadron, cal_ecl_timeShifts]
+        return calibs
 
     else:
         ###################################################
         # Do 2 crate and 1 crystal calibrations, validations,
-        # and plot the crate time jumps.
+        # and plot the crate time jumps.  This is the detault
 
-        print("crysCrateIterationLevel value resulting in default calibration iteration set up")
+        print("numCrysCrateIterations value resulting in default calibration iteration set up")
         print("Performing these calibration iterations:  crate -> crystal -> crate")
 
         ###################################################
@@ -690,8 +547,6 @@ def get_calibrations(input_data, **kwargs):
         eclValTAlgBhabha = Belle2.ECL.eclTValidationAlgorithm("eclBhabhaTimeCalibrationValidationCollector")
 
         # Define the CAF algorithm arguments
-        # eclValTAlgBhabha.cellIDLo= 3
-        # eclValTAlgBhabha.cellIDHi = 2
         eclValTAlgBhabha.meanCleanRebinFactor = 3
         eclValTAlgBhabha.meanCleanCutMinFactor = 0.4
         eclValTAlgBhabha.debugFilenameBase = "eclBhabhaTValidationAlgorithm"
@@ -744,8 +599,6 @@ def get_calibrations(input_data, **kwargs):
         eclValTAlgHadronic = Belle2.ECL.eclTValidationAlgorithm("eclHadronTimeCalibrationValidationCollector")
 
         # Define the CAF algorithm arguments
-        # eclValTAlgHadronic.cellIDLo= 3
-        # eclValTAlgHadronic.cellIDHi = 2
         eclValTAlgHadronic.meanCleanRebinFactor = 3
         eclValTAlgHadronic.meanCleanCutMinFactor = 0.4
         eclValTAlgHadronic.debugFilenameBase = "eclHadronTValidationAlgorithm"

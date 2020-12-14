@@ -11,8 +11,7 @@ Return code is
  255-wrong script arguments
 """
 
-from ROOT import Belle2, TFile
-from ROOT.Belle2 import ECLChannelMap
+from ROOT import TFile
 import sys
 
 ################################################

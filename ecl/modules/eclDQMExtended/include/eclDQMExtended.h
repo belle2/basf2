@@ -79,6 +79,8 @@ namespace Belle2 {
     std::string m_RunName;
     /** Save detailed fit data for failed fits */
     bool m_SaveDetailedFitData;
+    /** */
+    bool m_adjusted_timing;
 
     /** DBArray for payload 'ECLDSPPars0'. */
     DBArray<ECLDspData> m_ECLDspDataArray0;

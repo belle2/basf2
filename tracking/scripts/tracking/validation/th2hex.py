@@ -2,7 +2,6 @@ import ROOT
 
 import math
 import numpy as np
-import array
 
 
 def TH2Hex(name,

@@ -15,10 +15,9 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
-from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
@@ -36,6 +35,8 @@ class XToD0_D0ToHpJm(BaseSkim):
     __description__ = "Skim list for D0 to two charged FSPs."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     # Cached static method, so that its contents are only executed once for a single path.
     # Factored out into a separate function here, so it is available to other skims.
@@ -280,6 +281,8 @@ class XToDp_DpToKsHp(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
@@ -354,6 +357,8 @@ class XToDp_DpToHpHmJp(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdK("loose", path=path)
         stdPi("loose", path=path)
@@ -422,6 +427,8 @@ class LambdacTopHpJm(BaseSkim):
     __description__ = "Skim list for Lambda_c+ -> p K- pi+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -533,6 +540,8 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
@@ -630,6 +639,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdK("loose", path=path)
         stdPi("loose", path=path)
@@ -670,6 +681,8 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __description__ = "Skim list for D*+ to pi+ D0, D0 to pi0 and two conjugate charged FSPs."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -719,6 +732,8 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         loadStdSkimPi0(path=path)
@@ -765,6 +780,8 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
     __description__ = "Skim list for D*+ to K- pi+ pi- pi+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -822,6 +839,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -917,6 +936,8 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdKshorts(path=path)
 
@@ -957,6 +978,8 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         loadStdSkimPhoton(path=path)
         loadStdSkimPi0(path=path)
@@ -996,6 +1019,8 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __description__ = "A special version of `DstToD0Pi_D0ToHpHmPi0` to deal with Early Data."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         loadStdSkimPi0(path=path)

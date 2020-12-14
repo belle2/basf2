@@ -246,7 +246,6 @@ def treeFit(
     treeFitter.param('customOriginConstraint', customOriginConstraint)
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
-
     path.add_module(treeFitter)
 
 

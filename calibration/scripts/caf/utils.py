@@ -7,6 +7,7 @@ This module contains various utility functions for the CAF and Job submission Ba
 
 from basf2 import B2INFO, B2WARNING, B2DEBUG
 import os
+import glob
 from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
@@ -18,9 +19,10 @@ import contextlib
 import enum
 import shutil
 import itertools
+from urllib.parse import urlparse
 
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+from ROOT.Belle2 import CalibrationAlgorithm, IntervalOfValidity
 
 #: A newline string for B2INFO that aligns with the indentation of B2INFO's first line
 b2info_newline = "\n" + (7 * " ")
@@ -711,14 +713,14 @@ def find_absolute_file_paths(file_path_patterns):
     Also uses set() to prevent multiple instances of the same file path
     but returns a list of file paths.
 
-    Any root:// urls are taken as absolute file paths already and are simply
-    passed through. They should NOT contain wildcard patterns.
+    Any non "file" type urls are taken as absolute file paths already and are simply
+    passed through.
     """
-    import glob
     existing_file_paths = set()
     for file_pattern in file_path_patterns:
-        if file_pattern[:7] != "root://":
-            input_files = glob.glob(file_pattern)
+        file_pattern_uri = parse_file_uri(file_pattern)
+        if file_pattern_uri.scheme == "file":
+            input_files = glob.glob(file_pattern_uri.path)
             if not input_files:
                 B2WARNING(f"No files matching {file_pattern} can be found, it will be skipped!")
             else:
@@ -727,7 +729,7 @@ def find_absolute_file_paths(file_path_patterns):
                     if os.path.isfile(file_path):
                         existing_file_paths.add(file_path)
         else:
-            B2INFO(f"Found an xrootd file path {input_file_path} it will not be checked for validity.")
+            B2INFO(f"Found a non-local file pattern {file_pattern} it will not be checked for validity.")
             existing_file_paths.add(file_pattern)
 
     abs_file_paths = list(existing_file_paths)
@@ -806,6 +808,19 @@ def find_int_dirs(dir_path):
         except ValueError as err:
             pass
     return paths
+
+
+def parse_file_uri(file_uri):
+    """
+    A central function for parsing file URI strings. Just so we only have to change it in one place later.
+
+    Parameters:
+        file_uri (str)
+
+    Returns:
+        urllib.parse.ParseResult
+    """
+    return urlparse(file_uri, scheme="file", allow_fragments=False)
 
 
 UNBOUND_EXPRUN = ExpRun(-1, -1)

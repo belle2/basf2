@@ -287,7 +287,8 @@ void BKLMSimHistogrammerModule::event()
 //
 
 
-  if (nSimHit == 0) return;
+  if (nSimHit == 0)
+    return;
   for (int i = 0; i < n2DHits; i++) {
     BKLMHit2d* hit2D = hits2D[i];
     TVector3 gHitPos = hit2D->getGlobalPosition();

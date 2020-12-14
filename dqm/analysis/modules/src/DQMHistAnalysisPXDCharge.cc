@@ -194,22 +194,27 @@ void DQMHistAnalysisPXDChargeModule::event()
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
   }
 #endif
+
   int status = 0;
 
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    // cppcheck-suppress unreadVariable
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
+      // cppcheck-suppress unreadVariable
       status = 4;
     } else if (fabs(data - 50) > 15. || diff > 10) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
+      // cppcheck-suppress unreadVariable
       status = 3;
     } else {
       m_cCharge->Pad()->SetFillColor(kGreen);// Green
+      // cppcheck-suppress unreadVariable
       status = 2;
     }
 
@@ -224,7 +229,7 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
   tt->SetTextAngle(90);// Rotated
   tt->SetTextAlign(12);// Centered
   tt->Draw();

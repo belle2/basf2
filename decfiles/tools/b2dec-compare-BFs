@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Helper script that reads the decay file and prints out any differences between charge conjugated B meson decays
+"""
+__author__ = 'Stephan Duell'
+__copyright__ = '2020 - Belle II Collaboration'
+
+
+import basf2
+import argparse
+import os
+import sys
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-i', '--input',
+                        default=basf2.find_file('decfiles/dec/DECAY_BELLE2.DEC'),
+                        #nargs='1',
+                        help='input file names; it is possible to use the wildcard "*" to pass multiple files in input',
+                        metavar='FILE')
+    return parser
+
+if __name__ == "__main__":
+    args = arg_parser().parse_args()
+    filepath = args.input
+
+    Balldecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
+    Bdecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
+    BallBF = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
+    BtotBF = {'B+': 0., 'B-': 0., 'B0': 0., 'anti-B0': 0.}
+    jetsetscale = {'B+': 0., 'B-': 0., 'B0': 0., 'anti-B0': 0.}
+    togglesave = ''
+
+    with open(filepath) as f:
+        line = f.readline()
+        cnt = 1
+        while line:
+            if "Decay B+" in line and line[0]!='#':
+                togglesave = 'B+'
+            if "Decay B-" in line and line[0]!='#':
+                togglesave = 'B-'
+            if "Decay B0" in line and line[0]!='#':
+                togglesave = 'B0'
+            if "Decay anti-B0" in line and line[0]!='#':
+                togglesave = 'anti-B0'
+
+            if "Enddecay" in line:
+                togglesave = ''
+
+            if togglesave:
+                if(line[0] != '#' and line[0:5] != 'Decay' and line != '\n'):
+                    Bdecs[togglesave].append(line)
+
+            line = f.readline()
+            cnt += 1
+
+    basf2.B2INFO("# of B+ decays: {}".format(len(Bdecs['B+'])))
+    basf2.B2INFO("# of B- decays: {}".format(len(Bdecs['B-'])))
+    basf2.B2INFO("# of B0 decays: {}".format(len(Bdecs['B0'])))
+    basf2.B2INFO("# of anti-B0 decays: {}".format(len(Bdecs['anti-B0'])))
+
+    for keys, vals in Bdecs.items():
+        for string in vals:
+            BtotBF[keys] += float(string.split()[0])
+            BallBF[keys].append(float(string.split()[0]))
+
+    basf2.B2INFO("B meson total BF")
+    basf2.B2INFO(BtotBF)
+
+    nomatch = [index for index, (e1, e2) in enumerate(zip(BallBF['B+'], BallBF['B-'])) if e1 != e2]
+    basf2.B2INFO('charged B not matching decay modes:')
+    for idx in nomatch:
+        basf2.B2INFO('{} vs. {} at index {}'.format(Bdecs['B+'][idx], Bdecs['B-'][idx], idx))
+
+
+    nomatch2 = [index for index, (e3, e4) in enumerate(zip(BallBF['B0'], BallBF['anti-B0'])) if e3 != e4]
+    basf2.B2INFO('neutral B not matching decay modes:')
+    for idx in nomatch2:
+        basf2.B2INFO('{} vs. {} at index {}'.format(Bdecs['B0'][idx], Bdecs['anti-B0'][idx], idx))

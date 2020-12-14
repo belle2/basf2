@@ -15,7 +15,6 @@
 from tracking import add_tracking_for_PXDDataReduction_simulation
 from tracking.validation.plot import ValidationPlot
 from ROOT import Belle2
-import math
 import collections
 import ROOT
 import basf2

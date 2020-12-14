@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 
-from basf2 import *
+import basf2 as b2
 # from simulation import register_simulation
 # from reconstruction import register_reconstruction
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 argvs = sys.argv
 argc = len(argvs)
@@ -34,15 +33,15 @@ components = [
 # register_reconstruction(components)
 
 # Register RoI related modules for object decoding
-roiGen = register_module('ROIGenerator')
-roiPayloadAssembler = register_module('ROIPayloadAssembler')
+roiGen = b2.register_module('ROIGenerator')
+roiPayloadAssembler = b2.register_module('ROIPayloadAssembler')
 
 # create a main path
-main = create_path()
+main = b2.create_path()
 
 # Load Geometry module
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 
 # Add input module
 # input = register_module("SeqRootInput")
@@ -55,19 +54,19 @@ geometry = register_module('Geometry')
 # main.add_module(output)
 
 # Add Rbuf2Ds
-rbuf2ds = register_module("Rbuf2Ds")
+rbuf2ds = b2.register_module("Rbuf2Ds")
 # rbuf2ds = register_module("FastRbuf2Ds")
 rbuf2ds.param("RingBufferName", argvs[1])
 # rbuf2ds.param("NumThreads", 4 )
 main.add_module(rbuf2ds)
 
 # Add Progress
-progress = register_module("Progress")
+progress = b2.register_module("Progress")
 progress.param('maxN', 4)
 main.add_module(progress)
 
 # Add Elapsed Time
-elapsed = register_module("ElapsedTime")
+elapsed = b2.register_module("ElapsedTime")
 elapsed.param("EventInterval", 20000)
 main.add_module(elapsed)
 
@@ -77,7 +76,7 @@ main.add_module(elapsed)
 # main.add_module(ds2rbuf)
 
 # Add Ds2Raw
-ds2rbuf = register_module("Ds2Raw")
+ds2rbuf = b2.register_module("Ds2Raw")
 ds2rbuf.param("RingBufferName", argvs[2])
 main.add_module(ds2rbuf)
 
@@ -87,4 +86,4 @@ main.add_module(ds2rbuf)
 # main.add_module(output)
 
 # Run
-process(main)
+b2.process(main)

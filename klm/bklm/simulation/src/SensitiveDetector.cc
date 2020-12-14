@@ -129,7 +129,8 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
     const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
     if (postStep->GetProcessDefinedStep() != 0) {
-      if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
+      if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay)
+        moduleID |= BKLM_DECAYED_MASK;
     }
     int trackID = track->GetTrackID();
     if (m->hasRPCs()) {
@@ -189,16 +190,20 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   double phiStripD = m->getPhiStrip(localPosition);
   int phiStrip = int(phiStripD);
   int pMin = m->getPhiStripMin();
-  if (phiStrip < pMin) return;
+  if (phiStrip < pMin)
+    return;
   int pMax = m->getPhiStripMax();
-  if (phiStrip > pMax) return;
+  if (phiStrip > pMax)
+    return;
 
   double zStripD = m->getZStrip(localPosition);
   int zStrip = int(zStripD);
   int zMin = m->getZStripMin();
-  if (zStrip < zMin) return;
+  if (zStrip < zMin)
+    return;
   int zMax = m->getZStripMax();
-  if (zStrip > zMax) return;
+  if (zStrip > zMax)
+    return;
 
   phiStripLower = phiStrip;
   phiStripUpper = phiStrip;
@@ -209,7 +214,8 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   int n = 0;
   double rand = gRandom->Uniform();
   for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
-    if (m_SimPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand) break;
+    if (m_SimPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand)
+      break;
   }
   int nextStrip = (phiStripDiv > 0.0 ? 1 : -1);
   while (--n > 0) {
@@ -222,7 +228,8 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   }
   rand = gRandom->Uniform();
   for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
-    if (m_SimPar->getZMultiplicityCDF(zStripDiv, n) > rand) break;
+    if (m_SimPar->getZMultiplicityCDF(zStripDiv, n) > rand)
+      break;
   }
   nextStrip = (zStripDiv > 0.0 ? 1 : -1);
   while (--n > 0) {

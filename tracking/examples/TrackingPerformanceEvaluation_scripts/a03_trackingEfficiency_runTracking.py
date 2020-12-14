@@ -15,9 +15,8 @@
 #################################################################
 
 import sys
-from basf2 import *
-from reconstruction import add_reconstruction
-from tracking import *
+import basf2 as b2
+from tracking import add_tracking_reconstruction
 
 mcTrackFinding = False
 
@@ -40,16 +39,16 @@ print('simulation: ' + roi + ' ' + bkg)
 print('reconstruction ' + vxdtf)
 print()
 
-path = create_path()
+path = b2.create_path()
 
-root_input = register_module('RootInput')
+root_input = b2.register_module('RootInput')
 root_input.param('inputFileNames', input_root_files)
 path.add_module(root_input)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 path.add_module(gearbox)
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 path.add_module(geometry)
 
 add_tracking_reconstruction(
@@ -66,18 +65,18 @@ for modItem in modList:
         modItem.param('Validation', True)
 
 
-v0matcher = register_module('MCV0Matcher')
+v0matcher = b2.register_module('MCV0Matcher')
 v0matcher.param('V0ColName', 'V0ValidationVertexs')
-v0matcher.logging.log_level = LogLevel.INFO
+v0matcher.logging.log_level = b2.LogLevel.INFO
 path.add_module(v0matcher)
 
 
 path.add_module('Progress')
 
-root_output = register_module('RootOutput')
+root_output = b2.register_module('RootOutput')
 root_output.param('outputFileName', output_file_name)
 path.add_module(root_output)
 
-process(path)
+b2.process(path)
 
-print(statistics)
+print(b2.statistics)

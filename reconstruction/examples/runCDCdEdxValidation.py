@@ -6,15 +6,12 @@
 
 import basf2
 import os
-import sys
 import ROOT
-from ROOT import Belle2
-from modularAnalysis import *
 
-reset_database()
-use_database_chain()
-use_central_database("data_reprocessing_preproc8b")
-# use_local_database("localDB/database.txt", "localDB")
+basf2.reset_database()
+basf2.use_database_chain()
+basf2.use_central_database("data_reprocessing_preproc8b")
+# basf2.use_local_database("localDB/database.txt", "localDB")
 
 ROOT.gROOT.SetBatch(True)
 
@@ -36,12 +33,12 @@ else:
 mypath = basf2.Path()  # create your own path (call it what you like)
 
 
-moduleA = register_module("RootInput")
+moduleA = basf2.register_module("RootInput")
 moduleA.param("inputFileNames", input_files)
 mypath.add_module(moduleA)
 
 
-moduleB = register_module("CDCDedxValidation")
+moduleB = basf2.register_module("CDCDedxValidation")
 moduleB.param("fnRuns", 50)
 if var == 'bhabha':
     moduleB.param("SampleType", "bhabha")

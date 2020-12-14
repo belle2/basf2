@@ -14,8 +14,8 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
 from stdPhotons import stdPhotons
-from variables import variables as vm
 
+from validation_tools.metadata import create_validation_histograms
 path = b2.Path()
 
 histogram_filename = 'BtoXgamma_Validation.root'

@@ -83,10 +83,12 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
     const std::string& baseIdentifier = cutIdentifier.first;
+    const int numberOfFlags = cutIdentifier.second.size();
 
     m_cutResultHistograms.emplace(baseIdentifier,
-                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 1, 0, 0));
-    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());
+                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), numberOfFlags, 0,
+                                           numberOfFlags));
+    m_cutResultHistograms[baseIdentifier]->SetXTitle("");
     m_cutResultHistograms[baseIdentifier]->SetOption("bar");
     m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
     m_cutResultHistograms[baseIdentifier]->SetStats(false);

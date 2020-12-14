@@ -65,14 +65,14 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
-  m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
+  m_hCommonMode = new TH2D("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
-  m_hCommonModeDelta = new TH2F("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
+  m_hCommonModeDelta = new TH2D("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
                                 m_PXDModules.size(), 63, 0, 63);
   m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeDelta->SetStats(false);
-  m_hCommonModeOld = new TH2F("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
+  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
                               63, 0, 63);
   m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeOld->SetStats(false);
@@ -136,6 +136,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 void DQMHistAnalysisPXDCMModule::event()
 {
   double all_outside = 0.0, all = 0.0;
+  // cppcheck-suppress unreadVariable
   double all_cm = 0.0;
   bool error_flag = false;
   bool warn_flag = false;
@@ -181,6 +182,7 @@ void DQMHistAnalysisPXDCMModule::event()
       all_outside += outside;
       all += current;
       double dhpc = hh1->GetBinContent(64);
+      // cppcheck-suppress unreadVariable
       all_cm += dhpc;
       if (current > 1) {
         error_flag |= (outside / current > 1e-5); /// TODO level might need adjustment
@@ -191,26 +193,32 @@ void DQMHistAnalysisPXDCMModule::event()
     }
   }
 
+  // cppcheck-suppress variableScope
   int status = 0;
   {
     m_cCommonMode->cd();
     // not enough Entries
     if (all < 100.) {
       m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
+      // cppcheck-suppress unreadVariable
       status = 0; // default
     } else {
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
       if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
         m_cCommonMode->Pad()->SetFillColor(kRed);// Red
+        // cppcheck-suppress unreadVariable
         status = 4;
       } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
+        // cppcheck-suppress unreadVariable
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
         m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
+        // cppcheck-suppress unreadVariable
         status = 2;
       } else { // between 0 and 50 ...
         m_cCommonMode->Pad()->SetFillColor(kWhite);// White
+        // cppcheck-suppress unreadVariable
         status = 1;
       }
     }
@@ -222,7 +230,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -263,7 +271,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

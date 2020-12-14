@@ -19,10 +19,10 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 from tracking.validation.tracking_efficiency_helpers import run_simulation, run_reconstruction, get_generated_pt_value
 
-set_random_seed(123)
+b2.set_random_seed(123)
 
 pt_value = get_generated_pt_value(0)
 
@@ -30,9 +30,9 @@ output_filename = '../trackingEfficiency_pt_%.2fGeV.root' % pt_value
 
 print(output_filename)
 
-path = create_path()
+path = b2.create_path()
 
 run_simulation(path, pt_value)
 run_reconstruction(path, output_filename)
 
-process(path)
+b2.process(path)

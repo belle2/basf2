@@ -1,19 +1,19 @@
-import sys
-import multiprocessing as mp
-import basf2 as b2
+import basf2
 import validation_gt as vgt
 import rawdata as raw
 import reconstruction as rec
 import b2test_utils as b2u
+import sys
+import multiprocessing as mp
 
 # Use the validation Global Tags for the entire test.
-b2.conditions.override_globaltags(vgt.get_validation_globaltags())
+basf2.conditions.override_globaltags(vgt.get_validation_globaltags())
 
 
 def store_cdst(rawdata_file_name, cdst_file_name, data_type, number_of_events):
 
     # Unpack and reconstruct some raw data and store the output using the cDST raw-format.
-    child = b2.Path()
+    child = basf2.Path()
     child.add_module('RootInput',
                      inputFileName=rawdata_file_name)
     raw.add_unpackers(path=child)
@@ -27,8 +27,8 @@ def store_cdst(rawdata_file_name, cdst_file_name, data_type, number_of_events):
                         mc=False,
                         filename=cdst_file_name,
                         rawFormat=True)
-    b2.process(path=child,
-               max_event=number_of_events)
+    basf2.process(path=child,
+                  max_event=number_of_events)
 
 
 if __name__ == "__main__":
@@ -47,17 +47,17 @@ if __name__ == "__main__":
         child.start()
         child.join()
         if child.exitcode != 0:
-            b2.B2FATAL(f'The child process failed with exit code {child.exitcode}.')
+            basf2.B2FATAL(f'The child process failed with exit code {child.exitcode}.')
 
         # Check if the file contains the expected number of events
-        metadata = b2.get_file_metadata(cdst_file_name)
+        metadata = basf2.get_file_metadata(cdst_file_name)
         if not (metadata.getNEvents() == number_of_events):
-            b2.B2FATAL(f'The cDST file produced by the child process contains {metadata.getNEvents()} events '
-                       f'instead of {nummber_of_events}.')
+            basf2.B2FATAL(f'The cDST file produced by the child process contains {metadata.getNEvents()} events '
+                          f'instead of {nummber_of_events}.')
 
         # If everything is OK, reconstruct the cDST file.
-        main = b2.Path()
+        main = basf2.Path()
         main.add_module('RootInput',
                         inputFileName=cdst_file_name)
-        # rec.prepare_cdst_analysis(path=main)
-        b2.process(path=main)
+        rec.prepare_cdst_analysis(path=main)
+        basf2.process(path=main)

@@ -8,7 +8,7 @@ import subprocess
 import itertools
 from shutil import copyfile
 import ROOT
-from ROOT.Belle2 import FileMetaData, EventMetaData
+from ROOT.Belle2 import FileMetaData
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light

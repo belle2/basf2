@@ -61,6 +61,8 @@ class BtoD0h_Kspi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
@@ -119,6 +121,8 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -180,6 +184,8 @@ class B0toDpi_Kpipi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
@@ -214,6 +220,8 @@ class B0toDpi_Kspi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)
@@ -250,6 +258,8 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
@@ -281,6 +291,8 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         loadStdPi0ForBToHadrons(path=path)
@@ -330,6 +342,8 @@ class B0toDrho_Kpipi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         loadPiForBtoHadrons(path=path)
@@ -369,6 +383,8 @@ class B0toDrho_Kspi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -411,6 +427,8 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -456,6 +474,8 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -514,6 +534,8 @@ class BtoD0h_hh(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
@@ -577,6 +599,8 @@ class BtoD0h_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
@@ -624,6 +648,8 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         loadStdPi0ForBToHadrons(path=path)
@@ -690,6 +716,8 @@ class BtoD0h_Kshh(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdKshorts(path=path)
         loadPiForBtoHadrons(path=path)
@@ -752,6 +780,8 @@ class BtoD0rho_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
+    ApplyHLTHadronCut = True
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         loadStdPi0ForBToHadrons(path=path)
@@ -808,6 +838,8 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)

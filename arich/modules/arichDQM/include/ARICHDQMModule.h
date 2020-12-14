@@ -114,7 +114,8 @@ namespace Belle2 {
 
     TH1* h_ARICHOccAfterInjLer = NULL; /**< Histogram Ndigits after LER injection */
     TH1* h_ARICHOccAfterInjHer = NULL; /**< Histogram Ndigits after HER injection */
-
+    TH1F* h_ARICHOEccAfterInjLer = NULL; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+    TH1F* h_ARICHOEccAfterInjHer = NULL; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
     // dataobjects
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
 

@@ -181,6 +181,8 @@ int main(int argc, char* argv[])
      "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
     ("job-information", prog::value<string>(),
      "Create json file with metadata of output files and basf2 execution status.")
+    ("realm", prog::value<string>(),
+     "Set the realm of the basf2 execution.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -390,6 +392,11 @@ int main(int argc, char* argv[])
       string jobInfoFile = varMap["job-information"].as<string>();
       MetadataService::Instance().setJsonFileName(jobInfoFile);
       B2INFO("Job information file: " << jobInfoFile);
+    }
+
+    if (varMap.count("realm")) {
+      string realm = varMap["realm"].as<string>();
+      Environment::Instance().setRealm(realm);
     }
 
 

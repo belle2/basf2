@@ -183,6 +183,11 @@ namespace Belle2 {
     /** Set info from path executed by the framework. */
     void setJobInformation(const std::shared_ptr<Path>& path);
 
+    /** Set the basf2 execution realm. */
+    void setRealm(const std::string& realm);
+    /** Get the basf2 execution realm. */
+    const std::string& getRealm() const { return m_realm; }
+
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
      *  Function only relies on information available during module construction,
@@ -329,6 +334,7 @@ namespace Belle2 {
     int m_run; /**< override run for EventInfoSetter. */
     int m_experiment; /**< override experiment for EventInfoSetter. */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
+    std::string m_realm; /**< The realm in which basf2 is executed. */
 
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */

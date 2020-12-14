@@ -47,6 +47,7 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messag
   m_debugLevel(debugLevel),
   m_logInfo(0)
 {
+  messageStream.adjustLogLevel(m_logLevel);
 }
 
 

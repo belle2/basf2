@@ -194,6 +194,12 @@ void Framework::setStreamingObjects(const boost::python::list& streamingObjects)
   Environment::Instance().setStreamingObjects(vec);
 }
 
+void Framework::setRealm(const std::string& realm)
+{
+  Environment::Instance().setRealm(realm);
+}
+
+
 std::string Framework::findFile(const std::string& filename, const std::string& type, bool ignore_errors)
 {
   std::string result;
@@ -375,7 +381,10 @@ Returns:
 Raises:
   will raise a `ModuleNotCreatedError` if there is any problem creating the module.
 )DOCSTRING");
-    def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
+  def("set_realm", &Framework::setRealm, R"DOCSTRING(
+Set the basf2 execution realm.
+)DOCSTRING", args("realm"));
+  def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
 Processes up to max_events events by starting with the first module in the specified path.
 
  This method starts processing events only if there is a module in the path

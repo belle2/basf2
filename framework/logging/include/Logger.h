@@ -71,6 +71,13 @@
 #endif
 
 /**
+ * \def B2DEBUG_MODIFIABLE(level, streamText)
+ * Send a debug message for which the level may be adjusted with LogModRealm.
+ */
+#define B2DEBUG_MODIFIABLE(level, streamText) B2DEBUG(Belle2::LogConfig::c_Debug, level, streamText)
+
+
+/**
  * \def B2INFO(streamText)
  * Send an info message.
  */

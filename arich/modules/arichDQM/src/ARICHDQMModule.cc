@@ -130,8 +130,8 @@ namespace Belle2 {
 
     h_ARICHOccAfterInjLer = new TH1F("ARICHOccInjLER", " ARICHOccInjLER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
     h_ARICHOccAfterInjHer = new TH1F("ARICHOccInjHER", " ARICHOccInjHER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
-    h_ARICHEOccAfterInjLer = new TH1F("ARICHEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
-    h_ARICHEOccAfterInjHer = new TH1F("ARICHEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjLer = new TH1F("ARICHEOccInjLER", "ARICHEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjHer = new TH1F("ARICHEOccInjHER", "ARICHEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");

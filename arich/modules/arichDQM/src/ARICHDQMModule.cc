@@ -130,8 +130,8 @@ namespace Belle2 {
 
     h_ARICHOccAfterInjLer = new TH1F("ARICHOccInjLER", " ARICHOccInjLER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
     h_ARICHOccAfterInjHer = new TH1F("ARICHOccInjHER", " ARICHOccInjHER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
-    h_ARICHOEccAfterInjLer = new TH1F("ARICHEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
-    h_ARICHOEccAfterInjHer = new TH1F("ARICHEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjLer = new TH1F("ARICHEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjHer = new TH1F("ARICHEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");
@@ -164,9 +164,9 @@ namespace Belle2 {
       h_secHitsPerTrack[i]->SetOption("LIVE");
     }
     h_ARICHOccAfterInjLer->SetOption("LIVE");
-    h_ARICHOEccAfterInjLer->SetOption("LIVE");
+    h_ARICHEOccAfterInjLer->SetOption("LIVE");
     h_ARICHOccAfterInjHer->SetOption("LIVE");
-    h_ARICHOEccAfterInjHer->SetOption("LIVE");
+    h_ARICHEOccAfterInjHer->SetOption("LIVE");
 
     //Set the minimum to 0
     h_chDigit->SetMinimum(0);
@@ -253,9 +253,9 @@ namespace Belle2 {
     }
 
     h_ARICHOccAfterInjLer->Reset();
-    h_ARICHOEccAfterInjLer->Reset();
+    h_ARICHEOccAfterInjLer->Reset();
     h_ARICHOccAfterInjHer->Reset();
-    h_ARICHOEccAfterInjHer->reset();
+    h_ARICHEOccAfterInjHer->Reset();
   }
 
   void ARICHDQMModule::event()
@@ -441,7 +441,7 @@ namespace Belle2 {
           h_ARICHEOccAfterInjHer->Fill(diff2);
         } else {
           h_ARICHOccAfterInjLer->Fill(diff2, nentries);
-          h_ARICHOEccAfterInjLer->Fill(diff2);
+          h_ARICHEOccAfterInjLer->Fill(diff2);
         }
       }
     }

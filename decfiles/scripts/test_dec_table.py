@@ -13,7 +13,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
-from ROOT import Belle2
 import glob
 import sys
 
@@ -36,7 +35,7 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/{0}.dec'.format(event_type)))
+evtgeninput.param('userDECFile', find_file('/decfiles/dec/{0}.dec'.format(event_type)))
 main.add_module(evtgeninput)
 
 # detector simulation

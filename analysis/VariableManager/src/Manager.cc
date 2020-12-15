@@ -285,13 +285,24 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
   }
 }
 
-void Variable::Manager::deprecateVariable(const std::string& name, bool make_fatal, const std::string& description)
+void Variable::Manager::deprecateVariable(const std::string& name, bool make_fatal, const std::string& version,
+                                          const std::string& description)
 {
   auto varIter = m_deprecated.find(name);
   if (varIter == m_deprecated.end())
     m_deprecated.insert(std::make_pair(name, std::make_pair(make_fatal, description)));
   else
     B2FATAL("Could not create depreciation warning.");
+
+  auto mapIter = m_variables.find(name);
+  if (mapIter != m_variables.end()) {
+    if (make_fatal) {
+      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
+    } else {
+      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
+    }
+    mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+  }
 
 }
 

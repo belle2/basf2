@@ -119,6 +119,11 @@ namespace Belle2 {
         /** ctor */
         VarBase(const std::string& n, const std::string& d, const std::string& g)
           : name(n), description(d), group(g) { }
+
+        void extendDescriptionString(const std::string& d)
+        {
+          description.append(d);
+        }
       };
 
       /** A variable returning a floating-point value for a given Particle. */
@@ -198,7 +203,7 @@ namespace Belle2 {
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description);
       /** Make a variable deprecated. */
-      void deprecateVariable(const std::string& name, bool make_fatal, const std::string& description);
+      void deprecateVariable(const std::string& name, bool make_fatal, const std::string& version, const std::string& description);
       /** Check for a deprecated variable. */
       void deprecateVariable(const std::string& name);
 
@@ -282,9 +287,9 @@ namespace Belle2 {
     class DeprecateProxy {
     public:
       /** constructor. */
-      DeprecateProxy(const std::string& name, bool make_fatal, const std::string& description)
+      DeprecateProxy(const std::string& name, bool make_fatal, const std::string& version, const std::string& description)
       {
-        Manager::Instance().deprecateVariable(name, make_fatal, description);
+        Manager::Instance().deprecateVariable(name, make_fatal, version, description);
       }
     };
 
@@ -325,10 +330,10 @@ namespace Belle2 {
   static GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
   }
-  /** \def MAKE_DEPRECATED(name, make_fatal, description)
+  /** \def MAKE_DEPRECATED(name, make_fatal, version, description)
    *
    * Registers a variable as deprecated
    */
-#define MAKE_DEPRECATED(name, make_fatal, description) \
-  static DeprecateProxy VARMANAGER_MAKE_UNIQUE(_deprecateproxy)(std::string(name),  bool(make_fatal), std::string(description));
+#define MAKE_DEPRECATED(name, make_fatal, version, description) \
+  static DeprecateProxy VARMANAGER_MAKE_UNIQUE(_deprecateproxy)(std::string(name),  bool(make_fatal), std::string(version), std::string(description));
 }

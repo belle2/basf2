@@ -979,4 +979,3 @@ class B0toDstarD(BaseSkim):
             BsigList.append("B0:B0toDstarD" + str(chID))
 
         self.SkimLists = BsigList
-#  Copyright (c) 2020. Chiara La Licata

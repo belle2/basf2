@@ -120,6 +120,7 @@ namespace Belle2 {
         VarBase(const std::string& n, const std::string& d, const std::string& g)
           : name(n), description(d), group(g) { }
 
+        /** function to extend the description of the variable */
         void extendDescriptionString(const std::string& d)
         {
           description.append(d);

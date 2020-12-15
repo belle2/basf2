@@ -206,8 +206,6 @@ void DQMHistAnalysisPXDDAQModule::event()
   double data_LER_Miss = 0.0;
   double data_HER_Miss_1ms = 0.0;
   double data_LER_Miss_1ms = 0.0;
-  // cppcheck-suppress unreadVariable
-  // cppcheck-suppress variableScope
   double data_unused = 0.0;
 
   // Stat histogram
@@ -247,7 +245,6 @@ void DQMHistAnalysisPXDDAQModule::event()
     data_LER_Miss = hh1->GetBinContent(1 + 16) * scale;
     data_HER_Miss_1ms = hh1->GetBinContent(1 + 17) * scale;
     data_LER_Miss_1ms = hh1->GetBinContent(1 + 18) * scale;
-    // cppcheck-suppress unreadVariable
     data_unused = hh1->GetBinContent(1 + 19) * scale;
   }
 

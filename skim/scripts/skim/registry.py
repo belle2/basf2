@@ -22,6 +22,12 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
+    # TODO fix up the codes
+    ("10600800", "systematics", "SystematicsFourLeptonHLT"),
+    ("10600900", "systematics", "SystematicsRadmumuHLT"),
+    ("10601000", "systematics", "SystematicsJpsi"),
+    ("10601100", "systematics", "SystematicsKshort"),
+    ("10601200", "systematics", "SystematicsBhabha"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),

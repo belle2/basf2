@@ -189,15 +189,15 @@ def add_aafh_generator(
 def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
     """
     Add the default muon pair and tau pair generator KKMC.
-    For tau decays, TauolaBelle and TauolaBBB are available.
+    For tau decays, TauolaBelle and TauolaBelle2 are available.
     Signal events can be produced setting a configuration file. Please notice that the configuration files for
-    TauolaBelle and TauolaBBB has a very different structure (see the examples below generators/examples).
+    TauolaBelle and TauolaBelle2 has a very different structure (see the examples below generators/examples).
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu-mu+" or "tau-tau+"
         signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
-        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBBB is used.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
     """
 
@@ -210,7 +210,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBBB)
+    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBelle2)
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':

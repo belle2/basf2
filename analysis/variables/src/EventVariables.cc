@@ -37,6 +37,7 @@
 
 #include <analysis/utility/PCmsLabTransform.h>
 
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
@@ -46,6 +47,11 @@ namespace Belle2 {
   namespace Variable {
 
     // Event ------------------------------------------------
+    double isMC(const Particle*)
+    {
+      return Environment::Instance().isMC();
+    }
+
     double eventType(const Particle*)
     {
       StoreArray<MCParticle> mcparticles;
@@ -547,6 +553,8 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event");
 
+    REGISTER_VARIABLE("isMC", isMC,
+                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
     REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");

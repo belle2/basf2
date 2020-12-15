@@ -24,13 +24,17 @@ def run_validation(job_path, input_data_path, requested_iov, **kwargs):
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 
     # Verify that output from airflow is OK
-    from ROOT import TH1F, TCanvas, TFile, TGraph, TLine, kRed
+    from ROOT import TH1F, TCanvas, TFile, TGraph, TLine, kRed, gStyle
     import numpy as np
     import os
     from array import array
 
     if not os.path.exists('plots'):
         os.makedirs('plots')
+
+    # Add underflow, overflow and fit result
+    gStyle.SetOptStat(1111111)
+    gStyle.SetOptFit(1111)
 
     # ------------------------------------------------------------------------
     # Validation histograms
@@ -309,7 +313,7 @@ def run_validation(job_path, input_data_path, requested_iov, **kwargs):
     eeggRatiovsCellID.Write()
     mumuggRatiovsCellID.Write()
     newOldRatiovsCellID.Write()
-    one.Write()
+    one.Draw()
 
     fout.Close()
 

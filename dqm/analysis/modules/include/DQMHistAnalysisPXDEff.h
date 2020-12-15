@@ -96,7 +96,8 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
-    chid  mychid;
+    chid  mychid_status;
+    std::map <VxdID, chid> mychid_eff;
 #endif
   };
 } // end namespace Belle2

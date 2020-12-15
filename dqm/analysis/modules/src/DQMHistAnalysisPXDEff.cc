@@ -443,10 +443,10 @@ void DQMHistAnalysisPXDEffModule::event()
 #ifdef _BELLE2_EPICS
       if (m_useEpics) {
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          Double_t x, y;// we assume that doubel and Double_t are same!
+          Double_t x, y;// we assume that double and Double_t are same!
           gr->GetPoint(i, x, y);
           auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
-          SEVCHK(ca_put(DBR_DOUBLE, mychid_status, (void*)&my), "ca_set failure");
+          SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
         }
       }
 #endif

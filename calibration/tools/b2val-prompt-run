@@ -97,7 +97,7 @@ def get_files(args):
 
 
 def create_validation_jobs(args):
-    """Path to config JSON file, used to set up the validation script, CAF output path, input data path used.
+    """Creates a Job object that runs the validation script with the correct inputs from the config JSON file and ValidationSettings
 
 Required format of JSON file:
 
@@ -106,10 +106,10 @@ Required format of JSON file:
     {
      "validation_script": (str),
      "job_path" (str),
-     "input_data_path" (str),
-     "download_files" list(str)
+     "input_data_path" (str), <- Optional 
+     "download_files" list(str) <- Optional 
      "backend_args" dict,     <- Optional as the backend default values and/or values in the prompt script will be used otherwise
-     "requested_iov" array[4](int),
+     "requested_iov" array[4](int), <- Optional 
      "expert_config" dict     <- Optional as the prompt script default will be used if this isn't set here.
     }
 
@@ -147,13 +147,9 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     job_path = validation_config.get('job_path', None)
     input_data_path=validation_config.get('input_data_path', None)
     requested_iov=validation_config.get('requested_iov', None)
-    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f"{job_path} {input_data_path} {requested_iov}"]
+    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f"{job_path} {input_data_path} {requested_iov} {expert_config}"]
     job.append_current_basf2_setup_cmds()
     return [job]
-    # validation_module.run_validation(job_path=validation_config.get('job_path', ""), 
-    #                                  input_data_path=validation_config.get('job_path', ""),
-    #                                  requested_iov=validation_config.get('requested_iov', ""),
-    #                                  expert_config=expert_config)
 
 
 def get_argparser():

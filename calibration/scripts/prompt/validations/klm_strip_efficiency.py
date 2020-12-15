@@ -24,7 +24,7 @@ settings = ValidationSettings(name='KLM strip efficiency',
                               expert_config=None)
 
 
-def run_validation(job_path, input_data_path, requested_iov, **kwargs):
+def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
     # job_path will be replaced with path/to/calibration_results
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 

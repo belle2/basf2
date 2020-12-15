@@ -22,7 +22,7 @@ def loadStdVeryLooseTracks(particletype, path):
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in ['pi', 'K', 'p', 'e', 'mu']:
-        B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
+        ma.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
     ma.fillParticleList(particletype + '+:SkimVeryLoose', goodTrack, True, path=path)
 

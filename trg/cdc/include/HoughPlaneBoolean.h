@@ -72,8 +72,10 @@ namespace Belle2 {
               float ry,
               int weight = 1) override;
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif
 
     /// Votes with charge decision.
     // using TRGCDCHoughPlaneBase::vote; // to be checked
@@ -86,7 +88,9 @@ namespace Belle2 {
     // using TRGCDCHoughPlaneBase::vote; // to be checked
     void vote(unsigned patternId, int weight);
 
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 
     /// Votes with charge decision.
     void voteUsedInTrasan(float rx,

@@ -17,9 +17,10 @@ from datetime import datetime, timedelta
 import subprocess
 import multiprocessing as mp
 
-from .utils import method_dispatch
-from .utils import decode_json_string
-from .utils import grouper
+from caf.utils import method_dispatch
+from caf.utils import decode_json_string
+from caf.utils import grouper
+from caf.utils import parse_file_uri
 
 
 __all__ = ["Job", "SubJob", "Backend", "Local", "Batch", "LSF", "PBS", "HTCondor", "get_input_data"]
@@ -341,7 +342,7 @@ class Job:
             self.cmd = []
             #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
             self.args = []
-            #: Input files to job (`pathlib.Path`), a list of these is copied to the working directory.
+            #: Input files to job (`str`), a list of these is copied to the working directory.
             self.input_files = []
             #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
             self.setup_cmds = []
@@ -357,7 +358,7 @@ class Job:
             self.output_patterns = job_dict["output_patterns"]
             self.cmd = job_dict["cmd"]
             self.args = job_dict["args"]
-            self.input_files = [Path(p) for p in job_dict["input_files"]]
+            self.input_files = job_dict["input_files"]
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
             self.subjobs = {}
@@ -472,7 +473,7 @@ class Job:
 
     @input_files.setter
     def input_files(self, value):
-        self._input_files = [Path(p).absolute() for p in value]
+        self._input_files = value
 
     @property
     def max_subjobs(self):
@@ -523,19 +524,19 @@ class Job:
         job_dict["output_patterns"] = self.output_patterns
         job_dict["cmd"] = self.cmd
         job_dict["args"] = self.args
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = self.input_files
         job_dict["setup_cmds"] = self.setup_cmds
         job_dict["backend_args"] = self.backend_args
         job_dict["subjobs"] = [sj.job_dict for sj in self.subjobs.values()]
         return job_dict
 
-    def dump_input_data(self, path_prefix=""):
+    def dump_input_data(self):
         """
         Dumps the `Job.input_files` attribute to a JSON file. input_files should be a list of
-        Path objects.
+        string URI objects.
         """
         with open(Path(self.working_dir, _input_data_file_path), mode="w") as input_data_file:
-            json.dump([path_prefix+file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
+            json.dump(self.input_files, input_data_file, indent=2)
 
     def copy_input_sandbox_files_to_working_dir(self):
         """
@@ -550,19 +551,27 @@ class Job:
 
     def check_input_data_files(self):
         """
-        Check the input files and make sure that there aren't any duplicates and that the files actually exist.
+        Check the input files and make sure that there aren't any duplicates.
+        Also check if the files actually exist if possible.
         """
         existing_input_files = []  # We use a list instead of set to avoid losing any ordering of files
         for file_path in self.input_files:
-            file_path = Path(file_path).absolute()
-            if file_path.is_file():
+            file_uri = parse_file_uri(file_path)
+            if file_uri.scheme == "file":
+                p = Path(file_uri.path)
+                if p.is_file():
+                    if file_uri.geturl() not in existing_input_files:
+                        existing_input_files.append(file_uri.geturl())
+                    else:
+                        B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
+                else:
+                    B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
+            else:
+                B2DEBUG(29, f"{file_path} is not a local file URI. Skipping checking if file exists")
                 if file_path not in existing_input_files:
                     existing_input_files.append(file_path)
                 else:
                     B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
-            else:
-                B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
-
         if self.input_files and not existing_input_files:
             B2WARNING(f"No valid input file paths found for {job}, but some were requested.")
 
@@ -586,7 +595,8 @@ class Job:
         """
         This adds simple setup commands like ``source /path/to/tools/b2setup`` to your `Job`.
         It should detect if you are using a local release or CVMFS and append the correct commands
-        so that the job will have the same basf2 release environment.
+        so that the job will have the same basf2 release environment. It should also detect
+        if a local release is not compiled with the ``opt`` option.
 
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
@@ -599,8 +609,11 @@ class Job:
             self.setup_cmds.append("export BELLE2_NO_TOOLS_CHECK=\"TRUE\"")
             self.setup_cmds.append(f"BACKEND_B2SETUP={os.environ['BELLE2_TOOLS']}/b2setup")
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
+            self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
             self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
             self.setup_cmds.append(f"source $BACKEND_B2SETUP")
+            # b2code-option has to be executed only after the source of the tools.
+            self.setup_cmds.append(f"b2code-option $BACKEND_BELLE2_OPTION")
             self.setup_cmds.append(f"popd > /dev/null")
 
 
@@ -621,7 +634,7 @@ class SubJob(Job):
         #: Input files specific to this subjob
         if not input_files:
             input_files = []
-        self.input_files = [Path(p) for p in input_files]
+        self.input_files = input_files
         #: The result object of this SubJob. Only filled once it is is submitted to a backend
         #: since the backend creates a special result class depending on its type.
         self.result = None
@@ -677,7 +690,7 @@ class SubJob(Job):
         """
         job_dict = {}
         job_dict["id"] = self.id
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = self.input_files
         job_dict["args"] = self.args
         return job_dict
 
@@ -1138,14 +1151,12 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permission issues
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         job.copy_input_sandbox_files_to_working_dir()
-        job_backend_args = {**self.backend_args, **job.backend_args}
-        path_prefix = job_backend_args.get("path_prefix", "")
-        job.dump_input_data(path_prefix=path_prefix)
+        job.dump_input_data()
         # Make submission file if needed
         batch_submit_script_path = self.get_batch_submit_script_path(job)
         self._make_submit_file(job, batch_submit_script_path)
@@ -1175,8 +1186,8 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permissions issue
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         # Check if we have any valid input files
@@ -1184,13 +1195,12 @@ class Batch(Backend):
         # Add any required backend args that are missing (I'm a bit hesitant to actually merge with job.backend_args)
         # just in case you want to resubmit the same job with different backend settings later.
         job_backend_args = {**self.backend_args, **job.backend_args}
-        path_prefix = job_backend_args.get("path_prefix", "")
 
         # If there's no splitter then we just submit the Job with no SubJobs
         if not job.splitter:
             # Get all of the requested files for the input sandbox and copy them to the working directory
             job.copy_input_sandbox_files_to_working_dir()
-            job.dump_input_data(path_prefix=path_prefix)
+            job.dump_input_data()
             # Make submission file if needed
             batch_submit_script_path = self.get_batch_submit_script_path(job)
             self._make_submit_file(job, batch_submit_script_path)
@@ -1243,7 +1253,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently int the batch system globally. Waiting until submission can continue...")
+                B2INFO(f"Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this
@@ -1851,7 +1861,7 @@ class HTCondor(Batch):
                             "universe": "vanilla",
                             "getenv": "false",
                             "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
-                            "path_prefix": "",  # Path prefix for file path in backend_input_files.json
+                            "path_prefix": "",  # Path prefix for file path
                             "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
                            }
     #: Default ClassAd attributes to return from commands like condor_q

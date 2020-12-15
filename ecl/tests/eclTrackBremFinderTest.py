@@ -27,7 +27,7 @@ class CheckRelationBremClusterTestModule(b2.Module):
         bremCluster = None
 
         for cluster in clusters:
-            if cluster.isTrack() and cluster.getHypothesisId() == 5:
+            if cluster.isTrack() and cluster.hasHypothesis(Belle2.ECLCluster.EHypothesisBit.c_nPhotons):
                 # this is the primary of the electron
 
                 # is there a relation to our secondary cluster ?

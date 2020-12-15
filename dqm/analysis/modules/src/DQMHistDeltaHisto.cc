@@ -12,8 +12,6 @@
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

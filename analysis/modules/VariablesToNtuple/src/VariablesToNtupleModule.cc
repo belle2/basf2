@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013-2018 Belle II Collaboration                          *
+* Copyright(C) 2013-2020 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
@@ -107,6 +107,7 @@ void VariablesToNtupleModule::initialize()
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
   m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__production__", &m_production, "__production__/I");
   if (not m_particleList.empty()) {
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
@@ -184,6 +185,7 @@ void VariablesToNtupleModule::event()
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
+  m_production = m_eventMetaData->getProduction();
 
   if (m_particleList.empty()) {
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);

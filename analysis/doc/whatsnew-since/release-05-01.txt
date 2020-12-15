@@ -38,9 +38,11 @@ Variables
  * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
  * Added new variables :b2:var:`exp` and :b2:var:`log`.
  * Added special hadron ID variables :b2:var:`pionID_SVD`, :b2:var:`kaonID_SVD`, :b2:var:`protonID_SVD`, :b2:var:`binaryPID_SVD` which include SVD PDFs for pions, kaons and protons only. For hadron ID, users should **no longer** rely on the standard variables :b2:var:`pionID`, :b2:var:`kaonID`, :b2:var:`protonID`, :b2:var:`binaryPID` for the time being. For lepton identification instead, the :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`binaryPID` variables, which do not contain SVD PDF info yet, are still recommended.
-
  * Added the variable `particleSource`, which returns the mdst source, i.e. whether the particle was created from a track, an ECL
    cluster, or a KLM cluster, is a V0 object, an MC particle, or a composite particle.
+ * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true photons and beam backgrounds 
+
+ * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>`` theme. 
 
 Modules
 +++++++

@@ -440,7 +440,7 @@ void ECLBhabhaTCollectorModule::collect()
 
 
   // Save what CDC event t0 correction was applied
-  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(1.001, m_hadronEventT0_TO_bhabhaEventT0_correction);
+  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(0.001, m_hadronEventT0_TO_bhabhaEventT0_correction);
 
 
 

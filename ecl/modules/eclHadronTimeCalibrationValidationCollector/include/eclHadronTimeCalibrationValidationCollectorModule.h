@@ -85,7 +85,6 @@ namespace Belle2 {
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evt_num = -1;    /**< Event number for debug TTree output*/
-    int m_tree_exp = -1;     /**< Experiment number for debug TTree output */
     int m_tree_run = -1;     /**< Run number for debug TTree output */
     int m_tree_cid = -1;     /**< ECL Cell ID (1..8736) for debug TTree output */
     double m_tree_dt99 = -1;  /**< dt99 for cluster */
@@ -115,8 +114,6 @@ namespace Belle2 {
     double m_tightTrkD0 ;
 
     double m_E_photon_clust = -1;
-
-    bool storeCalib = true ;
 
   } ;
 }

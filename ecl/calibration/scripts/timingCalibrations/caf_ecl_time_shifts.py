@@ -119,7 +119,7 @@ def get_calibrations(input_data, **kwargs):
     tShifts_alg = Belle2.ECL.eclTimeShiftsAlgorithm()
     tShifts_alg.debugFilenameBase = "eclTimeShiftsAlgorithm"
 
-    # Define offsets so that the crysta+crate time plots are centred close to zer.
+    # Define offsets so that the crysta+crate time plots are centred close to zero.
     # tShifts_alg.timeShiftForPlotStyle = arr.array('d', [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  \
     #                                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  \
     #                                       0,0,0,0,0,0,0,0,0,0,0,0,0])

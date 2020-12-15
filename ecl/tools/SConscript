@@ -14,6 +14,4 @@ env['TOOLS_LIBS']['eclElectronicsPayloads'] = ['framework','ecl','ecl_dbobjects'
 env['TOOLS_LIBS']['eclWriteChannelMap'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
 env['TOOLS_LIBS']['eclDumpECLCrystalCalib'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
 env['TOOLS_LIBS']['eclCrystalEnergy'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
-env['TOOLS_LIBS']['eclCrystalCrateTimesDump'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
-env['TOOLS_LIBS']['eclCrateTimesDump'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
 Return('env')

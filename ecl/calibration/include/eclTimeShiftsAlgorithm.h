@@ -37,7 +37,7 @@ namespace Belle2 {
       /** Name of file with debug output, eclTimeShiftsAlgorithm.root by default */
       std::string debugFilenameBase;
 
-      /**< List of time offsets, one per crate, used just to centre the time
+      /** List of time offsets, one per crate, used just to centre the time
            constants around zero */
       double timeShiftForPlotStyle[52] ;
 

@@ -144,6 +144,7 @@ def make_combined_plot(pattern, histos, title=None):
         plt.title(title)
     plt.tight_layout()
 
+
 # get labels for all possible sides
 names_sides = []
 ladder_of_layer = [7, 10, 12, 16]

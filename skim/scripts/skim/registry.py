@@ -106,6 +106,7 @@ _RegisteredSkims = [
     ("18020300", "dark", "ALP3Gamma"),
     ("18020400", "dark", "EGammaControlDark"),
     ("18000000", "dark", "InelasticDarkMatter"),
+    ("18000001", "dark", "RadBhabhaV0Control"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),

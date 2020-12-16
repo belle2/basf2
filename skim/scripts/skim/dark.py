@@ -485,7 +485,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
-class radBhabhaV0Control(BaseSkim):
+class RadBhabhaV0Control(BaseSkim):
 
     """
     Control sample: :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"

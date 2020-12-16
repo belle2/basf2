@@ -522,7 +522,7 @@ class RadBhabhaV0Control(BaseSkim):
         vertex.treeFit('vpho:V0System', conf_level=0.0, path=my_path)
         ma.applyCuts('vpho:V0System', 'dr>0.5', path=my_path)
 
-        ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=my_path)
+        ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=path)
 
         eventCuts = ('nParticlesInList(gamma:veto)<1 and '
                      'nParticlesInList(vpho:Total)>0')

@@ -48,18 +48,23 @@ namespace Belle2 {
 
 
   private:
-    void fillPDF(TH2F* histo,  Belle2::TOP::TOPreco reco);
 
+    void fillPDF(Belle2::Const::ChargedStable, const Track*, TH2F*, short*, float*,  int&, int&);
+
+    /** reset the tree variables. Call it at the beginning of the event method! */
+    void resetTree();
+
+    static const int m_MaxPhotons = 5000; /**< maximumn number of digits allowed per PDF */
+    static const int m_MaxPDFPhotons = 50000; /**< maximumn number of digits allowed per PDF */
+
+    // steering parameters
     std::string m_particleList = "pi+:all";  /**< List of particles to be used for plotting */
     std::string m_outputName = "TOPRings.root";  /**< Name of the output file */
-    int m_toyNumber = 1;  /**< Number of toys used to fill the PDF maps */
-    bool m_saveHistograms = false;  /**< Set true to save the histograms fo the maps */
-    bool m_saveDigitTree = true;  /**< Set true to Save the branch with the digits */
+    int m_toyNumber = 1; /**< Number of toys used to populate the arrays of expected hits*/
+    bool m_saveHistograms = false;  /**< Set true to save the histograms of the maps */
 
     TFile* m_outputFile = nullptr;   /**< output file */
     TTree* m_tree = nullptr;   /**< tree where data are saved. One entry per particle in m_particleList */
-
-    short m_maxDigits =  5000;  /**< Maximum number of digit in the slot where the particles is extrapolated*/
 
     /** Variable branch addresses */
     std::vector<double> m_branchAddresses;
@@ -68,25 +73,41 @@ namespace Belle2 {
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::string> m_variables;
 
-    float m_digitTime[5000] = {0}; /**< Digit calibrated time [ns] */
-    short m_digitChannel[5000] = {0}; /**< SW channel (0-511) */
-    short m_digitPixelCol[5000] = {0}; /**< Pixel column */
-    short m_digitPixelRow[5000] = {0}; /**< Pixel row */
-    float m_digitAmplitude[5000] = {0}; /**< Digit amplitude [ADC] */
-    float m_digitWidth[5000] = {0}; /**< Digit calibrated width [ns] */
-    short m_digitASICChannel[5000] = {0}; /**< ASIC channel number (0-7) */
-    short m_digitPMTNumber[5000] = {0}; /**< Digit PMT number */
+    float m_digitTime[m_MaxPhotons]; /**< Digit calibrated time [ns] */
+    short m_digitChannel[m_MaxPhotons]; /**< SW channel (0-511) */
+    short m_digitPixelCol[m_MaxPhotons] = {0}; /**< Pixel column */
+    short m_digitPixelRow[m_MaxPhotons] = {0}; /**< Pixel row */
+    float m_digitAmplitude[m_MaxPhotons] = {0}; /**< Digit amplitude [ADC] */
+    float m_digitWidth[m_MaxPhotons] = {0}; /**< Digit calibrated width [ns] */
+    short m_digitASICChannel[m_MaxPhotons] = {0}; /**< ASIC channel number (0-7) */
+    short m_digitPMTNumber[m_MaxPhotons] = {0}; /**< Digit PMT number */
     short m_nDigits = 0; /**< Total number of digits in the slot where the track is extrapolated */
 
+    short m_pdfPixelE[m_MaxPDFPhotons] = {0}; /**< Pixel array for the hits gen */
+    float m_pdfTimeE[m_MaxPDFPhotons] = {0}; /**< x-t plot of the muon PDF as a 1D array */
+    short m_pdfPixelMU[m_MaxPDFPhotons] = {0}; /**< Pixel array for the hits gen */
+    float m_pdfTimeMU[m_MaxPDFPhotons] = {0}; /**< x-t plot of the muon PDF as a 1D array */
+    short m_pdfPixelPI[m_MaxPDFPhotons] = {0}; /**< Pixel array for the hits gen */
+    float m_pdfTimePI[m_MaxPDFPhotons] = {0}; /**< x-t plot of the muon PDF as a 1D array */
+    short m_pdfPixelK[m_MaxPDFPhotons] = {0}; /**< Pixel array for the hits gen */
+    float m_pdfTimeK[m_MaxPDFPhotons] = {0}; /**< x-t plot of the muon PDF as a 1D array */
+    short m_pdfPixelP[m_MaxPDFPhotons] = {0}; /**< Pixel array for the hits gen */
+    float m_pdfTimeP[m_MaxPDFPhotons] = {0}; /**< x-t plot of the muon PDF as a 1D array */
+    int m_pdfSamplesP = 0;
+    int m_pdfToysP = 0;
+    int m_pdfSamplesK = 0;
+    int m_pdfToysK = 0;
+    int m_pdfSamplesPI = 0;
+    int m_pdfToysPI = 0;
+    int m_pdfSamplesMU = 0;
+    int m_pdfToysMU = 0;
+    int m_pdfSamplesE = 0;
+    int m_pdfToysE = 0;
 
-
-    TH2F* m_hitMapMCK = new TH2F("hitMapMCK", "hitMapMCK", 64, 0, 64, 500, 0, 50); /**< x-t plot of the kaon PDF*/
-    TH2F* m_hitMapMCPi = new TH2F("hitMapMCPi", "hitMapMCPi", 64, 0, 64, 500, 0, 50); /**< x-t plot of the pion PDF*/
-    TH2F* m_hitMapMCP = new TH2F("hitMapMCP", "hitMapMCP", 64, 0, 64, 500, 0, 50); /**< x-t plot of the proton PDF*/
-    TH2F* m_hitMapMCE = new TH2F("hitMapMCE", "hitMapMCE", 64, 0, 64, 500, 0, 50); /**< x-t plot of the electron PDF*/
-    TH2F* m_hitMapMCMU = new TH2F("hitMapMCMU", "hitMapMCMU", 64, 0, 64, 500, 0, 50); /**< x-t plot of the muon PDF*/
-
-
-
+    TH2F* m_hitMapMCK = nullptr;//new TH2F("hitMapMCK", "hitMapMCK", 64, 0, 64, 500, 0, 100); /**< x-t plot of the kaon PDF*/
+    TH2F* m_hitMapMCPI =  nullptr;//new TH2F("hitMapMCPi", "hitMapMCPi", 64, 0, 64, 500, 0, 100); /**< x-t plot of the pion PDF*/
+    TH2F* m_hitMapMCP =  nullptr;//new TH2F("hitMapMCP", "hitMapMCP", 64, 0, 64, 500, 0, 100); /**< x-t plot of the proton PDF*/
+    TH2F* m_hitMapMCE =  nullptr;//new TH2F("hitMapMCE", "hitMapMCE", 64, 0, 64, 500, 0, 100); /**< x-t plot of the electron PDF*/
+    TH2F* m_hitMapMCMU =  nullptr;//new TH2F("hitMapMCMU", "hitMapMCMU", 64, 0, 64, 500, 0, 100); /**< x-t plot of the muon PDF*/
   };
 }

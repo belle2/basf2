@@ -519,8 +519,8 @@ class RadBhabhaV0Control(BaseSkim):
         ma.reconstructDecay("vpho:BhabhaSysyem -> e+:BhabhaTrack e-:BhabhaTrack", BhabhaSystemCuts, path=path)
 
         ma.reconstructDecay("vpho:V0System -> e+:V0TrackCuts e-:V0TrackCuts", '', path=path)
-        vertex.treeFit('vpho:V0System', conf_level=0.0, path=my_path)
-        ma.applyCuts('vpho:V0System', 'dr>0.5', path=my_path)
+        vertex.treeFit('vpho:V0System', conf_level=0.0, path=path)
+        ma.applyCuts('vpho:V0System', 'dr>0.5', path=path)
 
         ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=path)
 

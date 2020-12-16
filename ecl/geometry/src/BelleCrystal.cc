@@ -298,7 +298,7 @@ EInside BelleCrystal::Inside(const G4ThreeVector& p) const
     const Plane_t& t = fPlanes[i++];
     d = max(t.n * p + t.d, d);
   } while (i < nsides);
-  const G4double delta = 0.01;//0.5 * kCarTolerance;
+  const G4double delta = 0.001;//0.5 * kCarTolerance;
   int in = 0;
   in += d <= delta;
   in += d <= -delta;

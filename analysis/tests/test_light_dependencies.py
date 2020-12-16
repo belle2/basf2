@@ -3,9 +3,10 @@
 
 import glob
 import re
-import time
 import sys
 import subprocess
+import basf2
+from time import time
 
 """
 Check that no light-release-breaking dependencies have been added.
@@ -95,18 +96,14 @@ def check_dependencies(forbidden, sconscript_files, error=""):
 
 # grab all of the light release packages
 # (defined by the .light file for the sparse checkout)
-with open(".light") as fi:
-    light_packages = [
-        li[1:].strip().replace("/", "") for li in fi if li.endswith("/\n")
-    ]
+with open(basf2.find_file(".light")) as fi:
+    light_packages = [li.strip().replace("/", "") for li in fi if li.strip().endswith("/")]
 
 # we also need all packages (to compare), for this use b2code-package-list
 all_packages = subprocess.Popen(
     ["b2code-package-list"], stdout=subprocess.PIPE
 ).communicate()[0]
 all_packages = all_packages.decode("utf-8").strip().split(" ")
-all_packages = [pk for pk in all_packages if not pk.endswith(".rst")]
-# FIXME this ^^ line can be removed if b2code-package-list is fixed
 
 # the forbidden packages
 non_light_packages = set(all_packages).difference(set(light_packages))
@@ -115,7 +112,7 @@ non_light_packages = set(all_packages).difference(set(light_packages))
 return_code_sum = 0
 
 # run the check over all packages - just a dumb nested loop
-start = time.time()
+start = time()
 for package in light_packages:
     sconscript_files = get_sconscripts(package)
     return_code_sum += check_dependencies(
@@ -123,11 +120,7 @@ for package in light_packages:
     )
 
 # test finished, now report
-print(
-    "ran test of light dependenies, the loop took:",
-    time.time() - start,
-    "seconds to run",
-)
+print("Test of light dependencies, the loop took:", time() - start, "seconds to run")
 print("There were", return_code_sum, "forbidden dependencies")
 
 if return_code_sum != 0:

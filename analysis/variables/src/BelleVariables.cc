@@ -222,7 +222,7 @@ namespace Belle2 {
 
       TVectorF jacobian(Particle::c_DimMomentum);
       jacobian[0] = -1.0 * particle->getPx() / particle->getMass();
-      jacobian[0] = -1.0 * particle->getPy() / particle->getMass();
+      jacobian[1] = -1.0 * particle->getPy() / particle->getMass();
       jacobian[2] = -1.0 * particle->getPz() / particle->getMass();
       jacobian[3] = 1.0 * particle->getEnergy() / particle->getMass();
 

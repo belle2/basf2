@@ -242,7 +242,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   };
   fshape = getpolycone(GetName(), phi0, dphi, fcontour);
 #else
-  fshape = nullptr;
+  fshape = NULL;
 #endif
 //  StreamInfo(G4cout);
 }
@@ -1827,6 +1827,80 @@ void BelleLathe::DescribeYourselfTo(G4VGraphicsScene& scene) const
   scene.AddSolid(*this);
 }
 
+// Method to define the bounding box
+void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
+{
+  std::vector<vector_t> points;
+  vector_t point;
+
+  // placeholder vectors
+  const double inf = std::numeric_limits<double>::infinity();
+  G4ThreeVector minimum(inf, inf, inf), maximum(-inf, -inf, -inf);
+
+  // push outer vertices
+  if (fdphi < 2 * M_PI) { //if complete circle, will only be axes
+    point.x = frmax * cos(fphi); point.y = frmax * sin(fphi);
+    points.push_back(point);
+    point.x = frmax * cos(fphi + fdphi); point.y = frmax * sin(fphi + fdphi);
+    points.push_back(point);
+  }
+
+  // push inner vertices
+  point.x = frmin * cos(fphi); point.y = frmin * sin(fphi);
+  points.push_back(point);
+  if (frmin != 0) { // avoid duplicate 0,0
+    point.x = frmin * cos(fphi + fdphi); point.y = frmin * sin(fphi + fdphi);
+    points.push_back(point);
+  }
+
+  // check if rotation crosses an axis
+  // because inside is concave, extremum will always be at vertices
+  // because outside is convex, extremum may be at an axis crossing
+  // insector checks if point is within shape sector
+  if (insector(0, 1)) {
+    point.x = 0; point.y = frmax;
+    points.push_back(point);
+  }
+  if (insector(-1, 0)) {
+    point.x = -frmax; point.y = 0;
+    points.push_back(point);
+  }
+  if (insector(0, -1)) {
+    point.x = 0; point.y = -frmax;
+    points.push_back(point);
+  }
+  if (insector(1, 0)) {
+    point.x = frmax; point.y = 0;
+    points.push_back(point);
+  }
+
+  // change min/max vertice's components
+  for (std::vector<vector_t>::size_type i = 0; i != points.size(); i++) {
+    // global min in x
+    if (points[i].x < minimum.x())
+      minimum.setX(points[i].x);
+
+    // global min in y
+    if (points[i].y < minimum.y())
+      minimum.setY(points[i].y);
+
+    // global max in x
+    if (points[i].x > maximum.x())
+      maximum.setX(points[i].x);
+
+    // global max in y
+    if (points[i].y > maximum.y())
+      maximum.setY(points[i].y);
+  }
+
+  // set z values
+  minimum.setZ(fzmin);
+  maximum.setZ(fzmax);
+
+  // assign
+  pMin = minimum;
+  pMax = maximum;
+}
 
 void takePolyhedron(const HepPolyhedron& p)
 {
@@ -2035,5 +2109,6 @@ double mindist(const zr_t& r, const vector<cachezr_t>& contour)
   //  cout<<wn<<" "<<d<<endl;
   return d;
 }
+
 
 #endif

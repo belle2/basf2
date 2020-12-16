@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BelleCrystal_HH
+#define BelleCrystal_HH
 
 #include "G4Types.hh"
 
@@ -84,6 +85,9 @@ namespace Belle2 {
       void          DescribeYourselfTo(G4VGraphicsScene& scene) const;
       G4Polyhedron* CreatePolyhedron() const;
 
+      /** Two vectors define an axis-parallel bounding box for the shape */
+      void BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const;
+
     public:  // without description
 
       /**
@@ -99,6 +103,7 @@ namespace Belle2 {
       BelleCrystal& operator=(const BelleCrystal& rhs);
 
       G4ThreeVector vertex(unsigned int i) const;
+
     protected:  // with description
 
       G4bool MakePlane(const G4ThreeVector& p1,
@@ -130,3 +135,4 @@ namespace Belle2 {
 
   }
 }
+#endif

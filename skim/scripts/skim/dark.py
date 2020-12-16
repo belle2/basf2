@@ -19,6 +19,7 @@ import pdg
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
+import vertex as vertex
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
 

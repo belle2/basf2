@@ -1839,7 +1839,7 @@ void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
   G4ThreeVector minimum(inf, inf, inf), maximum(-inf, -inf, -inf);
 
   // Outer vertices
-  if (fdphi < 2 * M_PI) { // Only need axis-crossings if the shape is a full circle
+  if (fdphi < 2 * M_PI) { // Only axis-crossings are relevant if the shape is a full circle
     point.x = frmax * cos(fphi); point.y = frmax * sin(fphi);
     points.push_back(point);
     point.x = frmax * cos(fphi + fdphi); point.y = frmax * sin(fphi + fdphi);

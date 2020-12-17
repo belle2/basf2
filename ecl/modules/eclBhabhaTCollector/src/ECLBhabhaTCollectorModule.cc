@@ -271,9 +271,9 @@ void ECLBhabhaTCollectorModule::prepare()
   registerObject<TH1F>("tcrateDatabase_ns", tcrateDatabase_ns);
 
 
-  auto databaseCounter = new TH1F("databaseCounter",
+  auto databaseCounter = new TH1I("databaseCounter",
                                   ";A database was read in;Number of times database was saved to histogram", 1, 1, 2);
-  registerObject<TH1F>("databaseCounter", databaseCounter);
+  registerObject<TH1I>("databaseCounter", databaseCounter);
 
 
   auto numCrystalEntriesPerEvent = new TH1F("numCrystalEntriesPerEvent",
@@ -290,7 +290,7 @@ void ECLBhabhaTCollectorModule::prepare()
   auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 1, 8736 + 1);
   registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
-  auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 0, 1);
+  auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 1, 2);
   registerObject<TH1F>("CDCEventT0Correction", CDCEventT0Correction);
 
 
@@ -435,12 +435,12 @@ void ECLBhabhaTCollectorModule::collect()
 
   // Use a histogram with only one bin as a counter to know the number of times the database histograms were filled.
   //    This is mostly useful for the talg when running over multiple runs and trying to read ts values.
-  getObjectPtr<TH1F>("databaseCounter")->SetBinContent(1.001, 1);
+  getObjectPtr<TH1I>("databaseCounter")->SetBinContent(1, 1);
 
 
 
   // Save what CDC event t0 correction was applied
-  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(0.001, m_hadronEventT0_TO_bhabhaEventT0_correction);
+  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(1, m_hadronEventT0_TO_bhabhaEventT0_correction);
 
 
 

@@ -359,7 +359,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // The ts and tcrate database values are filled once per tcol instance so count the number of times that the database values
   //    were summed together by the histogram merging process and extract out the original values again.
-  auto databaseCounter = getObjectPtr<TH1F>("databaseCounter");
+  auto databaseCounter = getObjectPtr<TH1I>("databaseCounter");
   float numTimesFilled = databaseCounter->GetBinContent(1);
   B2INFO("Number of times database histograms were merged = " << numTimesFilled);
 

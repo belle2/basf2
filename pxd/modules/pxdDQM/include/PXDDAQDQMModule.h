@@ -71,6 +71,8 @@ namespace Belle2 {
       std::map<VxdID, TH1D*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
       std::map<int, TH1D*> hDAQDHCReduction;/**< DHC data reduction  */
 
+      TH1I* hEODBAfterInjLER{};          /**< Histogram of EODB after LER injection */
+      TH1I* hEODBAfterInjHER{};          /**< Histogram of EODB after HER injection */
       TH1I* hCM63AfterInjLER{};          /**< Histogram of CM63 after LER injection */
       TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
       TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */

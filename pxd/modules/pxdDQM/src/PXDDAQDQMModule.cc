@@ -99,6 +99,8 @@ void PXDDAQDQMModule::defineHisto()
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
 //   hDAQErrorEvent->SetStats(0);
+  hEODBAfterInjLER  = new TH1I("PXDEODBInjLER", "PXDEODBInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hEODBAfterInjHER  = new TH1I("PXDEODBInjHER", "PXDEODBInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hCM63AfterInjLER  = new TH1I("PXDCM63InjLER", "PXDCM63InjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hCM63AfterInjHER  = new TH1I("PXDCM63InjHER", "PXDCM63InjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
@@ -178,6 +180,8 @@ void PXDDAQDQMModule::event()
   /// thus we have to check for a difference to the number of events, too
   /// Remark: for HLT event selection and/or events rejected by the event-
   /// of-doom-buster, we might count anyhow broken events as broken from PXD
+
+  bool eotbFlag = m_rawSVD.getEntries() == 0;
 
   bool truncFlag = false; // flag events which are DHE truncated
   bool nolinkFlag = false; // flag events which are DHE truncated
@@ -274,6 +278,9 @@ void PXDDAQDQMModule::event()
     if (difference != 0x7FFFFFFF) {
       float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
+        if (eotbFlag) {
+          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);
+        }
         if (cm63Flag) {
           hDAQStat->Fill(5); // sum CM63 after HER
           if (diff2 > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
@@ -290,6 +297,9 @@ void PXDDAQDQMModule::event()
           if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
         }
       } else {
+        if (eotbFlag) {
+          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(diff2);
+        }
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
           if (diff2 > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
@@ -319,5 +329,5 @@ void PXDDAQDQMModule::event()
   if (mismatchFlag) hDAQStat->Fill(14);
 
   // Check Event-of-doom-busted or otherwise HLT rejected events
-  if (m_rawSVD.getEntries() == 0) hDAQStat->Fill(0);
+  if (eotbFlag) hDAQStat->Fill(0);
 }

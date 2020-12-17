@@ -512,24 +512,24 @@ class RadBhabhaV0Control(BaseSkim):
         V0Cuts = 'dr>0.5'
         PhotonVetoCuts = 'p>1.0'  # event should have no high E photons
 
-        ma.cutAndCopyList("gamma:Veto", "gamma:all", PhotonVetoCuts, path=path)
+        ma.cutAndCopyList("gamma:HighEGammaVeto", "gamma:all", PhotonVetoCuts, path=path)
         ma.cutAndCopyList("e+:BhabhaTrack", "e+:all", BhabhaTrackCuts, path=path)
         ma.cutAndCopyList("e+:V0Track", "e+:all", V0TrackCuts, path=path)
 
         ma.reconstructDecay("vpho:BhabhaSysyem -> e+:BhabhaTrack e-:BhabhaTrack", BhabhaSystemCuts, path=path)
 
-        ma.reconstructDecay("vpho:V0System -> e+:V0TrackCuts e-:V0TrackCuts", '', path=path)
+        ma.reconstructDecay("vpho:V0System -> e+:V0Track e-:V0Track", '', path=path)
         vertex.treeFit('vpho:V0System', conf_level=0.0, path=path)
-        ma.applyCuts('vpho:V0System', 'dr>0.5', path=path)
+        ma.applyCuts('vpho:V0System', V0Cuts, path=path)
 
         ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=path)
 
-        eventCuts = ('nParticlesInList(gamma:veto)<1 and '
+        eventCuts = ('nParticlesInList(gamma:HighEGammaVeto)<1 and '
                      'nParticlesInList(vpho:Total)>0')
 
         path = self.skim_event_cuts(eventCuts, path=path)
 
-        self.SkimLists = ["gamma:all", 'e-:all']
+        self.SkimLists = ["gamma:all", 'e+:all']
 
 
 @fancy_skim_header

@@ -1,6 +1,7 @@
 #include <ecl/geometry/BelleCrystal.h>
 #include <ecl/geometry/BelleLathe.h>
 #include <gtest/gtest.h>
+#include "ecl/geometry/shapes.h"
 
 using namespace std;
 using namespace Belle2;
@@ -67,6 +68,81 @@ namespace {
     EXPECT_DOUBLE_EQ(pMax_real.x(), pMax.x());
     EXPECT_DOUBLE_EQ(pMax_real.y(), pMax.y());
     EXPECT_DOUBLE_EQ(pMax_real.z(), pMax.z());
+  }
+
+  TEST_F(BelleCrystalTest, PentagonSurface)
+  {
+    // Create pentagon side
+    double z = 1;
+    double c1 = 0.25 * (sqrt(5) - 1), c2 = 0.25 * (sqrt(5) + 1);
+    double s1 = 0.25 * sqrt(10 + 2 * sqrt(5)), s2 = 0.25 * sqrt(10 - 2 * sqrt(5));
+    G4ThreeVector p0m(0, 1, -z), p1m(-s1, c1, -z), p2m(-s2, -c2, -z), p3m(s2, -c2, -z), p4m(s1, c1, -z);
+    G4ThreeVector p0p(0, 1, z), p1p(-s1, c1, z), p2p(-s2, -c2, z), p3p(s2, -c2, z), p4p(s1, c1, z);
+    G4ThreeVector vertices[] = {p0m, p1m, p2m, p3m, p4m, p0p, p1p, p2p, p3p, p4p};
+    BelleCrystal* c = new BelleCrystal("solid5", 5, vertices);
+
+    for (int i = 0; i < 1000 * 100; i++) {
+      G4ThreeVector p = c->GetPointOnSurface();
+      EXPECT_EQ(c->Inside(p), kSurface);
+    }
+    delete c;
+  }
+
+  TEST_F(BelleCrystalTest, BarrelSurfaces)
+  {
+    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
+    double wrapthickness = 0.17;
+    for (auto it = cryst.begin(); it != cryst.end(); it++) {
+      shape_t* s = *it;
+      std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
+      G4Translate3D tw;
+      G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
+      for (int i = 0; i < 1000 * 100; i++) {
+        G4ThreeVector p = c->GetPointOnSurface();
+        EInside I = c->Inside(p);
+        EXPECT_EQ(I, kSurface);
+      }
+      delete c;
+    }
+    for (auto it = cryst.begin(); it != cryst.end(); it++) delete *it;
+  }
+
+  TEST_F(BelleCrystalTest, ForwardSurfaces)
+  {
+    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
+    double wrapthickness = 0.17;
+    for (auto it = cryst.begin(); it != cryst.end(); it++) {
+      shape_t* s = *it;
+      std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
+      G4Translate3D tw;
+      G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
+      for (int i = 0; i < 1000 * 100; i++) {
+        G4ThreeVector p = c->GetPointOnSurface();
+        EInside I = c->Inside(p);
+        EXPECT_EQ(I, kSurface);
+      }
+      delete c;
+    }
+    for (auto it = cryst.begin(); it != cryst.end(); it++) delete *it;
+  }
+
+  TEST_F(BelleCrystalTest, BackwardSurfaces)
+  {
+    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_backward.dat");
+    double wrapthickness = 0.17;
+    for (auto it = cryst.begin(); it != cryst.end(); it++) {
+      shape_t* s = *it;
+      std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
+      G4Translate3D tw;
+      G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
+      for (int i = 0; i < 1000 * 100; i++) {
+        G4ThreeVector p = c->GetPointOnSurface();
+        EInside I = c->Inside(p);
+        EXPECT_EQ(I, kSurface);
+      }
+      delete c;
+    }
+    for (auto it = cryst.begin(); it != cryst.end(); it++) delete *it;
   }
 
   // Bounding limits for half circle starting pi/2

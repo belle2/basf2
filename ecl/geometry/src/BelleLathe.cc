@@ -913,6 +913,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
   return hit;
 }
 
+// True if (x,y) is within the shape rotation
 inline bool BelleLathe::insector(double x, double y) const
 {
   double d0 = fn0x * x + fn0y * y;
@@ -1827,36 +1828,35 @@ void BelleLathe::DescribeYourselfTo(G4VGraphicsScene& scene) const
   scene.AddSolid(*this);
 }
 
-// Method to define the bounding box
+// Function to define the bounding box
 void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
 {
   std::vector<vector_t> points;
   vector_t point;
 
-  // placeholder vectors
+  // Placeholder vectors
   const double inf = std::numeric_limits<double>::infinity();
   G4ThreeVector minimum(inf, inf, inf), maximum(-inf, -inf, -inf);
 
-  // push outer vertices
-  if (fdphi < 2 * M_PI) { //if complete circle, will only be axes
+  // Outer vertices
+  if (fdphi < 2 * M_PI) { // Only need axis-crossings if the shape is a full circle
     point.x = frmax * cos(fphi); point.y = frmax * sin(fphi);
     points.push_back(point);
     point.x = frmax * cos(fphi + fdphi); point.y = frmax * sin(fphi + fdphi);
     points.push_back(point);
   }
 
-  // push inner vertices
+  // Inner vertices
   point.x = frmin * cos(fphi); point.y = frmin * sin(fphi);
   points.push_back(point);
-  if (frmin != 0) { // avoid duplicate 0,0
+  if (frmin != 0) { // Avoid duplicate (0,0)
     point.x = frmin * cos(fphi + fdphi); point.y = frmin * sin(fphi + fdphi);
     points.push_back(point);
   }
 
-  // check if rotation crosses an axis
-  // because inside is concave, extremum will always be at vertices
-  // because outside is convex, extremum may be at an axis crossing
-  // insector checks if point is within shape sector
+  // Check if shape crosses an axis
+  // Because the inside is concave, extremums will always be at vertices
+  // Because the outside is convex, extremums may be at an axis-crossing
   if (insector(0, 1)) {
     point.x = 0; point.y = frmax;
     points.push_back(point);
@@ -1874,7 +1874,6 @@ void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
     points.push_back(point);
   }
 
-  // change min/max vertice's components
   for (std::vector<vector_t>::size_type i = 0; i != points.size(); i++) {
     // global min in x
     if (points[i].x < minimum.x())
@@ -1893,11 +1892,11 @@ void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
       maximum.setY(points[i].y);
   }
 
-  // set z values
+  // Set z extremum values
   minimum.setZ(fzmin);
   maximum.setZ(fzmax);
 
-  // assign
+  // Assign
   pMin = minimum;
   pMax = maximum;
 }

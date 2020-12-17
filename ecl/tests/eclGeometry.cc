@@ -18,7 +18,6 @@ namespace {
     double absolute_tolerance = 0.00001;
   };
 
-  /** Test the only method. */
   TEST_F(BelleCrystalTest, BoundingBoxFourSides)
   {
     // Create box size 2 2 2
@@ -31,7 +30,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     crystal->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(-1, -1, -1); G4ThreeVector pMax_real(1, 1, 1);
 
     EXPECT_DOUBLE_EQ(pMin_real.x(), pMin.x());
@@ -58,7 +57,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     crystal->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(-s1, -c2, -z); G4ThreeVector pMax_real(s1, 1, z);
 
     EXPECT_DOUBLE_EQ(pMin_real.x(), pMin.x());
@@ -145,9 +144,10 @@ namespace {
     for (auto it = cryst.begin(); it != cryst.end(); it++) delete *it;
   }
 
-  // Bounding limits for half circle starting pi/2
+  // Bounding limits for half circle starting at pi/2
   TEST_F(BelleLatheTest, BoundingBoxSect0)
   {
+    // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0}, {1, 0}, {1, 1}, { -1, 1}}; //z, r
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
     BelleLathe* sect = new BelleLathe("sect", M_PI / 2, M_PI, contourb);
@@ -156,7 +156,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     sect->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(-1, -1, -1);
     G4ThreeVector pMax_real(0, 1, 1);
 
@@ -169,7 +169,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for half circle starting 3pi/2
+  // Bouding limits for half circle starting at 3pi/2
   TEST_F(BelleLatheTest, BoundingBoxSect1)
   {
     // Create the Belle Lathe
@@ -181,7 +181,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     sect->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(0, -1, -1);
     G4ThreeVector pMax_real(1, 1, 1);
 
@@ -194,7 +194,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for quarter starting pi
+  // Bouding limits for quarter starting at pi
   TEST_F(BelleLatheTest, BoundingBoxSect2)
   {
     // Create the Belle Lathe
@@ -206,7 +206,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     sect->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(-1, -1, -1);
     G4ThreeVector pMax_real(0, 0, 1);
 
@@ -219,7 +219,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for three quarter starting 0
+  // Bouding limits for three quarter starting at 0
   TEST_F(BelleLatheTest, BoundingBoxSect3)
   {
     // Create the Belle Lathe
@@ -231,7 +231,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     sect->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(-1, -1, -1);
     G4ThreeVector pMax_real(1, 1, 1);
 
@@ -244,7 +244,7 @@ namespace {
     EXPECT_NEAR(pMax_real.z(), pMax.z(), absolute_tolerance);
   }
 
-  // Bouding limits for quarter starting pi/4 w/ hole
+  // Bouding limits for quarter starting at pi/4 w/ hole
   TEST_F(BelleLatheTest, BoundingBoxSect4)
   {
     // Create the Belle Lathe
@@ -256,7 +256,7 @@ namespace {
     G4ThreeVector pMin; G4ThreeVector pMax;
     sect->BoundingLimits(pMin, pMax);
 
-    // Real vectors
+    // Manually calculated bounding box
     G4ThreeVector pMin_real(cos(3 * M_PI / 4), 0.5 * sin(M_PI / 4), -1);
     G4ThreeVector pMax_real(cos(M_PI / 4), 1, 1);
 

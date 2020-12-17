@@ -721,26 +721,26 @@ G4Polyhedron* BelleCrystal::CreatePolyhedron() const
   return new PolyhedronBelleCrystal(np, pt.data());
 }
 
-// Method to define the bounding box
+// Function to define the bounding box
 void BelleCrystal::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
 {
-  // all extremums will be at vertices
+  // All extremums will be at vertices
   int np = 2 * nsides;
   G4ThreeVector pt;
 
-  // placeholder vectors
+  // Placeholder vectors
   const double inf = std::numeric_limits<double>::infinity();
-  G4ThreeVector minimum(inf, inf, inf), maximum(-inf, -inf, -inf); // placeholder vectors
+  G4ThreeVector minimum(inf, inf, inf), maximum(-inf, -inf, -inf);
 
   for (int i = 0; i < np; i++) {
     pt = vertex(i);
 
-    // assign new minimum and maximum
+    // Assign new minimum and new maximum
     minimum = min(minimum, pt);
     maximum = max(maximum, pt);
   }
 
-  // assign
+  // Assign
   pMin = minimum;
   pMax = maximum;
 }

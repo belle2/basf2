@@ -74,6 +74,12 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hMaxOccModAfterInjLER; /**< Histogram Max Occupancy after LER injection */
       std::map<VxdID, TH1F*> hMaxOccModAfterInjHER; /**< Histogram Max Occupancy after HER injection */
 
+//       TH2F* hTrigAfterInjLER{};         /**< Histogram Veto tuning triggers after LER injection */
+//       TH2F* hTrigAfterInjHER{};         /**< Histogram Veto tuning triggers after HER injection */
+
+      TH1I* hTriggersAfterTrigger{};          /**< Histogram for Nr Entries (=Triggers after Last Trigger */
+      TH1I* hTriggersPerBunch{};          /**< Histogram forTrigger per Bunch  */
+
       TH2F* hOccAfterInjLERGate{};          /**< Occupancy after LER injection per Gate */
       TH2F* hOccAfterInjHERGate{};          /**< Occupancy after HER injection per Gate */
 

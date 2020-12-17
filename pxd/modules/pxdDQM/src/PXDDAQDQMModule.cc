@@ -107,6 +107,10 @@ void PXDDAQDQMModule::defineHisto()
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hMissAfterInjLER  = new TH1I("PXDMissInjLER", "PXDMissInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hMissAfterInjHER  = new TH1I("PXDMissInjHER", "PXDMissInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hEODBTrgDiff  = new TH1I("PXDEODBTrgDiff", "PXDEODBTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hCM63TrgDiff  = new TH1I("PXDCM63TrgDiff", "PXDCM63TrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hTruncTrgDiff  = new TH1I("PXDTruncTrgDiff", "PXDTruncTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hMissTrgDiff  = new TH1I("PXDMissTrgDiff", "PXDMissTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
 
   hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 20, 0, 20);
   auto xa = hDAQStat->GetXaxis();
@@ -272,11 +276,17 @@ void PXDDAQDQMModule::event()
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
 //             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
+    double lasttrig = it.GetTimeSincePrevTrigger(0) / 127.; //  127MHz clock ticks to us, inexact rounding
+    if (eotbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
+    if (cm63Flag && hCM63TrgDiff) hCM63TrgDiff->Fill(lasttrig);
+    if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);
+    if (missingFlag && hMissTrgDiff) hMissTrgDiff->Fill(lasttrig);
+
     // get last injection time
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
         if (eotbFlag) {
           if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);

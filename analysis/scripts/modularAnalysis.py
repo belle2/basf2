@@ -8,9 +8,7 @@ This module defines wrapper functions around the analysis modules.
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
-
-
-__analysis_globaltag = 'analysis_tools_release-04-02'
+import subprocess
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -3169,7 +3167,12 @@ def getAnalysisGlobaltag():
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
     """
-    return __analysis_globaltag
+    tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline']).decode('UTF-8').rstrip().split(' ')
+    analysis_tag = ''
+    for tag in tags:
+        if tag.startswith('analysis_tools'):
+            analysis_tag = tag
+    return analysis_tag
 
 
 if __name__ == '__main__':

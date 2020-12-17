@@ -28,6 +28,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/python.hpp>
 
 #include <set>
@@ -196,7 +197,19 @@ void Framework::setStreamingObjects(const boost::python::list& streamingObjects)
 
 void Framework::setRealm(const std::string& realm)
 {
-  Environment::Instance().setRealm(realm);
+  int irealm = -1;
+  for (int i = LogConfig::c_None; i <= LogConfig::c_Production; i++) {
+    std::string thisRealm = LogConfig::logRealmToString((LogConfig::ELogRealm)i);
+    if (boost::iequals(realm, thisRealm)) { //case-insensitive
+      irealm = i;
+      break;
+    }
+  }
+  if (irealm < 0) {
+    B2ERROR("Invalid realm! Needs to be one of none, online or production.");
+  } else {
+    Environment::Instance().setRealm((LogConfig::ELogRealm)irealm);
+  }
 }
 
 

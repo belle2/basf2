@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     ("job-information", prog::value<string>(),
      "Create json file with metadata of output files and basf2 execution status.")
     ("realm", prog::value<string>(),
-     "Set the realm of the basf2 execution.")
+     "Set the realm of the basf2 execution (online or production).")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -395,8 +395,19 @@ int main(int argc, char* argv[])
     }
 
     if (varMap.count("realm")) {
-      string realm = varMap["realm"].as<string>();
-      Environment::Instance().setRealm(realm);
+      std::string realmParam = varMap["realm"].as<string>();
+      int realm = -1;
+      for (int i = LogConfig::c_Online; i <= LogConfig::c_Production; i++) {
+        std::string thisRealm = LogConfig::logRealmToString((LogConfig::ELogRealm)i);
+        if (boost::iequals(realmParam, thisRealm)) { //case-insensitive
+          realm = i;
+          break;
+        }
+      }
+      if (realm < 0) {
+        B2FATAL("Invalid realm! Needs to be one of online or production.");
+      }
+      Environment::Instance().setRealm((LogConfig::ELogRealm)realm);
     }
 
 

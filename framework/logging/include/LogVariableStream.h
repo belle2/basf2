@@ -82,7 +82,7 @@ public:
    * @param realm execution realm
    * @param logLevel realm dependent log level.
    */
-  LogModRealm(const std::string& realm, Belle2::LogConfig::ELogLevel logLevel) :
+  LogModRealm(Belle2::LogConfig::ELogRealm realm, Belle2::LogConfig::ELogLevel logLevel) :
     m_realm(realm),
     m_logLevel(logLevel)
   {
@@ -91,7 +91,7 @@ public:
   /**
    * Returns the realm.
    */
-  std::string getRealm() const
+  Belle2::LogConfig::ELogRealm getRealm() const
   {
     return m_realm;
   }
@@ -106,7 +106,7 @@ public:
 
 private:
   /** Realm for the conditional log level. */
-  std::string m_realm;
+  Belle2::LogConfig::ELogRealm m_realm;
 
   /** Realm dependent log level. */
   Belle2::LogConfig::ELogLevel m_logLevel;

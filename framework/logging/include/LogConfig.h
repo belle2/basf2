@@ -42,6 +42,12 @@ namespace Belle2 {
                     c_NoVariables = 0x100, /**< If set don't output any variables that are part of the message */
                   };
 
+    /** Definition of the supported execution realms */
+    enum ELogRealm { c_None,          /**< No specific realm. */
+                     c_Online,        /**< Online data taking. */
+                     c_Production     /**< Data production jobs. */
+                   };
+
     static const int c_DefaultDebugLevel = 10;  /**< Default debug level. */
 
     /**
@@ -59,6 +65,14 @@ namespace Belle2 {
      * @return The string representation of the log level type.
      */
     static const char* logLevelToString(ELogLevel logLevelType);
+
+    /**
+     * Converts a log realm type to a string.
+     *
+     * @param realm The log realm.
+     * @return The string representation of the log realm.
+     */
+    static const char* logRealmToString(ELogRealm realm);
 
     /**
      * Configure the log level.

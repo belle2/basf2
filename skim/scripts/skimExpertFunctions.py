@@ -330,12 +330,13 @@ class BaseSkim(ABC):
     def __contact__(self):
         pass
 
-    def __init__(self, *, OutputFileName=None, udstOutput=True, validation=False):
+    def __init__(self, *, OutputFileName=None, additionalDataDescription=None, udstOutput=True, validation=False):
         """Initialise the BaseSkim class.
 
         Parameters:
             OutputFileName (str): Name to give output uDST files. If none given, then
                 defaults to eight-number skim code.
+            additionalDataDescription (dict): additional data description to be added to the output file metadata.
             udstOutput (bool): If True, add uDST output to the path.
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
@@ -343,6 +344,7 @@ class BaseSkim(ABC):
         self.name = self.__class__.__name__
         self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName
+        self.additionalDataDescription = additionalDataDescription
         self._udstOutput = udstOutput
         self._validation = validation
         self.SkimLists = []
@@ -625,6 +627,7 @@ class BaseSkim(ABC):
             skimDecayMode=self.code,
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,
+            dataDescription=self.additionalDataDescription,
             path=path,
         )
         summaryOfLists(self.SkimLists, path=path)

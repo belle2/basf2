@@ -27,11 +27,11 @@ eclTimeShiftsAlgorithm::eclTimeShiftsAlgorithm():
   timeShiftForPlotStyle{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
   crysCrateShift_min(-20),
   crysCrateShift_max(20),
+  algorithmReadPayloads(false),
+  forcePayloadIOVnotOpenEndedAndSequentialRevision(false),
   m_ECLCrystalTimeOffset("ECLCrystalTimeOffset"),
   m_ECLCrateTimeOffset("ECLCrateTimeOffset"),
-  m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib"),
-  algorithmReadPayloads(false),
-  forcePayloadIOVnotOpenEndedAndSequentialRevision(false)//,
+  m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib")//,
 {
   setDescription(
     "Perform time calibration of ecl crystals by combining previous values from the DB for different calibrations."

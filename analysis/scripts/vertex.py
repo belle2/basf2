@@ -55,6 +55,7 @@ def _fitVertex(
     fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -89,6 +90,11 @@ def _fitVertex(
     pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
     pvfit.param('smearing', smearing)
+    if massConstraint:
+        if isinstance(massConstraint[0], str):
+            pvfit.param('massConstraintListParticlename', massConstraint)
+        else:
+            pvfit.param('massConstraintList', massConstraint)
     path.add_module(pvfit)
 
 
@@ -98,6 +104,7 @@ def kFit(list_name,
          constraint='',
          daughtersUpdate=False,
          decay_string='',
+         massConstraint=[],
          smearing=0,
          path=None):
     """
@@ -114,15 +121,18 @@ def kFit(list_name,
           * ``vertex`` for a vertex fit
           * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
           * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
+          * ``massfourC`` for a vertex fit with a 4-momentum constraint and mass constraints on the specified daughter particles
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list. (only for massfourC)
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):      modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
 def raveFit(

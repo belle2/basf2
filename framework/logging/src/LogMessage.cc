@@ -13,10 +13,16 @@
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/ProcessStatistics.h>
 
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <ostream>
 #include <utility>
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;
@@ -100,7 +106,24 @@ std::string LogMessage::toJSON(bool complete) const
     buffer << ",\"timestamp\":" << std::fixed << std::setprecision(3) << time;
   if (ProcHandler::EvtProcID() != -1 or complete)
     buffer << ",\"proc\":" << ProcHandler::EvtProcID();
-  //variables ...
+  if (complete) {
+    static StoreObjPtr<EventMetaData> eventMetaData;
+    if (eventMetaData.isValid()) {
+      buffer << ",\"experiment\":" << eventMetaData->getExperiment();
+      buffer << ",\"run\":" << eventMetaData->getRun();
+      buffer << ",\"subrun\":" << eventMetaData->getSubrun();
+      buffer << ",\"event\":" << eventMetaData->getEvent();
+    }
+    static StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+    if (processStatistics.isValid()) {
+      const auto& stats = processStatistics->getGlobal();
+      buffer << ",\"nruns\":" << int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_BeginRun));
+      buffer << ",\"nevents\":" << int(stats.getCalls());
+    }
+    buffer << ",\"initialize\":" << ((DataStore::Instance().getInitializeActive()) ? "true" : "false");
+    buffer << ",\"hostname\":\"" << boost::asio::ip::host_name() << '"';
+    buffer << ",\"pid\":" << int(getpid());
+  }
   buffer << "}\n";
   return buffer.str();
 }

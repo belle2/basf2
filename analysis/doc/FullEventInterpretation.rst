@@ -121,7 +121,8 @@ In order to find the latest, recommended FEI training, you can use the `b2condit
 ``b2conditionsdb-recommend input_file.mdst.root``
 
 This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
-Analysis tags are named ``analysis_tools_XXXX``.
+Analysis tags are named ``analysis_tools_XXXX``, and the latest and recommended one can be retrieved using
+the function ``modularAnalysis.getAnalysisGlobaltag()``.
 You will need to prepend this tag to your global tags list.
 This is done inside the FEI steering script.
 

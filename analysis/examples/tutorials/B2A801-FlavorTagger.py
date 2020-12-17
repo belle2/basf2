@@ -93,7 +93,7 @@ ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:sig', fillWithMostLikely=True,
                     path=cp_val_path)
 
-b2.conditions.append_globaltag("analysis_tools_release-04-02")
+b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.

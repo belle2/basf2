@@ -22,7 +22,7 @@ ma.inputMdst(
 
 # Add the database with the classifier weight files for the FEI
 # You can use the command b2conditionsdb-recommend
-b2.conditions.globaltags = ["analysis_tools_release-04-02"]
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
 
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels

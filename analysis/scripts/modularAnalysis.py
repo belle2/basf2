@@ -10,6 +10,9 @@ from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
 
 
+__analysis_globaltag = 'analysis_tools_release-04-02'
+
+
 def setAnalysisConfigParams(configParametersAndValues, path):
     """
     Sets analysis configuration parameters.
@@ -3136,6 +3139,13 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
+
+def getAnalysisGlobaltag():
+    """
+    Returns a string containing the name of the latest and recommended analysis globaltag.
+    """
+    return __analysis_globaltag
 
 
 if __name__ == '__main__':

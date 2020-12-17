@@ -175,10 +175,12 @@ void SoftwareTriggerResultPrinterModule::event()
     m_passedEventsPerTrigger["final_decision"][SoftwareTriggerCutResult::c_reject]++;
   }
 
-  const bool l1Accepted = m_l1Result->test();
-  if (l1Accepted) {
-    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_accept]++;
-  } else {
-    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
+  if (m_l1Result.isValid()) {
+    const bool l1Accepted = m_l1Result->test();
+    if (l1Accepted) {
+      m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_accept]++;
+    } else {
+      m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
+    }
   }
 }

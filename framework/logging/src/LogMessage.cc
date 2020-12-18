@@ -37,7 +37,8 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
   m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
-  m_logInfo(0)
+  m_logInfo(0),
+  m_count(0)
 {
 }
 
@@ -51,7 +52,8 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messag
   m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
-  m_logInfo(0)
+  m_logInfo(0),
+  m_count(0)
 {
 }
 
@@ -107,6 +109,7 @@ std::string LogMessage::toJSON(bool complete) const
   if (ProcHandler::EvtProcID() != -1 or complete)
     buffer << ",\"proc\":" << ProcHandler::EvtProcID();
   if (complete) {
+    buffer << ",\"count\":" << m_count;
     static StoreObjPtr<EventMetaData> eventMetaData;
     if (eventMetaData.isValid()) {
       buffer << ",\"experiment\":" << eventMetaData->getExperiment();

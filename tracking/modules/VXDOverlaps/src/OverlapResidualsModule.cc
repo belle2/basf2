@@ -591,10 +591,9 @@ void OverlapResidualsModule::event()
     }
 
     //LOOKING FOR 2 CONSECUTIVE SVD HITS IN OVERLAPPING MODULES OF A SAME LAYER
-    int pionCode = 211;
     RelationVector<Track> theTK = DataStore::getRelationsWithObj<Track>(&trk);
 
-    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::ChargedStable(pionCode));
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       svdTrkd0 = tfr->getD0();
       svdTrkz0 = tfr->getZ0();
@@ -603,9 +602,6 @@ void OverlapResidualsModule::event()
       pStar.Boost(0, 0, 3. / 11);
       svdTrkpCM = pStar.P();
     }
-
-    // const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
-    // B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
 
     svdTrkPXDHits = (trk.getPXDHitList()).size();
     svdTrkSVDHits = (trk.getSVDHitList()).size();

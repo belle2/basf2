@@ -103,7 +103,7 @@ namespace Belle2 {
       int kmi = lround(xmi / bar.A);
       int kma = lround(xma / bar.A);
 
-      // loop over reflections and over pixel columns
+      // loop over reflections in x and over pixel columns
 
       for (int k = kmi; k <= kma; k++) {
         for (unsigned col = 0; col < pixelPositions.getNumPixelColumns(); col++) {
@@ -127,12 +127,12 @@ namespace Belle2 {
       // determine the range of number of reflections in x before mirror
 
       double xmi = 0, xma = 0;
-      bool ok = rangeOfX(mirror.zb, xmi, xma); //TODO: z emission >= zb
+      bool ok = rangeOfX(mirror.zb, xmi, xma);
       if (not ok) return;
       int kmi = lround(xmi / bar.A);
       int kma = lround(xma / bar.A);
 
-      // loop over reflections before mirror
+      // loop over reflections in x before mirror
 
       double xE = emiPoint.X();
       double zE = emiPoint.Z();
@@ -154,7 +154,7 @@ namespace Belle2 {
       const auto& bar = m_inverseRaytracer->getBars().back();
       const auto& prism = m_inverseRaytracer->getPrism();
 
-      // determine the range of number of reflections after mirror
+      // determine the range of number of reflections in x after mirror
 
       std::vector<double> xDs;
       double minLen = 1e10;
@@ -172,7 +172,7 @@ namespace Belle2 {
       int kmi = lround(xmi / bar.A);
       int kma = lround(xma / bar.A);
 
-      // loop over reflections after mirror and over pixel columns
+      // loop over reflections in x after mirror and over pixel columns
 
       for (int k = kmi; k <= kma; k++) {
         for (unsigned col = 0; col < pixelPositions.getNumPixelColumns(); col++) {
@@ -212,19 +212,39 @@ namespace Belle2 {
     {
       const double precision = 0.01; //TODO ?
 
-      double x1 = 0;
-      double y1 = deltaXD(x1, sol, xD);
+      double x1 = 0;                    // x is dFic
+      double y1 = deltaXD(x1, sol, xD); // y is the difference in xD
       if (isnan(y1)) return false;
       if (abs(y1) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
+      int n1 = m_fastRaytracer->getNxm();
 
       double step = -dFic_dx * y1;
       for (int i = 1; i < 20; i++) { // search for zero-crossing interval
         double x2 = step * i;
         double y2 = deltaXD(x2, sol, xD);
         if (isnan(y2)) return false;
+        int n2 = m_fastRaytracer->getNxm();
+        if (n2 != n1) { // x2 is passing the discontinuity caused by different reflection number
+          double x3 = x2;
+          x2 = x1;
+          y2 = y1;
+          for (int k = 0; k < 20; k++) { // move x2 to discontinuity using bisection
+            double x = (x2 + x3) / 2;
+            double y = deltaXD(x, sol, xD);
+            if (isnan(y)) return false;
+            int n = m_fastRaytracer->getNxm();
+            if (n == n1) {
+              x2 = x;
+              y2 = y;
+            } else {
+              x3 = x;
+            }
+          }
+          if (y2 * y1 > 0) return false; // solution does not exist
+        }
         if (abs(y2) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
-        if (y2 * y1 < 0) { // zero-crossing interval identified
-          for (int k = 0; k < 20; k++) { // find zero-crossing x with bisection
+        if (y2 * y1 < 0) { // zero-crossing interval is identified
+          for (int k = 0; k < 20; k++) { // find zero-crossing using bisection
             double x = (x1 + x2) / 2;
             double y = deltaXD(x, sol, xD);
             if (isnan(y)) return false;
@@ -237,13 +257,16 @@ namespace Belle2 {
               y1 = y;
             }
           }
-          return m_fastRaytracer->getTotalReflStatus(m_cosTotal); //TODO: poseben 'zvezen' mode za fast raytracer?
+          return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
         }
         x1 = x2;
         y1 = y2;
       }
 
-      B2ERROR("PDFConstructor::doRaytracingCorrections: zero-crossing interval not found");
+      B2ERROR("PDFConstructor::doRaytracingCorrections: zero-crossing interval not found"
+              << LogVar("xD", xD) << LogVar("dFic_dx", dFic_dx) << LogVar("step", step)
+              << LogVar("x1", x1) << LogVar("y1", y1));
+
       return false;
     }
 
@@ -254,14 +277,21 @@ namespace Belle2 {
 
       double Len = m_fastRaytracer->getPropagationLen();
       double avSpeedOfLight = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
-      double dt_de = (D.dLen_de + Len * m_groupIndexDerivative / m_groupIndex) / avSpeedOfLight; // cromatic
-      double dt_dx =  D.dLen_dx / avSpeedOfLight; // channel x-size
-      double dt_dL = (D.dLen_dL + 1 / m_yScanner->getBeta() / m_groupIndex) / avSpeedOfLight; // parallax
-      double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / avSpeedOfLight; // multiple scattering in quartz
+
+      // derivatives: dt/de, dt/dx, dt/dL
+      double dt_de = (D.dLen_de + Len * m_groupIndexDerivative / m_groupIndex) / avSpeedOfLight; // for chromatic
+      double dt_dx =  D.dLen_dx / avSpeedOfLight; // for channel x-size
+      double dt_dL = (D.dLen_dL + 1 / m_yScanner->getBeta() / m_groupIndex) / avSpeedOfLight; // for parallax
+
+      // contribution of multiple scattering in quartz
+      double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / avSpeedOfLight;
 
       const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
       double L = m_yScanner->getTrackLengthInQuartz();
+
+      // sigma squared: channel x-size, parallax, multiple scattering
       double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2)) / 12 + pow(sigmaScat, 2);
+      // sigma squared: channel x-size, parallax, multiple scattering, chromatic
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
 
       double yB = m_fastRaytracer->getYB();
@@ -343,62 +373,80 @@ namespace Belle2 {
 
     bool PDFConstructor::rangeOfX(double z, double& xmi, double& xma)
     {
-      double maxLen = (s_maxTime - m_tof) / m_groupIndex * Const::speedOfLight;
+      double maxLen = (s_maxTime - m_tof) / m_groupIndex * Const::speedOfLight; // maximal propagation length
       if (maxLen < 0) return false;
 
       const auto& emission = m_track.getEmissionPoint();
       const auto& trk = emission.trackAngles;
       const auto& cer = cerenkovAngle();
 
+      // range in x from propagation lenght limit
+
       double dz = z - emission.position.Z();
       double cosFicLimit = (trk.cosTh * cer.cosThc - dz / maxLen) / (trk.sinTh * cer.sinThc); // at maxLen
-      if (copysign(cosFicLimit, dz) < -1) return false;
+      double cosLimit = (dz > 0) ? cosFicLimit : -cosFicLimit;
+      if (cosLimit < -1) return false; // photons cannot reach the plane at z within propagation lenght limit
 
+      std::vector<double> xmima;
       double x0 = emission.position.X();
-      double cosTotal = m_yScanner->getCosTotal();
-      double deltaX = maxLen * cosTotal; // from total reflection requirement (|kx| < cosTotal)
-      xmi = x0 - deltaX;
-      xma = x0 + deltaX;
+      if (cosLimit > 1) {
+        xmima.push_back(x0 - maxLen);
+        xmima.push_back(x0 + maxLen);
+      } else {
+        double a = trk.cosTh * cer.sinThc * cosFicLimit + trk.sinTh * cer.cosThc;
+        double b = cer.sinThc * sqrt(1 - cosFicLimit * cosFicLimit);
+        xmima.push_back(x0 + maxLen * (a * trk.cosFi - b * trk.sinFi));
+        xmima.push_back(x0 + maxLen * (a * trk.cosFi + b * trk.sinFi));
+        std::sort(xmima.begin(), xmima.end());
+      }
+      xmi = xmima[0];
+      xma = xmima[1];
+
+      // range in x from minimal/maximal possible extensions in x, if they exist (d(kx/kz)/dFic = 0)
 
       double theta = acos(trk.cosTh);
-      if (dz < 0) theta = M_PI - theta; // rotation around x for pi (z -> -z, phi -> -phi)
+      if (dz < 0) theta = M_PI - theta; // rotation around x by 180 deg. (z -> -z, phi -> -phi)
       dz = abs(dz);
       double thetaCer = acos(cer.cosThc);
-      if (theta - thetaCer >= M_PI / 2) return false;
+      if (theta - thetaCer >= M_PI / 2) return false; // photons cannot reach the plane at z
 
-      std::vector<double> x;
-      if (trk.sinFi == 0) {
-        x.push_back(tan(theta - thetaCer) * trk.cosFi);
-        if (theta + thetaCer < M_PI / 2) x.push_back(tan(theta + thetaCer) * trk.cosFi);
-        else x.push_back(INFINITY);
+      std::vector<double> dxdz;
+      double a = -cos(theta + thetaCer) * cos(theta - thetaCer);
+      double b = sin(2 * theta) * trk.cosFi;
+      double c = pow(trk.sinFi * cer.sinThc, 2) - pow(trk.cosFi, 2) * sin(theta + thetaCer) * sin(theta - thetaCer);
+      double D = b * b - 4 * a * c;
+      if (D < 0) return true; // minimum and maximum do not exist, range is given by propagation length limit
+      if (a != 0) {
+        D = sqrt(D);
+        dxdz.push_back((-b - D) / 2 / a);
+        dxdz.push_back((-b + D) / 2 / a);
       } else {
-        double a = -cos(theta + thetaCer) * cos(theta - thetaCer);
-        double b = sin(2 * theta) * trk.cosFi;
-        double c = pow(trk.sinFi * cer.sinThc, 2) - pow(trk.cosFi, 2) * sin(theta + thetaCer) * sin(theta - thetaCer);
-        if (a == 0) {
-          if (b == 0) return true;
-          x.push_back(-c / b);
-          x.push_back(copysign(INFINITY, b));
-        } else {
-          double D = b * b - 4 * a * c;
-          if (D < 0) return true;
-          D = sqrt(D);
-          x.push_back((-b - D) / 2 / a);
-          x.push_back((-b + D) / 2 / a);
-          for (int i = 0; i < 2; i++) {
-            double aa = (x[i] * cos(theta) - trk.cosFi * sin(theta)) * cer.cosThc;
-            double bb = (x[i] * sin(theta) - trk.cosFi * cos(theta)) * cer.sinThc;
-            double dd = trk.sinFi * cer.sinThc;
-            double cosFic = aa * bb / (bb * bb + dd * dd);
-            double kz = cos(theta) * cer.cosThc - sin(theta) * cer.sinThc * cosFic;
-            if (kz < 0) x[i] = copysign(INFINITY, x[1 - i] - x[i]);
-          }
+        if (b == 0) return true; // minimum and maximum do not exist, range is given by propagation length limit
+        dxdz.push_back(-c / b);
+        dxdz.push_back(copysign(INFINITY, b));
+      }
+      std::vector<double> cosFic(2, cosLimit);
+      for (int i = 0; i < 2; i++) {
+        if (abs(dxdz[i]) < INFINITY) {
+          double aa = (dxdz[i] * cos(theta) - trk.cosFi * sin(theta)) * cer.cosThc;
+          double bb = (dxdz[i] * sin(theta) + trk.cosFi * cos(theta)) * cer.sinThc;
+          double dd = trk.sinFi * cer.sinThc;
+          cosFic[i] = aa * bb / (bb * bb + dd * dd);
+          double kz = cos(theta) * cer.cosThc - sin(theta) * cer.sinThc * cosFic[i];
+          if (kz < 0) dxdz[i] = copysign(INFINITY, dxdz[1 - i] - dxdz[i]);
         }
       }
-      std::sort(x.begin(), x.end());
+      if (dxdz[0] > dxdz[1]) {
+        std::reverse(dxdz.begin(), dxdz.end());
+        std::reverse(cosFic.begin(), cosFic.end());
+      }
+      for (int i = 0; i < 2; i++) {
+        if (cosFic[i] < cosLimit) xmima[i] = x0 + dxdz[i] * dz;
+      }
 
-      xmi = std::max(xmi, x0 + dz * x[0]);
-      xma = std::min(xma, x0 + dz * x[1]);
+      // just to make sure xmima are within the limits given by maximal propagation length
+      xmi = std::max(xmima[0], x0 - maxLen);
+      xma = std::min(xmima[1], x0 + maxLen);
 
       return xma > xmi;
     }

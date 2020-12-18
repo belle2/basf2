@@ -57,6 +57,20 @@ namespace Belle2 {
       PhotonState(const TVector3& position, double kx, double ky, double kz);
 
       /**
+       * Constructor with position, track direction and cerenkov angles
+       * @param position initial photon position (must be inside quartz)
+       * @param trackDir track direction vector (must be unit vector)
+       * @param thc Cerenkov (polar) angle
+       * @param fic Cerenkov azimuthal angle
+       */
+      PhotonState(const TVector3& position, const TVector3& trackDir, double thc, double fic);
+
+      /**
+       * Changes sign of direction y component
+       */
+      PhotonState& flipKy() {m_ky = -m_ky; return *this;}
+
+      /**
        * Sets maximal allowed propagation length.
        * @param maxLen maximal allowed propagation length
        */
@@ -99,6 +113,12 @@ namespace Belle2 {
        * @return unfolded position
        */
       double getUnfoldedY(double y) const {return (func::unfold(y - m_y0, m_ny, m_B) + m_y0);}
+
+      /**
+       * Returns detection position x in unfolded prism
+       * @return detection position x in unfolded prism
+       */
+      double getXD() const {return getUnfoldedX(m_x);}
 
       /**
        * Returns detection position y in unfolded prism

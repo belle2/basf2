@@ -17,6 +17,7 @@ namespace Belle2 {
     void FastRaytracer::clear() const
     {
       m_photonStates.clear();
+      m_extraStates.clear();
       m_status = false;
       m_Nxm = 0;
       m_Nxb = 0;
@@ -26,7 +27,7 @@ namespace Belle2 {
       m_Nye = 0;
     }
 
-    void FastRaytracer::propagate(const PhotonState& photon) const
+    void FastRaytracer::propagate(const PhotonState& photon, bool averaging) const
     {
       clear();
       m_photonStates.push_back(photon);
@@ -72,6 +73,13 @@ namespace Belle2 {
       newState.propagate(m_prism);
       if (not newState.getPropagationStatus()) return;
 
+      if (averaging) {
+        m_extraStates.push_back(lastState);
+        auto& flippedState = m_extraStates.back().flipKy();
+        flippedState.propagate(m_prism);
+        if (not flippedState.getPropagationStatus()) return;
+      }
+
       m_Nxe = newState.getNx();
       m_Nye = newState.getNy();
 
@@ -89,15 +97,18 @@ namespace Belle2 {
     double FastRaytracer::getPropagationLen() const
     {
       if (m_photonStates.empty()) return 0;
-      return m_photonStates.back().getPropagationLen();
+      if (m_extraStates.empty()) return m_photonStates.back().getPropagationLen();
+      return (m_photonStates.back().getPropagationLen() + m_extraStates.back().getPropagationLen()) / 2; //TODO:check
     }
 
     double FastRaytracer::getXD() const
     {
       if (m_photonStates.empty()) return 0;
 
-      double x = m_photonStates.back().getX();
-      for (int i = m_photonStates.size() - 1; i > 0; i--) {
+      double x = m_extraStates.empty() ?
+                 m_photonStates.back().getXD() : (m_photonStates.back().getXD() + m_extraStates.back().getXD()) / 2;
+
+      for (int i = m_photonStates.size() - 2; i > 0; i--) {
         const auto& photonState = m_photonStates[i];
         if (photonState.getSegmentType() == PhotonState::c_MirrorSegment) break;
         x = photonState.getUnfoldedX(x);
@@ -137,7 +148,8 @@ namespace Belle2 {
     double FastRaytracer::getZD() const
     {
       if (m_photonStates.empty()) return 0;
-      return m_photonStates.back().getZD();
+      if (m_extraStates.empty()) return m_photonStates.back().getZD();
+      return (m_photonStates.back().getZD() + m_extraStates.back().getZD()) / 2;
     }
 
 

@@ -43,14 +43,21 @@ namespace Belle2 {
       /**
        * Propagate photon to photo-detector plane.
        * @param photon initial photon state
+       * @param averaging if true, propagate photon also in upside-down flipped prism
        */
-      void propagate(const PhotonState& photon) const;
+      void propagate(const PhotonState& photon, bool averaging = false) const;
 
       /**
        * Returns photon states (results of propagation).
        * @return photon states
        */
       const std::vector<PhotonState>& getPhotonStates() const {return m_photonStates;}
+
+      /**
+       * Returns extra states.
+       * @return extra states
+       */
+      const std::vector<PhotonState>& getExtraStates() const {return m_extraStates;}
 
       /**
        * Returns propagation status.
@@ -68,12 +75,14 @@ namespace Belle2 {
 
       /**
        * Returns total propagation length since initial position.
+       * If averaging is ON the return value equals to arithmetic average of true and flipped prism.
        * @return propagation length
        */
       double getPropagationLen() const;
 
       /**
        * Returns unfolded position in x at virtual Detector plane.
+       * If averaging is ON the return value equals to arithmetic average of true and flipped prism.
        * Reliable only if propagation status is true.
        * For reflected photons unfolding is done up to spherical mirror.
        * @return unfolded position in x at virtual Detector plane
@@ -99,6 +108,7 @@ namespace Belle2 {
 
       /**
        * Returns unfolded position in z of virtual Detector plane.
+       * If averaging is ON the return value equals to arithmetic average of true and flipped prism.
        * Reliable only if propagation status is true.
        * @return unfolded position in z of virtual Detector plane
        */
@@ -179,6 +189,7 @@ namespace Belle2 {
     private:
 
       mutable std::vector<PhotonState> m_photonStates; /**< photon states at propagation steps */
+      mutable std::vector<PhotonState> m_extraStates;  /**< extra storage */
       mutable bool m_status = false; /**< propagation status */
       mutable int m_Nxm = 0; /**< number of reflections in x before mirror */
       mutable int m_Nxb = 0; /**< number of reflections in x after mirror and before prism */

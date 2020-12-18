@@ -85,6 +85,7 @@ namespace Belle2 {
 
       if (geometry == c_Unified) {
         m_bars.push_back(BarSegment(module));
+        m_prism.yUp = m_bars.back().B / 2;
       } else {
         m_bars.push_back(BarSegment(module.getBarSegment2(), m_prism.zR));
         m_bars.push_back(BarSegment(module.getBarSegment1(), m_bars.back().zR));

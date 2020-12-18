@@ -11,6 +11,7 @@
 #include <top/reconstruction_cpp/PhotonState.h>
 #include <top/reconstruction_cpp/func.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 namespace Belle2 {
   namespace TOP {
@@ -30,6 +31,16 @@ namespace Belle2 {
       m_status(true)
     {}
 
+    PhotonState::PhotonState(const TVector3& position, const TVector3& trackDir, double thc, double fic):
+      m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
+      m_status(true)
+    {
+      TVector3 dir(cos(fic) * sin(thc), sin(fic) * sin(thc), cos(thc));
+      dir.RotateUz(trackDir);
+      m_kx = dir.X();
+      m_ky = dir.Y();
+      m_kz = dir.Z();
+    }
 
     bool PhotonState::isInside(const RaytracerBase::BarSegment& bar) const
     {
@@ -271,8 +282,14 @@ namespace Belle2 {
           }
           k += step;
         }
-        B2WARNING("PhotonState::propagate: unfolded prism window not found");
+        B2WARNING("PhotonState::propagate: unfolded prism window not found"
+                  << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown)
+                  << LogVar("y", m_y) << LogVar("z", m_z)
+                  << LogVar("ky", ky_in) << LogVar("kz", kz_in));
         return;
+      } else {
+        m_yD = m_y;
+        m_zD = m_z;
       }
 
 success:

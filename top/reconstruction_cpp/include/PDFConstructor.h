@@ -339,6 +339,8 @@ namespace Belle2 {
     };
 
 
+    //--- inline functions ------------------------------------------------------------
+
     inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma)
     {
       x = func::unfold(x, Nx, A);
@@ -350,7 +352,7 @@ namespace Belle2 {
     inline double PDFConstructor::deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD)
     {
       m_dFic = dFic;
-      m_fastRaytracer->propagate(m_inverseRaytracer->getReconstructedPhoton(sol, dFic));
+      m_fastRaytracer->propagate(m_inverseRaytracer->getReconstructedPhoton(sol, dFic), true);
       if (not m_fastRaytracer->getPropagationStatus()) return std::numeric_limits<double>::quiet_NaN();
       return m_fastRaytracer->getXD() - xD;
     }
@@ -393,7 +395,7 @@ namespace Belle2 {
       if (i_dx < 0) return;
       int k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 4) {
+        if (k > 8) {
           B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dx)");
           return;
         }
@@ -410,7 +412,7 @@ namespace Belle2 {
       if (i_dL < 0) return;
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 4) {
+        if (k > 8) {
           B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
           return;
         }
@@ -427,7 +429,7 @@ namespace Belle2 {
       if (i_de < 0) return;
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 4) {
+        if (k > 8) {
           B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
           return;
         }

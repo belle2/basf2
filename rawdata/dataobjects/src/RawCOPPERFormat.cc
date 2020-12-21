@@ -8,7 +8,7 @@
 
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-using namespace std;
+
 using namespace Belle2;
 //ClassImp(RawCOPPERFormat);
 
@@ -118,46 +118,6 @@ int* RawCOPPERFormat::GetDetectorBuffer(int n, int finesse_num)
 }
 
 
-
-unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
-{
-  unsigned int word[4];
-  unsigned int ret_word = 0;
-  int flag = 0, err_flag = 0;
-
-  for (int i = 0; i < 4; i++) {
-    if (GetFINESSENwords(n, i) > 0) {
-      word[ i ] = m_buffer[ GetOffsetFINESSE(n, i) + finesse_buffer_pos ];
-      if (flag != 0 && (ret_word != word[ i ])) {
-        err_flag = 1;
-      }
-      ret_word = word[ i ];
-      flag = 1;
-    }
-  }
-
-  if (flag == 0) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    B2FATAL(err_buf);
-  }
-
-  if (err_flag == 1) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
-            word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ],
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-#ifndef NO_DATA_CHECK
-    B2FATAL(err_buf);
-#endif
-  }
-  return ret_word;
-}
-
-
 // This function is available after RawCOPPER/Header ver.2
 int RawCOPPERFormat::GetPacketCRCError(int n)
 {
@@ -193,3 +153,63 @@ int RawCOPPERFormat::GetEventCRC16Value(int n, int finesse_num)
   return -1;
 }
 
+int* RawCOPPERFormat::PackDetectorBuf(int* /*packed_buf_nwords*/,
+                                      int* const(& /*detector_buf_ch*/)[MAX_PCIE40_CH],
+                                      int const(& /*nwords_ch*/)[MAX_PCIE40_CH],
+                                      RawCOPPERPackerInfo /*rawcpr_info*/)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. : %s %s %d: Exiting...\n", __FILE__,
+          __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+void RawCOPPERFormat::CompareHeaderValue(int /*n*/, const unsigned int (& /*input_val*/)[MAX_PCIE40_CH],
+                                         std::vector<std::vector<unsigned int> >& /*result*/)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. : %s %s %d: Exiting...\n", __FILE__,
+          __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
+  return;
+}
+
+void RawCOPPERFormat::GetNodeName(int n, char* node_name, int bufsize)
+{
+  unsigned int node_id = GetNodeID(n);
+  if (node_name == NULL || node_id == 0 || bufsize < 20) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL] Null pointer or strange node_id(%.8x)in an argument of this function. Exiting... : \n%s %s %d\n",
+            node_id,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf); // to reduce multiple error messages
+  } else {
+    sprintf(node_name, "cpr%d",
+            (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
+            (node_id & COPPERID_MASK));
+  }
+}
+
+void RawCOPPERFormat::GetNodeName(char* node_name, unsigned int node_id, int bufsize)
+{
+  if (node_name == NULL || node_id == 0 || bufsize < 20) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL] Null pointer or strange node_id(%.8x)in an argument of this function. Exiting... : \n%s %s %d\n",
+            node_id,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf); // to reduce multiple error messages
+  } else {
+    sprintf(node_name, "cpr%d",
+            (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
+            (node_id & COPPERID_MASK));
+  }
+}

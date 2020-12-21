@@ -6,18 +6,12 @@ SVD Database importer.
 Script to Import Calibrations into a local DB
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
-from ROOT.Belle2 import FileSystem
-import os
 import sys
-import glob
-import subprocess
-import interactive
 import argparse
-from fnmatch import fnmatch
 from termcolor import colored
+from basf2 import conditions as b2conditions
 
 parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
@@ -70,21 +64,15 @@ if not str(proceed) == 'y':
     print(colored(str(proceed) + ' != y, therefore we exit now', 'red'))
     exit(1)
 
-reset_database()
-use_database_chain()
-# central DB needed for the channel mapping DB object
-# GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "svd_Belle2_20181221"
-use_central_database(GLOBAL_TAG)
-use_local_database("localDB/database.txt", "localDB", invertLogging=True)
+b2conditions.prepend_globaltag("svd_basic")
 
 # local tag and database needed for commissioning
 
-main = create_path()
+main = b2.create_path()
 
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run})
 main.add_module(eventinfosetter)
 
@@ -94,13 +82,14 @@ main.add_module("Gearbox")
 run = int(run)
 
 
-class dbImporterModule(basf2.Module):
+class dbImporterModule(b2.Module):
     """
     :author: Laura Zani
     Module to call the importer methods for the payloads creation from XML file
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string
     """
+
     def beginRun(self):
         """
         Function to call the dbImporter methods to upload the different local payloads
@@ -130,8 +119,9 @@ class dbImporterModule(basf2.Module):
                 else:
                     print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
 
+
 main.add_module(dbImporterModule())
 
-process(main)
+b2.process(main)
 
 print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")

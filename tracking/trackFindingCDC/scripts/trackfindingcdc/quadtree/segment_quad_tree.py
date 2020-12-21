@@ -1,5 +1,4 @@
 import basf2
-from ROOT import Belle2
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.quadtree.quadTreePlotter import SegmentQuadTreePlotter
@@ -84,6 +83,7 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
 def main():
     run = SegmentQuadTreeRun()
     run.configure_and_execute_from_commandline()
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

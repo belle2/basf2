@@ -86,7 +86,7 @@ namespace {
         d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
         TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
         TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
-        trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215);
+        trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215, 0);
         tracks[i]->setTrackFitResultIndex(Const::pion, i);
       }
 
@@ -667,11 +667,11 @@ namespace {
 
     // initialise the lists
     kLongList.create();
-    kLongList->initialize(130, kLongList.getName());
+    kLongList->initialize(Const::Klong.getPDGCode(), kLongList.getName());
     muonsList.create();
-    muonsList->initialize(13, muonsList.getName());
+    muonsList->initialize(Const::muon.getPDGCode(), muonsList.getName());
     amuonsList.create();
-    amuonsList->initialize(-13, amuonsList.getName());
+    amuonsList->initialize(-Const::muon.getPDGCode(), amuonsList.getName());
     amuonsList->bindAntiParticleList(*(muonsList));
 
     // add some tracks
@@ -693,7 +693,7 @@ namespace {
       d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
       TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
       TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
-      trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215);
+      trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215, 0);
       tracks[i]->setTrackFitResultIndex(Const::muon, i);
     }
 
@@ -793,7 +793,7 @@ namespace {
     const float pValue = 0.5;
     const float bField = 1.5;
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
+    trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215, 0);
 
     // add one Track
     Track myTrack;
@@ -837,7 +837,7 @@ namespace {
     EXPECT_FLOAT_EQ(distance1, vClusterTrackDistance->function(muon));
 
     // add a Pion - no clusters matched here
-    trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215);
+    trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215, 0);
     Track mySecondTrack;
     mySecondTrack.setTrackFitResultIndex(Const::pion, 0);
     Track* pionTrack = tracks.appendNew(mySecondTrack);

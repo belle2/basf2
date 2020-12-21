@@ -21,7 +21,6 @@ import argparse
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 
 __authors__ = ['Benjamin Oberhof', 'Elisa Manoni',
                'Abtin Narimani Charan']
@@ -40,6 +39,7 @@ def argparser():
                         help='Add beam background'
                         'Default is False i.e. no beam background.')
     return parser
+
 
 args = argparser().parse_args()
 

@@ -218,10 +218,12 @@ def gen_constraints_from_config(filename='constraint_config.pickled'):
     constraint_sets, timedep_config, global_tags, init_event = read_config(filename)
     gen_constraints(constraint_sets, timedep_config, global_tags, init_event)
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Usage: basf2 constraints_generator.py config_filename')
         exit()
 
+    #: File name
     filename = sys.argv[1]
     gen_constraints_from_config(filename)

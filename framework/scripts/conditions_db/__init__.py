@@ -810,6 +810,8 @@ class ConditionsDB:
             if 'forward-compatibility' in data.keys():
                 description += f"|*Forward compatibility* | \\#{data['forward-compatibility']} |\n"
             description += '|*Details* |' + ''.join(data['details']) + ' |\n'
+            if data['task'] == 'online':
+                description += f'|*Impact on data taking*|' + ''.join(data['data_taking']) + ' |\n'
 
         # add information about uploaded payloads/IoVs
         description += '\nPayloads\n||Name||Revision||IoV||\n'

@@ -56,9 +56,6 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
-  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
-           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
-
 
   m_histoList = new TList();
 }
@@ -94,13 +91,9 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   float ChargeMax = 160;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 200;
-  float TimeMin = -60;
-  float TimeMax = 140;
-  if (m_isSVDTimeCalibrated) {
-    TimeMin = -100 ;
-    TimeMax =  100 ;
-  }
+  int TimeBins = 300;
+  float TimeMin = -150;
+  float TimeMax = 150;
 
   int MaxBinBins = 6;
   int MaxBinMax = 6;
@@ -312,7 +305,7 @@ void SVDDQMClustersOnTrackModule::event()
 
   BOOST_FOREACH(Track & track, m_storeTracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!tfr) continue;
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);

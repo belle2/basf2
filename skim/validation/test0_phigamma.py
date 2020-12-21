@@ -9,10 +9,16 @@
 #
 ########################################################
 
+"""
+<header>
+  <output>../phigamma_neutral.dst.root</output>
+  <contact>giuseppe.finocchiaro@lnf.infn.it</contact>
+</header>
+"""
+
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
-from ROOT import Belle2
 import glob
 
 b2.set_random_seed(12345)
@@ -100,7 +106,7 @@ phigamma_path.add_module(phokhara)
 add_simulation(phigamma_path)
 add_reconstruction(phigamma_path)
 
-add_mdst_output(phigamma_path, filename="./phigamma_neutral.dst.root")
+add_mdst_output(phigamma_path, filename="../phigamma_neutral.dst.root")
 
 # generate events
 b2.process(phigamma_path)

@@ -16,6 +16,9 @@ CHANGES since release-00-09-03:
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
+- TrackFitResult:
+  + ndf
+  + chi2
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
@@ -27,8 +30,6 @@ CHANGES since release-00-09-03:
   + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
-- TRGSummary:
-  * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * getTotalResult removed
   * non-prescaled results added

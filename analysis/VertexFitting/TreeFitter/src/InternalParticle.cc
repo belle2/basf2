@@ -96,66 +96,53 @@ namespace TreeFitter {
     if (hasPosition()) {
       fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
 
-      if (fitparams.getStateVector()(posindex)  == 0 &&
-          fitparams.getStateVector()(posindex + 1) == 0 &&
-          fitparams.getStateVector()(posindex + 2) == 0) {
+      std::vector<ParticleBase*> alldaughters;
+      ParticleBase::collectVertexDaughters(alldaughters, posindex);
 
-        TVector3 vtx = particle()->getVertex();
-        if (vtx.Mag()) { //if it's not zero
-          fitparams.getStateVector()(posindex) = vtx.X();
-          fitparams.getStateVector()(posindex + 1) = vtx.Y();
-          fitparams.getStateVector()(posindex + 2) = vtx.Z();
-        } else {
+      std::vector<ParticleBase*> vtxdaughters;
 
-          std::vector<ParticleBase*> alldaughters;
-          ParticleBase::collectVertexDaughters(alldaughters, posindex);
-
-          std::vector<ParticleBase*> vtxdaughters;
-
-          vector<RecoTrack*> trkdaughters;
-          for (auto daughter : alldaughters) {
-            if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
-              trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
-            } else if (daughter->hasPosition()
-                       && fitparams.getStateVector()(daughter->posIndex()) != 0) {
-              vtxdaughters.push_back(daughter);
-            }
-          }
-
-          TVector3 v;
-
-          if (trkdaughters.size() >= 2) {
-            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
-
-            RecoTrack* dau1 = trkdaughters[0];
-            RecoTrack* dau2 = trkdaughters[1];
-
-            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                     dau1->particle()->getPDGCode())))->getHelix();
-            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                     dau2->particle()->getPDGCode())))->getHelix();
-
-            double flt1(0), flt2(0);
-            HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
-
-            fitparams.getStateVector()(posindex)     = v.x();
-            fitparams.getStateVector()(posindex + 1) = v.y();
-            fitparams.getStateVector()(posindex + 2) = v.z();
-
-            dau1->setFlightLength(flt1);
-            dau2->setFlightLength(flt2);
-
-          } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-            // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
-          } else if (mother() && mother()->posIndex() >= 0) {
-            const int posindexmother = mother()->posIndex();
-            const int dim = m_config->m_originDimension; //TODO acess mother
-            fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
-          } else {
-            /** (0,0,0) is the best guess in any other case */
-            fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
-          }
+      vector<RecoTrack*> trkdaughters;
+      for (auto daughter : alldaughters) {
+        if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
+          trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
+        } else if (daughter->hasPosition()
+                   && fitparams.getStateVector()(daughter->posIndex()) != 0) {
+          vtxdaughters.push_back(daughter);
         }
+      }
+
+      TVector3 v;
+
+      if (trkdaughters.size() >= 2) {
+        std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
+
+        RecoTrack* dau1 = trkdaughters[0];
+        RecoTrack* dau2 = trkdaughters[1];
+
+        Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                 dau1->particle()->getPDGCode())))->getHelix();
+        Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                 dau2->particle()->getPDGCode())))->getHelix();
+
+        double flt1(0), flt2(0);
+        HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+
+        fitparams.getStateVector()(posindex)     = v.x();
+        fitparams.getStateVector()(posindex + 1) = v.y();
+        fitparams.getStateVector()(posindex + 2) = v.z();
+
+        dau1->setFlightLength(flt1);
+        dau2->setFlightLength(flt2);
+
+      } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
+        // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
+      } else if (mother() && mother()->posIndex() >= 0) {
+        const int posindexmother = mother()->posIndex();
+        const int dim = m_config->m_originDimension; //TODO acess mother
+        fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
+      } else {
+        /** (0,0,0) is the best guess in any other case */
+        fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
       }
     }
 

@@ -462,7 +462,6 @@ class HarvestingModule(basf2.Module):
 
 def test():
     """Test a quick analysis of the MCParticles in generic events."""
-    from tracking.validation.utilities import is_primary, is_stable_in_generator
     from .refiners import save_histograms, save_tree, save_fom
 
     def primaries_seen_in_detector(mc_particle):
@@ -524,6 +523,7 @@ def test():
             return MCParticleOverview
 
     ExampleHarvestingRun().configure_and_execute_from_commandline()
+
 
 if __name__ == "__main__":
     test()

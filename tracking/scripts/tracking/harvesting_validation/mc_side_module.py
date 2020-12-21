@@ -1,7 +1,5 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
 import numpy as np
@@ -11,6 +9,7 @@ import tracking.validation.utilities as utilities
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.peelers as peelers
+ROOT.gSystem.Load("libtracking")
 
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
@@ -209,11 +208,25 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     # #################################### #
 
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(name="mc_tree", folder_name="mc_tree", above_expert_level=default_expert_level)
+    save_tree = refiners.save_tree(
+        # using cond to suppress false doxygen warnings
+        #: \cond
+        name="mc_tree",
+        folder_name="mc_tree",
+        above_expert_level=default_expert_level
+        #: \endcond
+    )
 
     #: Save a basic tree
-    save_tree_basic = refiners.save_tree(name="mc_tree", folder_name="mc_tree",
-                                         above_expert_level=default_expert_level // 2, below_expert_level=default_expert_level)
+    save_tree_basic = refiners.save_tree(
+        # using cond to suppress false doxygen warnings
+        #: \cond
+        name="mc_tree",
+        folder_name="mc_tree",
+        above_expert_level=default_expert_level // 2,
+        below_expert_level=default_expert_level
+        #: \endcond
+    )
 
     #: Generate the average finding efficiencies and hit efficiencies
     save_overview_figures_of_merit = refiners.save_fom(

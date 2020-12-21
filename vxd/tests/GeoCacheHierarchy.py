@@ -13,13 +13,12 @@ and does not correctly change hierarchy filling, this test will fail.
 
 """
 
-import basf2
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 
 
-class CompareTransformationsModule(basf2.Module):
+class CompareTransformationsModule(b2.Module):
     """Python module to compare transformations stored in GeoCache and computed by the hierarchy"""
 
     def __init__(self):
@@ -69,10 +68,10 @@ class CompareTransformationsModule(basf2.Module):
         assert(abs(new_global_sensor_z - original_global_sensor_z - self.test_shift_z) < 1.e-14)
 
 
-main = create_path()
+main = b2.create_path()
 # No params for EventInfoSetter means exp=0, run=0 --> Monte Carlo, no alignment corrections
 main.add_module('EventInfoSetter')
 main.add_module('Gearbox')
 main.add_module('Geometry', components=['PXD', 'SVD'])
 main.add_module(CompareTransformationsModule())
-process(main)
+b2.process(main)

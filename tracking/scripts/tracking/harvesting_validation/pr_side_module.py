@@ -1,11 +1,7 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
-import math
-import warnings
 
 import numpy as np
 
@@ -14,6 +10,7 @@ import tracking.harvest.refiners as refiners
 import tracking.validation.utilities as utilities
 
 import tracking.harvest.peelers as peelers
+ROOT.gSystem.Load("libtracking")
 
 
 class PRSideTrackingValidationModule(harvesting.HarvestingModule):

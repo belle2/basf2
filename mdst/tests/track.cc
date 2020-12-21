@@ -30,7 +30,7 @@ namespace Belle2 {
     const float bField = 1.5;
 
     const auto newFitRes = trackFitResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, particeType, pValue,
-                                                     bField, 0, 0);
+                                                     bField, 0, 0, 0);
     return newFitRes;
   }
 

@@ -208,7 +208,7 @@ void ChargedPidMVAModule::event()
 void ChargedPidMVAModule::initializeMVA()
 {
 
-  B2INFO("Load supported MVA interfaces for charged particle identification...");
+  B2INFO("Run: " << m_event_metadata->getRun() << ". Load supported MVA interfaces for binary charged particle identification...");
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();

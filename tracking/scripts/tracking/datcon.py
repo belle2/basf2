@@ -1,7 +1,5 @@
 """Contains calls for the DATCON PXD data reduction chain"""
 
-import basf2
-
 
 def add_DATCON_simulation(path):
     """Add DATCON to simulation with standard parameters defined in the single modules.

@@ -16,8 +16,6 @@
 import sys
 import os
 import re
-import glob
-import shutil
 import subprocess
 import jupytext
 
@@ -47,6 +45,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 nbsphinx_allow_errors = True

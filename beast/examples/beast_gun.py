@@ -11,16 +11,13 @@
 # Date: 15.2.2018
 # -------------------------------------------------------------------------------------
 
-from basf2 import *
-import sys
-import os
-from background import add_output
+import basf2 as b2
 
 # set parameters
-main = create_path()
+main = b2.create_path()
 
 # Event info setter
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # set number of events
 eventinfosetter.param('evtNumList', [200])
 main.add_module(eventinfosetter)
@@ -34,12 +31,12 @@ main.add_module(eventinfosetter)
 # main.add_module(histo)
 
 # Gearbox - reads parameters from the xml files
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 main.add_module(gearbox)
 
 # Geant geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # select detectors to be built (IR structures+VXD+Beast2)
 geometry.param('components', ["STR", "BeamPipe", "Cryostat",
                               "HeavyMetalShield", "PXD", "SVD", "MICROTPC", "PINDIODE",
@@ -55,7 +52,7 @@ main.add_module(geometry)
 
 
 # particle gun module, shoot particles into your detector
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [11])  # electron
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniform')
@@ -72,7 +69,7 @@ particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
 # Geant simulation
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
 fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
@@ -93,7 +90,7 @@ main.add_module(fullsim)
 # main.add_module(he3study)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # uncomment below to add the event display module
@@ -103,7 +100,7 @@ main.add_module(progress)
 
 # store output hits into root file (these is collection of hits, not histograms)
 # by default all content of datastore is stored
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', "beast_test.root")
 # if you want to store only branches of interest (hits in your detector, etc.) use
 # output.param('branchNames', ['PlumeSimHits'])
@@ -111,7 +108,7 @@ main.add_module(output)
 
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

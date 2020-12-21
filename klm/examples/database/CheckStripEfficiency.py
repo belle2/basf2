@@ -3,7 +3,6 @@
 
 # Check KLM strip efficiency payloads.
 
-import basf2
 import ROOT
 from ROOT.Belle2 import KLMCalibrationChecker
 

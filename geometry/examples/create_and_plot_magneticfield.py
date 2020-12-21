@@ -6,6 +6,8 @@
 # result overlayed over the Material distribution
 ##############################################################################
 
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import pyplot as pl
 import os
 from basf2 import Path, process
 import ROOT as root
@@ -14,8 +16,6 @@ import numpy as np
 import matplotlib as mpl
 # switch to non-interactive backend
 mpl.use("Agg")
-from matplotlib import pyplot as pl
-from matplotlib.backends.backend_pdf import PdfPages
 
 ##############################################################################
 # Configuration

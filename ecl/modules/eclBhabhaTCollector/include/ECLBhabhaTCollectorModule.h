@@ -19,6 +19,7 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
 
 class TTree;
@@ -31,6 +32,8 @@ namespace Belle2 {
   class ECLCluster;
   class ECLChannelMapper;
 
+  const static double realNaN = std::numeric_limits<double>::quiet_NaN();
+  const static int    intNaN  = std::numeric_limits<int>::quiet_NaN();
 
   /**
    * This module generates time vs crystal 2D histograms to later
@@ -50,13 +53,13 @@ namespace Belle2 {
     virtual ~ECLBhabhaTCollectorModule();
 
     /** Replacement for defineHisto() in CalibrationCollector modules */
-    void inDefineHisto();
+    void inDefineHisto() override;
 
     /** Define histograms and read payloads from DB */
-    void prepare();
+    void prepare() override;
 
     /** Select events and crystals and accumulate histograms */
-    void collect();
+    void collect() override;
 
   private:
 
@@ -71,6 +74,9 @@ namespace Belle2 {
      * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
     StoreObjPtr<EventT0> m_eventT0;
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /** electronics amplitude calibration from database
         Scale amplitudefor each crystal and for dead pre-amps*/
@@ -98,70 +104,72 @@ namespace Belle2 {
     /**
      * Output tree with detailed event data.
      */
-    TTree* m_dbgTree_electrons;
-    TTree* m_dbgTree_tracks;
-    TTree* m_dbgTree_crystals;
-    TTree* m_dbgTree_event;
-    TTree* m_dbgTree_allCuts;
-    TTree* m_dbgTree_evt_allCuts;
-    TTree* m_dbgTree_crys_allCuts;
+    TTree* m_dbgTree_electrons = nullptr;
+    TTree* m_dbgTree_tracks = nullptr;
+    TTree* m_dbgTree_crystals = nullptr;
+    TTree* m_dbgTree_event = nullptr;
+    TTree* m_dbgTree_allCuts = nullptr;
+    TTree* m_dbgTree_evt_allCuts = nullptr;
+    TTree* m_dbgTree_crys_allCuts = nullptr;
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evtNum;    /**< Event number for debug TTree output*/
-    int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
-    double m_tree_en;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
-    double m_tree_E1Etot;     /**< Energy of crystal with maximum energy within
+    int m_tree_evtNum = intNaN;    /**< Event number for debug TTree output*/
+    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_amp = intNaN;     /**< Fitting amplitude from ECL for debug TTree output */
+    double m_tree_en = realNaN;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
+    double m_tree_E1Etot = realNaN;     /**< Energy of crystal with maximum energy within
                                     ECL cluster divided by total cluster energy,
                                     unitless for debug TTree output */
-    double m_tree_E1E2;     /**< Energy of crystal with maximum energy within ECL
+    double m_tree_E1E2 = realNaN;     /**< Energy of crystal with maximum energy within ECL
                                   cluster divided by second most energetic crystal
                                   in the cluster, unitless for debug TTree output */
-    double m_tree_E1p;     /**< Energy of crystal with maximum energy within ECL
+    double m_tree_E1p = realNaN;     /**< Energy of crystal with maximum energy within ECL
                                  cluster divided by total cluster energy divided by
                                  the track momentum, unitless for debug TTree output */
-    int m_tree_quality; /**< ECL fit quality for debug TTree output */
-    double m_tree_timeF; /**< ECL fitting time for debug TTree output */
-    double m_tree_time; /**< Time for Ts distribution for debug TTree output */
-    double m_tree_timetsPreviousTimeCalibs; /**< Time for Ts distribution after
+    int m_tree_quality = intNaN; /**< ECL fit quality for debug TTree output */
+    double m_tree_timeF = realNaN; /**< ECL fitting time for debug TTree output */
+    double m_tree_time = realNaN; /**< Time for Ts distribution for debug TTree output */
+    double m_tree_timetsPreviousTimeCalibs = realNaN; /**< Time for Ts distribution after
                                                   application of previous time calibrations
                                                   for debug TTree output */
-    double m_tree_t0;   /**< EventT0 (not from ECL) for debug TTree output */
-    double m_tree_t0_unc;   /**< EventT0 uncertainty for debug TTree output */
-    double m_tree_t0_ECLclosestCDC;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
-    double m_tree_t0_ECL_minChi2;   /**< EventT0 (from ECL) min chi2 for debug TTree output */
-    double m_tree_d0;    /** Track d0 for debug TTree output */
-    double m_tree_z0;    /** Track z0 for debug TTree output */
-    double m_tree_p;    /** Track momentum for debug TTree output */
-    double m_tree_nCDChits;    /** Number of CDC hits along the track for debug TTree output */
-    double m_tree_clustCrysE_DIV_maxEcrys;    /** ratio of crystal energy to energy of the crystal that
+    double m_tree_t0 = realNaN;   /**< EventT0 (not from ECL) for debug TTree output */
+    double m_tree_t0_unc = realNaN;   /**< EventT0 uncertainty for debug TTree output */
+    double m_tree_t0_ECLclosestCDC = realNaN;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
+    double m_tree_t0_ECL_minChi2 = realNaN;   /**< EventT0 (from ECL) min chi2 for debug TTree output */
+    double m_tree_d0 = realNaN;    /** Track d0 for debug TTree output */
+    double m_tree_z0 = realNaN;    /** Track z0 for debug TTree output */
+    double m_tree_p = realNaN;    /** Track momentum for debug TTree output */
+    double m_tree_nCDChits = realNaN;    /** Number of CDC hits along the track for debug TTree output */
+    double m_tree_clustCrysE_DIV_maxEcrys = realNaN;    /** ratio of crystal energy to energy of the crystal that
                                                    has the maximum energy, only for the crystals that
                                                    meet all the selection criteria for debug TTree output */
-    double m_tree_clustCrysE;    /** crystal energy, only for the crystals that meet all the selection
+    double m_tree_clustCrysE = realNaN;    /** crystal energy, only for the crystals that meet all the selection
                                       criteria for debug TTree output */
 
 
-    double m_tree_enPlus;     /**< Energy of cluster associated to positively charged track, GeV for debug TTree output */
-    double m_tree_enNeg;     /**< Energy of cluster associated to negatively charged track, GeV for debug TTree output */
-    double m_tree_tClustPos;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
-    double m_tree_tClustNeg;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
-    double m_tree_maxEcrystPosClust;     /**< Time of the highest energy crystal in the cluster
+    double m_tree_enPlus = realNaN;     /**< Energy of cluster associated to positively charged track, GeV for debug TTree output */
+    double m_tree_enNeg = realNaN;     /**< Energy of cluster associated to negatively charged track, GeV for debug TTree output */
+    double m_tree_tClustPos =
+      realNaN;     /**< Cluster time of cluster associated to positively charged track, ns for debug TTree output */
+    double m_tree_tClustNeg =
+      realNaN;     /**< Cluster time of cluster associated to negatively charged track, ns for debug TTree output */
+    double m_tree_maxEcrystPosClust = realNaN;     /**< Time of the highest energy crystal in the cluster
                                                associated to positively charged track, ns for debug TTree output */
-    double m_tree_maxEcrystNegClust;     /**< Time of the highest energy crystal in the cluster associated
+    double m_tree_maxEcrystNegClust = realNaN;     /**< Time of the highest energy crystal in the cluster associated
                                               to negatively charged track, ns for debug TTree output */
 
-    double m_tree_tClust;     /**< Cluster time of a cluster, ns for debug TTree output */
+    double m_tree_tClust = realNaN;     /**< Cluster time of a cluster, ns for debug TTree output */
 
-    double m_tree_ECLCalDigitTime;   /**< Time of an ECLCalDigit within a cluster, ns for debug TTree output */
-    double m_tree_ECLCalDigitE;   /**< Energy of an ECLCalDigit within a cluster, GeV for debug TTree output */
-    double m_tree_ECLDigitAmplitude;   /**< Amplitude (used to calculate energy) of an ECLDigit within
+    double m_tree_ECLCalDigitTime = realNaN;   /**< Time of an ECLCalDigit within a cluster, ns for debug TTree output */
+    double m_tree_ECLCalDigitE = realNaN;   /**< Energy of an ECLCalDigit within a cluster, GeV for debug TTree output */
+    double m_tree_ECLDigitAmplitude = realNaN;   /**< Amplitude (used to calculate energy) of an ECLDigit within
                                             a cluster, for debug TTree output */
 
 
-    int m_charge;        /**< particle charge, for debug TTree output */
-    double m_E_DIV_p;    /**< Energy divided by momentum, for debug TTree output */
-    double m_massInvTracks;    /**< invariant mass of the two tracks, for debug TTree output */
+    int m_charge = intNaN;        /**< particle charge, for debug TTree output */
+    double m_E_DIV_p = realNaN;    /**< Energy divided by momentum, for debug TTree output */
+    double m_massInvTracks = realNaN;    /**< invariant mass of the two tracks, for debug TTree output */
 
 
     /*** tree branches END ***/
@@ -181,17 +189,17 @@ namespace Belle2 {
     /****** Parameters for cuts ******/
     short m_timeAbsMax; /**< Events with abs(time) > m_timeAbsMax are excluded, mostly for histogram x-range purposes*/
 
-    int m_minCrystal; /**< First CellId to handle */
-    int m_maxCrystal; /**< Last CellId to handle */
+    int m_minCrystal = intNaN; /**< First CellId to handle */
+    int m_maxCrystal = intNaN; /**< Last CellId to handle */
 
     /* d0 and z0 values of the loose and tight tracks*/
-    double m_looseTrkZ0;
-    double m_tightTrkZ0;
-    double m_looseTrkD0;
-    double m_tightTrkD0;
+    double m_looseTrkZ0 = realNaN;
+    double m_tightTrkZ0 = realNaN;
+    double m_looseTrkD0 = realNaN;
+    double m_tightTrkD0 = realNaN;
 
-    int m_crystalCrate;    /**< Crate id for the crystal */
-    int m_runNum;   /**< run number */
+    int m_crystalCrate = intNaN;    /**< Crate id for the crystal */
+    int m_runNum = intNaN;   /**< run number */
 
     bool m_storeCalib = true;   /**< Boolean for whether or not to store the previous
                                     calibration calibration constants*/

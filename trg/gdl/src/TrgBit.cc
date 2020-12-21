@@ -42,9 +42,12 @@ TrgBit::TrgBit(void)
       _ftdl.set(f32b, i);
       _psnm.set(p32b, i);
       for (unsigned j = 0; j < 32; j++) {
-        if (j + i * 32 < n_input) _itdVector.push_back((i32b & (1 << j)) ? 1 : 0);
-        if (j + i * 32 < n_output) _ftdVector.push_back((f32b & (1 << j)) ? 1 : 0);
-        if (j + i * 32 < n_output) _psnVector.push_back((p32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_input)
+          _itdVector.push_back((i32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_output) {
+          _ftdVector.push_back((f32b & (1 << j)) ? 1 : 0);
+          _psnVector.push_back((p32b & (1 << j)) ? 1 : 0);
+        }
       }
     }
     timtype = trgsum->getTimType();
@@ -250,7 +253,7 @@ TrgBit::printPreScaleValues(void) const
     for (unsigned j = 0; j < N_BITS_RESERVED; j++) {
       unsigned k = _outputMap[nconf_ftdl][j];
       if (i == k) {
-        printf("%3d %10s %d\n", i, _outputBitNames[j], _psnmValues[nconf_psnm][i]);
+        printf("%3u %10s %d\n", i, _outputBitNames[j], _psnmValues[nconf_psnm][i]);
         break;
       }
     }
@@ -260,7 +263,7 @@ TrgBit::printPreScaleValues(void) const
 void
 TrgBit::printConf(void) const
 {
-  printf("TrgBit class: exp(%d), run(%d), nconf_psnm(%d), nconf_ftdl(%d), nconf_input(%d), n_input(%d), n_output(%d)\n", _exp, _run,
+  printf("TrgBit class: exp(%u), run(%u), nconf_psnm(%u), nconf_ftdl(%u), nconf_input(%u), n_input(%u), n_output(%u)\n", _exp, _run,
          nconf_psnm, nconf_ftdl, nconf_input, n_input, n_output);
 }
 

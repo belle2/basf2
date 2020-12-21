@@ -46,6 +46,7 @@ namespace Belle2 {
     void reply(const NSMMessage& msg);
     void log(LogFile::Priority pri, const char* format, ...);
     void log(LogFile::Priority pri, const std::string& msg);
+    int reset();
 
   public:
     NSMDataMap& getDataMap() { return m_datas; }
@@ -70,6 +71,8 @@ namespace Belle2 {
     typedef std::vector<NSMCommand> NSMCommandList;
 
   private:
+    int addDefaultHandlers();
+
     NSMCommandList& getCommandList() { return m_cmd_v; }
     void alloc_open(NSMCommunicator& com);
 

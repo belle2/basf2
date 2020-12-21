@@ -99,7 +99,6 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
 
     def log_error(self, *args):
         """Disable error logs"""
-        pass
 
     def do_GET(self):
         """Parse a get request"""
@@ -185,7 +184,6 @@ def run_redirect(pipe, redir_port):
 
         def log_error(self, *args):
             """Disable error logs"""
-            pass
 
     try:
         httpd = HTTPServer(("127.0.0.1", 12702), SimpleRedirectServer)

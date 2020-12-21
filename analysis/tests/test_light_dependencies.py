@@ -42,7 +42,7 @@ def get_dependencies(sconscript_filename):
     with open(sconscript_filename) as fi:
         file_data = fi.read()
         dependencies = re.search(
-            "env\['LIBS'\] *= *\[\n*((?:.*?|\n)*?)\n*\]", file_data
+            r"env\['LIBS'\] *= *\[\n*((?:.*?|\n)*?)\n*\]", file_data
         )
         if dependencies:
             dependencies = dependencies.group(1)

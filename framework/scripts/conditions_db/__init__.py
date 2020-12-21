@@ -53,6 +53,19 @@ def chunks(container, chunk_size):
         yield chunk
 
 
+class BearerAuth(requests.auth.AuthBase):
+    """Simple class to present bearer token instead of username/password"""
+    def __init__(self, token):
+        """Construct from a token"""
+        #: Authorization header to send with each request
+        self._authtoken = f"Bearer {token}"
+
+    def __call__(self, r):
+        """Update headers to include token"""
+        r.headers["authorization"] = self._authtoken
+        return r
+
+
 class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between globaltags"""
@@ -248,6 +261,16 @@ class ConditionsDB:
         """
         authtype = HTTPBasicAuth if basic else HTTPDigestAuth
         self._session.auth = authtype(user, password)
+
+    def set_authentication_token(self, token):
+        """
+        Set authentication token when talking to the database
+
+        Args:
+            token (str): JWT to hand to the database. Will not be checked
+                for validity here.
+        """
+        self._session.auth = BearerAuth(token)
 
     def request(self, method, url, message=None, *args, **argk):
         """

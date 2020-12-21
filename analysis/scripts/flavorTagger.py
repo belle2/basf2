@@ -17,13 +17,14 @@ from variables import utils
 from ROOT import Belle2
 import os
 import glob
+import b2bii
 
 
 def getBelleOrBelle2():
     """
     Gets the global ModeCode.
     """
-    if os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
+    if b2bii.isB2BII():
         return 'Belle'
     else:
         return 'Belle2'

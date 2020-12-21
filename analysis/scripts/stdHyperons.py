@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import os
 from basf2 import B2ERROR, B2WARNING
+from b2bii import isB2BII
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
 
@@ -21,7 +21,7 @@ def stdXi(fitter='TreeFit', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
-    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -83,7 +83,7 @@ def stdXi0(gammatype='eff40', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
-    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
         cutAndCopyList(
@@ -157,7 +157,7 @@ def stdOmega(fitter='TreeFit', path=None):
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
 
-    if not os.environ.get("B2BII") == 'TRUE':
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -196,7 +196,7 @@ def stdOmega(fitter='TreeFit', path=None):
     else:
         B2ERROR(f"stdOmega: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
-    if not os.environ.get("B2BII") == 'TRUE':
+    if not isB2BII():
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',

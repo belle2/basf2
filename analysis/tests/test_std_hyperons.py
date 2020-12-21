@@ -6,6 +6,7 @@ import os
 from basf2 import create_path
 from stdHyperons import stdXi, stdXi0, stdOmega, goodXi, goodXi0, goodOmega
 from itertools import product
+from b2bii import setB2BII, unsetB2BII
 
 
 class TestStdHyperons(unittest.TestCase):
@@ -68,10 +69,10 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi_b2bii(self):
         """Check stdXi for B2BII settings"""
-        os.environ["B2BII"] = 'TRUE'
+        setB2BII()
         for fitter in ['KFit', 'TreeFit']:
             self.assertTrue(self._check_list(lambda path: stdXi(fitter=fitter, path=path), expected_lists=['Xi-:std']))
-        os.environ["B2BII"] = 'FALSE'
+        unsetB2BII()
 
     def test_stdXi0(self):
         """Check stdXi0"""
@@ -85,7 +86,7 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi0_b2bii(self):
         """Check stdXi0 for B2BII settings"""
-        os.environ["B2BII"] = 'TRUE'
+        setB2BII()
         for gamma_efficiency in ['eff20', 'eff30', 'eff40', 'eff50', 'eff60']:
             self.assertTrue(
                 self._check_list(
@@ -93,7 +94,7 @@ class TestStdHyperons(unittest.TestCase):
                         gammatype=gamma_efficiency,
                         path=path),
                     expected_lists=['Xi0:std']))
-        os.environ["B2BII"] = 'FALSE'
+        unsetB2BII()
 
     def test_stdOmega(self):
         """Check stdOmega"""
@@ -107,7 +108,7 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdOmega_b2bii(self):
         """Check stdOmega for B2BII settings"""
-        os.environ["B2BII"] = 'TRUE'
+        setB2BII()
         for fitter in ['KFit', 'TreeFit']:
             self.assertTrue(
                 self._check_list(
@@ -115,7 +116,7 @@ class TestStdHyperons(unittest.TestCase):
                         fitter=fitter,
                         path=path),
                     expected_lists=['Omega-:std']))
-        os.environ["B2BII"] = 'FALSE'
+        unsetB2BII()
 
     def test_goodXi(self):
         """Check goodXi lists: veryloose, loose, tight"""

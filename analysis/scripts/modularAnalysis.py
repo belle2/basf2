@@ -145,9 +145,9 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
-        import os
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-        os.environ["B2BII"] = 'TRUE'
+        import b2bii
+        b2bii.setB2BII()
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
@@ -1901,8 +1901,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
-    import os
-    if not os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
+    import b2bii
+    if not b2bii.isB2BII():
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
@@ -2919,8 +2919,8 @@ def tagCurlTracks(particleLists,
     @param path:          module is added to this path.
     """
 
-    import os
-    belle = os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']
+    import b2bii
+    belle = b2bii.isB2BII()
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string

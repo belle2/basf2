@@ -56,6 +56,7 @@ import basf2
 from basf2 import B2INFO, B2WARNING
 import pybasf2
 import modularAnalysis as ma
+import b2bii
 
 import basf2_mva
 
@@ -175,7 +176,7 @@ class FSPLoader(object):
         """
         path = basf2.create_path()
 
-        if os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']:
+        if b2bii.isB2BII():
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),

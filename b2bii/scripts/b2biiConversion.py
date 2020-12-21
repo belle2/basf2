@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+import b2bii
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
@@ -125,7 +126,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
-    os.environ['B2BII'] = 'TRUE'
+    b2bii.setB2BII()
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

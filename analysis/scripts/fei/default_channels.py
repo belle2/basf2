@@ -20,7 +20,7 @@
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
 """
 
-import os
+import b2bii
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 from basf2 import B2FATAL, B2INFO
 
@@ -61,7 +61,7 @@ def get_default_channels(
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
 
-    convertedFromBelle = os.environ.get("B2BII", "").lower() in ['true', 'yes', 'on', '1']
+    convertedFromBelle = b2bii.isB2BII()
 
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID

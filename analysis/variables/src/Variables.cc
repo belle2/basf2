@@ -1111,6 +1111,8 @@ Note that this is context-dependent variable and can take different values depen
                       *  0 particle has no associated track
                       *  1 there is a matched track called connected - region(CR) track match
                       )DOC");
+    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
@@ -1131,9 +1133,6 @@ Note that this is context-dependent variable and can take different values depen
                       "candidate in the best candidate selection.");
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
-
-    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
-                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
   }
 }

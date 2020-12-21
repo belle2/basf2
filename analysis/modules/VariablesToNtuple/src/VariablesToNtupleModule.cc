@@ -126,7 +126,7 @@ void VariablesToNtupleModule::initialize()
     string branchName = makeROOTCompatible(varStr);
 
     // Check for deprecated variables
-    Variable::Manager::Instance().deprecateVariable(varStr);
+    Variable::Manager::Instance().checkDeprecatedVariable(varStr);
 
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 

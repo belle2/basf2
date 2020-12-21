@@ -205,8 +205,13 @@ namespace Belle2 {
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description);
       /** Make a variable deprecated. */
       void deprecateVariable(const std::string& name, bool make_fatal, const std::string& version, const std::string& description);
-      /** Check for a deprecated variable. */
-      void deprecateVariable(const std::string& name);
+
+      /**
+       * Check if a variable is deprecated.
+       * If it is marked as deprecated a warning is issued or a B2FATAL aborts the event loop.
+       * Which action is taken depends on the depreciation setting.
+       */
+      void checkDeprecatedVariable(const std::string& name);
 
       /** evaluate variable 'varName' on given Particle.
        *

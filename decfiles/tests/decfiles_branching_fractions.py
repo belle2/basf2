@@ -96,12 +96,12 @@ for particle in database.ParticleList():
             if((abs(code) == 511 or abs(code) == 521) and bfsum > 0 and abs(1.0 - bfsum) > 1e-7):
                 print('Sum of decay mode branching fractions '
                       f'for {name} is not compatible with 1 ({bfsum}).\n'
-                      f'Did you remember to run "{ac.color("blue")}b2dec-correct-pythiaBFs{ac.reset()}"?')
+                      f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')
                 exit(1)
             # This should be done for each particle, not only B mesons, but the
             # other particle's decays have not yet been fixed
             if((abs(code) == 511 or abs(code) == 521) and antibfsum > 0 and abs(1.0 - antibfsum) > 1e-7):
                 print('Sum of decay mode branching fractions '
                       f'for {antiname} is not compatible with 1 ({antibfsum}).\n'
-                      f'Did you remember to run "{ac.color("blue")}b2dec-correct-pythiaBFs{ac.reset()}"?')
+                      f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')
                 exit(1)

@@ -25,10 +25,10 @@ parser.add_argument("--bkg_dir",
                     "which is defined on the validation server.")
 args = parser.parse_args()
 
-from ROOT import Belle2
-from background import get_background_files
-from simulation import add_simulation
-import basf2
+from ROOT import Belle2  # noqa
+from background import get_background_files  # noqa
+from simulation import add_simulation  # noqa
+import basf2  # noqa
 
 # Pdg code of the charged stable particles & antiparticles.
 chargedStableList = []

@@ -556,6 +556,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("isMC", isMC,
                       "[Eventbased] Returns 1 if run on MC and 0 for data.");
     REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
+    MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
+                     Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,

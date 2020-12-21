@@ -917,6 +917,8 @@ def get_argument_parser():
                          help=argparse.SUPPRESS)
     options.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)
     options.add_argument("--http-password", default="Eil9ohphoo2quot", help=argparse.SUPPRESS)
+    options.add_argument("--auth-token", type=argparse.FileType('r'), default=None,
+                         help="File to to a CDB authentication token necessary for write access to the database")
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])
     parser.set_defaults(func=lambda x, y: parser.print_help())
@@ -1043,7 +1045,9 @@ def main():
 
     conditions_db = ConditionsDB(args.base_url, nprocess, retries)
 
-    if args.http_auth != "none":
+    if args.auth_token is not None:
+        conditions_db.set_authentication_token(args.auth_token.read().strip())
+    elif args.http_auth != "none":
         conditions_db.set_authentication(args.http_user, args.http_password, args.http_auth == "basic")
 
     try:

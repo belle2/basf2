@@ -6,6 +6,7 @@ Vertex Fitting
 
  * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
    reconstructed in ``eta -> gamma gamma``.
+ * Added a method `scaleError` in order to scale up helix errors and avoid underestimation of vertex error.
 
 Variables
 +++++++++
@@ -72,6 +73,8 @@ Modules
    .. warning:: Photons from KLMCluster should only be used in specific use-cases and after a thorough study of their effect.
 
  * In :b2:mod:`BtubeCreator`, new extrainfo ``TubeB_p_estimated`` was added. This returns the magnitude of the estimated momentum of the B which should fly in the direction of the Btube.
+
+ * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles and stores them in a new list.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

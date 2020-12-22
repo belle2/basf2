@@ -24,16 +24,15 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-MassFourCFitKFit::MassFourCFitKFit()
+MassFourCFitKFit::MassFourCFitKFit() : m_AfterVertexError(HepSymMatrix(3, 0)),
+  m_FourMomentum(TLorentzVector())
 {
   m_FlagFitted = false;
   m_FlagTrackVertexError = false;
   m_FlagFitIncludingVertex = false;
   m_FlagAtDecayPoint = true;
   m_NecessaryTrackCount = 2;
-  m_AfterVertexError = HepSymMatrix(3, 0);
   m_InvariantMass = -1.0;
-  m_FourMomentum = TLorentzVector();
   m_ConstraintMassCount = 0;
   m_ConstraintMassList.reserve(KFitConst::kMaxTrackCount2);
   m_ConstraintMassChildLists.reserve(KFitConst::kMaxTrackCount2);

@@ -29,7 +29,7 @@ def get_default_channels(
         hadronic=True,
         semileptonic=True,
         KLong=False,
-        baryonic=False,
+        baryonic=True,
         chargedB=True,
         neutralB=True,
         convertedFromBelle=False,
@@ -44,7 +44,7 @@ def get_default_channels(
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
     @param KLong whether to include K_long decays into the training (default is False)
-    @param baryonic whether to include baryons into the training (default is False)
+    @param baryonic whether to include baryons into the training (default is True)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)

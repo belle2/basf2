@@ -59,18 +59,6 @@ namespace Belle2 {
                      EPDFOption PDFOption = c_Optimal, EStoreOption storeOption = c_Reduced);
 
       /**
-       * Sets time window for likelihood determination.
-       * Window edges must not exceed those used during data taking or in simulation.
-       * @param minTime lower edge
-       * @param maxTime upper edge
-       */
-      static void setTimeWindow(double minTime, double maxTime)
-      {
-        s_minTime = minTime;
-        s_maxTime = maxTime;
-      }
-
-      /**
        * Returns cosine of total reflection angle
        * @return cosine of total reflection angle at mean photon energy for beta = 1
        */
@@ -236,16 +224,6 @@ namespace Belle2 {
       double deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD);
 
       /**
-       * Checks if scan method of YScanner is really required to be called when option is c_Optimal.
-       * With c_Optimal the scan method is called only when one of the detected photons is within the PDF peak.
-       * @param col pixel column (0-based)
-       * @param time PDF peak time
-       * @param wid PDF peak width squared
-       * @return true if required
-       */
-      bool isScanRequired(unsigned col, double time, double wid);
-
-      /**
        * Returns photon propagation losses (bulk absorption, surface reflectivity, mirror reflectivity)
        * @param E photon energy
        * @param propLen propagation length
@@ -321,6 +299,8 @@ namespace Belle2 {
       double m_groupIndexDerivative = 0; /**< derivative (dn_g/dE) of group refractive index at mean photon energy */
       double m_cosTotal = 0; /**< cosine of total reflection angle */
 
+      double m_minTime = 0; /**< time window lower edge */
+      double m_maxTime = 0; /**< time window upper edge */
       EPDFOption m_PDFOption = c_Optimal; /**< signal PDF construction option */
       EStoreOption m_storeOption = c_Reduced; /**< signal PDF storing option */
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
@@ -332,9 +312,6 @@ namespace Belle2 {
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< counter for number of calls to setSignalPDF<T> */
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< counter for number of calls to expandSignalPDF */
-
-      static double s_minTime; /**< time window lower edge */
-      static double s_maxTime; /**< time window upper edge */
 
     };
 
@@ -446,7 +423,7 @@ namespace Belle2 {
         const auto& solutions = m_inverseRaytracer->getSolutions(i);
         const auto& sol = solutions[i0];
         double time = m_tof + sol.len * m_groupIndex / Const::speedOfLight;
-        if (time > s_maxTime) continue;
+        if (time > m_maxTime) continue;
 
         const auto& sol_dx = solutions[i_dx];
         const auto& sol_de = solutions[i_de];
@@ -457,7 +434,7 @@ namespace Belle2 {
         if (not ok) continue;
 
         time = m_tof + m_fastRaytracer->getPropagationLen() * m_groupIndex / Const::speedOfLight;
-        if (time > s_maxTime) continue;
+        if (time > m_maxTime) continue;
 
         m_Fic = sol.getFic() + m_dFic;
 

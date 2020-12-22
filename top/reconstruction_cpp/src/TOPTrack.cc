@@ -10,6 +10,7 @@
 
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/reconstruction_cpp/RaytracerBase.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
@@ -19,6 +20,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <framework/datastore/StoreArray.h>
 #include <cmath>
 #include <vector>
 #include <algorithm>
@@ -31,7 +34,8 @@ namespace Belle2 {
     {}
 
 
-    TOPTrack::TOPTrack(const Track& track, const Const::ChargedStable& chargedStable)
+    TOPTrack::TOPTrack(const Track& track, const Const::ChargedStable& chargedStable,
+                       std::string digitsName)
     {
       // require fitResult
 
@@ -83,6 +87,36 @@ namespace Belle2 {
       m_charge = fitResult->getChargeSign();
       m_TOFLength = m_extHit->getTOF() * Const::speedOfLight * getBeta(chargedStable);
       m_valid = setHelix(m_alignment->getRotation(m_moduleID), m_alignment->getTranslation(m_moduleID));
+      if (not m_valid) return;
+
+      // selection of photon hits belonging to this track
+
+      double minTime = TOPRecoManager::getMinTime();
+      double maxTime = TOPRecoManager::getMaxTime();
+      const auto& pixelMasks = TOPRecoManager::getYScanner(m_moduleID)->getPixelMasks();
+
+      StoreArray<TOPDigit> digits(digitsName);
+      for (const auto& digit : digits) {
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+        int pixelID = digit.getPixelID();
+        if (not pixelMasks.isActive(pixelID)) continue;
+        double time = digit.getTime();
+        if (time < minTime or time > maxTime) continue;
+        if (digit.getModuleID() == m_moduleID) {
+          m_selectedHits.push_back(SelectedHit(pixelID, time, digit.getTimeError()));
+        } else {
+          m_numHitsOtherSlots++;
+        }
+      }
+
+      // selected photon hits mapped to pixel columns
+
+      unsigned numCols = TOPRecoManager::getYScanner(m_moduleID)->getPixelPositions().getNumPixelColumns();
+      for (const auto& hit : m_selectedHits) {
+        unsigned col = (hit.pixelID - 1) % numCols;
+        m_columnHits.emplace(col, &hit);
+      }
+
     }
 
     bool TOPTrack::setHelix(const TRotation& rotation, const TVector3& translation)
@@ -184,7 +218,7 @@ namespace Belle2 {
 
       m_helix.moveReferencePosition(length);
 
-      return true;
+      return m_length > bar.B / 2; // require minimal track lenght inside quartz (more than half of bar thickness)
     }
 
     const TOPTrack::AssumedEmission& TOPTrack::getEmissionPoint(double dL) const
@@ -196,6 +230,22 @@ namespace Belle2 {
         emissionPoint.isSet = true;
       }
       return emissionPoint;
+    }
+
+    bool TOPTrack::isScanRequired(unsigned col, double time, double wid) const
+    {
+      const auto& tts = TOPGeometryPar::Instance()->getGeometry()->getTTS(0); // PMT independent TTS should be fine here
+      const auto& range = m_columnHits.equal_range(col);
+      for (auto it = range.first; it != range.second; ++it) {
+        const auto hit = it->second;
+        for (const auto& gaus : tts.getTTS()) {
+          double sigsq = wid + pow(gaus.sigma, 2) + pow(hit->timeErr, 2);
+          double x = pow(hit->time - time - gaus.position, 2) / sigsq;
+          if (x < 10) return true;
+        }
+      }
+
+      return false;
     }
 
 

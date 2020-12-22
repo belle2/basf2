@@ -16,7 +16,10 @@
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
 
+#include <vector>
 #include <map>
+#include <unordered_map>
+#include <string>
 
 namespace Belle2 {
 
@@ -72,6 +75,25 @@ namespace Belle2 {
       };
 
       /**
+       * selected photon hit from TOPDigits
+       */
+      struct SelectedHit {
+        int pixelID = 0;    /**< pixel ID */
+        double time = 0;    /**< time */
+        double timeErr = 0; /**< time uncertainty */
+
+        /**
+         * Constructor
+         * @param pix pixel ID
+         * @param t time
+         * @param terr time uncertainty
+         */
+        SelectedHit(int pix, double t, double terr):
+          pixelID(pix), time(t), timeErr(terr)
+        {}
+      };
+
+      /**
        * Default constructor
        */
       TOPTrack()
@@ -81,8 +103,10 @@ namespace Belle2 {
        * Constructor from mdst track - isValid() must be checked before using the object
        * @param track mdst track
        * @param chargedStable hypothesis used in mdst track extrapolation
+       * @param digitsName name of TOPDigits collection
        */
-      explicit TOPTrack(const Track& track, const Const::ChargedStable& chargedStable = Const::pion);
+      explicit TOPTrack(const Track& track, const Const::ChargedStable& chargedStable = Const::pion,
+                        std::string digitsName = "");
 
       /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
@@ -186,6 +210,25 @@ namespace Belle2 {
        */
       const TOPBarHit* getBarHit() const {return m_barHit;}
 
+      /**
+       * Returns selected photon hits from TOPDigits belonging to the slot ID
+       * @return selected photon hits
+       */
+      const std::vector<SelectedHit>& getSelectedHits() const {return m_selectedHits;}
+
+      /**
+       * Returns number of selected hits in other slots (for BG estimation)
+       */
+      unsigned getNumHitsOtherSlots() const {return m_numHitsOtherSlots;}
+
+      /**
+       * Checks if scan method of YScanner is needed to construct PDF for a given pixel column.
+       * @param col pixel column (0-based)
+       * @param time PDF peak time
+       * @param wid PDF peak width squared
+       * @return true if at least one of the detected photons is within the PDF peak convoluted with TTS.
+       */
+      bool isScanRequired(unsigned col, double time, double wid) const;
 
     private:
 
@@ -211,6 +254,10 @@ namespace Belle2 {
       const MCParticle* m_mcParticle = 0;  /**< MC particle */
       const TOPBarHit* m_barHit = 0;  /**< bar hit */
       bool m_valid = false;  /**< true for properly defined track */
+
+      std::vector<SelectedHit> m_selectedHits; /**< selected photon hits from TOPDigits belonging to this slot ID */
+      unsigned m_numHitsOtherSlots = 0; /**< number of selected hits in other slots (for BG estimate) */
+      std::unordered_multimap<unsigned, const SelectedHit*> m_columnHits; /**< selected hits mapped to pixel columns */
 
       /** assumed emission points in module local frame */
       mutable std::map<double, TOPTrack::AssumedEmission> m_emissionPoints;

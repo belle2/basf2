@@ -21,10 +21,6 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    double PDFConstructor::s_minTime = -20.0;
-    double PDFConstructor::s_maxTime = 75.0;
-
-
     PDFConstructor::PDFConstructor(const TOPTrack& track, const Const::ChargedStable& hypothesis,
                                    EPDFOption PDFOption, EStoreOption storeOption):
       m_moduleID(track.getModuleID()), m_track(track), m_hypothesis(hypothesis),
@@ -47,6 +43,8 @@ namespace Belle2 {
       m_groupIndex = TOPGeometryPar::Instance()->getGroupIndex(m_yScanner->getMeanEnergy());
       m_groupIndexDerivative = TOPGeometryPar::Instance()->getGroupIndexDerivative(m_yScanner->getMeanEnergy());
       m_cosTotal = m_yScanner->getCosTotal();
+      m_minTime = TOPRecoManager::getMinTime();
+      m_maxTime = TOPRecoManager::getMaxTime();
 
       if (m_yScanner->isAboveThreshold()) {
         setSignalPDF();
@@ -163,7 +161,7 @@ namespace Belle2 {
       if (xDs.size() < 2) return;
 
       double minTime = m_tof + minLen * m_groupIndex / Const::speedOfLight;
-      if (minTime > s_maxTime) return;
+      if (minTime > m_maxTime) return;
 
       std::sort(xDs.begin(), xDs.end());
       double xmi = xDs.front();
@@ -303,7 +301,7 @@ namespace Belle2 {
       bool doScan = (m_PDFOption == c_Fine);
       if (m_PDFOption == c_Optimal) {
         double time = m_tof + Len / avSpeedOfLight;
-        doScan = isScanRequired(col, time, wid);
+        doScan = m_track.isScanRequired(col, time, wid);
       }
 
       m_yScanner->expand(col, yB, dydz, D, doScan);
@@ -356,12 +354,6 @@ namespace Belle2 {
 
     }
 
-    bool PDFConstructor::isScanRequired(unsigned /*col*/, double /*time*/, double /*wid*/)
-    {
-      //TODO ...
-      return true;
-    }
-
     double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type)
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
@@ -373,7 +365,7 @@ namespace Belle2 {
 
     bool PDFConstructor::rangeOfX(double z, double& xmi, double& xma)
     {
-      double maxLen = (s_maxTime - m_tof) / m_groupIndex * Const::speedOfLight; // maximal propagation length
+      double maxLen = (m_maxTime - m_tof) / m_groupIndex * Const::speedOfLight; // maximal propagation length
       if (maxLen < 0) return false;
 
       const auto& emission = m_track.getEmissionPoint();

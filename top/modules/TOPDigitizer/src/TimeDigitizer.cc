@@ -219,6 +219,9 @@ namespace Belle2 {
         digit->setChannel(m_channel);
         digit->setFirstWindow(rawDigit->getASICWindow());
         digit->setStatus(TOPDigit::c_OffsetSubtracted);
+        if (m_sampleTimes->isCalibrated()) {
+          digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
+        }
         digit->addRelationTo(rawDigit);
 
         // set relations to simulated hits and MC particles

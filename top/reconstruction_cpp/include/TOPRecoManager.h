@@ -62,6 +62,32 @@ namespace Belle2 {
       }
 
       /**
+       * Returns time window lower edge
+       * @return time window lower edge
+       */
+      static double getMinTime() {return TOPRecoManager::getInstance().m_minTime;}
+
+      /**
+       * Returns time window upper edge
+       * @return time window upper edge
+       */
+      static double getMaxTime() {return TOPRecoManager::getInstance().m_maxTime;}
+
+      /**
+       * Sets time window for likelihood determination.
+       * This function must be called per each event to prevent confusions
+       * when different modules set time window differently.
+       * Window edges must not exceed those used during data taking or in simulation.
+       * @param minTime lower edge
+       * @param maxTime upper edge
+       */
+      static void setTimeWindow(double minTime, double maxTime)
+      {
+        TOPRecoManager::getInstance().m_minTime = minTime;
+        TOPRecoManager::getInstance().m_maxTime = maxTime;
+      }
+
+      /**
        * Sets channel masks
        * @param mask channel mask
        * @param asicMask masked asics
@@ -130,6 +156,8 @@ namespace Belle2 {
       std::vector<InverseRaytracer> m_inverseRaytracers; /**< collection of inverse raytracers */
       std::vector<FastRaytracer> m_fastRaytracers; /**< collection of fast raytracers */
       std::vector<YScanner> m_yScanners; /**< collection of y-scanners */
+      double m_minTime = -20; /**< time window lower edge */
+      double m_maxTime = 75; /**< time window upper edge */
 
     };
 

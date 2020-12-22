@@ -12,10 +12,9 @@ import b2biiConversion
 
 # To properly read the Belle database the user name is set to g0db
 os.environ['PGUSER'] = 'g0db'
-# Add the necessary database if required by default B2BII should be set up
-# You can use the command b2conditionsdb-recommend also to recommend databases
-# It is possible to chain an additional database with the command below
-# b2.conditions.globaltags = ['B2BII_MC']
+# Add the necessary global tag
+# b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+b2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
 
 # Create path
 path = b2.create_path()
@@ -27,7 +26,6 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
         'validation',
         False),
     applySkim=True,
-    enableNisKsFinder=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
@@ -36,7 +34,7 @@ ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 particles = fei.get_default_channels(convertedFromBelle=True)
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MCConverted_Track14_2',
+configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
                                             b2bii=True, training=False, monitor=False, cache=0)
 
 # Get FEI path

@@ -522,14 +522,14 @@ class RadBhabhaV0Control(BaseSkim):
         vertex.treeFit('vpho:V0System', conf_level=0.0, path=path)
         ma.applyCuts('vpho:V0System', V0Cuts, path=path)
 
-        ma.reconstructDecay('vpho:Total-> vpho:BhabhaSysyem vpho:V0System', '', path=path)
+        ma.reconstructDecay('vpho:Total -> vpho:BhabhaSysyem vpho:V0System', '', path=path)
 
         eventCuts = ('nParticlesInList(gamma:HighEGammaVeto)<1 and '
                      'nParticlesInList(vpho:Total)>0')
 
         path = self.skim_event_cuts(eventCuts, path=path)
 
-        self.SkimLists = ["gamma:all", 'e+:all']
+        self.SkimLists = ["vpho:Total"]
 
 
 @fancy_skim_header
@@ -575,4 +575,9 @@ class InelasticDarkMatter(BaseSkim):
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
-        self.SkimLists = ["gamma:all", 'e-:all']
+        self.SkimLists = [
+            'gamma:ISR',
+            'e+:TrackFromIP',
+            'e+:HighEnergyTrack',
+            'gamma:HighEnergyPhotons',
+            'gamma:MediumEnergyPhotons']

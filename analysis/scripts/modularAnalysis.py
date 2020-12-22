@@ -1881,26 +1881,26 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=False,
+                     belle_sources=False, fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
-    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
+    particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
-    @param target_list_name name of the input ParticleList
-    @param inputParticlelists list of input particle list names, which serve
-                              as a source of particles to build ROE, the FSP particles from
-                              target_list_name are excluded from ROE object
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the inputParticlelists
-                              option will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of user-defined input particle list names, which serve
+                              as source of particles to build the ROE, the FSP particles from
+                              target_list_name are automatically excluded from the ROE object
+    @param fillWithMostLikely By default the module uses the most likely particle mass hypothesis for charged particles
+                              based on the PID likelihood. Turn this behavior off if you want to configure your own
+                              input particle lists.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate the
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
-    @param path      modules are added to this path
+    @param belle_sources      boolean to indicate that the ROE should be built from Belle sources only
+    @param path               modules are added to this path
     """
     if inputParticlelists is None:
         inputParticlelists = []

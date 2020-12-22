@@ -4,9 +4,7 @@
 import sys
 from pathlib import Path
 import time
-import glob
 from caf import backends
-import ROOT
 
 # Add timestamp to all INFO messages
 from basf2 import B2INFO, logging, LogLevel, LogInfo

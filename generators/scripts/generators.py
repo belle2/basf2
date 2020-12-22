@@ -232,9 +232,9 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         if not signalconfigfile == '':
             B2INFO(f"Using config file defined by user: {signalconfigfile}")
             if useTauolaBelle:
-                kkmc_tauconfigfile = signalconfigfile
+                kkmc_tauconfigfile = Belle2.FileSystem.findFile(signalconfigfile)
             else:
-                kkmc_inputfile = signalconfigfile
+                kkmc_inputfile = Belle2.FileSystem.findFile(signalconfigfile)
 
     elif finalstate == 'mu-mu+':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')

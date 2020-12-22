@@ -12,6 +12,7 @@ def fitVertex(
     fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -30,8 +31,10 @@ def fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -45,7 +48,7 @@ def fitVertex(
 
     B2WARNING(warning)
 
-    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
 def _fitVertex(
@@ -73,8 +76,10 @@ def _fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -125,7 +130,7 @@ def kFit(list_name,
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list. (only for massfourC)
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
@@ -195,7 +200,7 @@ def raveFit(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, daughtersUpdate, 0, path)
+    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, [], daughtersUpdate, 0, path)
 
 
 def treeFit(

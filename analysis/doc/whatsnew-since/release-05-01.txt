@@ -6,6 +6,8 @@ Vertex Fitting
 
  * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
    reconstructed in ``eta -> gamma gamma``.
+ * Added a new fit-type option ``massfourC`` to function func:`vertex.kFit`.
+   The kinematic fit is performed with the 4 momentum constraint of a mother particle and mass constraints of intermidiate particles specified by the option ``massConstraint``, simultaneously.
 
 Variables
 +++++++++

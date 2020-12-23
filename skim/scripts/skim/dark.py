@@ -575,9 +575,4 @@ class InelasticDarkMatter(BaseSkim):
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
-        self.SkimLists = [
-            'gamma:ISR',
-            'e+:TrackFromIP',
-            'e+:HighEnergyTrack',
-            'gamma:HighEnergyPhotons',
-            'gamma:MediumEnergyPhotons']
+        self.SkimLists = ['gamma:ISR']

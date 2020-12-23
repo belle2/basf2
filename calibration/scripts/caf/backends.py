@@ -2002,6 +2002,15 @@ class HTCondor(Batch):
                 else:
                     jobs_info = [{"JobStatus": 4, "HoldReason": None}]  # Set to completed
 
+            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
+            if not jobs_info:
+                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+
+            # If no job information is returned then the job already left the queue
+            # check in the history to see if it suceeded or failed
+            if not jobs_info:
+                jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+
             # Still no record of it after waiting for the exit code file?
             if not jobs_info:
                 jobs_info = [{"JobStatus": 6, "HoldReason": None}]  # Set to failed
@@ -2020,15 +2029,6 @@ class HTCondor(Batch):
                 raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
-
-            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
-            if not jobs_info:
-                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
-
-            # If no job information is returned then the job already left the queue
-            # check in the history to see if it suceeded or failed
-            if not jobs_info:
-                jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
 
     @classmethod
     def _create_job_result(cls, job, job_id):

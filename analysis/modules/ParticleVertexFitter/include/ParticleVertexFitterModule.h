@@ -86,8 +86,8 @@ namespace Belle2 {
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
-    std::vector<int> m_massConstraintList;/*< PDG codes of the particles to be mass constraint (massfourC)*/
-    std::vector<std::string> m_massConstraintListParticlename; /*< Name of the particles to be mass constraint (massfourC)*/
+    std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
+    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine
@@ -208,7 +208,7 @@ namespace Belle2 {
 
     /**
      * Adds given particle's child to the MassFourCFitKFit.
-     * @param kv reference to KFit FourCFit object
+     * @param kf reference to KFit FourCFit object
      * @param particle pointer to particle
      * @param particleId vector of daughters track id
      */

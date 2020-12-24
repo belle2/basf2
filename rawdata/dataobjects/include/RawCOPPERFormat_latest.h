@@ -431,7 +431,18 @@ namespace Belle2 {
     }
 
     if (GetFINESSENwords(n, finesse_num) > 0) {
-      int cur_pos = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
+      int cur_pos = GetBufferPos(n)
+                    + m_buffer[ GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num) ];
+
+      if (m_nwords <= 0 || cur_pos >= m_nwords) {
+        char err_buf[500];
+        sprintf(err_buf, "[FATAL] The position of the buffer( block %d, ch %d) is out of bounds (m_nwords = %d) : %s %s %d\n",
+                n, finesse_num, m_nwords,
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("[DEBUG] %s\n", err_buf);
+        B2FATAL(err_buf);
+        return NULL;
+      }
       return (m_buffer + cur_pos);
     }
     return NULL;

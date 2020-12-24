@@ -2009,7 +2009,10 @@ class HTCondor(Batch):
             # If no job information is returned then the job already left the queue
             # check in the history to see if it suceeded or failed
             if not jobs_info:
-                jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+                try:
+                    jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+                except KeyError:
+                    hold_reason = "No Reason Known"
 
             # Still no record of it after waiting for the exit code file?
             if not jobs_info:

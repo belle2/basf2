@@ -262,12 +262,9 @@ void SVDPerformanceTTreeModule::event()
           m_svdSensor = svd_Sensor_1;
           m_svdSize = strips_1;
 
-          float pitch = 50e-4;
-          float halfLength = 1.92;
-          if (m_svdLayer > 3) {
-            pitch = 75e-4;
-            halfLength = 2.88;
-          }
+          float pitch = svdSensor_1.getUPitch(m_svdTrkPosOS);
+          float halfLength = 0.5 * svdSensor_1.getUSize(m_svdTrkPosOS);
+
           m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
 
           m_svdStripCharge.clear();
@@ -328,11 +325,9 @@ void SVDPerformanceTTreeModule::event()
           m_svdSensor = svd_Sensor_1;
           m_svdSize = strips_1;
 
-          float pitch = 160e-4;
-          float halfLength = 6.144;
-          if (m_svdLayer > 3) {
-            pitch = 240e-4;
-          }
+          float pitch = svdSensor_1.getUPitch(m_svdTrkPosOS);
+          float halfLength = 0.5 * svdSensor_1.getUSize(m_svdTrkPosOS);
+
           m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
 
           m_svdStripCharge.clear();

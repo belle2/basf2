@@ -37,7 +37,8 @@ namespace Belle2 {
 
 
       /** Set an invariant mass of daughter particle for the mass-four-momentum-constraint fit.
-       * @param v vertex position
+       * @param m invariant mass
+       * @param childTrackId vector of daughter track ids
        * @return error code (zero if success)
        */
       enum KFitError::ECode       addMassConstraint(const double m, std::vector<unsigned>& childTrackId);

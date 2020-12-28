@@ -155,6 +155,7 @@ def add_hlt_processing(path,
 
     # Unpack the event content
     add_unpackers(path, components=unpacker_components)
+    path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

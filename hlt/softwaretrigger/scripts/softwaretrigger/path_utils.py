@@ -37,6 +37,7 @@ def add_hlt_dqm(path, run_type, components, dqm_mode):
         dqm_environment=constants.Location.hlt.name,
         components=components,
         dqm_mode=dqm_mode.name)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_'+dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components):

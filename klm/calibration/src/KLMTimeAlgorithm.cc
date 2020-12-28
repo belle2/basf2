@@ -44,98 +44,11 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
   m_timeConstants{nullptr},
   m_timeCableDelay{nullptr},
   m_debug{false},
-  m_useEventT0{true},
-  h_calibrated{nullptr},
-  h_diff{nullptr},
-  gre_time_channel_rpc{nullptr},
-  gre_time_channel_scint{nullptr},
-  gre_time_channel_scint_end{nullptr},
-  gr_timeShift_channel_rpc{nullptr},
-  gr_timeShift_channel_scint{nullptr},
-  gr_timeShift_channel_scint_end{nullptr},
-  hprf_rpc_phi_effC{nullptr},
-  hprf_rpc_z_effC{nullptr},
-  hprf_scint_phi_effC{nullptr},
-  hprf_scint_z_effC{nullptr},
-  hprf_scint_plane1_effC_end{nullptr},
-  hprf_scint_plane2_effC_end{nullptr},
-  h_time_rpc_tc{nullptr},
-  h_time_scint_tc{nullptr},
-  h_time_scint_tc_end{nullptr},
-  h_time_rpc{nullptr},
-  h_time_scint{nullptr},
-  h_time_scint_end{nullptr},
-  hc_time_rpc{nullptr},
-  hc_time_scint{nullptr},
-  hc_time_scint_end{nullptr},
-  fcn_pol1{nullptr},
-  fcn_const{nullptr},
-  fcn_gaus{nullptr},
-  fcn_land{nullptr},
-  m_outFile{nullptr}
+  m_useEventT0{true}
 {
   //m_EKLMGeometry = &(EKLM::GeometryData::Instance());
   m_elementNum = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
-  for (int ia = 0; ia < 2; ++ia) {
-    h_timeF_rpc[ia] = nullptr;
-    h_timeF_scint[ia] = nullptr;
-    h_timeF_scint_end[ia] = nullptr;
-    hc_timeF_rpc[ia] = nullptr;
-    hc_timeF_scint[ia] = nullptr;
-    hc_timeF_scint_end[ia] = nullptr;
-    h2_timeF_rpc[ia] = nullptr;
-    h2_timeF_scint[ia] = nullptr;
-    h2_timeF_scint_end[ia] = nullptr;
-    h2c_timeF_rpc[ia] = nullptr;
-    h2c_timeF_scint[ia] = nullptr;
-    h2c_timeF_scint_end[ia] = nullptr;
-    for (int ib = 0; ib < 8; ++ib) {
-      h_timeFS_rpc[ia][ib] = nullptr;
-      h_timeFS_scint[ia][ib] = nullptr;
-      hc_timeFS_rpc[ia][ib] = nullptr;
-      hc_timeFS_scint[ia][ib] = nullptr;
-      h2_timeFS[ia][ib] = nullptr;
-      h2c_timeFS[ia][ib] = nullptr;
-      for (int ic = 0; ic < 15; ++ic) {
-        h_timeFSL[ia][ib][ic] = nullptr;
-        hc_timeFSL[ia][ib][ic] = nullptr;
-        for (int id = 0; id < 2; ++id) {
-          h_timeFSLP[ia][ib][ic][id] = nullptr;
-          hc_timeFSLP[ia][ib][ic][id] = nullptr;
-          h2_timeFSLP[ia][ib][ic][id] = nullptr;
-          h2c_timeFSLP[ia][ib][ic][id] = nullptr;
-          for (int ie = 0; ie < 54; ++ie) {
-            h_timeFSLPC_tc[ia][ib][ic][id][ie] = nullptr;
-            h_timeFSLPC[ia][ib][ic][id][ie] = nullptr;
-            hc_timeFSLPC[ia][ib][ic][id][ie] = nullptr;
-          }
-        }
-      }
-    }
-    for (int ib = 0; ib < 4; ++ib) {
-      h_timeFS_scint_end[ia][ib] = nullptr;
-      hc_timeFS_scint_end[ia][ib] = nullptr;
-      h2_timeFS_end[ia][ib] = nullptr;
-      h2c_timeFS_end[ia][ib] = nullptr;
-      for (int ic = 0; ic < 14; ++ic) {
-        h_timeFSL_end[ia][ib][ic] = nullptr;
-        hc_timeFSL_end[ia][ib][ic] = nullptr;
-        for (int id = 0; id < 2; ++id) {
-          h_timeFSLP_end[ia][ib][ic][id] = nullptr;
-          hc_timeFSLP_end[ia][ib][ic][id] = nullptr;
-          h2_timeFSLP_end[ia][ib][ic][id] = nullptr;
-          h2c_timeFSLP_end[ia][ib][ic][id] = nullptr;
-          for (int ie = 0; ie < 75; ++ie) {
-            h_timeFSLPC_tc_end[ia][ib][ic][id][ie] = nullptr;
-            h_timeFSLPC_end[ia][ib][ic][id][ie] = nullptr;
-            hc_timeFSLPC_end[ia][ib][ic][id][ie] = nullptr;
-          }
-        }
-      }
-    }
-  }
-
 }
 
 KLMTimeAlgorithm::~KLMTimeAlgorithm()
@@ -529,6 +442,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       break;
   }
   m_outFile = new TFile(name.c_str(), "recreate");
+  createHistograms();
 
   std::vector<struct Event>::iterator it_v;
 

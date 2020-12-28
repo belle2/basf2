@@ -144,12 +144,9 @@ KLMTimeAlgorithm::~KLMTimeAlgorithm()
 
 void KLMTimeAlgorithm::createHistograms()
 {
-  double lowEdge_rpc = 0.0;
-  double upEdge_rpc = 10.0;
-  double lowEdge_scint = 0.0;
-  double upEdge_scint = 10.0;
-  double lowEdge_scint_end = 0.0;
-  double upEdge_scint_end = 10.0;
+  double lowEdge_rpc, upEdge_rpc;
+  double lowEdge_scint, upEdge_scint;
+  double lowEdge_scint_end, upEdge_scint_end;
 
   if (m_mc) {
     lowEdge_rpc = -10.0;
@@ -172,6 +169,9 @@ void KLMTimeAlgorithm::createHistograms()
   TString iFstring[2] = {"Backward", "Forward"};
   TString iPstring[2] = {"ZReadout", "PhiReadout"};
   TString hn, ht;
+
+  h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
+  h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
 
   gre_time_channel_scint = new TGraphErrors();
   gre_time_channel_rpc = new TGraphErrors();
@@ -529,8 +529,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       break;
   }
   m_outFile = new TFile(name.c_str(), "recreate");
-  h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
-  h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
 
   std::vector<struct Event>::iterator it_v;
 

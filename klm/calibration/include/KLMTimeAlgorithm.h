@@ -90,6 +90,22 @@ namespace Belle2 {
     };
 
     /**
+     * Channel calibration status.
+     */
+    enum ChannelCalibrationStatus {
+
+      /* Not enough data. */
+      c_NotEnoughData = 0,
+
+      /* Failed fit. */
+      c_FailedFit = 1,
+
+      /* Successful calibration. */
+      c_SuccessfulCalibration = 2,
+
+    };
+
+    /**
      * Constructor.
      */
     KLMTimeAlgorithm();

@@ -177,6 +177,14 @@ namespace Belle2 {
   private:
 
     /**
+     * Read calibration data.
+     * @return
+     * CalibrationAlgorithm::c_OK if the amount of data is sufficient,
+     * CalibrationAlgorithm::c_NotEnoughData otherwise.
+     */
+    CalibrationAlgorithm::EResult readCalibrationData();
+
+    /**
      * Create histograms.
      */
     void createHistograms();
@@ -216,32 +224,32 @@ namespace Belle2 {
     std::map<uint16_t, double> m_etime_channel;
 
     /** Central value of the global time distribution (BKLM RPC part). */
-    double m_time_channelAvg_rpc;
+    double m_time_channelAvg_rpc = 0.0;
 
     /** Central value error of the global time distribution (BKLM RPC part). */
-    double m_etime_channelAvg_rpc;
+    double m_etime_channelAvg_rpc = 0.0;
 
     /**
      * Central value of the global time distribution (BKLM scintillator part).
      */
-    double m_time_channelAvg_scint;
+    double m_time_channelAvg_scint = 0.0;
 
     /**
      * Central value error of the global time distribution
      * (BKLM scintillator part).
      */
-    double m_etime_channelAvg_scint;
+    double m_etime_channelAvg_scint = 0.0;
 
     /**
      * Central value of the global time distribution (EKLM scintillator part).
      */
-    double m_time_channelAvg_scint_end;
+    double m_time_channelAvg_scint_end = 0.0;
 
     /**
      * Central value error of the global time distribution
      * (EKLM scintillator part).
      */
-    double m_etime_channelAvg_scint_end;
+    double m_etime_channelAvg_scint_end = 0.0;
 
     /** Minimal digit number (total). */
     int m_MinimalDigitNumber = 100000000;

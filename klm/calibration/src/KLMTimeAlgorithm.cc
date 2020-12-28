@@ -34,12 +34,6 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
   CalibrationAlgorithm("KLMTimeCollector"),
   ev(),
   t_tin{nullptr},
-  m_time_channelAvg_rpc{0.0},
-  m_etime_channelAvg_rpc{0.0},
-  m_time_channelAvg_scint{0.0},
-  m_etime_channelAvg_scint{0.0},
-  m_time_channelAvg_scint_end{0.0},
-  m_etime_channelAvg_scint_end{0.0},
   m_lower_limit_counts{50},
   m_timeConstants{nullptr},
   m_timeCableDelay{nullptr},
@@ -53,6 +47,38 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
 
 KLMTimeAlgorithm::~KLMTimeAlgorithm()
 {
+}
+
+CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
+{
+  B2INFO("Read tree entries and seprate events by module id.");
+
+  t_tin = getObjectPtr<TTree>("time_calibration_data");
+  t_tin->SetBranchAddress("t0",           &ev.t0);
+  t_tin->SetBranchAddress("flyTime",      &ev.flyTime);
+  t_tin->SetBranchAddress("recTime",      &ev.recTime);
+  t_tin->SetBranchAddress("dist",         &ev.dist);
+  t_tin->SetBranchAddress("diffDistX",    &ev.diffDistX);
+  t_tin->SetBranchAddress("diffDistY",    &ev.diffDistY);
+  t_tin->SetBranchAddress("diffDistZ",    &ev.diffDistZ);
+  t_tin->SetBranchAddress("eDep",         &ev.eDep);
+  t_tin->SetBranchAddress("nPE",          &ev.nPE);
+  t_tin->SetBranchAddress("channelId",    &ev.channelId);
+  t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
+  t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
+
+  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
+  m_evts.clear();
+
+  int n = t_tin->GetEntries();
+  if (n < m_MinimalDigitNumber)
+    return CalibrationAlgorithm::c_NotEnoughData;
+  for (int i = 0; i < n; ++i) {
+    t_tin->GetEntry(i);
+    m_evts[ev.channelId].push_back(ev);
+  }
+  B2INFO("Events packing finish.");
+  return CalibrationAlgorithm::c_OK;
 }
 
 void KLMTimeAlgorithm::createHistograms()
@@ -400,33 +426,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   fcn_pol1 = new TF1("fcn_pol1", "pol1");
   fcn_const = new TF1("fcn_const", "pol0");
 
-  B2INFO("Read tree entries and seprate events by module id.");
-
-  t_tin = getObjectPtr<TTree>("time_calibration_data");
-  t_tin->SetBranchAddress("t0",           &ev.t0);
-  t_tin->SetBranchAddress("flyTime",      &ev.flyTime);
-  t_tin->SetBranchAddress("recTime",      &ev.recTime);
-  t_tin->SetBranchAddress("dist",         &ev.dist);
-  t_tin->SetBranchAddress("diffDistX",    &ev.diffDistX);
-  t_tin->SetBranchAddress("diffDistY",    &ev.diffDistY);
-  t_tin->SetBranchAddress("diffDistZ",    &ev.diffDistZ);
-  t_tin->SetBranchAddress("eDep",         &ev.eDep);
-  t_tin->SetBranchAddress("nPE",          &ev.nPE);
-  t_tin->SetBranchAddress("channelId",    &ev.channelId);
-  t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
-  t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
-
-  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
-  m_evts.clear();
-
-  int n = t_tin->GetEntries();
-  if (n < m_MinimalDigitNumber)
-    return CalibrationAlgorithm::c_NotEnoughData;
-  for (int i = 0; i < n; ++i) {
-    t_tin->GetEntry(i);
-    m_evts[ev.channelId].push_back(ev);
-  }
-  B2INFO("Events packing finish.");
+  CalibrationAlgorithm::EResult result = readCalibrationData();
+  if (result != CalibrationAlgorithm::c_OK)
+    return result;
 
   /* Choose non-existing file name. */
   std::string name = "time_calibration.root";
@@ -450,9 +452,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_cFlag.clear();
   m_minimizerOptions.SetDefaultStrategy(2);
 
-  m_time_channelAvg_scint = 0.0;
-  m_time_channelAvg_rpc = 0.0;
-
   /**********************************
    * First loop
    * Estimation of effective light speed for Scintillators and RPCs, separately.
@@ -467,7 +466,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       continue;
     m_evtsChannel = m_evts[channelId];
 
-    n = m_evtsChannel.size();
+    int n = m_evtsChannel.size();
     if (n < m_lower_limit_counts) {
       B2WARNING("Not enough calibration data collected." << LogVar("channel", channelId) << LogVar("number of digit", n));
       continue;

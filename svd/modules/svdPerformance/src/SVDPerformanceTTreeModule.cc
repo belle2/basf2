@@ -265,6 +265,10 @@ void SVDPerformanceTTreeModule::event()
           float pitch = svdSensor_1.getUPitch(m_svdTrkPosOS);
           float halfLength = 0.5 * svdSensor_1.getUSize(m_svdTrkPosOS);
 
+          B2DEBUG(40, "U cluster: layer=" << m_svdLayer << ", sensor=" << m_svdSensor << ", trkPosOS[]=" << m_svdTrkPosOS
+                  << ", pitch[]=" << pitch << ", halfLength[]=" << halfLength);
+
+
           m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
 
           m_svdStripCharge.clear();
@@ -327,6 +331,9 @@ void SVDPerformanceTTreeModule::event()
 
           float pitch = svdSensor_1.getUPitch(m_svdTrkPosOS);
           float halfLength = 0.5 * svdSensor_1.getUSize(m_svdTrkPosOS);
+
+          B2DEBUG(40, "V cluster: layer=" << m_svdLayer << ", sensor=" << m_svdSensor << ", trkPosOS[]=" << m_svdTrkPosOS
+                  << ", pitch[]=" << pitch << ", halfLength[]=" << halfLength);
 
           m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
 

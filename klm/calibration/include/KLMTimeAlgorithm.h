@@ -195,11 +195,6 @@ namespace Belle2 {
     struct Event ev;
 
     /**
-     * TTree obtained from the collector.
-     */
-    std::shared_ptr<TTree> t_tin;
-
-    /**
      * Container of hit information.
      * the global element number of the strip is used as the key.
      */

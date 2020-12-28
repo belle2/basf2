@@ -33,7 +33,6 @@ using namespace ROOT::Math;
 KLMTimeAlgorithm::KLMTimeAlgorithm() :
   CalibrationAlgorithm("KLMTimeCollector"),
   ev(),
-  t_tin{nullptr},
   m_lower_limit_counts{50},
   m_timeConstants{nullptr},
   m_timeCableDelay{nullptr},
@@ -52,29 +51,29 @@ KLMTimeAlgorithm::~KLMTimeAlgorithm()
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
 {
   B2INFO("Read tree entries and seprate events by module id.");
+  std::shared_ptr<TTree> timeCalibrationData;
+  timeCalibrationData = getObjectPtr<TTree>("time_calibration_data");
+  timeCalibrationData->SetBranchAddress("t0", &ev.t0);
+  timeCalibrationData->SetBranchAddress("flyTime", &ev.flyTime);
+  timeCalibrationData->SetBranchAddress("recTime", &ev.recTime);
+  timeCalibrationData->SetBranchAddress("dist", &ev.dist);
+  timeCalibrationData->SetBranchAddress("diffDistX", &ev.diffDistX);
+  timeCalibrationData->SetBranchAddress("diffDistY", &ev.diffDistY);
+  timeCalibrationData->SetBranchAddress("diffDistZ", &ev.diffDistZ);
+  timeCalibrationData->SetBranchAddress("eDep", &ev.eDep);
+  timeCalibrationData->SetBranchAddress("nPE", &ev.nPE);
+  timeCalibrationData->SetBranchAddress("channelId", &ev.channelId);
+  timeCalibrationData->SetBranchAddress("inRPC", &ev.inRPC);
+  timeCalibrationData->SetBranchAddress("isFlipped", &ev.isFlipped);
 
-  t_tin = getObjectPtr<TTree>("time_calibration_data");
-  t_tin->SetBranchAddress("t0",           &ev.t0);
-  t_tin->SetBranchAddress("flyTime",      &ev.flyTime);
-  t_tin->SetBranchAddress("recTime",      &ev.recTime);
-  t_tin->SetBranchAddress("dist",         &ev.dist);
-  t_tin->SetBranchAddress("diffDistX",    &ev.diffDistX);
-  t_tin->SetBranchAddress("diffDistY",    &ev.diffDistY);
-  t_tin->SetBranchAddress("diffDistZ",    &ev.diffDistZ);
-  t_tin->SetBranchAddress("eDep",         &ev.eDep);
-  t_tin->SetBranchAddress("nPE",          &ev.nPE);
-  t_tin->SetBranchAddress("channelId",    &ev.channelId);
-  t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
-  t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
-
-  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
+  B2INFO(LogVar("Total number of digits:", timeCalibrationData->GetEntries()));
   m_evts.clear();
 
-  int n = t_tin->GetEntries();
+  int n = timeCalibrationData->GetEntries();
   if (n < m_MinimalDigitNumber)
     return CalibrationAlgorithm::c_NotEnoughData;
   for (int i = 0; i < n; ++i) {
-    t_tin->GetEntry(i);
+    timeCalibrationData->GetEntry(i);
     m_evts[ev.channelId].push_back(ev);
   }
   B2INFO("Events packing finish.");

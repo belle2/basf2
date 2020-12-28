@@ -28,6 +28,7 @@ namespace Belle2 {
         m_yScanners.push_back(YScanner(moduleID));
         m_inverseRaytracers.push_back(InverseRaytracer(moduleID, m_yScanners.back().getCosTotal()));
         m_fastRaytracers.push_back(FastRaytracer(moduleID));
+        m_backgroundPDFs.push_back(BackgroundPDF(moduleID));
       }
     }
 
@@ -70,11 +71,30 @@ namespace Belle2 {
       return 0;
     }
 
+
+    const BackgroundPDF* TOPRecoManager::backgroundPDF(int moduleID)
+    {
+      if (m_backgroundPDFs.empty()) set();
+      if (m_redoBkg) {
+        for (auto& pdf : m_backgroundPDFs) pdf.set();
+        m_redoBkg = false;
+        B2INFO("background PDF's redone"); // TODO remove or change to debug level
+      }
+      unsigned k = moduleID - 1;
+      if (k < m_backgroundPDFs.size()) {
+        return &m_backgroundPDFs[k];
+      }
+
+      B2ERROR("TOPRecoManager::getBackgroundPDF: invalid moduleID" << LogVar("moduleID", moduleID));
+      return 0;
+    }
+
+
     void TOPRecoManager::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                         const TOPAsicMask& asicMask)
     {
-      auto& yScanners = TOPRecoManager::getInstance().m_yScanners;
-      if (yScanners.empty()) TOPRecoManager::getInstance().set();
+      auto& yScanners = getInstance().m_yScanners;
+      if (yScanners.empty()) getInstance().set();
 
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
       for (auto& yScanner : yScanners) {
@@ -86,14 +106,15 @@ namespace Belle2 {
           pixelMasks.set(pixelID, mask->isActive(moduleID, channel) and asicMask.isActive(moduleID, channel));
         }
       }
+      getInstance().m_redoBkg = true;
 
       B2INFO("TOPRecoManager: new channel masks have been passed to reconstruction");
     }
 
     void TOPRecoManager::setUncalibratedChannelsOff(const DBObjPtr<TOPCalChannelT0>& channelT0)
     {
-      auto& yScanners = TOPRecoManager::getInstance().m_yScanners;
-      if (yScanners.empty()) TOPRecoManager::getInstance().set();
+      auto& yScanners = getInstance().m_yScanners;
+      if (yScanners.empty()) getInstance().set();
 
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
       for (auto& yScanner : yScanners) {
@@ -106,14 +127,15 @@ namespace Belle2 {
           pixelMasks.setPixelOff(pixelID);
         }
       }
+      getInstance().m_redoBkg = true;
 
       B2INFO("TOPRecoManager: channelT0-uncalibrated channels have been masked off");
     }
 
     void TOPRecoManager::setUncalibratedChannelsOff(const DBObjPtr<TOPCalTimebase>& timebase)
     {
-      auto& yScanners = TOPRecoManager::getInstance().m_yScanners;
-      if (yScanners.empty()) TOPRecoManager::getInstance().set();
+      auto& yScanners = getInstance().m_yScanners;
+      if (yScanners.empty()) getInstance().set();
 
       const auto& ch_mapper = TOPGeometryPar::Instance()->getChannelMapper();
       const auto& fe_mapper = TOPGeometryPar::Instance()->getFrontEndMapper();
@@ -134,14 +156,15 @@ namespace Belle2 {
           pixelMasks.setPixelOff(pixelID);
         }
       }
+      getInstance().m_redoBkg = true;
 
       B2INFO("TOPRecoManager: timebase-uncalibrated channels have been masked off");
     }
 
     void TOPRecoManager::setChannelEffi()
     {
-      auto& yScanners = TOPRecoManager::getInstance().m_yScanners;
-      if (yScanners.empty()) TOPRecoManager::getInstance().set();
+      auto& yScanners = getInstance().m_yScanners;
+      if (yScanners.empty()) getInstance().set();
 
       for (auto& yScanner : yScanners) {
         auto& pixelEfficiencies = yScanner.pixelEfficiencies();
@@ -152,6 +175,7 @@ namespace Belle2 {
           pixelEfficiencies.set(pixelID, effi);
         }
       }
+      getInstance().m_redoBkg = true;
 
       B2INFO("TOPRecoManager: new relative pixel efficiencies have been passed to reconstruction");
     }

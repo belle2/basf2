@@ -33,6 +33,7 @@
 #pragma link C++ class Belle2::TOP::SignalPDF-;
 #pragma link C++ class Belle2::TOP::SignalPDF::PDFPeak-;
 #pragma link C++ class Belle2::TOP::SignalPDF::PDFExtra-;
+#pragma link C++ class Belle2::TOP::BackgroundPDF-;
 #pragma link C++ class Belle2::TOP::TOPRecoManager-;
 #pragma link C++ class Belle2::TOP::PDFConstructor-;
 #endif

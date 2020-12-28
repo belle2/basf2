@@ -71,6 +71,8 @@ namespace Belle2 {
 
       /**
        * Class constructor
+       * @param pixelID pixel ID
+       * @param tts TTS
        */
       SignalPDF(int pixelID, const TOPNominalTTS& tts);
 
@@ -146,6 +148,7 @@ namespace Belle2 {
 
     };
 
+    //--- inline functions ------------------------------------------------------------
 
     inline void SignalPDF::normalize(double a)
     {

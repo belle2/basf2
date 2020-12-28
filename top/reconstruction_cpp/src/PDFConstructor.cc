@@ -24,6 +24,10 @@ namespace Belle2 {
     PDFConstructor::PDFConstructor(const TOPTrack& track, const Const::ChargedStable& hypothesis,
                                    EPDFOption PDFOption, EStoreOption storeOption):
       m_moduleID(track.getModuleID()), m_track(track), m_hypothesis(hypothesis),
+      m_inverseRaytracer(TOPRecoManager::getInverseRaytracer(m_moduleID)),
+      m_fastRaytracer(TOPRecoManager::getFastRaytracer(m_moduleID)),
+      m_yScanner(TOPRecoManager::getYScanner(m_moduleID)),
+      m_backgroundPDF(TOPRecoManager::getBackgroundPDF(m_moduleID)),
       m_PDFOption(PDFOption), m_storeOption(storeOption)
     {
       if (not track.isValid()) {
@@ -31,12 +35,13 @@ namespace Belle2 {
         return;
       }
 
-      m_inverseRaytracer = TOPRecoManager::getInverseRaytracer(m_moduleID);
-      if (not m_inverseRaytracer) return;
-      m_fastRaytracer = TOPRecoManager::getFastRaytracer(m_moduleID);
-      if (not m_fastRaytracer) return;
-      m_yScanner = TOPRecoManager::getYScanner(m_moduleID);
-      if (not m_yScanner) return;
+      m_valid = m_inverseRaytracer != 0 and m_fastRaytracer != 0 and m_yScanner != 0 and
+                m_backgroundPDF != 0;
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor: missing reconstruction objects, cannot continue");
+        return;
+      }
+
       m_yScanner->prepare(track.getMomentumMag(), track.getBeta(hypothesis), track.getLengthInQuartz());
 
       m_tof = track.getTOF(hypothesis);
@@ -50,7 +55,11 @@ namespace Belle2 {
         setSignalPDF();
       }
       // setDeltaRayPDF();
-      // setBackgroundPDF(); ? vnesen od zunaj? kot del tracka?
+
+      double effi = m_backgroundPDF->getEfficiency();
+      double effiSum = TOPRecoManager::getEfficiencySum();
+      m_bkgPhotons = std::max(m_track.getNumHitsOtherSlots() * effi / (effiSum - effi), 0.1);
+      if (isnan(m_bkgPhotons)) m_bkgPhotons = 0.1; // in case all other modules are masked-out
     }
 
 
@@ -354,7 +363,7 @@ namespace Belle2 {
 
     }
 
-    double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type)
+    double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type) const
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
       double surf = m_yScanner->getBars().front().reflectivity;

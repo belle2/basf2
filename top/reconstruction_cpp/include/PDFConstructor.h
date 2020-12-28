@@ -15,6 +15,7 @@
 #include <top/reconstruction_cpp/FastRaytracer.h>
 #include <top/reconstruction_cpp/YScanner.h>
 #include <top/reconstruction_cpp/SignalPDF.h>
+#include <top/reconstruction_cpp/BackgroundPDF.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <vector>
 #include <map>
@@ -59,6 +60,12 @@ namespace Belle2 {
                      EPDFOption PDFOption = c_Optimal, EStoreOption storeOption = c_Reduced);
 
       /**
+       * Checks if the class instance is properly constructed
+       * @return true if properly constructed
+       */
+      bool isValid() const {return m_valid;}
+
+      /**
        * Returns cosine of total reflection angle
        * @return cosine of total reflection angle at mean photon energy for beta = 1
        */
@@ -72,16 +79,46 @@ namespace Belle2 {
       double getCosCerenkovAngle(double E) const;
 
       /**
-       * Returns signal PDF for all pixels
-       * @return signal PDF
+       * Returns signal PDF
+       * @return signal PDF in pixels (index = pixelID - 1)
        */
       const std::vector<SignalPDF>& getSignalPDF() const {return m_signalPDFs;}
+
+      /**
+       * Returns background PDF
+       * @return background PDF
+       */
+      const BackgroundPDF* getBackgroundPDF() const {return m_backgroundPDF;}
 
       /**
        * Returns the expected number of signal photons
        * @return expected number of signal photons
        */
       double getExpectedSignalPhotons() const {return m_signalPhotons;}
+
+      /**
+       * Returns the expected number of background photons
+       * @return expected number of background photons
+       */
+      double getExpectedBkgPhotons() const {return m_bkgPhotons;}
+
+      /**
+       * Returns the expected number of delta-ray photons
+       * @return expected number of delta-ray photons
+       */
+      double getExpectedDeltaPhotons() const {return m_deltaPhotons;}
+
+      /**
+       * Returns the expected number of photons (signal + background + delta-ray)
+       * @return expected number of photons
+       */
+      double getExpectedPhotons() const {return m_signalPhotons + m_bkgPhotons + m_deltaPhotons;}
+
+      /**
+       * Returns the number of photons used in log likelihood determination
+       * @return number of detected photons
+       */
+      unsigned getDetectedPhotons() const {return m_track.getSelectedHits().size();}
 
       /**
        * Returns number of calls of template function setSignalPDF<T> for a given peak type
@@ -232,7 +269,7 @@ namespace Belle2 {
        * @param type peak type, e.g. direct or reflected
        * @return survival probability due to propagation losses
        */
-      double propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type);
+      double propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type) const;
 
       /**
        * Expands signal PDF in y (y-scan)
@@ -260,7 +297,7 @@ namespace Belle2 {
        * @param xma upper limit on unfolded coordinate x
        * @return clipped x
        */
-      double clip(double x, int Nx, double A, double xmi, double xma);
+      double clip(double x, int Nx, double A, double xmi, double xma) const;
 
       /**
        * Finds the position on the mirror of the extreme reflection.
@@ -293,32 +330,35 @@ namespace Belle2 {
       const InverseRaytracer* m_inverseRaytracer = 0; /**< inverse ray-tracer */
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
+      const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
+      bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are not null */
 
       double m_tof = 0; /**< time-of-flight from IP to average photon emission position */
       double m_groupIndex = 0; /**< group refractive index at mean photon energy */
       double m_groupIndexDerivative = 0; /**< derivative (dn_g/dE) of group refractive index at mean photon energy */
       double m_cosTotal = 0; /**< cosine of total reflection angle */
-
       double m_minTime = 0; /**< time window lower edge */
       double m_maxTime = 0; /**< time window upper edge */
+
       EPDFOption m_PDFOption = c_Optimal; /**< signal PDF construction option */
       EStoreOption m_storeOption = c_Reduced; /**< signal PDF storing option */
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
+      double m_bkgPhotons = 0; /**< expected number of background photons */
+      double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 
       std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of  Cerenkov angles */
-
       double m_dFic = 0; /**< temporary storage for dFic used in last call to deltaXD */
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< counter for number of calls to setSignalPDF<T> */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< counter for number of calls to expandSignalPDF */
+      mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< number of calls to setSignalPDF<T> */
+      mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< number of calls to expandSignalPDF */
 
     };
 
 
     //--- inline functions ------------------------------------------------------------
 
-    inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma)
+    inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma) const
     {
       x = func::unfold(x, Nx, A);
       x = std::max(std::min(x, xma), xmi) - Nx * A;

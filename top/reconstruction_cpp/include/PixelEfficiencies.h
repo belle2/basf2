@@ -53,6 +53,12 @@ namespace Belle2 {
        */
       double get(int pixelID) const;
 
+      /**
+       * Returns pixel relative efficiencies of entire module
+       * @return vector of relative efficiencies
+       */
+      const std::vector<double>& getEfficiencies() const {return m_efficiencies;}
+
     private:
 
       int m_moduleID = 0; /**< slot ID */

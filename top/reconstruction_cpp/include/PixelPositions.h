@@ -88,6 +88,12 @@ namespace Belle2 {
       const PixelData& get(int pixelID) const;
 
       /**
+       * Returns pixel data of entire module
+       * @return vector of pixel data
+       */
+      const std::vector<PixelData>& getPixels() const {return m_pixels;}
+
+      /**
        * Transforms pixel row and column to pixel ID
        * Note: for convenience pixel row and column numbering starts with 0 here!
        * @param row pixel row (0-based)

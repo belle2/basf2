@@ -59,6 +59,12 @@ namespace Belle2 {
        */
       bool isActive(int pixelID) const;
 
+      /**
+       * Returns pixel masks of entire module
+       * @return vector of pixel masks
+       */
+      const std::vector<bool>& getMasks() const {return m_masks;}
+
     private:
 
       int m_moduleID = 0; /**< slot ID */

@@ -177,6 +177,11 @@ namespace Belle2 {
   private:
 
     /**
+     * Create histograms.
+     */
+    void createHistograms();
+
+    /**
      * Data struct used in collector and algorithm.
      */
     struct Event ev;

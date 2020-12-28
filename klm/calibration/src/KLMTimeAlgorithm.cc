@@ -142,64 +142,8 @@ KLMTimeAlgorithm::~KLMTimeAlgorithm()
 {
 }
 
-CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
+void KLMTimeAlgorithm::createHistograms()
 {
-  int channelId;
-  double effSpeed_end, effSpeed, effSpeed_RPC;
-  gROOT->SetBatch(kTRUE);
-  m_timeCableDelay = new KLMTimeCableDelay();
-  m_timeConstants = new KLMTimeConstants();
-
-  fcn_gaus = new TF1("fcn_gaus", "gaus");
-  fcn_land = new TF1("fcn_land", "landau");
-  fcn_pol1 = new TF1("fcn_pol1", "pol1");
-  fcn_const = new TF1("fcn_const", "pol0");
-
-  B2INFO("Read tree entries and seprate events by module id.");
-
-  t_tin = getObjectPtr<TTree>("time_calibration_data");
-  t_tin->SetBranchAddress("t0",           &ev.t0);
-  t_tin->SetBranchAddress("flyTime",      &ev.flyTime);
-  t_tin->SetBranchAddress("recTime",      &ev.recTime);
-  t_tin->SetBranchAddress("dist",         &ev.dist);
-  t_tin->SetBranchAddress("diffDistX",    &ev.diffDistX);
-  t_tin->SetBranchAddress("diffDistY",    &ev.diffDistY);
-  t_tin->SetBranchAddress("diffDistZ",    &ev.diffDistZ);
-  t_tin->SetBranchAddress("eDep",         &ev.eDep);
-  t_tin->SetBranchAddress("nPE",          &ev.nPE);
-  t_tin->SetBranchAddress("channelId",    &ev.channelId);
-  t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
-  t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
-
-  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
-  m_evts.clear();
-
-  int n = t_tin->GetEntries();
-  if (n < m_MinimalDigitNumber)
-    return CalibrationAlgorithm::c_NotEnoughData;
-  for (int i = 0; i < n; ++i) {
-    t_tin->GetEntry(i);
-    m_evts[ev.channelId].push_back(ev);
-  }
-  B2INFO("Events packing finish.");
-
-  /* Choose non-existing file name. */
-  std::string name = "time_calibration.root";
-  int i = 1;
-  while (1) {
-    struct stat buffer;
-    if (stat(name.c_str(), &buffer) != 0)
-      break;
-    name = "time_calibration_" + std::to_string(i) + ".root";
-    i = i + 1;
-    /* Overflow. */
-    if (i < 0)
-      break;
-  }
-  m_outFile = new TFile(name.c_str(), "recreate");
-  h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
-  h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
-
   double lowEdge_rpc = 0.0;
   double upEdge_rpc = 10.0;
   double lowEdge_scint = 0.0;
@@ -528,6 +472,65 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       }
     }
   }
+}
+
+CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
+{
+  int channelId;
+  double effSpeed_end, effSpeed, effSpeed_RPC;
+  gROOT->SetBatch(kTRUE);
+  m_timeCableDelay = new KLMTimeCableDelay();
+  m_timeConstants = new KLMTimeConstants();
+
+  fcn_gaus = new TF1("fcn_gaus", "gaus");
+  fcn_land = new TF1("fcn_land", "landau");
+  fcn_pol1 = new TF1("fcn_pol1", "pol1");
+  fcn_const = new TF1("fcn_const", "pol0");
+
+  B2INFO("Read tree entries and seprate events by module id.");
+
+  t_tin = getObjectPtr<TTree>("time_calibration_data");
+  t_tin->SetBranchAddress("t0",           &ev.t0);
+  t_tin->SetBranchAddress("flyTime",      &ev.flyTime);
+  t_tin->SetBranchAddress("recTime",      &ev.recTime);
+  t_tin->SetBranchAddress("dist",         &ev.dist);
+  t_tin->SetBranchAddress("diffDistX",    &ev.diffDistX);
+  t_tin->SetBranchAddress("diffDistY",    &ev.diffDistY);
+  t_tin->SetBranchAddress("diffDistZ",    &ev.diffDistZ);
+  t_tin->SetBranchAddress("eDep",         &ev.eDep);
+  t_tin->SetBranchAddress("nPE",          &ev.nPE);
+  t_tin->SetBranchAddress("channelId",    &ev.channelId);
+  t_tin->SetBranchAddress("inRPC",        &ev.inRPC);
+  t_tin->SetBranchAddress("isFlipped",    &ev.isFlipped);
+
+  B2INFO(LogVar("Total number of digit event:", t_tin->GetEntries()));
+  m_evts.clear();
+
+  int n = t_tin->GetEntries();
+  if (n < m_MinimalDigitNumber)
+    return CalibrationAlgorithm::c_NotEnoughData;
+  for (int i = 0; i < n; ++i) {
+    t_tin->GetEntry(i);
+    m_evts[ev.channelId].push_back(ev);
+  }
+  B2INFO("Events packing finish.");
+
+  /* Choose non-existing file name. */
+  std::string name = "time_calibration.root";
+  int i = 1;
+  while (1) {
+    struct stat buffer;
+    if (stat(name.c_str(), &buffer) != 0)
+      break;
+    name = "time_calibration_" + std::to_string(i) + ".root";
+    i = i + 1;
+    /* Overflow. */
+    if (i < 0)
+      break;
+  }
+  m_outFile = new TFile(name.c_str(), "recreate");
+  h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
+  h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
 
   std::vector<struct Event>::iterator it_v;
 

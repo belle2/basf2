@@ -185,7 +185,7 @@ void PXDDAQDQMModule::event()
   /// Remark: for HLT event selection and/or events rejected by the event-
   /// of-doom-buster, we might count anyhow broken events as broken from PXD
 
-  bool eotbFlag = m_rawSVD.getEntries() == 0;
+  bool eodbFlag = m_rawSVD.getEntries() == 0;
 
   bool truncFlag = false; // flag events which are DHE truncated
   bool nolinkFlag = false; // flag events which are DHE truncated
@@ -277,7 +277,7 @@ void PXDDAQDQMModule::event()
 //             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
     double lasttrig = it.GetTimeSincePrevTrigger(0) / 127.; //  127MHz clock ticks to us, inexact rounding
-    if (eotbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
+    if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
     if (cm63Flag && hCM63TrgDiff) hCM63TrgDiff->Fill(lasttrig);
     if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);
     if (missingFlag && hMissTrgDiff) hMissTrgDiff->Fill(lasttrig);
@@ -288,7 +288,7 @@ void PXDDAQDQMModule::event()
     if (difference != 0x7FFFFFFF) {
       double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
-        if (eotbFlag) {
+        if (eodbFlag) {
           if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);
         }
         if (cm63Flag) {
@@ -307,7 +307,7 @@ void PXDDAQDQMModule::event()
           if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
         }
       } else {
-        if (eotbFlag) {
+        if (eodbFlag) {
           if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(diff2);
         }
         if (cm63Flag) {
@@ -339,5 +339,5 @@ void PXDDAQDQMModule::event()
   if (mismatchFlag) hDAQStat->Fill(14);
 
   // Check Event-of-doom-busted or otherwise HLT rejected events
-  if (eotbFlag) hDAQStat->Fill(0);
+  if (eodbFlag) hDAQStat->Fill(0);
 }

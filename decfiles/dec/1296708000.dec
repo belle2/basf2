@@ -1,0 +1,41 @@
+# EventType: 1296708000
+# Descriptor:  [B- -> D'_10 l- nu, D'_10 -> D*0 eta] cc
+# NickName: Bu_Dprime1lnu_DstEta
+# Documentation: b->c l nu process, D'1 mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+Alias myB- B-
+Alias myB+ B+
+ChargeConj myB- myB+
+
+Alias myD'_10 D'_10
+Alias myanti-D'_10 anti-D'_10
+ChargeConj myD'_10 myanti-D'_10
+
+
+Decay Upsilon(4S)
+0.500 myB- B+  VSS;
+0.500 B- myB+  VSS;
+Enddecay
+
+
+Decay myB-
+0.500  myD'_10   e-  anti-nu_e   PHOTOS LLSW 0.68 -0.2 0.3;
+0.500  myD'_10  mu-  anti-nu_mu  PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay myB+
+
+Decay myD'_10
+1.0    D*0 eta                     PHSP;
+Enddecay
+CDecay myanti-D'_10
+
+
+
+End

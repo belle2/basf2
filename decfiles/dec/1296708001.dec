@@ -1,0 +1,41 @@
+# EventType: 1296708001
+# Descriptor:  [B- -> D_0*0 l- nu, D_0*0 -> D0 eta] cc
+# NickName: Bu_Dzerostlnu_Deta
+# Documentation: b->c l nu process, D_0* mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+
+Alias myB+ B+
+Alias myB- B-
+ChargeConj myB+ myB-
+ 
+Alias myD_0*0 D_0*0
+Alias myanti-D_0*0 anti-D_0*0
+ChargeConj myD_0*0 myanti-D_0*0
+ 
+Decay Upsilon(4S)
+0.500 myB+ B-  VSS;
+0.500 myB- B+  VSS;
+Enddecay
+ 
+ 
+Decay myB-
+0.500 myD_0*0  e-  anti-nu_e  PHOTOS LLSW 0.68 -0.2 0.3;
+0.500 myD_0*0  mu- anti-nu_mu PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay myB+
+ 
+Decay  myD_0*0
+1.0    D0 eta                     PHSP;
+Enddecay
+CDecay  myanti-D_0*0
+ 
+End
+
+

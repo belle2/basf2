@@ -22,13 +22,12 @@ namespace Belle2 {
 
     void SVDClusterTime::applyCoG6Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
-      //NOTE: timeError not computed!
+
+      // ISSUES:
+      // 1. time error not computer
 
       //the first frame is 0 by definition
       firstFrame = 0;
-
-      //take APV clock
-      double apvClockPeriod = 1 / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
       //take the strips in the rawCluster
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
@@ -51,7 +50,7 @@ namespace Belle2 {
         }
         if (stripSumAmplitudes != 0) {
           stripTime /= (stripSumAmplitudes);
-          stripTime *= apvClockPeriod;
+          stripTime *= m_apvClockPeriod;
         } else {
           stripTime = -1;
           B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
@@ -60,11 +59,11 @@ namespace Belle2 {
         // correct strip by the CalPeak
         stripTime -= m_PulseShapeCal.getPeakTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID);
 
+        if (isnan(m_triggerBin))
+          B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
         // calibrate strip time (cellID not used)
         stripTime =  m_CoG6TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, stripTime, m_triggerBin);
-
-        //set the strip time in the raw cluster
-        rawCluster.setStripTime(i, stripTime);
 
         //update cluster time
         time += stripTime * strip.maxSample;
@@ -77,11 +76,72 @@ namespace Belle2 {
 
     void SVDClusterTime::applyCoG3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
+
+      // ISSUES:
+      // 1. time error not computer
+
+      timeError = 0;
+
+      //take the MaxSum 3 samples
+      SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(rawCluster.getClsSamples(false));
+
+      std::vector<float> selectedSamples = maxSum.getSelectedSamples();
+      firstFrame = maxSum.getFirstFrame();
+
+
+      auto begin = selectedSamples.begin();
+      const auto end = selectedSamples.end();
+
+      auto retval = 0., norm = 0.;
+      for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
+        norm += static_cast<double>(*begin);
+        retval += static_cast<double>(*begin) * step;
+      }
+      float rawtime = retval / norm;
+
+      if (isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
+      //cellID not used for calibration
+      time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
+
     }
 
 
     void SVDClusterTime::applyELS3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
+
+      // ISSUES:
+      // 1. ELS3 tau hardcoded
+      // 2. time error not computer
+
+      timeError = 0;
+      float m_ELS3tau = 55;
+
+      //take the MaxSum 3 samples
+      SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(rawCluster.getClsSamples(false));
+
+      std::vector<float> selectedSamples = maxSum.getSelectedSamples();
+      firstFrame = maxSum.getFirstFrame();
+
+      auto begin = selectedSamples.begin();
+      const double E = std::exp(- m_apvClockPeriod / m_ELS3tau);
+      const double E2 = E * E;
+      const double E4 = E2 * E2;
+      double a0 = (*begin);
+      double a1 = (*(begin + 1));
+      double a2 = (*(begin + 2));
+
+      //compute raw time
+      const double w = (a0 -  E2 * a2) / (2 * a0 + E * a1);
+      auto rawtime_num  = 2 * E4 + w * E2;
+      auto rawtime_den =  1 - E4 - w * (2 + E2);
+      double rawtime = - m_apvClockPeriod * rawtime_num / rawtime_den;
+
+      if (isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
+      time = m_ELS3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
     }
 
   }  //SVD namespace

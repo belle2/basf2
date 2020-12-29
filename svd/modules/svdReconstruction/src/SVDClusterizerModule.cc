@@ -335,7 +335,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     m_position6SampleClass->computeClusterPosition(rawCluster, position, positionError);
   } else if (m_numberOfAcquiredSamples == 3) {
     //time
-    m_time6SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
+    m_time3SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
 
     //charge
     m_charge3SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);

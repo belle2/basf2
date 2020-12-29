@@ -29,12 +29,12 @@ namespace Belle2 {
       seedCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), seedCellID,
                                                     rawCluster.getSeedMaxSample());
 
-
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       //initialize noise and charge
       double noise = 0;
       charge = 0;
+
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
@@ -44,15 +44,14 @@ namespace Belle2 {
 
         // calibrate (ADC -> electrons)
         double stripCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, rawCharge);
-        rawCluster.setStripCharge(i, stripCharge);
 
-        noise += m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        double tmp_noise = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        noise += tmp_noise * tmp_noise;
 
         charge += stripCharge;
       }
 
       SNR = charge / sqrt(noise);
-
     }
 
     void SVDClusterCharge::applySumSamplesCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
@@ -63,6 +62,7 @@ namespace Belle2 {
       //initialize noise and charge
       double noise = 0;
       charge = 0;
+      seedCharge = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
@@ -74,9 +74,12 @@ namespace Belle2 {
 
         // calibrate (ADC -> electrons)
         double stripCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, rawCharge);
-        rawCluster.setStripCharge(i, stripCharge);
 
-        noise += m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        if (stripCharge > seedCharge)
+          seedCharge = stripCharge;
+
+        double tmp_noise = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        noise += tmp_noise * tmp_noise;
 
         charge += stripCharge;
       }
@@ -88,7 +91,20 @@ namespace Belle2 {
 
     void SVDClusterCharge::applyELS3Charge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
     {
-      /*
+
+      // ISSUES:
+      // 1. samples always in electrons for charge
+      // 2. hardcoded ELS3 tau
+      // 3. seed charge is maxSample
+
+      float   m_ELS3tau = 55;
+
+      //get seed charge
+      int seedCellID = rawCluster.getStripsInRawCluster().at(rawCluster.getSeedInternalIndex()).cellID;
+
+      seedCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), seedCellID,
+                                                    rawCluster.getSeedMaxSample());
+
       //initialize noise and charge
       double noise = 0;
       charge = 0;
@@ -99,11 +115,7 @@ namespace Belle2 {
 
       auto begin = selectedSamples.begin();
 
-      //calculate ELS hit-charge
-      double apvClockPeriod = 1/m_hwClock->getClockFrequency(Const::EDetector::SVD,"sampling");
-
-      double apvClockPeriod = m_hwClock->getClockFrequency(Const::EDetector::SVD,"sampling");
-      const double E = std::exp(- apvClockPeriod / m_ELS3tau);
+      const double E = std::exp(- m_apvClockPeriod / m_ELS3tau);
       const double E2 = E * E;
       const double E3 = E * E * E;
       const double E4 = E * E * E * E;
@@ -115,22 +127,20 @@ namespace Belle2 {
       const double w = (a0 -  E2 * a2) / (2 * a0 + E * a1);
       auto rawtime_num  = 2 * E4 + w * E2;
       auto rawtime_den =  1 - E4 - w * (2 + E2);
-      float rawtime = - apvClockPeriod * rawtime_num / rawtime_den;
+      float rawtime = - m_apvClockPeriod * rawtime_num / rawtime_den;
 
-      //convert samples in electrons if needed
-      if (!m_samplesAreInElectrons) {
-
-
-        a0 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a0);
-        a1 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a1);
-        a2 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a2);
-      }
+      a0 = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getStripsInRawCluster()[0].cellID,
+                                            a0);
+      a1 = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getStripsInRawCluster()[0].cellID,
+                                            a1);
+      a2 = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getStripsInRawCluster()[0].cellID,
+                                            a2);
 
 
       double num = (1. / E - E3) * a1 + (2 + E2) * a2 - (1 + 2 * E2) * a0;
-      double den =  apvClockPeriod / m_ELS3tau * std::exp(1 + rawtime / m_ELS3tau) * (1 + 4 * E2 + E4);
+      double den =  m_apvClockPeriod / m_ELS3tau * std::exp(1 + rawtime / m_ELS3tau) * (1 + 4 * E2 + E4);
 
-      double charge = num / den;
+      charge = num / den;
 
       //compute Noise
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
@@ -139,12 +149,14 @@ namespace Belle2 {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
-      noise += m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        double tmp_noise = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, strip.noise);
+        noise += tmp_noise * tmp_noise;
       }
 
-      SNR  = charge/noise;
-      */
+      SNR = charge / sqrt(noise);
+
     }
+
 
   }  //SVD namespace
 } //Belle2 namespace

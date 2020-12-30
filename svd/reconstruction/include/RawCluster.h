@@ -26,7 +26,7 @@ namespace Belle2 {
       int shaperDigitIndex; /**< index of the shaper digit*/
       int cellID; /**<strip cellID*/
       int maxSample; /** ADC max of the acquired samples*/
-      int noise; /** ADC noise */
+      float noise; /** ADC noise */
       Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC of the acquired samples*/
       double charge;
       double time;

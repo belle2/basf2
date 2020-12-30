@@ -272,10 +272,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdWidth = svdSensor_1.getUSize(m_svdTrkPosOS);
           m_svdLength = svdSensor_1.getVSize();
 
-          B2DEBUG(40, "U cluster: layer=" << m_svdLayer << ", sensor=" << m_svdSensor << ", trkPosOS[cm]=" << m_svdTrkPosOS
-                  << ", pitch[mm]=" << (m_svdPitch * 1e4) << ", width[cm]=" << m_svdWidth);
-
-
           m_svdClIntStrPos = fmod(m_svdClPos + 0.5 * m_svdWidth, m_svdPitch) / m_svdPitch;
 
           m_svdStripCharge.clear();
@@ -339,9 +335,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdPitch = svdSensor_1.getVPitch();
           m_svdWidth = svdSensor_1.getUSize(m_svdTrkPos);
           m_svdLength = svdSensor_1.getVSize();
-
-          B2DEBUG(40, "V cluster: layer=" << m_svdLayer << ", sensor=" << m_svdSensor << ", trkPosOS[cm]=" << m_svdTrkPosOS
-                  << ", pitch[mm]=" << (m_svdPitch * 1e4) << ", length[cm]=" << m_svdLength);
 
           m_svdClIntStrPos = fmod(m_svdClPos + 0.5 * m_svdLength, m_svdPitch) / m_svdPitch;
 

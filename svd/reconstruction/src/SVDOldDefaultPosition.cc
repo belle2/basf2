@@ -18,9 +18,11 @@ namespace Belle2 {
 
   namespace SVD {
 
-    void SVDOldDefaultPosition::computeClusterPosition(const Belle2::SVD::RawCluster& rawCluster, double& position,
+    void SVDOldDefaultPosition::computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position,
                                                        double& positionError)
     {
+
+      reconstructStrips(rawCluster);
 
       if (rawCluster.getSize() < 3)
         applyCoGPosition(rawCluster, position, positionError);

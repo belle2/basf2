@@ -10,6 +10,12 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDClusterPosition.h>
+#include <svd/reconstruction/SVDCoG3Time.h>
+#include <svd/reconstruction/SVDELS3Time.h>
+#include <svd/reconstruction/SVDELS3Charge.h>
+#include <svd/reconstruction/SVDMaxSampleCharge.h>
+#include <svd/reconstruction/SVDSumSamplesCharge.h>
+#include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 
@@ -25,6 +31,7 @@ namespace Belle2 {
     void SVDClusterPosition::applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
       //NOTE: position error NOT computed!
+      positionError = 0;
 
       const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& info = geo.getSensorInfo(rawCluster.getSensorID());
@@ -100,6 +107,69 @@ namespace Belle2 {
         sumStripCharge += stripCharge;
       }
       return sumStripCharge;
+    }
+
+    void SVDClusterPosition::reconstructStrips(Belle2::SVD::RawCluster& rawCluster)
+    {
+
+
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+
+      //loop on strips
+      for (int i = 0; i < (int)strips.size(); i++) {
+
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
+
+        RawCluster tmp(rawCluster.getSensorID(), rawCluster.isUSide(), 0, 0);
+        if (tmp.add(rawCluster.getSensorID(), rawCluster.isUSide(), strip)) {
+          double time = 0;
+
+          double timeError = 0;
+          int firstFrame = 0;
+
+          // time computation
+          // this section is commented because not used in position reconstruction:
+          /*    if(m_stripTimeAlgo == "ELS3"){
+            SVDELS3Time ct;
+            ct.computeClusterTime(tmp, time, timeError, firstFrame);
+
+          } else if(m_stripTimeAlgo == "CoG3"){
+            SVDCoG3Time ct;
+            ct.computeClusterTime(tmp, time, timeError, firstFrame);
+          }
+          rawCluster.setStripTime(i, time);
+          */
+
+          //charge computation
+          double charge = 0;
+          double SNR;
+          double seedCharge;
+          if (m_stripChargeAlgo == "ELS3") {
+            SVDELS3Charge cc;
+            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+          } else if (m_stripChargeAlgo == "MaxSample") {
+            SVDMaxSampleCharge cc;
+            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+          } else if (m_stripChargeAlgo == "SumSamples") {
+            SVDSumSamplesCharge cc;
+            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+          }
+
+          double CHARGE = 0;
+          SVDMaxSampleCharge cc;
+          cc.computeClusterCharge(tmp, CHARGE, SNR, seedCharge);
+
+          if ((abs(charge - CHARGE) / CHARGE > 0.3)   || charge < 0)
+            rawCluster.setStripCharge(i, CHARGE);
+          else
+            rawCluster.setStripCharge(i, charge);
+
+        } else
+          B2ERROR("this should not happen...");
+
+
+      }
+
     }
 
   }  //SVD namespace

@@ -12,7 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
-
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vector>
@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * computes the cluster position and position error
        */
-      virtual void computeClusterPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
+      virtual void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
 
       /**
        * virtual destructor
@@ -49,7 +49,12 @@ namespace Belle2 {
       /** AHT Position Algorithm*/
       void applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
+      /** reconstruct strips*/
+      void reconstructStrips(Belle2::SVD::RawCluster& rawCluster);
 
+      void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
+
+      void set_stripTimeAlgo(const std::string& user_stripTimeAlgo) {m_stripTimeAlgo = user_stripTimeAlgo;}
     protected:
 
       /** helper, returns the sum pf the strip charges*/
@@ -59,7 +64,8 @@ namespace Belle2 {
 
       SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
 
-
+      std::string m_stripChargeAlgo;
+      std::string m_stripTimeAlgo;
     };
 
   }

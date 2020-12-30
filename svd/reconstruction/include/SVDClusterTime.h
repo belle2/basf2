@@ -52,13 +52,13 @@ namespace Belle2 {
       virtual ~SVDClusterTime() {};
 
       /** CoG6 Time Algorithm*/
-      void applyCoG6Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+      void applyCoG6Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
       /** CoG3 Time Algorithm*/
-      void applyCoG3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+      void applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
       /** ELS3 Time Algorithm*/
-      void applyELS3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+      void applyELS3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
     protected:
 

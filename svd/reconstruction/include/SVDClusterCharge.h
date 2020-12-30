@@ -46,13 +46,13 @@ namespace Belle2 {
       virtual ~SVDClusterCharge() {};
 
       /** MaxSample Charge Algorithm*/
-      void applyMaxSampleCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+      void applyMaxSampleCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
       /** SumSamples Charge Algorithm*/
-      void applySumSamplesCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+      void applySumSamplesCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
       /** ELS3 Charge Algorithm*/
-      void applyELS3Charge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+      void applyELS3Charge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
     protected:
 

@@ -20,7 +20,8 @@ namespace Belle2 {
 
   namespace SVD {
 
-    void SVDClusterCharge::applyMaxSampleCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
+    void SVDClusterCharge::applyMaxSampleCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR,
+                                                double& seedCharge)
     {
 
       //get seed charge
@@ -54,7 +55,8 @@ namespace Belle2 {
       SNR = charge / sqrt(noise);
     }
 
-    void SVDClusterCharge::applySumSamplesCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
+    void SVDClusterCharge::applySumSamplesCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR,
+                                                 double& seedCharge)
     {
 
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
@@ -89,7 +91,7 @@ namespace Belle2 {
     }
 
 
-    void SVDClusterCharge::applyELS3Charge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
+    void SVDClusterCharge::applyELS3Charge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge)
     {
 
       // ISSUES:

@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    void SVDClusterTime::applyCoG6Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
+    void SVDClusterTime::applyCoG6Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
 
       // ISSUES:
@@ -74,7 +74,7 @@ namespace Belle2 {
       time = time / sumAmplitudes;
     }
 
-    void SVDClusterTime::applyCoG3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
+    void SVDClusterTime::applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
 
       // ISSUES:
@@ -108,7 +108,7 @@ namespace Belle2 {
     }
 
 
-    void SVDClusterTime::applyELS3Time(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
+    void SVDClusterTime::applyELS3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
 
       // ISSUES:

@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_new_svd_reconstruction(path, isROIsimulation=False):
+def add_svd_reconstruction(path, isROIsimulation=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -57,7 +57,7 @@ def add_new_svd_reconstruction(path, isROIsimulation=False):
 '''
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
+def add_old_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")

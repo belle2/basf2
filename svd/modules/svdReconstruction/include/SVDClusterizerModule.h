@@ -109,6 +109,15 @@ namespace Belle2 {
       /**string storing the cluster position reconstruction algorithm in 3-sample DAQ mode*/
       std::string m_positionRecoWith3SamplesAlgorithm = "not set";
 
+      /** string storing the strip time reconstruction algorithm for cluster position reconstruction in 6-sample DAQ mode*/
+      std::string m_stripTimeRecoWith6SamplesAlgorithm = "not set";
+      /** string storing the strip time reconstruction algorithm for cluster position reconstruction in 3-sample DAQ mode*/
+      std::string m_stripTimeRecoWith3SamplesAlgorithm = "not set";
+      /** string storing the strip charge reconstruction algorithm for cluster position reconstruction in 6-sample DAQ mode*/
+      std::string m_stripChargeRecoWith6SamplesAlgorithm = "not set";
+      /**string storing the strip charge reconstruction algorithm for cluster reconstruction in 3-sample DAQ mode*/
+      std::string m_stripChargeRecoWith3SamplesAlgorithm = "not set";
+
       SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
       SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/
       SVDClusterCharge* m_charge6SampleClass = nullptr; /**< cluster charge class for the 6-sample acquisition mode*/

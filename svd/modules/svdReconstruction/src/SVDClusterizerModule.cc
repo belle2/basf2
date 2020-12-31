@@ -83,6 +83,19 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
            m_positionRecoWith3SamplesAlgorithm);
 
+  addParam("stripTimeAlgorithm6Samples", m_stripTimeRecoWith6SamplesAlgorithm,
+           " choose strip time algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripTimeRecoWith6SamplesAlgorithm);
+  addParam("stripTimeAlgorithm3Samples", m_stripTimeRecoWith3SamplesAlgorithm,
+           " choose strip time algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripTimeRecoWith3SamplesAlgorithm);
+  addParam("stripChargeAlgorithm6Samples", m_stripChargeRecoWith6SamplesAlgorithm,
+           " choose strip charge algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripChargeRecoWith6SamplesAlgorithm);
+  addParam("stripChargeAlgorithm3Samples", m_stripChargeRecoWith3SamplesAlgorithm,
+           " choose strip charge algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripChargeRecoWith3SamplesAlgorithm);
+
   addParam("useDB", m_useDB,
            "if false use clustering and reconstruction configuration module parameters", m_useDB);
 
@@ -90,11 +103,6 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
 
 void SVDClusterizerModule::beginRun()
 {
-
-  std::string stripTimeRecoWith6SamplesAlgorithm = "CoG6";
-  std::string stripTimeRecoWith3SamplesAlgorithm = "CoG6";
-  std::string stripChargeRecoWith6SamplesAlgorithm = "MaxSample";
-  std::string stripChargeRecoWith3SamplesAlgorithm = "MaxSample";
 
 
   if (m_useDB) {
@@ -109,10 +117,10 @@ void SVDClusterizerModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
 
     //strip algorithms
-    stripTimeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
-    stripTimeRecoWith3SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith3Samples();
-    stripChargeRecoWith6SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith6Samples();
-    stripChargeRecoWith3SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith3Samples();
+    m_stripTimeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
+    m_stripTimeRecoWith3SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith3Samples();
+    m_stripChargeRecoWith6SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith6Samples();
+    m_stripChargeRecoWith3SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith3Samples();
 
   }
   //check that all algorithms are available, otherwise use the default one
@@ -150,22 +158,24 @@ void SVDClusterizerModule::beginRun()
   m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
   m_position6SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith6SamplesAlgorithm);
-  m_position6SampleClass->set_stripChargeAlgo(stripChargeRecoWith6SamplesAlgorithm);
-  m_position6SampleClass->set_stripTimeAlgo(stripTimeRecoWith6SamplesAlgorithm);
+  m_position6SampleClass->set_stripChargeAlgo(m_stripChargeRecoWith6SamplesAlgorithm);
+  m_position6SampleClass->set_stripTimeAlgo(m_stripTimeRecoWith6SamplesAlgorithm);
   m_position3SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith3SamplesAlgorithm);
-  m_position3SampleClass->set_stripChargeAlgo(stripChargeRecoWith3SamplesAlgorithm);
-  m_position3SampleClass->set_stripTimeAlgo(stripTimeRecoWith3SamplesAlgorithm);
+  m_position3SampleClass->set_stripChargeAlgo(m_stripChargeRecoWith3SamplesAlgorithm);
+  m_position3SampleClass->set_stripTimeAlgo(m_stripTimeRecoWith3SamplesAlgorithm);
 
 
   B2INFO("SVD  6-sample DAQ, cluster time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith6SamplesAlgorithm);
-  B2INFO(" with strip charge reconstructed with " << stripChargeRecoWith6SamplesAlgorithm << " and strip time reconstructed with " <<
-         stripTimeRecoWith6SamplesAlgorithm);
+  B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith6SamplesAlgorithm << " and strip time reconstructed with "
+         <<
+         m_stripTimeRecoWith6SamplesAlgorithm);
 
   B2INFO("SVD  3-sample DAQ, cluster time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith3SamplesAlgorithm);
-  B2INFO(" with strip charge reconstructed with " << stripChargeRecoWith3SamplesAlgorithm << " and strip time reconstructed with " <<
-         stripTimeRecoWith3SamplesAlgorithm);
+  B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith3SamplesAlgorithm << " and strip time reconstructed with "
+         <<
+         m_stripTimeRecoWith3SamplesAlgorithm);
 }
 
 void SVDClusterizerModule::initialize()

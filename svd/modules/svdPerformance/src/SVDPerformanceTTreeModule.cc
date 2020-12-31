@@ -179,7 +179,7 @@ void SVDPerformanceTTreeModule::event()
     }
 
 
-    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::ChargedStable(pionCode));
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::pion);
 
     if (tfr) {
       m_svdTrkd0 = tfr->getD0();

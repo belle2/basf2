@@ -5,7 +5,7 @@
 
 import os
 import sys
-from tools import *
+from tools import addLine, getBelleUrl_data, getMaxRunNo_data, readConfigFile_data
 
 # print debug messages ?
 debug = False
@@ -15,12 +15,12 @@ if len(sys.argv) == 1:
     sys.exit('Need one argument: path of config file with job parameters !')
 
 # read jobs parameters from config file
-runsPerJob,  expNoList, skimTypeList, dataTypeList, belleLevelList =\
+runsPerJob, expNoList, skimTypeList, dataTypeList, belleLevelList =\
     readConfigFile_data()
 
 # create output directory for tables if it doesn't exist
 if not os.path.exists('tables'):
-        os.makedirs('tables')
+    os.makedirs('tables')
 
 # open table and write in it
 # table name contains threshold for events number of each job
@@ -45,7 +45,7 @@ for expNo in expNoList:
                 minRunNo = 1
                 while minRunNo < absMaxRunNo:  # stop searching for runs after maxRunNo
 
-                    maxRunNo = minRunNo + (runsPerJob-1)
+                    maxRunNo = minRunNo + (runsPerJob - 1)
 
                     thisUrl = getBelleUrl_data(expNo, minRunNo, maxRunNo,
                                                skimType, dataType, belleLevel)
@@ -53,7 +53,8 @@ for expNo in expNoList:
                     if debug:
                         print('Checking up url: ' + thisUrl)
 
-                    addLine(f, [expNo, skimType, dataType, belleLevel, minRunNo, maxRunNo])
+                    addLine(f, [expNo, skimType, dataType,
+                                belleLevel, minRunNo, maxRunNo])
 
                     minRunNo = maxRunNo + 1
 f.close()

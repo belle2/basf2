@@ -1,12 +1,10 @@
 from pybasf2 import B2WARNING
 
-from basf2 import register_module, create_path
+from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
-
-from iov_conditional import phase_2_conditional
 
 
 def use_local_sectormap(path, pathToLocalSM):

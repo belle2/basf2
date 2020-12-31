@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import inspect
 import unittest
+
 from basf2 import create_path
 import stdPhotons
 
@@ -18,10 +20,12 @@ class TestStdPhotons(unittest.TestCase):
             std_function(path=testpath)
 
         # verify that we load only the list-creating modules
+        # the beam background MVA information is added to the photon lists by default
         self.assertEqual(
-            len(testpath.modules()), len(expected_lists),
+            len(testpath.modules()), len(expected_lists) + 1,
             "List %s doesn't work with function %s" % (listtype, std_function.__name__))
         self.assertTrue(all((module.type() == "ParticleLoader") or (module.type() == "ParticleListManipulator")
+                            or (module.type() == "MVAExpert")
                             for module in testpath.modules()))
 
         #
@@ -40,8 +44,29 @@ class TestStdPhotons(unittest.TestCase):
             self.assertEqual(a, b, "Loaded list \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
 
     def test_nonsense_list(self):
-        """check that the builder function works with the all list"""
-        self._check_list("flibble", expected_lists=[])
+        """Check that the builder function raises a ValueError for a non-existing list name."""
+        self.assertRaises(ValueError, self._check_list, "flibble")
+
+    def test_default_list_exists(self):
+        """
+        Check that the default list type is one of the lists in the cases that are checked for in :func:`stdPhotons.stdPhotons`.
+
+        This test relies on ``ValueError`` being raised for nonsense list types, which is tested by
+        :func:`test_nonsense_list`.  However, :func:`test_nonsense_list` doesn't ensure that the default list works, so
+        for that this test is needed.
+        """
+        test_path = create_path()
+        try:
+            stdPhotons.stdPhotons(path=test_path)
+        except ValueError:
+            stdPhotons_signature = inspect.signature(stdPhotons.stdPhotons)
+            default_listtype = stdPhotons_signature.parameters["listtype"].default
+            self.fail(f"stdPhotons default listtype {default_listtype} is not in set of allowed list names.")
+
+    def test_default_list_works(self):
+        """Check that the default list type (loose) works."""
+        # basically a duplicate of test_loose_list
+        self._check_list(expected_lists=["cdc", "loose"])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""

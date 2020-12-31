@@ -30,7 +30,6 @@
 
 
 import basf2 as b2
-from ROOT import Belle2
 
 # Change between Phase3 (phase2=False) and Phase2 geometry (phase2=True)
 phase2 = False

@@ -83,6 +83,10 @@ namespace Belle2 {
     addParam("enforceFitHypothesis", m_enforceFitHypothesis,
              "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
              m_enforceFitHypothesis);
+
+    addParam("loadPhotonsFromKLM", m_loadPhotonsFromKLM,
+             "If true, create photon candidates from KLM cluster.",
+             false);
   }
 
   void ParticleLoaderModule::initialize()
@@ -205,8 +209,13 @@ namespace Belle2 {
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
-              B2INFO("   -> MDST source: ECLClusters");
               m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+              if (m_loadPhotonsFromKLM) {
+                m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+                B2INFO("   -> MDST source: ECLClusters and KLMClusters");
+              } else {
+                B2INFO("   -> MDST source: ECLClusters");
+              }
             } else {
               B2INFO("   -> MDST source: V0");
               m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
@@ -307,19 +316,19 @@ namespace Belle2 {
         if (!roe) {
           B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
         } else {
-          addROEToParticleList(roe, pdgCode);
+          addROEToParticleList(roe, i, pdgCode, isSelfConjugatedParticle);
         }
       }
 
     } else {
       // Take all ROE if no particle list provided
       for (int i = 0; i < m_roes.getEntries(); i++) {
-        addROEToParticleList(m_roes[i]);
+        addROEToParticleList(m_roes[i], i);
       }
     }
   }
 
-  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode, bool isSelfConjugatedParticle)
+  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode, bool isSelfConjugatedParticle)
   {
 
     Particle* newPart = nullptr;
@@ -337,7 +346,8 @@ namespace Belle2 {
       TLorentzVector missing4Vector;
       missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
       missing4Vector.SetE(missing4Vector.Vect().Mag());
-      newPart = m_particles.appendNew(missing4Vector, pdgCode);
+      auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+      newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 
     }
     for (auto roe2Plist : m_ROE2Plists) {
@@ -730,7 +740,7 @@ namespace Belle2 {
       }
     }
 
-    // load reconstructed neutral KLM cluster's as Klongs or neutrons
+    // load reconstructed neutral KLM clusters as Klongs or neutrons or photons
     for (int i = 0; i < m_klmclusters.getEntries(); i++) {
       const KLMCluster* cluster      = m_klmclusters[i];
 

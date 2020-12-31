@@ -59,7 +59,7 @@ namespace Belle2 {
     const TRGCDCHelix& helix(void) const;
 
     /// Set helix parameter
-    void setHelix(TRGCDCHelix& helix);
+    void setHelix(const TRGCDCHelix& helix);
 
     /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
     int approach(TRGCDCLink&, bool sagCorrection = false) const;
@@ -144,7 +144,7 @@ namespace Belle2 {
 
   inline
   void
-  TRGCDCTrack::setHelix(TRGCDCHelix& helix)
+  TRGCDCTrack::setHelix(const TRGCDCHelix& helix)
   {
     _helix = helix;
   }

@@ -86,7 +86,7 @@ namespace TreeFitter {
     /** compare transverse track momentum*/
     bool static compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs);
 
-    /** has mass cosntraint */
+    /** has mass constraint */
     bool m_massconstraint ;
 
     /** Energy is not conserved at the decay (happens in Bremsstrahlung) */

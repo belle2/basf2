@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
+import basf2 as b2
 from tracking import add_tracking_reconstruction
 from reconstruction import add_dedx_modules
 from simulation import add_svd_simulation
@@ -15,31 +14,31 @@ from simulation import add_svd_simulation
 # --------------------------------------------------------------------
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
 particlegun.param('nTracks', 5)
 particlegun.param('varyNTracks', True)
@@ -57,24 +56,24 @@ particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
 # Simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 main.add_module(simulation)
 
 # PXD digitization & clustering
-pxd_digitizer = register_module('PXDDigitizer')
+pxd_digitizer = b2.register_module('PXDDigitizer')
 main.add_module(pxd_digitizer)
-pxd_clusterizer = register_module('PXDClusterizer')
+pxd_clusterizer = b2.register_module('PXDClusterizer')
 main.add_module(pxd_clusterizer)
 
 # SVD digitization & clustering
 add_svd_simulation(main)
 
 # CDC digitization
-cdcDigitizer = register_module('CDCDigitizer')
+cdcDigitizer = b2.register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
 # TOP digitization
-topdigi = register_module('TOPDigitizer')
+topdigi = b2.register_module('TOPDigitizer')
 main.add_module(topdigi)
 
 # tracking
@@ -84,37 +83,37 @@ add_tracking_reconstruction(main)
 add_dedx_modules(main)
 
 # Track extrapolation
-ext = register_module('Ext')
+ext = b2.register_module('Ext')
 main.add_module(ext)
 
 # Channel masker
 main.add_module('TOPChannelMasker')
 
 # Bunch finder
-finder = register_module('TOPBunchFinder')
+finder = b2.register_module('TOPBunchFinder')
 main.add_module(finder)
 
 # TOP reconstruction
-topreco = register_module('TOPReconstructor')
-topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
+topreco = b2.register_module('TOPReconstructor')
+topreco.logging.log_level = b2.LogLevel.DEBUG  # remove or comment to suppress printout
 topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
 main.add_module(topreco)
 
 # TOP DQM
-topdqm = register_module('TOPDQM')
+topdqm = b2.register_module('TOPDQM')
 main.add_module(topdqm)
 
 # Output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', 'TOPOutput.root')
 main.add_module(output)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

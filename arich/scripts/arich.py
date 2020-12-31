@@ -5,8 +5,7 @@
 This module defines wrapper functions around the arich modules.
 """
 
-from basf2 import register_module, create_path
-from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+from basf2 import register_module
 import variables.utils as vu
 
 

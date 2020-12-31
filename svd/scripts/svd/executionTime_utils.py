@@ -18,7 +18,6 @@
 #
 #
 
-from basf2 import *
 from ROOT import Belle2
 import numpy as np
 from per_event_statistics import PerEventStatisticsGetterModule

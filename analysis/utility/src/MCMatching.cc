@@ -235,7 +235,8 @@ namespace {
       if (property & Particle::PropertyFlags::c_IsIgnoreIntermediate)
         return true;
     } else if (absPDG == Const::photon.getPDGCode()) { // gamma
-      if (mcDaug->hasStatus(MCParticle::c_IsFSRPhoton) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
+      if (MCMatching::isFSR(mcDaug) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)
+          or (AnalysisConfiguration::instance()->useLegacyMCMatching() and MCMatching::isFSRLegacy(mcDaug))) {
         if (property & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons)
           return true;
       } else {
@@ -321,7 +322,9 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug! "
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
-      status |= MCErrorFlags::c_MissingResonance;
+      // if particle has c_IsIgnoreIntermediate flag, c_MissingResonance will not be added.
+      if (not(particle->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate))
+        status |= MCErrorFlags::c_MissingResonance;
     } else if (!(particle->getProperty() & Particle::PropertyFlags::c_IsUnspecified)) {
       // Check if the particle is unspecified. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;

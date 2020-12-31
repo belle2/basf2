@@ -17,7 +17,6 @@ class CountEvents(basf2.Module):
 
     def initialize(self):
         """Not implemented"""
-        pass
 
     def beginRun(self):
         """Creates an entry in the global num_events dictionary"""

@@ -39,7 +39,7 @@ namespace HandleRoot {
     initializeEvent(eventMapTVectorD, trackMapTVectorD);
   }
 
-  void initializeRoot(std::string prefix, TTree** runTree, TTree** eventTree,
+  void initializeRoot(const std::string& prefix, TTree** runTree, TTree** eventTree,
                       std::map<std::string, TVectorD*>& runMapTVectorD,
                       std::map<std::string, TVectorD*>& eventMapTVectorD,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
@@ -100,7 +100,7 @@ namespace HandleRoot {
 
   }
 
-  void initializeRoot(std::string prefix, TTree** runTree, TTree** eventTree,
+  void initializeRoot(const std::string& prefix, TTree** runTree, TTree** eventTree,
                       std::map<std::string, TVectorD*>& runMapTVectorD,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
                       std::map<std::string, double>& constMapD, std::map<std::string, std::vector<double> >& constMapV,
@@ -118,25 +118,25 @@ namespace HandleRoot {
                   );
   }
 
-  void saveTrackValues(std::string prefix,
-                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
+  void saveTrackValues(const std::string& prefix,
+                       const std::map<std::string, TClonesArray*>& trackMapTVectorD,
                        std::map<std::string, double>& trackMapD, std::map<std::string, std::vector<double> >& trackMapV
                       )
   {
     // Save m_mDouble
     for (map<string, double >::iterator it = trackMapD.begin(); it != trackMapD.end(); ++it) {
-      new((*trackMapTVectorD[prefix + "TrackDouble" + (*it).first])[trackMapD["iSave"]]) TVectorD(1, &(*it).second);
+      new((*trackMapTVectorD.at(prefix + "TrackDouble" + (*it).first))[trackMapD["iSave"]]) TVectorD(1, &(*it).second);
     }
     // Save m_mVector
     for (map<string, vector<double> >::iterator it = trackMapV.begin(); it != trackMapV.end(); ++it) {
       unsigned t_vectorSize = it->second.size();
-      new((*trackMapTVectorD[prefix + "TrackVector" + (*it).first])[trackMapD["iSave"]]) TVectorD(t_vectorSize, &((*it).second)[0]);
+      new((*trackMapTVectorD.at(prefix + "TrackVector" + (*it).first))[trackMapD["iSave"]]) TVectorD(t_vectorSize, &((*it).second)[0]);
     }
 
     trackMapD["iSave"]++;
   }
 
-  void saveEventValues(std::string prefix,
+  void saveEventValues(const std::string& prefix,
                        std::map<std::string, TVectorD*>& eventMapTVectorD,
                        std::map<std::string, double>& eventMapD, std::map<std::string, std::vector<double> >& eventMapV
                       )
@@ -186,7 +186,7 @@ namespace HandleRoot {
     terminateRoot(runMapTVectorD, eventMapTVectorD, trackMapTVectorD);
   }
 
-  void initializeBranches(std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
+  void initializeBranches(const std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
                           std::map<std::string, TVectorD*>& runMapTVectorD,
                           std::map<std::string, TVectorD*>& eventMapTVectorD,
                           std::map<std::string, TClonesArray*>& trackMapTVectorD
@@ -221,7 +221,7 @@ namespace HandleRoot {
     }
   }
 
-  void initializeBranches(std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
+  void initializeBranches(const std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
                           std::map<std::string, TVectorD*>& runMapTVectorD,
                           std::map<std::string, TClonesArray*>& trackMapTVectorD
                          )
@@ -255,7 +255,7 @@ namespace HandleRoot {
     }
   }
 
-  void getEventValues(std::string& prefix,
+  void getEventValues(const std::string& prefix,
                       std::map<std::string, TVectorD*>& eventMapTVectorD,
                       std::map<std::string, double>& eventMapD, std::map<std::string, std::vector<double> >& eventMapV
                      )
@@ -278,7 +278,7 @@ namespace HandleRoot {
     }
   }
 
-  void getTrackValues(std::string& prefix, int iTrack,
+  void getTrackValues(const std::string& prefix, int iTrack,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
                       std::map<std::string, double>& trackMapD, std::map<std::string, std::vector<double> >& trackMapV
                      )
@@ -317,7 +317,7 @@ namespace HandleRoot {
         string t_vectorName = t_name.substr(0, t_find);
         int t_vectorIndex = stoi(t_name.substr(t_find + 1, t_name.size()));
         // Create vector if not in map.
-        if (trackMapV.find(t_vectorName) == trackMapV.end()) {
+        if (!trackMapV.count(t_vectorName)) {
           trackMapV[t_vectorName] = vector<double> (1);
         }
         // Increase vector size if vector size is too small

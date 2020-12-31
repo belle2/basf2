@@ -9,13 +9,12 @@
 #
 ##############################################################################
 
-import basf2
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 
 
-class testSVDShaperDigitOrdering(basf2.Module):
+class testSVDShaperDigitOrdering(b2.Module):
 
     """Module to check SVDShaperDigit ordering."""
 
@@ -44,7 +43,7 @@ class testSVDShaperDigitOrdering(basf2.Module):
                   str(sensor.getSensorNumber()) + ' ' + side + ' ' + str(sd.getCellID()))
 
 
-main = create_path()
+main = b2.create_path()
 
 '''
 # to run on 2017 testbeam data
@@ -68,7 +67,7 @@ main.add_module('SVDUnpacker', GenerateShaperDigits=True)
 main.add_module(testSVDShaperDigitOrdering())
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

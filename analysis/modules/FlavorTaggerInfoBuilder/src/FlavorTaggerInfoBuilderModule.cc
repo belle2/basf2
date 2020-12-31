@@ -46,6 +46,7 @@ void FlavorTaggerInfoBuilderModule::event()
 {
   for (int i = 0; i < m_roes.getEntries(); i++) {
     const RestOfEvent* roe = m_roes[i];
+    if (!roe->isBuiltWithMostLikely()) continue;
     const Particle* particle = roe->getRelated<Particle>();
 
     // create FlavorTaggerInfo object

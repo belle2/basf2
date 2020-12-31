@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDGeneral.h
-// Description : An example module for DQM histogram analysis
+// Description : module for DQM histogram analysis of SVD sensors occupancies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20181128
@@ -98,8 +98,11 @@ namespace Belle2 {
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
-    //! IDs of all SXD Modules to iterate over
+    //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
+    TCanvas* m_c_avg_maxBin_UV = NULL; /**<Canvas with average max bin for U and V side*/
 
   };
 } // end namespace Belle2

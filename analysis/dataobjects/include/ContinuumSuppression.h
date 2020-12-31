@@ -131,7 +131,7 @@ namespace Belle2 {
      *
      * @return TVector3 ROE thrust axis
      */
-    TVector3 getThrustB(void) const
+    TVector3 getThrustB() const
     {
       return m_thrustB;
     }
@@ -141,7 +141,7 @@ namespace Belle2 {
      *
      * @return TVector3 ROE thrust axis
      */
-    TVector3 getThrustO(void) const
+    TVector3 getThrustO() const
     {
       return m_thrustO;
     }
@@ -151,7 +151,7 @@ namespace Belle2 {
      *
      * @return Float magnitude of B thrust axis
      */
-    float getThrustBm(void) const
+    float getThrustBm() const
     {
       return m_thrustBm;
     }
@@ -161,7 +161,7 @@ namespace Belle2 {
      *
      * @return Float magnitude of ROE thrust axis
      */
-    float getThrustOm(void) const
+    float getThrustOm() const
     {
       return m_thrustOm;
     }
@@ -171,7 +171,7 @@ namespace Belle2 {
      *
      * @return Float cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
      */
-    float getCosTBTO(void) const
+    float getCosTBTO() const
     {
       return m_cosTBTO;
     }
@@ -181,7 +181,7 @@ namespace Belle2 {
      *
      * @return Float cosine of the angle between the thrust axis of the B and the z-axis
      */
-    float getCosTBz(void) const
+    float getCosTBz() const
     {
       return m_cosTBz;
     }
@@ -191,7 +191,7 @@ namespace Belle2 {
      *
      * @return Float reduced Fox-Wolfram moment R2
      */
-    float getR2(void) const
+    float getR2() const
     {
       return m_R2;
     }
@@ -201,7 +201,7 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 0
      */
-    std::vector<float> getKsfwFS0(void) const
+    std::vector<float> getKsfwFS0() const
     {
       return m_ksfwFS0;
     }
@@ -211,7 +211,7 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 1
      */
-    std::vector<float> getKsfwFS1(void) const
+    std::vector<float> getKsfwFS1() const
     {
       return m_ksfwFS1;
     }
@@ -221,7 +221,7 @@ namespace Belle2 {
      *
      * @return vector of Cleo Cones constructed of all final state particles
      */
-    std::vector<float> getCleoConesALL(void) const
+    std::vector<float> getCleoConesALL() const
     {
       return m_cleoConesALL;
     }
@@ -231,7 +231,7 @@ namespace Belle2 {
      *
      * @return vector of Cleo Cones constructed of only ROE particles
      */
-    std::vector<float> getCleoConesROE(void) const
+    std::vector<float> getCleoConesROE() const
     {
       return m_cleoConesROE;
     }

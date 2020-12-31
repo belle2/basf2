@@ -185,7 +185,6 @@ if __name__ == "__main__":
     import tempfile
     import json
 
-    import basf2
     import basf2_mva
     import basf2_mva_util
     # ##############Building Data samples ###########################

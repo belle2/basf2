@@ -80,6 +80,8 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
   addParam("SaveDetailedFitData", m_SaveDetailedFitData, "Save detailed data "
            "(ampdiff_{cellid,shaper}, timediff_{cellid,shaper} histograms) for "
            "failed fits.", false);
+  addParam("AdjustedTiming", m_adjusted_timing, "Use improved procedure for "
+           "time determination in ShaperDSP emulator", true);
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -435,9 +437,9 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
 
-
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
-                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres);
+                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres,
+                       m_adjusted_timing);
   m_AmpFit = result.amp;
   m_TimeFit = result.time;
   m_QualityFit = result.quality;

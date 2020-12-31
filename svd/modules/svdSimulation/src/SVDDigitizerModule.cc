@@ -663,7 +663,7 @@ void SVDDigitizerModule::saveDigits()
   //Get time of the first sample
   const double bunchTimeSep = 2 * 1.96516; //in ns
   int triggerBin = modeByte.getTriggerBin();
-  int bunchXingsSinceAPVstart  = 2 * triggerBin + gRandom->Integer(2);
+  int bunchXingsSinceAPVstart  = 2 * triggerBin;
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   //Get SVD config from SVDEventInfo

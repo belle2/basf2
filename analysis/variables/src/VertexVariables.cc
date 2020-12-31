@@ -9,15 +9,11 @@
 **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 
 #include <TMatrixFSym.h>
 #include <TVector3.h>
@@ -27,161 +23,132 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+
 namespace Belle2 {
   class Particle;
 
   namespace Variable {
 
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+
     // Generated vertex information
     double mcDecayVertexX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getDecayVertex().X();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getDecayVertex().X();
     }
 
     double mcDecayVertexY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getDecayVertex().Y();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getDecayVertex().Y();
     }
 
     double mcDecayVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getDecayVertex().Z();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getDecayVertex().Z();
     }
 
     double mcDecayVertexRho(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getDecayVertex().Perp();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getDecayVertex().Perp();
+    }
+
+    TVector3 getMcDecayVertexFromIP(const MCParticle* mcparticle)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
     }
 
     double mcDecayVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).X();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcDecayVertexFromIP(mcparticle).X();
     }
 
     double mcDecayVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Y();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcDecayVertexFromIP(mcparticle).Y();
     }
 
     double mcDecayVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Z();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcDecayVertexFromIP(mcparticle).Z();
     }
 
     double mcDecayVertexFromIPRho(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Perp();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcDecayVertexFromIP(mcparticle).Perp();
     }
 
     double mcDecayVertexFromIPDistance(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()).Mag();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcDecayVertexFromIP(mcparticle).Mag();
     }
 
     double mcProductionVertexX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getProductionVertex().X();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getProductionVertex().X();
     }
 
     double mcProductionVertexY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getProductionVertex().Y();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getProductionVertex().Y();
     }
 
     double mcProductionVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        return mcparticle->getProductionVertex().Z();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return mcparticle->getProductionVertex().Z();
+    }
+
+    TVector3 getMcProductionVertexFromIP(const MCParticle* mcparticle)
+    {
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
     }
 
     double mcProductionVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).X();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcProductionVertexFromIP(mcparticle).X();
     }
 
     double mcProductionVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).Y();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcProductionVertexFromIP(mcparticle).Y();
     }
 
     double mcProductionVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (mcparticle) {
-        static DBObjPtr<BeamSpot> beamSpotDB;
-        const auto& frame = ReferenceFrame::GetCurrent();
-        return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition()).Z();
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!mcparticle) return realNaN;
+      return getMcProductionVertexFromIP(mcparticle).Z();
     }
 
     // vertex or POCA in respect to origin ------------------------------
@@ -233,102 +200,54 @@ namespace Belle2 {
 
     //----------------------------------------------------------------------------------
     // vertex or POCA in respect to measured IP
-    double particleDX(const Particle* part)
+
+    TVector3 getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).X();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).X();
-      }
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit)
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
+      return frame.getVertex(helix.getPerigee());
+    }
+
+
+    double particleDX(const Particle* part)
+    {
+      return getVertexD(part).X();
     }
 
     double particleDY(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Y();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).Y();
-      }
+      return getVertexD(part).Y();
     }
 
     double particleDZ(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Z();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).Z();
-      }
+      return getVertexD(part).Z();
     }
 
     double particleDRho(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Perp();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).Perp();
-      }
+      return getVertexD(part).Perp();
     }
 
     double particleDPhi(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Phi();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).Phi();
-      }
+      return getVertexD(part).Phi();
     }
 
     double particleDCosTheta(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).CosTheta();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).CosTheta();
-      }
+      return getVertexD(part).CosTheta();
     }
 
     double particleDistance(const Particle* part)
     {
-      static DBObjPtr<BeamSpot> beamSpotDB;
-      const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Mag();
-      } else {
-        UncertainHelix helix = trackFit->getUncertainHelix();
-        helix.passiveMoveBy(beamSpotDB->getIPPosition());
-        return frame.getVertex(helix.getPerigee()).Mag();
-      }
+      return getVertexD(part).Mag();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -341,13 +260,12 @@ namespace Belle2 {
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
-      const auto& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
-                                                         beamSpotDB->getCovVertex());
-      auto denominator = vertex * (vertexErr * vertex);
-      if (denominator <= 0) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      const TVector3& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+      const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
+                                                                beamSpotDB->getCovVertex());
+      const double denominator = vertex * (vertexErr * vertex);
+      if (denominator <= 0) return realNaN;
+
       return vertex.Mag2() / std::sqrt(denominator);
     }
 
@@ -355,80 +273,69 @@ namespace Belle2 {
 
     double particleProductionX(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertX")) {
-        return part->getExtraInfo("prodVertX");
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertX")) return realNaN;
+      return part->getExtraInfo("prodVertX");
     }
 
     double particleProductionY(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertY")) {
-        return part->getExtraInfo("prodVertY");
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertY")) return realNaN;
+      return part->getExtraInfo("prodVertY");
     }
 
     double particleProductionZ(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertZ")) {
-        return part->getExtraInfo("prodVertZ");
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertZ")) return realNaN;
+      return part->getExtraInfo("prodVertZ");
     }
 
     // Production vertex covariance matrix
     Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments)
     {
+      if (arguments.size() != 2) {
+        B2FATAL("Number of arguments of prodVertexCov function is incorrect!");
+      }
+
       int ielement = -1;
       int jelement = -1;
-      if (arguments.size() == 2) {
-        try {
-          ielement = Belle2::convertString<int>(arguments[0]);
-          jelement = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2ERROR("Arguments of prodVertexCov function must be integer!");
-          return nullptr;
-        }
+      try {
+        ielement = Belle2::convertString<int>(arguments[0]);
+        jelement = Belle2::convertString<int>(arguments[1]);
+      } catch (std::invalid_argument&) {
+        B2ERROR("Arguments of prodVertexCov function must be integer!");
+        return nullptr;
       }
-      if (ielement > -1 && jelement > -1 && ielement < 3 && jelement < 3) {
-        auto func = [ielement, jelement](const Particle * part) -> double {
-          std::vector<std::string> names = {"x", "y", "z"};
-          std::string prodVertS =  boost::str(boost::format("prodVertS%s%s") % names[ielement] % names[jelement]);
-          if (part->hasExtraInfo(prodVertS))
-          {
-            return part->getExtraInfo(prodVertS);
-          }
-          return std::numeric_limits<double>::quiet_NaN();
-        };
-        return func;
+
+      if (std::min(ielement, jelement) < 0 || std::max(ielement, jelement) > 2) {
+        B2ERROR("Range of indexes of prodVertexCov function is incorrect!");
+        return nullptr;
       }
-      B2WARNING("Arguments of prodVertexCov function are incorrect!");
-      return nullptr;
+
+      const std::vector<char> names = {'x', 'y', 'z'};
+      const std::string prodVertS = Form("prodVertS%c%c", names[ielement] , names[jelement]);
+
+      return [prodVertS](const Particle * part) -> double {
+        if (!part->hasExtraInfo(prodVertS)) return realNaN;
+        return part->getExtraInfo(prodVertS);
+      };
     }
 
     double particleProductionXErr(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertSxx")) {
-        return std::sqrt(part->getExtraInfo("prodVertSxx"));
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertSxx")) return realNaN;
+      return std::sqrt(part->getExtraInfo("prodVertSxx"));
     }
 
     double particleProductionYErr(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertSyy")) {
-        return std::sqrt(part->getExtraInfo("prodVertSyy"));
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertSyy")) return realNaN;
+      return std::sqrt(part->getExtraInfo("prodVertSyy"));
     }
 
     double particleProductionZErr(const Particle* part)
     {
-      if (part->hasExtraInfo("prodVertSzz")) {
-        return std::sqrt(part->getExtraInfo("prodVertSzz"));
-      }
-      return std::numeric_limits<double>::quiet_NaN();
+      if (!part->hasExtraInfo("prodVertSzz")) return realNaN;
+      return std::sqrt(part->getExtraInfo("prodVertSzz"));
     }
 
     VARIABLE_GROUP("Vertex Information");

@@ -151,16 +151,16 @@ namespace Belle2 {
 
     /**
      * Sets the size of the magnetic field map.
-     * @param mapSizeHER The number of points in the HER field parameters.
-     * @param mapSizeLER The number of points in the LER field parameters.
-     * @param mapSizeHERleak The number of points in the HER field parameters (leak field from LER).
+     * @param sizeHER The number of points in the HER field parameters.
+     * @param sizeLER The number of points in the LER field parameters.
+     * @param sizeHERleak The number of points in the HER field parameters (leak field from LER).
      */
     void setMapSize(int sizeHER, int sizeLER, int sizeHERleak) { m_mapSizeHER = sizeHER; m_mapSizeLER = sizeLER; m_mapSizeHERleak = sizeHERleak;}
 
     /**
      * Sets the size of the aperture map
-     * @param apertSizeHER The number of points in the HER aperture file.
-     * @param apertSizeLER The number of points in the LER aperture file.
+     * @param sizeHER The number of points in the HER aperture file.
+     * @param sizeLER The number of points in the LER aperture file.
      */
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 

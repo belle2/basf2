@@ -154,7 +154,7 @@ namespace Belle2 {
 
     /** Persist the range on a TTree.
      * @param t is the TTree under which the TBranch will be created
-     * @param branchname is the name of the TBranch holding m_range
+     * @param branchName is the name of the TBranch holding m_range
      */
     void persist(TTree* t, const std::string& branchName)
     {
@@ -164,7 +164,7 @@ namespace Belle2 {
 
     /** Set the Branches addresses to this filter.
      * @param t is the TTree containing the TBranch
-     * @param branchname is the name of the TBranch holding the m_range
+     * @param branchName is the name of the TBranch holding the m_range
      */
     void setBranchAddress(TTree* t, const std::string& branchName)
     {
@@ -544,7 +544,7 @@ namespace Belle2 {
 
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
-     * @param branchname is the name of the TBranch holding m_range
+     * @param branchName is the name of the TBranch holding m_range
      */
     void persist(TTree* t, const std::string& branchName)
     {
@@ -556,7 +556,7 @@ namespace Belle2 {
 
     /** Set the Branches addresses to this filter.
      * @param t is the TTree containing the TBranch
-     * @param branchname is the name of the TBranch holding the m_range
+     * @param branchName is the name of the TBranch holding the m_range
      */
     void setBranchAddress(TTree* t, const std::string& branchName)
     {
@@ -688,7 +688,7 @@ namespace Belle2 {
 
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
-     * @param branchname is the name of the TBranch holding m_range
+     * @param branchName is the name of the TBranch holding m_range
      */
     void persist(TTree* t, const std::string& branchName)
     {
@@ -704,7 +704,7 @@ namespace Belle2 {
 
     /** Set the Branches addresses to this filter.
      * @param t is the TTree containing the TBranch
-     * @param branchname is the name of the TBranch holding the m_range
+     * @param branchName is the name of the TBranch holding the m_range
      */
     void setBranchAddress(TTree* t, const std::string& branchName)
     {
@@ -860,7 +860,7 @@ namespace Belle2 {
 
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
-     * @param branchname is the name of the TBranch holding m_range
+     * @param branchName is the name of the TBranch holding m_range
      */
     void persist(TTree* t, const std::string& branchName)
     {
@@ -876,7 +876,7 @@ namespace Belle2 {
 
     /** Set the Branches addresses to this filter.
      * @param t is the TTree containing the TBranch
-     * @param branchname is the name of the TBranch holding the m_range
+     * @param branchName is the name of the TBranch holding the m_range
      */
     void setBranchAddress(TTree* t, const std::string& branchName)
     {

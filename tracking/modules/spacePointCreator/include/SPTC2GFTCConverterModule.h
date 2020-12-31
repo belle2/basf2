@@ -51,6 +51,7 @@ namespace Belle2 {
     void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
 
     /** get all related Clusters to a SpacePoint
+     * @param spacePoint pointer to the SpacePoint of interest
      * @param clusterNames the Name of the StoreArray where Clusters shall be looked for
      */
     template<typename ClusterType>

@@ -335,25 +335,25 @@ namespace Belle2 {
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
-                      "Returns 1 if at least one PSNM L1 trigger bit is true.");
+                      "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.");
     REGISTER_VARIABLE("L1PSNM(name)", L1PSNM ,
-                      "Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1FTDL(name)", L1FTDL ,
-                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1Input(name)", L1Input,
-                      "Returns the input bit status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the input bit status of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1Prescale(name)", L1Prescale,
-                      "Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
-                      "Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,
-                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
-                      "Returns the input bit status of the i-th input trigger bit.");
+                      "[Eventbased] Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
-                      "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
     REGISTER_VARIABLE("L1TimType", getTimType ,
-                      "Returns ETimingType time type.");
+                      "[Eventbased] Returns ETimingType time type.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(

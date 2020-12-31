@@ -55,6 +55,7 @@ namespace Belle2 {
       void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
 
       void set_stripTimeAlgo(const std::string& user_stripTimeAlgo) {m_stripTimeAlgo = user_stripTimeAlgo;}
+
     protected:
 
       /** helper, returns the sum pf the strip charges*/

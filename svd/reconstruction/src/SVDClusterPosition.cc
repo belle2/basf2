@@ -122,51 +122,63 @@ namespace Belle2 {
 
         RawCluster tmp(rawCluster.getSensorID(), rawCluster.isUSide(), 0, 0);
         if (tmp.add(rawCluster.getSensorID(), rawCluster.isUSide(), strip)) {
-          double time = 0;
-
-          double timeError = 0;
-          int firstFrame = 0;
 
           // time computation
-          // this section is commented because not used in position reconstruction:
-          /*    if(m_stripTimeAlgo == "ELS3"){
-            SVDELS3Time ct;
-            ct.computeClusterTime(tmp, time, timeError, firstFrame);
+          if (m_stripTimeAlgo.compare("dontdo") != 0) {
 
-          } else if(m_stripTimeAlgo == "CoG3"){
-            SVDCoG3Time ct;
-            ct.computeClusterTime(tmp, time, timeError, firstFrame);
-          }
-          rawCluster.setStripTime(i, time);
-          */
+            double time = 0;
+            double timeError = 0;
+            int firstFrame = 0;
 
-          //charge computation
-          double charge = 0;
-          double SNR;
-          double seedCharge;
-          if (m_stripChargeAlgo == "ELS3") {
-            SVDELS3Charge cc;
-            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
-          } else if (m_stripChargeAlgo == "MaxSample") {
-            SVDMaxSampleCharge cc;
-            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
-          } else if (m_stripChargeAlgo == "SumSamples") {
-            SVDSumSamplesCharge cc;
-            cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+            if (m_stripTimeAlgo == "ELS3") {
+              SVDELS3Time ct;
+              ct.computeClusterTime(tmp, time, timeError, firstFrame);
+
+            } else if (m_stripTimeAlgo == "CoG3") {
+              SVDCoG3Time ct;
+              ct.computeClusterTime(tmp, time, timeError, firstFrame);
+            }
+            rawCluster.setStripTime(i, time);
           }
 
-          double CHARGE = 0;
-          SVDMaxSampleCharge cc;
-          cc.computeClusterCharge(tmp, CHARGE, SNR, seedCharge);
+          // charge computation
+          // may be not needed in case the cluster position is computed using APV samples
+          // and not using reconstructed strips
+          if (m_stripChargeAlgo.compare("dontdo") != 0) {
+            double charge = 0;
+            double SNR;
+            double seedCharge;
 
-          if ((abs(charge - CHARGE) / CHARGE > 0.3)   || charge < 0)
-            rawCluster.setStripCharge(i, CHARGE);
-          else
-            rawCluster.setStripCharge(i, charge);
+            if (m_stripChargeAlgo == "ELS3") {
+              // ELS3 can return non-sense values for off-time or low-charge strips)
+              // if returned charge is negative or more than 30% different than MaxSample, we use MaxSample
+              // without notice to the user!
 
+              SVDELS3Charge cc;
+              cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+
+              double maxSample_charge = 0;
+              SVDMaxSampleCharge maxSample_cc;
+              maxSample_cc.computeClusterCharge(tmp, maxSample_charge, SNR, seedCharge);
+
+              if ((abs(charge - maxSample_charge) / maxSample_charge > 0.3) || charge < 0)
+                rawCluster.setStripCharge(i, maxSample_charge);
+              else
+                rawCluster.setStripCharge(i, charge);
+
+            } else if (m_stripChargeAlgo == "SumSamples") {
+              SVDSumSamplesCharge cc;
+              cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+              rawCluster.setStripCharge(i, charge);
+            } else  {
+              // MaxSample is used when the algorithm is not recognized
+              SVDMaxSampleCharge cc;
+              cc.computeClusterCharge(tmp, charge, SNR, seedCharge);
+              rawCluster.setStripCharge(i, charge);
+            }
+          }
         } else
           B2ERROR("this should not happen...");
-
 
       }
 

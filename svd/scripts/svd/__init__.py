@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_reconstruction(path, isROIsimulation=False):
+def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -34,7 +34,17 @@ def add_svd_reconstruction(path, isROIsimulation=False):
         clusterizer = register_module('SVDClusterizer')
         clusterizer.set_name(clusterizerName)
         clusterizer.param('Clusters', clustersName)
-        clusterizer.param('useDB', True)
+        clusterizer.param('timeAlgorithm6Samples', "CoG6")
+        clusterizer.param('timeAlgorithm3Samples', "CoG6")
+        clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
+        clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
+        clusterizer.param('positionAlgorithm6Samples', "oldDefault")
+        clusterizer.param('positionAlgorithm3Samples', "oldDefault")
+        clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
+        clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
+        clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
+        clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
+        clusterizer.param('useDB', False)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
@@ -45,16 +55,20 @@ def add_svd_reconstruction(path, isROIsimulation=False):
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
 
-'''
-    # Add SVDRecoDigit creator module
-    # useful for DQM and validation
-    if recocreatorName not in [e.name() for e in path.modules()]:
-        recoDigitCreator = register_module('SVDRecoDigitCreator')
-        recoDigitCreator.set_name(recocreatorName)
-        recoDigitCreator.param('RecoDigits', recoDigitsName)
-        recoDigitCreator.param('Clusters', clustersName)
-        path.add_module(recoDigitCreator)
-'''
+    if createRecoDigits:
+        # Add SVDRecoDigit creator module
+        # useful for DQM and validation
+        if recocreatorName not in [e.name() for e in path.modules()]:
+            recoDigitCreator = register_module('SVDRecoDigitCreator')
+            recoDigitCreator.set_name(recocreatorName)
+            recoDigitCreator.param('RecoDigits', recoDigitsName)
+            recoDigitCreator.param('Clusters', clustersName)
+            recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
+            recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+            recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
+            recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
+            recoDigitCreator.param('useDB', False)
+            path.add_module(recoDigitCreator)
 
 
 def add_old_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):

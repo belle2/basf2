@@ -380,7 +380,6 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   //apply the Lorentz Shift Correction
   position = applyLorentzShiftCorrection(position, sensorID, isU);
-  positionError = 0.002;
 
   //append the new cluster to the StoreArray...
   if (SNR > m_cutCluster) {

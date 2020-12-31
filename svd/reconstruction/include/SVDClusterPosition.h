@@ -14,6 +14,7 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 
 #include <vector>
 
@@ -58,15 +59,18 @@ namespace Belle2 {
 
     protected:
 
-      /** helper, returns the sum pf the strip charges*/
+      /** helper, returns the sum of the strip charges*/
       double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
+      /** helper, returns the sum in quadrature of the strip noise*/
+      double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
+
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
+      SVDNoiseCalibrations m_NoiseCal; /**<Noise calibrations for the position error*/
 
     private:
 
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
-
-      std::string m_stripChargeAlgo;
-      std::string m_stripTimeAlgo;
+      std::string m_stripChargeAlgo; /**< algorithm used to reconstruct strip charge for cluster position*/
+      std::string m_stripTimeAlgo; /**< algorithm used to reconstruct strip time for cluster position*/
     };
 
   }

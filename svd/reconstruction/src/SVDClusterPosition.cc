@@ -30,8 +30,6 @@ namespace Belle2 {
 
     void SVDClusterPosition::applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
-      //NOTE: position error NOT computed!
-      positionError = 0;
 
       const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& info = geo.getSensorInfo(rawCluster.getSensorID());
@@ -54,14 +52,37 @@ namespace Belle2 {
       }
 
       position /= charge;
+
+      //now compute position error
+      positionError = 0;
+      double pitch = rawCluster.isUSide() ? info.getUPitch() : info.getVPitch();
+      double sumStripCharge = getSumOfStripCharges(rawCluster);
+      float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strips.at(0).cellID);
+      //      float noiseLastStrip = m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.at(strips.size() - 1).cellID);
+      //      float noiseAverage = (noiseFirstStrip + noiseLastStrip) /2;
+      float noiseAverage = noiseFirstStrip;
+
+      double cutAdjacent = m_ClusterCal.getMinAdjSNR(rawCluster.getSensorID(), rawCluster.isUSide());
+
+      // if cluster size == 1
+      // add a strip charge equal to the zero-suppression threshold to compute the error
+      if (strips.size() == 1) {
+        double phantomCharge = cutAdjacent * noiseFirstStrip;
+        positionError = pitch * phantomCharge / (sumStripCharge + phantomCharge);
+
+      } else {
+        // if cluster size > 1
+        double a = cutAdjacent;
+        double sn = sumStripCharge / noiseAverage;
+        positionError = a * pitch / sn;
+      }
+
     }
+
 
 
     void SVDClusterPosition::applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
-
-      //NOTE: position error NOT computed!
-      positionError = 0;
 
       // NOTE:
       // tail and head are the two strips at the edge of the cluster
@@ -90,6 +111,17 @@ namespace Belle2 {
       double headPos = rawCluster.isUSide() ? info.getUCellPosition(headStripCellID) : info.getVCellPosition(headStripCellID);
       position = 0.5 * (tailPos + headPos + (headStripCharge - tailStripCharge) / centreCharge * pitch);
 
+      //now compute position error
+      double cutAdjacent = m_ClusterCal.getMinAdjSNR(rawCluster.getSensorID(), rawCluster.isUSide());
+      double sn = centreCharge / cutAdjacent / getClusterNoise(rawCluster);
+
+      // Rough estimates of Landau noise
+      double landauHead = tailStripCharge / centreCharge;
+      double landauTail = headStripCharge / centreCharge;
+      positionError = 0.5 * pitch * sqrt(1.0 / sn / sn +
+                                         0.5 * landauHead * landauHead +
+                                         0.5 * landauTail * landauTail);
+
     }
 
     double SVDClusterPosition::getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster)
@@ -107,6 +139,23 @@ namespace Belle2 {
         sumStripCharge += stripCharge;
       }
       return sumStripCharge;
+    }
+
+    double SVDClusterPosition::getClusterNoise(const Belle2::SVD::RawCluster& rawCluster)
+    {
+
+      double clusterNoise = 0;
+
+      //take the strips in the rawCluster
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+
+      // compute the sum of strip charges
+      for (auto aStrip : strips) {
+
+        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.cellID);
+        clusterNoise += averageNoiseInElectrons * averageNoiseInElectrons;
+      }
+      return sqrt(clusterNoise);
     }
 
     void SVDClusterPosition::reconstructStrips(Belle2::SVD::RawCluster& rawCluster)

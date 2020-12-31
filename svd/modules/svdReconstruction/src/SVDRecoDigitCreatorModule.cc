@@ -15,11 +15,12 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-#include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <svd/reconstruction/SVDTimeReconstruction.h>
-#include <svd/reconstruction/SVDChargeReconstruction.h>
 
+#include <svd/reconstruction/SVDReconstructionBase.h>
+
+#include <svd/reconstruction/SVDRecoTimeFactory.h>
+#include <svd/reconstruction/SVDRecoChargeFactory.h>
 
 using namespace std;
 using namespace Belle2;
@@ -105,11 +106,17 @@ void SVDRecoDigitCreatorModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
 
-  B2INFO("SVD  6-sample DAQ, strip time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
+  m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
+  m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
+  m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
+  m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
+
+  B2INFO("SVD  6-sample DAQ SVDRecoDigit, time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm);
 
-  B2INFO("SVD  3-sample DAQ, strip time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", strip charge algorithm: " <<
+  B2INFO("SVD  3-sample DAQ SVDRecoDigit, time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm);
+
 }
 
 void SVDRecoDigitCreatorModule::initialize()
@@ -156,8 +163,6 @@ void SVDRecoDigitCreatorModule::event()
 
   int numberOfAcquiredSamples = eventinfo->getNSamples();
 
-  int triggerBin = eventinfo->getModeByte().getTriggerBin();
-
   int nDigits = m_storeShaper.getEntries();
   if (nDigits == 0)
     return;
@@ -172,67 +177,71 @@ void SVDRecoDigitCreatorModule::event()
     VxdID sensorID = m_storeShaper[i]->getSensorID();
     bool isU =  m_storeShaper[i]->isUStrip();
     int cellID = m_storeShaper[i]->getCellID();
-    float averageNoiseInADC =  m_NoiseCal.getNoise(sensorID, isU, cellID);
-    float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(sensorID, isU, cellID);
 
-    float time = std::numeric_limits<float>::quiet_NaN();
-    float timeError = std::numeric_limits<float>::quiet_NaN();
-    float charge = std::numeric_limits<float>::quiet_NaN();
-    float chargeError = std::numeric_limits<float>::quiet_NaN();
-    int firstFrame = std::numeric_limits<int>::quiet_NaN();
-    std::vector<float> probabilities = {0.5};
-    double chi2 = std::numeric_limits<double>::quiet_NaN();
+    //build the StripInRawCluster and a fake RawCluster
+    RawCluster rawCluster(sensorID, isU, 0, 0);
+    Belle2::SVD::StripInRawCluster strip;
+    strip.shaperDigitIndex = i;
+    strip.cellID = cellID;
+    strip.maxSample = m_storeShaper[i]->getMaxADCCounts();
+    strip.noise = m_NoiseCal.getNoise(sensorID, isU, cellID);
+    strip.samples = m_storeShaper[i]->getSamples();;
+    strip.charge = std::numeric_limits<double>::quiet_NaN();;
+    strip.time = std::numeric_limits<double>::quiet_NaN();;
 
+    if (rawCluster.add(sensorID, rawCluster.isUSide(), strip)) {
 
-    // build SVDTimeReconstuction and SVDChargeReconstruction classes with the SVDShaperDigit
-    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(*m_storeShaper[i]);
-    timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
-    timeReco->setTriggerBin(triggerBin);
-    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*m_storeShaper[i]);
-    chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
+      double time = std::numeric_limits<float>::quiet_NaN();
+      double timeError = std::numeric_limits<float>::quiet_NaN();
+      double charge = std::numeric_limits<float>::quiet_NaN();
+      float chargeError = std::numeric_limits<float>::quiet_NaN();
+      int firstFrame = std::numeric_limits<int>::quiet_NaN();
+      std::vector<float> probabilities = {0.5};
+      double chi2 = std::numeric_limits<double>::quiet_NaN();
 
+      //dummy containers:
+      double SNR = std::numeric_limits<double>::quiet_NaN();
+      double seedCharge = std::numeric_limits<double>::quiet_NaN();
 
-    // get first frame, strip time and charge and their errors
-    if (numberOfAcquiredSamples == 6) {
-      std::pair<int, double> FFandTime = timeReco->getFirstFrameAndStripTime(m_timeRecoWith6SamplesAlgorithm);
-      firstFrame = FFandTime.first;
-      time = FFandTime.second;
-      timeError = timeReco->getStripTimeError(m_timeRecoWith6SamplesAlgorithm);
-      charge = chargeReco->getStripCharge(m_chargeRecoWith6SamplesAlgorithm);
-      chargeError = chargeReco->getStripChargeError(m_chargeRecoWith6SamplesAlgorithm);
-    } else if (numberOfAcquiredSamples == 3) {
-      std::pair<int, double> FFandTime = timeReco->getFirstFrameAndStripTime(m_timeRecoWith3SamplesAlgorithm);
-      firstFrame = FFandTime.first;
-      time = FFandTime.second;
-      timeError = timeReco->getStripTimeError(m_timeRecoWith3SamplesAlgorithm);
-      charge = chargeReco->getStripCharge(m_chargeRecoWith3SamplesAlgorithm);
-      chargeError = chargeReco->getStripChargeError(m_chargeRecoWith3SamplesAlgorithm);
-    } else
-      B2ERROR("SVD Reconstruction not available for this strip: not supported number of acquired APV samples!!");
+      if (numberOfAcquiredSamples == 6) {
 
-    // now go into FTSW reference frame
-    time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+        //time
+        m_time6SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
+        //charge
+        m_charge6SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
+      } else if (numberOfAcquiredSamples == 3) {
+        //time
+        m_time3SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
 
-    //append the new SVDRecoDigit to the StoreArray
-    m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
+        //charge
+        m_charge3SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
 
-    // write relations SVDRecoDigit -> SVDShaperDigit
-    RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
-                                  m_relRecoToShaperName);
-    if (relRecoToShaper) relRecoToShaper.clear();
+      } else
+        B2ERROR("SVD Reconstruction not available for this strip: not supported number of acquired APV samples!!");
 
-    int recoIndex = m_storeReco.getEntries() - 1;
-    int shaperIndex = i;
-    if (recoIndex != shaperIndex)
-      B2ERROR("incompatible SVDShaperDigit and SVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
-              recoIndex << " != " << shaperIndex << " = SVDShaperDigit index");
+      // now go into FTSW reference frame
+      time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
-    vector<pair<unsigned int, float> > digit_weights;
-    digit_weights.reserve(1);
-    digit_weights.emplace_back(shaperIndex, 1.0);
-    relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
+      //append the new SVDRecoDigit to the StoreArray
+      m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
 
+      // write relations SVDRecoDigit -> SVDShaperDigit
+      RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
+                                    m_relRecoToShaperName);
+      if (relRecoToShaper) relRecoToShaper.clear();
 
+      int recoIndex = m_storeReco.getEntries() - 1;
+      int shaperIndex = i;
+      if (recoIndex != shaperIndex)
+        B2ERROR("incompatible SVDShaperDigit and SVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
+                recoIndex << " != " << shaperIndex << " = SVDShaperDigit index");
+
+      vector<pair<unsigned int, float> > digit_weights;
+      digit_weights.reserve(1);
+      digit_weights.emplace_back(shaperIndex, 1.0);
+      relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
+
+    }
     i++;
   } //exit loop on ShaperDigits
 

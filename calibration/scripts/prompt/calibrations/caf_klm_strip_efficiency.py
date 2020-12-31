@@ -70,7 +70,6 @@ def get_calibrations(input_data, **kwargs):
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
 
     # For testing
     # reduced_file_to_iov_cdst = filter_by_max_files_per_run(file_to_iov_cdst, max_files_per_run, min_events_per_file)
@@ -92,7 +91,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 
     alg = KLMStripEfficiencyAlgorithm()

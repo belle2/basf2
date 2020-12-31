@@ -26,6 +26,7 @@ _RegisteredSkims = [
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
+    ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
@@ -118,8 +119,10 @@ _RegisteredSkims = [
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
 
     # --- WG9: Charmless B decays ---
-    ("19130100", "btocharmless", "CharmlessHad2Body"),
-    ("19130200", "btocharmless", "CharmlessHad3Body"),
+    ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130201", "btocharmless", "BtoHadTracks"),
+    ("19130300", "btocharmless", "BtoHad1Pi0"),
+    ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

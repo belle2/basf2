@@ -14,7 +14,9 @@
 </header>
 """
 
-from plotUtils import *
+import ROOT as R
+
+import plotUtils as pu
 
 inputRD = R.TFile.Open("../SVDValidationTTreeRecoDigit.root")
 
@@ -22,7 +24,7 @@ treeRD = inputRD.Get("tree")
 
 histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
-ploter(
+pu.ploter(
     name='TimeResolution',
     title='Resolution of the reconstructed time of a single strip',
     nbins=200,
@@ -30,7 +32,7 @@ ploter(
     xmax=100,
     x_label='RecoDigit time resolution (ns)',
     y_label='counts',
-    granules=gD,
+    granules=pu.gD,
     tree=treeRD,
     expr='recodigit_time - truehit_time',
     cut='',
@@ -39,7 +41,7 @@ ploter(
     check='Distribution between -40 and 20 ns.',
     isShifter=True)
 
-ploter(
+pu.ploter(
     name='StripCharge',
     title='Charge of the strip',
     nbins=50,
@@ -47,9 +49,9 @@ ploter(
     xmax=120000,
     x_label='Strip charge (# of electrons)',
     y_label='counts',
-    granules=gD,
-    tree=treeRD,
-    expr='recodigit_charge',
+    granules=pu.gD,
+    tree=treeS,
+    expr='strip_charge',
     cut='',
     descr='Strip charge for all RecoDigits related to one TrueHit.',
     check='Distribution peak around 15-30 ke.',

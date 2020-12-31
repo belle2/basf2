@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
+import sys
 
 
 def add_new_svd_reconstruction(path, isROIsimulation=False):
@@ -80,7 +80,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ""
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDClusterizerDirect')
+            clusterizer = b2.register_module('SVDClusterizerDirect')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -95,12 +95,12 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ''
 
         if fitterName not in [e.name() for e in path.modules()]:
-            fitter = register_module('SVDNNShapeReconstructor')
+            fitter = b2.register_module('SVDNNShapeReconstructor')
             fitter.set_name(fitterName)
             path.add_module(fitter)
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDNNClusterizer')
+            clusterizer = b2.register_module('SVDNNClusterizer')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -135,23 +135,23 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             maskingName = 'SVDStripMasking'
 
         if maskingName not in [e.name() for e in path.modules()]:
-            masking = register_module('SVDStripMasking')
+            masking = b2.register_module('SVDStripMasking')
             masking.set_name(maskingName)
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
     if dataFormatName not in [e.name() for e in path.modules()]:
-        dataFormat = register_module('SVDDataFormatCheck')
+        dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
 
     if fitterName not in [e.name() for e in path.modules()]:
-        fitter = register_module('SVDCoGTimeEstimator')
+        fitter = b2.register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
-        clusterizer = register_module('SVDSimpleClusterizer')
+        clusterizer = b2.register_module('SVDSimpleClusterizer')
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
@@ -159,7 +159,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
-        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
@@ -178,7 +178,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ""
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDClusterizerDirect')
+            clusterizer = b2.register_module('SVDClusterizerDirect')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -193,54 +193,124 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             clusterName = ''
 
         if fitterName not in [e.name() for e in path.modules()]:
-            fitter = register_module('SVDNNShapeReconstructor')
+            fitter = b2.register_module('SVDNNShapeReconstructor')
             fitter.set_name(fitterName)
             path.add_module(fitter)
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDNNClusterizer')
+            clusterizer = b2.register_module('SVDNNClusterizer')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path, daqMode=2):
+def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
 
-    svdevtinfoset = register_module("SVDEventInfoSetter")
-    svdevtinfoset.param("daqMode", daqMode)
-    path.add_module(svdevtinfoset)
+    if daqMode != 2 and daqMode != 1:
+        print("OOPS the acquisition mode that you want to simulate is not available.")
+        print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
+        sys.exit()
 
-    digitizer = register_module('SVDDigitizer')
+    # 6-sample acquisition mode
+    if daqMode == 2:
+        svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+        svdevtinfoset.param("daqMode", daqMode)
+        path.add_module(svdevtinfoset)
+
+        digitizer = b2.register_module('SVDDigitizer')
+        path.add_module(digitizer)
+
+    # 3-sample acquisition mode
+    # we previously simulated this mode with StartSampling = 58 (default StartSampling = -2)
     if daqMode == 1:
-        digitizer.param("StartSampling", 58)
+        if relativeShift == -1 and latencyShift == -1:
+            print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
+            sys.exit(1)
+        if relativeShift != -1 and latencyShift != -1:
+            print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
+            sys.exit(1)
 
-    path.add_module(digitizer)
+        svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+        svdevtinfoset.param("daqMode", 2)
+        svdevtinfoset.param("SVDEventInfo", "SVDEventInfoOriginal")
+        path.add_module(svdevtinfoset)
+
+        digitizer = b2.register_module('SVDDigitizer')
+        digitizer.param("ShaperDigits", "SVDShaperDigitsOriginal")
+        path.add_module(digitizer)
+
+        # emulate the 3-sample acquisition
+        emulator = b2.register_module("SVD3SamplesEmulator")
+        emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
+        emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
+        if latencyShift == -1:
+            emulator.param("chooseStartingSample", False)
+        else:
+            emulator.param("chooseStartingSample", True)
+            emulator.param("StartingSample", latencyShift)
+
+        if relativeShift == -1:
+            emulator.param("chooseRelativeShift", False)
+        else:
+            emulator.param("chooseRelativeShift", True)
+            emulator.param("relativeShift", relativeShift)
+
+        emulator.param("outputSVDEventInfo", "SVDEventInfo")
+        emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
+        path.add_module(emulator)
+
+        # emulate online zero-suppression
+        zsonline = b2.register_module("SVDZeroSuppressionEmulator")
+        zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
+        zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
+        path.add_module(zsonline)
+
+        # 3-mixed-6 sample mode not available
 
 
 def add_svd_unpacker(path):
 
-    unpacker = register_module('SVDUnpacker')
+    unpacker = b2.register_module('SVDUnpacker')
     path.add_module(unpacker)
 
 
-def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
+def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1):
 
-    unpacker = register_module('SVDUnpacker')
+    if relativeShift == -1 and latencyShift == -1:
+        print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
+        sys.exit(1)
+
+    if relativeShift != -1 and latencyShift != -1:
+        print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
+        sys.exit(1)
+
+    unpacker = b2.register_module('SVDUnpacker')
     unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")
     unpacker.param("svdShaperDigitListName", "SVDShaperDigitsOriginal")
     path.add_module(unpacker)
 
     # emulate the 3-sample acquisition
-    emulator = register_module("SVD3SamplesEmulator")
+    emulator = b2.register_module("SVD3SamplesEmulator")
     emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
     emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
-    emulator.param("StartingSample", latencyShift)
+    if latencyShift == -1:
+        emulator.param("chooseStartingSample", False)
+    else:
+        emulator.param("chooseStartingSample", True)
+        emulator.param("StartingSample", latencyShift)
+
+    if relativeShift == -1:
+        emulator.param("chooseRelativeShift", False)
+    else:
+        emulator.param("chooseRelativeShift", True)
+        emulator.param("relativeShift", relativeShift)
+
     emulator.param("outputSVDEventInfo", "SVDEventInfo")
     emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
     path.add_module(emulator)
 
     # emulate online zero-suppression
-    zsonline = register_module("SVDZeroSuppressionEmulator")
+    zsonline = b2.register_module("SVDZeroSuppressionEmulator")
     zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     path.add_module(zsonline)
@@ -248,7 +318,7 @@ def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
 
 def add_svd_packer(path):
 
-    packer = register_module('SVDPacker')
+    packer = b2.register_module('SVDPacker')
     path.add_module(packer)
 
 
@@ -264,7 +334,7 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         nameSPs = 'SVDSpacePoints'
 
     if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD = b2.register_module('SVDSpacePointCreator')
         spCreatorSVD.set_name(svdSPCreatorName)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)

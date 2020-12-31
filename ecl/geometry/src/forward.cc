@@ -30,22 +30,23 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 {
   G4LogicalVolume* top = &_top;
 
-  bool sec = 0;
-  double phi0 = 0, dphi = (sec) ? M_PI / 16 : 2 * M_PI;
+  const bool sec = 0;
+  // cppcheck-suppress knownConditionTrueFalse
+  const double phi0 = 0, dphi = sec ? M_PI / 16 : 2 * M_PI;
 
-  bool b_inner_support_ring = 1;
-  bool b_outer_support_ring = 1;
-  bool b_support_wall = 1;
-  bool b_ribs = 1;
-  bool b_septum_wall = 1;
-  bool b_crystals = 1;
-  bool b_preamplifier = 1;
-  bool b_support_leg = 1;
-  bool b_support_structure_13 = 1;
-  bool b_support_structure_15 = 1;
+  const bool b_inner_support_ring = 1;
+  const bool b_outer_support_ring = 1;
+  const bool b_support_wall = 1;
+  const bool b_ribs = 1;
+  const bool b_septum_wall = 1;
+  const bool b_crystals = 1;
+  const bool b_preamplifier = 1;
+  const bool b_support_leg = 1;
+  const bool b_support_structure_13 = 1;
+  const bool b_support_structure_15 = 1;
   bool b_connectors = 1;
   bool b_boards = 1;
-  bool b_cover = 1;
+  const bool b_cover = 1;
 
   b_connectors &= b_support_structure_15;
   b_boards &= b_support_structure_15;
@@ -836,7 +837,6 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->AddPlacedVolume(lsolid10, tsolid10_p1);
     //      new G4PVPlacement(tsolid10_p1, lsolid10, "psolid10", crystalSectorLogical, false, 0, overlap);
 
-    // cppcheck-suppress knownConditionTrueFalse
     if (b_connectors) {
       double t = 2, h20 = 32;
       G4VSolid* solid_connector = new G4Box("fwd_solid_connector", (110 + 2 * 20) / 2, (250 + 2 * 20) / 2, h20 / 2);
@@ -901,7 +901,6 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       for (int i = 0; i < 10; i++) place(lv8, G4Translate3D(0, 25 * (i - 4.5), -h20 / 2 + t + 30 / 2), i);
     }
 
-    // cppcheck-suppress knownConditionTrueFalse
     if (b_boards) {
       double hbv = 30;
       G4VSolid* solid_board = new G4Box("fwd_solid_board", (210) / 2, (110) / 2, hbv / 2);

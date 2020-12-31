@@ -17,7 +17,7 @@
 
 Alias      Etapsig    eta'
 ChargeConj Etapsig    Etapsig
-Alias      Etasig    eta'
+Alias      Etasig    eta
 ChargeConj Etasig    Etasig
 
 #

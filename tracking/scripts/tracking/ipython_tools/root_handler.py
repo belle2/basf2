@@ -1,5 +1,4 @@
 import numpy as np
-import os
 from root_pandas import read_root
 
 import pandas as pd

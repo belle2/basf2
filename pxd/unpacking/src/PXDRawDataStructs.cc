@@ -33,6 +33,7 @@ namespace Belle2 {
 
     void dhc_frame_header_word0::print(void) const
     {
+      /* cppcheck-suppress variableScope */
       const char* dhc_type_name[16] = {
         (const char*)"DHP_RAW",
         (const char*)"FCE_RAW",

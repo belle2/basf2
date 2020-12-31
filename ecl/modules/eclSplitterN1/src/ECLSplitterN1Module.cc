@@ -339,7 +339,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       // sort the listCrystals and keep the n highest in descending order
-      std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](auto & left, auto & right) {
+      std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](const auto & left, const auto & right) {
         return left.second < right.second;
       });
       std::vector< unsigned int> listCrystals; //cell id
@@ -751,7 +751,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         }
 
         // sort the listCrystals and keep the n highest in descending order
-        std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](auto & left, auto & right) {
+        std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](const auto & left, const auto & right) {
           return left.second < right.second;
         });
 

@@ -17,7 +17,7 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 import sys
 argvs = sys.argv
 
@@ -27,12 +27,12 @@ if len(argvs) < 6:
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Reader
 # reader = register_module('HSLBReaderArray')
-reader = register_module('DeSerializerCOPPER')
+reader = b2.register_module('DeSerializerCOPPER')
 reader.param('NodeID', int(argvs[2]))
 reader.param('FinesseBitFlag', int(argvs[3]))
 use_shm_flag = int(argvs[4])
@@ -43,7 +43,7 @@ reader.param('NodeName', argvs[5])
 # Histo Module
 # histo = register_module('HistoManager')
 # main.add_module (histo)
-histo = register_module('DqmHistoManager')
+histo = b2.register_module('DqmHistoManager')
 histo.param('HostName', 'ropc04')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 10)
@@ -51,16 +51,16 @@ histo.param('DumpInterval', 10)
 histo.param('HistoFileName', 'histo_file_'.join([argvs[1], '.root']))
 
 # Monitor module
-monitor = register_module('MonitorDataCOPPER')
+monitor = b2.register_module('MonitorDataCOPPER')
 
 # Sender
-sender = register_module('Serializer')
+sender = b2.register_module('Serializer')
 sender.param('DestPort', 30000)
 # sender.param('LocalHostName', 'cpr006')
 sender.param('LocalHostName', argvs[1])
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(reader)
@@ -70,4 +70,4 @@ main.add_module(reader)
 # main.add_module(sender)
 
 # Process all events
-process(main)
+b2.process(main)

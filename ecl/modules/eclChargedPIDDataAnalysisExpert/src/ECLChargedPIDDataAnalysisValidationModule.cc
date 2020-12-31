@@ -35,6 +35,9 @@ ECLChargedPIDDataAnalysisValidationModule::ECLChargedPIDDataAnalysisValidationMo
   addParam("inputPdgIdList", m_inputPdgIdList,
            "The list of (signed) pdgIds of the charged stable particles for which validation plots should be produced. Default is ALL charged stable particles.",
            defaultChargedPdgIds);
+  addParam("mergeChargeOfPdgIds", m_mergeChargeOfPdgIds,
+           "The list of (unsigned) pdgIds of the charged stable particles for which particle and antiparticle should be merged together in the plots. Default is no merging, meaning separate plots are generated for +/- charged particles for each input pdgId.",
+           std::vector<unsigned int>());
   addParam("outputFileName", m_outputFileName,
            "The base name of the output file. The pdgId of the charged particle is appended to the name.",
            std::string("ECLChargedPid"));
@@ -55,6 +58,17 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
   // Convert pdgId list to a set to remove any accidental repetitions.
   m_inputPdgIdSet = std::set<int>(m_inputPdgIdList.begin(), m_inputPdgIdList.end());
 
+  // By default, do not merge particles and antiparticles together,
+  // unless a particle hypo is in the configured "merge" list.
+  for (const auto& hypo : Const::chargedStableSet) {
+    bool merge = (std::find(m_mergeChargeOfPdgIds.begin(), m_mergeChargeOfPdgIds.end(),
+                            hypo.getPDGCode()) == m_mergeChargeOfPdgIds.end()) ? false : true;
+    if (merge) {
+      B2WARNING("For (unsigned) hypothesis " << hypo.getPDGCode() << ",  validation plots will be merged for +/- charged particles.");
+    }
+    m_mergeChargeFlagByHypo.insert(std::pair<Const::ChargedStable, bool>(hypo, merge));
+  }
+
   std::string chargedPdgIdStr;
   std::string fname;
 
@@ -65,8 +79,14 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
       B2FATAL("PDG: " << chargedPdgId << " in m_inputPdgIdSet is not that of a valid particle in Const::chargedStableSet! Aborting...");
     }
 
+    const auto chargedHypo = Const::chargedStableSet.find(std::abs(chargedPdgId));
+
+    // If merging particles and antiparticles for this hypo, no need to loop twice:
+    // register one TTree for the '+' charged pdgId only.
+    if (m_mergeChargeFlagByHypo[chargedHypo] and chargedPdgId < 0) continue;
+
     // Get the idx of this pdgId in the Const::chargedStableSet
-    auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
+    auto chargedIdx = chargedHypo.getIndex();
 
     if (chargedPdgId > 0) {
       chargedPdgIdStr = std::to_string(chargedPdgId);
@@ -104,12 +124,16 @@ void ECLChargedPIDDataAnalysisValidationModule::beginRun()
 void ECLChargedPIDDataAnalysisValidationModule::event()
 {
 
-  std::string chargedPdgIdStr;
-
   for (const auto& chargedPdgId : m_inputPdgIdSet) {
 
+    const auto chargedHypo = Const::chargedStableSet.find(std::abs(chargedPdgId));
+
+    // If merging particles and antiparticles for this hypo, no need to loop twice:
+    // fill one TTree for the '+' charged pdgId only.
+    if (m_mergeChargeFlagByHypo[chargedHypo] and chargedPdgId < 0) continue;
+
     // Get the idx of this pdgId in the Const::chargedStableSet
-    auto chargedIdx = Const::chargedStableSet.find(std::abs(chargedPdgId)).getIndex();
+    auto chargedIdx = chargedHypo.getIndex();
 
     if (chargedPdgId < 0) {
       // Add offset to idx for antiparticles.
@@ -139,7 +163,14 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       if (particle.hasStatus(MCParticle::c_IsVirtual)) continue; // Ignore virtual particles.
 
       // Skip all particles expect for the one of interest.
-      if (particle.getPDG() != chargedPdgId) continue;
+      // If merging particles and antiparticles for this pdgId, use abs so both charges are considered for the MCParticles.
+      if (m_mergeChargeFlagByHypo[chargedHypo]) {
+        // Charge-agnostic check.
+        if (std::abs(particle.getPDG()) != std::abs(chargedPdgId)) continue;
+      } else {
+        // Charge-dependent check.
+        if (particle.getPDG() != chargedPdgId) continue;
+      }
 
       // Get the matching track w/ max momentum.
       int itrack(0);
@@ -228,11 +259,16 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
 
   for (const auto& chargedPdgId : m_inputPdgIdSet) {
 
-    // Extract the sign of the charge.
-    const auto chargeSign = static_cast<int>(chargedPdgId / std::abs(chargedPdgId));
-
     // Define the charged stable particle ("sample") corresponding to the current pdgId.
     const auto chargedStableSample = Const::chargedStableSet.find(std::abs(chargedPdgId));
+
+    const auto mergeCharge = m_mergeChargeFlagByHypo[chargedStableSample];
+
+    // If partcile/antiparticle merging is active for this hypo, the results are stored for the '+' particle only.
+    if (mergeCharge && chargedPdgId <= 0) continue;
+
+    // Extract the sign of the charge.
+    const auto chargeSign = static_cast<int>(chargedPdgId / std::abs(chargedPdgId));
 
     // What we call "signal" is equal to the sample under consideration.
     const auto chargedStableSig = chargedStableSample;
@@ -247,21 +283,24 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
 
     m_outputFile[chargedSampleIdx]->cd();
 
+    auto pdgIdDesc = (mergeCharge) ? std::to_string(chargedPdgId) + " and -" + std::to_string(chargedPdgId) : std::to_string(
+                       chargedPdgId);
+
     // Add summary description of validation file content.
-    TNamed("Description", TString::Format("ECL Charged PID control plots for charged stable particles/antiparticles - Sample PDG = %i",
-                                          chargedPdgId).Data()).Write();
+    TNamed("Description", TString::Format("ECL Charged PID control plots for charged stable particles/antiparticles ; Sample PDG = %s",
+                                          pdgIdDesc.c_str()).Data()).Write();
 
     // Dump plots of PID variables.
-    dumpPIDVars(m_tree[chargedSampleIdx], chargedStableSig, chargeSign, chargedStableBkg);
+    dumpPIDVars(m_tree[chargedSampleIdx], chargedStableSig, chargeSign, chargedStableBkg, mergeCharge);
     // Dump plots of PID "signal" efficiency for this "sample".
-    dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, chargedStableSig);
+    dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, chargedStableSig, mergeCharge);
     // For pions, dump also the pi->lep fake rate.
     if (chargedStableSample == Const::pion) {
-      dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, Const::electron);
-      dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, Const::muon);
+      dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, Const::electron, mergeCharge);
+      dumpPIDEfficiencyFakeRate(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, Const::muon, mergeCharge);
     }
     // Dump plots of matching efficiency for this "sample".
-    dumpTrkClusMatchingEfficiency(m_tree[chargedSampleIdx], chargedStableSample, chargeSign);
+    dumpTrkClusMatchingEfficiency(m_tree[chargedSampleIdx], chargedStableSample, chargeSign, mergeCharge);
 
     // Write the TTree to file if requested.
     if (m_saveValidationTree) {
@@ -274,7 +313,7 @@ void ECLChargedPIDDataAnalysisValidationModule::terminate()
 }
 
 void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo,
-                                                            const int sigCharge, const Const::ChargedStable& bkgHypo)
+                                                            const int sigCharge, const Const::ChargedStable& bkgHypo, bool mergeSigCharge)
 {
 
   // Get the idx and pdgId of the input sample particle.
@@ -328,10 +367,13 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
     shifteropt = "shifter,";
   }
 
+  auto pdgIdDesc = (!mergeSigCharge) ? std::to_string(sigHypoPdgId * sigCharge) : std::to_string(
+                     sigHypoPdgId) + " and -" + std::to_string(sigHypoPdgId);
+
   // Add histogram info.
   h_pid->GetListOfFunctions()->Add(new TNamed("Description",
-                                              TString::Format("Sample PDG = %i - ECL global PID(%i) distribution. U/O flow is added to first (last) bin.",
-                                                              sigHypoPdgId * sigCharge,
+                                              TString::Format("Sample PDG = %s ; ECL global PID(%i) distribution. U/O flow is added to first (last) bin.",
+                                                              pdgIdDesc.c_str(),
                                                               sigHypoPdgId).Data()));
   h_pid->GetListOfFunctions()->Add(new TNamed("Check",
                                               "The more peaked at 1, the better. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
@@ -339,8 +381,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
-                                                    TString::Format("Sample PDG = %i - ECL distribution of binary $\\Delta log(L)$ = log(L(%i)) - log(L(%i)). U/O flow is added to first (last) bin.",
-                                                        sigHypoPdgId * sigCharge,
+                                                    TString::Format("Sample PDG = %s ; ECL distribution of binary $\\Delta log(L)$ = log(L(%i)) - log(L(%i)). U/O flow is added to first (last) bin.",
+                                                        pdgIdDesc.c_str(),
                                                         bkgHypoPdgId,
                                                         sigHypoPdgId).Data()));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
@@ -349,8 +391,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Description",
-                                                       TString::Format("Sample PDG = %i - Track-ECLCluster match flag distribution.",
-                                                           sigHypoPdgId * sigCharge).Data()));
+                                                       TString::Format("Sample PDG = %s ; Track-ECLCluster match flag distribution.",
+                                                           pdgIdDesc.c_str()).Data()));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Check",
                                                        "The more peaked at 1, the better. Non-zero population in the bins w/ flag != 0|1 indicates failure of MC matching for reco tracks. In such cases, flag=nan."));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
@@ -368,7 +410,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
 
 
 void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree* sampleTree, const Const::ChargedStable& sampleHypo,
-    const int sampleCharge, const Const::ChargedStable& sigHypo)
+    const int sampleCharge, const Const::ChargedStable& sigHypo, bool mergeSampleCharge)
 {
 
   // The ratio type: EFFICIENCY || FAKE RATE
@@ -437,6 +479,9 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     shifteropt = "shifter,";
   }
 
+  auto pdgIdDesc = (!mergeSampleCharge) ? std::to_string(sampleHypoPdgId) : std::to_string(std::abs(
+                     sampleHypoPdgId)) + " and -" + std::to_string(std::abs(sampleHypoPdgId));
+
   if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
 
     TEfficiency* t_pid_glob_ratio_p = new TEfficiency(*h_p_N, *h_p_D);
@@ -448,8 +493,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_p->SetPosteriorMode();
 
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Description",
-                                                             TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $p_{trk}$.",
-                                                                 sampleHypoPdgId,
+                                                             TString::Format("Sample PDG = %s ; %s of ECL global PID(%i) > %.2f as a function of $p_{trk}$.",
+                                                                 pdgIdDesc.c_str(),
                                                                  ratioType.c_str(),
                                                                  sigHypoPdgId,
                                                                  c_PID).Data()));
@@ -474,8 +519,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_th->SetPosteriorMode();
 
     t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Description",
-                                                              TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $\\theta_{cluster}$.",
-                                                                  sampleHypoPdgId,
+                                                              TString::Format("Sample PDG = %s ; %s of ECL global PID(%i) > %.2f as a function of $\\theta_{cluster}$.",
+                                                                  pdgIdDesc.c_str(),
                                                                   ratioType.c_str(),
                                                                   sigHypoPdgId,
                                                                   c_PID).Data()));
@@ -499,8 +544,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_eclreg->SetPosteriorMode();
 
     t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Description",
-                                                       TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of ECL cluster region ($\\theta_{cluster}$). Regions are labelled: 0 (outside ECL acceptance), 1 (ECL FWD), 2 (ECL Barrel), 3 (ECL BWD), 4 (ECL FWD/BWD gaps).",
-                                                           sampleHypoPdgId,
+                                                       TString::Format("Sample PDG = %s ; %s of ECL global PID(%i) > %.2f as a function of ECL cluster region ($\\theta_{cluster}$). Regions are labelled: 0 (outside ECL acceptance), 1 (ECL FWD), 2 (ECL Barrel), 3 (ECL BWD), 4 (ECL FWD/BWD gaps).",
+                                                           pdgIdDesc.c_str(),
                                                            ratioType.c_str(),
                                                            sigHypoPdgId,
                                                            c_PID).Data()));
@@ -525,8 +570,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
     t_pid_glob_ratio_phi->SetPosteriorMode();
 
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Description",
-                                                               TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $\\phi_{cluster}$.",
-                                                                   sampleHypoPdgId,
+                                                               TString::Format("Sample PDG = %s ; %s of ECL global PID(%i) > %.2f as a function of $\\phi_{cluster}$.",
+                                                                   pdgIdDesc.c_str(),
                                                                    ratioType.c_str(),
                                                                    sigHypoPdgId,
                                                                    c_PID).Data()));
@@ -553,7 +598,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
 
 
 void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TTree* tree, const Const::ChargedStable& sampleHypo,
-    const int sampleCharge)
+    const int sampleCharge, bool mergeSampleCharge)
 {
 
   // Get the (unsigned) pdgId of the input sample particle.
@@ -603,6 +648,9 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     shifteropt = "shifter,";
   }
 
+  auto pdgIdDesc = (!mergeSampleCharge) ? std::to_string(sampleHypoPdgId * sampleCharge) : std::to_string(
+                     sampleHypoPdgId) + " and -" + std::to_string(sampleHypoPdgId);
+
   if (TEfficiency::CheckConsistency(*h_pt_N, *h_pt_D)) {
 
     TEfficiency* t_match_eff_pt = new TEfficiency(*h_pt_N, *h_pt_D);
@@ -615,8 +663,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_pt->SetPosteriorMode();
 
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Description",
-                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $p_{T}^{trk}$.",
-                                                             sampleHypoPdgId * sampleCharge).Data()));
+                                                         TString::Format("Sample PDG = %s ; Efficiency of track-ECL-cluster matching as a function of $p_{T}^{trk}$.",
+                                                             pdgIdDesc.c_str()).Data()));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
@@ -639,8 +687,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_th->SetPosteriorMode();
 
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Description",
-                                                         TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $\\theta_{trk}$.",
-                                                             sampleHypoPdgId * sampleCharge).Data()));
+                                                         TString::Format("Sample PDG = %s ; Efficiency of track-ECL-cluster matching as a function of $\\theta_{trk}$.",
+                                                             pdgIdDesc.c_str()).Data()));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
@@ -662,8 +710,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_phi->SetPosteriorMode();
 
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Description",
-                                                          TString::Format("Sample PDG = %i - Efficiency of track-ECL-cluster matching as a function of $\\phi_{trk}$.",
-                                                              sampleHypoPdgId * sampleCharge).Data()));
+                                                          TString::Format("Sample PDG = %s ; Efficiency of track-ECL-cluster matching as a function of $\\phi_{trk}$.",
+                                                              pdgIdDesc.c_str()).Data()));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                           "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));

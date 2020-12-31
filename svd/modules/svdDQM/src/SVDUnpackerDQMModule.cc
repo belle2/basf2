@@ -87,11 +87,11 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
                                Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
 
-  m_DQMUnpackerHisto = new TH2F("m_DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
-  m_DQMEventFractionHisto = new TH1F("m_DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
-  m_DQMnSamplesHisto = new TH2F("m_DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
-  m_DQMnSamplesHisto2 = new TH2F("m_DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
-  m_DQMtrgQuality = new TH2F("m_DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
+  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
+  m_DQMEventFractionHisto = new TH1F("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
+  m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
+  m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
+  m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
 
   m_DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   m_DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);

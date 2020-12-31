@@ -51,7 +51,7 @@ namespace Belle2 {
     TRGBitStream();
 
     /// Constructor of fixed size.
-    TRGBitStream(int size, const std::string& name = "unknown");
+    explicit TRGBitStream(int size, const std::string& name = "unknown");
 
     /// Copy constructor.
     TRGBitStream(const TRGBitStream&);

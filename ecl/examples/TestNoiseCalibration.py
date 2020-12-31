@@ -68,7 +68,7 @@ mainPath.add_module(eventInfoSetter)
 
 if args.beamBkgPath:
     # Add beam background
-    bg = glob.glob(args.beamBkgPath + '/*.root')
+    bgFiles = glob.glob(args.beamBkgPath + '/*.root')
     # Add simulation
     add_simulation(mainPath, bkgfiles=bgFiles, components='ECL')
 else:

@@ -17,8 +17,8 @@ namespace Belle2 {
 
   /**
    * This class holds the prior distribution for a single particle species.
-   * Its basic data members are two 2D matrixes of floats (one for the probablity, one for it uncertainties)
-   * plus two arrays for the bins edges. All these elements, including the matrixes, are implemented as
+   * Its basic data members are two 2D matrices of floats (one for the probability, one for it uncertainties)
+   * plus two arrays for the bins edges. All these elements, including the matrices, are implemented as
    * 1 dimensional vectors.
    * The PIDPriors class that is stored in the database is basically nothing but a collection of 6 of these objects, one per particle species.
    */
@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /**
      * Sets the priors table from a 2D std::vector
-     * @param priors 2D std:vector of floats containing the prior probaiblity for each bin
+     * @param priors 2D std:vector of floats containing the prior probability for each bin
      */
     void setPriorsTable(const std::vector<float>& priors)
     {
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /**
      * Sets the priors error table from a 2D std::vector
-     * @param errors 2D std:vector of floats containing the error on the prior probaiblity for each bin
+     * @param errors 2D std:vector of floats containing the error on the prior probability for each bin
      */
     void setErrorsTable(const std::vector<float>& errors)
     {
@@ -76,7 +76,7 @@ namespace Belle2 {
 
 
     /**
-     * Sets axes lables
+     * Sets axes labels
      * @param labelX the label of the X axis
      * @param labelY the label of the X axis
      */
@@ -165,15 +165,16 @@ namespace Belle2 {
     std::vector<float> m_binEdgesX = {}; /**< The array containing the bin edges for the X axis */
     std::vector<float> m_binEdgesY = {}; /**< The array containing the bin edges for the Y axis */
     std::vector<float> m_priors; /**< The matrix with the prior probabilities */
-    std::vector<float> m_errors; /**< The the matrix with the errors on the prior probabilities */
+    std::vector<float> m_errors; /**< The matrix with the errors on the prior probabilities */
     std::string m_xAxisLabel = "" ; /**< label of the X axis, indicating which variable is represented here */
     std::string m_yAxisLabel = "" ; /**< label of the Y axis, indicating which variable is represented here */
 
 
     /**
-     * Checks is a values is withing the range of an array
+     * Checks if a value is within the range of an array
+     * @param text text to display in the warning message
      * @param val the value
-     * @param array the std::vector the val has to be found
+     * @param edges the vector of bin edge values the val has to be found in
      * @returns the position of the last edge below the input value
      */
     bool checkRange(const std::string& text, float val, const std::vector<float>& edges) const;
@@ -201,7 +202,7 @@ namespace Belle2 {
 
     /**
      * This function returns the position of a number in a sorted array of bin edges,
-     * assuming that the atter are equally spaced.
+     * assuming that the latter are equally spaced.
      * @param val the value
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value

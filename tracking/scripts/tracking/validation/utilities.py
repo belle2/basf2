@@ -4,7 +4,6 @@ from ROOT import Belle2
 
 import numpy as np
 import math
-import contextlib
 
 # Vectorised version of the error function for numpy arrays
 try:

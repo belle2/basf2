@@ -105,7 +105,7 @@ namespace Belle2 {
       /// implement: generate list of all global parameters in the DBObject
       virtual std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() = 0;
 
-      /// Sum value of global @param element @param param with a @param correction
+      /// Sum value of global element param with a correction
       virtual void updateGlobalParam(double correction, unsigned short element, unsigned short param) {setGlobalParam(getGlobalParam(element, param) + correction, element, param);}
       /// Get a raw pointer to the internal DB object (can be nullptr if not yet constructed)
       /// Use with caution - always check for nullptr

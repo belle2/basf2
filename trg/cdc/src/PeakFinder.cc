@@ -472,7 +472,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCPeakFinder::findPeaks(TCHPlaneMulti2& hp,
+  TRGCDCPeakFinder::findPeaks(const TCHPlaneMulti2& hp,
                               const unsigned threshold,
                               vector<vector<unsigned>>& peaks) const
   {
@@ -493,7 +493,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCPeakFinder::p1p2Methode(TCHPlane& hp,
+  TRGCDCPeakFinder::p1p2Methode(const TCHPlane& hp,
                                 const unsigned threshold,
                                 vector<vector<unsigned>>& peak_xy) const
   {
@@ -653,10 +653,9 @@ namespace Belle2 {
         if (p1rel) {
           continue;
         }
-      }
 
-      //Z (diagonal connection to lower left)
-      if (j > nX2) {
+
+        //Z (diagonal connection to lower left)
         if ((j % nX2) == 1) {
           a = j - 1;
         } else         {

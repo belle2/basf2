@@ -1,11 +1,9 @@
 from tracking import modules
 from tracking.run.event_generation import StandardEventGenerationRun
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 import sys
 import logging
 from tracking.harvest import refiners
 from tracking.harvest.harvesting import HarvestingModule
-import basf2
 import ROOT
 from ROOT import Belle2
 

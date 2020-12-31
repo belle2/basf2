@@ -59,7 +59,7 @@ namespace Belle2 {
                              const TRGClock& dataClock,
                              const TRGClock& userClockInput,
                              const TRGClock& userClockOutput,
-                             std::vector<TRGCDCSegment*>& tsSL);
+                             const std::vector<TRGCDCSegment*>& tsSL);
 
     /// Destructor.
     ~TRGCDCTrackSegmentFinder();
@@ -91,29 +91,29 @@ namespace Belle2 {
     TFile* m_fileTSF;
 
     /// ROOT TTree for input
-    TTree* m_treeInputTSF = 0;
+    TTree* m_treeInputTSF = nullptr;
     //// [TODO] Stores hitpattern information. [superlayer id, hitpattern, mc l/r, validation mc l/r, mc fine phi]
     //// validation mc l/r => 0: not valid, 1: priority, 2: secondary right, 3: secondary left
     // Stores hitpattern information. 9 components
     // [mc particle id, superlayer id, hitpattern, priorityLR, priorityPhi, secondPriorityRLR, secondPriorityRPhi, secondPriorityLLR, secondPriorityLPhi]
     /// Stores hitpattern information
-    TClonesArray* m_hitPatternInformation = 0;
+    TClonesArray* m_hitPatternInformation = nullptr;
 
     /// ROOT TTree for output
-    TTree* m_treeOutputTSF = 0;
+    TTree* m_treeOutputTSF = nullptr;
     /// [Efficiency, Pt, # MC TS]
     /// Efficiency = -1 means that # MC TS is 0.
-    TClonesArray* m_particleEfficiency = 0;
+    TClonesArray* m_particleEfficiency = nullptr;
     /// [SuperLayer Id, Wire Id, Priority Timing]
-    TClonesArray* m_tsInformation = 0;
+    TClonesArray* m_tsInformation = nullptr;
 
     /// ROOT Tree for NNTSF
-    TTree* m_treeNNTSF = 0;
+    TTree* m_treeNNTSF = nullptr;
     /// [superlayer id, lrDriftTime, timeWire0, timeWire1, ..., ...]
-    TClonesArray* m_nnPatternInformation = 0;
+    TClonesArray* m_nnPatternInformation = nullptr;
 
     /// make ROOT file or not
-    bool m_makeRootFile;
+    bool m_makeRootFile = false;
 
   public:
 
@@ -179,7 +179,7 @@ namespace Belle2 {
                     TRGSignalVector* s);
 
     /// Simulate TSF response for the inner
-    vector<TRGSignalVector*> simulateInner(TRGSignalVector& in,
+    vector<TRGSignalVector*> simulateInner(const TRGSignalVector& in,
                                            unsigned id);
 
     /// Simulate TSF response for the inner

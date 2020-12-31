@@ -38,10 +38,10 @@ namespace Belle2 {
                     unsigned size = 0);
 
     /// Copy constructor.
-    TRGSignalVector(const TRGSignalVector&);
+    explicit TRGSignalVector(const TRGSignalVector&);
 
     /// Constructor.
-    TRGSignalVector(const TRGSignal&);
+    explicit TRGSignalVector(const TRGSignal&);
 
     /// Destructor
     virtual ~TRGSignalVector();

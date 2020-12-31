@@ -116,7 +116,7 @@ def loadA_1Plus(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay(
+    ma.reconstructDecay(
         decayString='a_1+:all -> pi+:all pi+:all pi-:all',
         cut='0.8 < M < 1.6',
         dmID=1, writeOut=persistent,

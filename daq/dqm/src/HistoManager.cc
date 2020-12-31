@@ -39,6 +39,9 @@ bool HistoManager::add(string& subdir, string& name, int pid, TH1* histo)
     (*newmergedir)[name] = NULL; // TH1 is not yet created
     m_mergedir[subdir] = *newmergedir;
     printf("HistoManager: new list created for subdir %s\n", subdir.c_str());
+    delete newsubdir;
+    delete newhlist;
+    delete newmergedir;
   }
 
   // Get histogram map of subdir
@@ -66,7 +69,7 @@ bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
 
   // Replace histogram
   TH1* prevhisto = hlist[pid];
-  delete prevhisto;
+  if (prevhisto != NULL) delete prevhisto;
   hlist[pid] = histo;
   //  printf ( "HistoManager: histogram %s replaced in subdir %s, entry = %f\n",
   //     name.c_str(), subdir.c_str(), histo->GetEntries());
@@ -143,6 +146,7 @@ bool HistoManager::merge()
         else {
           TH1* merge_hist = mergelist[name];
           merge_hist->Add(hist);
+          merge_hist->SetTitle(hist->GetTitle());
         }
       }
     }
@@ -155,4 +159,39 @@ bool HistoManager::merge()
   return true;
 }
 
+void HistoManager::clear()
+{
+  for (map<string, map<string, map<int, TH1*>>>::iterator is = m_subdir.begin(); is != m_subdir.end(); ++is) {
+    map<string, map<int, TH1*>>& dirlist = is->second;
+
+    for (map<string, std::map<int, TH1*> >::iterator it = dirlist.begin(); it != dirlist.end(); ++it) {
+      map<int, TH1*>& hmap = it->second;
+
+      for (map<int, TH1*>::iterator ih = hmap.begin(); ih != hmap.end(); ++ih) {
+        TH1* hist = ih->second;
+        if (hist != NULL) delete hist;
+        //if (hist != NULL) hist->Reset();
+      }
+      hmap.clear();
+    }
+    dirlist.clear();
+  }
+  m_subdir.clear();
+
+  for (map<string, map<string, TH1*> >::iterator is = m_mergedir.begin(); is != m_mergedir.end(); ++is) {
+    map<string, TH1*>& dirlist = is->second;
+
+    for (map<string, TH1*>::iterator it = dirlist.begin(); it != dirlist.end(); ++it) {
+      TH1* hist = it->second;
+      if (hist != NULL) delete hist;
+      //it->second = NULL;
+      //if (hist != NULL) hist->Reset();
+    }
+    dirlist.clear();
+  }
+  m_mergedir.clear();
+
+  printf("HistoManager: clear\n");
+  m_memfile->ClearSharedMem();
+}
 

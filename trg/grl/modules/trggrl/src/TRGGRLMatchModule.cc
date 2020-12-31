@@ -680,7 +680,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 
     _w = abs(_w);
 
-    int L = _phi, R = _phi;
+    int L;
     if (_w >= 0 && _w <= 8) { L = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { L = _phi + 1; }
@@ -702,6 +702,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
       else { L = _phi + 1; }
     }
 
+    int R;
     if (_w >= 0 && _w <= 8) { R = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { R = _phi; }

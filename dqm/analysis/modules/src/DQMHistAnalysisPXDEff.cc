@@ -73,14 +73,18 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-
-
   int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
   int nv = 1;
   //Have been promised that all modules have the same number of pixels, so just take from the first one
   if (m_PXDModules.size() == 0) {
     //This could as well be a B2FATAL, the module won't do anything useful if this happens
-    B2ERROR("No PXDModules found! Can't really do anything useful now...");
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.4.1", "2.4.2", "2.5.1", "2.5.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
     VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
@@ -88,9 +92,23 @@ void DQMHistAnalysisPXDEffModule::initialize()
     nv = cellGetInfo.getVCells();
   }
 
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  }
+#endif
+
+
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
+#ifdef _BELLE2_EPICS
+    if (m_useEpics) {
+      auto& my = mychid_eff[aPXDModule];
+      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+      B2WARNING(m_pvPrefix + (std::string)aPXDModule);
+    }
+#endif
     TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
@@ -124,7 +142,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
-  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
+  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Integral and last-updated Efficiency per module;PXD Module;",
                                     m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 
@@ -160,8 +178,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
+    // values per module, see above
+    mychid_status.resize(2);
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Overall").data(), NULL, NULL, 10, &mychid_status[1]), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -244,6 +265,7 @@ void DQMHistAnalysisPXDEffModule::event()
     }
   }//One-Module histos finished
 
+  double stat_data = 0;
   bool error_flag = false;
   bool warn_flag = false;
   double all = 0.0;
@@ -272,6 +294,7 @@ void DQMHistAnalysisPXDEffModule::event()
                               var_e);
       }
 
+      /// TODO: one value per module, and please change to the "delta" instead of integral
       all += ihit;
       m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
@@ -306,7 +329,10 @@ void DQMHistAnalysisPXDEffModule::event()
 
   {
     m_cEffAll->cd();
+    m_cEffAll->cd(0);
     m_hEffAll->Paint("AP");
+    m_cEffAll->Clear();
+    m_cEffAll->cd(0);
 
     auto gr = m_hEffAll->GetPaintedGraph();
     if (gr) {
@@ -343,11 +369,9 @@ void DQMHistAnalysisPXDEffModule::event()
       gr->SetLineWidth(2);
       gr->SetMarkerStyle(8);
 
-      m_cEffAll->Clear();
-      m_cEffAll->cd(0);
       gr->Draw("AP");
 
-      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
+      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -364,6 +388,11 @@ void DQMHistAnalysisPXDEffModule::event()
           //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
         }
       }
+
+      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
+      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
+      m_cEffAll->Pad()->Modified();
+      m_cEffAll->Pad()->Update();
       m_line_warn->Draw();
       m_line_error->Draw();
     }
@@ -375,7 +404,19 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     m_cEffAllUpdate->cd();
     m_hEffAllUpdate->Paint("AP");
+    m_cEffAllUpdate->Clear();
+    m_cEffAllUpdate->cd(0);
+
     auto gr = m_hEffAllUpdate->GetPaintedGraph();
+    auto gr3 = (TGraphAsymmErrors*) m_hEffAll->GetPaintedGraph()->Clone();
+    if (gr3) {
+      for (int i = 0; i < gr3->GetN(); i++) {
+        Double_t x, y;
+        gr3->GetPoint(i, x, y);
+        gr3->SetPoint(i, x + 0.2, y);
+      }
+    }
+
     double scale_min = 1.0;
     if (gr) {
       for (int i = 0; i < gr->GetN(); i++) {
@@ -384,7 +425,7 @@ void DQMHistAnalysisPXDEffModule::event()
         // this has to be done first, as it will recalc Min/Max and destroy axis
         Double_t x, y;
         gr->GetPoint(i, x, y);
-        gr->SetPoint(i, x, y); // shift a bit if in same plot
+        gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
         if (i != 5) { // exclude 1.3.2
           /// check for val > 0.0) { would exclude all zero efficient modules!!!
@@ -399,26 +440,60 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-      gr->SetLineColor(kOrange);
-      gr->SetLineWidth(2);
+#ifdef _BELLE2_EPICS
+      if (m_useEpics) {
+        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+          Double_t x, y;// we assume that double and Double_t are same!
+          gr->GetPoint(i, x, y);
+          auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
+          SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
+        }
+      }
+#endif
+      gr->SetLineColor(kBlack);
+      gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
     } else scale_min = 0.0;
-    m_cEffAllUpdate->Clear();
-    m_cEffAllUpdate->cd(0);
-    gr->Draw("AP");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
+    if (gr) gr->Draw("AP");
+    if (gr3) gr3->Draw("P");
+    auto tt = new TLatex(5.5, scale_min + 0.15, "1.3.2 Module is excluded, please ignore");
+    tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
-    m_cEffAllUpdate->Modified();
-    m_cEffAllUpdate->Update();
+
+    if (all < 100.) {
+      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
+      stat_data = 0.;
+    } else {
+      if (error_flag) {
+        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
+        stat_data = 4.;
+      } else if (warn_flag) {
+        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
+        stat_data = 3.;
+      } else {
+        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
+        stat_data = 2.;
+        /// we wont use "white" =1 in this module
+        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
+      }
+    }
+    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
+    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
+    m_cEffAllUpdate->Pad()->Modified();
+    m_cEffAllUpdate->Pad()->Update();
+    m_line_warn->Draw();
+    m_line_error->Draw();
   }
+  m_cEffAllUpdate->Modified();
+  m_cEffAllUpdate->Update();
 
 
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
@@ -427,8 +502,8 @@ void DQMHistAnalysisPXDEffModule::event()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    double data = 0;
-    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -437,5 +512,12 @@ void DQMHistAnalysisPXDEffModule::event()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+#endif
 }
 

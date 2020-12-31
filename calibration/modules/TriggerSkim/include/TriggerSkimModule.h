@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <boost/variant.hpp>
+#include <boost/optional.hpp>
 
 namespace Belle2 {
   /// Returns the calibration result from SoftwareTriigerResult for skimming out calibration flagged events
@@ -43,6 +44,8 @@ namespace Belle2 {
     std::string m_logicMode{"or"};
     /** and do we want random prescale or counters ? */
     bool m_useRandomNumbersForPreScale{true};
+    /** value to return if there's no SoftwareTriggerResult */
+    boost::optional<int> m_resultOnMissing;
     /** if we don't use random prescale we need counters */
     std::vector<uint32_t> m_prescaleCounters;
   };

@@ -93,6 +93,35 @@ void TOPRingPlotterModule::resetTree()
   m_hitMapMCP->Reset();
   m_hitMapMCE->Reset();
   m_hitMapMCMU->Reset();
+
+  for (int i = 0; i < m_MaxPDFPhotons; i++) {
+    m_pdfPixelE[i] = 0;
+    m_pdfTimeE[i] = 0;
+    m_pdfPixelMU[i] = 0;
+    m_pdfTimeMU[i] = 0;
+    m_pdfPixelPI[i] = 0;
+    m_pdfTimePI[i] = 0;
+    m_pdfPixelK[i] = 0;
+    m_pdfTimeK[i] = 0;
+    m_pdfPixelP[i] = 0;
+    m_pdfTimeP[i] = 0;
+  }
+
+
+  m_nDigits = 0;
+
+  for (int i = 0; i < m_MaxPhotons; i++) {
+    m_digitTime[i] = 0; /**< Digit calibrated time [ns] */
+    m_digitChannel[i] = 0; /**< SW channel (0-511) */
+    m_digitPixelCol[i] = 0; /**< Pixel column */
+    m_digitPixelRow[i] = 0; /**< Pixel row */
+    m_digitAmplitude[i] = 0; /**< Digit amplitude [ADC] */
+    m_digitWidth[i] = 0; /**< Digit calibrated width [ns] */
+    m_digitASICChannel[i] = 0; /**< ASIC channel number (0-7) */
+    m_digitPMTNumber[i] = 0; /**< Digit PMT number */
+  }
+
+
   return;
 }
 
@@ -102,7 +131,6 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 {
   double mass = ch.getMass();
   int pdgCode = ch.getPDGCode();
-
 
   TOPtrack trkPDF(track, ch);
 
@@ -119,6 +147,24 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
     return ; // track is not in the acceptance of TOP
 
   arrayGuard = 0; // this keeps track of the total number of PDF samples we have saved so far
+  m_pdfAsHisto->Reset(); // clan the histogram that will contain the PDf to be sampled
+
+  // loops of pixels and PDF peaks to make a full sampling of the PDF
+  for (int pixelID = 1; pixelID <= 512; pixelID++) {
+    for (int iBinY = 1; iBinY < 1000 + 1; iBinY++) {
+      // MARKO'S Trick HERE
+      auto time = m_pdfAsHisto->GetYaxis()->GetBinCenter(iBinY);
+      auto pdfVal = reco.getPDF(pixelID, time, mass, pdgCode); // jitter = 0 understood
+      m_pdfAsHisto->Fill(pixelID - 0.5, time, pdfVal * 0.1); // bins are 1 px  X  0.1 ns wide
+      short pixelCol = (pixelID - 1) % 64 + 1;
+      histo->Fill(pixelCol, time, pdfVal * 0.8); // bins in the map are 8 px  X  0.1 ns wide
+    }
+  }
+
+  auto nExpPhot = reco.getExpectedPhotons();
+
+  m_pdfAsHisto->Scale(nExpPhot);
+  histo->Scale(nExpPhot);
 
   // loop over the toys
   for (int iSim = 0; iSim < m_toyNumber; iSim++) {
@@ -129,25 +175,16 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
     std::vector<float> tmpTime;
     std::vector<short> tmpPixel;
 
-    // loops of pixels and PDF peaks to make a full sampling of the PDF
-    for (int pixelID = 1; pixelID <= 512; pixelID++) {
-      for (int peak = 0; peak < reco.getNumofPDFPeaks(pixelID); peak++) {
+    short numPhot = gRandom->Poisson(nExpPhot);
 
-        float t0 = 0;
-        float sigma = 0;
-        float numPhotAvg = 0;
-        reco.getPDFPeak(pixelID, peak, t0, sigma, numPhotAvg);
-        short numPhot = gRandom->Poisson(numPhotAvg);
-
-        for (short rn = 0; rn < numPhot; rn++) {
-          float time = gRandom->Gaus(t0, sigma);
-          short pixelCol = (pixelID - 1) % 64 + 1;
-          histo->Fill(pixelCol, time);
-          tmpTime.push_back(time);
-          tmpPixel.push_back(pixelID);
-        }
-      }
+    for (short rn = 0; rn < numPhot; rn++) {
+      double time;
+      double pxID;
+      m_pdfAsHisto->GetRandom2(pxID, time);
+      tmpTime.push_back(time);
+      tmpPixel.push_back(short(pxID));
     }
+
 
     // before transferring the results of the PDF sampling into pixelArray and timeArray, check if there's
     // enough room.
@@ -162,6 +199,7 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
       return; // we already reached the max size of the arrays for sampling, no point in keep doing this
     }
   }
+
   return;
 }
 
@@ -171,11 +209,13 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 
 void TOPRingPlotterModule::initialize()
 {
-  m_hitMapMCK = new TH2F("hitMapMCK", "x-t map of the kaon PDF", 64, 0, 64, 50, 0, 100);
-  m_hitMapMCPI = new TH2F("hitMapMCPI", "x-t map of the pion PDF", 64, 0, 64, 50, 0, 100);
-  m_hitMapMCP = new TH2F("hitMapMCP", "x-t map of the proton PDF", 64, 0, 64, 50, 0, 100);
-  m_hitMapMCE = new TH2F("hitMapMCE", "x-t map of the electron PDF", 64, 0, 64, 50, 0, 100);
-  m_hitMapMCMU = new TH2F("hitMapMCMU", "x-t map of the muon PDF", 64, 0, 64, 50, 0, 100);
+  m_hitMapMCK = new TH2F("hitMapMCK", "x-t map of the kaon PDF", 64, 0, 64, 1000, 0, 100);
+  m_hitMapMCPI = new TH2F("hitMapMCPI", "x-t map of the pion PDF", 64, 0, 64, 1000, 0, 100);
+  m_hitMapMCP = new TH2F("hitMapMCP", "x-t map of the proton PDF", 64, 0, 64, 1000, 0, 100);
+  m_hitMapMCE = new TH2F("hitMapMCE", "x-t map of the electron PDF", 64, 0, 64, 1000, 0, 100);
+  m_hitMapMCMU = new TH2F("hitMapMCMU", "x-t map of the muon PDF", 64, 0, 64, 1000, 0, 100);
+
+  m_pdfAsHisto = new TH2F("pdfAsHisto", "tms holder for the pdf to be sampled", 512, 0, 512, 1000, 0, 100);
 
   B2INFO("creating a tree for TOPRingPlotterModule");
   m_outputFile = new TFile(m_outputName.c_str(), "recreate");
@@ -189,15 +229,15 @@ void TOPRingPlotterModule::initialize()
     m_tree->Branch("hitMapMCP", "TH2F", &m_hitMapMCP, 32000, 0);
   }
 
-  m_tree->Branch("nDigits", &m_nDigits, "m_nDigits/I");
-  m_tree->Branch("digitTime", m_digitTime, "m_digitTime[m_nDigits]/F");
-  m_tree->Branch("digitAmplitude", m_digitAmplitude, "m_digitAmplitude[m_nDigits]/F");
-  m_tree->Branch("digitWidth", m_digitWidth, "m_digitWidth[m_nDigits]/F");
-  m_tree->Branch("digitChannel", m_digitChannel, "m_digitChannel[m_nDigits]/S");
-  m_tree->Branch("digitPixelCol", m_digitPixelCol, "m_digitPixelCol[m_nDigits]/S");
-  m_tree->Branch("digitPixelRow", m_digitPixelRow, "m_digitPixelRow[m_nDigits]/S");
-  m_tree->Branch("digitASICChannel", m_digitASICChannel, "m_digitASICChannel[m_nDigits]/S");
-  m_tree->Branch("digitPMTNumber", m_digitPMTNumber, "m_digitPMTNumber[m_nDigits]/S");
+  m_tree->Branch("m_nDigits", &m_nDigits, "m_nDigits/S");
+  m_tree->Branch("m_digitTime", m_digitTime, "m_digitTime[m_nDigits]/F");
+  m_tree->Branch("m_digitAmplitude", m_digitAmplitude, "m_digitAmplitude[m_nDigits]/F");
+  m_tree->Branch("m_digitWidth", m_digitWidth, "m_digitWidth[m_nDigits]/F");
+  m_tree->Branch("m_digitChannel", m_digitChannel, "m_digitChannel[m_nDigits]/S");
+  m_tree->Branch("m_digitPixelCol", m_digitPixelCol, "m_digitPixelCol[m_nDigits]/S");
+  m_tree->Branch("m_digitPixelRow", m_digitPixelRow, "m_digitPixelRow[m_nDigits]/S");
+  m_tree->Branch("m_digitASICChannel", m_digitASICChannel, "m_digitASICChannel[m_nDigits]/S");
+  m_tree->Branch("m_digitPMTNumber", m_digitPMTNumber, "m_digitPMTNumber[m_nDigits]/S");
 
 
   m_tree->Branch("pdfSamplesP", &m_pdfSamplesP, "m_pdfSamplesP/I");
@@ -224,7 +264,6 @@ void TOPRingPlotterModule::initialize()
   m_tree->Branch("pdfToysE", &m_pdfToysE, "m_pdfToysE/I");
   m_tree->Branch("pdfPixelE", m_pdfPixelE, "m_pdfPixelE[m_pdfSamplesE]/S");
   m_tree->Branch("pdfTimeE", m_pdfTimeE, "m_pdfTimeE[m_pdfSamplesE]/F");
-
 
   // This parts parses the list of variables and creates the branches in the output tree.
   // This is copy-pasted from VariablesToNtupleModule
@@ -308,7 +347,6 @@ void TOPRingPlotterModule::event()
     if (moduleID < 1)
       continue;
 
-    m_nDigits = 0;
     for (const auto& digi : digits) {
       if (digi.getModuleID() == moduleID and digi.getHitQuality() == 1) {
         m_digitTime[m_nDigits] = digi.getTime();

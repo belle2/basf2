@@ -75,7 +75,7 @@ void DQMHistInjectionModule::initialize()
                             20000, 0 , 20000);
   m_hInjectionLERTOP = new TH1F("HitInjectionLERTOP", "TOP Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
-  m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
+  m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
 
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
@@ -89,7 +89,7 @@ void DQMHistInjectionModule::initialize()
                             20000, 0 , 20000);
   m_hInjectionHERTOP = new TH1F("HitInjectionHERTOP", "TOP Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
-  m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
+  m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
 
 #ifdef _BELLE2_EPICS

@@ -20,8 +20,7 @@ def loadStdDiLeptons(persistent=True, path=None):
     loadStdLooseJpsi2ee(persistent, path)
     loadStdLoosePsi2s2mumu(persistent, path)
     loadStdLoosePsi2s2ee(persistent, path)
-    loadStdPsi2s2mumu(persistent, path)
-    loadStdPsi2s2ee(persistent, path)
+    loadStdPsi2s2lepton(persistent, path)
 
 
 def loadStdLooseJpsi2mumu(persistent=True, path=None):
@@ -86,15 +85,19 @@ def loadStdJpsiTomumu(persistent=True, path=None):
     return 'J/psi:mumu'
 
 
-def loadStdPsi2s2mumu(persistent=True, path=None):
+def loadStdPsi2s2lepton(persistent=True, path=None):
     """
-    Load the 'psi(2S):mumu' list from 'mu-:all mu+:all', with :math:`3.2 < M < 4.1~GeV`
+    'psi(2S):ll' list of Psi(2S) to mumu or ee.
+    'psi(2S):mumu' reconstructed from 'mu-:all mu+:all', with :math:`3.2 < M < 4.1~GeV`
+    'psi(2S):ee' reconstructed from 'e-:all e+:all', with :math:`3.2 < M < 4.1~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('psi(2S):mumu -> mu-:all mu+:all', '3.2 < M < 4.1', 2, persistent, path)
-    return 'psi(2S):mumu'
+    ma.reconstructDecay('psi(2S):mumu -> mu-:all mu+:all', '3.2 < M < 4.1', 1, persistent, path=path)
+    ma.reconstructDecay('psi(2S):ee -> e-:all e+:all', '3.2 < M < 4.1', 2, persistent, path=path)
+    ma.copyLists('psi(2S):ll', ['psi(2S):mumu', 'psi(2S):ee'], persistent, path)
+    return 'psi(2S):ll'
 
 
 def loadStdLoosePsi2s2mumu(persistent=True, path=None):
@@ -106,17 +109,6 @@ def loadStdLoosePsi2s2mumu(persistent=True, path=None):
     """
     ma.reconstructDecay('psi(2S):mumuLoose -> mu-:loose mu+:loose', '3.2 < M < 4.1', 2, persistent, path)
     return 'psi(2S):mumuLoose'
-
-
-def loadStdPsi2s2ee(persistent=True, path=None):
-    """
-    Load the 'psi(2S):ee' list from 'e-:all e+:all', with :math:`3.2 < M < 4.1~GeV`
-
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
-    @param path         modules are added to this path
-    """
-    ma.reconstructDecay('psi(2S):ee -> e-:all e+:all', '3.2 < M < 4.1', 2, persistent, path)
-    return 'psi(2S):ee'
 
 
 def loadStdLoosePsi2s2ee(persistent=True, path=None):

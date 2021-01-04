@@ -7,8 +7,7 @@ import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0_Kpi, loadStdD0_Kpipipi)
 from skim.standardlists.dileptons import (loadStdDiLeptons, loadStdJpsiToee,
-                                          loadStdJpsiTomumu, loadStdPsi2s2mumu,
-                                          loadStdPsi2s2ee)
+                                          loadStdJpsiTomumu, loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdAllPhi, loadStdAllEta,
                                             loadStdAllEtaPrime, loadStdAllRho0,
                                             loadStdAllOmega, loadStdAllF_0,
@@ -95,8 +94,7 @@ class TDCPV(BaseSkim):
         stdKshorts(path=path)
         loadStdJpsiToee(path=path)
         loadStdJpsiTomumu(path=path)
-        loadStdPsi2s2mumu(path=path)
-        loadStdPsi2s2ee(path=path)
+        loadStdPsi2s2lepton(path=path)
         loadStdAllPhi(path=path)
         loadStdAllEta(path=path)
         loadStdAllEtaPrime(path=path)
@@ -143,8 +141,7 @@ class TDCPV(BaseSkim):
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',
                            'J/psi:mumu K_S0:merged',
-                           'psi(2S):ee K_S0:merged',
-                           'psi(2S):mumu K_S0:merged',
+                           'psi(2S):ll K_S0:merged',
                            'J/psi:ee K*0:all',
                            'J/psi:mumu K*0:all']
 

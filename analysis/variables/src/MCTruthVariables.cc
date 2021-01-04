@@ -250,7 +250,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits

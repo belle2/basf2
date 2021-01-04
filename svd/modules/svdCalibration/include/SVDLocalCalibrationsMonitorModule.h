@@ -81,6 +81,8 @@ namespace Belle2 {
     TBranch* b_noiseEl = nullptr; /**< strip noise (e-)*/
     TBranch* b_noiseAVE = nullptr; /**< sensor noise average (ADC)*/
     TBranch* b_noiseRMS = nullptr; /**< sensor noise rms (ADC)*/
+    TBranch* b_noiseElAVE = nullptr; /**< sensor noise average (e-)*/
+    TBranch* b_noiseElRMS = nullptr; /**< sensor noise rms (e-)*/
     TBranch* b_occupancyAVE = nullptr; /**< sensor occupancy average (ADC)*/
     TBranch* b_occupancyRMS = nullptr; /**< sensor occupancy rms (ADC)*/
     TBranch* b_calPeakADC = nullptr; /**< strip calPeakADC*/
@@ -113,6 +115,8 @@ namespace Belle2 {
     float m_occupancyRMS = -1; /**< sensor occupancy rms*/
     float m_noiseAVE = -1; /**< sensor noise average (ADC)*/
     float m_noiseRMS = -1; /**< sensor noise rms (ADC)*/
+    float m_noiseElAVE = -1; /**< sensor noise average (e-)*/
+    float m_noiseElRMS = -1; /**< sensor noise rms (e-)*/
     float m_pedestal = -1; /**< strip pedestal*/
     float m_pedestalAVE = -1; /**< sensor pedestal average*/
     float m_pedestalRMS = -1; /**< sensor pedestal rms*/

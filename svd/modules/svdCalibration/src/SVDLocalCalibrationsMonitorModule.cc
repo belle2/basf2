@@ -55,6 +55,8 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_pedestalRMS = m_tree->Branch("pedestalRMS", &m_pedestalRMS, "pedestalRMS/F");
   b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
   b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
+  b_noiseElAVE = m_tree->Branch("noiseElAVE", &m_noiseElAVE, "noiseElAVE/F");
+  b_noiseElRMS = m_tree->Branch("noiseElRMS", &m_noiseElRMS, "noiseElRMS/F");
   b_occupancyAVE = m_tree->Branch("occupancyAVE", &m_occupancyAVE, "occupancyAVE/F");
   b_occupancyRMS = m_tree->Branch("occupancyRMS", &m_occupancyRMS, "occupancyRMS/F");
   b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
@@ -472,6 +474,8 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_pedestalRMS = (m_hPedestal->getHistogram(theVxdID, m_side))->GetRMS();
           m_noiseAVE = (m_hNoise->getHistogram(theVxdID, m_side))->GetMean();
           m_noiseRMS = (m_hNoise->getHistogram(theVxdID, m_side))->GetRMS();
+          m_noiseElAVE = (m_hNoiseEl->getHistogram(theVxdID, m_side))->GetMean();
+          m_noiseElRMS = (m_hNoiseEl->getHistogram(theVxdID, m_side))->GetRMS();
           m_occupancyAVE = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetMean();
           m_occupancyRMS = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetRMS();
           m_gainAVE = (m_hGain->getHistogram(theVxdID, m_side))->GetMean();

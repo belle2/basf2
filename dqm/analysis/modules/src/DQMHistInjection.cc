@@ -412,7 +412,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
-    m_hInjectionLERTOP->Divide(Hits, Triggers);
+    m_hInjectionLERARICH->Divide(Hits, Triggers);
   }
 
   m_cInjectionLERARICH->Clear();

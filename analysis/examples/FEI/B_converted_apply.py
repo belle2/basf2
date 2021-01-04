@@ -26,12 +26,15 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
         'validation',
         False),
     applySkim=True,
+    # Actually, the KS finder should be set to True.
+    # However, here it's set to False because the necessary library is only present on kekcc and not on the build server.
+    enableNisKsFinder=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
 # Get FEI default channels for a converted training
 # Utilise the arguments to toggle on and off certain channels
-particles = fei.get_default_channels(convertedFromBelle=True, semileptonic=False)
+particles = fei.get_default_channels(convertedFromBelle=True)
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
 configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
@@ -45,9 +48,9 @@ path.add_path(feistate.path)
 
 # Add MC matching when applying to MC. This is required for variables like isSignal and mcErrors below
 path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
-# path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
+path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
-# path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
+path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
 # Store tag-side variables of interest.
 ma.variablesToNtuple('B+:generic',
@@ -60,15 +63,15 @@ ma.variablesToNtuple('B+:generic',
                       'isSignal'],
                      filename='B_charged_hadronic.root',
                      path=path)
-# ma.variablesToNtuple('B+:semileptonic',
-#                      ['cosThetaBetweenParticleAndNominalB',
-#                       'mcErrors',
-#                       'extraInfo(decayModeID)',
-#                       'extraInfo(uniqueSignal)',
-#                       'extraInfo(SignalProbability)',
-#                       'isSignalAcceptMissingNeutrino'],
-#                      filename='B_charged_semileptonic.root',
-#                      path=path)
+ma.variablesToNtuple('B+:semileptonic',
+                     ['cosThetaBetweenParticleAndNominalB',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignalAcceptMissingNeutrino'],
+                     filename='B_charged_semileptonic.root',
+                     path=path)
 
 ma.variablesToNtuple('B0:generic',
                      ['Mbc',
@@ -80,15 +83,15 @@ ma.variablesToNtuple('B0:generic',
                       'isSignal'],
                      filename='B_mixed_hadronic.root',
                      path=path)
-# ma.variablesToNtuple('B0:semileptonic',
-#                      ['cosThetaBetweenParticleAndNominalB',
-#                       'mcErrors',
-#                       'extraInfo(decayModeID)',
-#                       'extraInfo(uniqueSignal)',
-#                       'extraInfo(SignalProbability)',
-#                       'isSignalAcceptMissingNeutrino'],
-#                      filename='B_mixed_semileptonic.root',
-#                      path=path)
+ma.variablesToNtuple('B0:semileptonic',
+                     ['cosThetaBetweenParticleAndNominalB',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignalAcceptMissingNeutrino'],
+                     filename='B_mixed_semileptonic.root',
+                     path=path)
 
 # Process 100 events
 b2.process(path, max_event=100)

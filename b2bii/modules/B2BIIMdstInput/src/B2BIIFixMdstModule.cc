@@ -165,7 +165,7 @@ namespace Belle2 {
     addParam("scale_momenta_mode", m_scale_momenta_mode, "scale_momenta_mode", 2);
     addParam("Scale_error", m_scale_error, "Apply scale_error", 1);
 
-    addParam("Smear_trk", m_smear_trk, "Do extra-smearing for MC tracks", 0);
+    addParam("Smear_trk", m_smear_trk, "Do extra-smearing for MC tracks", 2);
     addParam("Extra_trk_vee2", m_add_or_remove_extra_trk_vee2,
              "1: add to Mdst_charged etc, -1: remove (move to Mdst_*_extra), 0:do nothing", 0);
 

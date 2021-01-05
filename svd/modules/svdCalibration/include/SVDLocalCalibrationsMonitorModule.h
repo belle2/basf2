@@ -60,6 +60,7 @@ namespace Belle2 {
     //branches
     TBranch* b_exp = nullptr; /**< exp number*/
     TBranch* b_run = nullptr; /**< run number*/
+    TBranch* b_date = nullptr; /**< date of the noise local run*/
     TBranch* b_hv = nullptr; /**< HV*/
     TBranch* b_ladder = nullptr; /**< ladder number*/
     TBranch* b_layer = nullptr; /**< layer number*/
@@ -98,6 +99,7 @@ namespace Belle2 {
     //branch variables
     int m_exp = -1; /**< exp number*/
     int m_run = -1; /**< run number*/
+    char m_date[11] = ""; /**< date of the noise local run*/
     float m_hv = -1; /**< applied hv=Vbias/2*/
     int m_layer = -1; /**< layer number*/
     int m_ladder = -1; /**< ladder number */

@@ -44,6 +44,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_tree = new TTree("calibLocal", "RECREATE");
   b_exp = m_tree->Branch("exp", &m_exp, "exp/i");
   b_run = m_tree->Branch("run", &m_run, "run/i");
+  b_date = m_tree->Branch("date", m_date, "date/C");
   b_hv = m_tree->Branch("hv", &m_hv, "hv/F");
   b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
@@ -71,6 +72,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_treeDetailed = new TTree("calibLocalDetailed", "RECREATE");
   b_exp = m_treeDetailed->Branch("exp", &m_exp, "exp/i");
   b_run = m_treeDetailed->Branch("run", &m_run, "run/i");
+  b_date = m_treeDetailed->Branch("date", m_date, "date/C");
   b_hv = m_treeDetailed->Branch("hv", &m_hv, "hv/F");
   b_layer = m_treeDetailed->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_treeDetailed->Branch("ladder", &m_ladder, "ladder/i");
@@ -93,6 +95,8 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
+  if (!m_DetectorConf.isValid())
+    B2WARNING("No valid SVDDetectorConfiguration for the requested IoV");
   if (!m_PedestalCal.isValid())
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
@@ -338,6 +342,8 @@ void SVDLocalCalibrationsMonitorModule::event()
   m_run = meta->getRun();
 
   m_hv = m_DetectorConf.getHV();
+  m_DetectorConf.getCalibDate().copy(m_date, 10);
+  m_date[10] = '\0';
 
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();

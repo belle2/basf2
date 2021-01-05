@@ -187,6 +187,10 @@ namespace Belle2 {
     h_hitsPerEvent->SetMinimum(0);
     h_theta->SetMinimum(0);
     h_hitsPerTrack->SetMinimum(0);
+    h_ARICHOccAfterInjLer->SetMinimum(0);
+    h_ARICHEOccAfterInjLer->SetMinimum(0);
+    h_ARICHOccAfterInjHer->SetMinimum(0);
+    h_ARICHEOccAfterInjHer->SetMinimum(0);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetMinimum(0);

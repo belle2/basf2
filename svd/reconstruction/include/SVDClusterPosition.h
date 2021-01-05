@@ -53,8 +53,10 @@ namespace Belle2 {
       /** reconstruct strips*/
       void reconstructStrips(Belle2::SVD::RawCluster& rawCluster);
 
+      /** set which algorithm to use for strip charge in cluster position reconstruction*/
       void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
 
+      /** set which algorithm to use for strip time in cluster position reconstruction, 'dontdo' will skip it*/
       void set_stripTimeAlgo(const std::string& user_stripTimeAlgo) {m_stripTimeAlgo = user_stripTimeAlgo;}
 
     protected:

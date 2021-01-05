@@ -24,7 +24,7 @@ namespace Belle2 {
     {
 
       // ISSUES:
-      // 1. time error not computer
+      // 1. time error not computed
 
       //the first frame is 0 by definition
       firstFrame = 0;

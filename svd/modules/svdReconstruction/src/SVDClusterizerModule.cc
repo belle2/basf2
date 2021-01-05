@@ -11,6 +11,8 @@
 #include <svd/modules/svdReconstruction/SVDClusterizerModule.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 
@@ -81,6 +83,19 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
            m_positionRecoWith3SamplesAlgorithm);
 
+  addParam("stripTimeAlgorithm6Samples", m_stripTimeRecoWith6SamplesAlgorithm,
+           " choose strip time algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripTimeRecoWith6SamplesAlgorithm);
+  addParam("stripTimeAlgorithm3Samples", m_stripTimeRecoWith3SamplesAlgorithm,
+           " choose strip time algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripTimeRecoWith3SamplesAlgorithm);
+  addParam("stripChargeAlgorithm6Samples", m_stripChargeRecoWith6SamplesAlgorithm,
+           " choose strip charge algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripChargeRecoWith6SamplesAlgorithm);
+  addParam("stripChargeAlgorithm3Samples", m_stripChargeRecoWith3SamplesAlgorithm,
+           " choose strip charge algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           m_stripChargeRecoWith3SamplesAlgorithm);
+
   addParam("useDB", m_useDB,
            "if false use clustering and reconstruction configuration module parameters", m_useDB);
 
@@ -88,6 +103,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
 
 void SVDClusterizerModule::beginRun()
 {
+
 
   if (m_useDB) {
     if (!m_recoConfig.isValid())
@@ -99,6 +115,12 @@ void SVDClusterizerModule::beginRun()
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
+
+    //strip algorithms
+    m_stripTimeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
+    m_stripTimeRecoWith3SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith3Samples();
+    m_stripChargeRecoWith6SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith6Samples();
+    m_stripChargeRecoWith3SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith3Samples();
 
   }
   //check that all algorithms are available, otherwise use the default one
@@ -136,14 +158,24 @@ void SVDClusterizerModule::beginRun()
   m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
   m_position6SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith6SamplesAlgorithm);
+  m_position6SampleClass->set_stripChargeAlgo(m_stripChargeRecoWith6SamplesAlgorithm);
+  m_position6SampleClass->set_stripTimeAlgo(m_stripTimeRecoWith6SamplesAlgorithm);
   m_position3SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith3SamplesAlgorithm);
+  m_position3SampleClass->set_stripChargeAlgo(m_stripChargeRecoWith3SamplesAlgorithm);
+  m_position3SampleClass->set_stripTimeAlgo(m_stripTimeRecoWith3SamplesAlgorithm);
+
 
   B2INFO("SVD  6-sample DAQ, cluster time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith6SamplesAlgorithm);
+  B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith6SamplesAlgorithm << " and strip time reconstructed with "
+         <<
+         m_stripTimeRecoWith6SamplesAlgorithm);
 
   B2INFO("SVD  3-sample DAQ, cluster time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith3SamplesAlgorithm);
-
+  B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith3SamplesAlgorithm << " and strip time reconstructed with "
+         <<
+         m_stripTimeRecoWith3SamplesAlgorithm);
 }
 
 void SVDClusterizerModule::initialize()
@@ -154,22 +186,30 @@ void SVDClusterizerModule::initialize()
   m_storeTrueHits.isOptional(m_storeTrueHitsName);
   m_storeMCParticles.isOptional(m_storeMCParticlesName);
 
-  m_storeClusters.registerRelationTo(m_storeDigits);
+  RelationArray relClusterDigits(m_storeClusters, m_storeDigits);
+  RelationArray relClusterTrueHits(m_storeClusters, m_storeTrueHits);
+  RelationArray relClusterMCParticles(m_storeClusters, m_storeMCParticles);
   RelationArray relDigitTrueHits(m_storeDigits, m_storeTrueHits);
   RelationArray relDigitMCParticles(m_storeDigits, m_storeMCParticles);
 
+  relClusterDigits.registerInDataStore();
   //Relations to simulation objects only if the ancestor relations exist
   if (relDigitTrueHits.isOptional())
-    m_storeClusters.registerRelationTo(m_storeTrueHits);
+    relClusterTrueHits.registerInDataStore();
   if (relDigitMCParticles.isOptional())
-    m_storeClusters.registerRelationTo(m_storeMCParticles);
-
+    relClusterMCParticles.registerInDataStore();
 
   //Store names to speed up creation later
   m_storeClustersName = m_storeClusters.getName();
   m_storeShaperDigitsName = m_storeDigits.getName();
   m_storeTrueHitsName = m_storeTrueHits.getName();
   m_storeMCParticlesName = m_storeMCParticles.getName();
+
+  m_relClusterShaperDigitName = relClusterDigits.getName();
+  m_relClusterTrueHitName = relClusterTrueHits.getName();
+  m_relClusterMCParticleName = relClusterMCParticles.getName();
+  m_relShaperDigitTrueHitName = relDigitTrueHits.getName();
+  m_relShaperDigitMCParticleName = relDigitMCParticles.getName();
 
   // Report:
   B2DEBUG(20, "SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
@@ -179,6 +219,11 @@ void SVDClusterizerModule::initialize()
   B2DEBUG(20, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
   B2DEBUG(20, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
   B2DEBUG(20, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(20, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2DEBUG(20, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(20, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2DEBUG(20, " 2. CLUSTERING:");
   B2DEBUG(20, " -->  Neighbour cut:      " << m_cutAdjacent);
   B2DEBUG(20, " -->  Seed cut:           " << m_cutSeed);
@@ -188,13 +233,24 @@ void SVDClusterizerModule::initialize()
 
 void SVDClusterizerModule::event()
 {
-
-
   int nDigits = m_storeDigits.getEntries();
   if (nDigits == 0)
     return;
 
   m_storeClusters.clear();
+
+  RelationArray relClusterMCParticle(m_storeClusters, m_storeMCParticles,
+                                     m_relClusterMCParticleName);
+  if (relClusterMCParticle) relClusterMCParticle.clear();
+
+  RelationArray relClusterDigit(m_storeClusters, m_storeDigits,
+                                m_relClusterShaperDigitName);
+  if (relClusterDigit) relClusterDigit.clear();
+
+  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits,
+                                  m_relClusterTrueHitName);
+  if (relClusterTrueHit) relClusterTrueHit.clear();
+
 
   if (m_useDB) {
     m_cutSeed = m_ClusterCal.getMinSeedSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
@@ -223,7 +279,7 @@ void SVDClusterizerModule::event()
 
     //Ignore digits with insufficient signal
     float thisNoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-    float thisCharge = m_storeDigits[i]->getMaxADCCounts();
+    int thisCharge = m_storeDigits[i]->getMaxADCCounts();
     B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
 
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
@@ -289,44 +345,32 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   double timeError = std::numeric_limits<double>::quiet_NaN();
   int firstFrame = std::numeric_limits<int>::quiet_NaN();
 
-  float charge = std::numeric_limits<float>::quiet_NaN();
-  float seedCharge = std::numeric_limits<float>::quiet_NaN();
-  float SNR = 100;//std::numeric_limits<float>::quiet_NaN();
+  double charge = std::numeric_limits<double>::quiet_NaN();
+  double seedCharge = std::numeric_limits<float>::quiet_NaN();
+  double SNR = std::numeric_limits<double>::quiet_NaN();
 
-  float position = std::numeric_limits<float>::quiet_NaN();
-  float positionError = std::numeric_limits<float>::quiet_NaN();
+  double position = std::numeric_limits<float>::quiet_NaN();
+  double positionError = std::numeric_limits<float>::quiet_NaN();
 
 
   if (m_numberOfAcquiredSamples == 6) {
+
     //time
-    std::pair<int, double> FFandTime = m_time6SampleClass->getFirstFrameAndClusterTime(rawCluster);
-    firstFrame = FFandTime.first;
-    time = FFandTime.second;
-    timeError = m_time6SampleClass->getClusterTimeError(rawCluster);
+    m_time6SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
     //charge
-    charge = m_charge6SampleClass->getClusterCharge(rawCluster);
-    SNR = m_charge6SampleClass->getClusterSNR(rawCluster);
-    seedCharge = m_charge6SampleClass->getClusterSeedCharge(rawCluster);
+    m_charge6SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
 
     //position
-    position = m_position6SampleClass->getClusterPosition(rawCluster);
-    positionError = m_position6SampleClass->getClusterPositionError(rawCluster);
-
+    m_position6SampleClass->computeClusterPosition(rawCluster, position, positionError);
   } else if (m_numberOfAcquiredSamples == 3) {
     //time
-    std::pair<int, double> FFandTime = m_time3SampleClass->getFirstFrameAndClusterTime(rawCluster);
-    firstFrame = FFandTime.first;
-    time = FFandTime.second;
-    timeError = m_time3SampleClass->getClusterTimeError(rawCluster);
+    m_time3SampleClass->computeClusterTime(rawCluster, time, timeError, firstFrame);
 
     //charge
-    charge = m_charge3SampleClass->getClusterCharge(rawCluster);
-    SNR = m_charge3SampleClass->getClusterSNR(rawCluster);
-    seedCharge = m_charge3SampleClass->getClusterSeedCharge(rawCluster);
+    m_charge3SampleClass->computeClusterCharge(rawCluster, charge, SNR, seedCharge);
 
     //position
-    position = m_position3SampleClass->getClusterPosition(rawCluster);
-    positionError = m_position3SampleClass->getClusterPositionError(rawCluster);
+    m_position3SampleClass->computeClusterPosition(rawCluster, position, positionError);
 
   } else //we should never get here!
     B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
@@ -338,30 +382,30 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   position = applyLorentzShiftCorrection(position, sensorID, isU);
 
   //append the new cluster to the StoreArray...
-  if (SNR > m_cutSeed) {
+  if (SNR > m_cutCluster) {
     m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
                                          firstFrame));
+
+    B2DEBUG(20, "CLUSTER SIZE = " << size);
+    B2DEBUG(20, "        time = " << time << ", timeError = " << timeError << ", firstframe = " << firstFrame);
+    B2DEBUG(20, "        charge = " << charge << ", SNR = " << SNR << ", seedCharge = " << seedCharge);
+    B2DEBUG(20, "        position = " << position << ", positionError = " << positionError);
+
     //..and write relations
     writeClusterRelations(rawCluster);
   }
-
 }
 
 void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawCluster)
 {
 
-  RelationArray relClusterDigit(m_storeClusters, m_storeDigits);
-  relClusterDigit.clear();
+  RelationArray relClusterDigit(m_storeClusters, m_storeDigits, m_relClusterShaperDigitName);
 
-  RelationArray relClusterMCParticle(m_storeClusters, m_storeMCParticles);
-  relClusterMCParticle.clear();
+  RelationArray relClusterMCParticle(m_storeClusters, m_storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits, m_relClusterTrueHitName);
 
-  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits);
-  relClusterTrueHit.clear();
-
-  RelationIndex<SVDShaperDigit, MCParticle> relDigitMCParticle(m_storeDigits, m_storeMCParticles);
-
-  RelationIndex<SVDShaperDigit, SVDTrueHit> relDigitTrueHit(m_storeDigits, m_storeTrueHits);
+  RelationIndex<SVDShaperDigit, MCParticle> relDigitMCParticle(m_storeDigits, m_storeMCParticles, m_relShaperDigitMCParticleName);
+  RelationIndex<SVDShaperDigit, SVDTrueHit> relDigitTrueHit(m_storeDigits, m_storeTrueHits, m_relShaperDigitTrueHitName);
 
 
   //register relation between ShaperDigit and Cluster

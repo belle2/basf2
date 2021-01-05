@@ -12,7 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
-
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -35,63 +35,32 @@ namespace Belle2 {
        */
       SVDClusterCharge() {};
 
-
       /**
-       * @return the cluster SNR
+       * computes the cluster charge, SNr and seedCharge
        */
-      double getClusterSNR(const Belle2::SVD::RawCluster& rawCluster)
-      {
-
-        double clusterCharge = getClusterCharge(rawCluster);
-        double clusterNoise = 0;
-
-        std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-        for (auto strip : strips)
-          clusterNoise += TMath::Power(m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID), 2);
-
-        clusterNoise = TMath::Sqrt(clusterNoise);
-
-        return clusterCharge / clusterNoise;
-
-      }
-
-      /**
-       * @return the cluster seed charge  (as strip max sample)
-       */
-      double getClusterSeedCharge(const Belle2::SVD::RawCluster& rawCluster)
-      {
-
-        std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-        double rawSeedCharge = rawCluster.getSeedMaxSample();
-        double seedCellID = strips.at(rawCluster.getSeedInternalIndex()).cellID;
-
-        double seedCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), seedCellID, rawSeedCharge);
-
-        return seedCharge;
-
-      }
-
-      /**
-       * @return the cluster charge
-       */
-      virtual double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) = 0;
-
-      /**
-       * @return the cluster charge error
-       * the SVDCluster does not have the chargeError data member
-       * but this method maybe useful for position error estimate
-       */
-      virtual double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) = 0;
+      virtual void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) = 0;
 
       /**
        * virtual destructor
        */
       virtual ~SVDClusterCharge() {};
 
+      /** MaxSample Charge Algorithm*/
+      void applyMaxSampleCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+
+      /** SumSamples Charge Algorithm*/
+      void applySumSamplesCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+
+      /** ELS3 Charge Algorithm*/
+      void applyELS3Charge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
     protected:
+
+      /** Hardware Clocks*/
+      DBObjPtr<HardwareClockSettings> m_hwClock;
+
+      /** APV clock period*/
+      double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
       /**SVDPulseShaper calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;

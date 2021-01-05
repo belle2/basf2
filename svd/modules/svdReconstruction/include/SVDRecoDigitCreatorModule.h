@@ -15,7 +15,9 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <svd/reconstruction/RawCluster.h>
-#include <svd/reconstruction/SVDChargeReconstruction.h>
+#include <svd/reconstruction/SVDClusterTime.h>
+#include <svd/reconstruction/SVDClusterCharge.h>
+#include <svd/reconstruction/SVDClusterPosition.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -23,7 +25,6 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
-//#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 
@@ -58,6 +59,7 @@ namespace Belle2 {
       std::string m_storeShaperDigitsName;
       /** Name of the collection to use for the SVDRecoDigits */
       std::string m_storeRecoDigitsName;
+
       /** Name of the collection to use for the SVDClusters */
       std::string m_storeClustersName;
 
@@ -78,7 +80,7 @@ namespace Belle2 {
       bool m_useDB = true;
 
       // 3. Cluster Reconstruction Configuration:
-      int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6,3 or 1*/
+
       /** string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
       std::string m_timeRecoWith6SamplesAlgorithm = "not set";
       /** string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/
@@ -87,6 +89,11 @@ namespace Belle2 {
       std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
       /**string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
       std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
+
+      SVDClusterTime* m_time6SampleClass = nullptr; /**< strip time class for the 6-sample acquisition mode*/
+      SVDClusterTime* m_time3SampleClass = nullptr; /**< strip time class for the 3-sample acquisition mode*/
+      SVDClusterCharge* m_charge6SampleClass = nullptr; /**< strip charge class for the 6-sample acquisition mode*/
+      SVDClusterCharge* m_charge3SampleClass = nullptr; /**< strip charge class for the 3-sample acquisition mode*/
 
       // 4. Calibration Objects
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/

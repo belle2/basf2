@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDOldDefaultPosition.h>
-#include <svd/reconstruction/SVDPositionReconstruction.h>
 
 #include <TMath.h>
 
@@ -20,48 +18,21 @@ namespace Belle2 {
 
   namespace SVD {
 
-
-    double SVDOldDefaultPosition::getClusterPosition(const Belle2::SVD::RawCluster& rawCluster)
+    void SVDOldDefaultPosition::computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position,
+                                                       double& positionError)
     {
 
-      //as weighted average of the strip position with strip max sample
+      reconstructStrips(rawCluster);
 
-      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-      SVDPositionReconstruction positionReco(strips, rawCluster.getSensorID(), rawCluster.isUSide());
-
-      double position = -99;
-
-      if (strips.size() < 3)
-        position = positionReco.getCoGPosition();
+      if (rawCluster.getSize() < 3)
+        applyCoGPosition(rawCluster, position, positionError);
       else
-        position = positionReco.getAHTPosition();
+        applyAHTPosition(rawCluster, position, positionError);
 
-      return position;
-    }
-
-    double SVDOldDefaultPosition::getClusterPositionError(const Belle2::SVD::RawCluster& rawCluster)
-    {
-
-      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-      SVDPositionReconstruction positionReco(strips, rawCluster.getSensorID(), rawCluster.isUSide());
-
-      double positionError = -99;
-
-      if (strips.size() < 3)
-        positionError = positionReco.getCoGPositionError();
-      else
-        positionError = positionReco.getAHTPositionError();
-
-      //apply cluster position error scale factors
-      positionError = m_ClusterCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), strips.size(),
+      //apply scale factors for the position errors
+      positionError = m_ClusterCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize(),
                       positionError);
-
-
-      return positionError;
     }
-
 
   }  //SVD namespace
 } //Belle2 namespace

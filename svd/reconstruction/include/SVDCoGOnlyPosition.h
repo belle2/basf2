@@ -28,14 +28,10 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the first frame and the cluster position
+       * computes the cluster position and position error
+       * with the CoG algorithm
        */
-      double getClusterPosition(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
-       * @return the cluster position error
-       */
-      double getClusterPositionError(const Belle2::SVD::RawCluster& rawCluster) override;
+      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
 
       /**
        * virtual destructor

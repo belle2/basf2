@@ -13,8 +13,6 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 
-#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -32,23 +30,15 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the first frame and the cluster time
+       * computes the cluster time, timeError and FirstFrame
+       * with the ELS3 algorithm
        */
-      std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) override;
-
-      /**
-       * @return the cluster time error
-       */
-      double getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster) override;
+      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
       /**
        * virtual destructor
        */
       virtual ~SVDELS3Time() {};
-
-    private:
-
-      SVD3SampleELSTimeCalibrations m_ELS3TimeCal; /**< SVD ELS3 Time calibration wrapper*/
 
     };
 

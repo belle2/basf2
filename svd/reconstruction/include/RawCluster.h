@@ -26,8 +26,10 @@ namespace Belle2 {
       int shaperDigitIndex; /**< index of the shaper digit*/
       int cellID; /**<strip cellID*/
       int maxSample; /** ADC max of the acquired samples*/
-      int noise; /** ADC noise */
+      float noise; /** ADC noise */
       Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC of the acquired samples*/
+      double charge;
+      double time;
     };
 
     /**
@@ -108,6 +110,15 @@ namespace Belle2 {
        * @return the internal index (in the stripsInRawCluster vector) of the seed strip
        */
       int getSeedInternalIndex() const {return m_seedInternalIndex;};
+
+      /**
+       * set the strip charge
+       */
+      void setStripCharge(int index, double charge) {m_strips.at(index).charge = charge;}
+      /**
+       * set the strip time
+       */
+      void setStripTime(int index, double time) {m_strips.at(index).time = time;}
 
     protected:
 

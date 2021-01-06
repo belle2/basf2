@@ -1098,11 +1098,7 @@ namespace Belle2 {
 
     }
 
-//-------------------------------------------------------------------------------------
-// new crystal position variables
-//-------------------------------------------------------------------------------------
-
-//! @returns the eclcaldigit Phi by digit energy rank
+    //! @returns the eclcaldigit Phi by digit energy rank
     double getPhiByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
@@ -1131,11 +1127,6 @@ namespace Belle2 {
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::R_energyrank};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
     }
-
-//-------------------------------------------------------------------------------------
-// end of new
-//-------------------------------------------------------------------------------------
-
 
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
     {

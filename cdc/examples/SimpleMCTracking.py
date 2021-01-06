@@ -26,31 +26,30 @@
 ##############################################################################
 ##
 
-import os
-from basf2 import *
+import basf2 as b2
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
-set_random_seed(1028307)
+b2.set_random_seed(1028307)
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [1])
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 
 # simulate CDC only; B-field outside CDC = 0
 geometry.param('components', ['MagneticFieldConstant4LimitedRCDC', 'CDC'])
 
 # particle gun to shoot particles in the detector
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 
 # choose the particles you want to simulate
 param_pGun = {
@@ -71,7 +70,7 @@ param_pGun = {
 pGun.param(param_pGun)
 
 # simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly <- obsolete ?
 g4sim.param('StoreAllSecondaries', True)
 # g4sim.param('SecondariesEnergyCut', 0.0)
@@ -80,12 +79,12 @@ g4sim.param('UICommandsAtIdle', ['/control/execute interactions.mac'])
 g4sim.param('ProductionCut', 1000000.)
 
 # digitizer
-cdcDigitizer = register_module('CDCDigitizer')
+cdcDigitizer = b2.register_module('CDCDigitizer')
 
 # find MCTracks
 # mctrackfinder = register_module('MCTrackFinder')
 # mctrackfinder = register_module('TrackFinderMCTruth')
-mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
+mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
 
 # select which detectors you would like to use
 param_mctrackfinder = {  # select which particles to use: primary particles
@@ -99,24 +98,24 @@ param_mctrackfinder = {  # select which particles to use: primary particles
 mctrackfinder.param(param_mctrackfinder)
 
 # setupgf
-setupgf = register_module('SetupGenfitExtrapolation')
+setupgf = b2.register_module('SetupGenfitExtrapolation')
 # param_setupgf = {}
 # setupgf.param(param_setupgf)
 
 # fitting
-cdcfitting = register_module('DAFRecoFitter')
+cdcfitting = b2.register_module('DAFRecoFitter')
 # param_cdcfitting = {}
 # cdcfitting.param(param_cdcfitting)
 
 # build track
-buildtrack = register_module("TrackCreator")
+buildtrack = b2.register_module("TrackCreator")
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', 'SimpleMCTrackingOutput.root')
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # add modules to path
 main.add_module(eventinfosetter)
@@ -136,5 +135,5 @@ main.add_module(buildtrack)
 main.add_module(output)
 
 # Process events
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

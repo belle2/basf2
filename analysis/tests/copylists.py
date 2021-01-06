@@ -121,6 +121,7 @@ class TestCopyLists(unittest.TestCase):
         The two mother particles have the same amount of daughters."""
         self.assertEqual(self._count("KS") + self._count("pi0"), self._count("KSpi0"))
 
+
 if __name__ == "__main__":
     with b2tu.clean_working_directory():
         run_copylists()

@@ -14,7 +14,6 @@ import basf2_mva
 import inspect
 import modularAnalysis as ma
 from variables import utils
-from ROOT import Belle2
 import os
 import glob
 import b2bii
@@ -1102,17 +1101,16 @@ def flavorTagger(
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
-    if not Belle2.FileSystem.findFile(workingDirectory, True):
-        B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
+    basf2.find_file(workingDirectory)
 
     global filesDirectory
     filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
     if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotFound):
-        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
+        if not basf2.find_file(workingDirectory + '/FlavorTagging', silent=True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
+        elif not basf2.find_file(workingDirectory + '/FlavorTagging/TrainedMethods', silent=True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
         filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 

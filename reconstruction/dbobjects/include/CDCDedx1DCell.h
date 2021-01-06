@@ -126,8 +126,8 @@ namespace Belle2 {
     };
 
     /** Return dE/dx mean value for given entrance angle
-     * @param continuous layer number
-     * @param entrance angle (-pi/2 to pi/2)
+     * @param layer continuous layer number
+     * @param enta entrance angle (-pi/2 to pi/2)
      */
     double getMean(unsigned int layer, double enta) const
     {

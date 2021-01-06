@@ -148,8 +148,10 @@ void DQMHistAnalysisECLModule::event()
   c_quality_analysis->cd();
   c_quality_analysis->SetLogy();
   TH1* h_quality = findHist("ECL/quality");
-  if (h_quality != NULL) h_quality->SetMinimum(0.1);
-  h_quality->Draw();
+  if (h_quality != NULL) {
+    h_quality->SetMinimum(0.1);
+    h_quality->Draw();
+  }
   c_quality_analysis->Draw();
   c_quality_analysis->Modified();
   c_quality_analysis->Update();
@@ -159,8 +161,10 @@ void DQMHistAnalysisECLModule::event()
   c_quality_other_analysis->cd();
   c_quality_other_analysis->SetLogy();
   TH1* h_quality_other = findHist("ECL/quality_other");
-  if (h_quality_other != NULL) h_quality_other->SetMinimum(0.1);
-  h_quality_other->Draw();
+  if (h_quality_other != NULL) {
+    h_quality_other->SetMinimum(0.1);
+    h_quality_other->Draw();
+  }
   c_quality_other_analysis->Draw();
   c_quality_other_analysis->Modified();
   c_quality_other_analysis->Update();

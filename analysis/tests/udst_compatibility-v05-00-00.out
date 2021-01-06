@@ -1363,6 +1363,76 @@ EventExtraInfo:
   getNames(): size(1)
     foo
   hasExtraInfo(foo): True
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B+:feiSL (1+0) + B-:feiSL (0+0)
+[INFO] collection=Particles
+ PDGCode=521 Charge=1 PDGMass=5.279
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices: 8, 1, 
+ daughter PDGCodes: 423, -13, 
+ mass=0.1057
+ momentum=(1.64, -0.13, 0.45) p=1.703
+ momentum scaling factor=1
+ position=(-0.01, -0.00, 0.01)
+ p-value of fit (if done): 0.0184
+ error matrix (px, py, pz, E, x, y ,z):
+    0.00022   -7.3e-05    4.7e-05    9.5e-05   -6.2e-06    5.5e-06    1.1e-06
+   -7.3e-05    3.6e-05   -1.3e-05   -2.9e-05    1.8e-06   -4.2e-06   -1.7e-07
+    4.7e-05   -1.3e-05    2.5e-05    2.3e-05   -2.3e-07    8.1e-07   -2.4e-06
+    9.5e-05   -2.9e-05    2.3e-05    4.3e-05   -1.5e-06      2e-06    2.4e-07
+   -6.2e-06    1.8e-06   -2.3e-07   -1.5e-06    4.8e-06   -1.7e-06   -3.2e-07
+    5.5e-06   -4.2e-06    8.1e-07      2e-06   -1.7e-06    3.7e-06    1.2e-06
+    1.1e-06   -1.7e-07   -2.4e-06    2.4e-07   -3.2e-07    1.2e-06    3.1e-06
+
+ extra info=( SignalProbability=0.004477 chiSquared=5.558 decayModeID=3 foo=1337 ndf=1 postCut_rank=2 preCut_rank=1 uniqueSignal=0 ) 
+
+[INFO]  - 9 = 521[0]
+[INFO]      o) daughter indices = 8 1
+[INFO]      o) mcPDG = nan
+[INFO]      o) daughter(0, mcPDG) = nan
+[INFO]      o) Mbc = 5.05022
+[INFO]      o) InvM = 1.54675
+[INFO]      o) deltaE = -3.71237
+[INFO]      o) daughter(1, pionID) = 3.10789e-10
+[INFO]      o) daughter(1, kaonID) = 2.90667e-44
+[INFO]      o) daughter(1, clusterE) = 0.173657
+[INFO]      o) daughter(1, klmClusterLayers) = 9
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B-:feiSL (0+0) + B+:feiSL (1+0)
+[INFO] collection=Particles
+ PDGCode=521 Charge=1 PDGMass=5.279
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices: 8, 1, 
+ daughter PDGCodes: 423, -13, 
+ mass=0.1057
+ momentum=(1.64, -0.13, 0.45) p=1.703
+ momentum scaling factor=1
+ position=(-0.01, -0.00, 0.01)
+ p-value of fit (if done): 0.0184
+ error matrix (px, py, pz, E, x, y ,z):
+    0.00022   -7.3e-05    4.7e-05    9.5e-05   -6.2e-06    5.5e-06    1.1e-06
+   -7.3e-05    3.6e-05   -1.3e-05   -2.9e-05    1.8e-06   -4.2e-06   -1.7e-07
+    4.7e-05   -1.3e-05    2.5e-05    2.3e-05   -2.3e-07    8.1e-07   -2.4e-06
+    9.5e-05   -2.9e-05    2.3e-05    4.3e-05   -1.5e-06      2e-06    2.4e-07
+   -6.2e-06    1.8e-06   -2.3e-07   -1.5e-06    4.8e-06   -1.7e-06   -3.2e-07
+    5.5e-06   -4.2e-06    8.1e-07      2e-06   -1.7e-06    3.7e-06    1.2e-06
+    1.1e-06   -1.7e-07   -2.4e-06    2.4e-07   -3.2e-07    1.2e-06    3.1e-06
+
+ extra info=( SignalProbability=0.004477 chiSquared=5.558 decayModeID=3 foo=1337 ndf=1 postCut_rank=2 preCut_rank=1 uniqueSignal=0 ) 
+
+[INFO]  - 9 = 521[0]
+[INFO]      o) daughter indices = 8 1
+[INFO]      o) mcPDG = nan
+[INFO]      o) daughter(0, mcPDG) = nan
+[INFO]      o) Mbc = 5.05022
+[INFO]      o) InvM = 1.54675
+[INFO]      o) deltaE = -3.71237
+[INFO]      o) daughter(1, pionID) = 3.10789e-10
+[INFO]      o) daughter(1, kaonID) = 2.90667e-44
+[INFO]      o) daughter(1, clusterE) = 0.173657
+[INFO]      o) daughter(1, klmClusterLayers) = 9
+[INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

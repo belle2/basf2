@@ -30,7 +30,7 @@ BeginX
  2900            1e0      BBB    0: ORIG  1: BBB
  2901            0e0      EQUALBR
  2902            2e0      FF2PIRHO
- 2903            0e0      IRCHL3PI
+ 2903            1e0      IRCHL3PI
  2904            0e0      IFKPIPI
  2905            0e0      IFCURR4PI
 ********************************************************************************

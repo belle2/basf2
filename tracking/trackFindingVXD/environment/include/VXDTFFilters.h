@@ -261,7 +261,9 @@ namespace Belle2 {
       return m_compactSecIDsMap.getFullSecID(aSensorID, normalizedU, normalizedV);
     }
 
-    /// returns the FullSecId of @param compactSecId
+    /** returns the FullSecId of
+      @param compactSecID
+    */
     FullSecID getFullID(CompactSecIDs::sectorID_t compactSecID) const
     {
       return m_staticSectors.at(compactSecID)->getFullSecID();

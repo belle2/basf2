@@ -7,6 +7,7 @@ This module defines wrapper functions around the analysis modules.
 
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+import basf2
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -722,7 +723,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -794,6 +795,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -803,10 +805,13 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    for decayString, cut in decayStringsWithCuts:
+        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -861,6 +866,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -870,6 +877,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+        getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -2656,6 +2665,24 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
+def getBeamBackgroundProbabilityMVA(
+    particleList,
+    path=None,
+):
+    """
+    Assign a probability to each ECL cluster as being background like (0) or signal like (1)
+    @param particleList     The input ParticleList, must be a photon list
+    @param path       modules are added to this path
+    """
+
+    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+    path.add_module(
+        'MVAExpert',
+        listNames=particleList,
+        extraInfoName='beamBackgroundProbabilityMVA',
+        identifier='BeamBackgroundMVA')
+
+
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
                          chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
@@ -3112,6 +3139,30 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
+
+def scaleError(outputListName, inputListName,
+               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
+               minErrors=[0.00140, 0, 0, 0.00157, 0],
+               path=None):
+    '''
+    This module creates a new charged particle list.
+    The helix errors of the new particles are scaled by constant factors.
+    Lower bounds can be set so that helix errors are confined above the limit.
+    The scale factors and lower bounds are defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
+
+    @param inputListName Name of input charged particle list to be scaled
+    @param outputListName Name of output charged particle list with scaled error
+    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param minErrors Lower bound can be set for each helix error.
+    '''
+    scale_error = register_module("HelixErrorScaler")
+    scale_error.set_name('ScaleError_' + inputListName)
+    scale_error.param('inputListName', inputListName)
+    scale_error.param('outputListName', outputListName)
+    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('minErrors', minErrors)
+    path.add_module(scale_error)
 
 
 if __name__ == '__main__':

@@ -115,7 +115,7 @@ namespace Belle2 {
     /** automatically sets the TLeaf addresses for a tree. Currently only TLeafI and TLeafD are supported
         @param t: the tree for setting the addresses
         @param filterVals: the targets for the TLeafD addresses, will be filled in the function
-        @param secIDVals: the targets for the TLeafI addresses, will be filled in the function
+        @param SecIDVals: the targets for the TLeafI addresses, will be filled in the function
     */
     void setLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
                           std::unordered_map<std::string, uint>& SecIDVals);

@@ -98,8 +98,8 @@ In principle, one can already try to use some of the Rest of Event variables.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use the search feature in the basf2 documentation, or use the offline help by typing ``basf2 variables.py``
-     in your bash terminal (for example ``basf2 variables.py | grep -i roe``).
+     Use the search feature in the basf2 documentation, or use the offline help by typing ``b2help-variables``
+     in your bash terminal (for example ``b2help-variables | grep -i roe``).
 
 .. admonition:: Solution
      :class: toggle solution

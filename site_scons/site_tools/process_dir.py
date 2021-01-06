@@ -291,6 +291,12 @@ def process_dir(
                 reg_map = env.RegMap(map_file, map_sources)
                 lib_files.append(reg_map)
 
+                if env['MODULE_IO'] and env.get('HAS_DOT', False):
+                    module_io = env.ModuleIo(reg_map)
+                    env.Depends(module_io, [lib, reg_map])
+                    env.Requires(module_io, [os.path.join('$BINDIR', 'basf2')])
+                    env.Alias('module-io', module_io)
+
             # check class versions
             for check_filename, linkdef_file in check_files:
                 env.ClassVersionCheck(check_filename, [linkdef_file, lib, debug] + env['REQUIRED_TOOLS'])

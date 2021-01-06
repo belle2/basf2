@@ -334,7 +334,7 @@ indicator for the quality of the B mesons we have reconstructed.
         n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Number of candidates')
-        ax.savefig('m_bc.pdf')
+        fig.savefig('m_bc.pdf')
 
 
 .. admonition:: Question
@@ -391,7 +391,7 @@ indicator for the quality of the B mesons we have reconstructed.
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
-        ax.savefig('m_bc_cut_0_01.pdf')
+        fig.savefig('m_bc_cut_0_01.pdf')
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
@@ -436,7 +436,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
     Then, fill two particle lists with muons and charged pions. For the muons, you can require a `muonID`
     above 0.9, for the pions a `pionID` above 0.5.
     For both you should apply some requirements on the track, you can use
-    ``dr < 0.5 and abs(dz) < 2 nCDCHits > 20 and thetaInCDCAcceptance``
+    ``dr < 0.5 and abs(dz) < 2 and nCDCHits > 20 and thetaInCDCAcceptance``
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -512,7 +512,7 @@ B\ :sub:`sig` we have just created.
     :class: toggle solution
 
     To account for B\ :sup:`0` meson mixing, you should also combine same-sign B\ :sup:`0` mesons as the
-    anti-B\ :sup:`0` can oscillate to a anti-B\ :sup:`0`.
+    anti-B\ :sup:`0` can oscillate to a B\ :sup:`0`.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -524,9 +524,9 @@ You have already done this in :ref:`onlinebook_roe` for a B meson, here however 
 will create a Rest of Event for the ϒ(4S). This allows us to count the tracks left over after reconstructing the ϒ(4S),
 for two correctly reconstructed B mesons there should be no tracks left over.
 
-For this to work we have to use a slightly different ROE mask than in the ROE chapter. In addition to the track cuts
-given there, two cuts on the two distance variables `dr` and `dz` are needed to match the cuts used by the FEI to
-reconstruct B\ :sub:`tag` candidates.
+For this to work we have to use a slightly different ROE mask than in the ROE chapter. To match the cuts used by the
+FEI to reconstruct B\ :sub:`tag` candidates, we have to tighten the cut on `dr` to below 2 and the cut on the absolute
+value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaInCDCAcceptance`) can be left as-is.
 
 .. admonition:: Exercise
     :class: exercise stacked

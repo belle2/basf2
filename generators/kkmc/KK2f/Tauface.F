@@ -102,46 +102,45 @@ C
 C-------------------------------------------------------------------------------
       idff    = xpar(ITAUXPAR+3) ! Lund identifier for first tau (15 for  tau-)
 C XK0 for tau decays.
-       xk0dec  = xpar(ITAUXPAR+5)        ! IR-cut for QED rad. in leptonic decays
+      xk0dec  = xpar(ITAUXPAR+5) ! IR-cut for QED rad. in leptonic decays
 C radiative correction switch in tau --> e (mu) decays !
-       itdkRC  = xpar(ITAUXPAR+4)        ! QED rad. in leptonic decays
+      itdkRC  = xpar(ITAUXPAR+4) ! QED rad. in leptonic decays
 C switches of tau+ tau- decay modes !!
-       Jak1            = xpar(ITAUXPAR+1)   ! Decay Mask for first tau
-       Jak2            = xpar(ITAUXPAR+2)   ! Decay Mask for second tau
+      Jak1            = xpar(ITAUXPAR+1) ! Decay Mask for first tau
+      Jak2            = xpar(ITAUXPAR+2) ! Decay Mask for second tau
 C output file number for TAUOLA
-       IOUT    = xpar(4)
+      IOUT    = xpar(4)
 C  KeyA1 is used for formfactors actually not in use
-       KeyA1   = xpar(ITAUXPAR+6)        ! Type of a1 current
+      KeyA1   = xpar(ITAUXPAR+6) ! Type of a1 current
 
-        WRITE(iout,bxope)
-        WRITE(iout,bxtxt) ' Parameters passed from KK  to Tauola:   '
-        WRITE(iout,bxl1i) Jak1,      'dec. type 1-st tau  ','Jak1  ','t01'
-        WRITE(iout,bxl1i) Jak2,      'dec. type 2-nd tau  ','Jak2  ','t02'
-        WRITE(iout,bxl1i) KeyA1,     'current type a1 dec.','KeyA1 ','t03'
-        WRITE(iout,bxl1i) idff,      'PDG id 1-st tau     ','idff  ','t04'
-        WRITE(iout,bxl1i) itdkRC,    'R.c. switch lept dec','itdkRC','t05'
-        WRITE(iout,bxl1g) xk0dec,    'IR-cut for lept r.c.','xk0dec','t06'
-        WRITE(iout,bxclo)
+      WRITE(iout,bxope)
+      WRITE(iout,bxtxt) ' Parameters passed from KK  to Tauola:   '
+      WRITE(iout,bxl1i) Jak1,      'dec. type 1-st tau  ','Jak1  ','t01'
+      WRITE(iout,bxl1i) Jak2,      'dec. type 2-nd tau  ','Jak2  ','t02'
+      WRITE(iout,bxl1i) KeyA1,     'current type a1 dec.','KeyA1 ','t03'
+      WRITE(iout,bxl1i) idff,      'PDG id 1-st tau     ','idff  ','t04'
+      WRITE(iout,bxl1i) itdkRC,    'R.c. switch lept dec','itdkRC','t05'
+      WRITE(iout,bxl1g) xk0dec,    'IR-cut for lept r.c.','xk0dec','t06'
+      WRITE(iout,bxclo)
 
-        IFEQUALBR = XPAR(ITAUXPAR+901)
-        FF2PIRHO  = XPAR(ITAUXPAR+902)
-        IRCHL3PI  = XPAR(ITAUXPAR+903)
-        IFKPIPI   = XPAR(ITAUXPAR+904)
-        IFCURR4PI = XPAR(ITAUXPAR+905)
-        LAMDEC    = XPAR(ITAUXPAR+906)
+      IFEQUALBR = XPAR(ITAUXPAR+901)
+      FF2PIRHO  = XPAR(ITAUXPAR+902)
+      IRCHL3PI  = XPAR(ITAUXPAR+903)
+      IFKPIPI   = XPAR(ITAUXPAR+904)
+      IFCURR4PI = XPAR(ITAUXPAR+905)
+      LAMDEC    = XPAR(ITAUXPAR+906)
 
-C       Print functional flags
-        PRINT *, 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
-     $            FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
+C     Print functional flags
+      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
+     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
         
-C       Print optional flags 
-        PRINT *, 'IFEQUALBR, LAMDEC = ',
-     $            IFEQUALBR, LAMDEC
+C     Print optional flags 
+      WRITE(iout,*) 'IFEQUALBR, LAMDEC = ',
+     $               IFEQUALBR, LAMDEC
 
-
-        if(IRCHL3PI.eq.1) then
-           CALL INIRChL(1)      ! (IRCHL)
-        endif
+      if(IRCHL3PI.eq.1) then
+         CALL INIRChL(1)        ! (IRCHL)
+      endif
       end
 
       SUBROUTINE INITDK(ITAUXPAR,xpar)

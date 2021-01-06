@@ -115,7 +115,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                     100, -1, 1);
     m_neuroHWOutPhi0 = new TH1F("NeuroHWOutPhi0",
                                 "phi distribution of unpacked neuro tracks; #phi [#circ]",
-                                180, 0, 360); // shift to reduce the binning error
+                                80, 0, 360); // shift to reduce the binning error
     m_neuroHWOutInvPt = new TH1F("NeuroHWOutInvPt",
                                  "Inverse Pt distribution of unpacked neuro tracks; p_{T}^{-1} [GeV^{-1}]",
                                  50, 0, 5);
@@ -139,7 +139,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                 "Inverse Pt distribution from incoming 2dtrack; p_{T}^{-1} [GeV^{-1}]",
                                 50, 0, 5);
     m_neuroHWInPhi0 = new TH1F("NeuroHWInPhi0", "Phi0 of incoming 2dtrack; #phi [#circ]",
-                               180, 0, 360);
+                               80, 0, 360);
     m_neuroHWInm_time = new TH1F("NeuroHWInM_time", "m_time distribution from incoming 2dtracks; clock cycle",
                                  48, 0, 48);
     m_neuroHWInTrackCount = new TH1F("NeuroHWInTrackCount", "number of neuro input 2dtracks per event",
@@ -212,7 +212,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                       50, 0, 5);
     m_neuroHWOutQuad5Phi0 = new TH1F("NeuroHWOutQuad5Phi0",
                                      "phi distribution from unpacker; #phi [#circ]",
-                                     180, 0, 360);
+                                     80, 0, 360);
 
     m_neuroHWOutQuad0Z = new TH1F("NeuroHWOutQuad0Z",
                                   "z distribution of neuro tracks; z [cm]",
@@ -225,7 +225,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                       50, 0, 5);
     m_neuroHWOutQuad0Phi0 = new TH1F("NeuroHWOutQuad0Phi0",
                                      "phi distribution from unpacker; #phi [#circ]",
-                                     180, 0, 360);
+                                     80, 0, 360);
 
     m_neuroHWOutQuad1Z = new TH1F("NeuroHWOutQuad1Z",
                                   "z distribution of neuro tracks; z [cm]",
@@ -235,7 +235,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                          100, -1, 1);
     m_neuroHWOutQuad1Phi0 = new TH1F("NeuroHWOutQuad1Phi0",
                                      "phi distribution from unpacker; #phi [#circ]",
-                                     180, 0, 360);
+                                     80, 0, 360);
     m_neuroHWOutQuad1InvPt = new TH1F("NeuroHWOutQuad1InvPt",
                                       "Pt distribution from unpacker; p_{T}^{-1} [GeV^{-1}]",
                                       50, 0, 5);
@@ -248,7 +248,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                          100, -1, 1);
     m_neuroHWOutQuad2Phi0 = new TH1F("NeuroHWOutQuad2Phi0",
                                      "phi distribution from unpacker; #phi [#circ]",
-                                     180, 0, 360);
+                                     80, 0, 360);
     m_neuroHWOutQuad2InvPt = new TH1F("NeuroHWOutQuad2InvPt",
                                       "Pt distribution from unpacker; p_{T}^{-1} [GeV^{-1}]",
                                       50, 0, 5);
@@ -261,7 +261,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                          100, -1, 1);
     m_neuroHWOutQuad3Phi0 = new TH1F("NeuroHWOutQuad3Phi0",
                                      "phi distribution from unpacker; #phi [#circ]",
-                                     180, 0, 360);
+                                     80, 0, 360);
     m_neuroHWOutQuad3InvPt = new TH1F("NeuroHWOutQuad3InvPt",
                                       "Pt distribution from unpacker; p_{T}^{-1} [GeV^{-1}]",
                                       50, 0, 5);
@@ -513,7 +513,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                               "Inverse Pt of 2dtracks; p_{T}^{-1} [GeV^{-1}]",
                               50, 0, 5);
     m_2DHWOutPhi0 = new TH1F("2DHWOutPhi0", "Phi0 of 2dtracks; #phi [#circ]",
-                             180, 0, 360);
+                             80, 0, 360);
     m_2DHWOutm_time = new TH1F("2DHWOutM_time", "m_time of 2dtracks; clock cycle",
                                96, -48, 48);
     m_2DHWOutTrackCount = new TH1F("2DHWOutTrackCount", "number of 2dtracks per event", 20, 0, 20);
@@ -533,7 +533,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                  50, 0, 5);
     m_neuroSWOutPhi0 = new TH1F("NeuroSWOutPhi0",
                                 "phi distribution from simulation, hw TS hw 2D; #phi [#circ]",
-                                180, 0, 360); // shift to reduce the binning error
+                                80, 0, 360); // shift to reduce the binning error
     m_neuroSWOutHitPattern = new TH1F("NeuroSWOutHitPattern",
                                       "stereo hit pattern of simulated neuro tracks, hw TS hw 2D; pattern",
                                       16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
@@ -722,7 +722,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                               "Inverse Pt of 2dtracks from simulation, sw TS sw 2D; p_{T}^{-1} [GeV^{-1}]",
                               50, 0, 5);
     m_2DSWOutPhi0 = new TH1F("2DSWOutPhi0", "Phi0 of 2dtracks from simulation, sw TS sw 2D; #phi [#circ]",
-                             180, 0, 360);
+                             80, 0, 360);
     m_2DSWOutm_time = new TH1F("2DSWOutM_time", "m_time of 2dtracks from simulation, sw TS sw 2D; clock cycle",
                                96, -48, 48);
     m_2DSWOutTrackCount = new TH1F("2DSWOutTrackCount", "number of 2dtracks per event from simulation, sw TS sw 2D", 20, 0, 20);
@@ -741,7 +741,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                        50, 0, 5);
     m_neuroSWTSSW2DOutPhi0 = new TH1F("NeuroSWTSSW2DOutPhi0",
                                       "phi distribution from simulation, sw TS sw 2D; #phi [#circ]",
-                                      180, 0, 360);
+                                      80, 0, 360);
     m_neuroSWTSSW2DOutHitPattern = new TH1F("NeuroSWTSSW2DOutHitPattern",
                                             "stereo hit pattern of simulated neuro tracks, sw TS sw 2D; pattern",
                                             16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
@@ -1066,7 +1066,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                            50, 0, 5);
     m_RecoPhi = new TH1F("RecoPhi",
                          "phi distribution of reconstructed tracks ; #phi [#circ]",
-                         180, 0, 360);
+                         80, 0, 360);
     m_RecoD0 = new TH1F("RecoD0",
                         "d0 distribution of reconstructed tracks ; d_{0} [cm]",
                         100, 0, 10);
@@ -1087,7 +1087,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                              50, 0, 5);
     m_RecoHWPhi = new TH1F("RecoHWPhi",
                            "hw matched phi distribution of reconstructed tracks; #phi [#circ]",
-                           180, 0, 360);
+                           80, 0, 360);
     m_RecoHWD0 = new TH1F("RecoHWD0",
                           "hw matched d0 distribution of reconstructed tracks ; d_{0} [cm]",
                           100, 0, 10);
@@ -1103,7 +1103,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                      50, 0, 5);
     m_neuroRecoHWOutPhi0 = new TH1F("NeuroRecoHWOutPhi0",
                                     "reco matched phi distribution of unpacked neuro tracks; #phi [#circ]",
-                                    180, 0, 360); // shift to reduce the binning error
+                                    80, 0, 360); // shift to reduce the binning error
     m_neuroRecoHWOutHitPattern = new TH1F("NeuroRecoUnpackedHitPattern",
                                           "reco matched stereo hit pattern of unpacked neuro tracks; pattern",
                                           16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
@@ -1126,7 +1126,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                   100, -10, 10);
     m_DeltaRecoHWPhi = new TH1F("DeltaRecoHWPhi",
                                 "difference between reconstructed and unpacked neuro phi; #Delta #phi [#circ]",
-                                180, -180, 180);
+                                80, -180, 180);
   }
   if (!m_limitedoutput && m_recoTracksName != "" && m_unpackedNeuroTracksName != "") {
     m_RecoHWZScatter = new TH2F("RecoHWZScatter",
@@ -1149,7 +1149,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                              50, 0, 5);
     m_RecoSWPhi = new TH1F("RecoSWPhi",
                            "sw matched phi distribution of reconstructed tracks ; #phi [#circ]",
-                           180, 0, 360);
+                           80, 0, 360);
     m_RecoSWD0 = new TH1F("RecoSWD0",
                           "sw matched d0 distribution of reconstructed tracks ; d_{0} [cm]",
                           100, 0, 10);
@@ -1170,7 +1170,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                      50, 0, 5);
     m_neuroRecoSWOutPhi0 = new TH1F("NeuroRecoSWOutPhi0",
                                     "reco matched phi distribution from simulation; #phi [#circ]",
-                                    180, 0, 360); // shift to reduce the binning error
+                                    80, 0, 360); // shift to reduce the binning error
     m_neuroRecoSWOutHitPattern = new TH1F("NeuroRecoSWHitPattern",
                                           "reco matched stereo hit pattern from simulation; pattern",
                                           16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
@@ -1193,7 +1193,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                   100, -10, 10);
     m_DeltaRecoSWPhi = new TH1F("DeltaRecoSWPhi",
                                 "difference between reconstructed and simulated neuro phi; #Delta #phi [#circ]",
-                                180, -180, 180);
+                                80, -180, 180);
   }
 
 
@@ -1210,7 +1210,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                    50, 0, 5);
     m_RecoSWTSSW2DPhi = new TH1F("RecoSWTSSW2DPhi",
                                  "sw matched phi distribution of reconstructed tracks ; #phi [#circ]",
-                                 180, 0, 360);
+                                 80, 0, 360);
     m_RecoSWTSSW2DD0 = new TH1F("RecoSWTSSW2DD0",
                                 "sw matched d0 distribution of reconstructed tracks ; d_{0} [cm]",
                                 100, 0, 10);
@@ -1231,7 +1231,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                            50, 0, 5);
     m_neuroRecoSWTSSW2DOutPhi0 = new TH1F("NeuroRecoSWTSSW2DOutPhi0",
                                           "reco matched phi distribution from simulation; #phi [#circ]",
-                                          180, 0, 360); // shift to reduce the binning error
+                                          80, 0, 360); // shift to reduce the binning error
     m_neuroRecoSWTSSW2DOutHitPattern = new TH1F("NeuroRecoSWTSSW2DHitPattern",
                                                 "reco matched stereo hit pattern from simulation; pattern",
                                                 16, 0, 16); // 4 stereo layers -> 2**4 possible patterns
@@ -1254,7 +1254,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                                         100, -10, 10);
     m_DeltaRecoSWTSSW2DPhi = new TH1F("DeltaRecoSWTSSW2DPhi",
                                       "difference between reconstructed and simulated neuro phi;#Delta #phi [#circ]",
-                                      180, -180, 180);
+                                      80, -180, 180);
   }
 
   // cd back to root directory

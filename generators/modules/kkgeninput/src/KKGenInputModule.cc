@@ -139,6 +139,13 @@ void KKGenInputModule::initializeGenerator()
   B2DEBUG(150, "m_taudecaytableFileName: " << m_taudecaytableFileName);
   B2DEBUG(150, "m_KKMCOutputFileName: " << m_KKMCOutputFileName);
 
+  // Ensure that files provided by user exists
+  if (!m_tauinputFileName.empty() && !FileSystem::fileExists(m_tauinputFileName)) {
+    B2FATAL("KKGenInputModule::initializeGenerator(): " << m_tauinputFileName << " not found!");
+  }
+  if (!m_taudecaytableFileName.empty() && !FileSystem::fileExists(m_taudecaytableFileName)) {
+    B2FATAL("KKGenInputModule::initializeGenerator(): " << m_taudecaytableFileName << " not found!");
+  }
 
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Info, 100, 100);
   initLogCapture.start();

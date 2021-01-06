@@ -92,7 +92,6 @@ mcstatus = array('d', [-511.5, 0.0, 511.5])
 ROOT.TH1.SetDefaultSumw2()
 
 for iFile in workingFiles:
-    # if Belle2.FileSystem.findFile(workingFile):
     tree.AddFile(iFile)
 
 totalBranches = []

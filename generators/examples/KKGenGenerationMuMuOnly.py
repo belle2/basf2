@@ -8,7 +8,6 @@
 ########################################################
 
 import basf2
-from ROOT import Belle2
 from beamparameters import add_beamparameters
 
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -24,8 +23,8 @@ beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
 kkgeninput = basf2.register_module('KKGenInput')
-kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
-kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
+kkgeninput.param('tauinputFile', basf2.find_file('data/generators/kkmc/mu.input.dat'))
+kkgeninput.param('KKdefaultFile', basf2.find_file('data/generators/kkmc/KK2f_defaults.dat'))
 kkgeninput.param('taudecaytableFile', '')
 kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
 

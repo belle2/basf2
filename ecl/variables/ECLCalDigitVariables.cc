@@ -16,6 +16,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+// for crystal geometry
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/geometry/B2Vector3.h>
+
 // dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -55,7 +59,10 @@ namespace Belle2 {
       thetaId = 23,
       cellId = 24,
       mcenergy = 25,
-      usedforenergy = 26
+      usedforenergy = 26,
+      phi_energyrank = 27, // Requires a geometry environment
+      theta_energyrank = 28, // Requires a geometry environment
+      R_energyrank = 29 // Requires a geometry environment
     };
 
     // enum with available center types
@@ -113,6 +120,15 @@ namespace Belle2 {
       }
 
       return -1;
+    }
+
+    //! @returns the position three vector of a cellid
+    // This function requires a geometry environment
+    Belle2::B2Vector3D getCellPosition(int cellid)
+    {
+      Belle2::ECL::ECLGeometryPar* geom = Belle2::ECL::ECLGeometryPar::Instance();
+      Belle2::B2Vector3D position = geom->GetCrystalPos(cellid - 1);
+      return position;
     }
 
     //! @returns variable requested (expert function, only called from this file)
@@ -183,6 +199,15 @@ namespace Belle2 {
         } else if (varid == varType::weight) {
           const auto weight = relatedDigits.weight(caldigitIndex);
           return weight;
+        } else if (varid == varType::phi_energyrank) {
+          Belle2::B2Vector3D position = getCellPosition(caldigitSelected->getCellId());
+          return position.Phi();
+        } else if (varid == varType::theta_energyrank) {
+          Belle2::B2Vector3D position = getCellPosition(caldigitSelected->getCellId());
+          return position.Theta();
+        } else if (varid == varType::R_energyrank) {
+          Belle2::B2Vector3D position = getCellPosition(caldigitSelected->getCellId());
+          return position.Mag();
         } else {
           B2FATAL("variable id not found.");
         }
@@ -1073,6 +1098,43 @@ namespace Belle2 {
 
     }
 
+//-------------------------------------------------------------------------------------
+// new crystal position variables
+//-------------------------------------------------------------------------------------
+
+//! @returns the eclcaldigit Phi by digit energy rank
+    double getPhiByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::phi_energyrank};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit Theta digit energy rank
+    double getThetaByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::theta_energyrank};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit R by digit energy rank
+    double getRByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::R_energyrank};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+//-------------------------------------------------------------------------------------
+// end of new
+//-------------------------------------------------------------------------------------
 
 
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
@@ -1236,7 +1298,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
                       "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
 
+    REGISTER_VARIABLE("eclcaldigitPhiByEnergyRank(i)", getPhiByEnergyRank,
+                      "[calibration] Returns phi of the i-th highest energy caldigit in the cluster (i>=0)");
 
+    REGISTER_VARIABLE("eclcaldigitThetaByEnergyRank(i)", getThetaByEnergyRank,
+                      "[calibration] Returns theta of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitRByEnergyRank(i)", getRByEnergyRank,
+                      "[calibration] Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
   }
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file

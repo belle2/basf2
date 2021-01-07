@@ -1,0 +1,12 @@
+Alias MyJpsi J/psi
+
+Decay vpho
+1.0 chi_c0 MyJpsi PHSP;
+Enddecay
+
+Decay MyJpsi
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

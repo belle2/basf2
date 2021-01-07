@@ -1,0 +1,12 @@
+Alias MyJpsi J/psi
+
+Decay vpho
+1.0 eta_c MyJpsi HELAMP 1 0 0 0 -1 0;
+Enddecay
+
+Decay MyJpsi
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

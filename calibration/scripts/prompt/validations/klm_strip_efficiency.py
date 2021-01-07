@@ -12,6 +12,7 @@ import basf2
 from prompt import ValidationSettings
 import sys
 
+
 ##############################
 # REQUIRED VARIABLE #
 ##############################
@@ -24,20 +25,64 @@ settings = ValidationSettings(name='KLM strip efficiency',
                               expert_config=None)
 
 
+def save_graph_to_root(graph_name):
+    '''
+    Save a TGraph in a ROOT file.
+    '''
+    graph = ROOT.gPad.GetPrimitive('Graph')
+    assert isinstance(graph, ROOT.TGraph) == 1
+    graph.SetName(graph_name)
+    graph.Write()
+
+
+def save_graph_to_pdf(root_file, graph_name):
+    '''
+    Save a drawn TGraph in a PDF file.
+    '''
+    graph = root_file.Get(graph_name)
+    assert isinstance(graph, ROOT.TGraph) == 1
+    graph.SetMarkerStyle(ROOT.EMarkerStyle.kFullDotSmall)
+    graph.SetMarkerColor(ROOT.EColor.kCyan + 2)
+    graph.GetXaxis().SetTitle("Run number")
+    graph.GetYaxis().SetTitle("Plane efficiency")
+    graph.SetMinimum(0.)
+    graph.SetMaximum(1.)
+    graph.Draw("AP")
+    ROOT.gPad.SetGridy()
+    canvas.SaveAs(f'efficiency_{graph_name}.pdf')
+
+
 def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
-    # job_path will be replaced with path/to/calibration_results
-    # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
+    '''
+    Run the validation.
+    Nota bene:
+      - job_path will be replaced with path/to/calibration_results
+      - input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
+    '''
 
     import os
-    import basf2
     import ROOT
-    from ROOT.Belle2 import KLMCalibrationChecker
+    from ROOT.Belle2 import BKLMElementNumbers, KLMCalibrationChecker, KLMElementNumbers
 
+    # Ignore the ROOT command line options.
+    ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
     # Run ROOT in batch mode.
     ROOT.gROOT.SetBatch(True)
+    # Set the Belle II style.
+    ROOT.gROOT.SetStyle("BELLE2")
+    # And unset the stat box.
     ROOT.gStyle.SetOptStat(0)
 
+    # Path to the database.txt file.
     database_file = f'{job_path}/KLMStripEfficiency/outputdb/database.txt'
+
+    # Dictionary with the definition of the validation plots.
+    bklm = KLMElementNumbers.c_BKLM
+    eklm = KLMElementNumbers.c_EKLM
+    first_rpc = BKLMElementNumbers.c_FirstRPCLayer
+    graph_dictionary = {'barrel_rpcs': f'subdetector=={bklm} && layer>={first_rpc}',
+                        'barrel_scintillators': f'subdetector=={bklm} && layer<{first_rpc}',
+                        'endcap_scintillators': f'subdetector=={eklm}'}
 
     # Check the list of runs from the file database.txt.
     exp_run_list = []
@@ -62,32 +107,23 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     # Merge the .root files into a single one and draw the histograms.
     file_name = f'strip_efficiency_exp{exp_run_list[0][0]}.root'
     command = f'hadd -f {file_name} ' \
-        f'strip_efficiency_exp{exp_run_list[0][0]}_run*.root'
+              f'strip_efficiency_exp{exp_run_list[0][0]}_run*.root'
     if (os.system(command) != 0):
         basf2.B2FATAL(f'The command "{command}" aborted during its execution.')
     input_file = ROOT.TFile(f'{file_name}')
     output_file = ROOT.TFile(f'histograms_{file_name}', 'recreate')
     output_file.cd()
     tree = input_file.Get('efficiency')
-    canvas = ROOT.TCanvas('canvas', 'canvas', 800, 400)
+    assert isinstance(tree, ROOT.TTree) == 1
+    canvas = ROOT.TCanvas('canvas', 'canvas', 800, 500)
     canvas.cd()
-    tree.Draw('efficiency:run', 'subdetector==1 && layer>=3')
-    canvas.SaveAs('efficiency_barrel_RPCs.pdf')
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    graph.SetName('barrel_rpcs')
-    graph.Write()
-    tree.Draw('efficiency:run', 'subdetector==1 && layer<3')
-    canvas.SaveAs('efficiency_barrel_scintillators.pdf')
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    graph.SetName('barrel_scintillators')
-    graph.Write()
-    tree.Draw('efficiency:run', 'subdetector==2')
-    canvas.SaveAs('efficiency_endcap_scintillators.pdf')
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    graph.SetName('endcap_scintillators')
-    graph.Write()
+    for name, cut in graph_dictionary.items():
+        tree.Draw('efficiency:run', cut)
+        save_graph_to_root(name)
+        save_graph_to_pdf(output_file, name)
     input_file.Close()
     output_file.Close()
+
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])

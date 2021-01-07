@@ -80,8 +80,8 @@ void e1ProfilePlots (TString input, TString sample, TString output) {
     cout << "nentries = " << nentries << endl;
     
     //..The variables in the ntuple
-    double charge, p, muPcms, muThetaLab, muPhiLab, bestMuonID, worstMuonID;
-    double clusterE, e1Uncorr, clustThetaLab, clustPhiLab, muptLab;
+    double charge, muThetaLab, muPhiLab, bestMuonID, worstMuonID;
+    double e1Uncorr, muptLab;
     allNtuples->SetBranchAddress("muThetaLab",&muThetaLab);
     allNtuples->SetBranchAddress("muPhiLab",&muPhiLab);
     allNtuples->SetBranchAddress("bestMuonID",&bestMuonID);

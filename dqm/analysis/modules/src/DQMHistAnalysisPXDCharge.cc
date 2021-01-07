@@ -194,12 +194,13 @@ void DQMHistAnalysisPXDChargeModule::event()
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
   }
 #endif
+
   int status = 0;
 
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {

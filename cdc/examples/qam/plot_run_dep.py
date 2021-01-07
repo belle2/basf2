@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-import ROOT
-from ROOT import TFile, TH1D, TH2D, TCanvas, TFile, TChain
-from ROOT import TH1F, TGraph, TGraphErrors
-import argparse
+from ROOT import TCanvas
+from ROOT import TGraphErrors
 import glob
 from qam import QAM
 from array import array

@@ -68,7 +68,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
         but just remove all data except for the event information.
     :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
-        generated numbers, otherwise are applied using an internal counter.)
+        generated numbers, otherwise are applied using an internal counter.
     """
 
     # Check components.
@@ -386,18 +386,21 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
-    rawFormat=False
+    rawFormat=False,
+    ignoreInputModulesCheck=False
 ):
     """
-    This function add the rootOutput module with the settings needed to produce a cdst to a path,
+    This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
 
-    @param path Path to add modules to
+    @param path Path to add modules to.
     @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     @param rawFormat saves the cdsts in the raw+tracking format.
+    @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
+           Needed when a conditional path is passed as input.
     """
 
     branches = [
@@ -484,11 +487,6 @@ def add_cdst_output(
             'TrackFitResults',
             'EventT0',
             'TRGECLClusters',
-            'TRGECLUnpackerStores',
-            'TRGECLUnpackerEvtStores',
-            'TRGGRLUnpackerStore',
-            'TRGGDLUnpackerStores',
-            'TRGTOPUnpackerStores',
             'CDCDedxTracks',
             'SVDShaperDigitsFromTracks',
             'PXDClustersFromTracks',
@@ -497,8 +495,8 @@ def add_cdst_output(
             'VXDDedxLikelihoods'
             ]
 
-        if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
+        if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
+            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
 
     if dataDescription is None:
         dataDescription = {}

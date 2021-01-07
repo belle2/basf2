@@ -107,7 +107,7 @@ def generate_constraints(constraint_sets, timedep, global_tags, init_event):
 
     from alignment.constraints_generator import save_config
     ccfn = save_config(constraint_sets, timedep, global_tags, init_event)
-    os.system('basf2 {} {}'.format(Belle2.FileSystem.findFile('alignment/scripts/alignment/constraints_generator.py'), ccfn))
+    os.system('basf2 {} {}'.format(find_file('alignment/scripts/alignment/constraints_generator.py'), ccfn))
 
     return files
 

@@ -142,9 +142,12 @@ global_env = Environment(
         os.path.join('$DATADIR', 'framework', 'particledb', 'evt.pdl')]
 )
 
-for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
-    if entry.endswith('.py'):
-        global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
+if analysis:
+    global_env['REQUIRED_TOOLS'] = []
+else:
+    for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
+        if entry.endswith('.py'):
+            global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
 
 if global_env.GetOption('doxygen'):
     global_env['MODULE_IO'] = True

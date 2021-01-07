@@ -367,10 +367,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
-  while ((obj = static_cast<TObject*>(nextkey()))) {
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvasName)
-        return static_cast<TCanvas*>(obj);
+        return dynamic_cast<TCanvas*>(obj);
     }
   }
   return nullptr;
@@ -379,11 +379,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
-  int isKlmIncluded = 1;
   /* If KLM is not included, stop here and return. */
   TH1* daqInclusion = findHist("KLM/daq_inclusion");
   if (not(daqInclusion == nullptr)) {
-    isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
+    int isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
     if (isKlmIncluded == 0)
       return;
   }

@@ -68,20 +68,39 @@ namespace Belle2 {
   };
 
 
-  // get vector of events from TTree
+
+  /** Get vector of events from TTree
+    @param tr: the tree from where the events are read
+    @return the vector of the event structure
+  */
   std::vector<Event> getEvents(TTree* tr);
 
-  // run the BeamSpot analysis using the splitPoints for BS-position parameters
+  /** Run the BeamSpot analysis using the splitPoints for BS-position parameters
+    @param evts: vector of events
+    @param splitPoints: the vector containing times of the edges of the BS-position calibration intervals [hours]
+    @return A tuple containing vector with BS-positions, vector with BS-positions stat. errors and a BS-size covarince matrix
+  */
   std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(std::vector<Event> evts,
       const std::vector<double>& splitPoints);
 
-  // Convert splitPoints [hours] to breakPoints in ExpRunEvt
+  /** Convert splitPoints [hours] to breakPoints in ExpRunEvt
+    @param events: vector of events
+    @param splitPoints: the vector containing times of the edges of the calibration intervals [hours]
+    @return a vector with calibration break-points in the exp-run-evt format
+   */
   std::vector<ExpRunEvt> convertSplitPoints(const std::vector<Event>& events, std::vector<double> splitPoints);
 
-  // get exp-run-evt number from time tEdge [hours]
+  /** Get the exp-run-evt number from the event time [hours]
+    @param events: vector of events
+    @param tEdge: the event time of the event of interest [hours]
+    @return the position of the time point in the exp-run-evt format
+   */
   ExpRunEvt getPosition(const std::vector<Event>& events, double tEdge);
 
-  // get the map of runs, where each run contains pair with start/end time [hours]
+  /** Get the map of runs, where each run contains pair with start/end time [hours]
+    @param evts: vector of events
+    @return a map where the key is exp-run and value start/end time of the particular run [hours]
+  */
   std::map<ExpRun, std::pair<double, double>> getRunInfo(const std::vector<Event>& evts);
 
 }

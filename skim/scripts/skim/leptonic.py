@@ -110,3 +110,74 @@ class LeptonicUntagged(BaseSkim):
             ],
             path=path,
         )
+
+
+@fancy_skim_header
+class dilepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`BBar \\to l^+l^-`
+        * :math:`BBar \\to l^+l^+`
+        * :math:`BBar \\to l^-l^-`
+    """
+    __authors__ = ["Alessandro Gaz, Chiara La Licata"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Inclusive dilepton skim"
+    )
+    __category__ = "physics, leptonic"
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList(
+            "e+:pid",
+            "e+:all",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID > 0.5",
+            True,
+            path=path,
+        )
+        ma.cutAndCopyList(
+            "mu+:pid",
+            "mu+:all",
+            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and muonID > 0.5",
+            True,
+            path=path,
+        )
+
+        ma.buildEventShape(
+            inputListNames=[],
+            default_cleanup=True,
+            allMoments=False,
+            cleoCones=True,
+            collisionAxis=True,
+            foxWolfram=True,
+            harmonicMoments=True,
+            jets=True,
+            sphericity=True,
+            thrust=True,
+            checkForDuplicates=False,
+            path=path)
+
+        ma.applyEventCuts(cut='foxWolframR2 < 0.5 and nTracks > 3', path=path)
+
+        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid',   'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
+
+        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid',   'M < 15', path=path)
+        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
+
+        ma.copyLists(outputListName='Upsilon(4S):ll',
+                     inputListNames=['Upsilon(4S):ee', 'Upsilon(4S):emu', 'Upsilon(4S):mumu'],
+                     path=path)
+
+        ma.copyLists(outputListName='Delta++:ll',
+                     inputListNames=['Delta++:ee', 'Delta++:emu', 'Delta++:mumu'],
+                     path=path)
+
+        dileptonList = ["Upsilon(4S):ll", "Delta++:ll"]
+        self.SkimLists = dileptonList

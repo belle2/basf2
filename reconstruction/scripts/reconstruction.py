@@ -77,6 +77,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     doom = path.add_module("EventsOfDoomBuster")
     event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
+    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -106,7 +107,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         if not components or ('SVD' in components):
             path.add_module("SVDShaperDigitsFromTracks")
 
-        # if you need to calculat the triggerResult, then you will need the full post-tracking recostruction
+        # if you need to calculate the triggerResult, then you will need the full post-tracking recostruction
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
             add_posttracking_reconstruction(path,
                                             components=components,

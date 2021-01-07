@@ -152,6 +152,7 @@ def add_hlt_processing(path,
 
     # Add the geometry (if not already present)
     path_utils.add_geometry_if_not_present(path)
+    path.add_module('StatisticsSummary').set_name('Sum_Initialization')
 
     # Unpack the event content
     add_unpackers(path, components=unpacker_components)
@@ -176,6 +177,7 @@ def add_hlt_processing(path,
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)
@@ -187,6 +189,7 @@ def add_hlt_processing(path,
 
     # Only create the ROIs for accepted events
     add_roi_finder(accept_path)
+    path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
     path_utils.add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
@@ -198,6 +201,7 @@ def add_hlt_processing(path,
     # However, if we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
+    path.add_module('StatisticsSummary').set_name('Sum_ROI_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)

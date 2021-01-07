@@ -110,11 +110,8 @@
 // R=1251.6+4, d[27,0]=0.0821, d[29,0]=0.0744, d[29,1]=0.0254, d[28,0]=0.0205, d[26,0]=0.0181, d[25,0]=0.016, d[28,1]=-0.0162, d[25,1]=-0.0188, d[26,1]=-0.0188, d[27,1]=-0.0201, 
 
 # transformation of the whole barrel with the supporting structures as a solid body
-# default barrel placement
-1001 0 0 0 0 0 0
+# Position used in ECLCrystalsShapeAndPosition rev 9 and earlier
+# 1001 0 0 0 0 0 0
 
-# barrel displaced by 2 mm toward forward endcap
-# 1001 0 0 0 2 0 0
-
-# barrel displaced by 2 mm toward backward endcap
-# 1001 0 0 0 2 3.14159265358979323846 0
+# alignment documented in BELLE2-NOTE-TE-2020-031 ECLCrystalsShapesAndPositions Rev 15
+1001 0.000491  1.368213 -0.570591     1.962884  0.636526 -1.954606

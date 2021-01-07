@@ -28,7 +28,7 @@ the software by following through a series of hands-on lessons.
 
    You can also take a sneak peek at the most recent version of the documentation by selecting
    the `development version <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_.
-   Hoever not all of the code examples might work for you yet.
+   However not all of the code examples might work for you yet.
 
    The earliest release version which contains this online book is
    ``release-05-01-12``.

@@ -291,7 +291,7 @@ def add_pretracking_reconstruction(path, components=None):
     add_ecl_modules(path, components)
 
     # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
+    path.add_module('StatisticsSummary').set_name('Sum_Pretracking_Clustering')
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -357,7 +357,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         if pruneTracks:
             add_prune_tracks(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
+    path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Clustering')
 
 
 def add_mdst_output(

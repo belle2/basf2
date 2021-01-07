@@ -23,8 +23,9 @@ the software by following through a series of hands-on lessons.
    page, just below the logo. You can also change your version by clicking on
    `other versions <https://software.belle2.org/>`_.
 
-   If you are a new to all of this, we recommend you to select the latest
-   *release version* (``release-xx-xx-xx`` with the largest ``xx-xx-xx``).
+   If you are a new to all of this, we recommend you to select the
+   *recommended release version* (``release-xx-xx-xx (recommended)`` in the
+   above list).
 
    You can also take a sneak peek at the most recent version of the documentation by selecting
    the `development version <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_.

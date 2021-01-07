@@ -177,7 +177,7 @@ def add_hlt_processing(path,
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
-        path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
+        accept_path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)
@@ -189,7 +189,7 @@ def add_hlt_processing(path,
 
     # Only create the ROIs for accepted events
     add_roi_finder(accept_path)
-    path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
+    accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
     path_utils.add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)

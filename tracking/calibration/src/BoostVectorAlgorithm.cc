@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Radek Zlebcik                                            *
@@ -8,17 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
 #include <framework/database/EventDependency.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 
 #include <iostream>
 #include <iomanip>
 
-#include <tracking/calibration/BeamSpotAlgorithm.h>
-#include <tracking/calibration/BeamSpotStandAlone.h>
+#include <tracking/calibration/BoostVectorAlgorithm.h>
+#include <tracking/calibration/BoostVectorStandAlone.h>
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/calibTools.h>
 
@@ -26,31 +25,30 @@
 using namespace std;
 using namespace Belle2;
 
-using Belle2::BeamSpotCalib::Event;
-using Belle2::BeamSpotCalib::getEvents;
-using Belle2::BeamSpotCalib::runBeamSpotAnalysis;
+using Belle2::BoostVectorCalib::Event;
+using Belle2::BoostVectorCalib::getEvents;
+using Belle2::BoostVectorCalib::runBoostVectorAnalysis;
 
-BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector")
+
+BoostVectorAlgorithm::BoostVectorAlgorithm() : CalibrationAlgorithm("BoostVectorCollector")
 {
-  setDescription("BeamSpot calibration algorithm");
+  setDescription("BoostVector calibration algorithm");
 }
 
 
-/** Create BS object */
-static TObject* getBeamSpotObj(TVector3 ipVtx, TMatrixDSym  ipVtxUnc, TMatrixDSym  sizeMat)
+/** Create BoostVector object */
+static TObject* getBoostVectorObj(TVector3 vBoost, TMatrixDSym  vBoostUnc, TMatrixDSym /*vBoostSpread*/)
 {
-  auto payload = new BeamSpot();
-  payload->setIP(ipVtx, ipVtxUnc);
-  payload->setSizeCovMatrix(sizeMat);
+  auto payload = new CollisionBoostVector();
+  payload->setBoost(vBoost, vBoostUnc);
   TObject* obj  = static_cast<TObject*>(payload);
   return obj;
 }
 
 
 
-
 /* Main calibration method calling dedicated functions */
-CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
+CalibrationAlgorithm::EResult BoostVectorAlgorithm::calibrate()
 {
   auto tracks = getObjectPtr<TTree>("tracks");
   if (!tracks || tracks->GetEntries() < 15) {
@@ -80,7 +78,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   //Loop over all BeamSize intervals
   vector<CalibrationData> calVec; //(splits.size());
   for (auto s : splits) {
-    CalibrationData calD = runAlgorithm(evts, s, runBeamSpotAnalysis);
+    CalibrationData calD = runAlgorithm(evts, s, runBoostVectorAnalysis);
     calVec.push_back(calD);
   }
 
@@ -93,10 +91,8 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   }
 
   // Store Payloads to files
-  storePayloads(evts, calVec, "BeamSpot", getBeamSpotObj);
+  storePayloads(evts, calVec, "BoostVector", getBoostVectorObj);
 
   return c_OK;
 }
-
-
 

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <TMatrixD.h>
+#include <TVectorD.h>
 #include <TString.h>
 #include <TRandom.h>
 

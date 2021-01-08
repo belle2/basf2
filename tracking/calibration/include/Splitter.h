@@ -40,6 +40,18 @@ namespace Belle2 {
     ExpRun(int Exp, int Run) : exp(Exp), run(Run) {}
   };
 
+
+  /** struct with expNum, runNum, evtNum */
+  struct ExpRunEvt {
+    int exp; ///< experiment number
+    int run; ///< run number
+    int evt; ///< event number
+    /** simple constructor */
+    ExpRunEvt(int Exp, int Run, int Evt) : exp(Exp), run(Run), evt(Evt) {}
+  };
+
+
+
   /** Not equal for ExpRun */
   inline bool operator!=(ExpRun a, ExpRun b) { return (a.exp != b.exp || a.run != b.run); }
 
@@ -166,5 +178,76 @@ namespace Belle2 {
 
 
   };
+
+
+  /** Get the map of runs, where each run contains pair with start/end time [hours]
+    @param evts: vector of events
+    @return a map where the key is exp-run and value start/end time of the particular run [hours]
+  */
+  template<typename Evt>
+  inline std::map<ExpRun, std::pair<double, double>> getRunInfo(const std::vector<Evt>& evts)
+  {
+    std::map<ExpRun, std::pair<double, double>> runsInfo;
+
+    for (auto& evt : evts) {
+      int Exp = evt.exp;
+      int Run = evt.run;
+      double time = evt.t;
+      //tracks->GetEntry(i);
+      if (runsInfo.count(ExpRun(Exp, Run))) {
+        double tMin, tMax;
+        std::tie(tMin, tMax) = runsInfo.at(ExpRun(Exp, Run));
+        tMin = std::min(tMin, time);
+        tMax = std::max(tMax, time);
+        runsInfo.at(ExpRun(Exp, Run)) = {tMin, tMax};
+      } else {
+        runsInfo[ExpRun(Exp, Run)] = {time, time};
+      }
+
+    }
+    return runsInfo;
+  }
+
+
+  /** Get the exp-run-evt number from the event time [hours]
+    @param events: vector of events
+    @param tEdge: the event time of the event of interest [hours]
+    @return the position of the time point in the exp-run-evt format
+   */
+// Get exp,run,evtNum from the time tEdge
+  template<typename Evt>
+  inline ExpRunEvt getPosition(const std::vector<Evt>& events, double tEdge)
+  {
+    ExpRunEvt evt(-1, -1, -1);
+    double tBreak = -1e10;
+    for (auto& e : events) {
+      if (e.t < tEdge) {
+        if (e.t > tBreak) {
+          tBreak = e.t;
+          evt =  ExpRunEvt(e.exp, e.run, e.evtNo);
+        }
+      }
+    }
+    return evt;
+  }
+
+// convert splitPoints [in UTC time] to expRunEvt
+  /** Convert splitPoints [hours] to breakPoints in ExpRunEvt
+    @param events: vector of events
+    @param splitPoints: the vector containing times of the edges of the calibration intervals [hours]
+    @return a vector with calibration break-points in the exp-run-evt format
+   */
+  template<typename Evt>
+  std::vector<ExpRunEvt> convertSplitPoints(const std::vector<Evt>& events, std::vector<double> splitPoints)
+  {
+
+    std::vector<ExpRunEvt>  breakPos;
+    for (auto p : splitPoints) {
+      auto pos = getPosition(events, p);
+      breakPos.push_back(pos);
+    }
+    return breakPos;
+  }
+
 
 }

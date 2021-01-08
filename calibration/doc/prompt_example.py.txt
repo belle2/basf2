@@ -23,6 +23,7 @@ settings = CalibrationSettings(name="Example Simple",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
+                               input_data_filters={"physics":["physics","Good"]}
                                expert_config={"events_per_file": 10000, ...},
                                depends_on=[caf_vxd_dependency])
 

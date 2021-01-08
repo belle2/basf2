@@ -1,0 +1,42 @@
+# EventType: 1110023000
+# Descriptor: [B0 -> omega gamma] cc
+# NickName: Bd_omegagamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Jyotirmoi Borah and Soumen Halder
+# Email: borah176121103@iitg.ac.in
+# Cuts: None
+# Date: 20201103 (YMD)
+
+#
+#  Decay table to generate
+# Upsilon(4S) -> B0 anti-B0 -> Generic
+#                |
+#                 -> omega gamma
+#                    | 
+#                    --> pi+ pi- pi0
+#                                | 
+#                                ---> gamma gamma
+#
+Alias omegasig omega
+Alias pi0sig pi0 
+#
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000 omegasig gamma SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+#
+Decay omegasig
+1.0 pi+ pi- pi0sig   PHOTOS PHSP;
+Enddecay
+#
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+#
+End

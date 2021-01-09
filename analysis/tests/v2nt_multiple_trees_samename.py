@@ -3,7 +3,7 @@
 
 import ROOT
 import b2test_utils
-from basf2 import set_random_seed, create_path, process
+from basf2 import create_path, set_random_seed
 from b2test_utils import configure_logging_for_tests
 from modularAnalysis import variablesToNtuple
 

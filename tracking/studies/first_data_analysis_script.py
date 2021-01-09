@@ -6,8 +6,9 @@ import os
 import basf2
 import rawdata
 
-from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
+from tracking import add_track_finding, add_track_fit_and_track_creator
 from tracking.harvesting_validation import recorded_data_module
+from tracking.path_utils import add_hit_preparation_modules
 
 
 def get_output_file_name(file_name):

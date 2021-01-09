@@ -7,12 +7,8 @@ from tracking.run.event_generation import StandardEventGenerationRun
 import tracking.metamodules as metamodules
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
-from tracking.validation.plot import ValidationPlot
 from tracking.validation.utilities import prob, is_primary
-from tracking.utilities import NonstrictChoices
-from ROOT import std
 from ROOT import Belle2  # make Belle2 namespace available
-import os
 import sys
 import numpy as np
 

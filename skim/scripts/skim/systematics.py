@@ -540,7 +540,7 @@ class SystematicsLambda(BaseSkim):
     __category__ = "systematics"
 
     def load_standard_lists(self, path):
-        stdLambdas("merged", path=path)
+        stdLambdas(path=path)
 
     def build_lists(self, path):
         va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
@@ -580,7 +580,7 @@ class SystematicsPhiGamma(BaseSkim):
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
-        stdKshorts("merged", path=path)
+        stdKshorts(path=path)
 
     TestFiles = [get_test_file("phigamma_neutral")]
 

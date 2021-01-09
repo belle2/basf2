@@ -64,7 +64,7 @@ int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray
   pout->Clear();
   int nprt = 0;
 
-  for (TIter next(pin); BParticle* p = (BParticle*) next();) {
+  for (TIter next(pin); BParticle* p = dynamic_cast<BParticle*>(next());) {
     if (p->charge() == charge && p->pid() == type) {
       TClonesArray& list = *pout;
       new(list[nprt++]) BParticle(*p);
@@ -80,9 +80,10 @@ int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, flo
   pout->Clear();
   int nprt = 0;
 
-  for (TIter next1(plist1); BParticle* p1 = (BParticle*) next1();) {
+  for (TIter next1(plist1); BParticle* p1 = dynamic_cast<BParticle*>(next1());) {
     // the second loop
-    for (TIter next2 = (plist1 != plist2 && same == 0) ?  TIter(plist2) : TIter(next1) ; BParticle* p2 = (BParticle*) next2();) {
+    for (TIter next2 = (plist1 != plist2
+                        && same == 0) ?  TIter(plist2) : TIter(next1) ; BParticle* p2 = dynamic_cast<BParticle*>(next2());) {
       BParticle  p = *p1 + *p2; // Combine two particles into a new particle
       if (p.InMassRange(masslow, massup)) {
         p.SetPid(pid);

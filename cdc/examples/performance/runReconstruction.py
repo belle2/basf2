@@ -15,38 +15,34 @@ output : Output root file, which contains helix parameters.
          Please use compare2Tracks.C for example.
 '''
 
-import basf2
-from basf2 import *
-import ROOT
+import basf2 as b2
 import os
 import os.path
 import argparse
-from reconstruction import add_cosmics_reconstruction
-from ROOT import Belle2
-from cdc.cr import *
+from cdc import cr
 
 # Set your suitable DB
-reset_database()
-use_database_chain()
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000", LogLevel.INFO)
-use_central_database("MagneticFieldPhase2QCSoff")
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000", b2.LogLevel.INFO)
+b2.use_central_database("MagneticFieldPhase2QCSoff")
 # use_local_database("/home/belle/muchida/basf2/work/caf/gcr2/test6/localDB/database.txt")
 
 
 def rec(input, output, topInCounter=False, magneticField=True,
         unpacking=True, fieldMapper=False):
-    main_path = basf2.create_path()
-    logging.log_level = LogLevel.INFO
+    main_path = b2.create_path()
+    b2.logging.log_level = b2.LogLevel.INFO
 
     # Get experiment and runnumber.
-    exp_number, run_number = getExpRunNumber(input)
+    exp_number, run_number = cr.getExpRunNumber(input)
 
     # Set the peiod of data taking.
-    data_period = getDataPeriod(exp=exp_number,
-                                run=run_number)
+    data_period = cr.getDataPeriod(exp=exp_number,
+                                   run=run_number)
 
-    mapperAngle = getMapperAngle(exp=exp_number,
-                                 run=run_number)
+    mapperAngle = cr.getMapperAngle(exp=exp_number,
+                                    run=run_number)
 
     # print(data_period)
     if os.path.exists('output') is False:
@@ -60,12 +56,12 @@ def rec(input, output, topInCounter=False, magneticField=True,
         main_path.add_module('CDCUnpacker')
 
     if data_period == 'gcr2017':
-        gearbox = register_module('Gearbox',
-                                  fileName="/geometry/GCR_Summer2017.xml",
-                                  override=[("/Global/length", "8.", "m"),
-                                            ("/Global/width", "8.", "m"),
-                                            ("/Global/height", "8.", "m"),
-                                            ])
+        gearbox = b2.register_module('Gearbox',
+                                     fileName="/geometry/GCR_Summer2017.xml",
+                                     override=[("/Global/length", "8.", "m"),
+                                               ("/Global/width", "8.", "m"),
+                                               ("/Global/height", "8.", "m"),
+                                               ])
         main_path.add_module(gearbox)
     else:
         main_path.add_module('Gearbox')
@@ -84,8 +80,8 @@ def rec(input, output, topInCounter=False, magneticField=True,
     main_path.add_module('Progress')
 
     # Add CDC CR reconstruction.
-    set_cdc_cr_parameters(data_period)
-    add_cdc_cr_reconstruction(main_path)
+    cr.set_cdc_cr_parameters(data_period)
+    cr.add_cdc_cr_reconstruction(main_path)
     # add_cosmics_reconstruction(main_path,
     #                               data_taking_period=data_period,
     #                           merge_tracks=False)
@@ -97,9 +93,9 @@ def rec(input, output, topInCounter=False, magneticField=True,
                          Output=output)
 
     #    main_path.add_module("RootOutput", outputFileName='full.root')
-    basf2.print_path(main_path)
-    basf2.process(main_path)
-    print(basf2.statistics)
+    b2.print_path(main_path)
+    b2.process(main_path)
+    print(b2.statistics)
 
 
 if __name__ == "__main__":

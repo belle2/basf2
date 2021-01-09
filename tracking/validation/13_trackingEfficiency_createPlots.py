@@ -35,7 +35,7 @@ import sys
 import math
 import numpy as np
 from optparse import OptionParser
-from tracking.validation.tracking_efficiency_helpers import *
+from tracking.validation.tracking_efficiency_helpers import get_generated_pt_values
 
 DELTA_PT = 0.0001
 

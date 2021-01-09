@@ -369,7 +369,6 @@ def add_cry_tb_generator(path):
 def add_no_generator(path):
     """Add no generator for e.g. background only studies"""
     # Nothing to do here since the background files are included in the add_simulation
-    pass
 
 
 # Generator module names hashed by shorthand menomics. Includes

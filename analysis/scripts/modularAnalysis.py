@@ -7,6 +7,7 @@ This module defines wrapper functions around the analysis modules.
 
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+import basf2
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -158,6 +159,12 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
+
+    .. warning::
+
+        This functon is kept for backward-compatibility.
+        Better to use `mdst.add_mdst_output` directly.
+
     """
 
     import mdst
@@ -166,105 +173,20 @@ def outputMdst(filename, path):
 
 def outputUdst(filename, particleLists=None, includeArrays=None, path=None, dataDescription=None):
     """
-    Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
+    Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Note that this does not reduce the amount of Particle objects saved,
-    see skimOutputUdst() for a function that does.
+    Note:
+        This does not reduce the amount of Particle objects saved,
+        see `udst.add_skimmed_udst_output` for a function that does.
+
     """
-
-    import mdst
-    import pdg
-
-    if particleLists is None:
-        particleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # also add anti-particle lists
-    plSet = set(particleLists)
-    for List in particleLists:
-        name, label = List.split(':')
-        plSet.add(pdg.conjugate(name) + ':' + label)
-
-    partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + includeArrays + list(plSet)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("dataLevel", "udst")
-
-    return mdst.add_mdst_output(path, mc=True, filename=filename,
-                                additionalBranches=partBranches,
-                                dataDescription=dataDescription)
-
-
-def skimOutputUdst(skimDecayMode, skimParticleLists=None, outputParticleLists=None,
-                   includeArrays=None, path=None, *,
-                   outputFile=None, dataDescription=None):
-    """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a udst file, saving only particles from skimParticleLists
-    and from outputParticleLists.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
-
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
-    """
-
-    from basf2 import AfterConditionPath
-
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
-
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".udst.root"):
-        outputFile += ".udst.root"
-
-    skimfilter = register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = create_path()
-    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
-               dataDescription=dataDescription)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+    import udst
+    udst.add_udst_output(
+        path=path, filename=filename, particleLists=particleLists,
+        additionalBranches=includeArrays, dataDescription=dataDescription)
 
 
 def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
@@ -799,7 +721,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -871,6 +793,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -880,10 +803,13 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    for decayString, cut in decayStringsWithCuts:
+        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -938,6 +864,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -947,6 +875,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+        getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -1951,26 +1881,26 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=False,
+                     belle_sources=False, fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
-    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
+    particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
-    @param target_list_name name of the input ParticleList
-    @param inputParticlelists list of input particle list names, which serve
-                              as a source of particles to build ROE, the FSP particles from
-                              target_list_name are excluded from ROE object
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the inputParticlelists
-                              option will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of user-defined input particle list names, which serve
+                              as source of particles to build the ROE, the FSP particles from
+                              target_list_name are automatically excluded from the ROE object
+    @param fillWithMostLikely By default the module uses the most likely particle mass hypothesis for charged particles
+                              based on the PID likelihood. Turn this behavior off if you want to configure your own
+                              input particle lists.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate the
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
-    @param path      modules are added to this path
+    @param belle_sources      boolean to indicate that the ROE should be built from Belle sources only
+    @param path               modules are added to this path
     """
     if inputParticlelists is None:
         inputParticlelists = []
@@ -2615,8 +2545,6 @@ def writePi0EtaVeto(
                                     (default is None)
     """
 
-    import basf2_mva
-
     renameSuffix = False
 
     for module in path.modules():
@@ -2733,6 +2661,24 @@ def writePi0EtaVeto(
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def getBeamBackgroundProbabilityMVA(
+    particleList,
+    path=None,
+):
+    """
+    Assign a probability to each ECL cluster as being background like (0) or signal like (1)
+    @param particleList     The input ParticleList, must be a photon list
+    @param path       modules are added to this path
+    """
+
+    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+    path.add_module(
+        'MVAExpert',
+        listNames=particleList,
+        extraInfoName='beamBackgroundProbabilityMVA',
+        identifier='BeamBackgroundMVA')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
@@ -3190,6 +3136,30 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
+
+def scaleError(outputListName, inputListName,
+               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
+               minErrors=[0.00140, 0, 0, 0.00157, 0],
+               path=None):
+    '''
+    This module creates a new charged particle list.
+    The helix errors of the new particles are scaled by constant factors.
+    Lower bounds can be set so that helix errors are confined above the limit.
+    The scale factors and lower bounds are defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
+
+    @param inputListName Name of input charged particle list to be scaled
+    @param outputListName Name of output charged particle list with scaled error
+    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param minErrors Lower bound can be set for each helix error.
+    '''
+    scale_error = register_module("HelixErrorScaler")
+    scale_error.set_name('ScaleError_' + inputListName)
+    scale_error.param('inputListName', inputListName)
+    scale_error.param('outputListName', outputListName)
+    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('minErrors', minErrors)
+    path.add_module(scale_error)
 
 
 if __name__ == '__main__':

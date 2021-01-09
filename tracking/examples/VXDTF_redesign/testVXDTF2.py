@@ -15,7 +15,7 @@
 #####################################################################
 
 
-from basf2 import *
+import basf2 as b2
 import argparse
 # Import custom module chain for VXDTF2
 from setup_modules import setup_VXDTF2
@@ -44,27 +44,27 @@ performFit = False
 generateTimeSeedAfterFit = False
 
 # Logging and Debug Levels
-set_log_level(LogLevel.ERROR)
-log_to_file('logVXDTF2Execution.log', append=False)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.log_to_file('logVXDTF2Execution.log', append=False)
 
 
 # ---------------------------------------------------------------------------------------
-path = create_path()
+path = b2.create_path()
 
 # Input
-rootInput = register_module('RootInput')
+rootInput = b2.register_module('RootInput')
 path.add_module(rootInput)
 
 # Event Info Module
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 path.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['BeamPipe',
                               'MagneticFieldConstant4LimitedRSVD',
                               'PXD',
@@ -82,32 +82,32 @@ setup_VXDTF2(path=path,
 
 if performFit:
     # This is required for RecoFitter
-    genFitExtrapolation = register_module('SetupGenfitExtrapolation')
+    genFitExtrapolation = b2.register_module('SetupGenfitExtrapolation')
     path.add_module(genFitExtrapolation)
 
     if not generateTimeSeedAfterFit:
-        timeSeed = register_module('IPTrackTimeEstimator')
+        timeSeed = b2.register_module('IPTrackTimeEstimator')
         timeSeed.param('useFittedInformation', False)
         path.add_module(timeSeed)
 
-    fitter = register_module('DAFRecoFitter')
+    fitter = b2.register_module('DAFRecoFitter')
     path.add_module(fitter)
 
     if generateTimeSeedAfterFit:
-        timeSeedAfterFit = register_module('IPTrackTimeEstimator')
+        timeSeedAfterFit = b2.register_module('IPTrackTimeEstimator')
         timeSeedAfterFit.param('useFittedInformation', True)
         path.add_module(timeSeedAfterFit)
 
 
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 path.add_module(output)
 
 
 if useDisplay:
-    display = register_module('Display')
+    display = b2.register_module('Display')
     display.param('showAllPrimaries', True)
     path.add_module(display)
 
 path.add_module('Progress')
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

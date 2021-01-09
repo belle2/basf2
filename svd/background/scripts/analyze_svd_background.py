@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-from basf2 import *
+import basf2 as b2
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 # Change this to point to actual locations on your system.
 input_dir = '/data/belle2/BG/Jun2014/bg_SVD/'
 output_dir = '/data/belle2/BG/Jun2014/bg_SVD/output/'
@@ -23,47 +22,47 @@ files = [input_dir + s + '_' + str(t) + 'us.root' for (s, t) in components]
 svd_branches = ['MCParticles', 'MCParticlesToSVDSimHits',
                 'MCParticlesToSVDTrueHits', 'SVDSimHits', 'SVDTrueHits']
 
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileNames', files)
 # input.param('branchNames', svd_branches)
 
 # Histogram manager immediately after master module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 # File to save histograms
 histo.param('histoFileName', output_dir + 'SVDBackgroundHisto.root')
 
 # Report progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['SVD'])
 
 # SVD digitizer
-svdDigi = register_module('SVDDigitizer')
+svdDigi = b2.register_module('SVDDigitizer')
 svdDigi.param('ElectronicEffects', False)
 
 # SVD clusterizer
 # svdClust = register_module('SVDClusterizer')
 
 # SVD beam background
-svdBkg = register_module('SVDBackground')
+svdBkg = b2.register_module('SVDBackground')
 svdBkg.param('componentNames', [s for (s, t) in components])
 svdBkg.param('componentTimes', [t for (s, t) in components])
 svdBkg.param('outputDirectory', output_dir)
 
-svdBkg.set_log_level(LogLevel.DEBUG)
+svdBkg.set_log_level(b2.LogLevel.DEBUG)
 svdBkg.set_debug_level(10)
 
 # output - do we want output?
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', output_dir + 'SVDBackgroundOutput.root')
 output.param('branchNames', ['SVDEnergyDepositionEvents', 'SVDNeutronFluxEvents'])
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Add modules to paths
 main.add_module(input)
@@ -77,7 +76,7 @@ main.add_module(svdBkg)
 main.add_module(output)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

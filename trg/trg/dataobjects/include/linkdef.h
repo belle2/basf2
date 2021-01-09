@@ -15,6 +15,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TRGTiming+;
+#pragma link C++ class Belle2::TRGTiming+; // checksum=0xaa980655, version=1
 
 #endif

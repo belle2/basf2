@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 
 # ####### Imports #######
-from basf2 import *
+import basf2 as b2
 
 import simulation
 
 # ######## Register modules  ########
-eventInfoSetterModule = register_module('EventInfoSetter')
+eventInfoSetterModule = b2.register_module('EventInfoSetter')
 eventInfoSetterModule.param({'evtNumList': [10], 'runList': [1],
                              'expList': [0]})
 
-progressModule = register_module('Progress')
+progressModule = b2.register_module('Progress')
 
-particleGunModule = register_module('ParticleGun')
+particleGunModule = b2.register_module('ParticleGun')
 particleGunModule.param({
     'pdgCodes': [13, -13],
     'nTracks': 10,
@@ -24,11 +24,11 @@ particleGunModule.param({
     'thetaParams': [17., 150.],
 })
 
-rootOutputModule = register_module('RootOutput')
+rootOutputModule = b2.register_module('RootOutput')
 rootOutputModule.param({'outputFileName': 'mc_gun.root'})
 
 # ######## Create paths and add modules  ########
-main = create_path()
+main = b2.create_path()
 
 main.add_module(eventInfoSetterModule)
 main.add_module(progressModule)
@@ -42,7 +42,7 @@ simulation.add_simulation(main, components=components)
 
 main.add_module(rootOutputModule)
 
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

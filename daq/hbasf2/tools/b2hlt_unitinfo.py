@@ -11,7 +11,7 @@
 # ************************************************************************#
 
 import zmq
-from argparse import ArgumentParser, FileType
+from argparse import ArgumentParser
 from zmq_daq.utils import normalize_addresses, get_monitor_table
 
 import os

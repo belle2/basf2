@@ -1,6 +1,6 @@
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
-from tracking.validation.harvesting import HarvestingModule
+from tracking.harvest.harvesting import HarvestingModule
 import os
 import multiprocessing
 

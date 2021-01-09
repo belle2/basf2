@@ -1,21 +1,18 @@
-from basf2 import *
+import basf2 as b2
 import os
 import shutil
 import glob
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
 
 from caf.framework import Calibration, CAF
-from caf.backends import Local
 
 import unittest
 from unittest import TestCase
 from pathlib import Path
 
 # show only Errors as we'll be setting off a lot of ugly deliberate warnings
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 
 class TestCalibrationClass_Configure(TestCase):
@@ -32,7 +29,7 @@ class TestCalibrationClass_Configure(TestCase):
         #: Calibration algorithm attribute for use in unittests
         self.alg2 = TestAlgo()
         #: Collector module attribute for use in unittests
-        self.col1 = register_module('CaTest')
+        self.col1 = b2.register_module('CaTest')
         #: Path to an example file
         self.example_file1 = Path("example1.root")
         self.example_file2 = Path("example2.root")
@@ -110,7 +107,7 @@ class TestCalibrationClass_Args(TestCase):
         #: Calibration algorithm for use in unittests
         self.alg2 = TestAlgo()
         #: Collector module attribute for use in unittests
-        self.col1 = register_module('CaTest')
+        self.col1 = b2.register_module('CaTest')
         #: Calibration name for use in unittests
         self.name = 'TestCalibration'
         #: Path to an example file
@@ -170,7 +167,7 @@ class TestCAF(TestCase):
         #: Calibration name for use in unittests
         self.name3 = 'TestCalibration3'
         alg = TestAlgo()
-        col = register_module('CaTest')
+        col = b2.register_module('CaTest')
         #: Path to an example file
         self.example_file1 = Path("example1.root")
         self.example_file1.touch()

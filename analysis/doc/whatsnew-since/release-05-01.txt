@@ -6,6 +6,10 @@ Vertex Fitting
 
  * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
    reconstructed in ``eta -> gamma gamma``.
+ * Added a method `scaleError` in order to scale up helix errors and avoid underestimation of vertex error.
+ * Added a new fit-type option ``massfourC`` to function :func:`vertex.kFit`. The kinematic fit is performed with the 4 momentum
+   constraint of a mother particle and mass constraints of intermediate particles specified by the option ``massConstraint``,
+   simultaneously.
 
 Variables
 +++++++++
@@ -22,13 +26,9 @@ Variables
  * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
    region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
- * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
+ * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection,
    collections of ROE and recoil variables have been expanded
- * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
-   binary PID variables have been added to the PID variable collection.
-
-   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
-
+ * A few binary PID variables have been added to the PID variable collection.
  * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
  * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters
    :b2:var:`mcDaughterDiffOf` , :b2:var:`mcDaughterDiffOfPhi`, :b2:var:`mcDaughterDiffOfPhiCMS`, :b2:var:`mcDaughterAngle`.
@@ -37,6 +37,17 @@ Variables
    during the calculation.
  * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
  * Added new variables :b2:var:`exp` and :b2:var:`log`.
+ * Added special hadron ID variables :b2:var:`pionID_SVD`, :b2:var:`kaonID_SVD`, :b2:var:`protonID_SVD`, :b2:var:`binaryPID_SVD`
+   which include SVD PDFs for pions, kaons and protons only. For hadron ID, users should **no longer** rely on the standard
+   variables :b2:var:`pionID`, :b2:var:`kaonID`, :b2:var:`protonID`, :b2:var:`binaryPID` for the time being. For lepton
+   identification instead, the :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`binaryPID` variables, which do not contain SVD PDF
+   info yet, are still recommended.
+ * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true
+   photons and beam backgrounds.
+ * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
+   theme.
+ * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
+   :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.
 
 Modules
 +++++++
@@ -48,22 +59,27 @@ Modules
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
  * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
    download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
-   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon. 
+   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon.
    Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
    ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
  * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
- * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into ROE 4-vector computation.
+ * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into
+   ROE 4-vector computation.
 
    .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.
 
  * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
    has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
    much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
- 
  * The :b2:mod:`ParticleLoader` now creates photon candidates from KLMCluster if the parameter ``loadPhotonsFromKLM`` is set to
    true. It is off by default.
 
    .. warning:: Photons from KLMCluster should only be used in specific use-cases and after a thorough study of their effect.
+
+ * In :b2:mod:`BtubeCreator`, new extrainfo ``TubeB_p_estimated`` was added. This returns the magnitude of the estimated momentum
+   of the B which should fly in the direction of the Btube.
+ * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles
+   and stores them in a new list.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

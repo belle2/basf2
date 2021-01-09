@@ -11,10 +11,8 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-import os
 import sys
 import glob
-import ROOT
 from ROOT import Belle2
 
 # Usage: basf2 run_ee5x5_algorithm_dPhi_data.py "inputfiles*.root"

@@ -37,6 +37,14 @@ namespace Belle2 {
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
+     * @param energyNiel the non-ionization energy in electrons
+     * @param tkPDG the PDG number of the track
+     * @param tkKEnergy the kinetic energy of the track
+     * @param detNb the He3tube number
+     * @param GlTime the global time
+     * @param tkPos the track position
+     * @param tkMom the track momentum
+     * @param tkMomDir the track momentum direction
      * @param neuProc boolean which tells whether or not a process was a neutron process
      */
     He3tubeSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos,

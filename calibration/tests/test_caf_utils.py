@@ -43,8 +43,8 @@ class TestUtils_getiov(TestCase):
         """
         test get_iov_from_file()
         """
-        from ROOT import Belle2
-        path = Belle2.FileSystem.findFile('framework/tests/root_input.root')
+        from basf2 import find_file
+        path = find_file('framework/tests/root_input.root')
         iov = get_iov_from_file(path)
         self.assertTrue(IoV(0, 1, 0, 1).contains(iov))
 

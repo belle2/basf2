@@ -46,8 +46,7 @@ namespace Belle2 {
     /** This is the method for getting the comprehensive list of strips
      * flagged as "cross talk" by the SVDCrossTalkFinderModule.
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *
@@ -66,8 +65,7 @@ namespace Belle2 {
      * Cross Talk, according to the bitmap of strips flagged as cross talk.
 
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: cluster position in cm
     *

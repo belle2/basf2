@@ -27,11 +27,11 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Tru
 
     # data format check NOT appended
     if dataFormatName not in [e.name() for e in path.modules()]:
-        dataFormat = register_module('SVDDataFormatCheck')
+        dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
-        clusterizer = register_module('SVDClusterizer')
+        clusterizer = b2.register_module('SVDClusterizer')
         clusterizer.set_name(clusterizerName)
         clusterizer.param('Clusters', clustersName)
         clusterizer.param('timeAlgorithm6Samples', "CoG6")
@@ -48,7 +48,7 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Tru
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
-        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
@@ -58,17 +58,31 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Tru
     if createRecoDigits:
         # Add SVDRecoDigit creator module
         # useful for DQM and validation
-        if recocreatorName not in [e.name() for e in path.modules()]:
-            recoDigitCreator = register_module('SVDRecoDigitCreator')
-            recoDigitCreator.set_name(recocreatorName)
-            recoDigitCreator.param('RecoDigits', recoDigitsName)
-            recoDigitCreator.param('Clusters', clustersName)
-            recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
-            recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
-            recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
-            recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
-            recoDigitCreator.param('useDB', False)
-            path.add_module(recoDigitCreator)
+        add_svd_create_recodigits(path, isROIsimulation)
+
+
+def add_svd_create_recodigits(path, isROIsimulation=False):
+
+    if(isROIsimulation):
+        recocreatorName = '__ROISVDRecoDigitCreator'
+        recoDigitsName = '__ROIsvdRecoDigits'
+        clustersName = '__ROIsvdClusters'
+    else:
+        recocreatorName = 'SVDRecoDigitCreator'
+        recoDigitsName = ""
+        clustersName = ""
+
+    if recocreatorName not in [e.name() for e in path.modules()]:
+        recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
+        recoDigitCreator.set_name(recocreatorName)
+        recoDigitCreator.param('RecoDigits', recoDigitsName)
+        recoDigitCreator.param('Clusters', clustersName)
+        recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
+        recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+        recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
+        recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
+        recoDigitCreator.param('useDB', False)
+        path.add_module(recoDigitCreator)
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):

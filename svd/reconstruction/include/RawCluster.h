@@ -25,11 +25,11 @@ namespace Belle2 {
     struct StripInRawCluster {
       int shaperDigitIndex; /**< index of the shaper digit*/
       int cellID; /**<strip cellID*/
-      int maxSample; /** ADC max of the acquired samples*/
-      float noise; /** ADC noise */
-      Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC of the acquired samples*/
-      double charge;
-      double time;
+      int maxSample; /**< ADC max of the acquired samples*/
+      float noise; /**< ADC noise */
+      Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC< of the acquired samples*/
+      double charge; /**< strip charge*/
+      double time; /**< strip time*/
     };
 
     /**

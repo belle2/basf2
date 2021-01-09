@@ -220,7 +220,7 @@ void SVDRecoDigitCreatorModule::event()
         B2ERROR("SVD Reconstruction not available for this strip: not supported number of acquired APV samples!!");
 
       // now go into FTSW reference frame
-      time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+      time = eventinfo->getTimeInFTSWReference(time, firstFrame);
 
       //append the new SVDRecoDigit to the StoreArray
       m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));

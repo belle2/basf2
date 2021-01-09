@@ -376,7 +376,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
   // now go into FTSW time reference frame
-  time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+  time = eventinfo->getTimeInFTSWReference(time, firstFrame);
 
   //apply the Lorentz Shift Correction
   position = applyLorentzShiftCorrection(position, sensorID, isU);

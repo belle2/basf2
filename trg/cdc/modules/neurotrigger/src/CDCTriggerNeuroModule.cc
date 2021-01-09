@@ -182,10 +182,10 @@ CDCTriggerNeuroModule::event()
     tsvector = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getTSVector() : tsvector;
     std::vector<bool> driftthreshold;
     for (int k = 8; k >= 0; k--) {
-      driftthreshold.push_back(!tsvector[k] | bool ((puredriftth & (1 << k)) >> k));
+      driftthreshold.push_back(!tsvector[k] || static_cast<bool>((puredriftth & (1 << k)) >> k));
     }
     int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
-    short quadrant;
+    short quadrant = 0;
     double tphi = m_tracks2D[itrack]->getPhi0();
     if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
     else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
@@ -208,6 +208,8 @@ CDCTriggerNeuroModule::event()
                            tsvector,
                            m_tracks2D[itrack]->getTime(),
                            quadrant //quadrant simulated from phi
+                           - 1, //quadrant not known in simulation
+                           m_tracks2D[itrack]->getQualityVector()
                           );
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {

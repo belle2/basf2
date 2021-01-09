@@ -8,8 +8,6 @@ import os
 import tempfile
 import atexit
 import shutil
-import contextlib
-import subprocess
 import ROOT
 
 import fei
@@ -18,7 +16,6 @@ from fei.config import Particle
 import numpy as np
 
 import ROOT
-from ROOT import Belle2
 import basf2_mva
 import pdg
 
@@ -246,8 +243,7 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
                         writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
@@ -255,6 +251,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -269,8 +267,7 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
                         writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
@@ -278,6 +275,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)

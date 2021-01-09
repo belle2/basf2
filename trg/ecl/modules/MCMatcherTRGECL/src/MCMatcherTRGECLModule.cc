@@ -222,7 +222,7 @@ void MCMatcherTRGECLModule::event()
       if (hitTCId != TCId[ihit]) {continue;}
       if (itimeindex != timeindex) {continue;}
       if (backtag == 0) { SignalContribution[ihit] =  SignalContribution[ihit] + hitE;}
-      else if (backtag != 0) { BKGContribution[ihit] =  BKGContribution[ihit] + hitE;}
+      else              { BKGContribution[ihit] =  BKGContribution[ihit] + hitE;}
 
 
       if (TCId[ihit] == hitTCId && maxEnergy[ihit][0] < hitE) {
@@ -382,13 +382,12 @@ void MCMatcherTRGECLModule::event()
   }
 
 
-  int m_hitNum = 0;
   StoreArray<TRGECLDigi0MC> TCDigiArray;
-  for (int ii = 0; ii < ihit; ii++) {
+  for (int ii = 0; ii < ihit; ++ii) {
 
     if (TCRawEnergy[ii] < 0.1) {continue;}
     TCDigiArray.appendNew();
-    m_hitNum = TCDigiArray.getEntries() - 1;
+    int m_hitNum = TCDigiArray.getEntries() - 1;
 
     TCDigiArray[m_hitNum]->setEventId(m_nEvent);
     TCDigiArray[m_hitNum]->setTCId(TCId[ii]);
@@ -421,7 +420,7 @@ void MCMatcherTRGECLModule::event()
   const int NofTCHit = trgeclHitArray.getEntries();
 
 
-  for (int ii = 0; ii < NofTCHit; ii++) {
+  for (int ii = 0; ii < NofTCHit; ++ii) {
 
     TRGECLHit* aTRGECLHit = trgeclHitArray[ii];
     TCIdHit[ii]         = (aTRGECLHit->getTCId() - 1);
@@ -429,7 +428,7 @@ void MCMatcherTRGECLModule::event()
     TCHitEnergy[ii] =  aTRGECLHit -> getEnergyDep();
     int itimeindex = (int)(TCHitTiming[ii] / 100 + 40);
 
-    for (int index = 0; index < trgeclDigi0ToMCPart.getEntries(); index++) {
+    for (int index = 0; index < trgeclDigi0ToMCPart.getEntries(); ++index) {
       int idigi = index;
       int idigitimeindex = (int)(TCRawTiming[idigi] / 100 + 40);
       if (TCId[idigi] != TCIdHit[ii]) {continue;}
@@ -493,11 +492,10 @@ void MCMatcherTRGECLModule::event()
     trgeclHitToMCPart.add(ii, TCPrimaryIndexHit[ii][0]);
   }
 
-  m_hitNum = 0;
   StoreArray<TRGECLHitMC> TCHitArray;
-  for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
+  for (int ii = 0; ii < trgeclHitArray.getEntries(); ++ii) {
     TCHitArray.appendNew();
-    m_hitNum = TCHitArray.getEntries() - 1;
+    int m_hitNum = TCHitArray.getEntries() - 1;
 
     TCHitArray[m_hitNum]->setEventId(m_nEvent);
     TCHitArray[m_hitNum]-> setTCId(TCIdHit[ii]);
@@ -521,14 +519,14 @@ void MCMatcherTRGECLModule::event()
 
   }
 
-  m_nEvent++;
+  ++m_nEvent;
 
 }
 
 
 void MCMatcherTRGECLModule::endRun()
 {
-  m_nRun++;
+  ++m_nRun;
 }
 
 void MCMatcherTRGECLModule::terminate()

@@ -39,7 +39,11 @@ namespace Belle2 {
         return BeamPipeGeoConfig;
       }
 
-      /** Create detector geometry */
+      /**
+       * Create detector geometry
+       * @param topVolume Geant4 logical top volume.
+       * @param type Geometry type.
+       */
       void createGeometry(G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
 
@@ -56,6 +60,8 @@ namespace Belle2 {
       * @param content A reference to the content part of the parameter
       *                description, which should to be used to create the ROOT
       *                objects.
+      * @param topVolume Geant4 logical top volume.
+      * @param type Geometry type.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {

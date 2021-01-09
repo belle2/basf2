@@ -5,33 +5,29 @@
 # Import payload TOPCalTimeWalk
 # --------------------------------------------------------------------------------
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import TOPDatabaseImporter
-import os
-import sys
-import glob
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Initialize TOP geometry parameters from gearbox
 main.add_module('TOPGeometryParInitializer', useDB=False)
 
 # process single event
-process(main)
+b2.process(main)
 
 # define a local database to save payloads(created automatically, if not existing)
-conditions.expert_settings(save_payloads="localDB/localDB.txt")
+b2.conditions.expert_settings(save_payloads="localDB/localDB.txt")
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()
@@ -55,4 +51,4 @@ print('a =', a, 'b = ', b)
 
 dbImporter.importTimeWalk(params, a, b)
 
-B2RESULT("Done")
+b2.B2RESULT("Done")

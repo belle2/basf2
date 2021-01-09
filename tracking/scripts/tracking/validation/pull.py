@@ -7,7 +7,6 @@ from .plot import ValidationPlot, compose_axis_label, get_unit
 from .utilities import erf
 from tracking.root_utils import root_save_name
 
-import math
 import collections
 
 import numpy as np

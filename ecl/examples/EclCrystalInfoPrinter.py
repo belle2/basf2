@@ -10,9 +10,7 @@
 ########################################################
 
 import basf2
-import ROOT
 from ROOT import Belle2
-from ROOT import gSystem
 import numpy as np
 import pandas as pd
 
@@ -80,10 +78,10 @@ class printCrystals(basf2.Module):
 
             self.list_pos.append(np.array([x, y, z, phi, theta, phiid, thetaid]))
 
-            nn1 = np.array(self.obj_neighbours1.getNeighbours(idx+1))
-            nn1c = np.array(self.obj_neighbours1C.getNeighbours(idx+1))
-            nn1legacy = np.array(self.obj_neighbours1legacy.getNeighbours(idx+1))
-            nn1clegacy = np.array(self.obj_neighbours1Clegacy.getNeighbours(idx+1))
+            nn1 = np.array(self.obj_neighbours1.getNeighbours(idx + 1))
+            nn1c = np.array(self.obj_neighbours1C.getNeighbours(idx + 1))
+            nn1legacy = np.array(self.obj_neighbours1legacy.getNeighbours(idx + 1))
+            nn1clegacy = np.array(self.obj_neighbours1Clegacy.getNeighbours(idx + 1))
             self.list_neighbours1.append(nn1)
             self.list_nneighbours1.append(len(nn1))
 
@@ -96,10 +94,10 @@ class printCrystals(basf2.Module):
             self.list_neighbours1clegacy.append(nn1clegacy)
             self.list_nneighbours1clegacy.append(len(nn1clegacy))
 
-            nn2 = np.array(self.obj_neighbours2.getNeighbours(idx+1))
-            nn2c = np.array(self.obj_neighbours2C.getNeighbours(idx+1))
-            nn2legacy = np.array(self.obj_neighbours2legacy.getNeighbours(idx+1))
-            nn2clegacy = np.array(self.obj_neighbours2Clegacy.getNeighbours(idx+1))
+            nn2 = np.array(self.obj_neighbours2.getNeighbours(idx + 1))
+            nn2c = np.array(self.obj_neighbours2C.getNeighbours(idx + 1))
+            nn2legacy = np.array(self.obj_neighbours2legacy.getNeighbours(idx + 1))
+            nn2clegacy = np.array(self.obj_neighbours2Clegacy.getNeighbours(idx + 1))
 
             self.list_neighbours2.append(nn2)
             self.list_nneighbours2.append(len(nn2))
@@ -167,6 +165,7 @@ class printCrystals(basf2.Module):
 
     def event(self):
         """Event loop"""
+
 
 # create path
 main_path = basf2.create_path()

@@ -158,8 +158,8 @@ namespace Belle2 {
 
     /**
     * Convert a value to sample range.
-    * @param value to be converted
-    * @result APVRawSampleType representation of x
+    * @param x value to be converted
+    * @return  APVRawSampleType representation of x
     */
     template<typename T> static DATCONSVDDigit::APVRawSampleType trimToSampleRange(T x)
     {

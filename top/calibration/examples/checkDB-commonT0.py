@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 from ROOT import Belle2
 
@@ -22,7 +22,7 @@ runLast = int(argvs[3])
 tag = argvs[4]
 
 
-class CheckCalibDB(Module):
+class CheckCalibDB(b2.Module):
     ''' print content of TOPCalCommonT0 '''
 
     def initialize(self):
@@ -47,7 +47,7 @@ class CheckCalibDB(Module):
         runNo = 'r' + '{:0=5d}'.format(evtMetaData.getRun())
 
         if not self.db:
-            B2ERROR(runNo + ': payload not found')
+            b2.B2ERROR(runNo + ': payload not found')
             return
         if not self.db.hasChanged():
             self.lastRun = runNo
@@ -84,12 +84,12 @@ class CheckCalibDB(Module):
 
 # Database
 if '.txt' in tag:
-    use_local_database(tag)
+    b2.use_local_database(tag)
 else:
-    use_central_database(tag)
+    b2.use_central_database(tag)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
 evtList = [1 for run in range(runFirst, runLast + 1)]
@@ -97,7 +97,7 @@ runList = [run for run in range(runFirst, runLast + 1)]
 expList = [expNo for run in range(runFirst, runLast + 1)]
 
 # Event info setter
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': evtList, 'runList': runList, 'expList': expList})
 main.add_module(eventinfosetter)
 
@@ -105,4 +105,4 @@ main.add_module(eventinfosetter)
 main.add_module(CheckCalibDB())
 
 # Process events
-process(main)
+b2.process(main)

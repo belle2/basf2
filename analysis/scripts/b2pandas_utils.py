@@ -19,6 +19,7 @@ class VariablesToHDF5(basf2.Module):
     instead of a root file. It is slower as it is implemented in pure python and
     should currently be considered a proof of concept.
     """
+
     def __init__(self, listname, variables, filename):
         """Constructor to initialize the internal state
 
@@ -56,7 +57,8 @@ class VariablesToHDF5(basf2.Module):
             basf2.B2ERROR("Cannot create output file")
             return
 
-        dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
+        dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
+                 ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
         for v in self._var_objects:
             # only float variables for now
             dtype.append((v.name, np.float64))
@@ -78,6 +80,7 @@ class VariablesToHDF5(basf2.Module):
         buf["exp"] = self._evtmeta.getExperiment()
         buf["run"] = self._evtmeta.getRun()
         buf["evt"] = self._evtmeta.getEvent()
+        buf["prod"] = self._evtmeta.getProduction()
         buf["ncand"] = len(buf)
         buf["icand"] = np.arange(len(buf))
 

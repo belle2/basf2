@@ -280,7 +280,7 @@ namespace Belle2 {
 
     /**
      * create a SpacePointTrackCand from the genfit::TrackCand
-     * @returns .first is the SPTC, .second is the conversion status, if < 0, something went wrong
+     * @returns first is the SPTC, .second is the conversion status, if < 0, something went wrong
      */
     std::pair<const Belle2::SpacePointTrackCand, conversionStatus>
     createSpacePointTC(const genfit::TrackCand* genfitTC, const StoreArray<PXDCluster>& pxdClusters,
@@ -295,10 +295,13 @@ namespace Belle2 {
 
     /**
      * templated version to get a SpacePoint from a Cluster
+     * @param cluster type of cluster
+     * @param flaggedHitIDs (detId, hitId) of genfit::TrackCand with flag if hit has already been used
+     * @param iHit index of hit
      * @param arrayName name of the StoreArray to be searched, defaults to empty string
      * @param singleCluster singleCluster SpacePoint? (Can probably be done in another way as well)
      * NOTE: returns nullptr if no (appropriate) SpacePoint can be found!
-     * @returns .first is a pointer to the SpacePoint, .second is the status, if this is < 0, .first is nullptr! (i.e. check .second first!)
+     * @returns first is a pointer to the SpacePoint, .second is the status, if this is < 0, .first is nullptr! (i.e. check .second first!)
      */
     template<typename ClusterType, typename TrueHitType>
     std::pair<Belle2::SpacePoint*, conversionStatus>
@@ -310,7 +313,7 @@ namespace Belle2 {
      * NOTE: marks hits as used!
      * NOTE: if no appropriate SpacePoint can be found, returns a nullptr pointer!
      * templated for easier handling of other ClusterTypes later, at the moment only SVDCluster needed!
-     * @returns .first is a pointer to the appropriate SpacePoint, .second is the conversion status, if this is <0 .first is nullptr! (i.e. check .second first)
+     * @returns first is a pointer to the appropriate SpacePoint, .second is the conversion status, if this is <0 .first is nullptr! (i.e. check .second first)
      */
     template<typename ClusterType>
     std::pair<Belle2::SpacePoint*, conversionStatus>
@@ -322,7 +325,7 @@ namespace Belle2 {
      * @param clusterInd index of Cluster to be checked in StoreArray
      * @param detID detector id
      * @param flaggedHitIDs (detId, hitId) of genfit::TrackCand with flag if hit has already been used
-     * @returns .first is validPos, .second is existingPos, if one is not found a negative number is returned!
+     * @returns first is validPos, .second is existingPos, if one is not found a negative number is returned!
      */
     std::pair<int, int> checkExistAndValid(int clusterInd, int detID, std::vector<flaggedPair<int> >& flaggedHitIDs);
 

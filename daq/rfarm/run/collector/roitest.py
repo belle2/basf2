@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 
-from basf2 import *
+import basf2 as b2
 # from simulation import register_simulation
 # from reconstruction import register_reconstruction
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 argvs = sys.argv
 argc = len(argvs)
@@ -43,10 +42,10 @@ components = [
 # roiPayloadAssembler = register_module('ROIPayloadAssembler')
 
 # to avoid undefined symbol
-geom = register_module("Geometry")
+geom = b2.register_module("Geometry")
 
 # create a main path
-main = create_path()
+main = b2.create_path()
 
 # Add input module
 # input = register_module("SeqRootInput")
@@ -59,7 +58,7 @@ main = create_path()
 # main.add_module(output)
 
 # Add Rbuf2Ds
-rbuf2ds = register_module("Rbuf2Ds")
+rbuf2ds = b2.register_module("Rbuf2Ds")
 # rbuf2ds = register_module("FastRbuf2Ds")
 rbuf2ds.param("RingBufferName", argvs[1])
 main.add_module(rbuf2ds)
@@ -72,7 +71,7 @@ main.add_module(rbuf2ds)
 # main.add_module(roiReadTest)
 
 # RoI sender
-roisender = register_module('ROISender')
+roisender = b2.register_module('ROISender')
 roisender.param("MessageQueueName", argvs[3])
 roisender.param("MessageQueueDepth", 20)
 roisender.param("MessageSize", 16384)
@@ -80,20 +79,20 @@ roisender.param("ROIpayloadName", "ROIpayload")
 main.add_module(roisender)
 
 # Add Progress
-progress = register_module("Progress")
+progress = b2.register_module("Progress")
 progress.param('maxN', 4)
 main.add_module(progress)
 
 # Add Elapsed Time
-etime = register_module("ElapsedTime")
+etime = b2.register_module("ElapsedTime")
 etime.param("EventInterval", 20000)
 main.add_module(etime)
 
 # Add Ds2Raw
-ds2raw = register_module("Ds2Raw")
+ds2raw = b2.register_module("Ds2Raw")
 ds2raw.param("RingBufferName", argvs[2])
 main.add_module(ds2raw)
 
 
 # Run
-process(main)
+b2.process(main)

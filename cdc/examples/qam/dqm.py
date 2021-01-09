@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
 from array import array
-from ROOT import gROOT, gStyle
-from ROOT import TFile, TF1, TH1D, TCanvas
-from ROOT import TH2D, TGraph, TLine, TBox
-from ROOT import kFullCircle, kOpenCircle
-from ROOT import kRed, kBlue, kGreen
-from ROOT import TGraphErrors
+from ROOT import TCanvas, TF1, TFile
+from ROOT import TGraph, TH2D, TLine
+from ROOT import kFullCircle
 import argparse
 
 nWires = [160, 160, 160, 160, 160, 160, 160, 160,

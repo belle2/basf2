@@ -172,7 +172,6 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.utils import IoV
 
-    from ROOT import Belle2
     import millepede_calibration as mpc
 
     import alignment.constraints
@@ -250,6 +249,10 @@ def get_calibrations(input_data, **kwargs):
             cal.collections[colname].pre_collector_path,
             'RootInput',
             entrySequences=[f'0:{max_processed_events_per_file}'])
+
+    # Bugfix for Condor:
+    from alignment.prompt_utils import fix_mille_paths_for_algo
+    fix_mille_paths_for_algo(cal.algorithms[0])
 
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.
     cal.max_iterations = cfg['max_iterations']

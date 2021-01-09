@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import basf2 as b2
 from ROOT import Belle2
-from basf2 import Module
-import os
-import shutil
-from basf2 import *
 
-logging.log_level = LogLevel.ERROR
+b2.logging.log_level = b2.LogLevel.ERROR
 
 
-class TestModule(Module):
+class TestModule(b2.Module):
 
     """Test to read relations."""
 
@@ -33,16 +30,16 @@ class TestModule(Module):
         to_relations = mcparticles[0].getRelationsTo("ALL")
 
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
 
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
-pgun = register_module('ParticleGun')
-g4sim = register_module('FullSim')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
+pgun = b2.register_module('ParticleGun')
+g4sim = b2.register_module('FullSim')
 # make the simulation less noisy
 
-main = create_path()
+main = b2.create_path()
 
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
@@ -51,4 +48,4 @@ main.add_module(pgun)
 main.add_module(g4sim)
 main.add_module(TestModule())
 
-process(main)
+b2.process(main)

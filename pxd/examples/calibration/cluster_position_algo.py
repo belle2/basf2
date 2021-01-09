@@ -8,10 +8,6 @@
 #
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
-import os
-import sys
-from basf2 import *
-import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import IntervalOfValidity
 

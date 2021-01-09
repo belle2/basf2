@@ -217,7 +217,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -388,7 +388,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
   {
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -434,7 +434,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {

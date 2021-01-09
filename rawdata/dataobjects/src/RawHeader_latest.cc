@@ -124,7 +124,7 @@ void RawHeader_latest::CheckHeader(int* buf)
   return;
 }
 
-void RawHeader_latest::SetOffset1stFINESSE(int offset_1st_FINESSE)
+void RawHeader_latest::SetOffset1stFINESSE(int /*offset_1st_FINESSE*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -133,7 +133,7 @@ void RawHeader_latest::SetOffset1stFINESSE(int offset_1st_FINESSE)
   B2FATAL(err_buf);
 }
 
-void RawHeader_latest::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
+void RawHeader_latest::SetOffset2ndFINESSE(int /*offset_2nd_FINESSE*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -142,7 +142,7 @@ void RawHeader_latest::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
   B2FATAL(err_buf);
 }
 
-void RawHeader_latest::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
+void RawHeader_latest::SetOffset3rdFINESSE(int /*offset_3rd_FINESSE*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -151,7 +151,7 @@ void RawHeader_latest::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
   B2FATAL(err_buf);
 }
 
-void RawHeader_latest::SetOffset4thFINESSE(int offset_4th_FINESSE)
+void RawHeader_latest::SetOffset4thFINESSE(int /*offset_4th_FINESSE*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",

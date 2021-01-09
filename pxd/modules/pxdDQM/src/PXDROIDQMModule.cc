@@ -48,8 +48,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 250, 0, 250);
   hrawROItype = new TH1F("hrawROItype", "ROI type;Nr per Event", 2, 0, 2);
 
-  hrawROIHLT_DHHID = new TH1F("hrawROIHLT_DHHID", "HLT ROI DHHID;ROIs per Module;DHH ID", 64, 0, 64);
-  hrawROIDC_DHHID = new TH1F("hrawROIDC_DHHID", "DATCON ROI DHHID;ROIs per Module; DHH ID", 64, 0, 64);
+  hrawROIHLT_DHHID = new TH1F("hrawROIHLT_DHHID", "HLT ROI per Module;DHH ID;ROIs per Module", 64, 0, 64);
+  hrawROIDC_DHHID = new TH1F("hrawROIDC_DHHID", "DATCON ROI per Module;DHH ID;ROIs per Module", 64, 0, 64);
 
   if (m_offlineDQM) {
     hrawROIHLTmap  = new TH2F("hrawROIHLTmap", "HLT ROI Middle Map;Ucell;Vcell", 250 / 5, 0, 250, 768 / 4, 0, 768);

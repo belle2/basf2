@@ -65,14 +65,14 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
-  m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
+  m_hCommonMode = new TH2D("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
-  m_hCommonModeDelta = new TH2F("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
+  m_hCommonModeDelta = new TH2D("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
                                 m_PXDModules.size(), 63, 0, 63);
   m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeDelta->SetStats(false);
-  m_hCommonModeOld = new TH2F("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
+  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
                               63, 0, 63);
   m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeOld->SetStats(false);
@@ -222,7 +222,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -263,7 +263,7 @@ void DQMHistAnalysisPXDCMModule::event()
 //     m_line3->Draw();
     }
 
-    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

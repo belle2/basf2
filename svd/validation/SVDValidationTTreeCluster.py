@@ -13,7 +13,7 @@
 
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -55,7 +55,7 @@ gROOT.ProcessLine('struct EventDataCluster {\
 from ROOT import EventDataCluster  # noqa
 
 
-class SVDValidationTTreeCluster(Module):
+class SVDValidationTTreeCluster(b2.Module):
     '''class to produce the ttree for cluster validation'''
 
     def __init__(self):

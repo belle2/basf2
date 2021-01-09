@@ -144,7 +144,7 @@ namespace Belle2 {
         for (unsigned j = 0; j < layers[i].size(); j++) {
           //const TRGTime & t = * (layers[i][j]->cell()->signal())[0];
           const float tsDrift = layers[i][j]->cell()->hit()->drift();
-          const TRGCDCSegment* t_cell = (TRGCDCSegment*)(layers[i][j]->cell());
+          const TRGCDCSegment* t_cell = static_cast<const TRGCDCSegment*>(layers[i][j]->cell());
           bool centerHit = (t_cell->priorityPosition() == 3);
           //cout<<"PF2D ["<<layers[i][j]->cell()->superLayerId()<<"-"<<layers[i][j]->cell()->localId()<<"] Tick: "<<t.time()<<" Drift: "<<tsDrift<<endl;
           //if (t.time() < timeMin) {

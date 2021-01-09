@@ -42,6 +42,9 @@ namespace Belle2 {
      * @param x The x component of the magnetic field vector.
      * @param y The y component of the magnetic field vector.
      * @param z The z component of the magnetic field vector.
+     * @param rmax Maximum radial coordinate.
+     * @param zmin Minimum z coordinate.
+     * @param zmax Maximum z coordinate.
      */
     void setMagneticFieldValues(double x, double y, double z, double rmax, double zmin, double zmax);
 

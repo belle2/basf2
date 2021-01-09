@@ -1,16 +1,13 @@
-import basf2
-import ROOT
 import re
 import datetime
-import os
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from ROOT import gSystem
 gSystem.Load('libcdc')
 
-reset_database()
-use_database_chain()
-use_central_database("Calibration_Offline_Development", LogLevel.INFO)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("Calibration_Offline_Development", b2.LogLevel.INFO)
 
 d = datetime.datetime.today()
 print(d.strftime('This Calculution is done at : %d-%m-%y %H:%M:%S\n'))
@@ -35,7 +32,7 @@ print(t0file)
 print(inputfiles)
 
 
-main = create_path()
+main = b2.create_path()
 main.add_module('EventInfoSetter',
                 evtNumList=[1],
                 runList=[1])
@@ -45,7 +42,7 @@ main.add_module('CDCJobCntlParModifier',
                 T0File=t0file)
 main.add_module('Geometry',
                 components=['CDC'])
-basf2.process(main)
+b2.process(main)
 Corr = Belle2.CDC.T0Correction()
 Corr.inputFileNames(inputfiles)
 Corr.outputFileName("t0.dat")

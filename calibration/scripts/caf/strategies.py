@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG, B2WARNING
-from .utils import AlgResult
-from .utils import B2INFO_MULTILINE
-from .utils import runs_overlapping_iov, runs_from_vector
-from .utils import iov_from_runs, split_runs_by_exp, vector_from_runs
-from .utils import find_gaps_in_iov_list, grouper, find_run_lists_from_boundaries
-from .utils import IoV, ExpRun
-from .state_machines import AlgorithmMachine
+from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
+from caf.utils import AlgResult
+from caf.utils import B2INFO_MULTILINE
+from caf.utils import runs_overlapping_iov, runs_from_vector
+from caf.utils import iov_from_runs, split_runs_by_exp, vector_from_runs
+from caf.utils import find_gaps_in_iov_list, grouper, find_run_lists_from_boundaries
+from caf.utils import IoV, ExpRun
+from caf.state_machines import AlgorithmMachine
 
 from abc import ABC, abstractmethod
-import itertools
-from collections import defaultdict
 import json
 
 
@@ -97,7 +95,6 @@ class AlgorithmStrategy(ABC):
         Abstract method that needs to be implemented. It will be called to actually execute the
         algorithm.
         """
-        pass
 
     def setup_from_dict(self, params):
         """
@@ -1005,4 +1002,3 @@ class StrategyError(Exception):
     """
     Basic Exception for this type of class.
     """
-    pass

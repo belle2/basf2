@@ -35,12 +35,9 @@ cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
 cut_noU = R.TCut('strip_dir!=0')  # V_P or -1
 cut_noV = R.TCut('strip_dir!=1')  # U_N or -1
-cut_Usize1 = R.TCut('(cluster_size==1)&&(strip_dir==0)')
-cut_Vsize1 = R.TCut('(cluster_size==1)&&(strip_dir==1)')
-cut_Usize2 = R.TCut('(cluster_size==2)&&(strip_dir==0)')
-cut_Vsize2 = R.TCut('(cluster_size==2)&&(strip_dir==1)')
-cut_Usize3plus = R.TCut('(cluster_size>2)&&(strip_dir==0)')
-cut_Vsize3plus = R.TCut('(cluster_size>2)&&(strip_dir==1)')
+cut_size1 = R.TCut('(cluster_size==1)')
+cut_size2 = R.TCut('(cluster_size==2)')
+cut_size3plus = R.TCut('(cluster_size>2)')
 cut_oneTH = R.TCut('cluster_truehits_number==1')  # one TrueHit associated with SVDCluster
 cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
 

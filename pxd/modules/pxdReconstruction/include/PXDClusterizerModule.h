@@ -58,7 +58,7 @@ namespace Belle2 {
        * vector from digit id to relationElement pointer for fast lookup
        * @param relation RelationArray to build the lookuptable for
        * @param lookup Lookuptable to fill
-       * @param number of digits in this event
+       * @param digits number of digits in this event
        */
       void createRelationLookup(const RelationArray& relation, RelationLookup& lookup, size_t digits);
 

@@ -4,14 +4,8 @@
 # this prints parameters from the database for a given tag, experiment and run number
 # Author: luka.santelj@ijs.si
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import ARICHDatabaseImporter
-import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -32,26 +26,26 @@ if options.object == '':
 
 # set database tag
 if options.tag == 'local':
-    use_local_database("localdb/database.txt", "localdb")
+    b2.use_local_database("localdb/database.txt", "localdb")
 elif options.tag == '':
     print("Using default tag")
 else:
-    use_central_database(options.tag)
+    b2.use_central_database(options.tag)
 
 
 # EventInfoSetter is only needed to register EventMetaData...
 # (will try to get rid of this)
-eventinfo = register_module('EventInfoSetter')
+eventinfo = b2.register_module('EventInfoSetter')
 eventinfo.initialize()
-main = create_path()
+main = b2.create_path()
 
 main.add_module(eventinfo)
 
 # load gearbox for reading parameters from xml files (by default in "arich/data")
-paramloader = register_module('Gearbox')
+paramloader = b2.register_module('Gearbox')
 paramloader.initialize()
 
-process(main)
+b2.process(main)
 
 # run the importer
 dbImporter = ARICHDatabaseImporter()

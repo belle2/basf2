@@ -40,8 +40,7 @@ materialscan.param({
     'ray.phi': 0,
     # Alternatively one can set the direction of the ray directly
     # 'ray.direction': [1, 0, 0],
-    # Max depth for the scan in cm (x axis limit on the histogram). 0 = no
-    # limit
+    # Max depth for the scan in cm (x axis limit on the histogram). 0 = no limit
     'ray.maxDepth': 0,
     # Bin width (roughly) for the output histogram in cm
     'ray.sampleDepth': 0.1,

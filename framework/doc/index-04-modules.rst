@@ -16,7 +16,8 @@ Of special importance to the users are the following modules:
   first module in the path if new events are to be generated.
 * `RootOutput` is used to write events to disk. This module can be added at any
   point in time and will usually write out the complete contents of the
-  DataStore. For convenience there are special functions like `add_mdst_output`
+  DataStore. For convenience there are special functions like 
+  :py:func:`mdst.add_mdst_output`
   which will limit the output to certain collections.
 * `RootInput` can be used to read events created with `RootOutput`
 

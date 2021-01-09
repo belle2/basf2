@@ -15,184 +15,184 @@ using namespace Belle2;
 static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
-TVector3 TagVertex::getTagVertex()
+TVector3 TagVertex::getTagVertex() const
 {
   return m_tagVertex;
 }
 
-TMatrixDSym TagVertex::getTagVertexErrMatrix()
+TMatrixDSym TagVertex::getTagVertexErrMatrix() const
 {
   return m_tagVertexErrMatrix;
 }
 
-float TagVertex::getTagVertexPval()
+float TagVertex::getTagVertexPval() const
 {
   return m_tagVertexPval;
 }
 
-const Particle* TagVertex::getVtxFitParticle(unsigned int trackIndex)
+const Particle* TagVertex::getVtxFitParticle(unsigned int trackIndex) const
 {
   if (trackIndex >= m_vtxFitParticles.size())
     return 0;
   return m_vtxFitParticles.at(trackIndex);
 }
 
-const MCParticle* TagVertex::getVtxFitMCParticle(unsigned int trackIndex)
+const MCParticle* TagVertex::getVtxFitMCParticle(unsigned int trackIndex) const
 {
   if (trackIndex >= m_vtxFitMCParticles.size())
     return 0;
   return m_vtxFitMCParticles.at(trackIndex);
 }
 
-float TagVertex::getDeltaT()
+float TagVertex::getDeltaT() const
 {
   return m_deltaT;
 }
 
-float TagVertex::getDeltaTErr()
+float TagVertex::getDeltaTErr() const
 {
   return m_deltaTErr;
 }
 
-TVector3 TagVertex::getMCTagVertex()
+TVector3 TagVertex::getMCTagVertex() const
 {
   return m_mcTagV;
 }
 
-int TagVertex::getMCTagBFlavor()
+int TagVertex::getMCTagBFlavor() const
 {
   return m_mcPDG;
 }
 
-float TagVertex::getMCDeltaTau()
+float TagVertex::getMCDeltaTau() const
 {
   return m_mcDeltaTau;
 }
 
-float TagVertex::getMCDeltaT()
+float TagVertex::getMCDeltaT() const
 {
   return m_mcDeltaT;
 }
 
-int TagVertex::getFitType()
+int TagVertex::getFitType() const
 {
   return m_FitType;
 }
 
-std::string TagVertex::getConstraintType()
+std::string TagVertex::getConstraintType() const
 {
   return m_constraintType;
 }
 
-TVector3 TagVertex::getConstraintCenter()
+TVector3 TagVertex::getConstraintCenter() const
 {
   if (m_constraintType == "noConstraint") return vecNaN;
   return m_constraintCenter;
 }
 
-TMatrixDSym TagVertex::getConstraintCov()
+TMatrixDSym TagVertex::getConstraintCov() const
 {
   return m_constraintCov;
 }
 
-int TagVertex::getNTracks()
+int TagVertex::getNTracks() const
 {
   return m_NTracks;
 }
 
-int TagVertex::getNFitTracks()
+int TagVertex::getNFitTracks() const
 {
   return m_NFitTracks;
 }
 
-float TagVertex::getTagVl()
+float TagVertex::getTagVl() const
 {
   return m_tagVl;
 }
 
-float TagVertex::getTruthTagVl()
+float TagVertex::getTruthTagVl() const
 {
   return m_truthTagVl;
 }
 
-float TagVertex::getTagVlErr()
+float TagVertex::getTagVlErr() const
 {
   return m_tagVlErr;
 }
 
-float TagVertex::getTagVol()
+float TagVertex::getTagVol() const
 {
   return m_tagVol;
 }
 
-float TagVertex::getTruthTagVol()
+float TagVertex::getTruthTagVol() const
 {
   return m_truthTagVol;
 }
 
-float TagVertex::getTagVolErr()
+float TagVertex::getTagVolErr() const
 {
   return m_tagVolErr;
 }
 
-float TagVertex::getTagVNDF()
+float TagVertex::getTagVNDF() const
 {
   return m_tagVNDF;
 }
 
-float TagVertex::getTagVChi2()
+float TagVertex::getTagVChi2() const
 {
   return m_tagVChi2;
 }
 
-float TagVertex::getTagVChi2IP()
+float TagVertex::getTagVChi2IP() const
 {
   return m_tagVChi2IP;
 }
 
-TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex)
+TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex) const
 {
   if (m_vtxFitParticles.size() <= trackIndex) return vecNaN;
-  return m_vtxFitParticles.at(trackIndex)->getTrackFitResult() -> getPosition();
+  return m_vtxFitParticles.at(trackIndex)->getTrackFitResult()->getPosition();
 }
 
 
-TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex)
+TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex) const
 {
   if (m_vtxFitParticles.size() <= trackIndex) return vecNaN;
   return m_vtxFitParticles.at(trackIndex)->getMomentum();
 }
 
-double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component)
+double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component) const
 {
   if (m_vtxFitParticles.size() <= trackIndex || component > 2) return realNaN;
   return m_vtxFitParticles.at(trackIndex)->getMomentum()[component];
 }
 
-double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex)
+double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex) const
 {
   if (m_vtxFitParticles.size() <= trackIndex) return realNaN;
   return m_vtxFitParticles.at(trackIndex)->getTrackFitResult()->getZ0();
 }
 
-double TagVertex::getVtxFitTrackD0(unsigned int trackIndex)
+double TagVertex::getVtxFitTrackD0(unsigned int trackIndex) const
 {
   if (m_vtxFitParticles.size() <= trackIndex) return realNaN;
   return m_vtxFitParticles.at(trackIndex)->getTrackFitResult()->getD0();
 }
 
-double TagVertex::getRaveWeight(unsigned int trackIndex)
+double TagVertex::getRaveWeight(unsigned int trackIndex) const
 {
   if (m_raveWeights.size() <= trackIndex) return realNaN;
   return m_raveWeights.at(trackIndex);
 }
 
-int TagVertex::getFitTruthStatus()
+int TagVertex::getFitTruthStatus() const
 {
   return m_fitTruthStatus;
 }
 
-int TagVertex::getRollBackStatus()
+int TagVertex::getRollBackStatus() const
 {
   return m_rollbackStatus;
 }

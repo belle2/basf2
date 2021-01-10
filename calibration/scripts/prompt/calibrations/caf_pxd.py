@@ -27,6 +27,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                        "hadron_calib",
                                        "offip_calib",
                                        "cosmic_calib",
+                                       "4S", "Continuum", "Scan",
                                        "physics", "Good"],
                                    "cosmic": ["cosmic"]},
                                expert_config={

@@ -107,9 +107,7 @@ pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
 
 print('bklm-windowstart: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze all events using ' + tagName)
 
-basf2.reset_database()
-basf2.use_database_chain()
-basf2.use_central_database(tagName)
+basf2.conditions.prepend_globaltag(tagName)
 
 main = basf2.create_path()
 if inputName.find(".sroot") >= 0:

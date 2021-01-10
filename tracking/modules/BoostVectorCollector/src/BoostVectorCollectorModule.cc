@@ -14,6 +14,8 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+#include <mdst/dataobjects/PIDLikelihood.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -31,8 +33,9 @@ REG_MODULE(BoostVectorCollector)
 BoostVectorCollectorModule::BoostVectorCollectorModule() : CalibrationCollectorModule(),
   m_exp(-99), m_run(-99), m_evt(-99),
   m_time(-99),
-  m_mu0_d0(-99), m_mu0_z0(-99), m_mu0_phi0(-99), m_mu0_tanlambda(-99), m_mu0_omega(-99),
-  m_mu1_d0(-99), m_mu1_z0(-99), m_mu1_phi0(-99), m_mu1_tanlambda(-99), m_mu1_omega(-99)
+  m_mu0_pid(-99), m_mu1_pid(-99)
+  //m_mu0_px(-99), m_mu0_px(-99), m_mu0_pz(-99),
+  //m_mu1_px(-99), m_mu1_px(-99), m_mu1_pz(-99)
 {
   //Set module properties
 
@@ -53,16 +56,6 @@ void BoostVectorCollectorModule::prepare()
   tree->Branch<int>("exp", &m_exp);
   tree->Branch<int>("run", &m_run);
   tree->Branch<double>("time", &m_time);
-
-  tree->Branch<double>("mu0_d0", &m_mu0_d0);
-  tree->Branch<double>("mu0_z0", &m_mu0_z0);
-  tree->Branch<double>("mu0_phi0", &m_mu0_phi0);
-  tree->Branch<double>("mu0_tanlambda", &m_mu0_tanlambda);
-
-  tree->Branch<double>("mu1_d0", &m_mu1_d0);
-  tree->Branch<double>("mu1_z0", &m_mu1_z0);
-  tree->Branch<double>("mu1_phi0", &m_mu1_phi0);
-  tree->Branch<double>("mu1_tanlambda", &m_mu1_tanlambda);
 
   tree->Branch<TVector3>("mu0_p", &m_mu0_p);
   tree->Branch<TVector3>("mu1_p", &m_mu1_p);
@@ -97,22 +90,11 @@ void BoostVectorCollectorModule::collect()
 
   const Particle* part0 = Y4SParticles->getParticle(0)->getDaughter(0);
   const Particle* part1 = Y4SParticles->getParticle(0)->getDaughter(1);
-  const TrackFitResult* tr0 = part0->getTrackFitResult();
-  const TrackFitResult* tr1 = part1->getTrackFitResult();
+  //const TrackFitResult* tr0 = part0->getTrackFitResult();
+  //const TrackFitResult* tr1 = part1->getTrackFitResult();
 
-  m_mu0_d0        = tr0->getD0();
-  m_mu0_z0        = tr0->getZ0();
-  m_mu0_phi0      = tr0->getPhi0();
-  m_mu0_tanlambda = tr0->getTanLambda();
-  m_mu0_omega     = tr0->getOmega();
-
-
-  m_mu1_d0        = tr1->getD0();
-  m_mu1_z0        = tr1->getZ0();
-  m_mu1_phi0      = tr1->getPhi0();
-  m_mu1_tanlambda = tr1->getTanLambda();
-  m_mu1_omega     = tr1->getOmega();
-
+  m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(11), Const::ChargedStable(13));
+  m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(11), Const::ChargedStable(13));
 
   m_mu0_p = part0->getMomentum();
   m_mu1_p = part1->getMomentum();

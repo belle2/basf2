@@ -86,7 +86,7 @@ def get_calibrations(input_data, **kwargs):
     ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
     vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=False, path=rec_path_1)
 
-    collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BS')
+    collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
     algorithm_bv = BoostVectorAlgorithm()
     algorithm_bv.setIntervalsLength(kwargs['expert_config']["size_interval_len"],  kwargs['expert_config']["position_interval_len"])
     algorithm_bv.setGapPenalty(kwargs['expert_config']["gap_penalty"])

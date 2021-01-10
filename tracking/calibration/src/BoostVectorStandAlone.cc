@@ -44,24 +44,25 @@ namespace Belle2 {
       tr->SetBranchAddress("run", &evt.run);
       tr->SetBranchAddress("exp", &evt.exp);
       tr->SetBranchAddress("event", &evt.evtNo);
-      tr->SetBranchAddress("mu0_d0", &evt.mu0.d0);
-      tr->SetBranchAddress("mu1_d0", &evt.mu1.d0);
-      tr->SetBranchAddress("mu0_z0", &evt.mu0.z0);
-      tr->SetBranchAddress("mu1_z0", &evt.mu1.z0);
 
-      tr->SetBranchAddress("mu0_tanlambda", &evt.mu0.tanlambda);
-      tr->SetBranchAddress("mu1_tanlambda", &evt.mu1.tanlambda);
+      TVector3* p0 = nullptr;
+      TVector3* p1 = nullptr;
 
+      tr->SetBranchAddress("mu0_p", &p0);
+      tr->SetBranchAddress("mu1_p", &p1);
 
-      tr->SetBranchAddress("mu0_phi0", &evt.mu0.phi0);
-      tr->SetBranchAddress("mu1_phi0", &evt.mu1.phi0);
+      tr->SetBranchAddress("mu0_pid", &evt.mu0.pid);
+      tr->SetBranchAddress("mu1_pid", &evt.mu1.pid);
+
 
       tr->SetBranchAddress("time", &evt.t); //time in hours
 
 
       for (int i = 0; i < tr->GetEntries(); ++i) {
         tr->GetEntry(i);
-        evt.toMicroM();
+
+        evt.mu0.p = *p0;
+        evt.mu1.p = *p1;
 
         evt.nBootStrap = 1;
         evt.isSig = true;
@@ -80,9 +81,18 @@ namespace Belle2 {
     tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBoostVectorAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {
-      vector<TVector3>     boostVec;
-      vector<TMatrixDSym>  boostVecUnc;
+      int n = splitPoints.size() + 1;
+      vector<TVector3>     boostVec(n);
+      vector<TMatrixDSym>  boostVecUnc(n);
       TMatrixDSym          boostVecSpred;
+
+      for (int i = 0; i < n; ++i) {
+        boostVec[i]    = TVector3(-1, -1, -1);
+        boostVecUnc[i].ResizeTo(3, 3);
+        boostVecUnc[i] = TMatrixDSym(3);
+      }
+      boostVecSpred.ResizeTo(3, 3);
+      boostVecSpred = TMatrixDSym(3);
 
       return make_tuple(boostVec, boostVecUnc, boostVecSpred);
     }

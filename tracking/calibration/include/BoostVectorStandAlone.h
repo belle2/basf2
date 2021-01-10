@@ -27,10 +27,8 @@ namespace Belle2 {
   namespace BoostVectorCalib {
     /** track parameters (neglecting curvature) */
     struct Track {
-      double d0;   ///< signed distance to the POCA in x-y plane
-      double z0;   ///< z position of the POCA
-      double phi0; ///< angle of the track in x-y plane
-      double tanlambda; ///< tan of angle in the z-dirrection, if zero no movement in z
+      TVector3 p;
+      double pid;
     };
 
     /** Event containing two tracks */
@@ -47,14 +45,6 @@ namespace Belle2 {
       bool isSig;     ///< is not removed by quality cuts?
       double t;       ///< time of event [hours]
 
-      /** from [cm] to [um] */
-      void toMicroM()
-      {
-        mu0.d0 *= 1e4;
-        mu1.d0 *= 1e4;
-        mu0.z0 *= 1e4;
-        mu1.z0 *= 1e4;
-      }
     };
 
 

@@ -57,8 +57,12 @@ void BoostVectorCollectorModule::prepare()
   tree->Branch<int>("run", &m_run);
   tree->Branch<double>("time", &m_time);
 
+  tree->Branch<double>("mu0_pid", &m_mu0_pid);
+  tree->Branch<double>("mu1_pid", &m_mu1_pid);
+
   tree->Branch<TVector3>("mu0_p", &m_mu0_p);
   tree->Branch<TVector3>("mu1_p", &m_mu1_p);
+
 
   // We register the objects so that our framework knows about them.
   // Don't try and hold onto the pointers or fill these objects directly
@@ -93,11 +97,12 @@ void BoostVectorCollectorModule::collect()
   //const TrackFitResult* tr0 = part0->getTrackFitResult();
   //const TrackFitResult* tr1 = part1->getTrackFitResult();
 
-  m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(11), Const::ChargedStable(13));
-  m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(11), Const::ChargedStable(13));
+  m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
+  m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
 
   m_mu0_p = part0->getMomentum();
   m_mu1_p = part1->getMomentum();
+
 
   getObjectPtr<TTree>("events")->Fill();
 

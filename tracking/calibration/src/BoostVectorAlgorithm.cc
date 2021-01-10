@@ -50,7 +50,7 @@ static TObject* getBoostVectorObj(TVector3 vBoost, TMatrixDSym  vBoostUnc, TMatr
 /* Main calibration method calling dedicated functions */
 CalibrationAlgorithm::EResult BoostVectorAlgorithm::calibrate()
 {
-  auto tracks = getObjectPtr<TTree>("tracks");
+  auto tracks = getObjectPtr<TTree>("events");
   if (!tracks || tracks->GetEntries() < 15) {
     if (tracks)
       B2WARNING("Too few data : " << tracks->GetEntries());

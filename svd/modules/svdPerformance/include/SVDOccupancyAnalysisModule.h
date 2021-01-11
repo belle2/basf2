@@ -55,10 +55,10 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    float m_group = 10000; /**< number of events to comput occupancy for occ VS time*/
+    float m_group = 10000; /**< number of events to compute occupancy for occ VS time*/
     float m_minZS = 3; /**< minimum zero suppresion cut*/
     float m_maxZS = 6; /**< max zero suppression cut*/
-    int m_pointsZS = 7; /**< num,ner of steps for different ZS cuts*/
+    int m_pointsZS = 7; /**< number of steps for different ZS cuts*/
     bool m_FADCmode = true; /**< if true, ZS done with same algorithm as on FADC*/
 
   private:

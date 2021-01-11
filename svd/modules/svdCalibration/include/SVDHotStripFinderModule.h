@@ -99,7 +99,7 @@ namespace Belle2 {
     SVDHistograms<TH1F>* hm_occAfter = nullptr; /**< occupancy distribution - not hot strips*/
 
     SVDHistograms<TH1F>* hm_dist = nullptr; /**< occupancy histograms*/
-    SVDHistograms<TH1F>* hm_dist1 = nullptr; /**< true occupancy histogrmas*/
+    SVDHistograms<TH1F>* hm_dist1 = nullptr; /**< true occupancy histograms*/
     SVDHistograms<TH2F>* hm_dist12 = nullptr; /**< true occupancy VS sensor histograms*/
 
     SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */

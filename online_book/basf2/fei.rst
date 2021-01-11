@@ -126,7 +126,7 @@ There is also a convenience function for that!
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The function to prepend to the list of global tags is `conditions.prepend_globaltag`.
+    The function to prepend to the list of global tags is `conditions.prepend_globaltag <ConditionsConfiguration.prepend_globaltag>`.
     Now combine this with the last hint!
 
 .. admonition:: Solution

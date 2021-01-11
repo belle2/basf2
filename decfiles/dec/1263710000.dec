@@ -12,20 +12,17 @@
 
 # B->D(2S)lnu
 
-Alias myB+ B+
-Alias myB- B-
-ChargeConj myB+ myB-
 
 Decay Upsilon(4S)
-0.500 myB+ B-  VSS;
-0.500 B+ myB-  VSS;
+0.500 B+sig B-  VSS;
+0.500 B+ B-sig  VSS;
 Enddecay
 
-Decay myB-
+Decay B-sig
 0.5  D(2S)0  e- anti-nu_e   PHOTOS FLATQ2;
 0.5  D(2S)0  mu- anti-nu_mu   PHOTOS FLATQ2;
 Enddecay
-CDecay myB+
+CDecay B+sig
 
 
 End

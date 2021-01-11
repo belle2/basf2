@@ -10,31 +10,27 @@
 # Date: 20201207
 #
 
-Alias myB+ B+
-Alias myB- B-
-ChargeConj myB+ myB-
-
-Alias myD_10 D_10
-Alias myanti-D_10 anti-D_10
-ChargeConj myD_10 myanti-D_10
+Alias D_10sig D_10
+Alias anti-D_10sig anti-D_10
+ChargeConj D_10sig anti-D_10sig
 
 Decay Upsilon(4S)
-0.500 myB+ B-  VSS;
-0.500 B+ myB-  VSS;
+0.500 B+sig B-  VSS;
+0.500 B+ B-sig  VSS;
 Enddecay
 
-Decay myB-
-0.5  myD_10  e- anti-nu_e   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.5  myD_10  mu- anti-nu_mu   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+Decay B-sig
+0.5  D_10sig  e- anti-nu_e   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.5  D_10sig  mu- anti-nu_mu   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
 Enddecay
-CDecay myB+
+CDecay B+sig
 
-Decay myD_10
+Decay D_10sig
 0.1719    D0 pi+ pi-                     PHOTOS PHSP;
 0.1145    D0 pi0 pi0                     PHOTOS PHSP;
 0.1145    D+ pi- pi0                     PHOTOS PHSP;
 Enddecay
-CDecay myanti-D_10
+CDecay anti-D_10sig
 
 
 End

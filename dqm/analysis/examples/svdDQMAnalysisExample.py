@@ -19,11 +19,12 @@ nevt = int(sys.argv[2])  # number of events
 b2conditions.reset()
 b2conditions.override_globaltags()
 b2conditions.globaltags = [
+    'svd_loadedOnFADC',
     'klm_alignment_testing',
     'data_reprocessing_proc11',
-    "data_reprocessing_prompt",
-    "online_proc11",
-    "Reco_master_patch_rel5"]
+    'data_reprocessing_prompt',
+    'online_proc11',
+    'Reco_master_patch_rel5']
 
 inroot = register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', inputFile)

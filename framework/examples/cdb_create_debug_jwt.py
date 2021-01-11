@@ -12,7 +12,8 @@ validity = timedelta(hours=1)
 secret = getpass.getpass("JWT Secret: ")
 
 payload = {
-    "user": "testuser",
+    "sub": "testuser",
+    "name": "Dr. Test User",
     "admin": [f"user_{username}_.*", "staging_online", "online"],
     "create_iov": ["test_creation.*"],
     "exp": datetime.utcnow() + validity

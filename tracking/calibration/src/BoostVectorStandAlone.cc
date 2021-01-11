@@ -13,6 +13,7 @@
 #include <tuple>
 #include "TTree.h"
 #include "TVector3.h"
+#include <Eigen/Dense>
 
 #include "minimizer.h"
 
@@ -28,6 +29,7 @@
 #endif
 
 using namespace std;
+using Eigen::VectorXd;
 
 namespace Belle2 {
 
@@ -50,11 +52,6 @@ namespace Belle2 {
         return (v1 + v2) / 2;
       }
     }
-
-
-
-
-
 
 
 
@@ -106,31 +103,29 @@ namespace Belle2 {
 
 
     struct FunBoost {
-      TVectorD vCos, vSin, vData, res;
+      VectorXd vCos, vSin, vData, res;
 
       double operator()(double c, double s)
       {
 
-        res.ResizeTo(vCos.GetNrows());
         res = -c * vCos - s * vSin - vData;
 
-        //res.Abs();
-        res.Sqr();
+        res =  res.array().square();
 
-        double* resA = res.GetMatrixArray();
+        double* resA = res.data();
 
-        return median(resA, res.GetNrows());
+        return median(resA, res.rows());
       }
     };
 
-    TVectorD toVec(vector<double> v)
+
+    VectorXd toVec(vector<double> v)
     {
-      TVectorD vec(v.size());
+      VectorXd vec(v.size());
       for (unsigned i = 0; i < v.size(); ++i)
         vec[i] = v[i];
       return vec;
     }
-
 
 // The input boost vector is used (angleX, anlgeY, rap) (in mili-units)
     vector<double> getRapidities(vector<TVector3> vecs, vector<double> boostDir)
@@ -142,7 +137,7 @@ namespace Belle2 {
       double th1 = vecs[1].Angle(boost);
 
       double C0, C1;
-      double mL  =  105.7;
+      double mL  =  105.7; //muon mass
       {
         double pMu0 = vecs[0].Mag();
         double pMu1 = vecs[1].Mag();
@@ -182,10 +177,6 @@ namespace Belle2 {
       //cout << "data size: " << vData.size() << endl;
 
       FunBoost fun;
-      fun.vCos.ResizeTo(vCos.size());
-      fun.vSin.ResizeTo(vSin.size());
-      fun.vData.ResizeTo(vData.size());
-
       fun.vCos  = toVec(vCos);
       fun.vSin  = toVec(vSin);
       fun.vData = toVec(vData);

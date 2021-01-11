@@ -321,8 +321,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     add_arich_modules(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_PID')
-
     # Not add EventT0Combiner module in prepare_cdst_analysis()
     if not for_cdst_analysis:
         path.add_module("EventT0Combiner")
@@ -357,7 +355,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         if pruneTracks:
             add_prune_tracks(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Clustering')
+    path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
 
 
 def add_mdst_output(

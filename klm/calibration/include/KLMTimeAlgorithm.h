@@ -216,9 +216,6 @@ namespace Belle2 {
      */
     std::map<uint16_t, std::vector<struct Event> > m_evts;
 
-    /** Container of hit information of one sigle strip. */
-    std::vector<struct Event> m_evtsChannel;
-
     /**
      * Calibration flag if the channel has enough hits collected and
      * fitted OK.
@@ -233,6 +230,24 @@ namespace Belle2 {
 
     /** Time distribution central value Error of each channel. */
     std::map<uint16_t, double> m_etime_channel;
+
+    /** Lower time boundary for RPC. */
+    double m_LowerTimeBoundaryRPC = -10.0;
+
+    /** Upper time boundary for RPC. */
+    double m_UpperTimeBoundaryRPC = 10.0;
+
+    /** Lower time boundary for BKLM scintillators. */
+    double m_LowerTimeBoundaryScintilltorsBKLM = 20.0;
+
+    /** Upper time boundary for BKLM scintillators. */
+    double m_UpperTimeBoundaryScintilltorsBKLM = 70.0;
+
+    /** Lower time boundary for EKLM scintillators. */
+    double m_LowerTimeBoundaryScintilltorsEKLM = 20.0;
+
+    /** Upper time boundary for BKLM scintillators. */
+    double m_UpperTimeBoundaryScintilltorsEKLM = 70.0;
 
     /** Central value of the global time distribution (BKLM RPC part). */
     double m_time_channelAvg_rpc = 0.0;

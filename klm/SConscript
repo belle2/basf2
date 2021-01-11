@@ -7,6 +7,6 @@ env['LIBS'] = ['klm_dataobjects', 'klm_dbobjects',
                'geometry',
                'mdst_dataobjects',
                'simulation', 'simulation_dataobjects',
-               '$ROOT_LIBS']
+               '$ROOT_LIBS', 'Minuit']
 
 Return('env')

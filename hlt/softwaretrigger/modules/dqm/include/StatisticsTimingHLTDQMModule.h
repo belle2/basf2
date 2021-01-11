@@ -49,7 +49,7 @@ namespace Belle2 {
       /// Parameter: Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "timing_statistics";
       /// Parameter: which modules should be shown in the overview list
-      std::vector<std::string> m_param_overviewModuleList = {"Sum_Tracking", "Sum_PID", "Sum_Pretracking_Clustering"};
+      std::vector<std::string> m_param_overviewModuleList = {"Sum_Tracking", "Sum_PID", "Sum_Clustering"};
     };
 
   }

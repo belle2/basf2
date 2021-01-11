@@ -62,12 +62,13 @@ class SVDValidationTTreeCluster(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeCluster, self).__init__()
+
+        #: Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeCluster.root', 'recreate')
-        '''Output ROOT file'''
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataCluster()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataCluster.__dict__:

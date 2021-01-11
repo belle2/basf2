@@ -15,6 +15,9 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
 /* Belle 2 headers. */
+#include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -92,13 +95,43 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
   m_debug{false},
   m_useEventT0{true}
 {
-  //m_EKLMGeometry = &(EKLM::GeometryData::Instance());
   m_elementNum = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
 }
 
 KLMTimeAlgorithm::~KLMTimeAlgorithm()
 {
+}
+
+void KLMTimeAlgorithm::setupDatabase()
+{
+  const std::vector<Calibration::ExpRun>& runs = getRunList();
+  int firstExperiment = runs[0].first;
+  int lastExperiment = runs[runs.size() - 1].first;
+  if (firstExperiment != lastExperiment) {
+    B2FATAL("Runs from different experiments are used "
+            "for KLM time calibration (single algorithm run).");
+  }
+  /* DataStore. */
+  DataStore::Instance().setInitializeActive(true);
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  /* Database. */
+  if (eventMetaData.isValid()) {
+    if (eventMetaData->getExperiment() != firstExperiment) {
+      B2FATAL("Runs from different experiments are used "
+              "for KLM time calibration (consecutive algorithm runs).");
+    }
+    eventMetaData->setExperiment(firstExperiment);
+    eventMetaData->setRun(runs[0].second);
+  } else {
+    eventMetaData.construct(1, runs[0].second, firstExperiment);
+  }
+  DBStore& dbStore = DBStore::Instance();
+  dbStore.update();
+  dbStore.updateEvent();
+  m_EKLMGeometry = &(EKLM::GeometryData::Instance());
 }
 
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
@@ -504,6 +537,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   int channelId;
   double effSpeed_end, effSpeed, effSpeed_RPC;
   gROOT->SetBatch(kTRUE);
+  setupDatabase();
   m_timeCableDelay = new KLMTimeCableDelay();
   m_timeConstants = new KLMTimeConstants();
 

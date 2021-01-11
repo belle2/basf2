@@ -193,6 +193,11 @@ namespace Belle2 {
   private:
 
     /**
+     * Setup the database.
+     */
+    void setupDatabase();
+
+    /**
      * Read calibration data.
      * @return
      * CalibrationAlgorithm::c_OK if the amount of data is sufficient,

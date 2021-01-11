@@ -39,7 +39,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
   addParam("nestedROEMask", m_nestedMask, "A switch to create nested ROE", std::string(""));
   addParam("fromMC", m_fromMC, "A switch to create MC ROE", false);
   addParam("useKLMEnergy", m_useKLMEnergy, "A switch to create ROE with KLM energy included", false);
-  addParam("mostLikely", m_builtWithMostLikely, "whether input particle lists contain most-likely lists", false);
+  addParam("mostLikely", m_builtWithMostLikely, "whether input particle lists contain most-likely lists", true);
   m_nestedROEArrayName = "NestedRestOfEvents";
 }
 

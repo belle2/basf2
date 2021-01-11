@@ -16,8 +16,10 @@ pedestal = 0
 
 
 class defaultPedestalImporter(b2.Module):
+    """strip pedestal importer"""
 
     def beginRun(self):
+        """do everything here"""
 
         iov = Belle2.IntervalOfValidity.always()
 

@@ -1350,7 +1350,7 @@ C ----------------------------------------------------------------------
       COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
-
+      REAL*4  RR1(1)    ! RANMAR generates floats
       REAL  HV(4),PN(4),PAA(4),PIM1(4),PIM2(4),PIPL(4),PNPI(4,9)
 C --- MASSES OF THE DECAY PRODUCTS
        AMP1=DCDMAS(IDFFIN(1,JNPI),0)
@@ -1371,6 +1371,16 @@ C MATRIX ELEMENT NUMBER:
          PNPI(I,2)=PIM2(I)
          PNPI(I,3)=PIPL(I)
       ENDDO
+      IF (MNUM.EQ.21) THEN ! symmetrize 
+         CALL KKMC_RANMAR(RR1,1)
+         IF (RR1(1).GT.0.5) THEN
+            DO I=1,4
+               PNPI(I,1)=PIPL(I)
+               PNPI(I,2)=PIM2(I)
+               PNPI(I,3)=PIM1(I)
+            ENDDO    
+         ENDIF
+      ENDIF
       END
 
 

@@ -5,16 +5,17 @@ Example script storing ADC, TDC and Hit distribution histograms.
 Usage :
 basf2 CDCHistMaker exp run
 '''
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1D, TH2D, TCanvas, TFile
+from ROOT import TFile, TH1D, TH2D
 import argparse
 import glob
+import os
 
 
-reset_database()
-use_database_chain()
-use_central_database("Calibration_Offline_Development", LogLevel.INFO)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("Calibration_Offline_Development", b2.LogLevel.INFO)
 
 
 nWires = [160, 160, 160, 160, 160, 160, 160, 160,  # SL0
@@ -72,7 +73,7 @@ histHit = [TH1D('h' + str(400000 + l_adc),
                 400, 0.0, 400.) for l_adc in range(56)]
 
 
-class CDCHistMakerModule(Module):
+class CDCHistMakerModule(b2.Module):
 
     """
     Class description.
@@ -97,7 +98,7 @@ class CDCHistMakerModule(Module):
 
     def event(self):
         """
-        reimplement Module::event()
+        reimplement b2.Module::event()
         """
 
         hits = Belle2.PyStoreArray('CDCHits')
@@ -146,7 +147,7 @@ def main(exp=1, run=3118, prefix='', dest=''):
     # Seach dst files.
     files = glob.glob(prefix + '/dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
     # create path
-    main = create_path()
+    main = b2.create_path()
     # Input (ROOT file).
     main.add_module('RootInput',
                     inputFileNames=files)
@@ -154,8 +155,8 @@ def main(exp=1, run=3118, prefix='', dest=''):
     main.add_module(CDCHistMakerModule(exp, run, dest))
     main.add_module('Progress')
     # process events and print call statistics
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)
 
 
 if __name__ == "__main__":

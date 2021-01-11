@@ -369,8 +369,7 @@ void KLMUnpackerModule::event()
           else if (channelReadoutBoard >= 16 && channelReadoutBoard < 32)
             subdetector = KLMElementNumbers::c_EKLM;
           else
-            B2FATAL("The PCIe40 channel is invalid."
-                    << LogVar("Channel", channelReadoutBoard));
+            continue;
           convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
         } else {
           B2FATAL("The maximum number of channels per readout board is invalid."

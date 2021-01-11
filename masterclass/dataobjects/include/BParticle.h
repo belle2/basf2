@@ -1,9 +1,6 @@
 //+
 // File : BParticle.h
 // Description : class to contain particle info.
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 28 - Jan - 2004
 //-
 
 #pragma once
@@ -13,6 +10,8 @@
 
 enum SIMPLEPID {PHOTON, ELECTRON, PION, MUON, KAON, PROTON, JPSI, D, DSTAR, B, PHI, LAMBDA0, ALL };
 
+//! The Class for Masterclass particle information
+//! This class provides the data structure of the particle that are used by Belle II Masterclass application.
 class BParticle : public TObject {
 
 private:
@@ -24,9 +23,9 @@ private:
   SIMPLEPID m_pid;  /*!< particle identity */
 
 public:
-  //! Default constructor
+//! Default constructor
   BParticle() {};
-  //! Constructor using the particle
+//! Constructor using the particle
   BParticle(const BParticle&) = default;
 
   /**
@@ -34,45 +33,45 @@ public:
    * @param px - x component of the particle momentum
    * @param py - y component of the particle momentum
    * @param pz - z component of the particle momentum
-   * @param e  - energy of the particle
+   * @param energy  - energy of the particle
    * @param charge  - unit charge of the particle
    * @param pid - particle identity - hypothesis with the highest maximum likelihood
    */
-  BParticle(float px, float py, float pz, float e, float c, SIMPLEPID pid);
+  BParticle(float px, float py, float pz, float energy, float charge, SIMPLEPID pid);
 
-  //! Default destructor
+//! Default destructor
   ~BParticle() {};
 
 
   /**
-   * @return x component of the particle momentum
+   * @return x component of the particle momentum GeV/c
    */
   float px() const { return m_px; };
   /**
-   * @return y component of the particle momentum
+   * @return y component of the particle momentum GeV/c
    */
   float py() const { return m_py; };
   /**z
-   * @return z component of the particle momentum
+   * @return z component of the particle momentum GeV/c
    */
   float pz() const { return m_pz; };
   /**
-   * @return particle energy
+   * @return particle energy GeV
    */
   float e() const { return m_e; };
   /**
    * Get the momentum of the particle
-   * @return particle momentum
+   * @return particle momentum GeV/c
    */
   float GetMomentum() const { return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz); };
   /**
    * Get the transverse momentum of the particle
-   * @return transverse particle momentum
+   * @return transverse particle momentum GeV/c
    */
   float GetTransverseMomentum() const { return sqrt(m_px * m_px + m_py * m_py); };
   /**
    * Get the particle charge
-   * @return particle charge
+   * @return particle unit charge
    */
   float charge() const { return m_charge; };
 
@@ -84,12 +83,14 @@ public:
   SIMPLEPID pid() const { return m_pid; };
   /**
    * Get the mass of the particle with the identity
-   * @param pod particle identity
+   * @param pid particle identity
+   * @return mass of the particle GeV/c2
    */
 
   float GetMass(SIMPLEPID pid);
   /**
    * Get the mass of the particle
+   * @return mass of the particle GeV/c2
    */
 
   float GetMass();
@@ -119,7 +120,7 @@ public:
 
   int  InMassRange(float mlower, float mupper) { float m = GetMass(); if (m >= mlower && m <= mupper) return 1; else return 0; };
 
-  //! Adds to particles
+//! Adds to particles
   BParticle operator+(const BParticle& b)
   {
 
@@ -135,7 +136,7 @@ public:
     return particle;
   };
 
-  //! Assign a particle
+//! Assign a particle
   BParticle& operator=(const BParticle&  p)
   {
     m_px = p.px();

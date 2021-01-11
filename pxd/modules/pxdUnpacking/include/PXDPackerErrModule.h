@@ -121,7 +121,7 @@ namespace Belle2 {
       void append_int32(unsigned int w); ///< cat 32value value to frame
       void add_frame_to_payload(void); ///< Add Frame to Event payload
 
-      /* function still to be implemented */
+      /** function still to be implemented */
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
       /** Check if we want this type of error in this event */

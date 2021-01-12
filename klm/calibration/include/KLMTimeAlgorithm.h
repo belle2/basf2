@@ -288,8 +288,8 @@ namespace Belle2 {
     /** Lower limit of hits collected for on single channel. */
     int m_lower_limit_counts;
 
-    /** Element number handler */
-    const KLMElementNumbers* m_elementNum;
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM geometry data. */
     const EKLM::GeometryData* m_EKLMGeometry;

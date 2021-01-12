@@ -49,6 +49,9 @@ static double s_LowerTimeBoundary = 0;
 /** Upper time boundary. */
 static double s_UpperTimeBoundary = 0;
 
+/** Maximal propagation distance (strip length). */
+static double s_StripLength = 0;
+
 static bool compareEventNumber(std::pair<uint16_t, unsigned int>& pair1,
                                std::pair<uint16_t, unsigned int>& pair2)
 {
@@ -75,14 +78,15 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
     x[0] = s_LowerTimeBoundary +
            (s_UpperTimeBoundary - s_LowerTimeBoundary) *
            (double(i) + 0.5) / c_NBinsTime;
-    int j = 0;
-    x[1] = 0;
-    double f = timeDensity(x, par);
-    if (s_BinnedData[i][j] == 0)
-      fval = fval + 2.0 * f;
-    else
-      fval = fval + 2.0 * (f - s_BinnedData[i][j] *
-                           (1.0 - log(s_BinnedData[i][j] / f)));
+    for (int j = 0; j < c_NBinsDistance; ++j) {
+      x[1] = 0;
+      double f = timeDensity(x, par);
+      if (s_BinnedData[i][j] == 0)
+        fval = fval + 2.0 * f;
+      else
+        fval = fval + 2.0 * (f - s_BinnedData[i][j] *
+                             (1.0 - log(s_BinnedData[i][j] / f)));
+    }
   }
 }
 
@@ -95,7 +99,7 @@ KLMTimeAlgorithm::KLMTimeAlgorithm() :
   m_debug{false},
   m_useEventT0{true}
 {
-  m_elementNum = &(KLMElementNumbers::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();
 }
 
@@ -595,8 +599,12 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::sort(channels.begin(), channels.end(), compareEventNumber);
 
   /* Two-dimensional fit for the channel with the maximal number of events. */
+  int subdetector, section, sector, layer, plane, strip;
+  m_ElementNumbers->channelNumberToElementNumbers(
+    channels[0].first, &subdetector, &section, &sector, &layer, &plane, &strip);
   s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
   s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
+  s_StripLength = m_EKLMGeometry->getStripLength(strip);
   for (i = 0; i < c_NBinsTime; ++i) {
     for (int j = 0; j < c_NBinsDistance; ++j)
       s_BinnedData[i][j] = 0;
@@ -610,7 +618,14 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     averageTime = averageTime + timeHit;
     int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
                              (s_UpperTimeBoundary - s_LowerTimeBoundary));
-    s_BinnedData[timeBin][0] = s_BinnedData[timeBin][0] + 1;
+    if (timeBin < 0 || timeBin >= c_NBinsTime)
+      continue;
+    int distanceBin = std::floor(it_v->dist * c_NBinsDistance / s_StripLength);
+    if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
+      B2ERROR("The distance to SiPM is greater than the strip length.");
+      continue;
+    }
+    s_BinnedData[timeBin][distanceBin] = s_BinnedData[timeBin][distanceBin] + 1;
   }
   averageTime = averageTime / eventsChannel.size();
   TMinuit minuit(3);

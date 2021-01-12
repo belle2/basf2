@@ -74,6 +74,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
   //
+  addParam("expertBeamConstraint", m_beamConstraint,
+           "Type int, default 0. The 4-momentum of particles with the given PDG will be constrained to the 4-momentum of the initial e+e- system.",
+           0);
   addParam("expertMassConstraintType", m_massConstraintType,
            "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. WAARNING not even guaranteed that it works.",
            0);
@@ -165,6 +168,7 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOriginVertex,
     m_customOriginCovariance,
     m_originDimension,
+    m_beamConstraint,
     m_inflationFactorCovZ
   );
 

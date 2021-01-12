@@ -81,6 +81,9 @@ namespace Belle2 {
      * */
     int m_massConstraintType;
 
+    /** PDG code of particle to be constrained to the beam 4-momentum */
+    int m_beamConstraint;
+
     /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed,
      * thus pinning down the PRODUCTION vertex of the mother to the IP

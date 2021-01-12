@@ -147,6 +147,8 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+        import b2bii
+        b2bii.setB2BII()
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
@@ -1881,7 +1883,7 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=True,
+                     fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
@@ -1899,7 +1901,6 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources      boolean to indicate that the ROE should be built from Belle sources only
     @param path               modules are added to this path
     """
     if inputParticlelists is None:
@@ -1909,7 +1910,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
-    if not belle_sources:
+    import b2bii
+    if not b2bii.isB2BII():
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
@@ -2907,7 +2909,6 @@ def labelTauPairMC(printDecayInfo=False, path=None):
 
 
 def tagCurlTracks(particleLists,
-                  belle=False,
                   mcTruth=False,
                   responseCut=0.324,
                   selectorType='cUt',
@@ -2932,7 +2933,6 @@ def tagCurlTracks(particleLists,
 
 
     @param particleLists: list of particle lists to check for curls.
-    @param belle:         bool flag for Belle or Belle II data/mc.
     @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
@@ -2945,6 +2945,9 @@ def tagCurlTracks(particleLists,
     @param train:         flag to set training mode if selector has a training mode (mva).
     @param path:          module is added to this path.
     """
+
+    import b2bii
+    belle = b2bii.isB2BII()
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string

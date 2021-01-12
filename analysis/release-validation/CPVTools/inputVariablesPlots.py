@@ -58,7 +58,6 @@ allInputVariables = []
 
 
 ft.WhichCategories(categories)
-ft.setBelleOrBelle2(belleOrBelle2)
 ft.setVariables()
 
 belleOrBelle2Flag = belleOrBelle2

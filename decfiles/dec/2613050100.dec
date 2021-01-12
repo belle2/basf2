@@ -1,6 +1,6 @@
-# EventType: 2613050201
-# Descriptor: [ccbar Dstarm2D0barPim D0bar2KSKS]
-# NickName: DstmToD0barPim_D0barToKS0KS0
+# EventType: 2613050100
+# Descriptor: [ccbar Dstarp2D0Pip D02KSKS]
+# NickName: DstpToD0Pip_D0ToKS0KS0
 # Cuts: None
 # Documentation: MC14a signal request
 # PhysicsWG: Charm
@@ -51,11 +51,11 @@ Enddecay
 
 Alias K_S0sig K_S0 
 
-Decay D*-
-1.0000  anti-D0sig   pi-        VSS;
+Decay D*+
+1.0000  D0sig   pi+        VSS;
 Enddecay
 
-Decay anti-D0sig
+Decay D0sig
 1.0000  K_S0sig   K_S0sig  PHSP;
 Enddecay
 

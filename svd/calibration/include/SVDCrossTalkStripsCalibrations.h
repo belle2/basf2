@@ -67,8 +67,8 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
-     * @param strip: cluster position in cm
-    *
+     * @param clsPosition: cluster position in cm
+     *
      * Output: boolean value, 1 is cross talk region, 0 otherwise.
      * it throws std::out_of_range if the strip is unknown
      */

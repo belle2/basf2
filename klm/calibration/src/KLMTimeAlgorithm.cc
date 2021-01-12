@@ -571,7 +571,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_outFile = new TFile(name.c_str(), "recreate");
   createHistograms();
 
-  std::vector<struct Event>::iterator it_v;
+  std::vector<struct Event>::iterator it;
   std::vector<struct Event> eventsChannel;
 
   eventsChannel.clear();
@@ -612,16 +612,16 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   }
   eventsChannel = m_evts[channels[0].first];
   double averageTime = 0;
-  for (it_v = eventsChannel.begin(); it_v != eventsChannel.end(); ++it_v) {
-    double timeHit = it_v->time();
+  for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+    double timeHit = it->time();
     if (m_useEventT0)
-      timeHit = timeHit - it_v->t0;
+      timeHit = timeHit - it->t0;
     averageTime = averageTime + timeHit;
     int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
                              (s_UpperTimeBoundary - s_LowerTimeBoundary));
     if (timeBin < 0 || timeBin >= c_NBinsTime)
       continue;
-    int distanceBin = std::floor(it_v->dist * c_NBinsDistance / s_StripLength);
+    int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
     if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
       B2ERROR("The distance to SiPM is greater than the strip length.");
       continue;
@@ -663,12 +663,12 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     eventsChannel = m_evts[channelId];
     int iSub = klmChannel.getSubdetector();
 
-    for (it_v = eventsChannel.begin(); it_v != eventsChannel.end(); ++it_v) {
-      TVector3 diffD = TVector3(it_v->diffDistX, it_v->diffDistY, it_v->diffDistZ);
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      TVector3 diffD = TVector3(it->diffDistX, it->diffDistY, it->diffDistZ);
       h_diff->Fill(diffD.Mag());
-      double timeHit = it_v->time();
+      double timeHit = it->time();
       if (m_useEventT0)
-        timeHit = timeHit - it_v->t0;
+        timeHit = timeHit - it->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -747,11 +747,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     eventsChannel = m_evts[channelId];
     int iSub = klmChannel.getSubdetector();
 
-    for (it_v = eventsChannel.begin(); it_v != eventsChannel.end(); ++it_v) {
-      double timeHit = it_v->time() - m_timeShift[channelId];
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time() - m_timeShift[channelId];
       if (m_useEventT0)
-        timeHit = timeHit - it_v->t0;
-      double distHit = it_v->dist;
+        timeHit = timeHit - it->t0;
+      double distHit = it->dist;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iL = klmChannel.getLayer() - 1;
@@ -872,10 +872,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       continue;
     eventsChannel = m_evts[channelId];
 
-    for (it_v = eventsChannel.begin(); it_v != eventsChannel.end(); ++it_v) {
-      double timeHit = it_v->time();
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time();
       if (m_useEventT0)
-        timeHit = timeHit - it_v->t0;
+        timeHit = timeHit - it->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -883,7 +883,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane();
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
-          double propgationT = it_v->dist / effSpeed_RPC;
+          double propgationT = it->dist / effSpeed_RPC;
           h_time_rpc->Fill(timeHit - propgationT);
           h_timeF_rpc[iF]->Fill(timeHit - propgationT);
           h_timeFS_rpc[iF][iS]->Fill(timeHit - propgationT);
@@ -894,7 +894,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2_timeFS[iF][iS]->Fill(iL, timeHit - propgationT);
           h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT);
         } else {
-          double propgationT = it_v->dist / effSpeed;
+          double propgationT = it->dist / effSpeed;
           h_time_scint->Fill(timeHit - propgationT);
           h_timeF_scint[iF]->Fill(timeHit - propgationT);
           h_timeFS_scint[iF][iS]->Fill(timeHit - propgationT);
@@ -911,7 +911,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it_v->dist / effSpeed_end;
+        double propgationT = it->dist / effSpeed_end;
         h_time_scint_end->Fill(timeHit - propgationT);
         h_timeF_scint_end[iF]->Fill(timeHit - propgationT);
         h_timeFS_scint_end[iF][iS]->Fill(timeHit - propgationT);
@@ -1057,10 +1057,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
     eventsChannel = m_evts[channelId];
-    for (it_v = eventsChannel.begin(); it_v != eventsChannel.end(); ++it_v) {
-      double timeHit = it_v->time();
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time();
       if (m_useEventT0)
-        timeHit = timeHit - it_v->t0;
+        timeHit = timeHit - it->t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -1068,7 +1068,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane();
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
-          double propgationT = it_v->dist / effSpeed_RPC;
+          double propgationT = it->dist / effSpeed_RPC;
           hc_time_rpc->Fill(timeHit - propgationT - m_timeShift[channelId]);
           hc_timeF_rpc[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
           hc_timeFS_rpc[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);
@@ -1079,7 +1079,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2c_timeFS[iF][iS]->Fill(iL, timeHit - propgationT - m_timeShift[channelId]);
           h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT - m_timeShift[channelId]);
         } else {
-          double propgationT = it_v->dist / effSpeed;
+          double propgationT = it->dist / effSpeed;
           hc_time_scint->Fill(timeHit - propgationT - m_timeShift[channelId]);
           hc_timeF_scint[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
           hc_timeFS_scint[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);
@@ -1096,7 +1096,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it_v->dist / effSpeed;
+        double propgationT = it->dist / effSpeed;
         hc_time_scint_end->Fill(timeHit - propgationT - m_timeShift[channelId]);
         hc_timeF_scint_end[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
         hc_timeFS_scint_end[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);

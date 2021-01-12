@@ -600,55 +600,71 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::sort(channels.begin(), channels.end(), compareEventNumber);
 
   /* Two-dimensional fit for the channel with the maximal number of events. */
-  int subdetector, section, sector, layer, plane, strip;
-  m_ElementNumbers->channelNumberToElementNumbers(
-    channels[0].first, &subdetector, &section, &sector, &layer, &plane, &strip);
-  s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
-  s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
-  s_StripLength = m_EKLMGeometry->getStripLength(strip) / CLHEP::cm * Unit::cm;
-  for (i = 0; i < c_NBinsTime; ++i) {
-    for (int j = 0; j < c_NBinsDistance; ++j)
-      s_BinnedData[i][j] = 0;
-  }
-  eventsChannel = m_evts[channels[0].first];
-  double averageTime = 0;
-  for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-    double timeHit = it->time();
-    if (m_useEventT0)
-      timeHit = timeHit - it->t0;
-    averageTime = averageTime + timeHit;
-    int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
-                             (s_UpperTimeBoundary - s_LowerTimeBoundary));
-    if (timeBin < 0 || timeBin >= c_NBinsTime)
-      continue;
-    int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
-    if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
-      B2ERROR("The distance to SiPM is greater than the strip length.");
-      continue;
+  int nFits = 100;
+  int nConvergedFits = 0;
+  double delay = 0;
+  double delayError = 0;
+  if (nFits > (int)channels.size())
+    nFits = channels.size();
+  for (i = 0; i < nFits; ++i) {
+    int subdetector, section, sector, layer, plane, strip;
+    m_ElementNumbers->channelNumberToElementNumbers(
+      channels[i].first, &subdetector, &section, &sector, &layer, &plane, &strip);
+    s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
+    s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
+    s_StripLength = m_EKLMGeometry->getStripLength(strip) / CLHEP::cm * Unit::cm;
+    for (int j = 0; j < c_NBinsTime; ++j) {
+      for (int k = 0; k < c_NBinsDistance; ++k)
+        s_BinnedData[j][k] = 0;
     }
-    s_BinnedData[timeBin][distanceBin] = s_BinnedData[timeBin][distanceBin] + 1;
+    eventsChannel = m_evts[channels[i].first];
+    double averageTime = 0;
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time();
+      if (m_useEventT0)
+        timeHit = timeHit - it->t0;
+      averageTime = averageTime + timeHit;
+      int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
+                               (s_UpperTimeBoundary - s_LowerTimeBoundary));
+      if (timeBin < 0 || timeBin >= c_NBinsTime)
+        continue;
+      int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
+      if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
+        B2ERROR("The distance to SiPM is greater than the strip length.");
+        continue;
+      }
+      s_BinnedData[timeBin][distanceBin] = s_BinnedData[timeBin][distanceBin] + 1;
+    }
+    averageTime = averageTime / eventsChannel.size();
+    TMinuit minuit(5);
+    int minuitResult;
+    minuit.mnparm(0, "P0", 1, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(1, "N", 10, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(2, "T0", averageTime, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
+    minuit.SetFCN(fcn);
+    minuit.mncomd("FIX 2 3 4 5", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 2", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 3", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 4", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 5", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    /* Require converged fit with accurate error matrix. */
+    if (minuit.fISW[1] != 3)
+      continue;
+    nConvergedFits++;
+    double channelDelay, channelDelayError;
+    minuit.GetParameter(4, channelDelay, channelDelayError);
+    delay = delay + channelDelay;
+    delayError = delayError + channelDelayError * channelDelayError;
   }
-  averageTime = averageTime / eventsChannel.size();
-  TMinuit minuit(5);
-  int minuitResult;
-  minuit.mnparm(0, "P0", 1, 0.001, 0, 0, minuitResult);
-  minuit.mnparm(1, "N", 10, 0.001, 0, 0, minuitResult);
-  minuit.mnparm(2, "T0", averageTime, 0.001, 0, 0, minuitResult);
-  minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
-  minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
-  minuit.SetFCN(fcn);
-  minuit.mncomd("FIX 2 3 4 5", minuitResult);
-  minuit.mncomd("MIGRAD 10000", minuitResult);
-  minuit.mncomd("RELEASE 2", minuitResult);
-  minuit.mncomd("MIGRAD 10000", minuitResult);
-  minuit.mncomd("RELEASE 3", minuitResult);
-  minuit.mncomd("MIGRAD 10000", minuitResult);
-  minuit.mncomd("RELEASE 4", minuitResult);
-  minuit.mncomd("MIGRAD 10000", minuitResult);
-  minuit.mncomd("RELEASE 5", minuitResult);
-  minuit.mncomd("MIGRAD 10000", minuitResult);
-  double delay, delayError;
-  minuit.GetParameter(4, delay, delayError);
+  delay = delay / nConvergedFits;
+  delayError = sqrt(delayError) / (nConvergedFits - 1);
 
   /**********************************
    * First loop

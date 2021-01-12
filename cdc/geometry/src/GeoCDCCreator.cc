@@ -63,7 +63,6 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
-      std::cout << "GeoCDCCreator constructor called" << std::endl;
       // Set job control params. before sensitivedetector and gometry construction
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
@@ -91,7 +90,6 @@ namespace Belle2 {
 
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
 
-      std::cout << "createGeometry called" << std::endl;
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
       G4Material* medHelium = geometry::Materials::get("CDCHeGas");
       G4Material* medEthane = geometry::Materials::get("CDCEthaneGas");
@@ -729,16 +727,12 @@ namespace Belle2 {
 
       // Construct electronics boards
       for (const auto& frontend : geo.getFrontends()) {
-        std::cout << "in getfront " << std::endl;
 
         const int iEB = frontend.getId();
         const double ebInnerR = frontend.getRmin();
         const double ebOuterR = frontend.getRmax();
         const double ebBZ = frontend.getZbwd();
         const double ebFZ = frontend.getZfwd();
-
-        std::cout << "ebInnerR: " << ebInnerR << std::endl;
-        std::cout << "ebOuterR: " << ebOuterR << std::endl;
 
         G4Tubs* ebTubeShape = new G4Tubs((format("solidSD_ElectronicsBoard_Layer%1%") % iEB).str().c_str(), ebInnerR * CLHEP::cm,
                                          ebOuterR * CLHEP::cm, (ebFZ - ebBZ)*CLHEP::cm / 2.0, 0 * CLHEP::deg, 360.*CLHEP::deg);

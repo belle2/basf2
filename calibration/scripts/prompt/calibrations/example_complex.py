@@ -28,6 +28,7 @@ settings = CalibrationSettings(name="Example Complex",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],
+                               input_data_filters={"physics": ["physics, Good"], "cosmics": ["cosmics"], "Bcosmics": ["Bcosmics"]},
                                depends_on=[example_simple],
                                expert_config={
                                               "physics_prescale": 0.2,

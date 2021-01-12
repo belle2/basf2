@@ -34,7 +34,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_hadron"],
+                               input_data_names=["hadron_calib"],
+                               input_data_filters={"hadron_calib": ["hadron_calib", "4S", "Continuum", "physics", "On"]},
                                depends_on=[],
                                expert_config={
                                    "max_events_per_run": 10000,
@@ -220,7 +221,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
 def get_calibrations(input_data, **kwargs):
 
-    file_to_iov_physics = input_data["hlt_hadron"]
+    file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]

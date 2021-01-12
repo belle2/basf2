@@ -23,7 +23,7 @@ namespace Belle2 {
   struct StepInformation {
     /** Construct a new instance
      * @param stepPosition step position
-     * @param stepMomentumstep momentum
+     * @param stepMomentum step momentum
      * @param stepElectrons number of created electrons
      * @param stepTime global time the step occured
      * @param stepLength step length

@@ -60,10 +60,11 @@ static bool compareEventNumber(std::pair<uint16_t, unsigned int>& pair1,
 
 static double timeDensity(double x[2], double* par)
 {
-  double polynomial, gauss;
+  double polynomial, t0, gauss;
   polynomial = par[0];
+  t0 = par[2] + par[4] * x[1];
   gauss = par[1] / (sqrt(2.0 * M_PI) * par[3]) *
-          exp(-0.5 * pow((x[0] - par[2]) / par[3], 2));
+          exp(-0.5 * pow((x[0] - t0) / par[3], 2));
   return fabs(polynomial + gauss);
 }
 
@@ -79,7 +80,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
            (s_UpperTimeBoundary - s_LowerTimeBoundary) *
            (double(i) + 0.5) / c_NBinsTime;
     for (int j = 0; j < c_NBinsDistance; ++j) {
-      x[1] = 0;
+      x[1] = s_StripLength * (double(j) + 0.5) / c_NBinsDistance;
       double f = timeDensity(x, par);
       if (s_BinnedData[i][j] == 0)
         fval = fval + 2.0 * f;
@@ -604,7 +605,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     channels[0].first, &subdetector, &section, &sector, &layer, &plane, &strip);
   s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
   s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
-  s_StripLength = m_EKLMGeometry->getStripLength(strip);
+  s_StripLength = m_EKLMGeometry->getStripLength(strip) / CLHEP::cm * Unit::cm;
   for (i = 0; i < c_NBinsTime; ++i) {
     for (int j = 0; j < c_NBinsDistance; ++j)
       s_BinnedData[i][j] = 0;
@@ -628,14 +629,15 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     s_BinnedData[timeBin][distanceBin] = s_BinnedData[timeBin][distanceBin] + 1;
   }
   averageTime = averageTime / eventsChannel.size();
-  TMinuit minuit(3);
+  TMinuit minuit(5);
   int minuitResult;
   minuit.mnparm(0, "P0", 1, 0.001, 0, 0, minuitResult);
   minuit.mnparm(1, "N", 10, 0.001, 0, 0, minuitResult);
   minuit.mnparm(2, "T0", averageTime, 0.001, 0, 0, minuitResult);
   minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
+  minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
   minuit.SetFCN(fcn);
-  minuit.mncomd("FIX 2 3 4", minuitResult);
+  minuit.mncomd("FIX 2 3 4 5", minuitResult);
   minuit.mncomd("MIGRAD 10000", minuitResult);
   minuit.mncomd("RELEASE 2", minuitResult);
   minuit.mncomd("MIGRAD 10000", minuitResult);
@@ -643,6 +645,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   minuit.mncomd("MIGRAD 10000", minuitResult);
   minuit.mncomd("RELEASE 4", minuitResult);
   minuit.mncomd("MIGRAD 10000", minuitResult);
+  minuit.mncomd("RELEASE 5", minuitResult);
+  minuit.mncomd("MIGRAD 10000", minuitResult);
+  double delay, delayError;
+  minuit.GetParameter(4, delay, delayError);
 
   /**********************************
    * First loop
@@ -833,8 +839,15 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
          << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
+  double effC_scint_end = 1.0 / delay;
+  double e_effC_scint_end = delayError / (delay * delay);
+
+  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_end, e_effC_scint_end);
+  B2INFO("Estimation of effective light speed of EKLM scintillators: "
+         << LogVar("Fitted Value (2d fit) ", logStr_z.Data()));
+
   // Default Effective light speed in current Database
-  effSpeed_end = 0.5 * (fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end));
+  effSpeed_end = effC_scint_end;
   effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
   effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
 
@@ -847,7 +860,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_timeConstants->setEffLightSpeed(effSpeed_RPC, KLMTimeConstants::c_RPC);
   m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_RPC);
 
-  effSpeed_end = 0.5671 * Const::speedOfLight;
   effSpeed = 0.5671 * Const::speedOfLight;
 
   /** ======================================================================================= **/
@@ -899,7 +911,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it_v->dist / effSpeed;
+        double propgationT = it_v->dist / effSpeed_end;
         h_time_scint_end->Fill(timeHit - propgationT);
         h_timeF_scint_end[iF]->Fill(timeHit - propgationT);
         h_timeFS_scint_end[iF][iS]->Fill(timeHit - propgationT);

@@ -80,14 +80,25 @@ namespace Belle2 {
       return getHistogram(view)->GetBinContent(bin);
     }
 
-    /** get the value contained in the corresponding bin, given @param layer, @param ladder, @param sensor and @param view*/
+    /** get the value contained in the corresponding bin, given
+     * @param layer
+     * @param ladder
+     * @param sensor
+     * @param view
+     */
     float getValue(int layer, int ladder, int sensor, int view)
     {
       int bin = m_histos[view]->FindBin(ladder, findBinY(layer, sensor));
       return getHistogram(view)->GetBinContent(bin);
     }
 
-    /** fill the histogram for @param layer, @param ladder, @param sensor @param view with @param value*/
+    /** fill the histogram for
+     * @param layer
+     * @param ladder
+     * @param sensor
+     * @param view with
+     * @param value
+     */
     void fill(int layer, int ladder, int sensor, int view, float value)
     {
       getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);

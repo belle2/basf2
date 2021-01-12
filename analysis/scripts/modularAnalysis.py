@@ -8,6 +8,7 @@ This module defines wrapper functions around the analysis modules.
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
+import subprocess
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -3163,6 +3164,18 @@ def scaleError(outputListName, inputListName,
     scale_error.param('scaleFactors', scaleFactors)
     scale_error.param('minErrors', minErrors)
     path.add_module(scale_error)
+
+
+def getAnalysisGlobaltag():
+    """
+    Returns a string containing the name of the latest and recommended analysis globaltag.
+    """
+    tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline']).decode('UTF-8').rstrip().split(' ')
+    analysis_tag = ''
+    for tag in tags:
+        if tag.startswith('analysis_tools'):
+            analysis_tag = tag
+    return analysis_tag
 
 
 if __name__ == '__main__':

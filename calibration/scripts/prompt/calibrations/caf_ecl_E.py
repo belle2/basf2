@@ -6,12 +6,13 @@ from prompt import CalibrationSettings
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
-settings = CalibrationSettings(name="ecl_energy",
-                               expert_username="hearty",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["bhabha_all_calib", "gamma_gamma_calib", "mumutight_calib", "Good"],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="ecl_energy", expert_username="hearty", description=__doc__, input_data_formats=["cdst"], input_data_names=[
+        "bhabha_all_calib", "gamma_gamma_calib", "mumutight_calib"], input_data_filters={
+            "bhabha_all_calib": [
+                "bhabha_all_calib", "Good", "On"], "gamma_gamma_calib": [
+                    "gamma_gamma_calib", "Good", "On"], "mumutight_calib": [
+                        "mumutight_calib", "Good or Recoverable", "On"]}, depends_on=[])
 
 # --------------------------------------------------------------
 # ..The calibration functions
@@ -54,6 +55,7 @@ def get_calibrations(input_data, **kwargs):
                                 algorithms=[algo_ee5x5],
                                 input_files=input_files_bhabha
                                 )
+    cal_ecl_ee5x5.backend_args = {"request_memory": "4 GB"}
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     ee5x5_pre_path = basf2.create_path()

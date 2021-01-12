@@ -43,6 +43,7 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <analysis/VariableManager/Manager.h>
 
@@ -67,6 +68,8 @@ TOPRingPlotterModule::TOPRingPlotterModule() : Module()
   // Parameter definitions
   addParam("particleList", m_particleList, "List of particles to be used for plotting", std::string("pi+:all"));
   addParam("variables", m_variables, "List of variables to be saved", {});
+  addParam("pdgHyp", m_pdgHyp, "List of pdg codes for which the PDF is sampled ansd saved. Valid values are 11, 13, 211, 321, 2212.",
+           m_pdgHyp);
   addParam("outputName", m_outputName, "Name of the output file", std::string("TOPRings.root"));
   addParam("nToys", m_toyNumber,
            "Number of toys used to sample the PDFs. Set it to a large number for a precise sampling of the PDF in the histograms (suggested for small number of events) ",
@@ -111,14 +114,20 @@ void TOPRingPlotterModule::resetTree()
   m_nDigits = 0;
 
   for (int i = 0; i < m_MaxPhotons; i++) {
-    m_digitTime[i] = 0; /**< Digit calibrated time [ns] */
-    m_digitChannel[i] = 0; /**< SW channel (0-511) */
-    m_digitPixelCol[i] = 0; /**< Pixel column */
-    m_digitPixelRow[i] = 0; /**< Pixel row */
-    m_digitAmplitude[i] = 0; /**< Digit amplitude [ADC] */
-    m_digitWidth[i] = 0; /**< Digit calibrated width [ns] */
-    m_digitASICChannel[i] = 0; /**< ASIC channel number (0-7) */
-    m_digitPMTNumber[i] = 0; /**< Digit PMT number */
+    m_digitTime[i] = 0;
+    m_digitChannel[i] = 0;
+    m_digitPixel[i] = 0;
+    m_digitPixelCol[i] = 0;
+    m_digitPixelRow[i] = 0;
+    m_digitAmplitude[i] = 0;
+    m_digitWidth[i] = 0;
+    m_digitASICChannel[i] = 0;
+    m_digitPMTNumber[i] = 0;
+    m_digitSlot[i] = {0};
+    m_digitBoardstack[i] = {0};
+    m_digitCarrier[i] = {0};
+    m_digitAsic[i] = {0};
+    m_digitQuality[i] = {0};
   }
 
 
@@ -139,7 +148,7 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 
   TOPreco reco(1, &mass, &pdgCode);
   reco.setPDFoption(TOPreco::c_Fine);
-  reco.setTimeWindow(0, 200);
+  reco.setTimeWindow(0, 100);
   reco.setMass(mass, pdgCode);
   reco.reconstruct(trkPDF, pdgCode);
 
@@ -151,13 +160,13 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 
   // loops of pixels and PDF peaks to make a full sampling of the PDF
   for (int pixelID = 1; pixelID <= 512; pixelID++) {
-    for (int iBinY = 1; iBinY < 1000 + 1; iBinY++) {
+    for (int iBinY = 1; iBinY < 500 + 1; iBinY++) {
       // MARKO'S Trick HERE
       auto time = m_pdfAsHisto->GetYaxis()->GetBinCenter(iBinY);
       auto pdfVal = reco.getPDF(pixelID, time, mass, pdgCode); // jitter = 0 understood
-      m_pdfAsHisto->Fill(pixelID - 0.5, time, pdfVal * 0.1); // bins are 1 px  X  0.1 ns wide
+      m_pdfAsHisto->Fill(pixelID - 0.5, time, pdfVal * 0.2); // bins are 1 px  X  0.2 ns wide
       short pixelCol = (pixelID - 1) % 64 + 1;
-      histo->Fill(pixelCol, time, pdfVal * 0.8); // bins in the map are 8 px  X  0.1 ns wide
+      histo->Fill(pixelCol, time, pdfVal * 1.6); // bins in the map are 8 px  X  0.2 ns wide
     }
   }
 
@@ -178,8 +187,8 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
     short numPhot = gRandom->Poisson(nExpPhot);
 
     for (short rn = 0; rn < numPhot; rn++) {
-      double time;
-      double pxID;
+      double time = 0;
+      double pxID = 0;
       m_pdfAsHisto->GetRandom2(pxID, time);
       tmpTime.push_back(time);
       tmpPixel.push_back(short(pxID));
@@ -209,36 +218,62 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 
 void TOPRingPlotterModule::initialize()
 {
-  m_hitMapMCK = new TH2F("hitMapMCK", "x-t map of the kaon PDF", 64, 0, 64, 1000, 0, 100);
-  m_hitMapMCPI = new TH2F("hitMapMCPI", "x-t map of the pion PDF", 64, 0, 64, 1000, 0, 100);
-  m_hitMapMCP = new TH2F("hitMapMCP", "x-t map of the proton PDF", 64, 0, 64, 1000, 0, 100);
-  m_hitMapMCE = new TH2F("hitMapMCE", "x-t map of the electron PDF", 64, 0, 64, 1000, 0, 100);
-  m_hitMapMCMU = new TH2F("hitMapMCMU", "x-t map of the muon PDF", 64, 0, 64, 1000, 0, 100);
 
-  m_pdfAsHisto = new TH2F("pdfAsHisto", "tms holder for the pdf to be sampled", 512, 0, 512, 1000, 0, 100);
+  // Check the list of pdg hypotheses
+  for (auto pdg : m_pdgHyp) {
+    if ((pdg != 11) & (pdg != 211) & (pdg != 321) & (pdg != 13) & (pdg != 2212))
+      B2FATAL("Invalid PDG hypothesis for the PDF evaluation: " << pdg);
+    short duplicateCount = 0;
+    for (auto pdg2 : m_pdgHyp) {
+      if (pdg == pdg2)
+        duplicateCount++;
+    }
+    if (duplicateCount > 1)
+      B2FATAL("Duplicate PDG hypothesis found");
+  }
+
+  m_hitMapMCK = new TH2F("hitMapMCK", "x-t map of the kaon PDF", 64, 0, 64, 500, 0, 100);
+  m_hitMapMCPI = new TH2F("hitMapMCPI", "x-t map of the pion PDF", 64, 0, 64, 500, 0, 100);
+  m_hitMapMCP = new TH2F("hitMapMCP", "x-t map of the proton PDF", 64, 0, 64, 500, 0, 100);
+  m_hitMapMCE = new TH2F("hitMapMCE", "x-t map of the electron PDF", 64, 0, 64, 500, 0, 100);
+  m_hitMapMCMU = new TH2F("hitMapMCMU", "x-t map of the muon PDF", 64, 0, 64, 500, 0, 100);
+
+  m_pdfAsHisto = new TH2F("pdfAsHisto", "tms holder for the pdf to be sampled", 512, 0, 512, 500, 0, 100);
 
   B2INFO("creating a tree for TOPRingPlotterModule");
   m_outputFile = new TFile(m_outputName.c_str(), "recreate");
   m_tree = new TTree("tree", "tree");
 
   if (m_saveHistograms) {
-    m_tree->Branch("hitMapMCE", "TH2F", &m_hitMapMCE, 32000, 0);
-    m_tree->Branch("hitMapMCMU", "TH2F", &m_hitMapMCMU, 32000, 0);
-    m_tree->Branch("hitMapMCPI", "TH2F", &m_hitMapMCPI, 32000, 0);
-    m_tree->Branch("hitMapMCK", "TH2F", &m_hitMapMCK, 32000, 0);
-    m_tree->Branch("hitMapMCP", "TH2F", &m_hitMapMCP, 32000, 0);
+    for (auto pdg : m_pdgHyp) {
+      if (pdg == 11)
+        m_tree->Branch("hitMapMCE", "TH2F", &m_hitMapMCE, 32000, 0);
+      else if (pdg == 13)
+        m_tree->Branch("hitMapMCMU", "TH2F", &m_hitMapMCMU, 32000, 0);
+      else if (pdg == 211)
+        m_tree->Branch("hitMapMCPI", "TH2F", &m_hitMapMCPI, 32000, 0);
+      else if (pdg == 321)
+        m_tree->Branch("hitMapMCK", "TH2F", &m_hitMapMCK, 32000, 0);
+      else if (pdg == 2212)
+        m_tree->Branch("hitMapMCP", "TH2F", &m_hitMapMCP, 32000, 0);
+    }
   }
 
-  m_tree->Branch("m_nDigits", &m_nDigits, "m_nDigits/S");
-  m_tree->Branch("m_digitTime", m_digitTime, "m_digitTime[m_nDigits]/F");
-  m_tree->Branch("m_digitAmplitude", m_digitAmplitude, "m_digitAmplitude[m_nDigits]/F");
-  m_tree->Branch("m_digitWidth", m_digitWidth, "m_digitWidth[m_nDigits]/F");
-  m_tree->Branch("m_digitChannel", m_digitChannel, "m_digitChannel[m_nDigits]/S");
-  m_tree->Branch("m_digitPixelCol", m_digitPixelCol, "m_digitPixelCol[m_nDigits]/S");
-  m_tree->Branch("m_digitPixelRow", m_digitPixelRow, "m_digitPixelRow[m_nDigits]/S");
-  m_tree->Branch("m_digitASICChannel", m_digitASICChannel, "m_digitASICChannel[m_nDigits]/S");
-  m_tree->Branch("m_digitPMTNumber", m_digitPMTNumber, "m_digitPMTNumber[m_nDigits]/S");
-
+  m_tree->Branch("nDigits", &m_nDigits, "m_nDigits/S");
+  m_tree->Branch("digitTime", m_digitTime, "m_digitTime[m_nDigits]/F");
+  m_tree->Branch("digitAmplitude", m_digitAmplitude, "m_digitAmplitude[m_nDigits]/F");
+  m_tree->Branch("digitWidth", m_digitWidth, "m_digitWidth[m_nDigits]/F");
+  m_tree->Branch("digitChannel", m_digitChannel, "m_digitChannel[m_nDigits]/S");
+  m_tree->Branch("digitPixel", m_digitPixel, "m_digitPixel[m_nDigits]/S");
+  m_tree->Branch("digitPixelCol", m_digitPixelCol, "m_digitPixelCol[m_nDigits]/S");
+  m_tree->Branch("digitPixelRow", m_digitPixelRow, "m_digitPixelRow[m_nDigits]/S");
+  m_tree->Branch("digitASICChannel", m_digitASICChannel, "m_digitASICChannel[m_nDigits]/S");
+  m_tree->Branch("digitPMTNumber", m_digitPMTNumber, "m_digitPMTNumber[m_nDigits]/S");
+  m_tree->Branch("digitSlot", m_digitSlot, "m_digitSlot[m_nDigits]/S");
+  m_tree->Branch("digitBoardstack", m_digitBoardstack, "m_digitBoardstack[m_nDigits]/S");
+  m_tree->Branch("digitCarrier", m_digitCarrier, "m_digitCarrier[m_nDigits]/S");
+  m_tree->Branch("digitAsic", m_digitAsic, "m_digitAsic[m_nDigits]/S");
+  m_tree->Branch("digitQuality", m_digitQuality, "m_digitQuality[m_nDigits]/S");
 
   m_tree->Branch("pdfSamplesP", &m_pdfSamplesP, "m_pdfSamplesP/I");
   m_tree->Branch("pdfToysP", &m_pdfToysP, "m_pdfToysP/I");
@@ -323,59 +358,104 @@ void TOPRingPlotterModule::event()
   // loops over all particles
   int n_part = particles->getListSize();
   for (int i = 0; i < n_part; i++) {
+
     // Reset the tree variables to the default values
     resetTree();
 
+    // Get the track associated to the particle
     const Particle* particle = particles->getParticle(i);
-
     const Track* track = particle->getTrack();
-    if (!track)
-      continue;
 
-    // Check if one can make a TOP track before going on
-    TOPtrack trk(track, Const::pion);
-    if (!trk.isValid())
-      continue;
+    bool isFromTrack = true;
+    short moduleID = 0;
+    short deltaModule = 0;
 
-    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable("topSlotID");
-
-    if (!var)
-      continue;
-
-    auto moduleID = var->function(particle);
+    // If there's no track, we will use the cluster position
+    // to pin-point the moduleID. This is meant to allow to use
+    // the module to study ECL backsplashes and conversions in the
+    // TOP volume
+    if (!track) {
+      const ECLCluster* clstr = particle->getECLCluster();
+      if (! clstr)
+        continue; // if there's not even a cluster, we can't do much
+      else {
+        if (clstr->getDetectorRegion() != 2)
+          continue; // the cluster is not in the barrel
+        isFromTrack = false;
+        // find the two slots closer to the cluster
+        auto phi = particle->getECLCluster()->getPhi();
+        if (phi < 0)
+          phi = 2 * TMath::Pi() - phi;
+        auto rawModuleID = phi / (TMath::Pi() / 8) + 1;
+        moduleID = int(rawModuleID);
+        if (rawModuleID - moduleID > 0.5) {
+          deltaModule = 1;
+          if (moduleID == 16)
+            deltaModule = -15; // ad-hoc treatment for the 16-1 boundary
+        } else {
+          deltaModule = -1;
+          if (moduleID == 1)
+            deltaModule = 15; // ad-hoc treatment for the 1-16 boundary
+        }
+      }
+    } else {
+      // Check if one can make a TOP track
+      TOPtrack trk(track, Const::pion);
+      if (!trk.isValid())
+        continue;
+      moduleID = trk.getModuleID();
+    }
 
     if (moduleID < 1)
       continue;
 
+    // Save the digit info for all the topDigits in the module where the track was extrapolated
     for (const auto& digi : digits) {
-      if (digi.getModuleID() == moduleID and digi.getHitQuality() == 1) {
+      // if we have a cluster, save the digits from the two modules closer to the cluster
+      if ((digi.getModuleID() == moduleID) || (!isFromTrack && digi.getModuleID() == moduleID + deltaModule)) {
         m_digitTime[m_nDigits] = digi.getTime();
         m_digitChannel[m_nDigits] = digi.getChannel();
+        m_digitPixel[m_nDigits] = digi.getPixelID();
         m_digitPixelCol[m_nDigits] = digi.getPixelCol();
         m_digitPixelRow[m_nDigits] = digi.getPixelRow();
         m_digitAmplitude[m_nDigits] = digi.getPulseHeight();
         m_digitWidth[m_nDigits] = digi.getPulseWidth();
         m_digitASICChannel[m_nDigits] = digi.getASICChannel();
         m_digitPMTNumber[m_nDigits] = digi.getPMTNumber();
+        m_digitSlot[m_nDigits] = digi.getModuleID();
+        m_digitBoardstack[m_nDigits] = digi.getBoardstackNumber();
+        m_digitCarrier[m_nDigits] = digi.getCarrierNumber();
+        m_digitAsic[m_nDigits] = digi.getASICNumber();
+        m_digitQuality[m_nDigits] = digi.getHitQuality();
         m_nDigits++;
         if (m_nDigits > m_MaxPhotons) break;
       }
     }
 
-
+    // Save the track variables from the VM
     for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
       m_branchAddresses[iVar] = m_functions[iVar](particle);
     }
 
-
-    fillPDF(Belle2::Const::electron, track, m_hitMapMCE, m_pdfPixelE, m_pdfTimeE, m_pdfSamplesE, m_pdfToysE);
-    fillPDF(Belle2::Const::muon, track, m_hitMapMCMU, m_pdfPixelMU, m_pdfTimeMU, m_pdfSamplesMU, m_pdfToysMU);
-    fillPDF(Belle2::Const::pion, track, m_hitMapMCPI, m_pdfPixelPI, m_pdfTimePI, m_pdfSamplesPI, m_pdfToysPI);
-    fillPDF(Belle2::Const::kaon, track, m_hitMapMCK, m_pdfPixelK, m_pdfTimeK, m_pdfSamplesK, m_pdfToysK);
-    fillPDF(Belle2::Const::proton, track, m_hitMapMCP, m_pdfPixelP, m_pdfTimeP, m_pdfSamplesP, m_pdfToysP);
+    // Save the PDF samplings
+    if (isFromTrack) {
+      for (auto pdg : m_pdgHyp) {
+        if (pdg == 11)
+          fillPDF(Belle2::Const::electron, track, m_hitMapMCE, m_pdfPixelE, m_pdfTimeE, m_pdfSamplesE, m_pdfToysE);
+        else if (pdg == 13)
+          fillPDF(Belle2::Const::muon, track, m_hitMapMCMU, m_pdfPixelMU, m_pdfTimeMU, m_pdfSamplesMU, m_pdfToysMU);
+        else if (pdg == 211)
+          fillPDF(Belle2::Const::pion, track, m_hitMapMCPI, m_pdfPixelPI, m_pdfTimePI, m_pdfSamplesPI, m_pdfToysPI);
+        else if (pdg == 321)
+          fillPDF(Belle2::Const::kaon, track, m_hitMapMCK, m_pdfPixelK, m_pdfTimeK, m_pdfSamplesK, m_pdfToysK);
+        else if (pdg == 2212)
+          fillPDF(Belle2::Const::proton, track, m_hitMapMCP, m_pdfPixelP, m_pdfTimeP, m_pdfSamplesP, m_pdfToysP);
+      }
+    }
 
     m_tree->Fill();
   }
+  return;
 }
 
 

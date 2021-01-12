@@ -49,13 +49,15 @@ namespace Belle2 {
 
   private:
 
+    /** Fills the pdf-related branches */
     void fillPDF(Belle2::Const::ChargedStable, const Track*, TH2F*, short*, float*,  int&, int&);
 
     /** reset the tree variables. Call it at the beginning of the event method! */
     void resetTree();
 
-    static const int m_MaxPhotons = 5000; /**< maximumn number of digits allowed per PDF */
-    static const int m_MaxPDFPhotons = 5000; /**< maximumn number of digits allowed per PDF */
+
+    static const int m_MaxPhotons = 5000; /**< maximum number of digits allowed per PDF */
+    static const int m_MaxPDFPhotons = 5000; /**< maximum number of digits allowed per PDF */
 
     // steering parameters
     std::string m_particleList = "pi+:all";  /**< List of particles to be used for plotting */
@@ -67,19 +69,27 @@ namespace Belle2 {
     TTree* m_tree = nullptr;   /**< tree where data are saved. One entry per particle in m_particleList */
 
     /** Variable branch addresses */
-    std::vector<double> m_branchAddresses;
+    std::vector<double> m_branchAddresses = {};
     /** List of function pointers corresponding to given variables. */
-    std::vector<Variable::Manager::FunctionPtr> m_functions;
+    std::vector<Variable::Manager::FunctionPtr> m_functions = {};
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
-    std::vector<std::string> m_variables;
+    std::vector<std::string> m_variables = {};
+
+    std::vector<short> m_pdgHyp = {11, 13, 211, 321, 2212}; /**< List of pdg codes for which the PDF is sampled ansd saved. */
 
     float m_digitTime[m_MaxPhotons] = {0}; /**< Digit calibrated time [ns] */
     short m_digitChannel[m_MaxPhotons] = {0}; /**< SW channel (0-511) */
+    short m_digitPixel[m_MaxPhotons] = {0}; /**< Pixel number (1-512)*/
     short m_digitPixelCol[m_MaxPhotons] = {0}; /**< Pixel column */
     short m_digitPixelRow[m_MaxPhotons] = {0}; /**< Pixel row */
     float m_digitAmplitude[m_MaxPhotons] = {0}; /**< Digit amplitude [ADC] */
     float m_digitWidth[m_MaxPhotons] = {0}; /**< Digit calibrated width [ns] */
-    short m_digitASICChannel[m_MaxPhotons] = {0}; /**< ASIC channel number (0-7) */
+    short m_digitSlot[m_MaxPhotons] = {0}; /**<Slot number (1-16) */
+    short m_digitBoardstack[m_MaxPhotons] = {0}; /**< BoardStack number  */
+    short m_digitCarrier[m_MaxPhotons] = {0}; /**< Carrier number  */
+    short m_digitAsic[m_MaxPhotons] = {0}; /**< Asic number  */
+    short m_digitQuality[m_MaxPhotons] = {0}; /**< Digit quality  */
+    short m_digitASICChannel[m_MaxPhotons] = {0}; /**< ASIC channel number */
     short m_digitPMTNumber[m_MaxPhotons] = {0}; /**< Digit PMT number */
     short m_nDigits = 0; /**< Total number of digits in the slot where the track is extrapolated */
 

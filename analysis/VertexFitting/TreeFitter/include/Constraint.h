@@ -27,6 +27,7 @@ namespace TreeFitter {
     enum Type { unknown = 0,
                 beamenergy,
                 beamspot,
+                beam,
                 origin,
                 lifetime,
                 resonance,

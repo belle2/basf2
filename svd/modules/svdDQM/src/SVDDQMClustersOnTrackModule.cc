@@ -333,13 +333,10 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
         }
 
-        RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
-        if (recoDigits.size() == 0) continue;
+        for (const SVDRecoDigit& recoDigit : svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>()) {
 
-        for (UInt_t re = 0; re < recoDigits.size(); re++) {
-
-          RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinUAll != nullptr) m_stripMaxBinUAll->Fill(shaper[0]->getMaxTimeBin());
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>();
+          if (m_stripMaxBinUAll != nullptr and shaper != nullptr) m_stripMaxBinUAll->Fill(shaper->getMaxTimeBin());
         }
 
 
@@ -357,14 +354,10 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
         }
 
-        RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
-        if (recoDigits.size() == 0) continue;
+        for (const SVDRecoDigit& recoDigit : svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>()) {
 
-        for (UInt_t re = 0; re < recoDigits.size(); re++) {
-
-          RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinVAll != nullptr) m_stripMaxBinVAll->Fill(shaper[0]->getMaxTimeBin());
-
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>();
+          if (m_stripMaxBinVAll != nullptr and shaper != nullptr) m_stripMaxBinVAll->Fill(shaper->getMaxTimeBin());
         }
 
       }

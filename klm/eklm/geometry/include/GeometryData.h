@@ -72,6 +72,15 @@ namespace Belle2 {
       }
 
       /**
+       * Get maximal strip length.
+       */
+      double getMaximalStripLength() const
+      {
+        return m_StripPosition[m_StripLenToAll[
+                                 m_nStripDifferent - 1]].getLength();
+      }
+
+      /**
        * Get number of strips with different lengths.
        */
       int getNStripsDifferentLength() const

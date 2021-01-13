@@ -206,6 +206,9 @@ void KLMTimeAlgorithm::createHistograms()
   gr_timeShift_channel_rpc = new TGraph();
   gr_timeShift_channel_scint_end = new TGraph();
 
+  double maximalStripLengthEKLM =
+    m_EKLMGeometry->getMaximalStripLength() / CLHEP::cm * Unit::cm;
+
   m_ProfileRpcPhi = new TProfile("hprf_rpc_phi_effC",
                                  "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
                                  400.0);
@@ -220,10 +223,10 @@ void KLMTimeAlgorithm::createHistograms()
                                             350, 0.0, 350.0);
   m_ProfileEKLMScintillatorPlane1 = new TProfile("hprf_scint_plane1_effC_end",
                                                  "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                                 350, 0.0, 350.0);
+                                                 200, 0.0, maximalStripLengthEKLM);
   m_ProfileEKLMScintillatorPlane2 = new TProfile("hprf_scint_plane2_effC_end",
                                                  "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                                 350, 0.0, 350.0);
+                                                 200, 0.0, maximalStripLengthEKLM);
 
   m_Profile2RpcPhi = new TProfile("hprf2_rpc_phi_effC",
                                   "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
@@ -239,10 +242,10 @@ void KLMTimeAlgorithm::createHistograms()
                                              350, 0.0, 350.0);
   m_Profile2EKLMScintillatorPlane1 = new TProfile("hprf2_scint_plane1_effC_end",
                                                   "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                                  350, 0.0, 350.0);
+                                                  200, 0.0, maximalStripLengthEKLM);
   m_Profile2EKLMScintillatorPlane2 = new TProfile("hprf2_scint_plane2_effC_end",
                                                   "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                                  350, 0.0, 350.0);
+                                                  200, 0.0, maximalStripLengthEKLM);
 
   h_time_rpc_tc = new TH1D("h_time_rpc_tc", "time distribtution for RPC", nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
   h_time_scint_tc = new TH1D("h_time_scint_tc", "time distribtution for Scintillator", nBin_scint,

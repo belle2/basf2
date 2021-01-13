@@ -58,10 +58,10 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
     if createRecoDigits and not isROIsimulation:
         # Add SVDRecoDigit creator module if not ROI simulation
         # useful for SVD performance studies
-        add_svd_create_recodigits(path)
+        add_svd_create_recodigits(path, recocreatorName)
 
 
-def add_svd_create_recodigits(path):
+def add_svd_create_recodigits(path, recocreatorName):
 
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')

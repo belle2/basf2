@@ -13,6 +13,7 @@
 #include <vector>
 #include <utility>
 #include <limits>
+#include "TF1.h"
 
 
 //If compiled within BASF2
@@ -31,6 +32,13 @@
 
 
 namespace Belle2 {
+
+  struct Atom {
+    double t1 = 0, t2 = 0;
+    int nEv = 0;
+  };
+
+
 
   /** Struct containing exp number and run number */
   struct ExpRun {
@@ -62,6 +70,27 @@ namespace Belle2 {
   std::map<ExpRun, std::pair<double, double>> filter(const std::map<ExpRun, std::pair<double, double>>& runs, double cut,
                                                      std::map<ExpRun, std::pair<double, double>>& runsRemoved);
 
+  /// get the range of interval with nIntervals and breaks stored in a vector
+  std::pair<int, int> getStartEndIndexes(int nIntervals,  std::vector<int> breaks, int indx);
+
+
+  /// Slice the vector to contain only elements with indeces s .. e (included)
+  inline std::vector<Atom> slice(std::vector<Atom> vec, int s, int e)
+  {
+    return std::vector<Atom>(vec.begin() + s, vec.begin() + e + 1);
+  }
+
+
+  /** Get calibration intervals according to the indexes of the breaks
+   * @param runsMap: map defining the time ranges of the runs
+   * @param currVec: vector with time intervals of the atoms (small non-divisible time intervals)
+   * @param breaks: vector with integer indexes of the breaks
+   * @return: a vector of the calib. interwas where each interval is a map with exp-run as a key and start- end-time as a value
+   **/
+  std::vector<std::map<ExpRun, std::pair<double, double>>> breaks2intervalsSep(const std::map<ExpRun,
+      std::pair<double, double>>& runsMap, const std::vector<Atom>& currVec, const std::vector<int>& breaks);
+
+
 
   /** Class that allows to split runs into the intervals of intended lenght
    *  in the same time it avoids of having large time gaps within calibration intervals
@@ -72,22 +101,9 @@ namespace Belle2 {
   class Splitter {
   public:
 
-    Splitter() : tBest(std::numeric_limits<double>::quiet_NaN()),
-      gapPenalty(std::numeric_limits<double>::quiet_NaN()) {}
+    Splitter() : lossFun(nullptr)  {}
 
 
-    /** Function to merge/divide runs into the calibration intervals of given
-      * characteristic length.
-      * @param runs: A map with key containing expNum+runNum and value start+end time in hours of the run
-      * @param tBestSize: An intended length of the calibration intervals for BS-size parameters [hours]
-      * @param tBestVtx: An intended length of the calibration intervals PS-position parameters [hours]
-      * @param GapPenalty: Higher number -> algorithm will tends more to avoid gaps in calib. intervals
-      * @return: Vector of BS-size calib. intervals always containing vector of BS-position calib. intervals.
-      *          The BS-position calib. interval is a map spanning in general over several runs
-      **/
-    std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(
-      const std::map<ExpRun, std::pair<double, double>>& runs,
-      double tBestSize, double tBestVtx, double GapPenalty);
 
 
     /** Get the start/end time of the BS-size calibration interval (vector of BS-position calib intervals).
@@ -126,15 +142,74 @@ namespace Belle2 {
                                                     std::map<ExpRun, std::pair<double, double>> I2);
 
 
+    /** Function to merge/divide runs into the calibration intervals of given
+      * characteristic length.
+      * @param runs: A map with key containing expNum+runNum and value start+end time in hours of the run
+      * @param tBestSize: An intended length of the calibration intervals for BS-size parameters [hours]
+      * @param tBestVtx: An intended length of the calibration intervals PS-position parameters [hours]
+      * @param GapPenalty: Higher number -> algorithm will tends more to avoid gaps in calib. intervals
+      * @return: Vector of BS-size calib. intervals always containing vector of BS-position calib. intervals.
+      *          The BS-position calib. interval is a map spanning in general over several runs
+      **/
+    template<typename Evt>
+    std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(
+      const std::map<ExpRun, std::pair<double, double>>& runs,  std::vector<Evt> evts,
+      //double tBestSize, double tBestVtx, double GapPenalty)
+      TString lossFunctionOuter, TString lossFunctionInner)
+    {
+      //sort events by time
+      std::sort(evts.begin(), evts.end(), [](const Evt & e1, const Evt & e2) { return (e1.t > e2.t); });
+
+      // Divide into small intervals
+      std::vector<std::pair<double, double>> smallRuns = splitToSmall(runs, 0.1);
+
+      std::vector<Atom> atoms = createAtoms(smallRuns, evts);
+
+
+      // Calculate breaks for SizeIntervals
+      lossFun = toTF1(lossFunctionOuter);
+      std::vector<int> breaksSize = dynamicBreaks(atoms);
+
+      std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>> splitsRun; //split intervals with runNumber info
+
+
+      // Calculate breaks for VtxIntervals
+      lossFun = toTF1(lossFunctionInner);
+      std::vector<int> breaksVtx;
+      for (int i = 0; i < int(breaksSize.size()) + 1; ++i) { //loop over all size intervals
+        int s, e;
+        std::tie(s, e) = getStartEndIndexes(atoms.size(), breaksSize, i);
+
+        // Store only atoms in the current BS-size calib. intervals
+        auto currVec = slice(atoms, s, e);
+
+        // Get optimal breaks in particular BS-size calib. interval
+        std::vector<int> breaksSmall = dynamicBreaks(currVec);
+
+        // Incorporate the runNumber information
+        auto splitSeg = breaks2intervalsSep(runs, currVec, breaksSmall);
+
+        // Put the vector of VtxInterval (representing division of BS-size interval)
+        // into the vector
+        splitsRun.push_back(splitSeg);
+
+        if (s != 0) breaksVtx.push_back(s - 1);
+        for (auto b : breaksSmall)
+          breaksVtx.push_back(b + s);
+        if (e != int(breaksSize.size())) breaksVtx.push_back(e);
+      }
+
+      return splitsRun;
+    }
+
+
   private:
-
-
 
     /** Get optimal break points using algorithm based on dynamic programing
       * @param runs: Vector of atoms, where each atom is an intervals in time
       * @return: Optimal indexes of the break points
      **/
-    std::vector<int> dynamicBreaks(std::vector<std::pair<double, double>>  runs);
+    std::vector<int> dynamicBreaks(const std::vector<Atom>&  runs);
 
 
 
@@ -146,7 +221,7 @@ namespace Belle2 {
       * @param[out] breaks: Output vector with indexes of optimal break points
       * @return: Minimal value of the summed loss function
      **/
-    double getMinLoss(const std::vector<std::pair<double, double>>&  vec,   int e, std::vector<int>& breaks);
+    double getMinLoss(const std::vector<Atom>&  vec,   int e, std::vector<int>& breaks);
 
 
     /** lossFunction of the calibration interval consisting of several "atoms" stored in vector vec
@@ -156,7 +231,7 @@ namespace Belle2 {
       * @param e: Last index of the calib. interval
       * @return: A value of the loss function
       **/
-    double lossFunction(const std::vector<std::pair<double, double>>&  vec, int s, int e) const;
+    double lossFunction(const std::vector<Atom>&  vec, int s, int e) const;
 
 
     /** Split the runs into small calibration intervals (atoms) of a specified size.
@@ -169,9 +244,60 @@ namespace Belle2 {
     static std::vector<std::pair<double, double>> splitToSmall(std::map<ExpRun, std::pair<double, double>> runs,
                                                                double intSize = 1. / 60);
 
+    // split to many small intervals (atoms)
+    template<typename Evt>
+    inline std::vector<Atom> createAtoms(const std::vector<std::pair<double, double>>& atomTimes,  const std::vector<Evt>& evts)
+    {
+      std::vector<Atom> atoms(atomTimes.size());
 
-    double tBest;      ///< target calib. interval time in hours
-    double gapPenalty; ///< in relative units (higher -> less gaps)
+      /*
+      unsigned a = 0;
+
+      for(unsigned i = 0; i < evts.size(); ++i) {
+
+          while(a < atomTimes.size() && evts[i].t > atomTimes[a].second)
+              ++a;
+          if(a >= atomTimes.size())
+              break;
+
+          if(atomTimes[a].first < evts[i].t && evts[i].t < atomTimes[a].second) {
+              ++atoms[a].nEv;
+          }
+
+      }
+
+      */
+      //TODO write it faster
+      for (unsigned i = 0; i < evts.size(); ++i) {
+        for (unsigned a = 0; a < atoms.size(); ++a)
+          if (atomTimes[a].first <= evts[i].t  && evts[i].t < atomTimes[a].second)
+            ++atoms[a].nEv;
+
+      }
+
+
+      for (unsigned a = 0; a < atoms.size(); ++a) {
+        atoms[a].t1 = atomTimes[a].first;
+        atoms[a].t2 = atomTimes[a].second;
+      }
+
+      return atoms;
+    }
+
+
+    TF1* toTF1(TString LossString)
+    {
+      LossString.ReplaceAll("rawTime", "[0]");
+      LossString.ReplaceAll("netTime", "[1]");
+      LossString.ReplaceAll("maxGap",  "[2]");
+      LossString.ReplaceAll("nEv",     "[3]");
+
+      return (new TF1("lossFun", LossString));
+    }
+
+
+    TF1*     lossFun;
+
 
     /** cache used by the clustering algorithm (has to be reset every time) */
     std::vector<std::pair<double, std::vector<int>>> cache;

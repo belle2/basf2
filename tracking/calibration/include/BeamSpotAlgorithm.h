@@ -25,21 +25,16 @@ namespace Belle2 {
     /// Destructor
     virtual ~BeamSpotAlgorithm() {}
 
-    /// Set the target lengths of the calibration intervals
-    void setIntervalsLength(double tSize, double tPos) { m_tSize = tSize; m_tPos = tPos; }
-
-    /// Set the penalty for the time-gap in the calib. interval
-    void setGapPenalty(double gapPenalty) { m_gapPenalty = gapPenalty; }
-
+    void setInnerLoss(std::string loss) { m_lossFunctionInner = loss; }
+    void setOuterLoss(std::string loss) { m_lossFunctionOuter = loss; }
   protected:
 
     /// Run algo on data
     virtual EResult calibrate() override;
 
   private:
-    double m_tSize = 2;    ///< Target length of the BeamSpot-size calib. interval [hours]
-    double m_tPos  = 0.5;  ///< Target length of the BeamSpot-position calib. interval [hours]
-    double m_gapPenalty = 10; ///< a constant scaling the time-gap penalty term in the lossFunction
+    TString m_lossFunctionOuter = "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)";
+    TString m_lossFunctionInner = "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)";
 
   };
 } // namespace Belle2

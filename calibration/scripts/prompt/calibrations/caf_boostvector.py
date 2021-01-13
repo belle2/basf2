@@ -7,13 +7,16 @@ Airflow script to perform BoostVector calibration.
 from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="BoostVector Calibrations",
-                               expert_username="zlebcr",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_mumu"],
-                               expert_config={"size_interval_len": 2.0, "position_interval_len": 0.5, "gap_penalty": 10},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="BoostVector Calibrations",
+    expert_username="zlebcr",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["hlt_mumu"],
+    expert_config={
+        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+    depends_on=[])
 
 ##############################
 
@@ -88,8 +91,8 @@ def get_calibrations(input_data, **kwargs):
 
     collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
     algorithm_bv = BoostVectorAlgorithm()
-    algorithm_bv.setIntervalsLength(kwargs['expert_config']["size_interval_len"],  kwargs['expert_config']["position_interval_len"])
-    algorithm_bv.setGapPenalty(kwargs['expert_config']["gap_penalty"])
+    algorithm_bv.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_bv.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
     calibration_bv = Calibration('BoostVector',
                                  collector=collector_bv,

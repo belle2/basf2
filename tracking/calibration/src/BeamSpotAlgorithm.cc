@@ -75,7 +75,8 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
   // Get intervals
   Splitter splt;
-  auto splits = splt.getIntervals(runsInfo, m_tSize, m_tPos, m_gapPenalty);
+  //auto splits = splt.getIntervals(runsInfo, evts, m_tSize, m_tPos, m_gapPenalty);
+  auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner); //  m_tSize, m_tPos, m_gapPenalty);
 
   //Loop over all BeamSize intervals
   vector<CalibrationData> calVec; //(splits.size());

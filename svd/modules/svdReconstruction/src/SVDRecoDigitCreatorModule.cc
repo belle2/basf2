@@ -123,8 +123,8 @@ void SVDRecoDigitCreatorModule::initialize()
 {
   //Register collections
   m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeClusters.isRequired(m_storeClustersName);
-  m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeClusters.isOptional(m_storeClustersName);
+  m_storeShaper.isOptional(m_storeShaperDigitsName);
 
   RelationArray relRecoToShaper(m_storeReco, m_storeShaper);
   relRecoToShaper.registerInDataStore();
@@ -248,7 +248,11 @@ void SVDRecoDigitCreatorModule::event()
 
   B2DEBUG(25, "Number of strips: " << m_storeReco.getEntries());
 
-  //write relations: SVDCluster -> SVDRecoDigit
+  // write relations: SVDCluster -> SVDRecoDigit
+  // if clusters are present
+  if (m_storeClusters.getEntries() == 0)
+    return;
+
   //1. loop on clusters
   //2. take related shaper digits
   //3. build relation with reco digit with the same index, using reco charge as weight
@@ -256,6 +260,7 @@ void SVDRecoDigitCreatorModule::event()
   RelationArray relClusterToReco(m_storeClusters, m_storeReco,
                                  m_relClusterToRecoName);
   if (relClusterToReco) relClusterToReco.clear();
+
 
   for (const SVDCluster& cluster : m_storeClusters) {
 

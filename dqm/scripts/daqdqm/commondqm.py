@@ -48,7 +48,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # SVD
         if components is None or 'SVD' in components:
             # reconstruct SVDRecoDigits first of all
-            add_svd_create_recodigits(path, 'SVDRecoDigitCreator')
+            add_svd_create_recodigits(path)
 
             # SVD DATA FORMAT
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')

@@ -6,7 +6,7 @@ from ROOT import Belle2
 import sys
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
+def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -61,7 +61,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
         add_svd_create_recodigits(path, recocreatorName)
 
 
-def add_svd_create_recodigits(path, recocreatorName):
+def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator"):
 
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
@@ -73,7 +73,7 @@ def add_svd_create_recodigits(path, recocreatorName):
         path.add_module(recoDigitCreator)
 
 
-def add_svd_old_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
+def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")

@@ -211,6 +211,21 @@ namespace Belle2 {
     void createHistograms();
 
     /**
+     * Fill profiles of time versus distance.
+     * @param[out] profileRpcPhi                 BKLM RPC phi plane.
+     * @param[out] profileRpcZ                   BKLM RPC z plane.
+     * @param[out] profileBKLMScintillatorPhi    BKLM scintillator phi plane.
+     * @param[out] profileBKLMScintillatorZ      BKLM scintillator z plane.
+     * @param[out] profileEKLMScintillatorPlane1 EKLM scintillator plane1.
+     * @param[out] profileEKLMScintillatorPlane2 EKLM scintillator plane2.
+     */
+    void fillTimeDistanceProfiles(
+      TProfile* profileRpcPhi, TProfile* profileRpcZ,
+      TProfile* profileBKLMScintillatorPhi, TProfile* profileBKLMScintillatorZ,
+      TProfile* profileEKLMScintillatorPlane1,
+      TProfile* profileEKLMScintillatorPlane2);
+
+    /**
      * Data struct used in collector and algorithm.
      */
     struct Event ev;
@@ -349,22 +364,42 @@ namespace Belle2 {
     /* Profiles used for effective light speed estimation. */
 
     /** For BKLM RPC phi plane. */
-    TProfile* hprf_rpc_phi_effC = nullptr;
+    TProfile* m_ProfileRpcPhi = nullptr;
 
     /** For BKLM RPC z plane. */
-    TProfile* hprf_rpc_z_effC = nullptr;
+    TProfile* m_ProfileRpcZ = nullptr;
 
     /** For BKLM scintillator phi plane. */
-    TProfile* hprf_scint_phi_effC = nullptr;
+    TProfile* m_ProfileBKLMScintillatorPhi = nullptr;
 
     /** For BKLM scintillator z plane. */
-    TProfile* hprf_scint_z_effC = nullptr;
+    TProfile* m_ProfileBKLMScintillatorZ = nullptr;
 
     /** For EKLM scintillator plane1. */
-    TProfile* hprf_scint_plane1_effC_end = nullptr;
+    TProfile* m_ProfileEKLMScintillatorPlane1 = nullptr;
 
     /** For EKLM scintillator plane2. */
-    TProfile* hprf_scint_plane2_effC_end = nullptr;
+    TProfile* m_ProfileEKLMScintillatorPlane2 = nullptr;
+
+    /* Profiles of time versus distance (after fit). */
+
+    /** For BKLM RPC phi plane. */
+    TProfile* m_Profile2RpcPhi = nullptr;
+
+    /** For BKLM RPC z plane. */
+    TProfile* m_Profile2RpcZ = nullptr;
+
+    /** For BKLM scintillator phi plane. */
+    TProfile* m_Profile2BKLMScintillatorPhi = nullptr;
+
+    /** For BKLM scintillator z plane. */
+    TProfile* m_Profile2BKLMScintillatorZ = nullptr;
+
+    /** For EKLM scintillator plane1. */
+    TProfile* m_Profile2EKLMScintillatorPlane1 = nullptr;
+
+    /** For EKLM scintillator plane2. */
+    TProfile* m_Profile2EKLMScintillatorPlane2 = nullptr;
 
     /*
      * Histograms of global time distribution used for effective light speed

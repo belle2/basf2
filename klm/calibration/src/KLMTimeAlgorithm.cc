@@ -206,24 +206,43 @@ void KLMTimeAlgorithm::createHistograms()
   gr_timeShift_channel_rpc = new TGraph();
   gr_timeShift_channel_scint_end = new TGraph();
 
-  hprf_rpc_phi_effC = new TProfile("hprf_rpc_phi_effC",
-                                   "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
-                                   400.0);
-  hprf_rpc_z_effC = new TProfile("hprf_rpc_z_effC",
-                                 "Time over propagation length for RPCs (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
+  m_ProfileRpcPhi = new TProfile("hprf_rpc_phi_effC",
+                                 "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
                                  400.0);
-  hprf_scint_phi_effC = new TProfile("hprf_scint_phi_effC",
-                                     "Time over propagation length for scintillators (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 350,
-                                     0.0, 350.0);
-  hprf_scint_z_effC = new TProfile("hprf_scint_z_effC",
-                                   "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                   350, 0.0, 350.0);
-  hprf_scint_plane1_effC_end = new TProfile("hprf_scint_plane1_effC_end",
-                                            "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+  m_ProfileRpcZ = new TProfile("hprf_rpc_z_effC",
+                               "Time over propagation length for RPCs (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
+                               400.0);
+  m_ProfileBKLMScintillatorPhi = new TProfile("hprf_scint_phi_effC",
+                                              "Time over propagation length for scintillators (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 350,
+                                              0.0, 350.0);
+  m_ProfileBKLMScintillatorZ = new TProfile("hprf_scint_z_effC",
+                                            "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                             350, 0.0, 350.0);
-  hprf_scint_plane2_effC_end = new TProfile("hprf_scint_plane2_effC_end",
-                                            "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
-                                            350, 0.0, 350.0);
+  m_ProfileEKLMScintillatorPlane1 = new TProfile("hprf_scint_plane1_effC_end",
+                                                 "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                                 350, 0.0, 350.0);
+  m_ProfileEKLMScintillatorPlane2 = new TProfile("hprf_scint_plane2_effC_end",
+                                                 "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                                 350, 0.0, 350.0);
+
+  m_Profile2RpcPhi = new TProfile("hprf2_rpc_phi_effC",
+                                  "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
+                                  400.0);
+  m_Profile2RpcZ = new TProfile("hprf2_rpc_z_effC",
+                                "Time over propagation length for RPCs (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
+                                400.0);
+  m_Profile2BKLMScintillatorPhi = new TProfile("hprf2_scint_phi_effC",
+                                               "Time over propagation length for scintillators (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 350,
+                                               0.0, 350.0);
+  m_Profile2BKLMScintillatorZ = new TProfile("hprf2_scint_z_effC",
+                                             "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                             350, 0.0, 350.0);
+  m_Profile2EKLMScintillatorPlane1 = new TProfile("hprf2_scint_plane1_effC_end",
+                                                  "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                                  350, 0.0, 350.0);
+  m_Profile2EKLMScintillatorPlane2 = new TProfile("hprf2_scint_plane2_effC_end",
+                                                  "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                                  350, 0.0, 350.0);
 
   h_time_rpc_tc = new TH1D("h_time_rpc_tc", "time distribtution for RPC", nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
   h_time_scint_tc = new TH1D("h_time_scint_tc", "time distribtution for Scintillator", nBin_scint,
@@ -537,6 +556,61 @@ void KLMTimeAlgorithm::createHistograms()
   }
 }
 
+void KLMTimeAlgorithm::fillTimeDistanceProfiles(
+  TProfile* profileRpcPhi, TProfile* profileRpcZ,
+  TProfile* profileBKLMScintillatorPhi, TProfile* profileBKLMScintillatorZ,
+  TProfile* profileEKLMScintillatorPlane1,
+  TProfile* profileEKLMScintillatorPlane2)
+{
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    uint16_t channel = klmChannel.getKLMChannelNumber();
+    if (m_cFlag[channel] == ChannelCalibrationStatus::c_NotEnoughData)
+      continue;
+
+    std::vector<struct Event>::iterator it;
+    std::vector<struct Event> eventsChannel;
+    eventsChannel = m_evts[channel];
+    int iSub = klmChannel.getSubdetector();
+
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time() - m_timeShift[channel];
+      if (m_useEventT0)
+        timeHit = timeHit - it->t0;
+      double distHit = it->dist;
+
+      if (iSub == KLMElementNumbers::c_BKLM) {
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane();
+        if (iL > 1) {
+          if (iP) {
+            profileRpcPhi->Fill(distHit, timeHit);
+          } else {
+            profileRpcZ->Fill(distHit, timeHit);
+          }
+        } else {
+          if (iP) {
+            profileBKLMScintillatorPhi->Fill(distHit, timeHit);
+          } else {
+            profileBKLMScintillatorZ->Fill(distHit, timeHit);
+          }
+        }
+      } else {
+        int iF = klmChannel.getSection() - 1;
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane() - 1;
+        int iC = klmChannel.getStrip() - 1;
+        m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
+        if (iP) {
+          profileEKLMScintillatorPlane1->Fill(distHit, timeHit);
+        } else {
+          profileEKLMScintillatorPlane2->Fill(distHit, timeHit);
+        }
+      }
+    }
+  }
+}
+
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 {
   int channelId;
@@ -600,7 +674,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::sort(channels.begin(), channels.end(), compareEventNumber);
 
   /* Two-dimensional fit for the channel with the maximal number of events. */
-  int nFits = 100;
+  int nFits = 1000;
   int nConvergedFits = 0;
   double delay = 0;
   double delayError = 0;
@@ -755,84 +829,43 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   delete h_time_rpc_tc;
   B2INFO("Effective Light m_timeShift obtained. done.");
 
-  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
-    channelId = klmChannel.getKLMChannelNumber();
-    if (m_cFlag[channelId] == ChannelCalibrationStatus::c_NotEnoughData)
-      continue;
-
-    eventsChannel = m_evts[channelId];
-    int iSub = klmChannel.getSubdetector();
-
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time() - m_timeShift[channelId];
-      if (m_useEventT0)
-        timeHit = timeHit - it->t0;
-      double distHit = it->dist;
-
-      if (iSub == KLMElementNumbers::c_BKLM) {
-        int iL = klmChannel.getLayer() - 1;
-        int iP = klmChannel.getPlane();
-        if (iL > 1) {
-          if (iP) {
-            hprf_rpc_phi_effC->Fill(distHit, timeHit);
-          } else {
-            hprf_rpc_z_effC->Fill(distHit, timeHit);
-          }
-        } else {
-          if (iP) {
-            hprf_scint_phi_effC->Fill(distHit, timeHit);
-          } else {
-            hprf_scint_z_effC->Fill(distHit, timeHit);
-          }
-        }
-      } else {
-        int iF = klmChannel.getSection() - 1;
-        int iS = klmChannel.getSector() - 1;
-        int iL = klmChannel.getLayer() - 1;
-        int iP = klmChannel.getPlane() - 1;
-        int iC = klmChannel.getStrip() - 1;
-        m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
-        if (iP) {
-          hprf_scint_plane1_effC_end->Fill(distHit, timeHit);
-        } else {
-          hprf_scint_plane2_effC_end->Fill(distHit, timeHit);
-        }
-      }
-    }
-  }
+  fillTimeDistanceProfiles(
+    m_ProfileRpcPhi, m_ProfileRpcZ,
+    m_ProfileBKLMScintillatorPhi, m_ProfileBKLMScintillatorZ,
+    m_ProfileEKLMScintillatorPlane1,  m_ProfileEKLMScintillatorPlane2);
 
   B2INFO("Effective light speed fitting.");
-  hprf_rpc_phi_effC->Fit("fcn_pol1", "EMQ");
+  m_ProfileRpcPhi->Fit("fcn_pol1", "EMQ");
   double slope_rpc_phi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
   double effC_rpc_phi = 1.0 / slope_rpc_phi;
   double e_effC_rpc_phi = e_slope_rpc_phi / (slope_rpc_phi * slope_rpc_phi);
 
-  hprf_rpc_z_effC->Fit("fcn_pol1", "EMQ");
+  m_ProfileRpcZ->Fit("fcn_pol1", "EMQ");
   double slope_rpc_z = fcn_pol1->GetParameter(1);
   double e_slope_rpc_z = fcn_pol1->GetParError(1);
   double effC_rpc_z = 1.0 / slope_rpc_z;
   double e_effC_rpc_z = e_slope_rpc_z / (slope_rpc_z * slope_rpc_z);
 
-  hprf_scint_phi_effC->Fit("fcn_pol1", "EMQ");
+  m_ProfileBKLMScintillatorPhi->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
   double e_slope_scint_phi = fcn_pol1->GetParError(1);
   double effC_scint_phi = 1.0 / slope_scint_phi;
   double e_effC_scint_phi = e_slope_scint_phi / (slope_scint_phi * slope_scint_phi);
 
-  hprf_scint_z_effC->Fit("fcn_pol1", "EMQ");
+  m_ProfileBKLMScintillatorZ->Fit("fcn_pol1", "EMQ");
   double slope_scint_z = fcn_pol1->GetParameter(1);
   double e_slope_scint_z = fcn_pol1->GetParError(1);
   double effC_scint_z = 1.0 / slope_scint_z;
   double e_effC_scint_z = e_slope_scint_z / (slope_scint_z * slope_scint_z);
 
-  hprf_scint_plane1_effC_end->Fit("fcn_pol1", "EMQ");
+  m_ProfileEKLMScintillatorPlane1->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane1_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane1_end = fcn_pol1->GetParError(1);
   double effC_scint_plane1_end = 1.0 / slope_scint_plane1_end;
   double e_effC_scint_plane1_end = e_slope_scint_plane1_end / (slope_scint_plane1_end * slope_scint_plane1_end);
 
-  hprf_scint_plane2_effC_end->Fit("fcn_pol1", "EMQ");
+  m_ProfileEKLMScintillatorPlane2->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane2_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
   double effC_scint_plane2_end = 1.0 / slope_scint_plane2_end;
@@ -1069,6 +1102,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     }
   }
 
+  fillTimeDistanceProfiles(
+    m_Profile2RpcPhi, m_Profile2RpcZ,
+    m_Profile2BKLMScintillatorPhi, m_Profile2BKLMScintillatorZ,
+    m_Profile2EKLMScintillatorPlane1,  m_Profile2EKLMScintillatorPlane2);
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
@@ -1151,12 +1188,18 @@ void KLMTimeAlgorithm::saveHist()
   m_outFile->cd();
   TDirectory* dir_effC = m_outFile->mkdir("effC_Hists");
   dir_effC->cd();
-  hprf_rpc_phi_effC->SetDirectory(dir_effC);
-  hprf_rpc_z_effC->SetDirectory(dir_effC);
-  hprf_scint_phi_effC->SetDirectory(dir_effC);
-  hprf_scint_z_effC->SetDirectory(dir_effC);
-  hprf_scint_plane1_effC_end->SetDirectory(dir_effC);
-  hprf_scint_plane2_effC_end->SetDirectory(dir_effC);
+  m_ProfileRpcPhi->SetDirectory(dir_effC);
+  m_ProfileRpcZ->SetDirectory(dir_effC);
+  m_ProfileBKLMScintillatorPhi->SetDirectory(dir_effC);
+  m_ProfileBKLMScintillatorZ->SetDirectory(dir_effC);
+  m_ProfileEKLMScintillatorPlane1->SetDirectory(dir_effC);
+  m_ProfileEKLMScintillatorPlane2->SetDirectory(dir_effC);
+  m_Profile2RpcPhi->SetDirectory(dir_effC);
+  m_Profile2RpcZ->SetDirectory(dir_effC);
+  m_Profile2BKLMScintillatorPhi->SetDirectory(dir_effC);
+  m_Profile2BKLMScintillatorZ->SetDirectory(dir_effC);
+  m_Profile2EKLMScintillatorPlane1->SetDirectory(dir_effC);
+  m_Profile2EKLMScintillatorPlane2->SetDirectory(dir_effC);
 
   m_outFile->cd();
   TDirectory* dir_time = m_outFile->mkdir("time");

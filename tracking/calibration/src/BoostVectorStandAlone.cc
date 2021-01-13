@@ -15,17 +15,17 @@
 #include "TVector3.h"
 #include <Eigen/Dense>
 
-#include "minimizer.h"
-
 //if compiled within BASF2
 #ifdef _PACKAGE_
 #include <tracking/calibration/BoostVectorStandAlone.h>
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>
+#include <tracking/calibration/minimizer.h>
 #else
 #include "BoostVectorStandAlone.h"
 #include "Splitter.h"
 #include "tools.h"
+#include "minimizer.h"
 #endif
 
 using namespace std;
@@ -300,18 +300,16 @@ namespace Belle2 {
     {
       vector<double> boostDir = fitBoostFast(evts);
       double yMag = fitBoostMagnitude(evts, boostDir);
-      double beta = tanh(yMag);
+      double beta = tanh(yMag); //from rapidity to velocity
 
       TVector3 bVec = TVector3(boostDir[0] / 1e3, boostDir[1] / 1e3, 1);
-      bVec.Unit();
-      bVec *= beta;
-
+      bVec = beta * bVec.Unit();
       return bVec;
     }
 
     pair<TVector3, TMatrixDSym>  getBoostAndError(vector<Event> evts)
     {
-      evts = filter(evts, {151.986 /*TanNomAngle*/, 0}, 0.9/*pid*/,  1.0);
+      evts = filter(evts, {151.986 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
 
       vectorVar var;
 

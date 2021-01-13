@@ -144,6 +144,43 @@ namespace Belle2 {
     calVec[iMin].bsPosIntervals[jMin].insert(shortRun);
   }
 
+  //encode integer num into double val such that val is nearly not changed (maximally by relative shift 1e-6)
+  inline double encodeNumber(double val, unsigned num)
+  {
+    double factor = pow(FLT_RADIX, DBL_MANT_DIG);
+    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+
+    int e;
+    double mantisa = std::frexp(val, &e);
+    long long mantisaI = mantisa * factor;
+
+    if (val != 0)
+      mantisaI = (mantisaI / fEnc) * fEnc  + num; //adding encoded number to mantisa
+    else {
+      mantisaI = factor / 2 + num;
+      e = -100;
+    }
+
+    double newVal = ldexp(mantisaI / factor, e);
+
+    return newVal;
+  }
+
+  inline unsigned decodeNumber(double val)
+  {
+    double factor = pow(FLT_RADIX, DBL_MANT_DIG);
+    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+
+    int e;
+    double mantisa = std::frexp(val, &e);
+    long long mantisaI = mantisa * factor;
+
+    return (mantisaI % fEnc);
+  }
+
+
+
+
   /** Store BeamSpot payloads to files */
   template<typename Evt>
   inline void storePayloads(const std::vector<Evt>& evts, std::vector<CalibrationData>&  calVec, std::string objName,
@@ -162,9 +199,12 @@ namespace Belle2 {
         for (auto I : r[k]) { //interval required to be within single run
           ExpRun exprun = I.first;
 
-          //Encode Start+End time of the payload
-          calVec[i].pars.cntUnc.at(k)(0, 1) = I.second.first / 1e20;
-          calVec[i].pars.cntUnc.at(k)(0, 2) = I.second.second / 1e20;
+          //Encode Start+End time in seconds of the payload
+          calVec[i].pars.cntUnc.at(k)(0, 1) = calVec[i].pars.cntUnc.at(k)(1, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 1),
+                                              round(I.second.first  * 3600));
+          calVec[i].pars.cntUnc.at(k)(0, 2) = calVec[i].pars.cntUnc.at(k)(2, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 2),
+                                              round(I.second.second * 3600));
+
           TObject* obj = getCalibObj(calVec[i].pars.cnt.at(k), calVec[i].pars.cntUnc.at(k), calVec[i].pars.spreadMat);
           if (exprun != exprunLast) { //if new run
             if (intraRun) { //if not first -> store

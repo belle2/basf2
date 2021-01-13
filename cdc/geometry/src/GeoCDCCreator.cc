@@ -815,10 +815,6 @@ namespace Belle2 {
         if( id > 157 && id < 164 )// Fiber
         logicalV = new G4LogicalVolume(boxShape, medTRG, logicalName, 0, 0, 0);*/
 
-
-        if ((id > 77 && id < 94) || (id > 131 && id < 146)) // G10
-          logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 1000 + id));
-
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
         const double phi = 360.0 / ndiv;
@@ -1006,11 +1002,10 @@ namespace Belle2 {
                                                      );
 
         G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
-        if (id < 19)
+        if (id < 19) {
           logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-
-        if (id < 19)
           logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 2000 + id));
+        }
 
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
@@ -1032,7 +1027,6 @@ namespace Belle2 {
         }
 
       }
-
       //
       // Construct rib5s.
       //
@@ -1334,10 +1328,6 @@ namespace Belle2 {
         if( ribID > 157 && ribID < 164 )// Fiber box
         logicalV = new G4LogicalVolume(boxShape, medTRG,  logicalName, 0, 0, 0);*/
 
-
-        if ((ribID > 77 && ribID < 94) || (ribID > 131 && ribID < 146))  // G10
-          logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 3000 + ribID));
-
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
         const double phi = 360.0 / number;
@@ -1527,9 +1517,6 @@ namespace Belle2 {
         G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
         if (rib4ID < 19)
           logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-
-        if (rib4ID < 19)
-          logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 4000 + rib4ID));
 
         logicalV->SetVisAttributes(m_VisAttributes.back());
 

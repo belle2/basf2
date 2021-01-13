@@ -168,6 +168,10 @@ void SVDRecoDigitCreatorModule::event()
     return;
 
   m_storeReco.clear();
+  RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
+                                m_relRecoToShaperName);
+  if (relRecoToShaper) relRecoToShaper.clear();
+
 
   //loop over the SVDShaperDigits
   int i = 0;
@@ -226,10 +230,6 @@ void SVDRecoDigitCreatorModule::event()
       m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
 
       // write relations SVDRecoDigit -> SVDShaperDigit
-      RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
-                                    m_relRecoToShaperName);
-      if (relRecoToShaper) relRecoToShaper.clear();
-
       int recoIndex = m_storeReco.getEntries() - 1;
       int shaperIndex = i;
       if (recoIndex != shaperIndex)
@@ -240,10 +240,11 @@ void SVDRecoDigitCreatorModule::event()
       digit_weights.reserve(1);
       digit_weights.emplace_back(shaperIndex, 1.0);
       relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
-
     }
     i++;
+
   } //exit loop on ShaperDigits
+
 
   B2DEBUG(25, "Number of strips: " << m_storeReco.getEntries());
 

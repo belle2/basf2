@@ -26,7 +26,7 @@ namespace Belle2 {
     typedef bool (SVDHitTimeSelectionFunction::*selFunction)(double, double, double, double) const;
 
     /** returns whether the hit came on time or not */
-    bool isInTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0)
+    bool isInTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0) const
     {
       // cppcheck-suppress assignBoolToPointer
       selFunction f = m_implementations[m_current];
@@ -34,7 +34,7 @@ namespace Belle2 {
     }
 
     /** returns whether the uCluster time is compatible with the vClsuter time */
-    bool areClustersInTime(double uTime, double vTime)
+    bool areClustersInTime(double uTime, double vTime) const
     {
       if (std::abs(uTime - vTime) > m_maxUVTimeDifference)
         return false;

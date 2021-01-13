@@ -162,12 +162,12 @@ namespace Belle2 {
       const double& t0 = 0, const double& t0Error = 0
     ) const
     {
-      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
-                                   sensorID.getLadderNumber(),
-                                   sensorID.getSensorNumber(),
-                                   m_aDBObjPtr->sideIndex(isU),
-                                   0 //strip not relevant
-                                  ).isInTime(svdTime, svdTimeError, t0, t0Error);
+      return m_time_aDBObjPtr->get_pointer(sensorID.getLayerNumber(),
+                                           sensorID.getLadderNumber(),
+                                           sensorID.getSensorNumber(),
+                                           m_aDBObjPtr->sideIndex(isU),
+                                           0 //strip not relevant
+                                          )->isInTime(svdTime, svdTimeError, t0, t0Error);
 
     }
 
@@ -185,12 +185,12 @@ namespace Belle2 {
       const double& uTime, const double& vTime = 0
     ) const
     {
-      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
-                                   sensorID.getLadderNumber(),
-                                   sensorID.getSensorNumber(),
-                                   m_aDBObjPtr->sideIndex(true), // side not relevant
-                                   0 // strip not relevant
-                                  ).areClustersInTime(uTime, vTime);
+      return m_time_aDBObjPtr->get_pointer(sensorID.getLayerNumber(),
+                                           sensorID.getLadderNumber(),
+                                           sensorID.getSensorNumber(),
+                                           m_aDBObjPtr->sideIndex(true), // side not relevant
+                                           0 // strip not relevant
+                                          )->areClustersInTime(uTime, vTime);
 
     }
 
@@ -257,4 +257,3 @@ namespace Belle2 {
     DBObjPtr< t_time_payload > m_time_aDBObjPtr; /**< SVDHitTimeSelectionFunction paylaod */
   };
 }
-

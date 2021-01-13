@@ -6,7 +6,7 @@ from ROOT import Belle2
 import sys
 
 
-def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=True):
+def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -55,28 +55,16 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Tru
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
 
-    if createRecoDigits:
-        # Add SVDRecoDigit creator module
-        # useful for DQM and validation
-        add_svd_create_recodigits(path, isROIsimulation)
+    if createRecoDigits and not isROIsimulation:
+        # Add SVDRecoDigit creator module if not ROI simulation
+        # useful for SVD performance studies
+        add_svd_create_recodigits(path)
 
 
-def add_svd_create_recodigits(path, isROIsimulation=False):
-
-    if(isROIsimulation):
-        recocreatorName = '__ROISVDRecoDigitCreator'
-        recoDigitsName = '__ROIsvdRecoDigits'
-        clustersName = '__ROIsvdClusters'
-    else:
-        recocreatorName = 'SVDRecoDigitCreator'
-        recoDigitsName = ""
-        clustersName = ""
+def add_svd_create_recodigits(path):
 
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
-        recoDigitCreator.set_name(recocreatorName)
-        recoDigitCreator.param('RecoDigits', recoDigitsName)
-        recoDigitCreator.param('Clusters', clustersName)
         recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
         recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
         recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
@@ -85,7 +73,7 @@ def add_svd_create_recodigits(path, isROIsimulation=False):
         path.add_module(recoDigitCreator)
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
+def add_svd_old_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")

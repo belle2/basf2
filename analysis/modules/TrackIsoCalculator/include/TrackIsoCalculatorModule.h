@@ -30,11 +30,11 @@ namespace Belle2 {
 
   public:
     /**
-     * Default constructor
+     * Default constructor.
      */
     DetSurfCylBoundaries() {};
     /**
-     * Constructor with parameters
+     * Constructor with parameters.
      */
     DetSurfCylBoundaries(float rho, float zfwd, float zbwd, float th_fwd, float th_fwd_brl, float th_bwd_brl, float th_bwd)
     {
@@ -81,23 +81,11 @@ namespace Belle2 {
     void initialize() override;
 
     /**
-     * Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
-    void beginRun() override;
-
-    /**
      * Called once for each event.
      *
      * This is most likely where your module will actually do anything.
      */
     void event() override;
-
-    /**
-     * Module endRun().
-     */
-    void endRun() override;
 
     /**
      * Module terminate().

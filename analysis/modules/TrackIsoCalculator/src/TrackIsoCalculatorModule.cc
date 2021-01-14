@@ -56,10 +56,6 @@ void TrackIsoCalculatorModule::initialize()
 
 }
 
-void TrackIsoCalculatorModule::beginRun()
-{
-}
-
 void TrackIsoCalculatorModule::event()
 {
 
@@ -120,10 +116,6 @@ void TrackIsoCalculatorModule::event()
     }
   }
 
-}
-
-void TrackIsoCalculatorModule::endRun()
-{
 }
 
 void TrackIsoCalculatorModule::terminate()

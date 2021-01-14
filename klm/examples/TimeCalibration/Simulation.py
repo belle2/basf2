@@ -3,6 +3,8 @@
 
 # Reconstruction of generated ee->mumu(ISR) events.
 
+import glob
+import os
 import sys
 import basf2
 from simulation import add_simulation
@@ -17,7 +19,16 @@ input.param('inputFileName', sys.argv[1])
 # Create the main path and add the modules
 main = basf2.create_path()
 main.add_module(input)
-add_simulation(main)
+
+background_files = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    background_directory = os.environ['BELLE2_BACKGROUND_DIR']
+    background_files = glob.glob(background_directory + '/*.root')
+else:
+    basf2.B2WARNING('The variable BELLE2_BACKGROUND_DIR is not set. '
+                    'Beam background is not used in the simulation')
+add_simulation(main, bkgfiles=background_files)
+
 add_reconstruction(main)
 add_cdst_output(main, filename=sys.argv[2], rawFormat=False)
 main.add_module('Progress')

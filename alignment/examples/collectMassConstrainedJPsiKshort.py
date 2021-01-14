@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-from ROOT import Belle2
 
 import simulation as sim
 import reconstruction as reco
@@ -10,7 +9,6 @@ import modularAnalysis as ana
 import beamparameters as beam
 import generators as gen
 
-import ROOT
 
 main = basf2.create_path()
 

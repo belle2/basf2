@@ -314,7 +314,7 @@ void SVDDQMClustersOnTrackModule::event()
     const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
     if (not recoTrack) continue;
 
-    for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>()) {
+    for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>(m_svdClustersName)) {
 
       int iLayer = svdCluster.getSensorID().getLayerNumber();
 
@@ -336,9 +336,9 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
         }
 
-        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>()) {
+        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>();
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
           if (m_stripMaxBinUAll != nullptr and shaper != nullptr) m_stripMaxBinUAll->Fill(shaper->getMaxTimeBin());
         }
 
@@ -357,9 +357,9 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
         }
 
-        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>()) {
+        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>();
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
           if (m_stripMaxBinVAll != nullptr and shaper != nullptr) m_stripMaxBinVAll->Fill(shaper->getMaxTimeBin());
         }
 

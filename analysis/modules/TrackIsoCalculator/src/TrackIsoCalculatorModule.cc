@@ -27,10 +27,10 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   // Parameter definitions
   addParam("particleList",
            m_pListName,
-           "The name of the input ParticleList.");
+           "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
   addParam("detectorInnerSurface",
            m_detInnerSurface,
-           "The name of the detector at whose innemrmost layer we extrapolate each helix's polar and azimuthal angle.");
+           "The name of the detector at whose innemrmost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
   addParam("use2DRhoPhiDist",
            m_use2DRhoPhiDist,
            "If true, will calculate the pair-wise track distance as the cord length on the (rho, phi) projection.",
@@ -48,6 +48,12 @@ void TrackIsoCalculatorModule::initialize()
 
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
+
+  if (!isStdChargedList()) {
+    B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
+            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+
 }
 
 void TrackIsoCalculatorModule::beginRun()

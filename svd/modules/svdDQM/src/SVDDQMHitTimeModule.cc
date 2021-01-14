@@ -22,6 +22,12 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("SVDHitTime"));
+  addParam("Clusters", m_storeSVDClustersName, "SVDCluster StoreArray name",
+           std::string(""));
+  addParam("EventInfo", m_storeSVDEventInfoName, "SVDEventInfo StoreObjPtr name",
+           std::string(""));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
 
@@ -36,7 +42,7 @@ void SVDDQMHitTimeModule::defineHisto()
 {
 
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("SVDHitTime")->cd();
+  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 
   int nBins = 300 ;
   double minT0 = -150 ;
@@ -111,8 +117,8 @@ void SVDDQMHitTimeModule::initialize()
 
   m_TrgResult.isOptional();
   m_eventT0.isOptional();
-  m_svdEventInfo.isOptional();
-  m_clusters.isOptional();
+  m_svdEventInfo.isOptional(m_storeSVDEventInfoName);
+  m_clusters.isOptional(m_storeSVDClustersName);
 
   REG_HISTOGRAM
 
@@ -153,6 +159,8 @@ void SVDDQMHitTimeModule::event()
     B2WARNING("Missing SVDEventInfo, SVDDQMHitTime is skipped.");
     return;
   }
+
+
 
   if (!m_clusters.isValid()) {
     B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");

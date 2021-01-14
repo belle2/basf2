@@ -37,12 +37,12 @@ class SVDValidationTTreeTrueHit(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeTrueHit, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeTrueHit.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventDataTrueHit class
         self.data = EventDataTrueHit()
-        '''Instance of the EventDataTrueHit class'''
 
         # Declare tree branches
         for key in EventDataTrueHit.__dict__:

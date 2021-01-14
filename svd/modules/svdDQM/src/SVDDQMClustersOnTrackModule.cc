@@ -56,6 +56,10 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
+  addParam("EventInfo", m_svdEventInfoName, "SVDEventInfo StoreArray name", std::string(""));
+  addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name", std::string(""));
+  addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name", std::string(""));
+  addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name", std::string(""));
 
   m_histoList = new TList();
 }
@@ -236,7 +240,7 @@ void SVDDQMClustersOnTrackModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
 
-    m_svdEventInfo.isOptional();
+    m_svdEventInfo.isOptional(m_svdEventInfoName);
     m_eventT0.isOptional();
     m_tracks.isOptional();
     m_resultStoreObjectPointer.isOptional();

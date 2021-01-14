@@ -47,8 +47,7 @@ namespace Belle2 {
 
     /** This is the method for getting the noise.
      * Input:
-     * @param sensor ID: identitiy of the sensor for which the
-     * calibration is required
+     * @param sensorID: identitiy of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *
@@ -74,8 +73,7 @@ namespace Belle2 {
     * of an ADC output average, so it is not an integer, but
     * a float number.
     * Input:
-    * @param sensor ID: identitiy of the sensor for which the
-    * calibration is required
+    * @param sensorID: identitiy of the sensor for which the calibration is required
     * @param isU: sensor side, true for p (u) side, false for n (v) side
     * @param strip: strip number
     *

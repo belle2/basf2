@@ -37,8 +37,9 @@ class SetAsideSimHits(basf2.Module):
     def __init__(self):
         '''initialize python module'''
         super().__init__()
+
+        #: selected sensor info
         self.selected_sensorID = Belle2.VxdID(3, 1, 1)
-        '''selected sensor info'''
 
     def event(self):
         '''event'''
@@ -55,8 +56,9 @@ class InjectSimHits(basf2.Module):
     def __init__(self):
         '''initialize python module'''
         super().__init__()
+        #: simHits store array
+
         self.simhits = Belle2.PyStoreArray("SVDSimHits")
-        '''sim hit store array'''
 
     def initialize(self):
         '''initialize'''

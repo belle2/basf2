@@ -67,7 +67,7 @@ namespace Belle2 {
      * @param[in] chi_thres Base value for chi2 threshold
      *
      * @param[in] adjusted_timing Optional. Use adjusted formula to determine fit time.
-     *              Not implemented into firmware yet, thus false by default.
+     *              Implemented in ShaperDSP firmware since exp 14.
      *              If true, algorithm will determine time near 0 with higher
      *              precision, time of low-energy hits will be one of {-4,0,4}
      *              If false, time will be one of {-32, -16, 0}

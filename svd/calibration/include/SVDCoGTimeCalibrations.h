@@ -42,8 +42,7 @@ namespace Belle2 {
     /** Return the strip time, given the raw strip time
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number - NOT USED
      * @param raw_time : raw CoG time in ns
@@ -70,8 +69,7 @@ namespace Belle2 {
      * and tje raw time error
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number - NOT USED
      * @param raw_time : raw CoG time in ns

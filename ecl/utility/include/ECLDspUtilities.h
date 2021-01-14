@@ -49,8 +49,15 @@ namespace Belle2 {
        * @param[in] cid      CellID, 1..8736
        * @param[in] adc[31]  Waveform data from ECLDsp dataobject
        * @param[in] ttrig    Trigger time from ECLTrig dataobject
+       * @param[in] adjusted_timing Optional.
+       *              Use adjusted formula to determine fit time.
+       *              Implemented in ShaperDSP firmware since exp 14.
+       *              If true, algorithm will determine time near 0 with higher
+       *              precision, time of low-energy hits will be one of {-4,0,4}
+       *              If false, time will be one of {-32, -16, 0}
        */
-      static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig);
+      static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig,
+                                     bool adjusted_timing = true);
 
     private:
       /**

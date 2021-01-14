@@ -8,6 +8,12 @@ from caf import strategies
 
 import os
 
+import alignment.parameters as parameters  # noqa
+import alignment.constraints as constraints  # noqa
+
+import alignment.collections as collections  # noqa
+from alignment.collections import make_collection  # noqa
+
 
 def limit_file_events(calibration, collection_limits):
     for colname, max_events in collection_limits.items():

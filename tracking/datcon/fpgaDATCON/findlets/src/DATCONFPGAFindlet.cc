@@ -21,6 +21,8 @@ DATCONFPGAFindlet::~DATCONFPGAFindlet() = default;
 DATCONFPGAFindlet::DATCONFPGAFindlet()
 {
   addProcessingSignalListener(&m_clusterLoader);
+  addProcessingSignalListener(&m_uInterceptFinder);
+  addProcessingSignalListener(&m_vInterceptFinder);
 }
 
 void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -28,6 +30,8 @@ void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const
   Super::exposeParameters(moduleParamList, prefix);
 
   m_clusterLoader.exposeParameters(moduleParamList, prefix);
+  m_uInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
+  m_vInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
 }
 
 void DATCONFPGAFindlet::beginEvent()
@@ -48,4 +52,6 @@ void DATCONFPGAFindlet::apply()
     return;
   }
 
+  m_uInterceptFinder.apply(m_uHits);
+  m_vInterceptFinder.apply(m_vHits);
 }

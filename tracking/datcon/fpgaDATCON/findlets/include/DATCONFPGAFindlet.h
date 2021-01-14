@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
+#include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2D.h>
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
@@ -20,8 +21,6 @@
 #include <vector>
 
 namespace Belle2 {
-//   class VxdID;
-
   class ModuleParamList;
 
   /**
@@ -58,6 +57,9 @@ namespace Belle2 {
   private:
     /// Findlets
     DATCONSVDClusterLoaderAndPreparer m_clusterLoader;
+
+    FastInterceptFinder2D m_uInterceptFinder;
+    FastInterceptFinder2D m_uInterceptFinder;
 
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_uHits;
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_vHits;

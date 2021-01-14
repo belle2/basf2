@@ -35,9 +35,20 @@
 #include <cmath>
 #include <stack>
 
+
+
 namespace Belle2 {
   namespace Variable {
-
+    double beamBackgroundProbabilityMVA(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
+        return particle->getExtraInfo("beamBackgroundProbabilityMVA");
+      } else {
+        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registerted! \n"
+                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -50,6 +61,8 @@ namespace Belle2 {
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
+
+
 
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
@@ -1232,6 +1245,8 @@ Returns an integer code for the ECL region of a cluster.
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 )DOC");
+
+
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
 Returns distance between ECL cluster and nearest track hitting the ECL.
 
@@ -1585,6 +1600,14 @@ Returns number of charged tracks matched to this cluster.
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.
 )DOC");
+    REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
+Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
+
+    - 1 for true photon clusters
+    - 0 for beam background clusters
+
+The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
+clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
 

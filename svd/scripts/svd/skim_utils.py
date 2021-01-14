@@ -59,8 +59,8 @@ class skimSVDBurstEventsModule(b2.Module):
 
         super().__init__()
 
+        #: max number of strips for NON-BURST events
         self.nMaxStrips = 5000
-        '''max number of strips for NON-BURST events'''
 
     def set_nMaxStrips(self, user_nMaxStrips):
         """set the max strips, otherwise 5000"""
@@ -172,8 +172,9 @@ class skimSVDTriggerBinEventsModule(b2.Module):
         """constructor"""
 
         super().__init__()
+
+        #: trigger bin
         self.tb = 99  # no selection of TB
-        ''' trigger bin to select'''
 
     def set_tb(self, user_tb):
         '''set the trigger bin, otherwise 99, i.e. no selection'''

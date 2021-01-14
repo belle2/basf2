@@ -60,7 +60,11 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class WrongRLInfoCounter(HarvestingModule):
@@ -121,7 +125,11 @@ class WrongRLInfoCounter(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SegmentFakeRatesModule(HarvestingModule):
@@ -251,7 +259,11 @@ class SegmentFakeRatesModule(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SegmentFinderParameterExtractorModule(HarvestingModule):
@@ -329,7 +341,11 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SeedsAnalyser(HarvestingModule):

@@ -136,14 +136,18 @@ global_env = Environment(
     ],
     # scripts and python modules that have to be installed before we can run b2code-classversion-check
     REQUIRED_TOOLS=[os.path.join('$BINDIR', 'b2code-classversion-check'),
+        os.path.join('$BINDIR', 'b2code-classversion-update'),
         os.path.join('$LIBDIR', 'b2test_utils', 'classversion.py'),
         os.path.join('$LIBDIR', 'pybasf2.so'),
         os.path.join('$DATADIR', 'framework', 'particledb', 'evt.pdl')]
 )
 
-for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
-    if entry.endswith('.py'):
-        global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
+if analysis:
+    global_env['REQUIRED_TOOLS'] = []
+else:
+    for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
+        if entry.endswith('.py'):
+            global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
 
 if global_env.GetOption('doxygen'):
     global_env['MODULE_IO'] = True

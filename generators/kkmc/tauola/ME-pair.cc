@@ -371,8 +371,7 @@ void eemu_(const float& Mtau, const float* pt, const float* pn, const float* p1,
   ptk[1] = pt[1] * p34[1];
   ptk[0] = pt[0] * p34[0];
 
-  double ptp34 = ptk[3] * ptk[3] - ptk[2] * ptk[2] - ptk[1] * ptk[1] - ptk[0] * ptk[0];
-  ptp34 = ptk[3] - ptk[2] - ptk[1] - ptk[0];
+  double ptp34 = ptk[3] - ptk[2] - ptk[1] - ptk[0];
 
   double PP[4];
   PP[3] = p2[3] / (pk + m2ee / 2.) - pt[3] / (ptp34 - m2ee / 2.);

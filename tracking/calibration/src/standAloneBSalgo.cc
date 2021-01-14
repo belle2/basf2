@@ -59,9 +59,9 @@ using namespace std;
 
 namespace Belle2 {
 
-// Sign-sensitive sqr,sqrt
-  inline double sqrS(double x) {return x >= 0 ? x * x : -x * x; }; //sign-sensitive sqr
-  inline double sqrtS(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); }; //sign-sensitive sqrt
+
+  inline double sqrS(double x) {return x >= 0 ? x * x : -x * x; } ///< sign-sensitive sqr
+  inline double sqrtS(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); } ///< sign-sensitive sqrt
 
   TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
 
@@ -91,8 +91,8 @@ namespace Belle2 {
       kY.print();
     }
 
-    /** Constructor based output of the linear regresion, assuming zero-order splines
-     * vals, errors and vector with splines - are aggregated results of linear-regresion
+    /** Constructor based output of the linear regression, assuming zero-order splines
+     * vals, errors and vector with splines - are aggregated results of linear-regression
        Order of variables in the vals & errs vector is the following:
        xVals, yVals, kXvals, kYvals, zVals */
     SpotParam(const vector<double>& vals, const vector<double>& errs, const vector<vector<double>>& spls, int order = 0)
@@ -146,7 +146,7 @@ namespace Belle2 {
   };
 
 
-  /** Spline with uncertainity obtained from the boot-strap replicas */
+  /** Spline with uncertainty obtained from the boot-strap replicas */
   struct UnknowSpline {
     vector<Spline> spls; ///< vector with replicas
     void add(Spline spl) { spls.push_back(spl); } ///< add boot-strap replica
@@ -208,7 +208,7 @@ namespace Belle2 {
 
 
 
-  /** variable with uncertainity from boot-strap replicas */
+  /** variable with uncertainty from boot-strap replicas */
   struct UnknowVar {
     vector<double> vars; ///< vector of variable values for all replicas
     void add(double x) { vars.push_back(x); } ///< add value to the replicas
@@ -261,7 +261,12 @@ namespace Belle2 {
   };
 
 
-// Get angle in XY-plane from cov-matrix elements, sizes in [um] !
+  /**  Get angle in XY-plane from cov-matrix elements, sizes in [um] !
+   @param SizeX: BS size x in [um]
+   @param SizeY: BS size y in [um]
+   @param SizeXY: Off-diagonal xy BS-size element in [um]
+   @return A angle phi of the beam spot
+   */
   double getAngle(double SizeX, double SizeY, double SizeXY)
   {
     double C = sqrS(SizeXY);
@@ -271,7 +276,13 @@ namespace Belle2 {
     return angle;
   }
 
-//Get the eigen-vals of symetric 2x2 matrix, sizes in [um] !
+
+  /**  Get eigen-sizes in the XY-plane from cov-matrix elements, sizes in [um] !
+   @param SizeX: BS size x in [um]
+   @param SizeY: BS size y in [um]
+   @param SizeXY: Off-diagonal xy BS-size element in [um]
+   @return A pair with small and high eigenvalue (in [um])
+   */
   pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
   {
     double A = pow(SizeX, 2) + pow(SizeY, 2);
@@ -292,7 +303,12 @@ namespace Belle2 {
   }
 
 
-//Get the eigen-vals of symetric 2x2 matrix, sizes in [um2] !
+  /**  Get the eigen-vals of symmetric 2x2 matrix, sizes in [um2] !
+   @param SizeXX: the xx element of the BS-size matrix in [um2]
+   @param SizeYY: the yy element of the BS-size matrix in [um2]
+   @param SizeXY: Off-diagonal xy BS-size element in [um2]
+   @return A smaller eigenvalue of the 2D BS-size matrix (in [um2]), can be negative!
+   */
   double getSize2MinMat(double SizeXX, double SizeYY, double SizeXY)
   {
     double A = SizeXX + SizeYY;
@@ -312,7 +328,7 @@ namespace Belle2 {
 
 
 
-  /** structure including all variables of interest with uncertainities from boot-strap */
+  /** structure including all variables of interest with uncertainties from boot-strap */
   struct UnknownPars {
     UnknowSpline x;  ///< BS position (x coordinate)
     UnknowSpline y;  ///< BS position (y coordinate)
@@ -354,7 +370,7 @@ namespace Belle2 {
       sizeZ.add(SizeZ);
 
 
-      // Calculate the eignen-values
+      // Calculate the eigen-values
       double SizeMin, SizeMax;
       tie(SizeMin, SizeMax) = getSizeMinMax(SizeX, SizeY, SizeXY);
 
@@ -536,8 +552,14 @@ namespace Belle2 {
 
 
 
-// get estimate of the zIP position (recurent function)
-// nestMax = number of iter, nest = current iter
+  /** Get estimate of the zIP position (recurrent function)
+    @param tr: track of interest
+    @param t: time of the event
+    @param spotPar: Beam Spot parameters
+    @param nestMax: Maximal number of iteration
+    @param nest: current id of the iteration
+    @return an zIP estimate for the given track
+  */
   double getZIPest(const Track& tr, double t, const SpotParam& spotPar, int nestMax = 5, int nest = 0)
   {
     double x0, y0;
@@ -557,7 +579,12 @@ namespace Belle2 {
   }
 
 
-// get the D0 position corrected for IP position
+  /** get the D0 track parameter corrected for IP position
+    @param tr: track of interest
+    @param t: the event time
+    @param spotPar: Beam Spot parameters
+    @return the d0 track parameter wrt the IP position
+    */
   double getCorrD(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP =  getZIPest(tr, t, spotPar);
@@ -570,7 +597,7 @@ namespace Belle2 {
     return (tr.d0 - f0);
   }
 
-//Transform D0 to time in the middle of interval
+  /** Transform D0 to time in the middle of interval */
   double getDtimeConst(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP  =  getZIPest(tr, t,                  spotPar);
@@ -589,7 +616,12 @@ namespace Belle2 {
   }
 
 
-// get Z0 corrected for the IP position
+  /** get Z0 corrected for the IP position
+    @param tr: track of interest
+    @param t: the event time
+    @param spotPar: Beam Spot parameters
+    @return the z0 track parameter wrt the IP position
+    */
   double getCorrZ(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP =  getZIPest(tr, t, spotPar);
@@ -606,7 +638,11 @@ namespace Belle2 {
 
 
 
-// get min & max time of the events
+
+  /** get min & max time of the events
+    @param evts: vector with events
+    @return a pair containing smallest and highest time
+    */
   pair<double, double> getStartStop(const vector<Event>&  evts)
   {
     double minT = 1e20, maxT = -1e20;
@@ -617,7 +653,7 @@ namespace Belle2 {
     return {minT, maxT};
   }
 
-//get list of file names from comma-separated string
+  /**get list of file names from comma-separated string */
   vector<TString> extractFileNames(TString str)
   {
     vector<TString> files;
@@ -629,7 +665,7 @@ namespace Belle2 {
     return files;
   }
 
-// read events from TTree to std::vector
+/// read events from TTree to std::vector
   vector<Event> getEvents(TTree* tr)
   {
 
@@ -672,7 +708,7 @@ namespace Belle2 {
     return events;
   }
 
-// Add random booth strp weights to events
+  /** Add random boot-strap weights to events */
   void bootStrap(vector<Event>& evts)
   {
     for (auto& e : evts)
@@ -682,7 +718,11 @@ namespace Belle2 {
 
 
 
-// Simple linear regresion fit
+  /** Simple linear regression fit
+    @param mat the matrix of the problem
+    @param r vector with the points to fit
+    @return vector with the fitted parameters
+   */
   TVectorD linearFit(TMatrixD mat, TVectorD r)
   {
     TMatrixD matT = mat; matT.T();
@@ -695,7 +735,14 @@ namespace Belle2 {
   }
 
 
-// Linear fit with errors & PRESS statistics
+  /** Linear fit with errors & PRESS statistics
+    @param m: the matrix of the problem
+    @param r: vector with the points to fit
+    @param[out] err2Mean: mean quadratic deviation of the fitted data points, corresponds to chi2/ndf
+    @param[out] err2press: mean quadratic error of the PRESS statistics
+    @param[out] err2pressErr: uncertainty of the err2press
+    @return vector with the fitted parameters
+   */
   pair<vector<double>, vector<double>> linearFitErr(TMatrixD m, TVectorD r, double& err2Mean, double& err2press, double& err2pressErr)
   {
     TMatrixD mT = m; mT.T();
@@ -748,11 +795,15 @@ namespace Belle2 {
 
 
 
-//Linear fit with positivity constraint on the output parameters (for BeamSpot-size fit)
+  /** Linear regression for the BS-size fit incorporating positivity constraint on the output parameters
+    @param mat the matrix of the problem
+    @param r vector of the points to fit
+    @return vector with the fitted parameters
+   */
   TVectorD linearFitPos(TMatrixD mat, TVectorD r)
   {
     const double s2MinLimit = pow(0.05, 2); //Minimal value of the BeamSpot eigenSize
-    B2ASSERT("Matrix size for size fit shoud be 3", mat.GetNcols() == 3);
+    B2ASSERT("Matrix size for size fit should be 3", mat.GetNcols() == 3);
     TMatrixD matT = mat; matT.T();
     TMatrixD A = matT * mat;
     TVectorD v = matT * r;
@@ -760,7 +811,7 @@ namespace Belle2 {
 
     TVectorD pars = Ainv * v;
 
-    //If everyting OK
+    //If everything is OK
     double s2Min = getSize2MinMat(pars[0], pars[1], pars[2]);
     if (pars[0] >= 0 && pars[1] >= 0 && s2Min >= s2MinLimit)
       return pars;
@@ -816,7 +867,7 @@ namespace Belle2 {
 
 
 
-// Get resolution histogram from 2D histo
+  /** Get resolution histogram from 2D histo */
   TH1D* getResolution(TH2D* hRes)
   {
     TH1D* hSigmaAll = new TH1D(rn(), "", 50, -M_PI, M_PI);
@@ -830,7 +881,7 @@ namespace Belle2 {
     return hSigmaAll;
   }
 
-// Get meanHisto from 2D histo
+  /** Get meanHisto from 2D histo */
   TH1D* getMean(const TH2D* hRes)
   {
     TH1D* hMean = new TH1D(rn(), "", 50, -M_PI, M_PI);
@@ -844,7 +895,7 @@ namespace Belle2 {
     return hMean;
   }
 
-// Geth theoretical <d0_1 *d0_2>
+  /** Get theoretical <d0_1 *d0_2> based on the provided BS size parameters */
   double getD12th(Event e, vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
@@ -858,7 +909,7 @@ namespace Belle2 {
     return ss * sxx + cc * syy + sc * sxy;
   }
 
-// Geth theoretical <z0_1 *z0_2>
+  /** Get theoretical <z0_1 *z0_2> based on the provided BS size parameters */
   double getZ12th(Event e, vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
@@ -875,7 +926,7 @@ namespace Belle2 {
 
 
 
-//Plot TGraph with the fitted function
+  /** Plot TGraph with the fitted function */
   void plotSpotPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TGraph* gr = new TGraph();
@@ -960,7 +1011,7 @@ namespace Belle2 {
   }
 
 
-//Plot TGraph with the fitted function
+  /** Plot TGraph with the fitted function */
   void plotSpotZPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* zProf  = new TProfile(rn(), "dProf", 100, -M_PI, M_PI, "S");
@@ -1021,7 +1072,7 @@ namespace Belle2 {
 
 
 
-//Plot pull distribution
+  /** Plot pull distribution for the position */
   void plotSpotPositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 70)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -200, 200);
@@ -1052,7 +1103,7 @@ namespace Belle2 {
   }
 
 
-//Plot pull distribution
+  /** Plot pull distribution for kX and kY */
   void plotKxKyFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 100, -800, 800, "S");
@@ -1122,7 +1173,7 @@ namespace Belle2 {
 
   }
 
-//Plot pull distribution
+  /** Plot pull distribution to visualize possible time dependence of the positions */
   void plotXYtimeDep(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 50,   -0.5, 0.5);
@@ -1184,7 +1235,7 @@ namespace Belle2 {
 
 
 
-//Plot pull distribution
+  /** Plot pull distribution for the z-position of the BS center */
   void plotSpotZpositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 1000)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -2000, 2000);
@@ -1215,7 +1266,7 @@ namespace Belle2 {
   }
 
 
-// Remove outliear from the position fit (for d0)
+  /** Remove outlier from the position fit (for d0) */
   void removeSpotPositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 70)
   {
     int nRem = 0;
@@ -1234,7 +1285,7 @@ namespace Belle2 {
   }
 
 
-// Remove outliear from the position fit (for z0)
+  /** Remove outlier from the position fit (for z0) */
   void removeSpotZpositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 1000)
   {
     int nRem = 0;
@@ -1254,7 +1305,7 @@ namespace Belle2 {
 
 
 
-//Fill matrix with bases based on linear splines
+  /** Fill matrix with bases based on linear splines for the time dependence */
   vector<vector<double>> fillSplineBasesLinear(const vector<Event>& evts, vector<double> spl,
                                                std::function<double(Track, double)> fun)
   {
@@ -1298,7 +1349,7 @@ namespace Belle2 {
   }
 
 
-//Fill matrix with bases based on zero-order splines
+  /** Fill matrix with bases based on zero-order splines for the time dependence */
   vector<vector<double>> fillSplineBasesZero(const vector<Event>& evts, vector<double> spl, std::function<double(Track, double)> fun)
   {
     int n = spl.size() + 1; //number of params
@@ -1348,7 +1399,7 @@ namespace Belle2 {
 
 
 
-// compare consistency of two splines, taking errers into account
+  /** evaluate a consistency of two splines, taking errors into account */
   double compareSplines(const Spline& spl1, const Spline& spl2)
   {
     double sum = 0;
@@ -1366,7 +1417,7 @@ namespace Belle2 {
     return sum;
   }
 
-// Fit width in z-direction in [um^2]
+  /** Fit width in z-direction (output in [um^2]) */
   double fitSpotZwidth(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
   {
 
@@ -1401,7 +1452,7 @@ namespace Belle2 {
 
 
 
-// Fit xy widths (including XZ, YZ slopes), no prior
+  /** Fit xy widths (including XZ, YZ slopes), no prior */
   SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                    const vector<double>& splKX, const vector<double>& splKY)
   {
@@ -1435,7 +1486,7 @@ namespace Belle2 {
     return SpotParam(pars, err2, {splX, splY, splKX, splKY});
   }
 
-// Fit xy widths (including XZ, YZ slopes), with prior info from spotPars
+  /** Fit xy widths (including XZ, YZ slopes), with prior info from spotPars */
   SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                    const vector<double>& splKX, const vector<double>& splKY, const SpotParam& spotPars)
   {
@@ -1475,7 +1526,7 @@ namespace Belle2 {
 
 
 
-// simple fit of position splines, without kX, kY
+  /** simple fit of position splines, without kX, kY slopes */
   SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY)
   {
     vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
@@ -1508,7 +1559,7 @@ namespace Belle2 {
 
 
 
-//Fit Zposition
+  /** Fit Zposition */
   SpotParam fitZpositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                 const vector<double>& splKX, const vector<double>& splKY,
                                 const vector<double>& splZ)
@@ -1546,7 +1597,7 @@ namespace Belle2 {
 
 
 
-//Fit Zposition, xIP, yIP fixed from d0 fit
+  /** Fit Zposition, xIP, yIP fixed from d0 fit */
   SpotParam fitZpositionSplinesSimple(const vector<Event>& evts, const vector<double>& splZ, const SpotParam& spotPars)
   {
     vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
@@ -1581,7 +1632,7 @@ namespace Belle2 {
 
 
 
-// Returns x-y sizes in um^2
+  /** Returns x-y sizes in um^2 */
   vector<double> fitSpotWidthCMS(const vector<Event>& evts, const SpotParam& spotPar)
   {
 
@@ -1604,14 +1655,14 @@ namespace Belle2 {
 
     TMatrixD mat = vecs2mat({ssVec, ccVec, scVec});
 
-    // Linear fit with constraint on positivness
+    // Linear fit with constraint on positiveness
     TVectorD resPhys = linearFitPos(mat, vec2vec(dataVec));
 
     return {resPhys(0), resPhys(1), resPhys(2)};
   }
 
 
-// Plot pulls in xy size fit
+  /** Plot pulls for xy size fit */
   void plotSpotSizePull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -2000, 2000);
@@ -1631,7 +1682,7 @@ namespace Belle2 {
   }
 
 
-// Plot pulls in Zsize fit
+  /** Plot pulls in Zsize fit */
   void plotSpotSizeZPull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY,  double sizeZZ)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -300e3, 600e3);
@@ -1659,7 +1710,7 @@ namespace Belle2 {
 
 
 
-// Plot size fit control plots
+  /** Plot size fit control plots */
   void plotSpotSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizeXY)
   {
     double sxx = sizeXY[0];
@@ -1718,7 +1769,7 @@ namespace Belle2 {
   }
 
 
-// Plot zSizeFit control plots
+  /** Plot zSizeFit control plots */
   void plotSpotZSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizesXY, double sizeZZ)
   {
 
@@ -1805,7 +1856,7 @@ namespace Belle2 {
 
 
 
-
+  /** Remove outliers in xy-spotSize */
   void removeSpotSizeOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double cut = 1500)
   {
 
@@ -1826,7 +1877,7 @@ namespace Belle2 {
   }
 
 
-// Remove outliers in spotSize
+  /** Remove outliers in z-spotSize */
   void removeSpotSizeZOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double sizeZZ,
                                double cut = 150000)
   {
@@ -1851,7 +1902,7 @@ namespace Belle2 {
   }
 
 
-// TRotation to TMatrixD
+  /** TRotation to TMatrixD */
   TMatrixD toMat(TRotation rot)
   {
     TMatrixD rotM(3, 3);
@@ -1868,7 +1919,14 @@ namespace Belle2 {
     return rotM;
   }
 
-// Rotate the BeamSpot ellipsoid by angles kX and kY
+
+  /** Get the rotated BS-size matrix by angles kX and kY
+    @param xySize: BS-size matrix in the frame where the z' axis is aligned with z axis. Includes xx, yy and xy elements.
+    @param zzSize: The BS-size in the z direction
+    @param kX: Angle of the BS in the XZ plane
+    @param kY: Angle of the BS in the YZ plane
+    @return The BS matrix in the nominal Belle2 frame
+  */
   TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY)
   {
     TRotation rot; // rotation moving eZ=(0,0,1) to (kX, kY, 1)
@@ -1907,7 +1965,7 @@ namespace Belle2 {
 
 
 
-// convert splitPoints [in utc time] to expRunEvt
+// convert splitPoints [in UTC time] to expRunEvt
   vector<ExpRunEvt> convertSplitPoints(const vector<Event>& events, vector<double> splitPoints)
   {
 
@@ -1962,7 +2020,7 @@ namespace Belle2 {
     vector<double> indY = splitPoints;
     vector<double> indZ = splitPoints;
 
-    //no time detepndence, as for beam size
+    //no time dependence, as for beam size
     vector<double> indKX =  {};
     vector<double> indKY =  {};
 

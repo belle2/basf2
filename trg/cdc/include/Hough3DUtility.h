@@ -16,6 +16,10 @@ public:
   Hough3DFinder(void);
   /// 3D finder destructor.
   ~Hough3DFinder(void);
+  /// Copy constructor, deleted.
+  Hough3DFinder(Hough3DFinder&) = delete;
+  /// Assignment operator, deleted.
+  Hough3DFinder& operator=(Hough3DFinder&) = delete;
   /// Sets which 3D finder to use.
   void setMode(int mode);
   /// Gets which 3D finder is used.

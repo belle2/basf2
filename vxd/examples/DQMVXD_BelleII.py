@@ -11,15 +11,13 @@
 # Contributors: Peter Kodys                                              *
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-from daqdqm.commondqm import add_common_dqm
 
 import PXDROIUnpackerModule
 
-import glob
 
 import argparse
 parser = argparse.ArgumentParser(
@@ -49,7 +47,7 @@ if (args.ExperimentType is 3):
     output_filename = "RootOutput_Phase3.root"
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 if (args.ExperimentType is 1):
     # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
@@ -76,7 +74,7 @@ add_tsim(main)
 # PXD digitization module
 # main.add_module('PXDDigitizer')
 # Convert digits to raw pxd data
-PXDPACKER = register_module('PXDPacker')
+PXDPACKER = b2.register_module('PXDPacker')
 # ============================================================================
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
@@ -122,9 +120,9 @@ main.add_module('PXDRawDQMCorr', histogramDirectoryName='PXDRCo')
 main.add_module('PXDRawDQM', histogramDirectoryName='PXDRaw')
 main.add_module('PXDROIDQM', histogramDirectoryName='PXDROI')
 
-pxddqmExpReco = register_module('PXDDQMExpressReco')
-svddqmExpReco = register_module('SVDDQMExpressReco')
-vxddqmExpReco = register_module('VXDDQMExpressReco')
+pxddqmExpReco = b2.register_module('PXDDQMExpressReco')
+svddqmExpReco = b2.register_module('SVDDQMExpressReco')
+vxddqmExpReco = b2.register_module('VXDDQMExpressReco')
 
 main.add_module(pxddqmExpReco)
 main.add_module(svddqmExpReco)
@@ -140,5 +138,5 @@ trackDQM = main.add_module('TrackDQM')
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

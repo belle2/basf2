@@ -68,7 +68,7 @@ def add_udst_output(
     if dataDescription is None:
         dataDescription = {}
 
-    dataDescription.setdefault("dataLevel", "udst")
+    dataDescription.update(dataLevel="udst")
 
     return mdst.add_mdst_output(
         path,

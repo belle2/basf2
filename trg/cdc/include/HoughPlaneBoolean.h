@@ -41,6 +41,12 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCHoughPlaneBoolean();
 
+    /// Copy constructor, deleted
+    TRGCDCHoughPlaneBoolean(TRGCDCHoughPlaneBoolean&) = delete;
+
+    /// Assignement operator, delete
+    TRGCDCHoughPlaneBoolean& operator=(TRGCDCHoughPlaneBoolean&) = delete;
+
   public:// Selectors
 
     /// returns entry in a cell.
@@ -58,12 +64,18 @@ namespace Belle2 {
     unsigned setEntry(unsigned serialId, unsigned n) override;
 
     /// clear all entries.
+    // cppcheck-suppress virtualCallInConstructor
     void clear(void) override;
 
     /// Votes.
     void vote(float rx,
               float ry,
               int weight = 1) override;
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif
 
     /// Votes with charge decision.
     // using TRGCDCHoughPlaneBase::vote; // to be checked
@@ -72,15 +84,19 @@ namespace Belle2 {
               float charge,
               int weight = 1);
 
+    /// Votes using registered pattern.
+    // using TRGCDCHoughPlaneBase::vote; // to be checked
+    void vote(unsigned patternId, int weight);
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
     /// Votes with charge decision.
     void voteUsedInTrasan(float rx,
                           float ry,
                           float charge,
                           int weight = 1);
-
-    /// Votes using registered pattern.
-    // using TRGCDCHoughPlaneBase::vote; // to be checked
-    void vote(unsigned patternId, int weight);
 
     /// registers a pattern..
     void registerPattern(unsigned id) override;

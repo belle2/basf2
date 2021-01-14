@@ -23,6 +23,7 @@
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
@@ -78,6 +79,12 @@ namespace Belle2 {
 
   private:
 
+    /** Number of channel hit histograms per sector for BKLM. */
+    const int m_ChannelHitHistogramsBKLM = 2;
+
+    /** Number of channel hit histograms per sector for EKLM. */
+    const int m_ChannelHitHistogramsEKLM = 3;
+
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -87,26 +94,8 @@ namespace Belle2 {
     /** Directory for BKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameBKLM;
 
-    /** KLM channel array index. */
-    const KLMChannelArrayIndex* m_ChannelArrayIndex;
-
-    /** KLM sector array index. */
-    const KLMSectorArrayIndex* m_SectorArrayIndex;
-
-    /** KLM element numbers. */
-    const KLMElementNumbers* m_ElementNumbers;
-
-    /** Element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
-
-    /** KLM digits. */
-    StoreArray<KLMDigit> m_Digits;
-
-    /** BKLM 1d hits. */
-    StoreArray<BKLMHit1d> m_BklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_BklmHit2ds;
+    /** KLM DAQ inclusion. */
+    TH1F* m_DAQInclusion;
 
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;
@@ -131,12 +120,6 @@ namespace Belle2 {
       EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
       BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
 
-    /** Number of channel hit histograms per sector for BKLM. */
-    const int m_ChannelHitHistogramsBKLM = 2;
-
-    /** Number of channel hit histograms per sector for EKLM. */
-    const int m_ChannelHitHistogramsEKLM = 3;
-
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;
 
@@ -148,6 +131,30 @@ namespace Belle2 {
 
     /** Number of KLM Digits. */
     TH1F* m_KlmDigitsNumber;
+
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
+
+    /** Raw KLM. */
+    StoreArray<RawKLM> m_RawKlms;
+
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
+
+    /** BKLM 1d hits. */
+    StoreArray<BKLMHit1d> m_BklmHit1ds;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_BklmHit2ds;
 
   };
 

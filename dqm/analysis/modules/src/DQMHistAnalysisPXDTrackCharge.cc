@@ -434,7 +434,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {

@@ -1,0 +1,36 @@
+# EventType: 1296700000
+# Descriptor:  [B- -> D_10 l- nu, D_10 -> D pi pi ] cc 
+# NickName: Bu_D1lnu_Dpipi
+# Documentation: b->c l nu process, D1 mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+Alias D_10sig D_10
+Alias anti-D_10sig anti-D_10
+ChargeConj D_10sig anti-D_10sig
+
+Decay Upsilon(4S)
+0.500 B+sig B-  VSS;
+0.500 B+ B-sig  VSS;
+Enddecay
+
+Decay B-sig
+0.5  D_10sig  e- anti-nu_e   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.5  D_10sig  mu- anti-nu_mu   PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+Enddecay
+CDecay B+sig
+
+Decay D_10sig
+0.1719    D0 pi+ pi-                     PHOTOS PHSP;
+0.1145    D0 pi0 pi0                     PHOTOS PHSP;
+0.1145    D+ pi- pi0                     PHOTOS PHSP;
+Enddecay
+CDecay anti-D_10sig
+
+
+End

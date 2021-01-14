@@ -87,7 +87,7 @@ namespace Belle2 {
       static pxdClusterShapeDescr pxdClusterShapeDescription;
 
       /** Set cluster shape ID.
-       * @param ClusterCandidate container of pixels creating cluster in PXD
+       * @param cls ClusterCandidate container of pixels creating cluster in PXD
        * @param sensorID sensor details for PXD sensors
        * @returns cluster shape ID
        */

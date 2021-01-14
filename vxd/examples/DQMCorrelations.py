@@ -23,11 +23,10 @@
 # Example steering file - 2017 Belle II Collaboration
 #############################################################
 
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
-from svd import *
-from pxd import *
+import svd
+import pxd
 
 import argparse
 parser = argparse.ArgumentParser(description="PXD+SVD+VXD DQM correlations for Belle II + TB, show all possible histos")
@@ -107,7 +106,7 @@ param_vxddqm = {'CutCorrelationSigPXD': args.CutCorrelationSigPXD,
 
 # Now let's create a path to simulate our events. We need a bit of statistics but
 # that's not too bad since we only simulate single muons
-main = create_path()
+main = b2.create_path()
 main.add_module("EventInfoSetter", evtNumList=[1000])
 main.add_module("Gearbox")
 # we only need the vxd for this
@@ -120,23 +119,23 @@ else:
 
 main.add_module("EvtGenInput")
 main.add_module("FullSim")
-add_pxd_simulation(main)
-add_svd_simulation(main)
-add_pxd_reconstruction(main)
-add_svd_reconstruction(main)
+pxd.add_pxd_simulation(main)
+svd.add_svd_simulation(main)
+pxd.add_pxd_reconstruction(main)
+svd.add_svd_reconstruction(main)
 
 if (args.SkipDQM is False):
-    histomanager = register_module('HistoManager', histoFileName=args.histo_file_name)
+    histomanager = b2.register_module('HistoManager', histoFileName=args.histo_file_name)
     main.add_module(histomanager)
     if (args.SkipPXDSVD is False):
         if (args.SkipDQMExpressReco is False):
-            pxddqmExpReco = register_module('PXDDQMExpressReco')
-            svddqmExpReco = register_module('SVDDQMExpressReco')
+            pxddqmExpReco = b2.register_module('PXDDQMExpressReco')
+            svddqmExpReco = b2.register_module('SVDDQMExpressReco')
             main.add_module(pxddqmExpReco)
             main.add_module(svddqmExpReco)
 
     if (args.SkipDQMExpressReco is False):
-        vxddqmExpReco = register_module('VXDDQMExpressReco')
+        vxddqmExpReco = b2.register_module('VXDDQMExpressReco')
         vxddqmExpReco.param(param_vxddqm)
         main.add_module(vxddqmExpReco)
 
@@ -146,5 +145,5 @@ if (args.DataOutput is True):
 
 main.add_module("Progress")
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

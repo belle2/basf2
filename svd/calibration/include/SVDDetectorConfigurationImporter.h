@@ -65,7 +65,7 @@ namespace Belle2 {
      * @param xmlFileName is the file name of the xml file
      */
 
-    void importSVDGlobalConfigParametersFromXML(const std::string& xmlfileName);
+    void importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName);
 
     /**
      * This method import to the database the local configuration parameters
@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param xmlFileName is the file name of the xml file
      */
 
-    void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName);
+    void importSVDLocalConfigParametersFromXML(const std::string& xmlFileName);
 
   private:
 

@@ -60,6 +60,7 @@ namespace Belle2 {
      * assumed for both values by dividing the pixel size by sqrt(12).
      *
      * @param hit    PXDTrueHit to use as base
+     * @param trackCandHit    actually not used, should be removed?
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
@@ -84,6 +85,7 @@ namespace Belle2 {
      * perfect tracking results when using this constructor
      *
      * @param hit    PXDCluster to use as base
+     * @param trackCandHit    actually not used, should be removed?
      */
     explicit PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 

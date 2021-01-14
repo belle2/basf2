@@ -41,12 +41,12 @@ class SVDValidationTTreeSimhit(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeSimhit, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeSimhit.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of eventDataSimhit
         self.data = EventDataSimhit()
-        '''Instance of the EventDataSimhit class'''
 
         # Declare tree branches
         for key in EventDataSimhit.__dict__:

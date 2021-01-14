@@ -63,11 +63,6 @@ namespace Belle2 {
       /** Name of the collection to use for the SVDClusters */
       std::string m_storeClustersName;
 
-      /** Name of the relation between SVDClusters and SVDRecoDigits*/
-      std::string m_relClusterToRecoName;
-      /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
-      std::string m_relRecoToShaperName;
-
       /** Collection of SVDClusters */
       StoreArray<SVDCluster> m_storeClusters;
       /** Collection of SVDShaperDigits */

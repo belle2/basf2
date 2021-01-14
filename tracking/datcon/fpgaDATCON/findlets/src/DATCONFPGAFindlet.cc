@@ -20,19 +20,32 @@ DATCONFPGAFindlet::~DATCONFPGAFindlet() = default;
 
 DATCONFPGAFindlet::DATCONFPGAFindlet()
 {
+  addProcessingSignalListener(&m_clusterLoader);
 }
 
 void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-}
 
+  m_clusterLoader.exposeParameters(moduleParamList, prefix);
+}
 
 void DATCONFPGAFindlet::beginEvent()
 {
   Super::beginEvent();
+
+  m_uHits.clear();
+  m_vHits.clear();
 }
 
 void DATCONFPGAFindlet::apply()
 {
+//   B2INFO("Here I am, this is me");
+  m_clusterLoader.apply(m_uHits, m_vHits);
+
+  // hit vectors are empty in case of high occupancy, a warning is created in m_clusterLoader
+  if (m_uHits.empty() or m_vHits.empty()) {
+    return;
+  }
+
 }

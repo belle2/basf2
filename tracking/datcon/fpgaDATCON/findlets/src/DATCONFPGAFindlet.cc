@@ -44,7 +44,6 @@ void DATCONFPGAFindlet::beginEvent()
 
 void DATCONFPGAFindlet::apply()
 {
-//   B2INFO("Here I am, this is me");
   m_clusterLoader.apply(m_uHits, m_vHits);
 
   // hit vectors are empty in case of high occupancy, a warning is created in m_clusterLoader

@@ -1823,7 +1823,7 @@ def findMCDecay(
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, outputFile, path):
+def summaryOfLists(particleLists, outputFile=None, path=None):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.

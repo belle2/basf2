@@ -233,13 +233,12 @@ void SVDClusterizerModule::event()
                         m_storeShaperDigitsName);
 
   //loop over the SVDShaperDigits
-  int i = 0;
-  while (i < nDigits) {
+  for (const SVDShaperDigit& currentDigit : m_storeDigits) {
 
     //retrieve the VxdID, sensor and cellID of the current ShaperDigit
-    VxdID thisSensorID = m_storeDigits[i]->getSensorID();
-    bool thisSide = m_storeDigits[i]->isUStrip();
-    int thisCellID = m_storeDigits[i]->getCellID();
+    VxdID thisSensorID = currentDigit.getSensorID();
+    bool thisSide = currentDigit.isUStrip();
+    int thisCellID = currentDigit.getCellID();
 
     if (m_useDB) {
       m_cutSeed = m_ClusterCal.getMinSeedSNR(thisSensorID, thisSide);
@@ -249,21 +248,19 @@ void SVDClusterizerModule::event()
 
     //Ignore digits with insufficient signal
     float thisNoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-    int thisCharge = m_storeDigits[i]->getMaxADCCounts();
+    int thisCharge = currentDigit.getMaxADCCounts();
     B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
 
-    if ((float)thisCharge / thisNoise < m_cutAdjacent) {
-      i++;
+    if ((float)thisCharge / thisNoise < m_cutAdjacent)
       continue;
-    }
 
     //this strip has a sufficient S/N
     StripInRawCluster aStrip;
-    aStrip.shaperDigitIndex = i;
+    aStrip.shaperDigitIndex = currentDigit.getArrayIndex();
     aStrip.maxSample = thisCharge;
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
-    aStrip.samples = m_storeDigits[i]->getSamples();
+    aStrip.samples = currentDigit.getSamples();
 
     //try to add the strip to the existing cluster
     if (! rawCluster.add(thisSensorID, thisSide, aStrip)) {
@@ -280,7 +277,6 @@ void SVDClusterizerModule::event()
         B2WARNING("this state is forbidden!!");
 
     }
-    i++;
   } //exit loop on ShaperDigits
 
   //write the last cluster, if good

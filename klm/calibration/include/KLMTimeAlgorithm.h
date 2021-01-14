@@ -212,18 +212,33 @@ namespace Belle2 {
 
     /**
      * Fill profiles of time versus distance.
-     * @param[out] profileRpcPhi                 BKLM RPC phi plane.
-     * @param[out] profileRpcZ                   BKLM RPC z plane.
-     * @param[out] profileBKLMScintillatorPhi    BKLM scintillator phi plane.
-     * @param[out] profileBKLMScintillatorZ      BKLM scintillator z plane.
-     * @param[out] profileEKLMScintillatorPlane1 EKLM scintillator plane1.
-     * @param[out] profileEKLMScintillatorPlane2 EKLM scintillator plane2.
+     *
+     * @param[out] profileRpcPhi
+     * BKLM RPC phi plane.
+     *
+     * @param[out] profileRpcZ
+     * BKLM RPC z plane.
+     *
+     * @param[out] profileBKLMScintillatorPhi
+     * BKLM scintillator phi plane.
+     *
+     * @param[out] profileBKLMScintillatorZ
+     * BKLM scintillator z plane.
+     *
+     * @param[out] profileEKLMScintillatorPlane1
+     * EKLM scintillator plane1.
+     *
+     * @param[out] profileEKLMScintillatorPlane2
+     * EKLM scintillator plane2.
+     *
+     * @param[in]  fill2dHistograms
+     * Whether to fill 2d histograms.
      */
     void fillTimeDistanceProfiles(
       TProfile* profileRpcPhi, TProfile* profileRpcZ,
       TProfile* profileBKLMScintillatorPhi, TProfile* profileBKLMScintillatorZ,
       TProfile* profileEKLMScintillatorPlane1,
-      TProfile* profileEKLMScintillatorPlane2);
+      TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms);
 
     /**
      * Data struct used in collector and algorithm.

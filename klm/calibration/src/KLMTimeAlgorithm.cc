@@ -545,12 +545,14 @@ void KLMTimeAlgorithm::createHistograms()
             hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                                             m_UpperTimeBoundaryScintilltorsEKLM);
             hn = Form("time_length_eklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
+            double stripLength = m_EKLMGeometry->getStripLength(iC + 1) /
+                                 CLHEP::cm * Unit::cm;
             m_HistTimeLengthEKLM[iF][iS][iL][iP][iC] =
               new TH2F(hn.Data(),
                        "Time versus propagation length; "
                        "propagation distance[cm]; "
                        "T_rec-T_0-T_fly-'T_calibration'[ns]",
-                       400, 0.0, 350.0,
+                       200, 0.0, stripLength,
                        400, m_LowerTimeBoundaryScintilltorsEKLM, m_UpperTimeBoundaryScintilltorsEKLM);
           }
         }
@@ -563,7 +565,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
   TProfile* profileRpcPhi, TProfile* profileRpcZ,
   TProfile* profileBKLMScintillatorPhi, TProfile* profileBKLMScintillatorZ,
   TProfile* profileEKLMScintillatorPlane1,
-  TProfile* profileEKLMScintillatorPlane2)
+  TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms)
 {
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     uint16_t channel = klmChannel.getKLMChannelNumber();
@@ -603,7 +605,8 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
+        if (fill2dHistograms)
+          m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
         if (iP) {
           profileEKLMScintillatorPlane1->Fill(distHit, timeHit);
         } else {
@@ -835,7 +838,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   fillTimeDistanceProfiles(
     m_ProfileRpcPhi, m_ProfileRpcZ,
     m_ProfileBKLMScintillatorPhi, m_ProfileBKLMScintillatorZ,
-    m_ProfileEKLMScintillatorPlane1,  m_ProfileEKLMScintillatorPlane2);
+    m_ProfileEKLMScintillatorPlane1, m_ProfileEKLMScintillatorPlane2, false);
 
   B2INFO("Effective light speed fitting.");
   m_ProfileRpcPhi->Fit("fcn_pol1", "EMQ");
@@ -1108,7 +1111,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   fillTimeDistanceProfiles(
     m_Profile2RpcPhi, m_Profile2RpcZ,
     m_Profile2BKLMScintillatorPhi, m_Profile2BKLMScintillatorZ,
-    m_Profile2EKLMScintillatorPlane1,  m_Profile2EKLMScintillatorPlane2);
+    m_Profile2EKLMScintillatorPlane1,  m_Profile2EKLMScintillatorPlane2, true);
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();

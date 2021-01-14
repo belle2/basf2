@@ -4,7 +4,6 @@ Import('env')
 # Belle 2 Software. It should be fine for most analysis but if you need to link
 # against additional libraries pleas put them here.
 env['LIBS'] = [
-    'mdst_dataobjects',
     'analysis_dataobjects',
     'analysis',
     'framework',

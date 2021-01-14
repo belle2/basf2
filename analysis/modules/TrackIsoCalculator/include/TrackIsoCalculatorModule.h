@@ -30,9 +30,13 @@ namespace Belle2 {
   class DetSurfCylBoundaries {
 
   public:
-    /** Defauklt constructor */
+    /**
+     * Default constructor
+     */
     DetSurfCylBoundaries() {};
-    /** Constructor with parameters */
+    /**
+     * Constructor with parameters
+     */
     DetSurfCylBoundaries(float rho, float zfwd, float zbwd, float th_fwd, float th_fwd_brl, float th_bwd_brl, float th_bwd)
     {
       m_rho = rho;
@@ -43,13 +47,13 @@ namespace Belle2 {
       m_th_bwd_brl = th_bwd_brl;
       m_th_bwd = th_bwd;
     };
-    float m_rho; /** Inner surface radius [cm] */
-    float m_zfwd; /** Inner surface z fwd [cm] */
-    float m_zbwd; /** Inner surface z bwd [cm] */
-    float m_th_fwd; /** Lower theta edge of fwd region [rad] */
-    float m_th_fwd_brl; /** fwd/barrel separation theta [rad] */
-    float m_th_bwd_brl; /** bwd/barrel separation theta [rad] */
-    float m_th_bwd; /** Upper theta edge of bwd region [rad] */
+    float m_rho; /**< Inner surface radius [cm] */
+    float m_zfwd; /**< Inner surface z fwd [cm] */
+    float m_zbwd; /**< Inner surface z bwd [cm] */
+    float m_th_fwd; /**< Lower theta edge of fwd region [rad] */
+    float m_th_fwd_brl; /**< fwd/barrel separation theta [rad] */
+    float m_th_bwd_brl; /**< bwd/barrel separation theta [rad] */
+    float m_th_bwd; /**< Upper theta edge of bwd region [rad] */
   };
 
   /**

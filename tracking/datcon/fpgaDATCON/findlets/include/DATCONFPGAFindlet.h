@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
+
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -55,6 +57,10 @@ namespace Belle2 {
 
   private:
     /// Findlets
+    DATCONSVDClusterLoaderAndPreparer m_clusterLoader;
+
+    std::vector<std::pair<VxdID, std::pair<long, long>>> m_uHits;
+    std::vector<std::pair<VxdID, std::pair<long, long>>> m_vHits;
 
   };
 }

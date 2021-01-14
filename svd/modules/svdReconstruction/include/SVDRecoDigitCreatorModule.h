@@ -44,13 +44,13 @@ namespace Belle2 {
       SVDRecoDigitCreatorModule();
 
       /** Initialize the module */
-      virtual void initialize() override;
+      void initialize() override;
 
       /** Initialize the module */
-      virtual void beginRun() override;
+      void beginRun() override;
 
       /** does the actual clustering */
-      virtual void event() override;
+      void event() override;
 
     protected:
 

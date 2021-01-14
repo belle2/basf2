@@ -16,6 +16,7 @@ input_files = sys.argv[1:]
 # Create KLM time calibration.
 algorithm = KLMTimeAlgorithm()
 algorithm.setMC(True)
+algorithm.setMinimalDigitNumber(0)
 cal_klm = Calibration(name='KLMTime', algorithms=algorithm)
 coll_cdst = get_collector('hlt_mumu', 'klmTime')
 rec_path_cdst = get_time_pre_collector_path(muon_list_name='klmTime', raw_format=False)

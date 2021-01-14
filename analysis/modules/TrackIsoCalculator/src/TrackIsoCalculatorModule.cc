@@ -30,7 +30,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
            "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
   addParam("detectorInnerSurface",
            m_detInnerSurface,
-           "The name of the detector at whose innemrmost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
+           "The name of the detector at whose innermost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
   addParam("use2DRhoPhiDist",
            m_use2DRhoPhiDist,
            "If true, will calculate the pair-wise track distance as the cord length on the (rho, phi) projection.",

@@ -1,4 +1,3 @@
-
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
 * Copyright(C) 2020 - Belle II Collaboration                             *
@@ -127,7 +126,7 @@ namespace Belle2 {
     std::string m_pListName;
 
     /**
-     * The name of the detector at whose innemrmost layer we extrapolate each track's polar and azimuthal angle.
+     * The name of the detector at whose innermost layer we extrapolate each track's polar and azimuthal angle.
      */
     std::string m_detInnerSurface;
 
@@ -162,7 +161,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_pList;
 
     /**
-     * Check whether input partilce list is a valid charged stable particle
+     * Check whether input particle list is of a valid charged stable particle.
      */
     inline bool isStdChargedList()
     {

@@ -1,4 +1,4 @@
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import sys
@@ -8,9 +8,9 @@ if len(sys.argv) != 3:
 filenameIn = sys.argv[1]
 filenameOut = sys.argv[2]
 
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
-main = create_path()
+main = b2.create_path()
 
 main.add_module('RootInput', inputFileName=filenameIn)
 main.add_module('Gearbox')
@@ -36,7 +36,7 @@ main.add_module('TRGECL',
                 TimeWindow=375)
 
 # add decision module and skip events that are not triggered
-not_triggered = create_path()
+not_triggered = b2.create_path()
 
 trigger = main.add_module('TRGGDLCosmicRun', BackToBack=True)
 trigger.if_false(not_triggered)

@@ -7,37 +7,37 @@
 #    usage : %> basf2 HoughETF.py -i [input root file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
 if not input_files.empty() and input_files.front().endswith(".sroot"):
-    root_input = register_module('SeqRootInput')
+    root_input = b2.register_module('SeqRootInput')
 else:
-    root_input = register_module('RootInput')
+    root_input = b2.register_module('RootInput')
 
-main = create_path()
+main = b2.create_path()
 main.add_module(root_input)
 
 # Set Database
-conditions.override_globaltags()
-use_database_chain()
-use_central_database("data_reprocessing_prompt")
-use_central_database("online")
+b2.conditions.override_globaltags()
+b2.use_database_chain()
+b2.use_central_database("data_reprocessing_prompt")
+b2.use_central_database("online")
 
-# set_log_level(LogLevel.DEBUG)
-set_log_level(LogLevel.INFO)
+# b2.set_log_level(b2.LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # cdc unpacker
-cdc_unpacker = register_module('CDCUnpacker')
+cdc_unpacker = b2.register_module('CDCUnpacker')
 cdc_unpacker.param('enableStoreCDCRawHit', True)
 main.add_module(cdc_unpacker)
 main.add_module('Gearbox')
 main.add_module('Geometry', components=['CDC',
                                         'MagneticFieldConstant4LimitedRCDC'])
 # cdc digitizer
-cdcdigitizer = register_module('CDCDigitizer')
+cdcdigitizer = b2.register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1,
                  'Resolution1': 0.,
                  'Resolution2': 0.}
@@ -80,4 +80,4 @@ output_name = 'etfout.root'
 main.add_module('RootOutput', outputFileName=output_name)
 
 # Process all events
-process(main)
+b2.process(main)

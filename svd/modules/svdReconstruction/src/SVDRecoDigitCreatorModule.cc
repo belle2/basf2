@@ -123,8 +123,8 @@ void SVDRecoDigitCreatorModule::initialize()
 {
   //Register collections
   m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeClusters.isRequired(m_storeClustersName);
-  m_storeShaper.isRequired(m_storeShaperDigitsName);
+  m_storeClusters.isOptional(m_storeClustersName);
+  m_storeShaper.isOptional(m_storeShaperDigitsName);
 
   RelationArray relRecoToShaper(m_storeReco, m_storeShaper);
   relRecoToShaper.registerInDataStore();
@@ -168,6 +168,10 @@ void SVDRecoDigitCreatorModule::event()
     return;
 
   m_storeReco.clear();
+  RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
+                                m_relRecoToShaperName);
+  if (relRecoToShaper) relRecoToShaper.clear();
+
 
   //loop over the SVDShaperDigits
   int i = 0;
@@ -226,10 +230,6 @@ void SVDRecoDigitCreatorModule::event()
       m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
 
       // write relations SVDRecoDigit -> SVDShaperDigit
-      RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
-                                    m_relRecoToShaperName);
-      if (relRecoToShaper) relRecoToShaper.clear();
-
       int recoIndex = m_storeReco.getEntries() - 1;
       int shaperIndex = i;
       if (recoIndex != shaperIndex)
@@ -240,14 +240,19 @@ void SVDRecoDigitCreatorModule::event()
       digit_weights.reserve(1);
       digit_weights.emplace_back(shaperIndex, 1.0);
       relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
-
     }
     i++;
+
   } //exit loop on ShaperDigits
+
 
   B2DEBUG(25, "Number of strips: " << m_storeReco.getEntries());
 
-  //write relations: SVDCluster -> SVDRecoDigit
+  // write relations: SVDCluster -> SVDRecoDigit
+  // if clusters are present
+  if (m_storeClusters.getEntries() == 0)
+    return;
+
   //1. loop on clusters
   //2. take related shaper digits
   //3. build relation with reco digit with the same index, using reco charge as weight
@@ -255,6 +260,7 @@ void SVDRecoDigitCreatorModule::event()
   RelationArray relClusterToReco(m_storeClusters, m_storeReco,
                                  m_relClusterToRecoName);
   if (relClusterToReco) relClusterToReco.clear();
+
 
   for (const SVDCluster& cluster : m_storeClusters) {
 

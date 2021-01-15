@@ -21,16 +21,11 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
-
 #include <vxd/geometry/GeoTools.h>
-
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include "TDirectory.h"
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 using namespace SoftwareTrigger;
 

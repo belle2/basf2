@@ -12,7 +12,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 
@@ -103,8 +103,6 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
 
 void SVDClusterizerModule::beginRun()
 {
-
-
   if (m_useDB) {
     if (!m_recoConfig.isValid())
       B2ERROR("no valid configuration found for SVD reconstruction");
@@ -186,18 +184,14 @@ void SVDClusterizerModule::initialize()
   m_storeTrueHits.isOptional(m_storeTrueHitsName);
   m_storeMCParticles.isOptional(m_storeMCParticlesName);
 
-  RelationArray relClusterDigits(m_storeClusters, m_storeDigits);
-  RelationArray relClusterTrueHits(m_storeClusters, m_storeTrueHits);
-  RelationArray relClusterMCParticles(m_storeClusters, m_storeMCParticles);
-  RelationArray relDigitTrueHits(m_storeDigits, m_storeTrueHits);
-  RelationArray relDigitMCParticles(m_storeDigits, m_storeMCParticles);
-
-  relClusterDigits.registerInDataStore();
+  m_storeClusters.registerRelationTo(m_storeDigits);
   //Relations to simulation objects only if the ancestor relations exist
+  RelationArray relDigitTrueHits(m_storeDigits, m_storeTrueHits);
   if (relDigitTrueHits.isOptional())
-    relClusterTrueHits.registerInDataStore();
+    m_storeClusters.registerRelationTo(m_storeTrueHits);
+  RelationArray relDigitMCParticles(m_storeDigits, m_storeMCParticles);
   if (relDigitMCParticles.isOptional())
-    relClusterMCParticles.registerInDataStore();
+    m_storeClusters.registerRelationTo(m_storeMCParticles);
 
   //Store names to speed up creation later
   m_storeClustersName = m_storeClusters.getName();
@@ -205,25 +199,14 @@ void SVDClusterizerModule::initialize()
   m_storeTrueHitsName = m_storeTrueHits.getName();
   m_storeMCParticlesName = m_storeMCParticles.getName();
 
-  m_relClusterShaperDigitName = relClusterDigits.getName();
-  m_relClusterTrueHitName = relClusterTrueHits.getName();
-  m_relClusterMCParticleName = relClusterMCParticles.getName();
-  m_relShaperDigitTrueHitName = relDigitTrueHits.getName();
-  m_relShaperDigitMCParticleName = relDigitMCParticles.getName();
-
   // Report:
   B2DEBUG(20, "SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
   B2DEBUG(20, " 1. COLLECTIONS:");
-  B2DEBUG(20, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(20, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
-  B2DEBUG(20, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2DEBUG(20, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  B2DEBUG(20, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(20, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2DEBUG(20, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
-  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(20, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2DEBUG(20, " -->  MCParticles:        " << m_storeMCParticlesName);
+  B2DEBUG(20, " -->  SVDShaperDigits:      " << m_storeShaperDigitsName);
+  B2DEBUG(20, " -->  SVDClusters:        " << m_storeClustersName);
+  B2DEBUG(20, " -->  SVDTrueHits:        " << m_storeTrueHitsName);
   B2DEBUG(20, " 2. CLUSTERING:");
   B2DEBUG(20, " -->  Neighbour cut:      " << m_cutAdjacent);
   B2DEBUG(20, " -->  Seed cut:           " << m_cutSeed);
@@ -239,19 +222,6 @@ void SVDClusterizerModule::event()
 
   m_storeClusters.clear();
 
-  RelationArray relClusterMCParticle(m_storeClusters, m_storeMCParticles,
-                                     m_relClusterMCParticleName);
-  if (relClusterMCParticle) relClusterMCParticle.clear();
-
-  RelationArray relClusterDigit(m_storeClusters, m_storeDigits,
-                                m_relClusterShaperDigitName);
-  if (relClusterDigit) relClusterDigit.clear();
-
-  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits,
-                                  m_relClusterTrueHitName);
-  if (relClusterTrueHit) relClusterTrueHit.clear();
-
-
   if (m_useDB) {
     m_cutSeed = m_ClusterCal.getMinSeedSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
     m_cutAdjacent = m_ClusterCal.getMinAdjSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
@@ -263,13 +233,12 @@ void SVDClusterizerModule::event()
                         m_storeShaperDigitsName);
 
   //loop over the SVDShaperDigits
-  int i = 0;
-  while (i < nDigits) {
+  for (const SVDShaperDigit& currentDigit : m_storeDigits) {
 
     //retrieve the VxdID, sensor and cellID of the current ShaperDigit
-    VxdID thisSensorID = m_storeDigits[i]->getSensorID();
-    bool thisSide = m_storeDigits[i]->isUStrip();
-    int thisCellID = m_storeDigits[i]->getCellID();
+    VxdID thisSensorID = currentDigit.getSensorID();
+    bool thisSide = currentDigit.isUStrip();
+    int thisCellID = currentDigit.getCellID();
 
     if (m_useDB) {
       m_cutSeed = m_ClusterCal.getMinSeedSNR(thisSensorID, thisSide);
@@ -279,21 +248,19 @@ void SVDClusterizerModule::event()
 
     //Ignore digits with insufficient signal
     float thisNoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-    int thisCharge = m_storeDigits[i]->getMaxADCCounts();
+    int thisCharge = currentDigit.getMaxADCCounts();
     B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
 
-    if ((float)thisCharge / thisNoise < m_cutAdjacent) {
-      i++;
+    if ((float)thisCharge / thisNoise < m_cutAdjacent)
       continue;
-    }
 
     //this strip has a sufficient S/N
     StripInRawCluster aStrip;
-    aStrip.shaperDigitIndex = i;
+    aStrip.shaperDigitIndex = currentDigit.getArrayIndex();
     aStrip.maxSample = thisCharge;
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
-    aStrip.samples = m_storeDigits[i]->getSamples();
+    aStrip.samples = currentDigit.getSamples();
 
     //try to add the strip to the existing cluster
     if (! rawCluster.add(thisSensorID, thisSide, aStrip)) {
@@ -310,7 +277,6 @@ void SVDClusterizerModule::event()
         B2WARNING("this state is forbidden!!");
 
     }
-    i++;
   } //exit loop on ShaperDigits
 
   //write the last cluster, if good
@@ -383,8 +349,8 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   //append the new cluster to the StoreArray...
   if (SNR > m_cutCluster) {
-    m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
-                                         firstFrame));
+    m_storeClusters.appendNew(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
+                              firstFrame);
 
     B2DEBUG(20, "CLUSTER SIZE = " << size);
     B2DEBUG(20, "        time = " << time << ", timeError = " << timeError << ", firstframe = " << firstFrame);
@@ -398,64 +364,25 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
 void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawCluster)
 {
-
-  RelationArray relClusterDigit(m_storeClusters, m_storeDigits, m_relClusterShaperDigitName);
-
-  RelationArray relClusterMCParticle(m_storeClusters, m_storeMCParticles, m_relClusterMCParticleName);
-  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits, m_relClusterTrueHitName);
-
-  RelationIndex<SVDShaperDigit, MCParticle> relDigitMCParticle(m_storeDigits, m_storeMCParticles, m_relShaperDigitMCParticleName);
-  RelationIndex<SVDShaperDigit, SVDTrueHit> relDigitTrueHit(m_storeDigits, m_storeTrueHits, m_relShaperDigitTrueHitName);
-
-
-  //register relation between ShaperDigit and Cluster
-  int clsIndex = m_storeClusters.getEntries() - 1;
-
-  map<int, float> mc_relations;
-  map<int, float> truehit_relations;
-
-  vector<pair<int, float> > digit_weights;
-  digit_weights.reserve(m_storeClusters[clsIndex]->getSize());
-
+  int i = m_storeClusters.getEntries() - 1;
+  const SVDCluster* currentCluster = m_storeClusters[i];
   std::vector<StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-
-  for (auto strip : strips) {
-
-    //Fill map with MCParticle relations
-    if (relDigitMCParticle) {
-      typedef const RelationIndex<SVDShaperDigit, MCParticle>::Element relMC_type;
-      for (relMC_type& mcRel : relDigitMCParticle.getElementsFrom(m_storeDigits[strip.shaperDigitIndex])) {
-        //negative weights are from ignored particles, we don't like them and
-        //thus ignore them :D
-        if (mcRel.weight < 0) continue;
-        mc_relations[mcRel.indexTo] += mcRel.weight;
-      };
-    };
-    //Fill map with SVDTrueHit relations
-    if (relDigitTrueHit) {
-      typedef const RelationIndex<SVDShaperDigit, SVDTrueHit>::Element relTrueHit_type;
-      for (relTrueHit_type& trueRel : relDigitTrueHit.getElementsFrom(m_storeDigits[strip.shaperDigitIndex])) {
-        //negative weights are from ignored particles, we don't like them and
-        //thus ignore them :D
-        if (trueRel.weight < 0) continue;
-        truehit_relations[trueRel.indexTo] += trueRel.weight;
-      };
-    };
-
-    digit_weights.push_back(make_pair(strip.shaperDigitIndex, strip.maxSample));
+  for (const auto& strip : strips) {
+    const SVDShaperDigit* currentDigit = m_storeDigits[strip.shaperDigitIndex];
+    currentCluster->addRelationTo(currentDigit, strip.maxSample);
+    RelationVector<MCParticle> mcParticlesRelations = currentDigit->getRelationsWith<MCParticle>(m_storeMCParticlesName);
+    for (unsigned int j = 0; j < mcParticlesRelations.size(); ++j) {
+      float weight = mcParticlesRelations.weight(j);
+      if (weight >= 0)
+        currentCluster->addRelationTo(mcParticlesRelations[j]);
+    }
+    RelationVector<SVDTrueHit> trueHitsRelations = currentDigit->getRelationsWith<SVDTrueHit>(m_storeTrueHitsName);
+    for (unsigned int j = 0; j < trueHitsRelations.size(); ++j) {
+      float weight = trueHitsRelations.weight(j);
+      if (weight >= 0)
+        currentCluster->addRelationTo(trueHitsRelations[j]);
+    }
   }
-
-
-  //Create Relations to this Digit
-  if (!mc_relations.empty()) {
-    relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
-  }
-  if (!truehit_relations.empty()) {
-    relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
-  }
-
-  relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
-
 }
 
 double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID vxdID, bool isU)

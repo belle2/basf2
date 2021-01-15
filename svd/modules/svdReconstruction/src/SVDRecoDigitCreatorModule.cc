@@ -11,8 +11,6 @@
 #include <svd/modules/svdReconstruction/SVDRecoDigitCreatorModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -126,17 +124,12 @@ void SVDRecoDigitCreatorModule::initialize()
   m_storeClusters.isOptional(m_storeClustersName);
   m_storeShaper.isOptional(m_storeShaperDigitsName);
 
-  RelationArray relRecoToShaper(m_storeReco, m_storeShaper);
-  relRecoToShaper.registerInDataStore();
-  RelationArray relClusterToReco(m_storeClusters, m_storeReco);
-  relClusterToReco.registerInDataStore();
+  m_storeReco.registerRelationTo(m_storeShaper);
+  m_storeClusters.registerRelationTo(m_storeReco);
 
   //Store names to speed up creation later
   m_storeClustersName = m_storeClusters.getName();
   m_storeShaperDigitsName = m_storeShaper.getName();
-
-  m_relRecoToShaperName = relRecoToShaper.getName();
-  m_relClusterToRecoName = relClusterToReco.getName();
 
   // Report:
   B2DEBUG(25, "SVDRecoDigitCreator Parameters (in default system unit, *=cannot be set directly):");
@@ -145,11 +138,7 @@ void SVDRecoDigitCreatorModule::initialize()
   B2DEBUG(25, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
   B2DEBUG(25, " -->  SVDRecoDigits:      " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
   B2DEBUG(25, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2DEBUG(25, " -->  ClusterToRecoRel:    " << m_relClusterToRecoName);
-  B2DEBUG(25, " -->  RecoToShaperRel:    " << m_relRecoToShaperName);
 }
-
-
 
 void SVDRecoDigitCreatorModule::event()
 {
@@ -163,20 +152,10 @@ void SVDRecoDigitCreatorModule::event()
 
   int numberOfAcquiredSamples = eventinfo->getNSamples();
 
-  int nDigits = m_storeShaper.getEntries();
-  if (nDigits == 0)
-    return;
-
-  m_storeReco.clear();
-  RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
-                                m_relRecoToShaperName);
-  if (relRecoToShaper) relRecoToShaper.clear();
-
+  int nShaperDigits = m_storeShaper.getEntries();
 
   //loop over the SVDShaperDigits
-  int i = 0;
-
-  while (i < nDigits) {
+  for (int i = 0; i < nShaperDigits; ++i) {
 
     VxdID sensorID = m_storeShaper[i]->getSensorID();
     bool isU =  m_storeShaper[i]->isUStrip();
@@ -227,56 +206,15 @@ void SVDRecoDigitCreatorModule::event()
       time = eventinfo->getTimeInFTSWReference(time, firstFrame);
 
       //append the new SVDRecoDigit to the StoreArray
-      m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
+      SVDRecoDigit* recoDigit = m_storeReco.appendNew(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2);
 
-      // write relations SVDRecoDigit -> SVDShaperDigit
-      int recoIndex = m_storeReco.getEntries() - 1;
-      int shaperIndex = i;
-      if (recoIndex != shaperIndex)
-        B2ERROR("incompatible SVDShaperDigit and SVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
-                recoIndex << " != " << shaperIndex << " = SVDShaperDigit index");
-
-      vector<pair<unsigned int, float> > digit_weights;
-      digit_weights.reserve(1);
-      digit_weights.emplace_back(shaperIndex, 1.0);
-      relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
+      // set the relation SVDRecoDigit -> SVDShaperDigit
+      recoDigit->addRelationTo(m_storeShaper[i]);
+      // and SVDCluster -> SVDRecoDigit
+      SVDCluster* cluster = m_storeShaper[i]->getRelated<SVDCluster>(m_storeClustersName);
+      cluster->addRelationTo(recoDigit, recoDigit->getCharge());
     }
-    i++;
-
   } //exit loop on ShaperDigits
-
-
-  B2DEBUG(25, "Number of strips: " << m_storeReco.getEntries());
-
-  // write relations: SVDCluster -> SVDRecoDigit
-  // if clusters are present
-  if (m_storeClusters.getEntries() == 0)
-    return;
-
-  //1. loop on clusters
-  //2. take related shaper digits
-  //3. build relation with reco digit with the same index, using reco charge as weight
-
-  RelationArray relClusterToReco(m_storeClusters, m_storeReco,
-                                 m_relClusterToRecoName);
-  if (relClusterToReco) relClusterToReco.clear();
-
-
-  for (const SVDCluster& cluster : m_storeClusters) {
-
-    int clusterIndex = cluster.getArrayIndex();
-
-    vector<pair<unsigned int, float> > digit_weights;
-    digit_weights.reserve(cluster.getSize());
-
-    RelationVector<SVDShaperDigit> theShaperDigits = DataStore::getRelationsWithObj<SVDShaperDigit>(&cluster);
-
-    for (int s = 0; s < (int)theShaperDigits.size(); s++)
-      digit_weights.push_back(make_pair(s, m_storeReco[s]->getCharge()));
-
-    relClusterToReco.add(clusterIndex, digit_weights.begin(), digit_weights.end());
-  }
-
 }
 
 

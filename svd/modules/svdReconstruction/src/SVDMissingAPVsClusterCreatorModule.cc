@@ -121,15 +121,13 @@ void SVDMissingAPVsClusterCreatorModule::event()
     //position of the first fake cluster:
     float fakeCluster_position = firstStrip_position + fakeCluster_width / 2;
     //store first fake cluster:
-    m_storeClusters.appendNew(SVDCluster(
-                                sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
-                              ));
+    m_storeClusters.appendNew(sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size,
+                              SNR, m_firstFrame);
     //  Store all other Fake Clusters into DataStore
     for (int i = 1; i < m_nFakeClusters; i++) {
       fakeCluster_position = fakeCluster_position + fakeCluster_width;
-      m_storeClusters.appendNew(SVDCluster(
-                                  sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
-                                ));
+      m_storeClusters.appendNew(sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size,
+                                SNR, m_firstFrame);
     }
   }
   B2DEBUG(29, "Number of clusters: " << m_storeClusters.getEntries());

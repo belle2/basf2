@@ -45,13 +45,13 @@ namespace Belle2 {
       SVDClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize() override;
+      void initialize() override;
 
       /** Initialize the module */
-      virtual void beginRun() override;
+      void beginRun() override;
 
       /** does the actual clustering */
-      virtual void event() override;
+      void event() override;
 
     protected:
 
@@ -64,16 +64,6 @@ namespace Belle2 {
       std::string m_storeTrueHitsName;
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the relation between SVDShaperDigits and MCParticles */
-      std::string m_relShaperDigitMCParticleName;
-      /** Name of the relation between SVDClusters and MCParticles */
-      std::string m_relClusterMCParticleName;
-      /** Name of the relation between SVDClusters and SVDShaperDigits */
-      std::string m_relClusterShaperDigitName;
-      /** Name of the relation between SVDShaperDigits and SVDTrueHits */
-      std::string m_relShaperDigitTrueHitName;
-      /** Name of the relation between SVDClusters and SVDTrueHits */
-      std::string m_relClusterTrueHitName;
 
       /** Collection of SVDClusters */
       StoreArray<SVDCluster> m_storeClusters;

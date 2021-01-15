@@ -102,8 +102,8 @@ python. Either interactively from your terminal:
 
   python3
 
->>> import numpy
->>> print(numpy.pi)
+>>> import math
+>>> print(math.pi)
 
 As a script from your terminal:
 
@@ -133,8 +133,8 @@ Let's create a python file from terminal and run it
   :class: exercise stacked
 
   Log in to KEKCC. Create a folder ``starterkit`` in your home folder and
-  create a python file ``my_file.py``. Import the python library `NumPy <https://numpy.org>`_ as the
-  shortcut ``np``, and print out the value of π.
+  create a python file ``my_file.py``. Import the basic math library `math <https://docs.python.org/3/library/math.html>`_
+  and print out the value of π.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
@@ -171,8 +171,8 @@ Let's create a python file from terminal and run it
 
   .. code-block:: python
 
-    import numpy as np
-    print(np.pi)
+    import math
+    print(math.pi)
 
 Congratulations! You've now created your first python file. Now, run it!
 
@@ -224,8 +224,13 @@ operating system called a kernel that runs the code.
   you have installed the right packages.
 
   * If you have the Belle II software explained and set up, there are no issues
-    at all (e.g. at DESY NAF)
-  * Else you might need to install some packages locally
+    at all. Please start your jupyter notebook after running ``b2setup`` as
+    shown in the SSH tutorial
+  * If you are using the DESY NAF Jupyter Hub, make sure that you select the
+    latest Belle II software release as kernel (i.e. ``release-xx-xx-xx``),
+    rather than ``python`` (the letter won't have ROOT properly set up).
+  * If you cannot set up the Belle II software, you might need to install some
+    packages locally
 
 Note that your script ``my_script.py`` from before is also shown.
 
@@ -587,7 +592,7 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
 .. code:: ipython3
 
-    df.query("(B0_mbc>5.2) & (B0_deltae>-1"))
+    df.query("(B0_mbc>5.2) & (B0_deltae>-1)")
 
 .. admonition:: Exercise
   :class: exercise stacked
@@ -842,7 +847,7 @@ You do not need to worry about this at this stage, but keep it in mind.
 
 .. warning::
 
-  The following will only work if you have the Belle II software `BASF2` set up.
+  The following will only work if you have the Belle II software ``BASF2`` set up.
   You will learn how to do so in the following chapters.
   You're invited to still try executing the following lines, but don't worry if
   you see an error message telling you that the style has not been found.
@@ -889,7 +894,7 @@ To import the file using chunking there are some slight differences in the code:
 .. code:: ipython3
 
    df_chunk = root_pandas.read_root(
-       [filePath/fileName], 'treeName', columns=Y4S_columns, chunksize=100
+       ['filePath/fileName'], columns=Y4S_columns, chunksize=100
    )
 
 Here I have defined which columns I wish to be included in the following string:
@@ -909,7 +914,7 @@ Here I have defined which columns I wish to be included in the following string:
   .. code:: ipython3
 
     files = ["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"]
-    df_chunk=root_pandas.read_root(files, 'Y4S', columns=Y4S_columns, chunksize=100000)
+    df_chunk=root_pandas.read_root(files, columns=Y4S_columns, chunksize=100000)
 
 Now the data is loaded as chunks, we "loop" over or run through all the chunks
 and piece them together. This is the point at which we can add our cuts to
@@ -917,6 +922,9 @@ reduce the loaded, chunked file more.
 
 .. code:: ipython3
   :linenos:
+
+  import pandas as pd
+
 
   cut = "(B0_mbc > 5.2)"  # Define our cut
 
@@ -975,6 +983,8 @@ However, your python journey has just begun and there's a lot to learn.
 
   We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
   Please help us extend it!
+
+.. include:: ../survey.rst
 
 .. topic:: Authors of this lesson
 

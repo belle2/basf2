@@ -224,5 +224,6 @@ if __name__ == '__main__':
         print('Usage: basf2 constraints_generator.py config_filename')
         exit()
 
+    #: File name
     filename = sys.argv[1]
     gen_constraints_from_config(filename)

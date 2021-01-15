@@ -13,7 +13,7 @@
 #####################################################################
 
 
-from basf2 import *
+import basf2 as b2
 import tracking
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
@@ -25,27 +25,27 @@ usePXD = False
 performFit = False
 
 # Logging and Debug Levels
-set_log_level(LogLevel.ERROR)
-log_to_file('logVXDTF1Evaluation.log', append=False)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.log_to_file('logVXDTF1Evaluation.log', append=False)
 
 
 # ---------------------------------------------------------------------------------------
-path = create_path()
+path = b2.create_path()
 
 # Input
-rootInput = register_module('RootInput')
+rootInput = b2.register_module('RootInput')
 path.add_module(rootInput)
 
 # Event Info Module
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 path.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['BeamPipe',
                               'MagneticFieldConstant4LimitedRSVD',
                               'PXD',
@@ -54,20 +54,20 @@ geometry.param('components', ['BeamPipe',
 path.add_module(geometry)
 
 # Event counter
-eventCounter = register_module('EventCounter')
+eventCounter = b2.register_module('EventCounter')
 path.add_module(eventCounter)
 
-genFitExtrapolation = register_module('SetupGenfitExtrapolation')
+genFitExtrapolation = b2.register_module('SetupGenfitExtrapolation')
 path.add_module(genFitExtrapolation)
 
 tracking.add_vxd_track_finding(path, "RecoTracks", components=["SVD"])
 
 if performFit:
-    fitter = register_module('DAFRecoFitter')
+    fitter = b2.register_module('DAFRecoFitter')
     path.add_module(fitter)
 
 # Matching
-mcTrackMatcherModule = register_module('MCRecoTracksMatcher')
+mcTrackMatcherModule = b2.register_module('MCRecoTracksMatcher')
 mcTrackMatcherModule.param({
     'UseCDCHits': False,
     'UseSVDHits': True,
@@ -85,5 +85,5 @@ trackingValidationModule = CombinedTrackingValidationModule(
     expert_level=2)
 path.add_module(trackingValidationModule)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

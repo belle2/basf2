@@ -17,10 +17,10 @@ import fei
 os.environ['PGUSER'] = 'g0db'
 # Get FEI default channels for Belle conversion
 # Utilise the arguments to toggle on and off certain channels
-particles = fei.get_default_channels(convertedFromBelle=True)
+particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', b2bii=True, training=True)
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

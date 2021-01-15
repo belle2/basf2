@@ -286,11 +286,15 @@ KEK network is rather complex so a very simplified layout is shown in
 
 
 So unless you are using VPN or are at KEK you most likely need to connect to the
-gateway servers first, either ``ssh1cc.kek.jp`` or ``ssh2cc.kek.jp``
+gateway servers first, either ``sshcc1.kek.jp`` or ``sshcc2.kek.jp``
 
 .. code-block:: none
 
-    ssh username@ssh1cc.kek.jp
+    ssh username@sshcc1.kek.jp
+
+.. warning::
+
+    Your username on KEKCC is not necessarily the same as your DESY username.
 
 and once this connection is established you can login to KEKCC from this gateway
 server.
@@ -301,8 +305,10 @@ server.
 
 .. warning::
 
-    This second step needs to be done in the terminal connected to the gateway
-    server
+    * This second step needs to be done in the terminal connected to the gateway
+      server
+    * The initial password for ``login.cc.kek.jp`` is not the same as that of
+      ``sshcc1.kek.jp``.
 
 Now you should be connected to KEKCC but you needed to enter two commands. And
 trying to copy files from KEKCC to your home machine becomes very complicated as
@@ -316,6 +322,24 @@ the optimal solution.
     * ``scp`` can be used to copy files from and to remote computers
     * you can jump between hosts by executing ssh in a ssh connection
     * ssh uses host keys to ensure the identity of the server you connect to
+
+Debugging
+---------
+
+If you run into trouble in one of the following sections it can be very
+instructive to switch on debugging output by using the ``-v`` option of ssh:
+
+.. code-block:: bash
+
+    ssh -v username@servername
+
+Once you have created a configuration file (next section) it can also sometimes
+be helpful to disable it to rule out this source of error. This can be done
+by using the ``-F`` option to specify a blank config file:
+
+.. code-block:: bash
+
+    ssh -F /dev/null username@servername
 
 SSH Configuration File
 ----------------------
@@ -365,6 +389,24 @@ configuration if we need to perform even more jumps. You should now be able to
 login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
+
+.. admonition:: In case of ``ProxyJump`` trouble
+    :class: toggle warning
+
+    The ``ProxyJump`` directive was introduced in OpenSSH 7.3. If you get an
+    error message ``Bad configuration option: proxyjump``, please check if
+    you can update your SSH client.
+
+    While we definitely recommend you to get an up-to-date system that can use
+    the newer version, a quick workaround is to replace the ``ProxyJump`` line
+    with the following (using ``ProxyCommand``):
+
+    .. code-block::
+
+        ProxyCommand ssh hostname -W %h:%p
+
+    Where ``hostname`` should be the server you jump through, so
+    ``sshcc1.kek.jp`` in our case.
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -500,7 +542,7 @@ with this key.
 
 .. code-block:: bash
 
-    ssh-copy-id -i ~/.ssh/id_rsa ssh1cc.kek.jp
+    ssh-copy-id -i ~/.ssh/id_rsa sshcc1.kek.jp
     ssh-copy-id -i ~/.ssh/id_rsa kekcc
 
 .. note::
@@ -703,7 +745,6 @@ should see a notebook interface open up.
       connections to ``localport`` on the local machine to whatever is called
       ``remotehost`` at port ``remoteport`` on ``server``
     * this allows to open jupyter notebooks on kekcc or other computing centers
-
 
 Additional Tips and Tricks (Optional)
 -------------------------------------
@@ -939,6 +980,8 @@ also find keyboard shortcuts for most of them.
       :linenos:
 
    Then ``ssh ccw01`` will also work from outside KEKCC.
+
+.. include:: ../survey.rst
 
 .. topic:: Author(s) of this lesson
 

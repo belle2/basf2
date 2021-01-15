@@ -98,8 +98,8 @@ In principle, one can already try to use some of the Rest of Event variables.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use the search feature in the basf2 documentation, or use the offline help by typing ``basf2 variables.py``
-     in your bash terminal (for example ``basf2 variables.py | grep -i roe``).
+     Use the search feature in the basf2 documentation, or use the offline help by typing ``b2help-variables``
+     in your bash terminal (for example ``b2help-variables | grep -i roe``).
 
 .. admonition:: Solution
      :class: toggle solution
@@ -149,7 +149,7 @@ For our example, let's start by defining the following selection cut strings:
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
      :emphasize-lines: 49-50
-     :lineno-start: 3-4
+     :lineno-start: 47
 
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,
@@ -164,7 +164,7 @@ because of different methods of measurement used to detect these particles.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Create a ROE mask using the `charged_cuts` and `photon_cuts` strings with the
+     Create a ROE mask using the ``charged_cuts`` and ``photon_cuts`` strings with the
      `appendROEMask` or `appendROEMasks` function.
 
 .. admonition:: Hint
@@ -419,6 +419,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
       continuum suppression or flavor tag.
     * Usage of ROE without a mask is **not** recommended.
 
+.. include:: ../survey.rst
 
 .. topic:: Authors of this lesson
 

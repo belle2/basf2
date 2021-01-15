@@ -1,8 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from tracking.path_utils import *
+import basf2 as b2
+
+# Many scripts import these functions from `tracking`, so leave these imports here
+from tracking.path_utils import (  # noqa
+    add_cdc_cr_track_finding,
+    add_cdc_track_finding,
+    add_cr_track_fit_and_track_creator,
+    add_eclcdc_track_finding,
+    add_geometry_modules,
+    add_hit_preparation_modules,
+    add_mc_matcher,
+    add_prune_tracks,
+    add_pxd_cr_track_finding,
+    add_pxd_track_finding,
+    add_svd_track_finding,
+    add_track_fit_and_track_creator,
+    add_vxd_track_finding_vxdtf2,
+    is_cdc_used,
+    is_ecl_used,
+    is_pxd_used,
+    is_svd_used,
+    use_local_sectormap,
+)
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
@@ -10,7 +31,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_cdcTrack_QI=False, add_vxdTrack_QI=False, add_recoTrack_QI=False):
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -48,13 +69,13 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         return
 
     if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
-        B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning all off.")
+        b2.B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning all off.")
         add_cdcTrack_QI = False
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
     if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
-        B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+        b2.B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
         add_cdcTrack_QI = False
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
@@ -110,7 +131,7 @@ def add_time_extraction(path, components=None):
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False):
+                                   merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -186,7 +207,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                      add_cdcTrack_QI=False, add_vxdTrack_QI=False):
+                      add_cdcTrack_QI=True, add_vxdTrack_QI=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -212,11 +233,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         return
 
     if use_ecl_to_cdc_ckf and not is_cdc_used(components):
-        B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
+        b2.B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
     if use_ecl_to_cdc_ckf and not is_ecl_used(components):
-        B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
+        b2.B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
     # register EventTrackingInfo
@@ -308,7 +329,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
 
     else:
         if not is_cdc_used(components):
-            B2FATAL("CDC must be in components")
+            b2.B2FATAL("CDC must be in components")
 
         reco_tracks_from_track_finding = reco_tracks
         if merge_tracks:
@@ -380,7 +401,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
 
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
+        material_effects = b2.register_module('SetupGenfitExtrapolation')
         material_effects.set_name(
             'SetupGenfitExtrapolationForPXDDataReduction')
         path.add_module(material_effects)
@@ -393,7 +414,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-    dafRecoFitter = register_module("DAFRecoFitter")
+    dafRecoFitter = b2.register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
@@ -430,13 +451,13 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = register_module('PXDSpacePointCreator')
+    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
     path.add_module(sp_creator_pxd)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 
-    track_finder = register_module('TrackFinderVXDCosmicsStandalone')
+    track_finder = b2.register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
     track_finder.param('SpacePoints', [pxd_spacepoints_name, svd_spacepoints_name])
     track_finder.param('QualityCut', quality_cut)
@@ -444,6 +465,6 @@ def add_vxd_standalone_cosmics_finder(
     track_finder.param('MaxRejectedSPs', max_rejected_sps)
     path.add_module(track_finder)
 
-    converter = register_module('SPTC2RTConverter')
+    converter = b2.register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     path.add_module(converter)

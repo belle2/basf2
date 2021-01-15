@@ -26,11 +26,16 @@
 
 namespace Belle2 {
 
+  /**
+   * Collector module used to create the histograms needed for the
+   * cross talk calibration
+   */
   class SVDCrossTalkCalibrationsCollectorModule : public CalibrationCollectorModule {
 
 
   public:
 
+    /** constructor */
     SVDCrossTalkCalibrationsCollectorModule();
 
     /** Init the module.*/
@@ -41,7 +46,6 @@ namespace Belle2 {
 
     /**Event processing */
     void collect() override final;
-
 
     /**End of run */
     void closeRun() override final;

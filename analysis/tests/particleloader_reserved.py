@@ -7,7 +7,7 @@ potential to conflict with the standard lists and any standard tools.
 '''
 
 import b2test_utils
-from basf2 import set_random_seed, create_path, process
+from basf2 import create_path, set_random_seed
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()

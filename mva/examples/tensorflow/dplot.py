@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
 import numpy as np
 import tensorflow as tf
 import basf2_mva
-import pandas
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -73,7 +71,7 @@ class Prior(object):
         """
         signal_weight = self.get_signal_cdf(X) / self.get_bckgrd_pdf(X)
         signal_weight = np.where(np.isfinite(signal_weight), signal_weight, 0)
-        # NOT self.get_bckgrd_cdf() here, signal and background are handlet asymmetrical!
+        # NOT self.get_bckgrd_cdf() here, signal and background are handled asymmetrical!
         bckgrd_weight = (1.0 - self.get_signal_cdf(X)) / self.get_bckgrd_pdf(X)
         bckgrd_weight = np.where(np.isfinite(bckgrd_weight), bckgrd_weight, 0)
         return np.r_[signal_weight, bckgrd_weight]

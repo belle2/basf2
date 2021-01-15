@@ -108,7 +108,7 @@ namespace Belle2 {
       typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
-      /** Typedef for the cut, that we use Particles as outr base objects. */
+      /** Typedef for the cut, that we use Particles as our base objects. */
       typedef Particle Object;
 
       /** Base class for information common to all types of variables. */
@@ -119,6 +119,12 @@ namespace Belle2 {
         /** ctor */
         VarBase(const std::string& n, const std::string& d, const std::string& g)
           : name(n), description(d), group(g) { }
+
+        /** function to extend the description of the variable */
+        void extendDescriptionString(const std::string& d)
+        {
+          description.append(d);
+        }
       };
 
       /** A variable returning a floating-point value for a given Particle. */
@@ -197,6 +203,15 @@ namespace Belle2 {
       void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description);
+      /** Make a variable deprecated. */
+      void deprecateVariable(const std::string& name, bool make_fatal, const std::string& version, const std::string& description);
+
+      /**
+       * Check if a variable is deprecated.
+       * If it is marked as deprecated a warning is issued or a B2FATAL aborts the event loop.
+       * Which action is taken depends on the depreciation setting.
+       */
+      void checkDeprecatedVariable(const std::string& name);
 
       /** evaluate variable 'varName' on given Particle.
        *
@@ -240,6 +255,8 @@ namespace Belle2 {
       std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
       /** List of registered meta variables. */
       std::map<std::string, std::shared_ptr<MetaVar>> m_meta_variables;
+      /** List of deprecated variables. */
+      std::map<std::string, std::pair<bool, std::string>> m_deprecated;
     };
 
     /** Internal class that registers a variable with Manager when constructed. */
@@ -269,6 +286,16 @@ namespace Belle2 {
       explicit GroupProxy(const std::string& groupName)
       {
         Manager::Instance().setVariableGroup(groupName);
+      }
+    };
+
+    /** Internal class that registers a variable as deprecated. */
+    class DeprecateProxy {
+    public:
+      /** constructor. */
+      DeprecateProxy(const std::string& name, bool make_fatal, const std::string& version, const std::string& description)
+      {
+        Manager::Instance().deprecateVariable(name, make_fatal, version, description);
       }
     };
 
@@ -309,4 +336,10 @@ namespace Belle2 {
   static GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
   }
+  /** \def MAKE_DEPRECATED(name, make_fatal, version, description)
+   *
+   * Registers a variable as deprecated
+   */
+#define MAKE_DEPRECATED(name, make_fatal, version, description) \
+  static DeprecateProxy VARMANAGER_MAKE_UNIQUE(_deprecateproxy)(std::string(name),  bool(make_fatal), std::string(version), std::string(description));
 }

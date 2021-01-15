@@ -154,7 +154,7 @@ background *events* or background *processes*.
 These are relatively easy to reject and can be done in the **trigger** or by
 rather simple cuts.
 More on this :ref:`later on in this lesson
-<onlinebook_fundamentals_trigger_filter>`.
+<onlinebook_fundamentals_triggers_filters>`.
 You don't need to worry too much about these if you are doing B physics.
 But these background processes can be important for low-multiplicity analyses.
 
@@ -423,6 +423,47 @@ KLM
 
     * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
 
+Data taking: numbering
+----------------------
+
+At Belle II (and Belle), data are identified by three counters: **experiment**, 
+**run**, and **event**.
+The coarsest counter is experiment, which denotes:
+
+        *A period of data taking typically lasting for several weeks, during 
+        which it is expected that there will be no major changes in Belle II 
+        or SuperKEKB operating conditions.*
+
+A run is a much shorter period of data-taking, lasting anywhere from minutes to
+several hours.
+Events are numbered sequentially within a run.
+A given data event is therefore uniquely identified by the experiment/run/event numbers.
+
+.. note:: 
+
+        In simulation (which will be discussed later), the experiment/run/event
+        counters are *set* by the generation.
+
+        For official MC samples these reset for every *production*, therefore 
+        this counter is additionally required to uniquely identify a simulated
+        event.
+
+        I.e. experiment/run/event/production
+
+.. seealso:: 
+
+        `Where can I rely on uniqueness of the ['__experiment__', '__run__',
+        '__event__', '__candidate__'] combination?
+        <https://questions.belle2.org/question/9704>`__
+
+.. note:: 
+
+        The numbering of "experiment" is rather unique to Belle and Belle II. 
+        LHC experiments, for example, simply count run and event number.
+
+        This use of "experiment number" is due to our ability to switch the
+        accelerator to different operating energies and change conditions.
+
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
 
@@ -463,7 +504,7 @@ Scan
    slightly different energies (usually 10-50 MeV apart). The goals of a scan is to measure
    the line shape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resonance peak (short scans), or to perform real physics measurements
-   such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)` energy).
+   such as the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)` energy).
 
 Non-4S
    SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at
@@ -581,7 +622,7 @@ Simulation: the Monte Carlo
 ---------------------------
 
 We need to be able to compare data from our detector to the expectation we have.
-In verty rare cases this might not be necessary, for example the discovery of the
+In very rare cases this might not be necessary, for example the discovery of the
 J/ψ was so clear a signal that we didn't need any comparison to understand
 that it was something new. But most of the time we need to make sure what we see
 is not some artefact of our very very complex experiment.
@@ -1141,26 +1182,26 @@ starting from those signals and combined particles that are reconstructed as sum
 
     Let's start from the **charged particles**.
 
-    * All the strongly- or electromagnetically decaying resonances, both charged and neutral
+    * All the strongly or electromagnetically decaying resonances, both charged and neutral
       (:math:`\rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not
       live long enough to significantly move away from the :math:`e^+e^-` interaction point, so they can
-      only be reconstructed detecting their decay products.
+      only be reconstructed by detecting their decay products.
     * Proton, electrons and their anti-particles are stable and definitively leave ionization signals
       in the tracking system, so they should be in the list.
-    * Other particles that could leave ionization are the long-lived, weakly decaying particles.
+    * Other particles that could leave ionization signals are the long-lived, weakly decaying particles.
       Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a
       very long flight length, usually exceeding the scale of the detector. Pions and kaons decay much
-      faster than a muon, buts still have a :math:`c\tau` of approximately 8 and 4 meters respectively,
-      which make then likely to leave a detectable track before decaying. The are both on the list.
+      faster than a muon, but still have a :math:`c\tau` of approximately 8 and 4 meters respectively,
+      which makes them likely to leave a detectable track before decaying. They are both on the list.
       :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any
       detectable track.
     * Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-living one
       is the :math:`\Xi^+` with a lifetime of 1.7 ns corresponding to :math:`c\tau \approx 5` cm. Such a particle,
       especially if it has some few GeV of momentum, can cross the PXD and even the inner layers of the SVD,
-      leaving a signal. However, such short track would be very difficult to reconstruct, and it's
-      much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
-    * Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as
-      deuteron, tritium of helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
+      leaving a signal. However, such a short track would be very difficult to reconstruct, and it's
+      much more convenient to reconstruct these hyperons by looking at their (almost) stable decay products.
+    * Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei such as the
+      deuteron, tritium or helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
       easily, by spallation processes on the inner detector materials.
 
 
@@ -1173,12 +1214,12 @@ starting from those signals and combined particles that are reconstructed as sum
       There are studies focused on reconstructing this particle in the ECL, but let's leave it out
       of the list for the moment.
     * The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitely to be considered stable
-      in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
+      in the scale of the experiment. Like the neutron, it leaves no ionization, but the KLM is designed
       to detect its interaction in the iron layers of the solenoid's return yoke. Let's count it as a
       reconstructed particle.
     * :math:`\Lambda` and :math:`K_s` behave similarly to the :math:`K_L`, but their lifetime is much shorter
       and, at the Belle II energies, they mostly decay inside the tracking volume. The most convenient way
-      to reconstruct and combine their decay products, pions and proton.
+      to reconstruct them is to reconstruct and combine their decay products, pions and proton.
 
 
 Let's see now how reconstructed and combined particles are handled, and what are the special cases.
@@ -1214,6 +1255,7 @@ V0
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
    material than expected and the multiple scattering corrections must be updated.
 
+.. include:: ../survey.rst
 
 .. topic:: Author(s) of this lesson
 

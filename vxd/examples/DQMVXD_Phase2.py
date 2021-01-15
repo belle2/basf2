@@ -10,11 +10,10 @@
 # Contributors: Peter Kodys                                              *
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
 # background (collision) files
 # bg = glob.glob('./BG/*.root')
@@ -29,7 +28,7 @@ num_events = 100
 output_filename = "RootOutput_Phase2.root"
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
 # main.add_module('EventInfoSetter', evtNumList=num_events)
@@ -57,9 +56,9 @@ add_reconstruction(main)
 main.add_module('HistoManager', histoFileName='Histos_DQMTracks_Phase2.root')
 # main.add_module('HistoManager', histoFileName='Histos_DQMTracks_BelleII.root')
 
-pxddqmExpReco = register_module('PXDDQMExpressReco')
-svddqmExpReco = register_module('SVDDQMExpressReco')
-vxddqmExpReco = register_module('VXDDQMExpressReco')
+pxddqmExpReco = b2.register_module('PXDDQMExpressReco')
+svddqmExpReco = b2.register_module('SVDDQMExpressReco')
+vxddqmExpReco = b2.register_module('VXDDQMExpressReco')
 
 main.add_module(pxddqmExpReco)
 main.add_module(svddqmExpReco)
@@ -75,5 +74,5 @@ trackDQM = main.add_module('TrackDQM')
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

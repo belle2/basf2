@@ -8,7 +8,7 @@
 #   Only experts should use it!
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 
 
 # The SectorMapBootstrap module will take care for the alterations.
@@ -17,7 +17,7 @@ from basf2 import *
 # file. The sectormap in the root file then can be compared to the original sectormap (also
 # in a root file). If you want to read a sectormap from a root file please change
 # the parameters accordingly.
-SMBSM1 = register_module("SectorMapBootstrap")
+SMBSM1 = b2.register_module("SectorMapBootstrap")
 SMBSM1.param("ReadSecMapFromDB", True)
 SMBSM1.param("ReadSectorMap", False)
 SMBSM1.param("SectorMapsInputFile", "SVDSectorMap_v000.root")
@@ -54,17 +54,17 @@ SMBSM1.param("threeHitFilterAdjustFunctions", [(0, "0"), (1, "x+3"), (15, "[0]")
 # this will, in addition to other debbugging output, print the original filter ("BEFORE")
 # and the altered filter ("AFTER") to the screen.
 # NOTE: there are order of 10th of thousends of filters both for 2-hits and 3-hits. So expect lots of output.
-SMBSM1.logging.log_level = LogLevel.DEBUG
+SMBSM1.logging.log_level = b2.LogLevel.DEBUG
 
 
 # needed else no sectormap from DB can be loaded
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 
 # create path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(SMBSM1)
-print_path(main)
+b2.print_path(main)
 # run path
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

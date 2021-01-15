@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from basf2 import conditions as b2conditions
 
 ##################################################################################
 #
@@ -17,9 +15,11 @@ from basf2 import conditions as b2conditions
 ##################################################################################
 
 
-class printElectronicNoise(basf2.Module):
+class printElectronicNoise(b2.Module):
+    """ print electronic noise """
 
     def beginRun(self):
+        """do everything here"""
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -37,10 +37,11 @@ class printElectronicNoise(basf2.Module):
                     print('   V-side noise = '+str(sensorInfo.getElectronicNoiseV())+' e-')
 
 
-class printAduEquivalent(basf2.Module):
+class printAduEquivalent(b2.Module):
+    """ print ADU equivalent"""
 
     def beginRun(self):
-
+        """do everything here"""
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         print('printing AduEquivalent for all ladder = 1 sensors')
@@ -61,9 +62,9 @@ class printAduEquivalent(basf2.Module):
 # gt = ""
 # b2conditions.prepend_globaltag(gt)
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1003])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [1])
@@ -75,9 +76,9 @@ main.add_module('Geometry')
 main.add_module(printElectronicNoise())
 main.add_module(printAduEquivalent())
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

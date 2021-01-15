@@ -20,7 +20,6 @@ import sys
 import pickle
 import inspect
 import unittest.mock as mock
-import basf2
 sys.modules['original_basf2'] = sys.modules['basf2']  # noqa
 import original_basf2
 

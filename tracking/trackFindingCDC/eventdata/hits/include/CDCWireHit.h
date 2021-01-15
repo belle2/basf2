@@ -87,7 +87,9 @@ namespace Belle2 {
        *  Also stores the index of the StoreArray
        *  from which the hit has been taken. Necessary for later translation to genfit.
        *
-       *  @param  ptrHit          Reference to the CDCHit.
+       *  @param  ptrHit                  Reference to the CDCHit.
+       *  @param  ptrTDCCountTranslator   instance of the used TDC count translator (optional)
+       *  @param  ptrADCCountTranslator   instance of the used ADC count translator (optional)
        */
       explicit CDCWireHit(const CDCHit* ptrHit,
                           CDC::TDCCountTranslatorBase* ptrTDCCountTranslator = nullptr,

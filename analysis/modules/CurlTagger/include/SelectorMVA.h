@@ -41,7 +41,7 @@ namespace Belle2 {
       /** returns vector of variables used by this selector. */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) override;
 
-      /** initialize whatever needs to be initalized (root file etc)  */
+      /** initialize whatever needs to be initialized (root file etc)  */
       virtual void initialize() override;
 
       /** collect training data and save to a root file*/

@@ -69,9 +69,9 @@ namespace Belle2 {
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
      *
      * @param recoTrack: The reco track the fit results are stored for
-     * @param useClosestHitInIP: Flag to turn on special handling which measurement to choose;
+     * @param useClosestHitToIP: Flag to turn on special handling which measurement to choose;
      *        especially useful for Cosmics
-     * @param useBFiledAtHit: Flag to calculate the BField at the used hit (closest to IP or first one), instead of the
+     * @param useBFieldAtHit: Flag to calculate the BField at the used hit (closest to IP or first one), instead of the
      *        one at the POCA. This is also useful for cosmics only.
      * @return
      */

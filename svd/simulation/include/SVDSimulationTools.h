@@ -197,8 +197,9 @@ namespace Belle2 {
        */
       double encodeTau(double tau) const
       { return m_minAmplitude + m_ATRatio * (tau - m_minTau); }
+
       /** Scale back a previously scaled tau value.
-       * @param  scaledtau a previously scaled tau value
+       * @param  scaledTau a previously scaled tau value
        * @return restored tau value
        */
       double decodeTau(double scaledTau) const

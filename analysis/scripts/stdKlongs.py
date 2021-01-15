@@ -11,7 +11,7 @@
 ########################################################
 
 from basf2 import B2FATAL, B2WARNING
-from modularAnalysis import fillParticleList, cutAndCopyList
+from modularAnalysis import fillParticleList
 
 
 def stdKlongs(listtype='allklm', path=None):

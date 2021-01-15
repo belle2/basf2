@@ -38,12 +38,12 @@ def module_io(target, source, env):
         try:
             subprocess.run(['basf2', '--module-io', module],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=dir, timeout=60)
-        except:
+        except Exception:
             continue
         try:
             subprocess.run(['dot', module + '.dot', '-Tpng', '-o', module + '.png'],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=dir, timeout=60)
-        except:
+        except Exception:
             pass
 
     return None

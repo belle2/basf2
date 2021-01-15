@@ -17,15 +17,34 @@ from caf.utils import IoV
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_bhabha" since we want to
-#     run over cdst hlt_bhabha skim files.
-settings = CalibrationSettings(name="ECL crystal and crate time calibrations and validations",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha"],
-                               depends_on=[],
-                               expert_config={"numCrysCrateIterations": 1})
+#     Default is to read in "bhabha_all_calib" since we want to
+#     run over cdst bhabha_all_calib skim files.  Also load in
+#     the hadron skim for validations.
+settings = CalibrationSettings(
+    name="ECL crystal and crate time calibrations and validations",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib", "hadron_calib"],
+    input_data_filters={
+            "bhabha_all_calib": [
+                "bhabha_all_calib",
+                "4S",
+                "Continuum",
+                "Scan",
+                "Good",
+                "physics",
+                "On"],
+            "hadron_calib": [
+                "hadron_calib",
+                "4S",
+                "Continuum",
+                "Scan",
+                "Good",
+                "physics",
+                "On"]},
+    depends_on=[],
+    expert_config={"numCrysCrateIterations": 1})
 
 
 ##############################
@@ -64,10 +83,11 @@ def get_calibrations(input_data, **kwargs):
     import numpy as np
 
     # In this script we want to use one sources of input data.
-    # Get the input files  from the input_data variable
-    # The input data should be the hlt bhabha skim
-    file_to_iov_bhabha = input_data["hlt_bhabha"]
-    file_to_iov_hadron = input_data["hlt_hadron"]
+    # Get the input files from the input_data variable
+    # The input data should be the bhabha skim for the calibrations
+    # and the hadron skim for the validations.
+    file_to_iov_bhabha = input_data["bhabha_all_calib"]
+    file_to_iov_hadron = input_data["hadron_calib"]
 
     # Could remove this limit on the number of files per run but will just
     # set to a large number in case we want to introduce it later.

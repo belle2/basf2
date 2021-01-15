@@ -55,8 +55,6 @@ If the track reached the KLM, it is classified according to how and where the ex
 Likelihood extraction
 ~~~~~~~~~~~~~~~~~~~~~
  
- .. _LongitudinalPdfs:
-
  .. figure:: pdf_figures/Muid-MuonPlus-Barrel14-exit-styled.pdf
     :width: 30 %
 
@@ -65,6 +63,8 @@ Likelihood extraction
 
  .. figure:: pdf_figures/Muid-MuonPlus-B4+E3-exit-styled.pdf
     :width: 30 %
+
+    .. _LongitudinalPdfs:
 
     Sample longitudinal-profile PDFs for energetic positevely-charged muons (top) and pions (bottom), for the barrel (left), forward endcap (middle) and a selected barrel-endcap-overlap (right). Barrel (endcap) layers are numbered 0-14 (15-28).
 

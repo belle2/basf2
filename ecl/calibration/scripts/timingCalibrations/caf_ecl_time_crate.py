@@ -14,14 +14,24 @@ from reconstruction import prepare_cdst_analysis
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_bhabha" since we want to
-#     run over cdst hlt_bhabha skim files.
-settings = CalibrationSettings(name="ECL crate time calibrations",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha"],
-                               depends_on=[])
+#     Default is to read in "bhabha_all_calib" since we want to
+#     run over cdst bhabha_all_calib skim files.
+settings = CalibrationSettings(
+    name="ECL crate time calibrations",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            "bhabha_all_calib",
+            "4S",
+            "Continuum",
+            "Scan",
+            "Good",
+            "physics",
+            "On"]},
+    depends_on=[])
 
 ##############################
 
@@ -58,8 +68,8 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    # The input data should be the hlt bhabha skim
-    file_to_iov_physics = input_data["hlt_bhabha"]
+    # The input data should be the bhabha skim
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

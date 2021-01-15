@@ -17,13 +17,14 @@ import array as arr
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_bhabha" since we want to
-#     run over cdst hlt_bhabha skim files.
+#     Default is to read in "caf_ecl_time_" since we want to
+#     run over cdst caf_ecl_time_ skim files.
 settings = CalibrationSettings(name="ECL crystal time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst", "mdst"],
-                               input_data_names=["hlt_bhabha"],
+                               input_data_names=["bhabha_all_calib"],
+                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib"]},
                                depends_on=[])
 
 
@@ -62,8 +63,8 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    # The input data should be the hlt bhabha skim
-    file_to_iov_physics = input_data["hlt_bhabha"]
+    # The input data should be the bhabha skim
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     # Could remove this limit on the number of files per run but will just
     # set to a large number in case we want to introduce it later.

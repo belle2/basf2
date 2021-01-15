@@ -16,14 +16,24 @@ from caf.utils import IoV
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_hadron" since we want to
-#     run over cdst hlt_hadron skim files.
-settings = CalibrationSettings(name="ECL time validations - hadronic",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_hadron"],
-                               depends_on=[])
+#     Default is to read in "hadron_calib" since we want to
+#     run over cdst hadron_calib skim files.
+settings = CalibrationSettings(
+    name="ECL time validations - hadronic",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["hadron_calib"],
+    input_data_filters={
+        "hadron_calib": [
+            "hadron_calib",
+            "4S",
+            "Continuum",
+            "Scan",
+            "Good",
+            "physics",
+            "On"]},
+    depends_on=[])
 
 ##############################
 
@@ -60,8 +70,8 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    # The input data should be the hlt hadron skim
-    file_to_iov_physics = input_data["hlt_hadron"]
+    # The input data should be the hadron skim
+    file_to_iov_physics = input_data["hadron_calib"]
 
     max_events_per_run = 3000
 

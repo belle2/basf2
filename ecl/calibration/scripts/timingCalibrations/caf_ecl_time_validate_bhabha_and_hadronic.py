@@ -16,14 +16,32 @@ from caf.utils import IoV
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_bhabha" since we want to
-#     run over cdst hlt_bhabha skim files.
-settings = CalibrationSettings(name="ECL time validations - bhabha and hadronic selections",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha", "hlt_hadron"],
-                               depends_on=[])
+#     Run over cdst bhabha_all_calib skim files and
+#     the hadron skim for validations.
+settings = CalibrationSettings(
+    name="ECL time validations - bhabha and hadronic selections",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib", "hadron_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+           "bhabha_all_calib",
+           "4S",
+           "Continuum",
+           "Scan",
+           "Good",
+           "physics",
+           "On"],
+        "hadron_calib": [
+           "hadron_calib",
+           "4S",
+           "Continuum",
+           "Scan",
+           "Good",
+           "physics",
+           "On"]},
+    depends_on=[])
 
 ##############################
 
@@ -60,9 +78,9 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    # The input data should be the hlt bhabha skim
-    file_to_iov_bhabha = input_data["hlt_bhabha"]
-    file_to_iov_hadron = input_data["hlt_hadron"]
+    # The input data should be the bhabha and hadron skims
+    file_to_iov_bhabha = input_data["bhabha_all_calib"]
+    file_to_iov_hadron = input_data["hadron_calib"]
 
     max_events_per_run = 3000
 

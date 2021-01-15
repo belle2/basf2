@@ -316,7 +316,7 @@ namespace Belle2 {
     int m_MinimalDigitNumber = 100000000;
 
     /** Lower limit of hits collected for on single channel. */
-    int m_lower_limit_counts;
+    int m_lower_limit_counts = 50;
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
@@ -331,22 +331,22 @@ namespace Belle2 {
     ROOT::Math::MinimizerOptions m_minimizerOptions;
 
     /** DBObject of time cost on some parts of the detector. */
-    KLMTimeConstants* m_timeConstants;
+    KLMTimeConstants* m_timeConstants = nullptr;
 
     /**
      * DBObject of the calibration constant of
      * each channel due to cable decay.
      */
-    KLMTimeCableDelay* m_timeCableDelay;
+    KLMTimeCableDelay* m_timeCableDelay = nullptr;
 
     /** Debug mode. */
-    bool m_debug;
+    bool m_debug = false;
 
     /** MC or data. */
     bool m_mc = false;
 
     /** Whether to use event T0 from CDC. */
-    bool m_useEventT0;
+    bool m_useEventT0 = true;
 
     /** Calibration statistics for each channel. */
     TH1I* h_calibrated = nullptr;

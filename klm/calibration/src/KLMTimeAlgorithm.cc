@@ -92,13 +92,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 }
 
 KLMTimeAlgorithm::KLMTimeAlgorithm() :
-  CalibrationAlgorithm("KLMTimeCollector"),
-  ev(),
-  m_lower_limit_counts{50},
-  m_timeConstants{nullptr},
-  m_timeCableDelay{nullptr},
-  m_debug{false},
-  m_useEventT0{true}
+  CalibrationAlgorithm("KLMTimeCollector")
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_minimizerOptions = ROOT::Math::MinimizerOptions();

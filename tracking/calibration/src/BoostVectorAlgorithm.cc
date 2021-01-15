@@ -92,7 +92,7 @@ CalibrationAlgorithm::EResult BoostVectorAlgorithm::calibrate()
   }
 
   // Store Payloads to files
-  storePayloads(evts, calVec, "BoostVector", getBoostVectorObj);
+  storePayloads(evts, calVec, "CollisionBoostVector", getBoostVectorObj);
 
   return c_OK;
 }

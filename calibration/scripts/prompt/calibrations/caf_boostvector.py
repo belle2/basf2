@@ -87,7 +87,7 @@ def get_calibrations(input_data, **kwargs):
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
-    vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=False, path=rec_path_1)
+    vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
     collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
     algorithm_bv = BoostVectorAlgorithm()

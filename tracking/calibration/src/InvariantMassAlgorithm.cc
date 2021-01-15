@@ -97,7 +97,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   }
 
   // Store Payloads to files
-  storePayloads(evts, calVec, "InvariantMass", getInvariantMassObj);
+  storePayloads(evts, calVec, "CollisionInvariantMass", getInvariantMassObj);
 
   return c_OK;
 }

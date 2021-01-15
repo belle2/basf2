@@ -17,8 +17,18 @@ supply them as arguments:
 
 To run on the full release directory run it without any arguments:
     $0
+
+Use the option --all to show all doxygen warnings and not only those about
+undocumented items.
 EOT
     exit 1;
+fi
+
+# check for all option
+GREP_STR=" not documented"
+if [ "$1" = "--all" ]; then
+  GREP_STR=""
+  shift
 fi
 
 # collect arguments or use belle2 release directory
@@ -29,5 +39,5 @@ TMPFILE=`mktemp`
 trap "rm -f $TMPFILE" EXIT
 
 # call doxygen on the files from the command line arguments
-sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | doxygen - 2>&1 >/dev/null | tee $TMPFILE
-grep " is not documented" $TMPFILE > /dev/null && exit 1 || exit 0
+sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee $TMPFILE
+grep " not documented" $TMPFILE > /dev/null && exit 1 || exit 0

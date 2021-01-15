@@ -425,7 +425,6 @@ namespace Belle2 {
     {
       unsigned n2HitResults = 0;
       unsigned n3HitResults = 0;
-      unsigned n4HitResults = 0;
       unsigned nTracksProcessed = m_tcs.size();
 
       for (const auto& tc : m_tcs) {
@@ -436,8 +435,7 @@ namespace Belle2 {
       }
 
       m_tcs.clear();
-      B2DEBUG(25, "SecMapTrainer::processTracks: nStoredValues for 2-/3-/4-hit: " << n2HitResults << "/" << n3HitResults << "/" <<
-              n4HitResults);
+      B2DEBUG(25, "SecMapTrainer::processTracks: nStoredValues for 2-/3-hit: " << n2HitResults << "/" << n3HitResults);
 
       return nTracksProcessed;
     }

@@ -11,6 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <analysis/dataobjects/TauPairDecay.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
@@ -38,6 +41,10 @@ namespace Belle2 {
 
   private:
 
+    /** pointer to tau pair decay objects */
+    StoreObjPtr<TauPairDecay> m_tauDecay;
+    /** StoreArray of MCParticles */
+    StoreArray<MCParticle> m_MCParticles;
     /** True if the generated event is a tau pair event. */
     bool tauPair;
     /** Number of positive tau leptons in the event */

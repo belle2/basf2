@@ -17,6 +17,7 @@
 // FRAMEWORK
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MDST
@@ -2061,13 +2062,13 @@ void ECLDataAnalysisModule::event()
     for (unsigned int i = 0; i < showerMCRelations.size(); ++i) {
       no_rel++;
       const auto mcParticle = showerMCRelations.object(i);
-      if (mcParticle->getSecondaryPhysicsProcess() == 0 && mcParticle->getPDG() == 130) {
+      if (mcParticle->getSecondaryPhysicsProcess() == 0 && mcParticle->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getDecayVertex().X();
         double vtxy = mcParticle->getDecayVertex().Y();
         double vtxz = mcParticle->getDecayVertex().Z();
         if ((TMath::Sqrt(vtxx * vtxx + vtxy * vtxy) > 118) || (vtxz > 196.16) || (vtxz < -102.16))
           no_Primary = 0;
-      } else if (mcParticle->getSecondaryPhysicsProcess() != 0 && mcParticle->getMother()->getPDG() == 130) {
+      } else if (mcParticle->getSecondaryPhysicsProcess() != 0 && mcParticle->getMother()->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getProductionVertex().X();
         double vtxy = mcParticle->getProductionVertex().Y();
         double vtxz = mcParticle->getProductionVertex().Z();
@@ -2113,7 +2114,7 @@ void ECLDataAnalysisModule::event()
             no_fMatch = 1;
           no_fFMatch = 1;
         }
-      } else if (mcParticle->getSecondaryPhysicsProcess() != 0 && mcParticle->getMother()->getPDG() == 130) {
+      } else if (mcParticle->getSecondaryPhysicsProcess() != 0 && mcParticle->getMother()->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getProductionVertex().X();
         double vtxy = mcParticle->getProductionVertex().Y();
         double vtxz = mcParticle->getProductionVertex().Z();

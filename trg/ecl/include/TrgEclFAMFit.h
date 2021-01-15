@@ -45,7 +45,7 @@ namespace Belle2 {
     /** Set flag for saving analysis table*/
     void SetAnaTagFlag(int anatagflag) {_AnaTag = anatagflag;}
     /** Set Threshold */
-    void SetThreshold(std::vector<int> threshold)
+    void SetThreshold(const std::vector<int>& threshold)
     {
       Threshold = threshold;
     };

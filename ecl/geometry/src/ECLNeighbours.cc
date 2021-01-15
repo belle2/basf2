@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Returns the list of neighbours for a given cell ID.                 *
+ * Returns the list of neighbours for a given cell ID.                    *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
@@ -12,7 +12,7 @@
 
 // ECL GEOMETRY
 #include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h> // for geometry
+#include <ecl/geometry/ECLGeometryPar.h>
 
 // FRAMEWORK
 #include <framework/logging/Logger.h>
@@ -39,20 +39,25 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   if (neighbourDef == "N") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
-    if ((parToInt >= 0) and (parToInt < 6)) initializeN(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
+    if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NC") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
-    if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 1);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
-  } else if (neighbourDef == "N2C") {
-    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus 2 corners): " << parToInt * 2 + 1 <<
-            " x " <<
+    if ((parToInt >= 0) and (parToInt < 11)) initializeNC(parToInt);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+  } else if (neighbourDef == "NLegacy") {
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
+            + 1);
+    if ((parToInt >= 0) and (parToInt < 11)) initializeNLegacy(parToInt);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+  } else if (neighbourDef == "NCLegacy") {
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
+            <<
             parToInt * 2 + 1);
-    if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 2);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
+    if ((parToInt >= 0) and (parToInt < 11)) initializeNCLegacy(parToInt, 1);
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {
@@ -71,7 +76,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   // or wrong type:
   else {
     B2FATAL("ECLNeighbours::ECLNeighbours (constructor via std::string): Invalid option: " << neighbourDef <<
-            " (valid: N, NC, NC2, R ( with R<30 cm), F (with 0.1<f<1)");
+            " (valid: N(n), NC(n), NLegacy(n), NCLegacy(n), R ( with R<30 cm), F (with 0.1<f<1)");
   }
 
 }
@@ -222,6 +227,81 @@ void ECLNeighbours::initializeF(double frac)
 
 void ECLNeighbours::initializeN(int n)
 {
+  // This is the "NxN-edges" case (in the barrel)
+  for (int i = 0; i < 8736; i++) {
+
+    // this vector will hold all neighbours for the i-th crystal
+    std::vector<short int> neighbours;
+    neighbours.push_back(i + 1);
+
+    std::vector<short int> neighbours_temp;
+
+    // iterate next, next-to-next, next-to-next-to-next, ...
+    for (int idx = 0; idx < n; idx++) {
+      EclNbr tmpNbr;
+      for (const auto& nbr : neighbours) {
+        const EclNbr& aNbr(tmpNbr.getNbr(nbr - 1)); // uses crystalid, but we store cellids
+        for (std::vector<EclNbr::Identifier>::const_iterator newnbr = aNbr.nearBegin(); newnbr != aNbr.nearEnd(); ++newnbr) {
+          neighbours_temp.push_back(((short) *newnbr) + 1); // store cellid, not crystalid
+        }
+      }
+
+      // now sort and remove all duplicates from neighbours_temp
+      sort(neighbours_temp.begin(), neighbours_temp.end());
+      neighbours_temp.erase(unique(neighbours_temp.begin(), neighbours_temp.end()), neighbours_temp.end());
+      neighbours.insert(neighbours.end(), neighbours_temp.begin(), neighbours_temp.end());
+    }
+
+    // push back the final vector of IDs, we have to erease the duplicate first ID
+    sort(neighbours.begin(), neighbours.end());
+    neighbours.erase(unique(neighbours.begin(), neighbours.end()), neighbours.end());
+    m_neighbourMap.push_back(neighbours);
+
+  }
+}
+
+void ECLNeighbours::initializeNC(const int n)
+{
+  // get the normal neighbours
+  initializeN(n);
+  // ECL geometry
+  ECLGeometryPar* geom = ECLGeometryPar::Instance();
+
+  for (int i = 0; i < 8736; i++) {
+    std::vector<short int> neighbours = m_neighbourMap.at(i + 1);
+    std::vector<short int> neighbours_temp;
+
+    geom->Mapping(i);
+    const int centerthetaid = geom->GetThetaID();
+
+    for (const auto& nbr : neighbours) {
+      geom->Mapping(nbr - 1);
+      const int thetaid = geom->GetThetaID();
+
+      if (abs(thetaid - centerthetaid) == n) {
+        const short int phiInc = increasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
+        const short int phiDec = decreasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
+        const int cid1 = geom->GetCellID(thetaid , phiInc) + 1;
+        const int cid2 = geom->GetCellID(thetaid , phiDec) + 1;
+
+        // if that crystal has two neighbours in the same theta-ring, it will not be removed
+        if (!((std::find(neighbours.begin(), neighbours.end(), cid1) != neighbours.end()) and
+              (std::find(neighbours.begin(), neighbours.end(), cid2) != neighbours.end()))) {
+          continue;
+        }
+      }
+      neighbours_temp.push_back(nbr);
+
+    }
+
+    m_neighbourMap[i + 1] = neighbours_temp;
+
+  } // end 8736 loop
+
+}
+
+void ECLNeighbours::initializeNLegacy(int n)
+{
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
@@ -266,7 +346,7 @@ void ECLNeighbours::initializeN(int n)
 }
 
 
-void ECLNeighbours::initializeNC(const int n, const int corners)
+void ECLNeighbours::initializeNCLegacy(const int n, const int corners)
 {
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();

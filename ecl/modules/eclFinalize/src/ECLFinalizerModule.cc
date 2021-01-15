@@ -251,19 +251,6 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   eclCluster->setPhi(eclShower->getPhi());
   eclCluster->setR(eclShower->getR());
   eclCluster->setPulseShapeDiscriminationMVA(eclShower->getPulseShapeDiscriminationMVA());
-#ifdef __INTEL_COMPILER
-#pragma warning push
-#pragma warning (disable:1786) //[[deprecated("message")]]
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  eclCluster->setClusterHadronIntensity(eclShower->getShowerHadronIntensity());
-#ifdef __INTEL_COMPILER
-#pragma warning pop
-#else
-#pragma GCC diagnostic pop
-#endif
   eclCluster->setNumberOfHadronDigits(eclShower->getNumberOfHadronDigits());
 
   // set relation to ECLShower

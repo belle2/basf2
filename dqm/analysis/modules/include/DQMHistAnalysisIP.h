@@ -46,6 +46,8 @@ namespace Belle2 {
     std::string m_histoname;
     /** The prefix of PV. */
     std::string  m_pvPrefix;
+    /** The prefix for MonitoringObj. */
+    std::string  m_monPrefix;
     /** Update entry intervall */
     int m_minEntries = 1000;
 
@@ -56,6 +58,9 @@ namespace Belle2 {
 
     /** last histogram */
     TH1* m_h_last = nullptr;
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
 
     /** flag if to export to EPICS */
     bool m_useEpics;

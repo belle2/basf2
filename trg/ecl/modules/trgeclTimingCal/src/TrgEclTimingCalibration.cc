@@ -302,11 +302,11 @@ int TRGECLTimingCalModule::Solve_Matrix()
   int ix = 0;
   if (b_solve) {
     for (int i = 0; i < nTC_tot; i++) {
-      if (i != TC_ref - 1) {
-        tcal_result[i] = x[ix];
-        ix++;
-      } else if (i == TC_ref - 1) {
+      if (i == TC_ref - 1) {
         tcal_result[i] = 0.0;
+      } else {
+        tcal_result[i] = x[ix];
+        ++ix;
       }
     }
     return 1;

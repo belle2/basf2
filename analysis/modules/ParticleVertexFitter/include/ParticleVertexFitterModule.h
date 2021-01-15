@@ -14,15 +14,18 @@
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-// DataStore
+// framework - DataStore
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
+#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
 // KFit
 #include <analysis/VertexFitting/KFit/MassFitKFit.h>
 #include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
 #include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
@@ -68,6 +71,7 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_plist; /**< particle list */
     std::string m_listName;       /**< particle list name */
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
@@ -82,6 +86,8 @@ namespace Belle2 {
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
+    std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
+    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine
@@ -93,6 +99,8 @@ namespace Belle2 {
     /**
      * Unconstrained vertex fit using KFit
      * @param p pointer to particle
+     * @param ipProfileConstraint flag for IP profile constraint
+     * @param ipTubeConstraint flag for IP tube constraint
      * @return true for successful fit
      */
     bool doKVertexFit(Particle* p, bool ipProfileConstraint, bool ipTubeConstraint);
@@ -124,6 +132,13 @@ namespace Belle2 {
      * @return true for successful fit
      */
     bool doKFourCFit(Particle* p);
+
+    /**
+     * MassFourC fit using KFit
+     * @param p pointer to particle
+     * @return true for successful fit
+     */
+    bool doKMassFourCFit(Particle* p);
 
     /**
      * Update mother particle after unconstrained vertex fit using KFit
@@ -166,6 +181,14 @@ namespace Belle2 {
     bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
 
     /**
+     * Update mother particle after MassFourC fit using KFit
+     * @param kv reference to KFit MassFit object
+     * @param p pointer to particle
+     * @return true for successful construction of mother
+     */
+    bool makeMassKFourCMother(analysis::MassFourCFitKFit& kv, Particle* p);
+
+    /**
      * update the map of daughter and tracks, find out which tracks belong to each daughter.
      * @param l represent the tracks ID
      * @param pars map of all parameters
@@ -184,6 +207,14 @@ namespace Belle2 {
     bool addChildofParticletoKFit(analysis::FourCFitKFit& kv, const Particle* particle);
 
     /**
+     * Adds given particle's child to the MassFourCFitKFit.
+     * @param kf reference to KFit FourCFit object
+     * @param particle pointer to particle
+     * @param particleId vector of daughters track id
+     */
+    bool addChildofParticletoMassKFit(analysis::MassFourCFitKFit& kf, const Particle* particle, std::vector<unsigned>& particleId);
+
+    /**
      * Adds IPProfile constraint to the vertex fit using KFit.
      */
     void addIPProfileToKFit(analysis::VertexFitKFit& kv);
@@ -195,14 +226,16 @@ namespace Belle2 {
 
     /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
-     * Pi0 particles are treated separately so they are filled to another vector.
+     * Particles formed from two photons (e.g. pi0) are treated separately so they are filled to another vector.
      */
-    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
+    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
+                          std::vector<const Particle*>& twoPhotonChildren);
 
     /**
-     * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
+     * Combines preFit particle and vertex information from vertex fit kv to create new postFit particle.
+     * A mass refit of this new particle is performed assuming that it originates from the point given by VertexFit.
      */
-    bool redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv) ;
+    bool redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit, const analysis::VertexFitKFit& kv) ;
 
     /**
      * Fit using Rave

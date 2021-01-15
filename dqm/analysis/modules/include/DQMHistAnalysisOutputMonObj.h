@@ -49,7 +49,13 @@ namespace Belle2 {
     std::string m_filename;/**< file name of root file */
     std::string m_procID;/**< processing id (online,proc10,etc)*/
     std::string m_treeFile;/**< if set, entry with monitoring variables is made in the run summary TTree*/
-    DQMFileMetaData* m_metaData = NULL; /**< output file meta data */
+    int m_run = 0;/**< run number */
+    int m_exp = 0;/**< experiment number */
+    int m_nevt = 0;/**< event number */
+    std::string m_runtype;/**< run type */
+
+
+    DQMFileMetaData* m_metaData = nullptr; /**< output file meta data */
   };
 } // end namespace Belle2
 

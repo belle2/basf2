@@ -56,9 +56,6 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
-    /** parameter to change the range of the time histograms*/
-    bool m_isSVDTimeCalibrated = false;
-
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
 

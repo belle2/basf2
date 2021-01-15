@@ -241,6 +241,16 @@ class IntervalOfValidity:
         # no union possible: not directly connected and not overlapping
         return None
 
+    def contains(self, exp, run):
+        """Check if a run is part of the validtiy"""
+        return self.first <= (exp, run) <= self.final
+
+    @property
+    def is_open(self):
+        """Check whether the iov is valid until infinity"""
+        #: Doxygen complains without this string.
+        return self.final == (math.inf, math.inf)
+
     @property
     def tuple(self):
         """Return the iov as a tuple with experiment/run numbers replaced with -1
@@ -534,6 +544,51 @@ class IoVSet:
         """Return the set of valid iovs"""
         return self.__iovs
 
+    @property
+    def first(self):
+        """Return the first run covered by this iov set
+
+        >>> a = IoVSet([(3,0,3,10), (10,11,10,23), (0,0,2,-1), (5,0,5,-1)])
+        >>> a.first
+        (0, 0)
+        """
+        if not self.__iovs:
+            return None
+        return min(self.iovs).first
+
+    @property
+    def final(self):
+        """Return the final run covered by this iov set
+
+        >>> a = IoVSet([(3,0,3,10), (10,11,10,23), (0,0,2,-1), (5,0,5,-1)])
+        >>> a.final
+        (10, 23)
+        """
+        if not self.__iovs:
+            return None
+        return max(self.iovs).final
+
+    @property
+    def gaps(self):
+        """Return the gaps in the set: Any area not covered between the first
+        point of validity and the last
+
+        >>> a = IoVSet([(0,0,2,-1)])
+        >>> a.gaps
+        {}
+        >>> b = IoVSet([(0,0,2,-1), (5,0,5,-1)])
+        >>> b.gaps
+        {(3, 0, 4, inf)}
+        >>> c = IoVSet([(0,0,2,-1), (5,0,5,-1), (10,3,10,6)])
+        >>> c.gaps
+        {(3, 0, 4, inf), (6, 0, 10, 2)}
+        """
+        if len(self.__iovs) < 2:
+            return IoVSet()
+
+        full_range = IoVSet([self.first + self.final])
+        return full_range - self
+
     def __bool__(self):
         """Return True if the set is not empty
 
@@ -602,6 +657,10 @@ class IoVSet:
     def __iter__(self):
         """Loop over the set of iovs"""
         return iter(self.__iovs)
+
+    def __len__(self):
+        """Return the number of validity intervals in this set"""
+        return len(self.__iovs)
 
     def __repr__(self):
         """Return a printable representation"""

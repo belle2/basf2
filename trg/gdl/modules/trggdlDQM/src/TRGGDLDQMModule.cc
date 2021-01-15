@@ -26,6 +26,12 @@
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 using namespace std;
 using namespace Belle2;
@@ -63,7 +69,7 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
            unsigned(10));
   addParam("bitNameOnBinLabel", m_bitNameOnBinLabel,
            "Put bitname on BinLabel",
-           false);
+           true);
   addParam("generatePostscript", m_generatePostscript,
            "Genarete postscript file or not",
            false);
@@ -156,7 +162,35 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_extra; i++) {
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
-
+    // output overlap
+    h_psn_overlap[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
+                                    n_output_overlap);
+    for (int i = 0; i < n_output_overlap; i++) {
+      h_psn_overlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+    }
+    // output no overlap
+    h_psn_nooverlap[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
+                                      n_output_overlap);
+    for (int i = 0; i < n_output_overlap; i++) {
+      h_psn_nooverlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+    }
+    // output pure extra
+    h_psn_pure_extra[iskim] = new TH1I(Form("hGDL_psn_pure_extra_%s", skim_smap[iskim].c_str()), "psn pure extra", n_output_pure_extra,
+                                       0, n_output_pure_extra);
+    for (int i = 0; i < n_output_pure_extra; i++) {
+      h_psn_pure_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_pure_extra[i]);
+    }
+    // efficiency
+    h_eff[iskim]       = new TH1D(Form("hGDL_eff_%s", skim_smap[iskim].c_str()), "efficiency", n_eff, 0, n_eff);
+    for (int i = 0; i < n_eff; i++) {
+      h_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_eff[i]);
+    }
+    h_pure_eff[iskim]  = new TH1D(Form("hGDL_pure_eff_%s", skim_smap[iskim].c_str()), "efficiency wrt. offline", n_pure_eff, 0,
+                                  n_pure_eff);
+    for (int i = 0; i < n_pure_eff; i++) {
+      h_pure_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_pure_eff[i]);
+      h_pure_eff[iskim]->GetXaxis()->SetLabelSize(0.05);
+    }
     for (unsigned i = 0; i < n_inbit; i++) {
       if (m_bitNameOnBinLabel) {
         h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
@@ -195,7 +229,15 @@ void TRGGDLDQMModule::defineHisto()
     }
   }
 
-
+  if (m_skim != 0) {
+    h_eff_shifter    = new TH1D(Form("hGDL_eff_shifter"), "efficiency", n_eff_shifter, 0, n_eff_shifter);
+    for (int i = 0; i < n_eff_shifter; i++) {
+      h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
+    }
+    h_eff_shifter->SetMaximum(1.2);
+    h_eff_shifter->SetMinimum(0);
+    h_eff_shifter->GetXaxis()->SetLabelSize(0.05);
+  }
   oldDir->cd();
 }
 
@@ -223,9 +265,15 @@ void TRGGDLDQMModule::beginRun()
     h_itd[iskim]->Reset();
     h_ftd[iskim]->Reset();
     h_psn[iskim]->Reset();
+    h_psn_extra[iskim]->Reset();
+    h_psn_pure_extra[iskim]->Reset();
+    h_eff[iskim]->Reset();
+    h_pure_eff[iskim]->Reset();
     h_timtype[iskim]->Reset();
   }
-
+  if (m_skim != 0) {
+    h_eff_shifter->Reset();
+  }
 
   oldDir->cd();
 }
@@ -247,6 +295,10 @@ void TRGGDLDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  m_ECLCalDigitData.registerInDataStore();
+  m_ECLDigitData.registerInDataStore();
+  trgeclmap = new TrgEclMapping();
 
   // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
@@ -419,7 +471,7 @@ void TRGGDLDQMModule::event()
   n_clocks = m_unpacker->getnClks();
   int nconf = m_unpacker->getconf();
   int nword_input  = m_unpacker->get_nword_input();
-  int nword_output = m_unpacker->get_nword_output();
+  const int nword_output = m_unpacker->get_nword_output();
   skim.clear();
 
   StoreArray<TRGGDLUnpackerStore> entAry;
@@ -514,9 +566,9 @@ void TRGGDLDQMModule::event()
     begin_run = false;
   }
 
-  int psn[5] = {0};
-  int ftd[5] = {0};
-  int itd[5] = {0};
+  int psn[10] = {0};
+  int ftd[10] = {0};
+  int itd[10] = {0};
   int timtype  = 0;
 
 
@@ -524,14 +576,14 @@ void TRGGDLDQMModule::event()
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
-    int psn_tmp[5] = {0};
-    int ftd_tmp[5] = {0};
-    int itd_tmp[5] = {0};
+    int psn_tmp[10] = {0};
+    int ftd_tmp[10] = {0};
+    int itd_tmp[10] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
-        if (itd_tmp[j] & (1 << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
+        if (itd_tmp[j] & (1u << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
       }
     }
     if (nconf == 0) {
@@ -540,7 +592,7 @@ void TRGGDLDQMModule::event()
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[0] & (1 << i)) h_p->SetBinContent(clk, i + 1, 1);
+        if (psn_tmp[0] & (1u << i)) h_p->SetBinContent(clk, i + 1, 1);
         if (ftd_tmp[0] & (1 << i)) h_f->SetBinContent(clk, i + 1, 1);
       }
       psn_tmp[1] = h_0->GetBinContent(clk, 1 + ee_psn[2]) * (1 << 16) + h_0->GetBinContent(clk, 1 + ee_psn[1]);
@@ -548,7 +600,7 @@ void TRGGDLDQMModule::event()
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[1] & (1 << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
+        if (psn_tmp[1] & (1u << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
@@ -558,7 +610,7 @@ void TRGGDLDQMModule::event()
         psn[j] |= psn_tmp[j];
         ftd[j] |= ftd_tmp[j];
         for (int i = 0; i < 32; i++) {
-          if (psn_tmp[j] & (1 << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
+          if (psn_tmp[j] & (1u << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
           if (ftd_tmp[j] & (1 << i)) h_f->SetBinContent(clk, i + 1 +  j * 32, 1);
         }
       }
@@ -572,6 +624,12 @@ void TRGGDLDQMModule::event()
   fillRiseFallTimings();
   // fill Output_extra for efficiency study
   fillOutputExtra();
+  // fill Output_overlap for trigger rate study
+  fillOutputOverlap();
+  // fill Output for high purity efficiency study
+  if (m_skim != 1) {
+    fillOutputPureExtra();
+  }
 
   // fill summary histograms
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
@@ -708,6 +766,7 @@ bool TRGGDLDQMModule::anaBitCondition(void)
             B2DEBUG(20,
                     m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
                     << "(" << fired << ")");
+            // cppcheck-suppress knownConditionTrueFalse
             if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
               return true;
             }
@@ -744,7 +803,6 @@ bool TRGGDLDQMModule::anaBitCondition(void)
       // can be blank (white space) or any delimiter.
       if (reading_word) {
         // end of a word, 'xxxx '
-        reading_word = false;
         if (result_the_term) {
           // worth to try
           bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
@@ -912,6 +970,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_itd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -946,6 +1005,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_ftd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -963,6 +1023,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_psn_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -977,6 +1038,74 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   }
 }
 
+
+void
+TRGGDLDQMModule::fillOutputOverlap(void)
+{
+  for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    bool cdc_fired = isFired("FFF") || isFired("FFO") || isFired("FFB") ||  isFired("FFY") ||  isFired("FYO") ||  isFired("FYB");
+    bool c4_fired = isFired("C4");
+    bool hie_fired = isFired("HIE");
+    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
+                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10")  || isFired("LML11")
+                      || isFired("LML12") || isFired("LML13") || isFired("ECLMUMU"));
+    bool klm_fired = isFired("MU_B2B") || isFired("MU_EB2B") || isFired("BEKLM") || isFired("CDCKLM1") || isFired("CDCKLM2");
+    bool short_fired = isFired("FSO") || isFired("FSB") || isFired("YSO") ||  isFired("YSB");
+    bool ff30_fired = isFired("FF30") || isFired("FY30");
+    bool bha3d_fired = isFired("BHA3D");
+
+    if (1) {
+      h_psn_overlap[skim[ifill]]->Fill(0.5);
+    }
+    if (cdc_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(1.5);
+    } else if (c4_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(2.5);
+    } else if (hie_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(3.5);
+    } else if (klm_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(4.5);
+    } else if (short_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(5.5);
+    } else if (ff30_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(6.5);
+    } else if (lml_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(7.5);
+    } else if (bha3d_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(8.5);
+    } else {
+      h_psn_overlap[skim[ifill]]->Fill(9.5);
+    }
+
+    if (1) {
+      h_psn_nooverlap[skim[ifill]]->Fill(0.5);
+    }
+    if (cdc_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(1.5);
+    }
+    if (c4_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(2.5);
+    }
+    if (hie_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(3.5);
+    }
+    if (klm_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(4.5);
+    }
+    if (short_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(5.5);
+    }
+    if (ff30_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(6.5);
+    }
+    if (lml_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(7.5);
+    }
+    if (bha3d_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(8.5);
+    }
+  }
+}
 
 
 void
@@ -1208,8 +1337,97 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (cdcecl4_fired && lml_fired) {
       h_psn_extra[skim[ifill]]->Fill(61.5);
     }
-
   }
+
+  for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    //fill efficiency values
+    h_eff[skim[ifill]]->SetBinContent(1,  h_psn_extra[skim[ifill]]->GetBinContent(1 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //fff with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(2,  h_psn_extra[skim[ifill]]->GetBinContent(2 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //ffo with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(3,  h_psn_extra[skim[ifill]]->GetBinContent(3 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //ffb with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(4,  h_psn_extra[skim[ifill]]->GetBinContent(19 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //ffy with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(5,  h_psn_extra[skim[ifill]]->GetBinContent(20 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //fyo with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(6,  h_psn_extra[skim[ifill]]->GetBinContent(21 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        5 + 1)); //fyb with c4|hie
+    h_eff[skim[ifill]]->SetBinContent(7,  h_psn_extra[skim[ifill]]->GetBinContent(27 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //hie with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(8,  h_psn_extra[skim[ifill]]->GetBinContent(26 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //c4 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(9,  h_psn_extra[skim[ifill]]->GetBinContent(28 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml0 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(10, h_psn_extra[skim[ifill]]->GetBinContent(29 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml1 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(11, h_psn_extra[skim[ifill]]->GetBinContent(30 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml2 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(12, h_psn_extra[skim[ifill]]->GetBinContent(31 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml3 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(13, h_psn_extra[skim[ifill]]->GetBinContent(32 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml4 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(14, h_psn_extra[skim[ifill]]->GetBinContent(33 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml5 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(15, h_psn_extra[skim[ifill]]->GetBinContent(34 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml6 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(16, h_psn_extra[skim[ifill]]->GetBinContent(35 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml7 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(17, h_psn_extra[skim[ifill]]->GetBinContent(36 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml8 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(18, h_psn_extra[skim[ifill]]->GetBinContent(37 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml9 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(19, h_psn_extra[skim[ifill]]->GetBinContent(38 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml10 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(20, h_psn_extra[skim[ifill]]->GetBinContent(39 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml12 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(21, h_psn_extra[skim[ifill]]->GetBinContent(40 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //lml13 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(22, h_psn_extra[skim[ifill]]->GetBinContent(9 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        0 + 1)); //bha3d with all
+    h_eff[skim[ifill]]->SetBinContent(23, h_psn_extra[skim[ifill]]->GetBinContent(42 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //mu_b2b with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(24, h_psn_extra[skim[ifill]]->GetBinContent(48 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //mu_b2b with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(25, h_psn_extra[skim[ifill]]->GetBinContent(49 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //mu_eb2b with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(26, h_psn_extra[skim[ifill]]->GetBinContent(44 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //cdcklm1 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(27, h_psn_extra[skim[ifill]]->GetBinContent(45 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        6 + 1)); //cdcklm2 with fff|ffo|ffb
+    h_eff[skim[ifill]]->SetBinContent(28, h_psn_extra[skim[ifill]]->GetBinContent(15 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //fff with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(29, h_psn_extra[skim[ifill]]->GetBinContent(16 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //ffo with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(30, h_psn_extra[skim[ifill]]->GetBinContent(17 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //ffb with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(31, h_psn_extra[skim[ifill]]->GetBinContent(11 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //ff with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(32, h_psn_extra[skim[ifill]]->GetBinContent(13 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //f with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(33, h_psn_extra[skim[ifill]]->GetBinContent(23 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //ffy with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(34, h_psn_extra[skim[ifill]]->GetBinContent(24 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //fyo with lml|eclmumu
+    h_eff[skim[ifill]]->SetBinContent(35, h_psn_extra[skim[ifill]]->GetBinContent(25 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
+                                        14 + 1)); //fyb with lml|eclmumu
+  }
+
+  if (m_skim != 0) {
+    h_eff_shifter->SetBinContent(1,  h_psn_extra[1]->GetBinContent(1 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fff with c4|hie
+    h_eff_shifter->SetBinContent(2,  h_psn_extra[1]->GetBinContent(2 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffo with c4|hie
+    h_eff_shifter->SetBinContent(3,  h_psn_extra[1]->GetBinContent(19 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffy with c4|hie
+    h_eff_shifter->SetBinContent(4,  h_psn_extra[1]->GetBinContent(20 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fyo with c4|hie
+    h_eff_shifter->SetBinContent(5,  h_psn_extra[1]->GetBinContent(27 + 1) / h_psn_extra[1]->GetBinContent(
+                                   6 + 1)); //hie with fff|ffo|ffb
+    h_eff_shifter->SetBinContent(6,  h_psn_extra[1]->GetBinContent(26 + 1) / h_psn_extra[1]->GetBinContent(
+                                   6 + 1)); //c4 with fff|ffo|ffb
+    h_eff_shifter->SetBinContent(7,  h_psn_extra[4]->GetBinContent(48 + 1) / h_psn_extra[4]->GetBinContent(
+                                   14 + 1) * 10); //mu_b2b with lml|eclmumu
+    h_eff_shifter->SetBinContent(8,  h_psn_extra[4]->GetBinContent(49 + 1) / h_psn_extra[4]->GetBinContent(
+                                   14 + 1) * 50); //mu_eb2b with lml|eclmumu
+  }
+
 }
 
 const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
@@ -1221,4 +1439,276 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
   "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)"
 };
+
+const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {
+  "all", "cdc", "c4", "hie", "klm", "short", "ff30", "lml", "bha3D", "other"
+};
+
+const char* TRGGDLDQMModule::c_eff_shifter[n_eff_shifter] = {
+  "CDC fff",
+  "CDC ffo",
+  "CDC ffy",
+  "CDC fyo",
+  "ECL hie",
+  "ECL c4",
+  "KLM b2b,x10",
+  "EKLM eb2b,x50"
+};
+
+const char* TRGGDLDQMModule::c_eff[n_eff] = {
+  "fff with c4|hie",
+  "ffo with c4|hie",
+  "ffb with c4|hie",
+  "ffy with c4|hie",
+  "fyo with c4|hie",
+  "fyb with c4|hie",
+  "hie with fff|ffo|ffb",
+  "c4 with fff|ffo|ffb",
+  "lml0 with fff|ffo|ffb",
+  "lml1 with fff|ffo|ffb",
+  "lml2 with fff|ffo|ffb",
+  "lml3 with fff|ffo|ffb",
+  "lml4 with fff|ffo|ffb",
+  "lml5 with fff|ffo|ffb",
+  "lml6 with fff|ffo|ffb",
+  "lml7 with fff|ffo|ffb",
+  "lml8 with fff|ffo|ffb",
+  "lml9 with fff|ffo|ffb",
+  "lml10 with fff|ffo|ffb",
+  "lml12 with fff|ffo|ffb",
+  "lml13 with fff|ffo|ffb",
+  "bha3d with all",
+  "mu_b2b with fff|ffo|ffb",
+  "mu_b2b with lml|eclmumu",
+  "mu_eb2b with lml|eclmumu",
+  "cdcklm1 with fff|ffo|ffb",
+  "cdcklm2 with fff|ffo|ffb",
+  "fff with lml|eclmumu",
+  "ffo with lml|eclmumu",
+  "ffb with lml|eclmumu",
+  "ff with lml|eclmumu",
+  "f with lml|eclmumu",
+  "ffy with lml|eclmumu",
+  "fyo with lml|eclmumu",
+  "fyb with lml|eclmumu"
+};
+
+
+void
+TRGGDLDQMModule::fillOutputPureExtra(void)
+{
+  //get offline CDC track information
+  StoreArray<Track> Tracks;
+  int n_fulltrack = 0;
+  float max_dphi = 0;
+  float phi_list[100];
+  for (int itrack = 0; itrack < Tracks.getEntries(); itrack++) {
+    const TrackFitResult* tfr = Tracks[itrack]->getTrackFitResult(Const::pion);
+    if (tfr == nullptr) continue;
+
+    float z0     = tfr->getZ0();
+    float d0     = tfr->getD0();
+    float phi    = tfr->getPhi();
+    //float omega  = tfr->getOmega();
+    int   flayer = tfr->getHitPatternCDC().getFirstLayer();
+    int   llayer = tfr->getHitPatternCDC().getLastLayer();
+    float pt     = tfr->getTransverseMomentum();
+    //std::cout << z0 << " " << d0 << " " << omega << " " << flayer << " " << llayer << " " << pt << std::endl;
+    if (z0 > -1 && z0 < 1 && d0 > -1 && d0 < 1 && flayer < 8 && llayer > 50
+        && pt > 0.3) { //select track from IP, hit SL0 and SL8, pt>0.3GeV
+      phi_list[n_fulltrack] = phi;
+      n_fulltrack += 1;
+    }
+  }
+  for (int i = 0; i < n_fulltrack; i++) {
+    for (int j = 0; j < n_fulltrack; j++) {
+      float dphi = phi_list[i] - phi_list[j];
+      if (dphi < 0)   dphi = -dphi;
+      if (dphi > 3.14) dphi = 2 * 3.14 - dphi;
+      if (dphi > max_dphi) max_dphi = dphi;
+    }
+  }
+
+  //get offline ECL cluster information
+  //StoreArray<ECLCluster> ECLClusters;
+  //double total_energy = 0;
+  //for (int iclst = 0; iclst < ECLClusters.getEntries(); iclst++) {
+  //  total_energy += ECLClusters[iclst]->getEnergyRaw();
+  //}
+  //
+  //
+  int ecl_timing_threshold_low  = -200; // (ns)  xtal timing selection
+  int ecl_timing_threshold_high =  200; // (ns)  xtal timing selection
+  double ecl_xtcid_energy_sum[576] = {0};
+  double total_energy = 0;
+  int ncluster = 0;
+  for (const auto& eclcalhit : m_ECLCalDigitData) {
+
+    // (ecl) calibation status check and cut
+    if (!eclcalhit.isCalibrated()) {continue;}
+    if (eclcalhit.isFailedFit()) {continue;}
+    if (eclcalhit.isTimeResolutionFailed()) {continue;}
+
+    // (ecl) xtal-id
+    int ecl_cid   = (double) eclcalhit.getCellId();
+
+    // (ecl) fitter quality check and cut
+    int ecl_quality = -1;
+    for (const auto& eclhit : m_ECLDigitData) {
+      if (ecl_cid == eclhit.getCellId()) {
+        ecl_quality = (int) eclhit.getQuality();
+      }
+    }
+    if (ecl_quality != 0) {continue;}
+
+    // (ecl) xtal energy
+    double ecl_xtal_energy  = eclcalhit.getEnergy(); // ECLCalDigit
+
+
+    // (ecl) timing cut
+    int ecl_timing = eclcalhit.getTime();
+    if (ecl_timing < ecl_timing_threshold_low ||
+        ecl_timing > ecl_timing_threshold_high) {continue;}
+
+    // (ecl) tc-id for xtal-id
+    int ecl_tcid  = trgeclmap->getTCIdFromXtalId(ecl_cid);
+    int ecl_thetaid = trgeclmap->getTCThetaIdFromTCId(ecl_tcid);
+
+    if (ecl_tcid >= 0 && ecl_tcid < 576 && ecl_thetaid >= 2 && ecl_thetaid <= 15) { //pick up only 2=<thetaid=<15
+      ecl_xtcid_energy_sum[ecl_tcid] = ecl_xtcid_energy_sum[ecl_tcid] + ecl_xtal_energy;
+      //ecltimingsum[i] = ecl_timing;
+    }
+  }
+
+  for (int i = 0; i < 576; i++) {
+    if (ecl_xtcid_energy_sum[i] > 0.1) {
+      total_energy += ecl_xtcid_energy_sum[i];
+      ncluster += 1;
+    }
+  }
+
+  //get offline KLM cluster information
+
+
+  //fff: require the number of CDC full tracks is more than or equal to 3
+  if (n_fulltrack > 2) {
+    //std::cout << "fff" << std::endl;
+    bool fff_fired = isFired("fff");
+    bool ffy_fired = isFired("ffy");
+    bool c4_fired  = isFired("C4");
+    bool hie_fired = isFired("HIE");
+    if (c4_fired || hie_fired) {
+      h_psn_pure_extra[0]->Fill(0.5);
+    }
+    if (fff_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(1.5);
+    }
+    if (ffy_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(2.5);
+    }
+  }
+  //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle > 90deg
+  if (n_fulltrack > 1 && max_dphi > 3.14 / 2.) {
+    //std::cout << "fff" << std::endl;
+    bool ffo_fired = isFired("ffo");
+    bool fyo_fired = isFired("fyo");
+    bool c4_fired  = isFired("C4");
+    bool hie_fired = isFired("HIE");
+    if (c4_fired || hie_fired) {
+      h_psn_pure_extra[0]->Fill(3.5);
+    }
+    if (ffo_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(4.5);
+    }
+    if (fyo_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(5.5);
+    }
+  }
+  //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle >150deg
+  if (n_fulltrack > 1 && max_dphi > 3.14 * 5 / 6.) {
+    //std::cout << "fff" << std::endl;
+    bool ffb_fired = isFired("ffb");
+    bool fyb_fired = isFired("fyb");
+    bool c4_fired  = isFired("C4");
+    bool hie_fired = isFired("HIE");
+    if (c4_fired || hie_fired) {
+      h_psn_pure_extra[0]->Fill(6.5);
+    }
+    if (ffb_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(7.5);
+    }
+    if (fyb_fired && (c4_fired || hie_fired)) {
+      h_psn_pure_extra[0]->Fill(8.5);
+    }
+  }
+
+  //hie: require the total energy of ECL cluster is more than 1GeV
+  if (total_energy > 1) {
+    //std::cout << "hie" << std::endl;
+    bool fff_fired = isFired("FFF");
+    bool ffo_fired = isFired("FFO");
+    bool ffb_fired = isFired("FFB");
+    bool hie_fired = isFired("hie");
+    if (fff_fired || ffo_fired || ffb_fired) {
+      h_psn_pure_extra[0]->Fill(9.5);
+    }
+    if (hie_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_pure_extra[0]->Fill(10.5);
+    }
+  }
+
+  //c4: require the total number of cluster is more than 3
+  if (ncluster > 3) {
+    //std::cout << "hie" << std::endl;
+    bool fff_fired = isFired("FFF");
+    bool ffo_fired = isFired("FFO");
+    bool ffb_fired = isFired("FFB");
+    bool c4_fired = isFired("c4");
+    if (fff_fired || ffo_fired || ffb_fired) {
+      h_psn_pure_extra[0]->Fill(11.5);
+    }
+    if (c4_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_pure_extra[0]->Fill(12.5);
+    }
+  }
+
+  h_pure_eff[0]->SetBinContent(1,  h_psn_pure_extra[0]->GetBinContent(1 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 0 + 1)); //fff with c4|hie
+  h_pure_eff[0]->SetBinContent(2,  h_psn_pure_extra[0]->GetBinContent(4 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 3 + 1)); //ffo with c4|hie
+  h_pure_eff[0]->SetBinContent(3,  h_psn_pure_extra[0]->GetBinContent(7 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 6 + 1)); //ffb with c4|hie
+  h_pure_eff[0]->SetBinContent(4,  h_psn_pure_extra[0]->GetBinContent(2 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 0 + 1)); //ffy with c4|hie
+  h_pure_eff[0]->SetBinContent(5,  h_psn_pure_extra[0]->GetBinContent(5 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 3 + 1)); //fyo with c4|hie
+  h_pure_eff[0]->SetBinContent(6,  h_psn_pure_extra[0]->GetBinContent(8 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 6 + 1)); //fyb with c4|hie
+  h_pure_eff[0]->SetBinContent(7,  h_psn_pure_extra[0]->GetBinContent(10 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 9 + 1)); //hie with fff|ffo|ffb
+  h_pure_eff[0]->SetBinContent(8,  h_psn_pure_extra[0]->GetBinContent(12 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 11 + 1)); //hie with fff|ffo|ffb
+
+}
+
+const char* TRGGDLDQMModule::output_pure_extra[n_output_pure_extra] = {
+  "c4|hie offline_fff", "fff&(c4|hie) offline_fff", "ffy&(c4|hie) offline_fff",
+  "c4|hie offline_ffo", "ffo&(c4|hie) offline_ffo", "fyo&(c4|hie) offline_ffo",
+  "c4|hie offline_ffb", "ffb&(c4|hie) offline_ffb", "fyb&(c4|hie) offline_ffb",
+  "fff|ffb|ffo offline_hie", "hie&(fff|ffb|ffo) offline_hie",
+  "fff|ffb|ffo offline_c4", "c4&(fff|ffb|ffo) offline_c4"
+};
+
+
+const char* TRGGDLDQMModule::c_pure_eff[n_pure_eff] = {
+  "fff with c4|hie",
+  "ffo with c4|hie",
+  "ffb with c4|hie",
+  "ffy with c4|hie",
+  "fyo with c4|hie",
+  "fyb with c4|hie",
+  "hie with fff|ffo|ffb",
+  "c4 with fff|ffo|ffb"
+};
+
 

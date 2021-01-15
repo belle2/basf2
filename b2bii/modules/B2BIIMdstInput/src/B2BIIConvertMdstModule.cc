@@ -175,6 +175,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
+  addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
 
   m_realData = false;
 
@@ -218,6 +219,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
+  if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
+
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
@@ -241,6 +244,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
+  if (m_convertTrkExtra) m_tracks.registerRelationTo(m_belleTrkExtra);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -584,11 +588,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, 1, helixParam, helixError);
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1, 0);
         trackFitPIndex = trackFitP->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
@@ -615,7 +619,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1, 0);
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
@@ -640,11 +644,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, -1, helixParam, helixError);
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1, 0);
         trackFitMIndex = trackFitM->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
@@ -670,7 +674,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1, 0);
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
@@ -718,12 +722,27 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    /*
+     * Documentation of Mdst_vee2 vertex fit:
+     *      /sw/belle/belle/b20090127_0910/share/tables/mdst.tdf (L96-L125)
+     */
+    auto appendVertexFitInfo = [](Belle::Mdst_vee2 & _belle_V0, Particle & _belle2_V0) {
+      // Add chisq of vertex fit. chiSquared=10^10 means the fit fails.
+      _belle2_V0.addExtraInfo("chiSquared", _belle_V0.chisq());
+      // Ndf of the vertex kinematic fit is 1
+      _belle2_V0.addExtraInfo("ndf", 1);
+      // Add p-value to extra Info
+      double prob = TMath::Prob(_belle_V0.chisq(), 1);
+      _belle2_V0.setPValue(prob);
+    };
+
     Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, KS);
       newV0 = m_particles.appendNew(KS);
       ksPList->addParticle(newV0);
 
@@ -771,6 +790,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, Lambda0);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
 
@@ -783,6 +803,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, antiLambda0);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
 
@@ -795,6 +816,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, gamma);
       newV0 = m_particles.appendNew(gamma);
       convGammaPList->addParticle(newV0);
     }
@@ -1111,7 +1133,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   // Create and initialize particle list
   StoreObjPtr<ParticleList> plist("K_L0:mdst");
   plist.create();
-  plist->initialize(130, "K_L0:mdst");
+  plist->initialize(Const::Klong.getPDGCode(), "K_L0:mdst");
 
   Belle::Mdst_klong_Manager& klong_manager = Belle::Mdst_klong_Manager::get_manager();
   for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); ++klong_Ite) {
@@ -1153,7 +1175,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
     for (Belle::Gen_hepevt_Manager::iterator klong_hep_it = GenMgr.begin(); klong_hep_it != GenMgr.end(); ++klong_hep_it) {
 
-      if (abs((*klong_hep_it).idhep()) == 130 && klong_hep_it->isthep() > 0) {
+      if (abs((*klong_hep_it).idhep()) == Const::Klong.getPDGCode() && klong_hep_it->isthep() > 0) {
 
         CLHEP::HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
         double sum(0.0);
@@ -1644,6 +1666,12 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     HitPatternCDC patternCdc;
     patternCdc.setNHits(cdcNHits);
 
+    // conversion of track position in CDC layers
+    if (m_convertTrkExtra) {
+      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
+                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+      track->addRelationTo(cdcExtraInfo);
+    }
     // conversion of the SVD hit pattern
     int svdHitPattern = trk_fit.hit_svd();
     // use hits from 3: SVD-rphi, 4: SVD-z
@@ -1680,7 +1708,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
       svdVMask <<= 2;
     }
 
-    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger());
+    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger(), 0);
 
     if (m_use6x6CovarianceMatrix4Tracks) {
       TMatrixDSym cartesianCovariance(6);
@@ -1706,7 +1734,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     }
 
     auto trackFit = m_trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(),
-                                                patternVxd.getInteger());
+                                                patternVxd.getInteger(), trk_fit.ndf());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
     /*
       B2INFO("--- B1 Track: ");
@@ -2203,7 +2231,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const Const::ParticleType& pType,
                                                             const float pValue,
                                                             const uint64_t hitPatternCDCInitializer,
-                                                            const uint32_t hitPatternVXDInitializer)
+                                                            const uint32_t hitPatternVXDInitializer,
+                                                            const uint16_t ndf)
 {
   TVector3 pos(position.x(),  position.y(),  position.z());
   TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
@@ -2223,7 +2252,7 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
     }
   }
 
-  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer);
+  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer, ndf);
 }
 
 double B2BIIConvertMdstModule::atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp)

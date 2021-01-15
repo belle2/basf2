@@ -100,6 +100,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     B2DEBUG(20, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
+    p.addStatus(MCParticle::c_PrimaryParticle);  // bit needs to be set in order for the GeneratedVertexDisplacer to work
     p.setPDG(pdg_code);
     p.setMomentum(TVector3(momentum.x(), momentum.y(), momentum.z()));
     p.setEnergy(momentum.t());

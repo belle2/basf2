@@ -1,5 +1,5 @@
 import basf2
-from iov_conditional import phase_2_conditional, make_conditional_at
+from iov_conditional import make_conditional_at
 
 
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
@@ -280,12 +280,18 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
     if direction == "forward":
         reverse_seed = True
     else:
         reverse_seed = False
 
     if use_mc_truth:
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
+
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",
@@ -313,19 +319,22 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
 
             filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
             useBestNInSeed=use_best_results,
+
+            seedHitJumping=1,
         )
 
     path.add_module("ToPXDCKF",
-                    inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
-                    outputRecoTrackStoreArrayName=pxd_reco_tracks,
-                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
-                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
-
                     advanceHighFilterParameters={"direction": direction},
-                    reverseSeed=reverse_seed,
 
                     writeOutDirection=direction,
+
+                    inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
                     relationCheckForDirection=direction,
 
-                    seedHitJumping=1,
+                    outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+
+                    reverseSeed=reverse_seed,
+                    reverseSeedState=reverse_seed,
                     **module_parameters).set_name(f"ToPXDCKF_{direction}")

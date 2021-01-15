@@ -1,7 +1,5 @@
-import basf2
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
 import numpy as np
@@ -11,6 +9,7 @@ import tracking.validation.utilities as utilities
 import tracking.harvest.refiners as refiners
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.peelers as peelers
+ROOT.gSystem.Load("libtracking")
 
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
@@ -209,14 +208,29 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     # #################################### #
 
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(name="mc_tree", folder_name="mc_tree", above_expert_level=default_expert_level)
+    save_tree = refiners.save_tree(
+        # using cond to suppress false doxygen warnings
+        #: \cond
+        name="mc_tree",
+        folder_name="mc_tree",
+        above_expert_level=default_expert_level
+        #: \endcond
+    )
 
     #: Save a basic tree
-    save_tree_basic = refiners.save_tree(name="mc_tree", folder_name="mc_tree",
-                                         above_expert_level=default_expert_level // 2, below_expert_level=default_expert_level)
+    save_tree_basic = refiners.save_tree(
+        # using cond to suppress false doxygen warnings
+        #: \cond
+        name="mc_tree",
+        folder_name="mc_tree",
+        above_expert_level=default_expert_level // 2,
+        below_expert_level=default_expert_level
+        #: \endcond
+    )
 
     #: Generate the average finding efficiencies and hit efficiencies
     save_overview_figures_of_merit = refiners.save_fom(
+        #: \cond
         name="{module.id}_overview_figures_of_merit",
         title="Overview figures in {module.title}",
         aggregation=np.nanmean,
@@ -227,6 +241,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 finding efficiency - the ratio of matched primary Monte Carlo tracks to all Monte Carlo tracks
 hit efficiency - the ratio of hits picked up by the matched pattern recognition track of primary Monte Carlo tracks
 """
+        #: \endcond
     )
 
     # Default refiners that can be disabled with a lower expert_level
@@ -234,10 +249,12 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
 
     #: Save a histogram of the hit efficiency
     save_hit_efficiency_histogram = refiners.save_histograms(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={"hit_efficiency": "hit efficiency"},
         filter_on="is_primary",
         description="Not a serious plot yet.",
+        #: \endcond
     )
 
     #: Rename the efficiency-profile quantities so that they display nicely in ROOT TLatex
@@ -251,6 +268,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
 
     #: Make profile of finding efficiency
     save_finding_efficiency_profiles = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select=renaming_select_for_finding_efficiency_profiles,
         y='finding efficiency',
@@ -258,10 +276,12 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         filter_on="is_primary",
         outlier_z_score=5.0,
         allow_discrete=True,
+        #: \endcond
     )
 
     #: Make profile of finding efficiency versus tan(lambda)
     save_finding_efficiency_by_tan_lamba_profiles = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'is_matched': 'finding efficiency',
@@ -273,10 +293,12 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Make profiles of finding efficiency versus tan(lambda) grouped by transverse momentum
     save_finding_efficiency_by_tan_lamba_in_pt_groups_profiles = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'is_matched': 'finding efficiency',
@@ -289,6 +311,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     # Make profiles of the hit efficiencies versus various fit parameters
@@ -303,6 +326,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
 
     #: Make profile of hit efficiency
     save_hit_efficiency_profiles = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select=renaming_select_for_hit_efficiency_profiles,
         y='hit efficiency',
@@ -310,10 +334,12 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         filter_on="is_primary",
         outlier_z_score=5.0,
         allow_discrete=True,
+        #: \endcond
     )
 
     #: Make profile of finding efficiency versus tan(lambda)
     save_hit_efficiency_by_tan_lambda_profiles = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'hit_efficiency': 'hit efficiency',
@@ -325,11 +351,13 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of finding efficiency versus pt, tan(lambda)
     save_finding_efficiency_by_pt_profiles_groupbyCharge = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'is_matched': 'finding efficiency',
@@ -341,11 +369,13 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         groupby=[("charge_truth", [0.])],
         outlier_z_score=5.0,
         allow_discrete=True,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of finding efficiency versus pt, tan(lambda)
     save_finding_efficiency_by_tan_lambda_profiles_groupbyCharge = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'is_matched': 'finding efficiency',
@@ -358,11 +388,13 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of finding efficiency versus pt, tan(lambda)
     save_hit_efficiency_by_pt_profiles_groupbyCharge = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'hit_efficiency': 'hit efficiency',
@@ -374,11 +406,13 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         groupby=[("charge_truth", [0.])],
         outlier_z_score=5.0,
         allow_discrete=True,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of finding efficiency versus pt, tan(lambda)
     save_hit_efficiency_by_tan_lambda_profiles_groupbyCharge = refiners.save_profiles(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         select={
             'hit_efficiency': 'hit efficiency',
@@ -391,23 +425,28 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: This creates a histogram for all MC track displaying the ratio of hits contained in any PR track
     #: Hence this is distinctly larger than the hit efficiency to the matched PR track
     #: Usefulness under discussion
     save_hit_efficiency_in_all_found_hist = refiners.save_histograms(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         # renaming quantity to name that is more suitable for display
         select=dict(hit_efficiency_in_all_found="total hit efficiency vs. all reconstructed tracks")
+        #: \endcond
     )
 
     #: This creates a histogram for *each missing* MC track displaying the ratio of hits contained in any PR tracks
     #: High values in this hit efficiencies means that the MC track is consumed by other PR tracks but no proper
     #: match could be established.
     save_missing_mc_tracks_hit_efficiency_in_all_found_hist = refiners.save_histograms(
+        #: \cond
         above_expert_level=default_expert_level - 1,
         filter_on="is_missing",  # show only the efficiencies of missing mc tracks
         # renaming quantity to name that is more suitable for display
         select=dict(hit_efficiency_in_all_found="total hit efficiency in all reconstructed tracks for missing mc tracks")
+        #: \endcond
     )

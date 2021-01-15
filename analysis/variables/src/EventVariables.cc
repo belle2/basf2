@@ -37,6 +37,7 @@
 
 #include <analysis/utility/PCmsLabTransform.h>
 
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
@@ -46,6 +47,11 @@ namespace Belle2 {
   namespace Variable {
 
     // Event ------------------------------------------------
+    double isMC(const Particle*)
+    {
+      return Environment::Instance().isMC();
+    }
+
     double eventType(const Particle*)
     {
       StoreArray<MCParticle> mcparticles;
@@ -547,7 +553,11 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event");
 
+    REGISTER_VARIABLE("isMC", isMC,
+                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
     REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
+    MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
+                     Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
@@ -579,7 +589,16 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
-    REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
+    REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
+[Eventbased] Production identifier.
+Uniquely identifies an MC sample by the (grid-jargon) production ID. 
+This is useful when analysing large MC samples split between more than one production or combining different MC samples (e.g. combining all continuum samples).
+In such cases the event numbers are sequential *only within a production*, so experiment/run/event will restart with every new sample analysed.
+
+.. tip:: Experiment/run/event/production is unique for all MC samples. Experiment/run/event is unique for data.
+
+.. seealso:: `Where can I rely on uniqueness of the ['__experiment__', '__run__', '__event__', '__candidate__'] combination? <https://questions.belle2.org/question/9704>`__
+)DOC");
 
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
@@ -596,7 +615,7 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
 )DOC");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
@@ -608,16 +627,16 @@ Returns NAN for data.
     REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
-                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
-                      " See also eventYear, provided for convenience."
-                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n\n"
+                      "See also eventYear, provided for convenience.\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("year", eventYear,
-                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n\n"
                       "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
                       "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
-                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n\n"
                       "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
     VARIABLE_GROUP("EventKinematics");

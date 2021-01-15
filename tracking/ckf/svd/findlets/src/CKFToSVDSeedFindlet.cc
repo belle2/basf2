@@ -95,16 +95,16 @@ void CKFToSVDSeedFindlet::apply()
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
 
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
-  B2DEBUG(50, "Created " << m_relations.size() << " relations.");
+  B2DEBUG(29, "Created " << m_relations.size() << " relations.");
 
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
-  B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
+  B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");
 
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
-  B2DEBUG(50, "After filtering: Having found " << m_results.size() << " results before overlap check");
+  B2DEBUG(29, "After filtering: Having found " << m_results.size() << " results before overlap check");
 
   m_recoTrackRelator.apply(m_results, m_relationsCDCToSVD);
   m_bestMatchSelector.apply(m_relationsCDCToSVD);

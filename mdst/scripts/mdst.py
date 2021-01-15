@@ -91,7 +91,7 @@ def add_mdst_dump(path, print_untested=False):
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD"
+            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"
             ]),
         DataStorePrinter("EventLevelTrackingInfo", [
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",
@@ -109,12 +109,12 @@ def add_mdst_dump(path, print_untested=False):
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
             "getClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
-            "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
+            "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta", "getR", "getHypotheses",
+            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
-            "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
+            "getCovarianceMatrix3x3", "getDetectorRegion",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
             "getPulseShapeDiscriminationMVA", "getMaxECellId",
             ], {
@@ -137,7 +137,7 @@ def add_mdst_dump(path, print_untested=False):
                              "getRelationsWith": ["KlIds", "MCParticles"],
                              }),
         DataStorePrinter("KlId", ["isKLM", "isECL", "getKlId"]),
-        DataStorePrinter("TRGSummary", ["getTimType"], {
+        DataStorePrinter("TRGSummary", ["getTimType", "getTimQuality"], {
             "getTRGSummary": range(10),
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
             "getInputBits": range(10),

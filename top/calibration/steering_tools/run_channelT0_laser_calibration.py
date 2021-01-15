@@ -16,8 +16,7 @@ import os
 import glob
 from caf import backends
 from caf.framework import Calibration, CAF
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
+from caf.strategies import SingleIOV
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
 from top_calibration import BS13d_calibration_local

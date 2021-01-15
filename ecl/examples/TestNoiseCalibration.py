@@ -51,6 +51,7 @@ def argparser():
                         'option with path to beam background files.')
     return parser
 
+
 args = argparser().parse_args()
 
 b2.set_log_level(b2.LogLevel.ERROR)
@@ -67,7 +68,7 @@ mainPath.add_module(eventInfoSetter)
 
 if args.beamBkgPath:
     # Add beam background
-    bg = glob.glob(args.beamBkgPath + '/*.root')
+    bgFiles = glob.glob(args.beamBkgPath + '/*.root')
     # Add simulation
     add_simulation(mainPath, bkgfiles=bgFiles, components='ECL')
 else:

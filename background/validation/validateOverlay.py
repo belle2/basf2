@@ -9,19 +9,17 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 import os
 import glob
-import sys
-import math
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 
-set_random_seed(123452)
+b2.set_random_seed(123452)
 
 
-class Histogrammer(Module):
+class Histogrammer(b2.Module):
 
     '''
     Make validation histograms for BG overlay.
@@ -35,11 +33,11 @@ class Histogrammer(Module):
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               100, 30000, 40000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 4000))
-        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 4000))
+        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
-                              100, 0, 100))
+                              100, 0, 200))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         for h in self.hist:
@@ -82,17 +80,17 @@ bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
     if bg is None:
-        B2FATAL('No beam background samples found in folder ' +
-                os.environ['BELLE2_BACKGROUND_DIR'])
-    B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
+        b2.B2FATAL('No beam background samples found in folder ' +
+                   os.environ['BELLE2_BACKGROUND_DIR'])
+    b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
 else:
-    B2FATAL('variable BELLE2_BACKGROUND_DIR is not set')
+    b2.B2FATAL('variable BELLE2_BACKGROUND_DIR is not set')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
@@ -103,11 +101,11 @@ add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, fo
 main.add_module(Histogrammer())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

@@ -21,13 +21,13 @@ import sys
 
 
 if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG overlay samples')
+    basf2.B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG overlay samples')
     sys.exit()
 
 # background overlay files
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 if len(bg) == 0:
-    B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    basf2.B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
     sys.exit()
 
 # Create path

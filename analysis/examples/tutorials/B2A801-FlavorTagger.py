@@ -5,7 +5,7 @@
 # Stuck? Ask for help at questions.belle2.org
 #
 # This tutorial demonstrates how to include the flavor
-# tagging user interphase into your analysis.
+# tagging user interface into your analysis.
 # The following decay chain:
 #
 # B0 -> J/psi Ks
@@ -37,24 +37,17 @@ cp_val_path = b2.Path()
 # Environment of the MC or data sample
 environmentType = "default"
 
-# If you want to use converted Belle data or MC set here "Belle"
-# Attention! If you set Belle you need to have the Belle database locally
-belleOrBelle2Flag = "Belle2"
-
-
 # For Belle data/MC use
-#  from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
-#  import os
-#
-#  isBelleMC = True  # False for Belle Data True for Belle MC
-#  setupB2BIIDatabase(isBelleMC)
-#  os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
-#  os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
-#
-#  environmentType = "Belle"
-#
-#  # You can use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A801-FlavorTagger.p
-#  ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
+# from b2biiConversion import convertBelleMdstToBelleIIMdst
+# import os
+
+# os.environ['PGUSER'] = 'g0db'
+# os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+
+# environmentType = "Belle"
+
+# # You can use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A801-FlavorTagger.py
+# ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
 
 # load input ROOT file
@@ -72,10 +65,7 @@ ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', 
 
 
 # For Belle data/MC use
-#  # use the existent K_S0:mdst list
-#  ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
-#
-#  # reconstruct B0 -> J/psi Ks decay
+#  # use the existent K_S0:mdst list to reconstruct B0 -> J/psi Ks decay
 #  ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
 
@@ -90,10 +80,10 @@ ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2
 ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(target_list_name='B0:sig',
+ma.buildRestOfEvent(target_list_name='B0:sig', fillWithMostLikely=True,
                     path=cp_val_path)
 
-b2.conditions.append_globaltag("analysis_tools_release-04-02")
+b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
@@ -112,15 +102,12 @@ weightfiles = 'B2nunubarBGx1'
 ft.flavorTagger(
     particleLists=['B0:sig'],
     weightFiles=weightfiles,
-    belleOrBelle2=belleOrBelle2Flag,
     path=cp_val_path)
 
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
 # combinerMethods=['TMVA-FBDT']
-#
-# With the belleOrBelle2 argument you specify if you are using Belle MC (also Belle Data) or Belle2 MC.
 #
 # All available categories are:
 # [
@@ -138,7 +125,7 @@ ft.flavorTagger(
 # 'MaximumPstar',
 # 'KaonPion']
 #
-# If you want to train yourself, have a look at the scritps under analysis/release-validation/CPVTools/
+# If you want to train yourself, have a look at the scripts under analysis/release-validation/CPVTools/
 # in principle you need only to run CPVToolsValidatorInParalell.sh
 # If you train the  event and combiner levels, you need two different samples of at least 500k events (one for each sampler).
 # The different samples are needed to avoid biases between levels.
@@ -155,10 +142,10 @@ ft.flavorTagger(
 #
 # Attention: to train the flavor tagger you need MC samples generated without built-in CP violation!
 # The best sample for this is B0-> nu_tau anti-nu_tau .
-# You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
+# You can apply cuts using the flavor Tagger: isNAN(qrOutput(FBDT)) < 1 rejects all events which do not
 # provide flavor information using the tag side
 ma.applyCuts(list_name='B0:sig',
-             cut='qrOutput(FBDT) > -2',
+             cut='isNAN(qrOutput(FBDT)) < 1',
              path=cp_val_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
@@ -169,8 +156,8 @@ ma.rankByHighest(particleList='B0:sig',
                  path=cp_val_path)
 
 # Fit vertex of the B0 on the signal side
-vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-           constraint='', path=cp_val_path)
+vx.kFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+        constraint='', path=cp_val_path)
 
 
 # Fit Vertex of the B0 on the tag side

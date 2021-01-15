@@ -13,7 +13,7 @@
 
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -52,22 +52,23 @@ gROOT.ProcessLine('struct EventDataCluster {\
 };')
 
 
-from ROOT import EventDataCluster
+from ROOT import EventDataCluster  # noqa
 
 
-class SVDValidationTTreeCluster(Module):
+class SVDValidationTTreeCluster(b2.Module):
     '''class to produce the ttree for cluster validation'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeCluster, self).__init__()
+
+        #: Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeCluster.root', 'recreate')
-        '''Output ROOT file'''
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataCluster()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataCluster.__dict__:

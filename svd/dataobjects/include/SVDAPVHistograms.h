@@ -27,7 +27,7 @@ namespace Belle2 {
     SVDAPVHistograms():
       SVDAPVHistograms(H()) {};
 
-    /** Use @param template to initialize all the histograms*/
+    /** Use @param templateAPV to initialize all the histograms*/
     explicit SVDAPVHistograms(const H& templateAPV);
 
     /** clean everything in the destructor */
@@ -61,7 +61,11 @@ namespace Belle2 {
     }
 
     // variable number of arguments for TH1 TH2...
-    /** fill the histogram for @param vxdID side @param view with @param args*/
+    /** fill the histogram for
+     * @param vxdID side
+     * @param view
+     * @param apv
+     * @param args value to be filled*/
     template< class ... Types>
     void fill(const VxdID& vxdID, int view, int apv, Types ... args)
     {
@@ -69,7 +73,11 @@ namespace Belle2 {
     }
 
     // variable number of arguments for TH1 TH2...
-    /** fill the histogram for @param vxdID side @param isU with @param args*/
+    /** fill the histogram for
+     * @param vxdID side
+     * @param isU
+     * @param apv
+     * @param args value to be filled*/
     template< class ... Types>
     void fill(const VxdID& vxdID, bool isU, int apv, Types ... args)
     {

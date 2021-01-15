@@ -4,6 +4,9 @@
 
 from prompt import CalibrationSettings
 from prompt.utils import events_in_basf2_file
+import basf2
+from random import choice
+from caf.framework import Calibration
 
 
 #: Tells the automated system some details of this script
@@ -12,11 +15,15 @@ settings = CalibrationSettings(name="CDC Tracking",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
-                               depends_on=[])
-
-
-import basf2
-from random import choice, seed
+                               depends_on=[],
+                               expert_config={
+                                   "max_files_per_run": 100000,
+                                   "min_events_per_file": 1,
+                                   "max_events_per_calibration": 200000,
+                                   "max_events_per_calibration_for_xt_sr": 1000000,
+                                   "max_events_per_file": 5000,
+                                   "max_events_per_file_hadron": 2500
+                               })
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -68,13 +75,13 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_hadron = input_data["hlt_hadron"]
     file_to_iov_Bcosmics = input_data["Bcosmics"]
 
-    max_files_per_run = 10
-    min_events_per_file = 1000
-
-    max_events_per_calibration = 200000  # for t0, tw calib. 200k events for each skim
-    max_events_per_calibration_for_xt_sr = 1000000  # for xt, sr calib. 1M events for each skim
-    max_events_per_file = 5000
-    max_events_per_file_hadron = 2500
+    expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["max_files_per_run"]
+    min_events_per_file = expert_config["min_events_per_file"]
+    max_events_per_calibration = expert_config["max_events_per_calibration"]  # for t0, tw calib.
+    max_events_per_calibration_for_xt_sr = expert_config["max_events_per_calibration_for_xt_sr"]  # for xt, sr calib.
+    max_events_per_file = expert_config["max_events_per_file"]
+    max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -335,9 +342,6 @@ def sr_algo():
     algo.setStoreHisto(True)
     algo.setThreshold(0.4)
     return algo
-
-
-from caf.framework import Calibration
 
 
 class CDCCalibration(Calibration):

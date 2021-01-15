@@ -60,7 +60,7 @@ for f in bkgs:
 #    ' ' + fileSAD + ' ' + outdir + '/output/'
         print(com)
         if os.path.isfile(outdir + '/log/' + logname) and skp == 0:
-            answ = raw_input("Output file already exists. Overwrite for all (y), skip existing (n): ")
+            answ = input("Output file already exists. Overwrite for all (y), skip existing (n): ")
             if answ == 'y':
                 skp = 2
             elif answ == 'n':

@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013-2018 Belle II Collaboration                          *
+* Copyright(C) 2013-2020 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
@@ -107,6 +107,7 @@ void VariablesToNtupleModule::initialize()
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
   m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__production__", &m_production, "__production__/I");
   if (not m_particleList.empty()) {
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
@@ -124,6 +125,10 @@ void VariablesToNtupleModule::initialize()
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
     string branchName = makeROOTCompatible(varStr);
+
+    // Check for deprecated variables
+    Variable::Manager::Instance().checkDeprecatedVariable(varStr);
+
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     // also collection function pointers
@@ -133,7 +138,10 @@ void VariablesToNtupleModule::initialize()
     } else {
       if (m_particleList.empty() && var->description.find("[Eventbased]") == string::npos) {
         B2ERROR("Variable '" << varStr << "' is not an event-based variable, "
-                "but you are using VariablesToNtuple without a decay string, i.e. in the event-wise mode.");
+                "but you are using VariablesToNtuple without a decay string, i.e. in the event-wise mode.\n"
+                "If you have created an event-based alias you can wrap your alias with `eventCached` to "
+                "declare it as event based, which avoids this error.\n\n"
+                "vm.addAlias('myAliasName', 'eventCached(myAlias)')");
         continue;
       }
       m_functions.push_back(var->function);
@@ -181,6 +189,7 @@ void VariablesToNtupleModule::event()
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
+  m_production = m_eventMetaData->getProduction();
 
   if (m_particleList.empty()) {
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);

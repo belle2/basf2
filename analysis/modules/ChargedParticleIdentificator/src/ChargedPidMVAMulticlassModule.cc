@@ -197,7 +197,8 @@ void ChargedPidMVAMulticlassModule::event()
 void ChargedPidMVAMulticlassModule::initializeMVA()
 {
 
-  B2INFO("Load supported MVA interfaces for multi-class charged particle identification...");
+  B2INFO("Run: " << m_event_metadata->getRun() <<
+         ". Load supported MVA interfaces for multi-class charged particle identification...");
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();
@@ -263,9 +264,11 @@ void ChargedPidMVAMulticlassModule::initializeMVA()
                 "] has no registered MVA classes! This shouldn't happen in multi-class mode. Aborting...");
       }
 
+      m_classes.clear();
       for (const auto& cls : specific_options.m_classes) {
         m_classes.push_back(cls);
       }
+
     }
   }
 }

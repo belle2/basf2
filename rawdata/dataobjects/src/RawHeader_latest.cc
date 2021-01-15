@@ -55,9 +55,6 @@ RawHeader_latest::~RawHeader_latest()
 //   return 0;
 // }
 
-
-
-
 void RawHeader_latest::CheckHeader(int* buf)
 {
 
@@ -94,41 +91,111 @@ void RawHeader_latest::CheckHeader(int* buf)
 
   // truncation mask
 
+  int ch = 0;
   // offset
-  if (buf[ POS_OFFSET_1ST_FINESSE ] < RAWHEADER_NWORDS) {
+  if (buf[ POS_CH_POS_TABLE + ch ] < RAWHEADER_NWORDS) {
     char err_buf[500];
-    sprintf(err_buf, "Invalid data offset for 1st finesse buffer(%d). Exiting...: %s %s %d\n",
-            buf[ POS_OFFSET_1ST_FINESSE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf, "Invalid data offset for ch(=%d) finesse buffer(%d). Exiting...: %s %s %d\n",
+            ch, buf[ POS_CH_POS_TABLE + ch ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }
 
-  if (buf[ POS_OFFSET_2ND_FINESSE ] < buf[ POS_OFFSET_1ST_FINESSE ]) {
+  for (int i = 1; i < (MAX_PCIE40_CH - 1); i++) {
+    ch = i;
+    if (buf[ POS_CH_POS_TABLE + ch ] < buf[ POS_CH_POS_TABLE + (ch - 1) ]) {
+      char err_buf[500];
+      sprintf(err_buf, "Invalid data offset for ch(=%d) finesse buffer(%d). Exiting...: %s %s %d\n",
+              ch, buf[ POS_CH_POS_TABLE + ch ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
+    }
+  }
+  ch = MAX_PCIE40_CH - 1;
+
+  if (buf[ POS_CH_POS_TABLE + ch ] < buf[ POS_CH_POS_TABLE + (ch - 1) ] ||
+      buf[ POS_CH_POS_TABLE + ch ] > buf[ POS_NWORDS ]) {
     char err_buf[500];
-    sprintf(err_buf, "Invalid data offset for 2nd finesse buffer(%d). Exiting...: %s %s %d\n",
-            buf[ POS_OFFSET_2ND_FINESSE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf, "Invalid data offset for ch(=%d) finesse buffer(%d). Exiting...: %s %s %d\n",
+            ch, buf[ POS_CH_POS_TABLE + ch ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }
-
-  if (buf[ POS_OFFSET_3RD_FINESSE ] < buf[ POS_OFFSET_2ND_FINESSE ]) {
-    char err_buf[500];
-    sprintf(err_buf, "Invalid data offset for 3rd finesse buffer(%d). Exiting...: %s %s %d\n",
-            buf[ POS_OFFSET_3RD_FINESSE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    B2FATAL(err_buf);
-  }
-
-  if (buf[ POS_OFFSET_4TH_FINESSE ] < buf[ POS_OFFSET_3RD_FINESSE ] ||
-      buf[ POS_OFFSET_4TH_FINESSE ] > buf[ POS_NWORDS ]) {
-    char err_buf[500];
-    sprintf(err_buf, "Invalid data offset for 4th finesse buffer(%d). Exiting...: %s %s %d\n",
-            buf[ POS_OFFSET_4TH_FINESSE ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    B2FATAL(err_buf);
-  }
-
   return;
+}
 
+void RawHeader_latest::SetOffset1stFINESSE(int /*offset_1st_FINESSE*/)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+}
 
+void RawHeader_latest::SetOffset2ndFINESSE(int /*offset_2nd_FINESSE*/)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+}
+
+void RawHeader_latest::SetOffset3rdFINESSE(int /*offset_3rd_FINESSE*/)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+}
+
+void RawHeader_latest::SetOffset4thFINESSE(int /*offset_4th_FINESSE*/)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+}
+
+int RawHeader_latest::GetOffset1stFINESSE()
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawHeader_latest::GetOffset2ndFINESSE()
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawHeader_latest::GetOffset3rdFINESSE()
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawHeader_latest::GetOffset4thFINESSE()
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
 }

@@ -6,14 +6,14 @@
 # This file can be used as input to simulation, see examples/simGCRData.py
 # --------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from rawdata import add_unpackers
 from reconstruction import add_cosmics_reconstruction
 from ROOT import Belle2
 import math
 
 
-class MakeMCParticles(Module):
+class MakeMCParticles(b2.Module):
     ''' make MCParticles from reconstructed cosmic tracks '''
 
     def initialize(self):
@@ -67,20 +67,20 @@ class MakeMCParticles(Module):
 
 
 # Create path
-main = create_path()
-emptypath = create_path()
+main = b2.create_path()
+emptypath = b2.create_path()
 
 # input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 # roinput = register_module('SeqRootInput')
 main.add_module(roinput)
 
 # geometry parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # unpackers
@@ -95,16 +95,16 @@ main.add_module(maker)
 maker.if_false(emptypath)
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('branchNames', ['MCParticles'])
 main.add_module(output)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

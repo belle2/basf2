@@ -3085,7 +3085,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, use2DRhoPhiDist=False, alias=None, *detectors):
+def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 

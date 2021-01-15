@@ -59,6 +59,11 @@ void TrackIsoCalculatorModule::initialize()
 void TrackIsoCalculatorModule::event()
 {
 
+  if (!m_pList) {
+    B2WARNING("Input ParticleList " << m_pListName << " not found in the DataStore!");
+    return;
+  }
+
   const auto nParticles = m_pList->getListSize();
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles);
@@ -100,7 +105,6 @@ void TrackIsoCalculatorModule::event()
     auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
 
     Particle* iParticle = m_pList->getParticle(iPart);
-    Particle* jParticle = m_pList->getParticle(jPart);
 
     B2DEBUG(10, m_extraInfoName << " = " << *minDist << " [cm] - Particle[" << iPart << "]'s closest partner at innermost " <<
             m_detInnerSurface << " surface is Particle[" << jPart << "]");
@@ -108,10 +112,6 @@ void TrackIsoCalculatorModule::event()
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(10, "\tStoring extraInfo for Particle[" << iPart << "]...");
       iParticle->writeExtraInfo(m_extraInfoName, *minDist);
-    }
-    if (!jParticle->hasExtraInfo(m_extraInfoName)) {
-      B2DEBUG(10, "\tStoring extraInfo for Particle[" << jPart << "]...");
-      jParticle->writeExtraInfo(m_extraInfoName, *minDist);
     }
   }
 
@@ -157,15 +157,15 @@ double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Part
                      && jExtTheta < th_fwd_brl) ? zfwd / cos(jExtTheta) : zbwd / cos(jExtTheta));
 
   // Now convert r, theta, phi to cartesian coordinates.
-  // 1. x = r * sin(theta) * cos(theta)
+  // 1. x = r * sin(theta) * cos(phi)
   // 2. y = r * sin(theta) * sin(phi)
   // 3. z = r * cos(theta)
 
-  const auto iExtX = iExtR * sin(iExtTheta) * cos(iExtTheta);
+  const auto iExtX = iExtR * sin(iExtTheta) * cos(iExtPhi);
   const auto iExtY = iExtR * sin(iExtTheta) * sin(iExtPhi);
   const auto iExtZ = iExtR * cos(iExtTheta);
 
-  const auto jExtX = jExtR * sin(jExtTheta) * cos(jExtTheta);
+  const auto jExtX = jExtR * sin(jExtTheta) * cos(jExtPhi);
   const auto jExtY = jExtR * sin(jExtTheta) * sin(jExtPhi);
   const auto jExtZ = jExtR * cos(jExtTheta);
 

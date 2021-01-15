@@ -45,27 +45,30 @@ if __name__ == '__main__':
     import basf2 as b2
     import modularAnalysis as ma
     from variables import variables
-    import variables.utils as vu
-    import variables.collections as vc
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
     ma.inputMdstList("default",
-                     filename=basf2.find_file("mdst13.root", "validation"),
+                     filelist=[b2.find_file("mdst13.root", "validation")],
                      path=path)
 
-    # Fill a particle list of stadndard charged particles (eg. pions).
+    # Fill a particle list of charged stable particles (eg. pions).
     # Apply (optionally) some quality selection.
-    ma.fillParticleList("pi+:loose", "", path=path)
-    ma.applyCuts("pi+:loose", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+    ma.fillParticleList("pi+:all", "", path=path)
+    ma.applyCuts("pi+:all", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
-    # Calculate the mininmal distance at a given detector surface among all
-    # track candidates in the input particle list.
+    ma.printList("pi+:all", False, path=path)
+    # Get particle statistics at the end of the job: number of events with at
+    # least one candidate, average number of candidates per event, etc.
+    # ma.summaryOfLists(["pi+:all"], path=path)
 
-    ma.calculateTrackIsolation("pi+:loose", path, alias="dist3DToClosestTrkAtSurface", *args.detectors)
-    ma.calculateTrackIsolation("pi+:loose", path, use2DRhoPhiDist=True, alias="dist2DRhoPhiToClosestTrkAtSurface", *args.detectors)
+    # # Calculate the mininmal distance at a given detector surface among all
+    # # track candidates in the input particle list.
+
+    ma.calculateTrackIsolation("pi+:all", path, *args.detectors, alias="dist3DToClosestTrkAtSurface")
+    ma.calculateTrackIsolation("pi+:all", path, *args.detectors, use2DRhoPhiDist=True, alias="dist2DRhoPhiToClosestTrkAtSurface")
 
     ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
     ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
@@ -77,11 +80,12 @@ if __name__ == '__main__':
                 m.set_log_level(b2.LogLevel.DEBUG)
                 m.set_debug_level(args.debug)
 
-    # Dump isolation variables in an ntuple.
-    path.add_module("VariablesToNtuple",
-                    particleList="pi+:loose",
-                    variables=ntup_vars,
-                    fileName="TrackIsolationVariables.root")
+    # Dump isolation variables in a ntuple.
+    ma.variablesToNtuple("pi+:all",
+                         ntup_vars,
+                         treename="pi",
+                         filename="TrackIsolationVariables.root",
+                         path=path)
 
     path.add_module("Progress")
 

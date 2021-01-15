@@ -69,17 +69,6 @@ namespace Belle2 {
     void fillPDFs(MuidElementNumbers::Hypothesis hypothesis);
 
     /**
-     * Construct spline interpolation coefficients (first, second, third derivatives).
-     * @param[in] n  Number of bins.
-     * @param[in] dx Width of each bin.
-     * @param[in] Y  Value of the bins.
-     * @param[in] B  First derivative.
-     * @param[in] C  Second derivative.
-     * @param[in] D  Third derivative.
-     */
-    void spline(int n, double dx, double Y[], double B[], double C[], double D[]);
-
-    /**
      * Calculate the longitudinal PDF for a given hypothesis.
      * @param[in] muid KLMMuidLikelihood dataobject.
      */

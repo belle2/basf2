@@ -5,8 +5,7 @@ from simulation import add_simulation
 
 from basf2 import conditions as b2conditions
 import basf2 as b2
-from svd import *
-from tracking import *
+from svd import add_svd_reconstruction
 import glob
 import ROOT
 from ROOT import Belle2, TH1F, TH2F, TFile
@@ -347,9 +346,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
 
         f.Close()
 
-# b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
-# b2conditions.prepend_globaltag("svd_NOCoGCorrections")
-b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
+# b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
 
 main = b2.create_path()
 

@@ -73,7 +73,7 @@ void SVDRecoDigitCreatorModule::beginRun()
 
   if (m_useDB) {
     if (!m_recoConfig.isValid())
-      B2ERROR("no valid configuration found for SVD reconstruction");
+      B2FATAL("no valid configuration found for SVD reconstruction");
     else
       B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 

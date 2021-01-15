@@ -59,7 +59,6 @@ namespace Belle2 {
       std::string m_storeShaperDigitsName;
       /** Name of the collection to use for the SVDRecoDigits */
       std::string m_storeRecoDigitsName;
-
       /** Name of the collection to use for the SVDClusters */
       std::string m_storeClustersName;
 
@@ -70,19 +69,19 @@ namespace Belle2 {
       /** Collection of SVDRecoDigits */
       StoreArray<SVDRecoDigit> m_storeReco;
 
-// 2. Reconstruction
+
+      // 2. Strip Reconstruction Configuration:
+
       /** if true takes the strip reconstruction configuration from the DB objects*/
       bool m_useDB = true;
 
-      // 3. Cluster Reconstruction Configuration:
-
-      /** string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
+      /** string storing the strip time reconstruction algorithm in 6-sample DAQ mode*/
       std::string m_timeRecoWith6SamplesAlgorithm = "not set";
-      /** string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/
+      /** string storing the strip time reconstruction algorithm in 3-sample DAQ mode*/
       std::string m_timeRecoWith3SamplesAlgorithm = "not set";
-      /** string storing the cluster charge reconstruction algorithm in 6-sample DAQ mode*/
+      /** string storing the strip charge reconstruction algorithm in 6-sample DAQ mode*/
       std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
-      /**string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
+      /**string storing the strip charge reconstruction algorithm in 3-sample DAQ mode*/
       std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
 
       SVDClusterTime* m_time6SampleClass = nullptr; /**< strip time class for the 6-sample acquisition mode*/
@@ -90,10 +89,10 @@ namespace Belle2 {
       SVDClusterCharge* m_charge6SampleClass = nullptr; /**< strip charge class for the 6-sample acquisition mode*/
       SVDClusterCharge* m_charge3SampleClass = nullptr; /**< strip charge class for the 3-sample acquisition mode*/
 
-      // 4. Calibration Objects
+      // 3. Calibration Objects
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
-
       SVDNoiseCalibrations m_NoiseCal; /**< wrapper of the noise calibrations*/
+
     };// end class declarations
 
 

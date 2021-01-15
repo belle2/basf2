@@ -43,6 +43,10 @@
 #include <vector>
 #include <numeric>
 
+
+#include <Eigen/Dense>
+
+
 //if compiled within BASF2
 #ifdef _PACKAGE_
 #include <tracking/calibration/BeamSpotStandAlone.h>
@@ -56,6 +60,12 @@
 
 
 using namespace std;
+
+using Eigen::VectorXd;
+using Eigen::Vector3d;
+using Eigen::MatrixXd;
+using Eigen::Matrix3d;
+
 
 namespace Belle2 {
   namespace BeamSpotCalib {

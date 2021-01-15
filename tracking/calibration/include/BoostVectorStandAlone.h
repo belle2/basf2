@@ -13,8 +13,8 @@
 #include <map>
 #include <utility>
 #include <tuple>
-#include "TMatrixDSym.h"
-#include "TVector3.h"
+#include <TMatrixDSym.h>
+#include <TVector3.h>
 
 //If compiled within BASF2
 #ifdef _PACKAGE_

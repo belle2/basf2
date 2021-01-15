@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from simulation import add_simulation
+
 from basf2 import conditions as b2conditions
+import basf2 as b2
 from svd import *
 from tracking import *
 import glob
@@ -14,23 +16,21 @@ numEvents = 2000
 # bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
 bkgFiles = None  # uncomment to remove  background
 simulateJitter = False
-
 ROIfinding = False
-MCTracking = True
-# set this string to identify the output rootfiles
-tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
 
-
-set_random_seed(1234)
+b2.set_random_seed(1234)
 # logging.log_level = LogLevel.DEBUG
 
 expList = [1003]
 
 
-class SVDClustersQuickCheck(basf2.Module):
+class SVDClustersQuickCheck(b2.Module):
+    ''' quick check of cluster reconstruction'''
 
     def initialize(self):
+        '''define histograms'''
 
+        #: \cond
         self.test = []
         self.testNew = []
         self.size = TH1F("cl_size", "Cluster Size", 20, 0, 20)
@@ -67,6 +67,7 @@ class SVDClustersQuickCheck(basf2.Module):
         self.positionPull2New = TH1F("clNew_positionPull2", "New Cluster Position Pull Size 2", 200, -10, 10)
         self.positionPull3 = TH1F("cl_positionPull3", "Cluster Position Pull Size >2", 200, -10, 10)
         self.positionPull3New = TH1F("clNew_positionPull3", "New Cluster Position Pull Size >2", 200, -10, 10)
+        #: \endcond
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -89,6 +90,8 @@ class SVDClustersQuickCheck(basf2.Module):
         print(self.test)
 
     def event(self):
+        ''' look at cluster and new clusters'''
+
         clusterList = Belle2.PyStoreArray("SVDClusters")
         clusterListNew = Belle2.PyStoreArray("SVDNewClusters")
         print("number of clusters = "+str(clusterList.getEntries())+" (old) VS "+str(clusterListNew.getEntries())+" (new)")
@@ -161,6 +164,8 @@ class SVDClustersQuickCheck(basf2.Module):
             self.positionPullNew.Fill((d.getPosition() - truePos)/d.getPositionSigma())
 
     def terminate(self):
+        '''write'''
+
         f = TFile("quicktestSVDClusterOldDefault.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
@@ -255,19 +260,21 @@ class SVDClustersQuickCheck(basf2.Module):
 
         f.Close()
 
-# reco digits:
 
-
-class SVDRecoDigitsQuickCheck(basf2.Module):
+class SVDRecoDigitsQuickCheck(b2.Module):
+    '''quick check of SVDRecoDigits'''
 
     def initialize(self):
+        '''define histograms'''
 
+        #: \cond
         self.test = []
         self.testNew = []
         self.time = TH1F("rd_time", "RecoDigit Time", 300, -100, 200)
         self.timeNew = TH1F("rdNew_time", "New RecoDigit Time", 300, -100, 200)
         self.charge = TH1F("rd_charge", "RecoDigit Charge", 300, 0, 100000)
         self.chargeNew = TH1F("rdNew_charge", "New RecoDigit Charge", 300, 0, 100000)
+        #: \endcond
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -290,6 +297,8 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
         print(self.test)
 
     def event(self):
+        '''look at old and new reco digits'''
+
         recodigitList = Belle2.PyStoreArray("SVDRecoDigits")
         recodigitListNew = Belle2.PyStoreArray("SVDNewRecoDigits")
 
@@ -314,6 +323,8 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
                                                                   d.getSensorID().getSensorNumber()+isU)
 
     def terminate(self):
+        '''write'''
+
         f = TFile("quicktestSVDRecoDigitOldDefault.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
@@ -340,9 +351,9 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
 # b2conditions.prepend_globaltag("svd_NOCoGCorrections")
 b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', expList)
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [numEvents])
@@ -362,63 +373,39 @@ for mod in main.modules():
         mod.param("timeAlgorithm", 0)
         mod.param("HeadTailSize", 3)
 
-clusterizer = register_module('SVDClusterizer')
+clusterizer = b2.register_module('SVDClusterizer')
 clusterizer.param('timeAlgorithm6Samples', "CoG6")
 clusterizer.param('timeAlgorithm3Samples', "CoG6")
 clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
 clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
 clusterizer.param('positionAlgorithm6Samples', "oldDefault")
 clusterizer.param('positionAlgorithm3Samples', "oldDefault")
+clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
+clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
+clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
+clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
 clusterizer.param('Clusters', "SVDNewClusters")
-clusterizer.param('useDB', True)
+clusterizer.param('useDB', False)
 main.add_module(clusterizer)
 
-recoDigitCreator = register_module('SVDRecoDigitCreator')
+recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
 recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
 recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
 recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
 recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
 recoDigitCreator.param('RecoDigits', "SVDNewRecoDigits")
-recoDigitCreator.param('useDB', True)
+recoDigitCreator.param('useDB', False)
 main.add_module(recoDigitCreator)
 
-'''
-simpleclusterizer = register_module('SVDSimpleClusterizer')
-simpleclusterizer.set_name("secondSVDSimpleClusterizer")
-simpleclusterizer.param('RecoDigits', "SVDNewRecoDigits")
-simpleclusterizer.param('Clusters', "SVDSimpleClusters")
-simpleclusterizer.param('useDB', True)
-main.add_module(simpleclusterizer)
-'''
 main.add_module(SVDClustersQuickCheck())
 main.add_module(SVDRecoDigitsQuickCheck())
 
-
-'''
-add_tracking_reconstruction(
-    main,
-    components=["SVD"],
-    mcTrackFinding=MCTracking,
-    trackFitHypotheses=[211],
-    skipHitPreparerAdding=True)
-
-
-tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
-clseval = register_module('SVDClusterEvaluationTrueInfo')
-clseval.param('outputFileName', "ClusterEvaluationTrueInfo" + str(tag))
-main.add_module(clseval)
-
-svdperf = register_module('SVDPerformance')
-svdperf.param('outputFileName', "SVDPerformance" + str(tag))
-main.add_module(svdperf)
-
-main.add_module('RootOutput')
-'''
+# main.add_module('RootOutput')
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

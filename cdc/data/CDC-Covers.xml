@@ -3276,7 +3276,7 @@ Rib6 (trapezoid-tube)
     <Offset desc="Number of divisions">1</Offset>
     <NDiv desc="Number of divisions">16</NDiv>
   </Rib4>
-  <Rib4 id="8" desc="FEE board 10">
+  <Rib4 id="9" desc="FEE board 10">
     <Name>FEEBoard</Name>
     <Length desc="FEEB length (X)" unit="mm">2.0</Length>
     <Width desc="FEEB width (Y)" unit="mm">200.0</Width>

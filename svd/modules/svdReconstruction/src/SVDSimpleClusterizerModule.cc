@@ -255,10 +255,14 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   int firstFrame = cluster.getFirstFrame();
 
   //first check SVDEventInfo name
-  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-  std::string m_svdEventInfoName = "SVDEventInfo";
-  if (!temp_eventinfo.isValid())
-    m_svdEventInfoName = m_svdEventInfoSet;
+  std::string m_svdEventInfoName = m_svdEventInfoSet;
+  if (m_svdEventInfoSet == "SVDEventInfoSim") {
+    StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+    m_svdEventInfoName = "SVDEventInfo";
+    if (!temp_eventinfo.isValid())
+      m_svdEventInfoName = m_svdEventInfoSet;
+  }
+
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 

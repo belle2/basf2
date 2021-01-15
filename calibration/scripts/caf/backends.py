@@ -1253,7 +1253,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently int the batch system globally. Waiting until submission can continue...")
+                B2INFO(f"Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this
@@ -1985,16 +1985,7 @@ class HTCondor(Batch):
                     B2DEBUG(29, f"Found {self.job_id} in condor_q_output.")
                     jobs_info.append(job_record)
 
-            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
-            if not jobs_info:
-                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
-
-            # If no job information is returned then the job already left the queue
-            # check in the history to see if it suceeded or failed
-            if not jobs_info:
-                jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
-
-            # Getting ridiculous, let's look for the exit code file where we expect it
+            # Let's look for the exit code file where we expect it
             if not jobs_info:
                 try:
                     exit_code = self.get_exit_code_from_file()
@@ -2010,6 +2001,18 @@ class HTCondor(Batch):
                     jobs_info = [{"JobStatus": 6, "HoldReason": None}]  # Set to failed
                 else:
                     jobs_info = [{"JobStatus": 4, "HoldReason": None}]  # Set to completed
+
+            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
+            if not jobs_info:
+                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+
+            # If no job information is returned then the job already left the queue
+            # check in the history to see if it suceeded or failed
+            if not jobs_info:
+                try:
+                    jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+                except KeyError:
+                    hold_reason = "No Reason Known"
 
             # Still no record of it after waiting for the exit code file?
             if not jobs_info:

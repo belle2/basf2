@@ -72,6 +72,9 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdStripTime", &m_svdStripTime);
   m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_U->Branch("svdRes", &m_svdRes, "svdRes/F");
+  m_t_U->Branch("svdPitch", &m_svdPitch, "svdPitch/F");
+  m_t_U->Branch("svdWidth", &m_svdWidth, "svdWidth/F");
+  m_t_U->Branch("svdLength", &m_svdLength, "svdLength/F");
   m_t_U->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_U->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
   m_t_U->Branch("svdClPosErr", &m_svdClPosErr, "svdClPosErr/F");
@@ -111,6 +114,9 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
   m_t_V->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
+  m_t_V->Branch("svdPitch", &m_svdPitch, "svdPitch/F");
+  m_t_V->Branch("svdWidth", &m_svdWidth, "svdWidth/F");
+  m_t_V->Branch("svdLength", &m_svdLength, "svdLength/F");
   m_t_V->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_V->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
   m_t_V->Branch("svdClPosErr", &m_svdClPosErr, "svdClPosErr/F");
@@ -262,13 +268,11 @@ void SVDPerformanceTTreeModule::event()
           m_svdSensor = svd_Sensor_1;
           m_svdSize = strips_1;
 
-          float pitch = 50e-4;
-          float halfLength = 1.92;
-          if (m_svdLayer > 3) {
-            pitch = 75e-4;
-            halfLength = 2.88;
-          }
-          m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
+          m_svdPitch = svdSensor_1.getUPitch(m_svdTrkPosOS);
+          m_svdWidth = svdSensor_1.getUSize(m_svdTrkPosOS);
+          m_svdLength = svdSensor_1.getVSize();
+
+          m_svdClIntStrPos = fmod(m_svdClPos + 0.5 * m_svdWidth, m_svdPitch) / m_svdPitch;
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
@@ -328,12 +332,11 @@ void SVDPerformanceTTreeModule::event()
           m_svdSensor = svd_Sensor_1;
           m_svdSize = strips_1;
 
-          float pitch = 160e-4;
-          float halfLength = 6.144;
-          if (m_svdLayer > 3) {
-            pitch = 240e-4;
-          }
-          m_svdClIntStrPos = fmod(m_svdClPos + halfLength, pitch) / pitch;
+          m_svdPitch = svdSensor_1.getVPitch();
+          m_svdWidth = svdSensor_1.getUSize(m_svdTrkPos);
+          m_svdLength = svdSensor_1.getVSize();
+
+          m_svdClIntStrPos = fmod(m_svdClPos + 0.5 * m_svdLength, m_svdPitch) / m_svdPitch;
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();

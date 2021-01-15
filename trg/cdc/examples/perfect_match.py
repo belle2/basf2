@@ -8,16 +8,15 @@
 #
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
-from interactive import embed
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Set Database
-use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+b2.use_database_chain()
+b2.use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 
 # Input file
 # Get type of input file to decide, which input module we want to use
@@ -27,19 +26,19 @@ if input_files.empty():
           'basf2 perfect_match.py -i input.sroot')
     exit(1)
 if input_files.front().endswith(".sroot"):
-    root_input = register_module('SeqRootInput')
+    root_input = b2.register_module('SeqRootInput')
 else:
-    root_input = register_module('RootInput')
+    root_input = b2.register_module('RootInput')
 
-unpacker = register_module('CDCUnpacker')
+unpacker = b2.register_module('CDCUnpacker')
 unpacker.param('enableStoreCDCRawHit', True)
 # unpacker.param('enablePrintOut', True)
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', 'UnpackerOutput.root')
 output.param('branchNames', ['CDCHits', 'CDCRawHits'])
 
 
-class PrintTRGTime(Module):
+class PrintTRGTime(b2.Module):
     """
     Print TRG time
     """
@@ -57,14 +56,14 @@ class PrintTRGTime(Module):
         """
         Print TRG time of an event
         """
-        B2INFO('Event {}:'.format(self.event_info.getEvent()))
+        b2.B2INFO('Event {}:'.format(self.event_info.getEvent()))
         for hit in self.cdc_hit:
             cdc_raw_hit = hit.getRelatedTo('CDCRawHits')
-            B2INFO('Trigger time: {}'.format(cdc_raw_hit.getTriggerTime()))
+            b2.B2INFO('Trigger time: {}'.format(cdc_raw_hit.getTriggerTime()))
 
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(root_input)
@@ -73,7 +72,7 @@ main.add_module(PrintTRGTime())
 # main.add_module(output)
 
 # Process all events
-print_path(main)
-process(main)
+b2.print_path(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

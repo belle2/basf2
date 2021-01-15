@@ -7,13 +7,13 @@
 # Authors: Kirill Chilikin, Stephan Duell
 
 import re
-
-from ROOT import Belle2
+import basf2
 from ROOT.Belle2 import EvtGenDatabasePDG
+from terminal_utils import ANSIColors as ac
 
 database = EvtGenDatabasePDG.Instance()
 
-f = open(Belle2.FileSystem.findFile('decfiles/dec/DECAY_BELLE2.DEC'))
+f = open(basf2.find_file('decfiles/dec/DECAY_BELLE2.DEC'))
 decfile_lines = f.readlines()
 f.close()
 
@@ -60,7 +60,7 @@ for particle in database.ParticleList():
             length = get_decay_length(name)
             antilength = get_decay_length(antiname)
             if (length > 0 and antilength > 0 and length != antilength):
-                print(f'Inconsistent length of decay description '
+                print('Inconsistent length of decay description '
                       f'for {name} ({length}) and {antiname} ({antilength}).')
                 exit(1)
 
@@ -85,18 +85,22 @@ for particle in database.ParticleList():
             bfsum = get_branching_fraction(name)
             antibfsum = get_branching_fraction(antiname)
             if (bfsum > 0 and antibfsum > 0 and bfsum != antibfsum):
-                print(f'Inconsistent sum of decay branching fractions '
-                      f'for {name} ({bfsum}) and {antiname} ({antibfsum}).')
+                print('Inconsistent sum of decay branching fractions '
+                      f'for {name} ({bfsum}) and {antiname} ({antibfsum}).\n'
+                      f'Did you remember to modify both {name} and {antiname} branching fractions? '
+                      f'Check it also by running "{ac.color("red")}b2dec-compare-BFs{ac.reset()}".')
                 exit(1)
             # This should be done for each particle, not only B mesons, but the
             # other particle's decays have not yet been fixed
             if((abs(code) == 511 or abs(code) == 521) and bfsum > 0 and abs(1.0 - bfsum) > 1e-7):
-                print(f'Sum of decay mode branching fractions '
-                      f'for {name} is not compatible with 1 ({bfsum}).')
+                print('Sum of decay mode branching fractions '
+                      f'for {name} is not compatible with 1 ({bfsum}).\n'
+                      f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')
                 exit(1)
             # This should be done for each particle, not only B mesons, but the
             # other particle's decays have not yet been fixed
             if((abs(code) == 511 or abs(code) == 521) and antibfsum > 0 and abs(1.0 - antibfsum) > 1e-7):
-                print(f'Sum of decay mode branching fractions '
-                      f'for {antiname} is not compatible with 1 ({antibfsum}).')
+                print('Sum of decay mode branching fractions '
+                      f'for {antiname} is not compatible with 1 ({antibfsum}).\n'
+                      f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')
                 exit(1)

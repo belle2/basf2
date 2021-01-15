@@ -200,21 +200,17 @@ void DQMHistAnalysisPXDChargeModule::event()
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // cppcheck-suppress unreadVariable
     status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
-      // cppcheck-suppress unreadVariable
       status = 4;
     } else if (fabs(data - 50) > 15. || diff > 10) {
       m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
-      // cppcheck-suppress unreadVariable
       status = 3;
     } else {
       m_cCharge->Pad()->SetFillColor(kGreen);// Green
-      // cppcheck-suppress unreadVariable
       status = 2;
     }
 

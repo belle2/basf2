@@ -29,6 +29,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
+#include <TVectorF.h>
+
 #include <limits>
 
 namespace Belle2 {
@@ -211,6 +213,30 @@ namespace Belle2 {
       return belleTrkExtra->getTrackLastZ();
     }
 
+    double BellePi0InvariantMassSignificance(const Particle* particle)
+    {
+      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
+      for (auto daughter : particle->getDaughters()) {
+        covarianceMatrix += daughter->getMomentumErrorMatrix();
+      }
+
+      TVectorF jacobian(Particle::c_DimMomentum);
+      jacobian[0] = -1.0 * particle->getPx() / particle->getMass();
+      jacobian[1] = -1.0 * particle->getPy() / particle->getMass();
+      jacobian[2] = -1.0 * particle->getPz() / particle->getMass();
+      jacobian[3] = 1.0 * particle->getEnergy() / particle->getMass();
+
+      double massErrSquared = jacobian * (covarianceMatrix * jacobian);
+
+      if (massErrSquared < 0.0)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      double invMass = particleInvariantMassFromDaughters(particle);
+      double nomMass = particle->getPDGMass();
+
+      return (invMass - nomMass) / sqrt(massErrSquared);
+    }
+
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
@@ -273,6 +299,12 @@ energy selection for Belle data and MC (50/100/150 MeV).
     REGISTER_VARIABLE("BelleLastCDCHitZ", BelleLastCDCHitZ, R"DOC(
 [Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
+
+    REGISTER_VARIABLE("BellePi0SigM", BellePi0InvariantMassSignificance, R"DOC(
+      [Legacy] Returns the significance of the pi0 mass used in the FEI for B2BII.
+      The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty.
+      Since the pi0's covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
+      )DOC");
 
     // this is defined in ECLVariables.{h,cc}
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(

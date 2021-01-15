@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+from ROOT import Belle2
 
 b2.logging.log_level = b2.LogLevel.ERROR
-
-from ROOT import Belle2
 
 
 class TestModule(b2.Module):

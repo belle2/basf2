@@ -38,6 +38,7 @@ namespace Belle2 {
      * @param clsSize Cluster size, number of fired strips that form the cluster.
      * @param clsSN Signal-to-noise ratio for the cluster
      * @param clsChi2 value for cluster fit
+     * @param firstFrame
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,

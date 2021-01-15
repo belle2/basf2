@@ -187,10 +187,15 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     # #################################### #
 
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=default_expert_level)
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="pr_tree", name="pr_tree", above_expert_level=default_expert_level
+        #: \endcond
+    )
 
     #: Save RecoTrack clone-rate information
     save_clone_rate = refiners.save_fom(
+        #: \cond
         name="{module.id}_overview_figures_of_merit",
         # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
         title="Overview figures in {module.title}",
@@ -199,11 +204,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select=["is_clone"],
         aggregation=np.mean,
         filter_on="is_clone_or_match",
+        #: \endcond
     )
 
     #: Make profile of the clone rate versus seed tan(lambda)
     #: Rename the quantities to names that display nicely by root latex translation
     save_clone_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_clone_or_match",
         select={
             'is_clone': 'clone rate',
@@ -215,11 +222,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=-1.73,
         upper_bound=3.27,
         bins=50
+        #: \endcond
     )
 
     #: Make profile of the clone rate versus seed phi0
     #: Rename the quantities to names that display nicely by root latex translation
     save_clone_rate_by_seed_phi0_profile = refiners.save_profiles(
+        #: \cond
         select={
             'is_clone': 'clone rate',
             'seed_phi0_estimate': 'seed #phi',
@@ -228,11 +237,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         y_binary=True,
         outlier_z_score=5.0,
         bins=50
+        #: \endcond
     )
 
     #: Make profile of the clone rate versus seed transverse momentum
     #: Rename the quantities to names that display nicely by root latex translation
     save_clone_rate_by_seed_pt_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_clone_or_match",
         select={
             'is_clone': 'clone rate',
@@ -244,11 +255,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=0,
         upper_bound=1.7,
         bins=50
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of the clone rate versus seed transverse momentum
     save_clone_rate_by_seed_pt_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="is_clone_or_match",
         select={
             'is_clone': 'clone rate',
@@ -261,11 +274,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=0,
         upper_bound=1.7,
         bins=50
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of the clone rate versus seed tan(lambda)
     save_clone_rate_by_seed_tan_lambda_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="is_clone_or_match",
         select={
             'is_clone': 'clone rate',
@@ -278,10 +293,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=-1.73,
         upper_bound=3.27,
         bins=50
+        #: \endcond
     )
 
     #: Save RecoTrack fake-rate information
     save_fake_rate = refiners.save_fom(
+        #: \cond
         name="{module.id}_overview_figures_of_merit",
         # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
         title="Overview figures in {module.title}",
@@ -290,11 +307,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         key="fake rate",
         select="is_fake",
         aggregation=np.mean,
+        #: \endcond
     )
 
     #: Make profile of the fake rate versus seed phi0
     #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_phi0_profile = refiners.save_profiles(
+        #: \cond
         select={
             'is_fake': 'fake rate',
             'seed_phi0_estimate': 'seed #phi',
@@ -302,11 +321,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         y='fake rate',
         y_binary=True,
         outlier_z_score=5.0,
+        #: \endcond
     )
 
     #: Make profile of the fake rate versus seed tan(lambda)
     #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
+        #: \cond
         select={
             'is_fake': 'fake rate',
             'seed_tan_lambda_estimate': 'seed tan #lambda',
@@ -316,11 +337,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Make profile of the fake rate versus seed transverse momentum
     #: Rename the quantities to names that display nicely by root latex translation
     save_fake_rate_by_seed_pt_profile = refiners.save_profiles(
+        #: \cond
         select={
             'is_fake': 'fake rate',
             'seed_pt_estimate': 'seed p_{t}',
@@ -330,11 +353,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of the fake rate versus seed tan(lambda)
     save_fake_rate_by_seed_tan_lambda_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="has_trackFitResult",
         select={
             'is_fake': 'fake rate',
@@ -346,11 +371,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=-1.73,
         upper_bound=3.27,
         groupby=[("track_charge", [0.])],
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Make profile of the fake rate versus seed transverse momentum
     save_fake_rate_by_seed_pt_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="has_trackFitResult",
         select={
             'is_fake': 'fake rate',
@@ -362,10 +389,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         lower_bound=0,
         upper_bound=1.7,
         groupby=[("track_charge", [0.])],
+        #: \endcond
     )
 
     #: Hit counts in each sub detector by the true pt value
     save_hit_counts_by_pt_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matched",
         select={
             "pt_truth": "true p_{t}",
@@ -381,10 +410,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Hit efficiency in each sub detector by the true pt value
     save_hit_efficiency_by_pt_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "pt_truth": "true p_{t}",
@@ -400,10 +431,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Hit purity in each sub detector by the true pt value
     save_hit_purity_by_pt_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "pt_truth": "true p_{t}",
@@ -419,10 +452,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Hit counts in each sub detector by the true tanlambda value
     save_hit_counts_by_tanlambda_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matched",
         select={
             "tan_lambda_truth": "true tan #lambda",
@@ -438,10 +473,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Hit efficiency in each sub detector by the true tanlambda value
     save_hit_efficiency_by_tanlambda_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "tan_lambda_truth": "true tan #lambda",
@@ -457,10 +494,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Hit purity in each sub detector by the true tanlambda value
     save_hit_purity_by_tanlambda_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "tan_lambda_truth": "true tan #lambda",
@@ -476,11 +515,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Hit counts in each sub detector by the true pt value
     save_hit_counts_by_pt_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="is_matched",
         select={
             "pt_truth": "true p_{t}",
@@ -497,11 +538,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Hit counts in each sub detector by the true tan lambda value
     save_hit_counts_by_tanlambda_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="is_matched",
         select={
             "tan_lambda_truth": "true tan #lambda",
@@ -518,11 +561,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Hit efficiency in each sub detector by the true pt value
     save_hit_efficiency_by_pt_profile_groupbyCharge = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "pt_truth": "true p_{t}",
@@ -539,11 +584,13 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=0,
         upper_bound=1.7,
+        #: \endcond
     )
 
     #: Charge dependent histograms
     #: Hit efficiency in each sub detector by the true tan lambda value
     save_hit_efficiency_by_tanlambda_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matchedPrimary",
         select={
             "tan_lambda_truth": "true tan #lambda",
@@ -560,10 +607,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        #: \endcond
     )
 
     #: Save simple FOM
     save_hit_efficiency = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit efficiency in the subdetectors",
@@ -571,10 +620,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="mc_hit_efficiency",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_pxd_hit_efficiency = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit efficiency in the subdetectors",
@@ -582,10 +633,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="mc_pxd_hit_efficiency",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_svd_hit_efficiency = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit efficiency in the subdetectors",
@@ -593,10 +646,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="mc_svd_hit_efficiency",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_cdc_hit_efficiency = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit efficiency in the subdetectors",
@@ -604,10 +659,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="mc_cdc_hit_efficiency",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_hit_purity = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit purity in the subdetectors",
@@ -615,10 +672,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="hit_purity",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_pxd_hit_purity = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit purity in the subdetectors",
@@ -626,10 +685,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="pxd_hit_purity",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_svd_hit_purity = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit purity in the subdetectors",
@@ -637,10 +698,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="svd_hit_purity",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Save simple FOM
     save_cdc_hit_purity = refiners.save_fom(
+        #: \cond
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
         description="Hit purity in the subdetectors",
@@ -648,10 +711,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select="cdc_hit_purity",
         aggregation=np.nanmean,
         filter_on="is_matchedPrimary"
+        #: \endcond
     )
 
     #: Creates a distribution of p values from the Genfit track fit for match pr tracks.
     save_p_value_histogram = refiners.save_histograms(
+        #: \cond
         filter_on="is_matched",
         select={"p_value": "Genfit p value"},
         description="""
@@ -660,81 +725,99 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
                     Generally some peaking behvaiour towards zero is too be expected if the errors are underestimated.
                     """,
         check="The distribution should be flat."
+        #: \endcond
     )
 
     #: Pull of seed omega
     save_seed_omega_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="seed_omega",
         quantity_name="seed #omega",
         folder_name="pull_seed_omega",
         truth_name="omega_truth",
         unit="1/cm",
+        #: \endcond
     )
 
     #: Pull of seed tan(lambda)
     save_seed_tan_lambda_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="seed_tan_lambda",
         quantity_name="seed tan #lambda",
         folder_name="pull_seed_tan_lambda",
         truth_name="tan_lambda_truth",
+        #: \endcond
     )
 
     #: Pull of fitted omega
     save_fitted_omega_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="omega",
         quantity_name="#omega",
         folder_name="pull_fitted_omega",
         unit="1/cm",
+        #: \endcond
     )
 
     #: Pull of fitted tan(lambda)
     save_fitted_tan_lambda_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="tan_lambda",
         quantity_name="tan #lambda",
         folder_name="pull_fitted_tan_lambda",
+        #: \endcond
     )
 
     #: Pull of fitted transverse momentum
     save_fitted_pt_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="pt",
         quantity_name="p_{t}",
         folder_name="pull_fitted_p_t",
+        #: \endcond
     )
 
     #: Pull of fitted x coordinate grouped by true transverse momentum
     save_fitted_x_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="x",
         quantity_name="x",
         folder_name="pull_fitted_x{groupby_addition}",
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
+        #: \endcond
     )
 
     #: Pull of fitted y coordinate grouped by true transverse momentum
     save_fitted_y_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="y",
         quantity_name="y",
         folder_name="pull_fitted_y{groupby_addition}",
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
+        #: \endcond
     )
 
     #: Pull of fitted z coordinate grouped by true transverse momentum
     save_fitted_z_pull_analysis = refiners.save_pull_analysis(
+        #: \cond
         filter_on="is_matched",
         part_name="z",
         quantity_name="z",
         folder_name="pull_fitted_z{groupby_addition}",
         groupby=[None, ("pt_truth", [0.070, 0.250, 0.600])],
+        #: \endcond
     )
 
     #: Resolutions as a function of true p_t
     save_resolutions_by_pt_profile = refiners.save_profiles(
+        #: \cond
         filter_on="is_matched",
         select={
             "pt_truth": "true p_{t}",
@@ -748,4 +831,5 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "#sigma(p_{t}) / p_{t}",
         ],
         y_log=True,
+        #: \endcond
     )

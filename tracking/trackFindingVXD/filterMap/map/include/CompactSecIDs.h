@@ -107,9 +107,9 @@ namespace Belle2 {
 
 
     /** Returns the compact id of the FullSecID
-      @param fullID: the FullSecID
-      @return 0 if @param fullID is unknown.
         It does not throw exceptions (at least it should not).
+      @param fullID: the FullSecID
+      @return 0 if fullID is unknown, else the compact sector id
     */
     sectorID_t getCompactID(const FullSecID& fullID) const
     {
@@ -170,16 +170,19 @@ namespace Belle2 {
 
     }
 
-    /// Returns the compact id of the FullSecID @param fullID.
-    /// If @param fullID is unknown 0 is returned.
-    /// It will not throw exceptions
+    /// Returns the compact id of the FullSecID fullID.
+    /// It will not throw exceptions.
+    /// @param fullID the FullSecID
+    /// @return if fullID is unknown 0 is returned, else the corresponding compact id
     sectorID_t operator [](const FullSecID& fullID) const
     {
       return getCompactID(fullID);
     }
 
     /// Returns the compact id of the pair of FullSecID id1 id2.
-    /// If @param id1 or @param id2 is undefined 0 is returned.
+    /// @param id1 first FullSecID
+    /// @param id2 second FullSecID
+    /// @return if id1 or id2 are undefined 0 is returned, else the compact sector id
     secPairID_t getCompactID(const FullSecID& id1, const FullSecID& id2) const
     {
 
@@ -195,8 +198,11 @@ namespace Belle2 {
 
     }
 
-    /// Uses the values coded by the Sector Pair ID @param pair_id
-    /// and sets the two compact Sector id @param id1 and @param id2
+    /// Uses the values coded by the Sector Pair ID pair_id
+    /// and sets the two compact Sector ids id1 and id2
+    /// @param pair_id input sector pair id
+    /// @param id1 reference to first sector id to be set
+    /// @param id2 reference second sector id to be set
     static void extractCompactID(secPairID_t pair_id, sectorID_t& id1, sectorID_t& id2)
     {
       id1 = pair_id & 0xffff;
@@ -206,7 +212,10 @@ namespace Belle2 {
 
 
     /// Returns the compact id of the triplet of FullSecID id1 id2 id3
-    /// If any of the id1, id2 or id3 is undefined 0 is returned.
+    /// @param id1: first id
+    /// @param id2: second id
+    /// @param id3: third id
+    /// @return If any of the id1, id2 or id3 is undefined 0 is returned, else the compact id of the triplet
     secTripletID_t getCompactID(const FullSecID& id1, const FullSecID& id2 ,
                                 const FullSecID& id3) const
     {
@@ -227,8 +236,11 @@ namespace Belle2 {
 
     }
 
-    /// Uses the values coded by the Sector Pair ID @param triplet_id
-    /// and sets the three compact Sector id @param id1 @param id2 @param id3
+    /// Uses the values coded by the Sector Pair ID to set the three compact sector ids
+    /// @param triplet_id input compact id of the triplet
+    /// @param id1 reference to compact id of first sector to be set
+    /// @param id2 reference to compact id of second sector to be set
+    /// @param id3 reference to compact id of third sector to be set
     static void extractCompactID(secTripletID_t triplet_id, sectorID_t& id1, sectorID_t& id2, sectorID_t& id3)
     {
       id1 = triplet_id & 0xffff;
@@ -337,6 +349,7 @@ namespace Belle2 {
     /// set the SublayerID of the sector
     /// @param sector: the FullSectorID of the sector, the sublayer id will be ignored during searching for the sector
     /// @param sublayer: the new sublayer id
+    /// @return true if successful
     bool setSubLayerID(FullSecID& sector, int sublayer)
     {
       // cross check if sector is registered in the map, compactID will be 0 if not

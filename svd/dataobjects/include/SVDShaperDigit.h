@@ -155,7 +155,7 @@ namespace Belle2 {
 
     /**
      * Convert a value to sample range.
-     * @param value to be converted
+     * @param x value to be converted
      * @result APVRawSampleType representation of x
      */
     template<typename T> static SVDShaperDigit::APVRawSampleType trimToSampleRange(T x)

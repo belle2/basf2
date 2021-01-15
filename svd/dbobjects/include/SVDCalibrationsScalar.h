@@ -35,10 +35,10 @@ namespace Belle2 {
       return svdScalar;
     }
 
-    /** get a poiter to the calibration of the side*/
-    const static inline calibrationType* get_pointer(const payloadContainerType& svdScalar, unsigned int /*strip*/)
+    /** get a reference to the calibration of the side*/
+    const static inline calibrationType& getReference(const payloadContainerType& svdScalar, unsigned int /*strip*/)
     {
-      return &svdScalar;
+      return svdScalar;
     }
 
     /** set the calibration of the side*/

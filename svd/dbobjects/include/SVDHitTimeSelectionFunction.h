@@ -66,31 +66,31 @@ namespace Belle2 {
     /** set the function ID (version)*/
     void setFunctionID(int user_current) {m_current = user_current;}
     /** get the function ID (function version)*/
-    int getFunctionID() {return m_current;}
+    int getFunctionID() const {return m_current;}
 
     //implementation firstVersion, setters and getters
     /** set the minimum cluster time */
     void setMinTime(double tMin) { m_tMin = tMin; }
     /** returns the  minimum cluster time */
-    float getMinTime() { return m_tMin; };
+    float getMinTime() const { return m_tMin; };
 
     //implementation secondVersion, setters and getters
     /** set the minimum time distance wrt t0 */
     void setDeltaTime(double deltaT) { m_deltaT = deltaT; }
     /** returns the minimum time distnace wrt t0 */
-    float getDeltaTime() { return m_deltaT; };
+    float getDeltaTime() const { return m_deltaT; };
 
     //implementation thirdVersion, setters and getters
     /** set the nSigma */
     void setNsigma(double nSigma) { m_nSigma = nSigma; }
     /** returns the  minimum cluster time */
-    float getNsigma() { return m_nSigma; };
+    float getNsigma() const { return m_nSigma; };
 
     //max U-V time difference
     /** set m_maxUVTimeDifference */
     void setMaxUVTimeDifference(double timeDiff) { m_maxUVTimeDifference = timeDiff; }
     /** get m_maxUVTimeDifference */
-    float getMaxUVTimeDifference() { return m_maxUVTimeDifference; }
+    float getMaxUVTimeDifference() const { return m_maxUVTimeDifference; }
   private:
 
     /** function parameters & implementations*/

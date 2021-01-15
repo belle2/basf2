@@ -116,8 +116,8 @@ namespace Belle2 {
     }
 
     /**
-     * Return a pointer to the calibration associated to a given strip.
-     * Return a pointer to the calibration associated to a given strip identified by:
+     * Return a reference to the calibration associated to a given strip.
+     * Return a reference to the calibration associated to a given strip identified by:
      * @param layer is the layer number (2 to 6 in the present geometry)
      * @param ladder is the ladder number ( 1 to 7 for layer 3, 1 to 10 for layer 4 etc...)
      * @param sensor is the sensor number ( 1 to 2 for layer 3, 1 to 3 for layer 4 etc...)
@@ -125,11 +125,11 @@ namespace Belle2 {
      * @param strip is the strip number: from 1 to 512 or 768 depending on the sensor
      * it throws std::out_of_range if the strip is unknown
      */
-    const typename T::calibrationType* get_pointer(unsigned int layer,
-                                                   unsigned int ladder,
-                                                   unsigned int sensor,
-                                                   unsigned int side,
-                                                   unsigned int strip) const
+    const typename T::calibrationType& getReference(unsigned int layer,
+                                                    unsigned int ladder,
+                                                    unsigned int sensor,
+                                                    unsigned int side,
+                                                    unsigned int strip) const
     {
       if (calibrations.size() <= layer) {
         B2FATAL("Layers vector is smaller than " << layer);
@@ -147,7 +147,7 @@ namespace Belle2 {
         B2FATAL("Sides vector is smaller than " << side);
       }
 
-      return T::get_pointer(sides[side] , strip);
+      return T::getReference(sides[side] , strip);
     }
 
     /**

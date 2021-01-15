@@ -19,71 +19,67 @@
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Abstract Class representing the SVD cluster time
+   */
+  class SVDClusterTime {
+
+  public:
 
     /**
-     * Abstract Class representing the SVD cluster time
+     * Constructor to create an empty Cluster Time Object
      */
-    class SVDClusterTime {
+    SVDClusterTime() {};
 
-    public:
+    /**
+     * set the trigger bin
+     */
+    void setTriggerBin(const int triggerBin)
+    { m_triggerBin = triggerBin; };
 
-      /**
-       * Constructor to create an empty Cluster Time Object
-       */
-      SVDClusterTime() {};
+    /**
+     * computes the cluster time, timeError and FirstFrame
+     */
+    virtual void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) = 0;
 
-      /**
-       * set the trigger bin
-       */
-      void setTriggerBin(const int triggerBin)
-      { m_triggerBin = triggerBin; };
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDClusterTime() {};
 
-      /**
-       * computes the cluster time, timeError and FirstFrame
-       */
-      virtual void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) = 0;
+    /** CoG6 Time Algorithm*/
+    void applyCoG6Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDClusterTime() {};
+    /** CoG3 Time Algorithm*/
+    void applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
-      /** CoG6 Time Algorithm*/
-      void applyCoG6Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+    /** ELS3 Time Algorithm*/
+    void applyELS3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
-      /** CoG3 Time Algorithm*/
-      void applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+  protected:
 
-      /** ELS3 Time Algorithm*/
-      void applyELS3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
+    /** trigger bin */
+    int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
 
-    protected:
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
 
-      /** trigger bin */
-      int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
-      /** Hardware Clocks*/
-      DBObjPtr<HardwareClockSettings> m_hwClock;
+    /**SVDPulseShaper calibration wrapper*/
+    SVDPulseShapeCalibrations m_PulseShapeCal;
 
-      /** APV clock period*/
-      double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+    /** CoG6 time calibration wrapper*/
+    SVDCoGTimeCalibrations m_CoG6TimeCal;
+    /** CoG3 time calibration wrapper*/
+    SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
+    /** ELS3 time calibration wrapper*/
+    SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
-      /**SVDPulseShaper calibration wrapper*/
-      SVDPulseShapeCalibrations m_PulseShapeCal;
-
-      /** CoG6 time calibration wrapper*/
-      SVDCoGTimeCalibrations m_CoG6TimeCal;
-      /** CoG3 time calibration wrapper*/
-      SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
-      /** ELS3 time calibration wrapper*/
-      SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
-
-    };
-
-  }
+  };
 
 }
 

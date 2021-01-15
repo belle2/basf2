@@ -18,64 +18,60 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Abstract Class representing the SVD cluster position
+   */
+  class SVDClusterPosition {
+
+  public:
 
     /**
-     * Abstract Class representing the SVD cluster position
+     * Constructor to create an empty Cluster Position Object
      */
-    class SVDClusterPosition {
+    SVDClusterPosition() {};
 
-    public:
+    /**
+     * computes the cluster position and position error
+     */
+    virtual void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
 
-      /**
-       * Constructor to create an empty Cluster Position Object
-       */
-      SVDClusterPosition() {};
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDClusterPosition() {};
 
-      /**
-       * computes the cluster position and position error
-       */
-      virtual void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) = 0;
+    /** CoG Position Algorithm*/
+    void applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDClusterPosition() {};
+    /** AHT Position Algorithm*/
+    void applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
 
-      /** CoG Position Algorithm*/
-      void applyCoGPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+    /** reconstruct strips*/
+    void reconstructStrips(Belle2::SVD::RawCluster& rawCluster);
 
-      /** AHT Position Algorithm*/
-      void applyAHTPosition(const Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError);
+    /** set which algorithm to use for strip charge in cluster position reconstruction*/
+    void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
 
-      /** reconstruct strips*/
-      void reconstructStrips(Belle2::SVD::RawCluster& rawCluster);
+    /** set which algorithm to use for strip time in cluster position reconstruction, 'dontdo' will skip it*/
+    void set_stripTimeAlgo(const std::string& user_stripTimeAlgo) {m_stripTimeAlgo = user_stripTimeAlgo;}
 
-      /** set which algorithm to use for strip charge in cluster position reconstruction*/
-      void set_stripChargeAlgo(const std::string& user_stripChargeAlgo) {m_stripChargeAlgo = user_stripChargeAlgo;}
+  protected:
 
-      /** set which algorithm to use for strip time in cluster position reconstruction, 'dontdo' will skip it*/
-      void set_stripTimeAlgo(const std::string& user_stripTimeAlgo) {m_stripTimeAlgo = user_stripTimeAlgo;}
+    /** helper, returns the sum of the strip charges*/
+    double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
+    /** helper, returns the sum in quadrature of the strip noise*/
+    double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
 
-    protected:
+    SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
+    SVDNoiseCalibrations m_NoiseCal; /**< Noise calibrations for the position error*/
 
-      /** helper, returns the sum of the strip charges*/
-      double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
-      /** helper, returns the sum in quadrature of the strip noise*/
-      double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
+  private:
 
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
-      SVDNoiseCalibrations m_NoiseCal; /**<Noise calibrations for the position error*/
-
-    private:
-
-      std::string m_stripChargeAlgo; /**< algorithm used to reconstruct strip charge for cluster position*/
-      std::string m_stripTimeAlgo; /**< algorithm used to reconstruct strip time for cluster position*/
-    };
-
-  }
+    std::string m_stripChargeAlgo; /**< algorithm used to reconstruct strip charge for cluster position*/
+    std::string m_stripTimeAlgo; /**< algorithm used to reconstruct strip time for cluster position*/
+  };
 
 }
 

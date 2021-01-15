@@ -15,34 +15,30 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster time
+   * computed with the CoG3 algorithm.
+   */
+  class SVDCoG3Time : public SVDClusterTime {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster time
-     * computed with the CoG3 algorithm.
+     * computes the cluster time, timeError and FirstFrame
+     * with the CoG3 algorithm
      */
-    class SVDCoG3Time : public SVDClusterTime {
-
-    public:
-
-      /**
-       * computes the cluster time, timeError and FirstFrame
-       * with the CoG3 algorithm
-       */
-      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
+    void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDCoG3Time() {};
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDCoG3Time() {};
 
 
-    };
-
-  }
+  };
 
 }
 

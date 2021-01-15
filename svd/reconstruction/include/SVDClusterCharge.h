@@ -19,57 +19,54 @@
 #include <vector>
 #include <TMath.h>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Abstract Class representing the SVD cluster charge
+   */
+  class SVDClusterCharge {
+
+  public:
 
     /**
-     * Abstract Class representing the SVD cluster charge
+     * Constructor to create an empty Cluster Charge Object
      */
-    class SVDClusterCharge {
+    SVDClusterCharge() {};
 
-    public:
+    /**
+     * computes the cluster charge, SNR and seedCharge
+     */
+    virtual void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) = 0;
 
-      /**
-       * Constructor to create an empty Cluster Charge Object
-       */
-      SVDClusterCharge() {};
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDClusterCharge() {};
 
-      /**
-       * computes the cluster charge, SNr and seedCharge
-       */
-      virtual void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) = 0;
+    /** MaxSample Charge Algorithm*/
+    void applyMaxSampleCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDClusterCharge() {};
+    /** SumSamples Charge Algorithm*/
+    void applySumSamplesCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
-      /** MaxSample Charge Algorithm*/
-      void applyMaxSampleCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+    /** ELS3 Charge Algorithm*/
+    void applyELS3Charge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
 
-      /** SumSamples Charge Algorithm*/
-      void applySumSamplesCharge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+  protected:
 
-      /** ELS3 Charge Algorithm*/
-      void applyELS3Charge(const Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge);
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
 
-    protected:
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
-      /** Hardware Clocks*/
-      DBObjPtr<HardwareClockSettings> m_hwClock;
+    /**SVDPulseShaper calibration wrapper*/
+    SVDPulseShapeCalibrations m_PulseShapeCal;
 
-      /** APV clock period*/
-      double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+    /**SVDNoise calibration wrapper*/
+    SVDNoiseCalibrations m_NoiseCal;
+  };
 
-      /**SVDPulseShaper calibration wrapper*/
-      SVDPulseShapeCalibrations m_PulseShapeCal;
-
-      /**SVDNoise calibration wrapper*/
-      SVDNoiseCalibrations m_NoiseCal;
-    };
-
-  }
 
 }
 

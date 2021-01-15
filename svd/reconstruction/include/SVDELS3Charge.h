@@ -17,33 +17,29 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster charge
+   * computed with the ELS3 algorithm.
+   * ELS3:
+   * Least-Squares method with the Exponentially decaying waveform.
+   */
+  class SVDELS3Charge : public SVDClusterCharge {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster charge
-     * computed with the ELS3 algorithm.
-     * ELS3:
-     * Least-Squares method with the Exponentially decaying waveform.
+     * virtual destructor
      */
-    class SVDELS3Charge : public SVDClusterCharge {
+    virtual ~SVDELS3Charge() {};
 
-    public:
+    /**
+    * compute the cluster charge, charge error and SNR with ELS3
+     */
+    void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDELS3Charge() {};
-
-      /**
-      * compute the cluster charge, charge error and SNR with ELS3
-       */
-      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
-
-    };
-
-  }
+  };
 
 }
 

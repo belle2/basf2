@@ -17,36 +17,32 @@
 #include <svd/reconstruction/SVDCoG3Time.h>
 #include <svd/reconstruction/SVDELS3Time.h>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Cluster Time Factory Class
+   */
+  class SVDRecoTimeFactory {
+
+  public:
 
     /**
-     * Cluster Time Factory Class
+     * static function that returns the
+     * class to compute the cluster time
      */
-    class SVDRecoTimeFactory {
-
-    public:
-
-      /**
-       * static function that returns the
-       * class to compute the cluster time
-       */
-      static SVDClusterTime* NewTime(const std::string& description)
-      {
-        if (description == "CoG6")
-          return new SVDCoG6Time;
-        if (description == "CoG3")
-          return new SVDCoG3Time;
-        if (description == "ELS3")
-          return new SVDELS3Time;
-
-        B2WARNING("the SVD cluster time algorithm is not recognized, using SVDCoG6Time!");
+    static SVDClusterTime* NewTime(const std::string& description)
+    {
+      if (description == "CoG6")
         return new SVDCoG6Time;
-      }
-    };
+      if (description == "CoG3")
+        return new SVDCoG3Time;
+      if (description == "ELS3")
+        return new SVDELS3Time;
 
-  }
+      B2WARNING("the SVD cluster time algorithm is not recognized, using SVDCoG6Time!");
+      return new SVDCoG6Time;
+    }
+  };
 
 }
 

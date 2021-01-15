@@ -14,147 +14,142 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
+  /**
+   * structure containing the relevant informations
+   * of each strip of the raw cluster
+   */
+  struct StripInRawCluster {
+    int shaperDigitIndex; /**< index of the shaper digit*/
+    int cellID; /**<strip cellID*/
+    int maxSample; /**< ADC max of the acquired samples*/
+    float noise; /**< ADC noise */
+    Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC< of the acquired samples*/
+    double charge; /**< strip charge*/
+    double time; /**< strip time*/
+  };
 
-  namespace SVD {
+  /**
+   * Class representing a raw cluster candidate during clustering of the SVD
+   */
+  class RawCluster {
+
+  public:
 
     /**
-     * structure containing the relevant informations
-     * of each strip of the raw cluster
+     * Default Constructor to create an empty RawCluster
      */
-    struct StripInRawCluster {
-      int shaperDigitIndex; /**< index of the shaper digit*/
-      int cellID; /**<strip cellID*/
-      int maxSample; /**< ADC max of the acquired samples*/
-      float noise; /**< ADC noise */
-      Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC< of the acquired samples*/
-      double charge; /**< strip charge*/
-      double time; /**< strip time*/
-    };
+    RawCluster() {};
 
     /**
-     * Class representing a raw cluster candidate during clustering of the SVD
+     * Constructor to create an empty RawCluster
      */
-    class RawCluster {
+    RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent);
 
-    public:
+    /**
+     * You can specify the name of StoreArray<SVDShaperDigit>
+     * which are needed to get clustered samples.
+     */
+    RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent, const std::string& storeShaperDigitsName);
 
-      /**
-       * Default Constructor to create an empty RawCluster
-       */
-      RawCluster() {};
+    /**
+     * Add a Strip to the current cluster.
+     * Update the cluster seed strip.
+     * @param StripInRawCluster aStrip to add to the cluster
+     * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
+     */
+    bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);
 
-      /**
-       * Constructor to create an empty RawCluster
-       */
-      RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent);
+    /**
+     * @return true if the raw cluster candidate can be promoted to raw cluster (seedMaxSample > 0 and seedSNR > cutSeed)
+     */
+    bool isGoodRawCluster();
 
-      /**
-       * You can specify the name of StoreArray<SVDShaperDigit>
-       * which are needed to get clustered samples.
-       */
-      RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent, const std::string& storeShaperDigitsName);
+    /**
+     * @return the VxdID of the cluster sensor
+     */
+    VxdID getSensorID() const {return m_vxdID;}
 
-      /**
-       * Add a Strip to the current cluster.
-       * Update the cluster seed strip.
-       * @param StripInRawCluster aStrip to add to the cluster
-       * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
-       */
-      bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);
+    /**
+     * @return true if the cluster is on the U/P side
+     */
+    bool isUSide() const {return m_isUside;}
 
-      /**
-       * @return true if the raw cluster candidate can be promoted to raw cluster (seedMaxSample > 0 and seedSNR > cutSeed)
-       */
-      bool isGoodRawCluster();
+    /**
+     * @return the APVFloatSamples obtained summing
+     * sample-by-sample all the strips on the cluster
+     */
+    Belle2::SVDShaperDigit::APVFloatSamples getClsSamples(bool inElectrons) const;
 
-      /**
-       * @return the VxdID of the cluster sensor
-       */
-      VxdID getSensorID() const {return m_vxdID;}
+    /**
+     * @return the float vector of clustered 3-samples
+     * selected by the MaxSum method
+     * with First Frame of the selection
+     */
+    std::pair<int, std::vector<float>> getMaxSum3Samples(bool inElectrons = false) const;
 
-      /**
-       * @return true if the cluster is on the U/P side
-       */
-      bool isUSide() const {return m_isUside;}
+    /**
+     * @return the cluster size (number of strips of the cluster)
+     */
+    int getSize() const { return m_strips.size(); }
 
-      /**
-       * @return the APVFloatSamples obtained summing
-       * sample-by-sample all the strips on the cluster
-       */
-      Belle2::SVDShaperDigit::APVFloatSamples getClsSamples(bool inElectrons) const;
+    /**
+     * @return the vector of the strips in the cluster
+     */
+    const std::vector<StripInRawCluster> getStripsInRawCluster() const { return m_strips; };
 
-      /**
-       * @return the float vector of clustered 3-samples
-       * selected by the MaxSum method
-       * with First Frame of the selection
-       */
-      std::pair<int, std::vector<float>> getMaxSum3Samples(bool inElectrons = false) const;
+    /**
+     * @return the max sample (in ADC) of the seed strip
+     */
+    int getSeedMaxSample() const {return m_seedMaxSample;};
 
-      /**
-       * @return the cluster size (number of strips of the cluster)
-       */
-      int getSize() const { return m_strips.size(); }
+    /**
+     * @return the internal index (in the stripsInRawCluster vector) of the seed strip
+     */
+    int getSeedInternalIndex() const {return m_seedInternalIndex;};
 
-      /**
-       * @return the vector of the strips in the cluster
-       */
-      const std::vector<StripInRawCluster> getStripsInRawCluster() const { return m_strips; };
+    /**
+     * set the strip charge
+     */
+    void setStripCharge(int index, double charge) {m_strips.at(index).charge = charge;}
+    /**
+     * set the strip time
+     */
+    void setStripTime(int index, double time) {m_strips.at(index).time = time;}
 
-      /**
-       * @return the max sample (in ADC) of the seed strip
-       */
-      int getSeedMaxSample() const {return m_seedMaxSample;};
+  protected:
 
-      /**
-       * @return the internal index (in the stripsInRawCluster vector) of the seed strip
-       */
-      int getSeedInternalIndex() const {return m_seedInternalIndex;};
+    /** VxdID of the cluster */
+    VxdID m_vxdID;
 
-      /**
-       * set the strip charge
-       */
-      void setStripCharge(int index, double charge) {m_strips.at(index).charge = charge;}
-      /**
-       * set the strip time
-       */
-      void setStripTime(int index, double time) {m_strips.at(index).time = time;}
+    /** side of the cluster */
+    bool m_isUside;
 
-    protected:
+    /** SNR above which the strip can be considered as seed*/
+    double m_cutSeed = 5;
 
-      /** VxdID of the cluster */
-      VxdID m_vxdID;
+    /** SNR above which the strip can be considered for clustering*/
+    double m_cutAdjacent = 3;
 
-      /** side of the cluster */
-      bool m_isUside;
+    /** ADC MaxSample of the seed strip */
+    int m_seedMaxSample = -1;
 
-      /** SNR above which the strip can be considered as seed*/
-      double m_cutSeed = 5;
+    /** SNR (using MaxSample) of the seed strip */
+    float m_seedSNR = -1;
 
-      /** SNR above which the strip can be considered for clustering*/
-      double m_cutAdjacent = 3;
+    /** SVDShaperDigit index of the seed strip of the cluster */
+    int m_seedIndex = -1;
 
-      /** ADC MaxSample of the seed strip */
-      int m_seedMaxSample = -1;
+    /** stripsInRawCluster index of the seed strip of the cluster */
+    int m_seedInternalIndex = -1;
 
-      /** SNR (using MaxSample) of the seed strip */
-      float m_seedSNR = -1;
+    /** vector containing the strips in the cluster */
+    std::vector<StripInRawCluster> m_strips;
 
-      /** SVDShaperDigit index of the seed strip of the cluster */
-      int m_seedIndex = -1;
+    /** Name of the collection to use for the SVDShaperDigits */
+    std::string m_storeShaperDigitsName;
 
-      /** stripsInRawCluster index of the seed strip of the cluster */
-      int m_seedInternalIndex = -1;
-
-      /** vector containing the strips in the cluster */
-      std::vector<StripInRawCluster> m_strips;
-
-      /** Name of the collection to use for the SVDShaperDigits */
-      std::string m_storeShaperDigitsName;
-
-    };
-
-  }
+  };
 
 }
 

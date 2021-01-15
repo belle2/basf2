@@ -17,36 +17,32 @@
 #include <svd/reconstruction/SVDSumSamplesCharge.h>
 #include <svd/reconstruction/SVDELS3Charge.h>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Cluster Charge Factory Class
+   */
+  class SVDRecoChargeFactory {
+
+  public:
 
     /**
-     * Cluster Charge Factory Class
+     * static function that returns the
+     * class to compute the cluster charge
      */
-    class SVDRecoChargeFactory {
-
-    public:
-
-      /**
-       * static function that returns the
-       * class to compute the cluster charge
-       */
-      static SVDClusterCharge* NewCharge(const std::string& description)
-      {
-        if (description == "MaxSample")
-          return new SVDMaxSampleCharge;
-        if (description == "SumSamples")
-          return new SVDSumSamplesCharge;
-        if (description == "ELS3")
-          return new SVDELS3Charge;
-
-        B2WARNING("the SVD cluster charge algorithm is not recognized, using SVDMaxSample!");
+    static SVDClusterCharge* NewCharge(const std::string& description)
+    {
+      if (description == "MaxSample")
         return new SVDMaxSampleCharge;
-      }
-    };
+      if (description == "SumSamples")
+        return new SVDSumSamplesCharge;
+      if (description == "ELS3")
+        return new SVDELS3Charge;
 
-  }
+      B2WARNING("the SVD cluster charge algorithm is not recognized, using SVDMaxSample!");
+      return new SVDMaxSampleCharge;
+    }
+  };
 
 }
 

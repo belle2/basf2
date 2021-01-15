@@ -15,32 +15,28 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster position
+   * computed with the old algorithm (up to release-05).
+   */
+  class SVDOldDefaultPosition : public SVDClusterPosition {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster position
-     * computed with the old algorithm (up to release-05).
+     * computes the cluster position and position error
+     * with the oldDefault algorithm
      */
-    class SVDOldDefaultPosition : public SVDClusterPosition {
+    void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
 
-    public:
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDOldDefaultPosition() {};
 
-      /**
-       * computes the cluster position and position error
-       * with the oldDefault algorithm
-       */
-      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
-
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDOldDefaultPosition() {};
-
-    };
-
-  }
+  };
 
 }
 

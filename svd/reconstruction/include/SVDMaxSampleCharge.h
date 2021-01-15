@@ -15,33 +15,29 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster charge
+   * computed summing the max sample of each strip
+   */
+  class SVDMaxSampleCharge : public SVDClusterCharge {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster charge
-     * computed summing the max sample of each strip
+    * compute the cluster charge, charge error and SNR with MaxSample
      */
-    class SVDMaxSampleCharge : public SVDClusterCharge {
-
-    public:
-
-      /**
-      * compute the cluster charge, charge error and SNR with MaxSample
-       */
-      void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
+    void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
 
 
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDMaxSampleCharge() {};
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDMaxSampleCharge() {};
 
 
-    };
-
-  }
+  };
 
 }
 

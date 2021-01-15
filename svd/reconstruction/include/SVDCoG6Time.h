@@ -15,33 +15,29 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster time
+   * computed with the CoG6 algorithm.
+   */
+  class SVDCoG6Time : public SVDClusterTime {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster time
-     * computed with the CoG6 algorithm.
+     * computes the cluster time, timeError and FirstFrame
+     * with the CoG6 algorithm
      */
-    class SVDCoG6Time : public SVDClusterTime {
+    void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
-    public:
-
-      /**
-       * computes the cluster time, timeError and FirstFrame
-       * with the CoG6 algorithm
-       */
-      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
-
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDCoG6Time() {};
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDCoG6Time() {};
 
 
-    };
-
-  }
+  };
 
 }
 

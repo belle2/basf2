@@ -15,35 +15,31 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster position
+   * computed with the CoGOnly algorithm.
+   */
+  class SVDCoGOnlyPosition : public SVDClusterPosition {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster position
-     * computed with the CoGOnly algorithm.
+     * computes the cluster position and position error
+     * with the CoG algorithm
      */
-    class SVDCoGOnlyPosition : public SVDClusterPosition {
+    void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
 
-    public:
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDCoGOnlyPosition() {};
 
-      /**
-       * computes the cluster position and position error
-       * with the CoG algorithm
-       */
-      void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
-
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDCoGOnlyPosition() {};
-
-    private:
+  private:
 
 
-    };
-
-  }
+  };
 
 }
 

@@ -15,34 +15,30 @@
 
 #include <vector>
 
-namespace Belle2 {
+namespace Belle2::SVD {
 
-  namespace SVD {
+  /**
+   * Derived Class representing the SVD cluster time
+   * computed with the ELS3 algorithm.
+   * ELS3:
+   * Least-Squares method with the Exponentially decaying waveform.
+   */
+  class SVDELS3Time : public SVDClusterTime {
+
+  public:
 
     /**
-     * Derived Class representing the SVD cluster time
-     * computed with the ELS3 algorithm.
-     * ELS3:
-     * Least-Squares method with the Exponentially decaying waveform.
+     * computes the cluster time, timeError and FirstFrame
+     * with the ELS3 algorithm
      */
-    class SVDELS3Time : public SVDClusterTime {
+    void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
 
-    public:
+    /**
+     * virtual destructor
+     */
+    virtual ~SVDELS3Time() {};
 
-      /**
-       * computes the cluster time, timeError and FirstFrame
-       * with the ELS3 algorithm
-       */
-      void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
-
-      /**
-       * virtual destructor
-       */
-      virtual ~SVDELS3Time() {};
-
-    };
-
-  }
+  };
 
 }
 

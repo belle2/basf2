@@ -10,6 +10,7 @@
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONFPGAFindlet.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/logging/Logger.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -40,17 +41,24 @@ void DATCONFPGAFindlet::beginEvent()
 
   m_uHits.clear();
   m_vHits.clear();
+  m_uTracks.clear();
+  m_vTracks.clear();
+
 }
 
 void DATCONFPGAFindlet::apply()
 {
   m_clusterLoader.apply(m_uHits, m_vHits);
+//   B2INFO("m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
 
   // hit vectors are empty in case of high occupancy, a warning is created in m_clusterLoader
   if (m_uHits.empty() or m_vHits.empty()) {
     return;
   }
 
-  m_uInterceptFinder.apply(m_uHits);
-  m_vInterceptFinder.apply(m_vHits);
+  m_uInterceptFinder.apply(m_uHits, m_uTracks);
+  m_vInterceptFinder.apply(m_vHits, m_vTracks);
+
+//   B2INFO("m_uTracks.size(): " << m_uTracks.size() << " m_vTracks.size(): " << m_vTracks.size());
+
 }

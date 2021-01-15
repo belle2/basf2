@@ -59,10 +59,13 @@ namespace Belle2 {
     DATCONSVDClusterLoaderAndPreparer m_clusterLoader;
 
     FastInterceptFinder2D m_uInterceptFinder;
-    FastInterceptFinder2D m_uInterceptFinder;
+    FastInterceptFinder2D m_vInterceptFinder;
 
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_uHits;
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_vHits;
+
+    std::vector<std::pair<double, double>> m_uTracks;
+    std::vector<std::pair<double, double>> m_vTracks;
 
   };
 }

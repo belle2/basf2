@@ -29,13 +29,13 @@ main = b2.create_path()
 if f_in_root[-6:] == ".sroot":
     rootfiletype = "sroot"
     input = b2.register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
 if f_in_root[-5:] == ".root":
     rootfiletype = "root"
     input = b2.register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
 
 input.param('inputFileName', f_in_root)
 main.add_module(input)

@@ -23,8 +23,8 @@ algorithmFor_positionRecoWith3Samples = "oldDefault"
 algorithmFor_chargeRecoWith6Samples = "MaxSample"
 algorithmFor_chargeRecoWith3Samples = "MaxSample"
 # strip reconstruction algorithms:
-algorithmFor_stripTimeRecoWith6Samples = "CoG6"
-algorithmFor_stripTimeRecoWith3Samples = "CoG6"
+algorithmFor_stripTimeRecoWith6Samples = "dontdo"
+algorithmFor_stripTimeRecoWith3Samples = "dontdo"
 algorithmFor_stripChargeRecoWith6Samples = "MaxSample"
 algorithmFor_stripChargeRecoWith3Samples = "MaxSample"
 

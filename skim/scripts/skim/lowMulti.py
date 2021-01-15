@@ -18,7 +18,7 @@ from stdPhotons import stdPhotons
 @fancy_skim_header
 class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
@@ -98,7 +98,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 @fancy_skim_header
 class LowMassTwoTrack(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \gamma h^{+}h^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for low mass two track events."
@@ -142,15 +142,15 @@ class LowMassTwoTrack(BaseSkim):
 @fancy_skim_header
 class SingleTagPseudoScalar(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\prime}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\\prime}`
 
     **Decay Modes**
 
-        1. :math:`\\pi^{0}\\to \\gamma \gamma`,
-        2. :math:`\\eta \\to \gamma\\gamma`,
+        1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
+        2. :math:`\\eta \\to \\gamma\\gamma`,
         3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
         4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
-        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \gamma\gamma)`,
+        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
         6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
     """
 

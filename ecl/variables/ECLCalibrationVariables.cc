@@ -36,16 +36,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-    double eclClusterUncorrectedE(const Particle* particle)
-    {
-
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        return cluster->getEnergyRaw();
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
     double eclEnergy3FWDBarrel(const Particle* particle)
     {
 
@@ -436,11 +426,6 @@ namespace Belle2 {
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");
-
-    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
-[Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
-This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
-)DOC");
 
     REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, R"DOC(
 [Calibration] Returns energy sum of three crystals in forward barrel.

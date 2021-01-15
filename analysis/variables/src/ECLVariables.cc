@@ -111,6 +111,16 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
+    double eclClusterUncorrectedE(const Particle* particle)
+    {
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->getEnergyRaw();
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
     double eclClusterE(const Particle* particle)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1281,6 +1291,11 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
       If no argument or only a cut string is provided and ``gamma:all`` or ``e-:all`` does not exist
       or if the variable is requested for a particle that is not a photon, NaN is returned.
       )DOC");
+
+    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
+[Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
+This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
+)DOC");
 
   }
 }

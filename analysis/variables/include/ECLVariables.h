@@ -65,6 +65,11 @@ namespace Belle2 {
     double eclClusterE(const Particle* particle);
 
     /**
+     * return ECL cluster's uncorrected energy
+     */
+    double eclClusterUncorrectedE(const Particle* particle);
+
+    /**
      * return ECL cluster's distance
      */
     double eclClusterR(const Particle* particle);

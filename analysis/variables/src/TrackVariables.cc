@@ -35,21 +35,9 @@ namespace Belle2 {
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
-    // An helper function to get track fit results
-    // Not registered in variable manager
-    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
-    {
-      const Track* track = particle->getTrack();
-      if (!track) return nullptr;
-
-      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
-                                         particle->getPDGCode())));
-      return trackFit;
-    }
-
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       if (det == Const::EDetector::CDC) {
@@ -85,84 +73,84 @@ namespace Belle2 {
 
     double trackNDF(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getNDF();
     }
 
     double trackChi2(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getChi2();
     }
 
     double trackFirstSVDLayer(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
 
     double trackFirstPXDLayer(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
     double trackFirstCDCLayer(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
     double trackLastCDCLayer(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
     double trackD0(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getD0();
     }
 
     double trackPhi0(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getPhi0();
     }
 
     double trackOmega(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getOmega();
     }
 
     double trackZ0(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getZ0();
     }
 
     double trackTanLambda(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getTanLambda();
     }
 
     double trackD0Error(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[0][0];
@@ -172,7 +160,7 @@ namespace Belle2 {
 
     double trackPhi0Error(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[1][1];
@@ -182,7 +170,7 @@ namespace Belle2 {
 
     double trackOmegaError(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[2][2];
@@ -192,7 +180,7 @@ namespace Belle2 {
 
     double trackZ0Error(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[3][3];
@@ -202,7 +190,7 @@ namespace Belle2 {
 
     double trackTanLambdaError(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[4][4];
@@ -212,14 +200,14 @@ namespace Belle2 {
 
     double trackPValue(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getPValue();
     }
 
     double trackFitHypothesisPDG(const Particle* part)
     {
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return realNaN;
       return trackFit->getParticleType().getPDGCode();
     }
@@ -249,7 +237,7 @@ namespace Belle2 {
       const double zbwd = pars[2];
 
       // get the track fit
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit) return vecNaN;
 
       // get helix and parameters
@@ -389,11 +377,7 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return realNaN;
 
-      const Belle2::Track* track = particle->getTrack();
-      if (!track) return realNaN;
-
-      const Belle2::TrackFitResult* trackfit =  track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
-                                                  particle->getPDGCode())));
+      const Belle2::TrackFitResult* trackfit =  particle->getTrackFitResult();
       if (!trackfit) return realNaN;
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
@@ -464,12 +448,12 @@ For mdst versions < 5.1, returns quiet_NaN().)DOC");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
     REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track");
     REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA");
-    REGISTER_VARIABLE("tanlambda", trackTanLambda, "Slope of the track in the r-z plane");
+    REGISTER_VARIABLE("tanLambda", trackTanLambda, "Slope of the track in the r-z plane");
     REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane");
     REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track");
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
-    REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
+    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit");
     REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,

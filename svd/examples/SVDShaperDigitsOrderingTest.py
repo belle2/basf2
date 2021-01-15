@@ -18,10 +18,8 @@ class testSVDShaperDigitOrdering(b2.Module):
 
     """Module to check SVDShaperDigit ordering."""
 
-    def __init__(
+    def __init__(self):
         '''initialize'''
-        self,
-    ):
 
         super().__init__()
 

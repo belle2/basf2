@@ -152,6 +152,8 @@ namespace Belle2 {
       /**
        * Draws CDCTracks.
        * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a stroke-width.
        */
       void drawTracks(const std::string& storeObjName,
                       const std::string& stroke,
@@ -170,6 +172,8 @@ namespace Belle2 {
       /**
        * Draw RecoTracks.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawRecoTracks(const std::string& storeArrayName,
                           const std::string& stroke,
@@ -178,6 +182,8 @@ namespace Belle2 {
       /**
        * Draw RecoTracks trajectories.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawRecoTrackTrajectories(const std::string& storeArrayName,
                                      const std::string& stroke,
@@ -186,6 +192,8 @@ namespace Belle2 {
       /**
        * Draw MCParticles.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawMCParticleTrajectories(const std::string& storeArrayName,
                                       const std::string& stroke,

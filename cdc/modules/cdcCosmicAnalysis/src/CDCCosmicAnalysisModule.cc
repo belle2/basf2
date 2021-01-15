@@ -11,14 +11,7 @@
 #include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <Math/ProbFuncMathCore.h>
 #include "algorithm"
@@ -57,13 +50,11 @@ CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
 void CDCCosmicAnalysisModule::initialize()
 {
   // Register histograms (calls back defineHisto)
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  m_Tracks.isRequired(m_trackArrayName);
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
+  m_TrackFitResults.isRequired(m_trackFitResultArrayName);
+  RelationArray relRecoTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   tfile = new TFile(m_outputFileName.c_str(), "RECREATE");
@@ -129,14 +120,8 @@ void CDCCosmicAnalysisModule::beginRun()
 
 void CDCCosmicAnalysisModule::event()
 {
-  const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-  const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
-  const StoreObjPtr<EventMetaData> eventMetaData;
-
-  if (eventMetaData)
-    run = eventMetaData->getRun();
+  if (m_EventMetaData.isValid())
+    run = m_EventMetaData->getRun();
 
   evtT0 = 0;
   if (m_eventT0Extraction) {
@@ -149,13 +134,13 @@ void CDCCosmicAnalysisModule::event()
   }
 
   // Loop over Tracks
-  int nTr = storeTrack.getEntries();
+  int nTr = m_Tracks.getEntries();
 
   short charge2 = 0;
   short charge1 = 0;
   bool up(false), down(false);
   for (int i = 0; i < nTr; ++i) {
-    const Belle2::Track* b2track = storeTrack[i];
+    const Belle2::Track* b2track = m_Tracks[i];
     const Belle2::TrackFitResult* fitresult;
     fitresult = b2track->getTrackFitResult(Const::muon);
     if (!fitresult) {

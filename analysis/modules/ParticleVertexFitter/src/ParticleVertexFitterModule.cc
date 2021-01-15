@@ -11,18 +11,14 @@
 // Own include
 #include <analysis/modules/ParticleVertexFitter/ParticleVertexFitterModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Btube.h>
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
@@ -65,7 +61,7 @@ namespace Belle2 {
              "list. If set to -1, all candidates are kept; if set to 0, "
              "the candidates failing the fit are removed.",
              0.001);
-    addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
+    addParam("vertexFitter", m_vertexFitter, "KFit or Rave", string("KFit"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint,
              "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing, btube",
@@ -73,15 +69,22 @@ namespace Belle2 {
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
     addParam("smearing", m_smearing, "smear IP tube width by given length", 0.002);
+    addParam("massConstraintList", m_massConstraintList,
+             "Type::[int]. List of daughter particles to mass constrain with int = pdg code. (only for MassFourCKFit)", {});
+    addParam("massConstraintListParticlename", m_massConstraintListParticlename,
+             "Type::[string]. List of daughter particles to mass constrain with string = particle name. (only for MassFourCKFit)", {});
   }
 
   void ParticleVertexFitterModule::initialize()
   {
+    // Particle list with name m_listName has to exist
+    m_plist.isRequired(m_listName);
+
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
     // RAVE setup
-    if (m_vertexFitter == "rave")
+    if (m_vertexFitter == "Rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
     B2DEBUG(1, "ParticleVertexFitterModule : magnetic field = " << m_Bfield);
@@ -89,6 +92,13 @@ namespace Belle2 {
 
     if (m_decayString != "")
       m_decaydescriptor.init(m_decayString);
+
+    if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
+      for (auto& containedParticle : m_massConstraintListParticlename) {
+        TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
+        m_massConstraintList.push_back(particletemp->PdgCode());
+      }
+    }
 
     B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
     if (m_decayString != "")
@@ -107,14 +117,7 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::event()
   {
-
-    StoreObjPtr<ParticleList> plist(m_listName);
-    if (!plist) {
-      B2ERROR("ParticleList " << m_listName << " not found");
-      return;
-    }
-
-    if (m_vertexFitter == "rave")
+    if (m_vertexFitter == "Rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
     m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
@@ -122,7 +125,7 @@ namespace Belle2 {
     TMatrixDSym beamSpotCov(3);
     if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
     if (m_withConstraint == "iptube") {
-      if (m_smearing > 0 && m_vertexFitter == "kfitter") {
+      if (m_smearing > 0 && m_vertexFitter == "KFit") {
         ParticleVertexFitterModule::smearBeamSpot(m_smearing);
       } else {
         ParticleVertexFitterModule::findConstraintBoost(2.);
@@ -132,13 +135,13 @@ namespace Belle2 {
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
       findConstraintBoost(0.03);
     }
-    if ((m_vertexFitter == "rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
+    if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
     std::vector<unsigned int> toRemove;
-    unsigned int n = plist->getListSize();
+    unsigned int n = m_plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
-      Particle* particle = plist->getParticle(i);
+      Particle* particle = m_plist->getParticle(i);
       m_hasCovMatrix = false;
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
@@ -179,10 +182,10 @@ namespace Belle2 {
       if (particle->getPValue() < m_confidenceLevel)
         toRemove.push_back(particle->getArrayIndex());
     }
-    plist->removeParticles(toRemove);
+    m_plist->removeParticles(toRemove);
 
     //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
-    if (m_vertexFitter == "rave")
+    if (m_vertexFitter == "Rave")
       analysis::RaveSetup::getInstance()->reset();
   }
 
@@ -204,8 +207,8 @@ namespace Belle2 {
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
     bool ok = false;
-    // fits with KFitter
-    if (m_vertexFitter == "kfitter") {
+    // fits with KFit
+    if (m_vertexFitter == "KFit") {
 
       // vertex fit
       if (m_fitType == "vertex") {
@@ -221,7 +224,7 @@ namespace Belle2 {
       // mass-constrained vertex fit
       if (m_fitType == "massvertex") {
         if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
-          B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
+          B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using KFit does not work with iptube or ipprofile constraint.");
         } else if (m_withConstraint == "pointing") {
           ok = doKMassPointingVertexFit(mother);
         } else {
@@ -232,7 +235,7 @@ namespace Belle2 {
       // mass fit
       if (m_fitType == "mass") {
         if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
-          B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
+          B2FATAL("ParticleVertexFitter: Invalid options - mass fit using KFit does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassFit(mother);
         }
@@ -241,22 +244,32 @@ namespace Belle2 {
       // four C fit
       if (m_fitType == "fourC") {
         if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
-          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using kfitter does not work with iptube or ipprofile constraint.");
+          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using KFit does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKFourCFit(mother);
         }
       }
 
-      // invalid KFitter fit type
+      // four mass C fit
+      if (m_fitType == "massfourC") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using KFit does not work with iptube or ipprofile constraint.");
+        } else {
+          ok = doKMassFourCFit(mother);
+        }
+      }
+
+      // invalid KFit fit type
       if (m_fitType != "vertex"
           && m_fitType != "massvertex"
           && m_fitType != "mass"
-          && m_fitType != "fourC")
+          && m_fitType != "fourC"
+          && m_fitType != "massfourC")
         B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the vertex fitter ");
     }
 
     // fits using Rave
-    if (m_vertexFitter == "rave") {
+    if (m_vertexFitter == "Rave") {
       try {
         ok = doRaveFit(mother);
       } catch (const rave::CheckedFloatException&) {
@@ -266,7 +279,7 @@ namespace Belle2 {
     }
 
     // invalid fitter
-    if (m_vertexFitter != "kfitter" && m_vertexFitter != "rave")
+    if (m_vertexFitter != "KFit" && m_vertexFitter != "Rave")
       B2FATAL("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
 
     if (!ok) return false;
@@ -279,7 +292,7 @@ namespace Belle2 {
   }
 
   bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
-                                                    std::vector<const Particle*>& pi0Children)
+                                                    std::vector<const Particle*>& twoPhotonChildren)
   {
     if (m_decayString.empty()) {
       // if decayString is empty, just use all primary daughters
@@ -304,18 +317,20 @@ namespace Belle2 {
         B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
         return false; // error matrix not valid
       }
-      bool isPi0 = false;
+      bool isTwoPhotonParticle = false;
       if (m_hasCovMatrix == false) {
-        if (child->getPDGCode() == Const::pi0.getPDGCode() && child->getNDaughters() == 2) {
-          if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
-              && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
-            isPi0 = true;
+        if (child->getPDGCode() == Const::pi0.getPDGCode() or child->getPDGCode() == 221) { // pi0 or eta
+          if (child->getNDaughters() == 2) {
+            if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
+                && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
+              isTwoPhotonParticle = true;
+            }
           }
         }
       }
-      if (isPi0) {
-        // move children from fitChildren to pi0Children
-        pi0Children.push_back(child);
+      if (isTwoPhotonParticle) {
+        // move children from fitChildren to twoPhotonChildren
+        twoPhotonChildren.push_back(child);
         itr = fitChildren.erase(itr);
       } else {
         itr++;
@@ -325,13 +340,14 @@ namespace Belle2 {
     return true;
   }
 
-  bool ParticleVertexFitterModule::redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv)
+  bool ParticleVertexFitterModule::redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit,
+      const analysis::VertexFitKFit& kv)
   {
     // TODO: something like setGammaError is necessary
     // this is just workaround for the moment
 
-    const Particle* g1Orig = pi0Orig->getDaughter(0);
-    const Particle* g2Orig = pi0Orig->getDaughter(1);
+    const Particle* g1Orig = preFit->getDaughter(0);
+    const Particle* g2Orig = preFit->getDaughter(1);
     Particle g1Temp(g1Orig->get4Vector(), 22);
     Particle g2Temp(g2Orig->get4Vector(), 22);
 
@@ -352,7 +368,7 @@ namespace Belle2 {
     g1Temp.updateMomentum(g1Orig->get4Vector(), pos, g1ErrMatrix, 1.0);
     g2Temp.updateMomentum(g2Orig->get4Vector(), pos, g2ErrMatrix, 1.0);
 
-    // perform the mass fit for pi0
+    // perform the mass fit for the two-photon particle
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
@@ -361,17 +377,17 @@ namespace Belle2 {
 
     km.setVertex(kv.getVertex());
     km.setVertexError(kv.getVertexError());
-    km.setInvariantMass(pi0Orig->getPDGMass());
+    km.setInvariantMass(preFit->getPDGMass());
 
     int err = km.doFit();
     if (err != 0) {
       return false;
     }
 
-    // The update of the daughters is disabled for the pi0 mass fit.
+    // The update of the daughters is disabled for this mass fit.
     bool updateDaughters = m_updateDaughters;
     m_updateDaughters = false;
-    bool ok = makeKMassMother(km, pi0Temp);
+    bool ok = makeKMassMother(km, postFit);
     m_updateDaughters = updateDaughters;
 
     return ok;
@@ -382,18 +398,18 @@ namespace Belle2 {
     if ((mother->getNDaughters() < 2 && !ipTubeConstraint) || mother->getNDaughters() < 1) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1) {
-      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
+    if (twoPhotonChildren.size() > 1) {
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
     }
 
     if ((fitChildren.size() < 2 && !ipTubeConstraint) || fitChildren.size() < 1) {
-      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is too low.");
+      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFit is too low.");
       return false;
     }
 
@@ -405,10 +421,10 @@ namespace Belle2 {
       kv.addParticle(child);
 
     if (ipProfileConstraint)
-      addIPProfileToKFitter(kv);
+      addIPProfileToKFit(kv);
 
     if (ipTubeConstraint)
-      addIPTubeToKFitter(kv);
+      addIPTubeToKFit(kv);
 
     // Perform vertex fit using only the particles with valid error matrices
     int err = kv.doFit();
@@ -416,17 +432,18 @@ namespace Belle2 {
       return false;
 
     bool ok = false;
-    if (pi0Children.size() == 0)
+    if (twoPhotonChildren.size() == 0)
       // in the case daughters do not include pi0 - this is it (fit done)
       ok = makeKVertexMother(kv, mother);
-    else if (pi0Children.size() == 1) {
-      // the daughters contain pi0:
-      // 1. refit pi0 to previously determined vertex
-      // 2. redo the fit using all particles (including pi0 this time)
+    else if (twoPhotonChildren.size() == 1) {
+      // there is a daughter reconstructed from two photons so without position information
+      // 1. determine vertex based on all other valid daughters
+      // 2. set position and error matrix of two-photon daughter to previously determined vertex
+      // 3. redo the fit using all particles (including two-photon particle this time)
 
-      const Particle* pi0 = pi0Children[0];
-      Particle pi0Temp(pi0->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
+      const Particle* twoPhotonDaughter = twoPhotonChildren[0];
+      Particle fixedTwoPhotonDaughter(twoPhotonDaughter->get4Vector(), twoPhotonDaughter->getPDGCode());
+      ok = redoTwoPhotonDaughterMassFit(&fixedTwoPhotonDaughter, twoPhotonDaughter, kv);
       if (!ok)
         return false;
 
@@ -437,10 +454,10 @@ namespace Belle2 {
       for (auto& child : fitChildren)
         kv2.addParticle(child);
 
-      kv2.addParticle(&pi0Temp);
+      kv2.addParticle(&fixedTwoPhotonDaughter);
 
       if (ipProfileConstraint)
-        addIPProfileToKFitter(kv2);
+        addIPProfileToKFit(kv2);
 
       err = kv2.doFit();
 
@@ -458,23 +475,23 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1) {
-      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
+    if (twoPhotonChildren.size() > 1) {
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
     }
 
     if (fitChildren.size() < 2) {
-      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFit is less than 2.");
       return false;
     }
 
     bool ok = false;
-    if (pi0Children.size() == 0) {
+    if (twoPhotonChildren.size() == 0) {
       // Initialise the Fitter
       analysis::MassVertexFitKFit kmv;
       kmv.setMagneticField(m_Bfield);
@@ -487,12 +504,13 @@ namespace Belle2 {
       if (err != 0)
         return false;
 
-      // in the case daughters do not include pi0 - this is it (fit done)
+      // in the case daughters do not include particles with two photon daughters like pi0 - this is it (fit done)
       ok = makeKMassVertexMother(kmv, mother);
-    } else if (pi0Children.size() == 1) {
-      // the daughters contain pi0:
-      // 1. refit pi0 to previously determined vertex
-      // 2. redo the fit using all particles (including pi0 this time)
+    } else if (twoPhotonChildren.size() == 1) {
+      // there is a daughter reconstructed from two photons so without position information
+      // 1. determine vertex based on all other valid daughters
+      // 2. set position and error matrix of two-photon daughter to previously determined vertex
+      // 3. redo the fit using all particles (including two-photon particle this time)
 
       analysis::VertexFitKFit kv;
       kv.setMagneticField(m_Bfield);
@@ -505,9 +523,9 @@ namespace Belle2 {
       if (err != 0)
         return false;
 
-      const Particle* pi0 = pi0Children[0];
-      Particle pi0Temp(pi0->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
+      const Particle* twoPhotonDaughter = twoPhotonChildren[0];
+      Particle fixedTwoPhotonDaughter(twoPhotonDaughter->get4Vector(), twoPhotonDaughter->getPDGCode());
+      ok = redoTwoPhotonDaughterMassFit(&fixedTwoPhotonDaughter, twoPhotonDaughter, kv);
       if (!ok)
         return false;
 
@@ -517,7 +535,7 @@ namespace Belle2 {
 
       for (auto child : fitChildren)
         kmv2.addParticle(child);
-      kmv2.addParticle(&pi0Temp);
+      kmv2.addParticle(&fixedTwoPhotonDaughter);
 
       kmv2.setInvariantMass(mother->getPDGMass());
       err = kmv2.doFit();
@@ -541,18 +559,18 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 0) {
-      B2FATAL("[ParticleVertexFitterModule::doKMassPointingVertexFit] MassPointingVertex fit using KFitter does not support fit with pi0s (yet).");
+    if (twoPhotonChildren.size() > 0) {
+      B2FATAL("[ParticleVertexFitterModule::doKMassPointingVertexFit] MassPointingVertex fit using KFit does not support fit with two-photon daughters (yet).");
     }
 
     if (fitChildren.size() < 2) {
-      B2WARNING("[ParticleVertexFitterModule::doKMassPointingVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("[ParticleVertexFitterModule::doKMassPointingVertexFit] Number of particles with valid error matrix entering the vertex fit using KFit is less than 2.");
       return false;
     }
 
@@ -615,7 +633,7 @@ namespace Belle2 {
       const Particle* child = mother->getDaughter(ichild);
 
       if (child->getNDaughters() > 0) {
-        bool err = addChildofParticletoKfitter(kf, child);
+        bool err = addChildofParticletoKFit(kf, child);
         if (!err) return false;
       } else {
         if (child->getPValue() < 0) return false; // error matrix not valid
@@ -633,6 +651,42 @@ namespace Belle2 {
     if (err != 0) return false;
 
     bool ok = makeKFourCMother(kf, mother);
+
+    return ok;
+  }
+
+  bool ParticleVertexFitterModule::doKMassFourCFit(Particle* mother)
+  {
+    if (mother->getNDaughters() < 2) return false;
+
+    analysis::MassFourCFitKFit kf;
+    kf.setMagneticField(m_Bfield);
+
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      const Particle* child = mother->getDaughter(ichild);
+
+      if (child->getNDaughters() > 0) {
+        bool massconstraint = std::find(m_massConstraintList.begin(), m_massConstraintList.end(),
+                                        std::abs(child->getPDGCode())) != m_massConstraintList.end();
+        std::vector<unsigned> childId;
+        bool err = addChildofParticletoMassKFit(kf, child, childId);
+        if (massconstraint) kf.addMassConstraint(child->getPDGMass(), childId);
+        if (!err) return false;
+      } else {
+        if (child->getPValue() < 0) return false; // error matrix not valid
+        kf.addParticle(child);
+      }
+    }
+
+    // apply four momentum constraint
+    PCmsLabTransform T;
+    kf.setFourMomentum(T.getBeamFourMomentum());
+
+    int err = kf.doFit();
+
+    if (err != 0) return false;
+
+    bool ok = makeMassKFourCMother(kf, mother);
 
     return ok;
   }
@@ -822,6 +876,69 @@ namespace Belle2 {
 
     return true;
   }
+
+  bool ParticleVertexFitterModule::makeMassKFourCMother(analysis::MassFourCFitKFit& kf, Particle* mother)
+  {
+    enum analysis::KFitError::ECode fitError;
+    fitError = kf.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
+    mother->addExtraInfo("MassFourCFitProb", TMath::Prob(kf.getCHIsq(), kf.getNDF()));
+    mother->addExtraInfo("MassFourCFitChi2", kf.getCHIsq());
+    mother->addExtraInfo("MassFourCFitNDF", kf.getNDF());
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter momenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      const unsigned nd = daughters.size();
+      unsigned l = 0;
+      std::vector<std::vector<unsigned>> pars;
+      std::vector<Particle*> allparticles;
+      for (unsigned ichild = 0; ichild < nd; ichild++) {
+        const Particle* daughter = mother->getDaughter(ichild);
+        std::vector<unsigned> pard;
+        if (daughter->getNDaughters() > 0) {
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
+          pars.push_back(pard);
+          allparticles.push_back(daughters[ichild]);
+        } else {
+          pard.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(daughters[ichild]);
+          l++;
+        }
+      }
+
+      unsigned track_count = kf.getTrackCount();
+      if (l != track_count)
+        return false;
+
+      for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
+        TLorentzVector childMoms;
+        TVector3 childPoss;
+        TMatrixFSym childErrMatrixs(7);
+        for (unsigned int iChild : pars[iDaug]) {
+          childMoms = childMoms +
+                      CLHEPToROOT::getTLorentzVector(
+                        kf.getTrackMomentum(iChild));
+          childPoss = childPoss +
+                      CLHEPToROOT::getTVector3(
+                        kf.getTrackPosition(iChild));
+          TMatrixFSym childErrMatrix =
+            CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild));
+          childErrMatrixs = childErrMatrixs + childErrMatrix;
+        }
+        allparticles[iDaug]->set4Vector(childMoms);
+        allparticles[iDaug]->setVertex(childPoss);
+        allparticles[iDaug]->setMomentumVertexErrorMatrix(childErrMatrixs);
+      }
+    }
+
+    return true;
+  }
+
 
   void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
       std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
@@ -1025,11 +1142,11 @@ namespace Belle2 {
     return isAll;
   }
 
-  bool ParticleVertexFitterModule::addChildofParticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
+  bool ParticleVertexFitterModule::addChildofParticletoKFit(analysis::FourCFitKFit& kf, const Particle* particle)
   {
     for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
       const Particle* child = particle->getDaughter(ichild);
-      if (child->getNDaughters() > 0) addChildofParticletoKfitter(kf, child);
+      if (child->getNDaughters() > 0) addChildofParticletoKFit(kf, child);
       else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 
@@ -1039,7 +1156,28 @@ namespace Belle2 {
     return true;
   }
 
-  void ParticleVertexFitterModule::addIPProfileToKFitter(analysis::VertexFitKFit& kv)
+  bool ParticleVertexFitterModule::addChildofParticletoMassKFit(analysis::MassFourCFitKFit& kf, const Particle* particle,
+      std::vector<unsigned>& particleId)
+  {
+    for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
+      const Particle* child = particle->getDaughter(ichild);
+      if (child->getNDaughters() > 0) {
+        bool massconstraint = std::find(m_massConstraintList.begin(), m_massConstraintList.end(),
+                                        std::abs(child->getPDGCode())) != m_massConstraintList.end();
+        std::vector<unsigned> childId;
+        addChildofParticletoMassKFit(kf, child, childId);
+        if (massconstraint) kf.addMassConstraint(child->getPDGMass(), childId);
+        particleId.insert(particleId.end(), childId.begin(), childId.end());
+      } else {
+        if (child->getPValue() < 0) return false; // error matrix not valid
+        kf.addParticle(child);
+        particleId.push_back(kf.getTrackCount() - 1);
+      }
+    }
+    return true;
+  }
+
+  void ParticleVertexFitterModule::addIPProfileToKFit(analysis::VertexFitKFit& kv)
   {
     HepPoint3D pos(0.0, 0.0, 0.0);
     CLHEP::HepSymMatrix covMatrix(3, 0);
@@ -1054,7 +1192,7 @@ namespace Belle2 {
     kv.setIpProfile(pos, covMatrix);
   }
 
-  void ParticleVertexFitterModule::addIPTubeToKFitter(analysis::VertexFitKFit& kv)
+  void ParticleVertexFitterModule::addIPTubeToKFit(analysis::VertexFitKFit& kv)
   {
     CLHEP::HepSymMatrix err(7, 0);
 

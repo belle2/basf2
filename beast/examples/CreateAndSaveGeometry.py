@@ -12,29 +12,28 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 
 # EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 
 # Geometry parameter loader
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
 # Geometry builder
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 
 # Overlap Checker
 # overlapchecker = register_module('OverlapChecker')
 # overlapchecker.param('Tolerance', 0.01)
 
 # Saves the geometry as a Root file
-geosaver = register_module('ExportGeometry')
+geosaver = b2.register_module('ExportGeometry')
 geosaver.param('Filename', 'Belle2Geo.root')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(eventinfosetter)
@@ -44,4 +43,4 @@ main.add_module(geometry)
 main.add_module(geosaver)
 
 # Process one event
-process(main)
+b2.process(main)

@@ -13,14 +13,11 @@
 
 #define TRGGDL_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 
 #include "trg/trg/Debug.h"
 #include "trg/gdl/modules/trggdl/TRGGDLModule.h"
-//framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
+//framework
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -46,8 +43,8 @@ namespace Belle2 {
     _simulationMode(1),
     _fastSimulationMode(0),
     _firmwareSimulationMode(0),
-    _algFilePath("ftd.alg"),
-    _Phase("Phase2")
+    _Phase("Phase2"),
+    _algFilePath("ftd.alg")
   {
 
     string desc = "TRGGDLModule(" + version() + ")";

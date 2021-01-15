@@ -9,7 +9,7 @@ import modularAnalysis as ma
 import variables as va
 import variables.collections as vc
 import variables.utils as vu
-from vertex import KFit
+from vertex import kFit
 from b2biiConversion import convertBelleMdstToBelleIIMdst
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
@@ -23,7 +23,7 @@ monitoring = False
 if len(sys.argv) == 1:
     basf2.B2WARNING("In the beginning of an analysis it is recommended to study the monitoring histograms.\n"
                     "These tell you if the conversion works as expected.\n"
-                    "If you want to create them, just provide any argument to this skript.")
+                    "If you want to create them, just provide any argument to this script.")
 else:
     monitoring = True
 
@@ -75,7 +75,7 @@ ma.cutAndCopyList('K_S0:good', 'K_S0:mdst', cut='goodBelleKshort', path=mypath)
 
 # It makes sense to perform a vertex fit of the K_S0 candidates and accept
 # only those candidates where the vertex fit converged
-KFit('K_S0:good', 0, path=mypath)
+kFit('K_S0:good', 0, path=mypath)
 
 # Again, let's print a few variable values:
 ma.matchMCTruth('K_S0:good', path=mypath)

@@ -48,6 +48,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   } catch (...) {}
 
   file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
+  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
   // no sha256 yet
 
   m_json["output_files"].push_back(file_json);
@@ -65,6 +66,7 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
   // no metadata and no check
 
   file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
+  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
   // no sha256 yet
 
   m_json["output_files"].push_back(file_json);
@@ -92,6 +94,25 @@ void MetadataService::addBasf2Status(const std::string& message)
   status["warnings"] = LogSystem::Instance().getMessageCounter(LogConfig::c_Warning);
   status["finished"] = false;
   status["message"] = message;
+
+  writeJson();
+}
+
+void MetadataService::addModuleCallsCount()
+{
+  if (m_fileName.empty()) return;
+
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+
+  if (processStatistics.isValid()) {
+
+    std::vector<ModuleStatistics> modulesSortedByIndex(processStatistics->getAll());
+    sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
+
+    for (const ModuleStatistics& stats : modulesSortedByIndex) {
+      m_json["modules_calls"][stats.getName()] = int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_Event));
+    }
+  }
 
   writeJson();
 }

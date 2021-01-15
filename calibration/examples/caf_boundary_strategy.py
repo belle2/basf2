@@ -2,24 +2,25 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
-set_log_level(LogLevel.DEBUG)
+import basf2 as b2
 
 import sys
 from pathlib import Path
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 
 
+b2.set_log_level(b2.LogLevel.DEBUG)
+
+
 def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 CAF_simplest.py <data directory>")
+        print("Usage: basf2 caf_boundary_strategy.py <data directory>")
         sys.exit(1)
 
     ###################################################

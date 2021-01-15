@@ -5,22 +5,25 @@
 SVD Default Cluster Calibration importer.
 t_min = -80,
 """
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import SVDClusterCuts
 from ROOT.Belle2 import SVDHitTimeSelectionFunction
+from basf2 import conditions as b2conditions
 import datetime
-import os
+
+# import sys
 
 # default values
 # cls hit time
-clsTimeMin = -80
+clsTimeMin = -999
 clsTimeFunctionID = 0  # default, t > clsTimeMin
 clsTimeDeltaT = 30  # NOT USED
 clsTimeNSigma = 10  # NOT USED
+
+# time difference U-V
+clsTimeDiff = 999  # default for DATA and exp 1003, 1002
+# clsTimeDiff = 10  # default for exp 0
 
 # cls cuts
 clsSeedSNR = 5
@@ -32,7 +35,7 @@ clsScaleErrSize3 = 1
 now = datetime.datetime.now()
 
 
-class defaultSVDClusterCalibrationImporter(basf2.Module):
+class defaultSVDClusterCalibrationImporter(b2.Module):
     """
     Defining the python module to do the import.
     """
@@ -53,9 +56,11 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         hitTimeSelection.setDeltaTime(clsTimeDeltaT)
         # version 2: |t-t0|<nSgma*tErrTOT - NOT USED
         hitTimeSelection.setNsigma(clsTimeNSigma)
-
+        # cluster time difference
+        hitTimeSelection.setMaxUVTimeDifference(clsTimeDiff)
         time_payload = Belle2.SVDClusterCalibrations.t_time_payload(
-            hitTimeSelection, "HitTimeSelection_default_" + str(now.isoformat()) + "_INFO:_tmin=-80")
+            hitTimeSelection, "HitTimeSelection_default_" + str(now.isoformat()) +
+            "_INFO:_tmin="+str(clsTimeMin)+"_tDiff="+str(clsTimeDiff))
 
         # cluster reconstruction & position error
         clsParam = SVDClusterCuts()
@@ -128,25 +133,23 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDClusterCalibrations.time_name, time_payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localdb_clusterCal/database.txt", "localdb_clusterCal", invertLogging=True)
+b2conditions.prepend_globaltag('svd_onlySVDinGeoConfiguration')
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = False)
+main.add_module("Gearbox")
+main.add_module("Geometry")
 
 main.add_module(defaultSVDClusterCalibrationImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

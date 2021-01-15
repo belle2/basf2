@@ -24,8 +24,6 @@
 #include <framework/database/DBImportObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/FileSystem.h>
@@ -36,26 +34,13 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
-
-#include <svd/calibration/SVDDetectorConfiguration.h>
-//#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <iostream>
-#include <fstream>
 #include <sstream>
-#include <TFile.h>
-#include <TVectorF.h>
-/*
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-*/
 
 using namespace std;
 using namespace Belle2;
@@ -196,7 +181,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
                     // ||
                     // test on the sensor != f( hybrid) anr apv perhaps
                    )
-                  B2ERROR("Inconsistency among maps: xml files tells \n" <<
+                  B2FATAL("Inconsistency among maps: xml files tells \n" <<
                           "layer " << layerId << " ladder " << ladderId <<
                           " hybridID " << hybridId << "\n" <<
                           "while the BASF2 map tells \n" <<

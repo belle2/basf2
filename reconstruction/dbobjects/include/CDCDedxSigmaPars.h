@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 #include <vector>
-#include <cmath>
 
 namespace Belle2 {
 
@@ -31,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxSigmaPars(short version, std::vector<double>& sigmapars): m_version(version), m_sigmapars(sigmapars) {};
+    CDCDedxSigmaPars(short version, const std::vector<double>& sigmapars): m_version(version), m_sigmapars(sigmapars) {};
 
     /**
      * Destructor
@@ -62,7 +61,8 @@ namespace Belle2 {
     void setVersion(short version) {m_version = version; };
 
     /** Set sigma parameter
-     * @param sigma parameter
+     * @param par parameter value
+     * @param value parameter key
      */
     void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
 
@@ -70,6 +70,6 @@ namespace Belle2 {
     short m_version{ -1}; /**< version number for sigma parameterization */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
-    ClassDef(CDCDedxSigmaPars, 1); /**< ClassDef */
+    ClassDef(CDCDedxSigmaPars, 2); /**< ClassDef */
   };
 } // end namespace Belle2

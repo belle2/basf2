@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
-#include <math.h>
 
 using namespace Belle2;
 using namespace Belle2::TOP;

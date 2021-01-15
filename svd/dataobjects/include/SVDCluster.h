@@ -38,15 +38,16 @@ namespace Belle2 {
      * @param clsSize Cluster size, number of fired strips that form the cluster.
      * @param clsSN Signal-to-noise ratio for the cluster
      * @param clsChi2 value for cluster fit
+     * @param firstFrame
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
-               unsigned short clsSize, float clsSN, float clsChi2):
+               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0):
       m_sensorID(sensorID), m_isU(isU),
       m_position(position), m_positionSigma(positionSigma),
       m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
-      m_clsChi2(clsChi2)
+      m_clsChi2(clsChi2), m_firstFrame(firstFrame)
     {}
 
     /** Default constructor for the ROOT IO. */
@@ -159,6 +160,11 @@ namespace Belle2 {
      */
     float getChi2() const { return m_clsChi2; }
 
+    /** Get firstFrame of the MaxSum algorithm.
+     * @return firstFrame of the MaxSum algorithm
+     */
+    int getFirstFrame() const { return m_firstFrame; }
+
     /** Get cluster quality indicator
     * @return probability that cluster is generated from signal hit.
     */
@@ -214,10 +220,11 @@ namespace Belle2 {
     unsigned short m_clsSize;  /**< Cluster size in pixels */
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
+    int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 6)
+    ClassDef(SVDCluster, 7)
 
   };
 

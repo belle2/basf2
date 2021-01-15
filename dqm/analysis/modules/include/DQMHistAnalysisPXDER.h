@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisPXDERModule();
     /* Destructor */
-    ~DQMHistAnalysisPXDERModule() override final;
+    ~DQMHistAnalysisPXDERModule();
 
   private:
 
@@ -171,9 +171,9 @@ namespace Belle2 {
        * @param bin bin which is fill in flag histogram.
        * @param pars array of parameters need for condition.
        * @param ratio Ratio of acquired events to reference events.
-       * @param hist Histogram of sources.
-       * @param refhist Reference histogram.
-       * @param flag Histogram of flags.
+       * @param name_hist Histogram of sources.
+       * @param name_refhist Reference histogram.
+       * @param flaghist Histogram of flags.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
@@ -212,7 +212,7 @@ namespace Belle2 {
 
     /**
      * Get a histogram by name (DEPRECATED), better use function from base class!
-     * @param histogram The name of the histogram.
+     * @param histoname The name of the histogram.
      * @return The pointer to the histogram, or nullptr if not found.
      */
     TH1* GetHisto(TString histoname);

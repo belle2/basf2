@@ -10,17 +10,15 @@
 </header>
 """
 
+import reconstruction
+from tracking.validation.run import TrackingValidationRun
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation_onlyEclSeed_expert.root'
 N_EVENTS = 10000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-import tracking
-from tracking.validation.run import TrackingValidationRun
-import reconstruction
 
 
 class toCDCfromEclCKF(TrackingValidationRun):

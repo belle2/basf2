@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import tempfile
 import basf2
 import b2test_utils
 import modularAnalysis as ma
-from vertex import KFit
-from ROOT import Belle2
+from vertex import kFit
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 def check(filename):
@@ -20,13 +17,13 @@ def check(filename):
     ntuple = ntuplefile.Get('ntuple')
 
     if ntuple.GetEntries() == 0:
-        B2FATAL("No D0s saved")
+        basf2.B2FATAL("No D0s saved")
 
     if ntuple.GetEntries("significanceOfDistance < 0 && significanceOfDistance != -1") > 0:
-        B2FATAL("Some entries have negative significanceOfDistance?")
+        basf2.B2FATAL("Some entries have negative significanceOfDistance?")
 
     if ntuple.GetEntries("significanceOfDistance > 0") == 0:
-        B2FATAL("significanceOfDistance never positive?")
+        basf2.B2FATAL("significanceOfDistance never positive?")
 
 
 testFile = tempfile.NamedTemporaryFile()
@@ -43,12 +40,12 @@ ma.reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 ma.matchMCTruth('pi0', path=main)
 
 # KFit
-KFit('pi0', 0.0, path=main)
+kFit('pi0', 0.0, path=main)
 
 ma.reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
 ma.matchMCTruth('D0', path=main)
 
-KFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
+kFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
 
 ntupler = basf2.register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)

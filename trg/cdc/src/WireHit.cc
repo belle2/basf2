@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <stdlib.h>
-#include "framework/datastore/StoreArray.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 
@@ -83,7 +82,7 @@ namespace Belle2 {
   TRGCDCWireHit::operator new(size_t size)
   {
     void* p = malloc(size);
-    _all.push_back((TRGCDCWireHit*) p);
+    _all.push_back(static_cast<TRGCDCWireHit*>(p));
 
 //     cout << ">---------------------" << endl;
 //     for (unsigned i = 0; i < _all.size(); i++)
@@ -98,7 +97,7 @@ namespace Belle2 {
     for (vector<TRGCDCWireHit*>::iterator it = _all.begin();
          it != _all.end();
          ++it) {
-      if ((* it) == (TRGCDCWireHit*) t) {
+      if ((* it) == static_cast<TRGCDCWireHit*>(t)) {
         _all.erase(it);
         break;
       }

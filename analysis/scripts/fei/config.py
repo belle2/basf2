@@ -27,19 +27,18 @@ import basf2
 # Define classes at top level to make them pickable
 # Creates new class via namedtuple, which are like a struct in C
 
-FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, b2bii, monitor, legacy, externTeacher, training')
-FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, False, True, None, 'basf2_mva_teacher', False)
+FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, monitor, legacy, externTeacher, training')
+FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, True, None, 'basf2_mva_teacher', False)
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
 FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
                                  "do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
                                  " None in this case the environment variable FEI_STAGE is used."
-FeiConfiguration.b2bii.__doc__ = "If true, it is assumed that we run on converted Belle MC or data"
 FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   "and the algorithm will be able to apply this training."
-FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
+FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
 
 
@@ -56,13 +55,15 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable,'
-                                             'bestCandidateCut, bestCandidateMode')
-PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, noBackgroundSampling,'
+                                             'bestCandidateVariable, bestCandidateCut, bestCandidateMode')
+PreCutConfiguration.__new__.__defaults__ = ('', -2, False, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
                                       "Particles which do not pass this cut are immediately discarded."
 PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence level to the VertexFitter."
+PreCutConfiguration.noBackgroundSampling.__doc__ = "For very pure channels, the background sampling factor is too high" \
+                                                   " and the MVA can't be trained. This disables background sampling."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
 PreCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep after the best-candidate ranking."

@@ -29,7 +29,8 @@ namespace Belle2 {
       m_circleCalculated(false) {}
 
     /** Constructor. expects 4 hits in TVector3 format, first parameter is outer hit, second is outerCenter hit, third is innercenter hit, last one is the innermost hit, optional parameter sets strength of magnetic field (standard is 1.5T)*/
-    FourHitFilters(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner, double magneticFieldStrength = 1.5):
+    FourHitFilters(const TVector3& outer, const TVector3& outerCenter, const TVector3& innerCenter, const TVector3& inner,
+                   const double magneticFieldStrength = 1.5):
       m_hitA(outer),
       m_hitB(outerCenter),
       m_hitC(innerCenter),
@@ -43,7 +44,7 @@ namespace Belle2 {
     ~FourHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outer, TVector3& outerCenter, TVector3& innerCenter, TVector3& inner)
+    void resetValues(const TVector3& outer, const TVector3& outerCenter, const TVector3& innerCenter, const TVector3& inner)
     {
       m_hitA = outer;
       m_hitB = outerCenter;
@@ -55,7 +56,7 @@ namespace Belle2 {
     }
 
     /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
-    void resetMagneticField(double magneticFieldStrength = 1.5) { m_threeHitFilter.resetMagneticField(magneticFieldStrength); }
+    void resetMagneticField(const double magneticFieldStrength = 1.5) { m_threeHitFilter.resetMagneticField(magneticFieldStrength); }
 
 
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */

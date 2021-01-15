@@ -16,8 +16,6 @@
 
 #include <vector>
 #include "CLHEP/Vector/LorentzVector.h"
-#include "trg/trg/Utilities.h"
-#include "trg/cdc/TRGCDC.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCTBase TRGCDCTrackBase
@@ -48,6 +46,9 @@ namespace Belle2 {
 
     /// Destructor
     virtual ~TRGCDCTrackBase();
+
+    /// Assignment operator, deleted
+    TRGCDCTrackBase& operator=(TRGCDCTrackBase&) = delete;
 
   public:
 

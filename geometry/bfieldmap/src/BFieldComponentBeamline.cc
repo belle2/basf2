@@ -27,23 +27,23 @@ namespace Belle2 {
   /** Triangle structure */
   struct triangle_t {
     /** 1st vertex index in a list of xy-points */
-    short int j0;
+    short int j0{0};
     /** 2nd vertex index in a list of xy-points */
-    short int j1;
+    short int j1{0};
     /** 3rd vertex index in a list of xy-points */
-    short int j2;
+    short int j2{0};
     /** 1st adjacent triangle in a list of triangles */
-    short int n0;
+    short int n0{0};
     /** 2nd adjacent triangle in a list of triangles */
-    short int n1;
+    short int n1{0};
     /** 3rd adjacent triangle in a list of triangles */
-    short int n2;
+    short int n2{0};
   };
 
   /** A simple 2d vector stucture */
   struct xy_t {
-    double x; /**< x component */
-    double y; /**< y component */
+    double x{0}; /**< x component */
+    double y{0}; /**< y component */
   };
 
   /**
@@ -171,9 +171,9 @@ namespace Belle2 {
      * Determine which triangle side is crossed by a line segment defined by r and v0 points
      *
      * @param prev  Triangle number which has been already checked
-     * @param xmin  Triangle number which is being checked
+     * @param curr  Triangle number which is being checked
      * @param r     Starting point of the line segment
-     * @param ny    Ending point of the line segment
+     * @param v0    Ending point of the line segment
      * @return      Next triangle index in the list if nothing found returns the total number of triangles in the list
      */
     [[nodiscard]] short int sideCross(short int prev, short int curr, const xy_t& r, const xy_t& v0) const

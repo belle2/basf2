@@ -4,7 +4,7 @@
 # Import timeit module and start a timer. Allows to get the runtime of the
 # program at any given point
 import timeit
-g_start_time = timeit.default_timer()
+g_start_time = timeit.default_timer()  # noqa
 
 # std
 import argparse
@@ -13,6 +13,8 @@ import os
 import subprocess
 import sys
 import time
+from typing import Dict, Optional, List, Union
+import logging
 
 # 3rd party
 import ROOT
@@ -25,7 +27,7 @@ import validationpath
 ###############################################################################
 
 
-def get_timezone():
+def get_timezone() -> str:
     """
     Returns the correct timezone as short string
     """
@@ -39,34 +41,27 @@ def get_timezone():
         return tz_tuple[0]
 
 
-def get_compact_git_hash(repo_folder):
+def get_compact_git_hash(repo_folder: str) -> Optional[str]:
     """
-    Returns the compact git hash from a folder (or any of this folders parents)
-    or None if none of theses folders is a git repository
+    Returns the compact git hash from a folder inside of a git repository
     """
-    cwd = os.getcwd()
-    os.chdir(repo_folder)
-    # todo: we want the short version here
     try:
-        current_git_commit = subprocess.check_output(
-            ["git", "show", "--oneline", "-s"]).decode().rstrip()
+        cmd_output = subprocess.check_output(
+            ["git", "show", "--oneline", "-s"], cwd=repo_folder
+        ).decode().rstrip()
         # the first word in this string will be the hash
-        current_git_commit = current_git_commit.split(" ")
-        if len(current_git_commit) > 1:
-            current_git_commit = current_git_commit[0]
+        cmd_output = cmd_output.split(" ")
+        if len(cmd_output) > 1:
+            return cmd_output[0]
         else:
-            # something went wrong, return None
-            current_git_commit = None
+            # something went wrong
+            return
     except subprocess.CalledProcessError:
-        current_git_commit = None
-    finally:
-        os.chdir(cwd)
-
-    return current_git_commit
+        return
 
 
-def basf2_command_builder(steering_file, parameters,
-                          use_multi_processing=False):
+def basf2_command_builder(steering_file: str, parameters: List[str],
+                          use_multi_processing=False) -> List[str]:
     """
     This utility function takes the steering file name and other basf2
     parameters and returns a list which can be executed via the OS shell for
@@ -84,7 +79,7 @@ def basf2_command_builder(steering_file, parameters,
     return cmd_params
 
 
-def available_revisions(work_folder):
+def available_revisions(work_folder: str) -> List[str]:
     """
     Loops over the results folder and looks for revisions. It then returns an
     ordered list, with the most recent revision being the first element in the
@@ -104,7 +99,7 @@ def available_revisions(work_folder):
     return revisions
 
 
-def get_start_time():
+def get_start_time() -> float:
     """!
     The function returns the value g_start_time which contain the start time
     of the validation and is set just a few lines above.
@@ -114,42 +109,11 @@ def get_start_time():
     return g_start_time
 
 
-def find_creator(outputfile, package, scripts, log):
-    """!
-    This function receives the name of a file and tries to find the file
-    in the given package which produces this file, i.e. find the file in
-    whose header 'outputfile' is listed under <output></output>.
-    It then returns a list of all Scripts who claim to be creating 'outputfile'
-
-    @param outputfile: The file of which we want to know by which script is
-        created
-    @param package: The package in which we want to search for the creator
-    """
-
-    # Get a list of all Script objects for scripts in the given package as well
-    # as from the validation-folder
-    candidates = [script for script in scripts
-                  if script.package in [package, 'validation']]
-
-    # Reserve some space for the results we will return
-    results = []
-
-    # Loop over all candidates and check if they have 'outputfile' listed
-    # under their outputs
-    for candidate in candidates:
-        if candidate.header and \
-           outputfile in candidate.header.get('output', []):
-            results.append(candidate)
-
-    # Return our results and warn if there is more than one creator
-    if len(results) == 0:
-        return None
-    if len(results) > 1:
-        log.warning('Found multiple creators for' + outputfile)
-    return results
-
-
-def get_validation_folders(location, basepaths, log):
+def get_validation_folders(
+        location: str,
+        basepaths: Dict[str, str],
+        log: logging.Logger
+) -> Dict[str, str]:
     """!
     Collects the validation folders for all packages from the stated release
     directory (either local or central). Returns a dict with the following
@@ -199,7 +163,8 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def get_argument_parser(modes=None):
+def get_argument_parser(modes: Optional[List[str]] = None) \
+        -> argparse.ArgumentParser:
 
     if not modes:
         modes = ["local"]
@@ -211,8 +176,8 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "-d",
         "--dry",
-        help="Perform a dry run, i.e. run thevalidation module without "
-             "actually executing thesteering files (for debugging purposes).",
+        help="Perform a dry run, i.e. run the validation module without "
+             "actually executing the steering files (for debugging purposes).",
         action='store_true'
     )
     parser.add_argument(
@@ -271,7 +236,7 @@ def get_argument_parser(modes=None):
         "--select-ignore-dependencies",
         help="The file name of one or more space separated validation "
              "scripts that should be executed exclusively. This will ignore "
-             "all depencies. This is useful if you modified a script that "
+             "all dependencies. This is useful if you modified a script that "
              "produces plots based on the output of its dependencies.",
         type=str,
         nargs='+'
@@ -323,11 +288,21 @@ def get_argument_parser(modes=None):
              "display the validation results in the system's default browser.",
         action='store_true'
     )
+    parser.add_argument(
+        "--max-run-time",
+        help="By default, running scripts (that is, steering files executed by"
+             "the validation framework) are terminated after a "
+             "certain time. Use this flag to change this setting by supplying "
+             "the maximal run time in minutes. Value <=0 disables the run "
+             "time upper limit entirely.",
+        type=int,
+        default=None,
+    )
 
     return parser
 
 
-def parse_cmd_line_arguments(modes=None):
+def parse_cmd_line_arguments(modes: Optional[List[str]] = None) -> argparse.Namespace:
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -343,7 +318,7 @@ def parse_cmd_line_arguments(modes=None):
     return get_argument_parser(modes).parse_args()
 
 
-def scripts_in_dir(dirpath, log, ext='*'):
+def scripts_in_dir(dirpath: str, log: logging.Logger, ext='*') -> List[str]:
     """!
     Returns all the files in the given dir (and its subdirs) that have
     the extension 'ext', if an extension is given (default: all extensions)
@@ -389,7 +364,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     return sorted(results)
 
 
-def strip_ext(path):
+def strip_ext(path: str) -> str:
     """
     Takes a path and returns only the name of the file, without the
     extension on the file name
@@ -397,7 +372,7 @@ def strip_ext(path):
     return os.path.splitext(os.path.split(path)[1])[0]
 
 
-def get_style(index, overall_item_count=1):
+def get_style(index: Optional[int], overall_item_count=1):
     """
     Takes an index and returns the corresponding line attributes,
     i.e. LineColor, LineWidth and LineStyle.
@@ -445,7 +420,7 @@ def get_style(index, overall_item_count=1):
     return ROOT.TAttLine(color, linestyle, linewidth)
 
 
-def index_from_revision(revision, work_folder):
+def index_from_revision(revision: str, work_folder: str) -> Optional[int]:
     """
     Takes the name of a revision and returns the corresponding index. Indices
     are used to ensure that the color and style of a revision in a plot are
@@ -466,7 +441,7 @@ def index_from_revision(revision, work_folder):
         return None
 
 
-def get_log_file_paths(logger):
+def get_log_file_paths(logger: logging.Logger) -> List[str]:
     """
     Returns list of paths that the FileHandlers of logger write to.
     :param logger: logging.logger object.
@@ -481,7 +456,7 @@ def get_log_file_paths(logger):
     return ret
 
 
-def get_terminal_width():
+def get_terminal_width() -> int:
     """
     Returns width of terminal in characters, or 80 if unknown.
 
@@ -492,8 +467,13 @@ def get_terminal_width():
     return get_terminal_size(fallback=(80, 24)).columns
 
 
-def congratulator(success=None, failure=None, total=None, just_comment=False,
-                  rate_name="Success rate"):
+def congratulator(
+        success: Optional[Union[int, float]] = None,
+        failure: Optional[Union[int, float]] = None,
+        total: Optional[Union[int, float]] = None,
+        just_comment=False,
+        rate_name="Success rate"
+) -> str:
     """ Keeping the morale up by commenting on success rates.
 
     Args:
@@ -572,7 +552,7 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
         )
 
 
-def terminal_title_line(title="", subtitle="", level=0):
+def terminal_title_line(title="", subtitle="", level=0) -> str:
     """ Print a title line in the terminal.
 
     Args:

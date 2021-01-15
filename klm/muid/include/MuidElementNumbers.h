@@ -11,9 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 /* C++ headers. */
 #include <vector>
@@ -74,6 +74,20 @@ namespace Belle2 {
       c_KaonMinus = 9,
       c_MuonPlus = 10,
       c_MuonMinus = 11,
+    };
+
+    /**
+     * Bits used for unique identifiers in getLongitudinalID() and in getTransverseID().
+     */
+    enum IdentifierBits {
+      /** Number of bits occupied by outcome in getLongitudinalID(). */
+      c_OutcomeBit = 7,
+      /** Number of bits occupied by lastLayer in getLongitudinalID(). */
+      c_LastLayerBit = 4,
+      /** Number of bits occupied by detector in getTransverseID(). */
+      c_DetectorBit = 2,
+      /** Number of bits occupied by degreesOfFreedom in getTransverseID(). */
+      c_DegreesOfFreedomBit = 6
     };
 
     /**
@@ -184,6 +198,28 @@ namespace Belle2 {
      * Both positive and negative charges are returned.
      */
     static std::vector<int> getPDGVector();
+
+    /**
+     * Get the unique longitudinal identifier for given hypothesis, outcome and last layer crossed.
+     * bits 0-3 for hypothesis;
+     * bits 4-10 for outcome;
+     * bits 11-14 for last layer crossed.
+     * @param[in] hypothesis Hypothesis number.
+     * @param[in] outcome    Track extrapolation outcome.
+     * @param[in] lastLayer  Last layer crossed during the extrapolation..
+     */
+    static int getLongitudinalID(int hypothesis, int outcome, int lastLayer);
+
+    /**
+     * Get the unique transverse identifier for given hypothesis, detector and degrees of freedom.
+     * bit 0-3 for hypothesis;
+     * bit 4-5 for detector;
+     * bit 6-11 for degrees of freedom.
+     * @param[in] hypothesis       Hypothesis number.
+     * @param[in] detector         Detector number.
+     * @param[in] degreesOfFreedom Number of degrees of freedom.
+     */
+    static int getTransverseID(int hypothesis, int detector, int degreesOfFreedom);
 
   protected:
 

@@ -25,6 +25,7 @@ namespace Belle2 {
     size_t getNFields() const { return m_name_v.size(); }
     const std::string get(const std::string& name) const;
     const std::string get(int i) const;
+    unsigned long long int getULLInt(const std::string& name) const;
     int getInt(const std::string& name) const;
     int getInt(int i) const;
     bool getBool(const std::string& name) const;

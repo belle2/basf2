@@ -3,7 +3,7 @@
 
 import re
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import logging
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
@@ -15,7 +15,6 @@ try:
 except ImportError:
     import xml.etree.ElementTree as XMLTree
 
-from validationfunctions import find_creator
 import json_objects
 
 
@@ -313,7 +312,9 @@ class Script:
         """
 
         # Read the file as a whole
-        with open(self.path, "r") as data:
+        # We specify encoding and errors here to avoid exceptions for people
+        # with strange preferred encoding settings in their OS
+        with open(self.path, "r", encoding="utf-8", errors="replace") as data:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags
@@ -364,3 +365,43 @@ class Script:
                 self.header[branch.tag.strip()] += branch_value
             else:
                 self.header[branch.tag.strip()] = branch_value
+
+
+def find_creator(
+        outputfile: str,
+        package: str,
+        scripts: List[Script],
+        log: logging.Logger
+) -> Optional[List[Script]]:
+    """!
+    This function receives the name of a file and tries to find the file
+    in the given package which produces this file, i.e. find the file in
+    whose header 'outputfile' is listed under <output></output>.
+    It then returns a list of all Scripts who claim to be creating 'outputfile'
+
+    @param outputfile: The file of which we want to know by which script is
+        created
+    @param package: The package in which we want to search for the creator
+    """
+
+    # Get a list of all Script objects for scripts in the given package as well
+    # as from the validation-folder
+    candidates = [script for script in scripts
+                  if script.package in [package, 'validation']]
+
+    # Reserve some space for the results we will return
+    results = []
+
+    # Loop over all candidates and check if they have 'outputfile' listed
+    # under their outputs
+    for candidate in candidates:
+        if candidate.header and \
+           outputfile in candidate.header.get('output', []):
+            results.append(candidate)
+
+    # Return our results and warn if there is more than one creator
+    if len(results) == 0:
+        return None
+    if len(results) > 1:
+        log.warning('Found multiple creators for' + outputfile)
+    return results

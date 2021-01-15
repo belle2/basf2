@@ -1,4 +1,4 @@
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import glob
 from reconstruction import add_reconstruction
@@ -6,9 +6,8 @@ from reconstruction import add_reconstruction
 from simulation import add_simulation
 import os
 
-# use_central_database('data_reprocessing_prompt')
-set_random_seed(1)
-bkgdir = "/remote/pcbelle11/sebastian/OfficialBKG/15thCampaign/phase3/set0/"
+b2.set_random_seed(1)
+bkgdir = "/remote/neurobelle/data/bckg/OfficialBKG/15thCampaign/phase3/set0/"
 thrange = [10, 170]
 particlegun_params = {
         'pdgCodes': [-13, 13],              # muons
@@ -24,7 +23,7 @@ particlegun_params = {
         'yVertexParams': [0, 0.0],          # vertex on z-axis
         'zVertexParams': [0.0, 0.0]}     # target range for training
 
-main = create_path()
+main = b2.create_path()
 main.add_module('EventInfoSetter', evtNumList=5000)  # , expList=[7], runList=[3525])
 main.add_module('Gearbox')
 main.add_module('Geometry')
@@ -32,7 +31,7 @@ main.add_module('BeamBkgMixer',
                 backgroundFiles=glob.glob(os.path.join(bkgdir, '*usual*.root')),
                 overallScaleFactor=1,
                 components=['CDC'])
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param(particlegun_params)
 main.add_module(particlegun)
 
@@ -42,26 +41,35 @@ main.add_module('CDCDigitizer')
 main.add_module('CDCTriggerTSF',
                 InnerTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/innerLUT_v2.2.coe"),
                 OuterTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/outerLUT_v2.2.coe"),
+                TSHitCollectionName='CDCTriggerNNInputSegmentHits')
+main.add_module('CDCTriggerTSF',
+                InnerTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/innerLUT_v2.2.coe"),
+                OuterTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/outerLUT_v2.2.coe"),
                 TSHitCollectionName='CDCTriggerSegmentHits')
 main.add_module('CDCTrigger2DFinder',
                 minHits=4,
                 minHitsShort=4,
                 minPt=0.3,
-                outputCollectionName='CDCTrigger2DFinderTracks')
-main.add_module('CDCTriggerETF',
-                hitCollectionName='CDCTriggerSegmentHits')
-main.add_module('CDCTriggerNeuro',
-                filename=Belle2.FileSystem.findFile("trg/cdc/data/Background2.0_20161207.root"),
-                # et_option='fastestpriority',
-                et_option='fastestpriority',
                 hitCollectionName='CDCTriggerSegmentHits',
+                outputCollectionName='CDCTrigger2DFinderTracks')
+main.add_module('CDCTrigger2DFinder',
+                minHits=4,
+                minHitsShort=4,
+                minPt=0.3,
+                hitCollectionName='CDCTriggerNNInputSegmentHits',
+                outputCollectionName='CDCTriggerNNInput2DFinderTracks')
+main.add_module('CDCTriggerETF',
+                hitCollectionName='CDCTriggerNNInputSegmentHits')
+main.add_module('CDCTriggerNeuro',
+                hitCollectionName='CDCTriggerNNInputSegmentHits',
                 outputCollectionName='CDCTriggerNeuroTracks',
-                inputCollectionName='CDCTrigger2DFinderTracks',
+                inputCollectionName='CDCTriggerNNInput2DFinderTracks',
+                fixedPoint=True,
                 writeMLPinput=True)
 add_reconstruction(main)
 
 
 main.add_module('RootOutput', outputFileName="phase3bckg-0-reco_sim.root")
 main.add_module('Progress')
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

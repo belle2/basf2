@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTKLM1_H
-#define BFIELDCOMPONENTKLM1_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
@@ -204,5 +203,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTKLM1_H */

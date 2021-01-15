@@ -318,7 +318,7 @@ void V0findingPerformanceEvaluationModule::terminate()
 
   //  addPurityPlots(m_histoList_purity, m_h3_MCParticlesPerV0, m_h3_V0s);
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

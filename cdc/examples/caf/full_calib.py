@@ -1,7 +1,5 @@
 import os
-import sys
 import subprocess
-import time
 import glob
 import shutil
 # import ndf_and_pval

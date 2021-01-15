@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import ROOT
 import math
 from ROOT import Belle2
-from modularAnalysis import *
+import modularAnalysis as ma
 from array import array
 
 from heapq import nlargest
@@ -376,7 +376,7 @@ def PrintBranchDef():
     print('\n')
 
 
-class CreateLogics(Module):
+class CreateLogics(b2.Module):
     """This module is to calculate some variables which are useful for the trigger development"""
     #: the output file
     file = ROOT.TFile(argvs[2], 'recreate')
@@ -637,8 +637,8 @@ class CreateLogics(Module):
 
 
 if __name__ == "__main__":
-    main = create_path()
-    inputMdst('default', argvs[1], main)
+    main = b2.create_path()
+    ma.inputMdst('default', argvs[1], main)
     main.add_module(CreateLogics())
     EffCalculation(main)
-    process(main)
+    b2.process(main)

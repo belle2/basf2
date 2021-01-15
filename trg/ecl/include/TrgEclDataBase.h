@@ -13,10 +13,7 @@
 #ifndef TRGECLDATABASE_H
 #define TRGECLDATABASE_H
 
-#include <iostream>
-#include <TObject.h>
-#include <TVector3.h>
-
+#include <vector>
 
 namespace Belle2 {
   ///  class TrgEclDataBase;
@@ -47,7 +44,7 @@ namespace Belle2 {
     /** TC CM Phi  */
     int Get3DBhabhaLUT(int);
     //! Make Fitter Coefficients from Signal PDF and Noise covariance metrix
-    void MakeFitterCoefficient(std::vector<int>, std::vector<int>);
+    void MakeFitterCoefficient(const std::vector<int>&, std::vector<int>);
     //! Util to interpalate Signal Shape
     double interFADC(double , std::vector<int>);
 

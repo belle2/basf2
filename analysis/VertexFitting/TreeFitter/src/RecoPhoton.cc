@@ -61,7 +61,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  bool RecoPhoton::useEnergy(Belle2::Particle& particle)
+  bool RecoPhoton::useEnergy(const Belle2::Particle& particle)
   {
     bool rc = true ;
     const int pdg = particle.getPDGCode();

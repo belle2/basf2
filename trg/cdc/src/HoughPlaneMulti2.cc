@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/trg/Utilities.h"
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/HoughPlaneMulti2.h"
 
 namespace Belle2 {

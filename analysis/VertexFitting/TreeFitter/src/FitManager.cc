@@ -159,6 +159,7 @@ namespace TreeFitter {
     return m_decaychain->tauIndex(particle);
   }
 
+  // cppcheck-suppress constParameter ; returncov is clearly changed in the function
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
@@ -253,6 +254,15 @@ namespace TreeFitter {
           setExtraInfo(&cand, "chiSquared", fitparchi2);
           setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
           setExtraInfo(&cand, "ndf", m_ndf);
+        }
+        if (pb.mother()) {
+          int motherPosIndex = pb.mother()->posIndex();
+          if (motherPosIndex >= 0) {
+            setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
+            setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
+            if (pb.mother()->dim() > 2)
+              setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+          }
         }
       }
 

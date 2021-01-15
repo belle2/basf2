@@ -14,11 +14,8 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <sstream>
 #include <fstream>
-#include "trg/trg/Debug.h"
 #include "trg/cdc/LUT.h"
-//#include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
@@ -82,7 +79,7 @@ namespace Belle2 {
 
   TRGCDCLUT* TRGCDCLUT::getLUT(const std::string& filename, int nInputBit)
   {
-    if (TRGCDCLUT::dictionary.find(filename) == TRGCDCLUT::dictionary.end()) {
+    if (!TRGCDCLUT::dictionary.count(filename)) {
       TRGCDCLUT::dictionary[filename] = TRGCDCLUT();
       TRGCDCLUT::dictionary[filename].setDataFile(filename, nInputBit);
     }

@@ -13,25 +13,23 @@
  to create summaries for a FEI training or application.
 """
 
-
+try:
+    from generators import get_default_decayfile
+except ModuleNotFoundError:
+    print("MonitoringBranchingFractions won't work.")
+from basf2_mva_evaluation import plotting
+import basf2_mva_util
+import pickle
+import copy
+import math
+import os
+import numpy as np
+import pdg
+from ROOT import Belle2
 import ROOT
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
-from ROOT import Belle2
 Belle2.Variable.Manager.Instance()
-
-import pdg
-import numpy as np
-import os
-import math
-import functools
-import copy
-import pdb
-import pickle
-
-import basf2_mva_util
-from basf2_mva_evaluation import plotting
-from generators import get_default_decayfile
 
 
 def removeJPsiSlash(string):
@@ -241,6 +239,7 @@ class MonitoringNTuple(object):
     """
     Reads the ntuple named variables from a ROOT file
     """
+
     def __init__(self, filename):
         """
         Reads ntuple from the given file
@@ -263,6 +262,7 @@ class MonitoringModuleStatistics(object):
     Reads the module statistics for a single particle from the outputted root file
     and puts them into a more accessible format
     """
+
     def __init__(self, particle):
         """
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
@@ -539,6 +539,7 @@ class MonitoringParticle(object):
     Monitoring object containing all the monitoring information
     about a single particle
     """
+
     def __init__(self, particle):
         """
         Read the monitoring information of the given particle

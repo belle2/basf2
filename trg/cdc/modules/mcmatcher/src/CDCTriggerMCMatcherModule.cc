@@ -9,7 +9,7 @@ namespace {
   //with range based for
   template<class Iter>
   struct iter_pair_range : std::pair<Iter, Iter> {
-    iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
+    explicit iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
     Iter begin() const {return this->first;}
     Iter end()   const {return this->second;}
   };
@@ -228,7 +228,7 @@ CDCTriggerMCMatcherModule::event()
     auto range_prTrackIds = prTrackId_by_hitId.equal_range(hitId);
 
     // count for every prTrack that has this hit
-    for (const pair<HitId, TrackId>& hitId_and_prTrackId :
+    for (const pair<HitId, TrackId> hitId_and_prTrackId :
          as_range(range_prTrackIds)) {
       TrackId prTrackId = hitId_and_prTrackId.second;
       B2DEBUG(200, " prTrackId : " <<  prTrackId  << ";  mcTrackId : " <<  mcTrackId);

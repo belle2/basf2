@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <svd/dataobjects/SVDCluster.h>
-
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -49,6 +46,9 @@ namespace Belle2 {
     float m_svdClSNR = 0;      /**< cluster SNR */
     float m_svdClTime = 0;      /**< cluster time */
     float m_svdRes = 0;   /**< residual computed by genfit */
+    float m_svdPitch = 0; /**< svd pitch */
+    float m_svdWidth = 0; /**< svd sensor width */
+    float m_svdLength = 0; /**< svd sensor length */
     float m_svdClIntStrPos = 0;      /**< cluster interstrip position */
     float m_svdClPos = 0;      /**< cluster position */
     float m_svdClPosErr = 0;      /**< cluster position error */
@@ -57,6 +57,7 @@ namespace Belle2 {
     float m_svdClZ = 0;     /**< cluster global Z */
     std::vector<float> m_svdStripCharge; /**< charge of the strips of the cluster*/
     std::vector<float> m_svdStripTime; /**< time of the strips of the cluster*/
+    std::vector<float> m_svdStripPosition; /**< absolute position of the strips of the cluster*/
     int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/
     int m_svdTrkSVDHits = 0; /**< number of SVD hits on the track*/
     int m_svdTrkCDCHits = 0; /**< number of CDC hits on the track*/

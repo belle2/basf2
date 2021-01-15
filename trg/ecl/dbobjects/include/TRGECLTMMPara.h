@@ -15,7 +15,6 @@
 #define TRGECLTMMPARA_H
 
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -29,7 +28,7 @@ namespace Belle2 {
 
     }
     //! Construction
-    TRGECLTMMPara(int FPGAversion):
+    explicit TRGECLTMMPara(int FPGAversion):
       m_FPGAversion(FPGAversion)
 
     {

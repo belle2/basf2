@@ -11,11 +11,8 @@
 // $Log$
 // 2017-02-16 : v01
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
-#include <framework/logging/Logger.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -27,7 +24,6 @@
 #include "trg//ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
-#include <stdlib.h>
 #include <iostream>
 #include <math.h>
 #include <TRandom.h>
@@ -145,7 +141,9 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}// 0.01MeV cut
+        /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
+        /* cppcheck-suppress variableScope */
         int maxbkgtag = 0;
         TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
         if (_BeambkgTag == 1) {
@@ -232,7 +230,9 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     }
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
+        /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
+        /* cppcheck-suppress variableScope */
         int maxbkgtag = 0;
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
         TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
@@ -352,7 +352,9 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::
   double tgen = 10.3;   // orignal
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
+  /* cppcheck-suppress variableScope */
   double ttt1 = 0; // [us]
+  /* cppcheck-suppress variableScope */
   double ttt2 = 0; // [us]
   //
   double frac_pileup   = 0.035; // pileup noise fraction?
@@ -488,18 +490,18 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
   double ttt2 = 0; // [us]
-  double frac_pileup   = 0.035; // pileup noise fraction?
-  double frac_parallel = 0.023; // parralel noise fraction?
-  double frac_serial   = 0.055; // serial noise fraction?
-  double times_pileup   =  1;   // noise scale based on Belle noise.
-  double times_parallel =  1;   // noise scale
-  double times_serial   =  1;   // noise scale
-  double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
-  double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
-  corr_pileup   = 0.011068;
-  corr_parallel = 0.00727324;
-  corr_serial   = 0.0173925;
+  //double frac_pileup   = 0.035; // pileup noise fraction?
+  //double frac_parallel = 0.023; // parralel noise fraction?
+  //double frac_serial   = 0.055; // serial noise fraction?
+  //double times_pileup   =  1;   // noise scale based on Belle noise.
+  //double times_parallel =  1;   // noise scale
+  //double times_serial   =  1;   // noise scale
+  //double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
+  //double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
+  //double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
+  double corr_pileup   = 0.011068;
+  double corr_parallel = 0.00727324;
+  double corr_serial   = 0.0173925;
 
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
@@ -618,8 +620,8 @@ TrgEclDigitizer::FADC(int flag_gen,
   //--------------------------------------
   double tsh, dd;
   static double tc, tc2, tsc, tris, b1, b2;
-  static double amp, td, t1, t2,  dft, as;
-
+  static double amp, dft, as;
+  static double td, t1, t2;
 
   static int ifir = 0;
 
@@ -812,7 +814,7 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
   //--------------------------------------
   double tsh, dd;
   static double tc, tc2, tsc, tris;
-  static double amp, td, t1, t2,  dft, as;
+  static double amp, dft, as;
 
 
   //  int im, ij;
@@ -821,10 +823,10 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
   if (ifir == 0) {
 
-    td =  0.10;  // diff time    (  0.10)
-    t1 =  0.10;  // integ1 real  (  0.10)
+    const double td =  0.10;  // diff time    (  0.10)
+    const double t1 =  0.10;  // integ1 real  (  0.10)
     // b1 = 30.90;  // integ1 imag  ( 30.90)
-    t2 =  0.01;  // integ2 real  (  0.01)
+    const double t2 =  0.01;  // integ2 real  (  0.01)
     // b2 = 30.01;  // integ2 imag  ( 30.01)
     double ts =  1.00;  // scint decay  (  1.00)
     dft = 0.600; // diff delay   ( 0.600)
@@ -919,12 +921,13 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
 double TrgEclDigitizer::ShapeF(double t00, double ts1)
 {
+  static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
   double dzna;
   // double das1,das0,dac0;
-  double dcs0s, dsn0s, dcs0d, dsn0d;
-  double dcs1s, dsn1s, dcs1d, dsn1d;
-  double a1, a2, b1, b2, c1, c2;
+  double dcs0s = realNaN, dsn0s = realNaN, dcs0d, dsn0d;
+  double dcs1s = realNaN, dsn1s = realNaN, dcs1d, dsn1d;
+  double a1, a2, b1, b2, c1, c2 = realNaN;
   double sv123 = 0.0;
 
   if (t00 <= 0.0) return 0;

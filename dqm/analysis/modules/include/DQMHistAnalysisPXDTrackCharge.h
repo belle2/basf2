@@ -17,11 +17,14 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
+#include <array>
 #include <TF1.h>
+#include "TF1Convolution.h"
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
 #include <TFile.h>
+#include <TH2.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -71,7 +74,9 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! only one fit function for all Landaus
-    TF1* m_fLandau = nullptr;
+    TF1Convolution* m_fConv = nullptr;
+    //! only one fit function for all Landaus
+    TF1* m_fFit = nullptr;
     //! Fit the Mean for all modules
     TF1* m_fMean = nullptr;
     //! Graph covering all modules
@@ -80,8 +85,23 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
     //! Final Canvases for Fit and Ref
     std::map<VxdID, TCanvas*> m_cChargeMod {};
+    //! Final Canvases for Fit and Ref per ASIC
+    std::map<VxdID, std::array<std::array<TCanvas*, 4>, 6>> m_cChargeModASIC {};
+    //! Histogram for TrackedClusters
+    TH1F* m_hTrackedClusters = nullptr;
+    //! Final Canvas for TrackedClusters
+    TCanvas* m_cTrackedClusters = nullptr;
+    //! Final Canvas Fit and Ref per ASIC
+    std::map<VxdID, TH2F*> m_hChargeModASIC2d {};
+    //! Final Canvas Fit and Ref per ASIC
+    std::map<VxdID, TCanvas*> m_cChargeModASIC2d {};
 
-    TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
+    /** TLine object for upper limit of track cluster charge */
+    TLine* m_line_up{};
+    /** TLine object for mean of track cluster charge */
+    TLine* m_line_mean{};
+    /** TLine object for lower limit of track cluster charge */
+    TLine* m_line_low{};
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;
@@ -89,6 +109,12 @@ namespace Belle2 {
     TFile* m_refFile = nullptr;
     /** Whether to use the color code for warnings and errors. */
     bool m_color = true;
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
+
+    /** flag if to export to EPICS */
+    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDCLUSTER_H
-#define PXDCLUSTER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -48,6 +47,8 @@ namespace Belle2 {
      * @param clsSize size of the cluster in pixels.
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
+     * @param uStart Start column of the cluster.
+     * @param vStart Start row of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
                float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,
@@ -72,6 +73,8 @@ namespace Belle2 {
      * @param clsSize size of the cluster in pixels.
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
+     * @param uStart Start column of the cluster.
+     * @param vStart Start row of the cluster.
      * @param clsKind ClusterKind of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
@@ -97,6 +100,8 @@ namespace Belle2 {
      * @param clsSize size of the cluster in pixels.
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
+     * @param uStart Start column of the cluster.
+     * @param vStart Start row of the cluster.
      * @param clsKind ClusterKind of the cluster.
      * @param etaValues The eta values of the cluster for sectors of incidence angles
      * @param shapeIndices The shapeIndices of the cluster for sectors of incidence angles
@@ -253,4 +258,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif

@@ -10,31 +10,18 @@
  ***************************************************************************/
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <string>
 #include "TH1F.h"
-#include "TPaveStats.h"
-#include <TString.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
-#include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
-#include "TH2F.h"
 #include "TTree.h"
 
-#include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-#include <analysis/utility/ReferenceFrame.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
@@ -101,13 +88,7 @@ namespace Belle2 {
   private:
 
 
-    static const int m_nSides = 2;
-
-
-    //list of functions to create histograms:
-    //    TH1F* createHistogram1D(const char* name, const char* title,
-    //                            Int_t nbins, Double_t min, Double_t max,
-    //                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
+    static const int m_nSides = 2; /**< number of sides*/
 
   };
 

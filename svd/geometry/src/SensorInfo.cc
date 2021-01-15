@@ -7,7 +7,6 @@
 
 #include <svd/geometry/SensorInfo.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/geometry/BFieldManager.h>
 
 #include <TVector3.h>

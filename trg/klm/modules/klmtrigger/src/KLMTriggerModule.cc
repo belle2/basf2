@@ -11,16 +11,14 @@
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // event data
 #include <framework/dataobjects/EventMetaData.h>
 
 // digits
-#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 #include <trg/klm/dataobjects/KLMTriggerHit.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
@@ -59,11 +57,11 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 
 void KLMTriggerModule::initialize()
 {
-  StoreArray<BKLMDigit> bklmDigits;
+  StoreArray<KLMDigit> klmDigits;
 
   StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
   klmTriggerHits.registerInDataStore();
-  klmTriggerHits.registerRelationTo(bklmDigits);
+  klmTriggerHits.registerRelationTo(klmDigits);
 
   StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
   klmTriggerTracks.registerInDataStore();
@@ -94,17 +92,21 @@ void KLMTriggerModule::endRun()
 
 void KLMTriggerModule::fillHits()
 {
-  StoreArray<BKLMDigit> bklmDigits;
-  if (!bklmDigits.isValid())
+  StoreArray<KLMDigit> klmDigits;
+  if (!klmDigits.isValid())
     return;
 
   StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
 
-  int nEntries = bklmDigits.getEntries();
+  int nEntries = klmDigits.getEntries();
   for (int i = 0; i < nEntries; ++i) {
+    const KLMDigit* bklmDigit_i = klmDigits[i];
+    if (bklmDigit_i->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     for (int j = i + 1; j < nEntries; ++j) {
-      const BKLMDigit* bklmDigit_i = bklmDigits[i];
-      const BKLMDigit* bklmDigit_j = bklmDigits[j];
+      const KLMDigit* bklmDigit_j = klmDigits[j];
+      if (bklmDigit_j->getSubdetector() != KLMElementNumbers::c_BKLM)
+        continue;
 
       if (bklmDigit_i->getSection() == bklmDigit_j->getSection() &&
           bklmDigit_i->getSector() == bklmDigit_j->getSector() &&
@@ -138,8 +140,8 @@ void KLMTriggerModule::fillHits()
         hit->setXInt(xInt);
         hit->setYInt(yInt);
         hit->setZInt(zInt);
-        hit->addRelationTo(bklmDigits[i]);
-        hit->addRelationTo(bklmDigits[j]);
+        hit->addRelationTo(klmDigits[i]);
+        hit->addRelationTo(klmDigits[j]);
       }
     }
   }
@@ -169,7 +171,7 @@ void KLMTriggerModule::fillTracks()
 
     int sectorID = section * c_TotalSectors + sector;
 
-    if (trackMap.find(sectorID) == trackMap.end())
+    if (!trackMap.count(sectorID))
       trackMap[sectorID] = klmTriggerTracks.appendNew(section, sector);
 
     trackMap[sectorID]->addRelationTo(klmTriggerHits[i]);
@@ -255,6 +257,7 @@ void KLMTriggerModule::calcChisq()
 
     // calculate chisq
     int denom = sumXX * nHits - sumX * sumX;
+    /* cppcheck-suppress variableScope */
     double denomInversed = 0.0;
     double slopeXY = 0.0;
     double interceptXY = 0.0;

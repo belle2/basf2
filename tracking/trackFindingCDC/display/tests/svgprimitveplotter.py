@@ -1,17 +1,15 @@
 
 # For safety since we encountered a hanging process
 # when this file is executed with basf2
-import basf2
+from ROOT import Belle2  # make Belle2 namespace available
 
 import os
 
-import ROOT
 
 from ROOT import gSystem
 
 gSystem.Load('libtracking_trackFindingCDC')
 
-from ROOT import Belle2  # make Belle2 namespace available
 
 Plotter = Belle2.TrackFindingCDC.SVGPrimitivePlotter
 AttributeMap = Belle2.TrackFindingCDC.PrimitivePlotter.AttributeMap

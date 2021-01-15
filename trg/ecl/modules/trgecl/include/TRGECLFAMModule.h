@@ -18,7 +18,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
 
 #include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
@@ -39,15 +38,15 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TRGECLFAMModule();
     /** Initilizes TRGECLFAMModule. */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Called when new run started.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** Called event by event. */
-    virtual void event();
+    virtual void event() override;
     /** Called when run ended. */
-    virtual void endRun();
+    virtual void endRun() override;
     /** Called when processing ended.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
   public:
 

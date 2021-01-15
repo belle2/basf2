@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import inspect
 import unittest
+
 from basf2 import create_path
 import stdPi0s
 
@@ -39,92 +41,105 @@ class TestStdPi0s(unittest.TestCase):
         print(list(result))
 
     def test_nonsense_list(self):
-        """check that the builder function works with the all list"""
-        self._check_list("flibble", expected_lists=[])
+        """check that the builder function raises a ValueError for a non-existing list name"""
+        self.assertRaises(ValueError, self._check_list, "flibble")
+
+    def test_default_list_exists(self):
+        """
+        Check that the default list type is one of the lists in the cases that are checked for in :func:`stdPi0s.stdPi0s`.
+
+        This test relies on ``ValueError`` being raised for nonsense list types, which is tested by
+        :func:`test_nonsense_list`.  However, :func:`test_nonsense_list` doesn't ensure that the default list works, so
+        for that this test is needed.
+        """
+        test_path = create_path()
+        try:
+            stdPi0s.stdPi0s(path=test_path)
+        except ValueError:
+            stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
+            default_listtype = stdPi0s_signature.parameters["listtype"].default
+            self.fail(f"stdPi0s default listtype {default_listtype} is not in set of allowed list names.")
+
+    def test_default_list_works(self):
+        """Check that the default list type works."""
+        stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
+        default_listtype = stdPi0s_signature.parameters["listtype"].default
+        self._check_list(expected_lists=["pi0" + default_listtype, default_listtype])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""
         self._check_list("all", expected_lists=["all", "all"])
 
-    def test_default_list(self):
-        """check that the builder function works with the default (veryLoose) list"""
-        self._check_list(expected_lists=["all", "pi0eff60", "eff60_nomcmatch", "eff60", "veryLoose"])
+    def test_eff10_Jan2020_list(self):
+        """check that the builder function works with the eff10_Jan2020 list"""
+        self._check_list("eff10_Jan2020", expected_lists=["pi0eff10_Jan2020", "eff10_Jan2020"])
 
-    def test_eff20_list(self):
-        """check that the builder function works with the eff20 list"""
-        self._check_list("eff20", expected_lists=["all", "pi0eff20", "eff20"])
+    def test_eff20_Jan2020_list(self):
+        """check that the builder function works with the eff20_Jan2020 list"""
+        self._check_list("eff20_Jan2020", expected_lists=["pi0eff20_Jan2020", "eff20_Jan2020"])
 
-    def test_eff30_list(self):
-        """check that the builder function works with the eff30 list"""
-        self._check_list("eff30", expected_lists=["all", "pi0eff30", "eff30"])
+    def test_eff30_Jan2020_list(self):
+        """check that the builder function works with the eff30_Jan2020 list"""
+        self._check_list("eff30_Jan2020", expected_lists=["pi0eff30_Jan2020", "eff30_Jan2020"])
 
-    def test_eff40_list(self):
-        """check that the builder function works with the eff40 list"""
-        self._check_list("eff40", expected_lists=["all", "pi0eff40", "eff40"])
+    def test_eff40_Jan2020_list(self):
+        """check that the builder function works with the eff40_Jan2020 list"""
+        self._check_list("eff40_Jan2020", expected_lists=["pi0eff40_Jan2020", "eff40_Jan2020"])
 
-    def test_eff50_list(self):
-        """check that the builder function works with the eff50 list"""
-        self._check_list("eff50", expected_lists=["all", "pi0eff50", "eff50"])
+    def test_eff50_Jan2020_nomcmatch_list(self):
+        """check that the builder function works with the eff50_Jan2020_nomcmatch list"""
+        self._check_list("eff50_Jan2020_nomcmatch", expected_lists=["pi0eff50_Jan2020", "eff50_Jan2020_nomcmatch"])
 
-    def test_eff60_nomcmatch_list(self):
-        """check that the builder function works with the eff60_nomcmatch list"""
-        self._check_list("eff60_nomcmatch", expected_lists=["all", "pi0eff60", "eff60_nomcmatch"])
+    def test_eff50_Jan2020_list(self):
+        """check that the builder function works with the eff50_Jan2020 list"""
+        self._check_list("eff50_Jan2020", expected_lists=["pi0eff50_Jan2020", "eff50_Jan2020_nomcmatch", "eff50_Jan2020"])
 
-    def test_eff60_list(self):
-        """check that the builder function works with the eff60 list"""
-        self._check_list("eff60", expected_lists=["all", "pi0eff60", "eff60_nomcmatch", "eff60"])
-
-    def test_veryloose_list(self):
-        """check that the builder function works with the veryLoose list"""
-        self._check_list("veryLoose", expected_lists=["all", "pi0eff60", "eff60_nomcmatch", "eff60", "veryLoose"])
-
-    def test_loose_list(self):
-        """check that the builder function works with the loose list"""
-        self._check_list("loose", expected_lists=["all", "pi0eff40", "eff40", "loose"])
-
-    def test_veryloosefit_list(self):
-        """check that the builder function works with the veryLooseFit list"""
-        self._check_list(
-            "veryLooseFit",
-            expected_lists=[
-                "all",
-                "pi0eff60",
-                "eff60_nomcmatch",
-                "eff60",
-                "veryLoose",
-                "veryLooseFit"])
-
-    def test_loosefit_list(self):
-        """check that the builder function works with the looseFit list"""
-        self._check_list("looseFit", expected_lists=["all", "pi0eff40", "eff40", "loose", "looseFit"])
+    def test_eff60_Jan2020_list(self):
+        """check that the builder function works with the eff60_Jan2020 list"""
+        self._check_list("eff60_Jan2020", expected_lists=["pi0eff60_Jan2020", "eff60_Jan2020"])
 
     def test_allfit_list(self):
         """check that the builder function works with the allFit list"""
         self._check_list("allFit", expected_lists=["all", "all", "allFit"])
 
-    def test_eff20fit_list(self):
-        """check that the builder function works with the eff20Fit list"""
-        self._check_list("eff20Fit", expected_lists=["all", "pi0eff20", "eff20", "eff20Fit"])
+    def test_eff10_Jan2020fit_list(self):
+        """check that the builder function works with the eff10_Jan2020Fit list"""
+        self._check_list("eff10_Jan2020Fit", expected_lists=["pi0eff10_Jan2020", "eff10_Jan2020", "eff10_Jan2020Fit"])
 
-    def test_eff30fit_list(self):
-        """check that the builder function works with the eff30Fit list"""
-        self._check_list("eff30Fit", expected_lists=["all", "pi0eff30", "eff30", "eff30Fit"])
+    def test_eff20_Jan2020fit_list(self):
+        """check that the builder function works with the eff20_Jan2020Fit list"""
+        self._check_list("eff20_Jan2020Fit", expected_lists=["pi0eff20_Jan2020", "eff20_Jan2020", "eff20_Jan2020Fit"])
 
-    def test_eff40fit_list(self):
-        """check that the builder function works with the eff40Fit list"""
-        self._check_list("eff40Fit", expected_lists=["all", "pi0eff40", "eff40", "eff40Fit"])
+    def test_eff30_Jan2020fit_list(self):
+        """check that the builder function works with the eff30_Jan2020Fit list"""
+        self._check_list("eff30_Jan2020Fit", expected_lists=["pi0eff30_Jan2020", "eff30_Jan2020", "eff30_Jan2020Fit"])
 
-    def test_eff50fit_list(self):
-        """check that the builder function works with the eff50Fit list"""
-        self._check_list("eff50Fit", expected_lists=["all", "pi0eff50", "eff50", "eff50Fit"])
+    def test_eff40_Jan2020fit_list(self):
+        """check that the builder function works with the eff40_Jan2020Fit list"""
+        self._check_list("eff40_Jan2020Fit", expected_lists=["pi0eff40_Jan2020", "eff40_Jan2020", "eff40_Jan2020Fit"])
 
-    def test_eff60fit_list(self):
-        """check that the builder function works with the eff60Fit list"""
-        self._check_list("eff60Fit", expected_lists=["all", "pi0eff60", "eff60_nomcmatch", "eff60", "eff60Fit"])
+    def test_eff50_Jan2020fit_list(self):
+        """check that the builder function works with the eff50_Jan2020Fit list"""
+        self._check_list(
+            "eff50_Jan2020Fit",
+            expected_lists=[
+                "pi0eff50_Jan2020",
+                'eff50_Jan2020_nomcmatch',
+                "eff50_Jan2020",
+                "eff50_Jan2020Fit"])
+
+    def test_eff60_Jan2020fit_list(self):
+        """check that the builder function works with the eff60_Jan2020Fit list"""
+        self._check_list("eff60_Jan2020Fit", expected_lists=["pi0eff60_Jan2020", "eff60_Jan2020", "eff60_Jan2020Fit"])
 
     def test_skim(self):
         """check that the builder function works with the skim list"""
-        self._check_list(std_function=stdPi0s.loadStdSkimPi0, expected_lists=["all", "pi0eff60", "eff60_nomcmatch", "skim"])
+        self._check_list(
+            std_function=stdPi0s.loadStdSkimPi0,
+            expected_lists=[
+                "pi0eff50_Jan2020",
+                "eff50_Jan2020_nomcmatch",
+                "skim"])
 
 
 if __name__ == '__main__':

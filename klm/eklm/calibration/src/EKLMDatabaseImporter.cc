@@ -12,8 +12,8 @@
 #include <klm/eklm/calibration/EKLMDatabaseImporter.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
-#include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
+#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
+#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 
 /* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
@@ -25,10 +25,6 @@ using namespace Belle2;
 
 EKLMDatabaseImporter::EKLMDatabaseImporter()
 {
-  m_ExperimentLow = 0;
-  m_RunLow = 0;
-  m_ExperimentHigh = -1;
-  m_RunHigh = -1;
 }
 
 EKLMDatabaseImporter::~EKLMDatabaseImporter()
@@ -67,14 +63,4 @@ void EKLMDatabaseImporter::importSimulationParameters()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   simPar.import(iov);
-}
-
-void EKLMDatabaseImporter::importElectronicsMap(
-  const EKLMElectronicsMap* electronicsMap)
-{
-  DBImportObjPtr<EKLMElectronicsMap> electronicsMapImport;
-  electronicsMapImport.construct(*electronicsMap);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  electronicsMapImport.import(iov);
 }

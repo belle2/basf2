@@ -15,7 +15,6 @@
 #define TRGECLBADRUN_H
 
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -29,11 +28,9 @@ namespace Belle2 {
 
     }
     //! Construction
-    TRGECLBadRun(int BadRunNumber):
+    explicit TRGECLBadRun(int BadRunNumber):
       m_BadRunNumber(BadRunNumber)
-
-    {
-    }
+    {}
 
     //! Set BadRunNumber
     void setBadRunNumber(int BadRunNumber) { m_BadRunNumber = BadRunNumber; }

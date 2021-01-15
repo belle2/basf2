@@ -1,13 +1,12 @@
-############################################################
+##########################################################
 # Python script to test the collector and
 # algorithm function to port SVDOCcupancyCalibrations to CAF
-#
+# usage: basf2 SVDOccupancyAndHotStripsCalibrationsCAF.py \
+# -i "/group/belle2/dataprod/Data/Raw/e00<expNum>/r02324<runNum>/sub00/*.HLT*"
 # Laura Zani (September 2019)
 ############################################################
 
-from basf2 import *
-
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
@@ -15,33 +14,34 @@ import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
 from ROOT.Belle2 import SVDHotStripsCalibrationsAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
 import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
 # import vertex as vx
 
+b2.set_log_level(b2.LogLevel.INFO)
+
 now = datetime.datetime.now()
+uniqueID_occup = ''
+uniqueID_hotStrips = ''
 
 input_branches = [
     'RawSVDs'
 ]
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def SVDOccupancyAndHotStripsCalibrations(files, tags):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     # logging.log_level = LogLevel.WARNING
 
@@ -51,13 +51,6 @@ def SVDOccupancyAndHotStripsCalibrations(files, tags):
 
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
-
-    # fil = register_module('SVDShaperDigitsFromTracks')
-    # fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
-    # main.add_module(fil)
-
-    # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
-    # with possibly changed global tags
     raw.add_unpackers(path, components=['SVD'])
     path.add_module(
         'SVDZeroSuppressionEmulator',
@@ -66,10 +59,12 @@ def SVDOccupancyAndHotStripsCalibrations(files, tags):
         ShaperDigitsIN='SVDShaperDigitsZS5',
         FADCmode=True)
 
-    collector = register_module('SVDOccupancyCalibrationsCollector')
+    collector = b2.register_module('SVDOccupancyCalibrationsCollector')
     collector.param("SVDShaperDigitsName", "SVDShaperDigitsZS5")
-    algorithm1 = SVDOccupancyCalibrationsAlgorithm("SVDOccupancyCAF")
-    algorithm2 = SVDHotStripsCalibrationsAlgorithm("SVDHotStripsCAF")
+    algorithm1 = SVDOccupancyCalibrationsAlgorithm(uniqueID_occup)
+    algorithm2 = SVDHotStripsCalibrationsAlgorithm(uniqueID_hotStrips)
+#    algorithm1 = SVDOccupancyCalibrationsAlgorithm("SVDOccupancyCAF")
+#    algorithm2 = SVDHotStripsCalibrationsAlgorithm("SVDHotStripsCAF")
 
     calibration = Calibration('SVDOccupancyAndHotStrips',
                               collector=collector,
@@ -88,14 +83,12 @@ def SVDOccupancyAndHotStripsCalibrations(files, tags):
 
 
 if __name__ == "__main__":
-    # use by default raw data from cdst of exp8, run1309 (shaperDigits need to be unpacked, not available in cdst format)
+    # use by default raw data from cdst of exp12, run 2324 (shaperDigits need to be unpacked, not available in cdst format)
+    #    input_files = ["/group/belle2/dataprod/Data/Raw/e0012/r02324/sub00/*"]
+    # comment it out to not hardcode the input path:
+
     input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance()
                    .getInputFilesOverride()]
-    # [            "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT5.f00098.root"]]
-    #  "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT5*"]]
-    # "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-    # e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"]]
-
     print(" ")
     print("INPUT FILES")
     print(" ")
@@ -118,8 +111,8 @@ if __name__ == "__main__":
                 s_exp = str(inputStringSplit[6])
                 print(str(s_run) + " " + str(s_exp))
                 runNum = runs.append(int(s_run[1:6]))
+                runNum = int(s_run[1:6])
                 expNum = int(s_exp[1:5])
-
     runs.sort()
 
     firstRun = runs[0]
@@ -131,13 +124,10 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
-    svdOccupAndHotStripsCAF = SVDOccupancyAndHotStripsCalibrations(input_files,
-                                                                   ['data_reprocessing_prompt_rel4_patchb',
-                                                                    'svd_loadedOnFADC', 'svd_basic'])
-
     uniqueID_occup = "SVDOccupancyCalibrations_" + \
         str(now.isoformat()) + "_INFO:_ZS5_Exp" + str(expNum) + "_runsFrom" + \
         str(firstRun) + "to" + str(lastRun)
+
     print("UniqueID for SVDccupancyCalibrations")
     print("")
     print(str(uniqueID_occup))
@@ -150,6 +140,9 @@ if __name__ == "__main__":
     print("")
     print(str(uniqueID_hotStrips))
     print("")
+
+    svdOccupAndHotStripsCAF = SVDOccupancyAndHotStripsCalibrations(input_files,
+                                                                   ['data_reprocessing_prompt', 'svd_basic', 'svd_loadedOnFADC'])
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdOccupAndHotStripsCAF)

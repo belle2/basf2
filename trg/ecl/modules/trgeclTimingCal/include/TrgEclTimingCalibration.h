@@ -8,10 +8,7 @@
 
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "TDecompLU.h"
 #include "TVector3.h"
-#include "TFile.h"
-#include "TTree.h"
 
 #include <framework/core/Module.h>
 #include <trg/ecl/TrgEclMapping.h>
@@ -38,15 +35,15 @@ namespace Belle2 {
 
   public:
     //! initialize function
-    virtual void initialize();
+    virtual void initialize() override;
     //! Begin Run function
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event function
-    virtual void event();
+    virtual void event() override;
     //! End Run function
-    virtual void endRun();
+    virtual void endRun() override;
     //! Terminate function
-    virtual void terminate();
+    virtual void terminate() override;
 
     //! Set TC position from TRGECLMap
     void Set_TCposition();
@@ -153,7 +150,7 @@ namespace Belle2 {
     std::vector<double> tcal_result_err;
 
     //! Flag matrix solved (0 : not solved  1 : solved)
-    int FlagMatrixSolved;
+    int FlagMatrixSolved = 0;
 
     //! Time offset
     //! Input time offset (iteration mode)

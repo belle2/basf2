@@ -18,9 +18,6 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include "TH1F.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
 
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -57,6 +54,16 @@ namespace Belle2 {
 
   private:
 
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
+
+    /** SVDClusters StoreArray name */
+    std::string m_storeSVDClustersName;
+    /** SVDEventInfo StoreObjPtry name */
+    std::string m_storeSVDEventInfoName;
+
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = false;
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 
@@ -64,7 +71,7 @@ namespace Belle2 {
      * See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
      * (2019/11/11) release-04-00-02, return values from getTimType() are
      * 0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet) */
-    int m_L1TimingSrc;
+    int m_L1TimingSrc = -1;
 
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Trigger selection data object */
     StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */

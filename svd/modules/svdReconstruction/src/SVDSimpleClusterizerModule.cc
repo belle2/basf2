@@ -15,9 +15,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-
 #include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
@@ -50,6 +48,9 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
+  addParam("ShaperDigits", m_storeShaperDigitsName,
+           "SVDShaperDigits collection name",
+           string(""));//NOTE: This collection is not directly accessed in this module, but indirectly accessed through SimpleClusterCandidate to get clustered samples.
 
   // 2. Clustering
   addParam("AdjacentSN", m_cutAdjacent,
@@ -60,9 +61,16 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            "Cluster size at which to switch to Analog head tail algorithm", m_sizeHeadTail);
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
+  addParam("timeAlgorithm", m_timeAlgorithm,
+           " int to choose time algorithm:  0 = 6-sample CoG (default for 6-sample acquisition mode), 1 = 3-sample CoG (default for 3-sample acquisition mode),  2 = 3-sample ELS",
+           m_timeAlgorithm);
+  addParam("Calibrate3SampleWithEventT0", m_calibrate3SampleWithEventT0,
+           " if true returns the calibrated time instead of the raw time for 3-sample time algorithms",
+           m_calibrate3SampleWithEventT0);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
-
+  addParam("SVDEventInfoName", m_svdEventInfoSet,
+           "Set the SVDEventInfo to use", string("SVDEventInfoSim"));
 
 }
 
@@ -116,6 +124,7 @@ void SVDSimpleClusterizerModule::initialize()
   B2DEBUG(1, " -->  Neighbour cut:      " << m_cutAdjacent);
   B2DEBUG(1, " -->  Seed cut:           " << m_cutSeed);
   B2DEBUG(1, " -->  Size HeadTail:      " << m_sizeHeadTail);
+  B2DEBUG(1, " -->  SVDEventInfoName:   " << m_svdEventInfoSet);
 }
 
 
@@ -148,7 +157,7 @@ void SVDSimpleClusterizerModule::event()
   }
   //create a dummy cluster just to start
   SimpleClusterCandidate clusterCandidate(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(),
-                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster, m_timeAlgorithm, m_storeShaperDigitsName, m_storeRecoDigitsName);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -181,6 +190,7 @@ void SVDSimpleClusterizerModule::event()
     aStrip.charge = thisCharge;
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
+    //this is the 6-sample CoG time and will be used to compute the 6-sample CoG cluster time, it will not be used for in 3-sample time algorithms:
     aStrip.time = m_storeDigits[i]->getTime();
     aStrip.timeError = m_storeDigits[i]->getTimeError();
 
@@ -196,7 +206,9 @@ void SVDSimpleClusterizerModule::event()
       }
 
       //prepare for the next cluster:
-      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
+      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster,
+                                                m_timeAlgorithm,
+                                                m_storeShaperDigitsName, m_storeRecoDigitsName);
 
       //start another cluster:
       if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))
@@ -237,25 +249,43 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float SNR = cluster.getSNR();
   float position = cluster.getPosition();
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
+  //this is the 6-sample CoG time, it will not be used for in 3-sample time algorithms:
   float time = cluster.getTime();
   float timeError = cluster.getTimeError();
+  int firstFrame = cluster.getFirstFrame();
 
   //first check SVDEventInfo name
-  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-  std::string m_svdEventInfoName = "SVDEventInfo";
-  if (!temp_eventinfo.isOptional("SVDEventInfo"))
-    m_svdEventInfoName = "SVDEventInfoSim";
+  std::string m_svdEventInfoName = m_svdEventInfoSet;
+  if (m_svdEventInfoSet == "SVDEventInfoSim") {
+    StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+    m_svdEventInfoName = "SVDEventInfo";
+    if (!temp_eventinfo.isValid())
+      m_svdEventInfoName = m_svdEventInfoSet;
+  }
+
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-  // shift cluster time by average TB time
-  // to do: reapply shift in CAF
-  //  time = time - eventinfo.getSVD2FTSWTimeShift();
+  //depending on the algorithm, time contains different information:
+  //6-sample CoG (0): this is the calibrated time already
+  //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
+  //It is possile to get the uncalibrated 3-sample raw time here
+  //to get the 6-sample raw time there is an option in SVDCoGTimeEstimatorModule
+  float caltime = time;
+  if (m_timeAlgorithm == 1 and m_calibrate3SampleWithEventT0)
+    caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
+  else if (m_timeAlgorithm == 2 and m_calibrate3SampleWithEventT0)
+    caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
 
+  // last step:
+  // shift cluster time by TB time AND by FirstFrame ( FF = 0 for the 6-sample CoG Time)
+  // the relative shift between 3- and 6-sample DAQ is also corrected
+  // NOTE: this shift is removed in the SVDTimeCalibrationCollector in the CAF
+  time = eventinfo->getTimeInFTSWReference(caltime, firstFrame);
 
   //  Store Cluster into Datastore
   m_storeClusters.appendNew(SVDCluster(
-                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
+                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame
                             ));
 
   //register relation between RecoDigit and Cluster
@@ -306,4 +336,3 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }
-

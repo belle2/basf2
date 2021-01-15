@@ -55,6 +55,7 @@ namespace Belle2 {
      * assumed for both values by dividing the pixel size by sqrt(12).
      *
      * @param hit    SVDTrueHit to use as base
+     * @param trackCandHit
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
@@ -96,7 +97,7 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be nullptr if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
     /** Get pointer to the u cluster used to create this RecoHit. */
     const SVDCluster* getUCluster() const {return m_uCluster; }

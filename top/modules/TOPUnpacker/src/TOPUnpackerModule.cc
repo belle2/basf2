@@ -18,8 +18,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // Dataobject classes
@@ -123,7 +121,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : m_rawData) {
-      for (int finesse = 0; finesse < 4; finesse++) {
+      for (int finesse = 0; finesse < raw.GetMaxNumOfCh(0); finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;

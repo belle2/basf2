@@ -29,7 +29,11 @@ REG_MODULE(LHEInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
+LHEInputModule::LHEInputModule() : Module(),
+  m_nInitial(0),
+  m_nVirtual(0),
+  m_evtNum(-1),
+  m_initial(0)
 {
   //Set module properties
   setDescription("LHE file input. This module loads an event record from LHE format and store the content into the MCParticle collection. LHE format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
@@ -38,12 +42,14 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of LHE files");
   addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
-  addParam("runNum", m_runNum, "run number (should be set if makeMaster=true)", 0);
-  addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
+  addParam("runNum", m_runNum, "Run number (should be set if makeMaster=true)", 0);
+  addParam("expNum", m_expNum, "Experiment number (should be set if makeMaster=true)", 0);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated (not implemented yet).", false);
-  addParam("nInitialParticles", m_nInitial, "Number of particles at the beginning of the events that should be made initial.", 0);
-  addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
+  addParam("nInitialParticles", m_nInitial, "Number of MCParticles at the beginning of the events that should be flagged c_Initial.",
+           0);
+  addParam("nVirtualParticles", m_nVirtual,
+           "Number of MCParticles at the beginning of the events that should be flagged c_IsVirtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
   addParam("meanDecayLength", m_meanDecayLength,
@@ -56,13 +62,13 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
 
 void LHEInputModule::initialize()
 {
-  //Beam Parameters, initial particl
+  //Beam Parameters, initial particles
   m_initial.initialize();
 
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
-    B2FATAL("invalid list of input files. No entries found.");
+    B2FATAL("Invalid list of input files. No entries found.");
   } else {
     //let's start with the first file:
     m_inputFileName = m_inputFileNames[m_iFile];
@@ -74,13 +80,13 @@ void LHEInputModule::initialize()
   } catch (runtime_error& e) {
     B2FATAL(e.what());
   }
-  m_lhe.m_nVirtual    = m_nVirtual;
-  m_lhe.m_nInitial    = m_nInitial;
+  m_lhe.setInitialIndex(m_nInitial);
+  m_lhe.setVirtualIndex(m_nInitial + m_nVirtual);
   m_lhe.m_wrongSignPz = m_wrongSignPz;
 
   //boost
   if (m_boost2Lab) {
-    MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_lhe.m_labboost = boost;
   }

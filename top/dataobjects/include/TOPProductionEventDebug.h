@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -29,7 +28,15 @@ namespace Belle2 {
 
     /**
      * Full constructor
+     * @param formatType format type
+     * @param formatVersion format version
      * @param scrodID hardware SCROD ID
+     * @param skipProcessingFlag flag for skip processing
+     * @param ctime CTime
+     * @param phase phase
+     * @param asicMask ASIC mask
+     * @param eventQueueDepth depth of event queue
+     * @param eventNumberByte byte of event number
      */
     TOPProductionEventDebug(unsigned short formatType,
                             unsigned short formatVersion,

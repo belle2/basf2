@@ -55,10 +55,10 @@ namespace Belle2 {
     {}
 
     /**
-     * This method import to the database the list of strips
-     * to be masked because hot.
-     * @param xmlFileName is the file name of the xml file
-     * @param errorTollerant if true bypasses sanity checks
+     * This method import to the database the neural network
+     * for hit time determination
+     * @param fileName is the file name of the xml file
+     * @param threeSamples if true, calibrate with 3 samples?
      */
 
     void importSVDHitTimeNeuralNetwork(std::string fileName, bool threeSamples = false);
@@ -75,8 +75,6 @@ namespace Belle2 {
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
 
-    /** class def needed by root */
-    ClassDef(SVDDatabaseImporter, 1);
   };
 
 } // Belle2 namespace

@@ -8,9 +8,9 @@ import os
 import tempfile
 import atexit
 import shutil
-import contextlib
-import subprocess
 import ROOT
+
+import b2bii
 
 import fei
 from fei.config import Particle
@@ -18,7 +18,6 @@ from fei.config import Particle
 import numpy as np
 
 import ROOT
-from ROOT import Belle2
 import basf2_mva
 import pdg
 
@@ -241,13 +240,13 @@ class TestFSPLoader(unittest.TestCase):
 
     def test_belle1_without_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=False, b2bii=True)
+        b2bii.setB2BII()
+        config = fei.config.FeiConfiguration(monitor=False)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
                         writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
@@ -255,22 +254,25 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        b2bii.unsetB2BII()
 
     def test_belle1_with_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=True, b2bii=True)
+        b2bii.setB2BII()
+        config = fei.config.FeiConfiguration(monitor=True)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
                         writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
@@ -278,6 +280,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -289,6 +293,7 @@ class TestFSPLoader(unittest.TestCase):
                         fileName='Monitor_FSPLoader.root')
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        b2bii.unsetB2BII()
 
 
 class TestTrainingData(unittest.TestCase):
@@ -384,14 +389,14 @@ class TestPreReconstruction(unittest.TestCase):
         path.add_module('BestCandidateSelection', particleList='D0:generic_0',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
 
         path.add_module('ParticleCombiner', decayString='D0:generic_1 -> pi-:generic pi+:generic', writeOut=True,
                         decayMode=1, cut='1.7 < M < 1.95')
         path.add_module('BestCandidateSelection', particleList='D0:generic_1',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -485,7 +490,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> K-:generic pi+:generic.root')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isSignal']),
@@ -516,7 +521,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> pi-:generic pi+:generic.root')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isSignal']),

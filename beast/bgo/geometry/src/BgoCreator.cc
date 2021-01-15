@@ -41,7 +41,7 @@ namespace Belle2 {
 
     BgoCreator::BgoCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     BgoCreator::~BgoCreator()
@@ -51,6 +51,9 @@ namespace Belle2 {
 
     void BgoCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       // **Materials from the NIST database**
       G4NistManager* man = G4NistManager::Instance();
 

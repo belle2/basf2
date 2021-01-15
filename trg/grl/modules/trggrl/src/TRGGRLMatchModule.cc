@@ -21,27 +21,14 @@
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 //framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/core/ModuleParamList.h>
 
-
-//utilities
-#include <framework/utilities/FileSystem.h>
-
-#include <boost/foreach.hpp>
-#include <fstream>
 #include <stdlib.h>
-#include <iostream>
 
 
 using namespace Belle2;
@@ -152,7 +139,6 @@ void TRGGRLMatchModule::initialize()
 
   StoreArray<TRGGRLShortTrack> grlst;
   grlst.registerInDataStore(m_grlstCollectionName);
-  StoreArray<TRGGRLShortTrack> grlst_tmp; // temporary buffer
 
   m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
@@ -167,10 +153,10 @@ void TRGGRLMatchModule::initialize()
     int x3 = patterns_base2[p][2];
     int x4 = patterns_base2[p][3];
     int d = x2 - x0;
-    x1 -= d;
-    x2 -= d;
-    x3 -= d;
-    x4 -= d;
+    x1 += d;
+    x2 += d;
+    x3 += d;
+    x4 += d;
     patterns_base0.push_back({x1, x2, x3, x4});
   }
 
@@ -195,7 +181,6 @@ void TRGGRLMatchModule::event()
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
   StoreArray<TRGGRLPHOTON> grlphoton(m_grlphotonlist);
   StoreArray<TRGGRLShortTrack> grlst(m_grlstCollectionName);
-  StoreArray<TRGGRLShortTrack> grlst_tmp;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   trgInfo.create();
 
@@ -267,6 +252,7 @@ void TRGGRLMatchModule::event()
       matphi->set_dphi_d(dphi_d_tmp);
       matphi->addRelationTo(track2Dlist[i]);
       matphi->addRelationTo(clusterlist[cluster_ind_phi]);
+      matphi->set_e(clusterlist[cluster_ind_phi]->getEnergyDep());
       //   track2Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
       clusterlist[cluster_ind_phi]->addRelationTo(track2Dlist[i]);
     }
@@ -332,7 +318,7 @@ void TRGGRLMatchModule::event()
 // Short tracking
   std::vector<bool> map_veto(64, 0);
   make_veto_map(track2Dlist, map_veto);
-  short_tracking(tslist, map_veto, track_phimap_i, patterns_base0, patterns_base2, grlst, grlst_tmp, trgInfo);
+  short_tracking(tslist, map_veto, track_phimap_i, patterns_base0, patterns_base2, grlst, trgInfo);
 
 }
 
@@ -405,6 +391,8 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
 
   if (phi_CDC > 2 * M_PI) {phi_CDC = phi_CDC - 2 * M_PI;}
   else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
+  if (_phi > 2 * M_PI) {_phi = _phi - 2 * M_PI;}
+  else if (_phi < 0) {_phi = _phi + 2 * M_PI;}
 
   //-- cluster/TRGECL information
   double    _cluster_x = _cluster->getPositionX();
@@ -692,46 +680,47 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 
     _w = abs(_w);
 
-    int L = _phi, R = _phi;
+    int L;
     if (_w >= 0 && _w <= 8) { L = _phi; }
     else if (_w >= 9 && _w <= 15) {
-      if (charge > 0) { L = _phi + 1; }
+      if (charge < 0) { L = _phi + 1; }
       else { L = _phi; }
     } else if (_w >= 16 && _w <= 24) {
-      if (charge > 0) { L = _phi + 2; }
+      if (charge < 0) { L = _phi + 2; }
       else { L = _phi; }
     } else if (_w >= 25 && _w <= 27) {
-      if (charge > 0) { L = _phi + 3; }
+      if (charge < 0) { L = _phi + 3; }
       else { L = _phi; }
     } else if (_w >= 28 && _w <= 30) {
-      if (charge > 0) { L = _phi + 3; }
+      if (charge < 0) { L = _phi + 3; }
       else { L = _phi + 1; }
     } else if (_w >= 31 && _w <= 32) {
-      if (charge > 0) { L = _phi + 4; }
+      if (charge < 0) { L = _phi + 4; }
       else { L = _phi + 1; }
     } else {
-      if (charge > 0) { L = _phi + 5; }
+      if (charge < 0) { L = _phi + 5; }
       else { L = _phi + 1; }
     }
 
+    int R;
     if (_w >= 0 && _w <= 8) { R = _phi; }
     else if (_w >= 9 && _w <= 15) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 1; }
     } else if (_w >= 16 && _w <= 24) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 2; }
     } else if (_w >= 25 && _w <= 27) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 3; }
     } else if (_w >= 28 && _w <= 30) {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 3; }
     } else if (_w >= 21 && _w <= 32) {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 4; }
     } else {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 5; }
     }
 
@@ -746,7 +735,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto,
                                        std::vector<bool>  phimap_i,
                                        std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
-                                       StoreArray<TRGGRLShortTrack> grlst, StoreArray<TRGGRLShortTrack> grlst_tmp,
+                                       StoreArray<TRGGRLShortTrack> grlst,
                                        StoreObjPtr<TRGGRLInfo> trgInfo)
 {
   std::vector<bool> SL0(64, 0);
@@ -819,14 +808,20 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
         std::cout<<std::endl;
   */
 //-- doing short tracking
+
+  std::vector< std::vector<int> > stlist_buf(0);
+
+  // -- ST finding with SL2
   for (int i = 0; i < 64; i++) {
 
-    // set a ST in the array no matter it is found or not
-    TRGGRLShortTrack* st = grlst_tmp.appendNew();
-    st->set_TS_ID(0, -1);
+    int ID0 = 0;
+    int ID1 = 0;
+    int ID2 = 0;
+    int ID3 = 0;
+    int ID4 = 0;
+    stlist_buf.push_back({0, 0, 0, 0, 0, 0});
 
-    if (!SL0[i] || !SL2[i]) continue;
-    bool SL0_already_found = false;
+    if (!SL2[i]) continue;
     bool SL2_already_found = false;
 
     for (int p = 0; p < 137; p++) {
@@ -866,13 +861,63 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
       if (SL2[i] && SL0[N64(i + x0)] && SL1[N64(i + x1)] && SL3[N64(i + x3)] && SL4[N64(i + x4)] && !SL2_already_found) {
         ST2[i] = true;
-        st->set_TS_ID(0, N64(i + x0));
-        st->set_TS_ID(1, N64(i + x1));
-        st->set_TS_ID(2, i);
-        st->set_TS_ID(3, N64(i + x3));
-        st->set_TS_ID(4, N64(i + x4));
+        ID0 = N64(i + x0);
+        ID1 = N64(i + x1);
+        ID2 = i;
+        ID3 = N64(i + x3);
+        ID4 = N64(i + x4);
         SL2_already_found = true; // if it has been found in previous pattern, no need to do it again.
       }
+
+      // if a pattern is found, no need to look for other pattern
+      if (SL2_already_found) break;
+
+    }
+
+    if (SL2_already_found) {
+      stlist_buf[i][0] = 1;
+      stlist_buf[i][1] = ID0;
+      stlist_buf[i][2] = ID1;
+      stlist_buf[i][3] = ID2;
+      stlist_buf[i][4] = ID3;
+      stlist_buf[i][5] = ID4;
+    }
+  }
+/////////
+//-- ST finding with SL0
+  for (int i = 0; i < 64; i++) {
+
+    if (!SL0[i]) continue;
+    bool SL0_already_found = false;
+
+    for (int p = 0; p < 137; p++) {
+
+      // following patterns will not be used.
+      if (p == 4) continue;
+      if (p == 5) continue;
+      if (p == 17) continue;
+      if (p == 26) continue;
+      if (p == 38) continue;
+      if (p == 41) continue;
+      if (p == 42) continue;
+      if (p == 47) continue;
+      if (p == 50) continue;
+      if (p == 60) continue;
+      if (p == 63) continue;
+      if (p == 64) continue;
+      if (p == 74) continue;
+      if (p == 93) continue;
+      if (p == 94) continue;
+      if (p == 95) continue;
+      if (p == 96) continue;
+      if (p == 104) continue;
+      if (p == 113) continue;
+      if (p == 114) continue;
+      if (p == 115) continue;
+      if (p == 123) continue;
+      if (p == 134) continue;
+      if (p == 135) continue;
+      if (p == 136) continue;
 
       int y1 = pattern_base0[p][0];
       int y2 = pattern_base0[p][1];
@@ -885,9 +930,13 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
         SL0_already_found = true; // if it has been found in previous pattern, no need to do it again.
       }
 
-    }
-  }
+      // if a pattern is found, no need to look for other pattern
+      if (SL0_already_found) break;
 
+    }
+
+  }
+/////////
 //-- extrapolation
   /*
     for (int i = 0; i < 64; i++) {
@@ -966,13 +1015,13 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
       //-- Fill the store array
       L++; R--;
-      int index = (L + R) / 2; // fill the middle one when multiple ST is found continuously in the map
+      int index = N64((L + R) / 2); // fill the middle one when multiple ST is found continuously in the map
       TRGGRLShortTrack* st = grlst.appendNew();
-      st->set_TS_ID(0, grlst_tmp[index]->get_TS_ID(0));
-      st->set_TS_ID(1, grlst_tmp[index]->get_TS_ID(1));
-      st->set_TS_ID(2, grlst_tmp[index]->get_TS_ID(2));
-      st->set_TS_ID(3, grlst_tmp[index]->get_TS_ID(3));
-      st->set_TS_ID(4, grlst_tmp[index]->get_TS_ID(4));
+      st->set_TS_ID(0, stlist_buf[index][1]);
+      st->set_TS_ID(1, stlist_buf[index][2]);
+      st->set_TS_ID(2, stlist_buf[index][3]);
+      st->set_TS_ID(3, stlist_buf[index][4]);
+      st->set_TS_ID(4, stlist_buf[index][5]);
     }
   }
 

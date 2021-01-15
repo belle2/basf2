@@ -92,7 +92,7 @@ bool MCUtil::allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<cons
 
   if (not mcTrack) {
     // Track is a fake
-    B2DEBUG(100, "Seed is a fake");
+    B2DEBUG(29, "Seed is a fake");
     return false;
   }
 
@@ -106,6 +106,6 @@ bool MCUtil::allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<cons
 
   const unsigned int numberOfCorrectHits = getNumberOfCorrectPXDHits(mcTrack, spacePoints);
 
-  B2DEBUG(100, "Have found " << numberOfCorrectHits << " correct out of  " << spacePoints.size() << " hits");
+  B2DEBUG(29, "Have found " << numberOfCorrectHits << " correct out of  " << spacePoints.size() << " hits");
   return numberOfCorrectHits == spacePoints.size();
 }

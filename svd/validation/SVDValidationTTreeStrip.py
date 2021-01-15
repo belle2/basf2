@@ -11,18 +11,14 @@
   </description>
 </header>
 """
-import sys
-import math
 import xml.etree.ElementTree as ET
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
-from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataStrip {\
@@ -36,21 +32,21 @@ gROOT.ProcessLine('struct EventDataStrip {\
     int strip_noise;\
     };')
 
-from ROOT import EventDataStrip
+from ROOT import EventDataStrip  # noqa
 
 
-class SVDValidationTTreeStrip(Module):
+class SVDValidationTTreeStrip(b2.Module):
+    '''class to create the strip ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeStrip, self).__init__()
-        # Output ROOT file
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeStrip.root', 'recreate')
-        # TTrees for output data
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventDataStrip class
+        #: instance of EventDataStrip class
         self.data = EventDataStrip()
 
         # Declare tree branches
@@ -60,9 +56,6 @@ class SVDValidationTTreeStrip(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Find digit with a cluster and save needed information"""

@@ -50,15 +50,15 @@ namespace TreeFitter {
                                                     );
 
     /** get helix and jacobian from a vertex */
-    static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+    static void getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                        int charge, double Bz,
                                                        Belle2::Helix& helix,
                                                        Eigen::Matrix<double, 5, 6>& jacobian);
 
     /** get jacobian from a vertex */
-    static void getJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+    static void getJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                int charge, double Bz,
-                                               Belle2::Helix& helix,
+                                               const Belle2::Helix& helix,
                                                Eigen::Matrix<double, 5, 6>& jacobian,
                                                double delta = 1e-5
                                               );
@@ -77,7 +77,7 @@ namespace TreeFitter {
                                 TVector3& position,
                                 TVector3& momentum, int& charge);
 
-    /** map of the helix paramteres by list index */
+    /** map of the helix parameters by list index */
     static std::string helixParName(int i) ;
 
     /** map of the vertex parameters by list index */

@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.cc
-// Description :
+// Description : module for DQM histogram analysis of SVD sensors efficiencies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20190428
@@ -32,7 +32,7 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
 
-  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
+  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
@@ -60,7 +60,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
     TH1F* ref_eff = (TH1F*)m_refFile->Get("refEfficiency");
     if (!ref_eff)
-      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Refence not found! using module parameters");
+      B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
     else {
       m_effEmpty = ref_eff->GetBinContent(1);
       m_effWarning = ref_eff->GetBinContent(2);
@@ -100,7 +100,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legEmpty->SetLineColor(kBlack);
 
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -121,6 +121,17 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
+
+  // add MonitoringObject and canvases
+  m_monObj = getMonitoringObject("svd");
+
+  m_c_found_tracks_UV = new TCanvas("svd_found_tracks_UV");
+  m_c_matched_clusters_UV = new TCanvas("svd_matched_clusters_UV");
+
+  // add canvases to MonitoringObject
+  m_monObj->addCanvas(m_c_found_tracks_UV);
+  m_monObj->addCanvas(m_c_matched_clusters_UV);
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -158,10 +169,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
 
-  Float_t effU = 0;
-  Float_t effV = 0;
-  Float_t erreffU = 0;
-  Float_t erreffV = 0;
+  Float_t effU;
+  Float_t effV;
+  Float_t erreffU;
+  Float_t erreffV;
 
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -323,7 +334,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
 
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
@@ -335,6 +345,48 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
     m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
     m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
   }
+
+  // get existing histograms produced by DQM modules
+  // Efficiency for the U side
+  TH2F* h_found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
+  TH2F* h_matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
+
+  //Efficiency for the V side
+  TH2F* h_found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
+  TH2F* h_matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
+
+  m_c_found_tracks_UV->Clear();
+  m_c_found_tracks_UV->Divide(2, 1);
+  m_c_found_tracks_UV->cd(1);
+  if (h_found_tracksU) h_found_tracksU->Draw("colz");
+  m_c_found_tracks_UV->cd(2);
+  if (h_found_tracksV) h_found_tracksV->Draw("colz");
+
+  m_c_matched_clusters_UV->Clear();
+  m_c_matched_clusters_UV->Divide(2, 1);
+  m_c_matched_clusters_UV->cd(1);
+  if (h_matched_clusU) h_matched_clusU->Draw("colz");
+  m_c_matched_clusters_UV->cd(2);
+  if (h_matched_clusV) h_matched_clusV->Draw("colz");
+
+  // add variables for run dependent monitoring
+
+  if (h_matched_clusU == NULL || h_found_tracksU == NULL) {
+    B2INFO("Histograms needed for Average Efficiency on U side are not found");
+    m_monObj->setVariable("avgEffU", -1);
+  } else {
+    double avgEffU = 1.*h_matched_clusU->GetEntries() / h_found_tracksU->GetEntries();
+    m_monObj->setVariable("avgEffU", avgEffU);
+  }
+
+  if (h_matched_clusV == NULL || h_found_tracksV == NULL) {
+    B2INFO("Histograms needed for Average Efficiency on V side are not found");
+    m_monObj->setVariable("avgEffV", -1);
+  } else {
+    double avgEffV = 1.*h_matched_clusV->GetEntries() / h_found_tracksV->GetEntries();
+    m_monObj->setVariable("avgEffV", avgEffV);
+  }
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()

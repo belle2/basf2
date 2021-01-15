@@ -34,6 +34,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -224,7 +225,7 @@ namespace Belle2 {
         return result;
 
       // check if mc match exists
-      const MCParticle* mcp = part->getRelated<MCParticle>();
+      const MCParticle* mcp = part->getMCParticle();
       if (mcp == nullptr)
         return result;
 
@@ -361,10 +362,12 @@ namespace Belle2 {
         B2FATAL("The Variables cosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
 
       PCmsLabTransform T;
-      // Hardcoded value, how to bypass this?
-      double e_Beam = 1.0579400E+1 / 2.0; // GeV
+      double e_Beam = T.getCMSEnergy() / 2.0; // GeV
       double m_B = part->getPDGMass();
-
+      // if this is a continuum run, use an approximate Y(4S) CMS energy
+      if (e_Beam * e_Beam - m_B * m_B < 0) {
+        e_Beam = 1.0579400E+1 / 2.0; // GeV
+      }
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
@@ -394,24 +397,16 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      double px = particle->getPx();
-      double py = particle->getPy();
+      TVector3 mom = particle->getMomentum();
 
-      if (py == py && px == px) {
+      TVector3 r = particle->getVertex() - beamSpotDB->getIPPosition();
 
-        double x = particle->getX() - (beamSpotDB->getIPPosition()).X();
-        double y = particle->getY() - (beamSpotDB->getIPPosition()).Y();
+      TVector3 Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
-        double pt = sqrt(px * px + py * py);
+      TVector3 curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
 
-//       const TVector3 m_BeamSpotCenter = TVector3(0., 0., 0.);
-//       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
-
-        double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
-        double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
-
-        return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
-      } else return std::numeric_limits<double>::quiet_NaN();
+      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
@@ -493,7 +488,7 @@ namespace Belle2 {
 
         return sum.M();
       } else {
-        return part->getMass();
+        return part->getMass(); // !
       }
     }
 
@@ -658,7 +653,7 @@ namespace Belle2 {
         s << "    ";
       }
       s << p->getPDGCode();
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int flags = MCMatching::getMCErrors(p, mcp);
         s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << flags << " ("
@@ -684,7 +679,7 @@ namespace Belle2 {
     double particleMCMomentumTransfer2(const Particle* part)
     {
       // for B meson MC particles only
-      const MCParticle* mcB = part->getRelated<MCParticle>();
+      const MCParticle* mcB = part->getMCParticle();
 
       if (!mcB)
         return std::numeric_limits<double>::quiet_NaN();
@@ -836,7 +831,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      auto* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<double>::quiet_NaN();
@@ -1028,8 +1023,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
-    REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass (determined from particle's 4-momentum vector)");
+    REGISTER_VARIABLE("M", particleMass, R"DOC(
+The particle's mass.
+
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+
+- If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
+- If this particle is an MC particle then this is the mass of that particle.
+- If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
+- If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
+
+  * You will see a difference between this mass and the :b2:var:`InvM`.
+  )DOC");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
@@ -1037,12 +1042,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
     REGISTER_VARIABLE("M2", particleMassSquared,
-                      "invariant mass squared (determined from particle's 4-momentum vector)");
+                      "The particle's mass squared.");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
+                      "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
@@ -1093,9 +1098,14 @@ namespace Belle2 {
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
-                      "called connected - region(CR) track match");
+    REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
+
+                      * -1 particle has no ECL cluster
+                      *  0 particle has no associated track
+                      *  1 there is a matched track called connected - region(CR) track match
+                      )DOC");
+    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"

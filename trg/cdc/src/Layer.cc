@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Cell.h"
 #include "trg/cdc/Layer.h"
 
@@ -106,7 +105,7 @@ namespace Belle2 {
   {
     if (_nCells == 0) {
       cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
-      return * (TRGCDCCell*)(TRGCDCUndefinedLayer);
+      return * dynamic_cast<const TRGCDCCell*>(TRGCDCUndefinedLayer);
     }
 
     if (id < 0)

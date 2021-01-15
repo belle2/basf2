@@ -10,6 +10,11 @@ import re
 from SCons.Builder import Builder
 from SCons.Scanner.C import CScanner
 
+# Classes outside of namespace Belle2.
+# Such classes can be linked using comment "// global".
+linkdef_global = \
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+([\w]*).*[+-]?\!?;\s*//.*global.*$', re.M)
+
 # everything that has #pragma link C++ .* Belle2::.*
 linkdef_everything = \
     re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*$', re.M)
@@ -20,7 +25,7 @@ linkdef_class_re = \
 
 # link requests with '// implicit' comment (doesn't require header file)
 linkdef_implicit = \
-    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//\s*implicit\s*$', re.M)
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//.*implicit.*$', re.M)
 
 
 def linkdef_emitter(target, source, env):
@@ -41,6 +46,20 @@ def linkdef_emitter(target, source, env):
     # loop over class names and construct the corresponding header file names
     contents = linkdef.get_text_contents()
     for line in contents.split('\n'):
+        # Classes outside of namespace Belle2.
+        match = linkdef_global.match(line)
+        if match is not None:
+            classname = match.group(1)
+            if classname is not None:
+                include_base = classname + '.h'
+                header_file = os.path.join(source_dir, include_base)
+                if os.path.isfile(header_file):
+                    include_file = os.path.join(include_dir, include_base)
+                    if include_file not in source:
+                        source.append(include_file)
+                else:
+                    print(f'Cannot find header file for the line "{line}".')
+
         # first check if this is looks like an actual request to create a dictionary
         if linkdef_everything.search(line) is None:
             continue
@@ -90,9 +109,14 @@ rootcling = Builder(action='rootcling -f $TARGET $CLINGFLAGS -rmf "${TARGET.base
                     '$_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', emitter=linkdef_emitter, source_scanner=CScanner())
 rootcling.action.cmdstr = '${ROOTCLINGCOMSTR}'
 
+# define builder for class version check
+classversion = Builder(action='b2code-classversion-check --error-style gcc $SOURCE && touch $TARGET')
+classversion.action.cmdstr = '${CLASSVERSIONCOMSTR}'
+
 
 def generate(env):
     env['BUILDERS']['RootDict'] = rootcling
+    env['BUILDERS']['ClassVersionCheck'] = classversion
 
 
 def exists(env):

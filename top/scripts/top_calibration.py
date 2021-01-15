@@ -9,9 +9,9 @@
 
 import basf2
 from caf.framework import Calibration, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
+from caf.strategies import SequentialRunByRun, SingleIOV
 from ROOT.Belle2 import TOP
+from math import ceil
 
 
 def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
@@ -51,7 +51,6 @@ def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     return cal
@@ -91,7 +90,6 @@ def BS13d_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     return cal
@@ -145,7 +143,6 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     return cal
@@ -183,6 +180,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0DeltaTCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
@@ -197,7 +195,6 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
 
     return cal
@@ -237,6 +234,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     #   collector module
     collector = basf2.register_module('TOPModuleT0LLCollector')
     collector.param('sample', sample)
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0LLAlgorithm()
@@ -251,7 +249,6 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
 
     return cal
@@ -303,7 +300,6 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     return cal
@@ -357,7 +353,6 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SequentialRunByRun
 
     return cal
@@ -388,6 +383,7 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
     collector.param('timeWindow', [t_min, t_max])
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -402,7 +398,6 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
 
     return cal
@@ -428,6 +423,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
 
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -442,14 +438,14 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.max_files_per_collector_job = 1
     cal.strategies = SingleIOV
 
     return cal
 
 
 def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
-                     globalTags=None, localDBs=None, new_cdst_format=True):
+                     globalTags=None, localDBs=None, new_cdst_format=True,
+                     backend_args=None):
     '''
     Returns calibration object for alignment of TOP modules.
     :param inputFiles: A list of input files in cdst data format
@@ -458,6 +454,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
     :param new_cdst_format: True or False for new or old cdst format, respectively
+    :param backend_args: Dictionary of backend args for the Collection object to use
     '''
 
     #   define calibration
@@ -469,6 +466,12 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.strategies = SingleIOV
+
+    # Since each Collection has its own maximum number of jobs to submit, we limit the number from each one
+    # so that the total adds up to something reasonable e.g. ~1600
+    total_jobs = 1600
+    number_of_slots = 16
+    jobs_per_collection = ceil(total_jobs/number_of_slots)
 
     #   add collections
     for slot in range(1, 17):
@@ -497,17 +500,19 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         collector.param('sample', sample)
         collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
+        collector.param('granularity', 'all')
 
         #   define collection
         collection = Collection(collector=collector, input_files=inputFiles,
-                                pre_collector_path=main, max_files_per_collector_job=-1)
+                                pre_collector_path=main, max_collector_jobs=jobs_per_collection)
         if globalTags:
             for globalTag in reversed(globalTags):
                 collection.use_central_database(globalTag)
         if localDBs:
             for localDB in reversed(localDBs):
                 collection.use_local_database(localDB)
-        collection.backend_args = {"queue": "l"}
+        if backend_args:
+            collection.backend_args = backend_args
 
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)

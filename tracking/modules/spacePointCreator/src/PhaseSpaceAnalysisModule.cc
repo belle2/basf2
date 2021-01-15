@@ -45,8 +45,8 @@ PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, "Name of the output root file without '.root' file ending + write mode"\
            " ('UPDATE' or 'RECREATE')", defaultRootFName);
 
-  // initialize pointers to NULL (cppcheck)
-  m_rootFilePtr = NULL;
+  // initialize pointers to nullptr (cppcheck)
+  m_rootFilePtr = nullptr;
   initializeCounters(0);
 }
 
@@ -82,8 +82,9 @@ void PhaseSpaceAnalysisModule::initialize()
     }
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
-      // cppcheck-suppress useStlAlgorithm
-      for (string id : m_PARAMrootFileName) { output += "'" + id + "' "; }
+      for (string id : m_PARAMrootFileName) {
+        output += "'" + id + "' ";
+      }
       B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output);
     }
 
@@ -103,8 +104,9 @@ void PhaseSpaceAnalysisModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
   string arrayNames;
-  // cppcheck-suppress useStlAlgorithm
-  for (string name : m_PARAMcontainerNames) { arrayNames += " " + name; }
+  for (string name : m_PARAMcontainerNames) {
+    arrayNames += " " + name;
+  }
   B2DEBUG(10, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
 
   StoreArray<MCParticle> mcParticles;
@@ -140,7 +142,7 @@ void PhaseSpaceAnalysisModule::event()
         continue;
       }
       MCParticle* mcParticle = mcParticles[id];
-      if (mcParticle == NULL) { // safety measure
+      if (mcParticle == nullptr) { // safety measure
         m_noMcPartCtr++;
         continue;
       }
@@ -157,7 +159,7 @@ void PhaseSpaceAnalysisModule::terminate()
   stringstream furtherInfo;
   if (m_skippedTCsCtr || m_noMcPartCtr) {
     furtherInfo << " There were " << m_skippedTCsCtr << " negative mcParticle IDs and " << m_noMcPartCtr <<
-                " NULL pointers to MCParticles";
+                " nullptr pointers to MCParticles";
   }
   unsigned int nMCParts = accumulate(m_mcPartCtr.begin(), m_mcPartCtr.end(), 0);
   B2INFO("PhaseSpaceAnalysis::terminate(): Collected mcParticle info in " << m_PARAMcontainerNames.size() << " containers."\
@@ -172,7 +174,7 @@ void PhaseSpaceAnalysisModule::terminate()
   }
 
   // do ROOT stuff
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O could mix with the root I/O of this module
     for (TTree* tree : m_treePtrs) { tree->Write(); }
     m_rootFilePtr->Close();

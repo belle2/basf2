@@ -11,16 +11,14 @@
   </description>
 </header>
 """
-import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
 from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
@@ -49,23 +47,25 @@ gROOT.ProcessLine('struct EventData {\
     float truehit_interstripPosition;\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
+    float truehit_time;\
     };')
 
-from ROOT import EventData
+from ROOT import EventData  # noqa
 
 
-class SVDValidationTTree(Module):
+class SVDValidationTTree(b2.Module):
+    '''class to produced the validation ttree '''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTree, self).__init__()
-        # Output ROOT file
-        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
-        # TTrees for output data
-        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
 
-        # Instance of the EventData class
+        #: Output ROOT file
+        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
+        #: TTree for output data
+        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
+        #: instance of EventData class
         self.data = EventData()
 
         # Declare tree branches
@@ -177,6 +177,7 @@ class SVDValidationTTree(Module):
                 self.data.truehit_interstripPosition = truehit_interstripPosition
                 self.data.truehit_deposEnergy = truehit.getEnergyDep()
                 self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
+                self.data.truehit_time = truehit.getGlobalTime()
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

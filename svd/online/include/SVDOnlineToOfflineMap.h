@@ -11,9 +11,7 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
-#include <iostream>
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
@@ -164,14 +162,15 @@ namespace Belle2 {
      * @param FADC is FADC number from the SVDRawCopper data.
      * @param APV25 is the APV25 number from the SVDRawCopper data.
      * @param channel is the APV25 channel number from the SVDRawCopper data.
+     * @param samples APV samples
+     * @param time strip time
      * @return a pointer to the new SVDShaperDigit owned by the caller whose
      * Position is 0
      * FIXME: There should be no such function in this mapping class, no dependence
      * on SVDShaperDigit and its interface.
      */
     SVDShaperDigit* NewShaperDigit(unsigned char FADC, unsigned char APV25,
-                                   unsigned char channel, short samples[6], float time = 0.0,
-                                   SVDModeByte mode = SVDModeByte());
+                                   unsigned char channel, short samples[6], float time = 0.0);
 
     /** Get SensorInfo for a given FADC/APV combination.
      * @param FADC is FADC number from the SVDRawCopper data.
@@ -184,7 +183,7 @@ namespace Belle2 {
     /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the layer number
      * @param ladder is the ladder number
-     * @param sensor is the sensor number
+     * @param dssd is the sensor number
      * @param side is true if U
      * @param strip is the strip number
      * @return true if the APV that reads the strip is in the map, false otherwise

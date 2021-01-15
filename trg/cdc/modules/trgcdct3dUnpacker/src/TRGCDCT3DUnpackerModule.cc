@@ -12,8 +12,6 @@
 //---------------------------------------------------------------
 
 #include <trg/cdc/modules/trgcdct3dUnpacker/TRGCDCT3DUnpackerModule.h>
-#include <bitset>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -37,7 +35,7 @@ TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
   addParam("T3DMOD", m_T3DMOD,
            "T3D module number",
            0);
-  B2INFO("TRGCDCT3DUnpacker: Constructor done.");
+  B2DEBUG(20, "TRGCDCT3DUnpacker: Constructor done.");
 }
 
 TRGCDCT3DUnpackerModule::~TRGCDCT3DUnpackerModule()
@@ -160,7 +158,7 @@ void TRGCDCT3DUnpackerModule::fillTreeTRGCDCT3DUnpacker(int* buf, int evt)
     //}
 
     for (unsigned _wd = 0; _wd < nBits_2k / 32; _wd++) { // 0..19
-      int wd = buf[clk * (nBits_2k / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (nBits_2k / 32) + _wd + nword_header];
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
           int bitPosition = (nBits_2k - 1) - _wd * 32 - bb;
@@ -226,7 +224,7 @@ void TRGCDCT3DUnpackerModule::fillTreeTRGCDCT3DUnpacker_2dfitter(int* buf, int e
     //}
 
     for (unsigned _wd = 0; _wd < nBits_2k / 32; _wd++) { // 0..19
-      int wd = buf[clk * (nBits_2k / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (nBits_2k / 32) + _wd + nword_header];
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
           int bitPosition = (nBits_2k - 1) - _wd * 32 - bb;
@@ -293,7 +291,7 @@ void TRGCDCT3DUnpackerModule::fillTreeTRGCDCT3DUnpacker_2624(int* buf, int evt)
     //}
 
     for (unsigned _wd = 0; _wd < nBits_2624 / 32; _wd++) { // 0..19
-      int wd = buf[clk * (nBits_2624 / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (nBits_2624 / 32) + _wd + nword_header];
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
           int bitPosition = (nBits_2624 - 1) - _wd * 32 - bb;

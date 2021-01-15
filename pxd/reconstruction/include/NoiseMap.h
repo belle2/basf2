@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_NOISEMAP_H
-#define PXD_NOISEMAP_H
+#pragma once
 
 #include <pxd/reconstruction/Pixel.h>
 
@@ -43,7 +42,7 @@ namespace Belle2 {
       virtual float getNoise(const Pixel&) const { return m_noiseLevel; }
 
       /** Check wether a signal exceeds a given significance
-       * @param pixel pixel to check
+       * @param px pixel to check
        * @param significance minimum significance
        */
       bool operator()(const Pixel& px, float significance) const { return getSignificance(px) >= significance; }
@@ -62,5 +61,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXD_NOISEMAP_H

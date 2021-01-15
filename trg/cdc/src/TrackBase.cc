@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/TrackBase.h"

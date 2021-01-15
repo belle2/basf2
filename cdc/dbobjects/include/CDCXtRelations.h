@@ -139,6 +139,32 @@ namespace Belle2 {
       addXTParams(xtID, delta);
     }
 
+    /**
+     * Replace xt parameters for the specified id. (=bin)
+     */
+    void replaceXTParams(const XtID xtID, const std::vector<float>&  param)
+    {
+      std::map<XtID, std::vector<float>>::iterator it = m_xts.find(xtID);
+
+      if (it != m_xts.end()) {
+        for (unsigned short i = 0; i < m_nXtParams; ++i) {
+          (it->second)[i] = param[i];
+        }
+      } else {
+        B2FATAL("Specified xt params not found in replaceXTParams !");
+      }
+    }
+
+    /**
+     * Replace xt parameters for the specified id. (=bin)
+     */
+    void replaceXTParams(unsigned short iCLayer, unsigned short iLR, unsigned short iAlpha, unsigned short iTheta,
+                         const std::vector<float>& param)
+    {
+      const XtID xtID = getXtID(iCLayer, iLR, iAlpha, iTheta);
+      replaceXTParams(xtID, param);
+    }
+
 
     /**
      * Get no. of alpha-angle bin
@@ -256,7 +282,7 @@ namespace Belle2 {
         }
         ++ibin;
       }
-      if (iAlpha == 999) B2FATAL("Alpha bin not found !");
+      if (iAlpha == 999) B2FATAL("Alpha bin not found ! " << alpha);
 
       return getXtID(iCLayer, iLR, iAlpha, iTheta);
     }
@@ -382,22 +408,37 @@ namespace Belle2 {
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 29;}
-    /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short xtId, unsigned short xtParam) const
+    /// Get global parameter for i-th component of the specified xtId
+    double getGlobalParam(unsigned short xtId, unsigned short i) const
     {
-      return getXtParams(xtId).at(xtParam);
+      return getXtParams(xtId).at(i);
     }
-    /// Set global parameter FIXME does nothing because CDC is not ready
-    void setGlobalParam(double value, unsigned short xtId, unsigned short xtParam)
+    /// Set global parameter for i-th component of the specified xtId
+    void setGlobalParam(double value, unsigned short xtId, unsigned short i)
     {
-      std::vector<float> allParams = getXtParams(xtId);
-      allParams.at(xtParam) = value;
-      setXtParams(xtId, allParams);
+
+      std::map<XtID, std::vector<float>>::const_iterator it = m_xts.find(xtId);
+      if (it != m_xts.end()) {
+        std::vector<float> allParams =  it->second;
+        allParams.at(i) = value;
+        setXtParams(xtId, allParams);
+      } else {
+        B2INFO("Specified xt params. not found in getXtParams.");
+        std::vector<float> allParams {0., 0., 0., 0., 0., 0., 0., 0.};
+        allParams.at(i) = value;
+        setXtParams(xtId, allParams);
+      }
     }
     /// list stored global parameters TODO FIXME CDC not ready
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() const
     {
-      return {};
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto ixt : m_xts) {
+        for (int i = 0; i < 8; ++i) {
+          result.push_back({ixt.first, i});
+        }
+      }
+      return result;
     }
   private:
     unsigned short m_xtParamMode;    /*!< Mode for xt parameterization */
@@ -407,7 +448,7 @@ namespace Belle2 {
     std::map<XtID, std::vector<float>>
                                     m_xts;    /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
 
-    ClassDef(CDCXtRelations, 1); /**< ClassDef */
+    ClassDef(CDCXtRelations, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

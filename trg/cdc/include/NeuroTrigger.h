@@ -4,17 +4,13 @@
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBStore.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
-  class CDCTriggerSegmentHit;
   class CDCTriggerTrack;
 
   /** Class to represent the CDC Neurotrigger.
@@ -134,11 +130,11 @@ namespace Belle2 {
     void setConstants();
 
     /** set fixed point precision */
-    void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
+    void setPrecision(const std::vector<unsigned>& precision) { m_precision = precision; }
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
-    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, std::string et_option);
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName, const std::string& et_option);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -165,7 +161,7 @@ namespace Belle2 {
      * or has no pattern restriction. An unrestricted expert is returned only
      * if there is no exactly matching expert.
      * @return index of the selected MLP, -1 if no matching MLP is found */
-    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern);
+    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern, const bool neurotrackinputmode);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);
@@ -191,7 +187,7 @@ namespace Belle2 {
      *                                  "fastestppriority" is used.
      *   "etf_or_zero"              :   the event time is obtained by the ETF, if
      */
-    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option);
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option, const bool);
 
     /** DEPRECATED!! Read out the event time and store it.
      * If there is no valid event time, it can be determined
@@ -217,7 +213,26 @@ namespace Belle2 {
      * @param track   axial hit relations are taken from given track
      * @return super layer pattern of hits in the current track
      */
-    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track);
+    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get complete hit pattern of neurotrack. This does the same as
+     * the getInputPattern function, but also shows the axial hit bits.
+     * This function was made for the simulation of the hardware debug
+     * information "TSVector".
+     */
+    unsigned long getCompleteHitPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get the drift threshold bits, where the time of the TS was outside of the accepted time window and thus
+     * shifted to the allowed maximum within the borders. Note, that to get the same values as from the unpacker,
+     * this value has to be combined with the (complement of the) TSVector.
+     */
+    unsigned long getPureDriftThreshold(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+
+    /** Select hits for each super layer from the ones related to input track
+     * @param isector              index of the MLP that will use the input
+     * @param track                all hit relations are taken from given track
+     * @param returnAllRelevant    if true, return all relevant hits instead of
+     *                             selecting the best (for making relations)
+     * @return list of selected hit indices */
+    std::vector<unsigned> selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track);
 
     /** Select best hits for each super layer
      * @param isector              index of the MLP that will use the input
@@ -239,7 +254,7 @@ namespace Belle2 {
      * @param isector index of the MLP
      * @param input vector of input values
      * @return unscaled output values (z vertex in cm and/or theta in radian) */
-    std::vector<float> runMLP(unsigned isector, std::vector<float> input);
+    std::vector<float> runMLP(unsigned isector, const std::vector<float>& input);
 
     /** Run an expert MLP with fixed point arithmetic. */
     std::vector<float> runMLPFix(unsigned isector, std::vector<float> input);

@@ -19,7 +19,8 @@ settings = CalibrationSettings(name="Example Simple",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
-                               depends_on=[])
+                               depends_on=[],
+                               expert_config={})
 
 ##############################
 
@@ -30,8 +31,7 @@ settings = CalibrationSettings(name="Example Simple",
 # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
 # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
 #
-# The database_chain, backend_args, backend, max_files_per_collector_job, and heartbeat of these
-# calibrations will all be set/overwritten by the b2caf-prompt-run tool.
+# The database_chain of these calibrations will all be set/overwritten by the b2caf-prompt-run tool.
 
 
 def get_calibrations(input_data, **kwargs):
@@ -45,8 +45,13 @@ def get_calibrations(input_data, **kwargs):
         backwards compatibility problems. But you could use the correct arguments in b2caf-prompt-run for this
         release explicitly if you want to.
 
-        Currently only kwargs["output_iov"] is used. This is the output IoV range that your payloads should
-        correspond to. Generally your highest ExpRun payload should be open ended e.g. IoV(3,4,-1,-1)
+        Currently only kwargs["requested_iov"] and kwargs["expert_config"] are used.
+
+        "requested_iov" is the IoV range of the bucket and your payloads should correspond to this range.
+        However your highest payload IoV should be open ended e.g. IoV(3,4,-1,-1)
+
+        "expert_config" is the input configuration. It takes default values from your `CalibrationSettings` but these are
+        overwritten by values from the 'expert_config' key in your input `caf_config.json` file when running ``b2caf-prompt-run``.
 
     Returns:
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
@@ -80,6 +85,9 @@ def get_calibrations(input_data, **kwargs):
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
 
+    # Get the expert configurations if you have something you might configure from them. It should always be available
+    expert_config = kwargs.get("expert_config")
+
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
@@ -87,7 +95,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()

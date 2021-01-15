@@ -1,12 +1,10 @@
 from pybasf2 import B2WARNING
 
-from basf2 import register_module, create_path
-from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
+from basf2 import register_module
+from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
-
-from iov_conditional import phase_2_conditional
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -92,7 +90,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
 
     # V0 finding
-    path.add_module('V0Finder', RecoTracks=reco_tracks)
+    path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # prune genfit tracks
     if pruneTracks:
@@ -265,6 +263,30 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
 
 
+def add_pxd_cr_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
+                             add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
+    """Add the pxd track finding to the path"""
+    if not is_pxd_used(components):
+        return
+
+    if use_mc_truth:
+        # MC CKF needs MC matching information
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
+                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=input_reco_tracks)
+
+    add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                        direction="backward", use_mc_truth=use_mc_truth, **kwargs)
+
+    if add_both_directions:
+        add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                            direction="forward", use_mc_truth=use_mc_truth, **kwargs)
+
+    path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=input_reco_tracks,
+                    VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
+
+
 def add_svd_track_finding(
         path,
         components,
@@ -423,7 +445,7 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
-                          use_second_hits=False, add_mva_quality_indicator=False,
+                          use_second_hits=False, add_mva_quality_indicator=True,
                           reattach_hits=False):
     """
     Convenience function for adding all cdc track finder modules
@@ -511,9 +533,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            filterParameters={"cut": 0.0},
-            deleteTracks=False,
-            resetTakenFlag=False
+            filterParameters={"cut": 0.7},
+            deleteTracks=True,
+            resetTakenFlag=True
         )
 
     # Export CDCTracks to RecoTracks representation

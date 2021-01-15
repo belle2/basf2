@@ -9,11 +9,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSensitiveDetector_H
-#define CDCSensitiveDetector_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/WireID.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <vector>
 #include <map>
@@ -238,6 +242,12 @@ namespace Belle2 {
                                   const WireID& otherWireId) const;
 
 
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
+
+      /** CDC simulation hits. */
+      StoreArray<CDCSimHit> m_CDCSimHits;
+
       /**
        * Magnetic field is on or off.
        */
@@ -294,5 +304,3 @@ namespace Belle2 {
     };
   }
 } // end of namespace Belle2
-
-#endif

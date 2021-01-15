@@ -28,7 +28,7 @@
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
@@ -36,7 +36,7 @@
 #include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
-#include <ecl/utility/ECLDspEmulator.h>
+#include <ecl/utility/ECLDspUtilities.h>
 
 using namespace std;
 using namespace Belle2;
@@ -56,6 +56,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("TriggerTime", m_trigTime,
+           "Flag to use crate trigger times from beam background overlay if there are any (default: false)", false);
   addParam("Background", m_background, "Flag to use the Digitizer configuration with backgrounds (default: false)", false);
   addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration (default: false)",
            false);
@@ -74,6 +76,10 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("DspWithExtraMCInfoThreshold", m_DspWithExtraMCInfoThreshold,
            "Threshold above with to store Dsp with extra MC information [GeV]",
            0.02);
+  addParam("DspDataTest", m_dspDataTest,
+           "Use DSP coefficients from the database for the processing. This "
+           "will significantly reduce performance so this option is to be "
+           "used for testing only.", false);
 
 }
 
@@ -151,6 +157,11 @@ void ECLDigitizerModule::beginRun()
 
   if (m_HadronPulseShape)  callbackHadronSignalShapes();
 
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
+  }
 }
 
 // interface to C shape fitting function function
@@ -160,27 +171,40 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
   const fitparams_t& r = m_fitparams[t.ifunc];
 
-  short int* id = (short int*)m_idn[t.idn].id;
+  ECLShapeFit result;
 
-  int A0  = (int) * (id + 0) - 128;
-  int Askip  = (int) * (id + 1) - 128;
+  if (!m_dspDataTest) {
+    short int* id = (short int*)m_idn[t.idn].id;
 
-  int Ahard  = (int) * (id + 2);
-  int k_a = (int) * ((unsigned char*)id + 26);
-  int k_b = (int) * ((unsigned char*)id + 27);
-  int k_c = (int) * ((unsigned char*)id + 28);
-  int k_16 = (int) * ((unsigned char*)id + 29);
-  int k1_chi = (int) * ((unsigned char*)id + 24);
-  int k2_chi = (int) * ((unsigned char*)id + 25);
+    int A0  = (int) * (id + 0) - 128;
+    int Askip  = (int) * (id + 1) - 128;
 
-  int chi_thres = (int) * (id + 15);
+    int Ahard  = (int) * (id + 2);
+    int k_a = (int) * ((unsigned char*)id + 26);
+    int k_b = (int) * ((unsigned char*)id + 27);
+    int k_c = (int) * ((unsigned char*)id + 28);
+    int k_16 = (int) * ((unsigned char*)id + 29);
+    int k1_chi = (int) * ((unsigned char*)id + 24);
+    int k2_chi = (int) * ((unsigned char*)id + 25);
 
-  int trg_time = ttrig;
+    int chi_thres = (int) * (id + 15);
 
-  auto result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-                       (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
-                       trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k_16, k1_chi,
-                       k2_chi, chi_thres);
+    int trg_time = ttrig;
+
+    result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
+                    (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
+                    trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k_16, k1_chi,
+                    k2_chi, chi_thres);
+  } else {
+    std::vector<int> adc(31);
+    for (int i = 0; i < 31; i++) adc[i] = FitA[i];
+    // NOTE: ttrig_packed is any even number in set {8*Z, 8*Z + 2, 8*Z + 4}
+    //       where Z is an integer number in 0..23 range
+    // ttrig = ttrig_packed - 2 * (ttrig_packed / 8);
+    // ttrig = 6*Z + q
+    int ttrig_packed = ttrig / 6 * 8 + ttrig % 6;
+    result = ECLDspUtilities::shapeFitter(j + 1, adc, ttrig_packed);
+  }
 
   m_lar = result.amp;
   m_ltr = result.time;
@@ -212,19 +236,13 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
   }
 }
 
-int ECLDigitizerModule::shapeSignals()
+void ECLDigitizerModule::shapeSignals()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
   const double trgtick = ec.s_clock / ec.m_rf / ec.m_ntrg;   // trigger tick
-  const int  DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) / 2.); // trigger decision can come in any time ???
-  const double timeInt = 2.* (double) DeltaT * trgtick;
-  const int      ttrig = 2 * DeltaT;
-  const double timeOffset = timeInt - ec.s_clock / (2 * ec.m_rf);
-
-  const auto eclTrig = m_eclTrigs.appendNew();
-  eclTrig->setTimeTrig(timeInt); //t0 (us)= (1520 - m_ltr)*24.*
+  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.m_rf);
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
@@ -234,7 +252,10 @@ int ECLDigitizerModule::shapeSignals()
 
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
-    int j = hit.getCellId() - 1; //0~8735
+    int cellId = hit.getCellId(); // 1 .. 8736
+    int j = cellId - 1; // 0 .. 8735
+    int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+    double timeOffset = tscale * m_ttime[id] - toff;
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
 
@@ -257,7 +278,10 @@ int ECLDigitizerModule::shapeSignals()
   // add only background hits
   for (const auto& hit : m_eclHits) {
     if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) continue;
-    int j = hit.getCellId() - 1; //0~8735
+    int cellId = hit.getCellId(); // 1 .. 8736
+    int j = cellId - 1; // 0 .. 8735
+    int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+    double timeOffset = tscale * m_ttime[id] - toff;
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
@@ -270,7 +294,10 @@ int ECLDigitizerModule::shapeSignals()
     // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
     const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
     for (const auto& hit : m_eclDiodeHits) {
-      int j = hit.getCellId() - 1; //0~8735
+      int cellId = hit.getCellId(); // 1 .. 8736
+      int j = cellId - 1; // 0 .. 8735
+      int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+      double timeOffset = tscale * m_ttime[id] - toff;
       double hitE       = hit.getEnergyDep() * m_calib[j].ascale * diodeEdep2crystalEdep;
       double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
 
@@ -290,11 +317,13 @@ int ECLDigitizerModule::shapeSignals()
     // This has been added by Alex Bobrov for calibration
     // of covariance matrix artificially generate 100 MeV in time for each crystal
     double hitE = 0.1, hitTimeAve = 0.0;
-    for (int j = 0; j < ec.m_nch; j++)
+    for (int j = 0; j < ec.m_nch; j++) {
+      int cellId = j + 1; // 1 .. 8736
+      int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+      double timeOffset = tscale * m_ttime[id] - toff;
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+    }
   }
-
-  return ttrig;
 }
 
 void ECLDigitizerModule::makeElectronicNoiseAndPedestal(int J, int* FitA)
@@ -313,7 +342,7 @@ void ECLDigitizerModule::makeWaveforms()
   BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
   out.putNBits(m_compAlgo & 0xff, 8);
   ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
-  if (comp == NULL)
+  if (comp == nullptr)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
@@ -339,11 +368,6 @@ void ECLDigitizerModule::makeWaveforms()
 void ECLDigitizerModule::event()
 {
   const EclConfiguration& ec = EclConfiguration::get();
-  const int ttrig = shapeSignals();
-
-  // We want to produce background waveforms in simulation first than
-  // dump to a disk, read from the disk to test before real data
-  if (m_waveformMaker) { makeWaveforms(); return; }
 
   // make relation between cellid and eclhits
   struct ch_t {int cell, id;};
@@ -354,19 +378,46 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-  bool isBGOverlay = m_eclWaveforms.isValid();
+  bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
   BitStream out;
-  ECLCompress* comp = NULL;
+  ECLCompress* comp = nullptr;
 
   // check background overlay
   if (isBGOverlay) {
     std::swap(out.getStore(), m_eclWaveforms->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
-    comp = selectAlgo(compAlgo);
-    if (comp == NULL)
+    comp = selectAlgo(compAlgo & 0x7f);
+    if (comp == nullptr)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
+    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrived
+    if (isTrigTime) {
+      for (int i = 0; i < ECL::ECL_CRATES; i++) {
+        unsigned char t = out.getNBits(7); // [0..72)
+        m_ttime[i] = t;
+      }
+    }
   }
+
+  if (!m_trigTime || !isTrigTime) { // reproduce previous logic -- one trigger time for all crates
+    int DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..72)
+    for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
+  }
+
+  int triggerTag0 = m_EventMetaData->getEvent();
+  for (int id = 0; id < ECL::ECL_CRATES; id++) {
+    auto eclTrig = m_eclTrigs.appendNew();
+    int triggerPhase0 = 2 * (m_ttime[id] + m_ttime[id] / 3);
+    eclTrig->setTrigId(id);
+    eclTrig->setTimeTrig(triggerPhase0);
+    eclTrig->setTrigTag(triggerTag0);
+  }
+
+  shapeSignals();
+
+  // We want to produce background waveforms in simulation first than
+  // dump to a disk, read from the disk to test before real data
+  if (m_waveformMaker) { makeWaveforms(); return; }
 
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
 
@@ -400,6 +451,9 @@ void ECLDigitizerModule::event()
     int       tFit = 0; // fit output : T_ave     12 bits
     int qualityFit = 0; // fit output : quality    2 bits
     int        chi = 0; // fit output : chi square   it is not available in the experiment
+
+    int id = m_eclMapper.getCrateID(j + 1) - 1; // 0 .. 51
+    int ttrig = 2 * m_ttime[id];
 
     shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
 

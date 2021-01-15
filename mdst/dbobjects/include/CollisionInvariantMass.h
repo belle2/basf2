@@ -25,7 +25,8 @@ namespace Belle2 {
 
     /** Set the CMS energy and its uncertainty.
      * @param mass invariant mass of the colliding beams
-     * @param error uncertainty of invariant mass
+     * @param error uncertainty of mean invariant mass
+     * @param spread width of invariant mass distribution
      */
     void setMass(double mass, double error, double spread)
     {

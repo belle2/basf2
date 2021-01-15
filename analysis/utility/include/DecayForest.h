@@ -24,6 +24,7 @@ namespace Belle2 {
   public:
     /**
      * Create a DecayForest from a full decaystring outputted by ParticleMCDecayString
+     * @param full_decaystring full decay string
      * @param save_memory by storing only the reconstructed and first valid original DecayTree
      * @param removeRadiativeGammaFlag remove radiative photons from decay string. Handle with care:
      * In the decay B+ --> e+ nu_e gamma, the gamma would be removed although this might be your signal.
@@ -33,17 +34,17 @@ namespace Belle2 {
     /**
      * Return nth tree (0 is the reconstructed tree)
      */
-    DecayTree& getTree(unsigned int n) { return forest[n]; }
+    const DecayTree& getTree(unsigned int n) const { return forest.at(n); }
 
     /**
      * Get reconstructed tree
      */
-    DecayTree& getReconstructedTree() { return forest[0]; }
+    const DecayTree& getReconstructedTree() const { return forest.at(0); }
 
     /**
      * Get first valid original tree
      */
-    DecayTree& getOriginalTree() { return forest[m_first_valid_original]; }
+    const DecayTree& getOriginalTree() const { return forest.at(m_first_valid_original); }
 
     /**
      * Convert DecayHashes outputted by ParticleMCDecayString module to an integer

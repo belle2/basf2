@@ -13,7 +13,6 @@
 
 #include <string>
 #include <ostream>
-#include <stdexcept>
 
 namespace Belle2 {
   /**

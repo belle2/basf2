@@ -60,7 +60,7 @@ CDCTrigger2DFitterModule::initialize()
   m_fitterTracks.registerRelationTo(segmentHits);
 
   // get geometry constants for first priority layers
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   // TODO: avoid hard coding the priority layers here
   vector<unsigned> iL = {3, 16, 28, 40, 52};
   for (int iAx = 0; iAx < 5; ++iAx) {
@@ -142,7 +142,7 @@ CDCTrigger2DFitterModule::event()
       }
     }
     if (nHits < m_minHits) {
-      B2INFO("Not enough hits to do 2D fit (" << m_minHits << " needed, got " << nHits << ")");
+      B2DEBUG(20, "Not enough hits to do 2D fit (" << m_minHits << " needed, got " << nHits << ")");
       continue;
     }
 

@@ -17,22 +17,16 @@
 #include <iostream>
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
-#include "trg/trg/SignalVector.h"
-#include "trg/trg/State.h"
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
-#include "cdc/geometry/CDCGeometryPar.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <bitset>
 
 using namespace std;
 
@@ -155,7 +149,7 @@ namespace Belle2 {
 
   void
   TCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
-                      string cdcCollectionName, string tsCollectionName)
+                      const string& cdcCollectionName, const string& tsCollectionName)
   {
     //...Get wire informtion for speed-up...
     unsigned nHits = 0;

@@ -14,14 +14,12 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <map>
 #include "TFile.h"
 #include "TTree.h"
 #include <framework/dataobjects/EventMetaData.h>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
@@ -70,7 +68,7 @@ namespace Belle2 {
 
     m_mConstD["Trg_PI"] = 3.141592653589793;
     // Get rr,zToStraw,angleSt,nWire
-    CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+    const CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
     m_mConstV["nWires"] = vector<double> (9);
     m_mConstV["nTSs"] = vector<double> (9);
@@ -245,8 +243,10 @@ namespace Belle2 {
     TRGDebug::enterStage("3D finder");
 
     // For saving to root file.
-    if (m_makeRootFile) m_mDouble["iSave"] = 0;
-    if (m_makeRootFile) HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    if (m_makeRootFile) {
+      m_mDouble["iSave"] = 0;
+      HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    }
 
     // Get event number.
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
@@ -449,6 +449,7 @@ namespace Belle2 {
     if (m_mBool["debugEfficiency"]) {
       // Notify when efficiency is not 1.
       for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
+        /* cppcheck-suppress variableScope */
         TCTrack& aTrack = * trackList[iTrack];
         // Find number of super layers that have priority layer hit.
         int nPriorityHitSL = 0;

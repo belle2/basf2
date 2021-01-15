@@ -246,8 +246,8 @@ namespace Belle2 {
     /** Helper function to loop over a python object that implements the iterator
      * concept and call a functor with each element as argument
      * @param pyObject the python object to iterate over
-     * @function any functor object which accepts a boost::python::object as its
-     *       only argument and returns true if the iteration should be continued
+     * @param function any functor object which accepts a boost::python::object as its
+     *        only argument and returns true if the iteration should be continued
      * @returns true if the iteration was completed over all elements
      */
     template<class Functor>
@@ -282,20 +282,12 @@ namespace Belle2 {
       });
     }
 
-    /// Recursion sentinal for the case that all element checks succeeded.
-    template<typename TupleType>
-    bool CheckTuple(const TupleType&, const boost::python::tuple&, SizeT<0>)
+    /// Check if all tuple elements match
+    template<typename... Types, std::size_t ... Is>
+    bool CheckTuple(const std::tuple<Types...>& tuple, const boost::python::tuple& pyTuple,
+                    std::index_sequence<Is...>)
     {
-      return true;
-    }
-
-    /// Recursion through the tuple checking the element at position N - 1.
-    template<typename... Types, size_t N>
-    bool CheckTuple(const std::tuple<Types...>& tuple, const boost::python::tuple& pyTuple, SizeT<N>)
-    {
-      using Scalar = typename std::tuple_element < N - 1, std::tuple<Types...> >::type;
-      if (not checkPythonObject(pyTuple[N - 1] , Scalar())) return false;
-      return CheckTuple(tuple, pyTuple, SizeT < N - 1 > ());
+      return (... && checkPythonObject(pyTuple[Is], std::get<Is>(tuple)));
     }
 
     /// Check if the python object is a tuple of objects of the correct types
@@ -304,7 +296,7 @@ namespace Belle2 {
     {
       if (not PyTuple_Check(pyObject.ptr())) return false;
       const boost::python::tuple& pyTuple = static_cast<const boost::python::tuple&>(pyObject);
-      return CheckTuple(tuple, pyTuple, SizeT<sizeof...(Types)>());
+      return CheckTuple(tuple, pyTuple, std::index_sequence_for<Types ...>());
     }
 
     /// Recursion sentinal for the case that all former type checks failed for the variant.
@@ -500,6 +492,7 @@ namespace Belle2 {
      * Reads a scalar type (int, double, string, bool) from a python object.
      *
      * @param pyObject Python object which stores the scalar type.
+     * @param Scalar A scalar.
      * @return Scalar type, which holds the value from the python object
      */
     template<typename Scalar>

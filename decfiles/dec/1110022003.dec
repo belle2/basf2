@@ -1,0 +1,63 @@
+# EventType: 1110022003
+# Descriptor: [B0 -> K+ pi- pi0] including K*(892)
+# NickName: Bd_K+pi-pi0
+# Documentation: BtoCharmless Phase 3 data validation studies.
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Riccardo Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 16 November, 2020
+
+Decay Upsilon(4S)
+1.0     B0sig   anti-B0sig  B0  anti-B0     VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.0000033       K*0        pi0             SVS;
+0.0000075       K*+        pi-             SVS;
+0.0000046669	K_0*0	   pi0		   PHSP;
+0.0000092657	K_0*+	   pi-		   PHSP;
+0.0000001416    rho(3S)-   K+	           SVS; 
+0.00000096      rho(2S)-   K+	           SVS;
+0.000007        rho-       K+              SVS;
+0.0000028       K+         pi-     pi0     PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay K*0
+1.0     K+      pi-     VSS;
+Enddecay
+CDecay anti-K*0
+
+Decay K*+
+1.0     K+      pi0     VSS;
+Enddecay
+CDecay K*-
+
+Decay K_0*+
+1.0     K+      pi0     PHSP;
+Enddecay
+CDecay K_0*-
+
+Decay K_0*0
+1.0     K+      pi-     PHSP;
+Enddecay
+CDecay anti-K_0*0
+
+Decay rho-
+1.0     pi-     pi0     VSS;
+Enddecay
+CDecay rho+
+
+Decay rho(2S)-
+1.0     pi-     pi0     VSS;
+Enddecay
+CDecay rho(2S)+
+
+Decay rho(3S)-
+1.0     pi-     pi0     VSS;
+Enddecay
+CDecay rho(3S)+
+
+End

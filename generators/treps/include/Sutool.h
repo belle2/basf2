@@ -44,7 +44,7 @@ namespace Belle2 {
     };
 
     double p2bdy(double, double, double, int&);
-    int pdecy(double, double*, TVector3&, TLorentzVector*, int);
+    int pdecy(double, double*, const TVector3&, TLorentzVector*, int);
     void rotate(TLorentzVector&, double,  double);
     float interp(float, float, float, float, float);
     int poisson(double);

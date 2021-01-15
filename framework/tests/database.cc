@@ -199,6 +199,22 @@ namespace {
     EXPECT_TRUE(iov1.trimOverlap(iov2, false));
     EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 10));
     EXPECT_TRUE(iov2 == IntervalOfValidity(3, 11, 4, -1));
+
+    // Validity is larger than we want on the lower edge
+    iov1 = IntervalOfValidity(11, 0, 12, 86);
+    // Want to trim off everything below exp=12
+    iov2 = IntervalOfValidity(0, 0, 11, -1);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, false));
+    EXPECT_EQ(iov1, IntervalOfValidity(12, 0, 12, 86));
+    EXPECT_EQ(iov2, IntervalOfValidity(0, 0, 11, -1));
+  }
+
+  /** Test direct database access */
+  TEST_F(DataBaseTest, getData)
+  {
+    EXPECT_TRUE(strcmp(Database::Instance().getData("TNamed", 1, 1)->GetName(), "Experiment 1") == 0);
+    EXPECT_TRUE(strcmp(Database::Instance().getData("TNamed", 4, 1)->GetName(), "Experiment 4") == 0);
+    EXPECT_TRUE(Database::Instance().getData("TNamed", 6, 1) == 0);
   }
 
   /** Test database access via DBObjPtr */
@@ -924,5 +940,4 @@ namespace {
     ptr = 3;
     EXPECT_FALSE(ptr.isValid());
   }
-
 }  // namespace

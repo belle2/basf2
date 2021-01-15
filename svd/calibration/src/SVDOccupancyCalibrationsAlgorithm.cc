@@ -11,10 +11,12 @@
 
 #include <svd/calibration/SVDOccupancyCalibrations.h>
 
-#include <TH2F.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
+
+#include <TH1F.h>
 #include <TString.h>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;

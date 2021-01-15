@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 
 from daqdqm.commondqm import add_common_dqm
 from IPDQM import add_IP_dqm
@@ -32,6 +31,12 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
 
     add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+
+    if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
+        # PXD (not useful on HLT)
+        if components is None or 'PXD' in components:
+            # need to be behind add_common_dqm as intercepts are calculated there
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
 
     # the following makes only sense in collisions
     if dqm_environment == "expressreco":

@@ -45,6 +45,16 @@ namespace Belle2 {
     double trackNVXDHits(const Particle* part);
 
     /**
+     * return NDF of the track fit which is equal to number of hits used in the fit (after outlier rejection) minus 5
+     */
+    double trackNDF(const Particle* part);
+
+    /**
+     * return chi2 of the track fit, which is computed based on the stored p-value and NDF
+     */
+    double trackChi2(const Particle* part);
+
+    /**
      * returns the first activated SVD layer associated to the track
      */
     double trackFirstSVDLayer(const Particle* part);
@@ -53,6 +63,11 @@ namespace Belle2 {
      * returns the first activated PXD layer associated to the track
      */
     double trackFirstPXDLayer(const Particle* part);
+
+    /**
+     * returns the first activated CDC layer associated to the track
+     */
+    double trackFirstCDCLayer(const Particle* part);
 
     /**
      * returns the last CDC layer associated to the track
@@ -65,7 +80,7 @@ namespace Belle2 {
     double trackD0(const Particle* part);
 
     /**
-     * returns the track's tranverse momentum angle
+     * returns the track's transverse momentum angle
      */
     double trackPhi0(const Particle* part);
 
@@ -90,7 +105,7 @@ namespace Belle2 {
     double trackD0Error(const Particle* part);
 
     /**
-     * returns the track's tranverse momentum angle error
+     * returns the track's transverse momentum angle error
      */
     double trackPhi0Error(const Particle* part);
 
@@ -157,7 +172,7 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*);
 
     /**
-     * returns time of first SVD sample relatvie to event T0
+     * returns time of first SVD sample relative to event T0
      */
     double svdFirstSampleTime(const Particle*);
 
@@ -199,8 +214,8 @@ namespace Belle2 {
     /** mc-meas/err_meas for the respective helix parameter for the given particle */
     double getHelixTanLambdaPull(const Particle* part);
 
-    /** helper function to get track fit result from particle */
-    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
+    /** helper function to get the position on the Helix */
+    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
   }
 } // Belle2 namespace
 

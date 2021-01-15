@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMAGNETICFIELD_H
-#define GEOMAGNETICFIELD_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 #include <framework/dbobjects/MagneticField.h>
@@ -49,6 +48,8 @@ namespace Belle2 {
      * Creates the global ROOT objects and prepares everything for other creators.
      *
      * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+     * @param topVolume Geant4 logical top volume.
+     * @param type Geometry type.
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
@@ -112,5 +113,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* GEOMAGNETICFIELD_H */

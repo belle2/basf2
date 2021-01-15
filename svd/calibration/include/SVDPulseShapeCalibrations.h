@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
-#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDStripCalAmp.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -50,8 +49,7 @@ namespace Belle2 {
      * strip, given the number of ADC counts.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param pulseADC : The ADC-pulse height, a double between 0 and 255 (included)
@@ -73,8 +71,7 @@ namespace Belle2 {
      * on that strip.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param charge: the charge in units [e] is also
@@ -97,8 +94,7 @@ namespace Belle2 {
      * on that strip.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param charge: the charge in units [e] is also

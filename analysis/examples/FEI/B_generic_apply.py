@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # William Sutcliffe 2019
 
@@ -18,14 +17,14 @@ ma.inputMdst(environmentType='default',
 # Add the necessary database
 # You can use the command b2conditionsdb-recommend
 # b2.conditions.globaltags = ['name of analysis global tag']
-b2.conditions.globaltags = ['analysis_tools_release-04']
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels
 particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False, cache=0)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

@@ -8,7 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /**
@@ -36,5 +39,9 @@ namespace Belle2 {
     bool m_param_deleteOtherRecoTracks = true;
     /// Minium NDF required for each track (up and down).
     double m_MinimumNumHitCut = 40;
+    /// Tracks.
+    StoreArray<RecoTrack> m_RecoTracks;
+    /// Merged tracks.
+    StoreArray<RecoTrack> m_MergedRecoTracks;
   };
 }

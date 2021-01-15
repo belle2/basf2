@@ -14,8 +14,6 @@
 #ifndef TRGECLTCMAPPING_FLAG_
 #define TRGECLTCMAPPING_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 #include "TVector3.h"
 //
@@ -23,9 +21,6 @@
 //
 namespace Belle2 {
 //
-//
-//
-  class TrgEclMapping;
 //
   /*! A class of TC Mapping.*/
 //

@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPMCTRACKMAKERMODULE_H
-#define TOPMCTRACKMAKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <string>
 
 namespace Belle2 {
 
@@ -69,5 +67,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

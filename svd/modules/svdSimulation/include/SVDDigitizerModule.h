@@ -14,21 +14,16 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/dataobjects/RelationElement.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 #include <string>
-#include <set>
-#include <vector>
 
 #include <root/TVector3.h>
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
-#include <root/TH2D.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -58,7 +53,7 @@ namespace Belle2 {
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon along the E/B fieldlines.
        * @param position start position of the charge
-       * @param electrons number of electrons and holes to drift
+       * @param carriers number of electrons and holes to drift
        * @param carrierType electrons or holes
        */
       void driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
@@ -100,29 +95,29 @@ namespace Belle2 {
 
       // 1. Collections
       /** Name of the collection for the MCParticles */
-      std::string m_storeMCParticlesName = "MCParticles";
+      std::string m_storeMCParticlesName = "";
       /** Name of the collection for the SVDSimhits */
-      std::string m_storeSimHitsName = "SVDSimHits";
+      std::string m_storeSimHitsName = "";
       /** Name of the collection for the SVDTrueHits */
-      std::string m_storeTrueHitsName = "SVDTrueHits";
+      std::string m_storeTrueHitsName = "";
       /** Name of the relation between MCParticles and SVDSimHits */
       std::string m_relMCParticleSimHitName = "";
       /** Name of the relation between SVDTrueHits and SVDSimHits */
       std::string m_relTrueHitSimHitName = "";
       /** Name of the collection for the SVDShaperDigits */
-      std::string m_storeShaperDigitsName = "SVDShaperDigits";
+      std::string m_storeShaperDigitsName = "";
       /** Name of the relation between SVDShaperDigits and MCParticles */
       std::string m_relShaperDigitMCParticleName = "";
       /** Name of the relation between SVDShaperDigits and SVDTrueHits */
       std::string m_relShaperDigitTrueHitName = "";
       /** Name of the SVDEventInfo object */
-      std::string m_svdEventInfoName = "SVDEventInfo";
+      std::string m_svdEventInfoName = "SVDEventInfoSim";
 
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
-      double m_segmentLength;
+      double m_segmentLength = 0.020;
       /** Width of diffusion cloud for simple drift model (in sigmas) */
-      double m_widthOfDiffusCloud;
+      double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge */
@@ -140,9 +135,9 @@ namespace Belle2 {
 
       // 4. Timing
       /** Shaping time of the APV25 shapers.*/
-      double m_shapingTime = 40;
+      double m_shapingTime = 250.0;
       /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 32;
+      double m_samplingTime = 16000. / 509.;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -161,11 +156,11 @@ namespace Belle2 {
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
-      double m_startSampling = 0;
+      double m_startSampling = -2.0;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
-      std::string m_rootFilename;
+      std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms = false;
       /** Name of the tab-delimited listing of signals */
@@ -183,7 +178,7 @@ namespace Belle2 {
       /** Index of the TrueHit the current hit belongs to */
       int                m_currentTrueHit = -1;
       /** Pointer to the sensor in which the current hit occurred */
-      Sensor*            m_currentSensor = 0;
+      Sensor*            m_currentSensor = nullptr;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Time of the current SimHit.. */

@@ -63,6 +63,7 @@ namespace Belle2 {
     /** Construct SVDRecoHit from a SVD cluster
       *
       * @param hit    SVDCluster to use as base.
+      * @param trackCandHit
       * FIXME: Parameter sigma is no longer used and will be removed.
      */
     explicit SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit = nullptr);
@@ -78,10 +79,10 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be nullptr if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
 
-    /** Get pointer to the Cluster used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the Cluster used when creating this RecoHit, can be nullptr if created from something else */
     const SVDCluster* getCluster() const { return m_cluster; }
 
     /** Is the coordinate u or v? */
@@ -103,6 +104,7 @@ namespace Belle2 {
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
+    /** Methods that actually interface to Genfit.  */
     // TODO: use HMatrixPhi for wedge sensors instead of rotating the plane!
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
 

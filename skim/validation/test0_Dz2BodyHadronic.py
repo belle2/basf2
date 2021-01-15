@@ -47,7 +47,7 @@ add_reconstruction(myMain)
 
 
 # Finally add mdst output
-output_filename = "./WG6_DstToD0pi_D0ToKpi.dst.root"
+output_filename = "../WG6_DstToD0pi_D0ToKpi.dst.root"
 add_mdst_output(myMain, filename=output_filename)
 
 # process events and print call statistics

@@ -9,10 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
-#include <TObject.h>
-#include <string>
-
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 
 namespace Belle2 {
@@ -61,10 +57,10 @@ namespace Belle2 {
      * @param biasVoltage Bias voltage on the sensor.
      * @param backplaneCapacitanceU Backplane capacitance/cm for U strips.
      * @param interstripCapacitanceU Interstrip capacitance/cm for U strips..
-     * @param coupling capacitanceU Coupling capacitance/cm for U strips.
+     * @param couplingCapacitanceU Coupling capacitance/cm for U strips.
      * @param backplaneCapacitanceV Backplane capacitance/cm for V strips.
      * @param interstripCapacitanceV Interstrip capacitance/cm for V strips.
-     * @param coupling capacitanceV Coupling capacitance/cm for V strips,
+     * @param couplingCapacitanceV Coupling capacitance/cm for V strips,
      * @param AduEquivalentU Charge in electrons per 1 ADU, U strips.
      * @param AduEquivalentV Charge in electrons per 1 ADU, V strips.
      * @param electronicNoiseU Noise on U-strips; for barrels the value for Origami,

@@ -58,7 +58,7 @@ namespace Belle2 {
       std::vector<CDCCKFState> nextStates;
 
       for (CDCCKFPath& path : paths) {
-        B2DEBUG(100, "Testing one path from " << path.back());
+        B2DEBUG(29, "Testing one path from " << path.back());
         m_stateCreator.apply(nextStates, path, wireHits);
         m_stateFilter.apply(path, nextStates);
 
@@ -66,29 +66,29 @@ namespace Belle2 {
         for (const auto& nextState : nextStates) {
           path.push_back(nextState);
 
-          B2DEBUG(100, "will go to " << nextState);
+          B2DEBUG(29, "will go to " << nextState);
           newPaths.push_back(path);
           path.pop_back();
         }
-        B2DEBUG(100, "Now having " << newPaths.size() << " in flight");
+        B2DEBUG(29, "Now having " << newPaths.size() << " in flight");
         nextStates.clear();
       }
 
-      B2DEBUG(100, "Having found " << newPaths.size() << " new paths");
+      B2DEBUG(29, "Having found " << newPaths.size() << " new paths");
       for (const auto& path : newPaths) {
-        B2DEBUG(100, path);
+        B2DEBUG(29, path);
       }
 
       m_pathMerger.apply(newPaths);
-      B2DEBUG(100, "Having found " << newPaths.size() << " new paths after merging");
+      B2DEBUG(29, "Having found " << newPaths.size() << " new paths after merging");
       for (const auto& path : newPaths) {
-        B2DEBUG(100, path);
+        B2DEBUG(29, path);
       }
 
       m_pathSelector.apply(newPaths);
-      B2DEBUG(100, "Having found " << newPaths.size() << " new paths after selection");
+      B2DEBUG(29, "Having found " << newPaths.size() << " new paths after selection");
       for (const auto& path : newPaths) {
-        B2DEBUG(100, path);
+        B2DEBUG(29, path);
       }
 
       if (newPaths.empty()) {

@@ -22,6 +22,8 @@ def create_argumentparser():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("input_file", type=str, nargs='?',
                         help="Input file that should be processed. No input file means MC generation.")
+    parser.add_argument("--oneline", default=False, action='store_true',
+                        help="Prints the recommended global tags as a one-liner string.")
     return parser
 
 
@@ -29,7 +31,7 @@ if __name__ == "__main__":
     args = create_argumentparser().parse_args()
 
     metadata = None
-    base_tags = [basf2.conditions.default_globaltags]
+    base_tags = basf2.conditions.default_globaltags
 
     # get metadata and base_tags from input file
     if args.input_file:
@@ -47,10 +49,13 @@ if __name__ == "__main__":
 
     # print result
     if result and result['tags']:
-        print('The recommended global tags are:\n')
-        print('  ' + ' '.join(result['tags']) + '\n')
-        if result['message']:
-            print('Your global tag manager (mgt-global-tag@belle2.org) tells you:\n')
-            print(result['message'])
+        if not args.oneline:
+            print('The recommended global tags are:\n')
+            print('  ' + ' '.join(result['tags']) + '\n')
+            if result['message']:
+                print('Your global tag manager (mgt-global-tag@belle2.org) tells you:\n')
+                print(result['message'])
+        else:
+            print(' '.join(result['tags']))
     else:
         basf2.B2ERROR("No recommended global tag found")

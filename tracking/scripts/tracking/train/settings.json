@@ -1,15 +1,23 @@
 {
-    "result_path": ".",
-    "n_events_training": 10000,
-    "n_events_testing": 1000,
-    "workers": 1,
+    "result_path": "output/",
+    "process_type": "BBBAR",
+    "n_events_training": 20000,
+    "n_events_testing": 5000,
+    "n_events_per_task": 100,
+    "n_events_test_on_data": -1,
+    "workers": 500,
     "basf2_processes_per_worker": 0,
+    "test_selected_task": false,
     "run_mva_evaluate": true,
     "run_validation_tasks": true,
+    "globaltags": [],
     "experiment_numbers": [0, 1003],
+    "datafiles": ["/group/belle2/dataprod/Data/Raw/e0012/r06423/sub00/physics.0012.06423.HLT1.f00001.root"],
     "bkgfiles_by_exp": {
-        "0": "/sw/belle2/bkg.rel4/",
+        "0": "/group/belle2/dataprod/BGOverlay/nominal_phase3/prerelease-05-00-00a/overlay/phase3/BGx1/set0/",
         "1002": "/gpfs/group/belle2/BGFile/OfficialBKG/phase2/pseudorandom/prod6/",
-        "1003": "/gpfs/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-00a/overlay/phase31/BGx1/set0"
+        "1003": "/group/belle2/dataprod/BGOverlay/early_phase3/prerelease-05-00-00a/overlay/phase31/BGx1/set0/",
+        "8": "/group/belle2/dataprod/BGOverlay/e0008/release-04-01-04/data_reprocessing_proc10/BGOverlay.physics.e0008.r01060.root",
+	"12": "/group/belle2/dataprod/BGOverlay/reproduce/e0012/prerelease-05-00-00a/bgoverlay_production_rel5patch/"
     }
 }

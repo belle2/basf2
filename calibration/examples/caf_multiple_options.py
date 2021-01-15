@@ -3,19 +3,17 @@
 # data already from running calibration/examples/1_create_sample_DSTs.sh
 # or just make your own any change the input data below.
 
-from basf2 import *
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
 from caf import backends
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -39,15 +37,14 @@ def main(argv):
         """
         Just to show that the function is correctly applied
         """
-        from basf2 import set_log_level, LogLevel
-        set_log_level(LogLevel.DEBUG)
-        B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
-        B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
+        b2.set_log_level(b2.LogLevel.DEBUG)
+        b2.B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
+        b2.B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
 
     # Make a bunch of test calibrations
     calibrations = []
     for i in range(1, 5):
-        col_test = register_module('CaTest')
+        col_test = b2.register_module('CaTest')
         col_test.set_name('Test{}'.format(i))   # Sets the prefix of the collected data in the datastore.
         # Allows us to execute algorithm over all input data, in one big IoV.
         col_test.param('granularity', 'all')

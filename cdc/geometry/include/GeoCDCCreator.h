@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOCDCCREATOR_H
-#define GEOCDCCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -50,6 +49,8 @@ namespace Belle2 {
       //! Creates the ROOT Objects for the CDC geometry.
       /*!
         \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      \param topVolume Geant4 top logical volume.
+      \param type Geometry type.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {
@@ -193,5 +194,3 @@ namespace Belle2 {
 
   } // end of cdc namespace
 } // end of Belle2 namespace
-
-#endif /* GEOCDCBELLEII_H */

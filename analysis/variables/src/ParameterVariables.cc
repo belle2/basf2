@@ -65,9 +65,9 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
-      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       if (daughterIDs.empty())
         B2FATAL("Wrong number of arguments for parameter function isAncestorOf. At least one needed!");
@@ -90,9 +90,9 @@ namespace Belle2 {
       }
 
       // Daughter obtained, get MC particle of daughter
-      const MCParticle* finalMCDaughter = curParticle->getRelatedTo<MCParticle>();
+      const MCParticle* finalMCDaughter = curParticle->getMCParticle();
       if (finalMCDaughter == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // Go up the MC chain, check for ancestor
       const MCParticle* curMCParticle = finalMCDaughter;
@@ -120,9 +120,9 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
-      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       int m_PDG, m_sign = 0;
 
@@ -203,7 +203,7 @@ namespace Belle2 {
         if (daughter >= nDaughters)
           return std::numeric_limits<float>::quiet_NaN();
 
-        const MCParticle* mcdaughter = daughters[daughter]->getRelated<MCParticle>();
+        const MCParticle* mcdaughter = daughters[daughter]->getMCParticle();
         if (!mcdaughter)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -301,7 +301,8 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      double result = 0.0;
+      PCmsLabTransform T;
+      TLorentzVector m = - T.getBeamFourMomentum();
 
       TLorentzVector motherMomentum = particle->get4Vector();
       TVector3       motherBoost    = -(motherMomentum.BoostVector());
@@ -313,27 +314,9 @@ namespace Belle2 {
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum.Boost(motherBoost);
 
-      result = cos(daugMomentum.Angle(motherMomentum.Vect()));
+      m.Boost(motherBoost);
 
-      return result;
-    }
-
-    double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters)
-    {
-      if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      int nDaughters = static_cast<int>(particle->getNDaughters());
-
-      long daughter1 = std::lround(daughters[0]);
-      long daughter2 = std::lround(daughters[1]);
-      if (daughter1 >= nDaughters || daughter2 >= nDaughters)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 a = frame.getMomentum(particle->getDaughter(daughter1)).Vect();
-      TVector3 b = frame.getMomentum(particle->getDaughter(daughter2)).Vect();
-      return cos(a.Angle(b));
+      return daugMomentum.Angle(m.Vect());
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -356,7 +339,7 @@ namespace Belle2 {
       const auto& frame = ReferenceFrame::GetCurrent();
       TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
 
-      return cos(daughterMomentumVector.Angle(vertexDiffVector));
+      return daughterMomentumVector.Angle(vertexDiffVector);
     }
 
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
@@ -493,10 +476,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
-                      "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
-    REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");
+                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
-                      cosine of the angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
+                      Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
                       Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.

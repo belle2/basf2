@@ -453,6 +453,7 @@ void MCRecoTracksMatcherModule::event()
   struct MostWeightEfficientPRId {
     RecoTrackId id;
     Efficiency weightedEfficiency;
+    // cppcheck-suppress unusedStructMember
     Efficiency efficiency;
   };
   std::vector<MostWeightEfficientPRId> mostWeightEfficientPRId_by_mcId(nMCRecoTracks);

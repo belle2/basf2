@@ -23,15 +23,21 @@ REG_MODULE(KLMDQM)
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),
-  m_TimeRPC(nullptr),
-  m_TimeScintillatorBKLM(nullptr),
-  m_TimeScintillatorEKLM(nullptr),
-  m_PlaneBKLMPhi(nullptr),
-  m_PlaneBKLMZ(nullptr),
-  m_PlaneEKLM(nullptr),
-  m_bklmHit2dsZ(nullptr),
-  m_BklmDigitsNumber(nullptr),
-  m_KlmDigitsNumber(nullptr)
+  m_DAQInclusion{nullptr},
+  m_TimeRPC{nullptr},
+  m_TimeScintillatorBKLM{nullptr},
+  m_TimeScintillatorEKLM{nullptr},
+  m_PlaneBKLMPhi{nullptr},
+  m_PlaneBKLMZ{nullptr},
+  m_PlaneEKLM{nullptr},
+  m_MaskedChannelsPerSector{nullptr},
+  m_bklmHit2dsZ{nullptr},
+  m_BklmDigitsNumber{nullptr},
+  m_KlmDigitsNumber{nullptr},
+  m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
+  m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
+  m_ElementNumbers{&(KLMElementNumbers::Instance())},
+  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -44,10 +50,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
-  m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -67,6 +69,11 @@ void KLMDQMModule::defineHisto()
   oldDirectory = gDirectory;
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
   newDirectory->cd();
+  /* DAQ inclusion. */
+  m_DAQInclusion = new TH1F("daq_inclusion", "Is KLM included in DAQ?", 2, 0.0, 2.0);
+  m_DAQInclusion->GetXaxis()->SetBinLabel(1, "No");
+  m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
+  m_DAQInclusion->SetOption("LIVE");
   /* Time histograms. */
   m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
@@ -83,16 +90,16 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorEKLM->SetOption("LIVE");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
-                            "BKLM plane occupancy (phi readout)",
+                            "BKLM plane occupancy (#phi readout)",
                             240, 0.5, 240.5);
   m_PlaneBKLMPhi->GetXaxis()->SetTitle("Layer number");
   m_PlaneBKLMPhi->SetOption("LIVE");
   m_PlaneBKLMZ = new TH1F("plane_bklm_z",
-                          "BKLM plane occupancy (Z readout)",
+                          "BKLM plane occupancy (z readout)",
                           240, 0.5, 240.5);
   m_PlaneBKLMZ->GetXaxis()->SetTitle("Layer number");
   m_PlaneBKLMZ->SetOption("LIVE");
-  m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy", 208, 0.5, 208.5);
+  m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy (both readouts)", 208, 0.5, 208.5);
   m_PlaneEKLM->GetXaxis()->SetTitle("Plane number");
   m_PlaneEKLM->SetOption("LIVE");
   /* Number of hits per channel. */
@@ -144,7 +151,8 @@ void KLMDQMModule::defineHisto()
         "_section_" + std::to_string(klmSector.getSection()) +
         "_sector_" + std::to_string(klmSector.getSector()) +
         "_" + std::to_string(j);
-      std::string title = "Sector " + std::to_string(klmSector.getSector());
+      std::string title = "Sector " + std::to_string(klmSector.getSector()) + " -- " +
+                          m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
       m_ChannelHits[sectorIndex][j] = new TH1F(
         name.c_str(), title.c_str(),
         firstChannelNumbers[i + 1] - firstChannelNumbers[i],
@@ -154,6 +162,18 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
+  /* Masked channels per sector:
+   * it is defined here, but filled by the analysis module. */
+  uint16_t totalSectors = m_SectorArrayIndex->getNElements();
+  m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
+                                       totalSectors, -0.5, totalSectors - 0.5);
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
+    uint16_t sector = klmSector.getKLMSectorNumber();
+    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
+  }
+  m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */
   m_BklmDigitsNumber = new TH1F("bklm_digits", "Number of BKLM Digits",
                                 250.0, 0.0, 250.0);
@@ -174,14 +194,20 @@ void KLMDQMModule::defineHisto()
 void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM;
-  m_BklmDigits.isRequired();
+  m_RawKlms.isOptional();
+  m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
   m_BklmHit2ds.isOptional();
-  m_EklmDigits.isRequired();
 }
 
 void KLMDQMModule::beginRun()
 {
+  /* DAQ inclusion. */
+  m_DAQInclusion->Reset();
+  if (m_RawKlms.isValid())
+    m_DAQInclusion->Fill("Yes", 1);
+  else
+    m_DAQInclusion->Fill("No", 1);
   /* Time. */
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();
@@ -212,12 +238,14 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
-  int i, nEklmDigits;
-  EKLMDigit* eklmDigit;
-  nEklmDigits = m_EklmDigits.getEntries();
+  int i, nDigits, nEklmDigits = 0;
+  KLMDigit* eklmDigit;
+  nDigits = m_Digits.getEntries();
   /* EKLM. */
-  for (i = 0; i < nEklmDigits; i++) {
-    eklmDigit = m_EklmDigits[i];
+  for (i = 0; i < nDigits; i++) {
+    eklmDigit = m_Digits[i];
+    if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     /*
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
@@ -241,16 +269,19 @@ void KLMDQMModule::event()
         continue;
       m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
     }
-    int planeGlobal = m_Elements->planeNumber(section, layer, sector, plane);
+    int planeGlobal = m_eklmElementNumbers->planeNumber(
+                        section, layer, sector, plane);
     m_PlaneEKLM->Fill(planeGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
+    nEklmDigits++;
   }
   /* BKLM. */
-  int nBklmDigits = m_BklmDigits.getEntries();
-  m_BklmDigitsNumber->Fill((double)nBklmDigits);
-  m_KlmDigitsNumber->Fill((double)nBklmDigits + nEklmDigits);
-  for (i = 0; i < nBklmDigits; i++) {
-    BKLMDigit* digit = static_cast<BKLMDigit*>(m_BklmDigits[i]);
+  m_BklmDigitsNumber->Fill((double)nDigits - nEklmDigits);
+  m_KlmDigitsNumber->Fill((double)nDigits);
+  for (i = 0; i < nDigits; i++) {
+    KLMDigit* digit = m_Digits[i];
+    if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     int section = digit->getSection();
     int sector = digit->getSector();
     int layer = digit->getLayer();

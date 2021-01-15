@@ -5,7 +5,7 @@
  * This module converts the ecl dataobject(s) in the mdst dataobect(s)    *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

@@ -15,8 +15,7 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
 import tracking as trk
 import rawdata as raw
@@ -24,14 +23,15 @@ import daqdqm.commondqm as cdqm
 
 # needed for some temporary issues with BKLMDisplacement payload
 b2conditions.override_globaltags()
-b2conditions.globaltags = ['klm_alignment_testing', 'online']
+b2conditions.globaltags = ['data_reprocessing_prompt', 'online_bucket10', 'Reco_master_patch_rel5', 'online']
 # b2conditions.globaltags = ['online']
 
 # main main
-main = create_path()
+main = b2.create_path()
 
 # RAW
-files = [' /group/belle2/dataprod/Data/Raw/e0010/r04295/sub00/physics.0010.04295.HLT1*.root']
+files = ['/group/belle2/dataprod/Data/PromptSkim/e0012/4S/r02874/skim/hadron/raw/sub00/physics.*.root']
+
 # no SVD raw data in this file:
 # files = ['/gpfs/group/belle2/fast_lane/inbox/debug.0012.01304.HLT3.f00010.root']
 
@@ -47,8 +47,12 @@ main.add_module("HistoManager", histoFileName="SVDRawDQMOutput.root")
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
-# unpack and reconstruct
-raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
+# unpack
+raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'TRG'])
+# uncomment to unpack simulating the 3-samples DAQ mode!
+# raw.add_unpackers(main, components=['PXD', 'CDC', 'TRG'])
+# svd.add_svd_unpacker_simulate3sampleAcquisitionMode(main)
+
 trk.add_tracking_reconstruction(main, components=['SVD', 'CDC'])
 
 # add DQM
@@ -57,9 +61,9 @@ cdqm.add_common_dqm(main, components=['SVD'])
 # == Show progress
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

@@ -3,7 +3,6 @@
 
 # Thomas Keck 2015
 
-import copy
 import numpy
 
 

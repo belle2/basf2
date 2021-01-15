@@ -5,19 +5,14 @@
 SVD Default PulseShape Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import SVDStripCalAmp
 import datetime
 
-import os
 
 now = datetime.datetime.now()
 
-peakTime = 75
 pulseWidth = 130
 
 # gain here is actually ADUequivalent (e-/ADC)
@@ -42,22 +37,32 @@ gain_origami_U = 271.4
 gain_origami_V = 218.8
 gain_fwd_U = 247.4
 gain_fwd_V = 245.7
+peakTime_L3_U = 67
+peakTime_L3_V = 58
+peakTime_bkw_U = 66
+peakTime_bkw_V = 52
+peakTime_origami_U = 66
+peakTime_origami_V = 52
+peakTime_fwd_U = 60
+peakTime_fwd_V = 51
 
 
-class defaultPulseShapeImporter(basf2.Module):
+class defaultPulseShapeImporter(b2.Module):
+    '''default pulse shape calibrations importer'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 
         # gain, peakTime,
         tmp_calAmp = SVDStripCalAmp()
         tmp_calAmp.gain = 275  # set after the loop on sensors
-        tmp_calAmp.peakTime = peakTime
+        tmp_calAmp.peakTime = 75  # set after the loop on sensors
         tmp_calAmp.pulseWidth = pulseWidth
         calAmp_payload = Belle2.SVDPulseShapeCalibrations.t_calAmp_payload(
             tmp_calAmp, "PulseShapeCalibrations_default_" + str(now.isoformat()) +
-            "_INFO:_peakTime=75_pulseWidth=130_gain=fromPhase3calibrations")
+            "_INFO:_peakTime=fromPhase3calibrations_pulseWidth=130_gain=fromPhase3calibrations")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -74,28 +79,37 @@ class defaultPulseShapeImporter(basf2.Module):
                         if side == 0:  # V
                             if layerNumber == 3:  # L3 V
                                 gain = gain_L3_V
+                                peakTime = peakTime_L3_V
                             else:
                                 Nstrips = 512
                                 if sensorNumber == 1:  # FW V
                                     gain = gain_fwd_V
+                                    peakTime = peakTime_fwd_V
                                 else:  # BKW V
                                     if sensorNumber == layerNumber - 1:  # FW V
                                         gain = gain_bkw_V
+                                        peakTime = peakTime_bkw_V
                                     else:  # BARREL V
                                         gain = gain_origami_V
+                                        peakTime = peakTime_origami_V
                         if side == 1:  # U
                             if layerNumber == 3:  # L3 U
                                 gain = gain_L3_U
+                                peakTime = peakTime_L3_U
                             else:
                                 if sensorNumber == 1:  # FW U
                                     gain = gain_fwd_U
+                                    peakTime = peakTime_fwd_U
                                 else:  # BKW U
                                     if sensorNumber == layerNumber - 1:  # FW U
                                         gain = gain_bkw_U
+                                        peakTime = peakTime_bkw_U
                                     else:  # BARREL U
                                         gain = gain_origami_U
+                                        peakTime = peakTime_origami_U
 
                         tmp_calAmp.gain = 1 / gain
+                        tmp_calAmp.peakTime = peakTime
 
                         # print(str(Nstrips))
                         for strip in range(0, Nstrips):
@@ -106,25 +120,23 @@ class defaultPulseShapeImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
+b2.conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module("Geometry", components=['SVD'])
+main.add_module("Geometry")
 
 main.add_module(defaultPulseShapeImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

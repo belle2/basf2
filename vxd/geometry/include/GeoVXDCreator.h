@@ -55,14 +55,15 @@ namespace Belle2 {
 
       /**
        * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       virtual SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) = 0;
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
-       * @param sensorID SensorID for the sensor
-       * @param sensor   Information about the sensor to create the Sensitive Detector for
+       * @param sensorID  SensorID for the sensor
+       * @param sensor    Information about the sensor to create the Sensitive Detector for
+       * @param placement Placement of the sensor
        */
       virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
                                                              const VXDGeoSensorPlacement& placement) = 0;
@@ -82,7 +83,9 @@ namespace Belle2 {
       /**
        * Return the position where a daughter component is to be placed
        * @param mother Mother component
-       * @param daugther Daughter component
+       * @param daughter Daughter component
+       * @param placement VXDGeoPlacement
+       * @param originCenter bool
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
       G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
@@ -112,6 +115,8 @@ namespace Belle2 {
        * @param createContainer if true, subcomponents are allowed to be placed
        *        on top or below the component and the whole component will be
        *        wrapped in an Air volume fitting all components
+       * @param originCenter bool
+       * @param allowOutside bool
        * @return offset in w which was applied to the component when extending it
        */
       GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
@@ -119,6 +124,7 @@ namespace Belle2 {
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
+       * @param name name of the Geant4 solid
        * @param width full forward width of the shape in mm
        * @param width2 full backward width of the shape in mm
        * @param length length of the shape in mm
@@ -159,6 +165,7 @@ namespace Belle2 {
        * The name is assumed to be unique and Volumes are cached.
        * @param name Name of the component
        * @param components Path to components
+       * @param vxdGeometryPar VXD geometry parameters
        */
       void readComponent(const std::string& name, GearDir components, VXDGeometryPar& vxdGeometryPar);
 
@@ -166,7 +173,8 @@ namespace Belle2 {
        * Read parameters for all components in placement container from Gearbox
        * into payload.
        * @param placements container holding names of all components to be cached
-       * @param componentDir Path to Gearbox where parameters are to be found
+       * @param componentsDir Path to Gearbox where parameters are to be found
+       * @param vxdGeometryPar
        */
       void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements, const GearDir& componentsDir,
                              VXDGeometryPar& vxdGeometryPar);

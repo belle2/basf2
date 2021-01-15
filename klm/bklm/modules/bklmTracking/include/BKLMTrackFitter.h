@@ -12,7 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -60,34 +60,64 @@ namespace Belle2 {
                       int depDir,    int indDir);
 
     //! Get track parameters in the global system. y = p0 + p1 * x; y = p2 + p3 * z, if in local sector fit mode: y = p0 + p1 * x; z = p2 + p3 * x
-    CLHEP::HepVector    getTrackParam() {return m_GlobalPar; }
+    CLHEP::HepVector    getTrackParam()
+    {
+      return m_GlobalPar;
+    }
 
     //! Get invariance matrix of track parameters in the global system.
-    CLHEP::HepSymMatrix getTrackParamErr() {return m_GlobalErr; }
+    CLHEP::HepSymMatrix getTrackParamErr()
+    {
+      return m_GlobalErr;
+    }
 
     //! Get track parameters in the sector locan system, y = p0 + p1 * x, z = p2 + p3 *x, where the first layer of the sector is used as reference.
-    CLHEP::HepVector    getTrackParamSector() {return m_SectorPar; }
+    CLHEP::HepVector    getTrackParamSector()
+    {
+      return m_SectorPar;
+    }
 
     //! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-    CLHEP::HepSymMatrix getTrackParamSectorErr() {return m_SectorErr; }
+    CLHEP::HepSymMatrix getTrackParamSectorErr()
+    {
+      return m_SectorErr;
+    }
 
     //! Is fit valid
-    bool isValid() { return m_Valid; }
+    bool isValid()
+    {
+      return m_Valid;
+    }
 
     //! Is fit good
-    bool  isGood()  { return m_Good; }
+    bool  isGood()
+    {
+      return m_Good;
+    }
 
     //! Chi square of the fit
-    float getChi2() { return m_Chi2; }
+    float getChi2()
+    {
+      return m_Chi2;
+    }
 
     //! number of the hits on this track
-    int getNumHit() { return m_NumHit; }
+    int getNumHit()
+    {
+      return m_NumHit;
+    }
 
     //! Invalidate track
-    void  inValidate() { m_Valid = false; }
+    void  inValidate()
+    {
+      m_Valid = false;
+    }
 
     //!  set the fitting mode, local system or global system
-    void  setGlobalFit(bool localOrGlobal) { m_globalFit = localOrGlobal; }
+    void  setGlobalFit(bool localOrGlobal)
+    {
+      m_globalFit = localOrGlobal;
+    }
 
   private:
 
@@ -120,15 +150,6 @@ namespace Belle2 {
 
     //! pointer to GeometryPar singleton
     bklm::GeometryPar*   m_GeoPar;
-
-    //! Hep3Vector indices
-    //enum { VX = 0, VY = 1, VZ = 2 };
-
-    //! fit vector and  Error matrix indices
-    //enum { AY = 0, BY = 1, AZ = 2, BZ = 3 };
-
-    //! a Matrix indices
-    //enum { MY = 0, MZ = 1 };
 
   };
 } // end of namespace Belle2

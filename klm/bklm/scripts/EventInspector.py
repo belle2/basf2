@@ -9,9 +9,8 @@
 import basf2
 import bklmDB
 import math
-import ctypes
 import ROOT
-from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
+from ROOT import Belle2
 
 
 class EventInspector(basf2.Module):
@@ -31,7 +30,7 @@ class EventInspector(basf2.Module):
     #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
     #: bit position for section [0..1]; forward is 0
-    BKLM_END_BIT = 14
+    BKLM_SECTION_BIT = 14
     #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
     #: bit mask for strip-1 [0..47]
@@ -43,11 +42,11 @@ class EventInspector(basf2.Module):
     #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
     #: bit mask for section [0..1]; forward is 0
-    BKLM_END_MASK = (1 << BKLM_END_BIT)
+    BKLM_SECTION_MASK = (1 << BKLM_SECTION_BIT)
     #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)
     #: bit mask for unique module identifier (end, sector, layer)
-    BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
+    BKLM_MODULEID_MASK = (BKLM_SECTION_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
     def __init__(self, exp, run, histName, pdfName, eventPdfName, verbosity,
                  maxDisplays, minRPCHits, legacyTimes, singleEntry, view):
@@ -1528,7 +1527,7 @@ class EventInspector(basf2.Module):
                     electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
                     if electId in self.electIdToModuleId:
                         moduleId = self.electIdToModuleId[electId]
-                        fb = (moduleId & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+                        fb = (moduleId & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
                         sector = (moduleId & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
                         layer = (moduleId & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
                         plane = (moduleId & self.BKLM_PLANE_MASK) >> self.BKLM_PLANE_BIT
@@ -1694,7 +1693,7 @@ class EventInspector(basf2.Module):
         nScint = 0
         for hit1d in hit1ds:
             key = hit1d.getModuleID()
-            fb = (key & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+            fb = (key & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
             sector = (key & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
             layer = (key & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
             plane = (key & self.BKLM_PLANE_MASK) >> self.BKLM_PLANE_BIT
@@ -1835,7 +1834,7 @@ class EventInspector(basf2.Module):
             mphi = phiKey & self.BKLM_MODULEID_MASK
             layer = (mphi & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
             sector = (mphi & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
-            fb = (mphi & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+            fb = (mphi & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
             sectorFB = sector if fb == 0 else sector + 8
             tphi = phiTimes[phiKey]
             tphiTrunc = int(tphi) & 0x3ff
@@ -1918,7 +1917,7 @@ class EventInspector(basf2.Module):
             key = hit2d.getModuleID()
             layer = (key & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
             sector = (key & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
-            fb = (key & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+            fb = (key & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
             phiStripMin = hit2d.getPhiStripMin() - 1
             phiStripMax = hit2d.getPhiStripMax() - 1
             zStripMin = hit2d.getZStripMin() - 1

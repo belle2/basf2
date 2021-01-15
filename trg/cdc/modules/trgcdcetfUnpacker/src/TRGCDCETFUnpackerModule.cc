@@ -12,8 +12,6 @@
 //---------------------------------------------------------------
 
 #include <trg/cdc/modules/trgcdcetfUnpacker/TRGCDCETFUnpackerModule.h>
-#include <bitset>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -114,7 +112,7 @@ void TRGCDCETFUnpackerModule::fillTreeTRGCDCETFUnpacker(int* buf, int evt)
     //}
 
     for (unsigned _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
-      int wd = buf[clk * (nBits / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (nBits / 32) + _wd + nword_header];
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
           int bitPosition = (nBits - 1) - _wd * 32 - bb;

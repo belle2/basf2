@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
@@ -20,13 +18,10 @@
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <string>
-#include <memory>
 #include <vector>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 
 namespace Belle2 {
@@ -90,7 +85,7 @@ namespace Belle2 {
     /** Short tracking logic*/
     void short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto, std::vector<bool>  phimap_i,
                         std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
-                        StoreArray<TRGGRLShortTrack> grlst, StoreArray<TRGGRLShortTrack> grlst_tmp,
+                        StoreArray<TRGGRLShortTrack> grlst,
                         StoreObjPtr<TRGGRLInfo> trgInfo);
 
     /** Short track extrapolation (to endcap) function*/

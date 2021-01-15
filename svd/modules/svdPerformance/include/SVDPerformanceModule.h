@@ -10,7 +10,6 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -29,14 +28,7 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
-#include <TCollection.h>
 #include <TList.h>
-#include <TH3F.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
 
@@ -65,7 +57,7 @@ namespace Belle2 {
     bool m_is2017TBanalysis = false; /**< true if we analyze 2017 TB data*/
     bool m_isSimulation = false; /**< true if we analyze Simulated data*/
 
-    float m_debugLowTime = - 100; /** cluster Time below this number will produce a printout */
+    float m_debugLowTime = - 100; /**< cluster Time below this number will produce a printout */
 
 
     /* user-defined parameters */
@@ -84,7 +76,7 @@ namespace Belle2 {
     StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit store array*/
     StoreArray<SVDRecoDigit> m_svdRecos; /**<SVDRecoDigits store array*/
     StoreArray<SVDCluster> m_svdClusters; /**<SVDCluster store array*/
-    StoreArray<RecoTrack> m_recoTracks; /*<<RecoTracks store array*/
+    StoreArray<RecoTrack> m_recoTracks; /**<RecoTracks store array*/
     StoreArray<Track> m_Tracks; /**<Tracks store array*/
     StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult store array*/
 
@@ -202,12 +194,12 @@ namespace Belle2 {
     /** Function returning a TH1F */
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);
+                            const char* xtitle, TList* histoList = nullptr);
     /** Function returning TH2F */
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
   };
 }

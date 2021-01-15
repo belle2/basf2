@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -27,7 +26,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import KFit
+from vertex import kFit
 from modularAnalysis import variablesToNtuple
 from stdPi0s import stdPi0s
 import variables.collections as vc
@@ -43,21 +42,21 @@ inputMdst(environmentType='default',
 
 # use standard final state particle lists
 #
-# creates "pi0:looseFit" ParticleList
-stdPi0s('looseFit', path=my_path)
+# creates "pi0:eff40_Jan2020Fit" ParticleList
+stdPi0s('eff40_Jan2020Fit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0', path=my_path)
+reconstructDecay('D0:pi0pi0 -> pi0:eff40_Jan2020Fit pi0:eff40_Jan2020Fit', '1.7 < M < 2.0', path=my_path)
 
 # perform mass fit using KFit
 # Reject the candidates with failed fit.
-KFit('D0:pi0pi0', 0.0, 'mass', path=my_path)
+kFit('D0:pi0pi0', 0.0, 'mass', path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0', path=my_path)
+reconstructDecay('B0:all -> D0:pi0pi0 pi0:eff40_Jan2020Fit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0', path=my_path)
 
 # perform MC matching (MC truth association)
 matchMCTruth('B0:all', path=my_path)
@@ -79,7 +78,7 @@ pi0_vars = vc.mc_truth + vc.kinematics + \
 output_file = 'B2A401-KFit-MassFit.root'
 variablesToNtuple('B0:all', B0_vars,
                   filename=output_file, treename='b0', path=my_path)
-variablesToNtuple('pi0:looseFit', pi0_vars,
+variablesToNtuple('pi0:eff40_Jan2020Fit', pi0_vars,
                   filename=output_file, treename='pi0', path=my_path)
 
 # Process the events

@@ -27,24 +27,34 @@ namespace Belle2 {
   class CDCTriggerNeuroDQMModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
-
     /** Constructor */
     CDCTriggerNeuroDQMModule();
     /** Destructor */
     virtual ~CDCTriggerNeuroDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
+    struct TSLine {
+      const CDCTriggerSegmentHit* hit;
+      std::string strline;
+      //vector<const CDCTriggerTrack*> relin2dtracks;
+      //vector<const CDCTriggerTrack*> relin2dtracks;
+      explicit TSLine(const CDCTriggerSegmentHit& h)
+      {
+        hit = &h;
+      }
+    };
+    typedef std::vector<TSLine> TSLines;
 
   private:
     /** Fill a histogram only with non-zero values */
@@ -78,11 +88,86 @@ namespace Belle2 {
       }
       return valid;
     }
+    std::string padto(std::string s, unsigned l)
+    {
+      if (s.size() < l) {
+        s.insert(s.begin(), l - s.size(), ' ');
+      }
+      return s;
+    }
+    std::string padright(std::string s, unsigned l)
+    {
+      if (s.size() < l) {
+        s.insert(s.end(), l - s.size(), ' ');
+      }
+      return s;
+    }
+    bool have_relation(const CDCTriggerTrack& track, const CDCTriggerSegmentHit& hit, std::string& arrayname)
+    {
+      bool related = false;
+      for (const CDCTriggerSegmentHit& ts : track.getRelationsTo<CDCTriggerSegmentHit>(arrayname)) {
+        if (&ts == &hit) {related = true;}
+      }
+      return related;
+    }
+    void sorted_insert(TSLines& lines, TSLine& line, std::string& arrayname, std::string& firstsortarray, std::string& secondsortarray)
+    {
+      bool inserted = false;
+      bool related = false;
+      TSLines::iterator it = lines.begin();
+      for (const CDCTriggerTrack& track : line.hit->getRelationsFrom<CDCTriggerTrack>(firstsortarray)) {
+        if (!inserted) {
+          for (TSLines::iterator i = lines.begin(); i < lines.end(); ++i) {
+            if (i->hit->getISuperLayer() % 2 != line.hit->getISuperLayer() % 2) {
+              continue;
+            }
+            if (have_relation(track, *(i->hit), arrayname)) {
+              it = i;
+              related = true;
+              if (i->hit->getSegmentID() > line.hit->getSegmentID()) {
+                inserted = true;
+                break;
+              }
+            }
+          }
+        } else { break; }
+      }
+      if (related) {
+        if (!inserted) {++it; }
+        lines.insert(it, line);
+      } else {
+        for (const CDCTriggerTrack& track : line.hit->getRelationsFrom<CDCTriggerTrack>(secondsortarray)) {
+          if (!inserted) {
+            for (TSLines::iterator i = it; i < lines.end(); ++i) {
+              if (i->hit->getISuperLayer() % 2 != line.hit->getISuperLayer() % 2) {
+                continue;
+              }
+              if (have_relation(track, *(i->hit), arrayname)) {
+                it = i;
+                related = true;
+                if (i->hit->getSegmentID() > line.hit->getSegmentID()) {
+                  inserted = true;
+                  break;
+                }
+              }
+            }
+          } else { break; }
+        }
+        if (related) {
+          if (!inserted) {++it; }
+          lines.insert(it, line);
+        } else {
+          lines.push_back(line);
+        }
+      }
+    }
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
     /** Switch to supress output for dqm online module */
     bool m_limitedoutput;
+    /** Number of identical track segments to be required for matching between HW and SW Neurotrigger */
+    int m_nsamets;
     // names for unpacked objects
     /** Name for TS hits from unpacker */
     std::string m_unpackedSegmentHitsName;
@@ -121,6 +206,10 @@ namespace Belle2 {
     std::string m_simNeuroTracksSWTSSW2DName;
     /** Name for neuro input vector using simulated TS and simulated 2D */
     std::string m_simNeuroInputVectorSWTSSW2DName;
+
+    /** Name for the RecoTrack array name */
+    std::string m_recoTracksName;
+
 
     // store arrays for direct access
     /** StoreArray for TS hits from unpacker */
@@ -320,8 +409,8 @@ namespace Belle2 {
 
 
     // hw 2D received TS
-    TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
-    TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
+    //TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
+    //TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
     TH1F* m_2DHWInTSPrioT_Layer0 = nullptr;            /**< Priority time of 2D track segments in layer 0 */
     TH1F* m_2DHWInTSPrioT_Layer2 = nullptr;            /**< Priority time of 2D track segments in layer 2 */
     TH1F* m_2DHWInTSPrioT_Layer4 = nullptr;            /**< Priority time of 2D track segments in layer 4 */

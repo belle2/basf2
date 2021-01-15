@@ -15,28 +15,22 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/trg/Debug.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/EventTime.h"
-#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <bitset>
-#include <sstream>
 #include <vector>
 
-#include "cdc/dataobjects/CDCHit.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Utilities.h"
-#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
 
-#include "TH1.h"
 #include "TH1D.h"
 
 using namespace std;
@@ -79,6 +73,7 @@ namespace Belle2 {
     //m_ver = 0;
     //m_foundT0 = 0;
   }
+
   TRGCDCEventTime::~TRGCDCEventTime()
   {
     delete m_evtOutputTs;

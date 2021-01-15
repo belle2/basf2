@@ -64,7 +64,7 @@ namespace Belle2 {
      * @param cname Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
      */
-    TCanvas* find_canvas(TString s);
+    TCanvas* find_canvas(TString cname);
 
     // Data members
   private:

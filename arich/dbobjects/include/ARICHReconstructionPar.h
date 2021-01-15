@@ -127,7 +127,7 @@ namespace Belle2 {
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
     * @return expected number of backgrond hits on pad
     */
-    double getBackgroundPerPad(double th_cer, std::vector<double>& pars) const;
+    double getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const;
 
     /**
      * Get number of expected background hits in ring (0.1<theta<0.5rad by default)
@@ -136,7 +136,7 @@ namespace Belle2 {
      * @param maxThc outter theta angle of ring
      * @return expected number of backgrond hits in ring
      */
-    double getExpectedBackgroundHits(std::vector<double>& pars, double minThc = 0.1, double maxThc = 0.5) const;
+    double getExpectedBackgroundHits(const std::vector<double>& pars, double minThc = 0.1, double maxThc = 0.5) const;
 
     /**
      * Get average number of pads in ring

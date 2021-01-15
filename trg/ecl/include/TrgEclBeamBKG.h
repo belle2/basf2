@@ -14,12 +14,9 @@
 #ifndef TRGECLBeamBKG_FLAG_
 #define TRGECLBeamBKG_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 #include "trg/ecl/TrgEclMapping.h"
-#include "TVector3.h"
 //
 //
 //
@@ -39,9 +36,15 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclBeamBKG();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclBeamBKG(TrgEclBeamBKG&) = delete;
+
+    /** Assignment operator, deleted. */
+    TrgEclBeamBKG& operator=(TrgEclBeamBKG&) = delete;
+
   public:
 
-    bool GetBeamBkg(std::vector<std::vector<double>>);
+    int GetBeamBkg(std::vector<std::vector<double>>);
 
   private:
     //

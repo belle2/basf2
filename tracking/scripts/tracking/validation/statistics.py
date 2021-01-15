@@ -54,7 +54,8 @@ def cubic_root(x):
 
 def rice_n_bin(n_data):
     """Returns the number of bins for a number of data instances according to the rice rule."""
-    return np.ceil(2.0 * cubic_root(n_data))
+    rice_n_bin = np.ceil(2.0 * cubic_root(n_data))
+    return rice_n_bin if rice_n_bin > 0 else 1
 
 
 def rice_exceptional_values(xs):
@@ -82,6 +83,7 @@ def is_binary_series(xs):
     """Determines if the given series only consists of true and false values"""
     is_one_or_zero = np.all((xs == 0) | (xs == 1) | ~np.isfinite(xs))
     return is_one_or_zero
+
 
 #: Constant defining how many unique values are allowed for a discrete quantity.
 default_max_n_unique_for_discrete = 20

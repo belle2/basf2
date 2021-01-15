@@ -12,47 +12,54 @@
 """
 <header>
   <input>EvtGenSimRec.root</input>
-  <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeStrip.root</output>
   <output>SVDValidationTTreeSpacePoint.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
+  <output>SVDValidationTTreeRecoTrack.root</output>
+  <output>SVDValidationTTreeRecoDigit.root</output>
+  <output>SVDValidationTTreeTrueHit.root</output>
+  <output>SVDValidationTTreeCluster.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 # Individual validation packages
-from SVDValidationTTree import *
-from SVDValidationTTreeStrip import *
-from SVDValidationTTreeSimhit import *
-from SVDValidationTTreeSpacePoint import *
+from SVDValidationTTree import SVDValidationTTree
+from SVDValidationTTreeStrip import SVDValidationTTreeStrip
+from SVDValidationTTreeSimhit import SVDValidationTTreeSimhit
+from SVDValidationTTreeSpacePoint import SVDValidationTTreeSpacePoint
+from SVDValidationTTreeRecoTrack import SVDValidationTTreeRecoTrack
+from SVDValidationTTreeRecoDigit import SVDValidationTTreeRecoDigit
+from SVDValidationTTreeTrueHit import SVDValidationTTreeTrueHit
+from SVDValidationTTreeCluster import SVDValidationTTreeCluster
 
-set_random_seed(12345)
+b2.set_random_seed(12345)
 
-main = create_path()
+main = b2.create_path()
 
 # Using 1000 EvtGen events already simulated and reconstructed
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', '../EvtGenSimRec.root')
 main.add_module(input)
 
 # Gearbox and Geometry modules need to be registered anyway
 
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Select subdetectors to be built
 geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
 # geometry.param("excludedComponents", "MagneticField")
 main.add_module(geometry)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # SVD validation modules
@@ -64,8 +71,17 @@ svdvalidationspacepoint = SVDValidationTTreeSpacePoint()
 main.add_module(svdvalidationspacepoint)
 svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
+svdvalidationtrack = SVDValidationTTreeRecoTrack()
+main.add_module(svdvalidationtrack)
+svdvalidationdigit = SVDValidationTTreeRecoDigit()
+main.add_module(svdvalidationdigit)
+svdvalidationtruehit = SVDValidationTTreeTrueHit()
+main.add_module(svdvalidationtruehit)
+svdvalidationcluster = SVDValidationTTreeCluster()
+main.add_module(svdvalidationcluster)
 
-process(main)
+
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

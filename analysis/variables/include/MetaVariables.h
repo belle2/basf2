@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014-2019 - Belle II Collaboration                        *
+ * Copyright(C) 2014-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe,                  *
@@ -50,6 +50,12 @@ namespace Belle2 {
      * Returns 1 if the particle is contained in the particle list
      */
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Set certain bits in a variable to zero
+     */
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments);
+
 
     /**
      * Returns 1 if the same mdst source object was used to create a particle in
@@ -111,7 +117,6 @@ namespace Belle2 {
      */
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
 
-
     /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
@@ -144,6 +149,13 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the difference of the given variable between the matched MC particles of two given daughters
+     * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * Third argument the name of the variable.
+     */
+    Manager::FunctionPtr mcDaughterDiffOf(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the difference of the given variable between the first daughters of the two given daughters
      * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      * Third argument the name of the variable.
@@ -155,6 +167,12 @@ namespace Belle2 {
      * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the matched MC particles of the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the difference of the angular variable phi between the first daughters of the two given daughters
@@ -181,6 +199,12 @@ namespace Belle2 {
      * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */
     Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable phi between the matched MC particles of two given daughters in the CMS frame
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters in the CMS frame
@@ -218,7 +242,23 @@ namespace Belle2 {
      * which is the sum of the first two daughter momenta.
      * The arguments in the argument vector must be generalized daughter indices.
      */
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between MC particles matched to daughters:
+     * If two indices given: returns the angle between the MC momenta of the two given daughters.
+     * If three indices given: Variable returns the angle between the MC momentum of the third particle and a vector
+     * which is the sum of the first two daughter MC momenta.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr mcDaughterAngle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the granddaughter particle's
+     * and the reverted particle's momentum vector in the daughter particle's rest frame.
+     * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
+     */
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.
@@ -297,10 +337,34 @@ namespace Belle2 {
     Manager::FunctionPtr sin(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the arcsine value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr asin(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the cosine value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */
     Manager::FunctionPtr cos(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the arccosine value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr acos(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the exponential value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr exp(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the natural log value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr log(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the log10 value of a variable of the given particle
@@ -405,6 +469,11 @@ namespace Belle2 {
     * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
     */
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns maximum opening angle in the given particle Lists.
+     */
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments);
 
     /**
     * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.

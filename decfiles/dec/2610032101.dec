@@ -1,6 +1,6 @@
-# EventType: 2610032100
-# Descriptor: [ccbar Dstarm2D0Pim D0bar2KsPi0]
-# NickName: Dstm_D0pim_KsPi0
+# EventType: 2610032101
+# Descriptor: [ccbar Dstarm2D0barPim D0bar2KS0Pi0]
+# NickName: DstmToD0barpim_D0barToKS0Pi0
 # Documentation: MC13a signal request
 # Tested: Yes
 # PhysicsWG: Charm
@@ -58,7 +58,7 @@ Decay D*-
 Enddecay
 
 Decay anti-D0sig
-1.000 K_S0        pi0             PHSP;
+1.000 K_S0sig     pi0sig          PHSP;
 Enddecay
 
 Decay K_S0sig

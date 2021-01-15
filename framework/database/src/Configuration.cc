@@ -23,7 +23,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2020-02-25"
+#define CURRENT_DEFAULT_TAG "master_2020-10-09"
 
 namespace py = boost::python;
 

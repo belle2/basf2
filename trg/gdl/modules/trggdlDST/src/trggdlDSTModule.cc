@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/dataobjects/TRGGDLDST.h>
@@ -20,7 +19,6 @@
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <string.h>
-#include <unistd.h>
 
 
 using namespace Belle2;
@@ -122,15 +120,24 @@ void TRGGDLDSTModule::event()
                    _data[_e_cdctiming][n_clocks - 1]);
 
 
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
-  TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
+  TRGSummary::ETimingType tt;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {
-    tt = TRGSummary::TTYP_PID0;
+    tt = TRGSummary::TTYP_ECL;
+  } else if (gtt == GDL::e_tt_top) {
+    tt = TRGSummary::TTYP_TOP;
+  } else if (gtt == GDL::e_tt_dphy) {
+    tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
+  } else if (gtt == GDL::e_tt_psnm) {
+    tt = TRGSummary::TTYP_SELF;
+  } else {
+    tt = TRGSummary::TTYP_NONE;
   }
+
   GDLResult->setTimType(tt);
 
 }

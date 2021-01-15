@@ -17,9 +17,7 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import sys
-import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -38,12 +36,12 @@ gROOT.ProcessLine('struct TreeStruct {\
 };'
                   )
 
-from ROOT import TreeStruct
 
+from ROOT import TreeStruct  # noqa
 # define the python module to save the PID information
 
 
-class TreeWriterModule(Module):
+class TreeWriterModule(b2.Module):
 
     """
     This module writes its output to a ROOT tree.
@@ -116,10 +114,10 @@ class TreeWriterModule(Module):
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
-            except:
+            except BaseException:
 
                 # some tracks don't have an mcparticle (fixed now)
-                B2WARNING('problems with track <-> mcparticle relations')
+                b2.B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
                 print('event: %d, track: %d' % (event, track.getArrayIndex()))
 
@@ -130,15 +128,16 @@ class TreeWriterModule(Module):
         self.file.Write()
         self.file.Close()
 
+
 # create path
-main = create_path()
+main = b2.create_path()
 
 # use the input file defined via command line
-main.add_module(register_module('RootInput'))
+main.add_module(b2.register_module('RootInput'))
 
 # add the python module defined above
 main.add_module(TreeWriterModule())
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

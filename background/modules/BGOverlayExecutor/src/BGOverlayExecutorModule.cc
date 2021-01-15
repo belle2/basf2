@@ -25,8 +25,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 using namespace std;
@@ -62,10 +61,8 @@ namespace Belle2 {
              "name of TOP collection to overlay with BG", string(""));
     addParam("ARICHDigitsName", m_ARICHDigitsName,
              "name of ARICH collection to overlay with BG", string(""));
-    addParam("BKLMDigitsName", m_BKLMDigitsName,
-             "name of BKLM collection to overlay with BG", string(""));
-    addParam("EKLMDigitsName", m_EKLMDigitsName,
-             "name of EKLM collection to overlay with BG", string(""));
+    addParam("KLMDigitsName", m_KLMDigitsName,
+             "name of KLM collection to overlay with BG", string(""));
 
   }
 
@@ -93,8 +90,7 @@ namespace Belle2 {
     registerDigits<CDCHit>(m_CDCHitsName);
     registerDigits<TOPDigit>(m_TOPDigitsName);
     registerDigits<ARICHDigit>(m_ARICHDigitsName);
-    registerDigits<BKLMDigit>(m_BKLMDigitsName);
-    registerDigits<EKLMDigit>(m_EKLMDigitsName);
+    registerDigits<KLMDigit>(m_KLMDigitsName);
 
   }
 
@@ -112,8 +108,7 @@ namespace Belle2 {
     addBGDigits<TOPDigit>(m_TOPDigitsName);
     addBGDigits<ARICHDigit>(m_ARICHDigitsName);
     //Compressed waveforms are loaded to the datastore by BGOverlayInputModule and unpacked and overlayed in ECLDigitizerModule
-    addBGDigits<BKLMDigit>(m_BKLMDigitsName);
-    addBGDigits<EKLMDigit>(m_EKLMDigitsName);
+    addBGDigits<KLMDigit>(m_KLMDigitsName);
 
   }
 

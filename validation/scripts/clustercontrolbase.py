@@ -157,7 +157,7 @@ class ClusterBase:
         return [donefile_exists, returncode]
 
     def terminate(self, job: Script):
-        """!
+        """! Terminate running job.
         """
         self.logger.error("Script termination not supported.")
 
@@ -169,4 +169,3 @@ class ClusterBase:
         @param path: The past that needs to be adjusted
         @return: The adjusted path
         """
-        pass

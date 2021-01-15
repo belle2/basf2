@@ -1,11 +1,14 @@
-//
-// Contributors: Caitlin MacQueen, Marco Milesi
-// Contact: cmq.centaurus@gmail.com
-// Last Modified: June 2018
-//
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Caitlin MacQueen, Marco Milesi                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef eclChargedPidSelector_h
-#define eclChargedPidSelector_h
+#pragma once
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -217,9 +220,8 @@ public :
   ClassDef(eclChargedPidSelector, 0); /**< ClassDef */
 };
 
-#endif
 
-#ifdef eclChargedPidSelector_cxx
+
 void eclChargedPidSelector::Init(TTree* tree)
 {
   // The Init() function is called when the selector needs to initialize
@@ -292,5 +294,3 @@ Bool_t eclChargedPidSelector::Notify()
 
   return kTRUE;
 }
-
-#endif // #ifdef eclChargedPidSelector_cxx

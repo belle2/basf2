@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 
 
-class PXDHitErrors(Module):
+class PXDHitErrors(b2.Module):
 
     """A simple module to check the reconstruction of PXDTrueHits."""
 
@@ -99,9 +98,9 @@ class PXDHitErrors(Module):
                         / cluster.getVSigma()
                 except ZeroDivisionError as e:
                     if cluster.getUSigma() < 1.0e-8:
-                        B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
+                        b2.B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
                     else:
-                        B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
+                        b2.B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
 
                 s_cl = \
                     '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '.format(

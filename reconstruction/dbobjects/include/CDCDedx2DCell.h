@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedx2DCell(short version, std::vector<TH2F>& twodgains): m_version(version), m_twodgains(twodgains) {};
+    CDCDedx2DCell(short version, const std::vector<TH2F>& twodgains): m_version(version), m_twodgains(twodgains) {};
 
     /**
      * Destructor
@@ -91,9 +91,9 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for the given bin
-     * @param layer number
-     * @param doca bin number
-     * @param enta bin number
+     * @param layer layer number
+     * @param dbin doca bin number
+     * @param ebin enta bin number
      */
     double getMean(unsigned int layer, int dbin, int ebin) const
     {
@@ -105,9 +105,9 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for given DOCA and entrance angle
-     * @param continuous layer number
-     * @param distance of closest approach
-     * @param entrance angle
+     * @param layer continuous layer number
+     * @param doca distance of closest approach
+     * @param enta entrance angle
      */
     double getMean(unsigned int layer, double doca, double enta) const
     {
@@ -151,6 +151,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCell, 4); /**< ClassDef */
+    ClassDef(CDCDedx2DCell, 5); /**< ClassDef */
   };
 } // end namespace Belle2

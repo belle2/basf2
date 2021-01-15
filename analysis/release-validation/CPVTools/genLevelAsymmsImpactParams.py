@@ -15,9 +15,15 @@
 ######################################################
 
 
+import basf2 as b2
+import os
+import glob
+import sys
+import math
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
-import basf2_mva
 
 import numpy as np
 import matplotlib as mpl
@@ -25,12 +31,6 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import sys
-import glob
-import os
 
 if len(sys.argv) != 3:
     sys.exit("Must provide 2 arguments: [Belle or Belle2] [samplesWildCards]"
@@ -42,7 +42,7 @@ samplesWildCards = sys.argv[2]
 
 workingDirectory = '.'
 
-if not Belle2.FileSystem.findFile(workingDirectory + '/GenLevelVariablesPlots', True):
+if not b2.find_file('GenLevelVariablesPlots', silent=True):
     os.mkdir(workingDirectory + '/GenLevelVariablesPlots')
 
 sourceFiles = glob.glob(str(samplesWildCards))

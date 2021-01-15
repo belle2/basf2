@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H
-#define GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -88,4 +87,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H */

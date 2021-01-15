@@ -35,7 +35,7 @@ void ARICHReconstructionPar::initializeDefault()
   m_aerogelFOM = {11.3, 13.0};
 }
 
-double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, std::vector<double>& pars) const
+double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const
 {
 
   int ipar = 0;
@@ -46,7 +46,7 @@ double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, std::vector<do
   return m_bkgPDF->Eval(th_cer) + m_flatBkgPerPad;
 }
 
-double ARICHReconstructionPar::getExpectedBackgroundHits(std::vector<double>& pars, double minThc, double maxThc) const
+double ARICHReconstructionPar::getExpectedBackgroundHits(const std::vector<double>& pars, double minThc, double maxThc) const
 {
 
   int ipar = 0;

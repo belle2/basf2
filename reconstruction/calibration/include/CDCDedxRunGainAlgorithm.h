@@ -13,121 +13,79 @@
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
+#include <TH1D.h>
 
 namespace Belle2 {
+
   /**
    * A calibration algorithm for CDC dE/dx run gains
-   *
    */
   class CDCDedxRunGainAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
-     * Constructor: Sets the description, the properties and the parameters of the algorithm.
-     */
+    * Constructor: Sets the description, the properties and the parameters of the algorithm.
+    */
     CDCDedxRunGainAlgorithm();
+
     /**
-     * Destructor
-     */
+    * Destructor
+    */
     virtual ~CDCDedxRunGainAlgorithm() {}
 
     /**
-    * reading input file and storing values in vectors
-    */
-    void setBadRunsdatafile(const std::string& fPath, const std::string& fName)
-    {
-
-      m_badRunFPath = fPath;
-      m_badRunFName = fName;
-      isRmBadruns = true;
-
-      printf("INF0: Taking bad run list file from: %s/%s \n", m_badRunFPath.data(), m_badRunFName.data());
-
-      std::ifstream inputfile;
-      inputfile.open(Form("%s/%s", m_badRunFPath.data(), m_badRunFName.data()));
-      if (inputfile.fail()) {
-        printf("%s\n", "input file of bad runs does not exits or corrupted!");
-        return;
-      }
-
-      int badrun = -999, nBadruns = 0;
-      double avgmean = 1.0;
-      printf("--- List of Bad runs \n");
-      while (true) {
-        nBadruns++;
-        inputfile >> badrun >> avgmean;
-        if (inputfile.eof()) break;
-        printf("%d) Bad Run # = %d, Running avg mean = %0.03f\n", nBadruns, badrun, avgmean);
-        listofbadruns.push_back(badrun);
-        rmeanOfbadrun.push_back(avgmean);
-      }
-      inputfile.close();
-    }
-
-    /**
-    * get path of input bad run file
-    */
-    std::string getBadRunFilePath() const {return m_badRunFPath;}
-
-    /**
-    * get name of input bad run file
-    */
-    std::string getBadRunFileName() const {return m_badRunFName;}
-
-    /**
-    * Check if run is listed as bad
-    */
-    void CheckRunStatus(Int_t irun, bool& status, double& rmean)
-    {
-      for (unsigned int j = 0; j < listofbadruns.size(); ++j) {
-        if (listofbadruns.at(j) == irun) {
-          printf("This is bad run %d \n", irun);
-          rmean = rmeanOfbadrun.at(j);
-          status = true;
-          break;
-        }
-      }
-    }
-
-    /**
-    * function to decide merge vs relative gains
+    * function to decide merged vs relative run-gains
     */
     void setMergePayload(bool value = true) {isMergePayload = value;}
 
     /**
-    * function to  store new payload after full calibration
+    * function to store new payload after full calibration
     */
-    void generateNewPayloads(double RunGainConst);
+    void generateNewPayloads(double RunGainConst, double ExistingRG);
+
+    /**
+    * function to hand flag for monitoring plotting
+    */
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
+    /**
+    * function to perform fit run by run
+    */
+    void FitGaussianWRange(TH1D*& temphist, TString& status);
 
     /**
     * function to make flag active for plotting
     */
-    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+    void setFitWidth(double value = 2.5) {fSigLim = value;}
+
+    /**
+    * function to set dedx hist bins
+    */
+    void setHistBins(int value = 600) {fdEdxBins = value;}
+
+    /**
+    * function to set dedx hist range
+    */
+    void setHistRange(double min = 0.0, double max = 3.0) {fdEdxMin = min; fdEdxMax = max;}
 
   protected:
 
     /**
-     * Run algorithm
-     */
+    * Run algorithm
+    */
     virtual EResult calibrate() override;
-
 
   private:
 
-    std::string m_badRunFPath; /**< path of bad run file */
-    std::string m_badRunFName; /**< name of bad run file */
-    bool isRmBadruns; /**< if bad runs consideration */
     bool isMakePlots; /**< produce plots for status */
     bool isMergePayload; /**< merge payload at the of calibration */
-    std::vector<int> listofbadruns; /**< vector of bad ru list */
-    std::vector<double> rmeanOfbadrun; /**< vector of runing avg mean*/
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
-
+    TString fsrun; /**< flag to indentify low stats runs */
+    double fSigLim; /**< fit range limit based on sigma */
+    int fdEdxBins; /**< number of bins for dedx histogram */
+    double fdEdxMin; /**< min dedx range for gain cal */
+    double fdEdxMax; /**< max dedx range for gain cal */
   };
 } // namespace Belle2

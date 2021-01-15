@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors:  Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,6 +41,11 @@ namespace Belle2 {
 
     /// Helper function for getting the already created reco hits (runtime reasons)
     const std::vector<PXDRecoHit>& getRecoHits() const;
+
+    /// Get the cached data of this state
+    const struct stateCache& getStateCache() const {
+      return m_stateCache;
+    }
 
   private:
     /// Precache the PXDRecoHits for runtime performance reasons.

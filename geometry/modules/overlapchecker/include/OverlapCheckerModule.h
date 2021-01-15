@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef OVERLAPCHECKERMODULE_H
-#define OVERLAPCHECKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -55,6 +54,7 @@ namespace Belle2 {
      *
      * @param volume The physical volume to be checked.
      * @param path The path name identifying the mother volume.
+     * @param depth The current depth in this tree as this function is recursive
      * @return True if the volume or one of its daughters is overlapping
      */
     bool checkVolume(G4VPhysicalVolume* volume, const std::string& path, int depth = 0);
@@ -73,4 +73,3 @@ namespace Belle2 {
     StoreObjPtr<DisplayData> m_displayData; /**< Pointer to the DisplayData where we add the overlap points for rendering */
   };
 } //Belle2 namespace
-#endif

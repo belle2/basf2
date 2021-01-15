@@ -11,9 +11,7 @@
 // $Log$
 // 2017-02-21 : version 1.0
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclFAMFit.h"
@@ -25,7 +23,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -119,8 +116,10 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   //  double EThreshold = _Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
-  double FitE = 0;
-  double FitT = 0;
+  /* cppcheck-suppress variableScope */
+  double FitE;
+  /* cppcheck-suppress variableScope */
+  double FitT;
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
@@ -398,8 +397,6 @@ TrgEclFAMFit::SetBeamBkgTag()
   TCRawEnergy.resize(576);
   TCRawTiming.resize(576);
 
-
-
   StoreArray<TRGECLDigi0> trgeclDigiArray;
   for (int ii = 0; ii < trgeclDigiArray.getEntries(); ii++) {
     TRGECLDigi0* aTRGECLDigi = trgeclDigiArray[ii];
@@ -428,10 +425,7 @@ TrgEclFAMFit::SetBeamBkgTag()
     }
   }
 
-
-
 }
-
 //
 //
 //
@@ -452,13 +446,12 @@ TrgEclFAMFit::save(int m_nEvent)
       TrgEclHitArray[m_hitNum]->setEventId(m_nEvent);
       TrgEclHitArray[m_hitNum]->setTCId(iTCIdm + 1);
       TrgEclHitArray[m_hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][iHit]);
-      TrgEclHitArray[m_hitNum] ->setTimeAve(TCFitTiming[iTCIdm][iHit]);
+      TrgEclHitArray[m_hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit]);
       if (_BeamBkgTag == 1) {
         TrgEclHitArray[m_hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
     }
   }
-
 
   m_hitNum = 0;
   if (_AnaTag == 1) {
@@ -475,12 +468,17 @@ TrgEclFAMFit::save(int m_nEvent)
         TrgEclAnaArray[m_hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm + 1));
         TrgEclAnaArray[m_hitNum]->setRawEnergy(TCRawEnergy[iTCIdm][iHit]);
         TrgEclAnaArray[m_hitNum]->setRawTiming(TCRawTiming[iTCIdm][iHit]);
-        TrgEclAnaArray[m_hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][iHit]);
+
+        //        TrgEclAnaArray[m_hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][iHit]);
+        int p_ene2adc = 525;
+        int ene_i0 = (int)(TCFitEnergy[iTCIdm][iHit] * 100000.0 / p_ene2adc);
+        double ene_d = (double) ene_i0 * p_ene2adc /  100000;
+        TrgEclAnaArray[m_hitNum]->setFitEnergy(ene_d);
+
         TrgEclAnaArray[m_hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit]);
         TrgEclAnaArray[m_hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
     }
   }
-
   return;
 }

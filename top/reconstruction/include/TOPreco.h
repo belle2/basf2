@@ -18,43 +18,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <top/dataobjects/TOPAsicMask.h>
 
-extern "C" {
-  void set_beta_rq_(float*);
-  void set_time_window_(float*, float*);
-  void get_time_window_(float*, float*);
-  void set_pdf_opt_(int*, int*, int*);
-  void set_store_opt_(int*);
-  float get_logl_(float*, float*, float*, float*);
-  void get_logl_ch_(float*, float*, float*, float*, float*);
-  int data_getnum_();
-  void set_channel_mask_(int*, int*, int*);
-  void set_channel_off_(int*, int*);
-  void print_channel_mask_();
-  void set_channel_effi_(int*, int*, float*);
-  void redo_pdf_(float*);
-  int get_num_peaks_(int*);
-  void get_peak_(int*, int*, float*, float*, float*);
-  float get_bgr_(int*);
-  int get_pik_typ_(int*, int*);
-  float get_pik_fic_(int*, int*);
-  float get_pik_e_(int*, int*);
-  float get_pik_sige_(int*, int*);
-  int get_pik_nx_(int*, int*);
-  int get_pik_ny_(int*, int*);
-  int get_pik_nxm_(int*, int*);
-  int get_pik_nym_(int*, int*);
-  int get_pik_nxe_(int*, int*);
-  int get_pik_nye_(int*, int*);
-  float get_pik_xd_(int*, int*);
-  float get_pik_yd_(int*, int*);
-  float get_pik_kxe_(int*, int*);
-  float get_pik_kye_(int*, int*);
-  float get_pik_kze_(int*, int*);
-  float get_pik_kxd_(int*, int*);
-  float get_pik_kyd_(int*, int*);
-  float get_pik_kzd_(int*, int*);
-}
-
 namespace Belle2 {
   namespace TOP {
 
@@ -87,14 +50,17 @@ namespace Belle2 {
        * Constructor
        * @param NumHyp number of mass hypotheses
        * @param Masses masses
+       * @param pdgCodes PDG codes
        * @param BkgPerModule estimation for minimal number of background hits
        * @param ScaleN0 scale factor to scale N0
        */
-      TOPreco(int NumHyp, double Masses[], double BkgPerModule = 0, double ScaleN0 = 1);
+      TOPreco(int NumHyp, double Masses[], int pdgCodes[],
+              double BkgPerModule = 0, double ScaleN0 = 1);
 
       /**
        * Set channel mask
        * @param mask channel mask
+       * @param asicMask masked asics
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                  const TOPAsicMask& asicMask);
@@ -114,7 +80,7 @@ namespace Belle2 {
       /**
        * Print channel mask
        */
-      static void printChannelMask() {print_channel_mask_();}
+      static void printChannelMask();
 
       /**
        * Set relative efficiencies of pixels
@@ -122,17 +88,11 @@ namespace Belle2 {
       static void setChannelEffi();
 
       /**
-       * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
-       * @param NumHyp number of mass hypotheses
-       * @param HypID internal codes in the same order as Masses[]
-       */
-      void setHypID(int NumHyp, int HypID[]);
-
-      /**
        * Set mass of the particle hypothesis (overrides settings in the constructor)
        * @param mass mass
+       * @param pdg PDG code
        */
-      void setMass(double mass);
+      void setMass(double mass, int pdg);
 
       /**
        * Set time window for photons.
@@ -145,26 +105,14 @@ namespace Belle2 {
        * @param Tmin minimum time [ns]
        * @param Tmax maximum time [ns]
        */
-      void setTimeWindow(double Tmin, double Tmax)
-      {
-        float tmin = (float) Tmin;
-        float tmax = (float) Tmax;
-        set_time_window_(&tmin, &tmax);
-      }
+      void setTimeWindow(double Tmin, double Tmax);
 
       /**
        * Returns time window for photons.
        * @param Tmin minimum time [ns]
        * @param Tmax maximum time [ns]
        */
-      void getTimeWindow(double& Tmin, double& Tmax)
-      {
-        float tmin = 0;
-        float tmax = 0;
-        get_time_window_(&tmin, &tmax);
-        Tmin = tmin;
-        Tmax = tmax;
-      }
+      void getTimeWindow(double& Tmin, double& Tmax);
 
       /**
        * Sets PDF option
@@ -172,21 +120,13 @@ namespace Belle2 {
        * @param NP number of emission positions along track segment (equidistant)
        * @param NC number of Cerenkov angles (equdistant in photon energies)
        */
-      void setPDFoption(PDFoption opt, int NP = 0, int NC = 0)
-      {
-        int iopt = opt;
-        set_pdf_opt_(&iopt, &NP, &NC);
-      }
+      void setPDFoption(PDFoption opt, int NP = 0, int NC = 0);
 
       /**
        * Sets option for storing PDF parameters in Fortran common TOP_PIK
        * @param opt option - see definition of StoreOption
        */
-      void setStoreOption(StoreOption opt)
-      {
-        int iopt = opt;
-        set_store_opt_(&iopt);
-      }
+      void setStoreOption(StoreOption opt);
 
       /**
        * Clear data list
@@ -205,17 +145,14 @@ namespace Belle2 {
       /**
        * Return size of data list
        */
-      int getDataSize()
-      {
-        return data_getnum_();
-      }
+      int getDataSize();
 
       /**
        * Run reconstruction for a given track
        * @param trk track
        * @param pdg PDG code for which to compute pulls. If 0 use MC true PDG.
        */
-      void reconstruct(TOPtrack& trk, int pdg = 0);
+      void reconstruct(const TOPtrack& trk, int pdg = 0);
 
       /**
        * Return status
@@ -267,14 +204,7 @@ namespace Belle2 {
        * @param sigma additional time smearing sigma
        * @return log likelihood
        */
-      double getLogL(double timeShift, double timeMin, double timeMax, double sigma = 0.0)
-      {
-        float t0 = (float) timeShift;
-        float tmin = (float) timeMin;
-        float tmax = (float) timeMax;
-        float sigt = (float) sigma;
-        return get_logl_(&t0, &tmin, &tmax, &sigt);
-      }
+      double getLogL(double timeShift, double timeMin, double timeMax, double sigma = 0.0);
 
       /**
        * Return pixel log likelihoods for the last mass hypothesis using time-shifted PDF
@@ -286,14 +216,31 @@ namespace Belle2 {
        * @param logL return array of pixel log likelihood values (must be zeroed on input)
        */
       void getLogL(double timeShift, double timeMin, double timeMax, double sigma,
-                   float* logL)
-      {
-        float t0 = (float) timeShift;
-        float tmin = (float) timeMin;
-        float tmax = (float) timeMax;
-        float sigt = (float) sigma;
-        get_logl_ch_(&t0, &tmin, &tmax, &sigt, logL);
-      }
+                   float* logL);
+
+      /**
+       * Return pixel log likelihoods and expected pixel signal photon counts for the
+       * last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sigma additional time smearing sigma
+       * @param logL return array of pixel log likelihood values (must be zeroed on input)
+       * @param sphot return array of pixel signal photon counts (must be zeroed on input)
+       */
+      void getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                   float* logL, float* sphot);
+
+      /**
+       * Return pixel signal photons for the last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sfot return array of pixel signal photon counts (must be zeroed on input)
+       */
+      void getSigPhot(double timeShift, double timeMin, double timeMax, float* sfot);
 
       /**
        * Return track hit at the bar in Local or Global frame
@@ -343,17 +290,18 @@ namespace Belle2 {
        * Return PDF for pixel pixelID at time t for mass hypothesis mass
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param t time
+       * @param mass particle mass
+       * @param PDG particle code
        * @param jitter additional time jitter, like electronic jitter
-       * @param mass mass
        */
-      double getPDF(int pixelID, double t, double mass, double jitter = 0);
+      double getPDF(int pixelID, double t, double mass, int PDG, double jitter = 0);
 
       /**
        * Set track beta (for beta resolution studies)
        * if beta>0 this value is used instead of beta from momentum and mass
        * @param beta beta value
        */
-      void setBeta(double beta) {m_beta = beta; float bt = beta; set_beta_rq_(&bt);};
+      void setBeta(double beta);
 
       /**
        * Return track beta
@@ -364,47 +312,34 @@ namespace Belle2 {
       /**
        * Re-calculate PDF for a given particle mass using option c_Fine
        * @param mass particle mass
+       * @param PDG particle code
        */
-      void redoPDF(double mass)
-      {
-        float m = mass;
-        redo_pdf_(&m);
-      }
+      void redoPDF(double mass, int PDG);
 
       /**
        * Returns number of peaks for given pixel describing signal PDF
        * @param pixelID pixel ID (1-based)
        * @return number of peaks
        */
-      int getNumofPDFPeaks(int pixelID) const
-      {
-        pixelID--; // 0-based is used in fortran
-        return get_num_peaks_(&pixelID);
-      }
+      int getNumofPDFPeaks(int pixelID) const;
 
       /**
        * Returns k-th PDF peak for given pixel describing signal PDF
        * @param pixelID pixel ID (1-based)
        * @param k peak counter (in C++ sense - starts with 0)
+       * @param position pisition
+       * @param width width
+       * @param numPhotons number of photons
        */
       void getPDFPeak(int pixelID, int k,
-                      float& position, float& width, float& numPhotons) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        get_peak_(&pixelID, &k, &position, &width, &numPhotons);
-      }
+                      float& position, float& width, float& numPhotons) const;
 
       /**
        * Returns estimated background level for given pixel
        * @param pixelID pixel ID (1-based)
        * @return number of background hits per nano second
        */
-      float getBkgLevel(int pixelID) const
-      {
-        pixelID--; // 0-based is used in fortran
-        return get_bgr_(&pixelID);
-      }
+      float getBkgLevel(int pixelID) const;
 
       /**
        * Returns type of the k-th PDF peak for given pixel
@@ -412,12 +347,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return 0 unknown, 1 direct, 2 reflected
        */
-      int getPDFPeakType(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_typ_(&pixelID, &k);
-      }
+      int getPDFPeakType(int pixelID, int k) const;
 
       /**
        * Returns Cerenkov azimuthal angle of PDF peak
@@ -425,12 +355,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return azimuthal angle
        */
-      float getPDFPeakFic(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_fic_(&pixelID, &k);
-      }
+      float getPDFPeakFic(int pixelID, int k) const;
 
       /**
        * Returns photon energy of PDF peak
@@ -438,12 +363,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return photon energy [eV]
        */
-      float getPDFPeakE(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_e_(&pixelID, &k);
-      }
+      float getPDFPeakE(int pixelID, int k) const;
 
       /**
        * Returns photon energy spread of PDF peak
@@ -451,12 +371,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return photon energy sigma [eV]
        */
-      float getPDFPeakSigE(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_sige_(&pixelID, &k);
-      }
+      float getPDFPeakSigE(int pixelID, int k) const;
 
       /**
        * Returns total number of reflections in x of PDF peak
@@ -464,12 +379,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections
        */
-      int getPDFPeakNx(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_nx_(&pixelID, &k));
-      }
+      int getPDFPeakNx(int pixelID, int k) const;
 
       /**
        * Returns total number of reflections in y of PDF peak
@@ -477,12 +387,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections
        */
-      int getPDFPeakNy(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_ny_(&pixelID, &k));
-      }
+      int getPDFPeakNy(int pixelID, int k) const;
 
       /**
        * Returns number of reflections in x before mirror
@@ -490,12 +395,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections before mirror
        */
-      int getPDFPeakNxm(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_nxm_(&pixelID, &k));
-      }
+      int getPDFPeakNxm(int pixelID, int k) const;
 
       /**
        * Returns number of reflections in y before mirror
@@ -503,12 +403,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections before mirror
        */
-      int getPDFPeakNym(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_nym_(&pixelID, &k));
-      }
+      int getPDFPeakNym(int pixelID, int k) const;
 
       /**
        * Returns number of reflections in x in prism
@@ -516,12 +411,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections before mirror
        */
-      int getPDFPeakNxe(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_nxe_(&pixelID, &k));
-      }
+      int getPDFPeakNxe(int pixelID, int k) const;
 
       /**
        * Returns number of reflections in y in prism
@@ -529,12 +419,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return total number of reflections before mirror
        */
-      int getPDFPeakNye(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return abs(get_pik_nye_(&pixelID, &k));
-      }
+      int getPDFPeakNye(int pixelID, int k) const;
 
       /**
        * Returns unfolded x position of pixel
@@ -542,12 +427,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return unfolded x
        */
-      float getPDFPeakXD(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_xd_(&pixelID, &k);
-      }
+      float getPDFPeakXD(int pixelID, int k) const;
 
       /**
        * Returns unfolded y position of pixel
@@ -555,12 +435,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return unfolded y
        */
-      float getPDFPeakYD(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_yd_(&pixelID, &k);
-      }
+      float getPDFPeakYD(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in x at emission
@@ -568,12 +443,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in x
        */
-      float getPDFPeakKxe(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kxe_(&pixelID, &k);
-      }
+      float getPDFPeakKxe(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in y at emission
@@ -581,12 +451,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in y
        */
-      float getPDFPeakKye(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kye_(&pixelID, &k);
-      }
+      float getPDFPeakKye(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in z at emission
@@ -594,12 +459,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in z
        */
-      float getPDFPeakKze(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kze_(&pixelID, &k);
-      }
+      float getPDFPeakKze(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in x at detection
@@ -607,12 +467,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in x
        */
-      float getPDFPeakKxd(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kxd_(&pixelID, &k);
-      }
+      float getPDFPeakKxd(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in y at detection
@@ -620,12 +475,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in y
        */
-      float getPDFPeakKyd(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kyd_(&pixelID, &k);
-      }
+      float getPDFPeakKyd(int pixelID, int k) const;
 
       /**
        * Returns photon reconstructed direction in z at detection
@@ -633,13 +483,7 @@ namespace Belle2 {
        * @param k peak counter (in C++ sense - starts with 0)
        * @return direction in z
        */
-      float getPDFPeakKzd(int pixelID, int k) const
-      {
-        pixelID--; // 0-based is used in fortran
-        k++; // counter starts with 1 in fortran
-        return get_pik_kzd_(&pixelID, &k);
-      }
-
+      float getPDFPeakKzd(int pixelID, int k) const;
 
     private:
 
@@ -660,8 +504,8 @@ namespace Belle2 {
                        double Px, double Py, double Pz, int Q,
                        int pdg = 0, int moduleID = 0);
 
-      int m_hypID;    /**< true hypothesis ID */
-      double m_beta;  /**< beta value, if set */
+      int m_hypID = 0;    /**< true hypothesis ID */
+      double m_beta = 0;  /**< beta value, if set */
 
     };
 

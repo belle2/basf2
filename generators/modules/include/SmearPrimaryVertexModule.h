@@ -1,29 +1,28 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Giacomo De Pietro                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SMEARPRIMARYVERTEXMODULE_H
-#define SMEARPRIMARYVERTEXMODULE_H
+#pragma once
 
+/* Belle II headers. */
 #include <framework/core/Module.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
-#include <TVector3.h>
-
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
 
   /**
-   * The SmearPrimaryVertex module moves the Primary Vertex (e+e- collision point) to
-   * to a new point defined by user. In addition smearing is applied randomly on event
-   * by event basis. Module loops over all MCParticles and shiftes their decay and
-   * production vertices.
+   * This module smears the primary vertex (the interaction point) according to the values stored in BeamParameters.
+   * The smearing is applied randomly on event by event basis. The module loops over all the MCParticles and smears
+   * their production vertices; if an MCParticle has no daughters, the decay vertex is also smeared.
    */
   class SmearPrimaryVertexModule : public Module {
 
@@ -31,74 +30,36 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * Sets the module parameters.
      */
     SmearPrimaryVertexModule();
 
-    /** Destructor. */
-    virtual ~SmearPrimaryVertexModule() {}
+    /**
+     * Destructor.
+     */
+    virtual ~SmearPrimaryVertexModule();
 
-    virtual void initialize() override; /**< initialize the module */
-    virtual void terminate() override;  /**< terminate the module */
+    /**
+     * Initialize the module.
+     */
+    virtual void initialize() override;
 
-    /** Method is called for each run. */
-    virtual void beginRun() override;
-
-    /** Method is called for each event. */
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
 
   private:
 
-    // Module parameters for the user interface
-
-    // new nominal interaction point (cm)
-    double m_new_ip_x; /**< New nominal position of Primary Vertex in x (cm) */
-    double m_new_ip_y; /**< New nominal position of Primary Vertex in y (cm) */
-    double m_new_ip_z; /**< New nominal position of Primary Vertex in z (cm) */
-
-    // new spread (standard deviation) for interaction point (cm)
-    double m_sigma_ip_x; /**< Spread (standard deviation) of Primary Vertex in x (cm) */
-    double m_sigma_ip_y; /**< Spread (standard deviation) of Primary Vertex in y (cm) */
-    double m_sigma_ip_z; /**< Spread (standard deviation) of Primary Vertex in z (cm) */
-
-    // new angle of beam profile (rad)
-    double m_new_angle_ip_xy; /**< Angle of rotation of Primary Vertex Profile wrt. z-axis (in xy-plane) in (rad) */
-    double m_new_angle_ip_yz; /**< Angle of rotation of Primary Vertex Profile wrt. x-axis (in yz-plane) in (rad) */
-    double m_new_angle_ip_zx; /**< Angle of rotation of Primary Vertex Profile wrt. y-axis (in zx-plane) in (rad) */
-
-    // new nominal ip point and sigma (cm)
-    TVector3 m_new_nominal_ip; /**< New nominal position of Primary Vertex in (cm) */
-    TVector3 m_sigma_ip;       /**< Spread (standard deviation) of Primary Vertex in (cm) */
-    TVector3 m_new_angle_ip;   /**< Angle of rotation of Primary Vertex Profile */
-
-    // new and old ip (smeared) (cm)
-    TVector3 old_ip;    /**< Old Primary Vertex position (before smearing) */
-    TVector3 m_new_ip;  /**< New Primery Vertex position (after smearing) */
+    /**
+     * Name of the MCParticles StoreArray.
+     */
+    std::string m_MCParticlesName;
 
     /**
-     * Returns the shifted vertex given as an input.
-     * @param oldVertex to be shifted
-     * @return shifted vertex (given by  oldVertex + (newIP - oldIP))
+     * Initial particle generation.
      */
-    TVector3 getShiftedVertex(TVector3 oldVertex);
+    InitialParticleGeneration m_Initial;
 
-
-    /**
-     * Determines the new Primary Vertex for this event from the primary vertex specified by the user and
-     * random shift given by the user specified spread.
-     */
-    void setNewPrimaryVertex(void);
-
-    /**
-     * Old primary vertex is taken to be the production vertex of the first MCParticle in the MCParticles array.
-     */
-    void setOldPrimaryVertex(void);
-
-    std::string m_particleList; /**< The name of the MCParticle collection. */
-
-    bool m_useDB; /**< Use values from the Database. */
   };
 
-} // end namespace Belle2
-
-#endif // SMEARPRIMARYVERTEXMODULE_H
+}

@@ -64,7 +64,7 @@ namespace {
     return minimalValue;
   }
 
-  /// Helper function to calculate the std of a given function over all states in the list
+  /// Helper function to calculate the standard deviation of a given function over all states in the list
   template<class APredicate>
   double stdOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
@@ -85,7 +85,7 @@ namespace {
       }
     }
 
-    return std::sqrt((sumSquared - sum / numberOfHits) / numberOfHits - 1);
+    return std::sqrt((sumSquared - sum * sum / numberOfHits) / (numberOfHits - 1));
   }
 }
 
@@ -167,7 +167,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
     var<named("cluster_1_size")>() = calculateSize(*firstCluster);
     var<named("cluster_2_size")>() = calculateSize(*secondCluster);
     var<named("mean_rest_cluster_size")>() = meanOver(allStates, calculateSize);
-    var<named("min_rest_cluster_size")>() = meanOver(allStates, calculateSize);
+    var<named("min_rest_cluster_size")>() = minOver(allStates, calculateSize);
     var<named("std_rest_cluster_size")>() = stdOver(allStates, calculateSize);
 
     var<named("cluster_1_snr")>() = calculateSNR(*firstCluster);

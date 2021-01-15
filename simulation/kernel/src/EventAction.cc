@@ -9,12 +9,10 @@
  **************************************************************************/
 
 #include <simulation/kernel/EventAction.h>
-#include <simulation/kernel/RunManager.h>
 #include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
-#include <list>
 #include <string>
 
 using namespace std;

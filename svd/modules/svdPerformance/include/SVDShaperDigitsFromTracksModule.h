@@ -14,11 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
   /**

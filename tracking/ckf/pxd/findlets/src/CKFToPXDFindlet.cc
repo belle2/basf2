@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -65,6 +65,7 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("onlyUseTracksWithSVD", m_param_onlyUseTracksWithSVD,
                                 "Only use tracks which have an SVD hit associated.",
                                 m_param_onlyUseTracksWithSVD);
+  moduleParamList->addParameter("reverseSeedState", m_param_reverseSeed, "Reverse the seed.", m_param_reverseSeed);
 
   // Default values
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
@@ -78,6 +79,8 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
   moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("preSeedFilter").setDefaultValue("loose");
+  moduleParamList->getParameter<std::string>("preHitFilter").setDefaultValue("loose");
 
   moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("PXDSpacePoints");
 
@@ -115,24 +118,27 @@ void CKFToPXDFindlet::apply()
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
   if (m_param_onlyUseTracksWithSVD) {
-    const auto hasNoSVD = [](const RecoTrack * recoTrack) {
+    const auto hasNoSVD = [this](const RecoTrack * recoTrack) {
       const auto& svdHitList = recoTrack->getSortedSVDHitList();
-      return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
+      if (svdHitList.empty()) return true;
+      // Require at least one hit in layer 3 or 4
+      return m_param_reverseSeed ? svdHitList.back()->getSensorID().getLayerNumber() > 4
+             : svdHitList.front()->getSensorID().getLayerNumber() > 4;
     };
     TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
   }
 
-  B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
+  B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");
 
   m_stateCreatorFromTracks.apply(m_recoTracksVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
-  B2DEBUG(50, "Created " << m_relations.size() << " relations.");
+  B2DEBUG(29, "Created " << m_relations.size() << " relations.");
 
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
-  B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
+  B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");
 
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
@@ -141,7 +147,7 @@ void CKFToPXDFindlet::apply()
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 
-  B2DEBUG(50, "Having found " << m_filteredResults.size() << " results");
+  B2DEBUG(29, "Having found " << m_filteredResults.size() << " results");
 
   m_resultStorer.apply(m_filteredResults);
   m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);

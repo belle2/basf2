@@ -10,6 +10,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       REAL PIK_DXCH(0:NUM_CHA-1)          ! x size of channel [cm]
       REAL PIK_DYCH(0:NUM_CHA-1)          ! y size of channel [cm]
       REAL PIK_BGR(0:NUM_CHA-1)           ! bkg. (normalised)
+      REAL PIK_DELTA(0:NUM_CHA-1)	  ! photons from delta rays (relative normalization)
 
       INTEGER NUM_PIK(0:NUM_CHA-1)        ! number of peaks in single channel
       INTEGER PIK_OVFL(0:NUM_CHA-1)       ! overflow (number of peaks lost
@@ -35,9 +36,10 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       REAL PIK_KYD(MAX_PIK,0:NUM_CHA-1) ! ky direction at detection
       REAL PIK_KZD(MAX_PIK,0:NUM_CHA-1) ! kz direction at detection
 
-      REAL STFS, STFB                   ! expected num. of signal, bkg. photons
+      REAL STFS, STFB, STFD             ! expected num. of signal, bkg. photons, from delta rays
       INTEGER LR_FLAG(0:1)              ! L/R flag
       REAL MASS_HYP, BETA, TOF          ! mass hypothesis, beta, time-of-flight
+      INTEGER PDG_HYP                   ! PDG code of hypothesis
       REAL FOT0, PTOT, T_MIN, T_MAX     ! photons/2pi, tot.refl.rq., min, max time
       REAL C_THC(-1:1), S_THC(-1:1)     ! cos & sin theta_Cer
       REAL TH0_SIP                      ! multiple scatt. contr. to theta_Cer
@@ -47,13 +49,13 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       INTEGER PDF_OPT                   ! options: 0 w/o yscan, 1 w/ yscan, 2 optimal
 
       COMMON /TOP_PIK/ NCH,
-     &     PIK_XCH, PIK_YCH, PIK_DXCH, PIK_DYCH, PIK_BGR, 
+     &     PIK_XCH, PIK_YCH, PIK_DXCH, PIK_DYCH, PIK_BGR, PIK_DELTA,
      &     NUM_PIK,  PIK_OVFL,
      &	   PIK_POZ, PIK_WID, PIK_NPH, PIK_FIC, PIK_E, PIK_SIGE,
      &     PIK_NX, PIK_NY, PIK_NXM, PIK_NYM, PIK_NXE, PIK_NYE,
      &     PIK_XD, PIK_YD, PIK_TYP,
      &     PIK_KXE, PIK_KYE, PIK_KZE, PIK_KXD, PIK_KYD, PIK_KZD, 
-     &     STFS, STFB, LR_FLAG,
+     &     STFS, STFB, STFD, LR_FLAG, PDG_HYP,
      &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MIN, T_MAX, C_THC, S_THC,
      &	   TH0_SIP, D_THC, BETA_RQ, STORE_OPT, PDF_OPT
 

@@ -90,7 +90,7 @@ typedef struct {
 } NSMudpbuf;
 
 /* NSMtcphead (in network byte order) */
-typedef struct {
+typedef struct NSMtcphead_struct {
   uint16_t req;
   uint16_t seq;
   uint16_t src;
@@ -159,7 +159,7 @@ typedef struct {
 
 typedef struct {
   char  name[NSMSYS_NAME_SIZ + 1]; /* 32 byte, *name == 0 if unavailable */
-  int16_t rsvi16;
+  uint16_t libver; /* library version, from nsm2-1997 */
   int16_t noddat; /* sys.dat index or -1 if unavailable */
   int16_t nodref; /* sys.ref index or -1 if unavailable */
   int16_t nodreg; /* sys.reg index or -1 if unavailable */
@@ -253,7 +253,8 @@ typedef struct {
   int64_t osiz;  /* how many bytes sent */
   int64_t otim;  /* how much time (in us) select had to wait */
   int32_t osel;  /* how many times select had to wait */
-  int32_t rsv32;
+  uint16_t version; /* nsmd2 version or library version */
+  int16_t rsv16;
   uint8_t sigobs;   /* sigobs=1 if SIGRTMIN is not defined */
   uint8_t priority; /* between 0-100 */
   uint8_t rsv;
@@ -267,7 +268,7 @@ typedef struct {
   int16_t funcid; /* function to call */
 } NSMsch;
 
-typedef struct {
+typedef struct NSMmem_struct {
   /* first 4 words are common to both NSMmem and NSMsys */
   int32_t ipaddr;
   int32_t pid;
@@ -276,7 +277,7 @@ typedef struct {
   char mem[NSM2_MEMSIZ];
 } NSMmem;
 
-typedef struct {
+typedef struct NSMsys_struct {
   /* first 4 words are common to both NSMmem and NSMsys */
   int32_t ipaddr;
   int32_t pid;
@@ -317,8 +318,8 @@ typedef struct {
   int16_t ready;
 
   /* copy of global variables for reference (not for use by nsmd) */
-  int16_t version;  /* nsmd version */
-  int16_t protocol; /* protocol version */
+  uint16_t version;  /* nsmd version */
+  uint16_t required; /* required version */
   int16_t priority;
   int16_t debug;
   char    logfile[NSMSYS_LOGNAME_SIZ];

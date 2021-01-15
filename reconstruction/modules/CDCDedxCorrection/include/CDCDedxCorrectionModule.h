@@ -8,20 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXCORRECTIONMODULE_H
-#define CDCDEDXCORRECTIONMODULE_H
-
-#include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionParameters.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <framework/dataobjects/EventMetaData.h>
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
@@ -30,13 +22,11 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
-#include <reconstruction/dbobjects/CDCDedxMeanPars.h>
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
 
-#include <string>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
   class CDCDedxTrack;
@@ -83,18 +73,19 @@ namespace Belle2 {
     /** Perform the cosine correction */
     void CosineCorrection(double costheta, double& dedx) const;
 
+    /** Perform the cosine edge correction */
+    void CosineEdgeCorrection(double costh, double& dedx) const;
+
     /** Perform a hadron saturation correction.
      * (Set the peak of the truncated mean for electrons to 1) */
     void HadronCorrection(double costheta,  double& dedx) const;
 
-    /** Perform a standard set of corrections (layer-level only) */
-    void StandardCorrection(int wireID, double costheta, double& dedx) const;
-
     /** Perform a standard set of corrections */
-    void StandardCorrection(int layer, int wireID, double doca, double enta, double costheta, double& dedx) const;
+    void StandardCorrection(int adc, int layer, int wireID, double doca, double enta, double length, double costheta,
+                            double& dedx) const;
 
     /** Get the standard set of corrections */
-    double GetCorrection(int layer, int wireID, double doca, double enta, double costheta) const;
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
 
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */
@@ -116,6 +107,8 @@ namespace Belle2 {
     bool m_runGain; /**< boolean to apply run gains */
     bool m_twoDCell; /**< boolean to apply 2D correction */
     bool m_oneDCell; /**< boolean to apply 1D correction */
+    bool m_cosineEdge; /**< boolean to apply cosine edge */
+    bool m_nonlADC; /**< boolean to apply non linear ADC */
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array: CDCDedxTrack */
 
@@ -128,6 +121,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
@@ -139,17 +134,5 @@ namespace Belle2 {
     /** upper bound for truncated mean */
     double m_removeHighest;
 
-    /** saturation correction parameter: alpha */
-    double  m_alpha{ -1.};
-    /** saturation correction parameter: gamma */
-    double  m_gamma{ -1.};
-    /** saturation correction parameter: delta */
-    double  m_delta{ -1.};
-    /** saturation correction parameter: power on cos(theta) */
-    double  m_power{ -1.};
-    /** saturation correction parameter: ratio */
-    double  m_ratio{ -1.};
-
   };
 } // Belle2 namespace
-#endif

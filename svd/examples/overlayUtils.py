@@ -16,8 +16,7 @@
 #############################################################
 
 import sys
-import os
-from basf2 import *
+import basf2 as b2
 import svd.overlay_utils as svdou
 import simulation as simu
 import glob
@@ -26,37 +25,37 @@ tag = "unused"
 if len(sys.argv) == 2:
     tag = sys.argv[1]
 
+'''
 # PREPARE YOUR INPUT FILES - ERROR printed at the end does not
 #                            affect output files
 # function provides output rootfile with SVDShaperDigits only
-'''
-main = create_path()
 
-# cosmics
-svdou.prepare_svd_overlay(main,\
- ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_120.root",\
-      "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_101.root",
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_100.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_10.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_1.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_2.root"
-])
+# random TRG
+# 1. link the input raw data in /gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/
+# and select:
+# location="/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/*.root"
+# and outputFileTag = ZS3
+# 2. then select:
+# location="/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/*_ZS3.root"
+# and outputFileTag = overlay
+# and outputFileTag = overlayZS with same location
 
-# xTalk
-svdou.prepare_svd_overlay(main,\
-                              ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/xTalk/physics*f00001.root"]
-                          )
-
-process(main)
+filelist=glob.glob(location)
+# print(filelist)
+for inputfile in filelist:
+    main = b2.create_path()
+#    svdou.prepare_svd_overlay(main, [inputfile],"ZS3")
+    svdou.prepare_svd_overlay(main, [inputfile],"overlay")
+#    svdou.prepare_svd_overlay(main, [inputfile],"overlayZS5")
 '''
 
 # EXAMPLE OF OVERLAY
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 # set the exp/run event informations
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [10])
@@ -72,11 +71,11 @@ main.add_module('EvtGenInput')
 bkgDir = '/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-00a/overlay/phase31/BGx1/set0/*.root'
 bg = glob.glob(bkgDir)
 if len(bg) == 0:
-    B2ERROR('No files found in ', bkgDir)
+    b2.B2ERROR('No files found in ', bkgDir)
     sys.exit()
 simu.add_simulation(main, bkgfiles=bg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
-if str(tag) == "xTalk" or str(tag) == "cosmics":
+if str(tag) == "xTalk" or str(tag) == "cosmics" or str(tag) == "randomTrigger" or str(tag) == "randomTriggerZS5":
     svdou.overlay_svd_data(main, str(tag))
 
 
@@ -91,8 +90,8 @@ main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

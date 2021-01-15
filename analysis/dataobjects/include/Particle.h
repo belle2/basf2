@@ -62,7 +62,7 @@ namespace Belle2 {
    * Additional private members are needed in order to make composite particles
    * (via combinations):
    *  - mdst index of an object from which the FS particle is created
-   *  - type of the object from which the particle is created (see EParticleType)
+   *  - source of the object from which the particle is created (see EParticleSourceObject)
    *  - flavor type (unflavored/flavored) of a decay or flavor type of FS particle
    *
    * Finally, it is possible to store user-defined floating-point values using addExtraInfo() and getExtraInfo(), identified by a string key.
@@ -75,13 +75,21 @@ namespace Belle2 {
   public:
 
     /**
-     * particle type enumerators (to be completed when all Mdst dataobjects are defined)
+     * particle source enumerators
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
+    enum EParticleSourceObject {
+      c_Undefined  = 0,
+      c_Track      = 1,
+      c_ECLCluster = 2,
+      c_KLMCluster = 3,
+      c_V0         = 4,
+      c_MCParticle = 5,
+      c_Composite  = 6
+    };
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
-      c_Unflavored = 0, /**< Is its own antiparticle or we don't know wether it is a particle/antiparticle. */
+      c_Unflavored = 0, /**< Is its own antiparticle or we don't know whether it is a particle/antiparticle. */
       c_Flavored = 1, /**< Is either particle or antiparticle. */
     };
 
@@ -135,13 +143,13 @@ namespace Belle2 {
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType flavor type
-     * @param particleType particle type
+     * @param particleType particle source
      * @param mdstIndex mdst index
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
-             const EParticleType particleType,
+             const EParticleSourceObject particleType,
              const unsigned mdstIndex);
 
     /**
@@ -166,7 +174,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
+     * @param properties particle property
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
@@ -183,8 +191,8 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
-     * @param daughter particle properties
+     * @param properties particle property
+     * @param daughterProperties daughter particle properties
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
@@ -222,7 +230,7 @@ namespace Belle2 {
     /**
      * Constructor from a reconstructed Track given as TrackFitResult.
      * To be used to create Particle objects from tracks with full control over
-     * the hypothesis (e.g. V0 daugthers).
+     * the hypothesis (e.g. V0 daughters).
      * @param trackArrayIndex track StoreArray index
      * @param trackFit pointer to TrackFitResult object
      * @param chargedStable Type of charged particle
@@ -284,6 +292,15 @@ namespace Belle2 {
     };
 
     /**
+     * Sets momentum scaling
+     * @param momentumScalingFactor scaling factor
+     */
+    void setMomentumScalingFactor(float momentumScalingFactor)
+    {
+      m_momentumScale = momentumScalingFactor;
+    }
+
+    /**
      * Sets 7x7 error matrix
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
@@ -333,18 +350,20 @@ namespace Belle2 {
     /**
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(int particleIndex, const bool updateType = true)
     {
       if (updateType) {
         // is it a composite particle or fsr corrected?
-        m_particleType = c_Composite;
+        m_particleSource = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
       m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
@@ -353,8 +372,9 @@ namespace Belle2 {
     /**
      * Removes index of daughter from daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool whether particle type should be updated if last daughter was removed
      */
-    void removeDaughter(const Particle* daughter);
+    void removeDaughter(const Particle* daughter, const bool updateType = true);
 
     // getters
 
@@ -383,12 +403,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns particle type as defined with enum EParticleType
+     * Returns particle source as defined with enum EParticleSourceObject
      * @return particle type
      */
-    EParticleType getParticleType() const
+    EParticleSourceObject getParticleSource() const
     {
-      return m_particleType;
+      return m_particleSource;
     }
 
     /**
@@ -421,8 +441,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns uncertaint on the invariant mass
-     * (requiers valid momentum error matrix)
+     * Returns uncertainty on the invariant mass
+     * (requires valid momentum error matrix)
      * @return mass error
      */
     //float getMassError() const;
@@ -449,7 +469,7 @@ namespace Belle2 {
     TLorentzVector get4Vector() const
     {
       TLorentzVector vec;
-      vec.SetXYZM(m_px, m_py, m_pz, m_mass);
+      vec.SetXYZM(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, m_mass);
       return vec;
     }
 
@@ -459,7 +479,7 @@ namespace Belle2 {
      */
     TVector3 getMomentum() const
     {
-      return TVector3(m_px, m_py, m_pz);
+      return m_momentumScale * TVector3(m_px, m_py, m_pz);
     };
 
     /**
@@ -468,7 +488,7 @@ namespace Belle2 {
      */
     float getMomentumMagnitude() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -477,7 +497,7 @@ namespace Belle2 {
      */
     float getP() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -486,7 +506,7 @@ namespace Belle2 {
      */
     float getPx() const
     {
-      return m_px;
+      return m_momentumScale * m_px;
     }
 
     /**
@@ -495,7 +515,7 @@ namespace Belle2 {
      */
     float getPy() const
     {
-      return m_py;
+      return m_momentumScale * m_py;
     }
 
     /**
@@ -504,7 +524,16 @@ namespace Belle2 {
      */
     float getPz() const
     {
-      return m_pz;
+      return m_momentumScale * m_pz;
+    }
+
+    /**
+     * Returns momentum scaling factor
+     * @return momentum scaling factor
+     */
+    float getMomentumScalingFactor() const
+    {
+      return m_momentumScale;
     }
 
     /**
@@ -640,7 +669,7 @@ namespace Belle2 {
     /** Apply a function to all daughters of this particle
      *
      * @param function function object to run on each daughter. If this
-     *    function returns true the processing will be stopped immeddiately.
+     *    function returns true the processing will be stopped immediately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
      * @return true if the function returned true for any of the particles it
@@ -666,13 +695,13 @@ namespace Belle2 {
     /**
      * Returns a vector of StoreArray indices of given MDST dataobjects
      *
-     * @param EParticleType corresponding to a given MDST dataobject
+     * @param type EParticleSourceObject corresponding to a given MDST dataobject
      * @return vector of StoreArray indices of a given MDST dataobjects
      */
-    std::vector<int> getMdstArrayIndices(EParticleType type) const;
+    std::vector<int> getMdstArrayIndices(EParticleSourceObject type) const;
 
     /**
-     * Returns true if final state ancessors of oParticle overlap
+     * Returns true if final state ancestors of oParticle overlap
      * @param oParticle pointer to particle
      * @return true if overlap, otherwise false
      */
@@ -694,9 +723,12 @@ namespace Belle2 {
      * M1 and M4 are copies since both conditions are fulfilled.
      *
      * @param oParticle pointer to other particle
+     * @param doDetailedComparison if true, this means that particles of different PDG codes,
+     *        but created from the same track or cluster will be indicated as copies.
+     *        Returns B2FATAL in case of comparison of c_MCParticle type to a non c_MCParticle.
      * @return true if particles are copies of each-other, otherwise false
      */
-    bool isCopyOf(const Particle* oParticle) const;
+    bool isCopyOf(const Particle* oParticle, bool doDetailedComparison = false) const;
 
     /**
      * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).
@@ -787,7 +819,7 @@ namespace Belle2 {
      */
     float getExtraInfo(const std::string& name) const;
 
-    /** Return wether the extra info with the given name is set. */
+    /** Return whether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
 
     /** Return the id of the associated ParticleExtraInfoMap or -1 if no map is set. */
@@ -851,6 +883,11 @@ namespace Belle2 {
     }
 
     /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     */
+    bool isMostLikely() const;
+
+    /**
     * Returns the ECLCluster EHypothesisBit for this Particle.
     */
     ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
@@ -891,6 +928,7 @@ namespace Belle2 {
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
     float m_pz;     /**< momentum component z */
+    float m_momentumScale = 1.0; /**< momentum scaling factor */
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
@@ -898,13 +936,13 @@ namespace Belle2 {
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
-    EParticleType m_particleType;  /**< particle type */
+    EParticleSourceObject m_particleSource;  /**< (mdst) source of particle */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
     int m_properties; /**< particle property */
     std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
     /**
-     * Identifier that can be used to identify whether the particle is unqiue
+     * Identifier that can be used to identify whether the particle is unique
      * or is a copy or representation of another. For example a kaon and pion
      * particles constructed from the same Track are representations of the
      * same physical object in the detector and cannot be used in the reconstruction
@@ -976,16 +1014,18 @@ namespace Belle2 {
 
     /**
      * Generate the PDG code with correct sign, using the charge
-     * @param charge of the particle
+     * @param chargedSign charge of the particle
      * @param chargedStable Type of charged particle
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 11); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 13); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
+    // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
+    // v13: added m_momentumScale
 
     friend class ParticleSubset;
   };

@@ -36,35 +36,34 @@ class DQMModes(Enum):
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 
-#: Definition of an EventOfDoom
-DOOM_NCDCHITSMAX = 6000
-DOOM_NSVDSHAPERDIGITSMAX = 70000
 
 #: Always store those objects
-ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]
+ALWAYS_SAVE_OBJECTS = ["EventMetaData", "RawFTSWs", "ROIpayload", "SoftwareTriggerResult", "SoftwareTriggerVariables",
+                       "TRGSummary"]
+
 #: Objects to be left on output
-RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs",
-                   "ROIs"]
+RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawTRGs", "ROIs"]
+
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
-                     'CDCHits', 'TOPDigits', 'ARICHHits',
-                     'ECLClusters',
+                     'CDCHits', 'TOPDigits',
+                     'ARICHHits', 'ECLClusters',
                      'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit1ds', 'EKLMHit2ds',
-                     'SoftwareTriggerResult']
+                     'EKLMHit2ds', 'SoftwareTriggerResult']
 
-#: list of DataStore names that are present when data enters the HLT.
-HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
+#: List of DataStore names that are present when data enters the HLT.
+HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData", "RawFTSWs"]
 HLT_INPUT_OBJECTS.remove("ROIs")
 
-#: list of DataStore names that are present when data enters the expressreco
+#: List of DataStore names that are present when data enters the expressreco
 EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
 # Detectors to be included in hlt
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
+
 # Detectors to be included in expressreco
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 #: Location of the database in the online system
-DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/database/database.txt"
+DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/conditions"

@@ -9,9 +9,10 @@ def fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='kfitter',
+    fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -21,7 +22,7 @@ def fitVertex(
 
     Info:
         Direct use of `fitVertex` is not recommended unless you know what you are doing.
-        If you're unsure, you probably want to use `treeFit` or `KFit`.
+        If you're unsure, you probably want to use `treeFit` or `kFit`.
 
     Parameters:
         list_name (str):        name of the input ParticleList
@@ -29,32 +30,35 @@ def fitVertex(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
-        fitter (str):           rave or kfitter
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fitter (str):           Rave or KFit
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
-        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
     warning = (
         "Direct use of fitVertex is not recommended unless you know what you are doing.\n"
-        "Please use treeFit or KFit.\n"
+        "Please use treeFit or kFit.\n"
         "See documentation at https://software.belle2.org"
     )
 
     B2WARNING(warning)
 
-    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
 def _fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='kfitter',
+    fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -71,11 +75,13 @@ def _fitVertex(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
-        fitter (str):           rave or kfitter
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fitter (str):           Rave or KFit
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
-        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
@@ -89,15 +95,21 @@ def _fitVertex(
     pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
     pvfit.param('smearing', smearing)
+    if massConstraint:
+        if isinstance(massConstraint[0], str):
+            pvfit.param('massConstraintListParticlename', massConstraint)
+        else:
+            pvfit.param('massConstraintList', massConstraint)
     path.add_module(pvfit)
 
 
-def KFit(list_name,
+def kFit(list_name,
          conf_level,
          fit_type='vertex',
          constraint='',
          daughtersUpdate=False,
          decay_string='',
+         massConstraint=[],
          smearing=0,
          path=None):
     """
@@ -114,268 +126,27 @@ def KFit(list_name,
           * ``vertex`` for a vertex fit
           * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
           * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
+          * ``massfourC`` for a vertex fit with a 4-momentum constraint and mass constraints on the specified daughter particles
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
-        daughtersUpdate( bool): make copy of the daughters and update them after the KFit
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
+        daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):      modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
-def vertexKFit(
+def raveFit(
     list_name,
     conf_level,
+    fit_type='vertex',
     decay_string='',
     constraint='',
-    smearing=0,
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same
-        functionality if you set the parameter ``fit_type`` to ``vertex``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
-        smearing (float) :  IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to vertex.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'vertex', constraint, False, smearing, path)
-
-
-def vertexKFitDaughtersUpdate(
-    list_name,
-    conf_level,
-    constraint='',
-    smearing=0,
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``vertex`` and the parameter ``daughtersUpdate`` to ``True``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
-        smearing (float) :  IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to vertex and the parameter daughtersUpdate to True.")
-
-    _fitVertex(list_name, conf_level, '', 'kfitter', 'vertex', constraint, True, smearing, path)
-
-
-def massVertexKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``massvertex``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to massvertex.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', False, 0, path)
-
-
-def massVertexKFitDaughtersUpdate(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``massvertex`` and the parameter ``daughtersUpdate`` to ``True``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to massvertex and the parameter daughtersUpdate to True.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', True, 0, path)
-
-
-def massKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``mass``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to mass.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', False, 0, path)
-
-
-def massKFitDaughtersUpdate(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``mass`` and the parameter ``daughtersUpdate`` to ``True``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to mass and the parameter daughtersUpdate to True.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', True, 0, path)
-
-
-def fourCKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``fourC``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to fourC.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', False, 0, path)
-
-
-def fourCKFitDaughtersUpdate(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-):
-    """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
-
-    Warning:
-        This function is no longer recommended and will be removed in release-05.
-        It is replaced by the function `KFit` which provides the same functionality
-        if you set the parameter ``fit_type`` to ``fourC`` and the parameter ``daughtersUpdate`` to ``True``.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-    """
-
-    B2WARNING("This function is no longer recommended and will be removed in release-05.\n"
-              "It is replaced by the function KFit which provides the same functionality"
-              "if you set the parameter fit_type to fourC and the parameter daughtersUpdate to True.")
-
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', True, 0, path)
-
-
-def vertexRave(
-    list_name,
-    conf_level,
-    decay_string='',
-    constraint='',
+    daughtersUpdate=False,
     path=None,
     silence_warning=False,
 ):
@@ -386,16 +157,23 @@ def vertexRave(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.kFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
         conf_level (float): minimum value of the confidence level to accept the fit.
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
+        fit_type (str): type of the RAVE vertex fit.Valid options are
+
+          * ``mass`` for a mass-constrained fit (the 7x7 error matrix of the mother particle has to be defined)
+          * ``vertex`` for a vertex fit without any mass constraint
+          * ``massvertex`` for a mass-constrained vertex fit
+
         decay_string (str): select particles used for the vertex fit
         constraint (str):   add aditional constraint to the fit
             (valid options are ipprofile or iptube).
+        daughtersUpdate (bool): make copy of the daughters and update them after the Rave vertex fit
         path (basf2.Path):  modules are added to this path
         silence_warning (bool): silence the warning advertising TreeFitter use
     """
@@ -422,228 +200,7 @@ def vertexRave(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'vertex', constraint, False, 0, path)
-
-
-def vertexRaveDaughtersUpdate(
-    list_name,
-    conf_level,
-    decay_string='',
-    constraint='',
-    path=None,
-    silence_warning=False,
-):
-    """
-    Performs a vertex fit using RAVE for each Particle in the given ParticleList and updating fully the
-    daughters used in the fit.
-
-    Warning:
-        `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
-        Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
-
-    The mother is only used in the fit if all daugthers (charged and neutral) are selected.
-    For this, leave the ``decay_string`` empty.
-
-    Information:
-       For vertices with a single track the mother is not used.
-       When a particle is fully updated its 4momentum, 3D vertex, covariance Matrix
-       and p-value are updated.
-       When the mother is not used in the fit, only its 3D vertex, covariance Matrix
-       and p-value are updated.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        constraint (str):   add aditional constraint to the fit
-            (valid options are ipprofile or iptube).
-        path (basf2.Path):  modules are added to this path
-        silence_warning (bool): silence the warning advertising TreeFitter use
-    """
-
-    # verbose deprecation message
-    message_a = (
-        "RAVE is deprecated since it is not maintained.\n"
-        "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
-        "Instead, we recommend TreeFitter (treeFit) or KFit.\n"
-        "Try: \n  treeFit(\'" + list_name + "\'," + str(conf_level) +
-        ", updateAllDaughters=True, path=mypath)\n"
-    )
-    message_b = "To silence this warning, add silence_warning=True when you call this function."
-
-    # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if constraint is '':
-        message_if = ""
-    else:
-        message_if = (
-            "Please consult the documentation at  https://software.belle2.org \n"
-            "(search for TreeFitter) for special constraints.\n"
-        )
-
-    if not silence_warning:
-        B2WARNING(message_a + message_if + message_b)
-
-    puvfit = register_module('VertexFitUpdateDaughters')
-    puvfit.set_name('VertexFitUpdateDaughters_' + list_name)
-    puvfit.param('listName', list_name)
-    puvfit.param('confidenceLevel', conf_level)
-    puvfit.param('decayString', decay_string)
-    puvfit.param('withConstraint', constraint)
-    path.add_module(puvfit)
-
-
-def massVertexRave(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-    silence_warning=False,
-):
-    """
-    Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
-
-    Warning:
-        `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
-        Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-        silence_warning (bool): silence the warning advertising TreeFitter use
-    """
-
-    # verbose deprecation message
-    message_a = (
-        "RAVE is deprecated since it is not maintained.\n"
-        "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
-        "Instead, we recommend TreeFitter (treeFit) or KFit.\n"
-        "Try: \n  treeFit(\'" + list_name + "\'," + str(conf_level) +
-        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False, path=mypath)\n"
-    )
-    message_b = "To silence this warning, add silence_warning=True when you call this function."
-
-    # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if decay_string is '':
-        message_if = ""
-    else:
-        message_if = (
-            "Please consult the documentation at  https://software.belle2.org \n"
-            "(search for TreeFitter) for special constraints.\n"
-        )
-
-    if not silence_warning:
-        B2WARNING(message_a + message_if + message_b)
-
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', False, 0, path)
-
-
-def massVertexRaveDaughtersUpdate(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-    silence_warning=False,
-):
-    """
-    Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList and update the daughters.
-
-    Warning:
-        `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
-        Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-        silence_warning (bool): silence the warning advertising TreeFitter use
-    """
-
-    # verbose deprecation message
-    message_a = (
-        "RAVE is deprecated since it is not maintained.\n"
-        "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
-        "Instead, we recommend TreeFitter (treeFit) or KFit.\n"
-        "Try: \n  treeFit(\'" + list_name + "\'," + str(conf_level) +
-        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True, path=mypath)\n"
-    )
-    message_b = "To silence this warning, add silence_warning=True when you call this function."
-
-    # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if decay_string is '':
-        message_if = ""
-    else:
-        message_if = (
-            "Please consult the documentation at  https://software.belle2.org \n"
-            "(search for TreeFitter) for special constraints.\n"
-        )
-
-    if not silence_warning:
-        B2WARNING(message_a + message_if + message_b)
-
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', True, 0, path)
-
-
-def massRave(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=None,
-    silence_warning=False,
-):
-    """
-    Perform mass fit using the RAVE for each Particle in the given ParticleList.
-    7x7 error matrix of the mother particle must be defined
-
-    Warning:
-        `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
-        Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
-
-    Parameters:
-        list_name (str):    name of the input ParticleList
-        conf_level (float): minimum value of the confidence level to accept the fit.
-            Setting this parameter to -1 selects all particle candidates.
-            The value of 0 rejects the particle candidates with failed fit.
-        decay_string (str): select particles used for the vertex fit
-        path (basf2.Path):  modules are added to this path
-        silence_warning (bool): silence the warning advertising TreeFitter use
-    """
-
-    # verbose deprecation message
-    message_a = (
-        "RAVE is deprecated since it is not maintained.\n"
-        "Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.\n"
-        "Instead, we recommend TreeFitter (treeFit) or KFit.\n"
-        "Try: \n  treeFit(\'" + list_name + "\'," + str(conf_level) +
-        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False, path=mypath)\n"
-    )
-    message_b = "To silence this warning, add silence_warning=True when you call this function."
-
-    # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if decay_string is '':
-        message_if = ""
-    else:
-        message_if = (
-            "Please consult the documentation at  https://software.belle2.org \n"
-            "(search for TreeFitter) for special constraints.\n"
-        )
-
-    if not silence_warning:
-        B2WARNING(message_a + message_if + message_b)
-
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'mass', '', False, 0, path)
+    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, None, daughtersUpdate, 0, path)
 
 
 def treeFit(
@@ -704,7 +261,6 @@ def treeFit(
     treeFitter.param('customOriginConstraint', customOriginConstraint)
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
-
     path.add_module(treeFitter)
 
 
@@ -718,6 +274,8 @@ def TagV(
     reqPXDHits=0,
     maskName='',
     fitAlgorithm='Rave',
+    useTruthInFit=False,
+    useRollBack=False,
     path=None,
 ):
     """
@@ -741,19 +299,27 @@ def TagV(
         trackFindingType (str): choose how to look for tag tracks. Can be set to
 
           * standard: all tracks except from Kshorts;
-          * standard_PXD: **default**, same as above but consider only tracks with at least 1 PXD hit;
-          * singleTrack: only choose the best track, DOES NOT WORK with no constraint;
-          * singleTrack_PXD: same as above but consider only tracks with at least 1 PXD hit;
+          * standard_PXD: **default**, same as above but consider only tracks with at least 1 PXD hit.
+              If the fit fails, attempt again with the standard option;
 
         fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFit
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
+        useTruthInFit (bool): True when the tag vertex fit is performed with the true momentum and
+            position of the tracks (default is false). The variable :b2:var:`TagVFitTruthStatus` is set to 1
+            if the truth-matching succeeds and 2 otherwise.
+        useRollBack (bool): True when the tag vertex fit is performed with position of tracks rolled back to
+            position of the mother B (default is false). The variable :b2:var:`TagVRollBackStatus` is set to 1
+            if the truth-matching succeeds and 2 otherwise.
         path (basf2.Path): modules are added to this path
 
     Warning:
         Note that the useFitAlgorithm (str) parameter is deprecated and replaced by constraintType (str)
         and trackFindingType (str)
+
+    Warning:
+        The trackFindingType ``singleTrack`` and ``singleTrack_PXD`` are broken and **cannot** be used any more.
     """
 
     tvfit = register_module('TagVertex')
@@ -767,6 +333,8 @@ def TagV(
     tvfit.param('askMCInformation', askMCInfo)
     tvfit.param('reqPXDHits', reqPXDHits)
     tvfit.param('fitAlgorithm', fitAlgorithm)
+    tvfit.param('useTruthInFit', useTruthInFit)
+    tvfit.param('useRollBack', useRollBack)
     path.add_module(tvfit)
 
 
@@ -785,8 +353,8 @@ def fitPseudo(
 
         from modularAnalysis import fitPseudo
         from stdPi0s import stdPi0s
-        stdPi0s("loose", path=mypath)
-        fitPseudo("pi0:loose", path=mypath)
+        stdPi0s("eff40_Jan2020", path=mypath)
+        fitPseudo("pi0:eff40_Jan2020", path=mypath)
 
     Parameters:
         list_name (str): the name of the list to add the covariance matrix to

@@ -10,7 +10,6 @@
 
 #include <svd/modules/svdReconstruction/SVDNNClusterizerModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -26,7 +25,6 @@
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
-#include <unordered_map>
 #include <algorithm>
 #include <numeric>
 #include <functional>

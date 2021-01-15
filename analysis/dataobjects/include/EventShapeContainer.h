@@ -25,7 +25,7 @@ namespace Belle2 {
    * (like thrust axis or jet axes). These quantities will be then used by the VaribaleManager functions
    * to get the final EventShape variable, which are usually very simple to calculate.
    * For example, the  EventShapeCalculator will store here the Fox-Wolfram moments, while the ratios of them will be calculated
-   * on fly by the Variable Manager. We prefer ths approach rather than storing every event shape variable direcly
+   * on fly by the Variable Manager. We prefer this approach rather than storing every event shape variable directly
    * here to keep a reasonably small data object, and making adding more variables easier.
    *
    * All the quantities are defined and calculated in the center of mass frame.
@@ -74,8 +74,8 @@ namespace Belle2 {
 
     /**
      * Sets the i-th sphericity eigenvector
-     * @param short the order (0,1,2)
-     * @param TVector3 the eigenvector
+     * @param i the order (0,1,2)
+     * @param eigenvector the eigenvector
      */
     void setSphericityEigenvector(short i, TVector3 eigenvector)
     {
@@ -87,8 +87,8 @@ namespace Belle2 {
 
     /**
      * Sets the i-th sphericity eigenvalue
-     * @param short the order (0,1,2)
-     * @param float the eigenvector
+     * @param i the order (0,1,2)
+     * @param eigenvalue the eigenvalue
      */
     void setSphericityEigenvalue(short i, float eigenvalue)
     {
@@ -100,8 +100,8 @@ namespace Belle2 {
 
     /**
      * Sets the Fox-Wolfram (FW) moment of order n. This is NOT the normalized FW moment (R1, R2...), but the original one.
-     * @param short The order (0 to 9)
-     * @param float The Fox-Wolfram moment value
+     * @param order The order (0 to 9)
+     * @param moment The Fox-Wolfram moment value
      */
     void setFWMoment(short order, float moment)
     {
@@ -113,7 +113,7 @@ namespace Belle2 {
 
     /**
      * Sets the thrust of the event
-     * @param float The thrust  value
+     * @param thrust thrust value
      */
     void setThrust(float thrust)
     {
@@ -122,7 +122,7 @@ namespace Belle2 {
 
     /**
      * Sets the thrust axis, normalizing it
-     * @param TVector3 thrust axis.
+     * @param thrustAxis thrust axis.
      */
     void setThrustAxis(TVector3 thrustAxis)
     {
@@ -133,7 +133,7 @@ namespace Belle2 {
 
     /**
      * Sets the spherocity axis, normalizing it
-     * @param TVector3 sperocity axis. Must have magnitude equal to the thrust value.
+     * @param spherocityAxis sperocity axis. Must have magnitude equal to the thrust value.
      */
     void setSpherocityAxis(TVector3 spherocityAxis)
     {
@@ -144,8 +144,8 @@ namespace Belle2 {
 
     /**
      * Sets the harmonic moment of order n, calculated using the thrust axis.
-     * @param short The order (0 to 9)
-     * @param float The harmonic moment value
+     * @param order The order (0 to 9)
+     * @param moment The harmonic moment value
      */
     void setHarmonicMomentThrust(short order, float moment)
     {
@@ -157,8 +157,8 @@ namespace Belle2 {
 
     /**
      * Sets the harmonic moment of order n, calculated using the collision axis.
-     * @param short The order (0 to 9)
-     * @param float The harmonic moment value
+     * @param order The order (0 to 9)
+     * @param moment The harmonic moment value
      */
     void setHarmonicMomentCollision(short order, float moment)
     {
@@ -170,8 +170,8 @@ namespace Belle2 {
 
     /**
      * Sets the Cleo cone of order n, calculated using the thrust axis.
-     * @param short The order (0 to 9)
-     * @param float The Cleo cone value
+     * @param order The order (0 to 9)
+     * @param moment The Cleo cone value
      */
     void setCleoConeThrust(short order, float moment)
     {
@@ -183,8 +183,8 @@ namespace Belle2 {
 
     /**
      * Sets the Cleo cone of order n, calculated using the collision axis.
-     * @param short The order (0 to 9)
-     * @param float The Cleo cone value
+     * @param order The order (0 to 9)
+     * @param moment The Cleo cone value
      */
     void setCleoConeCollision(short order, float moment)
     {
@@ -196,7 +196,7 @@ namespace Belle2 {
 
     /**
      * Sets the 4-momentum of the forward hemisphere, as defined by the thrust axis.
-     * @param TLorentzVector 4-momentum of the particles in the hemisphere
+     * @param mom TLorentzVector 4-momentum of the particles in the forward hemisphere
      */
     void setForwardHemisphere4Momentum(TLorentzVector mom)
     {
@@ -205,7 +205,7 @@ namespace Belle2 {
 
     /**
      * Sets the 4-momentum of the backward hemisphere, as defined by the thrust axis.
-     * @param TLorentzVector 4-momentum of the particles in the hemisphere
+     * @param mom TLorentzVector 4-momentum of the particles in the backward hemisphere
      */
     void setBackwardHemisphere4Momentum(TLorentzVector mom)
     {
@@ -222,7 +222,7 @@ namespace Belle2 {
      * Returns the thrust
      * @return TVector3 the thrust axis, normalized
      */
-    float getThrust()
+    float getThrust() const
     {
       return m_thrust;
     };
@@ -231,7 +231,7 @@ namespace Belle2 {
      * Returns the thrust axis (normalized).
      * @return TVector3 the thrust axis, normalized
      */
-    TVector3 getThrustAxis()
+    TVector3 getThrustAxis() const
     {
       return m_thrustAxis;
     };
@@ -240,17 +240,17 @@ namespace Belle2 {
      * Returns the spherocity axis (normalized).
      * @return TVector3 the spherocity axis, normalized
      */
-    TVector3 getSpherocityAxis()
+    TVector3 getSpherocityAxis() const
     {
       return m_spherocityAxis;
     };
 
     /**
      * Returns the i-th sphericity matrix eigenvalue.
-     * @param The number of the eigenvalue (0,1,2)
+     * @param i the number of the eigenvalue (0,1,2)
      * @return float the eigenvalue
      */
-    float getSphericityEigenvalue(short i)
+    float getSphericityEigenvalue(short i) const
     {
       if (i < 0 || i > 2) {
         B2ERROR("Invalid  Eigenvalue number  (n = " << i << "). There are only 3 eigenvalues...");
@@ -262,10 +262,10 @@ namespace Belle2 {
 
     /**
      * Returns the i-th sphericity matrix eigenvector.
-     * @param The number of the eigenvalue (0,1,2)
+     * @param i the number of the eigenvalue (0,1,2)
      * @return float the eigenvector
      */
-    TVector3 getSphericityEigenvector(short i)
+    TVector3 getSphericityEigenvector(short i) const
     {
       if (i < 0 || i > 2) {
         B2ERROR("Invalid  Eigenvalue number  (n = " << i << "). There are only 3 eigenvalues...");
@@ -279,10 +279,10 @@ namespace Belle2 {
 
     /**
      * Returns the Fox-Wolfram moment of a given order.
-     * @param short Order of the FW moment
+     * @param order Order of the FW moment
      * @return float FW moment
      */
-    float getFWMoment(short order)
+    float getFWMoment(short order) const
     {
       if (order < 0 || order > 9) {
         B2ERROR("Invalid Fox-Wolfram moment order. It must be in the [0,9] range.");
@@ -293,10 +293,10 @@ namespace Belle2 {
 
     /**
      * Returns the harmonic moment of a given order, calculated respect to the beam axis
-     * @param short Order of the harmonic moment
+     * @param order Order of the harmonic moment
      * @return float harmonic moment
      */
-    float getHarmonicMomentCollision(short order)
+    float getHarmonicMomentCollision(short order) const
     {
       if (order < 0 || order > 9) {
         B2ERROR("Invalid harmonic moment order. It  must be in the [0,9] range.");
@@ -307,10 +307,10 @@ namespace Belle2 {
 
     /**
      * Returns the harmonic moment of a given order, calculated respect to the thrust axis
-     * @param short Order of the harmonic moment
+     * @param order Order of the harmonic moment
      * @return float harmonic moment
      */
-    float getHarmonicMomentThrust(short order)
+    float getHarmonicMomentThrust(short order) const
     {
       if (order < 0 || order > 9) {
         B2ERROR("Invalid harmonic moment order. The order must be in the [0,9] range.");
@@ -322,10 +322,10 @@ namespace Belle2 {
 
     /**
      * Returns the Cleo cone of a given order, calculated respect to the beam axis
-     * @param short Order of the harmonic moment
+     * @param order Order of the harmonic moment
      * @return float Cleo cone
      */
-    float getCleoConeCollision(short order)
+    float getCleoConeCollision(short order) const
     {
       if (order < 0 || order > 9) {
         B2ERROR("Invalid CLEO cone order. The order must be in the [0,9] range.");
@@ -336,10 +336,10 @@ namespace Belle2 {
 
     /**
      * Returns the Cleo cone of a given order, calculated respect to the thrust axis
-     * @param short Order of the harmonic moment
+     * @param order Order of the harmonic moment
      * @return float Cleo cone
      */
-    float getCleoConeThrust(short order)
+    float getCleoConeThrust(short order) const
     {
       if (order < 0 || order > 9) {
         B2ERROR("Invalid CLEO cone order. The order must be in the [0,9] range.");
@@ -353,7 +353,7 @@ namespace Belle2 {
      * Returns the 4-momentum of the forward hemisphere, as defined by the thrust axis.
      * @return TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    TLorentzVector getForwardHemisphere4Momentum()
+    TLorentzVector getForwardHemisphere4Momentum() const
     {
       return m_forwardHemisphere4Momentum;
     };
@@ -362,7 +362,7 @@ namespace Belle2 {
      * Return the 4-momentum of the backward hemisphere, as defined by the thrust axis.
      * @return TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    TLorentzVector getBackwardHemisphere4Momentum()
+    TLorentzVector getBackwardHemisphere4Momentum() const
     {
       return m_backwardHemisphere4Momentum;
     };
@@ -371,10 +371,10 @@ namespace Belle2 {
   private:
 
     // Axes
-    TVector3 m_thrustAxis; /**< Thrust axis. It is not normalized, and it's lenght is the thrust value */
-    TVector3 m_spherocityAxis; /**< Spherocity axis. It is not normalized, and it's lenght is the spherocity value */
+    TVector3 m_thrustAxis; /**< Thrust axis. It is not normalized, and it's length is the thrust value */
+    TVector3 m_spherocityAxis; /**< Spherocity axis. It is not normalized, and it's length is the spherocity value */
 
-    // Axis-indepentend quantities
+    // Axis-independent quantities
     TVector3 m_sphericityEigenvector[3]; /**< Sphericity tensor eigenvectors*/
     float m_sphericityEigenvalue[3] = {0.}; /**< Sphericity tensor eigenvalues*/
     float m_foxWolframMoments[10] = {0.}; /**< Fox Wolfram moments up to order 9. */

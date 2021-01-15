@@ -12,8 +12,6 @@
 
 #include <simulation/monopoles/G4Monopole.h>
 
-#include <G4ParticleTable.hh>
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <framework/logging/Logger.h>
 

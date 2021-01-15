@@ -9,7 +9,6 @@
 
 #include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -127,7 +126,7 @@ CDCTrigger2DFinderModule::initialize()
 
   if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
 
-  CDCGeometryPar& cdc = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdc = CDCGeometryPar::Instance();
   int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {

@@ -72,5 +72,9 @@ namespace Belle2::SoftwareTrigger {
     double m_cosmicMinPt = 0.5 * Unit::GeV;
     /// which LAB cluster energy vetoes a cosmic candidate
     double m_cosmicMaxClusterEnergy = 1.0 * Unit::GeV;
+    /// maximum z0 for well understood magnetic field (cm)
+    double m_goodMagneticRegionZ0 = 57.;
+    /// minimum d0 for well understood magnetic field, if z0 is large (cm)
+    double m_goodMagneticRegionD0 = 26.5;
   };
 }

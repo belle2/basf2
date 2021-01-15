@@ -46,8 +46,10 @@ namespace Belle2 {
     std::string m_histoname;
     /** The prefix of PV. */
     std::string  m_pvPrefix;
+    /** The prefix for MonitoringObj. */
+    std::string  m_monPrefix;
     /** Update entry intervall */
-    int m_min_entries = 1000;
+    int m_minEntries = 1000;
 
     /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
@@ -57,6 +59,12 @@ namespace Belle2 {
     /** last histogram */
     TH1* m_h_last = nullptr;
 
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
+
+    /** flag if to export to EPICS */
+    bool m_useEpics;
+    /** number of EPICS PVs */
     static const int m_parameters = 2;
 #ifdef _BELLE2_EPICS
     chid mychid[m_parameters];// hard limit max 2 parameters

@@ -9,80 +9,194 @@
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
+#include <iostream>
+#include <fstream>
+
+class InputParser {
+public:
+  InputParser(const int& argc, char** argv)
+  {
+    for (int i = 1; i < argc; ++i)
+      this->tokens.push_back(std::string(argv[i]));
+  }
+  const std::string& getCmdOption(const std::string& option) const
+  {
+    std::vector<std::string>::const_iterator itr;
+    itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
+    if (itr != this->tokens.end() && ++itr != this->tokens.end()) {
+      return *itr;
+    }
+    static const std::string empty_string("");
+    return empty_string;
+  }
+  bool cmdOptionExists(const std::string& option) const
+  {
+    return std::find(this->tokens.begin(), this->tokens.end(), option)
+           != this->tokens.end();
+  }
+private:
+  std::vector <std::string> tokens;
+};
 
 using namespace Belle2;
 
-void setconfig_nnt()
+int main(int argc, char** argv)
 {
+  int iovc = 0;
+  int nniov_exp_start;
+  int nniov_exp_end;
+  int nniov_run_start;
+  int nniov_run_end;
+  std::string configfilename = "";
+  std::string nnname;
+  std::string nnpath;
+  std::string nnnote;
+  std::string fwname;
+  std::string fwnote;
+  bool ppbool;
+  std::string ppnote;
+
+
+  InputParser input(argc, argv);
+  if (input.cmdOptionExists("-h")) {
+    std::cout << "A small tool to create ConDB payloads for the Neurotrigger." << std::endl;
+    std::cout << "Usage: \% trg-cdc-neurotrigger-writedb -f example.conf" << std::endl;
+  }
+  const std::string& filename = input.getCmdOption("-f");
+  if (!filename.empty()) {
+    configfilename = filename;
+  }
+
   // Creating payload object:
   DBImportObjPtr<CDCTriggerNeuroConfig> nc;
   nc.construct();
-  //B2LinkFormat:
-  //                  start,  end,    offset, name,                   description
-  nc->addB2FormatLine(0,      22,     0,      "ETF",                  "");
-  nc->addB2FormatLine(23,     43,     0,      "TSF8",                 "");
-  nc->addB2FormatLine(44,     64,     0,      "TSF6",                 "");
-  nc->addB2FormatLine(65,     85,     0,      "TSF4",                 "");
-  nc->addB2FormatLine(86,     106,    0,      "TSF2",                 "");
-  nc->addB2FormatLine(107,    127,    0,      "TSF0",                 "");
-  nc->addB2FormatLine(128,    134,    0,      "Phi",                  "");
-  nc->addB2FormatLine(135,    141,    0,      "Omega",                "");
-  nc->addB2FormatLine(142,    351,    0,      "TSF1",                 "");
-  nc->addB2FormatLine(352,    561,    0,      "TSF3",                 "");
-  nc->addB2FormatLine(562,    771,    0,      "TSF5",                 "");
-  nc->addB2FormatLine(772,    981,    0,      "TSF7",                 "");
-  nc->addB2FormatLine(982,    1170,   0,      "TSF Selected",         "");
-  nc->addB2FormatLine(1172,   1521,   0,      "MLP Input",            "");
-  nc->addB2FormatLine(1522,   1524,   0,      "NetSel",               "");
-  nc->addB2FormatLine(1525,   1537,   0,      "MLP Output 0",         "");
-  nc->addB2FormatLine(1538,   1550,   0,      "MLP Output 1",         "");
-  nc->addB2FormatLine(1551,   1551,   0,      "Enable NNT",           "");
-  nc->addB2FormatLine(1552,   1552,   0,      "active etf",           "");
-  nc->addB2FormatLine(1553,   1558,   0,      "active 2d",            "");
-  nc->addB2FormatLine(1559,   1578,   0,      "active tsf7",          "");
-  nc->addB2FormatLine(1579,   1598,   0,      "active tsf5",          "");
-  nc->addB2FormatLine(1599,   1618,   0,      "active tsf3",          "");
-  nc->addB2FormatLine(1619,   1638,   0,      "active tsf1",          "");
-  nc->addB2FormatLine(1639,   1639,   0,      "active nnt",           "");
-  nc->addB2FormatLine(1640,   1975,   0,      "persistor stereo",     "");
-  nc->addB2FormatLine(1976,   1999,   0,      "empty bits",           "");
-  nc->addB2FormatLine(2000,   2015,   0,      "NNT Clock Counter",    "");
-  nc->addB2FormatLine(2016,   2031,   0,      "'00000' & B2I Clock",  "");
-  nc->addB2FormatLine(2032,   2047,   0,      "hex'dddd'",            "");
 
-  //set neural network filename:
-  nc->setNNName("v3.0.0_Neuro20170109_20170109");
+  std::ifstream confile;
+  try {
+    confile.open(configfilename, std::ifstream::in);
+  } catch (int e) {
+    std::cout << "ERROR! While opening file: " << configfilename << "    Error code: " << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  std::string line_all;
+  if (!confile.is_open()) {
+    std::cout << "ERROR! While opening file: " << configfilename << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  while (std::getline(confile, line_all)) {  // remove comments
+    std::size_t hashtag = line_all.find('#');
+    std::string line = line_all.substr(0, hashtag);
+    std::string par;
+    std::string key;
+    if (line.length() < 3) {
+      continue;
+      // check, if line wasnt a pure comment line
+    }
+    if (line.find('=') == std::string::npos) {
+      continue;
+    }
+    par = line.substr(0, line.find('='));
+    par.erase(std::remove(par.begin(), par.end(), ' '), par.end()); // remove whitespaces in whole string
 
-  // loading MLPs:
-  nc->loadMLPs("trg/cdc/data/Neuro20170109.root", "MLPs");
+    if (par == "nniov_run_start") {
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nniov_run_start = std::stoi(key);
+      iovc++;
+    }
+    if (par == "nniov_run_end") {
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nniov_run_end = std::stoi(key);
+      iovc++;
+    }
+    if (par == "nniov_exp_start") {
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nniov_exp_start = std::stoi(key);
+      iovc++;
+    }
+    if (par == "nniov_exp_end") {
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nniov_exp_end = std::stoi(key);
+      iovc++;
+    }
+    if (par == "nnname") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nnname = key;
+      //set neural network filename:
+      nc->setNNName(nnname);
+    }
+    if (par == "nnnote") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nnnote = key;
+      //add notes for expert networks
+      nc->setNNNotes(nnnote);
+    }
+    if (par == "nnpath") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      nnpath = key;
+      // loading MLPs:
+      nc->loadMLPs(nnpath, "MLPs");
+    }
+    if (par == "fwname") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      fwname = key;
+      //set firmware version id:
+      nc->setNNTFirmwareVersionID(fwname);
+    }
+    if (par == "fwnote") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      fwnote = key;
+      // add comment about firmware:
+      nc->setNNTFirmwareComment(fwnote);
 
-  //add notes for expert networks
-  nc->setNNNotes("Default weights from the basf2 data directory");
+    }
+    if (par == "ppnote") {
+      // may look confusing at a first glance, but cuts exactly the content between the first two occurrences of doublequotes
+      key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
+      ppnote = key;
+      //add preprocessing notes:
+      nc->setPPNotes(ppnote);
+    }
+    if (par == "ppbool") {
+      if (line.find("alse") != std::string::npos) { //dirty case insensitive
+        ppbool = false;
+      } else if (line.find("rue") != std::string::npos) {
+        ppbool = true;
+      } else {
+        std::cout << "ERROR!: Wrong key argument for parameter ppbool:" << line << std::endl;
+      }
+      //define to use the ETF:
+      nc->setUseETF(ppbool);
+    }
+    if (par == "addb2formatline") {
+      // split key in data fields:
+      std::stringstream ss;
+      ss << line.substr((line.find('(') + 1), (line.find(')') - 1 - line.find('(')));
+      std::string uid;
+      std::string startstr;
+      std::string endstr;
+      std::string offsetstr;
+      std::string description;
+      std::getline(ss, uid, ',');
+      std::getline(ss, startstr, ',');
+      std::getline(ss, endstr, ',');
+      std::getline(ss, offsetstr, ',');
+      std::getline(ss, description, '\n');
+      nc->addB2FormatLine(std::stoi(startstr), std::stoi(endstr), std::stoi(offsetstr), uid.substr((uid.find('"') + 1), (uid.find('"',
+                          uid.find('"') + 1) - 1 - uid.find('"'))), description.substr((description.find('"') + 1), (description.find('"',
+                              description.find('"') + 1) - 1 - description.find('"'))));
 
-  //define to use the ETF:
-  nc->setUseETF(true);
-
-  //add preprocessing notes:
-  nc->setPPNotes("default");
-
-  //set firmware version id:
-  nc->setNNTFirmwareVersionID("v0.0.0_default_20181120");
-
-  // add comment about firmware:
-  nc->setNNTFirmwareComment("not known yet");
-
-  IntervalOfValidity iov(1003, 0, 1003, -1);
-  nc.import(iov);
-}
-
-int main()
-{
-  setconfig_nnt();
+    }
+  }
+  if (iovc > 3) { // >3 means all 4 iov numbers are there
+    // set interval of validity:
+    IntervalOfValidity iov(nniov_exp_start, nniov_run_start, nniov_exp_end, nniov_run_end);
+    nc.import(iov);
+  }
+  return 0;
 }

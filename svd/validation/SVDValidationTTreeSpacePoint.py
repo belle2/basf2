@@ -11,17 +11,13 @@
   </description>
 </header>
 """
-import sys
-import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
-from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataSpacePoint {\
@@ -34,21 +30,21 @@ gROOT.ProcessLine('struct EventDataSpacePoint {\
     float time_v;\
     };')
 
-from ROOT import EventDataSpacePoint
+from ROOT import EventDataSpacePoint  # noqa
 
 
-class SVDValidationTTreeSpacePoint(Module):
+class SVDValidationTTreeSpacePoint(b2.Module):
+    '''class to create spacepoint ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeSpacePoint, self).__init__()
-        # Output ROOT file
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeSpacePoint.root', 'recreate')
-        # TTrees for output data
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventDataSpacePoint class
+        #: instance of EventDataSpacePoint class
         self.data = EventDataSpacePoint()
 
         # Declare tree branches
@@ -58,9 +54,6 @@ class SVDValidationTTreeSpacePoint(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Find digit with a cluster and save needed information"""

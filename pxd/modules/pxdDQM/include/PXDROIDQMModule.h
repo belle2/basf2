@@ -48,6 +48,7 @@ namespace Belle2 {
       std::string m_PXDRawROIsName;        /**< RawROI StoreArray name */
 
       bool m_eachModule{false}; ///< create a histo per module
+      bool m_offlineDQM{false}; ///< create 2d plots for offline checks
 
       /** Storearray for ROIs  */
       StoreArray<PXDRawROIs> m_storeROIs{};
@@ -85,7 +86,6 @@ namespace Belle2 {
       TH1F* hrawROIDCsizeU = nullptr; /** Histogram  */
 
       TH2F* hrawROINrDCvsNrHLT = nullptr; /** Histogram  */
-      TH2F* hrawROIEVTsWithOneSource = nullptr; /** Histogram  */
 
     };//end class declaration
 

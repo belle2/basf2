@@ -28,14 +28,14 @@
 
 import ROOT
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
 from ROOT import TFile, TChain, TTree, TH1F, TCanvas, TGraphErrors, TGraph, \
     gStyle, TNamed, TF1, TProfile
 import sys
 import math
 import numpy as np
 from optparse import OptionParser
-from tracking.validation.tracking_efficiency_helpers import *
+from tracking.validation.tracking_efficiency_helpers import get_generated_pt_values
 
 DELTA_PT = 0.0001
 

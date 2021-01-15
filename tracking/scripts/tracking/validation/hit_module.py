@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import collections
 import numpy as np
 
 # Need for B2WARNING for some reason
-import inspect
 
-from .pull import PullAnalysis
 from .fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
@@ -24,9 +21,9 @@ import basf2
 
 import ROOT
 
-ROOT.gSystem.Load('libtracking')
 from ROOT import Belle2
 
+ROOT.gSystem.Load('libtracking')
 # FIXME: define hash function for TrackCand to be able to add it to set. This is
 # not really correct, it just checks for the address and normally if a==b also
 # hash(a) == hash(b) is required

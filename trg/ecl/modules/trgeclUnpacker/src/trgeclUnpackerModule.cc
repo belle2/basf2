@@ -17,9 +17,14 @@
 // 3.02 : 2019/06/24 : 20GeV ECL BST bit
 // 3.03 : 2019/10/07 : New Lowmulti (12 & 13) bit
 // 4.00 : 2019/10/11 : Summary totally change
+// 4.01 : 2020/03/13 : Bug fixed. (Bug : SumStore always save only one TRG info. in latest window)
+// 4.02 : 2020/03/30 : Bug fixed. (Bug : vector sorting does not support '>=' => '>')
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
+
+#include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
 
 using namespace std;
 using namespace Belle2;
@@ -29,7 +34,7 @@ REG_MODULE(TRGECLUnpacker);
 
 string TRGECLUnpackerModule::version() const
 {
-  return string("4.00");
+  return string("4.02");
 }
 
 TRGECLUnpackerModule::TRGECLUnpackerModule()
@@ -40,7 +45,7 @@ TRGECLUnpackerModule::TRGECLUnpackerModule()
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  B2INFO("trgeclunpacker: Constructor done.");
+  B2DEBUG(20, "trgeclunpacker: Constructor done.");
 }
 
 TRGECLUnpackerModule::~TRGECLUnpackerModule() {}
@@ -86,14 +91,14 @@ void TRGECLUnpackerModule::event()
 
 void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn)
 {
-
+  /* cppcheck-suppress variableScope */
   int* rdat;
   if (raw_copper->GetDetectorNwords(i, 0) > 0) {
     rdat = raw_copper->GetDetectorBuffer(i, 0);
     etm_version = ((rdat[0] >> 16) & 0xffff);
     if (etm_version > 136) {
       checkBuffer(rdat, nnn);
-    } else if (etm_version <= 136) {
+    } else  {
       checkBuffer_v136(rdat, nnn);
     }
   }
@@ -133,14 +138,18 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int window_num  = 0;
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int summary_data      = 0;
   int summary_recon     = 0;
+  /* cppcheck-suppress variableScope */
   int summary_revo      = 0;
+  /* cppcheck-suppress variableScope */
   bool summary_trg      = false;
-
+  /* cppcheck-suppress variableScope */
   int data_win          = 0;
 
   // TC
+  /* cppcheck-suppress variableScope */
   int ntc_win           =     0;
   bool tc_trg           = false;
   // TC info
@@ -150,8 +159,8 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int conv_tc_t         =     0;
   int win3_revo         = -9999;
 
-  vector<int> sum_data;
-  vector<vector<int>> sum_info;
+  vector<unsigned> sum_data;
+  vector<vector<unsigned>> sum_info;
 
   vector<int> tc_data;
   vector<vector<int>> tc_info;
@@ -262,7 +271,11 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   // <---- Unpacking
 
   // Summary
+  /* cppcheck-suppress variableScope */
+  int sum_num_ord  = 0;
+  /* cppcheck-suppress variableScope */
   int sum_num      = 0;
+  /* cppcheck-suppress variableScope */
   int sum_revo     = 0;
   int cl_theta[6]  = {0};
   int cl_phi[6]    = {0};
@@ -360,78 +373,85 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
         cl_bha[k]  = (sum_info[j][12] >> (k + 12)) & 0x1;
       }
       ncl          = (sum_info[j][13]) & 0x7;
-    }
 
-    m_TRGECLSumArray.appendNew();
-    m_sumNum = m_TRGECLSumArray.getEntries() - 1;
-    m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
-    m_TRGECLSumArray[m_sumNum]->setSumNum(sum_num);
-    m_TRGECLSumArray[m_sumNum]->setSumRevo(sum_revo);
-    m_TRGECLSumArray[m_sumNum]->setCLTheta(cl_theta);
-    m_TRGECLSumArray[m_sumNum]->setCLPhi(cl_phi);
-    m_TRGECLSumArray[m_sumNum]->setCLTime(cl_time);
-    m_TRGECLSumArray[m_sumNum]->setCLEnergy(cl_energy);
-    m_TRGECLSumArray[m_sumNum]->setCLF1GeV(cl_1gev);
-    m_TRGECLSumArray[m_sumNum]->setCLF2GeV(cl_2gev);
-    m_TRGECLSumArray[m_sumNum]->setCLFBha(cl_bha);
-    m_TRGECLSumArray[m_sumNum]->setNCL(ncl);
-    m_TRGECLSumArray[m_sumNum]->setICN(icn);
-    m_TRGECLSumArray[m_sumNum]->setICNOver(icn_over);
-    m_TRGECLSumArray[m_sumNum]->setLowMulti(low_multi);
-    m_TRGECLSumArray[m_sumNum]->set3DBhabhaV(b2bhabha_v);
-    m_TRGECLSumArray[m_sumNum]->set3DBhabhaS(b2bhabha_s);
-    m_TRGECLSumArray[m_sumNum]->setMumu(mumu);
-    m_TRGECLSumArray[m_sumNum]->setPrescale(prescale);
-    m_TRGECLSumArray[m_sumNum]->set2DBhabha(b1bhabha);
-    m_TRGECLSumArray[m_sumNum]->setBhabhaType(b1_type);
-    m_TRGECLSumArray[m_sumNum]->setPhysics(physics);
-    m_TRGECLSumArray[m_sumNum]->setBG(bg_veto);
-    m_TRGECLSumArray[m_sumNum]->setEtot(etot);
-    m_TRGECLSumArray[m_sumNum]->setEtotType(etot_type);
-    m_TRGECLSumArray[m_sumNum]->setECLBST(ecl_bst);
-    m_TRGECLSumArray[m_sumNum]->setTime(time);
-    m_TRGECLSumArray[m_sumNum]->setTimeType(time_type);
+      m_TRGECLSumArray.appendNew();
+      m_sumNum = m_TRGECLSumArray.getEntries() - 1;
+      m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
+      m_TRGECLSumArray[m_sumNum]->setSumNum(sum_num);
+      m_TRGECLSumArray[m_sumNum]->setSumRevo(sum_revo);
+      m_TRGECLSumArray[m_sumNum]->setCLTheta(cl_theta);
+      m_TRGECLSumArray[m_sumNum]->setCLPhi(cl_phi);
+      m_TRGECLSumArray[m_sumNum]->setCLTime(cl_time);
+      m_TRGECLSumArray[m_sumNum]->setCLEnergy(cl_energy);
+      m_TRGECLSumArray[m_sumNum]->setCLF1GeV(cl_1gev);
+      m_TRGECLSumArray[m_sumNum]->setCLF2GeV(cl_2gev);
+      m_TRGECLSumArray[m_sumNum]->setCLFBha(cl_bha);
+      m_TRGECLSumArray[m_sumNum]->setNCL(ncl);
+      m_TRGECLSumArray[m_sumNum]->setICN(icn);
+      m_TRGECLSumArray[m_sumNum]->setICNOver(icn_over);
+      m_TRGECLSumArray[m_sumNum]->setLowMulti(low_multi);
+      m_TRGECLSumArray[m_sumNum]->set3DBhabhaV(b2bhabha_v);
+      m_TRGECLSumArray[m_sumNum]->set3DBhabhaS(b2bhabha_s);
+      m_TRGECLSumArray[m_sumNum]->setMumu(mumu);
+      m_TRGECLSumArray[m_sumNum]->setPrescale(prescale);
+      m_TRGECLSumArray[m_sumNum]->set2DBhabha(b1bhabha);
+      m_TRGECLSumArray[m_sumNum]->setBhabhaType(b1_type);
+      m_TRGECLSumArray[m_sumNum]->setPhysics(physics);
+      m_TRGECLSumArray[m_sumNum]->setBG(bg_veto);
+      m_TRGECLSumArray[m_sumNum]->setEtot(etot);
+      m_TRGECLSumArray[m_sumNum]->setEtotType(etot_type);
+      m_TRGECLSumArray[m_sumNum]->setECLBST(ecl_bst);
+      m_TRGECLSumArray[m_sumNum]->setTime(time);
+      m_TRGECLSumArray[m_sumNum]->setTimeType(time_type);
 
-    for (int k = 0; k < 6; k++) {
-      cl_1d.push_back(cl_theta[k]);
-      cl_1d.push_back(cl_phi[k]);
-      cl_1d.push_back(cl_time[k]);
-      cl_1d.push_back(cl_energy[k]);
-      cl_1d.push_back(cl_1gev[k]);
-      cl_1d.push_back(cl_2gev[k]);
-      cl_1d.push_back(cl_bha[k]);
-      cl_2d.push_back(cl_1d);
-      cl_1d.clear();
-    }
-    sort(cl_2d.begin(), cl_2d.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[3] > aa2[3];});
-
-    evt_1d_vector.push_back(abs(sum_num - 3));
-    evt_1d_vector.push_back(sum_revo);
-    evt_1d_vector.push_back(sum_num);
-    evt_1d_vector.push_back(time);
-    for (int k = 0; k < 6; k++) {
-      for (int l = 0; l < 7; l++) {
-        evt_1d_vector.push_back(cl_2d[k][l]);
+      for (int k = 0; k < 6; k++) {
+        cl_1d.push_back(cl_theta[k]);
+        cl_1d.push_back(cl_phi[k]);
+        cl_1d.push_back(cl_time[k]);
+        cl_1d.push_back(cl_energy[k]);
+        cl_1d.push_back(cl_1gev[k]);
+        cl_1d.push_back(cl_2gev[k]);
+        cl_1d.push_back(cl_bha[k]);
+        cl_2d.push_back(cl_1d);
+        cl_1d.clear();
       }
+      sort(cl_2d.begin(), cl_2d.end(),
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[3] > aa2[3];});
+
+      if (sum_num == -9999) {
+        sum_num_ord = -9999;
+      } else if (sum_num <= 3) {
+        sum_num_ord = 2 * abs(sum_num - 3);
+      } else {
+        sum_num_ord = (sum_num * 2) - 7;
+      }
+      evt_1d_vector.push_back(sum_num_ord);
+      evt_1d_vector.push_back(sum_revo);
+      evt_1d_vector.push_back(sum_num);
+      evt_1d_vector.push_back(time);
+      for (int k = 0; k < 6; k++) {
+        for (int l = 0; l < 7; l++) {
+          evt_1d_vector.push_back(cl_2d[k][l]);
+        }
+      }
+      evt_1d_vector.push_back(ncl);
+      evt_1d_vector.push_back(low_multi);
+      evt_1d_vector.push_back(b2bhabha_v);
+      evt_1d_vector.push_back(b2bhabha_s);
+      evt_1d_vector.push_back(mumu);
+      evt_1d_vector.push_back(prescale);
+      evt_1d_vector.push_back(icn);
+      evt_1d_vector.push_back(icn_over);
+      evt_1d_vector.push_back(etot_type);
+      evt_1d_vector.push_back(etot);
+      evt_1d_vector.push_back(ecl_bst);
+      evt_1d_vector.push_back(b1_type);
+      evt_1d_vector.push_back(b1bhabha);
+      evt_1d_vector.push_back(physics);
+      evt_1d_vector.push_back(time_type);
+      evt_2d_vector.push_back(evt_1d_vector);
+      evt_1d_vector.clear();
     }
-    evt_1d_vector.push_back(ncl);
-    evt_1d_vector.push_back(low_multi);
-    evt_1d_vector.push_back(b2bhabha_v);
-    evt_1d_vector.push_back(b2bhabha_s);
-    evt_1d_vector.push_back(mumu);
-    evt_1d_vector.push_back(prescale);
-    evt_1d_vector.push_back(icn);
-    evt_1d_vector.push_back(icn_over);
-    evt_1d_vector.push_back(etot_type);
-    evt_1d_vector.push_back(etot);
-    evt_1d_vector.push_back(ecl_bst);
-    evt_1d_vector.push_back(b1_type);
-    evt_1d_vector.push_back(b1bhabha);
-    evt_1d_vector.push_back(physics);
-    evt_1d_vector.push_back(time_type);
-    evt_2d_vector.push_back(evt_1d_vector);
-    evt_1d_vector.clear();
   } else {
     for (int k = 0; k < 6; k++) {
       cl_theta[k]   = 0;
@@ -499,18 +519,28 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int m_evtNum   = 0;
 
   int m_tcNum    = 0;
+  /* cppcheck-suppress variableScope */
   int m_tcid     = 0;
+  /* cppcheck-suppress variableScope */
   int m_time     = -9999;
+  /* cppcheck-suppress variableScope */
   int m_energy   = 0;
+  /* cppcheck-suppress variableScope */
   int m_win      = 0;
+  /* cppcheck-suppress variableScope */
   int m_revo     = 0;
+  /* cppcheck-suppress variableScope */
   int m_caltime  = -9999;
 
   int tot_ntc          = tc_info.size();
+  /* cppcheck-suppress variableScope */
   int evt_ntc          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_revo         = -9999;
+  /* cppcheck-suppress variableScope */
   int evt_win          = 0;
-  int evt_timing       = -9999;
+  /* cppcheck-suppress variableScope */
+  int evt_timing       = -9999; // most energetic
   int evt_cl_theta[6]  = {0};
   int evt_cl_phi[6]    = {0};
   int evt_cl_time[6]   = { -9999};
@@ -518,31 +548,57 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int evt_cl_1gev[6]   = {0};
   int evt_cl_2gev[6]   = {0};
   int evt_cl_bha[6]    = {0};
+  /* cppcheck-suppress variableScope */
   int evt_ncl          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_low_multi    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_v   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_s   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_mumu         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_prescale     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn_over     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_ecl_bst      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1_type      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1bhabha     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_physics      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_all     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_min     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_max     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_win     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_i     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_c     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_f     = 0;
+  /* cppcheck-suppress variableScope */
   int cl_tcid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_thetaid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_phiid = 0;
+  /* cppcheck-suppress variableScope */
   int m_clNum    = 0;
 
 
@@ -550,7 +606,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   if (evt_v_size != 0) {
     // Sort window : 3 => 4 => 2 => 5 => 1 => 6 => 7
     sort(evt_2d_vector.begin(), evt_2d_vector.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] <= aa2[0];});
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
   }
 
   if (tot_ntc != 0 && flag_checksum == 0 && nnn > 7) {
@@ -824,13 +880,17 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int window_num  = 0;
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int summary_data      = 0;
+  /* cppcheck-suppress variableScope */
   int summary_revo      = 0;
+  /* cppcheck-suppress variableScope */
   bool summary_trg      = false;
-
+  /* cppcheck-suppress variableScope */
   int data_win          = 0;
 
   // TC
+  /* cppcheck-suppress variableScope */
   int ntc_win           =     0;
   bool tc_trg           = false;
   // TC info
@@ -840,8 +900,8 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int conv_tc_t         =     0;
   int win3_revo         = -9999;
 
-  vector<int> sum_data;
-  vector<vector<int>> sum_info;
+  vector<unsigned> sum_data;
+  vector<vector<unsigned>> sum_info;  //TODO can these be unsigned? (required for bit shifts shifts)
 
   vector<int> tc_data;
   vector<vector<int>> tc_info;
@@ -947,7 +1007,9 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   // <---- Unpacking
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int sum_num        = 0;
+  /* cppcheck-suppress variableScope */
   int sum_revo       = 0;
   int cl_theta[6]    = {0};
   int cl_phi[6]      = {0};
@@ -1223,47 +1285,83 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int m_evtNum   = 0;
 
   int m_tcNum    = 0;
+  /* cppcheck-suppress variableScope */
   int m_tcid     = 0;
+  /* cppcheck-suppress variableScope */
   int m_time     = -9999;
+  /* cppcheck-suppress variableScope */
   int m_energy   = 0;
+  /* cppcheck-suppress variableScope */
   int m_win      = 0;
+  /* cppcheck-suppress variableScope */
   int m_revo     = 0;
+  /* cppcheck-suppress variableScope */
   int m_caltime  = -9999;
 
   int tot_ntc          = tc_info.size();
+  /* cppcheck-suppress variableScope */
   int evt_ntc          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_revo         = -9999;
+  /* cppcheck-suppress variableScope */
   int evt_win          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_timing       = -9999;
   int evt_cl_theta[6]  = {0};
   int evt_cl_phi[6]    = {0};
   int evt_cl_time[6]   = { -9999};
   int evt_cl_energy[6] = {0};
+  /* cppcheck-suppress variableScope */
   int evt_ncl          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_low_multi    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_v   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_s   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_mumu         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_prescale     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn_over     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_ecl_bst      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1_type      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1bhabha     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_physics      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_all     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_min     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_max     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_win     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_i     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_c     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_f     = 0;
+  /* cppcheck-suppress variableScope */
   int cl_tcid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_thetaid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_phiid = 0;
+  /* cppcheck-suppress variableScope */
   int m_clNum    = 0;
 
 
@@ -1271,7 +1369,7 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   if (evt_v_size != 0) {
     // Sort window : 3 => 4 => 2 => 5 => 1 => 6 => 7
     sort(evt_2d_vector.begin(), evt_2d_vector.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] <= aa2[0];});
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
   }
 
   if (tot_ntc != 0 && flag_checksum == 0 && nnn > 7) {

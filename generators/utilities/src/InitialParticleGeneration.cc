@@ -71,6 +71,11 @@ namespace Belle2 {
 
   MCInitialParticles& InitialParticleGeneration::generate()
   {
+    return generate(m_allowedFlags);
+  }
+
+  MCInitialParticles& InitialParticleGeneration::generate(int allowedFlags)
+  {
     if (!m_event) {
       m_event.create();
     }
@@ -82,8 +87,7 @@ namespace Belle2 {
       m_generateLER.reset();
       m_generateVertex.reset();
     }
-
-    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
+    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
     TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
     TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
@@ -94,9 +98,39 @@ namespace Belle2 {
       her = m_event->getLabToCMS() * her;
       ler = m_event->getLabToCMS() * ler;
       m_event->set(her, ler, vtx);
-      m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
+      m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
     }
     return *m_event;
   }
 
+  TVector3 InitialParticleGeneration::updateVertex(bool force)
+  {
+    if (!m_beamParams.isValid()) {
+      B2FATAL("Cannot generate beam without valid BeamParameters");
+    }
+    if (!m_event) {
+      // generate a new mc initial particle without smearing except for the vertex
+      generate(BeamParameters::c_smearVertex);
+      return m_event->getVertex();
+    }
+    if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearVertex) or
+        (m_event->hasGenerationFlags(BeamParameters::c_smearVertex) and not force)) {
+      // already has a smeared vertex or smearing disallowed. nothing to do
+      return {0, 0, 0};
+    }
+    // Ok, now we need to just update the vertex, make sure the parameters are up to date ...
+    if (m_beamParams.hasChanged()) {
+      m_generateHER.reset();
+      m_generateLER.reset();
+      m_generateVertex.reset();
+    }
+    // Add the smear vertex flag
+    m_event->setGenerationFlags(m_event->getGenerationFlags() | BeamParameters::c_smearVertex);
+    // And generate a vertex ...
+    auto previous = m_event->getVertex();
+    auto vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    m_event->setVertex(vtx);
+    // Everything done
+    return vtx - previous;
+  }
 } //Belle2 namespace

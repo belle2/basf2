@@ -56,17 +56,18 @@ namespace Belle2 {
     std::string m_listName;  /**< name of particle list */
     std::string m_decayString;          /**< specifies which daughter particles will be used as reference to create Btube*/
     bool m_associateBtubeToBselected; /**< whether to associate the Btube with the selected B*/
+    double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
-    StoreArray<Particle> particles; /**< the particles */
-    StoreArray<Btube> tubeArray; /**< the (output) array of Btube objects */
+    StoreArray<Btube> m_tubeArray; /**< the (output) array of Btube objects */
+    StoreObjPtr<ParticleList> m_plist; /**< the input particle list */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     /**
      * Main steering routine
      * @param p pointer to particle
-     * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
+     * @return true for successful fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);  /**< does the vertex fit with RAVE :  adaptive vertex fitter mode */
     void addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, TLorentzVector TLV); /**< fills extrainfos to the particle */

@@ -17,8 +17,6 @@ import flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
-import ROOT
-import sys
 
 # create path
 cp_val_path = b2.Path()
@@ -39,7 +37,7 @@ ma.reconstructDecay(decayString='B0:jpsiks -> J/psi:mumu K_S0:pipi', cut='Mbc > 
 ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(target_list_name='B0:jpsiks', path=cp_val_path)
+ma.buildRestOfEvent(target_list_name='B0:jpsiks', fillWithMostLikely=True, path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
 b2.use_central_database("analysis_tools_release-03-01-00")
@@ -50,8 +48,8 @@ ft.flavorTagger(
     weightFiles='B2nunubarBGx1',
     path=cp_val_path)
 
-vx.vertexRave(list_name='B0:jpsiks', conf_level=0.0,
-              decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
+vx.raveFit(list_name='B0:jpsiks', conf_level=0.0,
+           decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
 vx.TagV(list_name='B0:jpsiks', MCassociation='breco', path=cp_val_path)
 
 # Select variables that will be stored to ntuple

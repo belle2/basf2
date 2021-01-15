@@ -11,32 +11,31 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/GeoCache.h>
 #include <svd/calibration/SVDOccupancyCalibrations.h>
-#include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
+
+#include <TH1F.h>
+#include <TTree.h>
 
 #include <string>
-#include <TH2.h>
-#include <TFile.h>
-#include <TTree.h>
 #include <map>
 
 
 namespace Belle2 {
 
+  /**
+   * Collector module used to create the histograms needed for the
+   * cross talk calibration
+   */
   class SVDCrossTalkCalibrationsCollectorModule : public CalibrationCollectorModule {
 
 
   public:
 
+    /** constructor */
     SVDCrossTalkCalibrationsCollectorModule();
 
     /** Init the module.*/
@@ -48,7 +47,6 @@ namespace Belle2 {
     /**Event processing */
     void collect() override final;
 
-
     /**End of run */
     void closeRun() override final;
 
@@ -59,8 +57,8 @@ namespace Belle2 {
 
   private:
 
-    TTree* m_histogramTree; /**< Initialisation of TTree object */
-    TH1F* m_hist; /**< Initialisation of crosstalk histogram */
+    TTree* m_histogramTree = nullptr; /**< Initialisation of TTree object */
+    TH1F* m_hist = nullptr; /**< Initialisation of crosstalk histogram */
     int m_layer = 4; /**< Number of layers to define size of TTree */
     int m_ladder = 16; /**< Number of ladders */
     int m_sensor = 5; /**< Number of sensors */

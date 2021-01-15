@@ -17,10 +17,7 @@
 #ifndef TRGECLUNPACKER_H
 #define TRGECLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
@@ -28,13 +25,8 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
-#include "trg/ecl/TrgEclDataBase.h"
-#include "trg/ecl/TrgEclMapping.h"
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -50,19 +42,19 @@ namespace Belle2 {
     virtual ~TRGECLUnpackerModule();
 
     /** Initilizes TRGECLUnpackerModuel.*/
-    virtual void initialize();
+    void initialize() override;
 
     /** Called event by event.*/
-    virtual void event();
+    void event() override;
 
     /** Called when processing ended.*/
-    virtual void terminate();
+    void terminate() override;
 
     /** Called when new run started.*/
-    virtual void beginRun();
+    void beginRun() override;
 
     /** Called when run ended*/
-    virtual void endRun();
+    void endRun() override;
 
     /** returns version of TRGECLUnpackerModule.*/
     std::string version() const;

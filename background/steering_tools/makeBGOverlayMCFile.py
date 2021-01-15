@@ -3,7 +3,6 @@
 
 from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process, statistics
 import os
-from simulation import add_simulation
 from svd import add_svd_simulation
 import glob
 import sys
@@ -118,7 +117,7 @@ main.add_module('KLMDigitizer')
 
 # Output: digitized hits only
 branches = ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-            'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits']
+            'ARICHDigits', 'ECLWaveforms', 'KLMDigits']
 if gatedMode:
     branches += ['PXDInjectionBGTiming']
 main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=branches)

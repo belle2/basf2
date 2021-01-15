@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDCLUSTERSHAPE_H
-#define PXDCLUSTERSHAPE_H
+#pragma once
 
 #include <pxd/reconstruction/ClusterCandidate.h>
 
@@ -88,7 +87,7 @@ namespace Belle2 {
       static pxdClusterShapeDescr pxdClusterShapeDescription;
 
       /** Set cluster shape ID.
-       * @param ClusterCandidate container of pixels creating cluster in PXD
+       * @param cls ClusterCandidate container of pixels creating cluster in PXD
        * @param sensorID sensor details for PXD sensors
        * @returns cluster shape ID
        */
@@ -101,5 +100,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXDCLUSTERSHAPE_H

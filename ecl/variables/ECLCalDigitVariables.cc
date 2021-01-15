@@ -16,6 +16,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+// for crystal geometry
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/geometry/B2Vector3.h>
+
 // dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -57,6 +61,7 @@ namespace Belle2 {
       cellId = 24,
       mcenergy = 25,
       usedforenergy = 26,
+      R_geom = 27, // Requires a geometry environment
       phiOffset = 30,
       thetaOffset = 31,
       phiPointing = 32,
@@ -120,6 +125,15 @@ namespace Belle2 {
       return -1;
     }
 
+    //! @returns the position three vector of a cellid
+    // This function requires a geometry environment
+    double getCellIdMagnitude(int cellid)
+    {
+      Belle2::ECL::ECLGeometryPar* geom = Belle2::ECL::ECLGeometryPar::Instance();
+      Belle2::B2Vector3D position = geom->GetCrystalPos(cellid - 1);
+      return position.Mag();
+    }
+
     //! @returns variable requested (expert function, only called from this file)
     double getCalDigitExpertByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
@@ -163,6 +177,13 @@ namespace Belle2 {
 
         const auto caldigitSelected = relatedDigits.object(caldigitIndex);
 
+        // Mapping object for phi & theta
+        StoreObjPtr<ECLCellIdMapping> mapping;
+        if (!mapping) {
+          B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
         if (varid == varType::energy) {
           return caldigitSelected->getEnergy();
         } else if (varid == varType::time) {
@@ -188,6 +209,12 @@ namespace Belle2 {
         } else if (varid == varType::weight) {
           const auto weight = relatedDigits.weight(caldigitIndex);
           return weight;
+        } else if (varid == varType::phi) {
+          return mapping->getCellIdToPhi(caldigitSelected->getCellId());
+        } else if (varid == varType::theta) {
+          return mapping->getCellIdToTheta(caldigitSelected->getCellId());
+        } else if (varid == varType::R_geom) {
+          return getCellIdMagnitude(caldigitSelected->getCellId());
         } else {
           B2FATAL("variable id not found.");
         }
@@ -254,6 +281,8 @@ namespace Belle2 {
         return mapping->getCellIdToPhi(neighbourid);
       } else if (varid == varType::theta) {
         return mapping->getCellIdToTheta(neighbourid);
+      } else if (varid == varType::R_geom) {
+        return getCellIdMagnitude(neighbourid);
       } else if (varid == varType::phiId) {
         return mapping->getCellIdToPhiId(neighbourid);
       } else if (varid == varType::thetaId) {
@@ -784,6 +813,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit phi from ext
+    double getExtPhi(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::phi, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit theta
     double getTheta(const Particle* particle, const std::vector<double>& vars)
     {
@@ -792,6 +832,17 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::theta, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit theta from ext
+    double getExtTheta(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::theta, ECLCalDigitVariable::centerType::extCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -806,6 +857,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit phi id from ext
+    double getExtPhiId(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::phiId, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit theta id
     double getThetaId(const Particle* particle, const std::vector<double>& vars)
     {
@@ -817,6 +879,16 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit theta id from ext
+    double getExtThetaId(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::thetaId, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
 
     //! @returns the eclcaldigit cell id
     double getCellId(const Particle* particle, const std::vector<double>& vars)
@@ -1132,6 +1204,47 @@ namespace Belle2 {
       return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing, false);
     }
 
+    //! @returns the eclcaldigit Phi by digit energy rank
+    double getPhiByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::phi};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit Theta digit energy rank
+    double getThetaByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::theta};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit R
+    double getR(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::R_geom, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit R by digit energy rank
+    double getRByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::R_geom};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
@@ -1177,6 +1290,8 @@ namespace Belle2 {
                       "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTheta(i, j)", getTheta,
                       "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitR(i, j)", getR,
+                      "Returns R (from a geometry object) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitPhiId(i, j)", getPhiId,
                       "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitThetaId(i, j)", getThetaId,
@@ -1194,7 +1309,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
                       "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours)");
     REGISTER_VARIABLE("eclcaldigitMCEnergy(i, j)", getMCEnergy,
                       "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
     REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
@@ -1213,13 +1328,21 @@ namespace Belle2 {
                       "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2(i, j)", getExtECLCalDigitTwoComponentChi2,
                       "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtPhi(i, j)", getExtPhi,
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtTheta(i, j)", getExtTheta,
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtPhiId(i, j)", getExtPhiId,
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtThetaId(i, j)", getExtThetaId,
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
     REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
     REGISTER_VARIABLE("eclcaldigitExtCellPhiId", getExtCellPhiId, "[calibration] Returns the ext cell phi id");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours) for an ext track");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track");
 
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiOffset", getExtFrontPositionPhiOffset,
                       "[calibration] Returns the difference in the azimuthal angle (in radians)"
@@ -1302,7 +1425,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
                       "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
 
+    REGISTER_VARIABLE("eclcaldigitPhiByEnergyRank(i)", getPhiByEnergyRank,
+                      "Returns phi of the i-th highest energy caldigit in the cluster (i>=0)");
 
+    REGISTER_VARIABLE("eclcaldigitThetaByEnergyRank(i)", getThetaByEnergyRank,
+                      "Returns theta of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitRByEnergyRank(i)", getRByEnergyRank,
+                      "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
   }
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file

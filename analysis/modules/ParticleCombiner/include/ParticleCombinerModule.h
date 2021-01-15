@@ -16,6 +16,10 @@
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
 #include <string>
 #include <memory>
 
@@ -48,6 +52,10 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreObjPtr<ParticleList> m_outputList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_outputAntiList; /**< output anti-particle list */
+
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
@@ -71,6 +79,10 @@ namespace Belle2 {
     int m_maximumNumberOfCandidates; /**< maximum number of reconstructed candidates */
 
     bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
+
+    bool m_chargeConjugation; /**< boolean to control whether charge conjugated decay should be reconstructed as well */
+
+    bool m_allowChargeViolation; /**< switch to turn on and off the requirement of electric charge conservation */
 
   };
 

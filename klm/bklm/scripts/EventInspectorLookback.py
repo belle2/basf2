@@ -9,9 +9,8 @@ import basf2
 import bklmDB
 import math
 import array
-import ctypes
 import ROOT
-from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad
+from ROOT import Belle2
 
 
 class EventInspectorLookback(basf2.Module):
@@ -30,7 +29,7 @@ class EventInspectorLookback(basf2.Module):
     #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
     #: bit position for section [0..1]; forward is 0
-    BKLM_END_BIT = 14
+    BKLM_SECTION_BIT = 14
     #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
     #: bit mask for strip-1 [0..47]
@@ -42,11 +41,11 @@ class EventInspectorLookback(basf2.Module):
     #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
     #: bit mask for section [0..1]; forward is 0
-    BKLM_END_MASK = (1 << BKLM_END_BIT)
+    BKLM_SECTION_MASK = (1 << BKLM_SECTION_BIT)
     #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)
     #: bit mask for unique module identifier (end, sector, layer)
-    BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
+    BKLM_MODULEID_MASK = (BKLM_SECTION_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
     def __init__(self, exp, run, histName, pdfName, mode, window):
         """Constructor
@@ -324,7 +323,7 @@ class EventInspectorLookback(basf2.Module):
         self.dict_nHit2ds[self.windowValue] += len(hit2ds)
         for hit2d in hit2ds:
             key = hit2d.getModuleID()
-            fb = (key & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+            fb = (key & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
             x = hit2d.getGlobalPositionX()
             y = hit2d.getGlobalPositionY()
             if fb == 0:  # backward

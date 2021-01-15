@@ -107,7 +107,7 @@ namespace Belle2 {
      * @param condDbname is the name of the payload in the condition database
      * @param xmlFileName is the file name of the xml file
      * @param xmlTag is the tag in the xml file that contains the actual calibrations
-     * @param default is the value assigned to the calibration constant by default
+     * @param defaultValue is the value assigned to the calibration constant by default
      * @param errorTollerant if true bypasses sanity checks
      */
 
@@ -130,7 +130,6 @@ namespace Belle2 {
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
 
-    ClassDef(SVDLocalCalibrationsImporter, 1); /**< needed by root */
   };
 
 } // Belle2 namespace

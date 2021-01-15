@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDIGITIZER_H
-#define CDCDIGITIZER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -25,6 +24,7 @@
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -65,18 +65,14 @@ namespace Belle2 {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
       if (m_runGainFromDB) delete m_runGainFromDB;
+      if (m_xTalkFromDB) delete m_xTalkFromDB;
     };
 
   private:
     /** Method used to smear the drift length.
      *
      *  @param driftLength The value of drift length.
-     *  @param fraction Fraction of the first Gaussian used to smear drift length.
-     *  @param mean1 Mean value of the first Gassian used to smear drift length.
-     *  @param resolution1 Resolution of the first Gassian used to smear drift length.
-     *  @param mean2 Mean value of the second Gassian used to smear drift length.
-     *  @param resolution2 Resolution of the second Gassian used to smear drift length.
-     *
+     *  @param dDdt        dD/dt (drift velocity).
      *  @return Drift length after smearing.
      */
     double smearDriftLength(double driftLength, double dDdt);
@@ -117,6 +113,9 @@ namespace Belle2 {
 
     /** Set run-gain (from DB) */
     void setRunGain();
+
+    /** Add crosstalk */
+    void addXTalk();
 
     /** Set edep-to-ADC conversion params. (from DB) */
     //    void setEDepToADCConversions();
@@ -183,7 +182,6 @@ namespace Belle2 {
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
-    //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
@@ -211,6 +209,12 @@ namespace Belle2 {
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
     //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 
+    bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
+    bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
+    bool m_includeEarlyXTalks; /**< Flag to switch on/off xtalks earlier than the hit */
+    int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
+    DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
@@ -230,8 +234,17 @@ namespace Belle2 {
       int            m_simHitIndex3;   /**< SimHit index for 3rd drift time. */
       float          m_driftTime3;     /**< 3rd-shortest drift time in the cell. */
     };
+
+    /** Structure for saving the x-talk information. */
+    struct XTalkInfo {
+      /** Constructor that initializes all members. */
+      XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
+        m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
+      unsigned short m_tdc; /**< TDC count */
+      unsigned short m_adc; /**< ADC count */
+      unsigned short m_tot; /**< TOT       */
+      unsigned short m_status; /**< status */
+    };
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCDIGITIZER_H

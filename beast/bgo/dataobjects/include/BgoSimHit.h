@@ -40,16 +40,9 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase()
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
+      m_Position(Position)
     {
-      m_CellId = CellId;
-      m_TrackId = TrackId;
-      m_Pdg = Pdg;
-      m_FlightTime = FlightTime;
-      m_Edep = Edep;
-      m_Momentum = Momentum;
-      m_Position = Position;
-
     }
 
 

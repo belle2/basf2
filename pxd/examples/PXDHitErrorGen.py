@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from PXDHitErrorsTTree import PXDHitErrorsTTree
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # PXD digitization module
-pxddigi = register_module('PXDDigitizer')
+pxddigi = b2.register_module('PXDDigitizer')
 # PXD clustering module
-pxdclust = register_module('PXDClusterizer')
+pxdclust = b2.register_module('PXDClusterizer')
 # RootOutput
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 analyze = PXDHitErrorsTTree()
 
@@ -67,7 +67,7 @@ pxddigi.param('ElectronicEffects', True)
 pxddigi.param('SimpleDriftModel', False)
 
 # create processing path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
@@ -80,7 +80,7 @@ main.add_module(analyze)
 # main.add_module(output)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

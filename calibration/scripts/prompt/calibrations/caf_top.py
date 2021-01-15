@@ -8,17 +8,16 @@ Author: Marko Staric
 """
 
 from prompt import CalibrationSettings
-from caf.framework import Calibration
 from caf.utils import IoV
 from caf.strategies import SingleIOV
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
-from top_calibration import commonT0_calibration_BF, commonT0_calibration_LL
+from top_calibration import commonT0_calibration_BF
 
 
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(name="TOP post-tracking calibration",
-                               expert_username="staric",
+                               expert_username="saurabh",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_bhabha"],

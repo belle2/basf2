@@ -37,38 +37,8 @@ EOT
     exit 1;
 fi
 
-# crashes or endless loops in cppcheck 1.88
-EXCLUDES="-i ${SOFTWARE_DIR}/tracking/ckf/pxd/findlets/src/CKFToPXDFindlet.cc
-          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/CKFToSVDFindlet.cc
-          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/CKFToSVDSeedFindlet.cc
-          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/RecoTrackRelator.cc
-          -i ${SOFTWARE_DIR}/tracking/ckf/svd/findlets/src/RelationApplier.cc
-          -i ${SOFTWARE_DIR}/tracking/ckf/svd/utilities/src/SVDMCUtil.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/cdcToVXDExtrapolator/src/CKFModules.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/CosmicsTrackMergerFindlet.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/CosmicsTrackMergerModule.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/cosmicsTrackMerger/src/PhiRecoTrackRelationFilter.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/AxialTrackFinderModules.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/StereoHitFinderModule.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/trackFinderCDC/src/TrackFinderModule.cc
-          -i ${SOFTWARE_DIR}/tracking/modules/vxdCDCTrackMerger/src/MCVXDCDCTrackMergerModule.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/collectors/matchers/src/StereoHitTrackQuadTreeMatcher.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/filters/segmentTrack/src/SegmentTrackFilterFactory.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/AxialTrackFinderHough.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/MonopoleStereoHitFinder.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/MonopoleStereoHitFinderQuadratic.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/combined/src/StereoHitFinder.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/complete/src/TrackFinder.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/minimal/src/AxialTrackCreatorHitHough.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/findlets/minimal/src/AxialTrackCreatorSegmentHough.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0Curv.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0CurvTanL.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0Impact.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0ImpactCurv.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/Phi0TanL.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/perigee/tests/StereoHitContained.test.cc
-          -i ${SOFTWARE_DIR}/tracking/trackFindingCDC/hough/tests/LinearDivision.test.cc
-"
+# FIXME: to be removed when PHOKHARA is moved into externals.
+EXCLUDES="-i ${SOFTWARE_DIR}/generators/phokhara"
 
 cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
          --force --relative-paths=${SOFTWARE_DIR} \

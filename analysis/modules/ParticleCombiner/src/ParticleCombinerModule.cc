@@ -14,14 +14,12 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <memory>
@@ -73,8 +71,12 @@ namespace Belle2 {
              "  b) recoilParticleType = 2: \n\n"
              "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
              "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
+    addParam("chargeConjugation", m_chargeConjugation,
+             "If true, the charge-conjugated mode will be reconstructed as well", true);
+    addParam("allowChargeViolation", m_allowChargeViolation,
+             "If true the decay string does not have to conserve electric charge", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
     m_isSelfConjugatedParticle = false;
     m_generator = nullptr;
@@ -102,20 +104,35 @@ namespace Belle2 {
 
     // Daughters
     int nProducts = m_decaydescriptor.getNDaughters();
+    int daughtersNetCharge = 0;
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      int daughterPDGCode = daughter->getPDGCode();
+      if (m_recoilParticleType == 2 && i == 0) {
+        daughtersNetCharge -= EvtPDLUtil::charge(daughterPDGCode);
+      } else {
+        daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
+      }
+    }
+
+    if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+      if (!m_allowChargeViolation) {
+        B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"
+                "modularAnalysis.reconstructDecay(" << m_decayString << ", your_cuts, allowChargeViolation=True, path=mypath)");
+      }
+      B2WARNING("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "Processing is continued assuming that you allowed this deliberately, e.g. for systematic studies etc.");
     }
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
-    StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
-    if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-      antiParticleList.registerInDataStore(flags);
+    m_outputList.registerInDataStore(m_listName, flags);
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
+      m_outputAntiList.registerInDataStore(m_antiListName, flags);
     }
 
     if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
@@ -125,24 +142,20 @@ namespace Belle2 {
 
   void ParticleCombinerModule::event()
   {
-    StoreArray<Particle> particles;
+    m_outputList.create();
+    m_outputList->initialize(m_pdgCode, m_listName);
 
-    StoreObjPtr<ParticleList> outputList(m_listName);
-    outputList.create();
-    outputList->initialize(m_pdgCode, m_listName);
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
+      m_outputAntiList.create();
+      m_outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
 
-    if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
-      outputAntiList.create();
-      outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
-
-      outputList->bindAntiParticleList(*(outputAntiList));
+      m_outputList->bindAntiParticleList(*(m_outputAntiList));
     }
 
     m_generator->init();
 
     int numberOfCandidates = 0;
-    while (m_generator->loadNext()) {
+    while (m_generator->loadNext(m_chargeConjugation)) {
 
       Particle&& particle = m_generator->getCurrentParticle();
 
@@ -163,7 +176,7 @@ namespace Belle2 {
         const std::vector<Particle*> daughters = particle.getDaughters();
 
         if (daughters.size() < 2)
-          B2FATAL("Reconstructing particle as a duaghter of a recoil with less then 2 daughters!");
+          B2FATAL("Reconstructing particle as a daughter of a recoil with less then 2 daughters!");
 
         TLorentzVector pDaughters;
         for (unsigned i = 1; i < daughters.size(); i++) {
@@ -179,16 +192,16 @@ namespace Belle2 {
       if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
         if (m_ignoreIfTooManyCandidates) {
           B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached, skipping event");
-          outputList->clear();
+          m_outputList->clear();
         } else {
           B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached. Ignoring others");
         }
         break;
       }
 
-      Particle* newParticle = particles.appendNew(particle);
+      Particle* newParticle = m_particles.appendNew(particle);
 
-      outputList->addParticle(newParticle);
+      m_outputList->addParticle(newParticle);
 
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);

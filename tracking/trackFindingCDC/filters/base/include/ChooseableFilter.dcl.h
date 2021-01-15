@@ -36,7 +36,7 @@ namespace Belle2 {
 
     public:
       /// Setup the chooseable filter with available choices from the factory
-      Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory);
+      explicit Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory);
 
       /// Setup the chooseable filter with available choices from the factory and a default name
       Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory,
@@ -55,11 +55,14 @@ namespace Belle2 {
        *  Function to evaluate the object.
        *  Delegates to the filter chosen by module parameters.
        *
-       *  @param obj The object to be accepted or rejected.
-       *  @return    A finit float value if the object is accepted.
-       *             NAN if the object is rejected.
+       *  @param object The object to be accepted or rejected.
+       *  @return       A finit float value if the object is accepted.
+       *                NAN if the object is rejected.
        */
       Weight operator()(const Object& object) final;
+
+      /// Const version of operator
+      Weight operator()(const Object& object) const;
 
     public:
       /// Return name of the selected filter
@@ -101,7 +104,7 @@ namespace Belle2 {
       ChooseableFilter();
 
       /// Constructor of the chooseable filter taking the default filter name
-      ChooseableFilter(const std::string& filterName);
+      explicit ChooseableFilter(const std::string& filterName);
     };
   }
 }

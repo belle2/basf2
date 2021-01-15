@@ -13,19 +13,15 @@
 # ------------------------------------------------------------------------
 
 
-from basf2 import *
+import basf2 as b2
 import sys
 import glob
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors, TSpectrum, TCanvas
-import ROOT
-import pylab
-import numpy
-import time
+from ROOT import TFile, TH2F
 from laserResolutionTools import fitLaserResolution, plotLaserResolution
 
 
-class TOPLaserHistogrammerModule(Module):
+class TOPLaserHistogrammerModule(b2.Module):
 
     ''' Module to study resolution and performance of the top laser calibration.'''
 
@@ -172,34 +168,34 @@ for fname in files:
 
 if dbaddress != 'none':
     print("using local DB " + dbaddress)
-    reset_database()
-    use_local_database(dbaddress + "/localDB.txt", dbaddress)
+    b2.reset_database()
+    b2.use_local_database(dbaddress + "/localDB.txt", dbaddress)
 else:
     print("database not set. Continuing without calibrations")
 
 # Suppress messages and warnings during processing
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Define a global tag (note: the one given bellow can be out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
 if datatype == 'root':
-    roinput = register_module('RootInput')
+    roinput = b2.register_module('RootInput')
     roinput.param('inputFileNames', files)
     main.add_module(roinput)
 else:
-    roinput = register_module('SeqRootInput')
+    roinput = b2.register_module('SeqRootInput')
     roinput.param('inputFileNames', files)
     main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
 if datatype == 'pocket':
     print('pocket DAQ data assumed')
-    converter = register_module('Convert2RawDet')
+    converter = b2.register_module('Convert2RawDet')
     main.add_module(converter)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
@@ -207,15 +203,15 @@ main.add_module('TOPGeometryParInitializer')
 
 if datatype != 'root':
     # Unpacking (format auto detection works now)
-    unpack = register_module('TOPUnpacker')
+    unpack = b2.register_module('TOPUnpacker')
     main.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline
-    featureExtractor = register_module('TOPWaveformFeatureExtractor')
+    featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
     main.add_module(featureExtractor)
 
     # Convert to TOPDigits
-    converter = register_module('TOPRawDigitConverter')
+    converter = b2.register_module('TOPRawDigitConverter')
     if dbaddress == 'none':
         print("Not using Calibrations")
         converter.param('useSampleTimeCalibration', False)
@@ -247,15 +243,15 @@ else:
 main.add_module(resolutionModule)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
-print(statistics(statistics.TERM))
+print(b2.statistics)
+print(b2.statistics(b2.statistics.TERM))
 
 
 fitLaserResolution(dataFile=outfile, outputFile='laserResolutionResults.root', pdfType='cb', saveFits=True)

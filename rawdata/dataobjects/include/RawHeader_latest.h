@@ -11,11 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-//#include <TObject.h>
 #include <rawdata/switch_basf2_standalone.h>
-
-//#include <framework/datastore/DataStore.h>
 
 
 //#define HEADER_SIZE 16
@@ -35,7 +31,7 @@ namespace Belle2 {
     RawHeader_latest();
 
     //! Constructor using existing pointer to raw data buffer
-    RawHeader_latest(int*);
+    explicit RawHeader_latest(int*);
 
     //! Destructor
     ~RawHeader_latest();
@@ -179,7 +175,7 @@ namespace Belle2 {
     };
 
     enum {
-      RAWHEADER_NWORDS = 12
+      RAWHEADER_NWORDS = 56
     };
 
     enum {
@@ -196,10 +192,7 @@ namespace Belle2 {
       POS_TTUTIME = 5,
       POS_NODE_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
-      POS_OFFSET_1ST_FINESSE = 8,
-      POS_OFFSET_2ND_FINESSE = 9,
-      POS_OFFSET_3RD_FINESSE = 10,
-      POS_OFFSET_4TH_FINESSE = 11,
+      POS_CH_POS_TABLE = 8
     };
 
 
@@ -287,46 +280,9 @@ namespace Belle2 {
   inline void RawHeader_latest::SetTruncMask(int trunc_mask)
   {
     CheckSetBuffer();
+    /* cppcheck-suppress shiftTooManyBitsSigned */
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
   }
-
-  /*   inline void RawHeader_latest::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2) */
-  /*   { */
-  /*     m_buffer[ POS_HSLB_1 ] = word1; */
-  /*     m_buffer[ POS_HSLB_2 ] = word2; */
-  /*   } */
-
-
-  inline void RawHeader_latest::SetOffset1stFINESSE(int offset_1st_FINESSE)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_OFFSET_1ST_FINESSE ] = offset_1st_FINESSE;
-  }
-
-  inline void RawHeader_latest::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_OFFSET_2ND_FINESSE ] = offset_2nd_FINESSE;
-  }
-
-  inline void RawHeader_latest::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_OFFSET_3RD_FINESSE ] = offset_3rd_FINESSE;
-  }
-
-  inline void RawHeader_latest::SetOffset4thFINESSE(int offset_4th_FINESSE)
-  {
-    CheckSetBuffer();
-    m_buffer[ POS_OFFSET_4TH_FINESSE ] = offset_4th_FINESSE;
-  }
-
-  /*   inline void RawHeader_latest::SetFTSW2Words(int* ftsw_buf) */
-  /*   { */
-  /*     CheckSetBuffer(); */
-  /*     memcpy(&(m_buffer[ POS_HSLB_1 ]), (char*)ftsw_buf, sizeof(int) * 2); */
-  /*     return; */
-  /*   } */
 
   inline void RawHeader_latest::SetFTSW2Words(unsigned int word1,
                                               unsigned int word2)
@@ -449,29 +405,6 @@ namespace Belle2 {
     return 1;
   }
 
-  inline int RawHeader_latest::GetOffset1stFINESSE()
-  {
-    CheckGetBuffer();
-    return m_buffer[ POS_OFFSET_1ST_FINESSE ];
-  }
-
-  inline int RawHeader_latest::GetOffset2ndFINESSE()
-  {
-    CheckGetBuffer();
-    return m_buffer[ POS_OFFSET_2ND_FINESSE ];
-  }
-
-  inline int RawHeader_latest::GetOffset3rdFINESSE()
-  {
-    CheckGetBuffer();
-    return m_buffer[ POS_OFFSET_3RD_FINESSE ];
-  }
-
-  inline int RawHeader_latest::GetOffset4thFINESSE()
-  {
-    CheckGetBuffer();
-    return m_buffer[ POS_OFFSET_4TH_FINESSE ];
-  }
 
   /*   inline int RawHeader_latest::GetNumNodes() */
   /*   { */

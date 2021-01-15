@@ -63,7 +63,7 @@ Variables
 
 * The chi2 and ndf from KFit vertices are stored as extraInfo for debugging.
 
-* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successfull track fit hypothesis 
+* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successful track fit hypothesis 
   that was used to create this particle (that might be different from the PDG code of the particle list)
 
 * Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 
@@ -121,7 +121,7 @@ Variables
                 variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
                 variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
 
-* Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
+* Deprecated ``clusterHypothesis`` following changes to the ECLCluster storage on mdst. 
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ``ClusterHadronIntensity`` and ``clusterUniqueID``.
@@ -196,7 +196,7 @@ Modules
   ParticleList of composite particles (and only this one) was always added to
   the ROE.
 
-* The module :b2:mod:`VertexFitUpdateDaughters` now always updates
+* The module ``VertexFitUpdateDaughters`` now always updates
   the daughters (as advertised).
 
 

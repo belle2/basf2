@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-You can run ``basf2 variables.py`` to list all available variables.
+You can run ``b2help-variables`` to list all available variables.
 """
-from terminal_utils import Pager
-import argparse
 from variables import getCommandLineOptions
-from variables import printVars
+import subprocess
+import basf2
+
 
 if __name__ == "__main__":
     args = getCommandLineOptions()
+    basf2.B2WARNING("Calling basf2 variables.py is discouraged. The canonical way is to call b2help-variables.")
 
     if args.pager:
-        with Pager(r'Available variables in Variable\:\:Manager'):
-            printVars()
+        subprocess.call("b2help-variables")
     else:
-        printVars()
+        subprocess.call(["b2help-variables", "--no-pager"])

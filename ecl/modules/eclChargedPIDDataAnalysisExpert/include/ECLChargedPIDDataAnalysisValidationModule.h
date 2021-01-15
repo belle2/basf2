@@ -11,6 +11,9 @@
 
 #pragma once
 
+// Belle 2
+#include <mdst/dataobjects/MCParticle.h>
+
 // ROOT
 #include <TFile.h>
 #include <TH1F.h>
@@ -18,6 +21,7 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {
@@ -84,6 +88,17 @@ namespace Belle2 {
      * This is a configurable parameter.
      */
     std::vector<int> m_inputPdgIdList;
+
+    /**
+     * The (unsigned) pdgId list of the charged stable particles for which particle and antiparticle should be merged together in the plots.
+     * This is a configurable parameter.
+     */
+    std::vector<unsigned int> m_mergeChargeOfPdgIds;
+
+    /**
+     * A map to tell for each charged stable particle hypothesis whether particle and antiparticle should be merged together in the plots.
+     */
+    std::map<Const::ChargedStable, bool> m_mergeChargeFlagByHypo;
 
     /**
      * The pdgId set of the charged stable particles of interest.
@@ -250,12 +265,16 @@ namespace Belle2 {
      * Binning w/ variable bin size for track polar angle (in [rad]).
      * It follows the ECL geometry (although ECL gaps are not accounted for).
      */
-    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.561996, 2.2462387, 2.7070057, 3.1415926};
+    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.385, 0.561996, 1.13, 1.57, 1.88, 2.2462387, 2.47, 2.7070057, 3.1415926};
+
+    /** MCParticles. */
+    StoreArray<MCParticle> m_MCParticles;
 
     /**
      * Dump PID vars.
      */
-    void dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo, const int sigCharge, const Const::ChargedStable& bkgHypo);
+    void dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo, const int sigCharge, const Const::ChargedStable& bkgHypo,
+                     bool mergeSigCharge = false);
 
     /**
      * Dump PID efficiency / fake rate vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
@@ -264,11 +283,12 @@ namespace Belle2 {
      * \param[in] sampleHypo the `Const::ChargedStable` hypothesis corresponding to the charged particle under consideration.
      * \param[in] sampleCharge the charge (+/- 1) of the charged particle under consideration.
      * \param[in] sigHypo the `Const::ChargedStable` "signal" hypothesis to test.
+     * \param[in] mergeSampleCharge if true, will specify in the plot legend that we are looking at a sample made of +/- charges.
      *
      * If sampleHypo == sigHypo, will be measuring an efficiency, otherwise a fake rate.
      */
     void dumpPIDEfficiencyFakeRate(TTree* sampleTree, const Const::ChargedStable& sampleHypo, const int sampleCharge,
-                                   const Const::ChargedStable& sigHypo);
+                                   const Const::ChargedStable& sigHypo, bool mergeSampleCharge = false);
 
     /**
      * Dump track-to-ECL-cluster matching efficiency vs clusterTheta, clusterPhi, pt....
@@ -276,9 +296,11 @@ namespace Belle2 {
      * \param[in] sampleTree the `TTree` of the charged particle under consideration.
      * \param[in] sampleHypo the `Const::ChargedStable` hypothesis corresponding to the charged particle under consideration.
      * \param[in] sampleCharge the charge of the charged particle under consideration.
+     * \param[in] mergeSampleCharge if true, will specify in the plot legend that we are looking at a sample made of +/- charges.
      *
      */
-    void dumpTrkClusMatchingEfficiency(TTree* sampleTree, const Const::ChargedStable& sampleHypo, const int sampleCharge);
+    void dumpTrkClusMatchingEfficiency(TTree* sampleTree, const Const::ChargedStable& sampleHypo, const int sampleCharge,
+                                       bool mergeSampleCharge = false);
 
     /**
      * Check if the input pdgId is that of a valid charged stable particle.

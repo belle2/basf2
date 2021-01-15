@@ -18,12 +18,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <bitset>
-#include "trg/trg/Time.h"
 
 namespace Belle2 {
-
-  class TRGTime;
 
 /// A class to represent a state of multi bits
   class TRGState {
@@ -37,6 +33,7 @@ namespace Belle2 {
     TRGState(unsigned bitSize, unsigned value);
 
     /// Constructor.
+    // cppcheck-suppress noExplicitConstructor
     TRGState(std::vector<bool> states);
 
     /// Constructor.
@@ -48,8 +45,8 @@ namespace Belle2 {
     /// Constructor. type: 0-> binary, 1->hex
     TRGState(const char*, unsigned type);
 
-    // /// Copy constructor.
-    // TRGState(const TRGState &);
+    /// Default copy constructor.
+    TRGState(const TRGState&) = default;
 
     /// Destructor
     virtual ~TRGState();

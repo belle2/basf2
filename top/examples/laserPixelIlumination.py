@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+import os
 import sys
 from ROOT import Belle2
 from ROOT import TH2F, TFile
@@ -13,12 +14,12 @@ from ROOT import TH2F, TFile
 
 inputFile = 'laserSimulation.root'
 if not os.path.exists(inputFile):
-    B2ERROR(inputFile + ': file not found')
-    B2INFO('File can be generated with top/analysis/simLaserCalibration.py')
+    b2.B2ERROR(inputFile + ': file not found')
+    b2.B2INFO('File can be generated with top/analysis/simLaserCalibration.py')
     sys.exit()
 
 
-class Histogrammer(Module):
+class Histogrammer(b2.Module):
 
     ''' A module to histogram pixel hits from individual fibers'''
 
@@ -46,7 +47,7 @@ class Histogrammer(Module):
                     if k >= 0 and k < 9:
                         self.hist[k].Fill(digit.getPixelCol(), digit.getPixelRow())
                     else:
-                        B2ERROR('wrong decoding of fiber number: ' + str(k + 1))
+                        b2.B2ERROR('wrong decoding of fiber number: ' + str(k + 1))
                     if digit.getPixelID() == self.pixelID:
                         t = photon.getDetectionTime() - photon.getEmissionTime()
                         self.propTime.Fill(k + 1, t)
@@ -62,10 +63,10 @@ class Histogrammer(Module):
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 roinput.param('inputFileName', inputFile)
 main.add_module(roinput)
 
@@ -73,11 +74,11 @@ main.add_module(roinput)
 main.add_module(Histogrammer())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

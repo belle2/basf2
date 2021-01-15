@@ -1,7 +1,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <unordered_map>
 #include <vector>
 
 namespace Belle2 {
@@ -17,23 +16,12 @@ namespace Belle2 {
 
     /** Default constructor */
     TRGGDLDBAlgs() {}
+
     /** copy constructor */
-    TRGGDLDBAlgs(const TRGGDLDBAlgs& b)
-    {
-      m_algs.clear();
-      for (long unsigned int i = 0; i < b.m_algs.size(); i++) {
-        m_algs[i] = b.m_algs[i];
-      }
-    }
+    TRGGDLDBAlgs(const TRGGDLDBAlgs&) = default;
+
     /** assignment operator */
-    TRGGDLDBAlgs& operator=(const TRGGDLDBAlgs& b)
-    {
-      m_algs.clear();
-      for (long unsigned int i = 0; i < b.m_algs.size(); i++) {
-        m_algs[i] = b.m_algs[i];
-      }
-      return *this;
-    }
+    TRGGDLDBAlgs& operator=(const TRGGDLDBAlgs&) = default;
 
     /** Setter for a GDL logic alghrithm */
     void setalg(const std::string& s)

@@ -17,25 +17,13 @@
 #################################################################################
 
 
-from basf2 import *
-from svd import *
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory
-import os
+import basf2 as b2
+from ROOT import Belle2, TFile, TFitResultPtr, TH1F, TH2D
+from ROOT import TF1, gDirectory, gROOT
 # import numpy
 import math
-import random
-from array import array
-import basf2
-import sys
 from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 
-import matplotlib.pyplot as plt
-import numpy as np
-from numpy.linalg import inv, pinv
-from numpy.linalg import det, norm, cond
 
 svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"
@@ -46,7 +34,7 @@ gROOT.SetBatch(True)
 # mode = True
 
 
-class SVDCoGTimeCalibrationImporterModule(basf2.Module):
+class SVDCoGTimeCalibrationImporterModule(b2.Module):
     """
     Python class used for checking SVD CoG Calibration stored in a localDB,
     creating a localDB with the correction and a root file to check the corrections
@@ -91,12 +79,13 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         hasTimezero = self.cdcEventT0.hasEventT0()
         # print("Time: " + str(hasTimezero))
         if hasTimezero:
-            TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
+            svdEventInfo = Belle2.PyStoreObj("SVDEventInfo")
+            TBClusters = svdEventInfo.getModeByte().getTriggerBin()
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
             # print(str(tZero_err))

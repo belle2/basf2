@@ -12,6 +12,8 @@ from conditions_db import iov
 
 
 class TestIntervalOfValidity(unittest.TestCase):
+    """Helper class to test an IoV"""
+
     def iovify(self, iov):
         """Helper function to turn a tuple/None/list(tuple) into iov instances"""
         if isinstance(iov, list):
@@ -103,13 +105,16 @@ class TestIntervalOfValidity(unittest.TestCase):
             [(0, 0, -1, -1), (0, 0, -1, -1), None, None],
             [(0, 0, 1, -1), (0, 0, 1, -1), None, None],
             [(0, 0, 0, 0), (0, 0, 0, 0), None, None],
-            [(0, 0, 1, -1), (2, 0, 2, -1), (0, 0, 1, -1), (2, 0, 2, -1)]
+            [(0, 0, 1, -1), (2, 0, 2, -1), (0, 0, 1, -1), (2, 0, 2, -1)],
+            [(11, 0, 12, 86), (0, 0, 11, -1), (12, 0, 12, 86), (0, 0, 10, -1)],
         ]:
             self.assertEqual(iov(a) - iov(b), self.iovify(c), f'{a} - {b} = {c}')
             self.assertEqual(iov(b) - iov(a), self.iovify(d), f'{b} - {a} = {d}')
 
 
 class TestIoVSet(unittest.TestCase):
+    """Helper class to test a set of IoVs"""
+
     def test_add(self):
         """Test adding iovs to a set"""
         inputs = [
@@ -147,7 +152,7 @@ class TestIoVSet(unittest.TestCase):
         """Test intersecting two sets"""
         iovs = []
         for i in range(6):
-            iovs.append((i, 0, i+5, -1))
+            iovs.append((i, 0, i + 5, -1))
         result = {IntervalOfValidity(5, 0, 5, -1)}
         for _ in range(10):
             a = IoVSet([IntervalOfValidity.always()])
@@ -162,6 +167,7 @@ def load_tests(loader, tests, ignore):
     """Add the doctests to the list of tests"""
     tests.addTests(doctest.DocTestSuite(iov))
     return tests
+
 
 if __name__ == "__main__":
     # test everything

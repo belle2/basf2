@@ -10,7 +10,11 @@
  **************************************************************************/
 
 #pragma once
+
+#include <analysis/VariableManager/Manager.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -21,6 +25,11 @@ namespace Belle2 {
      * return digit level MVA that uses pulse shape discrimination to identify hadronic vs electromagnetic showers.
      */
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
+
+    /**
+     * return MVA output that uses shower shape variables to distinguish between true photon and beam background clusters
+     */
+    double beamBackgroundProbabilityMVA(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
@@ -121,6 +130,16 @@ namespace Belle2 {
     double eclClusterCellId(const Particle* particle);
 
     /**
+     * return the thetaID [0,68] of the crystal with highest energy
+     */
+    double eclClusterThetaId(const Particle* particle);
+
+    /**
+     * return the phiID [0,143] of the crystal with highest energy
+     */
+    double eclClusterPhiId(const Particle* particle);
+
+    /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
      */
     double eclClusterE1E9(const Particle* particle);
@@ -188,11 +207,6 @@ namespace Belle2 {
      * return the Cluster ID within the connected region of this cluster
      */
     double eclClusterId(const Particle* particle);
-
-    /**
-     * [deprecated] return the Hypothesis ID of this cluster
-     */
-    double eclClusterHypothesisId(const Particle* particle);
 
     /**
      * Returns 1.0 if the cluster has the 'N photons' hypothesis (historically
@@ -399,6 +413,13 @@ namespace Belle2 {
      * Returns cluster mdst array index
      */
     double eclClusterMdstIndex(const Particle* particle);
+
+    /**
+     * Returns function which returns true if the connected region of the particle's cluster is shared by another cluster.
+     * This other cluster can be neutral or matched to a track.
+     * A cut on the properties of the other cluster can be provided.
+     */
+    Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

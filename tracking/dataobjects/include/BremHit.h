@@ -33,6 +33,7 @@ namespace Belle2 {
      * @param bremEnergy The energy of the bremsstrahlung photon, which was radiated
      * @param clusterDistance The difference between the angle of the tracks direction
      * and the clusters position relative to the radiation position
+     * @param acceptanceFactor  The acceptance factor which is needed to find the BremHit
      */
     BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3& position, double bremEnergy,
             double clusterDistance, double acceptanceFactor) :
@@ -47,13 +48,13 @@ namespace Belle2 {
     }
 
     /** Set the radiation position. */
-    void setPosition(TVector3& position) {m_position = position;}
+    void setPosition(const TVector3& position) {m_position = position;}
 
     /** Set the radiated energy. */
-    void setBremEnergy(double bremEnergy) {m_bremEnergy = bremEnergy;}
+    void setBremEnergy(const double bremEnergy) {m_bremEnergy = bremEnergy;}
 
     /** Set the distance between the extrapolation and the bremCluster position. */
-    void setClusterDistance(double distance) {m_clusterDistance = distance;}
+    void setClusterDistance(const double distance) {m_clusterDistance = distance;}
 
     /** Return the radiation position. */
     TVector3 getPosition() const

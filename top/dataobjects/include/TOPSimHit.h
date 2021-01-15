@@ -11,8 +11,7 @@
 #pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
-#include <TObject.h>
-#include <TVector3.h>
+#include <TVector2.h>
 
 namespace Belle2 {
 

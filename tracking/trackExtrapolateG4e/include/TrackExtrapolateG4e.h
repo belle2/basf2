@@ -19,14 +19,17 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <ir/dbobjects/BeamPipeGeo.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/MuidParameters.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <structure/dbobjects/COILGeometryPar.h>
 
 /* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
@@ -171,22 +174,25 @@ namespace Belle2 {
     //! destructor
     ~TrackExtrapolateG4e();
 
-    //! Initialize for track extrapolation by the EXT module.
-    //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
-    //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
-    //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
+    /** Initialize for track extrapolation by the EXT module.
+     @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
+     @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
+     @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
+    */
     void initialize(double minPt, double minKE,
                     std::vector<Const::ChargedStable>& hypotheses);
 
-    //! Initialize for track extrapolation by the MUID module.
-    //! @param meanDt Mean value of the in-time window (ns).
-    //! @param maxDt Half-width of the in-time window (ns).
-    //! @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
-    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
-    //! @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
-    //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
-    //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
-    //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
+    /** Initialize for track extrapolation by the MUID module.
+     @param meanDt Mean value of the in-time window (ns).
+     @param maxDt Half-width of the in-time window (ns).
+     @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
+     @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
+     @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
+     @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
+     @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
+     @param addHitsToRecoTrack Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
+     @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
+    */
     void initialize(double meanDt, double maxDt, double maxSeparation,
                     double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
                     double minPt, double minKE, bool addHitsToRecoTrack, std::vector<Const::ChargedStable>& hypotheses);
@@ -354,6 +360,12 @@ namespace Belle2 {
     //! virtual "target" cylinder for MUID (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetMuid;
 
+    //! Conditions-database object for COIL geometry
+    DBObjPtr<COILGeometryPar> m_COILGeometryPar;
+
+    //! Conditions-database object for beam pipe geometry
+    DBObjPtr<BeamPipeGeo> m_BeamPipeGeo;
+
     //! Minimum squared radius (cm) outside of which extrapolation will continue
     double m_MinRadiusSq;
 
@@ -424,6 +436,9 @@ namespace Belle2 {
     //! PDF for the charged final state particle hypotheses
     std::map<int, MuidBuilder*> m_MuidBuilderMap;
 
+    //! EKLM element numbers.
+    const EKLMElementNumbers* m_eklmElementNumbers;
+
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
 
@@ -436,8 +451,8 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
     //! ECL clusters
     StoreArray<ECLCluster> m_eclClusters;

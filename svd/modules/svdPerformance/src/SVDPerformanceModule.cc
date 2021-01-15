@@ -1,16 +1,10 @@
 #include <svd/modules/svdPerformance/SVDPerformanceModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <geometry/GeometryManager.h>
-//#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
-#include <list>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <boost/foreach.hpp>
 
@@ -465,11 +459,11 @@ void SVDPerformanceModule::event()
 
   BOOST_FOREACH(Track & track, m_Tracks) {
 
-    const TrackFitResult* tfr = NULL;
+    const TrackFitResult* tfr = nullptr;
     if (m_is2017TBanalysis)
-      tfr = track.getTrackFitResult(Const::electron);
+      tfr = track.getTrackFitResultWithClosestMass(Const::electron);
     else
-      tfr = track.getTrackFitResult(Const::pion);
+      tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());
@@ -816,7 +810,7 @@ void SVDPerformanceModule::terminate()
   B2RESULT(" Layer 3, u = " << h_clSize_L3u->GetMean() << ", v = " << h_clSize_L3v->GetMean());
   B2RESULT(" Layer 4, u = " << h_clSize_L4u->GetMean() << ", v = " << h_clSize_L4v->GetMean());
   */
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

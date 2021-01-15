@@ -167,6 +167,9 @@ ECLGeometryPar::~ECLGeometryPar()
     delete m_B4ECLGeometryParDB;
     B2DEBUG(150, "m_B4ECLGeometryParDB deleted ");
   }
+  if (m_ECLForwardGlobalT) delete m_ECLForwardGlobalT;
+  if (m_ECLBarrelGlobalT) delete m_ECLBarrelGlobalT;
+  if (m_ECLBackwardGlobalT) delete m_ECLBackwardGlobalT;
 }
 
 void ECLGeometryPar::clear()
@@ -243,32 +246,26 @@ void ECLGeometryPar::read()
   G4Point3D p0(0, 0, 0); G4Vector3D v0(0, 0, 1);
 
   {
-    G4Transform3D T0 = getT("ECLForwardPhysical");
-    G4Transform3D T1;// = getT("ECLForwardSectorPhysical");
-    G4Transform3D T2 = getT("ECLForwardCrystalSectorPhysical_1");
-    G4Transform3D T = T0 * T1 * T2;
-
+    m_ECLForwardGlobalT = new G4Transform3D(getT("ECLForwardPhysical"));
+    G4Transform3D T =  getT("ECLForwardCrystalSectorPhysical_1");
     G4String tnamef("ECLForwardWrappedCrystal_Physical_");
     for (int i = 0; i < 72; i++) {
       G4String vname(tnamef); vname += to_string(i);
       G4Transform3D cT = T * getT(vname);
-      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      CrystalGeom_t c = {cT * p0, cT * v0};
       m_crystals.push_back(c);
       //      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
     }
   }
 
   {
-    G4Transform3D T0 = getT("ECLBackwardPhysical");
-    G4Transform3D T1;// = getT("ECLBackwardSectorPhysical");
-    G4Transform3D T2 = getT("ECLBackwardCrystalSectorPhysical_0");
-    G4Transform3D T = G4RotateZ3D(M_PI) * T0 * T1 * T2;
-
+    m_ECLBackwardGlobalT = new G4Transform3D(getT("ECLBackwardPhysical"));
+    G4Transform3D T = getT("ECLBackwardCrystalSectorPhysical_0");
     G4String tnamef("ECLBackwardWrappedCrystal_Physical_");
     for (int i = 0; i < 60; i++) {
       G4String vname(tnamef); vname += to_string(i);
       G4Transform3D cT = T * getT(vname);
-      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      CrystalGeom_t c = {cT * p0, cT * v0};
       m_crystals.push_back(c);
       //      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
     }
@@ -276,7 +273,10 @@ void ECLGeometryPar::read()
 
   {
     // get barrel sector (between two septums) transformation
-    G4Transform3D Ts = getT("ECLBarrelSectorPhysical_0");
+
+    // extract global barrel movements assuming we know transformation of the sector in axial symmetric situation
+    m_ECLBarrelGlobalT = new G4Transform3D(getT("ECLBarrelSectorPhysical_0") * G4RotateZ3D(M_PI / 2));
+    G4Transform3D Ts = G4RotateZ3D(-M_PI / 2);
     // since barrel sector is symmetric around phi=0 we need to
     // translate crystal with negative phi back to positive rotating
     // crystal position by (2*M_PI/72) angle
@@ -286,7 +286,7 @@ void ECLGeometryPar::read()
     for (int i = 0; i < 2 * 46; i++) {
       G4String vname(tname); vname += to_string(i);
       G4Transform3D cT = ((i % 2) ? Ts1 : Ts) * getT(vname);
-      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      CrystalGeom_t c = {cT * p0, cT * v0};
       m_crystals.push_back(c);
       //      G4cout << i << " " << c.pos << " " <<c.dir<<G4endl;
     }
@@ -355,13 +355,26 @@ void ECLGeometryPar::InitCrystal(int cid)
   else
     sincos<16>(ss16, nreplica, s, c);
 
+  G4Transform3D* T;
+  if (cid < 1152) {
+    T = m_ECLForwardGlobalT;
+  } else if (cid < 7776) {
+    T = m_ECLBarrelGlobalT;
+  } else {
+    T = m_ECLBackwardGlobalT;
+    c = -c;
+  }
   double xp = c * t.pos.x() - s * t.pos.y();
   double yp = s * t.pos.x() + c * t.pos.y();
-  m_current_crystal.pos.set(xp, yp, t.pos.z());
+  //  m_current_crystal.pos.set(xp, yp, t.pos.z());
 
   double xv = c * t.dir.x() - s * t.dir.y();
   double yv = s * t.dir.x() + c * t.dir.y();
-  m_current_crystal.dir.set(xv, yv, t.dir.z());
+  //  m_current_crystal.dir.set(xv, yv, t.dir.z());
+
+  m_current_crystal.pos = (1 / CLHEP::cm) * (*T * G4Point3D(xp, yp, t.pos.z()));
+  m_current_crystal.dir = *T * G4Vector3D(xv, yv, t.dir.z());
+
   //  cout<<t.pos<<" "<<t.dir<<" "<<m_current_crystal.pos<<" "<<m_current_crystal.dir<<endl;
   m_ini_cid = cid;
 }

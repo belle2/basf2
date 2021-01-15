@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MILLEPEDECOLLECTORMODULE_H
-#define MILLEPEDECOLLECTORMODULE_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <calibration/CalibrationCollectorModule.h>
@@ -56,22 +55,27 @@ namespace Belle2 {
      * Get all useable tracks for particles
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param addVertexPoint flag for adding the vertex point
      */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint = true);
 
     /** Fit given RecoTrack with GBL
      *
-     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param recoTrack A RecoTrack object to be fitted
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
      *
      * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)
      */
     bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
-    /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
+    /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex)
+     * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
+     */
     TMatrixD getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop);
 
-    /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
+    /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex)
+     * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
+     */
     TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     ///  Compute the transformation matrices d(q/p,u'v',u,v)/d(vx,vy,vz,px,py,pz,theta,phi,M) = dq/d(v,z) for
@@ -180,5 +184,3 @@ namespace Belle2 {
     void updateMassWidthIfSet(std::string listName, double& mass, double& width);
   };
 }
-
-#endif /* MILLEPEDECOLLECTORMODULE_H */

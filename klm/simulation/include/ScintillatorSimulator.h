@@ -11,10 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dbobjects/EKLMChannelData.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dbobjects/eklm/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -25,7 +24,7 @@ namespace Belle2 {
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
-    class ScintillatorSimulator : public EKLMHitMCTime {
+    class ScintillatorSimulator {
 
     public:
 
@@ -69,8 +68,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
 
       /**
        * Simulate EKLM strip.
@@ -78,8 +77,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.
@@ -95,12 +94,12 @@ namespace Belle2 {
       /**
        * Get number of photoelectrons (fit result).
        */
-      double getNPE();
+      double getNPhotoelectrons();
 
       /**
        * Get generated number of photoelectrons.
        */
-      int getGeneratedNPE();
+      int getNGeneratedPhotoelectrons();
 
       /**
        * Get total energy deposited in the strip (sum over ssimulation hits).
@@ -114,11 +113,11 @@ namespace Belle2 {
 
       /**
        * Generate photoelectrons.
-       * @param[in]     stripLen    Strip length.
-       * @param[in]     distSiPM    Distance from hit to SiPM.
-       * @param[in]     nPE         Number of photons to be simulated.
-       * @param[in]     timeShift   Time of hit.
-       * @param[in]     isReflected Whether the hits are reflected or not.
+       * @param[in] stripLen    Strip length.
+       * @param[in] distSiPM    Distance from hit to SiPM.
+       * @param[in] nPhotons    Number of photons to be simulated.
+       * @param[in] timeShift   Time of hit.
+       * @param[in] isReflected Whether the hits are reflected or not.
        */
       void generatePhotoelectrons(double stripLen, double distSiPM,
                                   int nPhotons, double timeShift,
@@ -132,7 +131,63 @@ namespace Belle2 {
        */
       void fillSiPMOutput(float* hist, bool useDirect, bool useReflected);
 
+      /**
+       * Get MC time.
+       * @return MC time.
+       */
+      float getMCTime() const
+      {
+        return m_MCTime;
+      }
+
+      /**
+       * Get SiPM MC time.
+       * @return SiPM MC yime.
+       */
+      float getSiPMMCTime() const
+      {
+        return m_SiPMMCTime;
+      }
+
     private:
+
+      /**
+       * Reallocate photoelectron buffers.
+       * @param[in] size New size of buffers.
+       */
+      void reallocPhotoElectronBuffers(int size);
+
+      /**
+       * Prepare simulation.
+       */
+      void prepareSimulation();
+
+      /**
+       *  Perform common simulation stage.
+       */
+      void performSimulation();
+
+      /**
+       * Sort photoelectrons.
+       * @param[in] nPhotoelectrons Number of photoelectrons.
+       * @return Pointer to index array.
+       */
+      int* sortPhotoelectrons(int nPhotoelectrons);
+
+      /**
+       * Add random noise to the signal (amplitude-dependend).
+       */
+      void addRandomSiPMNoise();
+
+      /**
+       * Simulate ADC (create digital signal from analog),
+       */
+      void simulateADC();
+
+      /**
+       * Debug output (signal and fit result histograms).
+       */
+      void debugOutput();
 
       /** Parameters. */
       const KLMScintillatorDigitizationParameters* m_DigPar;
@@ -203,43 +258,11 @@ namespace Belle2 {
       /** Threshold. */
       int m_Threshold;
 
-      /**
-       * Reallocate photoelectron buffers.
-       * @param[in] size New size of buffers.
-       */
-      void reallocPhotoElectronBuffers(int size);
+      /** MC time. */
+      float m_MCTime;
 
-      /**
-       * Prepare simulation.
-       */
-      void prepareSimulation();
-
-      /**
-       *  Perform common simulation stage.
-       */
-      void performSimulation();
-
-      /**
-       * Sort photoelectrons.
-       * @param[in] nPhotoelectrons Number of photoelectrons.
-       * @return Pointer to index array.
-       */
-      int* sortPhotoelectrons(int nPhotoelectrons);
-
-      /**
-       * Add random noise to the signal (amplitude-dependend).
-       */
-      void addRandomSiPMNoise();
-
-      /**
-       * Simulate ADC (create digital signal from analog),
-       */
-      void simulateADC();
-
-      /**
-       * Debug output (signal and fit result histograms).
-       */
-      void debugOutput();
+      /** MC time at SiPM. */
+      float m_SiPMMCTime;
 
     };
 

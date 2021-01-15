@@ -73,6 +73,7 @@ namespace Belle2 {
        * access to materials should be O(1) in most cases
        *
        * @param name Name of the material to be found
+       * @param showErrors If false don't show any errors, just return nullptr if the material cannot be found
        */
       G4Material* getMaterial(const std::string& name, bool showErrors = true);
 
@@ -106,7 +107,7 @@ namespace Belle2 {
 
       /**
        * Create an optical surface from Surface definition in DB
-       * @param parameters Optical surface definition
+       * @param surface Optical surface definition
        * @return new optical surface
        */
       G4OpticalSurface* createOpticalSurface(const GeoOpticalSurface& surface);

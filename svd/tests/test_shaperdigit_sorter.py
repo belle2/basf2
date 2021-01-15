@@ -1,5 +1,3 @@
-import os
-import tempfile
 import basf2
 import ROOT
 from ROOT import Belle2
@@ -13,18 +11,28 @@ class CreateDigits(basf2.Module):
     def __init__(self, digits):
         """digits is a list of (sensor, side, strip) for which to generate a digit"""
         super().__init__()
+        #: shaper digits
         self.svddigits = Belle2.PyStoreArray("SVDShaperDigits")
+        #: test digits
         self.digits = digits
+        #: six samples
         self.samples = ROOT.array('unsigned char', 6)()
+
         for i, sample in zip(range(6), [0, 0, 12, 18, 12, 8]):
             self.samples[i] = sample
+        #: mode byte
         self.mode = Belle2.SVDModeByte(144)
+        #: FADC time
         self.fadc_time = 0
 
     def initialize(self):
+        '''initialize'''
+
         self.svddigits.registerInDataStore()
 
     def event(self):
+        '''event'''
+
         for sensor, side, strip in self.digits:
             d = self.svddigits.appendNew()
             d.__assign__(Belle2.SVDShaperDigit(Belle2.VxdID(3, 1, sensor), side, strip, self.samples, self.fadc_time, self.mode))
@@ -38,6 +46,8 @@ class CheckOrderingOfDigits(basf2.Module):
     """Check ordering of SVD digits"""
 
     def event(self):
+        '''event'''
+
         digits = Belle2.PyStoreArray("SVDShaperDigits")
         current_ID = 0
         for d in digits:
@@ -52,6 +62,8 @@ class PrintDigitsAndClusters(basf2.Module):
     """Print all SVD digits and clusters"""
 
     def event(self):
+        '''event'''
+
         digits = Belle2.PyStoreArray("SVDShaperDigits")
         clusters = Belle2.PyStoreArray("SVDClusters")
         print('\nSorted digits and clusters:')

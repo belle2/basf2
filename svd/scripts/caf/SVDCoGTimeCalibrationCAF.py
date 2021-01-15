@@ -1,102 +1,102 @@
-from basf2 import *
-set_log_level(LogLevel.INFO)
-# set_log_level(LogLevel.WARNING)
+import basf2 as b2
 
 import os
 import sys
-import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
-from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
+import svd as svd
 
+b2.set_log_level(b2.LogLevel.INFO)
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
-    'SVDShaperDigits',
+    'RawSVDs'
+    # 'SVDShaperDigits',
+    # 'SVDEventInfo'
 ]
 
 now = datetime.datetime.now()
-# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 
 def remove_module(path, name):
 
-    new_path = create_path()
+    new_path = b2.create_path()
     for m in path.modules():
         if name != m.name():
             new_path.add_module(m)
     return new_path
 
-'''
-def pre_alg(algorithm, iteration):
+# pre_collector
 
-    B2INFO("Running pre_algorithm function")
-    evtinfo = register_module('EventInfoSetter', evtNumList=[1], runList=[1], expList=[1003])
-    evtinfo.initialize()
-    gear = register_module('Gearbox')
-    geom = register_module('Geometry')
-    gear.initialize()
-    geom.initialize()
-'''
+
+def pre_collector():
+
+    b2.B2INFO("Pre-collector")
+    pre_path = b2.create_path()
+    pre_path.add_module('RootInput', branchNames=input_branches)
+
+    pre_path.add_module("Gearbox")
+    pre_path.add_module("Geometry", useDB=True)
+
+    # run SVD unpacker
+    svd.add_svd_unpacker(pre_path)
+
+    # run SVD reconstruction, changing names of StoreArray
+    reco.add_svd_reconstruction(pre_path)
+
+    for moda in pre_path.modules():
+        if moda.name() == 'SVDCoGTimeEstimator':
+            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
+            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("CalibrationWithEventT0", False)
+        if moda.name() == 'SVDSimpleClusterizer':
+            moda.param("Clusters", 'SVDClustersFromTracks')
+            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("timeAlgorithm", 0)
+        if moda.name() == 'SVDSpacePointCreator':
+            moda.param("SVDClusters", 'SVDClustersFromTracks')
+
+    pre_path = remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
+
+    b2.print_path(pre_path)
+
+    return pre_path
 
 
 def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     path.add_module('Progress')
 
-    # Remove not useful branches
-    path.add_module('RootInput', branchNames=input_branches)
-
-    path.add_module("Gearbox")
-    path.add_module("Geometry", useDB=True)
-
-    # run SVD reconstruction, changing names of StoreArray
-    reco.add_svd_reconstruction(path)
-
-    for moda in path.modules():
-        if moda.name() == 'SVDCoGTimeEstimator':
-            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-        if moda.name() == 'SVDSimpleClusterizer':
-            moda.param("Clusters", 'SVDClustersFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-        if moda.name() == 'SVDSpacePointCreator':
-            moda.param("SVDClusters", 'SVDClustersFromTracks')
-
-    path = remove_module(path, 'SVDMissingAPVsClusterCreator')
-
     # collector setup
-    collector = register_module('SVDCoGTimeCalibrationCollector')
+    collector = b2.register_module('SVDTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
-    collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
+    collector.param("SVDEventInfoName", "SVDEventInfo")
+    collector.param("EventT0Name", "EventT0")
     collector.param("granularity", "run")
 
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
     algorithm.setMinEntries(100)
-    algorithm.setAllowedT0Shift(2.)
+    algorithm.setAllowedTimeShift(2.)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',
                               collector=collector,
                               algorithms=algorithm,
                               input_files=files,
-                              pre_collector_path=path,
+                              pre_collector_path=pre_collector(),
                               database_chain=[CentralDatabase(tag) for tag in tags],
                               output_patterns=None,
                               max_files_per_collector_job=1,
@@ -130,11 +130,13 @@ if __name__ == "__main__":
                 good_input_files.append(f)
                 print(str(f))
                 inputStringSplit = f.split("/")
-                s_run = str(inputStringSplit[10])
-                s_exp = str(inputStringSplit[8])
-                print(str(s_run) + " " + str(s_exp))
-                runNum = runs.append(int(s_run[1:6]))
-                expNum = int(s_exp[1:5])
+                for string in inputStringSplit:
+                    if string.startswith('r0'):
+                        s_run = str(string)
+                        runNum = runs.append(int(s_run[1:6]))
+                    if string.startswith('e0'):
+                        s_exp = str(string)
+                        expNum = int(s_exp[1:5])
 
     runs.sort()
 
@@ -147,13 +149,22 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
+    # print(good_input_files)
+
     uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_Exp" + \
         str(expNum) + "_runsFrom" + str(firstRun) + "to" + str(lastRun)
+    print("")
     print("UniqueID")
     print("")
     print(str(uniqueID))
     print("")
-    svdCoGCAF = SVDCoGTimeCalibration(good_input_files, ['data_reprocessing_prompt_rel4_patchb', 'svd_NOCoGCorrections'], uniqueID)
+    b2.conditions.override_globaltags()
+    svdCoGCAF = SVDCoGTimeCalibration(good_input_files,
+                                      ["online_proc11",
+                                       "data_reprocessing_proc11_baseline",
+                                       "staging_data_reprocessing_proc11",
+                                       "svd_NOCoGCorrections"],
+                                      uniqueID)
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCoGCAF)

@@ -11,17 +11,16 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 /* Belle 2 headers. */
@@ -46,32 +45,32 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~KLMDigitizerModule();
+    ~KLMDigitizerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -135,7 +134,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Simulation mode. */
     std::string m_SimulationMode;
@@ -143,8 +142,8 @@ namespace Belle2 {
     /** Whether the simulation is channel-specific. */
     bool m_ChannelSpecificSimulation;
 
-    /** Initial digitization time. */
-    double m_DigitizationInitialTime;
+    /** Initial digitization time in TDC periods. */
+    int m_DigitizationInitialTime;
 
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
@@ -179,11 +178,8 @@ namespace Belle2 {
     /** EKLM simulation hits. */
     StoreArray<EKLMSimHit> m_eklmSimHits;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /** FPGA fits. */
     StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;

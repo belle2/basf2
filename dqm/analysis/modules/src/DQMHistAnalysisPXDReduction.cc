@@ -31,13 +31,16 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
 DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -45,7 +48,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  m_monObj = getMonitoringObject("pxd");
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -70,6 +74,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
+  m_monObj->addCanvas(m_cReduction);
 
   /// FIXME were to put the lines depends ...
 //   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
@@ -87,9 +92,11 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -108,6 +115,9 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_hReduction->Reset(); // dont sum up!!!
 
   bool enough = false;
+  double ireduction = 0.0;
+  int ireductioncnt = 0;
+//   int ccnt = 1;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
@@ -118,10 +128,16 @@ void DQMHistAnalysisPXDReductionModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << name << " found in mem");
-      m_hReduction->Fill(i, hh1->GetMean());
+//       B2INFO("Histo " << name << " found in mem");
+      auto mean = hh1->GetMean();
+      m_hReduction->Fill(i, mean);
       if (hh1->GetEntries() > 100) enough = true;
+      if (mean > 0) {
+        ireduction += mean; // well fit would be better
+        ireductioncnt++;
+      }
     }
+//     ccnt++;
   }
   m_cReduction->cd();
 
@@ -148,13 +164,17 @@ void DQMHistAnalysisPXDReductionModule::event()
 //     m_line3->Draw();
   }
 
+  double data = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
+
+  m_monObj->setVariable("reduction", data);
+
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-  double data = 0; // what do we want to return?
-
-  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 

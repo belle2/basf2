@@ -15,11 +15,6 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <string>
 #include <regex>
-#include <TH1F.h>
-#include <TH1D.h>
-#include <TH2F.h>
-#include <TH2D.h>
-#include <TProfile.h>
 
 namespace Belle2 {
 
@@ -32,7 +27,7 @@ namespace Belle2 {
     SVDHistograms():
       SVDHistograms(H(), H(), H() , H()) {}; /**< the class is built with a default histogram for L3 and L456, U and V sides*/
 
-    /** Use @param template to initialize all the histograms*/
+    /** Use @param templateHisto to initialize all the histograms*/
     explicit SVDHistograms(const H& templateHisto):
       SVDHistograms(templateHisto, templateHisto,
                     templateHisto, templateHisto)

@@ -28,6 +28,7 @@ namespace Belle2 {
       m_fastRaytracer(TOPRecoManager::getFastRaytracer(m_moduleID)),
       m_yScanner(TOPRecoManager::getYScanner(m_moduleID)),
       m_backgroundPDF(TOPRecoManager::getBackgroundPDF(m_moduleID)),
+      m_deltaRayPDF(TOPRecoManager::getDeltaRayPDF(m_moduleID)),
       m_PDFOption(PDFOption), m_storeOption(storeOption)
     {
       if (not track.isValid()) {
@@ -36,7 +37,7 @@ namespace Belle2 {
       }
 
       m_valid = m_inverseRaytracer != 0 and m_fastRaytracer != 0 and m_yScanner != 0 and
-                m_backgroundPDF != 0;
+                m_backgroundPDF != 0 and m_deltaRayPDF != 0;
       if (not m_valid) {
         B2ERROR("TOP::PDFConstructor: missing reconstruction objects, cannot continue");
         return;
@@ -54,12 +55,17 @@ namespace Belle2 {
       if (m_yScanner->isAboveThreshold()) {
         setSignalPDF();
       }
-      // setDeltaRayPDF();
+
+      m_deltaRayPDF->prepare(track, hypothesis);
+      m_deltaPhotons = m_deltaRayPDF->getNumPhotons();
 
       double effi = m_backgroundPDF->getEfficiency();
       double effiSum = TOPRecoManager::getEfficiencySum();
       m_bkgPhotons = std::max(m_track.getNumHitsOtherSlots() * effi / (effiSum - effi), 0.1);
-      if (isnan(m_bkgPhotons)) m_bkgPhotons = 0.1; // in case all other modules are masked-out
+      if (isnan(m_bkgPhotons)) { // in case all other modules are masked-out (very unlikely) TODO
+        B2WARNING("TOP::PDFConstructor: estimated number of background photons is NaN -> set to 0.1");
+        m_bkgPhotons = 0.1;
+      }
     }
 
 
@@ -68,7 +74,7 @@ namespace Belle2 {
       const auto& pixelPositions = m_yScanner->getPixelPositions();
       int numPixels = pixelPositions.getNumPixels();
 
-      // prepare the memory for storing PDF parametrization
+      // prepare memory for storing PDF parametrization
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
@@ -82,14 +88,14 @@ namespace Belle2 {
       setSignalPDF_direct();
       setSignalPDF_reflected();
 
-      // count the expected number of photons
+      // count expected number of signal photons
 
       for (const auto& signalPDF : m_signalPDFs) {
         m_signalPhotons += signalPDF.getSum();
       }
       if (m_signalPhotons == 0) return;
 
-      // normalize the PDF
+      // normalize PDF
 
       for (auto& signalPDF : m_signalPDFs) {
         signalPDF.normalize(m_signalPhotons);
@@ -363,7 +369,8 @@ namespace Belle2 {
 
     }
 
-    double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny, SignalPDF::EPeakType type) const
+    double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny,
+                                             SignalPDF::EPeakType type) const
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
       double surf = m_yScanner->getBars().front().reflectivity;

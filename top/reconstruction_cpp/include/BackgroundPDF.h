@@ -42,6 +42,12 @@ namespace Belle2 {
       double getPDFValue(int pixelID) const;
 
       /**
+       * Returns pixel part of PDF
+       * @return pixel part of PDF (index = pixelID - 1)
+       */
+      const std::vector<double>& getPDF() const {return m_pdf;}
+
+      /**
        * Returns average of pixel relative efficiencies
        * @return average of pixel relative efficiencies
        */
@@ -55,7 +61,7 @@ namespace Belle2 {
       void set();
 
       int m_moduleID; /**< slot ID */
-      std::vector<double> m_pdf; /**< background PDF (index = pixelID - 1) */
+      std::vector<double> m_pdf; /**< pixel part of PDF (index = pixelID - 1) */
       double m_effi = 0; /**< average relative efficiency */
 
       friend class TOPRecoManager;

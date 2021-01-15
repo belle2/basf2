@@ -84,15 +84,18 @@ namespace Belle2 {
 
       double s = 0;
       double se = 0;
+      double see = 0;
       for (const auto& entry : m_efficiency.entries) {
         double e = entry.x;
         double p = entry.y * (1 - 1 / pow(topgp->getPhaseIndex(e), 2));
         s += p;
         se += p * e;
+        see += p * e * e;
       }
       if (s == 0) return;
-      double meanE = se / s;
-      m_cosTotal = sqrt(1 - 1 / pow(topgp->getPhaseIndex(meanE), 2));
+      m_meanE0 = se / s;
+      m_rmsE0 = sqrt(see / s - m_meanE0 * m_meanE0);
+      m_cosTotal = sqrt(1 - 1 / pow(topgp->getPhaseIndex(m_meanE0), 2));
     }
 
 

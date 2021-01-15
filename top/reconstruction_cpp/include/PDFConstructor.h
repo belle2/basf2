@@ -16,6 +16,7 @@
 #include <top/reconstruction_cpp/YScanner.h>
 #include <top/reconstruction_cpp/SignalPDF.h>
 #include <top/reconstruction_cpp/BackgroundPDF.h>
+#include <top/reconstruction_cpp/DeltaRayPDF.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <vector>
 #include <map>
@@ -91,6 +92,12 @@ namespace Belle2 {
       const BackgroundPDF* getBackgroundPDF() const {return m_backgroundPDF;}
 
       /**
+       * Returns delta-ray PDF
+       * @return delta-ray PDF
+       */
+      const DeltaRayPDF* getDeltaRayPDF() const {return m_deltaRayPDF;}
+
+      /**
        * Returns the expected number of signal photons
        * @return expected number of signal photons
        */
@@ -119,6 +126,17 @@ namespace Belle2 {
        * @return number of detected photons
        */
       unsigned getDetectedPhotons() const {return m_track.getSelectedHits().size();}
+
+      /**
+       * Returns PDF value.
+       * Note: isValid() must be true, otherwise segmentation violation can occure
+       * @param pixelID pixel ID
+       * @param time photon hit time
+       * @param timeErr uncertainty of hit time
+       * @param additional time smearing
+       * @return PDF value
+       */
+      double getPDFValue(int pixelID, double time, double timeErr, double sigt = 0) const;
 
       /**
        * Returns number of calls of template function setSignalPDF<T> for a given peak type
@@ -331,7 +349,8 @@ namespace Belle2 {
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
       const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
-      bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are not null */
+      const DeltaRayPDF* m_deltaRayPDF = 0; /**< delta-ray PDF */
+      bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are valid */
 
       double m_tof = 0; /**< time-of-flight from IP to average photon emission position */
       double m_groupIndex = 0; /**< group refractive index at mean photon energy */
@@ -347,7 +366,7 @@ namespace Belle2 {
       double m_bkgPhotons = 0; /**< expected number of background photons */
       double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 
-      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of  Cerenkov angles */
+      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles */
       double m_dFic = 0; /**< temporary storage for dFic used in last call to deltaXD */
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< number of calls to setSignalPDF<T> */
@@ -357,6 +376,21 @@ namespace Belle2 {
 
 
     //--- inline functions ------------------------------------------------------------
+
+
+    inline double PDFConstructor::getPDFValue(int pixelID, double time, double timeErr, double sigt) const
+    {
+      unsigned k = pixelID - 1;
+      if (k < m_signalPDFs.size()) {
+        double f = 0;
+        f += m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
+        f += m_deltaPhotons * m_deltaRayPDF->getPDFValue(pixelID, time);
+        f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID);
+        f /= getExpectedPhotons();
+        return f;
+      }
+      return 0;
+    }
 
     inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma) const
     {

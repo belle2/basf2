@@ -335,6 +335,18 @@ namespace Belle2 {
       double getRMSEnergy() const {return m_rmsE;}
 
       /**
+       * Returns mean photon energy for beta = 1
+       * @return mean photon energy for beta = 1
+       */
+      double getMeanEnergyBeta1() const {return m_meanE0;}
+
+      /**
+       * Returns r.m.s of photon energy for beta = 1
+       * @return r.m.s of photon energy for beta = 1
+       */
+      double getRMSEnergyBeta1() const {return m_rmsE0;}
+
+      /**
        * Returns r.m.s of multiple scattering angle in quartz converted to photon energy
        * @return r.m.s of multiple scattering angle in quartz [eV]
        */
@@ -433,12 +445,16 @@ namespace Belle2 {
        */
       PixelEfficiencies& pixelEfficiencies() {return m_pixelEfficiencies;}
 
+      // variables set in constructor (slot dependent)
       PixelPositions m_pixelPositions; /**< positions and sizes of pixels */
       PixelMasks m_pixelMasks; /**< pixel masks */
       PixelEfficiencies m_pixelEfficiencies; /**< pixel relative efficiencies */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
+      double m_meanE0 = 0; /**< mean photon energy for beta = 1 */
+      double m_rmsE0 = 0; /**< r.m.s of photon energy for beta = 1 */
       double m_cosTotal = 0; /**< cosine of total reflection angle */
 
+      // variables set in prepare method (track/hypothesis dependent)
       mutable double m_momentum = 0; /**< particle momentum magnitude */
       mutable double m_beta = 0; /**< particle beta */
       mutable double m_length = 0; /**< length of particle trajectory inside quartz */
@@ -446,9 +462,11 @@ namespace Belle2 {
       mutable double m_meanE = 0; /**< mean photon energy */
       mutable double m_rmsE = 0; /**< r.m.s of photon energy */
       mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */
-      mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
       mutable Table m_energyDistribution; /**< photon energy distribution */
       mutable Table m_quasyEnergyDistribution; /**< photon energy distribution convoluted with multiple scattering */
+      mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
+
+      // results of expand method (pixel column dependent)
       mutable std::vector<Result> m_results;   /**< results of PDF expansion in y */
       mutable bool m_scanDone = false;  /**< true if scan performed, false if reflections just merged */
 

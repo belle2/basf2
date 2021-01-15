@@ -57,11 +57,11 @@ namespace Belle2 {
       const int& bin
     ) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(),
-                              sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU),
-                              strip).calibratedValue(raw_time, bin);
+      return m_aDBObjPtr->getReference(sensorID.getLayerNumber(),
+                                       sensorID.getLadderNumber(),
+                                       sensorID.getSensorNumber(),
+                                       m_aDBObjPtr->sideIndex(isU),
+                                       strip).calibratedValue(raw_time, bin);
 
     }
 
@@ -106,4 +106,3 @@ namespace Belle2 {
     DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDCoGCalibrationFunction payload */
   };
 }
-

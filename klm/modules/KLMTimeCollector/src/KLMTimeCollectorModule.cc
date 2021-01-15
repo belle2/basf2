@@ -79,8 +79,6 @@ KLMTimeCollectorModule::~KLMTimeCollectorModule()
 
 void KLMTimeCollectorModule::prepare()
 {
-  setDescription("Preparation for BKLM Time Collector Module.");
-
   /* Initialize geometry. */
   //B2INFO("prepare :: Initialize geometry..");
   m_geoParB = bklm::GeometryPar::instance();
@@ -152,7 +150,6 @@ void KLMTimeCollectorModule::prepare()
 
 void KLMTimeCollectorModule::collect()
 {
-  setDescription("Time Calibration Collector. Main Collect Function of Collector Module Begins.");
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   m_Event.t0 = 0.0;
@@ -284,7 +281,6 @@ void KLMTimeCollectorModule::collect()
 
 void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
 {
-  setDescription("KLM time calibration collector. Used for collecting avaiable hits in EKLM range.");
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;
@@ -339,7 +335,6 @@ void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2
 
 void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
 {
-  setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_SCINT range.");
   double stripWidtm_HZ, stripWidtm_HPhi;
   for (BKLMHit2d& hit2d : bklmHit2ds) {
     if (hit2d.inRPC())
@@ -411,8 +406,6 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
 
 void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
 {
-  setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_RPC range.");
-
   for (BKLMHit2d& hit2d : bklmHit2ds) {
     if (!hit2d.inRPC())
       continue;
@@ -481,8 +474,6 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
 std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(uint16_t kID,
     std::multimap<unsigned int, ExtHit>& v_ExtHits)
 {
-  setDescription("KLM time calibration collector. Used for KLM hit and ExtHit matching.");
-
   ExtHit* entryHit = nullptr;
   ExtHit* exitHit = nullptr;
   std::multimap<unsigned int, ExtHit>::iterator it, itlow, itup;

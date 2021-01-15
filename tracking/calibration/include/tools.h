@@ -32,10 +32,10 @@
 
 namespace Belle2 {
 
-  // Get random string
+  /// Get random string
   inline TString rn() {return Form("%d", gRandom->Integer(1000000000)); }
 
-  //merge { vector<double> a, vector<double> b} into {a, b}
+  ///merge { vector<double> a, vector<double> b} into {a, b}
   inline std::vector<std::vector<double>> merge(std::vector<std::vector<std::vector<double>>> toMerge)
   {
     std::vector<std::vector<double>> allVecs;
@@ -45,7 +45,7 @@ namespace Belle2 {
   }
 
 
-  // std vector -> ROOT vector
+  /// std vector -> ROOT vector
   inline TVectorD vec2vec(std::vector<double> vec)
   {
     TVectorD v(vec.size());
@@ -55,7 +55,7 @@ namespace Belle2 {
     return v;
   }
 
-  // ROOT vector -> std vector
+  /// ROOT vector -> std vector
   inline std::vector<double> vec2vec(TVectorD v)
   {
     std::vector<double> vNew(v.GetNrows());
@@ -66,7 +66,7 @@ namespace Belle2 {
 
 
 
-  // merge columns (from std::vectors) into ROOT matrix
+  /// merge columns (from std::vectors) into ROOT matrix
   inline TMatrixD vecs2mat(std::vector<std::vector<double>> vecs)
   {
     TMatrixD m(vecs[0].size(), vecs.size());
@@ -77,7 +77,7 @@ namespace Belle2 {
     return m;
   }
 
-  // Equidistant range between xMin and xMax for spline of the first order
+  /// Equidistant range between xMin and xMax for spline of the first order
   inline std::vector<double> getRangeLin(int nVals, double xMin, double xMax)
   {
     B2ASSERT("At least one value in the spline required", nVals >= 1);
@@ -88,7 +88,7 @@ namespace Belle2 {
     return v;
   }
 
-  // Equidistant range between xMin and xMax for spline of the zero order
+  /// Equidistant range between xMin and xMax for spline of the zero order
   inline std::vector<double> getRangeZero(int nVals, double xMin, double xMax)
   {
     B2ASSERT("At least one value in the spline required", nVals >= 1);
@@ -100,7 +100,7 @@ namespace Belle2 {
   }
 
 
-  // put slice of original vector v[ind:ind+n] into new one
+  /// put slice of original vector v[ind:ind+n] into new one, n is number of elements
   inline std::vector<double> slice(std::vector<double> v, unsigned ind, unsigned n)
   {
     std::vector<double> vNew;
@@ -109,7 +109,7 @@ namespace Belle2 {
     return vNew;
   }
 
-  //To evaluate spline (zero order or first order)
+  /// Evaluate spline (zero order or first order) in point x
   inline double eval(const std::vector<double>& spl, const std::vector<double>& vals, double x)
   {
     int order = -1;

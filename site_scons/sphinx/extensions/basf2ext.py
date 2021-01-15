@@ -30,7 +30,7 @@ import re
 import textwrap
 from docutils import nodes
 from sphinx.util.nodes import nested_parse_with_titles
-from docutils.parsers.rst import directives, Directive, roles
+from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import StringList
 from basf2domain import Basf2Domain
 from basf2 import list_available_modules, register_module

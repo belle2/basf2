@@ -13,7 +13,7 @@
 """
 from collections import OrderedDict
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -37,19 +37,19 @@ gROOT.ProcessLine('struct EventDataRecoTrack {\
 from ROOT import EventDataRecoTrack  # noqa
 
 
-class SVDValidationTTreeRecoTrack(Module):
+class SVDValidationTTreeRecoTrack(b2.Module):
     '''class to create the reco track ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoTrack, self).__init__()
+        #: output root file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoTrack.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataRecoTrack()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoTrack.__dict__:

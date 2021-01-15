@@ -7,7 +7,7 @@
 #    usage : %> basf2 trgtopUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 
 import sys
 
@@ -21,32 +21,32 @@ if argc == 2:
     f_in_root = argvs[1]
 
 # set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-use_central_database("online")
+b2.use_central_database("online")
 
 # input
 if f_in_root[-6:] == ".sroot":
     rootfiletype = "sroot"
-    input = register_module('SeqRootInput')
+    input = b2.register_module('SeqRootInput')
 if f_in_root[-5:] == ".root":
     rootfiletype = "root"
-    input = register_module('RootInput')
+    input = b2.register_module('RootInput')
 
 input.param('inputFileName', f_in_root)
 
 # unpacker
-unpacker = register_module('TRGTOPUnpacker')
+unpacker = b2.register_module('TRGTOPUnpacker')
 # No unpacking. Just print info of trigger readout board
 # included in the data.
 # trgReadoutBoardSearch = False
 # unpacker.param('trgReadoutBoardSearch', trgReadoutBoardSearch)
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -60,4 +60,4 @@ main.add_module(output, branchNames=["TRGTOPUnpackerStores"])
 # if trgReadoutBoardSearch:
 #    process(main, max_event=100)
 # el
-process(main)
+b2.process(main)

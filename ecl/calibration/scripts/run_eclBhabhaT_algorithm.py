@@ -15,10 +15,9 @@
 # Glob expression can be passed as an input file.
 # Example: basf2 run_eclBhabhaT_algorithm.py "exp_0003_run_*.root"
 
-import os
 import sys
 import ROOT
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from glob import glob
 
@@ -63,8 +62,8 @@ algo.meanCleanCutMinFactor = 0.3
 # algo.crateIDHi = 9
 algo.debugFilenameBase = "eclBhabhaTAlgorithm"
 
-set_debug_level(35)
-set_log_level(LogLevel.INFO)   # LogLevel.INFO or LogLevel.DEBUG
+b2.set_debug_level(35)
+b2.set_log_level(b2.LogLevel.INFO)   # LogLevel.INFO or LogLevel.DEBUG
 
 
 exprun_vector = algo.getRunListFromAllData()

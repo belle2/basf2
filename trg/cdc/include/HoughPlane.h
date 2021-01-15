@@ -41,6 +41,12 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCHoughPlane();
 
+    /// Copy construtor, deleted
+    TRGCDCHoughPlane(TRGCDCHoughPlane&) = delete;
+
+    /// Assignment operator, deleted
+    TRGCDCHoughPlane& operator=(TRGCDCHoughPlane&) = delete;
+
   public:// Selectors
 
     /// returns entry in a cell.
@@ -61,6 +67,7 @@ namespace Belle2 {
     unsigned setEntry(unsigned serialId, unsigned n) override;
 
     /// clear all entries.
+    // cppcheck-suppress virtualCallInConstructor
     void clear(void) override;
 
     /// Clears entires only.

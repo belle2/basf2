@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from ROOT import Belle2
 import basf2
 import modularAnalysis as ma
 
 main = basf2.create_path()
-ma.inputMdst("MC10", Belle2.FileSystem.findFile("analysis/tests/mdst.root"), path=main)
+ma.inputMdst("MC10", basf2.find_file("analysis/tests/mdst.root"), path=main)
 
 # load the pions and write a something to extra info
 ma.fillParticleList('pi+:example', '', path=main)

@@ -169,7 +169,11 @@ namespace Belle2 {
     const std::vector<bool> getDirectionsOfFlight(const std::vector<const Belle2::SpacePoint*>& spacePoints, bool useMCInfo);
 
     /** split a curling SpacePointTrackCand into TrackStubs.
+     * @param trackCand the SpacePointTrackCand that has to be split
+     * @param splitIndices indices where to split it
      * @param onlyFirstPart return only the TrackStub that holds the SpacePoint from the first to the first entry of splitIndices (not included in returned SpacePointTrackCand)
+     * @param prevChecksInfo determine and set the referee status of the trackStub based upon the information from the previous tests
+     * @param removedHits SpacePoints were removed from this SPTC
      */
     std::vector<Belle2::SpacePointTrackCand>
     splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, const std::vector<int>& splitIndices, bool onlyFirstPart,
@@ -178,7 +182,9 @@ namespace Belle2 {
     /** get the direction of flight for a SpacePoint by using information from the underlying TrueHit
      * NOTE: this method assumes that there are already registered relations to a TrueHit for each SpacePoint
      * (if there are more only the first in the RelationVector will be used!)
+     * @param spacePoint pointer to the SpacePoint of interest
      * @param origin the assumed interaction point
+     * @return result of internally called function getDirOfFlightPosMom
      */
     template <typename TrueHitType>
     bool getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoint, B2Vector3F origin);

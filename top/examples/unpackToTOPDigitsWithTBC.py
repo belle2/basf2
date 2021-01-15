@@ -8,40 +8,40 @@
 # Name and location of local DB can be changed if needed
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 # roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
-converter = register_module('Convert2RawDet')
+converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
 # geometry parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry (only TOP needed)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Unpacking (format auto detection works now)
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
-featureExtractor = register_module('TOPWaveformFeatureExtractor')
+featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
 main.add_module(featureExtractor)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', True)  # enable calibration
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -54,7 +54,7 @@ converter.param('calpulseWidthMax', 6.0)  # in [ns]
 main.add_module(converter)
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
                              'TOPRawDigitsToTOPInterimFEInfos',
                              # 'TOPRawWaveforms', 'TOPRawWaveformsToTOPInterimFEInfos',
@@ -63,11 +63,11 @@ output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
 main.add_module(output)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

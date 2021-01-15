@@ -40,7 +40,7 @@ namespace Belle2 {
     m_printedToFile = 0;
   }
 
-  void TRGCDCJSignalData::setVhdlOutputFile(string vhdlOutputFile)
+  void TRGCDCJSignalData::setVhdlOutputFile(const string& vhdlOutputFile)
   {
     m_vhdlOutputFile = vhdlOutputFile;
   }
@@ -55,12 +55,12 @@ namespace Belle2 {
     m_printedToFile = printedToFile;
   }
 
-  void TRGCDCJSignalData::setVhdlInProcess(std::string vhdlInProcess)
+  void TRGCDCJSignalData::setVhdlInProcess(const std::string& vhdlInProcess)
   {
     m_vhdlInProcess = vhdlInProcess;
   }
 
-  void TRGCDCJSignalData::setVhdlOutProcess(std::string vhdlOutProcess)
+  void TRGCDCJSignalData::setVhdlOutProcess(const std::string& vhdlOutProcess)
   {
     m_vhdlOutProcess = vhdlOutProcess;
   }

@@ -128,6 +128,7 @@ namespace Belle2 {
      * @param sensor is the sensor number ( 1 to 2 for layer 3, 1 to 3 for layer 4 etc...)
      * @param side is the sensor view: 1 for Side U ( Side P ), 0 for side V (Side N)
      * @param strip is the strip number: from 1 to 512 or 768 depending on the sensor
+     * @param value
      * it throws std::out_of_range if the strip is unknown
      */
     void set(unsigned int layer,

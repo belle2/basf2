@@ -7,7 +7,7 @@
 #    usage : %> basf2 TrgEclRawdataAnalysis.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 
 import sys
 
@@ -20,20 +20,20 @@ if argc != 2:
 if argc == 2:
     f_in_root = argvs[1]
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('SeqRootInput')
+input = b2.register_module('SeqRootInput')
 # unpacker
-unpacker = register_module('TRGECLUnpacker')
+unpacker = b2.register_module('TRGECLUnpacker')
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 # unpacker
-trgeclrawana = register_module('TRGECLRawdataAnalysis')
+trgeclrawana = b2.register_module('TRGECLRawdataAnalysis')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -47,8 +47,8 @@ output.param("outputFileName", "TRGECLRawdataAnalysis_Cluster.root")
 main.add_module(output, branchNames=["TRGECLUnpackerStores", "TRGECLClusters", "TRGECLTimings"])
 
 # Process all events
-process(main)
+b2.process(main)
 #
 #
-print(statistics)
+print(b2.statistics)
 #

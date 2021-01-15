@@ -28,10 +28,12 @@ namespace Belle2 {
     //MicrotpcDataHit(): m_detNb(0) {}
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param column column vector
+     * @param row row vector
+     * @param BCID BCID vector
+     * @param TOT TOT vector
+     * @param detNb the TPC number
      */
-
-
     MicrotpcDataHit(int column, int row, int BCID, int TOT, int detNb):
       m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb)
     {

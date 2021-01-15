@@ -114,12 +114,12 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
   for (auto dir : dirs) {
     if (dir.empty()) continue;
     fullpath = (fs::path(dir) / path).string();
-    if (fileExists(fullpath)) return fullpath;
+    if (fileExists(fullpath)) return fs::canonical(fullpath).string();
   }
 
   // check local directory
   fullpath = fs::absolute(path).string();
-  if (fileExists(fullpath)) return fullpath;
+  if (fileExists(fullpath)) return fs::canonical(fullpath).string();
 
   // nothing found
   if (!silent)
@@ -146,11 +146,6 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
   if (getenv(envVar.c_str())) {
     dirs.emplace_back(getenv(envVar.c_str()));
   }
-  std::string dirName = boost::to_lower_copy(dataType) + "-data";
-  if (getenv("VO_BELLE2_SW_DIR")) {
-    dirs.push_back((fs::path(getenv("VO_BELLE2_SW_DIR")) / dirName).string());
-  }
-  dirs.push_back(dirName);
   std::string result = findFile(path, dirs, true);
   if (result.empty() && !silent)
     B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."

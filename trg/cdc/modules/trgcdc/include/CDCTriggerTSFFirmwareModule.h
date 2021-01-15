@@ -141,7 +141,7 @@ namespace Belle2 {
     std::vector<bool> m_stubLUT;
 
     /** debug level specified in the steering file */
-    int m_debugLevel;
+    int m_debugLevel = 0; //TODO what should be default?
 
     /// TDC count value from T0
     int m_TDCCountForT0 = 4988;
@@ -229,7 +229,7 @@ namespace Belle2 {
     outputArray read(FILE* instream);
 
     /// data stream
-    std::istream* ins;
+    std::istream* ins = nullptr;
 
     /**************************************************
      *  Merger simulation
@@ -305,7 +305,7 @@ namespace Belle2 {
     std::array<edgeList, 2> m_edge;
 
     /** ID of the earlist CDC hit in an event */
-    int m_iFirstHit;
+    int m_iFirstHit = std::numeric_limits<int>::quiet_NaN();
 
     /**
      *  write TSF input signals to the worker

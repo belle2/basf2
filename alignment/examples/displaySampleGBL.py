@@ -13,16 +13,13 @@
 ##############################################################################
 ##
 
-import os
-from basf2 import *
-import simulation
+import basf2 as b2
 import reconstruction
-from ROOT import Belle2
 
 import ROOT
 ROOT.gROOT.SetBatch(0)
 
-main = create_path()
+main = b2.create_path()
 
 main.add_module('RootInput')
 main.add_module('HistoManager', histoFileName='CollectorOutput.root')
@@ -39,5 +36,5 @@ main.add_module(
 
 main.add_module('Display', showRecoTracks=True)
 # main.add_module('RootOutput')
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -1,19 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import basf2
 
 import os
 import sys
-import ROOT
 
-from ROOT import Belle2
 
-from caf import backends
-from caf.framework import Calibration, CAF
-from alignment import MillepedeCalibration
-
-import reconstruction as reco
-import modularAnalysis as ana
+from caf.framework import CAF
 
 
 def main(argv):

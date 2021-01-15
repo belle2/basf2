@@ -3,8 +3,7 @@
 
 # Geometry helpers for VXD testbeam 2017
 
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 from testbeam.utils import add_vxdtf_v2
 
 
@@ -65,7 +64,7 @@ def add_simulation(path, momentum=5., positrons=False, momentum_spread=0.05):
     beamspot_size_y = 0.3  # cm (sigma of gaussian)
     beamspot_size_z = 0.3  # cm (sigma of gaussian)
     # ParticleGun
-    particlegun = register_module('ParticleGun')
+    particlegun = b2.register_module('ParticleGun')
     # number of primaries per event
     particlegun.param('nTracks', 1)
     # DESY electrons/positrons:
@@ -120,18 +119,18 @@ def add_reconstruction(
                          filter_overlapping=True,
                          use_segment_network_filters=True,
                          observerType=0,
-                         log_level=LogLevel.ERROR,
+                         log_level=b2.LogLevel.ERROR,
                          debug_level=1,
                          usedGeometry=useThisGeometry
                          )
         else:
             print("VXDTF1 not supported")
-    daf = register_module('DAFRecoFitter')
+    daf = b2.register_module('DAFRecoFitter')
     daf.param('initializeCDCTranslators', False)
-    daf.logging.log_level = LogLevel.ERROR
+    daf.logging.log_level = b2.LogLevel.ERROR
     path.add_module(daf)
-    track_creator = register_module('TrackCreator')
+    track_creator = b2.register_module('TrackCreator')
     track_creator.param('beamSpot', [0., 0., 0.])
     track_creator.param('pdgCodes', [11])
-    track_creator.logging.log_level = LogLevel.ERROR
+    track_creator.logging.log_level = b2.LogLevel.ERROR
     path.add_module(track_creator)

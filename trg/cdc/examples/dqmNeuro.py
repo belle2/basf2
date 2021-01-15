@@ -1,5 +1,4 @@
 import basf2
-from ROOT import Belle2
 import neurotrigger
 import reconstruction
 import sys
@@ -65,7 +64,7 @@ else:
     neurotrigger.add_neuro_2d_unpackers(main)
 
 # add filter to just use events with trg information present: ###
-main.add_module(neurotrigger.filterTRG())  # branchname="CDCTriggerNNInput2DFinderTracks"))
+main.add_module(neurotrigger.nnt_eventfilter())  # branchname="CDCTriggerNNInput2DFinderTracks"))
 
 # adding neurotrigger simulations for one hwsim and one swsim case: ###
 # neurotrigger.add_neurotrigger_sim(main)
@@ -77,7 +76,7 @@ neurotrigger.add_neurotrigger_hw(main)
 # add reconstruction in case .sroot files were used: ###
 #    main.add_module('CDCUnpacker')
 if ending == ".sroot":
-    reconstruction.add_reconstruction(main)
+    reconstruction.add_reconstruction(main, add_trigger_calculation=False)
 
 # add matcher modules to match trigger tracks to reco tracks: ###
 main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,

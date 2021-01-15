@@ -28,6 +28,7 @@ if __name__ == '__main__':
     input_file = args.input_file
     output_file = args.output_file
 
+    basf2.conditions.override_globaltags([])
     path = basf2.Path()
 
     branchNames = HLT_INPUT_OBJECTS

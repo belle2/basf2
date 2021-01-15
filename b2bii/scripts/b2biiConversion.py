@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+import b2bii
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
 import requests
-import http
 from ctypes import cdll
 
 
@@ -32,7 +32,7 @@ def setupBelleMagneticField(path):
     """
     This function set the Belle Magnetic field (constant).
     """
-    B2WARNING(
+    b2.B2WARNING(
         'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
         'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
@@ -53,26 +53,26 @@ def setupB2BIIDatabase(isMC=False):
     tagname = "B2BII%s" % ("_MC" if isMC else "")
     # and we want to cache them in a meaningful but separate directory
     payloaddir = tagname + "_database"
-    reset_database()
-    use_database_chain()
+    b2.reset_database()
+    b2.use_database_chain()
     # fallback to previously downloaded payloads if offline
     if not isMC:
-        use_local_database(
+        b2.use_local_database(
             "%s/dbcache.txt" %
             payloaddir,
             payloaddir,
             True,
-            LogLevel.ERROR)
+            b2.LogLevel.ERROR)
         # get payloads from central database
-        use_central_database(tagname, LogLevel.WARNING, payloaddir)
+        b2.use_central_database(tagname, b2.LogLevel.WARNING, payloaddir)
     # unless they are already found locally
     if isMC:
-        use_local_database(
+        b2.use_local_database(
             "%s/dbcache.txt" %
             payloaddir,
             payloaddir,
             False,
-            LogLevel.WARNING)
+            b2.LogLevel.WARNING)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
@@ -84,7 +84,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=0):
+                                  SmearTrack=2):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -105,9 +105,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
         enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
-        SmearTrack (float): Smear the MC tracks to match real data. Does not work on real data.
-            Default value is 0 which does no smearing. The recommended value is 2 if you want track smearing.
-            Details can be found https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing
+        SmearTrack (float): Smear the MC tracks to match real data.
+            Apart from the recommended default value of 2 it can also be set to 1.
+            Details about the difference between those two options can be found
+            `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
+            Set to 0 to skip smearing (automatically set to 0 internally for real data).
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -122,11 +124,13 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     else:
         os.environ['BELLE_POSTGRES_SERVER'] = useBelleDBServer
 
-    B2INFO('Belle DB server is set to: ' + os.environ['BELLE_POSTGRES_SERVER'])
+    b2.B2INFO('Belle DB server is set to: ' + os.environ['BELLE_POSTGRES_SERVER'])
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
-    input = register_module('B2BIIMdstInput')
+    b2bii.setB2BII()
+
+    input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:
         input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))
     if entrySequences is not None:
@@ -147,7 +151,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
 
     if (not generatorLevelReconstruction):
         # Fix MSDT Module
-        fix = register_module('B2BIIFixMdst')
+        fix = b2.register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
         # Hadron skim settings
@@ -155,23 +159,23 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix.param('HadronB', HadronB)
         fix.param('Smear_trk', SmearTrack)
         if (HadronA is not True and HadronB is True):
-            B2WARNING(
+            b2.B2WARNING(
                 'The Hadron A skim is turned off.'
                 'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
         path.add_module(fix)
 
         if(applySkim):
-            emptypath = create_path()
+            emptypath = b2.create_path()
             # discard 'bad events' marked by fixmdst
             fix.if_value('<=0', emptypath)
         else:
-            B2INFO('applySkim is set to be False.'
-                   'No bad events marked by fixmdst will be discarded.'
-                   'Corrections will still be applied.')
+            b2.B2INFO('applySkim is set to be False.'
+                      'No bad events marked by fixmdst will be discarded.'
+                      'Corrections will still be applied.')
     else:
-        B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
+        b2.B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
     # Convert MDST Module
-    convert = register_module('B2BIIConvertMdst')
+    convert = b2.register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
@@ -226,7 +230,7 @@ def parse_process_url(url):
         if os.path.exists(url):
             return [url]
         else:
-            B2ERROR(
+            b2.B2ERROR(
                 "Could not parse url '{0}': no such file or directory".format(url))
             return []
 
@@ -239,7 +243,7 @@ def parse_process_url(url):
         return [e.decode("ASCII")
                 for e in process_event.findall(request.content)]
     except (requests.ConnectionError, requests.HTTPError) as e:
-        B2ERROR(
+        b2.B2ERROR(
             "Failed to connect to '{url}': {message}".format(
                 url=url, message=str(e)))
 

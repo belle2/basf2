@@ -31,7 +31,11 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param edep the energy deposited
+     * @param V the amplitude
+     * @param time the time
+     * @param detNb the PIN diode number
+     * @param pdg the PDG of particles
      */
     PindiodeHit(float edep, float V, float time, int detNb, int pdg):
       m_edep(edep), m_V(V), m_time(time), m_detNb(detNb), m_pdg(pdg)

@@ -9,7 +9,7 @@ import re
 import yaml
 
 import basf2 as b2
-from modularAnalysis import applyCuts, removeParticlesNotInLists, skimOutputUdst, summaryOfLists
+from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 
 
@@ -84,55 +84,6 @@ def get_events_per_file(sampleName):
         raise KeyError(msg)
 
 
-def add_skim(label, lists, path):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-
-    Parameters:
-        label (str): the registered skim name
-        lists (list(str)): the list of ParticleList names that have been created by a skim list builder function
-        path (basf2.Path): modules are added to this path
-
-    """
-    skimCode = Registry.encode_skim_name(label)
-    skimOutputUdst(skimCode, lists, path=path)
-    summaryOfLists(lists, path=path)
-
-
-def setSkimLogging(path, additional_modules=None):
-    """
-    Turns the log level to ERROR for  several modules to decrease
-    the total size of the skim log files
-
-    Parameters:
-        skim_path (basf2.Path): modules are added to this path
-        additional_modules (list(str)): an optional list of extra noisy module
-            names that should be silenced
-    """
-    if additional_modules is None:
-        additional_modules = []
-    noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
-    for module in path.modules():
-        if module.type() in noisy_modules:
-            module.set_log_level(b2.LogLevel.ERROR)
-    return
-
-
-def ifEventPasses(cut, conditional_path, path):
-    """
-    If the event passes the given ``cut`` proceed to process everything in ``conditional_path``.
-    Afterwards return here and continue processing with the next module.
-
-    Arguments:
-        cut (str): selection criteria which needs to be fulfilled in order to continue with ``conditional_path``
-        conditional_path (basf2.Path): path to execute if the event fulfills the criteria ``cut``
-        path (basf2.Path): modules are added to this path
-    """
-    eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
-    eselect.if_value('=1', conditional_path, b2.AfterConditionPath.CONTINUE)
-
-
 def get_eventN(fileName):
     """
     Returns the number of events in a specific file
@@ -151,68 +102,47 @@ def get_eventN(fileName):
         b2.B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=None, outputParticleLists=None, includeArrays=None, *,
-                   outputFile=None, dataDescription=None):
+def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
     """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a mdst file, saving only particles from skimParticleLists
-    and from outputParticleLists. It outputs a .mdst file.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
+    Produce an ordered list of skims, by expanding any Python skim module names into a
+    list of skims in that module. Also produce a dict of skims grouped by Python module.
 
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
+    Raises:
+        RuntimeError: Raised if a skim is listed twice.
+        ValueError: Raised if ``LocalModule`` is passed and skims are normally expected
+            from more than one module.
     """
-    # Note: Keep this import! `skimExpertFunctions.py` a module used commonly throughout
-    # the skim package, and importing this up the top hijacks the argparser of any
-    # script which imports it.
-    from mdst import add_mdst_output
+    skims = []
 
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
+    for name in SkimsOrModules:
+        if name in Registry.names:
+            skims.append(name)
+        elif name in Registry.modules:
+            skims.extend(Registry.get_skims_in_module(name))
 
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
+    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
+    if duplicates:
+        raise RuntimeError(
+            f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"
+        )
 
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".mdst.root"):
-        outputFile += ".mdst.root"
+    modules = sorted({Registry.get_skim_module(skim) for skim in skims})
+    if LocalModule:
+        if len(modules) > 1:
+            raise ValueError(
+                f"Local module {LocalModule} specified, but the combined skim expects "
+                "skims from more than one module. No steering file written."
+            )
+        modules = {LocalModule.rstrip(".py"): sorted(skims)}
+    else:
+        modules = {
+            f"skim.{module}": sorted(
+                [skim for skim in skims if Registry.get_skim_module(skim) == module]
+            )
+            for module in modules
+        }
 
-    skimfilter = b2.register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = b2.create_path()
-    skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = b2.create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    add_mdst_output(skim_path, filename=outputFile)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+    return skims, modules
 
 
 def _sphinxify_decay(decay_string):
@@ -400,16 +330,23 @@ class BaseSkim(ABC):
     def __contact__(self):
         pass
 
-    def __init__(self, *, OutputFileName=None):
+    def __init__(self, *, OutputFileName=None, additionalDataDescription=None, udstOutput=True, validation=False):
         """Initialise the BaseSkim class.
 
         Parameters:
             OutputFileName (str): Name to give output uDST files. If none given, then
                 defaults to eight-number skim code.
+            additionalDataDescription (dict): additional data description to be added to the output file metadata.
+            udstOutput (bool): If True, add uDST output to the path.
+            validation (bool): If True, build lists and write validation histograms
+                instead of writing uDSTs.
         """
         self.name = self.__class__.__name__
         self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName
+        self.additionalDataDescription = additionalDataDescription
+        self._udstOutput = udstOutput
+        self._validation = validation
         self.SkimLists = []
 
     def load_standard_lists(self, path):
@@ -427,11 +364,7 @@ class BaseSkim(ABC):
 
     def additional_setup(self, path):
         """
-        Perform any setup steps necessary before running the skim. This may include:
-
-        * applying event-level cuts using `ifEventPasses`,
-        * adding the `MCMatcherParticles` module to the path,
-        * running the FEI.
+        Perform any setup steps necessary before running the skim.
 
         Warning:
             Standard particle lists should *not* be loaded in here. This should be done
@@ -461,15 +394,30 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path, *, udstOutput=True, validation=False):
+    def __call__(self, path, *, udstOutput=None, validation=None):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
-            udstOutput (bool): If True, add uDST output to the path.
-            validation (bool): If True, build lists and write validation histograms
-                instead of writing uDSTs.
+            udstOutput (bool): [DEPRECATED ARGUMENT] If True, add uDST output to the path.
+            validation (bool): [DEPRECATED ARGUMENT] If True, build lists and write
+                validation histograms instead of writing uDSTs.
         """
+        # Deprecation warning. All configuration should be done during initialisation.
+        warning = (
+            "Passing the `{arg}` argument to `BaseSkim.__call__` is deprecated. "
+            "Please pass all configuration parameters to the initialisation of "
+            "the skim object."
+        )
+        if udstOutput is not None:
+            b2.WARNING(warning.format(arg="udstOutput"))
+            self._udstOutput = udstOutput
+        if validation is not None:
+            b2.WARNING(warning.format(arg="validation"))
+            self._validation = validation
+
+        self._MainPath = path
+
         self.set_skim_logging(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
@@ -477,15 +425,37 @@ class BaseSkim(ABC):
         # self._ConditionalPath for the path if it is not None (otherwise just pass the
         # regular path)
         self.build_lists(self._ConditionalPath or path)
-        self.apply_hlt_hadron_cut(self._ConditionalPath or path)
+        self.apply_hlt_hadron_cut_if_required(self._ConditionalPath or path)
 
-        if udstOutput:
+        self.create_skim_flag()
+
+        if self._udstOutput:
             self.output_udst(self._ConditionalPath or path)
 
-        if validation:
+        if self._validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
             self.validation_histograms(self._ConditionalPath or path)
+
+    @property
+    def postskim_path(self):
+        """
+        Return the skim path.
+
+        * If `BaseSkim.skim_event_cuts` has been run, then the skim lists will only be
+          created on a conditional path, so subsequent modules should be added to the
+          conditional path.
+
+        * If `BaseSkim.skim_event_cuts` has not been run, then the main analysis path is
+          returned.
+        """
+
+        if not self._MainPath:
+            raise ValueError("Skim has not been added to the path yet!")
+        return self._ConditionalPath or self._MainPath
+
+    _MainPath = None
+    """Main analysis path."""
 
     _ConditionalPath = None
     """Conditional path to be set by `BaseSkim.skim_event_cuts` if event-level cuts are applied."""
@@ -540,6 +510,46 @@ class BaseSkim(ABC):
         eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
 
         return ConditionalPath
+
+    _flag = None
+
+    @property
+    def flag(self):
+        """
+        Event-level flag indication whether an event passes the skim or not. This
+
+        raises:
+            RuntimeError: Raised if skim flag has not been defined yet.
+        """
+        if self._flag is None:
+            raise RuntimeError(
+                "Skim flag has not been defined yet. Have you added the skim to the path?"
+            )
+        else:
+            return self._flag
+
+    def create_skim_flag(self):
+        """
+        Create a variable which checks that at least one skim list is non-empty.
+        """
+        # Keep this import here to avoid ROOT hijacking the argument parser
+        from variables import variables as vm  # noqa
+
+        if not self.SkimLists:
+            b2.B2FATAL(
+                "Cannot create skim flag, because skim has not been added to the path."
+            )
+        # Create a variable which checks that at least one skim list is non-empty
+        flag = f"passes_{self}"
+        cut = " or ".join(
+            f"[ countInList({SkimList})>0 ]" for SkimList in self.SkimLists
+        )
+        vm.addAlias(flag, f"passesEventCut({cut})")
+
+        self._flag = flag
+        b2.B2INFO(
+            f"Created event-level flag '{flag}' which is non-zero for events which pass skim {self}."
+        )
 
     def get_skim_list_names(self):
         """
@@ -604,21 +614,25 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
         """
 
+        # Keep this import here to avoid ROOT hijacking the argument parser
+        import udst  # noqa
+
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
             b2.B2FATAL(
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
-        skimOutputUdst(
+        udst.add_skimmed_udst_output(
             skimDecayMode=self.code,
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,
+            dataDescription=self.additionalDataDescription,
             path=path,
         )
         summaryOfLists(self.SkimLists, path=path)
 
-    def apply_hlt_hadron_cut(self, path):
+    def apply_hlt_hadron_cut_if_required(self, path):
         """Apply the ``hlt_hadron`` selection if the property ``ApplyHLTHadronCut`` is True.
 
         Parameters:
@@ -693,7 +707,7 @@ class CombinedSkim(BaseSkim):
         self.load_standard_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
-        self.apply_hlt_hadron_cut(path)
+        self.apply_hlt_hadron_cut_if_required(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
 
@@ -762,14 +776,38 @@ class CombinedSkim(BaseSkim):
         for skim in self.Skims:
             skim.output_udst(skim._ConditionalPath or path)
 
-    def apply_hlt_hadron_cut(self, path):
-        """Run the `BaseSkim.apply_hlt_hadron_cut` function for each skim.
+    def apply_hlt_hadron_cut_if_required(self, path):
+        """Run the `BaseSkim.apply_hlt_hadron_cut_if_required` function for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self.Skims:
-            skim.apply_hlt_hadron_cut(skim._ConditionalPath or path)
+            skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
+
+    @property
+    def postskim_path(self):
+        """
+        Undefined property, since no subsequent modules can be added to the path after a
+        combined skim.
+        """
+        b2.B2ERROR("Post-skim path not defined for combined skims.")
+        return NotImplemented
+
+    @property
+    def flag(self):
+        """
+        Undefined property, since the skim flag is not guaranteed to work for a combined skim.
+        """
+        b2.B2ERROR("Skim flags are not defined for combined skims.")
+        return NotImplemented
+
+    def create_skim_flag(self):
+        """
+        Undefined method, since the skim flag is not guaranteed to work for a combined skim.
+        """
+        b2.B2ERROR("Skim flags are not defined for combined skims.")
+        return NotImplemented
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

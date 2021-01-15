@@ -104,7 +104,7 @@ void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
       dedxmean = 0.0; dedxsigma = 0.0;
       runstatus = "Low Stats";
     } else {
-      if (!h_CDCdedxMean->GetFunction("f_Gaus")->IsValid()) {
+      if (h_CDCdedxMean->GetFunction("f_Gaus") == NULL || !h_CDCdedxMean->GetFunction("f_Gaus")->IsValid()) {
         dedxmean = 0.0; dedxsigma = 0.0;
         runstatus = "Fit Failed";
       } else {

@@ -306,17 +306,11 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     phiringsum.resize(17, 0);
     setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-    double E_br = 0;
-    double E_fwd = 0;
-    double E_bwd = 0;
     double E_phys = 0;
     double E_total = 0;
     int E_burst = 0;
     for (int iii = 0; iii <= 16; iii++) {
       if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
-      if (iii < 3) {E_fwd += phiringsum[iii];}
-      if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
-      if (iii > 14) {E_bwd += phiringsum[iii];}
       E_total += phiringsum[iii];
     }
     if (E_total == 0) {continue;}
@@ -661,18 +655,18 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   phiringsum.resize(17, 0);
   setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-  double E_br;
-  double E_fwd;
-  double E_bwd;
+  //double E_br;  //variable not used
+  //double E_fwd; //variable not used
+  //double E_bwd; //variable not used
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;
 
   for (int iii = 0; iii <= 16; iii++) {
     if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
-    if (iii < 3) {E_fwd += phiringsum[iii];}
-    if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
-    if (iii > 14) {E_bwd += phiringsum[iii];}
+    //if (iii < 3) {E_fwd += phiringsum[iii];} //TODO variable not used, should be?
+    //if (iii > 2 && iii < 15) {E_br += phiringsum[iii];} //TODO not used, should be?
+    //if (iii > 14) {E_bwd += phiringsum[iii];} //TODO not used, should be?
     E_total += phiringsum[iii];
   }
   if (E_total == 0) {return;}

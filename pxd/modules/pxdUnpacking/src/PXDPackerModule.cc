@@ -133,7 +133,10 @@ void PXDPackerModule::beginRun()
 {
   if (m_overrideFirmwareVersion == 0) {
     if (m_firmwareFromDB.isValid()) m_firmware = (*m_firmwareFromDB).getDHHFirmwareVersion();
-    else B2FATAL("Could not read PXD Firmware version from db");
+    else {
+      B2WARNING("Could not read PXD Firmware version from db, assume default (new) firmware");
+      m_firmware = 10;
+    }
   } else {
     m_firmware = m_overrideFirmwareVersion;
   }

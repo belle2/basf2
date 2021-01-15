@@ -65,8 +65,7 @@ void TrackIsoCalculatorModule::event()
 
   // Store the pair-wise distances in a 2D array.
   // Size is given by the length of the particle list.
-  std::vector<double> defaultDistances = std::vector<double>(nParticles);
-  std::fill(std::begin(defaultDistances), std::end(defaultDistances), 1e9);
+  std::vector<double> defaultDistances(nParticles, 1e9);
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");

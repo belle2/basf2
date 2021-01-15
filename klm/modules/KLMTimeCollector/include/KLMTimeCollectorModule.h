@@ -118,7 +118,7 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0;
 
     /** Time calibration data event. */
-    struct KLMTimeAlgorithm::Event m_ev;
+    KLMTimeAlgorithm::Event m_Event;
 
     /** BKLM geometry parameters. */
     const bklm::GeometryPar* m_geoParB;

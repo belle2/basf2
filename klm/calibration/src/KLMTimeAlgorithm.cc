@@ -138,18 +138,18 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
   B2INFO("Read tree entries and seprate events by module id.");
   std::shared_ptr<TTree> timeCalibrationData;
   timeCalibrationData = getObjectPtr<TTree>("time_calibration_data");
-  timeCalibrationData->SetBranchAddress("t0", &ev.t0);
-  timeCalibrationData->SetBranchAddress("flyTime", &ev.flyTime);
-  timeCalibrationData->SetBranchAddress("recTime", &ev.recTime);
-  timeCalibrationData->SetBranchAddress("dist", &ev.dist);
-  timeCalibrationData->SetBranchAddress("diffDistX", &ev.diffDistX);
-  timeCalibrationData->SetBranchAddress("diffDistY", &ev.diffDistY);
-  timeCalibrationData->SetBranchAddress("diffDistZ", &ev.diffDistZ);
-  timeCalibrationData->SetBranchAddress("eDep", &ev.eDep);
-  timeCalibrationData->SetBranchAddress("nPE", &ev.nPE);
-  timeCalibrationData->SetBranchAddress("channelId", &ev.channelId);
-  timeCalibrationData->SetBranchAddress("inRPC", &ev.inRPC);
-  timeCalibrationData->SetBranchAddress("isFlipped", &ev.isFlipped);
+  timeCalibrationData->SetBranchAddress("t0", &m_Event.t0);
+  timeCalibrationData->SetBranchAddress("flyTime", &m_Event.flyTime);
+  timeCalibrationData->SetBranchAddress("recTime", &m_Event.recTime);
+  timeCalibrationData->SetBranchAddress("dist", &m_Event.dist);
+  timeCalibrationData->SetBranchAddress("diffDistX", &m_Event.diffDistX);
+  timeCalibrationData->SetBranchAddress("diffDistY", &m_Event.diffDistY);
+  timeCalibrationData->SetBranchAddress("diffDistZ", &m_Event.diffDistZ);
+  timeCalibrationData->SetBranchAddress("eDep", &m_Event.eDep);
+  timeCalibrationData->SetBranchAddress("nPE", &m_Event.nPE);
+  timeCalibrationData->SetBranchAddress("channelId", &m_Event.channelId);
+  timeCalibrationData->SetBranchAddress("inRPC", &m_Event.inRPC);
+  timeCalibrationData->SetBranchAddress("isFlipped", &m_Event.isFlipped);
 
   B2INFO(LogVar("Total number of digits:", timeCalibrationData->GetEntries()));
   m_evts.clear();
@@ -159,7 +159,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
     return CalibrationAlgorithm::c_NotEnoughData;
   for (int i = 0; i < n; ++i) {
     timeCalibrationData->GetEntry(i);
-    m_evts[ev.channelId].push_back(ev);
+    m_evts[m_Event.channelId].push_back(m_Event);
   }
   B2INFO("Events packing finish.");
   return CalibrationAlgorithm::c_OK;

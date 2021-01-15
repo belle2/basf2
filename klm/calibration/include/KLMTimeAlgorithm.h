@@ -240,10 +240,8 @@ namespace Belle2 {
       TProfile* profileEKLMScintillatorPlane1,
       TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms);
 
-    /**
-     * Data struct used in collector and algorithm.
-     */
-    struct Event ev;
+    /** Collected event data. */
+    Event m_Event;
 
     /**
      * Container of hit information.

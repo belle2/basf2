@@ -15,14 +15,10 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 
 /* Belle 2 headers. */
-#include <framework/datastore/StoreArray.h>
 #include <simulation/background/BkgSensitiveDetector.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 /* Geant4 headers. */
 #include <G4Step.hh>
@@ -53,16 +49,11 @@ SensitiveDetector::SensitiveDetector(const G4String& name) :
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();
-
-  StoreArray<MCParticle> particles;
-  StoreArray<BKLMSimHit> simHits;
-  StoreArray<BKLMSimHitPosition> simHitPositions;
-  simHits.registerInDataStore();
-  simHitPositions.registerInDataStore();
-  particles.registerRelationTo(simHits);
-  simHitPositions.registerRelationTo(simHits);
-  RelationArray particleToSimHits(particles, simHits);
-  registerMCParticleRelation(particleToSimHits);
+  m_MCParticles.isRequired();
+  m_SimHits.registerInDataStore();
+  m_SimHitPositions.registerInDataStore();
+  m_MCParticles.registerRelationTo(m_SimHits);
+  m_SimHitPositions.registerRelationTo(m_SimHits);
 }
 
 //-----------------------------------------------------
@@ -87,11 +78,6 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
   if (m_BkgSensitiveDetector != nullptr) {
     m_BkgSensitiveDetector->step(step, history);
   }
-
-  StoreArray<BKLMSimHit> simHits;
-  StoreArray<BKLMSimHitPosition> simHitPositions;
-  StoreArray<MCParticle> particles;
-  RelationArray particleToSimHits(particles, simHits);
 
   // It is not necessary to detect motion from one volume to another (or track death
   // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -133,6 +119,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         moduleID |= BKLM_DECAYED_MASK;
     }
     int trackID = track->GetTrackID();
+    const MCParticle* currentMCParticle = m_MCParticles[trackID];
     if (m->hasRPCs()) {
       int phiStripLower = -1;
       int phiStripUpper = -1;
@@ -145,9 +132,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
           moduleIDZ, BKLMElementNumbers::c_ZPlane);
         BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
         BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
-        BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-        particleToSimHits.add(trackID, simHits.getEntries() - 1);
-        BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+        BKLMSimHit* simHit = m_SimHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
+        currentMCParticle->addRelationTo(simHit);
+        BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
       if (phiStripLower > 0) {
@@ -155,9 +142,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
           moduleID, BKLMElementNumbers::c_PhiPlane);
         BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
         BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
-        BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-        particleToSimHits.add(trackID, simHits.getEntries() - 1);
-        BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+        BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
+        currentMCParticle->addRelationTo(simHit);
+        BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
     } else {
@@ -174,9 +161,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
           moduleID, BKLMElementNumbers::c_ZPlane);
         propTime = propagationTimes.z();
       }
-      BKLMSimHit* simHit = simHits.appendNew(moduleID, propTime, time, eDep);
-      particleToSimHits.add(trackID, simHits.getEntries() - 1);
-      BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+      BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propTime, time, eDep);
+      currentMCParticle->addRelationTo(simHit);
+      BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
       simHitPosition->addRelationTo(simHit);
     }
     return true;

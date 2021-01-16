@@ -11,10 +11,14 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
 /* Belle 2 headers. */
+#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
@@ -62,6 +66,15 @@ namespace Belle2 {
 
       //! Simulation parameters (from DB)
       DBObjPtr<BKLMSimulationPar> m_SimPar;
+
+      //! MC particles.
+      StoreArray<MCParticle> m_MCParticles;
+
+      //! BKLM simulated hits.
+      StoreArray<BKLMSimHit> m_SimHits;
+
+      //! BKLM simulated hit positions.
+      StoreArray<BKLMSimHitPosition> m_SimHitPositions;
 
     };
 

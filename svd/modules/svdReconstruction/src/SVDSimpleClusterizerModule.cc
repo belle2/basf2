@@ -284,9 +284,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   time = eventinfo->getTimeInFTSWReference(caltime, firstFrame);
 
   //  Store Cluster into Datastore
-  m_storeClusters.appendNew(SVDCluster(
-                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame
-                            ));
+  m_storeClusters.appendNew(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame);
 
   //register relation between RecoDigit and Cluster
   int clsIndex = m_storeClusters.getEntries() - 1;

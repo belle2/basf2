@@ -64,7 +64,7 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0;  /**< EventT0 data object */
 
     /** StoreArray of the Tracks*/
-    StoreArray<Track> m_storeTracks;
+    StoreArray<Track> m_tracks;
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;

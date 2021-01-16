@@ -364,7 +364,7 @@ namespace Belle2 {
       }
       const Track* track = particle->getTrack();
       if (track) {
-        ExtHit* edgeExtHit;
+        ExtHit* edgeExtHit = nullptr;
         if (front) {
           for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
             if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
@@ -387,6 +387,7 @@ namespace Belle2 {
           }
         }
 
+        if (!edgeExtHit) return std::numeric_limits<double>::quiet_NaN();
         const TVector3& extHitPosition = edgeExtHit->getPosition();
         const TVector3& trackPointing = edgeExtHit->getMomentum();
 

@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
@@ -52,19 +52,19 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
-            B2ERROR("shortTracks=True is deprecated and no longer supported! "
-                    "Network weights will now be loaded from the database. "
-                    "If you really want to use shorttracks, load the specific network "
-                    "weights in the Neurotrigger module!")
+            b2.B2ERROR("shortTracks=True is deprecated and no longer supported! "
+                       "Network weights will now be loaded from the database. "
+                       "If you really want to use shorttracks, load the specific network "
+                       "weights in the Neurotrigger module!")
             exit()
         path.add_module('CDCTriggerNeuro')
 
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:
-        B2WARNING("full simulation mode does not include all CDC trigger modules yet")
+        b2.B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger
-        trgcdc = register_module('TRGCDC')
+        trgcdc = b2.register_module('TRGCDC')
         trgcdc_params = {
             'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
             'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),

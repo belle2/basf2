@@ -11,7 +11,6 @@ matching tools for inclusive analyses with sum-of-exclusive method.
 __authors__ = "Sam Cunliffe and Yo Sato"
 
 import basf2
-from ROOT import Belle2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, \
     copyLists, variablesToNtuple
 from variables.utils import create_aliases_for_selected
@@ -20,7 +19,7 @@ from stdCharged import stdE, stdK, stdPi
 from stdPi0s import stdPi0s
 
 mypath = basf2.create_path()
-testinput = Belle2.FileSystem.findFile('analysis/tests/mdst.root')
+testinput = basf2.find_file('analysis/tests/mdst.root')
 inputMdst("default", testinput, path=mypath)
 
 stdPi0s("all", path=mypath)

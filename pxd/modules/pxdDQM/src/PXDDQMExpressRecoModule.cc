@@ -83,20 +83,20 @@ void PXDDQMExpressRecoModule::defineHisto()
   int nPXDChips = gTools->getTotalPXDChips();
 
   // Create basic histograms:
-  m_hitMapCounts = new TH1I("DQMER_PXD_PixelHitmapCounts", "DQM ER PXD Integrated number of fired pixels per sensor",
+  m_hitMapCounts = new TH1D("DQMER_PXD_PixelHitmapCounts", "DQM ER PXD Integrated number of fired pixels per sensor",
                             nPXDSensors, 0, nPXDSensors);
   m_hitMapCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCounts->GetYaxis()->SetTitle("counts");
-  m_hitMapClCounts = new TH1I("DQMER_PXD_ClusterHitmapCounts", "DQM ER PXD Integrated number of clusters per sensor",
+  m_hitMapClCounts = new TH1D("DQMER_PXD_ClusterHitmapCounts", "DQM ER PXD Integrated number of clusters per sensor",
                               nPXDSensors, 0, nPXDSensors);
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
   // basic counters per chip:
-  m_hitMapCountsChip = new TH1I("DQMER_PXD_PixelHitmapCountsChip", "DQM ER PXD Integrated number of fired pixels per chip",
+  m_hitMapCountsChip = new TH1D("DQMER_PXD_PixelHitmapCountsChip", "DQM ER PXD Integrated number of fired pixels per chip",
                                 nPXDChips, 0, nPXDChips);
   m_hitMapCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsChip = new TH1I("DQMER_PXD_ClusterHitmapCountsChip", "DQM ER PXD Integrated number of clusters per chip",
+  m_hitMapClCountsChip = new TH1D("DQMER_PXD_ClusterHitmapCountsChip", "DQM ER PXD Integrated number of clusters per chip",
                                   nPXDChips, 0, nPXDChips);
   m_hitMapClCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
@@ -124,17 +124,17 @@ void PXDDQMExpressRecoModule::defineHisto()
     m_hitMapClCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
-  m_fired = new TH1F*[nPXDSensors];
-  m_clusters = new TH1F*[nPXDSensors];
+  m_fired.resize(nPXDSensors);
+  m_clusters.resize(nPXDSensors);
   // FIXME: startrow histos are for experts not shifters
-  //m_startRow = new TH1F*[nPXDSensors];
-  //m_chargStartRow = new TH1F*[nPXDSensors];
-  //m_startRowCount = new TH1F*[nPXDSensors];
-  m_clusterCharge = new TH1F*[nPXDSensors];
-  m_pixelSignal = new TH1F*[nPXDSensors];
-  m_clusterSizeU = new TH1F*[nPXDSensors];
-  m_clusterSizeV = new TH1F*[nPXDSensors];
-  m_clusterSizeUV = new TH1F*[nPXDSensors];
+  //m_startRow.resize(nPXDSensors);
+  //m_chargStartRow.resize(nPXDSensors);
+  //m_startRowCount.resize(nPXDSensors);
+  m_clusterCharge.resize(nPXDSensors);
+  m_pixelSignal.resize(nPXDSensors);
+  m_clusterSizeU.resize(nPXDSensors);
+  m_clusterSizeV.resize(nPXDSensors);
+  m_clusterSizeUV.resize(nPXDSensors);
   for (int i = 0; i < nPXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromPXDIndex(i);
     int iLayer = id.getLayerNumber();
@@ -149,7 +149,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     string name = str(format("DQMER_PXD_%1%_Fired") % sensorDescr);
     string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = nullptr;
-    m_fired[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
+    m_fired[i] = new TH1D(name.c_str(), title.c_str(), 200, 0, 200);
     m_fired[i]->SetCanExtend(TH1::kAllAxes);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
@@ -159,7 +159,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = nullptr;
-    m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
+    m_clusters[i] = new TH1D(name.c_str(), title.c_str(), 200, 0, 200);
     m_clusters[i]->SetCanExtend(TH1::kAllAxes);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
@@ -172,7 +172,7 @@ void PXDDQMExpressRecoModule::defineHisto()
 
     //int nPixels;/** Number of pixels on PXD v direction */
     //nPixels = SensorInfo.getVCells();
-    //m_startRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_startRow[i] = new TH1D(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
     //m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
     //m_startRow[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
@@ -180,12 +180,12 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     //name = str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
     //title = str(format("DQM ER PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
-    //m_chargStartRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_chargStartRow[i] = new TH1D(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
     //m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     //m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
     //name = str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
     //title = str(format("DQM ER PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
-    //m_startRowCount[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_startRowCount[i] = new TH1D(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
     //m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     //m_startRowCount[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
@@ -193,7 +193,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Cluster Charge") % sensorDescr);
-    m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 256, 0, 256);
+    m_clusterCharge[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_clusterCharge[i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -201,7 +201,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Pixel Signal") % sensorDescr);
-    m_pixelSignal[i] = new TH1F(name.c_str(), title.c_str(), 256, 0, 256);
+    m_pixelSignal[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_pixelSignal[i]->GetXaxis()->SetTitle("signal of pixels [ADU]");
     m_pixelSignal[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -209,7 +209,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Cluster Size U") % sensorDescr);
-    m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+    m_clusterSizeU[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -217,7 +217,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Cluster Size V") % sensorDescr);
-    m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+    m_clusterSizeV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -225,7 +225,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Cluster Size U+V") % sensorDescr);
-    m_clusterSizeUV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
+    m_clusterSizeUV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeUV[i]->GetXaxis()->SetTitle("size of u+v clusters");
     m_clusterSizeUV[i]->GetYaxis()->SetTitle("counts");
   }

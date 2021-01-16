@@ -158,7 +158,7 @@ namespace Belle2 {
 
 
     /// updates the sublayer ID of the FullSecIDs used in the VXDTFFilters with the one used during the training contained in the SectorGraph
-    /// @param mainGrapgh : the graph from which the updated FullSecIDs are retrieved
+    /// @param mainGraph  : the graph from which the updated FullSecIDs are retrieved
     /// @param segFilters : the filters which need to be updated
     template <class FilterType> unsigned updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
         VXDTFFilters<SpacePoint>& segFilters);

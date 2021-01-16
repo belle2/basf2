@@ -28,13 +28,16 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 
 //   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
 
 DQMHistInjectionModule::~DQMHistInjectionModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -84,31 +87,33 @@ void DQMHistInjectionModule::initialize()
                                 20000);
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  m_nodes.resize(10);
-  SEVCHK(ca_create_channel((m_pvPrefix + "LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
-  m_nodes[0].histo = nullptr;
-  SEVCHK(ca_create_channel((m_pvPrefix + "LER:PXD").data(), NULL, NULL, 10, &m_nodes[1].mychid), "ca_create_channel failure");
-  m_nodes[1].histo = m_hInjectionLERPXD;
-  SEVCHK(ca_create_channel((m_pvPrefix + "LER:ECL").data(), NULL, NULL, 10, &m_nodes[2].mychid), "ca_create_channel failure");
-  m_nodes[2].histo = m_hInjectionLERECL;
-  SEVCHK(ca_create_channel((m_pvPrefix + "HER:Triggers").data(), NULL, NULL, 10, &m_nodes[3].mychid), "ca_create_channel failure");
-  m_nodes[3].histo = nullptr;
-  SEVCHK(ca_create_channel((m_pvPrefix + "HER:PXD").data(), NULL, NULL, 10, &m_nodes[4].mychid), "ca_create_channel failure");
-  m_nodes[4].histo = m_hInjectionHERPXD;
-  SEVCHK(ca_create_channel((m_pvPrefix + "HER:ECL").data(), NULL, NULL, 10, &m_nodes[5].mychid), "ca_create_channel failure");
-  m_nodes[5].histo = m_hInjectionHERECL;
-  SEVCHK(ca_create_channel((m_pvPrefix + "LER:TOP").data(), NULL, NULL, 10, &m_nodes[6].mychid), "ca_create_channel failure");
-  m_nodes[6].histo = m_hInjectionLERTOP;
-  SEVCHK(ca_create_channel((m_pvPrefix + "HER:TOP").data(), NULL, NULL, 10, &m_nodes[7].mychid), "ca_create_channel failure");
-  m_nodes[7].histo = m_hInjectionHERTOP;
-  SEVCHK(ca_create_channel((m_pvPrefix + "LER:SVD").data(), NULL, NULL, 10, &m_nodes[8].mychid), "ca_create_channel failure");
-  m_nodes[8].histo = m_hInjectionLERSVD;
-  SEVCHK(ca_create_channel((m_pvPrefix + "HER:SVD").data(), NULL, NULL, 10, &m_nodes[9].mychid), "ca_create_channel failure");
-  m_nodes[9].histo = m_hInjectionHERSVD;
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    m_nodes.resize(10);
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
+    m_nodes[0].histo = nullptr;
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:PXD").data(), NULL, NULL, 10, &m_nodes[1].mychid), "ca_create_channel failure");
+    m_nodes[1].histo = m_hInjectionLERPXD;
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:ECL").data(), NULL, NULL, 10, &m_nodes[2].mychid), "ca_create_channel failure");
+    m_nodes[2].histo = m_hInjectionLERECL;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:Triggers").data(), NULL, NULL, 10, &m_nodes[3].mychid), "ca_create_channel failure");
+    m_nodes[3].histo = nullptr;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:PXD").data(), NULL, NULL, 10, &m_nodes[4].mychid), "ca_create_channel failure");
+    m_nodes[4].histo = m_hInjectionHERPXD;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:ECL").data(), NULL, NULL, 10, &m_nodes[5].mychid), "ca_create_channel failure");
+    m_nodes[5].histo = m_hInjectionHERECL;
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:TOP").data(), NULL, NULL, 10, &m_nodes[6].mychid), "ca_create_channel failure");
+    m_nodes[6].histo = m_hInjectionLERTOP;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:TOP").data(), NULL, NULL, 10, &m_nodes[7].mychid), "ca_create_channel failure");
+    m_nodes[7].histo = m_hInjectionHERTOP;
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:SVD").data(), NULL, NULL, 10, &m_nodes[8].mychid), "ca_create_channel failure");
+    m_nodes[8].histo = m_hInjectionLERSVD;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:SVD").data(), NULL, NULL, 10, &m_nodes[9].mychid), "ca_create_channel failure");
+    m_nodes[9].histo = m_hInjectionHERSVD;
 
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  cleanPVs();
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+    cleanPVs();
+  }
 #endif
   B2DEBUG(1, "DQMHistInjection: initialized.");
 }
@@ -261,7 +266,9 @@ void DQMHistInjectionModule::event()
 
   //Finding only one of them should only happen in very strange situations...
 #ifdef _BELLE2_EPICS
-  m_nodes[0].histo = Triggers;
+  if (m_useEpics) {
+    m_nodes[0].histo = Triggers;
+  }
 #endif
   if (Hits && Triggers) {
     m_hInjectionLERECL->Divide(Hits, Triggers);
@@ -284,7 +291,9 @@ void DQMHistInjectionModule::event()
 
   //Finding only one of them should only happen in very strange situations...
 #ifdef _BELLE2_EPICS
-  m_nodes[3].histo = Triggers;
+  if (m_useEpics) {
+    m_nodes[3].histo = Triggers;
+  }
 #endif
   if (Hits && Triggers) {
     m_hInjectionHERECL->Divide(Hits, Triggers);
@@ -377,60 +386,64 @@ void DQMHistInjectionModule::event()
   m_hInjectionHERTOP->Draw("hist");
 
 #ifdef _BELLE2_EPICS
-  for (auto& m : m_nodes) {
-    if (!m.mychid) continue;
-    int length = m.data.size();
-    if (length != int(ca_element_count(m.mychid)) && int(ca_element_count(m.mychid)) > 0) {
-      // FIXME, unclear why this is needed to prevent crashes on new run?
-      m.data.resize(int(ca_element_count(m.mychid)), 0.0);
-      length = m.data.size();
-    }
-    if (m.histo && m.histo->GetNcells() > 2 && length > 0  && length == int(ca_element_count(m.mychid))) {
-      // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
-      // We fill up the array with ZEROs otherwise
-      if (m.histo->GetDimension() == 1) {
-        int i = 0;
-        int nx = m.histo->GetNbinsX() + 1;
-        for (int x = 1; x < nx && i < length ; x++) {
-          m.data[i++] = m.histo->GetBinContent(x);
-        }
-
-      } else if (m.histo->GetDimension() == 2) {
-        int i = 0;
-        int nx = m.histo->GetNbinsX() + 1;
-        int ny = m.histo->GetNbinsY() + 1;
-        for (int y = 1; y < ny && i < length; y++) {
+  if (m_useEpics) {
+    for (auto& m : m_nodes) {
+      if (!m.mychid) continue;
+      int length = m.data.size();
+      if (length != int(ca_element_count(m.mychid)) && int(ca_element_count(m.mychid)) > 0) {
+        // FIXME, unclear why this is needed to prevent crashes on new run?
+        m.data.resize(int(ca_element_count(m.mychid)), 0.0);
+        length = m.data.size();
+      }
+      if (m.histo && m.histo->GetNcells() > 2 && length > 0  && length == int(ca_element_count(m.mychid))) {
+        // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
+        // We fill up the array with ZEROs otherwise
+        if (m.histo->GetDimension() == 1) {
+          int i = 0;
+          int nx = m.histo->GetNbinsX() + 1;
           for (int x = 1; x < nx && i < length ; x++) {
-            m.data[i++] = m.histo->GetBinContent(x, y);
+            m.data[i++] = m.histo->GetBinContent(x);
+          }
+
+        } else if (m.histo->GetDimension() == 2) {
+          int i = 0;
+          int nx = m.histo->GetNbinsX() + 1;
+          int ny = m.histo->GetNbinsY() + 1;
+          for (int y = 1; y < ny && i < length; y++) {
+            for (int x = 1; x < nx && i < length ; x++) {
+              m.data[i++] = m.histo->GetBinContent(x, y);
+            }
           }
         }
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+      } else {
+        B2DEBUG(99, "Inj " << ca_name(m.mychid) << " , " << m.histo << " , " << (m.histo ? m.histo->GetNcells() : 0) << " , " << length <<
+                " , "
+                <<
+                ca_element_count(m.mychid));
       }
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
-    } else {
-      B2DEBUG(99, "Inj " << ca_name(m.mychid) << " , " << m.histo << " , " << (m.histo ? m.histo->GetNcells() : 0) << " , " << length <<
-              " , "
-              <<
-              ca_element_count(m.mychid));
     }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 
 void DQMHistInjectionModule::cleanPVs(void)
 {
 #ifdef _BELLE2_EPICS
-  for (auto m : m_nodes) {
-    if (m.mychid) {
-      int length = int(ca_element_count(m.mychid));
-      if (length > 0) {
-        m.data.resize(length, 0.0);
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+  if (m_useEpics) {
+    for (auto m : m_nodes) {
+      if (m.mychid) {
+        int length = int(ca_element_count(m.mychid));
+        if (length > 0) {
+          m.data.resize(length, 0.0);
+          SEVCHK(ca_array_put(DBR_DOUBLE, length, m.mychid, (void*)m.data.data()), "ca_put failure");
+        } else {
+          B2DEBUG(99, "clean: lenght " << ca_name(m.mychid));
+        }
       } else {
-        B2DEBUG(99, "clean: lenght " << ca_name(m.mychid));
+        B2DEBUG(99, "clean: chid " << ca_name(m.mychid));
       }
-    } else {
-      B2DEBUG(99, "clean: chid " << ca_name(m.mychid));
     }
   }
 #endif
@@ -440,10 +453,12 @@ void DQMHistInjectionModule::terminate()
 {
   B2DEBUG(1, "DQMHistInjection: terminate called");
 #ifdef _BELLE2_EPICS
-  for (auto m : m_nodes) {
-    SEVCHK(ca_clear_channel(m.mychid), "ca_clear_channel failure");
+  if (m_useEpics) {
+    for (auto m : m_nodes) {
+      SEVCHK(ca_clear_channel(m.mychid), "ca_clear_channel failure");
+    }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
 

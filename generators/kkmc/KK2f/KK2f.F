@@ -414,7 +414,7 @@
       CALL KinLib_Boost(3, 1d0/exe,PolBeam2,PolBeam2) ! beam2_rest --> CMS
 */////////////////////////////////////////////////////////////////////////////////////
 
-      WRITE(*,*) 'KK2f_WignerIni:=================CMS================================='
+      WRITE(*,*) 'KK2f_WignerIni:=================CMS==================='
       CALL KinLib_VecPrint(6 ,'PolBeam1',PolBeam1)
       CALL KinLib_VecPrint(6 ,'PolBeam2',PolBeam2)
 
@@ -425,7 +425,7 @@
       CALL GPS_TralorUnDo(   1,PolBeam1,Polar1)     ! CMS --> beam1_rest GPS
       CALL GPS_TralorUnDo(   2,PolBeam2,Polar2)     ! CMS --> beam2_rest GPS
 
-      WRITE(*,*) 'KK2f_WignerIni:=================GPS================================='
+      WRITE(*,*) 'KK2f_WignerIni:=================GPS=================='
       CALL KinLib_VecPrint(6 ,'Polar1  ',Polar1)
       CALL KinLib_VecPrint(6 ,'Polar2  ',Polar2)
 
@@ -637,6 +637,7 @@
                CALL TauPair_Make1        ! tau decay generation
                CALL TauPair_ImprintSpin  ! introduction of spin effects by rejection
                CALL TauPair_Make2        ! book-keeping, Photos, and pyhepc(2) HepEvt-->Pythia
+               IF (LevPri.EQ.-1) CALL KKDUMPHEP(m_nevgen,0,0)
             ENDIF
          ENDIF
       ENDIF

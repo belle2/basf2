@@ -230,7 +230,7 @@ namespace TreeFitter {
     if (pb) {
       updateCand(*pb, cand, isTreeHead);
     } else {
-      B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
+      B2ERROR("Can't find candidate " << cand.getName() << " in tree " << m_particle->getName());
     }
     return pb != nullptr;
   }
@@ -242,6 +242,7 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
+
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
         const TVector3 pos(m_fitparams->getStateVector()(posindex),
@@ -254,6 +255,15 @@ namespace TreeFitter {
           setExtraInfo(&cand, "chiSquared", fitparchi2);
           setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
           setExtraInfo(&cand, "ndf", m_ndf);
+        }
+        if (pb.mother()) {
+          int motherPosIndex = pb.mother()->posIndex();
+          if (motherPosIndex >= 0) {
+            setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
+            setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
+            if (pb.mother()->dim() > 2)
+              setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+          }
         }
       }
 
@@ -289,7 +299,7 @@ namespace TreeFitter {
   {
     const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother) {
+    if (updateableMother and not cand.hasExtraInfo("bremsCorrected")) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
         auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));

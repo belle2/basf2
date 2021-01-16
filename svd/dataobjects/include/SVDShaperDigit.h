@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_SHAPERDIGIT_H
-#define SVD_SHAPERDIGIT_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/dataobjects/DigitBase.h>
@@ -156,7 +155,7 @@ namespace Belle2 {
 
     /**
      * Convert a value to sample range.
-     * @param value to be converted
+     * @param x value to be converted
      * @result APVRawSampleType representation of x
      */
     template<typename T> static SVDShaperDigit::APVRawSampleType trimToSampleRange(T x)
@@ -240,7 +239,7 @@ namespace Belle2 {
     {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
-      for (int k = 0; k < c_nAPVSamples; k++)
+      for (size_t k = 0; k < c_nAPVSamples; k++)
         if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 
@@ -265,5 +264,3 @@ namespace Belle2 {
   }; // class SVDShaperDigit
 
 } // end namespace Belle2
-
-#endif // SVD_SHAPERDIGIT_H

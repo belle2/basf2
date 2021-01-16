@@ -17,8 +17,9 @@ class CheckZS(basf2.Module):
     def __init__(self, thresholdSN):
         '''initialize python module'''
         super().__init__()
+
+        #: SNR threshold
         self.thresholdSN = thresholdSN
-        '''SNR threshold'''
 
     def event(self):
         '''event'''

@@ -149,7 +149,10 @@ bool SVD3SampleCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration
   if (!rawTimeL3V) {
     meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   } else {
-    meanRawTimeL3V = rawTimeL3V->GetMean();
+    if (rawTimeL3V->GetEntries() > m_minEntries)
+      meanRawTimeL3V = rawTimeL3V->GetMean();
+    else
+      meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   }
   if (!m_previousRawTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
@@ -167,4 +170,3 @@ bool SVD3SampleCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration
     return false;
   }
 }
-

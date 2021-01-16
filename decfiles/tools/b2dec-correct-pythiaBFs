@@ -47,13 +47,13 @@ if __name__ == '__main__':
         line = f.readline()
         cnt = 1
         while line:
-            if "Decay B+" in line:
+            if "Decay B+" in line and line[0]!='#':
                 togglesave = 'B+'
-            if "Decay B-" in line:
+            if "Decay B-" in line and line[0]!='#':
                 togglesave = 'B-'
-            if "Decay B0" in line:
+            if "Decay B0" in line and line[0]!='#':
                 togglesave = 'B0'
-            if "Decay anti-B0" in line:
+            if "Decay anti-B0" in line and line[0]!='#':
                 togglesave = 'anti-B0'
 
             if "Enddecay" in line:
@@ -94,13 +94,13 @@ if __name__ == '__main__':
             line = f.readline()
             cnt = 1
             while line:
-                if "Decay B+" in line:
+                if "Decay B+" in line and line[0]!='#':
                     togglesave = 'B+'
-                if "Decay B-" in line:
+                if "Decay B-" in line and line[0]!='#':
                     togglesave = 'B-'
-                if "Decay B0" in line:
+                if "Decay B0" in line and line[0]!='#':
                     togglesave = 'B0'
-                if "Decay anti-B0" in line:
+                if "Decay anti-B0" in line and line[0]!='#':
                     togglesave = 'anti-B0'
 
                 if "Enddecay" in line:

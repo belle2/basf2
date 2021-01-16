@@ -101,7 +101,7 @@ moduleio = Builder(action=module_io, emitter=module_io_emitter)
 moduleio.action.cmdstr = '${MODULEIOCOMSTR}'
 
 # define builder for doxygen
-doxygen = Builder(action=f'doxygen $SOURCE 2>&1 > build/doxygen.log | sed "s;^{os.environ["BELLE2_LOCAL_DIR"]}/;;g" 1>&2',
+doxygen = Builder(action=f'doxygen $SOURCE 2>&1 > build/doxygen.log | sed "s;^{os.environ.get("BELLE2_LOCAL_DIR", "")}/;;g" 1>&2',
                   emitter=lambda target, source, env: (['build/doxygen/html/index.html'], source))
 
 

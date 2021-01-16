@@ -36,7 +36,17 @@ namespace Belle2 {
     }
 
     /** Standard constructor
-     * @param energyDep Deposited energy in GeV
+     * @param trkID track ID
+     * @param ladder the Ladder number
+     * @param sensor the Sensor number
+     * @param pdg the PDG number of the track
+     * @param time the global time
+     * @param energyDep the energy deposition in electrons
+     * @param length track length
+     * @param posEntry the entry track position
+     * @param localposEntry the local entry track position
+     * @param posExit the exit track position
+     * @param momEntry the track momentum
      */
     FANGSSimHit(int trkID, int ladder, int sensor, int pdg, float time, float energyDep,
                 float length, const float* posEntry, const float* localposEntry,

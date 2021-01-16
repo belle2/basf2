@@ -76,6 +76,8 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         self.svdZS5strips.isRequired()
 
     def event(self):
+        """ event """
+
         self.svd_sps[0] = self.svdSPs.getEntries()
 
         self.svd_clusters[0] = self.svdclusters.getEntries()

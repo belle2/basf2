@@ -44,4 +44,20 @@ if __name__ == "__main__":
     # this function does the hard work
     udst.add_udst_dump(main, True)
 
-    basf2.process(main)
+    # also dump some variables just in case the DataStorePrinter hides some
+    # problems (like has happened once: PR #7525 / BII-7148).
+    sanity_check_variables = [
+        "mcPDG",
+        "daughter(0, mcPDG)",  # check the MCParticle <--> Particle relation (or array index lookup)
+        "Mbc", "InvM", "deltaE",
+        "daughter(1, pionID)",  # check the PIDLikelihoods <--> Particle relation
+        "daughter(1, kaonID)",
+        "daughter(1, clusterE)",  # check the ECLCluster <--> Particle relation (or array index lookup)
+        "daughter(1, klmClusterLayers)",  # check the KLMCluster <--> Particle relation (or array index lookup)
+    ]
+    for listname in ["B+:feiSL", "B-:feiSL", "B0:feiSL"]:
+        main.add_module(
+            "ParticlePrinter", listName=listname, variables=sanity_check_variables)
+
+    # only 1 event in the file, but set explicitly case this test script gets copied
+    basf2.process(main, 1)

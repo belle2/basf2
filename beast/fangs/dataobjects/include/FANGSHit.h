@@ -31,7 +31,13 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param column the column
+     * @param row the row
+     * @param BCID the BCID
+     * @param TOT the TOT
+     * @param detNb the TPC number
+     * @param pdg the PDG of particles
+     * @param trkID the track ID
      */
     FANGSHit(int column, int row, int BCID, int TOT, int detNb, int pdg, int trkID):
       m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb), m_pdg(pdg), m_trkID(trkID)

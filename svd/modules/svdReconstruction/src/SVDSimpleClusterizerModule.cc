@@ -64,6 +64,9 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
   addParam("timeAlgorithm", m_timeAlgorithm,
            " int to choose time algorithm:  0 = 6-sample CoG (default for 6-sample acquisition mode), 1 = 3-sample CoG (default for 3-sample acquisition mode),  2 = 3-sample ELS",
            m_timeAlgorithm);
+  addParam("Calibrate3SampleWithEventT0", m_calibrate3SampleWithEventT0,
+           " if true returns the calibrated time instead of the raw time for 3-sample time algorithms",
+           m_calibrate3SampleWithEventT0);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
   addParam("SVDEventInfoName", m_svdEventInfoSet,
@@ -252,20 +255,26 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   int firstFrame = cluster.getFirstFrame();
 
   //first check SVDEventInfo name
-  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-  std::string m_svdEventInfoName = "SVDEventInfo";
-  if (!temp_eventinfo.isValid())
-    m_svdEventInfoName = m_svdEventInfoSet;
+  std::string m_svdEventInfoName = m_svdEventInfoSet;
+  if (m_svdEventInfoSet == "SVDEventInfoSim") {
+    StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+    m_svdEventInfoName = "SVDEventInfo";
+    if (!temp_eventinfo.isValid())
+      m_svdEventInfoName = m_svdEventInfoSet;
+  }
+
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
   //depending on the algorithm, time contains different information:
   //6-sample CoG (0): this is the calibrated time already
   //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
+  //It is possile to get the uncalibrated 3-sample raw time here
+  //to get the 6-sample raw time there is an option in SVDCoGTimeEstimatorModule
   float caltime = time;
-  if (m_timeAlgorithm == 1)
+  if (m_timeAlgorithm == 1 and m_calibrate3SampleWithEventT0)
     caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
-  else if (m_timeAlgorithm == 2)
+  else if (m_timeAlgorithm == 2 and m_calibrate3SampleWithEventT0)
     caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
 
   // last step:
@@ -275,9 +284,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   time = eventinfo->getTimeInFTSWReference(caltime, firstFrame);
 
   //  Store Cluster into Datastore
-  m_storeClusters.appendNew(SVDCluster(
-                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame
-                            ));
+  m_storeClusters.appendNew(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame);
 
   //register relation between RecoDigit and Cluster
   int clsIndex = m_storeClusters.getEntries() - 1;
@@ -327,4 +334,3 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }
-

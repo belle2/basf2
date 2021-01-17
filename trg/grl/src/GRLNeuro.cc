@@ -103,7 +103,7 @@ GRLNeuro::initialize(const Parameters& p)
 
 
 vector<float>
-GRLNeuro::runMLP(unsigned isector, vector<float> input)
+GRLNeuro::runMLP(unsigned isector, const vector<float>& input)
 {
   const GRLMLP& expert = m_MLPs[isector];
   vector<float> weights = expert.getWeights();
@@ -132,7 +132,7 @@ GRLNeuro::runMLP(unsigned isector, vector<float> input)
 }
 
 vector<float>
-GRLNeuro::runMLPFix(unsigned isector, vector<float> input)
+GRLNeuro::runMLPFix(unsigned isector, const vector<float>& input)
 {
   unsigned precisionInput = m_precision[3];
   unsigned precisionWeights = m_precision[4];

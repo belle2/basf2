@@ -11,7 +11,7 @@ GRLMLP::GRLMLP():
 
 GRLMLP::GRLMLP(std::vector<unsigned short>& nodes,
                unsigned short targets,
-               std::vector<float>& outputscale
+               const std::vector<float>& outputscale
               ):
   nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale)
 {

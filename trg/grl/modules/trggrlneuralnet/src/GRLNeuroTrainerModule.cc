@@ -59,11 +59,6 @@ GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
   addParam("trainFilename", m_trainFilename,
            "Name of the root file where the generated training samples will be saved.",
            string("GRLNeuroTrigger.root"));
-  //addParam("logFilename", m_logFilename,
-  //         "Base name of the text files where the training logs will be saved "
-  //         "(two for each sector, named logFilename_BestRun_i.log "
-  //         "and logFilename_AllOptima_i.log).",
-  //         string("GRLNeuroTrigger"));
   addParam("arrayname", m_arrayname,
            "Name of the TObjArray to hold the NeuroTrigger parameters.",
            string("MLPs"));
@@ -94,26 +89,11 @@ GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
   addParam("multiplyHidden", m_parameters.multiplyHidden,
            "If true, multiply nHidden with number of input nodes.",
            m_parameters.multiplyHidden);
-  //addParam("target", m_parameters.target,
-  //         "Train one output of MLP to give judgement.", m_parameters.targetZ);
   addParam("outputScale", m_parameters.outputScale,
            "Output scale for all networks (1 value list or nMLP value lists). "
            "Output[i] of the MLP is scaled from [-1, 1] "
            "to [outputScale[2*i], outputScale[2*i+1]]. "
            "(units: z[cm] / theta[degree])", m_parameters.outputScale);
-  // parameters for training data preparation
-  //addParam("nTrainPrepare", m_nTrainPrepare,
-  //         "Number of samples for preparation of relevant ID ranges "
-  //         "(0: use default ranges).", 1000);
-  //addParam("IDranges", m_IDranges,
-  //         "If list is not empty, it will replace the default ranges. "
-  //         "1 list or nMLP lists. Set nTrainPrepare to 0 if you use this option.",
-  //         {});
-  //addParam("relevantCut", m_relevantCut,
-  //         "Cut for preparation of relevant ID ranges.", 0.02);
-  //addParam("cutSum", m_cutSum,
-  //         "If true, relevantCut is applied to the sum over hit counters, "
-  //         "otherwise directly on the hit counters.", false);
   addParam("nTrainMin", m_nTrainMin,
            "Minimal number of training samples "
            "or factor to multiply with number of weights. "
@@ -131,13 +111,6 @@ GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
            "Number of validation samples for training.", 1000);
   addParam("nTest", m_nTest,
            "Number of test samples to get resolution after training.", 5000);
-  //addParam("stopLoop", m_stopLoop,
-  //         "If true, stop event loop when maximal number of samples "
-  //         "is reached for all sectors.", true);
-  //addParam("rescaleTarget", m_rescaleTarget,
-  //         "If true, set target values > outputScale to 1, "
-  //         "else skip them.", true);
-  // parameters for training
   addParam("wMax", m_wMax,
            "Weights are limited to [-wMax, wMax] after each training epoch "
            "(for convenience of the FPGA implementation).",
@@ -257,15 +230,8 @@ GRLNeuroTrainerModule::event()
   std::vector<float> output;
 
   ////CDC input
-  //StoreArray<CDCTriggerTrack> cdc2DTrkArray(m_2DfinderCollectionName);
   std::vector<float> cdc2d_phi;
   std::vector<float> cdc2d_pt;
-  //for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
-  //  cdc2d_phi.push_back(cdc2DTrkArray[itrk]->getPhi0());
-  //  cdc2d_pt.push_back(cdc2DTrkArray[itrk]->getPt());
-  //  input.push_back(cdc2DTrkArray[itrk]->getPhi0());
-  //  input.push_back(cdc2DTrkArray[itrk]->getPt());
-  //}
 
   //GRL input
   StoreObjPtr<TRGGRLUnpackerStore> GRLStore(m_GRLCollectionName);
@@ -423,7 +389,8 @@ GRLNeuroTrainerModule::event()
     input.push_back(TCPhiLab[TC - 1] / TMath::Pi());
     input.push_back((eclTrgClusterArray[ic]->getEnergyDep() * 0.001 - 3.5) / 3.5);
     //}
-    //B2DEBUG(50,"InputECL " << ic << " " << tcT << " " << TC << " " << TCcotThetaLab[TC-1] << " " << TCPhiLab[TC-1] << " " << eclTrgClusterArray[ic]->getEnergyDep() << " " << EventTiming );
+    B2DEBUG(50, "InputECL " << ic << " " << tcT << " " << TC << " " << TCcotThetaLab[TC - 1] << " " << TCPhiLab[TC - 1] << " " <<
+            eclTrgClusterArray[ic]->getEnergyDep() << " " << EventTiming);
   }
 
   //output
@@ -435,9 +402,6 @@ GRLNeuroTrainerModule::event()
   StoreObjPtr<SoftwareTriggerResult> result_soft;
   if (result_soft.isValid()) {
     const std::map<std::string, int>& skim_map = result_soft->getResults();
-    //if (skim_map.find("software_trigger_cut&skim&accept_tau_tau") != skim_map.end()) {
-    //  accepted = (result_soft->getResult("software_trigger_cut&skim&accept_tau_tau") == SoftwareTriggerCutResult::c_accept);
-    //}
     if (skim_map.find("software_trigger_cut&skim&accept_hadronb2") != skim_map.end()) {
       accepted_hadron = (result_soft->getResult("software_trigger_cut&skim&accept_hadronb2") == SoftwareTriggerCutResult::c_accept);
     }
@@ -456,8 +420,10 @@ GRLNeuroTrainerModule::event()
   int cdc_sector = cdc2d_phi.size();
   int ecl_sector = selTC.size();
   int isector = cdc_sector * n_ecl_sector + ecl_sector;
-  //B2DEBUG(50,"Input " << cdc_sector << " " << ecl_sector << " " << accepted_signal << " " << accepted_bg);
-  //if(accepted_signal && !accepted_filter)B2DEBUG(50,"Input " << cdc_sector << " " << ecl_sector << " " << accepted_signal << " " << accepted_filter << " " << accepted_bhabha);
+  B2DEBUG(50, "Input " << cdc_sector << " " << ecl_sector << " " << accepted_signal << " " << accepted_bg);
+  if (accepted_signal
+      && !accepted_filter)B2DEBUG(50, "Input " << cdc_sector << " " << ecl_sector << " " << accepted_signal << " " << accepted_filter <<
+                                    " " << accepted_bhabha);
 
   if (accepted_signal) {
     output.push_back(1);
@@ -588,9 +554,6 @@ GRLNeuroTrainerModule::train(unsigned isector)
   fann_set_activation_function_hidden(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_training_algorithm(ann, FANN_TRAIN_RPROP);
-  // keep full train error curve for best run
-  vector<double> bestTrainLog = {};
-  vector<double> bestValidLog = {};
   // keep train error of optimum for all runs
   vector<double> trainOptLog = {};
   vector<double> validOptLog = {};

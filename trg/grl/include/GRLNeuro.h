@@ -79,7 +79,7 @@ namespace Belle2 {
     //void setConstants();
 
     /** set fixed point precision */
-    void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
+    void setPrecision(const std::vector<unsigned>& precision) { m_precision = precision; }
 
     /** set the hit collection and event time to required
      * and store the hit collection name */
@@ -100,10 +100,10 @@ namespace Belle2 {
      * @param isector index of the MLP
      * @param input vector of input values
      * @return unscaled output values (z vertex in cm and/or theta in radian) */
-    std::vector<float> runMLP(unsigned isector, std::vector<float> input);
+    std::vector<float> runMLP(unsigned isector, const std::vector<float>& input);
 
     /** Run an expert MLP with fixed point arithmetic. */
-    std::vector<float> runMLPFix(unsigned isector, std::vector<float> input);
+    std::vector<float> runMLPFix(unsigned isector, const std::vector<float>& input);
 
   private:
     /** List of networks */

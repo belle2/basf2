@@ -79,16 +79,6 @@ namespace Belle2 {
     bool m_load;
     /** Parameters for the NeuroTrigger. */
     GRLNeuro::Parameters m_parameters;
-    /** Switch for sector selection during training. */
-    bool m_selectSectorByMC;
-    /** Number of samples to prepare input ranges. */
-    int m_nTrainPrepare;
-    /** Input ranges given over the module parameters. */
-    std::vector<std::vector<float>> m_IDranges;
-    /** Cut on the hit counters to get relevant ID ranges. */
-    double m_relevantCut;
-    /** Switch to apply cut to single hit counter or to sum over counters. */
-    bool m_cutSum;
     /** Minimal number of training samples. */
     double m_nTrainMin;
     /** Maximal number of training samples. */
@@ -99,10 +89,6 @@ namespace Belle2 {
     int m_nValid;
     /** Number of test samples. */
     int m_nTest;
-    /** Switch for eary stopping. */
-    bool m_stopLoop;
-    /** Switch to rescale out of range target values or ignore them. */
-    bool m_rescaleTarget;
     /** Limit for weights. */
     double m_wMax;
     /** Number of threads for training. */
@@ -128,13 +114,15 @@ namespace Belle2 {
     std::vector<float> TCPhiCOM;
     std::vector<float> TCThetaCOM;
     std::vector<float> TC1GeV;
+    /** convert radian to degree */
+    double radtodeg = 0;
 
     /** Number of CDC sectors. */
-    int n_cdc_sector;
+    int n_cdc_sector = 0;
     /** Number of ECL sectors. */
-    int n_ecl_sector;
+    int n_ecl_sector = 0;
     /** Number of Total sectors. */
-    int n_sector;
+    int n_sector = 0;
 
     /** Histograms for monitoring */
     std::vector<TH1D*> h_cdc2d_phi_sig;
@@ -160,7 +148,7 @@ namespace Belle2 {
     std::vector<TH1D*> h_ncdci_bg;
     std::vector<TH1D*> h_necl_bg;
 
-    double radtodeg;
+    /** BG scale factor for training */
     std::vector<int> scale_bg;
 
   };

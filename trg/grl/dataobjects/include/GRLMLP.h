@@ -16,7 +16,7 @@ namespace Belle2 {
     GRLMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    GRLMLP(std::vector<unsigned short>& nodes, unsigned short targets, std::vector<float>& outputscale);
+    GRLMLP(std::vector<unsigned short>& nodes, unsigned short targets, const std::vector<float>& outputscale);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~GRLMLP() { }

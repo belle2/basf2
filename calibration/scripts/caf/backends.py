@@ -612,7 +612,6 @@ class Job:
             self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
             self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
             self.setup_cmds.append(f"source $BACKEND_B2SETUP")
-            self.setup_cmds.append(f"b2setup")  # FIXME: it seems redundant, remove it?
             # b2code-option has to be executed only after the source of the tools.
             self.setup_cmds.append(f"b2code-option $BACKEND_BELLE2_OPTION")
             self.setup_cmds.append(f"popd > /dev/null")

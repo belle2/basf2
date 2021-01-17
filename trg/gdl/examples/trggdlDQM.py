@@ -25,14 +25,14 @@ main = b2.create_path()
 if argc == 2 and argvs[1][-6:] == ".sroot":
     f_in_root = argvs[1]
     input = b2.register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
     input.param('inputFileName', f_in_root)
 elif argc == 2 and argvs[1][-5:] == ".root":
     f_in_root = argvs[1]
     input = b2.register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
     input.param('inputFileName', f_in_root)
 elif argc == 1:
     input = b2.register_module('RootInput')

@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------------------------------
 import os
 import basf2 as b2
+import random
 
 ################
 import sys  # get argv
@@ -76,7 +77,6 @@ cdctrg = b2.register_module("TRGCDC")
 # one event
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
-import random
 intseed = random.randint(1, 10000000)
 
 pGun = b2.register_module('ParticleGun')

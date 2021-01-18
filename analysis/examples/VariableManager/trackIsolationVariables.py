@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Doxygen should skip this script
+# @cond
+
 """
 Test track isolation variables.
 
@@ -42,8 +45,6 @@ def argparser():
 
 
 if __name__ == "__main__":
-    """ Example script
-    """
 
     # Argparse options.
     #
@@ -67,14 +68,16 @@ if __name__ == "__main__":
     ma.applyCuts("pi+:mypions", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
     # 3D distance (default).
-    ma.calculateTrackIsolation("pi+:mypions", path, *args.detectors, alias="dist3DToClosestTrkAtSurface")
+    ma.calculateTrackIsolation("pi+:mypions",
+                               path,
+                               *args.detectors,
+                               alias="dist3DToClosestTrkAtSurface")
     # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation(
-        "pi+:mypions",
-        path,
-        *args.detectors,
-        use2DRhoPhiDist=True,
-        alias="dist2DRhoPhiToClosestTrkAtSurface")
+    ma.calculateTrackIsolation("pi+:mypions",
+                               path,
+                               *args.detectors,
+                               use2DRhoPhiDist=True,
+                               alias="dist2DRhoPhiToClosestTrkAtSurface")
 
     ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
     ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
@@ -95,3 +98,5 @@ if __name__ == "__main__":
     b2.process(path)
 
     print(b2.statistics)
+
+# @endcond

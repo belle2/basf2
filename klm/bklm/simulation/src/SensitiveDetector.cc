@@ -31,12 +31,6 @@
 /* ROOT headers. */
 #include <TRandom3.h>
 
-#define DEPTH_SECTION 2
-#define DEPTH_SECTOR 3
-#define DEPTH_LAYER 5
-#define DEPTH_PLANE 9
-#define DEPTH_SCINT 10
-
 using namespace std;
 using namespace Belle2::bklm;
 
@@ -96,16 +90,16 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
   if ((eDep > 0.0) && (postStep->GetCharge() != 0.0)) {
     const G4VTouchable* hist = preStep->GetTouchable();
     int depth = hist->GetHistoryDepth();
-    if (depth < DEPTH_PLANE) {
+    if (depth < m_DepthPlane) {
       B2WARNING("BKLM SensitiveDetector::step(): "
                 << LogVar("Touchable HistoryDepth", depth)
-                << LogVar(" should be at least", DEPTH_PLANE));
+                << LogVar("Should be at least", m_DepthPlane));
       return false;
     }
-    int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
-    int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
-    int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
-    int section = hist->GetCopyNumber(depth - DEPTH_SECTION);
+    int plane = hist->GetCopyNumber(depth - m_DepthPlane);
+    int layer = hist->GetCopyNumber(depth - m_DepthLayer);
+    int sector = hist->GetCopyNumber(depth - m_DepthSector);
+    int section = hist->GetCopyNumber(depth - m_DepthSection);
     int moduleID =
       int(BKLMElementNumbers::moduleNumber(section, sector, layer));
     double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
@@ -148,7 +142,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         simHitPosition->addRelationTo(simHit);
       }
     } else {
-      int scint = hist->GetCopyNumber(depth - DEPTH_SCINT);
+      int scint = hist->GetCopyNumber(depth - m_DepthScintillator);
       BKLMElementNumbers::setStripInModule(moduleID, scint);
       BKLMStatus::setMaximalStrip(moduleID, scint);
       double propTime;

@@ -59,6 +59,21 @@ namespace Belle2 {
       //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
       double m_HitTimeMax;
 
+      //! Depth section.
+      static constexpr int m_DepthSection{2};
+
+      //! Depth sector.
+      static constexpr int m_DepthSector{3};
+
+      //! Depth layer.
+      static constexpr int m_DepthLayer{5};
+
+      //! Depth plane.
+      static constexpr int m_DepthPlane{9};
+
+      //! Depth scintillator.
+      static constexpr int m_DepthScintillator{10};
+
       //! Pointer to a sensitive-detector object used for beam-background steps
       BkgSensitiveDetector* m_BkgSensitiveDetector;
 

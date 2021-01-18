@@ -66,7 +66,7 @@ To write a new skim, please follow these steps:
 
        TestFiles = [get_test_file("MC13_ggBGx1")]
 
-8. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
+8. *[Mandatory]* Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
 With all of these steps followed, you will now be able to run your skim using the :ref:`skim command line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put into production, please also complete the following steps:
 
@@ -75,6 +75,12 @@ With all of these steps followed, you will now be able to run your skim using th
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
 10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+
+
+.. _skim-steering-file:
+
+Building skim lists in a steering file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -88,7 +94,64 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     ma.inputMdstList("default", [], path=path)
     skim = MySkim()
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
-    path.process()
+    b2.process(path)
+
+After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``.
+
+.. warning:: There is a subtle but important technicality here: if ``BaseSkim.skim_event_cuts`` has been called, then the skim lists are not built for all events on the path, but they are built for all events on a conditional path. A side-effect of this is that no post-skim path can be safely defined for the `CombinedSkim` class (since a combined skim of five skims may have up to five conditional paths).
+
+After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to (*e.g.* performing further reconstruction using the skim candidates). However, the final call to `basf2.process` must be passed the original (main) path.
+
+.. code-block:: python
+
+    skim = MySkim()
+    skim(path)
+    # Add subsequent modules to skim.postskim_path
+    ma.variablesToNtuple(skim.SkimLists[0], ["pt", "E"], path=skim.postskim_path)
+    # Process full path
+    b2.process(path)
+
+The above code snippet will produce both uDST and ntuple output. To only build the skim lists without writing to uDST, pass the configuration parameter ``outputUdst=False`` during initialisation of the skim object:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+
+Disabling uDST output may be useful to you if you want to do any of the following:
+
+* print the statistics of the skim without producing any output files,
+
+* build the skim lists and perform further reconstruction or fitting on the skim candidates before writing the ROOT output,
+
+* go directly from unskimmed MDST to analysis ntuples in a single steering file (but please consider first using the centrally-produce skimmed uDSTs), or
+
+* use the :ref:`skim flag<skim-flags>` to build the skim lists and write an event-level ntuple with information about which events pass the skim.
+
+.. tip::
+
+    The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims. :ref:`b2skim-run<b2skim-run>` is preferable for quickly testing a skim during skim development. :ref:`b2skim-generate<b2skim-generate>` should be used as a starting point if you are doing anything more complicated than simply running a skim on an MDST file to produce a uDST file.
+
+
+.. _skim-flags:
+
+Skim flags
+..........
+
+When a skim is added to the path, an event-level variable is created (via an alias), which indicates whether an event passes the skim or not. It is of the form ``passes_<SKIMNAME>``, and can be accessed through the property ``BaseSkim.flag``.
+
+The same caveat from the previous section regarding ``postskim_path`` applies here. The skim flag is not guaranteed to work if used on the main path, because the skim lists may not be built for all events.
+
+In the below code snippet, we build the skim lists, skip the uDST output, and write an ntuple containing the skim flag and other event-level variables:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+    # Add subsequent modules to skim.postskim_path, including anything that uses skim.flag
+    ma.variablesToNtuple("", [skim.flag, "nTracks"], path=skim.postskim_path)
+    # Process full path
+    b2.process(path)
 
 
 .. _skim-running:
@@ -121,9 +184,10 @@ In the skim package, there are command-line tools available for running skims, d
 .................................................
 
 .. tip::
-   This tool is for special cases where this does not suffice (such as running on the grid). If you
-   just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. If you want to
-   test the performance of your skim, consider using the :ref:`b2skim-stats tools<testing-skims>`.
+   This tool is for cases where other tools does not suffice (such as running on the grid, or adding
+   additional modules to the path after adding a skim.). If you just want to run a skim on KEKCC,
+   consider using :ref:`b2skim-run<b2skim-run>`. If you want to test the performance of your skim,
+   consider using the :ref:`b2skim-stats tools<testing-skims>`.
 
 .. argparse::
    :filename: skim/tools/b2skim-generate
@@ -142,7 +206,7 @@ A Jupyter notebook skimming tutorial can be found in ``skim/tutorial/Skimming_Tu
 Skim registry
 ~~~~~~~~~~~~~
 
-All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in `skim.registry.RegisteredSkims` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
+All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in ``skim/scripts/skim/registry.py`` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
 The skim numbering convention is defined on the `Confluence skim page`_.
 

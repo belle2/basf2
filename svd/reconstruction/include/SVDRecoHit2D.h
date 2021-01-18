@@ -55,6 +55,7 @@ namespace Belle2 {
      * assumed for both values by dividing the pixel size by sqrt(12).
      *
      * @param hit    SVDTrueHit to use as base
+     * @param trackCandHit
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */

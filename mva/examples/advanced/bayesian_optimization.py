@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Markus Prim 2017
 # Thomas Keck
 # Dennis Weyland
 
-# A simple example to use bayesian optimiation for the hyperparameters of a FastBDT.
+# A simple example to use bayesian optimization for the hyperparameters of a FastBDT.
 # The package used in this example is https://github.com/scikit-optimize
 # and can be installed with
 # pip3 install scikit-optimize
@@ -18,15 +17,13 @@
 import basf2_mva
 import basf2_mva_util
 import skopt
-from skopt.space import Real, Integer
-from sklearn.externals.joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 
 
 def f(x):
     """Returns the figure of merit for the optimization.
-    The functions trains the classifier with the given hyperparamters on the training sample and
-    calculates the AUC on the independet test sample.
+    The functions trains the classifier with the given hyperparameters on the training sample and
+    calculates the AUC on the independent test sample.
     """
     g_options = general_options
     g_options.m_identifier = "test.xml"

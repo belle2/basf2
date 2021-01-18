@@ -15,7 +15,7 @@
 
 namespace TreeFitter {
 
-  /** reprasentation of all charged final states FIXME rename since this name is taken in tracking    */
+  /** representation of all charged final states FIXME rename since this name is taken in tracking    */
   class RecoTrack : public RecoParticle {
 
   public:
@@ -40,7 +40,7 @@ namespace TreeFitter {
     /**   project the constraint (calculate residuals)  */
     virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const override;
 
-    /** updated the cahed parameters */
+    /** updated the cached parameters */
     ErrCode updateParams(double flt);
 
     /** dimension (5) */
@@ -83,5 +83,8 @@ namespace TreeFitter {
 
     /** only lower triangle filled! */
     Eigen::Matrix<double, 5, 5>m_covariance;
+
+    /** scale the momenta by this correction factor */
+    const float m_momentumScalingFactor;
   };
 }

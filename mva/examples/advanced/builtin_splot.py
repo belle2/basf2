@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
 import basf2_mva
-from basf2 import *
-from modularAnalysis import *
-
 
 if __name__ == "__main__":
     from basf2 import conditions
@@ -74,7 +70,7 @@ if __name__ == "__main__":
     meta_options.m_splot_boosted = False
     basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
-    # Now we use a bossted sPlot training
+    # Now we use a boosted sPlot training
     general_options.m_identifier = "MVASPlotBoosted"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = True
@@ -99,13 +95,13 @@ if __name__ == "__main__":
                      basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
     """
-    path = create_path()
-    inputMdstList('MC6', ['/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_0001*.root'], path=path)
-    fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5')], path=path)
-    reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
-    KFit('D0', 0.1, path=path)
-    applyCuts('D0', '1.8 < M < 1.9', path=path)
-    matchMCTruth('D0', path=path)
+    path = b2.create_path()
+    ma.inputMdstList('MC6', ['/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_0001*.root'], path=path)
+    ma.fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5')], path=path)
+    ma.reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
+    vx.kFit('D0', 0.1, path=path)
+    ma.applyCuts('D0', '1.8 < M < 1.9', path=path)
+    ma.matchMCTruth('D0', path=path)
 
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Pdf', identifier='MVAPdf')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Full', identifier='MVAFull')
@@ -114,7 +110,7 @@ if __name__ == "__main__":
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombined', identifier='MVASPlotCombined')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotBoosted', identifier='MVASPlotBoosted')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombinedBoosted', identifier='MVASPlotCombinedBoosted')
-    variablesToNtuple('D0', ['isSignal', 'extraInfo(Pdf)', 'extraInfo(Full)', 'extraInfo(Ordinary)', 'extraInfo(SPlot)',
+    ma.variablesToNtuple('D0', ['isSignal', 'extraInfo(Pdf)', 'extraInfo(Full)', 'extraInfo(Ordinary)', 'extraInfo(SPlot)',
                              'extraInfo(SPlotCombined)', 'extraInfo(SPlotBoosted)', 'extraInfo(SPlotCombinedBoosted)'], path=path)
-    process(path)
+    b2.process(path)
     """

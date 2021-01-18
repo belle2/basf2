@@ -1,12 +1,12 @@
 # EventType: 1210032010
 # Descriptor: Y(4S) -> B+ B-
-#                     [B+ -> rho+ rho0]
+#                     [B+ -> rho+ rho0] f_L=PDG
 #                      B- -> anything
 # NickName: Bu_rho+rho0
 # Documentation:    Decay mode for phi2/alpha and rediscoveries
 # Tested:Yes
-# Reponsible: F. Abudinen
-# Email: fernando.abudinen@ts.infn.it
+# Reponsible: R. Manfredi, F. Abudinen
+# Email: riccardo.manfredi@ts.infn.it
 # PhysicsWG: BToCharmless
 # Cuts: None
 # Date: 22/05/2020

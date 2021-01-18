@@ -246,6 +246,7 @@ namespace Belle2 {
   }
 
   /// intersection
+  // cppcheck-suppress constParameter
   int intersect(const TRGCDCLpar& lp1, const TRGCDCLpar& lp2, CLHEP::HepVector& v1, CLHEP::HepVector& v2)
   {
     CLHEP::HepVector cen1(lp1.center());
@@ -324,7 +325,7 @@ namespace Belle2 {
 //
 
   /// ostream operator
-  std::ostream& operator<<(std::ostream& o, TRGCDCLpar& s)
+  std::ostream& operator<<(std::ostream& o, const TRGCDCLpar& s)
   {
     return o << " al=" << s.m_alpha << " be=" << s.m_beta
            << " ka=" << s.m_kappa << " ga=" << s.m_gamma;

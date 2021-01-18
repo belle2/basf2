@@ -4,18 +4,21 @@
 """ Skim list building functions for the low multiplicity physics working group """
 
 __authors__ = [
-    "Xing-Yu Zhou"
+    "Xing-Yu Zhou",
+    "Hisaki Hayashii"
 ]
 
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from stdCharged import stdE, stdPi
+from stdPhotons import stdPhotons
 
 
 @fancy_skim_header
 class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and `e^{+}e^{-} \\to \mu^{+}\mu^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
@@ -95,7 +98,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 @fancy_skim_header
 class LowMassTwoTrack(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \gamma h^{+}h^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for low mass two track events."
@@ -108,7 +111,7 @@ class LowMassTwoTrack(BaseSkim):
         skim_label = 'LowMassTwoTrack'
 
         # Tracks from IP
-        IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+        IP_cut = '[abs(dz) < 5] and [abs(dr) < 2.0]'
         # Tracks of momenta greater than 0.5 GeV in the Lab frame
         p_cut = '[p > 0.5]'
         # Clusters of energy greater than 2 GeV in the CMS frame
@@ -134,3 +137,74 @@ class LowMassTwoTrack(BaseSkim):
             path=path)
 
         self.SkimLists = ['vpho:' + skim_label]
+
+
+@fancy_skim_header
+class SingleTagPseudoScalar(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\\prime}`
+
+    **Decay Modes**
+
+        1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
+        2. :math:`\\eta \\to \\gamma\\gamma`,
+        3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
+        4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
+        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
+        6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
+    """
+
+    __authors__ = ["Hisaki Hayashii"]
+    __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
+    __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
+    __category__ = "physics, low multiplicity"
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+
+        label = "PseudoScalarSkim"
+        TrackCuts = "abs(dz) < 2.0 and dr < 0.5 and pt > 0.15"
+
+        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and electronID > 0.7", path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and electronID < 0.7", path=path)
+        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
+
+        pi0MassWindow = "0.06 < InvM < 0.18"
+        etaMassWindow = "0.50 < InvM < 0.60"
+        etapMassWindow = "0.91 < InvM < 1.10"
+        ModesAndCuts = [
+            (f"pi0:{label}_loose -> gamma:{label} gamma:{label}", pi0MassWindow),
+            (f"eta:gg -> gamma:{label} gamma:{label}", etaMassWindow),
+            (f"eta:pipipi0 -> pi+:{label} pi-:{label} pi0:{label}_loose", etaMassWindow),
+            (f"eta:pipig -> pi+:{label} pi-:{label} gamma:{label}", etaMassWindow),
+            (f"eta':pipieta_gg -> pi+:{label} pi-:{label} eta:gg", etapMassWindow),
+            (f"eta':pipig -> pi+:{label} pi-:{label} gamma:{label}", etapMassWindow),
+        ]
+        for dmID, (mode, cut) in enumerate(ModesAndCuts):
+            ma.reconstructDecay(mode, cut, dmID=dmID, path=path)
+
+        ma.cutAndCopyList(f"pi0:{label}_highE", f"pi0:{label}_loose", "E > 0.5", path=path)
+
+        particles = [
+            f"pi0:{label}_highE",
+            f"eta:gg",
+            f"eta:pipipi0",
+            f"eta:pipig",
+            f"eta':pipieta_gg",
+            f"eta':pipig"
+        ]
+        ModeSum = " + ".join(f"nParticlesInList({particle})" for particle in particles)
+        presel = f"nParticlesInList(e+:{label}) == 1 and nParticlesInList(pi+:{label}) <= 2"
+        EventCuts = f"{presel} and formula({ModeSum}) >= 1"
+
+        # Although a condition of "mode_sum >= 1" looks like very loose,
+        # the reduction rate of this SingleTagPseudoScalar skim is very large, i.e. 1/50,
+        # since the requirements, one high-energy electron and <=2 other charged
+        # tracks, are quite stringent.
+        path = self.skim_event_cuts(EventCuts, path=path)
+
+        self.SkimLists = [f"e+:{label}"]

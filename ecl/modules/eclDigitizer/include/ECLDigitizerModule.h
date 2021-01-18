@@ -140,7 +140,7 @@ namespace Belle2 {
      *  is an even number from 0 to 142, so here it is stored as
      *  numbers from 0 to 71 inclusive.
      */
-    unsigned char m_ttime[ECL::ECL_CRATES];
+    unsigned char m_ttime[ECL::ECL_CRATES] = {};
 
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,

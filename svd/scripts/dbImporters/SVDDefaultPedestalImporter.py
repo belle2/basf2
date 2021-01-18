@@ -5,14 +5,9 @@
 SVD Default Pedestal Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
-from ROOT.Belle2 import SVDPedestalCalibrations
 import datetime
-import os
 
 now = datetime.datetime.now()
 
@@ -20,9 +15,11 @@ now = datetime.datetime.now()
 pedestal = 0
 
 
-class defaultPedestalImporter(basf2.Module):
+class defaultPedestalImporter(b2.Module):
+    """strip pedestal importer"""
 
     def beginRun(self):
+        """do everything here"""
 
         iov = Belle2.IntervalOfValidity.always()
 
@@ -50,12 +47,10 @@ class defaultPedestalImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPedestalCalibrations.name, payload, iov)
 
 
-use_local_database("localDB_pedestal/database.txt", "localDB_pedestal")
-
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
@@ -65,8 +60,8 @@ main.add_module("Geometry", components=['SVD'])
 main.add_module(defaultPedestalImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

@@ -2,9 +2,7 @@
 
 """CDC Wire Efficiency and BadWire creator. Creates layer-by-layer and wire-by-wire efficiencies and returns bad wire list"""
 
-import basf2
 from prompt import CalibrationSettings
-from prompt.utils import events_in_basf2_file
 from caf.framework import Calibration
 
 

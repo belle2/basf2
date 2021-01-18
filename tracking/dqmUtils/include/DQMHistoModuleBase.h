@@ -50,7 +50,13 @@ namespace Belle2 {
 
     /** Function to create array of TH1F histograms, one for each layer.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the layer number and then used as a name for the histogram.
-     * @param titleTemplate - same as nameTemplate but for title. */
+     * @param titleTemplate - same as nameTemplate but for title.
+     * @param nbinsx - number of bins.
+     * @param xlow - range x-axis (low boundary).
+     * @param xup - range x-axis (high boundary).
+     * @param xTitle - title x-axis.
+     * @param yTitle - title y-axis
+     * */
     virtual TH1F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
                                 std::string xTitle, std::string yTitle);
     /** Same as above but for TH2F. */
@@ -59,7 +65,13 @@ namespace Belle2 {
 
     /** Function to create array of TH1F histograms, one for each sensor.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the output of the SensorNameDescription function and then used as a name for the histogram.
-     * @param titleTemplate - same as nameTemplate but for title and with the SensorTitleDescription function. */
+     * @param titleTemplate - same as nameTemplate but for title and with the SensorTitleDescription function.
+     * @param nbinsx - number of bins.
+     * @param xlow - range x-axis (low boundary).
+     * @param xup - range x-axis (high boundary).
+     * @param xTitle - title x-axis.
+     * @param yTitle - title y-axis
+     * */
     virtual TH1F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
                                  std::string xTitle, std::string yTitle);
     /** Same as above but for TH2F. */

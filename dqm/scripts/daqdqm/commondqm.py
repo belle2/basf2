@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+# from svd import add_svd_create_recodigits
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
@@ -46,8 +47,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
         # SVD
         if components is None or 'SVD' in components:
+            # reconstruct SVDRecoDigits first of all
+            # add_svd_create_recodigits(path)
+
             # SVD DATA FORMAT
-            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            svdunpackerdqm = b2.register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
             # offline ZS emulator
             path.add_module(
@@ -74,7 +78,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
-            eventT0DQMmodule = register_module('EventT0DQM')
+            eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
@@ -90,13 +94,16 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         hlt_skim_lines_in_plot = [
             "accept_hadron",
-            "accept_mumu_1trk",
-            "accept_mumu_2trk",
+            "accept_hadronb2",
+            "accept_bhabha_all",
             "accept_bhabha",
-            "accept_bhabhaecl",
             "accept_gamma_gamma",
-            "accept_tau_tau",
-            "accept_single_photon_1GeV",
+            "accept_mumu_2trk",
+            "accept_mumutight",
+            "accept_radmumu",
+            "accept_offip",
+            "accept_tau_2trk",
+            "accept_tau_Ntrk",
         ]
 
         # Default plot
@@ -116,8 +123,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
            },
            cutResultIdentifiersIgnored={
                "skim": [
-                   "accept_bhabha",
-                   "accept_bhabhaecl",
+                   "accept_bhabha_all",
                    ]
            },
            createTotalResultHistograms=False,
@@ -129,17 +135,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
         if components is None or 'SVD' in components:
-            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            svdunpackerdqm = b2.register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
 
     # CDC
     if (components is None or 'CDC' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        cdcdqm = register_module('cdcDQM7')
+        cdcdqm = b2.register_module('cdcDQM7')
         path.add_module(cdcdqm)
 
         module_names = [m.name() for m in path.modules()]
         if ('SoftwareTrigger' in module_names):
-            cdcdedxdqm = register_module('CDCDedxDQM')
+            cdcdedxdqm = b2.register_module('CDCDedxDQM')
             path.add_module(cdcdedxdqm)
 
         if dqm_environment == "expressreco":
@@ -147,40 +153,40 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # ECL
     if (components is None or 'ECL' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        ecldqm = register_module('ECLDQM')
+        ecldqm = b2.register_module('ECLDQM')
         path.add_module(ecldqm)
-        ecldqmext = register_module('ECLDQMEXTENDED')
+        ecldqmext = b2.register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
         # we dont want to create large histograms on HLT, thus ERECO only
         if dqm_environment == "expressreco":
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
     # TOP
     if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        topdqm = register_module('TOPDQM')
+        topdqm = b2.register_module('TOPDQM')
         path.add_module(topdqm)
     # KLM
     if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        klmdqm = register_module("KLMDQM")
+        klmdqm = b2.register_module("KLMDQM")
         path.add_module(klmdqm)
 
     # TRG before all reconstruction runs (so on all events with all unpacked information)
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "before_filter"]):
         # TRGECL
-        trgecldqm = register_module('TRGECLDQM')
+        trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
         # TRGGDL
-        trggdldqm = register_module('TRGGDLDQM')
+        trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
         # TRGGRL
-        trggrldqm = register_module('TRGGRLDQM')
+        trggrldqm = b2.register_module('TRGGRLDQM')
         path.add_module(trggrldqm)
         # TRGCDCTSF
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
             path.add_module('TRGCDCTSFDQM', TSFMOD=mod_tsf)
         # TRGCDC2D
-        trgcdct2ddqm = register_module('TRGCDCT2DDQM')
+        trgcdct2ddqm = b2.register_module('TRGCDCT2DDQM')
         path.add_module(trgcdct2ddqm)
         # TRGCDC3D
         nmod_t3d = [0, 1, 2, 3]
@@ -198,28 +204,18 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
-        trggdldqm_skim = register_module('TRGGDLDQM')
+        trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
 
-    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
-        # CDCTriggerNeuro
-        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
-                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
-        path.add_module('SetupGenfitExtrapolation')
-        path.add_module('CDCTriggerNeuroDQM',
-                        limitedoutput=True,
-                        showRecoTracks=True,
-                        skipWithoutHWTS=True,
-                        maxRecoZDist=1.0,
-                        maxRecoD0Dist=0.5,
-                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        trackDqm = register_module('TrackDQM')
+        trackDqm = b2.register_module('TrackDQM')
         path.add_module(trackDqm)
 
     # ARICH

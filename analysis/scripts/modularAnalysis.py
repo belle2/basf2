@@ -7,6 +7,8 @@ This module defines wrapper functions around the analysis modules.
 
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+import basf2
+import subprocess
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -146,6 +148,8 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+        import b2bii
+        b2bii.setB2BII()
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
@@ -158,6 +162,12 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
+
+    .. warning::
+
+        This functon is kept for backward-compatibility.
+        Better to use `mdst.add_mdst_output` directly.
+
     """
 
     import mdst
@@ -166,105 +176,20 @@ def outputMdst(filename, path):
 
 def outputUdst(filename, particleLists=None, includeArrays=None, path=None, dataDescription=None):
     """
-    Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
+    Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Note that this does not reduce the amount of Particle objects saved,
-    see skimOutputUdst() for a function that does.
+    Note:
+        This does not reduce the amount of Particle objects saved,
+        see `udst.add_skimmed_udst_output` for a function that does.
+
     """
-
-    import mdst
-    import pdg
-
-    if particleLists is None:
-        particleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # also add anti-particle lists
-    plSet = set(particleLists)
-    for List in particleLists:
-        name, label = List.split(':')
-        plSet.add(pdg.conjugate(name) + ':' + label)
-
-    partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + includeArrays + list(plSet)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("dataLevel", "udst")
-
-    return mdst.add_mdst_output(path, mc=True, filename=filename,
-                                additionalBranches=partBranches,
-                                dataDescription=dataDescription)
-
-
-def skimOutputUdst(skimDecayMode, skimParticleLists=None, outputParticleLists=None,
-                   includeArrays=None, path=None, *,
-                   outputFile=None, dataDescription=None):
-    """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a udst file, saving only particles from skimParticleLists
-    and from outputParticleLists.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
-
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
-    """
-
-    from basf2 import AfterConditionPath
-
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
-
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".udst.root"):
-        outputFile += ".udst.root"
-
-    skimfilter = register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = create_path()
-    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
-               dataDescription=dataDescription)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+    import udst
+    udst.add_udst_output(
+        path=path, filename=filename, particleLists=particleLists,
+        additionalBranches=includeArrays, dataDescription=dataDescription)
 
 
 def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
@@ -359,24 +284,137 @@ def loadGearbox(path, silence_warning=False):
     path.add_module(paramloader)
 
 
-def printPrimaryMCParticles(path):
+def printPrimaryMCParticles(path, **kwargs):
     """
-    Prints all primary MCParticles.
+    Prints all primary MCParticles, that is particles from
+    the physics generator and not particles created by the simulation
+
+    This is equivalent to `printMCParticles(onlyPrimaries=True, path=path) <printMCParticles>` and additional
+    keyword arguments are just forwarded to that function
     """
-
-    mcparticleprinter = register_module('PrintMCParticles')
-    path.add_module(mcparticleprinter)
+    return printMCParticles(onlyPrimaries=True, path=path, **kwargs)
 
 
-def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
+def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
+
+    By default this will print a tree of just the particle names and their pdg
+    codes in the event, for example ::
+
+        [INFO] Content of MCParticle list
+        ╰── Upsilon(4S) (300553)
+            ├── B+ (521)
+            │   ├── anti-D_0*0 (-10421)
+            │   │   ├── D- (-411)
+            │   │   │   ├── K*- (-323)
+            │   │   │   │   ├── anti-K0 (-311)
+            │   │   │   │   │   ╰── K_S0 (310)
+            │   │   │   │   │       ├── pi+ (211)
+            │   │   │   │   │       │   ╰╶╶ p+ (2212)
+            │   │   │   │   │       ╰── pi- (-211)
+            │   │   │   │   │           ├╶╶ e- (11)
+            │   │   │   │   │           ├╶╶ n0 (2112)
+            │   │   │   │   │           ├╶╶ n0 (2112)
+            │   │   │   │   │           ╰╶╶ n0 (2112)
+            │   │   │   │   ╰── pi- (-211)
+            │   │   │   │       ├╶╶ anti-nu_mu (-14)
+            │   │   │   │       ╰╶╶ mu- (13)
+            │   │   │   │           ├╶╶ nu_mu (14)
+            │   │   │   │           ├╶╶ anti-nu_e (-12)
+            │   │   │   │           ╰╶╶ e- (11)
+            │   │   │   ╰── K_S0 (310)
+            │   │   │       ├── pi0 (111)
+            │   │   │       │   ├── gamma (22)
+            │   │   │       │   ╰── gamma (22)
+            │   │   │       ╰── pi0 (111)
+            │   │   │           ├── gamma (22)
+            │   │   │           ╰── gamma (22)
+            │   │   ╰── pi+ (211)
+            │   ├── mu+ (-13)
+            │   │   ├╶╶ anti-nu_mu (-14)
+            │   │   ├╶╶ nu_e (12)
+            │   │   ╰╶╶ e+ (-11)
+            │   ├── nu_mu (14)
+            │   ╰── gamma (22)
+            ...
+
+
+    There's a distinction between primary and secondary particles. Primary
+    particles are the ones created by the physics generator while secondary
+    particles are ones generated by the simulation of the detector interaction.
+
+    Secondaries are indicated with a dashed line leading to the particle name
+    and if the output is to the terminal they will be printed in red. If
+    ``onlyPrimaries`` is True they will not be included in the tree.
+
+    On demand, extra information on all the particles can be displayed by
+    enabling any of the ``showProperties``, ``showMomenta``, ``showVertices``
+    and ``showStatus`` flags. Enabling all of them will look like
+    this::
+
+        ...
+        ╰── pi- (-211)
+            │ mass=0.14 energy=0.445 charge=-1 lifetime=6.36
+            │ p=(0.257, -0.335, 0.0238) |p|=0.423
+            │ production vertex=(0.113, -0.0531, 0.0156), time=0.00589
+            │ status flags=PrimaryParticle, StableInGenerator, StoppedInDetector
+            │ list index=48
+            │
+            ╰╶╶ n0 (2112)
+                mass=0.94 energy=0.94 charge=0 lifetime=5.28e+03
+                p=(-0.000238, -0.0127, 0.0116) |p|=0.0172
+                production vertex=(144, 21.9, -1.29), time=39
+                status flags=StoppedInDetector
+                creation process=HadronInelastic
+                list index=66
+
+    The first line of extra information is enabled by ``showProperties``, the
+    second line by ``showMomenta``, the third line by ``showVertices`` and the
+    last two lines by ``showStatus``. Note that all values are given in Belle II
+    standard units, that is GeV, centimeter and nanoseconds.
+
+    The depth of the tree can be limited with the ``maxLevel`` argument: If it's
+    bigger than zero it will limit the tree to the given number of generations.
+    A visual indicator will be added after each particle which would have
+    additional daughters that are skipped due to this limit. An example event
+    with ``maxLevel=3`` is given below. In this case only the tau neutrino and
+    the pion don't have additional daughters. ::
+
+        [INFO] Content of MCParticle list
+        ╰── Upsilon(4S) (300553)
+            ├── B+ (521)
+            │   ├── anti-D*0 (-423) → …
+            │   ├── tau+ (-15) → …
+            │   ╰── nu_tau (16)
+            ╰── B- (-521)
+                ├── D*0 (423) → …
+                ├── K*- (-323) → …
+                ├── K*+ (323) → …
+                ╰── pi- (-211)
+
+
+    Parameters:
+        onlyPrimaries (bool): If True show only primary particles, that is particles coming from
+            the generator and not created by the simulation.
+        maxLevel (int): If 0 or less print the whole tree, otherwise stop after n generations
+        showProperties (bool): If True show mass, energy and charge of the particles
+        showMomenta (bool): if True show the momenta of the particles
+        showVertices (bool): if True show production vertex and production time of all particles
+        showStatus (bool): if True show some status information on the particles.
+            For secondary particles this includes creation process.
     """
 
-    mcparticleprinter = register_module('PrintMCParticles')
-    mcparticleprinter.param('onlyPrimaries', onlyPrimaries)
-    mcparticleprinter.param('maxLevel', maxLevel)
-    path.add_module(mcparticleprinter)
+    return path.add_module(
+        "PrintMCParticles",
+        onlyPrimaries=onlyPrimaries,
+        maxLevel=maxLevel,
+        showProperties=showProperties,
+        showMomenta=showMomenta,
+        showVertices=showVertices,
+        showStatus=showStatus,
+    )
 
 
 def correctBrems(outputList,
@@ -685,7 +723,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
     path.add_module(pload)
 
 
-def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False):
+def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -725,6 +764,11 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         fillParticleLists([kaons, pions, v0lambdas], path=mypath)
 
     Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
+
+    Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
         the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
 
@@ -751,6 +795,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -758,10 +804,15 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
+    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    for decayString, cut in decayStringsWithCuts:
+        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
-def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False):
+def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -791,6 +842,11 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
 
     Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
+
+    Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
         the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
 
@@ -810,6 +866,9 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -817,7 +876,10 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
+    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
+        getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -1822,26 +1884,25 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=False,
+                     fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
-    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
+    particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
-    @param target_list_name name of the input ParticleList
-    @param inputParticlelists list of input particle list names, which serve
-                              as a source of particles to build ROE, the FSP particles from
-                              target_list_name are excluded from ROE object
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the inputParticlelists
-                              option will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of user-defined input particle list names, which serve
+                              as source of particles to build the ROE, the FSP particles from
+                              target_list_name are automatically excluded from the ROE object
+    @param fillWithMostLikely By default the module uses the most likely particle mass hypothesis for charged particles
+                              based on the PID likelihood. Turn this behavior off if you want to configure your own
+                              input particle lists.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate the
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
-    @param path      modules are added to this path
+    @param path               modules are added to this path
     """
     if inputParticlelists is None:
         inputParticlelists = []
@@ -1850,7 +1911,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
-    if not belle_sources:
+    import b2bii
+    if not b2bii.isB2BII():
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
@@ -1860,6 +1922,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('mostLikely', fillWithMostLikely)
     path.add_module(roeBuilder)
 
 
@@ -2225,8 +2288,9 @@ def buildContinuumSuppression(list_name, roe_mask, path):
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
 
-    @param list_name name of the input ParticleList
-    @param path      modules are added to this path
+    :param list_name: name of the input ParticleList
+    :param roe_mask: name of the ROE mask
+    :param path: modules are added to this path
     """
 
     qqBuilder = register_module('ContinuumSuppressionBuilder')
@@ -2420,12 +2484,15 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    workingDirectory='.',
     mode='standard',
-    downloadFlag=True,
     selection='',
     path=None,
-    suffix=''
+    suffix='',
+    hardParticle='gamma',
+    pi0PayloadNameOverride=None,
+    pi0SoftPhotonCutOverride=None,
+    etaPayloadNameOverride=None,
+    etaSoftPhotonCutOverride=None
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2444,9 +2511,6 @@ def writePi0EtaVeto(
     * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
     * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
-
-    If you don't have weight files in your workingDirectory,
-    these files are downloaded from the database to your workingDirectory automatically.
 
     The following strings are available for mode:
 
@@ -2471,16 +2535,18 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param workingDirectory the weight file directory
     @param mode				choose one mode out of 'standard', 'tight', 'cluster' and 'both'
-    @param downloadFlag 	whether download default weight files or not
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
+    @param hardParticle           particle name which is used to calculate the pi0/eta probability (default is gamma)
+    @param pi0PayloadNameOverride  specify the payload name of pi0 veto only if one wants to use non-default one. (default is None)
+    @param pi0SoftPhotonCutOverride specify the soft photon selection criteria of pi0 veto only if one wants to use non-default one.
+                                    (default is None)
+    @param etaPayloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
+    @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
+                                    (default is None)
     """
-
-    import os
-    import basf2_mva
 
     renameSuffix = False
 
@@ -2491,7 +2557,7 @@ def writePi0EtaVeto(
                     break
                 for submodule in subpath.modules():
                     print(submodule.name())
-                    if f'gamma:HardPhoton{suffix}' in submodule.name():
+                    if f'{hardParticle}:HardPhoton{suffix}' in submodule.name():
                         suffix += '_0'
                         B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
                         renameSuffix = True
@@ -2500,20 +2566,17 @@ def writePi0EtaVeto(
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-    fillSignalSideParticleList(f'gamma:HardPhoton{suffix}', decayString, path=roe_path)
-    if not os.path.isdir(workingDirectory):
-        os.mkdir(workingDirectory)
-        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+    fillSignalSideParticleList(f'{hardParticle}:HardPhoton{suffix}', decayString, path=roe_path)
 
     dictListName = {'standard': 'Origin',
                     'tight': 'TightEnergyThreshold',
                     'cluster': 'LargeClusterSize',
                     'both': 'TightEnrgyThresholdAndLargeClusterSize'}
 
-    dictPi0EnergyCut = {'standard': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'tight': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
-                        'cluster': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'both': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]'}
+    dictPi0EnergyCut = {'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+                        'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {'standard': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
                         'tight': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
@@ -2525,16 +2588,6 @@ def writePi0EtaVeto(
                              'cluster': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2',
                              'both': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2'}
 
-    dictPi0WeightFileName = {'standard': 'pi0veto_origin.root',
-                             'tight': 'pi0veto_tight.root',
-                             'cluster': 'pi0veto_cluster.root',
-                             'both': 'pi0veto_both.root'}
-
-    dictEtaWeightFileName = {'standard': 'etaveto_origin.root',
-                             'tight': 'etaveto_tight.root',
-                             'cluster': 'etaveto_cluster.root',
-                             'both': 'etaveto_both.root'}
-
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'Pi0VetoIdentifierWithLargerClusterSize',
@@ -2545,83 +2598,90 @@ def writePi0EtaVeto(
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
 
-    dictPi0ExtraInfoName = {'standard': 'Pi0VetoOrigin',
-                            'tight': 'Pi0VetoTightEnergyThreshold',
-                            'cluster': 'Pi0VetoLargeClusterSize',
-                            'both': 'Pi0VetoTightEnergyThresholdAndLargeClusterSize'}
+    dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
+                            'tight': 'Pi0ProbTightEnergyThreshold',
+                            'cluster': 'Pi0ProbLargeClusterSize',
+                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
 
-    dictEtaExtraInfoName = {'standard': 'EtaVetoOrigin',
-                            'tight': 'EtaVetoTightEnergyThreshold',
-                            'cluster': 'EtaVetoLargeClusterSize',
-                            'both': 'EtaVetoTightEnergyThresholdAndLargeClusterSize'}
-
-    dictPi0ExtraInfoRename = {'standard': 'Pi0ProbOrigin',
-                              'tight': 'Pi0ProbTightEnergyThreshold',
-                              'cluster': 'Pi0ProbLargeClusterSize',
-                              'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
-
-    dictEtaExtraInfoRename = {'standard': 'EtaProbOrigin',
-                              'tight': 'EtaProbTightEnergyThreshold',
-                              'cluster': 'EtaProbLargeClusterSize',
-                              'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
+    dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
+                            'tight': 'EtaProbTightEnergyThreshold',
+                            'cluster': 'EtaProbLargeClusterSize',
+                            'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
     TimingAndNHitsCut = dictTimingAndNHitsCut[mode]
-    Pi0WeightFileName = dictPi0WeightFileName[mode]
-    EtaWeightFileName = dictEtaWeightFileName[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
     EtaExtraInfoName = dictEtaExtraInfoName[mode]
-    Pi0ExtraInfoRename = dictPi0ExtraInfoRename[mode]
-    EtaExtraInfoRename = dictEtaExtraInfoRename[mode]
 
     """
     pi0 veto
     """
+    if pi0PayloadNameOverride is not None:
+        Pi0PayloadName = pi0PayloadNameOverride
+    if pi0SoftPhotonCutOverride is None:
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
+
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    # fill the particleList for soft photon with energy cut
-    fillParticleList(pi0soft, Pi0EnergyCut, path=roe_path)
-    # apply an additional cut for soft photon
-    applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
+    # fill the particleList for soft photon with energy, timing and clusterNHits cuts
+    fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> gamma:HardPhoton{suffix} ' + pi0soft, '', path=roe_path)
-    # if you don't have weight files in your workingDirectory,
-    # these files are downloaded from database to your workingDirectory automatically.
-    if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
-        if downloadFlag:
-            basf2_mva.download(Pi0PayloadName, workingDirectory + '/' + Pi0WeightFileName)
-            B2INFO('writePi0EtaVeto: ' + Pi0WeightFileName + ' has been downloaded from database to workingDirectory.')
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
+                     allowChargeViolation=True, path=roe_path)
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
-                        extraInfoName=Pi0ExtraInfoName, identifier=workingDirectory + '/' + Pi0WeightFileName)
+                        extraInfoName=Pi0ExtraInfoName, identifier=Pi0PayloadName)
     # Pick up only one pi0/eta candidate with the highest pi0/eta probability.
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
-                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
 
     """
     eta veto
     """
+    if etaPayloadNameOverride is not None:
+        EtaPayloadName = etaPayloadNameOverride
+    if etaSoftPhotonCutOverride is None:
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        EtaSoftPhotonCut = etaSoftPhotonCutOverride
+
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
-    applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> gamma:HardPhoton{suffix} ' + etasoft, '', path=roe_path)
-    if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
-        if downloadFlag:
-            basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
-            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + ' has been downloaded from database to workingDirectory.')
+    fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
+                     allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
-                        extraInfoName=EtaExtraInfoName, identifier=workingDirectory + '/' + EtaWeightFileName)
+                        extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
-                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def getBeamBackgroundProbabilityMVA(
+    particleList,
+    path=None,
+):
+    """
+    Assign a probability to each ECL cluster as being background like (0) or signal like (1)
+    @param particleList     The input ParticleList, must be a photon list
+    @param path       modules are added to this path
+    """
+
+    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+    path.add_module(
+        'MVAExpert',
+        listNames=particleList,
+        extraInfoName='beamBackgroundProbabilityMVA',
+        identifier='BeamBackgroundMVA')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
@@ -2850,7 +2910,6 @@ def labelTauPairMC(printDecayInfo=False, path=None):
 
 
 def tagCurlTracks(particleLists,
-                  belle=False,
                   mcTruth=False,
                   responseCut=0.324,
                   selectorType='cUt',
@@ -2875,7 +2934,6 @@ def tagCurlTracks(particleLists,
 
 
     @param particleLists: list of particle lists to check for curls.
-    @param belle:         bool flag for Belle or Belle II data/mc.
     @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
@@ -2888,6 +2946,9 @@ def tagCurlTracks(particleLists,
     @param train:         flag to set training mode if selector has a training mode (mva).
     @param path:          module is added to this path.
     """
+
+    import b2bii
+    belle = b2bii.isB2BII()
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string
@@ -3079,6 +3140,42 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
+
+def scaleError(outputListName, inputListName,
+               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
+               minErrors=[0.00140, 0, 0, 0.00157, 0],
+               path=None):
+    '''
+    This module creates a new charged particle list.
+    The helix errors of the new particles are scaled by constant factors.
+    Lower bounds can be set so that helix errors are confined above the limit.
+    The scale factors and lower bounds are defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
+
+    @param inputListName Name of input charged particle list to be scaled
+    @param outputListName Name of output charged particle list with scaled error
+    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param minErrors Lower bound can be set for each helix error.
+    '''
+    scale_error = register_module("HelixErrorScaler")
+    scale_error.set_name('ScaleError_' + inputListName)
+    scale_error.param('inputListName', inputListName)
+    scale_error.param('outputListName', outputListName)
+    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('minErrors', minErrors)
+    path.add_module(scale_error)
+
+
+def getAnalysisGlobaltag():
+    """
+    Returns a string containing the name of the latest and recommended analysis globaltag.
+    """
+    tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline']).decode('UTF-8').rstrip().split(' ')
+    analysis_tag = ''
+    for tag in tags:
+        if tag.startswith('analysis_tools'):
+            analysis_tag = tag
+    return analysis_tag
 
 
 if __name__ == '__main__':

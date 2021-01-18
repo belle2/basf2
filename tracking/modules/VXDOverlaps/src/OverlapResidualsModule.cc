@@ -14,6 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -25,6 +26,8 @@
 #include <TDirectory.h>
 #include <math.h>
 #include <iostream>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
 using namespace std;
@@ -316,68 +319,144 @@ void OverlapResidualsModule::defineHisto()
     t_PXD->Branch("extSensor_PXD", &extSensor_PXD, "extSensor_PXD/i");
     //Tree for SVD u overlapping clusters
     t_SVD_U = new TTree("t_SVD_U", "Tree for SVD u-overlaps");
-    t_SVD_U->Branch("deltaRes", &deltaRes_SVD_U, "deltaResU/F");
-    t_SVD_U->Branch("intRes", &intRes_SVD_U, "intRes/F");
-    t_SVD_U->Branch("intClPos", &intClPos_SVD_U, "intClPos/F");
-    t_SVD_U->Branch("intClPosErr", &intClPosErr_SVD_U, "intClPosErr/F");
-    t_SVD_U->Branch("intTruePos", &intTruePos_SVD_U, "intTruePos/F");
-    t_SVD_U->Branch("intClPhi", &intClPhi_SVD_U, "intClPhi/F");
-    t_SVD_U->Branch("intClZ", &intClZ_SVD_U, "intClZ/F");
-    t_SVD_U->Branch("intTrkPos", &intTrkPos_SVD_U, "intTrkPos/F");
-    t_SVD_U->Branch("intTrkPosErr", &intTrkPosErr_SVD_U, "intTrkPosErr/F");
-    t_SVD_U->Branch("intTrkQoP", &intTrkQoP_SVD_U, "intTrkQoP/F");
-    t_SVD_U->Branch("intTrkPrime", &intTrkPrime_SVD_U, "intTrkPrime/F");
-    t_SVD_U->Branch("intLayer", &intLayer_SVD_U, "intLayer/i");
-    t_SVD_U->Branch("intLadder", &intLadder_SVD_U, "intLadder/i");
-    t_SVD_U->Branch("intSensor", &intSensor_SVD_U, "intSensor/i");
-    t_SVD_U->Branch("intSize", &intSize_SVD_U, "intSize/i");
-    t_SVD_U->Branch("deltaRes", &deltaRes_SVD_U, "deltaResU/F");
-    t_SVD_U->Branch("extRes", &extRes_SVD_U, "extRes/F");
-    t_SVD_U->Branch("extClPos", &extClPos_SVD_U, "extClPos/F");
-    t_SVD_U->Branch("extClPosErr", &extClPosErr_SVD_U, "extClPosErr/F");
-    t_SVD_U->Branch("extTruePos", &extTruePos_SVD_U, "extTruePos/F");
-    t_SVD_U->Branch("extClPhi", &extClPhi_SVD_U, "extClPhi/F");
-    t_SVD_U->Branch("extClZ", &extClZ_SVD_U, "extClZ/F");
-    t_SVD_U->Branch("extTrkPos", &extTrkPos_SVD_U, "extTrkPos/F");
-    t_SVD_U->Branch("extTrkPosErr", &extTrkPosErr_SVD_U, "extTrkPosErr/F");
-    t_SVD_U->Branch("extTrkQoP", &extTrkQoP_SVD_U, "extTrkQoP/F");
-    t_SVD_U->Branch("extTrkPrime", &extTrkPrime_SVD_U, "extTrkPrime/F");
-    t_SVD_U->Branch("extLayer", &extLayer_SVD_U, "extLayer/i");
-    t_SVD_U->Branch("extLadder", &extLadder_SVD_U, "extLadder/i");
-    t_SVD_U->Branch("extSensor", &extSensor_SVD_U, "extSensor/i");
-    t_SVD_U->Branch("extSize", &extSize_SVD_U, "extSize/i");
+    t_SVD_U->Branch("svdDeltaRes", &svdDeltaRes_U, "svdDeltaRes/F");
+    t_SVD_U->Branch("svdTrkPXDHits", &svdTrkPXDHits, "svdTrkPXDHits/i");
+    t_SVD_U->Branch("svdTrkSVDHits", &svdTrkSVDHits, "svdTrkSVDHits/i");
+    t_SVD_U->Branch("svdTrkCDCHits", &svdTrkCDCHits, "svdTrkCDCHits/i");
+    t_SVD_U->Branch("svdTrkd0", &svdTrkd0, "svdTrkd0/F");
+    t_SVD_U->Branch("svdTrkz0", &svdTrkz0, "svdTrkz0/F");
+    t_SVD_U->Branch("svdTrkpT", &svdTrkpT, "svdTrkpT/F");
+    t_SVD_U->Branch("svdTrkpCM", &svdTrkpCM, "svdTrkpCM/F");
+    // Internal ladder variables
+    t_SVD_U->Branch("svdClSNR_int", &svdClSNR_U_int, "svdClSNR_int/F");
+    t_SVD_U->Branch("svdClCharge_int", &svdClCharge_U_int, "svdClCharge_int/F");
+    t_SVD_U->Branch("svdStripCharge_int", &svdStripCharge_U_int);
+    t_SVD_U->Branch("svdClTime_int", &svdClTime_U_int, "svdClTime_int/F");
+    t_SVD_U->Branch("svdStripTime_int", &svdStripTime_U_int);
+    t_SVD_U->Branch("svdStripPosition_int", &svdStripPosition_U_int);
+    t_SVD_U->Branch("svdRes_int", &svdRes_U_int, "svdRes_int/F");
+    t_SVD_U->Branch("svdClIntStrPos_int", &svdClIntStrPos_U_int, "svdClIntStrPos_int/F");
+    t_SVD_U->Branch("svdClPos_int", &svdClPos_U_int, "svdClPos_int/F");
+    t_SVD_U->Branch("svdClPosErr_int", &svdClPosErr_U_int, "svdClPosErr_int/F");
+    t_SVD_U->Branch("svdTruePos_int", &svdTruePos_U_int, "svdTruePos_int/F");
+    t_SVD_U->Branch("svdClPhi_int", &svdClPhi_U_int, "svdClPhi_int/F");
+    t_SVD_U->Branch("svdClZ_int", &svdClZ_U_int, "svdClZ_int/F");
+    t_SVD_U->Branch("svdTrkTraversedLength_int", &svdTrkTraversedLength_U_int, "svdTrkTraversedLength_int/F");
+    t_SVD_U->Branch("svdTrkPos_int", &svdTrkPos_U_int, "svdTrkPos_int/F");
+    t_SVD_U->Branch("svdTrkPosOS_int", &svdTrkPosOS_U_int, "svdTrkPosOS_int/F");
+    t_SVD_U->Branch("svdTrkPosErr_int", &svdTrkPosErr_U_int, "svdTrkPosErr_int/F");
+    t_SVD_U->Branch("svdTrkPosErrOS_int", &svdTrkPosErrOS_U_int, "svdTrkPosErrOS_int/F");
+    t_SVD_U->Branch("svdTrkQoP_int", &svdTrkQoP_U_int, "svdTrkQoP_int/F");
+    t_SVD_U->Branch("svdTrkPrime_int", &svdTrkPrime_U_int, "svdTrkPrime_int/F");
+    t_SVD_U->Branch("svdTrkPrimeOS_int", &svdTrkPrimeOS_U_int, "svdTrkPrimeOS_int/F");
+    t_SVD_U->Branch("svdTrkPosUnbiased_int", &svdTrkPosUnbiased_U_int, "svdTrkPosUnbiased_int/F");
+    t_SVD_U->Branch("svdTrkPosErrUnbiased_int", &svdTrkPosErrUnbiased_U_int, "svdTrkPosErrUnbiased_int/F");
+    t_SVD_U->Branch("svdTrkQoPUnbiased_int", &svdTrkQoPUnbiased_U_int, "svdTrkQoPUnbiased_int/F");
+    t_SVD_U->Branch("svdTrkPrimeUnbiased_int", &svdTrkPrimeUnbiased_U_int, "svdTrkPrimeUnbiased_int/F");
+    t_SVD_U->Branch("svdLayer_int", &svdLayer_U_int, "svdLayer_int/i");
+    t_SVD_U->Branch("svdLadder_int", &svdLadder_U_int, "svdLadder_int/i");
+    t_SVD_U->Branch("svdSensor_int", &svdSensor_U_int, "svdSensor_int/i");
+    t_SVD_U->Branch("svdSize_int", &svdSize_U_int, "svdSize_int/i");
+    // External ladder variables
+    t_SVD_U->Branch("svdClSNR_ext", &svdClSNR_U_ext, "svdClSNR_ext/F");
+    t_SVD_U->Branch("svdClCharge_ext", &svdClCharge_U_ext, "svdClCharge_ext/F");
+    t_SVD_U->Branch("svdStripCharge_ext", &svdStripCharge_U_ext);
+    t_SVD_U->Branch("svdClTime_ext", &svdClTime_U_ext, "svdClTime_ext/F");
+    t_SVD_U->Branch("svdStripTime_ext", &svdStripTime_U_ext);
+    t_SVD_U->Branch("svdStripPosition_ext", &svdStripPosition_U_ext);
+    t_SVD_U->Branch("svdRes_ext", &svdRes_U_ext, "svdRes_ext/F");
+    t_SVD_U->Branch("svdClIntStrPos_ext", &svdClIntStrPos_U_ext, "svdClIntStrPos_ext/F");
+    t_SVD_U->Branch("svdClPos_ext", &svdClPos_U_ext, "svdClPos_ext/F");
+    t_SVD_U->Branch("svdClPosErr_ext", &svdClPosErr_U_ext, "svdClPosErr_ext/F");
+    t_SVD_U->Branch("svdTruePos_ext", &svdTruePos_U_ext, "svdTruePos_ext/F");
+    t_SVD_U->Branch("svdClPhi_ext", &svdClPhi_U_ext, "svdClPhi_ext/F");
+    t_SVD_U->Branch("svdClZ_ext", &svdClZ_U_ext, "svdClZ_ext/F");
+    t_SVD_U->Branch("svdTrkTraversedLength_ext", &svdTrkTraversedLength_U_ext, "svdTrkTraversedLength_ext/F");
+    t_SVD_U->Branch("svdTrkPos_ext", &svdTrkPos_U_ext, "svdTrkPos_ext/F");
+    t_SVD_U->Branch("svdTrkPosOS_ext", &svdTrkPosOS_U_ext, "svdTrkPosOS_ext/F");
+    t_SVD_U->Branch("svdTrkPosErr_ext", &svdTrkPosErr_U_ext, "svdTrkPosErr_ext/F");
+    t_SVD_U->Branch("svdTrkPosErrOS_ext", &svdTrkPosErrOS_U_ext, "svdTrkPosErrOS_ext/F");
+    t_SVD_U->Branch("svdTrkQoP_ext", &svdTrkQoP_U_ext, "svdTrkQoP_ext/F");
+    t_SVD_U->Branch("svdTrkPrime_ext", &svdTrkPrime_U_ext, "svdTrkPrime_ext/F");
+    t_SVD_U->Branch("svdTrkPrimeOS_ext", &svdTrkPrimeOS_U_ext, "svdTrkPrimeOS_ext/F");
+    t_SVD_U->Branch("svdTrkPosUnbiased_ext", &svdTrkPosUnbiased_U_ext, "svdTrkPosUnbiased_ext/F");
+    t_SVD_U->Branch("svdTrkPosErrUnbiased_ext", &svdTrkPosErrUnbiased_U_ext, "svdTrkPosErrUnbiased_ext/F");
+    t_SVD_U->Branch("svdTrkQoPUnbiased_ext", &svdTrkQoPUnbiased_U_ext, "svdTrkQoPUnbiased_ext/F");
+    t_SVD_U->Branch("svdTrkPrimeUnbiased_ext", &svdTrkPrimeUnbiased_U_ext, "svdTrkPrimeUnbiased_ext/F");
+    t_SVD_U->Branch("svdLayer_ext", &svdLayer_U_ext, "svdLayer_ext/i");
+    t_SVD_U->Branch("svdLadder_ext", &svdLadder_U_ext, "svdLadder_ext/i");
+    t_SVD_U->Branch("svdSensor_ext", &svdSensor_U_ext, "svdSensor_ext/i");
+    t_SVD_U->Branch("svdSize_ext", &svdSize_U_ext, "svdSize_ext/i");
     //Tree for SVD v overlapping clusters
     t_SVD_V = new TTree("t_SVD_V", "Tree for SVD v-overlaps");
-    t_SVD_V->Branch("deltaRes", &deltaRes_SVD_V, "deltaResV/F");
-    t_SVD_V->Branch("intRes", &intRes_SVD_V, "intRes/F");
-    t_SVD_V->Branch("intClPos", &intClPos_SVD_V, "intClPos/F");
-    t_SVD_V->Branch("intClPosErr", &intClPosErr_SVD_V, "intClPosErr/F");
-    t_SVD_V->Branch("intTruePos", &intTruePos_SVD_V, "intTruePos/F");
-    t_SVD_V->Branch("intClPhi", &intClPhi_SVD_V, "intClPhi/F");
-    t_SVD_V->Branch("intClZ", &intClZ_SVD_V, "intClZ/F");
-    t_SVD_V->Branch("intTrkPos", &intTrkPos_SVD_V, "intTrkPos/F");
-    t_SVD_V->Branch("intTrkPosErr", &intTrkPosErr_SVD_V, "intTrkPosErr/F");
-    t_SVD_V->Branch("intTrkQoP", &intTrkQoP_SVD_V, "intTrkQoP/F");
-    t_SVD_V->Branch("intTrkPrime", &intTrkPrime_SVD_V, "intTrkPrime/F");
-    t_SVD_V->Branch("intLayer", &intLayer_SVD_V, "intLayer/i");
-    t_SVD_V->Branch("intLadder", &intLadder_SVD_V, "intLadder/i");
-    t_SVD_V->Branch("intSensor", &intSensor_SVD_V, "intSensor/i");
-    t_SVD_V->Branch("intSize", &intSize_SVD_V, "intSize/i");
-    t_SVD_V->Branch("deltaRes", &deltaRes_SVD_V, "deltaResV/F");
-    t_SVD_V->Branch("extRes", &extRes_SVD_V, "extRes/F");
-    t_SVD_V->Branch("extClPos", &extClPos_SVD_V, "extClPos/F");
-    t_SVD_V->Branch("extClPosErr", &extClPosErr_SVD_V, "extClPosErr/F");
-    t_SVD_V->Branch("extTruePos", &extTruePos_SVD_V, "extTruePos/F");
-    t_SVD_V->Branch("extClPhi", &extClPhi_SVD_V, "extClPhi/F");
-    t_SVD_V->Branch("extClZ", &extClZ_SVD_V, "extClZ/F");
-    t_SVD_V->Branch("extTrkPos", &extTrkPos_SVD_V, "extTrkPos/F");
-    t_SVD_V->Branch("extTrkPosErr", &extTrkPosErr_SVD_V, "extTrkPosErr/F");
-    t_SVD_V->Branch("extTrkQoP", &extTrkQoP_SVD_V, "extTrkQoP/F");
-    t_SVD_V->Branch("extTrkPrime", &extTrkPrime_SVD_V, "extTrkPrime/F");
-    t_SVD_V->Branch("extLayer", &extLayer_SVD_V, "extLayer/i");
-    t_SVD_V->Branch("extLadder", &extLadder_SVD_V, "extLadder/i");
-    t_SVD_V->Branch("extSensor", &extSensor_SVD_V, "extSensor/i");
-    t_SVD_V->Branch("extSize", &extSize_SVD_V, "extSize/i");
+    t_SVD_V->Branch("svdDeltaRes", &svdDeltaRes_V, "svdDeltaRes/F");
+    t_SVD_V->Branch("svdTrkPXDHits", &svdTrkPXDHits, "svdTrkPXDHits/i");
+    t_SVD_V->Branch("svdTrkSVDHits", &svdTrkSVDHits, "svdTrkSVDHits/i");
+    t_SVD_V->Branch("svdTrkCDCHits", &svdTrkCDCHits, "svdTrkCDCHits/i");
+    t_SVD_V->Branch("svdTrkd0", &svdTrkd0, "svdTrkd0/F");
+    t_SVD_V->Branch("svdTrkz0", &svdTrkz0, "svdTrkz0/F");
+    t_SVD_V->Branch("svdTrkpT", &svdTrkpT, "svdTrkpT/F");
+    t_SVD_V->Branch("svdTrkpCM", &svdTrkpCM, "svdTrkpCM/F");
+    // Internal ladder variables
+    t_SVD_V->Branch("svdClSNR_int", &svdClSNR_V_int, "svdClSNR_int/F");
+    t_SVD_V->Branch("svdClCharge_int", &svdClCharge_V_int, "svdClCharge_int/F");
+    t_SVD_V->Branch("svdStripCharge_int", &svdStripCharge_V_int);
+    t_SVD_V->Branch("svdClTime_int", &svdClTime_V_int, "svdClTime_int/F");
+    t_SVD_V->Branch("svdStripTime_int", &svdStripTime_V_int);
+    t_SVD_V->Branch("svdStripPosition_int", &svdStripPosition_V_int);
+    t_SVD_V->Branch("svdRes_int", &svdRes_V_int, "svdRes_int/F");
+    t_SVD_V->Branch("svdClIntStrPos_int", &svdClIntStrPos_V_int, "svdClIntStrPos_int/F");
+    t_SVD_V->Branch("svdClPos_int", &svdClPos_V_int, "svdClPos_int/F");
+    t_SVD_V->Branch("svdClPosErr_int", &svdClPosErr_V_int, "svdClPosErr_int/F");
+    t_SVD_V->Branch("svdTruePos_int", &svdTruePos_V_int, "svdTruePos_int/F");
+    t_SVD_V->Branch("svdClPhi_int", &svdClPhi_V_int, "svdClPhi_int/F");
+    t_SVD_V->Branch("svdClZ_int", &svdClZ_V_int, "svdClZ_int/F");
+    t_SVD_V->Branch("svdTrkTraversedLength_int", &svdTrkTraversedLength_V_int, "svdTrkTraversedLength_int/F");
+    t_SVD_V->Branch("svdTrkPos_int", &svdTrkPos_V_int, "svdTrkPos_int/F");
+    t_SVD_V->Branch("svdTrkPosOS_int", &svdTrkPosOS_V_int, "svdTrkPosOS_int/F");
+    t_SVD_V->Branch("svdTrkPosErr_int", &svdTrkPosErr_V_int, "svdTrkPosErr_int/F");
+    t_SVD_V->Branch("svdTrkPosErrOS_int", &svdTrkPosErrOS_V_int, "svdTrkPosErrOS_int/F");
+    t_SVD_V->Branch("svdTrkQoP_int", &svdTrkQoP_V_int, "svdTrkQoP_int/F");
+    t_SVD_V->Branch("svdTrkPrime_int", &svdTrkPrime_V_int, "svdTrkPrime_int/F");
+    t_SVD_V->Branch("svdTrkPrimeOS_int", &svdTrkPrimeOS_V_int, "svdTrkPrimeOS_int/F");
+    t_SVD_V->Branch("svdTrkPosUnbiased_int", &svdTrkPosUnbiased_V_int, "svdTrkPosUnbiased_int/F");
+    t_SVD_V->Branch("svdTrkPosErrUnbiased_int", &svdTrkPosErrUnbiased_V_int, "svdTrkPosErrUnbiased_int/F");
+    t_SVD_V->Branch("svdTrkQoPUnbiased_int", &svdTrkQoPUnbiased_V_int, "svdTrkQoPUnbiased_int/F");
+    t_SVD_V->Branch("svdTrkPrimeUnbiased_int", &svdTrkPrimeUnbiased_V_int, "svdTrkPrimeUnbiased_int/F");
+    t_SVD_V->Branch("svdLayer_int", &svdLayer_V_int, "svdLayer_int/i");
+    t_SVD_V->Branch("svdLadder_int", &svdLadder_V_int, "svdLadder_int/i");
+    t_SVD_V->Branch("svdSensor_int", &svdSensor_V_int, "svdSensor_int/i");
+    t_SVD_V->Branch("svdSize_int", &svdSize_V_int, "svdSize_int/i");
+    // External ladder variables
+    t_SVD_V->Branch("svdClSNR_ext", &svdClSNR_V_ext, "svdClSNR_ext/F");
+    t_SVD_V->Branch("svdClCharge_ext", &svdClCharge_V_ext, "svdClCharge_ext/F");
+    t_SVD_V->Branch("svdStripCharge_ext", &svdStripCharge_V_ext);
+    t_SVD_V->Branch("svdClTime_ext", &svdClTime_V_ext, "svdClTime_ext/F");
+    t_SVD_V->Branch("svdStripTime_ext", &svdStripTime_V_ext);
+    t_SVD_V->Branch("svdStripPosition_ext", &svdStripPosition_V_ext);
+    t_SVD_V->Branch("svdRes_ext", &svdRes_V_ext, "svdRes_ext/F");
+    t_SVD_V->Branch("svdClIntStrPos_ext", &svdClIntStrPos_V_ext, "svdClIntStrPos_ext/F");
+    t_SVD_V->Branch("svdClPos_ext", &svdClPos_V_ext, "svdClPos_ext/F");
+    t_SVD_V->Branch("svdClPosErr_ext", &svdClPosErr_V_ext, "svdClPosErr_ext/F");
+    t_SVD_V->Branch("svdTruePos_ext", &svdTruePos_V_ext, "svdTruePos_ext/F");
+    t_SVD_V->Branch("svdClPhi_ext", &svdClPhi_V_ext, "svdClPhi_ext/F");
+    t_SVD_V->Branch("svdClZ_ext", &svdClZ_V_ext, "svdClZ_ext/F");
+    t_SVD_V->Branch("svdTrkTraversedLength_ext", &svdTrkTraversedLength_V_ext, "svdTrkTraversedLength_ext/F");
+    t_SVD_V->Branch("svdTrkPos_ext", &svdTrkPos_V_ext, "svdTrkPos_ext/F");
+    t_SVD_V->Branch("svdTrkPosOS_ext", &svdTrkPosOS_V_ext, "svdTrkPosOS_ext/F");
+    t_SVD_V->Branch("svdTrkPosErr_ext", &svdTrkPosErr_V_ext, "svdTrkPosErr_ext/F");
+    t_SVD_V->Branch("svdTrkPosErrOS_ext", &svdTrkPosErrOS_V_ext, "svdTrkPosErrOS_ext/F");
+    t_SVD_V->Branch("svdTrkQoP_ext", &svdTrkQoP_V_ext, "svdTrkQoP_ext/F");
+    t_SVD_V->Branch("svdTrkPrime_ext", &svdTrkPrime_V_ext, "svdTrkPrime_ext/F");
+    t_SVD_V->Branch("svdTrkPrimeOS_ext", &svdTrkPrimeOS_V_ext, "svdTrkPrimeOS_ext/F");
+    t_SVD_V->Branch("svdTrkPosUnbiased_ext", &svdTrkPosUnbiased_V_ext, "svdTrkPosUnbiased_ext/F");
+    t_SVD_V->Branch("svdTrkPosErrUnbiased_ext", &svdTrkPosErrUnbiased_V_ext, "svdTrkPosErrUnbiased_ext/F");
+    t_SVD_V->Branch("svdTrkQoPUnbiased_ext", &svdTrkQoPUnbiased_V_ext, "svdTrkQoPUnbiased_ext/F");
+    t_SVD_V->Branch("svdTrkPrimeUnbiased_ext", &svdTrkPrimeUnbiased_V_ext, "svdTrkPrimeUnbiased_ext/F");
+    t_SVD_V->Branch("svdLayer_ext", &svdLayer_V_ext, "svdLayer_ext/i");
+    t_SVD_V->Branch("svdLadder_ext", &svdLadder_V_ext, "svdLadder_ext/i");
+    t_SVD_V->Branch("svdSensor_ext", &svdSensor_V_ext, "svdSensor_ext/i");
+    t_SVD_V->Branch("svdSize_ext", &svdSize_V_ext, "svdSize_ext/i");
   }
   //Go back to the default output directory
   oldDir->cd();
@@ -512,6 +591,22 @@ void OverlapResidualsModule::event()
     }
 
     //LOOKING FOR 2 CONSECUTIVE SVD HITS IN OVERLAPPING MODULES OF A SAME LAYER
+    RelationVector<Track> theTK = DataStore::getRelationsWithObj<Track>(&trk);
+
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::pion);
+    if (tfr) {
+      svdTrkd0 = tfr->getD0();
+      svdTrkz0 = tfr->getZ0();
+      svdTrkpT = tfr->getMomentum().Perp();
+      TLorentzVector pStar = tfr->get4Momentum();
+      pStar.Boost(0, 0, 3. / 11);
+      svdTrkpCM = pStar.P();
+    }
+
+    svdTrkPXDHits = (trk.getPXDHitList()).size();
+    svdTrkSVDHits = (trk.getSVDHitList()).size();
+    svdTrkCDCHits = (trk.getCDCHitList()).size();
+
     for (unsigned int i = 0; i < svdClusters.size(); i++) {
       const SVDCluster* svd_1 = svdClusters[i];
 
@@ -555,11 +650,17 @@ void OverlapResidualsModule::event()
           B2DEBUG(40, " ============= 2 hits in a SVD overlap ============= ");
           const TVectorD resUnBias_SVD_1 =  fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_SVD_2 =  fittedResult_2->getResidual(0, false).getState();
+          genfit::MeasuredStateOnPlane state_unbiased_1 = fittedResult_1->getFittedState(false);
+          genfit::MeasuredStateOnPlane state_unbiased_2 = fittedResult_2->getFittedState(false);
+          const TVectorD& svd_predIntersect_unbiased_1 = state_unbiased_1.getState();
+          const TVectorD& svd_predIntersect_unbiased_2 = state_unbiased_2.getState();
+          const TMatrixDSym& covMatrix_unbiased_1 = state_unbiased_1.getCov();
+          const TMatrixDSym& covMatrix_unbiased_2 = state_unbiased_2.getCov();
           genfit::MeasuredStateOnPlane state_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1);
-          const TVectorD& svd_predIntersect_1 = state_1.getState();
-          const TMatrixDSym& covMatrix_1 = state_1.getCov();
           genfit::MeasuredStateOnPlane state_2 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_2);
+          const TVectorD& svd_predIntersect_1 = state_1.getState();
           const TVectorD& svd_predIntersect_2 = state_2.getState();
+          const TMatrixDSym& covMatrix_1 = state_1.getCov();
           const TMatrixDSym& covMatrix_2 = state_2.getCov();
           //Restricting to consecutive SVD u-clusters
           if (svd_1->isUCluster() == true && svd_2->isUCluster() == true) {
@@ -583,41 +684,113 @@ void OverlapResidualsModule::event()
             B2DEBUG(40, "SVD: difference of u-residuals =========> " << over_U_SVD);
             //Fill SVD tree for u-overlaps if required by the user
             if (m_ExpertLevel) {
-              deltaRes_SVD_U = over_U_SVD;
-              intRes_SVD_U = res_U_1;
-              intClPos_SVD_U = svd_1->getPosition();
-              intClPosErr_SVD_U = svd_1->getPositionSigma();
+              svdDeltaRes_U = over_U_SVD;
+              svdRes_U_int = res_U_1;
+              svdClTime_U_int = svd_1->getClsTime();
+              svdClSNR_U_int = svd_1->getSNR();
+              svdClCharge_U_int = svd_1->getCharge();
+              svdClPosErr_U_int = svd_1->getPositionSigma();
               if (isMC && trueHit_1.size() > 0)
-                intTruePos_SVD_U = trueHit_1[0]->getU();
+                svdTruePos_U_int = trueHit_1[0]->getU();
               else
-                intTruePos_SVD_U = -99;
-              intClPhi_SVD_U = svdPhi_1;
-              intClZ_SVD_U = svdZ_1;
-              intTrkPos_SVD_U = svd_predIntersect_1[3];
-              intTrkPosErr_SVD_U = sqrt(covMatrix_1[3][3]);
-              intTrkQoP_SVD_U = svd_predIntersect_1[0];
-              intTrkPrime_SVD_U = svd_predIntersect_1[1];
-              intLayer_SVD_U = svd_Layer_1;
-              intLadder_SVD_U = svd_Ladder_1;
-              intSensor_SVD_U = svd_Sensor_1;
-              intSize_SVD_U = strips_1;
-              extRes_SVD_U = res_U_2;
-              extClPos_SVD_U = svd_2->getPosition();
-              extClPosErr_SVD_U = svd_2->getPositionSigma();
+                svdTruePos_U_int = -99;
+              svdClPhi_U_int = svdPhi_1;
+              svdClZ_U_int = svdZ_1;
+              svdTrkPos_U_int = svd_predIntersect_1[3];
+              svdTrkPosOS_U_int = svd_predIntersect_1[4];
+              svdTrkPosErr_U_int = sqrt(covMatrix_1[3][3]);
+              svdTrkPosErrOS_U_int = sqrt(covMatrix_1[4][4]);
+              svdTrkQoP_U_int = svd_predIntersect_1[0];
+              svdTrkPrime_U_int = svd_predIntersect_1[1];
+              svdTrkPrimeOS_U_int = svd_predIntersect_1[2];
+              svdTrkTraversedLength_U_int = svdSensor_1.getThickness() * sqrt(1 + svdTrkPrimeOS_U_int * svdTrkPrimeOS_U_int + svdTrkPrime_U_int *
+                                            svdTrkPrime_U_int);
+              svdTrkPosUnbiased_U_int = svd_predIntersect_unbiased_1[3];
+              svdClPos_U_int = svdRes_U_int / 1e4 + svdTrkPosUnbiased_U_int;
+              svdTrkPosErrUnbiased_U_int = sqrt(covMatrix_unbiased_1[3][3]);
+              svdTrkQoPUnbiased_U_int = svd_predIntersect_unbiased_1[0];
+              svdTrkPrimeUnbiased_U_int = svd_predIntersect_unbiased_1[1];
+              svdLayer_U_int = svd_Layer_1;
+              svdLadder_U_int = svd_Ladder_1;
+              svdSensor_U_int = svd_Sensor_1;
+              svdSize_U_int = strips_1;
+
+              float pitch = 50e-4;
+              float halfLength = 1.92;
+              if (svdLayer_U_int > 3) {
+                pitch = 75e-4;
+                halfLength = 2.88;
+              }
+              svdClIntStrPos_U_int = fmod(svdClPos_U_int + halfLength, pitch) / pitch;
+
+              svdStripCharge_U_int.clear();
+              svdStripTime_U_int.clear();
+              svdStripPosition_U_int.clear();
+              //retrieve relations and set strip charges and times
+              RelationVector<SVDRecoDigit> theRecoDigits_1 = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+              if ((theRecoDigits_1.size() != svdSize_U_int) && (svdSize_U_int != 128)) //virtual cluster
+                B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_U_int <<
+                        " cluster size");
+
+              //skip clusters created beacuse of missing APV
+              if (svdSize_U_int < 128)
+                for (unsigned int d = 0; d < svdSize_U_int; d++) {
+                  svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
+                  svdStripTime_U_int.push_back(theRecoDigits_1[d]->getTime());
+                  double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits_1[d]->getCellID());
+                  //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+                  svdStripPosition_U_int.push_back(misalignedStripPos - svd_1->getPosition() + svdClPos_U_int);
+                }
+
+              svdRes_U_ext = res_U_2;
+              svdClTime_U_ext = svd_2->getClsTime();
+              svdClSNR_U_ext = svd_2->getSNR();
+              svdClCharge_U_ext = svd_2->getCharge();
+              svdClPosErr_U_ext = svd_2->getPositionSigma();
               if (isMC && trueHit_2.size() > 0)
-                extTruePos_SVD_U = trueHit_2[0]->getU();
+                svdTruePos_U_ext = trueHit_2[0]->getU();
               else
-                extTruePos_SVD_U = -99;
-              extClPhi_SVD_U = svdPhi_2;
-              extClZ_SVD_U = svdZ_2;
-              extTrkPos_SVD_U = svd_predIntersect_2[3];
-              extTrkPosErr_SVD_U = sqrt(covMatrix_2[3][3]);
-              extTrkQoP_SVD_U = svd_predIntersect_2[0];
-              extTrkPrime_SVD_U = svd_predIntersect_2[1];
-              extLayer_SVD_U = svd_Layer_2;
-              extLadder_SVD_U = svd_Ladder_2;
-              extSensor_SVD_U = svd_Sensor_2;
-              extSize_SVD_U = strips_2;
+                svdTruePos_U_ext = -99;
+              svdClPhi_U_ext = svdPhi_2;
+              svdClZ_U_ext = svdZ_2;
+              svdTrkPos_U_ext = svd_predIntersect_2[3];
+              svdTrkPosOS_U_ext = svd_predIntersect_2[4];
+              svdTrkPosErr_U_ext = sqrt(covMatrix_2[3][3]);
+              svdTrkPosErrOS_U_ext = sqrt(covMatrix_2[4][4]);
+              svdTrkQoP_U_ext = svd_predIntersect_2[0];
+              svdTrkPrime_U_ext = svd_predIntersect_2[1];
+              svdTrkPrimeOS_U_ext = svd_predIntersect_2[2];
+              svdTrkTraversedLength_U_ext = svdSensor_2.getThickness() * sqrt(1 + svdTrkPrimeOS_U_ext * svdTrkPrimeOS_U_ext + svdTrkPrime_U_ext *
+                                            svdTrkPrime_U_ext);
+              svdTrkPosUnbiased_U_ext = svd_predIntersect_unbiased_2[3];
+              svdClPos_U_ext = svdRes_U_ext / 1e4 + svdTrkPosUnbiased_U_ext;
+              svdTrkPosErrUnbiased_U_ext = sqrt(covMatrix_unbiased_2[3][3]);
+              svdTrkQoPUnbiased_U_ext = svd_predIntersect_unbiased_2[0];
+              svdTrkPrimeUnbiased_U_ext = svd_predIntersect_unbiased_2[1];
+              svdLayer_U_ext = svd_Layer_2;
+              svdLadder_U_ext = svd_Ladder_2;
+              svdSensor_U_ext = svd_Sensor_2;
+              svdSize_U_ext = strips_2;
+
+              svdClIntStrPos_U_ext = fmod(svdClPos_U_ext + halfLength, pitch) / pitch;
+
+              svdStripCharge_U_ext.clear();
+              svdStripTime_U_ext.clear();
+              svdStripPosition_U_ext.clear();
+              //retrieve relations and set strip charges and times
+              RelationVector<SVDRecoDigit> theRecoDigits_2 = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_2);
+              if ((theRecoDigits_2.size() != svdSize_U_ext) && (svdSize_U_ext != 128)) //virtual cluster
+                B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_U_ext <<
+                        " cluster size");
+              //skip clusters created beacuse of missing APV
+              if (svdSize_U_ext < 128)
+                for (unsigned int d = 0; d < svdSize_U_ext; d++) {
+                  svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
+                  svdStripTime_U_ext.push_back(theRecoDigits_2[d]->getTime());
+                  double misalignedStripPos = svdSensor_2.getUCellPosition(theRecoDigits_2[d]->getCellID());
+                  //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+                  svdStripPosition_U_ext.push_back(misalignedStripPos - svd_2->getPosition() + svdClPos_U_ext);
+                }
               t_SVD_U->Fill();
             }
             //Fill histograms of residuals differences with SVD u clusters
@@ -686,41 +859,112 @@ void OverlapResidualsModule::event()
             B2DEBUG(40, "SVD: difference of v-residuals =========> " << over_V_SVD);
             //Fill SVD tree for v-overlaps if required by the user
             if (m_ExpertLevel) {
-              deltaRes_SVD_V = over_V_SVD;
-              intRes_SVD_V = res_V_1;
-              intClPos_SVD_V = svd_1->getPosition();
-              intClPosErr_SVD_V = svd_1->getPositionSigma();
+              svdDeltaRes_V = over_V_SVD;
+              svdRes_V_int = res_V_1;
+              svdClTime_V_int = svd_1->getClsTime();
+              svdClSNR_V_int = svd_1->getSNR();
+              svdClCharge_V_int = svd_1->getCharge();
+              svdClPosErr_V_int = svd_1->getPositionSigma();
               if (isMC && trueHit_1.size() > 0)
-                intTruePos_SVD_V = trueHit_1[0]->getV();
+                svdTruePos_V_int = trueHit_1[0]->getV();
               else
-                intTruePos_SVD_V = -99;
-              intClPhi_SVD_V = svdPhi_1;
-              intClZ_SVD_V = svdZ_1;
-              intTrkPos_SVD_V = svd_predIntersect_1[4];
-              intTrkPosErr_SVD_V = sqrt(covMatrix_1[4][4]);
-              intTrkQoP_SVD_V = svd_predIntersect_1[0];
-              intTrkPrime_SVD_V = svd_predIntersect_1[2];
-              intLayer_SVD_V = svd_Layer_1;
-              intLadder_SVD_V = svd_Ladder_1;
-              intSensor_SVD_V = svd_Sensor_1;
-              intSize_SVD_V = strips_1;
-              extRes_SVD_V = res_V_2;
-              extClPos_SVD_V = svd_2->getPosition();
-              extClPosErr_SVD_V = svd_2->getPositionSigma();
+                svdTruePos_V_int = -99;
+              svdClPhi_V_int = svdPhi_1;
+              svdClZ_V_int = svdZ_1;
+              svdTrkPos_V_int = svd_predIntersect_1[4];
+              svdTrkPosOS_V_int = svd_predIntersect_1[3];
+              svdTrkPosErr_V_int = sqrt(covMatrix_1[4][4]);
+              svdTrkPosErrOS_V_int = sqrt(covMatrix_1[3][3]);
+              svdTrkQoP_V_int = svd_predIntersect_1[0];
+              svdTrkPrime_V_int = svd_predIntersect_1[2];
+              svdTrkPrimeOS_V_int = svd_predIntersect_1[1];
+              svdTrkTraversedLength_V_int = svdSensor_1.getThickness() * sqrt(1 + svdTrkPrimeOS_V_int * svdTrkPrimeOS_V_int + svdTrkPrime_V_int *
+                                            svdTrkPrime_V_int);
+              svdTrkPosUnbiased_V_int = svd_predIntersect_unbiased_1[4];
+              svdClPos_V_int = svdRes_V_int / 1e4 + svdTrkPosUnbiased_V_int;
+              svdTrkPosErrUnbiased_V_int = sqrt(covMatrix_unbiased_1[4][4]);
+              svdTrkQoPUnbiased_V_int = svd_predIntersect_unbiased_1[0];
+              svdTrkPrimeUnbiased_V_int = svd_predIntersect_unbiased_1[2];
+              svdLayer_V_int = svd_Layer_1;
+              svdLadder_V_int = svd_Ladder_1;
+              svdSensor_V_int = svd_Sensor_1;
+              svdSize_V_int = strips_1;
+
+              float pitch = 160e-4;
+              float halfLength = 6.144;
+              if (svdLayer_V_int > 3) {
+                pitch = 240e-4;
+              }
+              svdClIntStrPos_V_int = fmod(svdClPos_V_int + halfLength, pitch) / pitch;
+
+              svdStripCharge_V_int.clear();
+              svdStripTime_V_int.clear();
+              svdStripPosition_V_int.clear();
+              //retrieve relations and set strip charges and times
+              RelationVector<SVDRecoDigit> theRecoDigits_1 = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+              if ((theRecoDigits_1.size() != svdSize_V_int) && (svdSize_V_int != 128)) //virtual cluster
+                B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_1.size() << " != " << svdSize_V_int <<
+                        " cluster size");
+              //skip clusters created beacuse of missing APV
+              if (svdSize_V_int < 128)
+                for (unsigned int d = 0; d < svdSize_V_int; d++) {
+                  svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
+                  svdStripTime_V_int.push_back(theRecoDigits_1[d]->getTime());
+                  double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits_1[d]->getCellID());
+                  //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+                  svdStripPosition_V_int.push_back(misalignedStripPos - svd_1->getPosition() + svdClPos_V_int);
+                }
+
+              svdRes_V_ext = res_V_2;
+              svdClTime_V_ext = svd_2->getClsTime();
+              svdClSNR_V_ext = svd_2->getSNR();
+              svdClCharge_V_ext = svd_2->getCharge();
+              svdClPosErr_V_ext = svd_2->getPositionSigma();
               if (isMC && trueHit_2.size() > 0)
-                extTruePos_SVD_V = trueHit_2[0]->getV();
+                svdTruePos_V_ext = trueHit_2[0]->getV();
               else
-                extTruePos_SVD_V = -99;
-              extClPhi_SVD_V = svdPhi_2;
-              extClZ_SVD_V = svdZ_2;
-              extTrkPos_SVD_V = svd_predIntersect_2[4];
-              extTrkPosErr_SVD_V = sqrt(covMatrix_2[4][4]);
-              extTrkQoP_SVD_V = svd_predIntersect_2[0];
-              extTrkPrime_SVD_V = svd_predIntersect_2[2];
-              extLayer_SVD_V = svd_Layer_2;
-              extLadder_SVD_V = svd_Ladder_2;
-              extSensor_SVD_V = svd_Sensor_2;
-              extSize_SVD_V = strips_2;
+                svdTruePos_V_ext = -99;
+              svdClPhi_V_ext = svdPhi_2;
+              svdClZ_V_ext = svdZ_2;
+              svdTrkPos_V_ext = svd_predIntersect_2[4];
+              svdTrkPosOS_V_ext = svd_predIntersect_2[3];
+              svdTrkPosErr_V_ext = sqrt(covMatrix_2[4][4]);
+              svdTrkPosErrOS_V_ext = sqrt(covMatrix_1[3][3]);
+              svdTrkQoP_V_ext = svd_predIntersect_2[0];
+              svdTrkPrime_V_ext = svd_predIntersect_2[2];
+              svdTrkPrimeOS_V_ext = svd_predIntersect_2[1];
+              svdTrkTraversedLength_V_ext = svdSensor_2.getThickness() * sqrt(1 + svdTrkPrimeOS_V_ext * svdTrkPrimeOS_V_ext + svdTrkPrime_V_ext *
+                                            svdTrkPrime_V_ext);
+              svdTrkPosUnbiased_V_ext = svd_predIntersect_unbiased_2[4];
+              svdClPos_V_ext = svdRes_V_ext / 1e4 + svdTrkPosUnbiased_V_ext;
+              svdTrkPosErrUnbiased_V_ext = sqrt(covMatrix_unbiased_2[4][4]);
+              svdTrkQoPUnbiased_V_ext = svd_predIntersect_unbiased_2[0];
+              svdTrkPrimeUnbiased_V_ext = svd_predIntersect_unbiased_2[2];
+              svdLayer_V_ext = svd_Layer_2;
+              svdLadder_V_ext = svd_Ladder_2;
+              svdSensor_V_ext = svd_Sensor_2;
+              svdSize_V_ext = strips_2;
+
+              svdClIntStrPos_V_ext = fmod(svdClPos_V_ext + halfLength, pitch) / pitch;
+
+              svdStripCharge_V_ext.clear();
+              svdStripTime_V_ext.clear();
+              svdStripPosition_V_ext.clear();
+              //retrieve relations and set strip charges and times
+              RelationVector<SVDRecoDigit> theRecoDigits_2 = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_2);
+              if ((theRecoDigits_2.size() != svdSize_V_ext) && (svdSize_V_ext != 128)) //virtual cluster
+                B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits_2.size() << " != " << svdSize_V_ext <<
+                        " cluster size");
+              //skip clusters created beacuse of missing APV
+              if (svdSize_V_ext < 128)
+                for (unsigned int d = 0; d < svdSize_V_ext; d++) {
+                  svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());
+                  svdStripTime_V_ext.push_back(theRecoDigits_2[d]->getTime());
+                  double misalignedStripPos = svdSensor_2.getVCellPosition(theRecoDigits_2[d]->getCellID());
+                  //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+                  svdStripPosition_V_ext.push_back(misalignedStripPos - svd_2->getPosition() + svdClPos_V_ext);
+                }
+
               t_SVD_V->Fill();
             }
             //Fill histograms of residuals differences with SVD v clusters

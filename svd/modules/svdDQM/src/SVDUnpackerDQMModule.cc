@@ -46,9 +46,8 @@ SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFil
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDUnpacker"));
-  addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
-  addParam("DiagnosticsName", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
-  addParam("EventInfoName", m_SVDEventInfoName, "Name of SVDEventInfo object", std::string(""));
+  addParam("DAQDiagnostics", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
+  addParam("EventInfo", m_SVDEventInfoName, "Name of SVDEventInfo object", std::string(""));
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 }
@@ -87,10 +86,11 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
                                Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
 
-  m_DQMUnpackerHisto = new TH2F("m_DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
-  m_DQMEventFractionHisto = new TH1F("m_DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
-  m_DQMnSamplesHisto = new TH2F("m_DQMnSamplesHisto", "nAPVsamples VS DAQMode", 2, 1, 3, 3, 1, 4);
-  m_DQMnSamplesHisto2 = new TH2F("m_DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
+  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
+  m_DQMEventFractionHisto = new TH1F("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
+  m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
+  m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
+  m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
 
   m_DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   m_DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -99,26 +99,35 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
   m_DQMEventFractionHisto->SetMinimum(0);
 
-  m_DQMnSamplesHisto->GetYaxis()->SetTitle("DAQ Mode");
-  m_DQMnSamplesHisto->GetXaxis()->SetTitle("number of APV samples");
+  m_DQMnSamplesHisto->GetXaxis()->SetTitle("DAQ Mode");
+  m_DQMnSamplesHisto->GetYaxis()->SetTitle("number of APV samples");
 
-  m_DQMnSamplesHisto2->GetYaxis()->SetTitle("DAQ Mode");
-  m_DQMnSamplesHisto2->GetXaxis()->SetTitle("number of APV samples");
+  m_DQMnSamplesHisto2->GetXaxis()->SetTitle("DAQ Mode");
+  m_DQMnSamplesHisto2->GetYaxis()->SetTitle("number of APV samples");
+
+  m_DQMtrgQuality->GetXaxis()->SetTitle("TRG Quality");
+  m_DQMtrgQuality->GetYaxis()->SetTitle("number of APV samples");
 
   TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
-  TString Xsamples[2] = {"3", "6"};
-  TString Ysamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
+  TString Ysamples[2] = {"3", "6"};
+  TString Xsamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
+
+  TString Xquality[4] = {"coarse", "fine", "super fine", "no TRGSummary"};
 
   //preparing X axis of the DQMUnpacker histograms
   for (unsigned short i = 0; i < nBits; i++) m_DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
 
   //preparing X and Y axis of the DQMnSamples histograms
-  for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
+  for (unsigned short i = 0; i < 3; i++) m_DQMnSamplesHisto->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
   for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto2->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
 
-  for (unsigned short i = 0; i < 3; i++) m_DQMnSamplesHisto->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
+  for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
   for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto2->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
+
+  //preparing X and Y axis of the DQMtrgQuality histograms
+  for (unsigned short i = 0; i < 4; i++) m_DQMtrgQuality->GetXaxis()->SetBinLabel(i + 1, Xquality[i].Data());
+  for (unsigned short i = 0; i < 2; i++) m_DQMtrgQuality->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
 
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
@@ -132,6 +141,7 @@ void SVDUnpackerDQMModule::initialize()
   m_eventMetaData.isRequired();
   m_svdDAQDiagnostics.isOptional(m_SVDDAQDiagnosticsName);
   m_svdEventInfo.isOptional(m_SVDEventInfoName);
+  m_objTrgSummary.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -163,6 +173,10 @@ void SVDUnpackerDQMModule::beginRun()
 
   if (m_DQMnSamplesHisto2 != nullptr) {
     m_DQMnSamplesHisto2->Reset();
+  }
+
+  if (m_DQMtrgQuality != nullptr) {
+    m_DQMtrgQuality->Reset();
   }
 
   m_shutUpNoData = false;
@@ -205,6 +219,7 @@ void SVDUnpackerDQMModule::event()
     return;
   }
 
+
   m_badEvent = 0;
   m_nEvents++;
 
@@ -212,8 +227,15 @@ void SVDUnpackerDQMModule::event()
   int daqMode = m_svdEventInfo->getModeByte().getDAQMode();
   int nSamples = m_svdEventInfo->getNSamples();
 
-  m_DQMnSamplesHisto->Fill(nSamples / 3, daqMode);
-  if (daqMode < 3) m_DQMnSamplesHisto2->Fill(nSamples / 3, daqMode);
+  m_DQMnSamplesHisto->Fill(daqMode, nSamples / 3);
+  if (daqMode < 3) m_DQMnSamplesHisto2->Fill(daqMode, nSamples / 3);
+
+
+  //filling TRGqualityHisto
+  if (m_objTrgSummary.isValid()) {
+    int trgQuality = m_objTrgSummary->getTimQuality();
+    m_DQMtrgQuality->Fill(trgQuality, nSamples / 3);
+  } else m_DQMtrgQuality->Fill(4, nSamples / 3);
 
 
   //filling m_DQMUnpackerHisto

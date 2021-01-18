@@ -15,11 +15,8 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 
@@ -100,31 +97,30 @@ namespace Belle2 {
 
     if (roe) {
 
-      // Charged tracks -> Pion
-      //
-      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
+      if (!roe->isBuiltWithMostLikely()) {
+        B2ERROR("The ROE was not created with the most-likely particle lists."
+                "Did you use your own input particle lists?"
+                "The continuum suppression builder does not work with this setting.");
+      }
 
-      for (const Track* track : roeTracks) {
+      // Charged tracks
+      //
+      std::vector<const Particle*> chargedROEParticles = roe->getChargedParticles(maskName);
+
+      for (const Particle* chargedROEParticle : chargedROEParticles) {
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
-        // Create particle from track with most probable hypothesis
-        const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
-        const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-        // Here we skip tracks with 0 charge
-        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) {
-          B2WARNING("Track with charge = 0 skipped! From the ContinuumSuppression");
-          continue;
-        }
-        Particle charged_particle(track, charged);
-        if (charged_particle.getParticleSource() == Particle::c_Track) {
-          TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();
+        // Allow only particles with most probable hypothesis
+        if (chargedROEParticle->isMostLikely()) {
+
+          TLorentzVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.emplace_back(p_cms.Vect(), charged_particle.getCharge());
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), chargedROEParticle->getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -133,21 +129,19 @@ namespace Belle2 {
         }
       }
 
-      // ECLCluster -> Gamma
+      // ECLCluster
       //
-      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters(maskName);
+      std::vector<const Particle*> roePhotons = roe->getPhotons(maskName);
 
-      for (const ECLCluster* cluster : roeECLClusters) {
+      for (const Particle* photon : roePhotons) {
 
-        if (cluster->isNeutral() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-          // Create particle from ECLCluster with gamma hypothesis
-          Particle gamma_particle(cluster, Const::photon);
+        if (photon->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
 
-          TLorentzVector p_cms = T.rotateLabToCms() * gamma_particle.get4Vector();
+          TLorentzVector p_cms = T.rotateLabToCms() * photon->get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.emplace_back(p_cms.Vect(), gamma_particle.getCharge());
+          p3_cms_q_roe.emplace_back(p_cms.Vect(), photon->getCharge());
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;

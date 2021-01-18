@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
-from tracking import add_tracking_reconstruction
 import os
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction
@@ -20,52 +19,52 @@ parser.add_option('-f', '--file', dest='filename',
 home = os.environ['BELLE2_LOCAL_DIR']
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input root file
-input_module = register_module('RootInput')
+input_module = b2.register_module('RootInput')
 input_module.param('inputFileName', home + "/ARICHEvents.root")
 main.add_module(input_module)
 
 # Histogram manager immediately after master module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['ARICH'])
 main.add_module(geometry)
 
 # ARICH digitizer
-arichDigi = register_module('ARICHDigitizer')
+arichDigi = b2.register_module('ARICHDigitizer')
 main.add_module(arichDigi)
 
 # convert ARICHDigits to ARICHHits
-arichHits = register_module('ARICHFillHits')
+arichHits = b2.register_module('ARICHFillHits')
 main.add_module(arichHits)
 
 # ARICH reconstruction
 # calculate PID likelihoods for all tracks
-arichreco = register_module('ARICHReconstructor')
+arichreco = b2.register_module('ARICHReconstructor')
 main.add_module(arichreco)
 
 # ARICH Ntuple
 # create flat ntuple for performance analysis
-arichNtuple = register_module('ARICHNtuple')
+arichNtuple = b2.register_module('ARICHNtuple')
 arichNtuple.param('outputFile', options.filename)
 main.add_module(arichNtuple)
 
 # ARICH DQM
 # create DQM occupancy plots
-arichdqm = register_module('ARICHDQM')
+arichdqm = b2.register_module('ARICHDQM')
 main.add_module(arichdqm)
 
 # Uncomment to store DataStore content to root file
@@ -74,11 +73,11 @@ main.add_module(arichdqm)
 # main.add_module(output)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

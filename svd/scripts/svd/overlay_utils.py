@@ -21,9 +21,7 @@
 #
 ######
 
-from basf2 import *
-from ROOT import Belle2
-import basf2
+import basf2 as b2
 
 
 def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):
@@ -35,16 +33,16 @@ def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):
 
     for inputfile in inputFiles:
 
-        basf2.conditions.reset()
-        basf2.conditions.override_globaltags()
-        basf2.conditions.globaltags = ['svd_basic', "online"]
+        b2.conditions.reset()
+        b2.conditions.override_globaltags()
+        b2.conditions.globaltags = ['svd_basic', "online"]
         splittext = ""
         if(str(outputFileTag) == "ZS3"):
             splittext = inputfile.split(".root")
         else:
             splittext = inputfile.split("_ZS3.root")
         outputfile = splittext[0]+"_"+str(outputFileTag)+".root"
-        main = create_path()
+        main = b2.create_path()
         main.add_module("RootInput", inputFileNames=inputfile)
         if(str(outputFileTag) == "ZS3"):
             main.add_module("SVDUnpacker", svdShaperDigitListName="SVDShaperDigitsZS3")
@@ -62,8 +60,8 @@ def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):
             main.add_module("RootOutput", branchNames=["SVDEventInfo", "SVDShaperDigitsZS3"], outputFileName=outputfile)
         else:
             main.add_module("RootOutput", branchNames=["SVDShaperDigits"], outputFileName=outputfile)
-        print_path(main)
-        process(main)
+        b2.print_path(main)
+        b2.process(main)
 
 
 def overlay_svd_data(path, datatype="randomTrigger", overlayfiles=""):
@@ -91,14 +89,14 @@ def overlay_svd_data(path, datatype="randomTrigger", overlayfiles=""):
     print(" -> overlaying the following files to simulation: ")
     print(str(overlayfiles))
 
-    bkginput = register_module('BGOverlayInput')
+    bkginput = b2.register_module('BGOverlayInput')
     bkginput.set_name('BGOverlayInput_SVDOverlay')
     bkginput.param('bkgInfoName', 'BackgroundInfoSVDOverlay')
     bkginput.param('extensionName', "_SVDOverlay")
     bkginput.param('inputFileNames', overlayfiles)
     path.add_module(bkginput)
 
-    bkgexecutor = register_module('BGOverlayExecutor')
+    bkgexecutor = b2.register_module('BGOverlayExecutor')
     bkgexecutor.set_name('BGOverlayExecutor_SVDOverlay')
     bkgexecutor.param('bkgInfoName', 'BackgroundInfoSVDOverlay')
     path.add_module(bkgexecutor)

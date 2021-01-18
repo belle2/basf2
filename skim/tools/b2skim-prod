@@ -80,8 +80,7 @@ to create these YAML files from a list of LPNs.
         runNumber: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
-names of the skims. The combined skims must be defined in
-`skim.registry.RegisteredSkims`. The other required arguments include the skim campaign,
+names of the skims. The other required arguments include the skim campaign,
 intended release to be used, and base directory of the repository to output the JSON
 files in.
 
@@ -154,8 +153,11 @@ import re
 import sys
 import yaml
 
-from basf2 import B2ERROR, B2INFO, B2WARNING
+import jinja2
+
+from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
+from skimExpertFunctions import resolve_skim_modules
 from skim.registry import Registry
 
 
@@ -694,56 +696,30 @@ def make_combined_steering_file(
     # Retrieve the list of individual skims going into this combined skim
     SingleSkims = CombinedSkimDefinitions[SkimName]
 
-    # And then group them into the modules they belong to, so we can put together some
-    # nice import statements
-    modules = sorted({Registry.get_skim_module(skim) for skim in SingleSkims})
-    GroupedSkims = {
-        f"skim.{module}": [
-            skim for skim in SingleSkims if Registry.get_skim_module(skim) == module
-        ]
-        for module in modules
-    }
-
-    # Handle local override of skim script, in case we need to replace a skim module at production time
-    if LocalModule and len(modules) > 1:
+    try:
+        skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
+    except ValueError:
         B2ERROR(
             f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
             "        more than one skim module. Not sure what to do in this situation, so \n"
             f"        please modify {SteeringFile} yourself."
         )
-    elif LocalModule:
-        # Replace the normal module with the local one
-        LocalModule = LocalModule.rstrip(".py")
-        NormalModule = modules[0]
-        GroupedSkims[LocalModule] = GroupedSkims.pop(f"skim.{NormalModule}")
+        skims, modules = resolve_skim_modules(SingleSkims)
 
-    BasicImports = """import basf2 as b2
-import modularAnalysis as ma
-from skimExpertFunctions import CombinedSkim
-"""
-    if LocalModule:
-        BasicImports += "\n"
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
+    env.lstrip_blocks = True
 
-    SkimImports = "".join(
-        [
-            f"from {module} import {', '.join(skims)}\n"
-            for (module, skims) in GroupedSkims.items()
-        ]
+    template = env.get_template("skim_steering_file_template.jinja2")
+    CodeString = template.render(
+        skims=skims,
+        modules=modules,
+        stats=False,
+        hints=False,
     )
-    SkimObjects = [f"    {skim}(),\n" for skim in SingleSkims]
-    MainProcessing = f"""
-path = b2.Path()
-ma.inputMdstList("default", [], path=path)
-skim = CombinedSkim(
-{''.join(SkimObjects)})
-skim(path)
-b2.process(path)
-"""
-
-    SteeringFileCode = BasicImports + SkimImports + MainProcessing
 
     with open(SteeringFile, "w") as f:
-        f.write(SteeringFileCode)
+        f.write(CodeString)
 
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
 
@@ -808,7 +784,7 @@ def make_request_dict(
         "InputSandboxFilePrefix": SkimScriptsDirectory,
         "InputData": LPNList,
         "Priority": 8,
-        "SteeringFile": f"{skimName}_Skim_Standalone.py",
+        "SteeringFile": f"{skimName}_Skim.py",
         "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
@@ -947,8 +923,7 @@ def get_argument_parser():
         required=True,
         nargs="+",
         metavar="CombinedSkim",
-        help="List of skims to produce request files for. "
-        "Only accepts combined skims listed in `skim.registry.RegisteredSkims`.",
+        help="List of skims to produce request files for."
     )
     parser.add_argument(
         "-o",

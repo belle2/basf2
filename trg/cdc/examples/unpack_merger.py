@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
 if not input_files.empty() and input_files.front().endswith(".sroot"):
-    root_input = register_module('SeqRootInput')
+    root_input = b2.register_module('SeqRootInput')
 else:
-    root_input = register_module('RootInput')
+    root_input = b2.register_module('RootInput')
 
-main = create_path()
+main = b2.create_path()
 main.add_module(root_input)
 
-merger_unpacker = register_module('CDCTriggerUnpacker')
-merger_unpacker.logging.log_level = LogLevel.DEBUG
+merger_unpacker = b2.register_module('CDCTriggerUnpacker')
+merger_unpacker.logging.log_level = b2.LogLevel.DEBUG
 merger_unpacker.logging.debug_level = 100
-merger_unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+merger_unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 
 main.add_module(merger_unpacker)
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

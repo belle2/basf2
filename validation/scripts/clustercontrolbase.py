@@ -169,4 +169,3 @@ class ClusterBase:
         @param path: The past that needs to be adjusted
         @return: The adjusted path
         """
-        pass

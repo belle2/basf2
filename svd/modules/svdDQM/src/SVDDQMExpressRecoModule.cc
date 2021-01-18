@@ -53,12 +53,12 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
   addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
            std::string("SVDShaperDigits"));
+  addParam("Clusters", m_storeSVDClustersName, "Cluster StoreArray name",
+           std::string("SVDClusters"));
   addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
-  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
-           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,
            "cut for accepting to hitmap histogram, using strips only", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
@@ -176,13 +176,9 @@ void SVDDQMExpressRecoModule::defineHisto()
   float ChargeMax = 80;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 200;
-  float TimeMin = -60;
-  float TimeMax = 140;
-  if (m_isSVDTimeCalibrated) {
-    TimeMin = -100 ;
-    TimeMax =  100 ;
-  }
+  int TimeBins = 300;
+  float TimeMin = -150;
+  float TimeMax = 150;
 
   int MaxBinBins = 6;
   int MaxBinMax = 6;
@@ -604,7 +600,6 @@ void SVDDQMExpressRecoModule::initialize()
     StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
     StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
     StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-    m_storeSVDClustersName = storeSVDClusters.getName();
 
     storeSVDClusters.isOptional();
     storeSVDShaperDigits.isOptional();

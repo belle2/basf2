@@ -12,12 +12,13 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
+import variables as va
 import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
@@ -48,7 +49,7 @@ class Systematics(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def JpsimumuTagProbe(self, path):
         """Build JpsimumuTagProbe lists for systematics skims."""
@@ -123,7 +124,7 @@ class SystematicsTracking(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
@@ -227,7 +228,7 @@ class Resonance(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def getDsList(self, path):
         """Build Ds list for systematics skims."""
@@ -533,33 +534,23 @@ class SystematicsRadEE(BaseSkim):
 
 @fancy_skim_header
 class SystematicsLambda(BaseSkim):
-    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Jake Bennett"]
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    def build_lists(self, path):
-        LambdaCuts = "M < 1.2"
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
 
-        ma.fillParticleList("p+:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        ma.fillParticleList("pi-:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
+    def build_lists(self, path):
+        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
+        va.variables.addAlias("pMom", "daughter(0,p)")
+        va.variables.addAlias("piMom", "daughter(1,p)")
+        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
-        for chID, channel in enumerate(LambdaChannel):
-            ma.reconstructDecay("Lambda0:syst" + str(chID) + " -> " + channel, LambdaCuts, chID, path=path)
-            vertex.kFit("Lambda0:syst" + str(chID), 0.002, path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "1.10<M<1.13", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*x+y*y)>0.0225", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*px+y*py)>0", path=path)
-            ma.applyCuts(
-                "Lambda0:syst" +
-                str(chID),
-                "formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009",
-                path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "p>0.2", path=path)
-            ma.matchMCTruth("Lambda0:syst0", path=path)
-            LambdaList.append("Lambda0:syst" + str(chID))
+        ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
+        LambdaList.append("Lambda0:syst0")
 
         self.SkimLists = LambdaList
 
@@ -589,7 +580,7 @@ class SystematicsPhiGamma(BaseSkim):
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
-        stdKshorts("merged", path=path)
+        stdKshorts(path=path)
 
     TestFiles = [get_test_file("phigamma_neutral")]
 

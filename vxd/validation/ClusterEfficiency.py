@@ -10,7 +10,6 @@
   </description>
 </header>
 """
-import sys
 import math
 import basf2 as b2
 from ROOT import PyConfig
@@ -33,6 +32,7 @@ class ClusterEfficiency(b2.Module):
     """
     Plot Efficiency to find a U and V cluster for each given truehit.
     """
+
     def initialize(self):
         """
         Create ROOT TProfiles for all layers and momenta.
@@ -164,8 +164,8 @@ class ClusterEfficiency(b2.Module):
 
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
-                B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                          (p.Mag(), ", ".join(str() for p in momenta)))
+                b2.B2WARNING("Strange particle momentum: %f, expected one of %s" %
+                             (p.Mag(), ", ".join(str() for p in momenta)))
                 continue
 
             # and check all truehits

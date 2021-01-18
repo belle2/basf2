@@ -64,7 +64,7 @@ namespace {
     return minimalValue;
   }
 
-  /// Helper function to calculate the std of a given function over all states in the list
+  /// Helper function to calculate the standard deviation of a given function over all states in the list
   template<class APredicate>
   double stdOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
@@ -85,7 +85,7 @@ namespace {
       }
     }
 
-    return std::sqrt((sumSquared - sum / numberOfHits) / numberOfHits - 1);
+    return std::sqrt((sumSquared - sum * sum / numberOfHits) / (numberOfHits - 1));
   }
 }
 

@@ -10,33 +10,28 @@
 #
 # Author: luka.santelj@ijs.si
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import ARICHDatabaseImporter
-import os
 import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
 
 argvs = sys.argv
 argc = len(argvs)
 
 # set local database folder
-use_local_database("localdb/database.txt", "localdb")
+b2.use_local_database("localdb/database.txt", "localdb")
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
-eventinfo = register_module('EventInfoSetter')
+eventinfo = b2.register_module('EventInfoSetter')
 eventinfo.initialize()
 
 # load gearbox for reading parameters from xml files (by default in "arich/data")
-paramloader = register_module('Gearbox')
+paramloader = b2.register_module('Gearbox')
 paramloader.initialize()
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfo)
-process(main)
+b2.process(main)
 
 # and run the importer
 dbImporter = ARICHDatabaseImporter()

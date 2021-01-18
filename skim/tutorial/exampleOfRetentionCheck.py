@@ -13,7 +13,7 @@ import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import get_test_file
 from skimRetentionCheck import RetentionCheck, pathWithRetentionCheck
-from skim.fei import runFEIforB0SL, B0SL
+from skim.fei import runFEIforB0SL
 
 # Create a basf2 path.
 path = b2.create_path()

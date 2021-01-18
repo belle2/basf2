@@ -356,6 +356,24 @@ class Script:
             else:
                 self.header[branch.tag.strip()] = branch_value
 
+    @property
+    def description(self) -> str:
+        """ Description of script as set in header """
+        self.load_header()
+        return self.header.get("description", "")
+
+    @property
+    def contact(self) -> str:
+        """ Contact of script as set in header """
+        self.load_header()
+        return self.header.get("contact", "")
+
+    @property
+    def interval(self) -> str:
+        """ Interval of script executation as set in header """
+        self.load_header()
+        return self.header.get("interval", "nightly")
+
 
 def find_creator(
         outputfile: str,

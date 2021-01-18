@@ -403,20 +403,13 @@ class IntervalSelector:
         #: stores the intervals which have been selected
         self.intervals = [x.strip() for x in intervals]
 
-    def in_interval(self, script_object):
+    def in_interval(self, script_object: Script) -> bool:
         """
         checks whether the interval listed in a script object's header is
         within the selected
         """
 
-        # for scripts, which have no interval set, the default is nightly
-        script_interval = "nightly"
-
-        if script_object.header is not None:
-            if "interval" in script_object.header:
-                script_interval = script_object.header["interval"]
-
-        return script_interval in self.intervals
+        return script_object.interval in self.intervals
 
 
 ###############################################################################

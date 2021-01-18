@@ -126,16 +126,13 @@ class Mails:
             failed_script["package"] = script.package
             failed_script["rootfile"] = ", ".join(script.get_input_files())
             failed_script["comparison_text"] = " -- "
-            try:
-                failed_script["description"] = script.header["description"]
-            except (KeyError, TypeError):
-                failed_script["description"] = " -- "
+            failed_script["description"] = script.description
             # this is called comparison_result but it is handled as error
             # type when composing mail
             failed_script["comparison_result"] = "script failed to execute"
             # add contact of failed script to mail_log
             try:
-                for contact in parse_mail_address(script.header["contact"]):
+                for contact in parse_mail_address(script.contact):
                     if contact not in mail_log:
                         mail_log[contact] = {}
                     mail_log[contact][script.name] = failed_script

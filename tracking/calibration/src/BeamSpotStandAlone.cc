@@ -29,7 +29,6 @@
 #include <TTree.h>
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
-#include <TVectorD.h>
 #include <TGraph.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -734,17 +733,16 @@ namespace Belle2 {
       @param r vector with the points to fit
       @return vector with the fitted parameters
      */
-    TVectorD linearFit(TMatrixD mat, TVectorD r)
+    VectorXd linearFit(MatrixXd mat, VectorXd r)
     {
-      TMatrixD matT = mat; matT.T();
-      TMatrixD A = matT * mat;
+      MatrixXd matT = mat.transpose();
+      MatrixXd A = matT * mat;
 
-      TVectorD v = matT * r;
-      TMatrixD Ainv = A; Ainv.Invert();
+      VectorXd v = matT * r;
+      MatrixXd Ainv = A.inverse();
 
       return (Ainv * v);
     }
-
 
     /** Linear fit with errors & PRESS statistics
       @param m: the matrix of the problem
@@ -754,19 +752,20 @@ namespace Belle2 {
       @param[out] err2pressErr: uncertainty of the err2press
       @return vector with the fitted parameters
      */
-    pair<vector<double>, vector<double>> linearFitErr(TMatrixD m, TVectorD r, double& err2Mean, double& err2press, double& err2pressErr)
+    pair<vector<double>, vector<double>> linearFitErr(MatrixXd m, VectorXd r, double& err2Mean, double& err2press, double& err2pressErr)
     {
-      TMatrixD mT = m; mT.T();
-      TMatrixD mat = mT * m;
+      MatrixXd mT = m.transpose();
+      MatrixXd mat = mT * m;
 
-      mat.Invert();
-      TMatrixD A = mat * mT;
-      TVectorD res = A * r;
-      TVectorD dataH = m * res;
+      //mat.Invert();
+      mat = mat.inverse();
+      MatrixXd A = mat * mT;
+      VectorXd res = A * r;
+      VectorXd dataH = m * res;
 
 
       //errs
-      double err2 = (dataH - r).Norm2Sqr() / (r.GetNrows() - res.GetNrows());
+      double err2 = (dataH - r).squaredNorm() / (r.rows() - res.rows());
 
 
       // Get PRESS statistics of the linear fit
@@ -774,28 +773,28 @@ namespace Belle2 {
         //TMatrixD Ahat =  m*A;
         double press = 0;
         double press2 = 0;
-        for (int i = 0; i < r.GetNrows(); ++i) {
+        for (int i = 0; i < r.rows(); ++i) {
           double Ahat = 0;
-          for (int k = 0; k < m.GetNcols(); ++k)
+          for (int k = 0; k < m.cols(); ++k)
             Ahat += m(i, k) * A(k, i);
 
           double v = pow((r(i) - dataH(i)) / (1 - Ahat), 2);
           press += v;
           press2 += v * v;
         }
-        press  /= r.GetNrows();
-        press2 /= (r.GetNrows() - 1);
+        press  /= r.rows();
+        press2 /= (r.rows() - 1);
 
         err2press = press;
-        err2pressErr = sqrt((press2 - press * press) / r.GetNrows()) / sqrt(r.GetNrows());
+        err2pressErr = sqrt((press2 - press * press) / r.rows()) / sqrt(r.rows());
       }
 
 
 
-      TMatrixD AT = A; A.T();
-      TMatrixD errMat = err2 * AT * A;
-      TVectorD errs2(errMat.GetNrows());
-      for (int i = 0; i < errs2.GetNrows(); ++i)
+      MatrixXd AT = A.transpose(); //  A.T();
+      MatrixXd errMat = err2 * AT * A;
+      VectorXd errs2(errMat.rows());
+      for (int i = 0; i < errs2.rows(); ++i)
         errs2(i) = errMat(i, i);
 
       err2Mean = err2;
@@ -811,16 +810,16 @@ namespace Belle2 {
       @param r vector of the points to fit
       @return vector with the fitted parameters
      */
-    TVectorD linearFitPos(TMatrixD mat, TVectorD r)
+    VectorXd linearFitPos(MatrixXd mat, VectorXd r)
     {
       const double s2MinLimit = pow(0.05, 2); //Minimal value of the BeamSpot eigenSize
-      B2ASSERT("Matrix size for size fit should be 3", mat.GetNcols() == 3);
-      TMatrixD matT = mat; matT.T();
-      TMatrixD A = matT * mat;
-      TVectorD v = matT * r;
-      TMatrixD Ainv = A; Ainv.Invert();
+      B2ASSERT("Matrix size for size fit should be 3", mat.cols() == 3);
+      MatrixXd matT = mat.transpose();
+      MatrixXd A = matT * mat;
+      VectorXd v = matT * r;
+      MatrixXd Ainv = A.inverse();
 
-      TVectorD pars = Ainv * v;
+      VectorXd pars = Ainv * v;
 
       //If everything is OK
       double s2Min = getSize2MinMat(pars[0], pars[1], pars[2]);
@@ -831,16 +830,15 @@ namespace Belle2 {
       //Get the error matrix
       //////////////////////////
 
-      int nDf = r.GetNrows() - 3;
+      int nDf = r.rows() - 3;
       //Calculate average error
-      double err2 = (mat * pars - r).Norm2Sqr() / nDf;
+      double err2 = (mat * pars - r).squaredNorm() / nDf;
 
-      TMatrixD wMat = Ainv * matT;
-      TMatrixD wMatT = wMat; wMatT.T();
+      MatrixXd wMat  = Ainv * matT;
+      MatrixXd wMatT = wMat.transpose();
 
-      TMatrixD covMat = err2 * wMat * wMatT;
-      TMatrixD covMatI = covMat;
-      covMatI.Invert();
+      MatrixXd covMat = err2 * wMat * wMatT;
+      MatrixXd covMatI = covMat.inverse();
 
       //////////////////////////
       //Get maximum likelihood
@@ -854,12 +852,13 @@ namespace Belle2 {
         double c = cos(phi);
         double s = sin(phi);
 
-        TVectorD xVec(3);
-        xVec(0) = eig1 * c * c + eig2 * s * s;
-        xVec(1) = eig1 * s * s + eig2 * c * c;
-        xVec(2) = s * c * (eig1 - eig2);
+        VectorXd xVec(3);
+        xVec[0] = eig1 * c * c + eig2 * s * s;
+        xVec[1] = eig1 * s * s + eig2 * c * c;
+        xVec[2] = s * c * (eig1 - eig2);
 
-        double res = covMatI.Similarity(xVec - pars);
+        //double res = covMatI.Similarity(xVec - pars);
+        double res = (xVec - pars).transpose() * covMatI * (xVec - pars);
         return res;
       }, s2MinLimit, 400, 0, 2 * M_PI, 0);
 
@@ -1450,7 +1449,7 @@ namespace Belle2 {
         }
       }
 
-      TMatrixD mat = vecs2mat({zzVec});
+      MatrixXd mat = vecs2mat({zzVec});
 
       vector<double> pars, err2;
       double err2Mean, err2press, err2pressErr;
@@ -1484,12 +1483,12 @@ namespace Belle2 {
 
       vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
 
-      TMatrixD A = vecs2mat(allVecs);
+      MatrixXd A = vecs2mat(allVecs);
 
 
-      TVectorD vData = vec2vec(dataVec);
+      VectorXd vData = vec2vec(dataVec);
 
-      vector<double> pars(A.GetNcols()), err2(A.GetNcols());
+      vector<double> pars(A.cols()), err2(A.cols());
       double err2Mean, err2press, err2pressErr;
       tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
@@ -1518,12 +1517,12 @@ namespace Belle2 {
 
       vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
 
-      TMatrixD A = vecs2mat(allVecs);
+      MatrixXd A = vecs2mat(allVecs);
 
 
-      TVectorD vData = vec2vec(dataVec);
+      VectorXd vData = vec2vec(dataVec);
 
-      vector<double> pars(A.GetNcols()), err2(A.GetNcols());
+      vector<double> pars(A.cols()), err2(A.cols());
       double err2Mean, err2press, err2pressErr;
       tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
@@ -1553,11 +1552,11 @@ namespace Belle2 {
 
       vector<vector<double>> allVecs = merge({basesX, basesY});
 
-      TMatrixD A = vecs2mat(allVecs);
+      MatrixXd A = vecs2mat(allVecs);
 
-      TVectorD vData = vec2vec(dataVec);
+      VectorXd vData = vec2vec(dataVec);
 
-      vector<double> pars(A.GetNcols()), err2(A.GetNcols());
+      vector<double> pars(A.cols()), err2(A.cols());
       double err2Mean, err2press, err2pressErr;
       tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
@@ -1594,11 +1593,11 @@ namespace Belle2 {
 
       vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY, basesZ});
 
-      TMatrixD A = vecs2mat(allVecs);
+      MatrixXd A = vecs2mat(allVecs);
 
-      TVectorD vData = vec2vec(dataVec);
+      VectorXd vData = vec2vec(dataVec);
 
-      vector<double> pars(A.GetNcols()), err2(A.GetNcols());
+      vector<double> pars(A.cols()), err2(A.cols());
       double err2Mean, err2press, err2pressErr;
       tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
@@ -1623,11 +1622,11 @@ namespace Belle2 {
         }
       }
 
-      TMatrixD A = vecs2mat({basesZ});
+      MatrixXd A = vecs2mat({basesZ});
 
-      TVectorD vData = vec2vec(dataVec);
+      VectorXd vData = vec2vec(dataVec);
 
-      vector<double> pars(A.GetNcols()), err2(A.GetNcols());
+      vector<double> pars(A.cols()), err2(A.cols());
       double err2Mean, err2press, err2pressErr;
       tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
@@ -1664,10 +1663,10 @@ namespace Belle2 {
       }
 
 
-      TMatrixD mat = vecs2mat({ssVec, ccVec, scVec});
+      MatrixXd mat = vecs2mat({ssVec, ccVec, scVec});
 
       // Linear fit with constraint on positiveness
-      TVectorD resPhys = linearFitPos(mat, vec2vec(dataVec));
+      VectorXd resPhys = linearFitPos(mat, vec2vec(dataVec));
 
       return {resPhys(0), resPhys(1), resPhys(2)};
     }

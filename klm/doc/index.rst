@@ -55,11 +55,11 @@ If the track reached the KLM, it is classified according to how and where the ex
 Likelihood extraction
 ~~~~~~~~~~~~~~~~~~~~~
  
- .. figure:: pdf_figures/Muid-MuonPlus-Barrel14-exit-styled.pdf
+ .. image:: pdf_figures/Muid-MuonPlus-Barrel14-exit-styled.*
     :width: 30 %
 
  .. .. figure:: pdf_figures/Muid-MuonPlus-Endcap13-exit-styled.pdf
-    :width: 30 %
+ ..   :width: 30 %
 
  .. .. figure:: pdf_figures/Muid-MuonPlus-B4+E3-exit-styled.pdf
    .. :width: 30 %

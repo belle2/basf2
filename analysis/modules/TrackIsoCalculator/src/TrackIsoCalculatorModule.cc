@@ -43,25 +43,27 @@ TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
 
 void TrackIsoCalculatorModule::initialize()
 {
+
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
 
+  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ".");
+
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
-
-  if (!isStdChargedList()) {
-    B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
-            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
-  }
-
 }
 
 void TrackIsoCalculatorModule::event()
 {
 
   if (!m_pList) {
-    B2WARNING("Input ParticleList " << m_pListName << " not found in the DataStore!");
+    B2WARNING("Input ParticleList: " << m_pListName << " not found in the DataStore! Skip TrackIsoCalculator application...");
     return;
+  }
+
+  if (!isStdChargedList()) {
+    B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
+            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
   const auto nParticles = m_pList->getListSize();

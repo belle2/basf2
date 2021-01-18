@@ -17,6 +17,8 @@ import argparse
 
 
 def argparser():
+    """ Argument parser
+    """
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -39,12 +41,15 @@ def argparser():
     return parser
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    """ Example script
+    """
 
-    args = argparser().parse_args()
-
-    # Command line arguments are parsed before importing basf2, to avoid PyROOT hijacking them
+    # Argparse options.
+    #
+    # NB: Command line arguments are parsed before importing basf2, to avoid PyROOT hijacking them
     # in case of overlapping option names.
+    args = argparser().parse_args()
 
     import basf2 as b2
     import modularAnalysis as ma
@@ -54,19 +59,22 @@ if __name__ == '__main__':
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
-    ma.inputMdstList("default",
-                     filelist=[b2.find_file("mdst14.root", "validation")],
-                     path=path)
+    ma.inputMdstList("default", filelist=[b2.find_file("mdst14.root", "validation")], path=path)
 
     # Fill a particle list of charged stable particles (eg. pions).
     # Apply (optionally) some quality selection.
-    ma.fillParticleList("pi+:all", "", path=path)
-    ma.applyCuts("pi+:all", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+    ma.fillParticleList("pi+:mypions", "", path=path)
+    ma.applyCuts("pi+:mypions", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
     # 3D distance (default).
-    ma.calculateTrackIsolation("pi+:all", path, *args.detectors, alias="dist3DToClosestTrkAtSurface")
+    ma.calculateTrackIsolation("pi+:mypions", path, *args.detectors, alias="dist3DToClosestTrkAtSurface")
     # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation("pi+:all", path, *args.detectors, use2DRhoPhiDist=True, alias="dist2DRhoPhiToClosestTrkAtSurface")
+    ma.calculateTrackIsolation(
+        "pi+:mypions",
+        path,
+        *args.detectors,
+        use2DRhoPhiDist=True,
+        alias="dist2DRhoPhiToClosestTrkAtSurface")
 
     ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
     ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
@@ -79,11 +87,7 @@ if __name__ == '__main__':
                 m.set_debug_level(args.debug)
 
     # Dump isolation variables in a ntuple.
-    ma.variablesToNtuple("pi+:all",
-                         ntup_vars,
-                         treename="pi",
-                         filename="TrackIsolationVariables.root",
-                         path=path)
+    ma.variablesToNtuple("pi+:mypions", ntup_vars, treename="pi", filename="TrackIsolationVariables.root", path=path)
 
     path.add_module("Progress")
 

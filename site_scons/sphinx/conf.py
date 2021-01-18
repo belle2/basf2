@@ -277,7 +277,7 @@ latex_elements = {
     'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    'preamble': '\setcounter{tocdepth}{2}',
+    'preamble': '\\setcounter{tocdepth}{2}',
 
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
@@ -359,7 +359,7 @@ def process_sig(app, what, name, obj, options, signature, return_annotation):
     remove unhelpful 'self' arguments from methods.
     """
     if what == 'method' and signature:
-        reg = re.compile('^\( \(.*\)arg1')
+        reg = re.compile('^\\( \\(.*\\)arg1')
         signature = reg.sub('(', signature)
         return (signature, return_annotation)
 
@@ -444,11 +444,11 @@ def process_docstring(app, what, name, obj, options, lines):
         re.compile(r'^( *)@returns? '): r':return: ',
     }
     newlines = []
-    for l in lines:
-        new = l
+    for line in lines:
+        new = line
         for reg, sub in substitutions.items():
             new = reg.sub(sub, new)
-        if new != l:
+        if new != line:
             # Sphinx wants a new paragraph before these, so let's add one
             newlines += ['']
         newlines += [new]

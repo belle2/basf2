@@ -6,9 +6,6 @@ import os
 from typing import Optional, List
 import logging
 
-# A pretty printer. Prints prettier lists, dicts, etc. :)
-import pprint
-
 # Import XML Parser. Use C-Version, if available
 try:
     import xml.etree.cElementTree as XMLTree

@@ -3,7 +3,7 @@
 
 import re
 import os
-from typing import Optional, Dict, List
+from typing import Optional, List
 import logging
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
@@ -16,9 +16,6 @@ except ImportError:
     import xml.etree.ElementTree as XMLTree
 
 import json_objects
-
-
-pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
 # todo [code quality, low prio, easy]: This should be an enum
@@ -134,14 +131,6 @@ class Script:
         Replaces the . between the file name and extension with an underscore _
         """
         return re.sub(r'[\W_]+', '_', file_name)
-
-    def dump(self):
-        """!
-        Print out all properties = attributes of a script.
-        @return: None
-        """
-        print()
-        pp.pprint(vars(self))
 
     def to_json(self, current_tag):
 

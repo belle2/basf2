@@ -1,3 +1,8 @@
+/*
+<header>
+<noexecute>Used as library.</noexecute>
+</header>
+*/
 
 #include "TClass.h"
 #include "TList.h"
@@ -26,7 +31,7 @@ void saveHist(const char* filename, const char* pat)
 
   TFile outf(filename,"RECREATE") ;
   TObject* obj ;
-  while((obj=iter->Next())) {    
+  while((obj=iter->Next())) {
     if (TString(obj->GetName()).Index(re)>=0) {
       obj->Write() ;
       std::cout << "." ;
@@ -58,8 +63,8 @@ void loadHist(const char* filename="in.root", const char* pfx=0, const char* pat
   std::cout << "doAdd = " << (doAdd?"T":"F") << std::endl ;
   std::cout << "loadHist: reading." ;
   while((key=(TKey*)iter->Next())) {
-   
-    Int_t ridx = TString(key->GetName()).Index(re) ;    
+
+    Int_t ridx = TString(key->GetName()).Index(re) ;
     if (ridx==-1) {
       continue ;
     }

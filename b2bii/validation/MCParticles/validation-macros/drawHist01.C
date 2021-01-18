@@ -1,3 +1,9 @@
+/*
+<header>
+<noexecute>Used as library.</noexecute>
+</header>
+*/
+
 #include <iostream>
 #include "histio.C"
 #include "TCanvas.h"
@@ -155,7 +161,7 @@
        hbasf->Draw() ;
        hbasf->GetXaxis()->SetTitle(xtitle) ;
        hbasf->GetYaxis()->SetTitle(ytitle) ;
-       
+
        hbasf2->SetLineStyle(2) ;
        hbasf2->SetLineWidth(2) ;
        hbasf2->Draw("same") ;

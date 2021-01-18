@@ -124,11 +124,7 @@ class Mails:
             # give failed_script the same format as error_data in method
             # create_mail_log
             failed_script["package"] = script.package
-            try:
-                failed_script["rootfile"] = ", ".join(script.header["input"])
-            except (KeyError, TypeError):
-                # TypeError occurs if script.header is None
-                failed_script["rootfile"] = " -- "
+            failed_script["rootfile"] = ", ".join(script.get_input_files())
             failed_script["comparison_text"] = " -- "
             try:
                 failed_script["description"] = script.header["description"]

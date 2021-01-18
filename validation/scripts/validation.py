@@ -1184,8 +1184,7 @@ class Validation:
         def handle_waiting_script(script_obj: Script):
             # Determine the way of execution depending on whether
             # data files are created
-            if script_obj.header and \
-               script_obj.header.get('output', []):
+            if script_obj.get_output_files():
                 script_obj.control = control
             else:
                 script_obj.control = local_control

@@ -104,10 +104,10 @@ class Script:
         #   and then add attributes that access the information in here to
         #   maintain central control over all possible tags and their
         #   postprocessing
-        # todo [code quality, low prio, easy]: It's also bad that this is
-        #   None both when parsing failed and when parsing hasn't been tried
-        #   The information from the file header
-        self.header = None  # type: Optional[Dict]
+        #: The information from the file header
+        self.header = dict()
+        #: Set if we tried to parse this but there were issues during parsing
+        self.header_parsing_errors = False
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -135,8 +135,6 @@ class Script:
         """ A flag set in the header that tells us to simply ignore this
         script for the purpose of running the validation.
         """
-        if self.header is None:
-            return True
         return "noexecute" in self.header
 
     @staticmethod
@@ -265,9 +263,6 @@ class Script:
         return a list of input files which this script will read.
         This information is only available, if load_header has been called
         """
-        if self.header is None:
-            return []
-
         return self.header.get('input', [])
 
     def get_output_files(self):
@@ -275,9 +270,6 @@ class Script:
         return a list of output files this script will create.
         This information is only available, if load_header has been called
         """
-        if self.header is None:
-            return []
-
         return self.header.get('output', [])
 
     def is_cacheable(self):
@@ -286,9 +278,6 @@ class Script:
         files are already present.
         This information is only available, if load_header has been called
         """
-        if self.header is None:
-            return False
-
         return 'cacheable' in self.header
 
     def load_header(self):
@@ -315,6 +304,7 @@ class Script:
             xml = pat.findall(steering_file_content)[0].strip()
         except IndexError:
             self.log.error('No file header found: ' + self.path)
+            self.header_parsing_errors = True
             return
 
         # Create an XML tree from the plain XML code.
@@ -322,6 +312,7 @@ class Script:
             xml_tree = XMLTree.ElementTree(XMLTree.fromstring(xml)).getroot()
         except XMLTree.ParseError:
             self.log.error('Invalid XML in header: ' + self.path)
+            self.header_parsing_errors = True
             return
 
         # we have a header

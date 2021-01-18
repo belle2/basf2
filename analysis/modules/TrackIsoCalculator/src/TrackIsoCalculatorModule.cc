@@ -56,11 +56,6 @@ void TrackIsoCalculatorModule::initialize()
 void TrackIsoCalculatorModule::event()
 {
 
-  if (!m_pList) {
-    B2WARNING("Input ParticleList: " << m_pListName << " not found in the DataStore! Skip TrackIsoCalculator application...");
-    return;
-  }
-
   if (!isStdChargedList()) {
     B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");

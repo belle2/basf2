@@ -15,6 +15,7 @@ import validationpath
 from validationfunctions import available_revisions
 # martin's mail utils
 import mail_utils
+from validationscript import Script
 
 
 def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
@@ -110,9 +111,7 @@ class Mails:
         for failed_script in failed_scripts:
 
             # get_script_by_name works with _ only ...
-            for suffix in ["py", "C"]:
-                failed_script = failed_script.replace("." + suffix,
-                                                      "_" + suffix)
+            failed_script = Script.sanitize_file_name(failed_script)
             script = self._validator.get_script_by_name(failed_script)
             if script is None:
                 continue

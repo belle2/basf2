@@ -93,7 +93,7 @@ class Script:
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
         # by an underscore. Useful e.g. for cluster controls.
-        self.name = Script.sanitize_file_name(str(os.path.basename(self.path)))
+        self.name = self.sanitize_file_name(str(os.path.basename(self.path)))
         # useful when displaying the filename to the user
         self.name_not_sanitized = str(os.path.basename(self.path))
 

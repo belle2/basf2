@@ -232,35 +232,33 @@ class Script:
         script.dependencies-list
         @return: None
         """
-        # If all necessary header information are available:
-        if self.header is not None:
+        # Loop over all the dependencies given in the header information
+        for root_file in self.get_input_files():
 
-            # Loop over all the dependencies given in the header information
-            for root_file in self.header.get('input', []):
+            # Find the script which is responsible for the creation of
+            # the input file (in the same package or in validation folder)
+            creator = find_creator(
+                root_file,
+                self.package,
+                scripts,
+                self.log
+            )
 
-                # Find the script which is responsible for the creation of
-                # the input file (in the same package or in validation folder)
-                creator = find_creator(
-                    root_file,
-                    self.package,
-                    scripts,
-                    self.log
-                )
+            # If no creator could be found, raise an error!
+            if creator is None:
+                self.log.error(
+                    f'Unmatched dependency for {self.path}: {root_file} '
+                    f'has no creator! This means that we will have to skip '
+                    f'this script.')
+                self.status = ScriptStatus.skipped
 
-                # If no creator could be found, raise an error!
-                if creator is None:
-                    self.log.error(
-                        f'Unmatched dependency for {self.path}:{root_file} '
-                        f'has no creator!')
-                    self.status = ScriptStatus.skipped
+            # If creator(s) could be found, add those scripts to the
+            # list of scripts on which self depends
+            else:
+                self.dependencies += creator
 
-                # If creator(s) could be found, add those scripts to the
-                # list of scripts on which self depends
-                else:
-                    self.dependencies += creator
-
-            # remove double entries
-            self.dependencies = list(set(self.dependencies))
+        # remove double entries
+        self.dependencies = list(set(self.dependencies))
 
     def get_input_files(self):
         """
@@ -388,8 +386,7 @@ def find_creator(
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if candidate.header and \
-           outputfile in candidate.header.get('output', []):
+        if outputfile in candidate.get_output_files():
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator

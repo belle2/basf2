@@ -49,7 +49,7 @@ class Systematics(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def JpsimumuTagProbe(self, path):
         """Build JpsimumuTagProbe lists for systematics skims."""
@@ -124,7 +124,7 @@ class SystematicsTracking(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
@@ -228,7 +228,7 @@ class Resonance(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def getDsList(self, path):
         """Build Ds list for systematics skims."""

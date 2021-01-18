@@ -8,7 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 ################
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -20,20 +20,20 @@ if argc == 3:
     f_out_root = argvs[2]
 
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-main = create_path()
+main = b2.create_path()
 
 # input
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
 
 # Unpacker
-trgeclUnpacker = register_module("TRGECLUnpacker")
-trggdlUnpacker = register_module("TRGGDLUnpacker")
-trggdlsummary = register_module("TRGGDLSummary")
+trgeclUnpacker = b2.register_module("TRGECLUnpacker")
+trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
+trggdlsummary = b2.register_module("TRGGDLSummary")
 
 main.add_module(trgeclUnpacker)
 main.add_module(trggdlUnpacker)
@@ -41,13 +41,13 @@ main.add_module(trggdlsummary)
 
 
 # QAM
-trgeclqam = register_module('TRGECLQAM')
+trgeclqam = b2.register_module('TRGECLQAM')
 trgeclqam.param('outputFileName', f_out_root)
 main.add_module(trgeclqam)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

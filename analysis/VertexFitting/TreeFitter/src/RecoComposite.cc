@@ -22,6 +22,13 @@ namespace TreeFitter {
     updateParams();
   }
 
+  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
+                               bool massConstraint)
+    : ParticleBase(particle, mother, &config), m_params(), m_hasEnergy(true), m_massconstraint(massConstraint)
+  {
+    updateParams();
+  }
+
   ErrCode RecoComposite::initParticleWithMother(FitParams& fitparams)
   {
     return initTau(fitparams);
@@ -97,6 +104,9 @@ namespace TreeFitter {
   {
     ErrCode status;
     switch (type) {
+      case Constraint::mass:
+        status |= projectMassConstraint(fitparams, p);
+        break;
       case Constraint::composite:
         status |= projectRecoComposite(fitparams, p);
         break ;

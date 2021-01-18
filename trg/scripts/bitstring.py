@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""
+r"""
 This package defines classes that simplify bit-wise creation, manipulation and
 interpretation of data.
 
@@ -775,7 +775,6 @@ class Bits(object):
                   initialising using 'bytes' or 'filename'.
 
         """
-        pass
 
     def __new__(cls, auto=None, length=None, offset=None, _cache=None, **kwargs):
         # For instances auto-initialised with a string we intern the
@@ -3348,9 +3347,9 @@ class BitArray(Bits):
             # Prevent self assignment woes
             new = copy.copy(self)
         positions = [lengths[0] + start]
-        for l in lengths[1:-1]:
+        for k in lengths[1:-1]:
             # Next position is the previous one plus the length of the next section.
-            positions.append(positions[-1] + l)
+            positions.append(positions[-1] + k)
         # We have all the positions that need replacements. We do them
         # in reverse order so that they won't move around as we replace.
         positions.reverse()

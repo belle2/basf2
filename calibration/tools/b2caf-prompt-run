@@ -37,7 +37,7 @@ from prompt import prompt_script_package
 def get_caf_input_data(args):
     """Path to input data json file, used to find input files for the CAF job.
 Also to create the IoV for each run so the calibrations can use it if necessary.
-
+    
 Note that the input data json file should have the form:
 
 .. code-block:: python

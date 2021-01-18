@@ -1,4 +1,4 @@
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import glob
 from reconstruction import add_reconstruction
@@ -6,7 +6,7 @@ from reconstruction import add_reconstruction
 from simulation import add_simulation
 import os
 
-set_random_seed(1)
+b2.set_random_seed(1)
 bkgdir = "/remote/neurobelle/data/bckg/OfficialBKG/15thCampaign/phase3/set0/"
 thrange = [10, 170]
 particlegun_params = {
@@ -23,7 +23,7 @@ particlegun_params = {
         'yVertexParams': [0, 0.0],          # vertex on z-axis
         'zVertexParams': [0.0, 0.0]}     # target range for training
 
-main = create_path()
+main = b2.create_path()
 main.add_module('EventInfoSetter', evtNumList=5000)  # , expList=[7], runList=[3525])
 main.add_module('Gearbox')
 main.add_module('Geometry')
@@ -31,7 +31,7 @@ main.add_module('BeamBkgMixer',
                 backgroundFiles=glob.glob(os.path.join(bkgdir, '*usual*.root')),
                 overallScaleFactor=1,
                 components=['CDC'])
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param(particlegun_params)
 main.add_module(particlegun)
 
@@ -71,5 +71,5 @@ add_reconstruction(main)
 
 main.add_module('RootOutput', outputFileName="phase3bckg-0-reco_sim.root")
 main.add_module('Progress')
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

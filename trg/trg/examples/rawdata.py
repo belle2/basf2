@@ -7,8 +7,9 @@
 #    usage : %> basf2 TrgGdlUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 
+import os
 import sys
 import re
 
@@ -23,24 +24,24 @@ if argc == 2:
 
 
 # set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-use_central_database("TRGGDL_201811")
+b2.use_central_database("TRGGDL_201811")
 
 # input
 if f_in_root[-6:] == ".sroot":
-    input = register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    input = b2.register_module('SeqRootInput')
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
 if f_in_root[-5:] == ".root":
-    input = register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    input = b2.register_module('RootInput')
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
 
 print(f_in_root)
 input.param('inputFileName', f_in_root)
 
-anarawdata = register_module('TRGRAWDATA')
+anarawdata = b2.register_module('TRGRAWDATA')
 
 anarawdata.param('nwd_2ds', 3939)
 anarawdata.param('nwd_3ds', 3939)
@@ -71,7 +72,7 @@ anarawdata.param('on_top', True)
 anarawdata.param('scale_top', 32)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -83,9 +84,9 @@ if gen_hist:
     if not os.path.isdir('rawdatahist'):
         os.mkdir('rawdatahist')
 
-    histo = register_module('HistoManager')
+    histo = b2.register_module('HistoManager')
     histo.param("histoFileName", "rawdatahist/raw.%s.root" % basename)
     main.add_module(histo)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

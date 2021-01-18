@@ -6,6 +6,73 @@ from ROOT import Belle2
 import sys
 
 
+def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
+
+    if(isROIsimulation):
+        clusterizerName = '__ROISVDClusterizer'
+        recocreatorName = '__ROISVDRecoDigitCreator'
+        dataFormatName = '__ROISVDDataFormat'
+        recoDigitsName = '__ROIsvdRecoDigits'
+        clustersName = '__ROIsvdClusters'
+        shaperDigitsName = ""
+        missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
+    else:
+        clusterizerName = 'SVDClusterizer'
+        recocreatorName = 'SVDRecoDigitCreator'
+        dataFormatName = 'SVDDataFormat'
+        recoDigitsName = ""
+        clustersName = ""
+        shaperDigitsName = ""
+        missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
+
+    # data format check NOT appended
+    if dataFormatName not in [e.name() for e in path.modules()]:
+        dataFormat = b2.register_module('SVDDataFormatCheck')
+        dataFormat.param('ShaperDigits', shaperDigitsName)
+
+    if clusterizerName not in [e.name() for e in path.modules()]:
+        clusterizer = b2.register_module('SVDClusterizer')
+        clusterizer.set_name(clusterizerName)
+        clusterizer.param('Clusters', clustersName)
+        clusterizer.param('timeAlgorithm6Samples', "CoG6")
+        clusterizer.param('timeAlgorithm3Samples', "CoG6")
+        clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
+        clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
+        clusterizer.param('positionAlgorithm6Samples', "oldDefault")
+        clusterizer.param('positionAlgorithm3Samples', "oldDefault")
+        clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
+        clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
+        clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
+        clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
+        clusterizer.param('useDB', False)
+        path.add_module(clusterizer)
+
+    if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
+        missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator.set_name(missingAPVsClusterCreatorName)
+        path.add_module(missingAPVCreator)
+
+    # Add SVDSpacePointCreator
+    add_svd_SPcreation(path, isROIsimulation)
+
+    if createRecoDigits and not isROIsimulation:
+        # Add SVDRecoDigit creator module if not ROI simulation
+        # useful for SVD performance studies
+        add_svd_create_recodigits(path, recocreatorName)
+
+
+def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator"):
+
+    if recocreatorName not in [e.name() for e in path.modules()]:
+        recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
+        recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
+        recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+        recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
+        recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
+        recoDigitCreator.param('useDB', False)
+        path.add_module(recoDigitCreator)
+
+
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):

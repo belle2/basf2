@@ -8,7 +8,7 @@
 # usage: basf2 SOME_PATH/unpack_cdctrigger.py -i inputFile.[s]root [-o outputFile.root]
 # (items in the square brackets [] are optional)
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 # whether we will also unpack CDC data
@@ -18,26 +18,26 @@ skim_dummy_trg = True
 
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
 if not input_files.empty() and input_files.front().endswith(".sroot"):
-    root_input = register_module('SeqRootInput')
+    root_input = b2.register_module('SeqRootInput')
 else:
-    root_input = register_module('RootInput')
+    root_input = b2.register_module('RootInput')
 
-main = create_path()
+main = b2.create_path()
 main.add_module(root_input)
 
 if unpack_CDCHit:
     # Set Database
-    use_database_chain()
-    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-    cdc_unpacker = register_module('CDCUnpacker')
+    b2.use_database_chain()
+    b2.use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    cdc_unpacker = b2.register_module('CDCUnpacker')
     cdc_unpacker.param('enableStoreCDCRawHit', True)
     main.add_module(cdc_unpacker)
 
-unpacker = register_module('CDCTriggerUnpacker')
-unpacker.logging.log_level = LogLevel.DEBUG
+unpacker = b2.register_module('CDCTriggerUnpacker')
+unpacker.logging.log_level = b2.LogLevel.DEBUG
 # increase this value to get debug mesages in more detail
 unpacker.logging.debug_level = 10
-unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 # size (number of words) of the Belle2Link header
 unpacker.param('headerSize', 3)
 # unpack the data from the 2D tracker and save its Bitstream
@@ -57,7 +57,7 @@ main.add_module(unpacker)
 
 if skim_dummy_trg:
     # don't save the output if there are no trigger data in the event
-    empty_path = create_path()
+    empty_path = b2.create_path()
     unpacker.if_false(empty_path)
 
 # save the output root file with specified file name
@@ -69,5 +69,5 @@ main.add_module('RootOutput',
                                     'RawSVDs',
                                     'RawPXDs',
                                     'RawTOPs'])
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

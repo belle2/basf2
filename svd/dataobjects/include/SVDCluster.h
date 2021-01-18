@@ -130,8 +130,8 @@ namespace Belle2 {
      */
     float getClsTime() const { return m_clsTime; }
 
-    /** Get standard deviation of waveform maximum times of cluster strip signals.
-     * @return standard deviation of waveform maximum times.
+    /** Get the error of the reconstructed hit time.
+     * @return error of the reconstructed hit time.
      */
     float getClsTimeSigma() const { return m_clsTimeSigma; }
 

@@ -35,10 +35,10 @@ using namespace std;
 using namespace Belle2::bklm;
 
 SensitiveDetector::SensitiveDetector(const G4String& name) :
-  SensitiveDetectorBase(name, Const::KLM),
-  m_FirstCall(true),
-  m_BkgSensitiveDetector(nullptr),
-  m_GeoPar(nullptr)
+  SensitiveDetectorBase{name, Const::KLM},
+  m_FirstCall{true},
+  m_BkgSensitiveDetector{nullptr},
+  m_GeoPar{nullptr}
 {
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
@@ -81,47 +81,46 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
   // instead of trying to find entry and exit points and then saving only the midpoint.
   // Do same for scintillators.
 
-  double       eDep     = step->GetTotalEnergyDeposit() / CLHEP::MeV;  // GEANT4: in MeV
-  G4StepPoint* preStep  = step->GetPreStepPoint();
-  G4StepPoint* postStep = step->GetPostStepPoint();
-  G4Track*     track    = step->GetTrack();
+  double       eDep     {step->GetTotalEnergyDeposit() / CLHEP::MeV};  // GEANT4: in MeV
+  G4StepPoint* preStep  {step->GetPreStepPoint()};
+  G4StepPoint* postStep {step->GetPostStepPoint()};
+  G4Track*     track    {step->GetTrack()};
 
   // Record a BKLMSimHit for a charged track that deposits some energy.
   if ((eDep > 0.0) && (postStep->GetCharge() != 0.0)) {
-    const G4VTouchable* hist = preStep->GetTouchable();
-    int depth = hist->GetHistoryDepth();
+    const G4VTouchable* hist{preStep->GetTouchable()};
+    int depth{hist->GetHistoryDepth()};
     if (depth < m_DepthPlane) {
       B2WARNING("BKLM SensitiveDetector::step(): "
                 << LogVar("Touchable HistoryDepth", depth)
                 << LogVar("Should be at least", m_DepthPlane));
       return false;
     }
-    int plane = hist->GetCopyNumber(depth - m_DepthPlane);
-    int layer = hist->GetCopyNumber(depth - m_DepthLayer);
-    int sector = hist->GetCopyNumber(depth - m_DepthSector);
-    int section = hist->GetCopyNumber(depth - m_DepthSection);
-    int moduleID =
-      int(BKLMElementNumbers::moduleNumber(section, sector, layer));
-    double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
+    int plane{hist->GetCopyNumber(depth - m_DepthPlane)};
+    int layer{hist->GetCopyNumber(depth - m_DepthLayer)};
+    int sector{hist->GetCopyNumber(depth - m_DepthSector)};
+    int section{hist->GetCopyNumber(depth - m_DepthSection)};
+    int moduleID{int(BKLMElementNumbers::moduleNumber(section, sector, layer))};
+    double time{0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime())};  // GEANT4: in ns
     if (time > m_HitTimeMax)
       return false;
-    const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
-    const Module* m = m_GeoPar->findModule(section, sector, layer);
-    const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
-    const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
+    const CLHEP::Hep3Vector globalPosition{0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm}; // in cm
+    const Module* m {m_GeoPar->findModule(section, sector, layer)};
+    const CLHEP::Hep3Vector localPosition{m->globalToLocal(globalPosition)};
+    const CLHEP::Hep3Vector propagationTimes{m->getPropagationTimes(localPosition)};
     if (postStep->GetProcessDefinedStep() != 0) {
       if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay)
         moduleID |= BKLM_DECAYED_MASK;
     }
-    int trackID = track->GetTrackID();
+    int trackID{track->GetTrackID()};
     if (m->hasRPCs()) {
-      int phiStripLower = -1;
-      int phiStripUpper = -1;
-      int zStripLower = -1;
-      int zStripUpper = -1;
+      int phiStripLower{ -1};
+      int phiStripUpper{ -1};
+      int zStripLower{ -1};
+      int zStripUpper{ -1};
       convertHitToRPCStrips(localPosition, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
       if (zStripLower > 0) {
-        int moduleIDZ = moduleID;
+        int moduleIDZ{moduleID};
         BKLMElementNumbers::setPlaneInModule(
           moduleIDZ, BKLMElementNumbers::c_ZPlane);
         BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
@@ -142,7 +141,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         simHitPosition->addRelationTo(simHit);
       }
     } else {
-      int scint = hist->GetCopyNumber(depth - m_DepthScintillator);
+      int scint{hist->GetCopyNumber(depth - m_DepthScintillator)};
       BKLMElementNumbers::setStripInModule(moduleID, scint);
       BKLMStatus::setMaximalStrip(moduleID, scint);
       double propTime;
@@ -168,21 +167,21 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
 void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosition, const Module* m,
                                               int& phiStripLower, int& phiStripUpper, int& zStripLower, int& zStripUpper)
 {
-  double phiStripD = m->getPhiStrip(localPosition);
-  int phiStrip = int(phiStripD);
-  int pMin = m->getPhiStripMin();
+  double phiStripD{m->getPhiStrip(localPosition)};
+  int phiStrip{int(phiStripD)};
+  int pMin{m->getPhiStripMin()};
   if (phiStrip < pMin)
     return;
-  int pMax = m->getPhiStripMax();
+  int pMax{m->getPhiStripMax()};
   if (phiStrip > pMax)
     return;
 
-  double zStripD = m->getZStrip(localPosition);
-  int zStrip = int(zStripD);
-  int zMin = m->getZStripMin();
+  double zStripD{m->getZStrip(localPosition)};
+  int zStrip{int(zStripD)};
+  int zMin{m->getZStripMin()};
   if (zStrip < zMin)
     return;
-  int zMax = m->getZStripMax();
+  int zMax{m->getZStripMax()};
   if (zStrip > zMax)
     return;
 
@@ -190,15 +189,15 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   phiStripUpper = phiStrip;
   zStripLower = zStrip;
   zStripUpper = zStrip;
-  double phiStripDiv = fmod(phiStripD, 1.0) - 0.5; // between -0.5 and +0.5 within central phiStrip
-  double zStripDiv = fmod(zStripD, 1.0) - 0.5;   // between -0.5 and +0.5 within central zStrip
+  double phiStripDiv{fmod(phiStripD, 1.0) - 0.5}; // between -0.5 and +0.5 within central phiStrip
+  double zStripDiv{fmod(zStripD, 1.0) - 0.5};   // between -0.5 and +0.5 within central zStrip
   int n = 0;
-  double rand = gRandom->Uniform();
+  double rand{gRandom->Uniform()};
   for (n = 1; n < m_SimPar->getMaxMultiplicity(); ++n) {
     if (m_SimPar->getPhiMultiplicityCDF(phiStripDiv, n) > rand)
       break;
   }
-  int nextStrip = (phiStripDiv > 0.0 ? 1 : -1);
+  int nextStrip{(phiStripDiv > 0.0 ? 1 : -1)};
   while (--n > 0) {
     phiStrip += nextStrip;
     if ((phiStrip >= pMin) && (phiStrip <= pMax)) {

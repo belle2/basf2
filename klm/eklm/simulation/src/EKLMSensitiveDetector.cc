@@ -28,8 +28,8 @@
 using namespace Belle2;
 
 EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name) :
-  Simulation::SensitiveDetectorBase(name, Const::KLM),
-  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
+  Simulation::SensitiveDetectorBase{name, Const::KLM},
+  m_ElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
@@ -47,7 +47,7 @@ EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
 
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
-  const int stripLevel = 1;
+  const int stripLevel{1};
   int section, layer, sector, plane, strip, stripGlobal;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
@@ -58,12 +58,12 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
   stripGlobal = m_ElementNumbers->stripNumber(
                   section, layer, sector, plane, strip);
-  const G4double eDep = aStep->GetTotalEnergyDeposit();
+  const G4double eDep{aStep->GetTotalEnergyDeposit()};
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)
     return false;
-  const G4Track& track = * aStep->GetTrack();
-  const G4double hitTime = track.GetGlobalTime();
+  const G4Track& track{*aStep->GetTrack()};
+  const G4double hitTime{track.GetGlobalTime()};
   /* No time cut for background studies. */
   if (hitTime > m_ThresholdHitTime) {
     B2INFO("EKLMSensitiveDetector: "
@@ -76,7 +76,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
   EKLMSimHit* hit = m_SimHits.appendNew();
-  CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
+  CLHEP::Hep3Vector trackMomentum{track.GetMomentum()};
   hit->setMomentum(TLorentzVector(trackMomentum.x(), trackMomentum.y(),
                                   trackMomentum.z(), track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());

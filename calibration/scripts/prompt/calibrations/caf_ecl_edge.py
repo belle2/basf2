@@ -10,7 +10,8 @@ settings = CalibrationSettings(name="ecl_edge",
                                expert_username="hearty",
                                description=__doc__,
                                input_data_formats=["mdst"],
-                               input_data_names=["hlt_mumu_2trk"],
+                               input_data_names=["mumutight_calib"],
+                               input_data_filters={"mumutight_calib": ["mumutight_calib", "Good"]},
                                depends_on=[])
 
 # --------------------------------------------------------------
@@ -25,7 +26,7 @@ def get_calibrations(input_data, **kwargs):
 
     # --------------------------------------------------------------
     # ..Input data
-    file_to_iov_mu_mu = input_data["hlt_mumu_2trk"]
+    file_to_iov_mu_mu = input_data["mumutight_calib"]
     input_files_mu_mu = list(file_to_iov_mu_mu.keys())
 
     # ..Algorithm
@@ -33,7 +34,8 @@ def get_calibrations(input_data, **kwargs):
 
     # ..The calibration
     ecledge_collector = basf2.register_module("eclEdgeCollector")
-    cal_ecl_edge = Calibration(name="ecl_edge", collector=ecledge_collector, algorithms=algo_edge, input_files=input_files_mu_mu)
+    cal_ecl_edge = Calibration(name="ecl_edge", collector=ecledge_collector, algorithms=algo_edge,
+                               input_files=input_files_mu_mu[:1], max_collector_jobs=1)
 
     # ..pre_path to include geometry
     ecl_edge_pre_path = basf2.create_path()

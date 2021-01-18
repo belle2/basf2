@@ -693,10 +693,9 @@ class Validation:
             py_files = scripts_in_dir(folder, self.log, '.py')
             for steering_file in c_files + py_files:
                 script = Script(steering_file, package, self.log)
-
                 script.load_header()
                 # only select this script, if this interval has been selected
-                if interval_selector.in_interval(script):
+                if interval_selector.in_interval(script) and not script.noexecute:
                     self.scripts.append(script)
 
         # Thats it, now there is a complete list of all steering files on

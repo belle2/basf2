@@ -3,7 +3,7 @@
 
 import re
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, List
 import logging
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
@@ -21,6 +21,7 @@ import json_objects
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
+# todo [code quality, low prio, easy]: This should be an enum
 class ScriptStatus:
 
     """!
@@ -99,8 +100,14 @@ class Script:
         # The package to which the steering file belongs
         self.package = package
 
-        # The information from the file header
-        self.header = None  # type: Optional[Dict, Any]
+        # todo [code quality, low prio, easy]: A cleaner way would be to make this private
+        #   and then add attributes that access the information in here to
+        #   maintain central control over all possible tags and their
+        #   postprocessing
+        # todo [code quality, low prio, easy]: It's also bad that this is
+        #   None both when parsing failed and when parsing hasn't been tried
+        #   The information from the file header
+        self.header = None  # type: Optional[Dict]
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -122,6 +129,15 @@ class Script:
         #: cluster controls in order to terminate the job if it exceeds the
         #: runtime.
         self.job_id = None  # type: Optional[str]
+
+    @property
+    def noexecute(self) -> bool:
+        """ A flag set in the header that tells us to simply ignore this
+        script for the purpose of running the validation.
+        """
+        if self.header is None:
+            return True
+        return "noexecute" in self.header
 
     @staticmethod
     def sanitize_file_name(file_name):
@@ -382,6 +398,8 @@ def find_creator(
     @param outputfile: The file of which we want to know by which script is
         created
     @param package: The package in which we want to search for the creator
+    @param scripts: List of all script objects/candidates
+    @param log: Logger
     """
 
     # Get a list of all Script objects for scripts in the given package as well

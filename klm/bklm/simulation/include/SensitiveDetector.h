@@ -43,11 +43,6 @@ namespace Belle2 {
       //! Process each step in the BKLM
       bool step(G4Step*, G4TouchableHistory*) override;
 
-      //! Tidy up at the end of each event
-      void EndOfEvent(G4HCofThisEvent*) override
-      {
-      }
-
     private:
 
       //! Find the ranges of matching RPC strips for each simulated hit

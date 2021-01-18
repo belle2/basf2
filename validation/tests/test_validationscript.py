@@ -39,8 +39,8 @@ class ValidationScriptTest(unittest.TestCase):
 
             self.assertEqual("description_text", script.description)
             self.assertEqual("Thomas Kuhr thomas.kuhr@lmu.de", script.contact[0])
-            self.assertEqual(1, len(script.get_output_files()))
-            self.assertEqual("EvtGenSim.root", script.get_output_files()[0])
+            self.assertEqual(1, len(script.output_files))
+            self.assertEqual("EvtGenSim.root", script.output_files[0])
             self.assertEqual("release", script.interval)
 
 

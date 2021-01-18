@@ -230,7 +230,7 @@ class Script:
         @return: None
         """
         # Loop over all the dependencies given in the header information
-        for root_file in self.get_input_files():
+        for root_file in self.input_files:
 
             # Find the script which is responsible for the creation of
             # the input file (in the same package or in validation folder)
@@ -257,7 +257,8 @@ class Script:
         # remove double entries
         self.dependencies = list(set(self.dependencies))
 
-    def get_input_files(self):
+    @property
+    def input_files(self):
         """
         return a list of input files which this script will read.
         This information is only available, if load_header has been called
@@ -265,7 +266,8 @@ class Script:
         self.load_header()
         return self._header.get('input', [])
 
-    def get_output_files(self):
+    @property
+    def output_files(self):
         """
         return a list of output files this script will create.
         This information is only available, if load_header has been called
@@ -273,6 +275,7 @@ class Script:
         self.load_header()
         return self._header.get('output', [])
 
+    @property
     def is_cacheable(self):
         """
         Returns true, if the script must not be executed if its output
@@ -401,7 +404,7 @@ def find_creator(
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if outputfile in candidate.get_output_files():
+        if outputfile in candidate.output_files:
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator

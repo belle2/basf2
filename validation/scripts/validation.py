@@ -926,14 +926,14 @@ class Validation:
             self.log.warning(msg)
 
     def apply_script_caching(self):
-        cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
+        cacheable_scripts = [s for s in self.scripts if s.is_cacheable]
 
         output_dir_datafiles = validationpath.get_results_tag_folder(
             self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
-            outfiles = s.get_output_files()
+            outfiles = s.output_files
             files_exist = True
             for of in outfiles:
                 full_path = os.path.join(output_dir_datafiles, of)
@@ -1177,7 +1177,7 @@ class Validation:
         def handle_waiting_script(script_obj: Script):
             # Determine the way of execution depending on whether
             # data files are created
-            if script_obj.get_output_files():
+            if script_obj.output_files:
                 script_obj.control = control
             else:
                 script_obj.control = local_control

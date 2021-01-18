@@ -124,7 +124,7 @@ class Mails:
             # give failed_script the same format as error_data in method
             # create_mail_log
             failed_script["package"] = script.package
-            failed_script["rootfile"] = ", ".join(script.get_input_files())
+            failed_script["rootfile"] = ", ".join(script.input_files)
             failed_script["comparison_text"] = " -- "
             failed_script["description"] = script.description
             # this is called comparison_result but it is handled as error

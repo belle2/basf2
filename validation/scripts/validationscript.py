@@ -100,12 +100,8 @@ class Script:
         # The package to which the steering file belongs
         self.package = package
 
-        # todo [code quality, low prio, easy]: A cleaner way would be to make this private
-        #   and then add attributes that access the information in here to
-        #   maintain central control over all possible tags and their
-        #   postprocessing
         #: The information from the file header
-        self.header = dict()
+        self._header = dict()
         #: Set if we tried to parse this but there were issues during parsing
         self.header_parsing_errors = False
         #: Set to true once header was parsed
@@ -138,7 +134,7 @@ class Script:
         script for the purpose of running the validation.
         """
         self.load_header()
-        return "noexecute" in self.header
+        return "noexecute" in self._header
 
     @staticmethod
     def sanitize_file_name(file_name):
@@ -267,7 +263,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return self.header.get('input', [])
+        return self._header.get('input', [])
 
     def get_output_files(self):
         """
@@ -275,7 +271,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return self.header.get('output', [])
+        return self._header.get('output', [])
 
     def is_cacheable(self):
         """
@@ -284,7 +280,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return 'cacheable' in self.header
+        return 'cacheable' in self._header
 
     def load_header(self):
         """!
@@ -326,7 +322,7 @@ class Script:
             return
 
         # we have a header
-        self.header = {}
+        self._header = {}
 
         # Loop over that tree
         for branch in xml_tree:
@@ -351,28 +347,28 @@ class Script:
             # implementation technically allows multiple occurrences of the
             # same <tag></tag>-pair, which will be bundled to the same key in
             # the key in the returned dictionary
-            if branch.tag.strip() in self.header:
-                self.header[branch.tag.strip()] += branch_value
+            if branch.tag.strip() in self._header:
+                self._header[branch.tag.strip()] += branch_value
             else:
-                self.header[branch.tag.strip()] = branch_value
+                self._header[branch.tag.strip()] = branch_value
 
     @property
     def description(self) -> str:
         """ Description of script as set in header """
         self.load_header()
-        return self.header.get("description", "")
+        return self._header.get("description", "")
 
     @property
     def contact(self) -> str:
         """ Contact of script as set in header """
         self.load_header()
-        return self.header.get("contact", "")
+        return self._header.get("contact", "")
 
     @property
     def interval(self) -> str:
         """ Interval of script executation as set in header """
         self.load_header()
-        return self.header.get("interval", "nightly")
+        return self._header.get("interval", "nightly")
 
 
 def find_creator(

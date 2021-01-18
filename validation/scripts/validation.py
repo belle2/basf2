@@ -16,7 +16,7 @@ import sys
 import time
 import shutil
 import datetime
-from typing import List
+from typing import List, Optional
 
 import json_objects
 import mail_log
@@ -829,7 +829,7 @@ class Validation:
                         suma += float(run_times[dict_key])
                     script.runtime = suma / len(run_times)
 
-    def get_script_by_name(self, name):
+    def get_script_by_name(self, name: str) -> Optional[Script]:
         """!
 
         """

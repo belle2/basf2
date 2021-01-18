@@ -113,10 +113,8 @@ class Mails:
             for suffix in ["py", "C"]:
                 failed_script = failed_script.replace("." + suffix,
                                                       "_" + suffix)
-            if self._validator.get_script_by_name(failed_script):
-                script = self._validator.get_script_by_name(failed_script)
-            else:
-                # can't do anything if script is not found
+            script = self._validator.get_script_by_name(failed_script)
+            if script is None:
                 continue
 
             script.load_header()

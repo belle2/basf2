@@ -10,6 +10,7 @@
 #pragma link C++ class Belle2::TRGGRLPHOTON+; // checksum=0x79f9c705, version=2
 #pragma link C++ class Belle2::TRGGRLShortTrack+; // checksum=0xd13040ac, version=1
 #pragma link C++ class Belle2::TRGGRLInfo+; // checksum=0xbe9db82c, version=3
+#pragma link C++ class Belle2::TRGGRLInnerTrack+;
 #pragma link C++ class Belle2::TRGGRLUnpackerStore+; // checksum=0x914396a2, version=1
 
 #endif

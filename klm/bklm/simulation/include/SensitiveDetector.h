@@ -17,6 +17,7 @@
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -75,6 +76,9 @@ namespace Belle2 {
 
       //! BKLM simulated hit positions.
       StoreArray<BKLMSimHitPosition> m_SimHitPositions;
+
+      //! Relation array between MCPartices and BKLMSimHits.
+      RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
 
     };
 

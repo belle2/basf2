@@ -52,7 +52,8 @@ SensitiveDetector::SensitiveDetector(const G4String& name) :
   m_MCParticles.isRequired();
   m_SimHits.registerInDataStore();
   m_SimHitPositions.registerInDataStore();
-  m_MCParticles.registerRelationTo(m_SimHits);
+  m_MCParticlesToSimHits.registerInDataStore();
+  registerMCParticleRelation(m_MCParticlesToSimHits);
   m_SimHitPositions.registerRelationTo(m_SimHits);
 }
 
@@ -119,7 +120,6 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         moduleID |= BKLM_DECAYED_MASK;
     }
     int trackID = track->GetTrackID();
-    const MCParticle* currentMCParticle = m_MCParticles[trackID];
     if (m->hasRPCs()) {
       int phiStripLower = -1;
       int phiStripUpper = -1;
@@ -133,7 +133,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
         BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
         BKLMSimHit* simHit = m_SimHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-        currentMCParticle->addRelationTo(simHit);
+        m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
         BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
@@ -143,7 +143,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
         BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
         BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-        currentMCParticle->addRelationTo(simHit);
+        m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
         BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
@@ -162,7 +162,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         propTime = propagationTimes.z();
       }
       BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propTime, time, eDep);
-      currentMCParticle->addRelationTo(simHit);
+      m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
       BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
       simHitPosition->addRelationTo(simHit);
     }

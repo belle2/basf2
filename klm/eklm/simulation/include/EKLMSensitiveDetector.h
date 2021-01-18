@@ -20,55 +20,59 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
-namespace Belle2::EKLM {
+namespace Belle2 {
 
-  /**
-   * The Class for EKLM Sensitive Detector.
-   * @details
-   * In this class, every variables defined in EKLMSimHit will be calculated.
-   * EKLMSimHits are saved into hits collection.
-   */
-
-  class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
-
-  public:
+  namespace EKLM {
 
     /**
-     * Constructor.
+     * The Class for EKLM Sensitive Detector.
+     * @details
+     * In this class, every variables defined in EKLMSimHit will be calculated.
+     * EKLMSimHits are saved into hits collection.
      */
-    explicit EKLMSensitiveDetector(G4String name);
 
-    /**
-     * Destructor.
-     */
-    ~EKLMSensitiveDetector();
+    class EKLMSensitiveDetector : public Simulation::SensitiveDetectorBase  {
 
-    /**
-     * Process each step and calculate variables for EKLMSimHit
-     * store EKLMSimHit.
-     */
-    bool step(G4Step* aStep, G4TouchableHistory* history) override;
+    public:
 
-  private:
+      /**
+       * Constructor.
+       */
+      explicit EKLMSensitiveDetector(G4String name);
 
-    /** Element numbers. */
-    const EKLMElementNumbers* m_ElementNumbers;
+      /**
+       * Destructor.
+       */
+      ~EKLMSensitiveDetector();
 
-    /** MC particles. */
-    StoreArray<MCParticle> m_MCParticles;
+      /**
+       * Process each step and calculate variables for EKLMSimHit
+       * store EKLMSimHit.
+       */
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
-    /** Simulation hits. */
-    StoreArray<EKLMSimHit> m_SimHits;
+    private:
 
-    /** Relation array between MCPartices and EKLMSimHits. */
-    RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
-    /**
-     * All hits with time large  than m_ThresholdHitTime
-     * will be dropped.
-     */
-    G4double m_ThresholdHitTime;
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
 
-  };
+      /** Simulation hits. */
+      StoreArray<EKLMSimHit> m_SimHits;
+
+      /** Relation array between MCPartices and EKLMSimHits. */
+      RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
+
+      /**
+       * All hits with time large  than m_ThresholdHitTime
+       * will be dropped.
+       */
+      G4double m_ThresholdHitTime;
+
+    };
+
+  }
 
 }

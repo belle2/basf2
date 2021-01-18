@@ -262,31 +262,6 @@ class Script:
             # remove double entries
             self.dependencies = list(set(self.dependencies))
 
-        # If the necessary header information are not available:
-        else:
-            # If there is a script whose name comes before this script, this
-            # is presumed as a dependency
-
-            # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in scripts
-                           if script.package == self.package]
-
-            # Divide that list into .py and .c files, because .py files are
-            # always executed before .C files:
-            py_files = [_ for _ in in_same_pkg if _.path.endswith('py')]
-            c_files = [_ for _ in in_same_pkg if _.path.endswith('C')]
-
-            # Make sure the lists are ordered by the path of the files
-            py_files.sort(key=lambda x: x.path)
-            c_files.sort(key=lambda x: x.path)
-
-            # Now put the two lists back together
-            in_same_pkg = py_files + c_files
-
-            if in_same_pkg.index(self) - 1 >= 0:
-                predecessor = in_same_pkg[in_same_pkg.index(self) - 1]
-                self.dependencies.append(predecessor)
-
     def get_input_files(self):
         """
         return a list of input files which this script will read.

@@ -43,7 +43,7 @@ SensitiveDetector::SensitiveDetector(const G4String& name) :
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();
-  m_MCParticles.isRequired();
+  m_MCParticles.isOptional();
   m_SimHits.registerInDataStore();
   m_SimHitPositions.registerInDataStore();
   m_MCParticlesToSimHits.registerInDataStore();

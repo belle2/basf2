@@ -35,7 +35,7 @@ EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name) :
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  m_MCParticles.isRequired();
+  m_MCParticles.isOptional();
   m_SimHits.registerInDataStore();
   m_MCParticles.registerRelationTo(m_SimHits);
   registerMCParticleRelation(m_MCParticlesToSimHits);

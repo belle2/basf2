@@ -3094,7 +3094,7 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
 
     Parameters:
         list_name (str): name of the input ParticleList.
-                         It must be a list of charged stable particles as defined in `Const::chargedStableSet`.
+                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
                          The charge-conjugate ParticleList will be also processed automatically.
         path (basf2.Path): the module is added to this path.
         use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
@@ -3104,10 +3104,15 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
                                Please note, for each input detector a variable is calculated,
                                and the detector's name is appended to the alias to distinguish them.
         *detectors: detectors at whose entry surface track isolation variables will be calculated.
+                    Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
 
     """
 
     from variables import variables
+
+    det_choices = ("CDC", "PID", "ECL", "KLM")
+    if any(d not in det_choices for d in detectors):
+        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
     for det in detectors:
         path.add_module("TrackIsoCalculator",

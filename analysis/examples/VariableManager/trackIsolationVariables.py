@@ -2,6 +2,9 @@
 
 """
 Test track isolation variables.
+
+For each particle's track in the input charged stable particle list,
+calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
 """
 
 __author__ = 'Marco Milesi'
@@ -24,7 +27,8 @@ def argparser():
                         default=["CDC", "PID", "ECL", "KLM"],
                         choices=["CDC", "PID", "ECL", "KLM"],
                         help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
-                        "Pass a space-separated list of names.")
+                        "Pass a space-separated list of names.\n"
+                        "NB: 'PID' indicates TOP+ARICH entry surface.")
     parser.add_argument("-d", "--debug",
                         action="store",
                         default=0,
@@ -39,7 +43,7 @@ if __name__ == '__main__':
 
     args = argparser().parse_args()
 
-    # Command line arguments are parsed before importing basf2, to avoid PyROOT hijacking them.
+    # Command line arguments are parsed before importing basf2, to avoid PyROOT hijacking them
     # in case of overlapping option names.
 
     import basf2 as b2
@@ -51,7 +55,7 @@ if __name__ == '__main__':
 
     # Add input data and ParticleLoader modules to the path.
     ma.inputMdstList("default",
-                     filelist=[b2.find_file("mdst13.root", "validation")],
+                     filelist=[b2.find_file("mdst14.root", "validation")],
                      path=path)
 
     # Fill a particle list of charged stable particles (eg. pions).
@@ -59,21 +63,15 @@ if __name__ == '__main__':
     ma.fillParticleList("pi+:all", "", path=path)
     ma.applyCuts("pi+:all", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
-    ma.printList("pi+:all", False, path=path)
-    # Get particle statistics at the end of the job: number of events with at
-    # least one candidate, average number of candidates per event, etc.
-    # ma.summaryOfLists(["pi+:all"], path=path)
-
-    # # Calculate the mininmal distance at a given detector surface among all
-    # # track candidates in the input particle list.
-
+    # 3D distance (default).
     ma.calculateTrackIsolation("pi+:all", path, *args.detectors, alias="dist3DToClosestTrkAtSurface")
+    # 2D distance on rho-phi plane (chord length).
     ma.calculateTrackIsolation("pi+:all", path, *args.detectors, use2DRhoPhiDist=True, alias="dist2DRhoPhiToClosestTrkAtSurface")
 
     ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
     ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
 
-    # Optionally activate debug mode for the TrackIsoCalculator module(s)
+    # Optionally activate debug mode for the TrackIsoCalculator module(s).
     if args.debug:
         for m in path.modules():
             if "TrackIsoCalculator" in m.name():
@@ -89,7 +87,7 @@ if __name__ == '__main__':
 
     path.add_module("Progress")
 
-    # Process the data
+    # Process the data.
     b2.process(path)
 
     print(b2.statistics)

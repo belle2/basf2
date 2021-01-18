@@ -108,6 +108,8 @@ class Script:
         self.header = dict()
         #: Set if we tried to parse this but there were issues during parsing
         self.header_parsing_errors = False
+        #: Set to true once header was parsed
+        self._header_parsing_attempted = False
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -135,6 +137,7 @@ class Script:
         """ A flag set in the header that tells us to simply ignore this
         script for the purpose of running the validation.
         """
+        self.load_header()
         return "noexecute" in self.header
 
     @staticmethod
@@ -263,6 +266,7 @@ class Script:
         return a list of input files which this script will read.
         This information is only available, if load_header has been called
         """
+        self.load_header()
         return self.header.get('input', [])
 
     def get_output_files(self):
@@ -270,6 +274,7 @@ class Script:
         return a list of output files this script will create.
         This information is only available, if load_header has been called
         """
+        self.load_header()
         return self.header.get('output', [])
 
     def is_cacheable(self):
@@ -278,6 +283,7 @@ class Script:
         files are already present.
         This information is only available, if load_header has been called
         """
+        self.load_header()
         return 'cacheable' in self.header
 
     def load_header(self):
@@ -288,6 +294,10 @@ class Script:
         values that were read from the XML header.
         @return: None
         """
+        if self._header_parsing_attempted:
+            return
+
+        self._header_parsing_attempted = True
 
         # Read the file as a whole
         # We specify encoding and errors here to avoid exceptions for people

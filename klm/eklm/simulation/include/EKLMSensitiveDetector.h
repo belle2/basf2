@@ -16,6 +16,8 @@
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
@@ -54,8 +56,14 @@ namespace Belle2 {
       /** Element numbers. */
       const EKLMElementNumbers* m_ElementNumbers;
 
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
+
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;
+
+      /** Relation array between MCPartices and EKLMSimHits. */
+      RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
 
       /**
        * All hits with time large  than m_ThresholdHitTime

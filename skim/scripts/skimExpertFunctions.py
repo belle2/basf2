@@ -840,7 +840,7 @@ class CombinedSkim(BaseSkim):
             this function can only be run after `build_lists` is run.
         """
         ParticleListLists = [skim.SkimLists for skim in self.Skims]
-        ParticleLists = [l for L in ParticleListLists for l in L]
+        ParticleLists = [lst for L in ParticleListLists for lst in L]
         DuplicatedParticleLists = {
             ParticleList
             for ParticleList in ParticleLists

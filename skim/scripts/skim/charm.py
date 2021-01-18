@@ -465,7 +465,7 @@ class LambdacTopHpJm(BaseSkim):
             100,
             2.2,
             2.4,
-            'Mass distribution of $\Lambda_{C}^{+}$',
+            'Mass distribution of $\\Lambda_{C}^{+}$',
             myEmail,
             'mass of Lambda_c+ (mean=2.28646) ',
             'Please check agreement of: mean, sigma and ratio of signal and background',

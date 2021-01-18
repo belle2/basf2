@@ -128,14 +128,6 @@ class Script:
         #: runtime.
         self.job_id = None  # type: Optional[str]
 
-    @property
-    def noexecute(self) -> bool:
-        """ A flag set in the header that tells us to simply ignore this
-        script for the purpose of running the validation.
-        """
-        self.load_header()
-        return "noexecute" in self._header
-
     @staticmethod
     def sanitize_file_name(file_name):
         """!
@@ -257,34 +249,6 @@ class Script:
         # remove double entries
         self.dependencies = list(set(self.dependencies))
 
-    @property
-    def input_files(self):
-        """
-        return a list of input files which this script will read.
-        This information is only available, if load_header has been called
-        """
-        self.load_header()
-        return self._header.get('input', [])
-
-    @property
-    def output_files(self):
-        """
-        return a list of output files this script will create.
-        This information is only available, if load_header has been called
-        """
-        self.load_header()
-        return self._header.get('output', [])
-
-    @property
-    def is_cacheable(self):
-        """
-        Returns true, if the script must not be executed if its output
-        files are already present.
-        This information is only available, if load_header has been called
-        """
-        self.load_header()
-        return 'cacheable' in self._header
-
     def load_header(self):
         """!
         This method opens the file given in self.path, tries to extract the
@@ -354,6 +318,45 @@ class Script:
                 self._header[branch.tag.strip()] += branch_value
             else:
                 self._header[branch.tag.strip()] = branch_value
+
+    # Below are all of the getter methods for accessing data from the header
+    # If the header isn't loaded at the time they are called, we do that.
+
+    @property
+    def input_files(self):
+        """
+        return a list of input files which this script will read.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return self._header.get('input', [])
+
+    @property
+    def output_files(self):
+        """
+        return a list of output files this script will create.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return self._header.get('output', [])
+
+    @property
+    def is_cacheable(self):
+        """
+        Returns true, if the script must not be executed if its output
+        files are already present.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return 'cacheable' in self._header
+
+    @property
+    def noexecute(self) -> bool:
+        """ A flag set in the header that tells us to simply ignore this
+        script for the purpose of running the validation.
+        """
+        self.load_header()
+        return "noexecute" in self._header
 
     @property
     def description(self) -> str:

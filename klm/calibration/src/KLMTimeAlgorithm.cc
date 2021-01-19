@@ -933,26 +933,28 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
           double propgationT = it->dist / effSpeed_RPC;
-          h_time_rpc->Fill(timeHit - propgationT);
-          h_timeF_rpc[iF]->Fill(timeHit - propgationT);
-          h_timeFS_rpc[iF][iS]->Fill(timeHit - propgationT);
-          h_timeFSL[iF][iS][iL]->Fill(timeHit - propgationT);
-          h_timeFSLP[iF][iS][iL][iP]->Fill(timeHit - propgationT);
-          h_timeFSLPC[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT);
-          h2_timeF_rpc[iF]->Fill(iS, timeHit - propgationT);
-          h2_timeFS[iF][iS]->Fill(iL, timeHit - propgationT);
-          h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT);
+          double time = timeHit - propgationT;
+          h_time_rpc->Fill(time);
+          h_timeF_rpc[iF]->Fill(time);
+          h_timeFS_rpc[iF][iS]->Fill(time);
+          h_timeFSL[iF][iS][iL]->Fill(time);
+          h_timeFSLP[iF][iS][iL][iP]->Fill(time);
+          h_timeFSLPC[iF][iS][iL][iP][iC]->Fill(time);
+          h2_timeF_rpc[iF]->Fill(iS, time);
+          h2_timeFS[iF][iS]->Fill(iL, time);
+          h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
           double propgationT = it->dist / effSpeed;
-          h_time_scint->Fill(timeHit - propgationT);
-          h_timeF_scint[iF]->Fill(timeHit - propgationT);
-          h_timeFS_scint[iF][iS]->Fill(timeHit - propgationT);
-          h_timeFSL[iF][iS][iL]->Fill(timeHit - propgationT);
-          h_timeFSLP[iF][iS][iL][iP]->Fill(timeHit - propgationT);
-          h_timeFSLPC[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT);
-          h2_timeF_scint[iF]->Fill(iS, timeHit - propgationT);
-          h2_timeFS[iF][iS]->Fill(iL, timeHit - propgationT);
-          h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT);
+          double time = timeHit - propgationT;
+          h_time_scint->Fill(time);
+          h_timeF_scint[iF]->Fill(time);
+          h_timeFS_scint[iF][iS]->Fill(time);
+          h_timeFSL[iF][iS][iL]->Fill(time);
+          h_timeFSLP[iF][iS][iL][iP]->Fill(time);
+          h_timeFSLPC[iF][iS][iL][iP][iC]->Fill(time);
+          h2_timeF_scint[iF]->Fill(iS, time);
+          h2_timeFS[iF][iS]->Fill(iL, time);
+          h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         }
       } else {
         int iF = klmChannel.getSection() - 1;
@@ -961,15 +963,16 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
         double propgationT = it->dist / effSpeed_end;
-        h_time_scint_end->Fill(timeHit - propgationT);
-        h_timeF_scint_end[iF]->Fill(timeHit - propgationT);
-        h_timeFS_scint_end[iF][iS]->Fill(timeHit - propgationT);
-        h_timeFSL_end[iF][iS][iL]->Fill(timeHit - propgationT);
-        h_timeFSLP_end[iF][iS][iL][iP]->Fill(timeHit - propgationT);
-        h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT);
-        h2_timeF_scint_end[iF]->Fill(iS, timeHit - propgationT);
-        h2_timeFS_end[iF][iS]->Fill(iL, timeHit - propgationT);
-        h2_timeFSLP_end[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT);
+        double time = timeHit - propgationT;
+        h_time_scint_end->Fill(time);
+        h_timeF_scint_end[iF]->Fill(time);
+        h_timeFS_scint_end[iF][iS]->Fill(time);
+        h_timeFSL_end[iF][iS][iL]->Fill(time);
+        h_timeFSLP_end[iF][iS][iL][iP]->Fill(time);
+        h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fill(time);
+        h2_timeF_scint_end[iF]->Fill(iS, time);
+        h2_timeFS_end[iF][iS]->Fill(iL, time);
+        h2_timeFSLP_end[iF][iS][iL][iP]->Fill(iC, time);
       }
     }
   }
@@ -1122,26 +1125,28 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
           double propgationT = it->dist / effSpeed_RPC;
-          hc_time_rpc->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeF_rpc[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFS_rpc[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSL[iF][iS][iL]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSLP[iF][iS][iL][iP]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSLPC[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeF_rpc[iF]->Fill(iS, timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeFS[iF][iS]->Fill(iL, timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT - m_timeShift[channelId]);
+          double time = timeHit - propgationT - m_timeShift[channelId];
+          hc_time_rpc->Fill(time);
+          hc_timeF_rpc[iF]->Fill(time);
+          hc_timeFS_rpc[iF][iS]->Fill(time);
+          hc_timeFSL[iF][iS][iL]->Fill(time);
+          hc_timeFSLP[iF][iS][iL][iP]->Fill(time);
+          hc_timeFSLPC[iF][iS][iL][iP][iC]->Fill(time);
+          h2c_timeF_rpc[iF]->Fill(iS, time);
+          h2c_timeFS[iF][iS]->Fill(iL, time);
+          h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
           double propgationT = it->dist / effSpeed;
-          hc_time_scint->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeF_scint[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFS_scint[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSL[iF][iS][iL]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSLP[iF][iS][iL][iP]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          hc_timeFSLPC[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeF_scint[iF]->Fill(iS, timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeFS[iF][iS]->Fill(iL, timeHit - propgationT - m_timeShift[channelId]);
-          h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT - m_timeShift[channelId]);
+          double time = timeHit - propgationT - m_timeShift[channelId];
+          hc_time_scint->Fill(time);
+          hc_timeF_scint[iF]->Fill(time);
+          hc_timeFS_scint[iF][iS]->Fill(time);
+          hc_timeFSL[iF][iS][iL]->Fill(time);
+          hc_timeFSLP[iF][iS][iL][iP]->Fill(time);
+          hc_timeFSLPC[iF][iS][iL][iP][iC]->Fill(time);
+          h2c_timeF_scint[iF]->Fill(iS, time);
+          h2c_timeFS[iF][iS]->Fill(iL, time);
+          h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         }
       } else {
         int iF = klmChannel.getSection() - 1;
@@ -1150,15 +1155,16 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
         double propgationT = it->dist / effSpeed;
-        hc_time_scint_end->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        hc_timeF_scint_end[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        hc_timeFS_scint_end[iF][iS]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        hc_timeFSL_end[iF][iS][iL]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        hc_timeFSLP_end[iF][iS][iL][iP]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        hc_timeFSLPC_end[iF][iS][iL][iP][iC]->Fill(timeHit - propgationT - m_timeShift[channelId]);
-        h2c_timeF_scint_end[iF]->Fill(iS, timeHit - propgationT - m_timeShift[channelId]);
-        h2c_timeFS_end[iF][iS]->Fill(iL, timeHit - propgationT - m_timeShift[channelId]);
-        h2c_timeFSLP_end[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT - m_timeShift[channelId]);
+        double time = timeHit - propgationT - m_timeShift[channelId];
+        hc_time_scint_end->Fill(time);
+        hc_timeF_scint_end[iF]->Fill(time);
+        hc_timeFS_scint_end[iF][iS]->Fill(time);
+        hc_timeFSL_end[iF][iS][iL]->Fill(time);
+        hc_timeFSLP_end[iF][iS][iL][iP]->Fill(time);
+        hc_timeFSLPC_end[iF][iS][iL][iP][iC]->Fill(time);
+        h2c_timeF_scint_end[iF]->Fill(iS, time);
+        h2c_timeFS_end[iF][iS]->Fill(iL, time);
+        h2c_timeFSLP_end[iF][iS][iL][iP]->Fill(iC, time);
       }
     }
   }

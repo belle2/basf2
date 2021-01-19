@@ -34,8 +34,8 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    TString m_lossFunctionOuter = "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)";
-    TString m_lossFunctionInner = "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)";
+    TString m_lossFunctionOuter = "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)";
+    TString m_lossFunctionInner = "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)";
   };
 } // namespace Belle2
 

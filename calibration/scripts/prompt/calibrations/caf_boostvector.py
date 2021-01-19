@@ -14,8 +14,8 @@ settings = CalibrationSettings(
     input_data_formats=["cdst"],
     input_data_names=["hlt_mumu"],
     expert_config={
-        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+        "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
     depends_on=[])
 
 ##############################

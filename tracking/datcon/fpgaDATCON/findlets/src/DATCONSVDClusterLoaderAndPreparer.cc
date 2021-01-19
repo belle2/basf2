@@ -61,7 +61,6 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<std::pair<VxdID, std::
     const uint& sensorNumber = sensorID.getSensorNumber();
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
-
     if (cluster.isUCluster()) {
       nClusterPerLayer.at(layerNumber - 3)++;
       const float rotangle = initialAngle[layerNumber - 3] + (ladderNumber - 1) * angleStep[layerNumber - 3];

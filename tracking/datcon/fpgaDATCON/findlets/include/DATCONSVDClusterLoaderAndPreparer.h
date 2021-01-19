@@ -52,7 +52,7 @@ namespace Belle2 {
   private:
     // Parameters
     /// StoreArray name of the input Track Store Array
-    std::string m_param_SVDClusterStoreArrayName = "DATCONSVDCluster";
+    std::string m_param_SVDClusterStoreArrayName = "DATCONSVDClusters";
 
     // Store Arrays
     /// Input SVDCluster Store Array

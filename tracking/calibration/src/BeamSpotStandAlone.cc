@@ -445,8 +445,8 @@ namespace Belle2 {
         //Store the vertex position
         int nVals = x.spls[0].vals.size();
 
-        vtxPos.resize(0);
-        vtxErr.resize(0);
+        vtxPos.clear();
+        vtxErr.clear();
 
         const double toCm = 1e-4;
 
@@ -758,7 +758,6 @@ namespace Belle2 {
       MatrixXd mT = m.transpose();
       MatrixXd mat = mT * m;
 
-      //mat.Invert();
       mat = mat.inverse();
       MatrixXd A = mat * mT;
       VectorXd res = A * r;
@@ -793,10 +792,11 @@ namespace Belle2 {
 
 
       MatrixXd AT = A.transpose(); //  A.T();
-      MatrixXd errMat = err2 * AT * A;
+      MatrixXd errMat = err2 * A * AT;
       VectorXd errs2(errMat.rows());
       for (int i = 0; i < errs2.rows(); ++i)
         errs2(i) = errMat(i, i);
+
 
       err2Mean = err2;
 

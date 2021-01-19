@@ -351,7 +351,7 @@ namespace Belle2 {
 
 
   template<typename Fun1, typename Fun2>
-  CalibrationAlgorithm::EResult runCalibration(TTree* tracks,  std::string calibName,  Fun1 GetEvents,  Fun2 calibAnalysis,
+  CalibrationAlgorithm::EResult runCalibration(TTree* tracks,  const std::string& calibName,  Fun1 GetEvents,  Fun2 calibAnalysis,
                                                std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)> calibObjCreator,
                                                TString m_lossFunctionOuter, TString m_lossFunctionInner)
   {

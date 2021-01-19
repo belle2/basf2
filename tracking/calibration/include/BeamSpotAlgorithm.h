@@ -25,8 +25,8 @@ namespace Belle2 {
     /// Destructor
     virtual ~BeamSpotAlgorithm() {}
 
-    void setInnerLoss(std::string loss) { m_lossFunctionInner = loss; }
-    void setOuterLoss(std::string loss) { m_lossFunctionOuter = loss; }
+    void setInnerLoss(const std::string& loss) { m_lossFunctionInner = loss; }
+    void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }
   protected:
 
     /// Run algo on data

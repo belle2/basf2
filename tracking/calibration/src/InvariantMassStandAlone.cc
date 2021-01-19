@@ -83,7 +83,7 @@ namespace Belle2 {
 
 
 
-    vector<double>  getInvMassPars(const vector<Event>& evts)
+    vector<double>  getInvMassPars(const vector<Event>& /*evts*/)
     {
       return { -1, -1, -1}; //dummy values
     }
@@ -91,6 +91,7 @@ namespace Belle2 {
 
 
     // Returns tuple with the invariant mass parameters
+    // cppcheck-suppress passedByValue
     tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runInvariantMassAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {

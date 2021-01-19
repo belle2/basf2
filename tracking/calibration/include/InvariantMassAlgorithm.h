@@ -25,8 +25,8 @@ namespace Belle2 {
     /// Destructor
     virtual ~InvariantMassAlgorithm() {}
 
-    void setInnerLoss(TString loss) { m_lossFunctionInner = loss; }
-    void setOuterLoss(TString loss) { m_lossFunctionOuter = loss; }
+    void setInnerLoss(const std::string& loss) { m_lossFunctionInner = loss; }
+    void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }
 
   protected:
 

@@ -196,7 +196,7 @@ namespace Belle2 {
 
 
 
-    vector<Event> filter(const vector<Event>& evts, vector<double> boostDir, double pidCut, double rapCut)
+    vector<Event> filter(const vector<Event>& evts, const vector<double>& boostDir, double pidCut, double rapCut)
     {
       vector<Event> evtsF;
 
@@ -226,7 +226,7 @@ namespace Belle2 {
 
 
 // Fit xy widths (including XZ, YZ slopes), no prior
-    double fitBoostMagnitude(const vector<Event>& evts, vector<double> boostDir)
+    double fitBoostMagnitude(const vector<Event>& evts, const vector<double>& boostDir)
     {
 
       vector<double> yAvgVec;
@@ -329,6 +329,7 @@ namespace Belle2 {
 
 
 // Returns tuple with the beamspot parameters
+    // cppcheck-suppress passedByValue
     tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBoostVectorAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {
@@ -342,19 +343,24 @@ namespace Belle2 {
 
       for (int i = 0; i < n; ++i) {
 
-
         tie(boostVec[i], boostVecUnc[i]) =  getBoostAndError(evtsSep[i]);
 
 
-        double aX = 1e3 * boostVec[i](0) / boostVec[i](2);
-        double aY = 1e3 * boostVec[i](1) / boostVec[i](2);
+        // TanThetaXZ of boostVector
+        double aX = 1e3 * boostVec[i][0] / boostVec[i][2];
+        // TanThetaYZ of boostVector
+        double aY = 1e3 * boostVec[i][1] / boostVec[i][2];
 
+        // TanThetaXZ unc of boostVector
         double eX = 1e3 * sqrt(boostVecUnc[i](0, 0)) / boostVec[i](2);
+        // TanThetaYZ unc of boostVector
         double eY = 1e3 * sqrt(boostVecUnc[i](1, 1)) / boostVec[i](2);
 
-        cout << evtsSep[i][0].run << " " << i << " " <<  evtsSep[i].size() << " :  " << aX << "+-" << eX << "  " << aY << "+-" << eY <<
-             "  :  " << 1e3 * boostVec[i].norm() << endl;
+        B2INFO(evtsSep[i][0].run << " " << i << " " <<  evtsSep[i].size() << " :  " << aX << "+-" << eX << "  " << aY << "+-" << eY <<
+               "  :  " << 1e3 * boostVec[i].norm());
       }
+
+      // Spread is currently not calculated
       boostVecSpred = MatrixXd::Zero(3, 3);
 
       return make_tuple(boostVec, boostVecUnc, boostVecSpred);

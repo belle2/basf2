@@ -39,6 +39,11 @@ namespace Belle2 {
     const unsigned int& currentLayer = currentStateCache.geoLayer;
     const unsigned int& nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
 
+    // Patch for the PXD layer 2 overlap inefficiency fix
+    // previous implementation of maximumLadderNumber was calculated using GeoCache gave incorrect value for exp1003
+    // Geometrically, PXD layer 1 has 8 ladders, pxd layer 2 has 12 ladder
+    int numberOfLaddersForLayer[2] = {8, 12};
+
     for (CKFToPXDState* nextState : states) {
       const CKFToPXDState::stateCache& nextStateCache = nextState->getStateCache();
       const unsigned int nextLayer = nextStateCache.geoLayer;
@@ -50,7 +55,7 @@ namespace Belle2 {
         // next layer is an overlap one, so lets return all hits from the same layer, that are on a
         // ladder which is below the last added hit.
         const unsigned int fromLadderNumber = currentStateCache.ladder;
-        const unsigned int maximumLadderNumber = VXD::GeoCache::getInstance().getLadders(currentStateCache.sensorID).size();
+        const unsigned int maximumLadderNumber = numberOfLaddersForLayer[currentLayer - 1];
 
         // the reason for this strange formula is the numbering scheme in the VXD.
         // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,

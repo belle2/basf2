@@ -51,7 +51,6 @@ void DATCONSVDClusterLoaderAndPreparer2::apply(std::vector<SVDCluster>& uCluster
     const uint& layerNumber = sensorID.getLayerNumber();
     const uint& ladderNumber = sensorID.getLadderNumber();
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
-    B2INFO("new cluster information: " << sensorID << " isU: " << cluster.isUCluster() << " position: " << localPosition);
 
     nClusterPerLayer.at(layerNumber - 3)++;
     const float rotangle = initialAngle[layerNumber - 3] + (ladderNumber - 1) * angleStep[layerNumber - 3];
@@ -77,7 +76,6 @@ void DATCONSVDClusterLoaderAndPreparer2::apply(std::vector<SVDCluster>& uCluster
     const uint& layerNumber = sensorID.getLayerNumber();
     const uint& sensorNumber = sensorID.getSensorNumber();
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
-    B2INFO("new cluster information: " << sensorID << " isU: " << cluster.isUCluster() << " position: " << localPosition);
 
     nClusterPerLayer.at(4 + layerNumber - 3)++;
     const int radius = svdRadii[layerNumber - 3];

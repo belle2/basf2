@@ -467,15 +467,14 @@ class Validation:
         # The logging-object for the validation (Instance of the logging-
         # module). Initialize the log as 'None' and then call the method
         # 'create_log()' to create the actual log.
-        self.log = None
-        self.create_log()
+        self.log = self.create_log()
 
         # The list which holds all steering file objects
         # (as instances of class Script)
-        self.scripts = []
+        self.scripts = []  # type: List[Script]
 
         # A list of all packages from which we have collected steering files
-        self.packages = []
+        self.packages = []  # type: List[str]
 
         # This list of packages which will be ignored by default. This is
         # only the validation package itself, because it only creates
@@ -511,7 +510,7 @@ class Validation:
         #: The maximum time before a script is skipped, if it does not
         #: terminate. Unit: minutes. Set to <= 0 to skip this limitation
         #: entirely.
-        self.script_max_runtime_in_minutes = 60*5
+        self.script_max_runtime_in_minutes = 60 * 5
 
         #: Number of parallel processes
         self.parallel = None
@@ -593,7 +592,7 @@ class Validation:
                     reason="Depends on '{}'".format(script_object.path)
                 )
 
-    def create_log(self):
+    def create_log(self) -> logging.Logger:
         """!
         Create the logger.
         We use the logging module to create an object which allows us to
@@ -604,17 +603,17 @@ class Validation:
         """
         # Create the log and set its default level to DEBUG, which means that
         # it will store _everything_.
-        self.log = logging.getLogger('validate_basf2')
-        self.log.setLevel(logging.DEBUG)
+        log = logging.getLogger('validate_basf2')
+        log.setLevel(logging.DEBUG)
 
         # Now we add another custom level 'NOTE'. This is because we don't
         # want to print ERRORs and WARNINGs to the console output, therefore
         # we need a higher level.
-        # We define the new level and tell 'self.log' what to do when we use it
+        # We define the new level and tell 'log' what to do when we use it
         logging.NOTE = 100
         logging.addLevelName(logging.NOTE, 'NOTE')
-        self.log.note = lambda msg, *args: self.log._log(logging.NOTE,
-                                                         msg, args)
+        log.note = lambda msg, *args: log._log(logging.NOTE,
+                                               msg, args)
 
         # Set up the console handler. The console handler will redirect a
         # certain subset of all log message (i.e. those with level 'NOTE') to
@@ -629,8 +628,8 @@ class Validation:
         console_format = logging.Formatter('%(message)s')
         console_handler.setFormatter(console_format)
 
-        # Add the console handler to self.log
-        self.log.addHandler(console_handler)
+        # Add the console handler to log
+        log.addHandler(console_handler)
 
         # Now set up the file handler. The file handler will redirect
         # _everything_ we log to a logfile so that we have all possible
@@ -656,8 +655,9 @@ class Validation:
                                         datefmt='%Y-%m-%d %H:%M:%S')
         file_handler.setFormatter(file_format)
 
-        # Add the file handler to self.log
-        self.log.addHandler(file_handler)
+        # Add the file handler to log
+        log.addHandler(file_handler)
+        return log
 
     def collect_steering_files(self, interval_selector):
         """!
@@ -996,7 +996,7 @@ class Validation:
             rev
         )
 
-    def add_script(self, script):
+    def add_script(self, script: Script):
         """!
         Explictly add a script object. In normal operation, scripts are
         auto-discovered but this method is useful for testing
@@ -1005,7 +1005,7 @@ class Validation:
         self.scripts.append(script)
 
     @staticmethod
-    def sort_scripts(script_list):
+    def sort_scripts(script_list: List[Script]):
         """
         Sort the list of scripts that have to be processed by runtime,
         execute slow scripts first If no runtime information is available
@@ -1293,7 +1293,7 @@ class Validation:
 
         html_folder = validationpath.get_html_folder(self.work_folder)
         results_folder = validationpath.get_results_folder(
-                self.work_folder
+            self.work_folder
         )
 
         os.makedirs(html_folder, exist_ok=True)

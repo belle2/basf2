@@ -32,9 +32,10 @@ Finally, for estimating the disk space per inverse attobarn, the calculations ar
 import argparse
 from functools import lru_cache
 import json
-import subprocess
 import pandas as pd
 from pathlib import Path
+from tempfile import TemporaryDirectory
+import subprocess
 
 from tabulate import tabulate
 
@@ -136,26 +137,27 @@ def get_luminosity(filename):
     exp = metadata["experimentLow"], metadata["experimentHigh"]
     runs = metadata["runLow"], metadata["runHigh"]
 
-    subprocess.run(
-        [
-            "b2info-luminosity",
-            "--exp",
-            "-".join(map(str, exp)),
-            "--run",
-            "-".join(map(str, runs)),
-            "--what",
-            "offline",
-            # Pass a dummy token so script does not ask for password.
-            # No password is required, since only using offline DB.
-            "--token",
-            "DUMMY_ARGUMENT",
-        ],
-        check=True,
-        stdout=subprocess.PIPE,
-        cwd="/tmp",  # place CSV output of b2info-luminosity in /tmp
-    )
-    with open("/tmp/dfruns.csv") as f:
-        df = pd.read_csv(f)
+    with TemporaryDirectory():
+        # Put CSV output of b2info-luminosity in temporary directory
+        subprocess.run(
+            [
+                "b2info-luminosity",
+                "--exp",
+                "-".join(map(str, exp)),
+                "--run",
+                "-".join(map(str, runs)),
+                "--what",
+                "offline",
+                # Pass a dummy token so script does not ask for password.
+                # No password is required, since only using offline DB.
+                "--token",
+                "DUMMY_ARGUMENT",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+        )
+        with open("dfruns.csv") as f:
+            df = pd.read_csv(f)
 
     # If luminosity is found to be zero, return None
     lumi = df["intLumi"].sum()

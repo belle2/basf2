@@ -11,14 +11,21 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/datcon/fpgaDATCON/findlets/SVDShaperDigitConverter.h>
+#include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
+#include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer2.h>
 #include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2D.h>
+
+#include <svd/dataobjects/SVDCluster.h>
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include <vector>
+
+#include <tracking/dataobjects/DATCONSVDDigit.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -56,10 +63,22 @@ namespace Belle2 {
 
   private:
     /// Findlets
-    DATCONSVDClusterLoaderAndPreparer m_clusterLoader;
+    SVDShaperDigitConverter m_digitConverter;
+
+    DATCONSVDClusterizer m_uClusterizer;
+    DATCONSVDClusterizer m_vClusterizer;
+
+    DATCONSVDClusterLoaderAndPreparer m_clusterLoaderAndPreparer;
+    DATCONSVDClusterLoaderAndPreparer2 m_clusterLoaderAndPreparer2;
 
     FastInterceptFinder2D m_uInterceptFinder;
     FastInterceptFinder2D m_vInterceptFinder;
+
+    std::vector<DATCONSVDDigit> m_uDigits;
+    std::vector<DATCONSVDDigit> m_vDigits;
+
+    std::vector<SVDCluster> m_uClusters;
+    std::vector<SVDCluster> m_vClusters;
 
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_uHits;
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_vHits;

@@ -29,6 +29,11 @@ void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, c
 
 //   Super::exposeParameters(moduleParamList, prefix);
 
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUFinder"),
+                                m_param_isUFinder,
+                                "Intercept finder for u-side or v-side?",
+                                m_param_isUFinder);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
                                 m_maxRecursionLevel,
                                 "Maximum recursion level for the fast Hough trafo algorithm.",
@@ -89,9 +94,16 @@ void FastInterceptFinder2D::initialize()
   B2ASSERT("The maximum number of currentRecursion in u must not be larger than 14, but it is " << m_maxRecursionLevel,
            m_maxRecursionLevel <= 14);
   m_unitX = (m_maximumX - m_minimumX) / m_nAngleSectors;
+  if (not m_param_isUFinder) {
+    m_unitX = (tan(m_maximumX) - tan(m_minimumX)) / m_nAngleSectors;
+  }
   for (uint i = 0; i < m_nAngleSectors; i++) {
     double x = m_minimumX + m_unitX * i;
     double xc = x + 0.5 * m_unitX;
+    if (not m_param_isUFinder) {
+      x = atan(tan(m_minimumX) + m_unitX * i);
+      xc = atan(tan(m_minimumX) + m_unitX * ((double)i + 0.5));
+    }
 
     m_HSXLUT[i] = x;
     m_HSSinValuesLUT[i] = convertToInt(sin(x), 3);

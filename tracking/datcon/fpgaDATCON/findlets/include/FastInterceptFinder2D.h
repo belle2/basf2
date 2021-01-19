@@ -68,13 +68,15 @@ namespace Belle2 {
     void DepthFirstSearch(uint lastIndexX, uint lastIndexY);
 
     // Parameters
+    bool m_param_isUFinder = true;
+
     uint m_maxRecursionLevel = 6;
 
     uint m_nAngleSectors = 256;
 
     uint m_nVerticalSectors = 256;
 
-    long m_verticalHoughSpaceSize = convertToInt(1, 6);
+    long m_verticalHoughSpaceSize = convertToInt(64, 6);
 
     double m_minimumX = -3.168;
     double m_maximumX = 3.168;

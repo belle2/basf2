@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
@@ -318,6 +319,9 @@ namespace Belle2 {
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** BKLM geometry data. */
+    const bklm::GeometryPar* m_BKLMGeometry;
 
     /** EKLM geometry data. */
     const EKLM::GeometryData* m_EKLMGeometry;

@@ -80,10 +80,6 @@ namespace Belle2 {
     std::string m_track = "Tracks"; /**< Name of the Tracks store object pointer used as parameter of the module*/
     StoreArray<Track> m_trk; /**< Tracks store object pointer*/
 
-    /**SVDHistograms */
-    std::unique_ptr<SVDHistograms<TH1F>> m_hClsTimeOnTracks{}; /**< Cluster time for clusters on tracks*/
-    std::unique_ptr<SVDHistograms<TH1F>> m_hClsTimeAll{}; /**< Cluster time for clusters not on tracks*/
-    std::unique_ptr<SVDHistograms<TH1F>> m_hClsDiffTimeOnTracks{}; /**< Cluster time for clusters on tracks*/
   };
 
 } // end namespace Belle2

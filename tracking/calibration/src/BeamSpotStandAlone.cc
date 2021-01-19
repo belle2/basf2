@@ -1947,7 +1947,7 @@ namespace Belle2 {
       MatrixXd rotM  = toMat(rot);
       MatrixXd rotMT = rotM.transpose();
 
-      MatrixXd eigenMat(3, 3); //z-rot included in eigenMat
+      Matrix3d eigenMat =  Matrix3d::Zero(); //z-rot included in eigenMat
       eigenMat(0, 0) = xySize[0];
       eigenMat(1, 1) = xySize[1];
       eigenMat(0, 1) = xySize[2];

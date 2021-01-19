@@ -50,7 +50,7 @@ pu.ploter(
     x_label='Strip charge (# of electrons)',
     y_label='counts',
     granules=pu.gD,
-    tree=treeS,
+    tree=treeRD,
     expr='strip_charge',
     cut='',
     descr='Strip charge for all RecoDigits related to one TrueHit.',

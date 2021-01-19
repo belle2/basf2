@@ -16,7 +16,7 @@ import sys
 import time
 import shutil
 import datetime
-from typing import List
+from typing import List, Optional
 
 import json_objects
 import mail_log
@@ -403,20 +403,13 @@ class IntervalSelector:
         #: stores the intervals which have been selected
         self.intervals = [x.strip() for x in intervals]
 
-    def in_interval(self, script_object):
+    def in_interval(self, script_object: Script) -> bool:
         """
         checks whether the interval listed in a script object's header is
         within the selected
         """
 
-        # for scripts, which have no interval set, the default is nightly
-        script_interval = "nightly"
-
-        if script_object.header is not None:
-            if "interval" in script_object.header:
-                script_interval = script_object.header["interval"]
-
-        return script_interval in self.intervals
+        return script_object.interval in self.intervals
 
 
 ###############################################################################
@@ -693,10 +686,9 @@ class Validation:
             py_files = scripts_in_dir(folder, self.log, '.py')
             for steering_file in c_files + py_files:
                 script = Script(steering_file, package, self.log)
-
                 script.load_header()
                 # only select this script, if this interval has been selected
-                if interval_selector.in_interval(script):
+                if interval_selector.in_interval(script) and not script.noexecute:
                     self.scripts.append(script)
 
         # Thats it, now there is a complete list of all steering files on
@@ -830,7 +822,7 @@ class Validation:
                         suma += float(run_times[dict_key])
                     script.runtime = suma / len(run_times)
 
-    def get_script_by_name(self, name):
+    def get_script_by_name(self, name: str) -> Optional[Script]:
         """!
 
         """
@@ -934,14 +926,14 @@ class Validation:
             self.log.warning(msg)
 
     def apply_script_caching(self):
-        cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
+        cacheable_scripts = [s for s in self.scripts if s.is_cacheable]
 
         output_dir_datafiles = validationpath.get_results_tag_folder(
             self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
-            outfiles = s.get_output_files()
+            outfiles = s.output_files
             files_exist = True
             for of in outfiles:
                 full_path = os.path.join(output_dir_datafiles, of)
@@ -1185,8 +1177,7 @@ class Validation:
         def handle_waiting_script(script_obj: Script):
             # Determine the way of execution depending on whether
             # data files are created
-            if script_obj.header and \
-               script_obj.header.get('output', []):
+            if script_obj.output_files:
                 script_obj.control = control
             else:
                 script_obj.control = local_control

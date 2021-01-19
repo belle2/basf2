@@ -15,13 +15,34 @@
 #include "tracking/calibration/Splitter.h"
 #include <TMatrixDSym.h>
 #include <TVector3.h>
-#include <framework/database/EventDependency.h>
 #include <functional>
 #include <tuple>
+#include <map>
+
+#include <framework/database/EventDependency.h>
+#include <framework/datastore/StoreArray.h>
+#include <calibration/CalibrationAlgorithm.h>
+
+#include <Eigen/Dense>
 
 namespace Belle2 {
 
   // General functions to perform the calibration
+
+
+  inline TMatrixDSym toTMatrixDSym(Eigen::MatrixXd mIn)
+  {
+    TMatrixDSym mOut(mIn.rows());
+    for (int i = 0; i < mIn.rows(); ++i)
+      for (int j = 0; j < mIn.cols(); ++j)
+        mOut(i, j) = mIn(i, j);
+    return mOut;
+  }
+
+  inline TVector3 toTVector3(Eigen::VectorXd vIn)
+  {
+    return TVector3(vIn(0), vIn(1), vIn(2));
+  }
 
   /** get id of the time point t */
   inline int getID(const std::vector<double>& breaks, double t)
@@ -37,9 +58,9 @@ namespace Belle2 {
 
   /** The BeamSpot related parameters for single size-calibration interval */
   struct calibPars {
-    std::vector<TVector3> cnt; ///< vector of BS positions for each BS-pos calib. interval
-    std::vector<TMatrixDSym> cntUnc; ///< vector of BS positions uncs. for each BS-pos calib. interval
-    TMatrixDSym  spreadMat; ///< BS size CovMatrix
+    std::vector<Eigen::VectorXd> cnt; ///< vector of BS positions for each BS-pos calib. interval
+    std::vector<Eigen::MatrixXd> cntUnc; ///< vector of BS positions uncs. for each BS-pos calib. interval
+    Eigen::MatrixXd  spreadMat; ///< BS size CovMatrix
     int size() const {return cnt.size();}
   };
 
@@ -69,9 +90,9 @@ namespace Belle2 {
       double Start, End;
       std::tie(Start, End) = Splitter::getStartEnd(r);
 
-      TVector3 ipNow;
-      TMatrixDSym ipeNow(3);
-      TMatrixDSym  sizeMatNow(3);
+      Eigen::Vector3d ipNow;
+      Eigen::MatrixXd ipeNow;
+      Eigen::MatrixXd sizeMatNow;
 
       double distMin = 1e20;
       //Find the closest calibrated interval
@@ -101,10 +122,8 @@ namespace Belle2 {
       calVec[i].pars.cntUnc.resize(r.size());
       for (unsigned ii = 0; ii < r.size(); ++ii) {
         calVec[i].pars.cnt.at(ii) = ipNow;
-        calVec[i].pars.cntUnc.at(ii).ResizeTo(3, 3);
         calVec[i].pars.cntUnc.at(ii) = ipeNow;
       }
-      calVec[i].pars.spreadMat.ResizeTo(3, 3);
       calVec[i].pars.spreadMat = sizeMatNow;
     }
 
@@ -184,7 +203,7 @@ namespace Belle2 {
   /** Store BeamSpot payloads to files */
   template<typename Evt>
   inline void storePayloads(const std::vector<Evt>& evts, std::vector<CalibrationData>&  calVec, std::string objName,
-                            std::function<TObject*(TVector3, TMatrixDSym, TMatrixDSym)  > getCalibObj)
+                            std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
 
     // Loop to store payloads
@@ -200,10 +219,15 @@ namespace Belle2 {
           ExpRun exprun = I.first;
 
           //Encode Start+End time in seconds of the payload
-          calVec[i].pars.cntUnc.at(k)(0, 1) = calVec[i].pars.cntUnc.at(k)(1, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 1),
-                                              round(I.second.first  * 3600));
-          calVec[i].pars.cntUnc.at(k)(0, 2) = calVec[i].pars.cntUnc.at(k)(2, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 2),
-                                              round(I.second.second * 3600));
+          if (calVec[i].pars.cntUnc.at(k).rows() == 3) {
+            calVec[i].pars.cntUnc.at(k)(0, 1) = calVec[i].pars.cntUnc.at(k)(1, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 1),
+                                                round(I.second.first  * 3600));
+            calVec[i].pars.cntUnc.at(k)(0, 2) = calVec[i].pars.cntUnc.at(k)(2, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 2),
+                                                round(I.second.second * 3600));
+          } else {
+            calVec[i].pars.cntUnc.at(k)(0, 0)    = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 0),    round(I.second.first  * 3600));
+            calVec[i].pars.spreadMat(0, 0) = encodeNumber(calVec[i].pars.spreadMat(0, 0), round(I.second.first  * 3600));
+          }
 
           TObject* obj = getCalibObj(calVec[i].pars.cnt.at(k), calVec[i].pars.cntUnc.at(k), calVec[i].pars.spreadMat);
           if (exprun != exprunLast) { //if new run
@@ -243,8 +267,6 @@ namespace Belle2 {
   /** run BeamSpot algorithm for single BS-size interval */
   template<typename Evt, typename Fun>
   inline CalibrationData runAlgorithm(const std::vector<Evt>& evts, std::vector<std::map<ExpRun, std::pair<double, double>>> range,
-                                      //std::function<std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>(std::vector<Evt>,
-                                      //const std::vector<double>&)> runCalibAnalysis
                                       Fun runCalibAnalysis
                                      )
   {
@@ -314,17 +336,69 @@ namespace Belle2 {
     }
 
     // Run the BeamSpot analysis
-    calD.pars.spreadMat.ResizeTo(3, 3);
+    //calD.pars.spreadMat.ResizeTo(3, 3);
     B2INFO("Start of running BS analysis ID : ");
     tie(calD.pars.cnt, calD.pars.cntUnc, calD.pars.spreadMat) = runCalibAnalysis(evtsNow, breaks);
     //calD.pars = runBeamSpotAnalysis(evtsNow, breaks);
-    B2INFO("End of running BS analysis - SizeMatZ : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
+    B2INFO("End of running BS analysis - SizeMatX : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
     B2ASSERT("All intervals have IP calibration", calD.pars.cnt.size() == r.size());
     B2ASSERT("All intervals have IPunc calibration", calD.pars.cntUnc.size() == r.size());
 
     calD.isCalibrated = true;
 
     return calD;
+  }
+
+
+  template<typename Fun1, typename Fun2>
+  CalibrationAlgorithm::EResult runCalibration(TTree* tracks,  std::string calibName,  Fun1 GetEvents,  Fun2 calibAnalysis,
+                                               std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)> calibObjCreator,
+                                               TString m_lossFunctionOuter, TString m_lossFunctionInner)
+  {
+    //auto tracks = calAlgo->getObjectPtr<TTree>("events");
+    if (!tracks || tracks->GetEntries() < 15) {
+      if (tracks)
+        B2WARNING("Too few data : " << tracks->GetEntries());
+      return CalibrationAlgorithm::EResult::c_NotEnoughData;
+    }
+    B2INFO("Number of tracks: " << tracks->GetEntries());
+
+    // Tree to vector of Events
+    auto evts = GetEvents(tracks); //.get());
+
+    //Time range for each ExpRun
+    std::map<ExpRun, std::pair<double, double>> runsInfoOrg = getRunInfo(evts);
+    std::map<ExpRun, std::pair<double, double>> runsRemoved;
+    auto runsInfo = filter(runsInfoOrg, 2. / 60, runsRemoved); //include only runs longer than 2mins
+
+    if (runsInfo.size() == 0) {
+      B2WARNING("Too short run");
+      return  CalibrationAlgorithm::EResult::c_NotEnoughData;
+    }
+
+    // Get intervals
+    Splitter splt;
+    auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner);
+
+    //Loop over all BeamSize intervals
+    std::vector<CalibrationData> calVec; //(splits.size());
+    for (auto s : splits) {
+      CalibrationData calD = runAlgorithm(evts, s, calibAnalysis);
+      calVec.push_back(calD);
+    }
+
+    // exptrapolate to low-stat intervals
+    extrapolateCalibration(calVec);
+
+    // Include removed short runs
+    for (auto shortRun : runsRemoved) {
+      addShortRun(calVec,  shortRun);
+    }
+
+    // Store Payloads to files
+    storePayloads(evts, calVec, calibName, calibObjCreator);
+
+    return CalibrationAlgorithm::EResult::c_OK;
   }
 
 

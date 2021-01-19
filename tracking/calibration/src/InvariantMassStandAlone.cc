@@ -26,6 +26,9 @@
 #include "tools.h"
 #endif
 
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+
 using namespace std;
 
 namespace Belle2 {
@@ -88,22 +91,21 @@ namespace Belle2 {
 
 
     // Returns tuple with the invariant mass parameters
-    tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runInvariantMassAnalysis(vector<Event> evts,
+    tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runInvariantMassAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {
       int n = splitPoints.size() + 1;
       assert(n == 1);  //no split points, the spead interval identical to the center interval
-      vector<TVector3>     invMassVec(n);
-      vector<TMatrixDSym>  invMassVecUnc(n);
-      TMatrixDSym          invMassVecSpred;
+      vector<VectorXd>     invMassVec(n);
+      vector<MatrixXd>  invMassVecUnc(n);
+      MatrixXd          invMassVecSpred;
 
-
-
-      invMassVecUnc[0].ResizeTo(3, 3);
-      invMassVecSpred.ResizeTo(3, 3);
+      invMassVec[0].resize(1);       //1D vector for center of the 1D Gauss
+      invMassVecUnc[0].resize(1, 1); //1x1 matrix covariance mat of the center
+      invMassVecSpred.resize(1, 1);  //1x1 matrix for spread of the 1D Gauss
 
       auto res =  getInvMassPars(evts);
-      invMassVec[0].SetX(res[0]);
+      invMassVec[0](0) = res[0];
       invMassVecUnc[0](0, 0) = res[1];
       invMassVecSpred(0, 0) = res[2];
 

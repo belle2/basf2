@@ -122,13 +122,6 @@ namespace Belle2 {
     };
 
 
-    VectorXd toVec(const vector<double>& v)
-    {
-      VectorXd vec(v.size());
-      for (unsigned i = 0; i < v.size(); ++i)
-        vec[i] = v[i];
-      return vec;
-    }
 
     MatrixXd toMat(const vector<vector<double>>& vecs)
     {
@@ -138,22 +131,6 @@ namespace Belle2 {
         for (unsigned i = 0; i < vecs[k].size(); ++i)
           mat(i, k) = vecs[k][i];
       return mat;
-    }
-
-
-    Vector3d toVec(TVector3 v)
-    {
-      return Vector3d(v.X(), v.Y(), v.Z());
-    }
-
-    TMatrixDSym toRootMat(const Matrix3d& v)
-    {
-      TMatrixDSym m(3);
-      for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-          m(i, j) = v(i, j);
-
-      return m;
     }
 
 
@@ -167,7 +144,7 @@ namespace Belle2 {
       double th1 = vecs[1].Angle(boost);
 
       double C0, C1;
-      double mL  =  105.7; //muon mass
+      double mL  = 105.6583745; //muon mass [MeV]
       {
         double pMu0 = vecs[0].Mag();
         double pMu1 = vecs[1].Mag();
@@ -205,7 +182,6 @@ namespace Belle2 {
         }
       }
 
-      //cout << "data size: " << vData.size() << endl;
 
       FunBoost fun;
 
@@ -214,7 +190,6 @@ namespace Belle2 {
 
       auto res = getMinimum(fun, 130 , 170, -20, 20);
 
-      //cout << res[0] <<" "<< res[1] << endl;
 
       return res;
     }
@@ -273,22 +248,22 @@ namespace Belle2 {
 
 
     struct vectorVar {
-      vector<TVector3> vecs;
+      vector<Vector3d> vecs;
 
-      void add(TVector3 v) { vecs.push_back(v); }
+      void add(Vector3d v) { vecs.push_back(v); }
 
-      TVector3 getNom() const { return vecs[0]; }
+      Vector3d getNom() const { return vecs[0]; }
 
-      TMatrixDSym getCov() const
+      MatrixXd getCov() const
       {
         Matrix3d res = Matrix3d::Zero();
         for (unsigned i = 1; i < vecs.size(); ++i) {
-          Vector3d diff = toVec(vecs[i] - vecs[0]);
+          Vector3d diff = vecs[i] - vecs[0];
           res += diff * diff.transpose();
         }
         if (vecs.size() > 1)
           res *= 1. / (vecs.size() - 1);
-        return toRootMat(res);
+        return res;
 
       }
 
@@ -307,7 +282,7 @@ namespace Belle2 {
       return bVec;
     }
 
-    pair<TVector3, TMatrixDSym>  getBoostAndError(vector<Event> evts)
+    pair<Vector3d, Matrix3d>  getBoostAndError(vector<Event> evts)
     {
       evts = filter(evts, {151.986 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
 
@@ -319,7 +294,8 @@ namespace Belle2 {
           for (auto& e : evts)
             e.nBootStrap = gRandom->Poisson(1);
 
-        TVector3 boost = getBoostVector(evts);
+        TVector3 b = getBoostVector(evts);
+        Vector3d boost(b.X(), b.Y(), b.Z());
         var.add(boost);
       }
       return make_pair(var.getNom(), var.getCov());
@@ -353,35 +329,33 @@ namespace Belle2 {
 
 
 // Returns tuple with the beamspot parameters
-    tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBoostVectorAnalysis(vector<Event> evts,
+    tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBoostVectorAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {
       int n = splitPoints.size() + 1;
-      vector<TVector3>     boostVec(n);
-      vector<TMatrixDSym>  boostVecUnc(n);
-      TMatrixDSym          boostVecSpred;
+      vector<VectorXd>     boostVec(n);
+      vector<MatrixXd>  boostVecUnc(n);
+      MatrixXd          boostVecSpred;
 
       vector<vector<Event>> evtsSep = separate(evts, splitPoints);
 
 
       for (int i = 0; i < n; ++i) {
 
-        boostVecUnc[i].ResizeTo(3, 3);
 
         tie(boostVec[i], boostVecUnc[i]) =  getBoostAndError(evtsSep[i]);
 
 
-        double aX = 1e3 * boostVec[i].X() / boostVec[i].Z();
-        double aY = 1e3 * boostVec[i].Y() / boostVec[i].Z();
+        double aX = 1e3 * boostVec[i](0) / boostVec[i](2);
+        double aY = 1e3 * boostVec[i](1) / boostVec[i](2);
 
-        double eX = 1e3 * sqrt(boostVecUnc[i](0, 0)) / boostVec[i].Z();
-        double eY = 1e3 * sqrt(boostVecUnc[i](1, 1)) / boostVec[i].Z();
+        double eX = 1e3 * sqrt(boostVecUnc[i](0, 0)) / boostVec[i](2);
+        double eY = 1e3 * sqrt(boostVecUnc[i](1, 1)) / boostVec[i](2);
 
         cout << evtsSep[i][0].run << " " << i << " " <<  evtsSep[i].size() << " :  " << aX << "+-" << eX << "  " << aY << "+-" << eY <<
-             "  :  " << 1e3 * boostVec[i].Mag() << endl;
+             "  :  " << 1e3 * boostVec[i].norm() << endl;
       }
-      boostVecSpred.ResizeTo(3, 3);
-      boostVecSpred = TMatrixDSym(3);
+      boostVecSpred = MatrixXd::Zero(3, 3);
 
       return make_tuple(boostVec, boostVecUnc, boostVecSpred);
     }

@@ -27,8 +27,6 @@
 #include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TMatrixD.h>
-#include <TMatrixDSym.h>
 #include <TGraph.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -73,7 +71,7 @@ namespace Belle2 {
     inline double sqrS(double x) {return x >= 0 ? x * x : -x * x; } ///< sign-sensitive sqr
     inline double sqrtS(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); } ///< sign-sensitive sqrt
 
-    TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
+    MatrixXd getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
 
 
     /** structure containing most of the beam spot parameters */
@@ -394,7 +392,7 @@ namespace Belle2 {
         xyAngle.add(angle);
 
         //Get whole cov matrix
-        TMatrixD matSize = getRotatedSizeMatrix({sqrS(SizeX), sqrS(SizeY), sqrS(SizeXY)}, sqrS(SizeZ), sPar.kX.val(sPar.kX.center()),
+        MatrixXd matSize = getRotatedSizeMatrix({sqrS(SizeX), sqrS(SizeY), sqrS(SizeXY)}, sqrS(SizeZ), sPar.kX.val(sPar.kX.center()),
                                                 sPar.kY.val(sPar.kY.center()));
 
         // Store elements in [um]
@@ -442,19 +440,22 @@ namespace Belle2 {
       }
 
       /** get output in Belle2-like format */
-      void getOutput(vector<TVector3>& vtxPos, vector<TMatrixDSym>& vtxErr, TMatrixDSym& sizeMat)
+      void getOutput(vector<VectorXd>& vtxPos, vector<MatrixXd>& vtxErr, MatrixXd& sizeMat)
       {
         //Store the vertex position
         int nVals = x.spls[0].vals.size();
+
+        vtxPos.resize(0);
+        vtxErr.resize(0);
 
         const double toCm = 1e-4;
 
         for (int i = 0; i < nVals; ++i) {
           //vertex position
-          TVector3 vtx(x.spls[0].vals[i]*toCm, y.spls[0].vals[i]*toCm, z.spls[0].vals[i]*toCm);
+          Vector3d vtx(x.spls[0].vals[i]*toCm, y.spls[0].vals[i]*toCm, z.spls[0].vals[i]*toCm);
 
-          //vertex error matrix (symetric)
-          TMatrixDSym mS(3);
+          //vertex error matrix (symmetric)
+          Matrix3d mS = Matrix3d::Zero();
           mS(0, 0) = sqrS(x.spls[0].errs[i] * toCm);
           mS(1, 1) = sqrS(y.spls[0].errs[i] * toCm);
           mS(2, 2) = sqrS(z.spls[0].errs[i] * toCm);
@@ -465,7 +466,7 @@ namespace Belle2 {
 
         //BeamSpot size matrix (from boot-strap iteration 0)
 
-        sizeMat.ResizeTo(3, 3);
+        sizeMat.resize(3, 3);
         sizeMat(0, 0) = sqrS(matXX.vars[0] * toCm);
         sizeMat(1, 1) = sqrS(matYY.vars[0] * toCm);
         sizeMat(2, 2) = sqrS(matZZ.vars[0] * toCm);
@@ -770,7 +771,7 @@ namespace Belle2 {
 
       // Get PRESS statistics of the linear fit
       {
-        //TMatrixD Ahat =  m*A;
+        //Ahat =  m*A;
         double press = 0;
         double press2 = 0;
         for (int i = 0; i < r.rows(); ++i) {
@@ -1912,10 +1913,10 @@ namespace Belle2 {
     }
 
 
-    /** TRotation to TMatrixD */
-    TMatrixD toMat(TRotation rot)
+    /** TRotation to MatrixXd */
+    MatrixXd toMat(TRotation rot)
     {
-      TMatrixD rotM(3, 3);
+      MatrixXd rotM(3, 3);
       rotM(0, 0) = rot.XX();
       rotM(0, 1) = rot.XY();
       rotM(0, 2) = rot.XZ();
@@ -1937,16 +1938,16 @@ namespace Belle2 {
       @param kY: Angle of the BS in the YZ plane
       @return The BS matrix in the nominal Belle2 frame
     */
-    TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY)
+    MatrixXd getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY)
     {
       TRotation rot; // rotation moving eZ=(0,0,1) to (kX, kY, 1)
       rot.RotateX(-kY); //x-rot
       rot.RotateY(+kX); //y-rot
 
-      TMatrixD rotM = toMat(rot);
-      TMatrixD rotMT = rotM; rotMT.T();
+      MatrixXd rotM  = toMat(rot);
+      MatrixXd rotMT = rotM.transpose();
 
-      TMatrixD eigenMat(3, 3); //z-rot included in eigenMat
+      MatrixXd eigenMat(3, 3); //z-rot included in eigenMat
       eigenMat(0, 0) = xySize[0];
       eigenMat(1, 1) = xySize[1];
       eigenMat(0, 1) = xySize[2];
@@ -1963,7 +1964,7 @@ namespace Belle2 {
 
 
 // Returns tuple with the beamspot parameters
-    tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(vector<Event> evts,
+    tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBeamSpotAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {
       const double xyPosLimit  = 70; //um
@@ -2061,9 +2062,9 @@ namespace Belle2 {
 
       //allPars.printStat();
 
-      vector<TVector3> vtxPos;
-      vector<TMatrixDSym> vtxErr;
-      TMatrixDSym sizeMat;
+      vector<VectorXd> vtxPos;
+      vector<MatrixXd> vtxErr;
+      MatrixXd sizeMat;
 
       allPars.getOutput(vtxPos, vtxErr, sizeMat);
 

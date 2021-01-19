@@ -12,9 +12,8 @@
 
 #include <vector>
 #include <tuple>
-#include <TVector3.h>
-#include <TMatrixDSym.h>
 #include <TTree.h>
+#include <Eigen/Dense>
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
@@ -72,8 +71,9 @@ namespace Belle2 {
       @param splitPoints: the vector containing times of the edges of the BS-position calibration intervals [hours]
       @return A tuple containing vector with BS-positions, vector with BS-positions stat. errors and a BS-size covarince matrix
     */
-    std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(std::vector<Event> evts,
-        const std::vector<double>& splitPoints);
+    std::tuple<std::vector<Eigen::VectorXd>, std::vector<Eigen::MatrixXd>, Eigen::MatrixXd>  runBeamSpotAnalysis(
+      std::vector<Event> evts,
+      const std::vector<double>& splitPoints);
 
 
   }

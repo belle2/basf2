@@ -10,11 +10,10 @@
 
 #pragma once
 #include <vector>
-#include <map>
 #include <utility>
 #include <tuple>
-#include <TMatrixDSym.h>
 #include <TVector3.h>
+#include <Eigen/Dense>
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
@@ -51,8 +50,9 @@ namespace Belle2 {
     std::vector<Event> getEvents(TTree* tr);
 
     // Returns tuple with the beamspot parameters
-    std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runInvariantMassAnalysis(std::vector<Event> evts,
-        const std::vector<double>& splitPoints);
+    std::tuple<std::vector<Eigen::VectorXd>, std::vector<Eigen::MatrixXd>, Eigen::MatrixXd>  runInvariantMassAnalysis(
+      std::vector<Event> evts,
+      const std::vector<double>& splitPoints);
 
   }
 }

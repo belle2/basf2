@@ -55,9 +55,9 @@ void DATCONSVDClusterLoaderAndPreparer2::apply(std::vector<SVDCluster>& uCluster
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
     nClusterPerLayer.at(layerNumber - 3)++;
-    const float rotangle = initialAngle[layerNumber - 3] + (ladderNumber - 1) * angleStep[layerNumber - 3];
-    const float cosRotAngle = cos(rotangle);
-    const float sinRotAngle = sin(rotangle);
+    const double rotangle = initialAngle[layerNumber - 3] + (ladderNumber - 1) * angleStep[layerNumber - 3];
+    const double cosRotAngle = cos(rotangle);
+    const double sinRotAngle = sin(rotangle);
     const int    sensorRadius = svdRadii[layerNumber - 3];
     const int    ytmp = localPosition + rPhiShiftsOfLayers[layerNumber - 3];
 
@@ -67,8 +67,8 @@ void DATCONSVDClusterLoaderAndPreparer2::apply(std::vector<SVDCluster>& uCluster
     const long radiusSquared = x * x + y * y; // therefore radius is in µm as well, like all other length values
     // x or y divided by r^2 can create values very close to 0. To cope for this and still
     // have non-zero numbers after conversion and rounding, the conversion to int is made with 10^7
-    std::pair<long, long> pos2D = std::make_pair(convertToInt(2. * (float)x / (float)radiusSquared, 10),
-                                                 convertToInt(2. * (float)y / (float)radiusSquared, 10));
+    std::pair<long, long> pos2D = std::make_pair(convertToInt(2. * (double)x / (double)radiusSquared, 10),
+                                                 convertToInt(2. * (double)y / (double)radiusSquared, 10));
     uHits.emplace_back(std::make_pair(sensorID, pos2D));
   }
 

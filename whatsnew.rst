@@ -28,6 +28,11 @@ This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
 .. List of changes for the framework package
 
+.. rubric:: Removal of old and deprecated database functions
+
+Some functions used in the past to handle the conditions database (like ``basf2.use_local_database`` or ``basf2.reset_database``) are removed, and any script using them does not work anymore.
+This removal does not imply any functionality loss, since the users can use the `basf2.conditions` object to properly configure the conditions database in their steering files (see also :ref:`configuring_cdb`).
+
 .. include:: framework/doc/whatsnew-since/release-05-01.txt
 
 Changes since release-04

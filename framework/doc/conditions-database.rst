@@ -74,6 +74,8 @@ If multiple globaltags are selected the software will look for all necessary
 payloads in each of them in turn and always take each payload from the first
 globaltag it can be found in.
 
+.. _configuring_cdb:
+
 Configuring the Conditions Database
 ===================================
 

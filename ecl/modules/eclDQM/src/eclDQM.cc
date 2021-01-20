@@ -93,12 +93,12 @@ void ECLDQMModule::defineHisto()
   h_evtot = new TH1F("event", "Total event bank", 1, 0, 1);
   h_evtot->SetOption("LIVE");
 
-  h_quality = new TH1F("quality", "Fit quality flag (0-good, 1- large amplitude, 2 - w/o time,  3 - bad chi2)", 4, 0, 4);
+  h_quality = new TH1F("quality", "Fit quality flag (0-good, 1-integer overflow, 2-low amplitude,  3-bad chi2)", 4, 0, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
   h_quality->SetFillColor(kPink - 4);
   h_quality->SetOption("LIVE");
 
-  h_quality_other = new TH1F("quality_other", "Fit quality flag for waveform type 'other'", 4, 0, 4);
+  h_quality_other = new TH1F("quality_other", "Fit quality flag for unexpectedly saved waveforms", 4, 0, 4);
   h_quality_other->GetXaxis()->SetTitle("Flag number");
   h_quality_other->SetFillColor(kPink - 4);
   h_quality_other->SetOption("LIVE");
@@ -107,7 +107,7 @@ void ECLDQMModule::defineHisto()
   h_bad_quality->GetXaxis()->SetTitle("Cell IDs");
   h_bad_quality->SetOption("LIVE");
 
-  h_trigtag1 = new TH1F("trigtag1", "Trigger tag flag # 1", 2, 0, 2);
+  h_trigtag1 = new TH1F("trigtag1", "Global event number <-> trigger tag consistency. 0-good", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Trigger tag flag #1");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
@@ -208,9 +208,9 @@ void ECLDQMModule::defineHisto()
 
   //2D histograms creation.
 
-  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Crate ID", 52, 1, 53, 11, -1, 10);
+  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Internal data consistency. 0-good, 1-data corruption", 52, 1, 53, 11, -1, 10);
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID");
-  h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
+  h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
   h_trigtag2_trigid->SetOption("LIVE");
 
   h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs. Cell ID", 8736, 1, 8737);

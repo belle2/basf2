@@ -65,16 +65,16 @@ void DATCONFPGAFindlet::beginEvent()
 void DATCONFPGAFindlet::apply()
 {
   m_digitConverter.apply(m_uDigits, m_vDigits);
-  B2INFO("m_uDigits.size(): " << m_uDigits.size() << " m_vDigits.size(): " << m_vDigits.size());
+  B2DEBUG(29, "m_uDigits.size(): " << m_uDigits.size() << " m_vDigits.size(): " << m_vDigits.size());
 
   m_uClusterizer.apply(m_uDigits, m_uClusters);
   m_vClusterizer.apply(m_vDigits, m_vClusters);
-  B2INFO("m_uClusters.size(): " << m_uClusters.size() << " m_vClusters.size(): " << m_vClusters.size());
+  B2DEBUG(29, "m_uClusters.size(): " << m_uClusters.size() << " m_vClusters.size(): " << m_vClusters.size());
 
-  m_clusterLoaderAndPreparer.apply(m_uHits, m_vHits);
-  B2INFO("1: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
+//   m_clusterLoaderAndPreparer.apply(m_uHits, m_vHits);
+//   B2DEBUG(29, "1: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
   m_clusterLoaderAndPreparer2.apply(m_uClusters, m_vClusters, m_uHits, m_vHits);
-  B2INFO("2: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
+  B2DEBUG(29, "2: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
 
   // hit vectors are empty in case of high occupancy, a warning is created in m_clusterLoader
   if (m_uHits.empty() or m_vHits.empty()) {
@@ -84,6 +84,6 @@ void DATCONFPGAFindlet::apply()
   m_uInterceptFinder.apply(m_uHits, m_uTracks);
   m_vInterceptFinder.apply(m_vHits, m_vTracks);
 
-//   B2INFO("m_uTracks.size(): " << m_uTracks.size() << " m_vTracks.size(): " << m_vTracks.size());
+  B2DEBUG(29, "m_uTracks.size(): " << m_uTracks.size() << " m_vTracks.size(): " << m_vTracks.size());
 
 }

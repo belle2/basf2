@@ -138,7 +138,7 @@ void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, l
     tracks.emplace_back(trackCand);
   }
 
-  B2INFO("m_activeSectorArray.size: " << m_activeSectorArray.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
+  B2DEBUG(29, "m_activeSectorArray.size: " << m_activeSectorArray.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
 
 }
 
@@ -216,7 +216,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, s
           m_SectorArray[localIndexY * m_nAngleSectors + localIndexX] = -layerFilter(layerHits);
           m_activeSectorArray.push_back(std::make_pair(localIndexX, localIndexY));
 //           int nActiveSectors = std::count_if(m_SectorArray.begin(), m_SectorArray.end(), [](int c) {return c < 0;});
-//           B2INFO("number of active sectors: " << nActiveSectors << " localIndexX: " << localIndexX << " localIndexY: " << localIndexY << " totalIndex: " << localIndexY * m_nAngleSectors + localIndexX);
+//           B2DEBUG(29, "number of active sectors: " << nActiveSectors << " localIndexX: " << localIndexX << " localIndexY: " << localIndexY << " totalIndex: " << localIndexY * m_nAngleSectors + localIndexX);
         }
       }
     }
@@ -241,7 +241,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
   for (auto& currentCell : m_activeSectorArray) {
     const uint currentIndex = currentCell.second * m_nAngleSectors + currentCell.first;
     if (m_SectorArray[currentIndex] > -1) continue;
-//     B2INFO("Do I ever not continue? " << currentCell);
+//     B2DEBUG(29, "Do I ever not continue? " << currentCell);
 
     m_clusterInitialPosition = currentCell;
     m_clusterCoG = currentCell;
@@ -255,7 +255,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
       double CoGY = ((double)m_clusterCoG.second / (double)m_clusterSize) * m_unitY - m_verticalHoughSpaceSize;
 
       m_trackCandidates.emplace_back(std::make_pair(CoGX, CoGY));
-//       B2INFO("CoGX: " << CoGX << " CoGY: " << CoGY);
+//       B2DEBUG(29, "CoGX: " << CoGX << " CoGY: " << CoGY);
     }
     m_clusterCount++;
   }

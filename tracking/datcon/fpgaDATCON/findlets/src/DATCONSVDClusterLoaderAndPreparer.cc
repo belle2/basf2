@@ -21,19 +21,21 @@ using namespace TrackFindingCDC;
 
 DATCONSVDClusterLoaderAndPreparer::DATCONSVDClusterLoaderAndPreparer() : Super()
 {
-//   this->addProcessingSignalListener(&m_trackFitter);
 }
 
 void DATCONSVDClusterLoaderAndPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-//   m_trackFitter.exposeParameters(moduleParamList, prefix);
-
-//   Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "DATCONSVDClusterStoreArrayName"),
                                 m_param_SVDClusterStoreArrayName,
                                 "StoreArray name of the DATCONSVDCluster Store Array.",
                                 m_param_SVDClusterStoreArrayName);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxClustersPerLayer"),
+                                m_param_maxClustersPerLayer,
+                                "Maximum number of clusters on one layer before aborting tracking.",
+                                m_param_maxClustersPerLayer);
 
 }
 
@@ -89,21 +91,21 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<std::pair<VxdID, std::
         switch (layerNumber) {
           case 4:
             if (sensorNumber == 1) {
-              z = localPosition * cosSlantedAngles[layerNumber - 4] + zShiftL4[sensorNumber - 1];
+              z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL4[sensorNumber - 1];
             } else {
               z = localPosition + zShiftL4[sensorNumber - 1];
             }
             break;
           case 5:
             if (sensorNumber == 1) {
-              z = localPosition * cosSlantedAngles[layerNumber - 4] + zShiftL5[sensorNumber - 1];
+              z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL5[sensorNumber - 1];
             } else {
               z = localPosition + zShiftL5[sensorNumber - 1];
             }
             break;
           case 6:
             if (sensorNumber == 1) {
-              z = localPosition * cosSlantedAngles[layerNumber - 4] + zShiftL6[sensorNumber - 1];
+              z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL6[sensorNumber - 1];
             } else {
               z = localPosition + zShiftL6[sensorNumber - 1];
             }
@@ -114,7 +116,8 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<std::pair<VxdID, std::
     }
   }
 
-  if (std::any_of(nClusterPerLayer.begin(), nClusterPerLayer.end(), [](int i) {return i > 50;})) {
+  const uint* maxOfClustersPerLayer = std::max_element(nClusterPerLayer.begin(), nClusterPerLayer.end());
+  if (*maxOfClustersPerLayer > m_param_maxClustersPerLayer) {
     B2WARNING("High occupancy in SVD, aborting DATCON...");
     uHits.clear();
     vHits.clear();

@@ -31,19 +31,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for loading the seeds from the data store.
-   * Also, the tracks are fitted and only the fittable tracks are passed on.
-   *
-   * If a direction != "invalid" is given, the relations of the tracks to the given store array are checked.
-   * If there is a relation with the weight equal to the given direction (meaning there is already a
-   * partner for this direction), the track is not passed on.
+   * Findlet for performing the DATCON ROI calculation close to the implementation
+   * on FPGA.
    */
   class DATCONFPGAFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<>;
 
   public:
-    /// Constructor, for setting module description and parameters.
+    /// Constructor for adding the subfindlets
     DATCONFPGAFindlet();
 
     /// Default desctructor
@@ -52,38 +48,55 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Create the store arrays
-//     void initialize() override;
-
-    /// Load in the reco tracks and the hits
+    /// Function to call all the sub-findlets
     void apply() override;
 
     /// Clear the object pools
     void beginEvent() override;
 
   private:
-    /// Findlets
+    /// Findlets:
+    /// Convert SVDShaperDigits into DATCONSVDDigits
     SVDShaperDigitConverter m_digitConverter;
 
+    /// Cluster u-side strips
     DATCONSVDClusterizer m_uClusterizer;
+    /// Cluster v-side strips
     DATCONSVDClusterizer m_vClusterizer;
 
+    /// Load SVDCluster from DATCONSVDSimpleClusterizerModule and calculate the quantities
+    /// used in the Hough Trafo (intercept finding)
     DATCONSVDClusterLoaderAndPreparer m_clusterLoaderAndPreparer;
+
+    /// Load SVDCluster from the two DATCONSVDClusterizer Findlets and calculate the quantities
+    /// used in the Hough Trafo (intercept finding)
     DATCONSVDClusterLoaderAndPreparer2 m_clusterLoaderAndPreparer2;
 
+    /// Hough Space intercept finding for u-side
     FastInterceptFinder2D m_uInterceptFinder;
+    /// Hough Space intercept finding for v-side
     FastInterceptFinder2D m_vInterceptFinder;
 
+    /// vector containing u-side DATCONSVDDigits only
     std::vector<DATCONSVDDigit> m_uDigits;
+    /// vector containing v-side DATCONSVDDigits only
     std::vector<DATCONSVDDigit> m_vDigits;
 
+    /// vector containing u-side SVDClusters only
     std::vector<SVDCluster> m_uClusters;
+    /// vector containing v-side SVDClusters only
     std::vector<SVDCluster> m_vClusters;
 
+    /// vector containing the prepared u-side hits for intercept finding
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_uHits;
+    /// vector containing the prepared v-side hits for intercept finding
     std::vector<std::pair<VxdID, std::pair<long, long>>> m_vHits;
 
+    /// u-side "tracks" from intercept finding, consisting of the x-y pair
+    /// from the intercept in the 2D Hough Space
     std::vector<std::pair<double, double>> m_uTracks;
+    /// v-side "tracks" from intercept finding, consisting of the x-y pair
+    /// from the intercept in the 2D Hough Space
     std::vector<std::pair<double, double>> m_vTracks;
 
   };

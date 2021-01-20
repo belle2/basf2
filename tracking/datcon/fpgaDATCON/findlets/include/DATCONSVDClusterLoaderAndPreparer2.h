@@ -22,12 +22,10 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for loading the seeds from the data store.
-   * Also, the tracks are fitted and only the fittable tracks are passed on.
-   *
-   * If a direction != "invalid" is given, the relations of the tracks to the given store array are checked.
-   * If there is a relation with the weight equal to the given direction (meaning there is already a
-   * partner for this direction), the track is not passed on.
+   * Findlet for loading SVDClusters that were created by the DATCONSVDClusterizer findlet and prepare them
+   * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
+   * of coordinates for finding track candidates in r-phi and r-z.
+   * This is in contrast to the DATCONSVDClusterLoaderAndPreparer, which operates on SVDClusters created by the DATCONSVDSimpleClusterizerModule.
    */
   class DATCONSVDClusterLoaderAndPreparer2 : public
     TrackFindingCDC::Findlet<SVDCluster, SVDCluster, std::pair<VxdID, std::pair<long, long>>,
@@ -37,7 +35,7 @@ namespace Belle2 {
           std::pair<VxdID, std::pair<long, long>>>;
 
   public:
-    /// Add the subfindlets
+    /// Load clusters and prepare them for intercept finding
     DATCONSVDClusterLoaderAndPreparer2();
 
     /// Expose the parameters of the sub findlets.
@@ -46,32 +44,46 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load in the reco tracks and the hits
+    /// Load the SVDClusters and create two vectors containing the hits prepared for intercept finding
+    /// This function takes uClusters and vClusters as distinct vectors which where created by the DATCONSVDClusterizer findlet
     void apply(std::vector<SVDCluster>& uClusters, std::vector<SVDCluster>& vClusters,
                std::vector<std::pair<VxdID, std::pair<long, long>>>& uHits,
                std::vector<std::pair<VxdID, std::pair<long, long>>>& vHits) override;
 
   private:
     // Parameters
+    /// Cut value for aborting tracking if more than this number of clusters is found on one layer
+    uint m_param_maxClustersPerLayer = 50;
 
-    std::array<int, 8> nClusterPerLayer = {0};
+    /// array containing the number of clusters per layer. If this exceeds a cut value, tracking is aborted
+    std::array<uint, 8> nClusterPerLayer = {0};
 
     // ATTENTION: all the values below are hardcoded and taken from svd/data/SVD-Components.xml
-    const std::array<int, 4> svdRadii = {38990, 80000, 104000, 135150};    // in µm
-    const std::array<int, 4> rPhiShiftsOfLayers = { -4680, -10780, -11036, -19076};    // in µm
-//     const float initialAngle[4] = { -0.310755873318, 0.1396263402, -0.1396263402, -0.0698131701};    // in rad
-    const std::array<float, 4> initialAngle = {(342.195 - 360.) / 180. * M_PI, 8. / 180. * M_PI, -8. / 180. * M_PI, -4. / 180. * M_PI};    // in rad
-//     const float angleStep[4] = {0.897597901026, 0.628318530718, 0.523598775598, 0.392699081699};    // in rad
+    /// Radii of the SVD layers, in µm
+    const std::array<int, 4> svdRadii = {38990, 80000, 104000, 135150};
+    /// shift in r-phi to create windmill structure, in µm
+    const std::array<int, 4> rPhiShiftsOfLayers = { -4680, -10780, -11036, -19076};
+    /// phi-value of the first ladder in each layer, i.e. sensors X.1.Y, in rad
+    const std::array<float, 4> initialAngle = {(342.195 - 360.) / 180. * M_PI, 8. / 180. * M_PI, -8. / 180. * M_PI, -4. / 180. * M_PI};
+    /// angle difference between two consecutive ladders, in rad
     const std::array<float, 4> angleStep = {2. * M_PI / 7., M_PI / 5., M_PI / 6., M_PI / 8.};    // in rad
-    const std::array<float, 3> cosSlantedAngles = {cos(0.207694180987), cos(0.279252680319), cos(0.368264472171)};
-    const std::array<float, 3> sinSlantedAngles = {sin(0.207694180987), sin(0.279252680319), sin(0.368264472171)};
-//     const float slantedRadius[4] = {38.99, 66890, 86500, 112100};    // in µm
+    /// cosine values of the slanted sensors
+    const std::array<float, 4> cosSlantedAngles = {1, cos(0.207694180987), cos(0.279252680319), cos(0.368264472171)};
+    /// sine values of the slanted sensors
+    const std::array<float, 4> sinSlantedAngles = {1, sin(0.207694180987), sin(0.279252680319), sin(0.368264472171)};
 
-    const std::array<int, 2> zShiftL3 = {92350, -32650};    // in µm
-    const std::array<int, 3> zShiftL4 = {149042, 24760, -100240};    // in µm
-    const std::array<int, 4> zShiftL5 = {233754, 110560, -14440, -139440};    // in µm
-    const std::array<int, 5> zShiftL6 = {303471, 182060, 57060, -67940, -192940};    // in µm
+    /// shift along z of the L3 senosrs, in µn
+    const std::array<int, 2> zShiftL3 = {92350, -32650};
+    /// shift along z of the L4 senosrs, in µn
+    const std::array<int, 3> zShiftL4 = {149042, 24760, -100240};
+    /// shift along z of the L5 senosrs, in µn
+    const std::array<int, 4> zShiftL5 = {233754, 110560, -14440, -139440};
+    /// shift along z of the L6 senosrs, in µn
+    const std::array<int, 5> zShiftL6 = {303471, 182060, 57060, -67940, -192940};
 
+    /// convert float to long int for more similarity to the FPGA implementation
+    /// @param value to be converted
+    /// @param power multiply value by 10^power
     inline long convertToInt(float value, int power)
     {
       long factor = (long)pow(10, power);

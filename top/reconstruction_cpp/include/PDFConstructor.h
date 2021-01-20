@@ -95,7 +95,7 @@ namespace Belle2 {
        * Returns delta-ray PDF
        * @return delta-ray PDF
        */
-      const DeltaRayPDF* getDeltaRayPDF() const {return m_deltaRayPDF;}
+      const DeltaRayPDF& getDeltaRayPDF() const {return m_deltaRayPDF;}
 
       /**
        * Returns the expected number of signal photons
@@ -137,6 +137,13 @@ namespace Belle2 {
        * @return PDF value
        */
       double getPDFValue(int pixelID, double time, double timeErr, double sigt = 0) const;
+
+      /**
+       * Returns extended log likelihood
+       * Note: isValid() must be true, otherwise segmentation violation can occure
+       * @return log likelihood
+       */
+      double getLogL() const;
 
       /**
        * Returns number of calls of template function setSignalPDF<T> for a given peak type
@@ -342,6 +349,14 @@ namespace Belle2 {
        */
       double derivativeOfReflectedX(double x, double xe, double ze, double zd) const;
 
+      /**
+       * Returns log of Poisson distribution without log(N!) term
+       * @param mean mean value
+       * @param N number of occurrences
+       * @return log Poisson
+       */
+      double logPoisson(double mean, int N) const;
+
       int m_moduleID = 0; /**< slot ID */
       const TOPTrack& m_track;   /**< track at TOP */
       const Const::ChargedStable& m_hypothesis; /**< particle hypothesis */
@@ -349,7 +364,7 @@ namespace Belle2 {
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
       const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
-      const DeltaRayPDF* m_deltaRayPDF = 0; /**< delta-ray PDF */
+      DeltaRayPDF m_deltaRayPDF; /**< delta-ray PDF */
       bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are valid */
 
       double m_tof = 0; /**< time-of-flight from IP to average photon emission position */
@@ -384,12 +399,18 @@ namespace Belle2 {
       if (k < m_signalPDFs.size()) {
         double f = 0;
         f += m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
-        f += m_deltaPhotons * m_deltaRayPDF->getPDFValue(pixelID, time);
+        f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
         f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID);
         f /= getExpectedPhotons();
         return f;
       }
       return 0;
+    }
+
+    inline double PDFConstructor::logPoisson(double mean, int N) const
+    {
+      if (mean == 0 and N == 0) return 0;
+      return N * log(mean) - mean;
     }
 
     inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma) const

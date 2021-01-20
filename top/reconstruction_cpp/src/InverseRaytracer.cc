@@ -262,7 +262,7 @@ namespace Belle2 {
     {
       for (int i = 0; i < 2; i++) {
         const auto& solutions = m_solutions[i];
-        if (solutions.back().Nym != solutions.front().Nym) return true;
+        if (m_ok[i] and solutions.back().Nym != solutions.front().Nym) return true;
       }
       return false;
     }

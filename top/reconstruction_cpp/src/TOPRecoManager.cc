@@ -30,10 +30,6 @@ namespace Belle2 {
         m_fastRaytracers.push_back(FastRaytracer(moduleID));
         m_backgroundPDFs.push_back(BackgroundPDF(moduleID));
       }
-      // delta-ray PDF's in a separate loop since they store pointer to background PDF
-      for (unsigned moduleID = 1; moduleID <= geo->getNumModules(); moduleID++) {
-        m_deltaRayPDFs.push_back(DeltaRayPDF(moduleID));
-      }
     }
 
     const InverseRaytracer* TOPRecoManager::inverseRaytracer(int moduleID)
@@ -90,19 +86,6 @@ namespace Belle2 {
       }
 
       B2ERROR("TOPRecoManager::getBackgroundPDF: invalid moduleID" << LogVar("moduleID", moduleID));
-      return 0;
-    }
-
-
-    const DeltaRayPDF* TOPRecoManager::deltaRayPDF(int moduleID)
-    {
-      if (m_deltaRayPDFs.empty()) set();
-      unsigned k = moduleID - 1;
-      if (k < m_deltaRayPDFs.size()) {
-        return &m_deltaRayPDFs[k];
-      }
-
-      B2ERROR("TOPRecoManager::getDeltaRayPDF: invalid moduleID" << LogVar("moduleID", moduleID));
       return 0;
     }
 

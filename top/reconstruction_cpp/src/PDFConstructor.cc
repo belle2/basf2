@@ -28,7 +28,7 @@ namespace Belle2 {
       m_fastRaytracer(TOPRecoManager::getFastRaytracer(m_moduleID)),
       m_yScanner(TOPRecoManager::getYScanner(m_moduleID)),
       m_backgroundPDF(TOPRecoManager::getBackgroundPDF(m_moduleID)),
-      m_deltaRayPDF(TOPRecoManager::getDeltaRayPDF(m_moduleID)),
+      m_deltaRayPDF(m_moduleID),
       m_PDFOption(PDFOption), m_storeOption(storeOption)
     {
       if (not track.isValid()) {
@@ -36,8 +36,7 @@ namespace Belle2 {
         return;
       }
 
-      m_valid = m_inverseRaytracer != 0 and m_fastRaytracer != 0 and m_yScanner != 0 and
-                m_backgroundPDF != 0 and m_deltaRayPDF != 0;
+      m_valid = m_inverseRaytracer != 0 and m_fastRaytracer != 0 and m_yScanner != 0 and m_backgroundPDF != 0;
       if (not m_valid) {
         B2ERROR("TOP::PDFConstructor: missing reconstruction objects, cannot continue");
         return;
@@ -56,8 +55,8 @@ namespace Belle2 {
         setSignalPDF();
       }
 
-      m_deltaRayPDF->prepare(track, hypothesis);
-      m_deltaPhotons = m_deltaRayPDF->getNumPhotons();
+      m_deltaRayPDF.prepare(track, hypothesis);
+      m_deltaPhotons = m_deltaRayPDF.getNumPhotons();
 
       double effi = m_backgroundPDF->getEfficiency();
       double effiSum = TOPRecoManager::getEfficiencySum();
@@ -275,10 +274,6 @@ namespace Belle2 {
         x1 = x2;
         y1 = y2;
       }
-
-      B2ERROR("PDFConstructor::doRaytracingCorrections: zero-crossing interval not found"
-              << LogVar("xD", xD) << LogVar("dFic_dx", dFic_dx) << LogVar("step", step)
-              << LogVar("x1", x1) << LogVar("y1", y1));
 
       return false;
     }
@@ -521,6 +516,22 @@ namespace Belle2 {
       return x * mirror.R + mirror.xc;
     }
 
+
+    double PDFConstructor::getLogL() const
+    {
+      double logL = 0;
+      for (const auto& hit : m_track.getSelectedHits()) {
+        double f = getPDFValue(hit.pixelID, hit.time, hit.timeErr);
+        if (f <= 0) {
+          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative" << LogVar("PDFValue", f));
+          continue;
+        }
+        logL += log(f);
+      }
+      logL += logPoisson(getExpectedPhotons(), getDetectedPhotons());
+
+      return logL;
+    }
 
   } // namespace TOP
 } // namespace Belle2

@@ -14,7 +14,6 @@
 #include <top/reconstruction_cpp/FastRaytracer.h>
 #include <top/reconstruction_cpp/YScanner.h>
 #include <top/reconstruction_cpp/BackgroundPDF.h>
-#include <top/reconstruction_cpp/DeltaRayPDF.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
 #include <top/dbobjects/TOPCalTimebase.h>
@@ -77,16 +76,6 @@ namespace Belle2 {
       static const BackgroundPDF* getBackgroundPDF(int moduleID)
       {
         return getInstance().backgroundPDF(moduleID);
-      }
-
-      /**
-       * Returns delta-ray PDF of a given module
-       * @param moduleID slot ID (1-based)
-       * @return pointer to delta-ray PDF or null pointer if moduleID is not valid
-       */
-      static const DeltaRayPDF* getDeltaRayPDF(int moduleID)
-      {
-        return getInstance().deltaRayPDF(moduleID);
       }
 
       /**
@@ -202,18 +191,10 @@ namespace Belle2 {
        */
       const BackgroundPDF* backgroundPDF(int moduleID);
 
-      /**
-       * Returns delta-ray PDF of a given module
-       * @param moduleID slot ID
-       * @return delta-ray PDF or null pointer for invalid moduleID
-       */
-      const DeltaRayPDF* deltaRayPDF(int moduleID);
-
       std::vector<InverseRaytracer> m_inverseRaytracers; /**< collection of inverse raytracers */
       std::vector<FastRaytracer> m_fastRaytracers; /**< collection of fast raytracers */
       std::vector<YScanner> m_yScanners; /**< collection of y-scanners */
       std::vector<BackgroundPDF> m_backgroundPDFs; /**< collection of background PDF's */
-      std::vector<DeltaRayPDF> m_deltaRayPDFs; /**< collection of delta-ray PDF's */
       double m_minTime = -20; /**< time window lower edge */
       double m_maxTime = 75; /**< time window upper edge */
       bool m_redoBkg = false; /**< flag to signal whether backgroundPDF has to be redone */

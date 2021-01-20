@@ -12,6 +12,9 @@
 #include <top/reconstruction_cpp/func.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
+#include <algorithm>
+
+using namespace std;
 
 namespace Belle2 {
   namespace TOP {
@@ -251,7 +254,10 @@ namespace Belle2 {
       if (m_z > prism.zFlat) {
 
         int step = 1;
-        if (m_ky < 0) step = -1;
+        if (m_ky < 0) {
+          step = -1;
+          m_y = std::min(m_y, prism.yUp);
+        }
 
         unsigned k = prism.k0;
         while (k < prism.unfoldedWindows.size()) {

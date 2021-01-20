@@ -32,16 +32,11 @@ namespace Belle2 {
       explicit DeltaRayPDF(int moduleID);
 
       /**
-       * Clear mutable variables
-       */
-      void clear() const;
-
-      /**
        * Prepare the object
        * @param track track at TOP
        * @param hypothesis particle hypothesis
        */
-      void prepare(const TOPTrack& track, const Const::ChargedStable& hypothesis) const;
+      void prepare(const TOPTrack& track, const Const::ChargedStable& hypothesis);
 
       /**
        * Returns slot ID
@@ -145,7 +140,7 @@ namespace Belle2 {
 
       // variables set in constructor (slot dependent)
       int m_moduleID; /**< slot ID */
-      const BackgroundPDF* m_background; /**< background PDF */
+      const BackgroundPDF* m_background = 0; /**< background PDF */
       double m_zD = 0; /**< detector (photo-cathode) position in z */
       double m_zM = 0; /**< spherical mirror position in z */
       double m_phaseIndex = 0; /**< phase refractive index */
@@ -156,11 +151,11 @@ namespace Belle2 {
       std::vector<GausXY> m_tableGaus; /**< table of normal (Gaussian) distribution */
 
       // variables set in prepare method (track/hypothesis dependent)
-      mutable double m_dirFrac = 0; /**< fraction of direct photons */
-      mutable double m_dirT0 = 0;   /**< minimal propagation time of direct photons */
-      mutable double m_reflT0 = 0;  /**< minimal propagation time of reflected photons */
-      mutable double m_TOF = 0;     /**< time-of-flight of particle */
-      mutable double m_numPhotons = 0; /**< number of photons */
+      double m_dirFrac = 0; /**< fraction of direct photons */
+      double m_dirT0 = 0;   /**< minimal propagation time of direct photons */
+      double m_reflT0 = 0;  /**< minimal propagation time of reflected photons */
+      double m_TOF = 0;     /**< time-of-flight of particle */
+      double m_numPhotons = 0; /**< number of photons */
 
     };
 

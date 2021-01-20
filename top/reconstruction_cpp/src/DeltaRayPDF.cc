@@ -21,10 +21,16 @@ namespace Belle2 {
     DeltaRayPDF::DeltaRayPDF(int moduleID):
       m_moduleID(moduleID), m_background(TOPRecoManager::getBackgroundPDF(moduleID))
     {
-      if (not m_background) B2FATAL("TOP::DeltaRayPDF: background PDF not found");
+      if (not m_background) {
+        B2ERROR("TOP::DeltaRayPDF: background PDF not found");
+        return;
+      }
 
       const auto* yScanner = TOPRecoManager::getYScanner(moduleID);
-      if (not yScanner) B2FATAL("TOP::DeltaRayPDF: YScanner not found");
+      if (not yScanner) {
+        B2ERROR("TOP::DeltaRayPDF: YScanner not found");
+        return;
+      }
 
       m_zD = yScanner->getPrism().zD;
       m_zM = yScanner->getBars().back().zR;
@@ -56,16 +62,7 @@ namespace Belle2 {
       for (auto& gaus : m_tableGaus) gaus.y /= sum;
     }
 
-    void DeltaRayPDF::clear() const
-    {
-      m_dirFrac = 0;
-      m_dirT0 = 0;
-      m_reflT0 = 0;
-      m_TOF = 0;
-      m_numPhotons = 0;
-    }
-
-    void DeltaRayPDF::prepare(const TOPTrack& track, const Const::ChargedStable& hypothesis) const
+    void DeltaRayPDF::prepare(const TOPTrack& track, const Const::ChargedStable& hypothesis)
     {
       double z = track.getEmissionPoint().position.Z();
       m_dirFrac = directFraction(z);

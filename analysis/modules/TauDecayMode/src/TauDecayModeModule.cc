@@ -10,8 +10,10 @@
 
 #include <TauDecayModeModule.h>
 
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -41,7 +43,6 @@
 using namespace std;
 using namespace Belle2;
 
-
 // this part parse a string with a given separetor___________________________________________________________________________
 std::vector<std::string> parseString(std::string str, std::string sep)
 {
@@ -70,7 +71,9 @@ std::vector<std::string> parseString(std::string str, std::string sep)
 
 std::map<string, int> make_map()
 {
-  const char* fileName = "/home/evilgauss/Documentos/BelleII/TauolaBBB/workdir/map_tau_v2.txt";
+
+  const char* fileName = "/home/evilgauss/Documentos/BelleII/TauolaBBB/workdir/map_tau_v4.txt";
+
   ifstream f;
   f.open(fileName);
   string line;
@@ -87,7 +90,6 @@ std::map<string, int> make_map()
   return map_tau;
 }
 
-
 // Driver function to sort the vector elements by
 // second element of pair in descending order
 bool EnergySortInRev(const std::pair<int, double>& a,
@@ -95,6 +97,7 @@ bool EnergySortInRev(const std::pair<int, double>& a,
 {
   return (a.second > b.second);
 }
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -104,26 +107,40 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 
-TauDecayModeModule::TauDecayModeModule() : Module()
+TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
 {
   // Set module properties
-  setDescription("Fill the histograms with the values of the MCParticle collection");
+  setDescription("");
   //Parameter definition
   addParam("printmode",      m_printmode,      "Printout more information from each event", 0);
+  //addParam("mapping", m_mapping , "txt map path");
 }
+
+
+
 //
 void TauDecayModeModule::initialize()
 {
-
+  nop = 0 ;
+  taum_no = -1;
+  taup_no = -1;
   EventNumber = 1;
   mode_decay = make_map();
-  //vec_b1m, vec_b1p, vec_phi, vec_f1, vec_a1m, vec_a1p, vec_rhom, vec_rhop
+  m_tauDecay.registerInDataStore();
+
 }
 void TauDecayModeModule::event()
 {
-  StoreArray<MCParticle> MCParticles;
+  //StoreArray<MCParticle> MCParticles;
   //
+  IdentifyTauPair();
+  if (tauPair) {
+    m_pprong = getProngOfDecay(*MCParticles[idOfTauPlus - 1]);
+    m_mprong = getProngOfDecay(*MCParticles[idOfTauMinus - 1]);
+  }
 
+
+  if (!m_tauDecay) m_tauDecay.create();
   //
   vec_em.clear(), vec_ep.clear(), vec_nue.clear(), vec_anue.clear();
   vec_mum.clear(), vec_mup.clear(), vec_numu.clear(), vec_anumu.clear();
@@ -136,11 +153,11 @@ void TauDecayModeModule::event()
                 vec_rhop.clear();
   vec_K0.clear(), vec_K0_br.clear(), vec_rho0.clear(), vec_f0.clear();
   //
+
   for (int i = 0; i < MCParticles.getEntries(); i++) {
+
     MCParticle& p = *MCParticles[i];
-    //B2INFO("TauDecayMode::PDG: " << p.getPDG() << " p.hasStatus(2): " << p.hasStatus(2)
-    //       <<" isInitial: " << p.isInitial() << " i: " << i << "  here");
-    //if (p.hasStatus(2) == 1) B2INFO("i: " << i << " PDG: "<< p.getPDG() << " isInitial: " << p.isInitial() << "  here");
+
     if (p.getPDG() ==  11 && p.isInitial() == 0)  vec_em.push_back(i);
     if (p.getPDG() == -11 && p.isInitial() == 0)  vec_ep.push_back(i);
     //
@@ -194,13 +211,9 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 213) vec_rhop.push_back(i);
     if (p.getPDG() == 113) vec_rho0.push_back(i);
     if (p.getPDG() == 9010221) vec_f0.push_back(i);
-
-
-
-
   }
   //
-  if (m_printmode > 1) {
+  if (m_printmode < 0) {
     B2INFO("TauDecayMode:: vec_nut.size()  = " << vec_nut.size());
     B2INFO("TauDecayMode:: vec_anut.size() = " << vec_anut.size());
     B2INFO("TauDecayMode:: vec_em.size()   = "  << vec_em.size());
@@ -209,7 +222,6 @@ void TauDecayModeModule::event()
     B2INFO("TauDecayMode:: vec_pip.size()  = " << vec_pip.size());
     B2INFO("TauDecayMode:: vec_pi0.size()  = " << vec_pi0.size());
     B2INFO("TauDecayMode:: vec_gam.size()  = " << vec_gam.size());
-// test for extra particles
     B2INFO("TauDecayMode:: vec_K0.size()  = " << vec_K0.size());
     B2INFO("TauDecayMode:: vec_K0_br.size()  = " << vec_K0_br.size());
     B2INFO("TauDecayMode:: vec_k0s.size()  = " << vec_k0s.size());
@@ -386,9 +398,9 @@ void TauDecayModeModule::event()
     int ii = vec_gamtmp_tauminus[i].first;
     MCParticle* p = MCParticles[ii];
     double Estar = getEnergyTauRestFrame(p, -1);
-    if (m_printmode > 2) cout << "vec_gamtmp_tauminus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
+    if (m_printmode < 0) cout << "vec_gamtmp_tauminus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
                                 Estar << endl;
-    if (Estar > 0.1) { // tune ?
+    if (Estar > 0.00) { // tune ?
       vec_dau_tauminus.push_back(ii);
     }
   }
@@ -398,9 +410,9 @@ void TauDecayModeModule::event()
     int ii = vec_gamtmp_tauplus[i].first;
     MCParticle* p = MCParticles[ii];
     double Estar = getEnergyTauRestFrame(p, +1);
-    if (m_printmode > 2) cout << "vec_gamtmp_tauplus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
+    if (m_printmode < 0) cout << "vec_gamtmp_tauplus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
                                 Estar << endl;
-    if (Estar > 0.1) { // tune ?
+    if (Estar > 0.00) { // tune ?
       vec_dau_tauplus.push_back(ii);
     }
   }
@@ -620,7 +632,7 @@ void TauDecayModeModule::event()
     if (pdg == -10311) m_tauminusdecaymode.append(".kstarbr");
     if (pdg == 331) m_tauminusdecaymode.append(".etapr");
 
-    //test with resonances
+
     if (pdg == 221) m_tauminusdecaymode.append(".|eta|");
     if (pdg == 223) m_tauminusdecaymode.append(".|omega|");
     if (pdg == 323) m_tauminusdecaymode.append(".kstarp");
@@ -639,16 +651,25 @@ void TauDecayModeModule::event()
     if (pdg == 9010221) m_tauminusdecaymode.append(".|f0|");
   }
 //
-  //
   //if (m_printmode>1) B2INFO("TauDecayMode:: PDG inside vec_dau_tauminus = " << pdg << " tauminusdecaymode = " << m_tauminusdecaymode);
-  //
 
 
-  if (m_printmode > 3) B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode, mode_decay));
+
+  if (m_printmode == 5) {
+    if (TauBBBmode(m_tauminusdecaymode, mode_decay) == -1) {nop = nop + 1;}
+    if (TauBBBmode(m_tauminusdecaymode, mode_decay) == -1) {
+      //float per = nop*100/27400;
+      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode, mode_decay));
+      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " << m_tauminusdecaymode);
+      //B2INFO("No encontrado =" << nop <<" el porcentaje" << per <<"%");
+    }
+  }
+
+  if (m_printmode == 10) B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode, mode_decay));
   //m_tauminusdecaymode=m_tauminusdecaymode.erase(0,1); // remove the leading dot
-  if (m_printmode > 0) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
-                                m_tauminusdecaymode);
-  //
+  if (m_printmode == 10) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
+                                  m_tauminusdecaymode);
+  //}
   m_tauplusdecaymode = "";
   for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {
     MCParticle* p = MCParticles[vec_dau_tauplus[i]];
@@ -693,10 +714,10 @@ void TauDecayModeModule::event()
     if (pdg == 331) m_tauplusdecaymode.append(".etapr");
 
     //test with resonances
-    if (pdg == 221) m_tauplusdecaymode.append(".|eta|"); // intermediate resonances are implicit unless used as dictionary
-    if (pdg == 223) m_tauplusdecaymode.append(".|omega|"); // intermediate resonances are implicit unless used as dictionary
-    if (pdg == 323) m_tauplusdecaymode.append(".|kstarp|"); // intermediate resonances are implicit unless used as dictionary
-    if (pdg == -323) m_tauplusdecaymode.append(".|kstarm|"); // intermediate resonances are implicit unless used as dictionary
+    if (pdg == 221) m_tauplusdecaymode.append(".|eta|");
+    if (pdg == 223) m_tauplusdecaymode.append(".|omega|");
+    if (pdg == 323) m_tauplusdecaymode.append(".|kstarp|");
+    if (pdg == -323) m_tauplusdecaymode.append(".|kstarm|");
     if (pdg == 9000211) m_tauplusdecaymode.append(".|a0p|");
     if (pdg == -9000211) m_tauplusdecaymode.append(".|a0m|");
     if (pdg == 10213) m_tauplusdecaymode.append(".|b1p|");
@@ -712,11 +733,44 @@ void TauDecayModeModule::event()
     //
     //if (m_printmode>1) B2INFO("TauDecayMode:: PDG inside vec_dau_tauplus = " << pdg << "  m_tauplusdecaymode = " <<  m_tauplusdecaymode);
     //
-    //if(m_printmode>3) B2INFO("TauDecayMode:: Decay mode is ="<<TauBBBmode(m_tauplusdecaymode));
+    //if(m_printmode==10) B2INFO("TauDecayMode:: Decay mode is ="<<TauBBBmode(m_tauplusdecaymode));
+
   }
-  m_tauplusdecaymode = m_tauplusdecaymode.erase(0, 1); // remove the leading dot
-  if (m_printmode > 0) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<  m_tauplusdecaymode);
+  if (m_printmode == 5) {
+    if (TauBBBmode(m_tauplusdecaymode, mode_decay) == -1) {
+      //float per = nop*100/27400;
+      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode, mode_decay));
+      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau+ -> " << m_tauminusdecaymode);
+      //B2INFO("No encontrado =" << nop <<" el porcentaje" << per <<"%");
+    }
+  }
+  //m_tauplusdecaymode = m_tauplusdecaymode.erase(0,1); // remove the leading dot
+  if (m_printmode == 10) B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode, mode_decay));
+  if (m_printmode == 10) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
+                                  m_tauplusdecaymode);
+
   //
+
+  m_mmode = TauBBBmode(m_tauminusdecaymode, mode_decay);
+  m_pmode = TauBBBmode(m_tauplusdecaymode, mode_decay);
+  if (m_mmode == -1) {
+    taum_no = taum_no - 1;
+    m_mmode = taum_no;
+  }
+  if (m_pmode == -1) {
+    taup_no = taup_no - 1;
+    m_mmode = taup_no;
+  }
+
+
+  m_tauDecay->addTauMinusIdMode(m_mmode);
+  m_tauDecay->addTauPlusIdMode(m_pmode);
+
+  m_tauDecay->addTauPlusMcProng(m_pprong);
+  m_tauDecay->addTauMinusMcProng(m_mprong);
+
+
+
   EventNumber = EventNumber + 1;
   //
 }
@@ -724,6 +778,30 @@ void TauDecayModeModule::event()
 void TauDecayModeModule::terminate()
 {
 }
+
+void TauDecayModeModule::IdentifyTauPair()
+{
+  numOfTauPlus = 0;
+  numOfTauMinus = 0;
+  idOfTauPlus = 0;
+  idOfTauMinus = 0;
+  for (int i = 0; i < MCParticles.getEntries(); i++) {
+    MCParticle& p = *MCParticles[i];
+
+    if (p.getStatus() == 1 && p.getPDG() == 15) {
+      numOfTauMinus++;
+      idOfTauMinus = p.getIndex();
+    }
+    if (p.getStatus() == 1 && p.getPDG() == -15) {
+      numOfTauPlus++;
+      idOfTauPlus = p.getIndex();
+    }
+  }
+  if (numOfTauPlus == 1 && numOfTauMinus == 1) {
+    tauPair = true;
+  } else tauPair = false;
+}
+
 //
 double TauDecayModeModule::getEnergyTauRestFrame(const MCParticle* p, const int ichg)
 {
@@ -762,64 +840,31 @@ int TauDecayModeModule::getRecursiveMotherCharge(const MCParticle* p)
   } else if (mother->getPDG() == 15) {
     return -1;
   } else if (mother->getPDG() == -15) {
-    return +1;
+    return 1;
   } else {
     return getRecursiveMotherCharge(mother);
   }
 }
-//pdg(11)=e- pdg(22)=gamma pdg(111)=pi0 pdg(15)=tau-  || mother->getPDG() == 221
 
-int TauDecayModeModule::getRecursiveMother(const MCParticle* p)
+
+
+
+int TauDecayModeModule::getProngOfDecay(const MCParticle& p)
 {
-  const MCParticle* mother = p->getMother();
-  if (mother->getPDG() == 15 || mother->getPDG() == -15) {
-    return 1;
+  int ret = 0;
+  const vector<MCParticle*> daughters = p.getDaughters();
+  if (daughters.empty()) return ret;
+  for (MCParticle* d : daughters) {
+    if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+    // TODO: Improve how to identify a final state particle.
+    bool isChargedFinalState = find(begin(finalStatePDGs),
+                                    end(finalStatePDGs),
+                                    abs(d->getPDG())) != end(finalStatePDGs);
+    if (isChargedFinalState) ret++;
+    else ret += getProngOfDecay(*d);
   }
-
-  else if (mother->getPDG() == 221) {
-    if (getRecursiveMother(mother) == 9000211 || getRecursiveMother(mother) == -9000211) {
-      return 10;
-    } else if (getRecursiveMother(mother) == 20223) {
-      return 11;
-    } else if (getRecursiveMother(mother) == 9000111) {
-      return 12;
-    } else {
-      return 2;
-    }
-  } else if (mother->getPDG() == 223) {
-    if (getRecursiveMother(mother) == 10213 || getRecursiveMother(mother) == -10213) {
-      return 13;
-    } else if (getRecursiveMother(mother) == 9000211 || getRecursiveMother(mother) == -9000211) {
-      return 14;
-    } else {
-      return 3;
-    }
-
-
-  } else if (mother->getPDG() == 9000211 || mother->getPDG() == -9000211) {
-    return 4;
-
-  } else if (mother->getPDG() == 10213 || mother->getPDG() == 10213) {
-    return 5;
-
-  } else if (mother->getPDG() == 9010221) {
-    return 6;
-
-  } else if (mother->getPDG() == 213 || mother->getPDG() == -213) {
-    if (getRecursiveMother(mother) == 10213 || getRecursiveMother(mother) == -10213) {
-      return 15;
-    } else {
-      return 7;
-    }
-  } else if (mother->getPDG() == 333) {
-    return 8;
-  } else if (mother->getPDG() == 20223) {
-    return 9;
-  } else {
-    return getRecursiveMother(mother);
-  }
+  return ret;
 }
-//a1=20213, b1=10213 , eta=221, omega=223, ro+=213, f1=20223 , a0+=9000211 , a0=9000111
 
 
 
@@ -859,10 +904,9 @@ int TauDecayModeModule::TauBBBmode(string state, map<string, int> tau_map)
       return itr -> second;
       break;
     }
-    // else{
-    //     continue;
-    // }
+
   }
-  return 0;
+  return -1;
 
 }
+

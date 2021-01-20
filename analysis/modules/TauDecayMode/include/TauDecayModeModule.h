@@ -12,6 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/VariableManager/Utility.h>
 #include <TVector3.h>
@@ -25,6 +27,7 @@
 #include <map>
 #include <fstream>
 #include <string>
+#include <analysis/dataobjects/TauPairDecay.h>
 namespace Belle2 {
   class TauDecayModeModule : public Module {
 
@@ -45,14 +48,42 @@ namespace Belle2 {
 
   private:
 
+    /** pointer to tau pair decay objects */
+    StoreObjPtr<TauPairDecay> m_tauDecay;
+
     int EventNumber;
+    int nop;
+    int taum_no;
+    int taup_no;
+
+    /** StoreArray of MCParticles */
+    StoreArray<MCParticle> MCParticles;
 
     std::map<std::string, int> mode_decay;
 
     std::string m_tauminusdecaymode;
     std::string m_tauplusdecaymode;
 
+    Int_t m_pmode;
+    /** ID of the decay channel of negative tau*/
+    Int_t m_mmode;
+    /** Prong of the decay channel of positive tau */
+    Int_t m_pprong;
+    /** Prong of the decay channel of negative tau*/
+    Int_t m_mprong;
 
+    bool tauPair;
+    /** Number of positive tau leptons in the event */
+    int numOfTauPlus;
+    /** Number of negative tau leptons in the event */
+    int numOfTauMinus;
+    /** Index of the generated positive tau */
+    int idOfTauPlus;
+    /** Index of the generated negative tau */
+    int idOfTauMinus;
+
+    /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
+    const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
 
     std::vector<int> vec_em, vec_ep, vec_nue, vec_anue;
     std::vector<int> vec_mum, vec_mup, vec_numu, vec_anumu;
@@ -66,16 +97,18 @@ namespace Belle2 {
     std::vector<int> vec_dau_tauminus;
     std::vector<int> vec_dau_tauplus;
 
-
+    /** Identifies if the event is a generated tau pair */
+    void IdentifyTauPair();
     double getEnergyTauRestFrame(const MCParticle* mc, const int ichg);
     int getRecursiveMotherCharge(const MCParticle* mc);
-    int getRecursiveMother(const MCParticle* mc);
+    //int getRecursiveMother(const MCParticle* mc);
     int TauBBBmode(std::string s, std::map<std::string, int> tau_map);
+    int getProngOfDecay(const MCParticle& mc);
 
   protected:
 
     int m_printmode;
-
+    std::string m_mapping;
 
   };
 

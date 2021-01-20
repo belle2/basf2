@@ -1,5 +1,21 @@
 #! /usr/bin/env python3
 
+'''
+Tool to generate a ROOT file with ECL DQM reference histograms and save information about references in the database.
+
+Brief instruction how to use this script:
+
+1. Create a dqm analysis file from a raw dqm file.
+basf2 dqm/analysis/examples/eclDQManalysis.py raw_filename DQM_Path/analysis_filename
+where default 'DQM_Path' name should be '/group/belle2/group/detector/ECL/tmp/DQManalysis'
+
+2. Run this script
+b2ecl-dqm-ref [-h] [--file FILE] exp run.
+
+3. Move output file to 'daq_dqm_gui' repository.
+
+'''
+
 import argparse
 import ROOT
 import sqlite3

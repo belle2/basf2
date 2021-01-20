@@ -370,9 +370,9 @@ try:
 
 	output_file.Close()
 
-	shutil.copy2('./'+output_file_path, previous_ref_set.format(r_type = run_type))
-	#shutil.copy2('./'+output_file_path,'./past_'+run_type+'.root')
-
+	print('point 1')
+	shutil.copyfile('./'+output_file_path, previous_ref_set.format(r_type = run_type))
+	print('point 2')
 
 except Exception as err:
 	print("Error:", err)

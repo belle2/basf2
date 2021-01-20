@@ -23,20 +23,12 @@
 namespace Belle2 {
   class DATCONSVDDigit;
   class SVDCluster;
-//   class SVDShaperDigit;
-//   class SVDTrueHit;
-//   class MCParticle;
-//   class VxdID;
 
   class ModuleParamList;
 
   /**
-   * Findlet for loading the seeds from the data store.
-   * Also, the tracks are fitted and only the fittable tracks are passed on.
-   *
-   * If a direction != "invalid" is given, the relations of the tracks to the given store array are checked.
-   * If there is a relation with the weight equal to the given direction (meaning there is already a
-   * partner for this direction), the track is not passed on.
+   * Findlet for clustering DATCONSVDDigits and creating SVDClusters that are used for tracking in DATCON.
+   * This finldet only clusters strips on one side
    */
   class DATCONSVDClusterizer : public TrackFindingCDC::Findlet<DATCONSVDDigit, SVDCluster> {
     /// Parent class
@@ -46,7 +38,7 @@ namespace Belle2 {
     typedef std::map<int, float> simpleSVDNoiseMap;
 
   public:
-    /// Add the subfindlets
+    /// Cluster SVD strips
     DATCONSVDClusterizer();
 
     /// Expose the parameters of the sub findlets.
@@ -58,13 +50,17 @@ namespace Belle2 {
     /// Begin Run
     void beginRun() override;
 
-    /// Load in the reco tracks and the hits
+    /// Load in the DATCONSVDDigits and create SVDClusters from them
     void apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters) override;
 
   private:
 
+    /// fill the noise map to be used for SNR cuts
     void fillDATCONSVDNoiseMap();
 
+    /// calculate the SNR of a DATCONSVDDigit (= one strip) in a simplified way
+    /// @param digit DATCONSVDDigit for which the SNR is calculated
+    /// @return SNR of the digit
     float calculateSNR(DATCONSVDDigit digit);
 
     /// SVD Noise payload
@@ -74,16 +70,15 @@ namespace Belle2 {
     /// Simple noise map for u-strips*/
     simpleSVDNoiseMap svdNoiseMap;
 
-    /// bla
+    /// File name for a file containing the noise of the strips for export to FPGA
     std::string m_param_noiseMapfileName = "noiseMap.txt";
-    /// blub
+    /// Write the noise map to file m_param_noiseMapfileName for export to FPGA?
     bool m_param_writeNoiseMapsToFile = false;
-    /// blub
+    /// Is this the finldlet for u-side or for v-side?
     bool m_param_isU = true;
 
     /// maximum cluster size
     unsigned short m_param_maxiClusterSize = 20;
-    /// noise cut
     /// Value above which u-strips are considered noisy, all other u-strips will get assigned a standard noise value of m_noiseCut
     float m_param_noiseCut = 4;
     /// Require a SNR for a u-strip signal to be valid.
@@ -91,8 +86,10 @@ namespace Belle2 {
     /// Require a SNR for at least one strip in the u-cluster to make the cluster valid.
     float m_param_requiredSNRcluster = 5;
 
+    /// instance of GeoCache to avoid creating it again for every cluster
     const VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
+    /// struct containing a cluster candidate for easier handling
     struct clusterCandidate {
       VxdID vxdID = 0; /**< VxdID of the cluster */
       std::vector<unsigned short> strips; /**< Vector containing strips (DATCONSVDDigits) that are added */
@@ -105,6 +102,13 @@ namespace Belle2 {
       int seedCharge = 0; /**< Seed Charge of the cluster */
       float clusterPosition = 0; /**< Position of the cluster */
 
+      /// add a new strip to the current cluster candidate if possible
+      /// @param nextID VxdID of the digit to be added
+      /// @param nextCharge charge (in ADU) of the digit to be added
+      /// @param nextCellID strip number of the digit to be added
+      /// @param nextStripSNR SNR of the digit to be added
+      /// @param maxClusterSize maximum cluster size, if exceeded, start new cluster
+      /// @return true if digit was successfully added to current cluster candidate, else return false
       bool add(VxdID nextID, int nextCharge, unsigned short nextCellID, float nextStripSNR, unsigned short maxClusterSize)
       {
         bool added = false;
@@ -137,6 +141,9 @@ namespace Belle2 {
 
       };
 
+      /// calculate cluster properties once a cluster is ready to be stored
+      /// @param pitch strip pitch of the sensor and sensor side on which the cluster was found
+      /// @param stripsInSensor number of strips of the sensor and sensor side on which the cluster was found
       void finalizeCluster(const double pitch, const int stripsInSensor)
       {
         charge = std::accumulate(charges.begin(), charges.end(), 0);

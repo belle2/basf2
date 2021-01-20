@@ -241,7 +241,6 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
   for (auto& currentCell : m_activeSectorArray) {
     const uint currentIndex = currentCell.second * m_nAngleSectors + currentCell.first;
     if (m_SectorArray[currentIndex] > -1) continue;
-//     B2DEBUG(29, "Do I ever not continue? " << currentCell);
 
     m_clusterInitialPosition = currentCell;
     m_clusterCoG = currentCell;
@@ -252,10 +251,13 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
       double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize) * m_unitX + m_minimumX;
+      if (not m_param_isUFinder) {
+        CoGX = atan(tan(m_minimumX) + m_unitX * ((double)m_clusterCoG.first / (double)m_clusterSize));
+      }
       double CoGY = ((double)m_clusterCoG.second / (double)m_clusterSize) * m_unitY - m_verticalHoughSpaceSize;
 
       m_trackCandidates.emplace_back(std::make_pair(CoGX, CoGY));
-//       B2DEBUG(29, "CoGX: " << CoGX << " CoGY: " << CoGY);
+      B2DEBUG(29, "CoGX: " << CoGX << " CoGY: " << CoGY);
     }
     m_clusterCount++;
   }

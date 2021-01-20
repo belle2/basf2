@@ -24,12 +24,9 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for loading the seeds from the data store.
-   * Also, the tracks are fitted and only the fittable tracks are passed on.
-   *
-   * If a direction != "invalid" is given, the relations of the tracks to the given store array are checked.
-   * If there is a relation with the weight equal to the given direction (meaning there is already a
-   * partner for this direction), the track is not passed on.
+   * Findlet for converting SVDShaperDigits into DATCONSVDDigits.
+   * DATCONSVDDigtis are a simplified digit that contains different information of the SVD hits to have information
+   * similar as in the real FPGA DATCON.
    */
   class SVDShaperDigitConverter : public TrackFindingCDC::Findlet<DATCONSVDDigit, DATCONSVDDigit> {
     /// Parent class
@@ -39,6 +36,7 @@ namespace Belle2 {
     /// Add the subfindlets
     SVDShaperDigitConverter();
 
+    /// default destructor
     virtual ~SVDShaperDigitConverter() = default;
 
     /// Expose the parameters of the sub findlets.

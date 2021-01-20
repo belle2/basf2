@@ -16,6 +16,8 @@
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer2.h>
 #include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
+#include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 
@@ -77,6 +79,14 @@ namespace Belle2 {
     /// Hough Space intercept finding for v-side
     FastInterceptFinder2D m_vInterceptFinder;
 
+    /// Extrapolate found tracks to PXD sensors
+    ToPXDExtrapolator m_toPXDExtrapolator;
+
+    /// Calculate and store ROIs
+    ROICalculator m_ROICalculator;
+
+
+    // Vectors containing the information throughout the steps and sub findlets
     /// vector containing u-side DATCONSVDDigits only
     std::vector<DATCONSVDDigit> m_uDigits;
     /// vector containing v-side DATCONSVDDigits only
@@ -98,6 +108,11 @@ namespace Belle2 {
     /// v-side "tracks" from intercept finding, consisting of the x-y pair
     /// from the intercept in the 2D Hough Space
     std::vector<std::pair<double, double>> m_vTracks;
+
+    /// Extrapolated hits in u direction
+    std::vector<std::pair<VxdID, long>> m_uExtrapolations;
+    /// Extrapolated hits in v direction
+    std::vector<std::pair<VxdID, long>> m_vExtrapolations;
 
   };
 }

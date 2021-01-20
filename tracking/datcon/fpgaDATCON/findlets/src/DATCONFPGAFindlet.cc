@@ -25,11 +25,14 @@ DATCONFPGAFindlet::DATCONFPGAFindlet()
   addProcessingSignalListener(&m_uClusterizer);
   addProcessingSignalListener(&m_vClusterizer);
 
-  addProcessingSignalListener(&m_clusterLoaderAndPreparer);
+//   addProcessingSignalListener(&m_clusterLoaderAndPreparer);
   addProcessingSignalListener(&m_clusterLoaderAndPreparer2);
 
   addProcessingSignalListener(&m_uInterceptFinder);
   addProcessingSignalListener(&m_vInterceptFinder);
+
+  addProcessingSignalListener(&m_toPXDExtrapolator);
+  addProcessingSignalListener(&m_ROICalculator);
 }
 
 void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -40,11 +43,14 @@ void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const
   m_uClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
   m_vClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
 
-  m_clusterLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
+//   m_clusterLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
   m_clusterLoaderAndPreparer2.exposeParameters(moduleParamList, prefix);
 
   m_uInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
   m_vInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
+
+  m_toPXDExtrapolator.exposeParameters(moduleParamList, prefix);
+  m_ROICalculator.exposeParameters(moduleParamList, prefix);
 }
 
 void DATCONFPGAFindlet::beginEvent()
@@ -59,6 +65,8 @@ void DATCONFPGAFindlet::beginEvent()
   m_vHits.clear();
   m_uTracks.clear();
   m_vTracks.clear();
+  m_uExtrapolations.clear();
+  m_vExtrapolations.clear();
 
 }
 
@@ -85,5 +93,9 @@ void DATCONFPGAFindlet::apply()
   m_vInterceptFinder.apply(m_vHits, m_vTracks);
 
   B2DEBUG(29, "m_uTracks.size(): " << m_uTracks.size() << " m_vTracks.size(): " << m_vTracks.size());
+
+  m_toPXDExtrapolator.apply(m_uTracks, m_vTracks, m_uExtrapolations, m_vExtrapolations);
+
+  m_ROICalculator.apply(m_uExtrapolations, m_vExtrapolations);
 
 }

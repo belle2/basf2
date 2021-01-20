@@ -55,6 +55,10 @@ Variables
 Modules
 +++++++
 
+ * Added a module :b2:mod:`TrackIsoCalculator`, which takes as input a standard charged particle list, and calculates for every particle's track in the list the
+   3D distance to the closest track in the event. The distance is calculated as the 3D separation between the points where two extraplolated track helices cross a given
+   detector's inner surface, where the detector is an input parameter to the module. This variable can be used to parametrise charged particle
+   identification efficiencies and mis-identification probabilities, as they can depend on the activity around each charged particle candidate.
  * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
    :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
  * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the

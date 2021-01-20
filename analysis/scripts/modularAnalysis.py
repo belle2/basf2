@@ -3085,6 +3085,47 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     path.add_module(chargedpid)
 
 
+def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None):
+    """
+    Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
+
+    Currently, a proxy for isolation is defined as the 3D distance (or optionally, a 2D distance projecting on r-phi)
+    of each particle's track to its closest neighbour at a given detector entry surface.
+
+    Parameters:
+        list_name (str): name of the input ParticleList.
+                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
+                         The charge-conjugate ParticleList will be also processed automatically.
+        path (basf2.Path): the module is added to this path.
+        use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
+                                          as the cord length on the (rho, phi) projection.
+                                          By default, a 3D distance is calculated.
+        alias (Optional[str]): An alias to the extraInfo variable computed by the `TrackIsoCalculator` module.
+                               Please note, for each input detector a variable is calculated,
+                               and the detector's name is appended to the alias to distinguish them.
+        *detectors: detectors at whose entry surface track isolation variables will be calculated.
+                    Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
+
+    """
+
+    from variables import variables
+
+    det_choices = ("CDC", "PID", "ECL", "KLM")
+    if any(d not in det_choices for d in detectors):
+        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
+
+    for det in detectors:
+        path.add_module("TrackIsoCalculator",
+                        particleList=list_name,
+                        detectorInnerSurface=det,
+                        use2DRhoPhiDist=use2DRhoPhiDist)
+        if isinstance(alias, str):
+            if not use2DRhoPhiDist:
+                variables.addAlias(f"{alias}{det}", f"extraInfo(dist3DToClosestTrkAt{det}Surface)")
+            else:
+                variables.addAlias(f"{alias}{det}", f"extraInfo(dist2DRhoPhiToClosestTrkAt{det}Surface)")
+
+
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     """
     Calculates distance between two vertices, distance of closest approach between a vertex and a track,\

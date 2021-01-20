@@ -100,9 +100,6 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
 
   // create a dummy cluster just to start
   clusterCand.vxdID = digits.at(0).getSensorID();
-//  clusterCand.strips.emplace_back(digits.at(0).getCellID());
-//  clusterCand.charges.emplace_back(digits.at(0).getMaxSampleCharge());
-//  clusterCand.maxSNRinClusterCandidate = calculateSNR(digits.at(0));
 
   for (auto& digit : digits) {
 
@@ -113,19 +110,11 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
 
     //retrieve the VxdID, sensor and cellID of the current DATCONSVDDigit
     VxdID thisSensorID = digit.getSensorID();
-//     bool thisSide = digit.isUStrip();
     unsigned short thisCellID = digit.getCellID();
     unsigned short thisCharge = digit.getMaxSampleCharge();
 
-//    const VXD::SensorInfoBase& info = geoCache.getSensorInfo(thisSensorID);
-//    double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
-//    unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
-
     //try to add the strip to the existing cluster
     if (! clusterCand.add(thisSensorID, thisCharge, thisCellID, stripSNR, m_param_maxiClusterSize)) {
-//       B2INFO("Is any strip not added?");
-//       B2INFO("Cluster Cand size: " << clusterCand.strips.size());
-
       //if the strip is not added, write the cluster, if present and good:
       if (clusterCand.strips.size() > 0) {
         const VXD::SensorInfoBase& info = geoCache.getSensorInfo(clusterCand.vxdID);
@@ -134,7 +123,6 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
 
         clusterCand.finalizeCluster(pitch, numberofStrips);
         if (clusterCand.maxSNRinClusterCandidate >= m_param_requiredSNRcluster) {
-//           B2INFO("Do I add a cluster?");
           double clusterPositionError = pitch;
           if (clusterCand.strips.size() == 1) {
             clusterPositionError = pitch / sqrt(12.);
@@ -228,10 +216,10 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
 
       std::set<Belle2::VxdID> svdSensors = aGeometry.getSensors(*itSvdLadders);
       std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
-      B2DEBUG(1, "    svd sensor info " << * (svdSensors.begin()));
+      B2DEBUG(29, "    svd sensor info " << * (svdSensors.begin()));
 
       while (itSvdSensors != svdSensors.end()) { //loop on sensors
-        B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
+        B2DEBUG(29, "    svd sensor info " << *itSvdSensors);
 
         int layer = itSvdSensors->getLayerNumber();
         int ladder =  itSvdSensors->getLadderNumber();

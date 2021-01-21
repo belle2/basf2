@@ -205,11 +205,12 @@ void ParticleStatsModule::terminate()
     // now the ACM and ACMPE
     for (int iFlav = 0; iFlav < 4; ++iFlav) {
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents);
-      json[pName][Form("%s ACM", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents;
+      json["retention"][pName][Form("%s ACM", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents;
 
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents / (*m_PassMatrix)(iList, iList));
-      json[pName][Form("%s ACPME", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents / (*m_PassMatrix)(iList,
-                                                            iList);
+      json["retention"][pName][Form("%s ACPME", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList,
+          iFlav) / nEvents / (*m_PassMatrix)(iList,
+                                             iList);
     }
     stream << "\n";
   }

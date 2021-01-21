@@ -2,6 +2,9 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
+ * Robust 2D minimizer using grid search                                  *
+ * Used for function with steps in derivatives                            *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Radek Zlebcik                                            *
  *                                                                        *
@@ -16,17 +19,13 @@
 #include <utility>
 #include <iostream>
 
-struct FunTest {
-  double operator()(double a, double b) {return (std::pow(a - 1, 2) + std::pow(b - 2, 2));}
-};
 
 
-
-
+/** Get minimum inside and outside of the smaller window devined by i0, j0 */
 inline std::pair<double, double> getMinima(std::vector<std::vector<double>> vals, int i0, int j0)
 {
   int N = vals.size();
-  int Nzoom = (N - 1) / 2 + 1;
+  int Nzoom = (N + 1) / 2;
 
 
   double minIn  = 1e50;
@@ -43,19 +42,19 @@ inline std::pair<double, double> getMinima(std::vector<std::vector<double>> vals
   return {minIn, minOut};
 }
 
+/** Get minimum of 2D function in the rectangular domain defined by xMin,xMax & yMin,yMax */
 inline std::vector<double> getMinimum(std::function<double(double, double)> fun, double xMin, double xMax, double yMin, double yMax)
 {
-  const int N = 17;
-  const int Nzoom = 9;
+  const int N = 17; //the grid has size N x N
+  const int Nzoom = (N + 1) / 2; // the size of the zoomed rectangle where minimum is
 
 
-  const int kMax = 35;
+  const int kMax = 35; //number of iterations
 
   std::vector<std::vector<double>> vals(N);
   for (auto& v : vals) v.resize(N);
 
   for (int k = 0; k < kMax; ++k) {
-    //std::cout << "Radek iteration " << k << std::endl;
 
     // get values of the function
     for (int i = 0; i < N; ++i)
@@ -118,12 +117,3 @@ inline std::vector<double> getMinimum(std::function<double(double, double)> fun,
   return {xMinNow, yMinNow};
 }
 
-
-inline void minimizer()
-{
-  FunTest fun;
-  auto res = getMinimum(fun, -5, 5, -5, 5);
-
-  std::cout << res[0] << " " << res[1] << std::endl;
-
-}

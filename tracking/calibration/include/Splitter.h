@@ -33,9 +33,11 @@
 
 namespace Belle2 {
 
+  /** Very small (few mins) calibration interval which cannot be further divided  : Atom */
   struct Atom {
-    double t1 = 0, t2 = 0;
-    int nEv = 0;
+    double t1 = 0; ///< Start time of the Atom
+    double t2 = 0; ///< End time of the Atom
+    int nEv = 0; ///< Number of events in Atom
   };
 
 
@@ -250,41 +252,28 @@ namespace Belle2 {
     {
       std::vector<Atom> atoms(atomTimes.size());
 
-      /*
-      unsigned a = 0;
-
-      for(unsigned i = 0; i < evts.size(); ++i) {
-
-          while(a < atomTimes.size() && evts[i].t > atomTimes[a].second)
-              ++a;
-          if(a >= atomTimes.size())
-              break;
-
-          if(atomTimes[a].first < evts[i].t && evts[i].t < atomTimes[a].second) {
-              ++atoms[a].nEv;
-          }
-
-      }
-
-      */
-      //TODO write it faster
-      for (unsigned i = 0; i < evts.size(); ++i) {
-        for (unsigned a = 0; a < atoms.size(); ++a)
-          if (atomTimes[a].first <= evts[i].t  && evts[i].t < atomTimes[a].second)
-            ++atoms[a].nEv;
-
-      }
-
-
+      // Store start/end times to atoms
       for (unsigned a = 0; a < atoms.size(); ++a) {
         atoms[a].t1 = atomTimes[a].first;
         atoms[a].t2 = atomTimes[a].second;
       }
 
+
+      // count the number of events in each atom
+      for (unsigned i = 0; i < evts.size(); ++i) {
+        for (unsigned a = 0; a < atoms.size(); ++a)
+          if (atoms[a].t1 <= evts[i].t  && evts[i].t < atoms[a].t2)
+            ++atoms[a].nEv;
+
+      }
+
+
+
       return atoms;
     }
 
 
+    /** Convert lossFunction from string to TF1 */
     TF1* toTF1(TString LossString)
     {
       LossString.ReplaceAll("rawTime", "[0]");
@@ -296,7 +285,7 @@ namespace Belle2 {
     }
 
 
-    TF1*     lossFun;
+    TF1*   lossFun; ///< loss function used for clustering of Atoms
 
 
     /** cache used by the clustering algorithm (has to be reset every time) */
@@ -340,7 +329,6 @@ namespace Belle2 {
     @param tEdge: the event time of the event of interest [hours]
     @return the position of the time point in the exp-run-evt format
    */
-// Get exp,run,evtNum from the time tEdge
   template<typename Evt>
   inline ExpRunEvt getPosition(const std::vector<Evt>& events, double tEdge)
   {

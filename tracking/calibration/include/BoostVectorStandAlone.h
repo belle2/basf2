@@ -28,8 +28,8 @@ namespace Belle2 {
   namespace BoostVectorCalib {
     /** track parameters (neglecting curvature) */
     struct Track {
-      TVector3 p;
-      double pid;
+      TVector3 p; ///< momentum vector of the track
+      double pid; ///< particle ID of mu/e separation
     };
 
     /** Event containing two tracks */
@@ -49,9 +49,15 @@ namespace Belle2 {
     };
 
 
+    /** Convert events from TTree to std::vector */
     std::vector<Event> getEvents(TTree* tr);
 
-    // Returns tuple with the beamspot parameters
+
+    /** Run the BoostVector analysis with short calibration intervals defined by the splitPoints
+      @param evts: vector of events
+      @param splitPoints: the vector containing times of the edges of the short calibration intervals [hours]
+      @return A tuple containing vector with BV-centers, vector with BV-centers stat. errors and a BV-spread covariance matrix
+    */
     std::tuple<std::vector<Eigen::VectorXd>, std::vector<Eigen::MatrixXd>, Eigen::MatrixXd>  runBoostVectorAnalysis(
       std::vector<Event> evts,
       const std::vector<double>& splitPoints);

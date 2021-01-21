@@ -28,17 +28,25 @@
 namespace Belle2 {
 
   // General functions to perform the calibration
+  // Notice that the goal of the claibraiton is to estimate the parameters
+  // of the Gaussian distribution: center + covariance matrix describing the spread.
+  // In general it requires more data to determine the spread, so there can be
+  // several calib. intervals with the same spread but different calues of
+  // the center position of the Gaussian (mean).
+  // They are called "spread interval" and "short interval"
 
 
+  /** Function that converts Eigen symmetric matrix to ROOT matrix */
   inline TMatrixDSym toTMatrixDSym(Eigen::MatrixXd mIn)
   {
     TMatrixDSym mOut(mIn.rows());
     for (int i = 0; i < mIn.rows(); ++i)
       for (int j = 0; j < mIn.cols(); ++j)
-        mOut(i, j) = mIn(i, j);
+        mOut(i, j) = (mIn(i, j) + mIn(j, i)) / 2.;
     return mOut;
   }
 
+  /** Function that converts Eigen vector to ROOT vector */
   inline TVector3 toTVector3(Eigen::VectorXd vIn)
   {
     return TVector3(vIn(0), vIn(1), vIn(2));
@@ -56,23 +64,23 @@ namespace Belle2 {
     return -1;
   }
 
-  /** The BeamSpot related parameters for single size-calibration interval */
+  /** The parameters related to single spread-calibration interval */
   struct calibPars {
-    std::vector<Eigen::VectorXd> cnt; ///< vector of BS positions for each BS-pos calib. interval
-    std::vector<Eigen::MatrixXd> cntUnc; ///< vector of BS positions uncs. for each BS-pos calib. interval
-    Eigen::MatrixXd  spreadMat; ///< BS size CovMatrix
-    int size() const {return cnt.size();}
+    std::vector<Eigen::VectorXd> cnt; ///< vector of means for each small  calib. interval
+    std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainities of means for each small calib. interval
+    Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
+    int size() const {return cnt.size();} ///< number of the small intervals
   };
 
 
-  /** BeamSpot data in the BS-size interval + relevant intervals */
+  /** Parameters and data relevan for single spread calibration interval */
   struct CalibrationData {
-    /** vector of the BS-position intervals */
+    /** vector of the start and end times of the  short calibration intervals */
     std::vector<std::map<ExpRun, std::pair<double, double>>> bsPosIntervals;
 
     std::vector<ExpRunEvt> breakPoints; ///< vector with break points positions
 
-    calibPars pars;
+    calibPars pars; ///< The parameters of the calibration itself
 
     bool isCalibrated = false; ///< true if calibration run was successful
 
@@ -83,7 +91,7 @@ namespace Belle2 {
   /* Extrapolate calibration to intervals where it failed */
   inline void extrapolateCalibration(std::vector<CalibrationData>&  calVec)
   {
-    //put closest neighbor, where stat was low or algo failed
+    //put closest neighbor, where the statistic was low or algo failed
     for (unsigned i = 0; i < calVec.size(); ++i) {
       if (calVec[i].pars.cnt.size() != 0) continue;
       const auto& r =  calVec[i].bsPosIntervals;
@@ -129,7 +137,7 @@ namespace Belle2 {
 
   }
 
-  /** Extrapolate calibration to the shortRun which was filtered before */
+  /** Extrapolate calibration to the very short runs which were filtered before */
   inline void addShortRun(std::vector<CalibrationData>& calVec,  std::pair<ExpRun, std::pair<double, double>> shortRun)
   {
     double shortStart = shortRun.second.first;
@@ -163,21 +171,22 @@ namespace Belle2 {
     calVec[iMin].bsPosIntervals[jMin].insert(shortRun);
   }
 
-  //encode integer num into double val such that val is nearly not changed (maximally by relative shift 1e-6)
+  /** Encode integer num into double val such that val is nearly not changed (maximally by a relative shift 1e-6).
+    * It is use to store time information to the payloads   */
   inline double encodeNumber(double val, unsigned num)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
     static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
 
-    int e;
+    int e; //exponent of the number
     double mantisa = std::frexp(val, &e);
-    long long mantisaI = mantisa * factor;
+    long long mantisaI = mantisa * factor; //mantisa as integer
 
     if (val != 0)
-      mantisaI = (mantisaI / fEnc) * fEnc  + num; //adding encoded number to mantisa
+      mantisaI = (mantisaI / fEnc) * fEnc  + num; //adding encoded number to last digits of mantisa
     else {
       mantisaI = factor / 2 + num;
-      e = -100;
+      e = -100; //if the val is zero, ensure very small number by the exponent
     }
 
     double newVal = ldexp(mantisaI / factor, e);
@@ -185,6 +194,7 @@ namespace Belle2 {
     return newVal;
   }
 
+  /** Decode the integer number encoded in val */
   inline unsigned decodeNumber(double val)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
@@ -200,7 +210,7 @@ namespace Belle2 {
 
 
 
-  /** Store BeamSpot payloads to files */
+  /** Store payloads to files */
   template<typename Evt>
   inline void storePayloads(const std::vector<Evt>& evts, std::vector<CalibrationData>&  calVec, std::string objName,
                             std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
@@ -264,7 +274,7 @@ namespace Belle2 {
     Database::Instance().storeData(objName, intraRun, m_iov);
   }
 
-  /** run BeamSpot algorithm for single BS-size interval */
+  /** run calibration algorithm for single spread-calibration interval */
   template<typename Evt, typename Fun>
   inline CalibrationData runAlgorithm(const std::vector<Evt>& evts, std::vector<std::map<ExpRun, std::pair<double, double>>> range,
                                       Fun runCalibAnalysis
@@ -273,7 +283,6 @@ namespace Belle2 {
     CalibrationData calD;
     auto& r = range;
     double rStart, rEnd;
-    //tie(calD.s, calD.e) = Splitter::getStartEnd(r);
     std::tie(rStart, rEnd) = Splitter::getStartEnd(r);
     B2INFO("Start of loop startTime endTime : " << rStart << " " << rEnd);
 
@@ -329,20 +338,18 @@ namespace Belle2 {
              calD.breakPoints.at(0).evt << " " << calD.breakPoints.size());
 
 
-    //If too few events, let the BeamSpot pars empty
+    //If too few events, let have the output empty
     //Will be filled with the closest neighbor at the next stage
     if (evtsNow.size() < 50) {
       return calD;
     }
 
-    // Run the BeamSpot analysis
-    //calD.pars.spreadMat.ResizeTo(3, 3);
-    B2INFO("Start of running BS analysis ID : ");
+    // Run the calibration
+    B2INFO("Start of running calibration over spread-calibraiont interval");
     tie(calD.pars.cnt, calD.pars.cntUnc, calD.pars.spreadMat) = runCalibAnalysis(evtsNow, breaks);
-    //calD.pars = runBeamSpotAnalysis(evtsNow, breaks);
-    B2INFO("End of running BS analysis - SizeMatX : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
-    B2ASSERT("All intervals have IP calibration", calD.pars.cnt.size() == r.size());
-    B2ASSERT("All intervals have IPunc calibration", calD.pars.cntUnc.size() == r.size());
+    B2INFO("End of running analysis - SpreadMatX : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
+    B2ASSERT("All short intervals have calibration of the mean value", calD.pars.cnt.size() == r.size());
+    B2ASSERT("All short intervals have  calibration of the unc. of mean", calD.pars.cntUnc.size() == r.size());
 
     calD.isCalibrated = true;
 
@@ -355,7 +362,7 @@ namespace Belle2 {
                                                std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)> calibObjCreator,
                                                TString m_lossFunctionOuter, TString m_lossFunctionInner)
   {
-    //auto tracks = calAlgo->getObjectPtr<TTree>("events");
+    // Check that there are at least some data
     if (!tracks || tracks->GetEntries() < 15) {
       if (tracks)
         B2WARNING("Too few data : " << tracks->GetEntries());
@@ -364,30 +371,31 @@ namespace Belle2 {
     B2INFO("Number of tracks: " << tracks->GetEntries());
 
     // Tree to vector of Events
-    auto evts = GetEvents(tracks); //.get());
+    auto evts = GetEvents(tracks);
 
     //Time range for each ExpRun
     std::map<ExpRun, std::pair<double, double>> runsInfoOrg = getRunInfo(evts);
-    std::map<ExpRun, std::pair<double, double>> runsRemoved;
+    std::map<ExpRun, std::pair<double, double>> runsRemoved; //map with time intervals of very short runs
     auto runsInfo = filter(runsInfoOrg, 2. / 60, runsRemoved); //include only runs longer than 2mins
 
+    // If nothing remains
     if (runsInfo.size() == 0) {
       B2WARNING("Too short run");
       return  CalibrationAlgorithm::EResult::c_NotEnoughData;
     }
 
-    // Get intervals
+    // Get intervals based on the input loss functions
     Splitter splt;
     auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner);
 
-    //Loop over all BeamSize intervals
-    std::vector<CalibrationData> calVec; //(splits.size());
+    //Loop over all spread-calibration intervals
+    std::vector<CalibrationData> calVec;
     for (auto s : splits) {
-      CalibrationData calD = runAlgorithm(evts, s, calibAnalysis);
+      CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the intervals s
       calVec.push_back(calD);
     }
 
-    // exptrapolate to low-stat intervals
+    // exptrapolate results to the low-stat intervals
     extrapolateCalibration(calVec);
 
     // Include removed short runs

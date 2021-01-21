@@ -37,7 +37,7 @@ namespace Belle2 {
 
 
 
-/// read events from TTree to std::vector
+    /// read events from TTree to std::vector
     vector<Event> getEvents(TTree* tr)
     {
 
@@ -82,7 +82,7 @@ namespace Belle2 {
     }
 
 
-
+    /** run the collision invariant mass calibration */
     vector<double>  getInvMassPars(const vector<Event>& /*evts*/)
     {
       return { -1, -1, -1}; //dummy values
@@ -96,7 +96,8 @@ namespace Belle2 {
         const vector<double>& splitPoints)
     {
       int n = splitPoints.size() + 1;
-      assert(n == 1);  //no split points, the spead interval identical to the center interval
+      //no split points, i.e. the spead interval identical to the center interval
+      B2ASSERT("No split points for InvariantMass calibration", n == 1);
       vector<VectorXd>     invMassVec(n);
       vector<MatrixXd>  invMassVecUnc(n);
       MatrixXd          invMassVecSpred;

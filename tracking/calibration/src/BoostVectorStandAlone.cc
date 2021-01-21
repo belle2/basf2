@@ -38,9 +38,10 @@ namespace Belle2 {
 
   namespace BoostVectorCalib {
 
+    /** get median of array v of length n */
     double median(double* v, int n)
     {
-      assert(n > 2);
+      B2ASSERT("At least 3 points to get median", n > 2);
 
       if (n % 2 == 1) { // odd number of elements
         std::nth_element(v, v + n / 2, v + n);
@@ -60,7 +61,7 @@ namespace Belle2 {
 
 
 
-/// read events from TTree to std::vector
+    // Read events from TTree to std::vector
     vector<Event> getEvents(TTree* tr)
     {
 
@@ -104,25 +105,25 @@ namespace Belle2 {
       return events;
     }
 
-
+    /** Functor to minimize median of residuals^2 */
     struct FunBoost {
-      MatrixXd mat;
-      VectorXd res;
+      MatrixXd mat; ///< Matrix of the linear system
+      VectorXd res; ///< vector with residuals^2
 
+      /** get median of residuals^2 */
       double operator()(double c, double s)
       {
+        // c and s are slopes of 2D linear function
         Vector3d pars(-c, -s, -1);
-        res = mat * pars;
+        res = mat * pars; // calculate residuals
         res =  res.array().square();
 
-        double* resA = res.data();
-
-        return median(resA, res.rows());
+        return median(res.data(), res.rows());
       }
     };
 
 
-
+    /** Convert vector of vectors (i.e. columns) to Eigen matrix  */
     MatrixXd toMat(const vector<vector<double>>& vecs)
     {
       MatrixXd mat(vecs[0].size(), vecs.size());
@@ -134,7 +135,7 @@ namespace Belle2 {
     }
 
 
-// The input boost vector is used (angleX, anlgeY, rap) (in mili-units)
+    /** Rapidities of particles with momenta vecs wrt the input boost vector (tanAngleX, tanAnlgeY) (in mili-units) */
     vector<double> getRapidities(vector<TVector3> vecs, vector<double> boostDir)
     {
       TVector3 boost(boostDir[0] / 1e3, boostDir[1] / 1e3, 1);
@@ -160,7 +161,7 @@ namespace Belle2 {
       return {y0, y1};
     }
 
-// Fit xy widths (including XZ, YZ slopes), no prior
+    /** Fit the tanAngleX and tanAngleY of the boost vector */
     vector<double> fitBoostFast(const vector<Event>& evts)
     {
       vector<double> vCos, vSin, vData;
@@ -195,7 +196,13 @@ namespace Belle2 {
     }
 
 
-
+    /** Filter the events by PID and rapidity cut
+      @param evts: vector of events
+      @param boostDir: direction of the boost vector
+      @param pidCut: PID cut for mu/e, only events with both tracks above threshold are accepted
+      @param rapCut: Cut on rapidity in CMS system, to suppress forward/backward topology where detector acceptance is limited
+      @return A filtered vector of events
+    */
     vector<Event> filter(const vector<Event>& evts, const vector<double>& boostDir, double pidCut, double rapCut)
     {
       vector<Event> evtsF;
@@ -225,7 +232,7 @@ namespace Belle2 {
 
 
 
-// Fit xy widths (including XZ, YZ slopes), no prior
+    /** fit the BoostVector magnitude with boost direction vector as input */
     double fitBoostMagnitude(const vector<Event>& evts, const vector<double>& boostDir)
     {
 
@@ -247,13 +254,17 @@ namespace Belle2 {
     }
 
 
+    /** Structure to store all bootstrap replicas */
     struct vectorVar {
-      vector<Vector3d> vecs;
+      vector<Vector3d> vecs; ///< Vector of replicas
 
+      /** Add replica */
       void add(Vector3d v) { vecs.push_back(v); }
 
+      /** Get the nominal result */
       Vector3d getNom() const { return vecs[0]; }
 
+      /** Get cov matrix with unc. */
       MatrixXd getCov() const
       {
         Matrix3d res = Matrix3d::Zero();
@@ -271,6 +282,7 @@ namespace Belle2 {
     };
 
 
+    /** run boost vector calibration over evts */
     TVector3 getBoostVector(const vector<Event>& evts)
     {
       vector<double> boostDir = fitBoostFast(evts);
@@ -282,6 +294,7 @@ namespace Belle2 {
       return bVec;
     }
 
+    /** run boost vector calibration for several bootstrap replicas to get unc. */
     pair<Vector3d, Matrix3d>  getBoostAndError(vector<Event> evts)
     {
       evts = filter(evts, {151.986 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
@@ -302,6 +315,7 @@ namespace Belle2 {
 
     }
 
+    /** cluster events in evts vector to several pieces according to the splitPoints (times of partitions) */
     vector<vector<Event>> separate(const vector<Event>& evts, const vector<double>& splitPoints)
     {
       vector<vector<Event>> evtsOut(splitPoints.size() + 1);
@@ -328,7 +342,7 @@ namespace Belle2 {
 
 
 
-// Returns tuple with the beamspot parameters
+    // Returns tuple with the boost vector parameters
     // cppcheck-suppress passedByValue
     tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBoostVectorAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)

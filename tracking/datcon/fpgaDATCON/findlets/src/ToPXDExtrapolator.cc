@@ -69,17 +69,10 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
   double angleDiff;
 
   for (auto& uTrack : uTracks) {
-    double trackPhi = uTrack.first + M_PI_2;
-    if (trackPhi < -M_PI) trackPhi += 2 * M_PI;
-    if (trackPhi >  M_PI) trackPhi -= 2 * M_PI;
-//     const double trackOmega = uTrack.second * 1e-6;
-//     const double trackRadius = 1./trackOmega;
+    const double trackPhi = uTrack.first;
+    const double trackRadius = uTrack.second;
 
-    // 1./uTrack.second * 1e10 yields trackRadius in cm. To convert to µm, which all other values are in,
-    // multiplication by another 1e4 is required -> total of 1e14
-    double trackRadius = convertToInt(1. / uTrack.second, 14);
-    B2INFO("trackPhi: " << trackPhi << " omega: " << uTrack.second << " trackRadius: " <<
-           trackRadius);// << " trackRadius * 1e4 -> um: " << convertToInt(trackRadius, 4));
+    B2DEBUG(29, "trackPhi (in rad): " << trackPhi <<  " trackRadius (in um): " << trackRadius);
 
     // layer 1 extrapolation
     uint layer = 1;
@@ -95,24 +88,23 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         angleDiff += 2 * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL1) continue;
-      B2INFO("angleDiff: " << angleDiff);
-      B2INFO("trackRadius * trackRadius: " << trackRadius * trackRadius);
-      B2INFO("trackRadius * cos(angleDiff): " << trackRadius * cos(angleDiff));
-      B2INFO("trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
-      B2INFO("sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
+      B2DEBUG(29, "angleDiff: " << angleDiff);
+      B2DEBUG(29, "trackRadius * trackRadius: " << trackRadius * trackRadius);
+      B2DEBUG(29, "trackRadius * cos(angleDiff): " << trackRadius * cos(angleDiff));
+      B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
+      B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
-      // sensorPerpRadius is in µm tan is multiplied by 1000, so this is basically nm
-//       long y = sensorPerpRadius * convertToInt(tan(angleDiff), 3);
-//       long y = (long)(-trackRadius * cos(angleDiff) + sqrt(trackRadius * trackRadius - (sensorPerpRadius - trackRadius * sin(angleDiff)) * (sensorPerpRadius - trackRadius * sin(angleDiff)) ));
-      double y = (-trackRadius * cos(angleDiff) + sqrt(trackRadius * trackRadius - (sensorPerpRadius - trackRadius * sin(angleDiff)) *
-                                                       (sensorPerpRadius - trackRadius * sin(angleDiff))));
-      B2INFO("y from extrapolation: " << y);
+      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius,
+                                3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff),
+               3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
+
+      B2DEBUG(29, "y from extrapolation: " << y);
 
       if (y >= sensorMinY && y <= sensorMaxY) {
-        B2INFO("I hit a sensor!!! " << y << " on sensor: " << layer << "." << ladder << ".X");
-
         long localUPosition = y - shiftY;
-        B2INFO("localUPosition: " << localUPosition);
+        B2DEBUG(29, "I hit a sensor!!! " << y << " on sensor: " << layer << "." << ladder << ".X, with localUPosition: " << localUPosition);
 
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);
@@ -152,13 +144,23 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         angleDiff += 2 * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL2) continue;
+      B2DEBUG(29, "angleDiff: " << angleDiff);
+      B2DEBUG(29, "trackRadius * trackRadius: " << trackRadius * trackRadius);
+      B2DEBUG(29, "trackRadius * cos(angleDiff): " << trackRadius * cos(angleDiff));
+      B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
+      B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
-      // sensorPerpRadius is in µm, tan is multiplied by 1000, so this is basically nm
-      long y = sensorPerpRadius * convertToInt(tan(angleDiff), 3);
+      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius,
+                                3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff),
+               3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
+
+      B2DEBUG(29, "y from extrapolation: " << y);
 
       if (y >= sensorMinY && y <= sensorMaxY) {
-
         long localUPosition = y - shiftY;
+        B2DEBUG(29, "I hit a sensor!!! " << y << " on sensor: " << layer << "." << ladder << ".X, with localUPosition: " << localUPosition);
 
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);

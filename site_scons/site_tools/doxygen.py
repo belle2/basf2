@@ -75,7 +75,7 @@ def doxygen_groups(target, source, env):
 
 /** @defgroup {package}_dataobjects {package} data objects
  *  @ingroup {package}
- *  @ingroup Dataobjects
+ *  @ingroup DataObjects
  */
 
 /** @defgroup {package}_modules {package} modules

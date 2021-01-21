@@ -7,7 +7,9 @@ import re
 
 
 image_path = 'build/module_io'
-files = os.listdir(image_path)
+files = []
+if os.path.isdir(image_path):
+    files = os.listdir(image_path)
 
 # list of modules with I/O plots, _without_ "Module" suffix
 modules_with_plots = [f[:-4] for f in files if re.match(r'.*.png', f) and os.stat(os.path.join(image_path, f)).st_size > 0]

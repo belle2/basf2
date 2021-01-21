@@ -66,7 +66,7 @@ namespace Belle2 {
     /// phi-value of the first ladder in each layer, i.e. sensors X.1.Y, in rad
     const std::array<double, 4> initialAngle = {(342.195 - 360.) / 180. * M_PI, 8. / 180. * M_PI, -8. / 180. * M_PI, -4. / 180. * M_PI};
     /// angle difference between two consecutive ladders, in rad
-    const std::array<double, 4> angleStep = {2. * M_PI / 7., M_PI / 5., M_PI / 6., M_PI / 8.};    // in rad
+    const std::array<double, 4> angleStep = {2. * M_PI / 7., M_PI / 5., M_PI / 6., M_PI / 8.};
     /// cosine values of the slanted sensors
     const std::array<double, 4> cosSlantedAngles = {1, cos(0.207694180987), cos(0.279252680319), cos(0.368264472171)};
     /// sine values of the slanted sensors

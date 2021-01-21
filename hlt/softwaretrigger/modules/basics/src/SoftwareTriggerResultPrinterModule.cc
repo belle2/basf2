@@ -186,8 +186,8 @@ void SoftwareTriggerResultPrinterModule::event()
   } else {
     if (m_eventMetaDataPtr)
       B2WARNING("Uncaught exception encountered: Trying to access StoreObjPtr object 'TRGSummary' (durability: event), which was not created in exp/run/evt: "
-                << m_eventMetaDataPtr->getExperiment() << " / "
-                << m_eventMetaDataPtr->getRun() << " / "
-                << m_eventMetaDataPtr->getEvent());
+                << LogVar("exp", m_eventMetaDataPtr->getExperiment())
+                << LogVar("run", m_eventMetaDataPtr->getRun())
+                << LogVar("event", m_eventMetaDataPtr->getEvent()));
   }
 }

@@ -141,7 +141,8 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
     return texts
 
-def plotRetention(ret, verb):
+def plotRetention(ret, what = 'retention', verb = False):
+
     """
     plot retention rate
     
@@ -150,31 +151,36 @@ def plotRetention(ret, verb):
     """
 
     # get retention rate
-    retention = dict()
+    results = dict()
 
+    # retention is in %, rest is not
+    
     for ch in ret['retention'].keys():
-        retention[ch] = ret['retention'][ch].get('retention')*100
+        results[ch] = ret['retention'][ch].get(what)
 
-    color = ['blue'] * len(retention)
-    retention['Total'] = ret['Total Retention']*100
-    color.append('red')
+    color = ['blue'] * len(results)
+    if what == 'retention':
+        results['Total'] = ret['Total Retention']
+        color.append('red')
+
     if verb:
-        print(f"===== Retention rate (%) =====")
-        [print(f"{key:20} = {value:0.2}%") for key, value in retention.items()]
-        print("="*31)
+        print(f"===== {what}  =====")
+        [print(f"{key:20} = {value:0.2}") for key, value in results.items()]
+        print("="*30)
 
     fig, ax = plt.subplots(figsize=(12,10))
-    ax.barh(list(retention.keys()), retention.values(), align='center', color=color)
+    ax.barh(list(results.keys()), results.values(), align='center', color=color)
 
-    ax.set_yticklabels(retention.keys(), fontsize=18)
+    ax.set_yticklabels(results.keys(), fontsize=18)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.tick_params(axis='y', which='minor', bottom=False)
     ax.grid(True, axis='x')
-    ax.set_xlabel('Retention rate [%]')
-    plt.savefig(f"RetentionRate.png", bbox_inches="tight", dpi=150)
-    print(f"Retention Rate plot save to RetentionRate.png")
+    ax.set_xlabel(f'{what}')
+    fname = f"{what.replace(' ','_')}.png"
+    plt.savefig(fname, bbox_inches="tight", dpi=150)
+    print(f"{what} plot save to {fname}")
 
-def plotPassMatrix(ret, verb):
+def plotPassMatrix(ret, verb = False):
     """
     plot pass matrix
     
@@ -223,7 +229,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--json', help='Input json file', type = str, required=True)
     plot_actions = {
-        "Retention"  : "Retention rate plot for particles monitored",
+        "retention"  : "Retention rate",
+        "All Particles ACM"  : "All Particles Average Candidate Multiplicity",
+        "All Particles ACPME"  : "All Particles ACM for Passed Events",
         "PassMatrix" : "Pass matrix"
         }
 
@@ -233,7 +241,7 @@ if __name__ == '__main__':
             action="store",
             nargs='+',
             choices=list(plot_actions.keys()),
-            default=list(plot_actions.keys()),
+            default=['retention','PassMatrix'],
             )
     parser.add_argument("--verbose",
                         dest="verb",
@@ -245,9 +253,9 @@ if __name__ == '__main__':
     with open(args.json) as js: 
         ret = json.load(js)
 
-    if args.plot:
-        if "Retention" in args.plot:
-            plotRetention(ret, args.verb)
-        if "PassMatrix" in args.plot:
-            plotPassMatrix(ret, args.verb)
+    for what in args.plot:
+        if what == "PassMatrix":
+            plotPassMatrix(ret, verb=args.verb)
+        else:
+            plotRetention(ret, what=what, verb=args.verb)
 

@@ -200,7 +200,7 @@ void ParticleStatsModule::terminate()
 
     std::string pName  = m_strParticleLists[iList].c_str();
     float retRate = (*m_PassMatrix)(iList, iList);
-    json[pName]["retention"] = retRate;
+    json["retention"][pName]["retention"] = retRate;
     std::string flavs[4] = {"All Particles", "Particles", "Anti Particles",  "Self-conjugates"};
     // now the ACM and ACMPE
     for (int iFlav = 0; iFlav < 4; ++iFlav) {

@@ -105,12 +105,16 @@ namespace Belle2 {
     TH1D* h_eff_shifter = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
-    //! event by event psnm timing distribution
-    TH2I* h_p = nullptr;
-    //! event by event ftdl timing distribution
-    TH2I* h_f = nullptr;
-    //! event by event input timing distribution
-    TH2I* h_i = nullptr;
+    ////! event by event psnm timing distribution
+    //TH2I* h_p = nullptr;
+    ////! event by event ftdl timing distribution
+    //TH2I* h_f = nullptr;
+    ////! event by event input timing distribution
+    //TH2I* h_i = nullptr;
+    std::vector<std::vector<int>> h_0_vec;
+    std::vector<std::vector<int>> h_p_vec;
+    std::vector<std::vector<int>> h_f_vec;
+    std::vector<std::vector<int>> h_i_vec;
 
     TDirectory* oldDir = nullptr;
     TDirectory* dirDQM = nullptr;
@@ -168,6 +172,11 @@ namespace Belle2 {
     int ee_psn[10] = {0};
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};
+    int n_leafs = 0;
+    int n_leafsExtra = 0;
+    int nconf = 0;
+    int nword_input  = 0;
+    int nword_output = 0;
 
     //condition database for input bits
     DBObjPtr<TRGGDLDBInputBits>m_dbinput;
@@ -178,6 +187,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBFTDLBits> m_dbftdl;
     unsigned  n_outbit = 0;
     char outbitname[320][100]  = {""};
+
 
     //name of skim from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_gdldqm] = {

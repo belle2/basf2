@@ -373,6 +373,23 @@ void TRGGDLDQMModule::initialize()
   for (int i = 0; i < 320; i++) {
     strcpy(outbitname[i], m_dbftdl->getoutbitname(i));
   }
+  n_leafs  = m_unpacker->getnLeafs();
+  n_leafsExtra = m_unpacker->getnLeafsExtra();
+  n_clocks = m_unpacker->getnClks();
+  nconf = m_unpacker->getconf();
+  nword_input  = m_unpacker->get_nword_input();
+  nword_output = m_unpacker->get_nword_output();
+
+  std::vector<int> temp_h_0_vec(n_leafs + n_leafsExtra, 0);
+  std::vector<int> temp_h_p_vec(n_outbit, 0);
+  std::vector<int> temp_h_f_vec(n_outbit, 0);
+  std::vector<int> temp_h_i_vec(n_inbit, 0);
+  for (unsigned i = 0; i < n_clocks; i++) {
+    h_0_vec.push_back(temp_h_0_vec);
+    h_p_vec.push_back(temp_h_p_vec);
+    h_f_vec.push_back(temp_h_f_vec);
+    h_i_vec.push_back(temp_h_i_vec);
+  }
 
 }
 
@@ -464,14 +481,6 @@ void TRGGDLDQMModule::event()
   static unsigned nvcd = 0;
   static bool begin_run = true;
 
-  int n_leafs = 0;
-  n_leafs  = m_unpacker->getnLeafs();
-  int n_leafsExtra = 0;
-  n_leafsExtra = m_unpacker->getnLeafsExtra();
-  n_clocks = m_unpacker->getnClks();
-  int nconf = m_unpacker->getconf();
-  int nword_input  = m_unpacker->get_nword_input();
-  const int nword_output = m_unpacker->get_nword_output();
   skim.clear();
 
   StoreArray<TRGGDLUnpackerStore> entAry;
@@ -505,24 +514,23 @@ void TRGGDLDQMModule::event()
 
   const double clkTo2ns = 1. / .508877;
   const double clkTo1ns = 0.5 / .508877;
-  TH2I* h_0;
 
   dirDQM->cd();
 
-
-  h_0 = new TH2I(Form("hgdl%08d", evtno), "", n_clocks, 0, n_clocks, n_leafs + n_leafsExtra, 0,
-                 n_leafs + n_leafsExtra);
-  h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, n_outbit, 0, n_outbit);
-  h_f = new TH2I(Form("hftd%08d", evtno), "", n_clocks, 0, n_clocks, n_outbit, 0, n_outbit);
-  h_i = new TH2I(Form("hitd%08d", evtno), "", n_clocks, 0, n_clocks, n_inbit, 0, n_inbit);
-  for (unsigned i = 0; i < n_inbit; i++) {
-    h_i->GetYaxis()->SetBinLabel(i + 1, inbitname[i]);
+  for (unsigned i = 0; i < n_clocks; i++) {
+    for (int j = 0; j < n_leafs + n_leafsExtra; j++) {
+      h_0_vec[i][j] = 0;
+    }
+    for (unsigned j = 0; j < n_outbit; j++) {
+      h_p_vec[i][j] = 0;
+    }
+    for (unsigned j = 0; j < n_outbit; j++) {
+      h_f_vec[i][j] = 0;
+    }
+    for (unsigned j = 0; j < n_inbit; j++) {
+      h_i_vec[i][j] = 0;
+    }
   }
-  for (unsigned i = 0; i < n_outbit; i++) {
-    h_f->GetYaxis()->SetBinLabel(i + 1, outbitname[i]);
-    h_p->GetYaxis()->SetBinLabel(i + 1, outbitname[i]);
-  }
-
 
   oldDir->cd();
 
@@ -536,20 +544,16 @@ void TRGGDLDQMModule::event()
       }
     }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      h_0->SetBinContent(entAry[ii]->m_unpacker[clk_map] + 1, leaf + 1, *Bits[leaf]);
+      h_0_vec[entAry[ii]->m_unpacker[clk_map]][leaf] = *Bits[leaf];
     }
   }
-  for (int leaf = 0; leaf < 320; leaf++) {
-    if (LeafBitMap[leaf] != -1)h_0->GetYaxis()->SetBinLabel(LeafBitMap[leaf] + 1, LeafNames[LeafBitMap[leaf]]);
-  }
-
-  int coml1rvc      = h_0->GetBinContent(1,        1 + _e_coml1rvc);
-  int toprvc        = h_0->GetBinContent(1,        1 + _e_toprvc);
-  int eclrvc        = h_0->GetBinContent(1,        1 + _e_eclrvc);
-  int cdcrvc        = h_0->GetBinContent(1,        1 + _e_cdcrvc);
-  int c1_top_timing = h_0->GetBinContent(n_clocks, 1 + _e_toptiming);
-  int c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + _e_ecltiming);
-  int c1_cdc_timing = h_0->GetBinContent(n_clocks, 1 + _e_cdctiming);
+  int coml1rvc      = h_0_vec[0         ][_e_coml1rvc];
+  int toprvc        = h_0_vec[0         ][_e_toprvc];
+  int eclrvc        = h_0_vec[0         ][_e_eclrvc];
+  int cdcrvc        = h_0_vec[0         ][_e_cdcrvc];
+  int c1_top_timing = h_0_vec[n_clocks - 1][_e_toptiming];
+  int c1_ecl_timing = h_0_vec[n_clocks - 1][_e_ecltiming];
+  int c1_cdc_timing = h_0_vec[n_clocks - 1][_e_cdctiming];
   int c8_top_timing = c1_top_timing >> 3;
   int c2_top_timing = c1_top_timing >> 1;
   int c8_ecl_timing = c1_ecl_timing >> 3;
@@ -572,7 +576,7 @@ void TRGGDLDQMModule::event()
   int timtype  = 0;
 
 
-  int gdll1_rvc = h_0->GetBinContent(h_0->GetXaxis()->FindBin(n_clocks - 0.5), 1 + _e_gdll1rvc);
+  int gdll1_rvc = h_0_vec[n_clocks - 1][_e_gdll1rvc];
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
@@ -580,45 +584,50 @@ void TRGGDLDQMModule::event()
     int ftd_tmp[10] = {0};
     int itd_tmp[10] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
-      itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
+      itd_tmp[j] = h_0_vec[clk - 1][ee_itd[j]];
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
-        if (itd_tmp[j] & (1u << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
+        if (i + j * 32 >= h_i_vec[clk - 1].size())continue;
+        if (itd_tmp[j] & (1u << i)) h_i_vec[clk - 1][i +  j * 32] = 1;
       }
     }
     if (nconf == 0) {
-      psn_tmp[0] = h_0->GetBinContent(clk, 1 + ee_psn[0]);
-      ftd_tmp[0] = h_0->GetBinContent(clk, 1 + ee_ftd[0]);
+      psn_tmp[0] = h_0_vec[clk - 1][ee_psn[0]];
+      ftd_tmp[0] = h_0_vec[clk - 1][ee_ftd[0]];
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[0] & (1u << i)) h_p->SetBinContent(clk, i + 1, 1);
-        if (ftd_tmp[0] & (1 << i)) h_f->SetBinContent(clk, i + 1, 1);
+        if (i >= (int)h_p_vec[clk - 1].size())continue;
+        if (psn_tmp[0] & (1u << i)) h_p_vec[clk - 1][i] = 1;
+        if (ftd_tmp[0] & (1u << i)) h_f_vec[clk - 1][i] = 1;
       }
-      psn_tmp[1] = h_0->GetBinContent(clk, 1 + ee_psn[2]) * (1 << 16) + h_0->GetBinContent(clk, 1 + ee_psn[1]);
-      ftd_tmp[1] = h_0->GetBinContent(clk, 1 + ee_ftd[2]) * (1 << 16) + h_0->GetBinContent(clk, 1 + ee_ftd[1]);
+      psn_tmp[1] = h_0_vec[clk - 1][ee_psn[2]] * (1 << 16) + h_0_vec[clk - 1][ee_psn[1]];
+      ftd_tmp[1] = h_0_vec[clk - 1][ee_ftd[2]] * (1 << 16) + h_0_vec[clk - 1][ee_ftd[1]];
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[1] & (1u << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
-        if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
+        if (i + 32 >= (int)h_p_vec[clk - 1].size())continue;
+        if (psn_tmp[1] & (1u << i)) h_p_vec[clk - 1][i + 32] = 1;
+        if (ftd_tmp[1] & (1u << i)) h_f_vec[clk - 1][i + 32] = 1;
       }
     } else {
       for (unsigned j = 0; j < (unsigned)nword_output; j++) {
-        psn_tmp[j] = h_0->GetBinContent(clk, 1 + ee_psn[j]);
-        ftd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_ftd[j]);
+        psn_tmp[j] = h_0_vec[clk - 1][ee_psn[j]];
+        ftd_tmp[j] = h_0_vec[clk - 1][ee_ftd[j]];
         psn[j] |= psn_tmp[j];
         ftd[j] |= ftd_tmp[j];
         for (int i = 0; i < 32; i++) {
-          if (psn_tmp[j] & (1u << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
-          if (ftd_tmp[j] & (1 << i)) h_f->SetBinContent(clk, i + 1 +  j * 32, 1);
+          if (i + j * 32 >= h_p_vec[clk - 1].size())continue;
+          if (psn_tmp[j] & (1u << i)) h_p_vec[clk - 1][i  +  j * 32] = 1;
+          if (ftd_tmp[j] & (1u << i)) h_f_vec[clk - 1][i  +  j * 32] = 1;
         }
       }
     }
-    int timtype_tmp = h_0->GetBinContent(clk, 1 + _e_timtype);
+    int timtype_tmp = h_0_vec[clk - 1][_e_timtype];
     timtype = (timtype_tmp == 0) ? timtype : timtype_tmp;
 
   } // clk
+
 
   // fill rising and falling edges
   fillRiseFallTimings();
@@ -713,13 +722,6 @@ void TRGGDLDQMModule::event()
     }
   }
 
-  // discard event by event histograms
-  if (! m_eventByEventTimingHistRecord) {
-    h_0->Delete();
-    h_p->Delete();
-    h_f->Delete();
-    h_i->Delete();
-  }
 }
 
 bool TRGGDLDQMModule::anaBitCondition(void)
@@ -868,23 +870,23 @@ void TRGGDLDQMModule::genVcd(void)
     seqnum = 0;
     outf << "#" << clk - 1 << endl;
     for (unsigned k = 1; k <= n_inbit; k++) {
-      if (clk == 1 || prev_i[k - 1] != h_i->GetBinContent(clk, k)) {
-        prev_i[k - 1] = h_i->GetBinContent(clk, k);
-        outf << h_i->GetBinContent(clk, k) << "n" << seqnum << endl;
+      if (clk == 1 || prev_i[k - 1] != h_i_vec[clk - 1][k - 1]) {
+        prev_i[k - 1] = h_i_vec[clk - 1][k - 1];
+        outf << h_i_vec[clk - 1][k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
     for (unsigned k = 1; k <= n_outbit; k++) {
-      if (clk == 1 || prev_f[k - 1] != h_f->GetBinContent(clk, k)) {
-        prev_f[k - 1] = h_f->GetBinContent(clk, k);
-        outf << h_f->GetBinContent(clk, k) << "n" << seqnum << endl;
+      if (clk == 1 || prev_f[k - 1] != h_f_vec[clk - 1][k - 1]) {
+        prev_f[k - 1] = h_f_vec[clk - 1][k - 1];
+        outf << h_f_vec[clk - 1][k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
     for (unsigned k = 1; k <= n_outbit; k++) {
-      if (clk == 1 || prev_p[k - 1] != h_p->GetBinContent(clk, k)) {
-        prev_p[k - 1] = h_p->GetBinContent(clk, k);
-        outf << h_p->GetBinContent(clk, k) << "n" << seqnum << endl;
+      if (clk == 1 || prev_p[k - 1] != h_p_vec[clk - 1][k - 1]) {
+        prev_p[k - 1] = h_p_vec[clk - 1][k - 1];
+        outf << h_p_vec[clk - 1][k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
@@ -925,10 +927,10 @@ TRGGDLDQMModule::isFired(std::string bitname)
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
       if (isPsnm) {
-        if (h_p->GetBinContent(clk + 1, bn + 1) > 0)
+        if (h_p_vec[clk][bn] > 0)
           return true;
       } else {
-        if (h_f->GetBinContent(clk + 1, bn + 1) > 0)
+        if (h_f_vec[clk][bn] > 0)
           return true;
       }
     }
@@ -936,7 +938,7 @@ TRGGDLDQMModule::isFired(std::string bitname)
   bn = m_dbinput->getinbitnum(bitname.c_str());
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
-      if (h_i->GetBinContent(clk + 1, bn + 1) > 0)
+      if (h_i_vec[clk][bn] > 0)
         return true;
     }
   }
@@ -947,7 +949,6 @@ void
 TRGGDLDQMModule::fillRiseFallTimings(void)
 {
 
-  //std::cout << "rise " << skim.size() << std::endl;
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
     //reduce #plot
@@ -966,7 +967,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_i->GetBinContent(clk + 1, i + 1) > 0) {
+        if (h_i_vec[clk][i] > 0) {
           if (! rising_done) {
             h_itd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -974,7 +975,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_i->GetBinContent(clk + 1, i + 1) == 0) {
+        } else if (h_i_vec[clk][i] == 0) {
           if (rising_done && ! falling_done) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;
@@ -1001,7 +1002,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_f->GetBinContent(clk + 1, i + 1) > 0) {
+        if (h_f_vec[clk][i] > 0) {
           if (! rising_done) {
             h_ftd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -1009,7 +1010,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_f->GetBinContent(clk + 1, i + 1) == 0) {
+        } else if (h_f_vec[clk][i] == 0) {
           if (rising_done && ! falling_done) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;
@@ -1019,7 +1020,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       rising_done = false;
       falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_p->GetBinContent(clk + 1, i + 1) > 0) {
+        if (h_p_vec[clk][i] > 0) {
           if (! rising_done) {
             h_psn_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -1027,7 +1028,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_p->GetBinContent(clk + 1, i + 1) == 0) {
+        } else if (h_p_vec[clk][i] == 0) {
           if (rising_done && ! falling_done) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;
@@ -1560,7 +1561,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
     int   flayer = tfr->getHitPatternCDC().getFirstLayer();
     int   llayer = tfr->getHitPatternCDC().getLastLayer();
     float pt     = tfr->getTransverseMomentum();
-    //std::cout << z0 << " " << d0 << " " << omega << " " << flayer << " " << llayer << " " << pt << std::endl;
     if (z0 > -1 && z0 < 1 && d0 > -1 && d0 < 1 && flayer < 8 && llayer > 50
         && pt > 0.3) { //select track from IP, hit SL0 and SL8, pt>0.3GeV
       phi_list[n_fulltrack] = phi;
@@ -1639,7 +1639,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //fff: require the number of CDC full tracks is more than or equal to 3
   if (n_fulltrack > 2) {
-    //std::cout << "fff" << std::endl;
     bool fff_fired = isFired("fff");
     bool ffy_fired = isFired("ffy");
     bool c4_fired  = isFired("C4");
@@ -1656,7 +1655,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
   //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle > 90deg
   if (n_fulltrack > 1 && max_dphi > 3.14 / 2.) {
-    //std::cout << "fff" << std::endl;
     bool ffo_fired = isFired("ffo");
     bool fyo_fired = isFired("fyo");
     bool c4_fired  = isFired("C4");
@@ -1673,7 +1671,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
   //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle >150deg
   if (n_fulltrack > 1 && max_dphi > 3.14 * 5 / 6.) {
-    //std::cout << "fff" << std::endl;
     bool ffb_fired = isFired("ffb");
     bool fyb_fired = isFired("fyb");
     bool c4_fired  = isFired("C4");
@@ -1691,7 +1688,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //hie: require the total energy of ECL cluster is more than 1GeV
   if (total_energy > 1) {
-    //std::cout << "hie" << std::endl;
     bool fff_fired = isFired("FFF");
     bool ffo_fired = isFired("FFO");
     bool ffb_fired = isFired("FFB");
@@ -1706,7 +1702,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //c4: require the total number of cluster is more than 3
   if (ncluster > 3) {
-    //std::cout << "hie" << std::endl;
     bool fff_fired = isFired("FFF");
     bool ffo_fired = isFired("FFO");
     bool ffb_fired = isFired("FFB");

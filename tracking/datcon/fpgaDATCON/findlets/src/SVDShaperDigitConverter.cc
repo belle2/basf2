@@ -26,14 +26,11 @@ using namespace TrackFindingCDC;
 
 SVDShaperDigitConverter::SVDShaperDigitConverter() : Super()
 {
-//   this->addProcessingSignalListener(&m_trackFitter);
 }
 
 void SVDShaperDigitConverter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-//   m_trackFitter.exposeParameters(moduleParamList, prefix);
-
-//   Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDShaperDigitsName"),
                                 m_param_storeSVDShaperDigitsName,

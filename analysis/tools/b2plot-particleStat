@@ -141,7 +141,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
     return texts
 
-def plotRetention(ret, what = 'retention', verb = False):
+def plotRetention(ret, what = 'Retention', verb = False):
 
     """
     plot retention rate
@@ -152,15 +152,13 @@ def plotRetention(ret, what = 'retention', verb = False):
 
     # get retention rate
     results = dict()
-
-    # retention is in %, rest is not
     
-    for ch in ret['retention'].keys():
-        results[ch] = ret['retention'][ch].get(what)
+    for ch in ret['Retention'].keys():
+        results[ch] = ret['Retention'][ch].get(what)
 
     color = ['blue'] * len(results)
-    if what == 'retention':
-        results['Total'] = ret['Total Retention']
+    if what == 'Retention':
+        results['Total'] = ret['Total retention']
         color.append('red')
 
     if verb:
@@ -188,14 +186,14 @@ def plotPassMatrix(ret, verb = False):
             verb : verbose mode
     """
 
-    nn = len(ret['retention'].keys())
+    nn = len(ret['Retention'].keys())
     # y+1 to store Unique
     mat = np.zeros((nn, nn+1))
 
     xnames = []
     ynames = []
 
-    for i,ch in enumerate(ret['retention'].keys()):
+    for i,ch in enumerate(ret['Retention'].keys()):
         if not ch.startswith("B"):
             continue
         xnames.append(ch)
@@ -229,7 +227,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--json', help='Input json file', type = str, required=True)
     plot_actions = {
-        "retention"  : "Retention rate",
+        "Retention"  : "Retention rate",
         "All Particles ACM"  : "All Particles Average Candidate Multiplicity",
         "All Particles ACPME"  : "All Particles ACM for Passed Events",
         "PassMatrix" : "Pass matrix"
@@ -241,7 +239,7 @@ if __name__ == '__main__':
             action="store",
             nargs='+',
             choices=list(plot_actions.keys()),
-            default=['retention','PassMatrix'],
+            default=['Retention','PassMatrix'],
             )
     parser.add_argument("--verbose",
                         dest="verb",

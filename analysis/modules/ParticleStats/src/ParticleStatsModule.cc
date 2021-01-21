@@ -200,15 +200,15 @@ void ParticleStatsModule::terminate()
 
     std::string pName  = m_strParticleLists[iList].c_str();
     float retRate = (*m_PassMatrix)(iList, iList);
-    json["retention"][pName]["retention"] = retRate;
+    json["Retention"][pName]["Retention"] = retRate;
     std::string flavs[4] = {"All Particles", "Particles", "Anti Particles",  "Self-conjugates"};
     // now the ACM and ACMPE
     for (int iFlav = 0; iFlav < 4; ++iFlav) {
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents);
-      json["retention"][pName][Form("%s ACM", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents;
+      json["Retention"][pName][Form("%s ACM", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents;
 
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents / (*m_PassMatrix)(iList, iList));
-      json["retention"][pName][Form("%s ACPME", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList,
+      json["Retention"][pName][Form("%s ACPME", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList,
           iFlav) / nEvents / (*m_PassMatrix)(iList,
                                              iList);
     }
@@ -223,9 +223,9 @@ void ParticleStatsModule::terminate()
          (float)m_nPass / (float)nEvents);
   stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
   stream << "\n======================================================================\n";
-  json["Total Retention"] = m_nPass / nEvents;
-  json["events passing"] = m_nPass;
-  json["events processed"] = nEvents;
+  json["Total retention"] = m_nPass / nEvents;
+  json["Events passing"] = m_nPass;
+  json["Events processed"] = nEvents;
   json["Total particles number"] = m_nParticles;
   B2INFO(stream.str());
   if (m_outputFile != "") {

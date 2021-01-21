@@ -1,0 +1,269 @@
+#!/usr/bin/env python3
+
+#
+# script to produce plot from json from PartcleStatModule
+#
+# Stefano Lacaprara  <lacaprara@pd.infn.it>  INFN Padova
+#
+
+
+import matplotlib.pyplot as plt
+from matplotlib import ticker
+import matplotlib
+matplotlib.use('Agg')
+import numpy as np
+import json
+import argparse
+
+
+try:
+    import b2plot as b2p
+    plt.style.use('belle2')
+except:
+    pass
+
+
+# from https://matplotlib.org/3.1.1/gallery/images_contours_and_fields/image_annotated_heatmap.html
+def heatmap(data, row_labels, col_labels, ax=None,
+            cbar_kw={}, cbarlabel="", **kwargs):
+    """
+    Create a heatmap from a numpy array and two lists of labels.
+
+    Parameters
+    ----------
+    data
+        A 2D numpy array of shape (N, M).
+    row_labels
+        A list or array of length N with the labels for the rows.
+    col_labels
+        A list or array of length M with the labels for the columns.
+    ax
+        A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
+        not provided, use current axes or create a new one.  Optional.
+    cbar_kw
+        A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
+    cbarlabel
+        The label for the colorbar.  Optional.
+    **kwargs
+        All other arguments are forwarded to `imshow`.
+    """
+
+    if not ax:
+        ax = plt.gca()
+
+    # Plot the heatmap
+    im = ax.imshow(data, **kwargs)
+
+    # Create colorbar
+    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
+    cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+
+    # We want to show all ticks...
+    ax.set_xticks(np.arange(data.shape[1]))
+    ax.set_yticks(np.arange(data.shape[0]))
+    # ... and label them with the respective list entries.
+    ax.set_xticklabels(col_labels)
+    ax.set_yticklabels(row_labels)
+
+    # Let the horizontal axes labeling appear on top.
+    ax.tick_params(top=True, bottom=False,
+                   labeltop=True, labelbottom=False)
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=-30, ha="right",
+             rotation_mode="anchor")
+
+    # Turn spines off and create white grid.
+    for edge, spine in ax.spines.items():
+        spine.set_visible(False)
+
+    ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
+    ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
+    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    return im, cbar
+
+
+def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
+                     textcolors=["black", "white"],
+                     threshold=None, **textkw):
+    """
+    A function to annotate a heatmap.
+
+    Parameters
+    ----------
+    im
+        The AxesImage to be labeled.
+    data
+        Data used to annotate.  If None, the image's data is used.  Optional.
+    valfmt
+        The format of the annotations inside the heatmap.  This should either
+        use the string format method, e.g. "$ {x:.2f}", or be a
+        `matplotlib.ticker.Formatter`.  Optional.
+    textcolors
+        A list or array of two color specifications.  The first is used for
+        values below a threshold, the second for those above.  Optional.
+    threshold
+        Value in data units according to which the colors from textcolors are
+        applied.  If None (the default) uses the middle of the colormap as
+        separation.  Optional.
+    **kwargs
+        All other arguments are forwarded to each call to `text` used to create
+        the text labels.
+    """
+
+    if not isinstance(data, (list, np.ndarray)):
+        data = im.get_array()
+
+    # Normalize the threshold to the images color range.
+    if threshold is not None:
+        threshold = im.norm(threshold)
+    else:
+        threshold = im.norm(data.max())/2.
+
+    # Set default alignment to center, but allow it to be
+    # overwritten by textkw.
+    kw = dict(horizontalalignment="center",
+              verticalalignment="center")
+    kw.update(textkw)
+
+    # Get the formatter in case a string is supplied
+    if isinstance(valfmt, str):
+        valfmt = matplotlib.ticker.StrMethodFormatter(valfmt)
+
+    # Loop over the data and create a `Text` for each "pixel".
+    # Change the text's color depending on the data.
+    texts = []
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
+            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+            texts.append(text)
+
+    return texts
+
+def plotRetention(ret, what = 'Retention', verb = False):
+
+    """
+    plot retention rate
+    
+    param: ret (dict) the content of json
+           verb : verbose mode
+    """
+
+    # get retention rate
+    results = dict()
+    
+    for ch in ret['Retention'].keys():
+        results[ch] = ret['Retention'][ch].get(what)
+
+    color = ['blue'] * len(results)
+    if what == 'Retention':
+        results['Total'] = ret['Total retention']
+        color.append('red')
+
+    if verb:
+        print(f"===== {what}  =====")
+        [print(f"{key:20} = {value:0.2}") for key, value in results.items()]
+        print("="*30)
+
+    fig, ax = plt.subplots(figsize=(12,10))
+    ax.barh(list(results.keys()), results.values(), align='center', color=color)
+
+    ax.set_yticklabels(results.keys(), fontsize=18)
+    ax.invert_yaxis()  # labels read top-to-bottom
+    ax.tick_params(axis='y', which='minor', bottom=False)
+    ax.grid(True, axis='x')
+    ax.set_xlabel(f'{what}')
+    fname = f"{what.replace(' ','_')}.png"
+    plt.savefig(fname, bbox_inches="tight", dpi=150)
+    print(f"{what} plot save to {fname}")
+
+def plotPassMatrix(ret, verb = False):
+    """
+    plot pass matrix
+    
+    params: ret (dict): the content of json
+            verb : verbose mode
+    """
+
+    nn = len(ret['Retention'].keys())
+    # y+1 to store Unique
+    mat = np.zeros((nn, nn+1))
+
+    xnames = []
+    ynames = []
+
+    for i,ch in enumerate(ret['Retention'].keys()):
+        if not ch.startswith("B"):
+            continue
+        xnames.append(ch)
+        if verb:
+            print("="*70)
+        for j,(k,v) in enumerate(ret['Pass matrix'][ch].items()):
+            if verb:
+                print(f"{i:2}:{j:2} {ch} - {k:30} : {v:0.2f}")
+            if i==0:
+                ynames.append(k)
+            mat[i, j] = v
+
+
+    fig, ax = plt.subplots(figsize=(12,12))
+
+    im, cbar = heatmap(mat, xnames, ynames, ax=ax,
+                       cmap="YlGn", cbarlabel="Pass Matrix")
+    texts = annotate_heatmap(im, valfmt="{x:0.0%}")
+
+    fig.tight_layout()
+    plt.savefig(f"PassMatrix.png", bbox_inches="tight", dpi=150)
+    print(f"PassMatrix plot save to PassMatrix.png")
+
+def argparser():
+    """
+    Parse options as command-line arguments.
+    """
+
+    description = "Script to plot from json produced by ParticleStat module."
+
+    parser = argparse.ArgumentParser(description=description, usage=__doc__, add_help=True)
+
+    parser.add_argument('--json', dest="json", help='Input json file', type=str, required=True)
+
+    plot_actions = {
+        "Retention"  : "Retention rate",
+        "All Particles ACM"  : "All Particles Average Candidate Multiplicity",
+        "All Particles ACPME"  : "All Particles ACM for Passed Events",
+        "PassMatrix" : "Pass matrix"
+        }
+
+    parser.add_argument('--plot',
+            help='Which plot to produce',
+            dest="plot",
+            action="store",
+            nargs='+',
+            choices=list(plot_actions.keys()),
+            default=['Retention','PassMatrix'],
+            )
+
+    parser.add_argument("--verbose",
+                        dest="verb",
+                        action="store_true",
+                        default=False,
+                        help="Verbose mode")
+
+    return parser
+
+if __name__ == '__main__':
+
+    args = argparser().parse_args()
+
+    with open(args.json) as js: 
+        ret = json.load(js)
+
+    for what in args.plot:
+        if what == "PassMatrix":
+            plotPassMatrix(ret, verb=args.verb)
+        else:
+            plotRetention(ret, what=what, verb=args.verb)
+

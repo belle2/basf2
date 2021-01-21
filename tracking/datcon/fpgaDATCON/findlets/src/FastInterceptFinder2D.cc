@@ -14,20 +14,18 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 FastInterceptFinder2D::FastInterceptFinder2D() : Super()
 {
-//   this->addProcessingSignalListener(&m_trackFitter);
 }
 
 void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-//   m_trackFitter.exposeParameters(moduleParamList, prefix);
-
-//   Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUFinder"),
                                 m_param_isUFinder,
@@ -98,7 +96,7 @@ void FastInterceptFinder2D::initialize()
     m_unitX = (tan(m_maximumX) - tan(m_minimumX)) / m_nAngleSectors;
   }
   for (uint i = 0; i < m_nAngleSectors; i++) {
-    double x = m_minimumX + m_unitX * i;
+    double x = m_minimumX + m_unitX * (double)i;
     double xc = x + 0.5 * m_unitX;
     if (not m_param_isUFinder) {
       x = atan(tan(m_minimumX) + m_unitX * i);
@@ -116,11 +114,13 @@ void FastInterceptFinder2D::initialize()
   m_HSSinValuesLUT[m_nAngleSectors] = convertToInt(sin(m_maximumX), 3);
   m_HSCosValuesLUT[m_nAngleSectors] = convertToInt(cos(m_maximumX), 3);
 
-  m_unitY = 2 * m_verticalHoughSpaceSize / m_nVerticalSectors;
+  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
   for (uint i = 0; i <= m_nVerticalSectors; i++) {
     m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
     m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
+  B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize << " unitX: " << m_unitX <<
+          " unitY: " << m_unitY);
 }
 
 void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
@@ -132,7 +132,34 @@ void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, l
   m_trackCandidates.clear();
 
   fastInterceptFinder2d(hits, 0, m_nAngleSectors, 0, m_nVerticalSectors, 0);
+//   for (uint y = 0; y < m_nVerticalSectors; y++) {
+//     for (uint x = 0; x < m_nAngleSectors; x++) {
+//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
+//       if (cellContent < -1) {
+//         std::cout << "-" << abs(cellContent) << " ";
+//       } else if (cellContent >= 0 && cellContent < 10) {
+//         std::cout << " " <<  cellContent << " ";
+//       } else if (cellContent >= 10) {
+//         std::cout << cellContent << " ";
+//       }
+//     }
+//     std::cout << std::endl;
+//   }
   FindHoughSpaceCluster();
+//   for (uint y = 0; y < m_nVerticalSectors; y++) {
+//     for (uint x = 0; x < m_nAngleSectors; x++) {
+//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
+//       if (cellContent < -1) {
+//         std::cout << "-" << abs(cellContent) << " ";
+//       } else if (cellContent >= 0 && cellContent < 10) {
+//         std::cout << " " <<  cellContent << " ";
+//       } else if (cellContent >= 10) {
+//         std::cout << cellContent << " ";
+//       }
+//     }
+//     std::cout << std::endl;
+//   }
+//   std::cout << std::endl;
 
   for (auto& trackCand : m_trackCandidates) {
     tracks.emplace_back(trackCand);
@@ -232,9 +259,20 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
 
   m_clusterCount = 1;
 
-  // TODO: double check this lambda for sorting...
+  // this sorting makes sure the clusters can be searched from bottom left of the HS to top right
+  // normally, a C++ array looks like a matrix:
+  // (0   , 0) ... (maxX, 0   )
+  //    ...            ...
+  // (0, maxY) ... (maxX, maxY)
+  // but for sorting we want it to be like regular coordinates
+  // (0, maxY) ... (maxX, maxY)
+  //    ...            ...
+  // (0, 0   ) ... (maxX, 0   )
+  // By setting the offset to the maximum allowed number of cells (2^14) and simplifying
+  // (16384 - a.second) * 16384 + a.first < (16384 - b.second) * 16384 + b.first
+  // we get the formula below
   auto sortSectors = [](const std::pair<uint, uint> a, const std::pair<uint, uint> b) {
-    return ((a.second < b.second) or (a.second == b.second and a.first < b.first));
+    return ((int)b.second - (int)a.second) * 16384 < (int)b.first - (int)a.first;
   };
   std::sort(m_activeSectorArray.begin(), m_activeSectorArray.end(), sortSectors);
 
@@ -250,14 +288,28 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     DepthFirstSearch(currentCell.first, currentCell.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize) * m_unitX + m_minimumX;
+      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_minimumX;
       if (not m_param_isUFinder) {
-        CoGX = atan(tan(m_minimumX) + m_unitX * ((double)m_clusterCoG.first / (double)m_clusterSize));
+        CoGX = atan(tan(m_minimumX) + m_unitX * ((double)m_clusterCoG.first / (double)m_clusterSize) + 1.0);
       }
-      double CoGY = ((double)m_clusterCoG.second / (double)m_clusterSize) * m_unitY - m_verticalHoughSpaceSize;
+      double CoGY = m_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
 
-      m_trackCandidates.emplace_back(std::make_pair(CoGX, CoGY));
-      B2DEBUG(29, "CoGX: " << CoGX << " CoGY: " << CoGY);
+      if (m_param_isUFinder) {
+        double trackPhi = CoGX + M_PI_2;
+        if (trackPhi < -M_PI) trackPhi += 2 * M_PI;
+        if (trackPhi >  M_PI) trackPhi -= 2 * M_PI;
+
+        // 1./CoGY * 1e10 yields trackRadius in mm. To convert to µm, which all other values are in,
+        // multiplication by another 1e3 is required -> total of 1e13
+        double trackRadius = 1. / CoGY * 1e+13;
+
+        m_trackCandidates.emplace_back(std::make_pair(trackPhi, trackRadius));
+      } else {
+        m_trackCandidates.emplace_back(std::make_pair(CoGX, CoGY));
+      }
+      B2DEBUG(29, "m_clusterCoG.first: " << m_clusterCoG.first << " " << ((double)m_clusterCoG.first / (double)m_clusterSize) <<
+              " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) << " CoGX: " << CoGX
+              << " CoGY: " << CoGY);
     }
     m_clusterCount++;
   }
@@ -267,12 +319,12 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
-  for (uint currentIndexY = lastIndexY; currentIndexY <= lastIndexY + 1; currentIndexY++) {
+  for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
     if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
-        m_clusterSize >= m_MaximumHSClusterSize) return;
+        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
     for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
       if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
-          m_clusterSize >= m_MaximumHSClusterSize) return;
+          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
 
       // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
       if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;

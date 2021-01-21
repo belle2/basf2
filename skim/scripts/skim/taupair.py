@@ -37,6 +37,8 @@ class TauLFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    produce_on_tau_samples = False  # retention is too high on taupair
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdK("all", path=path)
@@ -236,6 +238,8 @@ class TauGeneric(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    produce_on_tau_samples = False  # retention is too high on taupair
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         stdPhotons("all", path=path)
@@ -362,6 +366,8 @@ class TauThrust(BaseSkim):
     __description__ = "Skim for Tau decays using thrust."
     __contact__ = __liaison__
     __category__ = "physics, tau"
+
+    produce_on_tau_samples = False  # retention is too high on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)

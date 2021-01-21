@@ -110,6 +110,7 @@ class BaseFEISkim(BaseSkim):
     NoisyModules = ["ParticleCombiner"]
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     @staticmethod
     @lru_cache()

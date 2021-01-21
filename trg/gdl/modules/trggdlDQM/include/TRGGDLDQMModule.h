@@ -16,6 +16,12 @@
 #include "trg/ecl/TrgEclMapping.h"
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+
 
 namespace Belle2 {
 
@@ -105,15 +111,12 @@ namespace Belle2 {
     TH1D* h_eff_shifter = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
-    ////! event by event psnm timing distribution
-    //TH2I* h_p = nullptr;
-    ////! event by event ftdl timing distribution
-    //TH2I* h_f = nullptr;
-    ////! event by event input timing distribution
-    //TH2I* h_i = nullptr;
     std::vector<std::vector<int>> h_0_vec;
+    ////! event by event psnm timing distribution
     std::vector<std::vector<int>> h_p_vec;
+    ////! event by event ftdl timing distribution
     std::vector<std::vector<int>> h_f_vec;
+    ////! event by event input timing distribution
     std::vector<std::vector<int>> h_i_vec;
 
     TDirectory* oldDir = nullptr;
@@ -140,8 +143,6 @@ namespace Belle2 {
     unsigned _exp = 0;
     unsigned _run = 0;
     std::vector<int> skim;
-    //private:
-    //StoreArray<TRGGDLUnpackerStore> store;
 
     static const int n_output_extra = 73;
     static const char* output_extra[n_output_extra];
@@ -219,8 +220,25 @@ namespace Belle2 {
       "mumutight"
     };
 
+  private:
+
     //ecltrg<->ecl mappint
     TrgEclMapping* trgeclmap = nullptr;
+
+    //Input store array of GDL data
+    StoreArray<TRGGDLUnpackerStore> entAry;
+
+    //Input store array of metadata
+    StoreObjPtr<EventMetaData> bevt;
+
+    //Input store array of HLT
+    StoreObjPtr<SoftwareTriggerResult> result_soft;
+
+    //Input store array of track
+    StoreArray<Track> Tracks;
+
+    //Input store array of ECL
+    //StoreArray<ECLCluster> ECLClusters;
     StoreArray<ECLCalDigit> m_ECLCalDigitData;
     StoreArray<ECLDigit>    m_ECLDigitData;
 

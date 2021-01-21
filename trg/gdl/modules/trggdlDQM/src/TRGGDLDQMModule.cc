@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 #include <trg/gdl/modules/trggdlDQM/TRGGDLDQMModule.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,13 +24,6 @@
 #include <fstream>
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 using namespace std;
 using namespace Belle2;
@@ -292,12 +284,9 @@ void TRGGDLDQMModule::initialize()
     end_skim_gdldqm = nskim_gdldqm;
   }
 
-  StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
 
-  m_ECLCalDigitData.registerInDataStore();
-  m_ECLDigitData.registerInDataStore();
   trgeclmap = new TrgEclMapping();
 
   // calls back the defineHisto() function, but the HistoManager module has to be in the path
@@ -483,7 +472,6 @@ void TRGGDLDQMModule::event()
 
   skim.clear();
 
-  StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) {
     return;
   }
@@ -492,7 +480,6 @@ void TRGGDLDQMModule::event()
   for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
     if (iskim == 0) skim.push_back(iskim);
   }
-  StoreObjPtr<SoftwareTriggerResult> result_soft;
   if (result_soft.isValid()) {
     const std::map<std::string, int>& skim_map = result_soft->getResults();
     for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
@@ -1546,7 +1533,6 @@ void
 TRGGDLDQMModule::fillOutputPureExtra(void)
 {
   //get offline CDC track information
-  StoreArray<Track> Tracks;
   int n_fulltrack = 0;
   float max_dphi = 0;
   float phi_list[100];
@@ -1577,7 +1563,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
 
   //get offline ECL cluster information
-  //StoreArray<ECLCluster> ECLClusters;
   //double total_energy = 0;
   //for (int iclst = 0; iclst < ECLClusters.getEntries(); iclst++) {
   //  total_energy += ECLClusters[iclst]->getEnergyRaw();

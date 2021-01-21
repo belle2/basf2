@@ -17,6 +17,8 @@ Tools for luminosity
 Tools for ParticleStats
 +++++++++++++++++++++++
 
+.. _b2plot-particleStats:
+
 ``b2plot-particleStats``: Analyze a json produced by :b2:mod:`ParticleStats` to produce plot of retention rate and pass matrix
 ------------------------------------------------------------------------------------------------------------------------------
 

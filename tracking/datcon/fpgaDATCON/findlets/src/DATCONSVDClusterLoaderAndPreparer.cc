@@ -77,9 +77,10 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<std::pair<VxdID, std::
       const long radiusSquared = x * x + y * y; // therefore radius is in µm as well, like all other length values
 //       const double radius = sensorRadius;
       // x or y divided by r^2 can create values very close to 0. To cope for this and still
-      // have non-zero numbers after conversion and rounding, the conversion to int is made with 10^7
+      // have non-zero numbers after conversion and rounding, the conversion to int is made with 10^10
       std::pair<long, long> pos2D = std::make_pair(convertToInt(2. * (double)x / (double)radiusSquared, 10),
                                                    convertToInt(2. * (double)y / (double)radiusSquared, 10));
+      B2DEBUG(29, "x, y: " << x << " " << y << " Hough-values: " << pos2D.first << " " << pos2D.second);
       uHits.emplace_back(std::make_pair(sensorID, pos2D));
     } else {
       nClusterPerLayer.at(4 + layerNumber - 3)++;

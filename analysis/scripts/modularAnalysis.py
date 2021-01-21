@@ -1827,14 +1827,16 @@ def summaryOfLists(particleLists, outputFile=None, path=None):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
+    If an output file name is provided the statistics is also dumped into a json file with that name.
 
     @param particleLists list of input ParticleLists
-    @param outputFile output file name (default none)
+    @param outputFile output file name (not created by default)
     """
 
     particleStats = register_module('ParticleStats')
     particleStats.param('particleLists', particleLists)
-    particleStats.param('outputFile', outputFile)
+    if outputFile is not None:
+        particleStats.param('outputFile', outputFile)
     path.add_module(particleStats)
 
 

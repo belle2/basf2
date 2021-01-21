@@ -60,8 +60,8 @@ def reducelist(list_of_cuts, df, current_name=None, current_cut=None, x=0, y=0):
                               x + 2 ** (len(list_of_cuts) - 1), y + 1)
 
 
-def make_chunks(l, n):
-    return [l[i:i + n] for i in range(0, len(l), n)]
+def make_chunks(k, n):
+    return [k[i:i + n] for i in range(0, len(k), n)]
 
 
 def write_value_cell(key, value):

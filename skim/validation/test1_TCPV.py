@@ -17,9 +17,9 @@ from skim.tdcpv import TDCPV
 
 path = b2.Path()
 
-fileList = ['../TDCPV.dst.root']
+fileList = ['../TCPV.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = TDCPV(OutputFileName='../TDCPV.udst.root')
+skim = TDCPV(OutputFileName='../TCPV.udst.root')
 skim(path)
 b2.process(path)

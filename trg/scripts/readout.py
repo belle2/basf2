@@ -5,6 +5,16 @@
 # steering file - 2017 Belle II Collaboration
 ######################################################
 
+import basf2 as b2
+
+from ROOT import Belle2
+import numpy as np
+import sys
+# from testpkg.bitstring import BitArray
+from bitstring import BitArray
+import pickle
+import re
+
 
 # we need to modify this to get data from different coppers
 
@@ -22,16 +32,6 @@ hslb = (('11000001', 'b'),
 
 
 integrity_check = False
-
-import basf2 as b2
-
-from ROOT import Belle2
-import numpy as np
-import sys
-# from testpkg.bitstring import BitArray
-from bitstring import BitArray
-import pickle
-import re
 
 [steering, srootFile] = sys.argv[:2]
 if len(sys.argv) >= 3:

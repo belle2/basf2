@@ -7,6 +7,7 @@ import math
 from ROOT import Belle2
 import modularAnalysis as ma
 from array import array
+import sys  # get argv
 
 from heapq import nlargest
 from effCalculation import EffCalculation
@@ -15,7 +16,6 @@ PI = 3.1415926
 Fac = 180.0 / PI
 
 
-import sys  # get argv
 argvs = sys.argv
 argn = len(argvs)
 if argn != 3:

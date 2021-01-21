@@ -74,6 +74,7 @@ class printMobility(b2.Module):
 
         print('TEMPERATURE = ' + str(sensorInfo.getTemperature))
 
+
 # add your GT here:
 # gt = ""
 # b2conditions.prepend_globaltag(gt)

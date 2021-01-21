@@ -31,12 +31,12 @@ b2.use_central_database("TRGGDL_201811")
 # input
 if f_in_root[-6:] == ".sroot":
     input = b2.register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
 if f_in_root[-5:] == ".root":
     input = b2.register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
 
 print(f_in_root)
 input.param('inputFileName', f_in_root)

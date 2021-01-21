@@ -29,7 +29,7 @@ try:
     # ok, we've got a header with corresponding plot
     module = modules_with_plots[found_idx]
     classname = module + 'Module'
-except:
+except Exception:
     pass
 
 belle2ns = False
@@ -47,7 +47,7 @@ for line in open(filename):
         if re.match(r'.*class ' + classname + '.*', line):
             # found class declaration, add comment before it
             print('''/**
-* \image html ''' + module + '''.png
+* \\image html ''' + module + '''.png
 */''')
 
     # end of belle2 namespace -> end grouping
@@ -81,9 +81,9 @@ for line in open(filename):
 # avoid some further errors with lost stdout/stderr
 try:
     sys.stdout.close()
-except:
+except Exception:
     pass
 try:
     sys.stderr.close()
-except:
+except Exception:
     pass

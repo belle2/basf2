@@ -116,6 +116,41 @@ namespace Belle2 {
     }
 
     /**
+     * Return a reference to the calibration associated to a given strip.
+     * Return a reference to the calibration associated to a given strip identified by:
+     * @param layer is the layer number (2 to 6 in the present geometry)
+     * @param ladder is the ladder number ( 1 to 7 for layer 3, 1 to 10 for layer 4 etc...)
+     * @param sensor is the sensor number ( 1 to 2 for layer 3, 1 to 3 for layer 4 etc...)
+     * @param side is the sensor view: 1 for Side U ( Side P ), 0 for side V (Side N)
+     * @param strip is the strip number: from 1 to 512 or 768 depending on the sensor
+     * it throws std::out_of_range if the strip is unknown
+     */
+    const typename T::calibrationType& getReference(unsigned int layer,
+                                                    unsigned int ladder,
+                                                    unsigned int sensor,
+                                                    unsigned int side,
+                                                    unsigned int strip) const
+    {
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      const auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      const auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      const auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::getReference(sides[side] , strip);
+    }
+
+    /**
      * Get the unique ID  of the calibration
      */
     TString get_uniqueID() const {return m_uniqueID;}
@@ -179,4 +214,3 @@ namespace Belle2 {
   };
 
 }
-

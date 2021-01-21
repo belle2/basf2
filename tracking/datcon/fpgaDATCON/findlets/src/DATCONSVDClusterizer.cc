@@ -27,19 +27,11 @@ using namespace TrackFindingCDC;
 
 DATCONSVDClusterizer::DATCONSVDClusterizer() : Super()
 {
-//   this->addProcessingSignalListener(&m_trackFitter);
 }
 
 void DATCONSVDClusterizer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-//   m_trackFitter.exposeParameters(moduleParamList, prefix);
-
-//   Super::exposeParameters(moduleParamList, prefix);
-
-//   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeDATCONSVDDigitsName"),
-//                                 m_param_storeDATCONSVDDigitsName,
-//                                 "Name of DATCONSVDDigit StoreArray.",
-//                                 m_param_storeDATCONSVDDigitsName);
+  Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseMap"),
                                 m_param_noiseMapfileName,
@@ -87,9 +79,6 @@ void DATCONSVDClusterizer::beginRun()
 void DATCONSVDClusterizer::initialize()
 {
   Super::initialize();
-
-//   m_storeDATCONSVDDigits.isRequired(m_param_storeDATCONSVDDigitsName);
-//   m_param_storeDATCONSVDDigitsName = m_storeDATCONSVDDigits.getName();
 }
 
 void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters)
@@ -241,7 +230,6 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
           if (noise > m_param_noiseCut) {
             svdNoiseMap.insert(std::make_pair(simpleVXDID + strip, noise));
             if (m_param_writeNoiseMapsToFile) {
-//                 noiseMapU << layer << " " << ladder << " " << sensor << " " << strip << " " << noise << endl;
               noiseMap << 4096 * (layer - 3) + 16 * (ladder - 1) + (sensor - 1) << " " << strip << " " << noise << std::endl;
             }
           }
@@ -252,7 +240,6 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
     }
     ++itSvdLayers;
   }
-
   if (m_param_writeNoiseMapsToFile) {
     noiseMap.close();
   }

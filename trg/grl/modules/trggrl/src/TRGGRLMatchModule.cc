@@ -175,10 +175,6 @@ void TRGGRLMatchModule::beginRun()
 
 void TRGGRLMatchModule::event()
 {
-  StoreObjPtr<EventMetaData> bevt;
-  int _exp = bevt->getExperiment();
-  int _run = bevt->getRun();
-  int _event = bevt->getEvent();
 
   StoreArray<CDCTriggerTrack> track2Dlist(m_2d_tracklist);
   StoreArray<CDCTriggerTrack> track3Dlist(m_3d_tracklist);
@@ -1059,7 +1055,7 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   st_ec1_4b[2] = st_ec1_36b[18]  or st_ec1_36b[19] or st_ec1_36b[20] or st_ec1_36b[21] or st_ec1_36b[22] or st_ec1_36b[23]
                  or st_ec1_36b[24] or st_ec1_36b[25] or st_ec1_36b[26] or st_ec1_36b[27] or st_ec1_36b[28];
   st_ec1_4b[3] = st_ec1_36b[26]  or st_ec1_36b[27] or st_ec1_36b[28] or st_ec1_36b[29] or st_ec1_36b[30] or st_ec1_36b[31]
-                 or st_ec1_36b[32] or st_ec1_36b[33] or st_ec1_36b[34] or st_ec1_36b[36] or st_ec1_36b[0];
+                 or st_ec1_36b[32] or st_ec1_36b[33] or st_ec1_36b[34] or st_ec1_36b[35] or st_ec1_36b[0];
   st_ec2_4b[0] = st_ec2_36b[35] or st_ec2_36b[0] or st_ec2_36b[1] or st_ec2_36b[2] or st_ec2_36b[3] or st_ec2_36b[4] or st_ec2_36b[5]
                  or st_ec2_36b[6] or st_ec2_36b[7] or st_ec2_36b[8] or st_ec2_36b[9];
   st_ec2_4b[1] = st_ec2_36b[8]  or st_ec2_36b[9] or st_ec2_36b[10] or st_ec2_36b[11] or st_ec2_36b[12] or st_ec2_36b[13]
@@ -1067,7 +1063,7 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   st_ec2_4b[2] = st_ec2_36b[18]  or st_ec2_36b[19] or st_ec2_36b[20] or st_ec2_36b[21] or st_ec2_36b[22] or st_ec2_36b[23]
                  or st_ec2_36b[24] or st_ec2_36b[25] or st_ec2_36b[26] or st_ec2_36b[27] or st_ec2_36b[28];
   st_ec2_4b[3] = st_ec2_36b[26]  or st_ec2_36b[27] or st_ec2_36b[28] or st_ec2_36b[29] or st_ec2_36b[30] or st_ec2_36b[31]
-                 or st_ec2_36b[32] or st_ec2_36b[33] or st_ec2_36b[34] or st_ec2_36b[36] or st_ec2_36b[0];
+                 or st_ec2_36b[32] or st_ec2_36b[33] or st_ec2_36b[34] or st_ec2_36b[35] or st_ec2_36b[0];
 
 
 
@@ -1163,10 +1159,10 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
 //short-klm matching at endcap
   for (int i = 0; i < 4; i++) {
-    if (klm_sectormap_fwd[i] and st_ec1_36b[i])sklm_fwd++;
+    if (klm_sectormap_fwd[i] and st_ec1_4b[i])sklm_fwd++;
   }
   for (int i = 0; i < 4; i++) {
-    if (klm_sectormap_bwd[i] and st_ec2_36b[i])sklm_bwd++;
+    if (klm_sectormap_bwd[i] and st_ec2_4b[i])sklm_bwd++;
   }
   sklm = sklm_fwd + sklm_bwd;
 

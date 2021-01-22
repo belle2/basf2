@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
   /**
@@ -63,6 +64,11 @@ namespace Belle2 {
     std::vector<std::string> m_ParticleLists;
     /** input momentum scale modifier */
     double m_scale;
+
+    /**
+     * function to set momentum scaling factor
+     */
+    void setMomentumScalingFactor(Particle* particle);
 
   }; // TrackingMomentumModule
 

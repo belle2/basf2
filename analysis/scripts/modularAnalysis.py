@@ -657,7 +657,10 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
 
 def scaleTrackMomenta(inputListNames, scale, path=None):
     """
-    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Scale momenta of the particles according to the scaling factor scale.
+    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names

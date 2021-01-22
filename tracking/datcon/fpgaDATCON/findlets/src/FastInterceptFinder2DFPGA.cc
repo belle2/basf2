@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2DFPGA.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -19,11 +19,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FastInterceptFinder2D::FastInterceptFinder2D() : Super()
+FastInterceptFinder2DFPGA::FastInterceptFinder2DFPGA() : Super()
 {
 }
 
-void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -84,7 +84,7 @@ void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, c
 
 }
 
-void FastInterceptFinder2D::initialize()
+void FastInterceptFinder2DFPGA::initialize()
 {
   Super::initialize();
 
@@ -123,8 +123,8 @@ void FastInterceptFinder2D::initialize()
           " unitY: " << m_unitY);
 }
 
-void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
-                                  std::vector<std::pair<double, double>>& tracks)
+void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+                                      std::vector<std::pair<double, double>>& tracks)
 {
   m_SectorArray.assign(m_nAngleSectors * m_nVerticalSectors, 0);
   m_activeSectorArray.clear();
@@ -169,8 +169,8 @@ void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, l
 
 }
 
-void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
-                                                  uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion)
+void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+                                                      uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion)
 {
   std::vector<std::pair<VxdID, std::pair<long, long>>> containedHits;
 
@@ -250,7 +250,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, s
   }
 }
 
-void FastInterceptFinder2D::FindHoughSpaceCluster()
+void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
 {
   // cell content meanings:
   // -3, -4  : active sector, not yet visited
@@ -315,7 +315,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
   }
 }
 
-void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
+void FastInterceptFinder2DFPGA::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 

@@ -24,13 +24,14 @@ namespace Belle2 {
    * Findlet for finging intersections of sinosoidal curves in the 2D Hough space by iteratively calling
    * fastInterceptFinder2d.
    */
-  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
+  class FastInterceptFinder2DFPGA : public
+    TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
 
   public:
     /// Find intercepts in the 2D Hough space
-    FastInterceptFinder2D();
+    FastInterceptFinder2DFPGA();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

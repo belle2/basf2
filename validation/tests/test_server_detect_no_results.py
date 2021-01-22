@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import sys
 import os
@@ -16,7 +15,7 @@ def main():
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
         os.chdir(str(tmpdir))
 
         # run validation server
@@ -33,7 +32,7 @@ def main():
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
         os.chdir(str(tmpdir))
 
         # create validation results folders, but still no folders inside
@@ -55,7 +54,7 @@ def main():
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
         # should work when the folders are present
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
         os.chdir(str(tmpdir))
 
         # create validation results folders, but still no folders inside

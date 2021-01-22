@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # basf2 specific imports
 from basf2 import statistics
@@ -167,7 +166,7 @@ def statistics_plots(
             h_module_timing.GetXaxis().SetBinLabel(
                 index, modstat.name)
             index += 1
-        h_module_timing.Write('%s%sTiming' % (prefix, method_name[method]))
+        h_module_timing.Write('{}{}Timing'.format(prefix, method_name[method]))
         h_module_timing.GetListOfFunctions().RemoveLast()
 
     # Memory usage profile
@@ -248,7 +247,7 @@ def statistics_plots(
             )
             h_module_memory.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
-        h_module_memory.Write('%s%sMemory' % (prefix, method_name[method]))
+        h_module_memory.Write('{}{}Memory'.format(prefix, method_name[method]))
         h_module_memory.GetListOfFunctions().RemoveLast()
 
     if plot_file:
@@ -382,7 +381,7 @@ def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
 
     print(f'Running: {running[0]}')
     for __ in running[1:]:
-        print('{0} {1}'.format(len('Running:') * " ", __))
+        print('{} {}'.format(len('Running:') * " ", __))
 
     return len(running) + 2
 
@@ -548,7 +547,7 @@ class Validation:
             if script_object.status == ScriptStatus.skipped:
                 self.skip_script(
                     script_object,
-                    reason="Depends on '{}'".format(script_object.path)
+                    reason=f"Depends on '{script_object.path}'"
                 )
 
     def build_headers(self):
@@ -574,7 +573,7 @@ class Validation:
                                         ScriptStatus.failed]:
             self.log.warning('Skipping ' + script_object.path)
             if reason:
-                self.log.debug("Reason for skipping: {}.".format(reason))
+                self.log.debug(f"Reason for skipping: {reason}.")
             script_object.status = ScriptStatus.skipped
 
         # Also skip all dependent scripts.
@@ -582,7 +581,7 @@ class Validation:
             if script_object in dependent_script.dependencies:
                 self.skip_script(
                     dependent_script,
-                    reason="Depends on '{}'".format(script_object.path)
+                    reason=f"Depends on '{script_object.path}'"
                 )
 
     def create_log(self) -> logging.Logger:
@@ -775,7 +774,7 @@ class Validation:
             self.log.note("{}/{} scripts were skipped".format(
                 len(skipped_scripts), len(self.scripts)))
             for s in skipped_scripts:
-                self.log.note("* {}".format(s))
+                self.log.note(f"* {s}")
             self.log.note("")
         else:
             self.log.note("No scripts were skipped. Nice!")
@@ -803,7 +802,7 @@ class Validation:
 
         run_times = {}
         path = validationpath.get_results_runtime_file(self.work_folder)
-        with open(path, "r") as runtimes:
+        with open(path) as runtimes:
 
             # Get our data
             for line in runtimes:
@@ -857,7 +856,7 @@ class Validation:
                 s.unique_name() in to_keep_dependencies)]
 
         # Check if some of the selected_packages were not found.
-        packages = set(s.package for s in self.scripts)
+        packages = {s.package for s in self.scripts}
         packages_not_found = list(set(selected_packages) - packages)
         if packages_not_found:
             msg = "You asked to select the package(s) {}, but they were not " \
@@ -915,9 +914,9 @@ class Validation:
                 script_obj.status = ScriptStatus.skipped
 
         # Check if some of the selected_packages were not found.
-        script_names = set(
+        script_names = {
             Script.sanitize_file_name(s.name) for s in self.scripts
-        )
+        }
         scripts_not_found = set(script_selection) - script_names
         if scripts_not_found:
             msg = "You requested script(s) {}, but they seem to not have " \
@@ -1132,7 +1131,7 @@ class Validation:
                 running = [script for script in remaining_scripts
                            if script.status == ScriptStatus.running]
                 print(
-                    'Finished [{0},{1}]: {2} -> {3}'.format(
+                    'Finished [{},{}]: {} -> {}'.format(
                         len(waiting),
                         len(running),
                         script_obj.path,
@@ -1214,7 +1213,7 @@ class Validation:
                                if _.status == ScriptStatus.waiting]
                     running = [_ for _ in remaining_scripts
                                if _.status == ScriptStatus.running]
-                    print('Started [{0},{1}]: {2}'.format(
+                    print('Started [{},{}]: {}'.format(
                         len(waiting), len(running),
                         script_obj.path)
                     )
@@ -1488,7 +1487,7 @@ def execute(tag=None, is_test=None):
 
         # Log that everything is finished
         validation.log.note(
-            'Validation finished! Total runtime: {0}s'.format(
+            'Validation finished! Total runtime: {}s'.format(
                 int(timeit.default_timer() - get_start_time())
             )
         )

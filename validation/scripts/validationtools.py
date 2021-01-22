@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """This file contains multiple utility functions which can be used by
 validation steering files. """

@@ -13,3 +13,4 @@
 using namespace Belle2;
 
 REG_MODULE(DATCONFPGA)
+REG_MODULE(DATCON)

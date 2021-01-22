@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework', 'pxd', 'pxd_dataobjects', 'vxd_dataobjects', 'simulation_dataobjects',
+    'genfit2', 'mdst_dataobjects', 'tracking_dataobjects', 'analysis_VertexFitting'
+]
+env['SUBLIB'] = True
+
+Return('env')

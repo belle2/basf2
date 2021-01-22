@@ -315,8 +315,3 @@ namespace Belle2 {
 
 
 }
-
-void Splitter()
-{
-  cout << "Helenka" << endl;
-}

@@ -28,12 +28,15 @@
 namespace Belle2 {
 
   // General functions to perform the calibration
-  // Notice that the goal of the claibraiton is to estimate the parameters
+  // Notice that the goal of the calibration is to estimate the parameters
   // of the Gaussian distribution: center + covariance matrix describing the spread.
   // In general it requires more data to determine the spread, so there can be
-  // several calib. intervals with the same spread but different calues of
-  // the center position of the Gaussian (mean).
-  // They are called "spread interval" and "short interval"
+  // several calib. subintervals with different values of
+  // the center position of the Gaussian (mean) but with identical spread parameters.
+  // The longer  intervals of constant spread are called "intervals"
+  // The shorter intervals of constant mean value are called "subintervals"
+  // In general there are several subintervals withing single interval
+  // By definition a subinterval always belongs only to single interval.
 
 
   /** Function that converts Eigen symmetric matrix to ROOT matrix */
@@ -64,19 +67,19 @@ namespace Belle2 {
     return -1;
   }
 
-  /** The parameters related to single spread-calibration interval */
+  /** The parameters related to single calibration interval */
   struct calibPars {
-    std::vector<Eigen::VectorXd> cnt; ///< vector of means for each small  calib. interval
-    std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainities of means for each small calib. interval
+    std::vector<Eigen::VectorXd> cnt; ///< vector of means for each calib. subinterval
+    std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
-    int size() const {return cnt.size();} ///< number of the small intervals
+    int size() const {return cnt.size();} ///< number of the subintervals
   };
 
 
-  /** Parameters and data relevan for single spread calibration interval */
+  /** Parameters and data relevant for single calibration interval */
   struct CalibrationData {
-    /** vector of the start and end times of the  short calibration intervals */
-    std::vector<std::map<ExpRun, std::pair<double, double>>> bsPosIntervals;
+    /** vector of the start and end times of the calibration subintervals */
+    std::vector<std::map<ExpRun, std::pair<double, double>>> subIntervals;
 
     std::vector<ExpRunEvt> breakPoints; ///< vector with break points positions
 
@@ -88,13 +91,13 @@ namespace Belle2 {
 
 
 
-  /* Extrapolate calibration to intervals where it failed */
+  /** Extrapolate calibration to intervals where it failed */
   inline void extrapolateCalibration(std::vector<CalibrationData>&  calVec)
   {
     //put closest neighbor, where the statistic was low or algo failed
     for (unsigned i = 0; i < calVec.size(); ++i) {
       if (calVec[i].pars.cnt.size() != 0) continue;
-      const auto& r =  calVec[i].bsPosIntervals;
+      const auto& r =  calVec[i].subIntervals;
       double Start, End;
       std::tie(Start, End) = Splitter::getStartEnd(r);
 
@@ -106,8 +109,8 @@ namespace Belle2 {
       //Find the closest calibrated interval
       for (unsigned j = 0; j < calVec.size(); ++j) {
         if (calVec[j].isCalibrated == false) continue; //skip not-calibrated intervals
-        const auto& rJ = calVec[j].bsPosIntervals;
-        for (unsigned jj = 0; jj < rJ.size(); ++jj) {
+        const auto& rJ = calVec[j].subIntervals;
+        for (unsigned jj = 0; jj < rJ.size(); ++jj) { //loop over subintervals
           const auto& rNow = rJ[jj];
           double s = rNow.begin()->second.first;
           double e = rNow.rbegin()->second.second;
@@ -149,8 +152,8 @@ namespace Belle2 {
     for (unsigned i = 0; i < calVec.size(); ++i) {
       if (calVec[i].isCalibrated == false)
         continue;
-      for (unsigned j = 0; j < calVec[i].bsPosIntervals.size(); ++j) {
-        for (auto I : calVec[i].bsPosIntervals[j]) {
+      for (unsigned j = 0; j < calVec[i].subIntervals.size(); ++j) {
+        for (auto I : calVec[i].subIntervals[j]) {
           double s = I.second.first;
           double e = I.second.second;
 
@@ -168,7 +171,7 @@ namespace Belle2 {
     }
 
     B2ASSERT("Must be found", iMin != -1 && jMin != -1);
-    calVec[iMin].bsPosIntervals[jMin].insert(shortRun);
+    calVec[iMin].subIntervals[jMin].insert(shortRun);
   }
 
   /** Encode integer num into double val such that val is nearly not changed (maximally by a relative shift 1e-6).
@@ -180,10 +183,10 @@ namespace Belle2 {
 
     int e; //exponent of the number
     double mantisa = std::frexp(val, &e);
-    long long mantisaI = mantisa * factor; //mantisa as integer
+    long long mantisaI = mantisa * factor; //mantissa as integer
 
     if (val != 0)
-      mantisaI = (mantisaI / fEnc) * fEnc  + num; //adding encoded number to last digits of mantisa
+      mantisaI = (mantisaI / fEnc) * fEnc  + num; //adding encoded number to last digits of mantissa
     else {
       mantisaI = factor / 2 + num;
       e = -100; //if the val is zero, ensure very small number by the exponent
@@ -220,9 +223,10 @@ namespace Belle2 {
     ExpRun exprunLast(-1, -1); //last exprun
     EventDependency* intraRun = nullptr;
 
+    // Loop over calibration intervals
     for (unsigned i = 0; i < calVec.size(); ++i) {
-      const auto& r = calVec[i].bsPosIntervals; //   splits[i];
-      // Loop over vtx calibration intervals
+      const auto& r = calVec[i].subIntervals; //   splits[i];
+      // Loop over calibration subintervals
       for (int k = 0; k < int(r.size()); ++k) {
 
         for (auto I : r[k]) { //interval required to be within single run
@@ -264,17 +268,16 @@ namespace Belle2 {
           }
           exprunLast = exprun;
         }
-      } //end loop over vtx-intervals
+      } //end loop over calibration subintervals
 
-
-    } //end loop over size-intervals
+    } //end loop over calibration intervals
 
     //Store the last entry
     auto m_iov = IntervalOfValidity(exprunLast.exp, exprunLast.run, exprunLast.exp, exprunLast.run);
     Database::Instance().storeData(objName, intraRun, m_iov);
   }
 
-  /** run calibration algorithm for single spread-calibration interval */
+  /** run calibration algorithm for single calibration interval */
   template<typename Evt, typename Fun>
   inline CalibrationData runAlgorithm(const std::vector<Evt>& evts, std::vector<std::map<ExpRun, std::pair<double, double>>> range,
                                       Fun runCalibAnalysis
@@ -331,7 +334,7 @@ namespace Belle2 {
 
     calD.breakPoints = convertSplitPoints(evtsNow, breaks);
 
-    calD.bsPosIntervals = r;
+    calD.subIntervals = r;
 
     if (breaks.size() > 0)
       B2INFO("StartOfCalibInterval (run,evtNo,vtxIntervalsSize) " <<   calD.breakPoints.at(0).run << " " <<
@@ -345,11 +348,11 @@ namespace Belle2 {
     }
 
     // Run the calibration
-    B2INFO("Start of running calibration over spread-calibraiont interval");
+    B2INFO("Start of running calibration over calibration interval");
     tie(calD.pars.cnt, calD.pars.cntUnc, calD.pars.spreadMat) = runCalibAnalysis(evtsNow, breaks);
     B2INFO("End of running analysis - SpreadMatX : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
-    B2ASSERT("All short intervals have calibration of the mean value", calD.pars.cnt.size() == r.size());
-    B2ASSERT("All short intervals have  calibration of the unc. of mean", calD.pars.cntUnc.size() == r.size());
+    B2ASSERT("All subintervals have calibration of the mean value", calD.pars.cnt.size() == r.size());
+    B2ASSERT("All subintervals have calibration of the unc. of mean", calD.pars.cntUnc.size() == r.size());
 
     calD.isCalibrated = true;
 
@@ -357,6 +360,16 @@ namespace Belle2 {
   }
 
 
+  /** Run the the calibration over the whole event sample
+    @param tracks: TTree object with mu-mu events
+    @param calibName: name of the calibration payload
+    @param GetEvents: function that transforms TTree to std::vector
+    @param calibAnalysis: function that performs the calibration on a single calibration interval
+    @param calibObjCreator: function that stores results to the payload class which inherits from TObject
+    @param m_lossFunctionOuter: Lost function for the calibration intervals of the spread parameters
+    @param m_lossFunctionInner: Lost function for the calibration subintervals (for the mean value parameters)
+    @return State of the calibration run, i.e. EResult::c_OK if everything OK
+  */
   template<typename Fun1, typename Fun2>
   CalibrationAlgorithm::EResult runCalibration(TTree* tracks,  const std::string& calibName,  Fun1 GetEvents,  Fun2 calibAnalysis,
                                                std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)> calibObjCreator,
@@ -388,14 +401,14 @@ namespace Belle2 {
     Splitter splt;
     auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner);
 
-    //Loop over all spread-calibration intervals
+    //Loop over all calibration intervals
     std::vector<CalibrationData> calVec;
     for (auto s : splits) {
-      CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the intervals s
+      CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the interval s
       calVec.push_back(calD);
     }
 
-    // exptrapolate results to the low-stat intervals
+    // extrapolate results to the low-stat intervals
     extrapolateCalibration(calVec);
 
     // Include removed short runs

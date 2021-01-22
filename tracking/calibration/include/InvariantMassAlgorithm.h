@@ -25,10 +25,10 @@ namespace Belle2 {
     /// Destructor
     virtual ~InvariantMassAlgorithm() {}
 
-    /// Set outer loss function
+    /// Set outer loss function (for calibration intervals)
     void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }
 
-    /// Set inner loss function
+    /// Set inner loss function (for calibration subintervals)
     void setInnerLoss(const std::string& loss) { m_lossFunctionInner = loss; }
 
   protected:
@@ -37,10 +37,10 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    /// Outer loss function
+    /// Outer loss function (for calibration intervals with constant InvarinatMass spread)
     TString m_lossFunctionOuter = "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)";
 
-    /// Inner loss function
+    /// Inner loss function (for calibration subintervals with constant InvariantMass)
     TString m_lossFunctionInner = "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)";
   };
 } // namespace Belle2

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # standard
 import sys
@@ -30,7 +29,7 @@ def start_webserver():
 
 def http_post(command, json_args):
     call_url = validation_url + command
-    print("Posting {} to {}".format(json_args, command))
+    print(f"Posting {json_args} to {command}")
     r = requests.post(call_url,
                       json=json_args)
     if not r.ok:
@@ -50,7 +49,7 @@ def check_for_plotting(revs, tmp_folder):
     :param tmp_folder: Temporary folder
     """
 
-    print("Trying to recreate plots for revisions {}".format(revs))
+    print(f"Trying to recreate plots for revisions {revs}")
 
     res = http_post("create_comparison", {"revision_list": revs})
     if not res:
@@ -90,10 +89,10 @@ def check_for_plotting(revs, tmp_folder):
         validationpath.get_html_plots_tag_comparison_json(tmp_folder, revs)
 
     if not os.path.exists(comp_folder):
-        print("Comparison folder {} does not exist".format(comp_folder))
+        print(f"Comparison folder {comp_folder} does not exist")
         return False
     if not os.path.isfile(comp_json):
-        print("Comparison json {} does not exist".format(comp_json))
+        print(f"Comparison json {comp_json} does not exist")
         return False
 
     # just check for one random plot
@@ -103,7 +102,7 @@ def check_for_plotting(revs, tmp_folder):
         "validationTestPlotsB_gaus_histogram.pdf"
     )
     if not os.path.isfile(some_plot):
-        print("Comparison plot {} does not exist".format(some_plot))
+        print(f"Comparison plot {some_plot} does not exist")
         return False
 
     print("Comparison properly created")
@@ -197,7 +196,7 @@ def main():
         os.chdir(str(tmpdir))
 
         for r in revs_to_gen:
-            check_execute("validate_basf2 --test --tag {}".format(r))
+            check_execute(f"validate_basf2 --test --tag {r}")
 
         # make sure the webserver process is terminated in any case
         try:
@@ -218,7 +217,7 @@ def main():
             # webserver process properly
             e = sys.exc_info()[0]
             # print exception again
-            print("Error {}".format(e))
+            print(f"Error {e}")
             print(traceback.format_exc())
             success = False
         finally:

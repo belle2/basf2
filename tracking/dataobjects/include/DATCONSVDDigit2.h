@@ -11,6 +11,7 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
+#include <framework/dataobjects/DigitBase.h>
 
 #include <cstdint>
 #include <sstream>
@@ -20,16 +21,16 @@
 namespace Belle2 {
 
   /**
-  * The DATCONSVDDigit class.
+  * The DATCONSVDDigit2 class.
   *
   * This class is a simplified version of the SVDShaperDigit class.
   * It is used for the DATCON simulation, as DATCON has less information of the SVD hits
   * available compared to the usual SVDShaperDigits.
-  * The DATCONSVDDigit holds a set of 6 raw APV25 signal samples taken on a strip.
+  * The DATCONSVDDigit2 holds a set of 6 raw APV25 signal samples taken on a strip.
   */
 
-//     class DATCONSVDDigit : public DigitBase {
-  class DATCONSVDDigit : public RelationsObject {
+  class DATCONSVDDigit2 : public DigitBase {
+//   class DATCONSVDDigit2 : public RelationsObject {
 
   public:
 
@@ -53,8 +54,8 @@ namespace Belle2 {
     * @param samples std::array of 6 APV raw samples.
     */
     template<typename T>
-    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples]):
+    DATCONSVDDigit2(VxdID sensorID, bool isU, short cellID,
+                    T samples[c_nAPVSamples]):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
@@ -69,7 +70,7 @@ namespace Belle2 {
     * @param samples std::array of 6 APV raw samples.
     */
     template<typename T>
-    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples) :
+    DATCONSVDDigit2(VxdID sensorID, bool isU, short cellID, T samples) :
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
@@ -81,10 +82,42 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     // cppcheck does not recognize initialization through other constructor
     // cppcheck-suppress uninitMemberVar
-    DATCONSVDDigit() : DATCONSVDDigit(
+    DATCONSVDDigit2() : DATCONSVDDigit2(
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )
     {}
+
+    /**
+    * Implementation of base class function.
+    * Enables BG overlay module to identify uniquely the physical channel of this
+    * Digit.
+    * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
+    * strip number (18-28)
+    */
+    unsigned int getUniqueChannelID() const override
+    { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
+
+    /**
+    * Implementation of base class function.
+    * Addition is always possible, so we always return successful merge.
+    * Pile-up method.
+    * @param bg beam background digit
+    * @return append status
+    */
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
+    {
+      // Don't modify and don't append when bg points nowhere.
+      if (!bg) return DigitBase::c_DontAppend;
+//       const auto& bgSamples = dynamic_cast<const DATCONSVDDigit2*>(bg)->getFloatSamples();
+//       // Add background samples to the digit's and trim back to range
+//       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
+//                      m_samples.begin(),
+//                      [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+//       { return trimToSampleRange(x + y); }
+//                     );
+//       // FIXME: Reset FADC time flag in mode byte.
+      return DigitBase::c_DontAppend;
+    }
 
     /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }
@@ -161,14 +194,14 @@ namespace Belle2 {
     * @param x value to be converted
     * @return  APVRawSampleType representation of x
     */
-    template<typename T> static DATCONSVDDigit::APVRawSampleType trimToSampleRange(T x)
+    template<typename T> static DATCONSVDDigit2::APVRawSampleType trimToSampleRange(T x)
     {
       T trimmedX = std::min(
-                     static_cast<T>(std::numeric_limits<DATCONSVDDigit::APVRawSampleType>::max()),
+                     static_cast<T>(std::numeric_limits<DATCONSVDDigit2::APVRawSampleType>::max()),
                      std::max(
-                       static_cast<T>(std::numeric_limits<DATCONSVDDigit::APVRawSampleType>::lowest()),
+                       static_cast<T>(std::numeric_limits<DATCONSVDDigit2::APVRawSampleType>::lowest()),
                        x));
-      return static_cast<DATCONSVDDigit::APVRawSampleType>(trimmedX);
+      return static_cast<DATCONSVDDigit2::APVRawSampleType>(trimmedX);
     }
 
 
@@ -195,12 +228,12 @@ namespace Belle2 {
     bool m_isU;                       /**< True if U, false if V. */
     short m_cellID;                   /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;          /**< 6 APV signals from the strip. */
-    unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
+    unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit2 */
     unsigned short m_maxSampleCharge; /**< Charge of sample max */
     unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
 
-    ClassDef(DATCONSVDDigit, 1)
+    ClassDefOverride(DATCONSVDDigit2, 2);
 
-  }; // class DATCONSVDDigit
+  }; // class DATCONSVDDigit2
 
 } // end namespace Belle2

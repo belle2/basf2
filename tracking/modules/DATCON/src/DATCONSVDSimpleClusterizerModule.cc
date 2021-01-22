@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa                                          *
+ * Contributors: Giulia Casarosa, Christian Wessel                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,14 +42,25 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
            "MCParticles collection name", string(""));
 
   // 2. Clustering
+  addParam("useNoiseFilter", m_useNoiseFilter,
+           "Use a simple noise fiter", bool(true));
   addParam("NoiseLevelADU", m_NoiseLevelInADU,
            "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(5));
   addParam("NoiseCutADU", m_NoiseCutInADU,
            "Simple assumption of the noise level of the sensors in ADU's", (unsigned short)(5));
   addParam("useSimpleClustering", m_useSimpleClustering,
            "Use the simple clustering that is currently done on FPGA for phase 2", bool(true));
-  addParam("maxClusterSize", m_maxClusterSize,
-           "Maximum cluster size in count of strips.", (unsigned short)(6));
+  addParam("maxClusterSizeU", m_maxClusterSizeU,
+           "Maximum cluster size in count of u-strips.", (unsigned short)(8));
+  addParam("maxClusterSizeV", m_maxClusterSizeV,
+           "Maximum cluster size in count of v-strips.", (unsigned short)(8));
+  addParam("noiseCutU", m_noiseCutU, "Save noise value for a u-strip in svdNoiseMap if it exceeds m_noiseU.", float(4.0));
+  addParam("noiseCutV", m_noiseCutV, "Save noise value for a v-strip in svdNoiseMap if it exceeds m_noiseV.", float(3.0));
+  addParam("requiredSNRstripU", m_requiredSNRstripU, "Required SNR for a u-strip signal.", float(3.0));
+  addParam("requiredSNRstripV", m_requiredSNRstripV, "Required SNR for a v-strip signal.", float(3.0));
+  addParam("requiredSNRclusterU", m_requiredSNRclusterU, "Required SNR for minimum one u-strip in cluster.", float(5.0));
+  addParam("requiredSNRclusterV", m_requiredSNRclusterV, "Required SNR for minimum one v-strip in cluster.", float(5.0));
+  addParam("writeNoiseMapsToFile", m_writeNoiseMapsToFile, "Write the simple SVD noise maps to files?", bool(false));
 
 }
 
@@ -79,6 +90,13 @@ void DATCONSVDSimpleClusterizerModule::initialize()
 
 }
 
+void DATCONSVDSimpleClusterizerModule::beginRun()
+{
+  svdNoiseMapU.clear();
+  svdNoiseMapV.clear();
+  fillDATCONSVDNoiseMap();
+}
+
 
 
 void DATCONSVDSimpleClusterizerModule::event()
@@ -90,20 +108,24 @@ void DATCONSVDSimpleClusterizerModule::event()
   storeDATCONSVDCluster.clear();
   clusterCandidates.clear();
 
+
   //create a dummy cluster just to start
-  DATCONSVDSimpleClusterCandidate clusterCandidate(storeDATCONSVDDigits[0]->getSensorID(), storeDATCONSVDDigits[0]->isUStrip(),
-                                                   m_maxClusterSize);
+  bool uStripFirstDigit = storeDATCONSVDDigits[0]->isUStrip();
+  unsigned short maxClusterSize = uStripFirstDigit ? m_maxClusterSizeU : m_maxClusterSizeV;
+  float requiredSNRcluster      = uStripFirstDigit ? m_requiredSNRclusterU : m_requiredSNRclusterV;
+  DATCONSVDSimpleClusterCandidate clusterCandidate(storeDATCONSVDDigits[0]->getSensorID(), uStripFirstDigit,
+                                                   maxClusterSize, requiredSNRcluster);
 
   unsigned short digitindex = 0;
 
   //loop over the DATCONSVDDigits
   for (auto& datconsvddigit : storeDATCONSVDDigits) {
 
-    if (!noiseFilter(datconsvddigit)) {
+    float stripSNR = calculateSNR(datconsvddigit);
+    if (stripSNR < (datconsvddigit.isUStrip() ? m_requiredSNRstripU : m_requiredSNRstripV)) {
       digitindex++;
       continue;
     }
-
 
     //retrieve the VxdID, sensor and cellID of the current DATCONSVDDigit
     VxdID thisSensorID = datconsvddigit.getSensorID();
@@ -112,7 +134,7 @@ void DATCONSVDSimpleClusterizerModule::event()
     unsigned short thisCharge = datconsvddigit.getMaxSampleCharge();
 
     //try to add the strip to the existing cluster
-    if (! clusterCandidate.add(thisSensorID, thisSide, digitindex, thisCharge, thisCellID)) {
+    if (! clusterCandidate.add(thisSensorID, thisSide, digitindex, thisCharge, thisCellID, stripSNR)) {
       //if the strip is not added, write the cluster, if present and good:
       if (clusterCandidate.size() > 0) {
         if (m_useSimpleClustering) {
@@ -126,10 +148,12 @@ void DATCONSVDSimpleClusterizerModule::event()
       }
 
       //prepare for the next cluster:
-      clusterCandidate = DATCONSVDSimpleClusterCandidate(thisSensorID, thisSide, m_maxClusterSize);
+      maxClusterSize      = thisSide ? m_maxClusterSizeU : m_maxClusterSizeV;
+      requiredSNRcluster  = thisSide ? m_requiredSNRclusterU : m_requiredSNRclusterV;
+      clusterCandidate = DATCONSVDSimpleClusterCandidate(thisSensorID, thisSide, maxClusterSize, requiredSNRcluster);
 
       //start another cluster:
-      if (! clusterCandidate.add(thisSensorID, thisSide, digitindex, thisCharge, thisCellID))
+      if (! clusterCandidate.add(thisSensorID, thisSide, digitindex, thisCharge, thisCellID, stripSNR))
         B2WARNING("this state is forbidden!!");
     }
     digitindex++;
@@ -192,7 +216,7 @@ void DATCONSVDSimpleClusterizerModule::saveClusters()
 
     for (auto digitindexit = indices.begin(); digitindexit != indices.end(); digitindexit++) {
 
-      DATCONSVDDigit* datconsvddigit = storeDATCONSVDDigits[*digitindexit];
+      DATCONSVDDigit2* datconsvddigit = storeDATCONSVDDigits[*digitindexit];
       RelationVector<MCParticle> relatedMC = datconsvddigit->getRelationsTo<MCParticle>();
       RelationVector<SVDTrueHit> relatedSVDTrue = datconsvddigit->getRelationsTo<SVDTrueHit>();
 
@@ -214,32 +238,128 @@ void DATCONSVDSimpleClusterizerModule::saveClusters()
   }
 }
 
-/*
-* Simple noise filter.
-* Run the noise filter over the given numbers of samples.
-* If it fulfills the requirements true is returned.
-* TODO: Improve!!!
-*/
-bool DATCONSVDSimpleClusterizerModule::noiseFilter(DATCONSVDDigit datconsvddigit)
+// /*
+// * Simple noise filter.
+// * Run the noise filter over the given numbers of samples.
+// * If it fulfills the requirements true is returned.
+// */
+float DATCONSVDSimpleClusterizerModule::calculateSNR(DATCONSVDDigit2 datconsvddigit)
 {
-  bool passNoiseFilter = false;  /**< initialize the passNoiseFilter with false as default */
   unsigned short maxSampleIndex = datconsvddigit.getMaxSampleIndex();
-  DATCONSVDDigit::APVRawSamples sample = datconsvddigit.getRawSamples();
-//   unsigned short noiseCut = sample[maxSampleIndex] / 2;  // the initial idea was to declare a strip signal as noise if the samples neighbouring the maximum samle (i.e. maxSampleIndex-1 and maxSampleIndex+1) had a charge (in ADU) of less then getMaxSampleCharge / 2
-  unsigned short noiseCut = m_NoiseCutInADU; //sample[maxSampleIndex] / 8;
+  DATCONSVDDigit2::APVRawSamples sample = datconsvddigit.getRawSamples();
+  unsigned short stripID = datconsvddigit.getCellID();
+  bool side = datconsvddigit.isUStrip();
+  VxdID sensorID = datconsvddigit.getSensorID();
+  int simpleVXDID = 131072 * (sensorID.getLayerNumber() - 3) + 8192 * (sensorID.getLadderNumber() - 1)
+                    + 1024 * (sensorID.getSensorNumber() - 1) + stripID;
 
-  if (sample[maxSampleIndex] <= m_NoiseLevelInADU /*|| noiseCut < m_NoiseLevelInADU*/) {
-    return false;
+  float stripNoise = side ? m_noiseCutU : m_noiseCutV;
+  if (side == true && svdNoiseMapU.find(simpleVXDID) != svdNoiseMapU.end()) {
+    stripNoise = svdNoiseMapU.at(simpleVXDID);
+  } else if (side == false && svdNoiseMapV.find(simpleVXDID) != svdNoiseMapV.end()) {
+    stripNoise = svdNoiseMapV.at(simpleVXDID);
   }
 
-  /* The maximum sample is expected to be 2nd or 3rd, so maybe change the conditions
-   * in the if-clause accordingly to maxSampleIndex > 1 && maxSampleIndex < 4
-   */
-  if (maxSampleIndex > 0 && maxSampleIndex < (sample.size() - 1)) {
-    if (sample[maxSampleIndex - 1] >= noiseCut && sample[maxSampleIndex + 1] >= noiseCut) {
-      passNoiseFilter = true;
-    }
-  }
+  float currentSNR = (float)sample[maxSampleIndex] / stripNoise;
 
-  return passNoiseFilter;
+  return currentSNR;
+
 }
+
+
+void DATCONSVDSimpleClusterizerModule::fillDATCONSVDNoiseMap()
+{
+  //call for a geometry instance
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
+  std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
+
+  std::ofstream noiseMapU;
+  std::ofstream noiseMapV;
+  if (m_writeNoiseMapsToFile) {
+    noiseMapU.open("svdNoiseMapU.txt", std::ios::trunc);
+    noiseMapV.open("svdNoiseMapV.txt", std::ios::trunc);
+  }
+
+  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
+
+    std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
+    std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
+
+    while (itSvdLadders != svdLadders.end()) { //loop on Ladders
+
+      std::set<Belle2::VxdID> svdSensors = aGeometry.getSensors(*itSvdLadders);
+      std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
+      B2DEBUG(1, "    svd sensor info " << * (svdSensors.begin()));
+
+      while (itSvdSensors != svdSensors.end()) { //loop on sensors
+        B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
+
+        int layer = itSvdSensors->getLayerNumber();
+        int ladder =  itSvdSensors->getLadderNumber();
+        int sensor = itSvdSensors->getSensorNumber();
+        Belle2::VxdID theVxdID(layer, ladder, sensor);
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+
+        int simpleVXDID = 131072 * (layer - 3) + 8192 * (ladder - 1) + 1024 * (sensor - 1);
+
+        for (int side = 0; side < 2; side++) {
+
+          int Ncells = currentSensorInfo->getUCells();
+          if (side == 0)
+            Ncells = currentSensorInfo->getVCells();
+
+          for (int strip = 0; strip < Ncells; strip++) {
+
+//             m_mask = -1;
+//             if (m_MaskedStr.isValid())
+//               m_mask = m_MaskedStr.isMasked(theVxdID, side, strip);
+
+            float noise = -1;
+//             m_noiseEl = -1;
+            if (m_NoiseCal.isValid()) {
+              noise = m_NoiseCal.getNoise(theVxdID, side, strip);
+//               m_noiseEl = m_NoiseCal.getNoiseInElectrons(theVxdID, side, strip);
+            }
+
+            if (side == 0 && noise > m_noiseCutV) {
+              svdNoiseMapV.insert(std::make_pair(simpleVXDID + strip, noise));
+              if (m_writeNoiseMapsToFile) {
+//                 noiseMapV << layer << " " << ladder << " " << sensor << " " << strip << " " << noise << endl;
+                noiseMapV << 4096 * (layer - 3) + 16 * (ladder - 1) + (sensor - 1) << " " << strip << " " << noise << endl;
+              }
+            } else if (side == 1 && noise > m_noiseCutU) {
+              svdNoiseMapU.insert(std::make_pair(simpleVXDID + strip, noise));
+              if (m_writeNoiseMapsToFile) {
+//                 noiseMapU << layer << " " << ladder << " " << sensor << " " << strip << " " << noise << endl;
+                noiseMapU << 4096 * (layer - 3) + 16 * (ladder - 1) + (sensor - 1) << " " << strip << " " << noise << endl;
+              }
+            }
+
+//             m_pedestal = -1;
+//             if (m_PedestalCal.isValid())
+//               m_pedestal = m_PedestalCal.getPedestal(theVxdID, side, strip);
+//
+//             m_gain = -1;
+//             if (m_PulseShapeCal.isValid()) {
+//               m_gain = m_PulseShapeCal.getChargeFromADC(theVxdID, side, strip, 1/*ADC*/);
+//               m_calPeakADC = 22500. / m_PulseShapeCal.getChargeFromADC(theVxdID, side, strip, 1/*ADC*/);
+//               m_calPeakTime = m_PulseShapeCal.getPeakTime(theVxdID, side, strip);
+//               m_pulseWidth = m_PulseShapeCal.getWidth(theVxdID, side, strip);
+//             }
+          }
+        }
+        ++itSvdSensors;
+      }
+      ++itSvdLadders;
+    }
+    ++itSvdLayers;
+  }
+
+  if (m_writeNoiseMapsToFile) {
+    noiseMapU.close();
+    noiseMapV.close();
+  }
+
+}
+

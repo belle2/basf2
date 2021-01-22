@@ -18,7 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
+#include <tracking/dataobjects/DATCONSVDDigit2.h>
 
 
 namespace Belle2 {
@@ -55,7 +55,7 @@ namespace Belle2 {
   private:
 
     StoreArray<SVDShaperDigit> storeSVDShaperDigits;    /**< SVDShaperDigits StoreArray */
-    StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;    /**< DATCONSVDDigits StoreArray */
+    StoreArray<DATCONSVDDigit2> storeDATCONSVDDigits;    /**< DATCONSVDDigits StoreArray */
     StoreArray<SVDTrueHit> storeTrueHits;               /**< SVDTrueHits StoreArray */
     StoreArray<MCParticle> storeMCParticles;            /**< MCParticles StoreArray */
 

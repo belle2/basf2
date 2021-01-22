@@ -25,11 +25,9 @@ namespace Belle2 {
     /** Constructor to create an empty Cluster */
     DATCONSVDSimpleClusterCandidate();
 
-    /** Constructor indicating vxdid and u-side information */
-    DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside);
-
-    /** Constructor indicating vxdid, u-side information in case of a maximum cluster size */
-    DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside, unsigned short maxClusterSize);
+    /** Constructor indicating vxdid, u-side information, a maximum cluster size, and a required SNR for the cluster */
+    DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside, unsigned short maxClusterSize = 8, float reqSNR = 4.0) : m_vxdID(vxdID),
+      m_isUside(isUside) , m_maxClusterSize(maxClusterSize), requiredSNR(reqSNR) {};
 
     /**
      * Add a Strip to the current cluster.
@@ -39,9 +37,10 @@ namespace Belle2 {
      * @param index: Index of the strip inside the DATCONSVDDigit StoreArray
      * @param charge: Charge of the strip that is to be added
      * @param cellID: CellID of the strip that is to be added
+     * @param stripSNR: SNR of the strip that is to be added
      * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
      */
-    bool add(VxdID vxdID, bool isUside, unsigned short index, unsigned short charge, unsigned short cellID);
+    bool add(VxdID vxdID, bool isUside, unsigned short index, unsigned short charge, unsigned short cellID, float stripSNR);
 
     /**
      * compute the position of the cluster
@@ -56,7 +55,15 @@ namespace Belle2 {
     /**
      * return true if the cluster candidate can be promoted to cluster
      */
-    bool isGoodCluster();
+    inline bool isGoodCluster()
+    {
+      bool isGood = false;
+
+      if ((m_size <= 3 && maxSNRinClusterCandidate >= 5) || (m_size > 3 && maxSNRinClusterCandidate >= requiredSNR))
+        isGood = true;
+
+      return isGood;
+    };
 
     /**
      * return the VxdID of the cluster sensor
@@ -79,6 +86,11 @@ namespace Belle2 {
      * I.e. charge of the central strip in case of simple cluster.
      */
     unsigned short getSeedCharge() const { return m_seedCharge; }
+
+    /**
+     * Return the maximum SNR of this cluster candidate.
+     */
+    float getMaxSNR() const { return maxSNRinClusterCandidate; }
 
     /**
      * return the position of the cluster
@@ -139,6 +151,12 @@ namespace Belle2 {
 
     /** Vector of the indices in the DATCONSVDDigit StoreArray of the added strips */
     std::vector<unsigned short> m_digitIndices;
+
+    /** Required SNR for at least one strip in the candidate to make this cluster candidate a good one */
+    float requiredSNR;
+
+    /** Maximum SNR of all the strips in the cluster candidate */
+    float maxSNRinClusterCandidate;
 
   }; // end class definition
 

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/DigitBase.h>
 
 #include <cstdint>
 #include <sstream>
@@ -198,8 +197,6 @@ namespace Belle2 {
     unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
     unsigned short m_maxSampleCharge; /**< Charge of sample max */
     unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
-
-//     ClassDefOverride(DATCONSVDDigit, 1);
 
   }; // class DATCONSVDDigit
 

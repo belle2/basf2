@@ -15,7 +15,7 @@
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer2.h>
-#include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2DFPGA.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
 
@@ -75,9 +75,9 @@ namespace Belle2 {
     DATCONSVDClusterLoaderAndPreparer2 m_clusterLoaderAndPreparer2;
 
     /// Hough Space intercept finding for u-side
-    FastInterceptFinder2D m_uInterceptFinder;
+    FastInterceptFinder2DFPGA m_uInterceptFinder;
     /// Hough Space intercept finding for v-side
-    FastInterceptFinder2D m_vInterceptFinder;
+    FastInterceptFinder2DFPGA m_vInterceptFinder;
 
     /// Extrapolate found tracks to PXD sensors
     ToPXDExtrapolator m_toPXDExtrapolator;

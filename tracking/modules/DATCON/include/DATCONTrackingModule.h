@@ -15,7 +15,7 @@
 #include <tracking/modules/DATCON/DATCONHoughSpaceClusterCand.h>
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
 #include <tracking/dataobjects/DATCONTrack.h>
-#include <tracking/dataobjects/DATCONSVDDigit.h>
+#include <tracking/dataobjects/DATCONSVDDigit2.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -180,7 +180,7 @@ namespace Belle2 {
     StoreArray<SpacePoint> storeSVDSpacePoints;
 
     /** DATCONSVDDigit StoreArray */
-    StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
+    StoreArray<DATCONSVDDigit2> storeDATCONSVDDigits;
     /** DATCONSVDCluster StoreArray */
     StoreArray<SVDCluster> storeDATCONSVDCluster;
     /** DATCONSVDSpacePoint StoreArray */

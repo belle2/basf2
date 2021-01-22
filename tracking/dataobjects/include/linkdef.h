@@ -32,7 +32,7 @@
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
 #pragma link C++ class Belle2::hitXP+; // checksum=0xdd9d6ff4, version=1
 #pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xfa2e4b3c, version=1
-#pragma link C++ class Belle2::DATCONSVDDigit+; // checksum=0x45b64e93, version=1
+#pragma link C++ class Belle2::DATCONSVDDigit2+; // checksum=0x478a0a2b, version=2
 #pragma link C++ class Belle2::DATCONSVDSpacePoint+; // checksum=0xb78110ca, version=1
 #pragma link C++ class Belle2::DATCONMostProbableHit+; // checksum=0x75b048b2, version=2
 #pragma link C++ class Belle2::DATCONTrack+; // checksum=0xa157a1e1, version=1

@@ -70,12 +70,12 @@ void SVDShaperDigitToDATCONSVDDigitConverterModule::event()
     VxdID sensorid = shaperdigit.getSensorID();
     bool isu = shaperdigit.isUStrip();
     short cellid = shaperdigit.getCellID();
-    DATCONSVDDigit::APVFloatSamples rawsamples = shaperdigit.getSamples();
+    DATCONSVDDigit2::APVFloatSamples rawsamples = shaperdigit.getSamples();
 
-    DATCONSVDDigit newDATCONSVDDigit(sensorid, isu, cellid, rawsamples);
-    DATCONSVDDigit* datcondigit = storeDATCONSVDDigits.appendNew(newDATCONSVDDigit);
+    DATCONSVDDigit2 newDATCONSVDDigit(sensorid, isu, cellid, rawsamples);
+    DATCONSVDDigit2* datcondigit = storeDATCONSVDDigits.appendNew(newDATCONSVDDigit);
 
-    // Register relation to the SVDShaperDigit the DATCONSVDDigit is derived from
+    // Register relation to the SVDShaperDigit the DATCONSVDDigit2 is derived from
     datcondigit->addRelationTo(&shaperdigit);
 
     // Register relations to the according MCParticle and SVDTrueHit

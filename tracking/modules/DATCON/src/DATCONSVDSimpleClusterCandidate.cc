@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Christian Wessel                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,17 +16,8 @@ using namespace std;
 
 namespace Belle2 {
 
-  DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside)
-    : m_vxdID(vxdID)
-    , m_isUside(isUside) { m_maxClusterSize = 0; };
-
-  DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside, unsigned short maxClusterSize)
-    : m_vxdID(vxdID)
-    , m_isUside(isUside)
-    , m_maxClusterSize(maxClusterSize) {};
-
   bool DATCONSVDSimpleClusterCandidate::add(VxdID vxdID, bool isUside, unsigned short index, unsigned short charge,
-                                            unsigned short cellID)
+                                            unsigned short cellID, float stripSNR)
   {
 
     bool added = false;
@@ -57,6 +48,9 @@ namespace Belle2 {
       if (charge > m_seedCharge) {
         m_seedCharge = charge;
 //         m_seedIndex = m_strips.size() - 1;
+      }
+      if (stripSNR > maxSNRinClusterCandidate) {
+        maxSNRinClusterCandidate = stripSNR;
       }
     }
     return added;
@@ -93,18 +87,6 @@ namespace Belle2 {
     m_seedStripIndex = seedStripIndex;
     m_seedCharge = m_charges.at(m_seedStripIndex - 1);
     m_position = clusterPosition;
-  };
-
-
-  bool DATCONSVDSimpleClusterCandidate::isGoodCluster()
-  {
-
-    bool isGood = false;
-
-    if (m_seedCharge > 0)
-      isGood = true;
-
-    return isGood;
   };
 
 } //Belle2 namespace

@@ -18,6 +18,7 @@
 #include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2DFPGA.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
+#include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 
@@ -27,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
+// #include <tracking/dataobjects/DATCONSVDDigit.h>
 
 namespace Belle2 {
   class ModuleParamList;

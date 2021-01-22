@@ -52,21 +52,8 @@ namespace Belle2 {
     // Parameters
     /// SVDShaperDigits StoreArray name
     std::string m_param_storeSVDShaperDigitsName = "SVDShaperDigits";
-    /// DATCONSVDDigits StoreArray name
-    std::string m_param_storeDATCONSVDDigitsName = "DATCONSVDDigits";
-    /// SVDTrueHits StoreArray name
-    std::string m_param_storeTrueHitsName = "SVDTrueHits";
-    /// MCParticles StoreArray name
-    std::string m_param_storeMCParticlesName = "MCParticles";
-
-    /// save relations to SVDTrueHits and MCParticles
-    bool m_param_saveStoreArrays = false;
 
 
     StoreArray<SVDShaperDigit> m_storeSVDShaperDigits;    /**< SVDShaperDigits StoreArray */
-    StoreArray<DATCONSVDDigit> m_storeDATCONSVDDigits;    /**< DATCONSVDDigits StoreArray */
-    StoreArray<SVDTrueHit> m_storeTrueHits;               /**< SVDTrueHits StoreArray */
-    StoreArray<MCParticle> m_storeMCParticles;            /**< MCParticles StoreArray */
-
   };
 }

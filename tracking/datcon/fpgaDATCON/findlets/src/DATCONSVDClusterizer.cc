@@ -14,7 +14,9 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
+#include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
+
+// #include <tracking/dataobjects/DATCONSVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>

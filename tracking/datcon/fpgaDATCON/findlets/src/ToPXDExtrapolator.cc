@@ -112,7 +112,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         if (m_param_storePXDIntercepts) {
           PXDIntercept intercept;
           intercept.setCoorU((double)localUPosition * Unit::nm);  // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<long>::max());
+          intercept.setCoorV(-std::numeric_limits<double>::max());
           intercept.setVxdID(sensorID);
           m_pxdIntercepts.appendNew(intercept);
         }
@@ -123,7 +123,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         if (m_param_storePXDIntercepts) {
           PXDIntercept intercept;
           intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<long>::max());
+          intercept.setCoorV(-std::numeric_limits<double>::max());
           intercept.setVxdID(sensorID);
           m_pxdIntercepts.appendNew(intercept);
         }
@@ -168,7 +168,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         if (m_param_storePXDIntercepts) {
           PXDIntercept intercept;
           intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<long>::max());
+          intercept.setCoorV(-std::numeric_limits<double>::max());
           intercept.setVxdID(sensorID);
           m_pxdIntercepts.appendNew(intercept);
         }
@@ -179,7 +179,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         if (m_param_storePXDIntercepts) {
           PXDIntercept intercept;
           intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<long>::max());
+          intercept.setCoorV(-std::numeric_limits<double>::max());
           intercept.setVxdID(sensorID);
           m_pxdIntercepts.appendNew(intercept);
         }
@@ -208,7 +208,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
           vExtrapolations.emplace_back(sensorID, localVPosition);
           if (m_param_storePXDIntercepts) {
             PXDIntercept intercept;
-            intercept.setCoorU(-std::numeric_limits<long>::max());
+            intercept.setCoorU(-std::numeric_limits<double>::max());
             intercept.setCoorV((double)localVPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
             intercept.setVxdID(sensorID);
             m_pxdIntercepts.appendNew(intercept);
@@ -234,7 +234,7 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
           vExtrapolations.emplace_back(sensorID, localVPosition);
           if (m_param_storePXDIntercepts) {
             PXDIntercept intercept;
-            intercept.setCoorU(-std::numeric_limits<long>::max());
+            intercept.setCoorU(-std::numeric_limits<double>::max());
             intercept.setCoorV((double)localVPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
             intercept.setVxdID(sensorID);
             m_pxdIntercepts.appendNew(intercept);

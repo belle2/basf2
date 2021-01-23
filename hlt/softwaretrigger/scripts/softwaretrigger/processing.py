@@ -54,7 +54,6 @@ def setup_basf2_and_db(zmq=False):
     args = parser.parse_args()
 
     # Local DB specification
-    basf2.reset_database()
     basf2.conditions.override_globaltags()
     if args.central_db_tag:
         for central_tag in args.central_db_tag:

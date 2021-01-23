@@ -144,9 +144,7 @@ else:
     print('   Write at most', maxDisplays, 'event displays, requiring # RPC hits per sector >=', minRPCHits,
           '  # Muids in event >=', minMuidHits)
 
-basf2.reset_database()
-basf2.use_database_chain()
-basf2.use_central_database(tagName)
+basf2.conditions.prepend_globaltag(tagName)
 
 main = basf2.create_path()
 main.add_module('RootInput', inputFileName=inputName)

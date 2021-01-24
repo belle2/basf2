@@ -23,3 +23,4 @@ if __name__ == "__main__":
     check_file("mdst12.root")
     check_file("mdst13.root")
     # TODO: update this to check a data event when a suitable file is added
+    b2.B2INFO("Ciao")

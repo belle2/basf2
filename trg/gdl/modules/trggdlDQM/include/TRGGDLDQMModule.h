@@ -138,6 +138,9 @@ namespace Belle2 {
     void genVcd(void);
     bool anaBitCondition(void);
     bool isFired(std::string bitname);
+    bool isFired_quick(const std::string& bitname, const bool& isPsnm);
+    int getinbitnum(const char* c) const;
+    int getoutbitnum(const char* c) const;
     unsigned n_clocks = 0;
     unsigned evtno = 0;
     unsigned _exp = 0;

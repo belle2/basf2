@@ -901,6 +901,50 @@ void TRGGDLDQMModule::genVcd(void)
 }
 
 bool
+TRGGDLDQMModule::isFired_quick(const std::string& bitname, const bool& isPsnm = 0)
+{
+  int bn = getoutbitnum(bitname.c_str());
+  for (unsigned clk = 0; clk < n_clocks; clk++) {
+    if (bn > -1) {
+      if (isPsnm) {
+        if (h_p_vec[clk][bn] > 0)
+          return true;
+      } else {
+        if (h_f_vec[clk][bn] > 0)
+          return true;
+      }
+    }
+  }
+  bn = getinbitnum(bitname.c_str());
+  for (unsigned clk = 0; clk < n_clocks; clk++) {
+    if (bn > -1) {
+      if (h_i_vec[clk][bn] > 0)
+        return true;
+    }
+  }
+  return false;
+}
+
+int
+TRGGDLDQMModule::getinbitnum(const char* c) const
+{
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(c, inbitname[i]) == 0)return i;
+  }
+  return -1;
+}
+
+int
+TRGGDLDQMModule::getoutbitnum(const char* c) const
+{
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(c, outbitname[i]) == 0)return i;
+  }
+  return -1;
+}
+
+
+bool
 TRGGDLDQMModule::isFired(std::string bitname)
 {
   bool isPsnm = false;
@@ -1031,16 +1075,21 @@ void
 TRGGDLDQMModule::fillOutputOverlap(void)
 {
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-    bool cdc_fired = isFired("FFF") || isFired("FFO") || isFired("FFB") ||  isFired("FFY") ||  isFired("FYO") ||  isFired("FYB");
-    bool c4_fired = isFired("C4");
-    bool hie_fired = isFired("HIE");
-    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
-                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10")  || isFired("LML11")
-                      || isFired("LML12") || isFired("LML13") || isFired("ECLMUMU"));
-    bool klm_fired = isFired("MU_B2B") || isFired("MU_EB2B") || isFired("BEKLM") || isFired("CDCKLM1") || isFired("CDCKLM2");
-    bool short_fired = isFired("FSO") || isFired("FSB") || isFired("YSO") ||  isFired("YSB");
-    bool ff30_fired = isFired("FF30") || isFired("FY30");
-    bool bha3d_fired = isFired("BHA3D");
+    bool cdc_fired = isFired_quick("fff", true) || isFired_quick("ffo", true) || isFired_quick("ffb", true)
+                     ||  isFired_quick("ffy", true) ||  isFired_quick("fyo", true) ||  isFired_quick("fyb", true);
+    bool c4_fired = isFired_quick("c4", true);
+    bool hie_fired = isFired_quick("hie", true);
+    bool lml_fired = (isFired_quick("lml0", true) || isFired_quick("lml1", true) || isFired_quick("lml2", true)
+                      || isFired_quick("lml3", true) || isFired_quick("lml4", true) || isFired_quick("lml5", true)
+                      || isFired_quick("lml6", true) || isFired_quick("lml7", true) || isFired_quick("lml8", true) || isFired_quick("lml9", true)
+                      || isFired_quick("lml10", true)  || isFired_quick("lml11", true)
+                      || isFired_quick("lml12", true) || isFired_quick("lml13", true) || isFired_quick("eclmumu", true));
+    bool klm_fired = isFired_quick("mu_b2b", true) || isFired_quick("mu_eb2b", true) || isFired_quick("beklm", true)
+                     || isFired_quick("cdcklm1", true) || isFired_quick("cdcklm2", true);
+    bool short_fired = isFired_quick("fso", true) || isFired_quick("fsb", true) || isFired_quick("yso", true)
+                       ||  isFired_quick("ysb", true);
+    bool ff30_fired = isFired_quick("ff30", true) || isFired_quick("fy30", true);
+    bool bha3d_fired = isFired_quick("bha3d", true);
 
     if (1) {
       h_psn_overlap[skim[ifill]]->Fill(0.5);
@@ -1100,44 +1149,47 @@ void
 TRGGDLDQMModule::fillOutputExtra(void)
 {
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-    bool c4_fired = isFired("C4");
-    bool hie_fired = isFired("HIE");
-    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
-                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10") || isFired("ECLMUMU"));
-    bool fff_fired = isFired("FFF");
-    bool ff_fired  = isFired("ff");
-    bool f_fired   = isFired("f");
-    bool ffo_fired = isFired("FFO");
-    bool ffb_fired = isFired("FFB");
-    bool ffy_fired = isFired("ffy");
-    bool fyo_fired = isFired("fyo");
-    bool fyb_fired = isFired("fyb");
-    bool bha2D_fired = isFired("bhabha");
-    bool bha3D_fired = isFired("bha3d");
-    bool lml0_fired  = isFired("LML0");
-    bool lml1_fired  = isFired("LML1");
-    bool lml2_fired  = isFired("LML2");
-    bool lml3_fired  = isFired("LML3");
-    bool lml4_fired  = isFired("LML4");
-    bool lml5_fired  = isFired("LML5");
-    bool lml6_fired  = isFired("LML6");
-    bool lml7_fired  = isFired("LML7");
-    bool lml8_fired  = isFired("LML8");
-    bool lml9_fired  = isFired("LML9");
-    bool lml10_fired = isFired("LML10");
-    bool lml12_fired = isFired("LML12");
-    bool lml13_fired = isFired("LML13");
-    bool eclmumu_fired = isFired("ECLMUMU");
-    bool mu_b2b_fired = isFired("mu_b2b");
-    bool mu_eb2b_fired = isFired("mu_eb2b");
-    bool cdcklm1_fired = isFired("cdcklm1");
-    bool cdcklm2_fired = isFired("cdcklm2");
-    bool klm_hit_fired = isFired("klm_hit");
-    bool eklm_hit_fired = isFired("eklm_hit");
-    bool cdcecl1_fired = isFired("cdcecl1");
-    bool cdcecl2_fired = isFired("cdcecl2");
-    bool cdcecl3_fired = isFired("cdcecl3");
-    bool cdcecl4_fired = isFired("cdcecl4");
+
+    bool c4_fired = isFired_quick("c4", true);
+    bool hie_fired = isFired_quick("hie", true);
+    bool lml_fired = (isFired_quick("lml0", true) || isFired_quick("lml1", true) || isFired_quick("lml2", true)
+                      || isFired_quick("lml3", true) || isFired_quick("lml4", true) || isFired_quick("lml5", true)
+                      || isFired_quick("lml6", true) || isFired_quick("lml7", true) || isFired_quick("lml8", true) || isFired_quick("lml9", true)
+                      || isFired_quick("lml10", true) || isFired_quick("eclmumu", true));
+    bool fff_fired = isFired_quick("fff", true);
+    bool ff_fired  = isFired_quick("ff");
+    bool f_fired   = isFired_quick("f");
+    bool ffo_fired = isFired_quick("ffo", true);
+    bool ffb_fired = isFired_quick("ffb", true);
+    bool ffy_fired = isFired_quick("ffy", true);
+    bool fyo_fired = isFired_quick("fyo", true);
+    bool fyb_fired = isFired_quick("fyb", true);
+    bool bha2D_fired = isFired_quick("bhabha");
+    bool bha3D_fired = isFired_quick("bha3d");
+    bool lml0_fired  = isFired_quick("lml0");
+    bool lml1_fired  = isFired_quick("lml1");
+    bool lml2_fired  = isFired_quick("lml2");
+    bool lml3_fired  = isFired_quick("lml3");
+    bool lml4_fired  = isFired_quick("lml4");
+    bool lml5_fired  = isFired_quick("lml5");
+    bool lml6_fired  = isFired_quick("lml6");
+    bool lml7_fired  = isFired_quick("lml7");
+    bool lml8_fired  = isFired_quick("lml8");
+    bool lml9_fired  = isFired_quick("lml9");
+    bool lml10_fired = isFired_quick("lml10");
+    bool lml12_fired = isFired_quick("lml12");
+    bool lml13_fired = isFired_quick("lml13");
+    bool eclmumu_fired = isFired_quick("eclmumu");
+    bool mu_b2b_fired = isFired_quick("mu_b2b");
+    bool mu_eb2b_fired = isFired_quick("mu_eb2b");
+    bool cdcklm1_fired = isFired_quick("cdcklm1");
+    bool cdcklm2_fired = isFired_quick("cdcklm2");
+    bool klm_hit_fired = isFired_quick("klm_hit");
+    bool eklm_hit_fired = isFired_quick("eklm_hit");
+    bool cdcecl1_fired = isFired_quick("cdcecl1");
+    bool cdcecl2_fired = isFired_quick("cdcecl2");
+    bool cdcecl3_fired = isFired_quick("cdcecl3");
+    bool cdcecl4_fired = isFired_quick("cdcecl4");
     bool fso_fired = isFired("fso");
     bool fsb_fired = isFired("fsb");
     bool syo_fired = isFired("syo");
@@ -1624,10 +1676,10 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //fff: require the number of CDC full tracks is more than or equal to 3
   if (n_fulltrack > 2) {
-    bool fff_fired = isFired("fff");
-    bool ffy_fired = isFired("ffy");
-    bool c4_fired  = isFired("C4");
-    bool hie_fired = isFired("HIE");
+    bool fff_fired = isFired_quick("fff");
+    bool ffy_fired = isFired_quick("ffy");
+    bool c4_fired  = isFired_quick("c4");
+    bool hie_fired = isFired_quick("hie");
     if (c4_fired || hie_fired) {
       h_psn_pure_extra[0]->Fill(0.5);
     }
@@ -1640,10 +1692,10 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
   //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle > 90deg
   if (n_fulltrack > 1 && max_dphi > 3.14 / 2.) {
-    bool ffo_fired = isFired("ffo");
-    bool fyo_fired = isFired("fyo");
-    bool c4_fired  = isFired("C4");
-    bool hie_fired = isFired("HIE");
+    bool ffo_fired = isFired_quick("ffo");
+    bool fyo_fired = isFired_quick("fyo");
+    bool c4_fired  = isFired_quick("c4");
+    bool hie_fired = isFired_quick("hie");
     if (c4_fired || hie_fired) {
       h_psn_pure_extra[0]->Fill(3.5);
     }
@@ -1656,10 +1708,10 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
   //ffo: require the number of CDC full tracks is more than or equal to 2, opening angle >150deg
   if (n_fulltrack > 1 && max_dphi > 3.14 * 5 / 6.) {
-    bool ffb_fired = isFired("ffb");
-    bool fyb_fired = isFired("fyb");
-    bool c4_fired  = isFired("C4");
-    bool hie_fired = isFired("HIE");
+    bool ffb_fired = isFired_quick("ffb");
+    bool fyb_fired = isFired_quick("fyb");
+    bool c4_fired  = isFired_quick("c4");
+    bool hie_fired = isFired_quick("hie");
     if (c4_fired || hie_fired) {
       h_psn_pure_extra[0]->Fill(6.5);
     }
@@ -1673,10 +1725,10 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //hie: require the total energy of ECL cluster is more than 1GeV
   if (total_energy > 1) {
-    bool fff_fired = isFired("FFF");
-    bool ffo_fired = isFired("FFO");
-    bool ffb_fired = isFired("FFB");
-    bool hie_fired = isFired("hie");
+    bool fff_fired = isFired_quick("fff");
+    bool ffo_fired = isFired_quick("ffo");
+    bool ffb_fired = isFired_quick("ffb");
+    bool hie_fired = isFired_quick("hie");
     if (fff_fired || ffo_fired || ffb_fired) {
       h_psn_pure_extra[0]->Fill(9.5);
     }
@@ -1687,10 +1739,10 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
 
   //c4: require the total number of cluster is more than 3
   if (ncluster > 3) {
-    bool fff_fired = isFired("FFF");
-    bool ffo_fired = isFired("FFO");
-    bool ffb_fired = isFired("FFB");
-    bool c4_fired = isFired("c4");
+    bool fff_fired = isFired_quick("fff");
+    bool ffo_fired = isFired_quick("ffo");
+    bool ffb_fired = isFired_quick("ffb");
+    bool c4_fired = isFired_quick("c4");
     if (fff_fired || ffo_fired || ffb_fired) {
       h_psn_pure_extra[0]->Fill(11.5);
     }

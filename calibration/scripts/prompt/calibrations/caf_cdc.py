@@ -14,8 +14,16 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
-                               depends_on=[])
+                               input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
+                               depends_on=[],
+                               expert_config={
+                                   "max_files_per_run": 100000,
+                                   "min_events_per_file": 1,
+                                   "max_events_per_calibration": 200000,
+                                   "max_events_per_calibration_for_xt_sr": 1000000,
+                                   "max_events_per_file": 5000,
+                                   "max_events_per_file_hadron": 2500
+                               })
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -63,45 +71,49 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
-    file_to_iov_mumu = input_data["hlt_mumu"]
-    file_to_iov_hadron = input_data["hlt_hadron"]
-    file_to_iov_Bcosmics = input_data["Bcosmics"]
+    file_to_iov_mumu = input_data["mumutight_calib"]
+    file_to_iov_hadron = input_data["hadron_calib"]
+    file_to_iov_Bcosmics = input_data["cosmic_calib"]
 
-    max_files_per_run = 10
-    min_events_per_file = 1000
-
-    max_events_per_calibration = 200000  # for t0, tw calib. 200k events for each skim
-    max_events_per_calibration_for_xt_sr = 1000000  # for xt, sr calib. 1M events for each skim
-    max_events_per_file = 5000
-    max_events_per_file_hadron = 2500
+    expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["max_files_per_run"]
+    min_events_per_file = expert_config["min_events_per_file"]
+    max_events_per_calibration = expert_config["max_events_per_calibration"]  # for t0, tw calib.
+    max_events_per_calibration_for_xt_sr = expert_config["max_events_per_calibration_for_xt_sr"]  # for xt, sr calib.
+    max_events_per_file = expert_config["max_events_per_file"]
+    max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
-    basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
+    basf2.B2INFO(f"Total number of mumutight_calib files actually used as input = {len(input_files_mumu)}")
     chosen_files_mumu = select_files(input_files_mumu[:], max_events_per_calibration, max_events_per_file)
     chosen_files_mumu_for_xt_sr = select_files(input_files_mumu[:], max_events_per_calibration_for_xt_sr, max_events_per_file)
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
+    basf2.B2INFO(f"Total number of hadron_calib files actually used as input = {len(input_files_hadron)}")
     chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file_hadron)
     chosen_files_hadron_for_xt_sr = select_files(input_files_hadron[:],
                                                  max_events_per_calibration_for_xt_sr, max_events_per_file_hadron)
 
     reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, max_files_per_run, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
-    basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
+    basf2.B2INFO(f"Total number of cosmic_calib files actually used as input = {len(input_files_Bcosmics)}")
     chosen_files_Bcosmics = select_files(input_files_Bcosmics[:], max_events_per_calibration, max_events_per_file)
     chosen_files_Bcosmics_for_xt_sr = select_files(
         input_files_Bcosmics[:],
         max_events_per_calibration_for_xt_sr,
         max_events_per_file)
 
-    input_file_dict = {"hlt_mumu": chosen_files_mumu_for_xt_sr, "hlt_hadron": chosen_files_hadron_for_xt_sr,
-                       "Bcosmics": chosen_files_Bcosmics_for_xt_sr}
+    input_file_dict = {"mumutight_calib": chosen_files_mumu_for_xt_sr,
+                       "hadron_calib": chosen_files_hadron_for_xt_sr,
+                       "cosmic_calib": chosen_files_Bcosmics_for_xt_sr
+                       }
 
-    chosen_file_dict = {"hlt_mumu": chosen_files_mumu, "hlt_hadron": chosen_files_hadron,
-                        "Bcosmics": chosen_files_Bcosmics}
+    chosen_file_dict = {"mumutight_calib": chosen_files_mumu,
+                        "hadron_calib": chosen_files_hadron,
+                        "cosmic_calib": chosen_files_Bcosmics
+                        }
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
@@ -176,8 +188,8 @@ def get_calibrations(input_data, **kwargs):
 
     return [cal0, cal1, cal2, cal3, cal4, cal5]
 
-
 #################################################
+
 
 def pre_collector(max_events=None):
     """
@@ -359,7 +371,7 @@ class CDCCalibration(Calibration):
         from caf.framework import Collection
 
         for skim_type, file_list in input_file_dict.items():
-            if skim_type is "Bcosmics":
+            if skim_type is "cosmic_calib":
                 collection = Collection(collector=collector(),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector_cr(max_events=max_events),

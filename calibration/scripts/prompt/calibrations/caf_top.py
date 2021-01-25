@@ -8,8 +8,8 @@ Author: Marko Staric
 """
 
 from prompt import CalibrationSettings
-from caf.utils import IoV
-from caf.strategies import SingleIOV
+from caf.utils import vector_from_runs, IoV, ExpRun
+from caf.strategies import SingleIOV, SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
@@ -21,7 +21,8 @@ settings = CalibrationSettings(name="TOP post-tracking calibration",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_bhabha"],
-                               depends_on=[])
+                               depends_on=[],
+                               expert_config={"payload_boundaries": None})
 
 
 # Required function
@@ -45,8 +46,18 @@ def get_calibrations(input_data, **kwargs):
 
     for c in cal:
         if c.strategies == SingleIOV:
-            for alg in c.algorithms:
-                alg.params = {"apply_iov": output_iov}
+            # if payload boundaries are set, turn all the SingleIOV strategies into SequentialBoundaries
+            # and set the iovs that were passed via expert_config
+            if expert_config["payload_boundaries"] is not None:
+                payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+                basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+                c.strategies = SequentialBoundaries
+                c.setBoundaries(vector_from_runs(payload_boundaries))
+
+            # no payload_boundaries se
+            else:
+                for alg in c.algorithms:
+                    alg.params = {"apply_iov": output_iov}
         else:
             for alg in c.algorithms:
                 alg.params = {"iov_coverage": output_iov}

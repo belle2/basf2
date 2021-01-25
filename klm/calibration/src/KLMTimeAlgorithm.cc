@@ -416,6 +416,16 @@ void KLMTimeAlgorithm::createHistograms()
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             hc_timeFSLPC[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                                         m_UpperTimeBoundaryScintilltorsBKLM);
+            hn = Form("time_length_bklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
+            double stripLength = 200;
+            m_HistTimeLengthBKLM[iF][iS][iL][iP][iC] =
+              new TH2F(hn.Data(),
+                       "Time versus propagation length; "
+                       "propagation distance[cm]; "
+                       "T_rec-T_0-T_fly-'T_calibration'[ns]",
+                       200, 0.0, stripLength,
+                       400, m_LowerTimeBoundaryScintilltorsBKLM,
+                       m_UpperTimeBoundaryScintilltorsBKLM);
           }
         }
       }
@@ -589,8 +599,11 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
       double distHit = it->dist;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
+        int iF = klmChannel.getSection();
+        int iS = klmChannel.getSector() - 1;
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane();
+        int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
           if (iP) {
             profileRpcPhi->Fill(distHit, timeHit);
@@ -598,6 +611,8 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
             profileRpcZ->Fill(distHit, timeHit);
           }
         } else {
+          if (fill2dHistograms)
+            m_HistTimeLengthBKLM[iF][iS][iL][iP][iC]->Fill(distHit, timeHit);
           if (iP) {
             profileBKLMScintillatorPhi->Fill(distHit, timeHit);
           } else {
@@ -1306,6 +1321,8 @@ void KLMTimeAlgorithm::saveHist()
 
           int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
           for (int iC = 0; iC < nchannel_max; ++iC) {
+            if (iL < 2)
+              m_HistTimeLengthBKLM[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
             h_timeFSLPC[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
             hc_timeFSLPC[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
             delete h_timeFSLPC_tc[iF][iS][iL][iP][iC];

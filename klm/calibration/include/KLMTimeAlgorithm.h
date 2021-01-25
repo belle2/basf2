@@ -616,13 +616,16 @@ namespace Belle2 {
     /** BKLM part. */
     TH1D* h_timeFSLPC[2][8][15][2][54] = {nullptr};
 
+    /** Two-dimensional distributions of time versus propagation length. */
+    TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {nullptr};
+
     /** EKLM part, used for effective light speed estimation. */
     TH1D* h_timeFSLPC_tc_end[2][4][14][2][75] = {nullptr};
 
     /** EKLM part. */
     TH1D* h_timeFSLPC_end[2][4][14][2][75] = {nullptr};
 
-    /** Two-dimensional distribution of time versus propagation length. */
+    /** Two-dimensional distributions of time versus propagation length. */
     TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {nullptr};
 
     /* Histograms of time distribution of each channel after calibration. */

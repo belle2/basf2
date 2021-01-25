@@ -47,7 +47,7 @@ void SpacePointLoaderAndPreparer::apply(std::vector<std::tuple<const SpacePoint*
 
   for (auto& spacePoint : m_storeSpacePoints) {
     const B2Vector3D& hitPos = spacePoint.getPosition();
-    const double hitRadiusSquared = hitPos.Perp();
+    const double hitRadiusSquared = hitPos.Perp() * hitPos.Perp();
     // content of hits: pointer to the SpacePoint, its VxdID, the conformal-transformed x and y coordinates of the SpacePoint, and its z coordinate
     hits.emplace_back(&spacePoint, spacePoint.getVxdID(), 2.*hitPos.X() / hitRadiusSquared, 2.*hitPos.Y() / hitRadiusSquared,
                       hitPos.Z());

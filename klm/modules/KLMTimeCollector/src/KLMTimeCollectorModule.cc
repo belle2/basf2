@@ -387,8 +387,7 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
         if (fabs(diffLocal.z()) > stripWidtm_HZ  || fabs(diffLocal.y()) > stripWidtm_HPhi)
           continue;
 
-        const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
-        double propaLength = propaLengthV3[2  - digitHit.isPhiReadout()];
+        double propaLength = corMod->getPropagationDistance(positionLocal_extHit, digitHit.getStrip(), digitHit.isPhiReadout());
 
         m_Event.isFlipped = corMod->isFlipped();
         m_Event.recTime = digitHit.getTime();

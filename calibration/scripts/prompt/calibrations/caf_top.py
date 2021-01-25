@@ -17,7 +17,7 @@ from top_calibration import commonT0_calibration_BF
 
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(name="TOP post-tracking calibration",
-                               expert_username="saurabh",
+                               expert_username="skohani",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_bhabha"],
@@ -38,9 +38,9 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    cal = [BS13d_calibration_cdst(inputFiles),
-           moduleT0_calibration_DeltaT(inputFiles),
-           moduleT0_calibration_LL(inputFiles, sample),
+    cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
+           moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
+           moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
            commonT0_calibration_BF(inputFiles)]
 
     for c in cal:

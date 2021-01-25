@@ -42,7 +42,7 @@ class SelectTRGTypes(basf2.Module):
 
 
 # Define global tag
-basf2.use_central_database(globalTag)
+basf2.conditions.prepend_globaltag(globalTag)
 
 # Create paths
 main = basf2.create_path()

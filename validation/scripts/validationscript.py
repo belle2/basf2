@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import re
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 import logging
-
-# A pretty printer. Prints prettier lists, dicts, etc. :)
-import pprint
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -18,9 +14,7 @@ except ImportError:
 import json_objects
 
 
-pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
-
-
+# todo [code quality, low prio, easy]: This should be an enum
 class ScriptStatus:
 
     """!
@@ -92,15 +86,19 @@ class Script:
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
         # by an underscore. Useful e.g. for cluster controls.
-        self.name = Script.sanitize_file_name(str(os.path.basename(self.path)))
+        self.name = self.sanitize_file_name(str(os.path.basename(self.path)))
         # useful when displaying the filename to the user
         self.name_not_sanitized = str(os.path.basename(self.path))
 
         # The package to which the steering file belongs
         self.package = package
 
-        # The information from the file header
-        self.header = None  # type: Optional[Dict, Any]
+        #: The information from the file header
+        self._header = dict()
+        #: Set if we tried to parse this but there were issues during parsing
+        self.header_parsing_errors = False
+        #: Set to true once header was parsed
+        self._header_parsing_attempted = False
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -129,14 +127,6 @@ class Script:
         Replaces the . between the file name and extension with an underscore _
         """
         return re.sub(r'[\W_]+', '_', file_name)
-
-    def dump(self):
-        """!
-        Print out all properties = attributes of a script.
-        @return: None
-        """
-        print()
-        pp.pprint(vars(self))
 
     def to_json(self, current_tag):
 
@@ -207,7 +197,7 @@ class Script:
         Generates a unique name from the package and name of the script
         which only occurs once in th whole validation suite
         """
-        return "script_unique_name_{}_{}".format(self.package, self.name)
+        return f"script_unique_name_{self.package}_{self.name}"
 
     def compute_dependencies(self, scripts):
         """!
@@ -216,91 +206,33 @@ class Script:
         script.dependencies-list
         @return: None
         """
-        # If all necessary header information are available:
-        if self.header is not None:
+        # Loop over all the dependencies given in the header information
+        for root_file in self.input_files:
 
-            # Loop over all the dependencies given in the header information
-            for root_file in self.header.get('input', []):
+            # Find the script which is responsible for the creation of
+            # the input file (in the same package or in validation folder)
+            creator = find_creator(
+                root_file,
+                self.package,
+                scripts,
+                self.log
+            )
 
-                # Find the script which is responsible for the creation of
-                # the input file (in the same package or in validation folder)
-                creator = find_creator(
-                    root_file,
-                    self.package,
-                    scripts,
-                    self.log
-                )
+            # If no creator could be found, raise an error!
+            if creator is None:
+                self.log.error(
+                    f'Unmatched dependency for {self.path}: {root_file} '
+                    f'has no creator! This means that we will have to skip '
+                    f'this script.')
+                self.status = ScriptStatus.skipped
 
-                # If no creator could be found, raise an error!
-                if creator is None:
-                    self.log.error(
-                        f'Unmatched dependency for {self.path}:{root_file} '
-                        f'has no creator!')
-                    self.status = ScriptStatus.skipped
+            # If creator(s) could be found, add those scripts to the
+            # list of scripts on which self depends
+            else:
+                self.dependencies += creator
 
-                # If creator(s) could be found, add those scripts to the
-                # list of scripts on which self depends
-                else:
-                    self.dependencies += creator
-
-            # remove double entries
-            self.dependencies = list(set(self.dependencies))
-
-        # If the necessary header information are not available:
-        else:
-            # If there is a script whose name comes before this script, this
-            # is presumed as a dependency
-
-            # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in scripts
-                           if script.package == self.package]
-
-            # Divide that list into .py and .c files, because .py files are
-            # always executed before .C files:
-            py_files = [_ for _ in in_same_pkg if _.path.endswith('py')]
-            c_files = [_ for _ in in_same_pkg if _.path.endswith('C')]
-
-            # Make sure the lists are ordered by the path of the files
-            py_files.sort(key=lambda x: x.path)
-            c_files.sort(key=lambda x: x.path)
-
-            # Now put the two lists back together
-            in_same_pkg = py_files + c_files
-
-            if in_same_pkg.index(self) - 1 >= 0:
-                predecessor = in_same_pkg[in_same_pkg.index(self) - 1]
-                self.dependencies.append(predecessor)
-
-    def get_input_files(self):
-        """
-        return a list of input files which this script will read.
-        This information is only available, if load_header has been called
-        """
-        if self.header is None:
-            return []
-
-        return self.header.get('input', [])
-
-    def get_output_files(self):
-        """
-        return a list of output files this script will create.
-        This information is only available, if load_header has been called
-        """
-        if self.header is None:
-            return []
-
-        return self.header.get('output', [])
-
-    def is_cacheable(self):
-        """
-        Returns true, if the script must not be executed if its output
-        files are already present.
-        This information is only available, if load_header has been called
-        """
-        if self.header is None:
-            return False
-
-        return 'cacheable' in self.header
+        # remove double entries
+        self.dependencies = list(set(self.dependencies))
 
     def load_header(self):
         """!
@@ -310,11 +242,15 @@ class Script:
         values that were read from the XML header.
         @return: None
         """
+        if self._header_parsing_attempted:
+            return
+
+        self._header_parsing_attempted = True
 
         # Read the file as a whole
         # We specify encoding and errors here to avoid exceptions for people
         # with strange preferred encoding settings in their OS
-        with open(self.path, "r", encoding="utf-8", errors="replace") as data:
+        with open(self.path, encoding="utf-8", errors="replace") as data:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags
@@ -326,6 +262,7 @@ class Script:
             xml = pat.findall(steering_file_content)[0].strip()
         except IndexError:
             self.log.error('No file header found: ' + self.path)
+            self.header_parsing_errors = True
             return
 
         # Create an XML tree from the plain XML code.
@@ -333,10 +270,11 @@ class Script:
             xml_tree = XMLTree.ElementTree(XMLTree.fromstring(xml)).getroot()
         except XMLTree.ParseError:
             self.log.error('Invalid XML in header: ' + self.path)
+            self.header_parsing_errors = True
             return
 
         # we have a header
-        self.header = {}
+        self._header = {}
 
         # Loop over that tree
         for branch in xml_tree:
@@ -361,10 +299,67 @@ class Script:
             # implementation technically allows multiple occurrences of the
             # same <tag></tag>-pair, which will be bundled to the same key in
             # the key in the returned dictionary
-            if branch.tag.strip() in self.header:
-                self.header[branch.tag.strip()] += branch_value
+            if branch.tag.strip() in self._header:
+                self._header[branch.tag.strip()] += branch_value
             else:
-                self.header[branch.tag.strip()] = branch_value
+                self._header[branch.tag.strip()] = branch_value
+
+    # Below are all of the getter methods for accessing data from the header
+    # If the header isn't loaded at the time they are called, we do that.
+
+    @property
+    def input_files(self):
+        """
+        return a list of input files which this script will read.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return self._header.get('input', [])
+
+    @property
+    def output_files(self):
+        """
+        return a list of output files this script will create.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return self._header.get('output', [])
+
+    @property
+    def is_cacheable(self):
+        """
+        Returns true, if the script must not be executed if its output
+        files are already present.
+        This information is only available, if load_header has been called
+        """
+        self.load_header()
+        return 'cacheable' in self._header
+
+    @property
+    def noexecute(self) -> bool:
+        """ A flag set in the header that tells us to simply ignore this
+        script for the purpose of running the validation.
+        """
+        self.load_header()
+        return "noexecute" in self._header
+
+    @property
+    def description(self) -> str:
+        """ Description of script as set in header """
+        self.load_header()
+        return self._header.get("description", "")
+
+    @property
+    def contact(self) -> str:
+        """ Contact of script as set in header """
+        self.load_header()
+        return self._header.get("contact", "")
+
+    @property
+    def interval(self) -> str:
+        """ Interval of script executation as set in header """
+        self.load_header()
+        return self._header.get("interval", "nightly")
 
 
 def find_creator(
@@ -382,6 +377,8 @@ def find_creator(
     @param outputfile: The file of which we want to know by which script is
         created
     @param package: The package in which we want to search for the creator
+    @param scripts: List of all script objects/candidates
+    @param log: Logger
     """
 
     # Get a list of all Script objects for scripts in the given package as well
@@ -395,8 +392,7 @@ def find_creator(
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if candidate.header and \
-           outputfile in candidate.header.get('output', []):
+        if outputfile in candidate.output_files:
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator

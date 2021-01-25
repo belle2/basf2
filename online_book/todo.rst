@@ -4,7 +4,7 @@
 
     This page is still under construction in this version of the documentation.
 
-    If you are browsing and older version, you might want to check whether
+    If you are browsing an older version, you might want to check whether
     there are more recent additions in the
     `development version <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_
     or any release version newer than the one you are currently browsing.

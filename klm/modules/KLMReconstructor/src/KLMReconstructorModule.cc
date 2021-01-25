@@ -119,6 +119,8 @@ void KLMReconstructorModule::initialize()
 
 void KLMReconstructorModule::beginRun()
 {
+  if (!m_ChannelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
   if (!m_TimeWindow.isValid())
     B2FATAL("KLM time window data are not available.");
   m_CoincidenceWindow = m_TimeWindow->getCoincidenceWindow();

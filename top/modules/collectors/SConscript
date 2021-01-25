@@ -1,7 +1,7 @@
 Import('env')
 
-env['LIBS'] = [ 'framework', 'calibration', 'top', 'top_reconstruction',
-                'top_dataobjects', 'mdst_dataobjects', 'tracking_dataobjects',
-		'analysis_utility', '$ROOT_LIBS', 'gfortran']
+env['LIBS'] = ['framework', 'calibration', 'top', 'top_reconstruction',
+               'top_dataobjects', 'mdst_dataobjects', 'tracking_dataobjects',
+               '$ROOT_LIBS', 'gfortran']
 
 Return('env')

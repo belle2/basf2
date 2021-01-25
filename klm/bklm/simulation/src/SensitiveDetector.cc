@@ -127,12 +127,12 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
     const Module* m = m_GeoPar->findModule(section, sector, layer);
     const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
-    const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
     if (postStep->GetProcessDefinedStep() != 0) {
       if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
     }
     int trackID = track->GetTrackID();
     if (m->hasRPCs()) {
+      const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
       int phiStripLower = -1;
       int phiStripUpper = -1;
       int zStripLower = -1;
@@ -161,6 +161,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
       }
     } else {
       int scint = hist->GetCopyNumber(depth - DEPTH_SCINT);
+      const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition, scint);
       BKLMElementNumbers::setStripInModule(moduleID, scint);
       BKLMStatus::setMaximalStrip(moduleID, scint);
       double propTime;

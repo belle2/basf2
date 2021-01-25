@@ -1,10 +1,18 @@
-Alias MyJpsi J/psi
+#EventType:2802000030 
+#Descriptor: ee->chi_c0 jpsi
+#Tested: Yes
+#PhysicsWG: Charmonium
+#Responsible: Junhao Yin
+#Email: yinjh2012@korea.ac.kr
+#Date: 20210111
+
+Alias Jpsisig J/psi
 
 Decay vpho
-1.0 chi_c0 MyJpsi PHSP;
+1.0 chi_c0 Jpsisig PHSP;
 Enddecay
 
-Decay MyJpsi
+Decay Jpsisig
 0.5 e+ e- VLL;
 0.5 mu+ mu- VLL;
 Enddecay

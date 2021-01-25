@@ -51,7 +51,7 @@ pu.ploter(
     y_label='counts',
     granules=pu.gD,
     tree=treeRD,
-    expr='strip_charge',
+    expr='recodigit_charge',
     cut='',
     descr='Strip charge for all RecoDigits related to one TrueHit.',
     check='Distribution peak around 15-30 ke.',

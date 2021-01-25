@@ -173,8 +173,11 @@ class tau_encoder:
         """
         creates the class
         """
+        #: amp range
         self.amp_min, self.amp_max = amp_range
+        #: tau range
         self.tau_min, self.tau_max = tau_range
+        #: at ratio
         self.at_ratio = (self.amp_max - self.amp_min) / (self.tau_max - self.tau_min)
 
     def encode(self, tau):
@@ -208,13 +211,21 @@ class SampleGenerator:
         bin_size is the % fraction of t0_min, t0_max interval corresponding to a single output t0 bin.
         """
 
+        #: t0 bounds
         self.t0_min, self.t0_max = t0_bounds
+        #: tau bounds
         self.tau_min, self.tau_max = tau_bounds
+        #: amplitude bounds
         self.amp_min, self.amp_max = amplitude_bounds
+        #: sigma bounds
         self.sigma_min, self.sigma_max = sigma_bounds
+        #: tau encored
         self.tau_coder = tau_encoder(amplitude_bounds, tau_bounds)
+        #: tau sigma
         self.tau_sigma = tau_sigma
+        #: bin size
         self.bin_size = bin_size
+        #: wf ?
         self.wf = wf
 
     def get_t0_bounds(self):
@@ -239,6 +250,7 @@ class SampleGenerator:
         '''
         Set width limits for the simulation.
         '''
+        #: tau min
         self.tau_min = tau_min
         self.tau_max = tau_max
 
@@ -264,7 +276,9 @@ class SampleGenerator:
         '''
         Generate sample_size samples.
         '''
+        #: sample size
         self.n_samples = sample_size
+        #: stock data
         self.stockdata = pd.DataFrame({
             'test': np.random.uniform(size=self.n_samples),
             't0': np.random.uniform(self.t0_min, self.t0_max, size=self.n_samples),

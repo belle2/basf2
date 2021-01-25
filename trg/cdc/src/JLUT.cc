@@ -493,6 +493,7 @@ namespace Belle2 {
     return t_offsetName.str();
   }
 
+  // cppcheck-suppress constParameter
   TRGCDCJSignal const TRGCDCJLUT::operate(const TRGCDCJSignal& in, TRGCDCJSignal& out)
   {
 

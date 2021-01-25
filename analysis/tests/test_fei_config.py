@@ -18,7 +18,6 @@ class TestFeiConfiguration(unittest.TestCase):
         config = fei.config.FeiConfiguration()
         self.assertEqual(config.prefix, 'FEI_TEST')
         self.assertEqual(config.cache, None)
-        self.assertEqual(config.b2bii, False)
         self.assertEqual(config.monitor, True)
         self.assertEqual(config.legacy, None)
         self.assertEqual(config.externTeacher, 'basf2_mva_teacher')

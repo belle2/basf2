@@ -54,7 +54,6 @@ def setup_basf2_and_db(zmq=False):
     args = parser.parse_args()
 
     # Local DB specification
-    basf2.reset_database()
     basf2.conditions.override_globaltags()
     if args.central_db_tag:
         for central_tag in args.central_db_tag:
@@ -156,14 +155,11 @@ def add_hlt_processing(path,
     # Unpack the event content
     add_unpackers(path, components=unpacker_components)
 
-    # Build up two paths: one for all accepted events...
+    # Build one path for all accepted events...
     accept_path = basf2.Path()
 
-    # ... and one for all dismissed events
-    discard_path = basf2.Path()
-
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, abort_path=discard_path, **kwargs)
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
@@ -175,7 +171,7 @@ def add_hlt_processing(path,
 
         # There are two possibilities for the output of this module
         # (1) the event is dismissed -> only store the metadata
-        hlt_filter_module.if_value("==0", discard_path, basf2.AfterConditionPath.CONTINUE)
+        path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
@@ -183,10 +179,6 @@ def add_hlt_processing(path,
         path.add_path(accept_path)
     else:
         basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
-
-    # For all dismissed events we set the HLTDiscard error flag and remove the data store content
-    discard_path.add_module("EventErrorFlag", errorFlag=ROOT.Belle2.EventMetaData.c_HLTDiscard)
-    path_utils.add_store_only_metadata_path(discard_path)
 
     # For accepted events we continue the reconstruction
     path_utils.add_post_filter_reconstruction(accept_path, run_type=run_type, components=reco_components)

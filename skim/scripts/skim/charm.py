@@ -15,10 +15,9 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
-from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
@@ -466,7 +465,7 @@ class LambdacTopHpJm(BaseSkim):
             100,
             2.2,
             2.4,
-            'Mass distribution of $\Lambda_{C}^{+}$',
+            'Mass distribution of $\\Lambda_{C}^{+}$',
             myEmail,
             'mass of Lambda_c+ (mean=2.28646) ',
             'Please check agreement of: mean, sigma and ratio of signal and background',

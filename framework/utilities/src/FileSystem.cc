@@ -114,12 +114,12 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
   for (auto dir : dirs) {
     if (dir.empty()) continue;
     fullpath = (fs::path(dir) / path).string();
-    if (fileExists(fullpath)) return fullpath;
+    if (fileExists(fullpath)) return fs::canonical(fullpath).string();
   }
 
   // check local directory
   fullpath = fs::absolute(path).string();
-  if (fileExists(fullpath)) return fullpath;
+  if (fileExists(fullpath)) return fs::canonical(fullpath).string();
 
   // nothing found
   if (!silent)

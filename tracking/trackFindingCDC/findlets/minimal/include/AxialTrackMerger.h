@@ -68,9 +68,11 @@ namespace Belle2 {
       static double doTracksFitTogether(CDCTrack& track1, CDCTrack& track2);
 
       /**
-       *  Remove all hits that are further than factor * driftlength waay from the trajectory
+       *  Remove all hits that are further than factor * driftlength away from the trajectory
        *
        *  @param factor gives a number how far the hit is allowed to be.
+       *  @param wireHits the wirehits that should be considered
+       *  @param trajectory the reference trajectory
        */
       static void removeStrangeHits(double factor,
                                     std::vector<const CDCWireHit*>& wireHits,

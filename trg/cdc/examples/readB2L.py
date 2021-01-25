@@ -12,34 +12,35 @@
 # 2015/07/12 : Updated for 2D trgcdc update //JB
 # 2016/04/08 : Added NeuroTrigger. Updated for head //JB
 
-from basf2 import *
+import basf2 as b2
+import os
 import glob
 
 # ...suppress messages and warnings during processing...
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # 0 means using different seed every time.
-set_random_seed(1)
+b2.set_random_seed(1)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
 
 ##########################################################
 # Register modules
-evtmetagen = register_module('EventInfoSetter')
-evtmetainfo = register_module('Progress')
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-particlegun = register_module('ParticleGun')
-evtgeninput = register_module('EvtGenInput')
-kkgeninput = register_module('KKGenInput')
-mcparticleprinter = register_module('PrintMCParticles')
-g4sim = register_module('FullSim')
-bkgmixer = register_module('BeamBkgMixer')
-cdcdigitizer = register_module('CDCDigitizer')
-cdctrg = register_module("TRGCDC")
-rootOut = register_module('RootOutput')
-rootIn = register_module('RootInput')
-srootIn = register_module('SeqRootInput')
-neuro = register_module('NeuroTrigger')
+evtmetagen = b2.register_module('EventInfoSetter')
+evtmetainfo = b2.register_module('Progress')
+paramloader = b2.register_module('Gearbox')
+geobuilder = b2.register_module('Geometry')
+particlegun = b2.register_module('ParticleGun')
+evtgeninput = b2.register_module('EvtGenInput')
+kkgeninput = b2.register_module('KKGenInput')
+mcparticleprinter = b2.register_module('PrintMCParticles')
+g4sim = b2.register_module('FullSim')
+bkgmixer = b2.register_module('BeamBkgMixer')
+cdcdigitizer = b2.register_module('CDCDigitizer')
+cdctrg = b2.register_module("TRGCDC")
+rootOut = b2.register_module('RootOutput')
+rootIn = b2.register_module('RootInput')
+srootIn = b2.register_module('SeqRootInput')
+neuro = b2.register_module('NeuroTrigger')
 
 
 ##########################################################
@@ -182,9 +183,9 @@ cdctrg.param('TRGCDCDataInputMode', 2)
 # define parameters
 neuro.param('filename', os.path.join(basf2datadir, "trg/cdc/Neuro20160309Nonlin.root"))
 # output warnings, info and some debug output for neurotrigger module
-# neuro.logging.log_level = basf2.LogLevel.DEBUG
+# neuro.logging.log_level = b2.LogLevel.DEBUG
 # neuro.logging.debug_level = 80
-# basf2.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+# b2.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 
 # ...RootOutput...
 rootOut.param('outputFileName', 'basf2.root')
@@ -198,7 +199,7 @@ rootIn.param('inputFileName', 'basf2.root')
 # Path settings.
 
 # For full simulation.
-fullMain = create_path()
+fullMain = b2.create_path()
 # Add modules to paths
 fullMain.add_module(evtmetagen)
 fullMain.add_module(evtmetainfo)
@@ -215,7 +216,7 @@ fullMain.add_module(cdctrg)
 fullMain.add_module(neuro)
 
 # For only generator+G4Sim and save file. (To save time)
-g4SimMain = create_path()
+g4SimMain = b2.create_path()
 # Add modules to paths
 g4SimMain.add_module(evtmetagen)
 g4SimMain.add_module(evtmetainfo)
@@ -231,7 +232,7 @@ g4SimMain.add_module(cdcdigitizer)
 g4SimMain.add_module(rootOut)
 
 # For TSIM with generator+G4Sim saved file. (To save time)
-savedG4SimMain = create_path()
+savedG4SimMain = b2.create_path()
 # Add modules to paths
 savedG4SimMain.add_module(rootIn)
 savedG4SimMain.add_module(evtmetainfo)
@@ -240,7 +241,7 @@ savedG4SimMain.add_module(geobuilder)
 savedG4SimMain.add_module(cdctrg)
 
 # For only generator and save file.
-generatorMain = create_path()
+generatorMain = b2.create_path()
 # Add modules to paths
 generatorMain.add_module(evtmetagen)
 generatorMain.add_module(evtmetainfo)
@@ -254,7 +255,7 @@ generatorMain.add_module(g4sim)
 generatorMain.add_module(rootOut)
 
 # For TSIM with generator saved file.
-savedGeneratorMain = create_path()
+savedGeneratorMain = b2.create_path()
 # Add modules to paths
 savedGeneratorMain.add_module(rootIn)
 savedGeneratorMain.add_module(evtmetainfo)
@@ -265,7 +266,7 @@ savedGeneratorMain.add_module(cdcdigitizer)
 savedGeneratorMain.add_module(cdctrg)
 
 # For reading B2L
-readB2LMain = create_path()
+readB2LMain = b2.create_path()
 # Add modules to paths
 readB2LMain.add_module(srootIn)
 readB2LMain.add_module(paramloader)
@@ -288,7 +289,7 @@ readB2LMain.add_module(cdctrg)
 # process(savedGeneratorMain)
 
 # read B2L data
-process(readB2LMain)
+b2.process(readB2LMain)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

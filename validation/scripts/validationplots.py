@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Normal imports
 import glob
@@ -19,7 +18,7 @@ import ROOT
 # Fatal in <TClass::SetUnloaded>: The TClass for map<TString,double> is being
 # unloaded when in state 3 To prevent this, we are loading RooFit here
 # before ROOT has a chance to do this
-from ROOT import RooFit
+from ROOT import RooFit  # noqa
 
 # The pretty printer. Print prettier :)
 import pprint
@@ -30,10 +29,6 @@ from validationplotuple import Plotuple
 from validationfunctions import index_from_revision, get_style, \
     available_revisions, terminal_title_line
 import validationfunctions
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 from validationrootobject import RootObject
 

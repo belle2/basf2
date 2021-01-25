@@ -81,7 +81,7 @@ void SVDShaperDigitSorterModule::event()
   StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
   // If not digits, nothing to do
   if (!storeShaperDigits || !storeShaperDigits.getEntries()) return;
-  B2DEBUG(89, "Initial size of StoreShaperDigits array: " << storeShaperDigits.getEntries());
+  B2DEBUG(29, "Initial size of StoreShaperDigits array: " << storeShaperDigits.getEntries());
 
   RelationArray relShaperDigitMCParticle(m_relShaperDigitMCParticleName);
   RelationArray relShaperDigitTrueHit(m_relShaperDigitTrueHitName);
@@ -117,6 +117,6 @@ void SVDShaperDigitSorterModule::event()
   RelationArray::Identity to;
   if (relShaperDigitMCParticle) relShaperDigitMCParticle.consolidate(from, to, RelationArray::c_deleteElement);
   if (relShaperDigitTrueHit) relShaperDigitTrueHit.consolidate(from, to, RelationArray::c_deleteElement);
-  B2DEBUG(89, "Final size of StoreShaperDigits store array: " << storeShaperDigits.getEntries());
+  B2DEBUG(29, "Final size of StoreShaperDigits store array: " << storeShaperDigits.getEntries());
 
 }

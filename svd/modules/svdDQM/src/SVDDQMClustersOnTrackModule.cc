@@ -21,16 +21,11 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
-
 #include <vxd/geometry/GeoTools.h>
-
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include "TDirectory.h"
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -56,6 +51,10 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
+  addParam("EventInfo", m_svdEventInfoName, "SVDEventInfo StoreArray name", std::string(""));
+  addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name", std::string(""));
+  addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name", std::string(""));
+  addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name", std::string(""));
 
   m_histoList = new TList();
 }
@@ -236,9 +235,9 @@ void SVDDQMClustersOnTrackModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
 
-    m_svdEventInfo.isOptional();
+    m_svdEventInfo.isOptional(m_svdEventInfoName);
     m_eventT0.isOptional();
-    m_storeTracks.isOptional();
+    m_tracks.isOptional();
     m_resultStoreObjectPointer.isOptional();
 
   }
@@ -268,7 +267,7 @@ void SVDDQMClustersOnTrackModule::beginRun()
 void SVDDQMClustersOnTrackModule::event()
 {
 
-  if (!m_storeTracks.isValid()) {
+  if (!m_tracks.isValid()) {
     B2WARNING("Missing Tracks StoreArray. Skipping SVDDQMClustersOnTrack");
     return;
   }
@@ -302,44 +301,40 @@ void SVDDQMClustersOnTrackModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-
-  BOOST_FOREACH(Track & track, m_storeTracks) {
+  for (const Track& track : m_tracks) {
 
     const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
-    if (!tfr) continue;
+    if (not tfr) continue;
 
-    RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
-    RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
+    if (not recoTrack) continue;
 
-    for (int cl = 0 ; cl < (int)svdClustersTrack.size(); cl++) {
+    for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>(m_svdClustersName)) {
 
-      int iLayer = svdClustersTrack[cl]->getSensorID().getLayerNumber();
+      int iLayer = svdCluster.getSensorID().getLayerNumber();
 
-      float time = svdClustersTrack[cl]->getClsTime();
+      float time = svdCluster.getClsTime();
       if (m_desynchSVDTime && m_svdEventInfo.isValid())
-        time = time - m_svdEventInfo->getSVD2FTSWTimeShift(svdClustersTrack[cl]->getFirstFrame());
+        time = time - m_svdEventInfo->getSVD2FTSWTimeShift(svdCluster.getFirstFrame());
 
-      if (svdClustersTrack[cl]->isUCluster()) {
+      if (svdCluster.isUCluster()) {
 
         m_clsTrkTimeUEvtT0->Fill(time, eventT0);
 
         if (iLayer == 3) {
-          if (m_clsTrkChargeU3 != nullptr) m_clsTrkChargeU3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRU3 != nullptr) m_clsTrkSNRU3->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkChargeU3 != nullptr) m_clsTrkChargeU3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRU3 != nullptr) m_clsTrkSNRU3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU3 != nullptr) m_clsTrkTimeU3->Fill(time);
         } else {
-          if (m_clsTrkChargeU456 != nullptr) m_clsTrkChargeU456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRU456 != nullptr) m_clsTrkSNRU456->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkChargeU456 != nullptr) m_clsTrkChargeU456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRU456 != nullptr) m_clsTrkSNRU456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
         }
 
-        RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
-        if (recoDigits.size() == 0) continue;
+        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-        for (UInt_t re = 0; re < recoDigits.size(); re++) {
-
-          RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinUAll != nullptr) m_stripMaxBinUAll->Fill(shaper[0]->getMaxTimeBin());
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
+          if (m_stripMaxBinUAll != nullptr and shaper != nullptr) m_stripMaxBinUAll->Fill(shaper->getMaxTimeBin());
         }
 
 
@@ -348,23 +343,19 @@ void SVDDQMClustersOnTrackModule::event()
         m_clsTrkTimeVEvtT0->Fill(time, eventT0);
 
         if (iLayer == 3) {
-          if (m_clsTrkChargeV3 != nullptr) m_clsTrkChargeV3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRV3 != nullptr) m_clsTrkSNRV3->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkChargeV3 != nullptr) m_clsTrkChargeV3->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRV3 != nullptr) m_clsTrkSNRV3->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV3 != nullptr) m_clsTrkTimeV3->Fill(time);
         } else {
-          if (m_clsTrkChargeV456 != nullptr) m_clsTrkChargeV456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRV456 != nullptr) m_clsTrkSNRV456->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkChargeV456 != nullptr) m_clsTrkChargeV456->Fill(svdCluster.getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRV456 != nullptr) m_clsTrkSNRV456->Fill(svdCluster.getSNR());
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
         }
 
-        RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
-        if (recoDigits.size() == 0) continue;
+        for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-        for (UInt_t re = 0; re < recoDigits.size(); re++) {
-
-          RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinVAll != nullptr) m_stripMaxBinVAll->Fill(shaper[0]->getMaxTimeBin());
-
+          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
+          if (m_stripMaxBinVAll != nullptr and shaper != nullptr) m_stripMaxBinVAll->Fill(shaper->getMaxTimeBin());
         }
 
       }

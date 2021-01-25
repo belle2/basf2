@@ -8,7 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 ################
 import sys  # get argv
 import re
@@ -16,43 +16,43 @@ import os.path
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 
-set_log_level(LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.DEBUG)
 
-use_central_database("TRGGDL_201811")
+b2.use_central_database("TRGGDL_201811")
 
-main = create_path()
+main = b2.create_path()
 
 if argc == 2 and argvs[1][-6:] == ".sroot":
     f_in_root = argvs[1]
-    input = register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    input = b2.register_module('SeqRootInput')
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
     input.param('inputFileName', f_in_root)
 elif argc == 2 and argvs[1][-5:] == ".root":
     f_in_root = argvs[1]
-    input = register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    input = b2.register_module('RootInput')
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
     input.param('inputFileName', f_in_root)
 elif argc == 1:
-    input = register_module('RootInput')
+    input = b2.register_module('RootInput')
     input.param('inputFileName', '/home/belle/nkzw/e3.4S/r034*/all/raw/sub00/raw.physics.hlt_hadron.0003.*.root')
     basename = "e3.4S.r034"
 else:
     sys.exit("trggdlDQM.py> # of arg is strange. Exit.")
 
 main.add_module(input)
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param("histoFileName", "dqm.%s.root" % basename)
 
 # Unpacker
-trggdlUnpacker = register_module("TRGGDLUnpacker")
+trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
 main.add_module(histo)
 
 # DQM
 # trggdldqm = register_module('TRGGDLDQM', logLevel=LogLevel.DEBUG, debugLevel=20)
-trggdldqm = register_module('TRGGDLDQM')
+trggdldqm = b2.register_module('TRGGDLDQM')
 # event by event bit-vs-clock TH2I hist for itd, ftdl, psnm in ROOT file.
 trggdldqm.param('eventByEventTimingHistRecord', False)
 # bit name on BinLabel for hGDL_itd,ftd,psn.
@@ -80,9 +80,9 @@ if dumpVcdFileTrue:
 
 main.add_module(trggdldqm)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

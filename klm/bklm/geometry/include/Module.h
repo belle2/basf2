@@ -209,7 +209,6 @@ namespace Belle2 {
       double getPropagationDistance(const CLHEP::Hep3Vector& local,
                                     int strip, bool phiReadout) const;
 
-
       //! Convert local coordinates to signal-propagation time (ns)
       //! Version for RPCs.
       const CLHEP::Hep3Vector getPropagationTimes(const CLHEP::Hep3Vector&) const;

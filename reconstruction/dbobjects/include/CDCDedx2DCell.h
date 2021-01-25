@@ -91,9 +91,9 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for the given bin
-     * @param layer number
-     * @param doca bin number
-     * @param enta bin number
+     * @param layer layer number
+     * @param dbin doca bin number
+     * @param ebin enta bin number
      */
     double getMean(unsigned int layer, int dbin, int ebin) const
     {
@@ -105,9 +105,9 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for given DOCA and entrance angle
-     * @param continuous layer number
-     * @param distance of closest approach
-     * @param entrance angle
+     * @param layer continuous layer number
+     * @param doca distance of closest approach
+     * @param enta entrance angle
      */
     double getMean(unsigned int layer, double doca, double enta) const
     {

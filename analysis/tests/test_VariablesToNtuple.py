@@ -61,6 +61,7 @@ with b2test_utils.clean_working_directory():
     assert t1.GetListOfBranches().Contains('__event__'), "event number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__run__'), "run number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__production__'), "production number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from electronList tree"
 
@@ -70,6 +71,7 @@ with b2test_utils.clean_working_directory():
     assert t2.GetListOfBranches().Contains('__event__'), "event number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__run__'), "run number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__production__'), "production number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from photonList tree"
 
@@ -97,6 +99,7 @@ with b2test_utils.clean_working_directory():
     assert t.GetListOfBranches().Contains('__event__'), "event number branch is missing"
     assert t.GetListOfBranches().Contains('__run__'), "run number branch is missing"
     assert t.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing"
+    assert t.GetListOfBranches().Contains('__production__'), "production number branch is missing"
     assert not t.GetListOfBranches().Contains('__candidate__'), "candidate number branch is present in eventwise tree"
     assert not t.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is present in eventwise tree"
 
@@ -104,6 +107,7 @@ with b2test_utils.clean_working_directory():
     assert t.__run__ == 0, "run number not as expected"
     assert t.__experiment__ == 0, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"
 
     nTracks_12 = 0
     nTracks_11 = 0
@@ -129,8 +133,10 @@ with b2test_utils.clean_working_directory():
     assert t.__run__ == 0, "run number not as expected"
     assert t.__experiment__ == 0, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"
 
     t.GetEntry(9)
     assert t.__run__ == 0, "run number not as expected"
     assert t.__experiment__ == 0, "experiment number not as expected"
     assert t.__event__ == 10, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"

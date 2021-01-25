@@ -10,9 +10,7 @@
 ########################################################
 
 import basf2
-import ROOT
 from ROOT import Belle2
-from ROOT import gSystem
 import numpy as np
 import pandas as pd
 

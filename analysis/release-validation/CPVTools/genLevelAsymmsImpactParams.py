@@ -15,6 +15,7 @@
 ######################################################
 
 
+import basf2 as b2
 import os
 import glob
 import sys
@@ -41,7 +42,7 @@ samplesWildCards = sys.argv[2]
 
 workingDirectory = '.'
 
-if not Belle2.FileSystem.findFile(workingDirectory + '/GenLevelVariablesPlots', True):
+if not b2.find_file('GenLevelVariablesPlots', silent=True):
     os.mkdir(workingDirectory + '/GenLevelVariablesPlots')
 
 sourceFiles = glob.glob(str(samplesWildCards))

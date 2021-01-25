@@ -234,6 +234,11 @@ def get_calibrations(input_data, **kwargs):
 
     cal_klm.algorithms = [millepede.algo]
 
+    # Bugfix for Condor:
+    from alignment.prompt_utils import fix_mille_paths_for_algo
+    for algorithm in cal_klm.algorithms:
+        fix_mille_paths_for_algo(algorithm)
+
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = SequentialRunByRun
         algorithm.params = {"iov_coverage": output_iov}

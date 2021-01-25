@@ -52,6 +52,7 @@ namespace Belle2 {
       /** Add charge to the pixel
        * @param charge charge in electrons to be added
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
+       * @param truehit Index of the truehit contributing the charge, -1 for none
        */
       void add(double charge, int particle = -1, int truehit = -1)
       {

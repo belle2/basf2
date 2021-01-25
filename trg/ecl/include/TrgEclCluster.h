@@ -37,6 +37,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclCluster();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclCluster(TrgEclCluster&) = delete;
+
+    /** Assignement operator, deleted. */
+    TrgEclCluster& operator=(TrgEclCluster&) = delete;
+
   public:
 
     /** set ICN for each part(Fw,Br,Bw) */

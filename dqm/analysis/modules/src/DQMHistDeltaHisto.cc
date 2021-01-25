@@ -1,4 +1,4 @@
-﻿//+
+//+
 // File : DQMHistDeltaHisto.cc
 // Description : DQM Histogram analysis module to generate delta histograms
 //
@@ -8,14 +8,10 @@
 
 
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <dqm/analysis/modules/DQMHistDeltaHisto.h>
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -34,7 +30,7 @@ DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
 {
   addParam("Interval", m_interval, "Interval time for diff histos [s]", 180);
   addParam("MonitoredHistos", m_monitored_histos, "List of histograms to monitor", vector<string>());
-  B2DEBUG(1, "DQMHistDeltaHisto: Constructor done.");
+  B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
 }
 
 
@@ -43,17 +39,18 @@ DQMHistDeltaHistoModule::~DQMHistDeltaHistoModule() { }
 void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
-  B2INFO("DQMHistDeltaHisto: initialized.");
+  B2DEBUG(20, "DQMHistDeltaHisto: initialized.");
   for (auto& histoname : m_monitored_histos) {
     queue<SSNODE*> hq;
     m_histos_queues[histoname] = hq;
   }
+  m_evtMetaDataPtr.isRequired();
 }
 
 
 void DQMHistDeltaHistoModule::beginRun()
 {
-  B2INFO("DQMHistDeltaHisto: beginRun called.");
+  B2DEBUG(20, "DQMHistDeltaHisto: beginRun called.");
   for (auto& histoname : m_monitored_histos) {
     queue<SSNODE*>& hq = m_histos_queues[histoname];
     while (!hq.empty()) {
@@ -68,15 +65,15 @@ void DQMHistDeltaHistoModule::beginRun()
 TCanvas* DQMHistDeltaHistoModule::find_canvas(TString canvas_name)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = NULL;
+  TObject* obj = nullptr;
 
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvas_name)
-        return (TCanvas*)obj;
+        return dynamic_cast<TCanvas*>(obj);
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 void DQMHistDeltaHistoModule::clear_node(SSNODE* n)
@@ -88,13 +85,16 @@ void DQMHistDeltaHistoModule::clear_node(SSNODE* n)
 void DQMHistDeltaHistoModule::event()
 {
 
-  B2INFO("DQMHistDeltaHisto: event called.");
-  StoreObjPtr<EventMetaData> evtMetaData;
-  time_t cur_mtime = evtMetaData->getTime();
+  B2DEBUG(20, "DQMHistDeltaHisto: event called.");
+  if (!m_evtMetaDataPtr.isValid()) {
+    B2ERROR("No valid EventMetaData.");
+    return;
+  }
+  time_t cur_mtime = m_evtMetaDataPtr->getTime();
 
   for (auto& histoname : m_monitored_histos) {
     TH1* hh = findHist(histoname.c_str());
-    if (hh == NULL) continue;
+    if (hh == nullptr) continue;
     if (hh->GetDimension() != 1) continue;
     queue<SSNODE*>& hq = m_histos_queues[histoname];
     if (hq.empty()) {
@@ -124,18 +124,16 @@ void DQMHistDeltaHistoModule::event()
         }
       }
     }
-
-    TH1* h_diff = hq.back()->diff_histo;
-    h_diff->SetName((string(h_diff->GetName()) + "_diff").c_str());
-    if (h_diff->Integral() != 0) h_diff->Scale(hh->Integral() / h_diff->Integral());
-
     TString a = histoname;
     StringList s = StringUtil::split(a.Data(), '/');
     std::string dirname = s[0];
     std::string hname = s[1];
     std::string canvas_name = dirname + "/c_" + hname;
     TCanvas* c = find_canvas(canvas_name);
-    if (c == NULL) continue;
+    if (c == nullptr) continue;
+    TH1* h_diff = hq.back()->diff_histo;
+    h_diff->SetName((a + "_diff").Data());
+    if (h_diff->Integral() != 0) h_diff->Scale(hh->Integral() / h_diff->Integral());
     c->cd();
     h_diff->SetLineColor(kRed);
     h_diff->SetLineStyle(kDotted);

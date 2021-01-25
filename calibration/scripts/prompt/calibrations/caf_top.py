@@ -46,15 +46,19 @@ def get_calibrations(input_data, **kwargs):
 
     for c in cal:
         if c.strategies == SingleIOV:
+
             # if payload boundaries are set, turn all the SingleIOV strategies into SequentialBoundaries
             # and set the iovs that were passed via expert_config
             if expert_config["payload_boundaries"] is not None:
+
                 payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+                payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
                 basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
                 c.strategies = SequentialBoundaries
                 c.setBoundaries(vector_from_runs(payload_boundaries))
+                for alg in c.algorithms:
+                    alg.params = {'iov_coverage': output_iov}
 
-            # no payload_boundaries se
             else:
                 for alg in c.algorithms:
                     alg.params = {"apply_iov": output_iov}

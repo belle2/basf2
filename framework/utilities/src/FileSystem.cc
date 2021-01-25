@@ -122,20 +122,20 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
       continue;
     fullpath = (fs::path(dir) / path).string();
     if (fileExists(fullpath)) {
-      if (!isSymLink(fullpath))
-        return fs::canonical(fullpath).string();
-      else
+      if (isSymLink(fullpath) or isSymLink(dir))
         return fullpath;
+      else
+        return fs::canonical(fullpath).string();
     }
   }
 
   // check local directory
   fullpath = fs::absolute(path).string();
   if (fileExists(fullpath)) {
-    if (!isSymLink(fullpath))
-      return fs::canonical(fullpath).string();
-    else
+    if (isSymLink(fullpath))
       return fullpath;
+    else
+      return fs::canonical(fullpath).string();
   }
 
   // nothing found

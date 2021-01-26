@@ -13,6 +13,7 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder1D.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
 
@@ -55,8 +56,11 @@ namespace Belle2 {
     /// by calculating the conformal mapped x and y values of the 3D SpacePoint
     SpacePointLoaderAndPreparer m_spacePointLoaderAndPreparer;
 
-    /// Hough Space intercept finding for u-side
+    /// Hough Space intercept finder
     FastInterceptFinder2D m_interceptFinder;
+
+    /// Simple 1D Hough Space intercept finder
+    FastInterceptFinder1D m_simpleInterceptFinder;
 
     /// hits are a combination of:
     /// pointer to a SpacePoint

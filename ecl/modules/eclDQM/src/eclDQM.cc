@@ -103,7 +103,7 @@ void ECLDQMModule::defineHisto()
   h_quality_other->SetFillColor(kPink - 4);
   h_quality_other->SetOption("LIVE");
 
-  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs. Cell ID", 8736, 1, 8737);
+  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID", 8736, 1, 8737);
   h_bad_quality->GetXaxis()->SetTitle("Cell ID");
   h_bad_quality->SetOption("LIVE");
 
@@ -213,30 +213,30 @@ void ECLDQMModule::defineHisto()
 
   //2D histograms creation.
 
-  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Internal data consistency vs. crate. 0-good, 1-data corruption",
+  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Internal data consistency vs crate. 0-good, 1-data corruption",
                                52, 1, 53, 11, -1, 10);
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
   h_trigtag2_trigid->SetOption("LIVE");
 
-  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs. Cell ID", 8736, 1, 8737);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", 8736, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC counts, #approx 0.05 MeV)");
   h_pedmean_cellid->SetOption("LIVE");
 
-  h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal rms vs. Cell ID",
+  h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
                                  8736, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. rms (ADC counts, #approx 0.05 MeV)");
+  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC counts, #approx 0.05 MeV)");
   h_pedrms_cellid->SetOption("LIVE");
 
-  h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal rms vs. Theta ID",
+  h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal stddev vs #theta ID",
                                   68, 0, 68);
-  h_pedrms_thetaid->GetXaxis()->SetTitle("Theta ID (0-12=FWD, 59-67=BWD endcap)");
-  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. rms (ADC counts, #approx 0.05 MeV)");
+  h_pedrms_thetaid->GetXaxis()->SetTitle("#theta ID (0-12=FWD, 59-67=BWD endcap)");
+  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. stddev (ADC counts, #approx 0.05 MeV)");
   h_pedrms_thetaid->SetOption("LIVE");
 
-  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
+  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs Crate ID", 52, 1, 53, 145, 0, 145);
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time (only even, 0-142)");
   h_trigtime_trigid->SetOption("LIVE");
@@ -399,7 +399,7 @@ void ECLDQMModule::event()
 
     for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
     m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
-    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal rms histogram filling.
+    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal stddev histogram filling.
     m_geom->Mapping(i);
     h_pedrms_thetaid->Fill(m_geom->GetThetaID(), m_PedestalRms[i]);
 

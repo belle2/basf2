@@ -24,7 +24,7 @@ namespace Belle2::SVD {
     int cellID; /**<strip cellID*/
     int maxSample; /**< ADC max of the acquired samples*/
     float noise; /**< ADC noise */
-    Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC< of the acquired samples*/
+    Belle2::SVDShaperDigit::APVFloatSamples samples; /**< ADC of the acquired samples*/
     double charge; /**< strip charge*/
     double time; /**< strip time*/
   };
@@ -43,19 +43,30 @@ namespace Belle2::SVD {
 
     /**
      * Constructor to create an empty RawCluster
+     * @param vxdID sensorID
+     * @param isUside true if the RawCluster is on the U-side
+     * @param cutSeed minimum SNR of the seed strip
+     * @param cutAdjacent minimum SNR of a strip belonging to the cluster
      */
     RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent);
 
     /**
      * You can specify the name of StoreArray<SVDShaperDigit>
      * which are needed to get clustered samples.
+     * @param vxdID sensorID
+     * @param isUside true if the RawCluster is on the U-side
+     * @param cutSeed minimum SNR of the seed strip
+     * @param cutAdjacent minimum SNR of a strip belonging to the cluster
+     * @param storeShaperDigitsName name of the SVDShaperDigit StoreArray
      */
     RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent, const std::string& storeShaperDigitsName);
 
     /**
      * Add a Strip to the current cluster.
      * Update the cluster seed strip.
-     * @param StripInRawCluster aStrip to add to the cluster
+     * @param vxdID sensorID
+     * @param isUside true if the RawCluster is on the U-side
+     * @param aStrip the raw strip to be added to the cluster
      * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
      */
     bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);
@@ -76,12 +87,14 @@ namespace Belle2::SVD {
     bool isUSide() const {return m_isUside;}
 
     /**
+     * @param inElectrons if true samples are returned in electrons instead of ADC
      * @return the APVFloatSamples obtained summing
      * sample-by-sample all the strips on the cluster
      */
     Belle2::SVDShaperDigit::APVFloatSamples getClsSamples(bool inElectrons) const;
 
     /**
+     * @param inElectrons if true samples are returned in electrons instead of ADC
      * @return the float vector of clustered 3-samples
      * selected by the MaxSum method
      * with First Frame of the selection
@@ -110,10 +123,14 @@ namespace Belle2::SVD {
 
     /**
      * set the strip charge
+     * @param index of the strip in the cluster
+     * @param charge of the strip
      */
     void setStripCharge(int index, double charge) {m_strips.at(index).charge = charge;}
     /**
      * set the strip time
+     * @param index of the strip in the cluster
+     * @param time of the strip
      */
     void setStripTime(int index, double time) {m_strips.at(index).time = time;}
 

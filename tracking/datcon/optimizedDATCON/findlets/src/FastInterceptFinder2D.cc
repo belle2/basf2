@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -28,54 +29,54 @@ void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, c
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
-                                m_maxRecursionLevel,
+                                m_param_maxRecursionLevel,
                                 "Maximum recursion level for the fast Hough trafo algorithm.",
-                                m_maxRecursionLevel);
+                                m_param_maxRecursionLevel);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"),
-                                m_nAngleSectors,
+                                m_param_nAngleSectors,
                                 "Number of angle sectors (= x-axis) dividing the Hough space.",
-                                m_nAngleSectors);
+                                m_param_nAngleSectors);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"),
-                                m_nVerticalSectors,
+                                m_param_nVerticalSectors,
                                 "Number of vertical sectors (= y-axis) dividing the Hough space.",
-                                m_nVerticalSectors);
+                                m_param_nVerticalSectors);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"),
-                                m_verticalHoughSpaceSize,
-                                "data type: long. Vertical size of the Hough space.",
-                                m_verticalHoughSpaceSize);
+                                m_param_verticalHoughSpaceSize,
+                                "Vertical size of the Hough space.",
+                                m_param_verticalHoughSpaceSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"),
-                                m_minimumX,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMinimumX"),
+                                m_param_minimumX,
                                 "Minimum x value of the Hough space.",
-                                m_minimumX);
+                                m_param_minimumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumX"),
-                                m_maximumX,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMaximumX"),
+                                m_param_maximumX,
                                 "Maximum x value of the Hough space.",
-                                m_maximumX);
+                                m_param_maximumX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"),
-                                m_MinimumHSClusterSize,
+                                m_param_MinimumHSClusterSize,
                                 "Maximum x value of the Hough space.",
-                                m_MinimumHSClusterSize);
+                                m_param_MinimumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"),
-                                m_MaximumHSClusterSize,
+                                m_param_MaximumHSClusterSize,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSize);
+                                m_param_MaximumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"),
-                                m_MaximumHSClusterSizeX,
+                                m_param_MaximumHSClusterSizeX,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSizeX);
+                                m_param_MaximumHSClusterSizeX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"),
-                                m_MaximumHSClusterSizeY,
+                                m_param_MaximumHSClusterSizeY,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSizeY);
+                                m_param_MaximumHSClusterSizeY);
 
 }
 
@@ -83,12 +84,15 @@ void FastInterceptFinder2D::initialize()
 {
   Super::initialize();
 
-  m_maxRecursionLevel = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
-  B2ASSERT("The maximum number of currentRecursion in u must not be larger than 14, but it is " << m_maxRecursionLevel,
-           m_maxRecursionLevel <= 14);
-  m_unitX = (m_maximumX - m_minimumX) / m_nAngleSectors;
-  for (uint i = 0; i < m_nAngleSectors; i++) {
-    double x = m_minimumX + m_unitX * (double)i;
+  // TODO: fix value for max recursion level, should be the maximum of the parameter given, and the calculation below
+  m_param_maxRecursionLevel = ceil(log2(std::max(m_param_nAngleSectors, m_param_nVerticalSectors))) - 1;
+  B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
+           m_param_maxRecursionLevel <<
+           ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
+           m_param_maxRecursionLevel <= 14);
+  m_unitX = (m_param_maximumX - m_param_minimumX) / m_param_nAngleSectors;
+  for (uint i = 0; i < m_param_nAngleSectors; i++) {
+    double x = m_param_minimumX + m_unitX * (double)i;
     double xc = x + 0.5 * m_unitX;
 
     m_HSXLUT[i] = x;
@@ -98,77 +102,221 @@ void FastInterceptFinder2D::initialize()
     m_HSCenterCosValuesLUT[i] = cos(xc);
     m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_nAngleSectors] = m_maximumX;
-  m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
-  m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
+  m_HSXLUT[m_param_nAngleSectors] = m_param_maximumX;
+  m_HSSinValuesLUT[m_param_nAngleSectors] = sin(m_param_maximumX);
+  m_HSCosValuesLUT[m_param_nAngleSectors] = cos(m_param_maximumX);
 
-  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (uint i = 0; i <= m_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
+  m_unitY = 2. * m_param_verticalHoughSpaceSize / m_param_nVerticalSectors;
+  for (uint i = 0; i <= m_param_nVerticalSectors; i++) {
+    m_HSYLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i;
+    m_HSYCenterLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
-  B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize << " unitX: " << m_unitX <<
+  B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize << " unitX: "
+          << m_unitX <<
           " unitY: " << m_unitY);
+
+  initializeSectorFriendMap();
+
+  //call for a geometry instance
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+
+  for (auto& sensorID : aGeometry.getListOfSensors()) {
+    if (sensorID.getLayerNumber() == 6) {
+      m_layerSixSensors.emplace_back(sensorID);
+    }
+  }
+
 }
 
-void FastInterceptFinder2D::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
-                                  std::vector<std::pair<double, double>>& tracks)
+void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<const SpacePoint*>& trackCandidates)
 {
-  m_SectorArray.assign(m_nAngleSectors * m_nVerticalSectors, 0);
-  m_activeSectorArray.clear();
-  m_activeSectorArray.reserve(4096);
   m_trackCandidates.clear();
 
-  fastInterceptFinder2d(hits, 0, m_nAngleSectors, 0, m_nVerticalSectors, 0);
-//   for (uint y = 0; y < m_nVerticalSectors; y++) {
-//     for (uint x = 0; x < m_nAngleSectors; x++) {
-//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
-//       if (cellContent < -1) {
-//         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent >= 0 && cellContent < 10) {
-//         std::cout << " " <<  cellContent << " ";
-//       } else if (cellContent >= 10) {
-//         std::cout << cellContent << " ";
-//       }
-//     }
-//     std::cout << std::endl;
-//   }
-  FindHoughSpaceCluster();
-//   for (uint y = 0; y < m_nVerticalSectors; y++) {
-//     for (uint x = 0; x < m_nAngleSectors; x++) {
-//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
-//       if (cellContent < -1) {
-//         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent >= 0 && cellContent < 10) {
-//         std::cout << " " <<  cellContent << " ";
-//       } else if (cellContent >= 10) {
-//         std::cout << cellContent << " ";
-//       }
-//     }
-//     std::cout << std::endl;
-//   }
-//   std::cout << std::endl;
+  for (auto& sensorID : m_layerSixSensors) {
+    m_SectorArray.assign(m_param_nAngleSectors * m_param_nVerticalSectors, 0);
+    m_activeSectors.clear();
+    m_activeSectors.reserve(4096);
 
-  for (auto& trackCand : m_trackCandidates) {
-    tracks.emplace_back(trackCand);
+    m_currentSensorsHitList.clear();
+    fillThisSensorsHitMap(hits, sensorID);
+
+    fastInterceptFinder2d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
+
+//     FindHoughSpaceCluster();
   }
 
-  B2DEBUG(29, "m_activeSectorArray.size: " << m_activeSectorArray.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
+  for (auto& trackCand : m_trackCandidates) {
+//     trackCandidates.emplace_back(trackCand);
+  }
+
+  B2DEBUG(29, "m_activeSectors.size: " << m_activeSectors.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
 
 }
 
-void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
-                                                  uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion)
-{
-  std::vector<std::pair<VxdID, std::pair<long, long>>> containedHits;
 
-  if (currentRecursion == m_maxRecursionLevel + 1) return;
+void FastInterceptFinder2D::initializeSectorFriendMap()
+{
+  const std::vector<VxdID> friends6XX1 = {VxdID(3, 0, 1), VxdID(4, 0, 1), VxdID(5, 0, 1)};
+  const std::vector<VxdID> friends6XX2 = {VxdID(3, 0, 1), VxdID(4, 0, 1), VxdID(4, 0, 2), VxdID(5, 0, 1), VxdID(5, 0, 2)};
+  const std::vector<VxdID> friends6XX3 = {VxdID(3, 0, 1), VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(5, 0, 2), VxdID(5, 0, 3)};
+  const std::vector<VxdID> friends6XX4 = {VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 3), VxdID(5, 0, 4)};
+  const std::vector<VxdID> friends6XX5 = {VxdID(3, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 4)};
+
+  friendSensorMap thetaFriends;
+  thetaFriends.insert(std::make_pair(VxdID(6, 0, 1), friends6XX1));
+  thetaFriends.insert(std::make_pair(VxdID(6, 0, 2), friends6XX2));
+  thetaFriends.insert(std::make_pair(VxdID(6, 0, 3), friends6XX3));
+  thetaFriends.insert(std::make_pair(VxdID(6, 0, 4), friends6XX4));
+  thetaFriends.insert(std::make_pair(VxdID(6, 0, 5), friends6XX5));
+
+  const std::vector<VxdID> friends601X = {VxdID(3, 1, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 12, 0)};
+  const std::vector<VxdID> friends602X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 3, 0)};
+  const std::vector<VxdID> friends603X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 2, 0), VxdID(5, 3, 0)};
+  const std::vector<VxdID> friends604X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 3, 0), VxdID(5, 4, 0)};
+  const std::vector<VxdID> friends605X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(5, 5, 0)};
+  const std::vector<VxdID> friends606X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(5, 6, 0)};
+  const std::vector<VxdID> friends607X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 5, 0), VxdID(5, 6, 0)};
+  const std::vector<VxdID> friends608X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(5, 6, 0), VxdID(5, 7, 0)};
+  const std::vector<VxdID> friends609X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(5, 8, 0)};
+  const std::vector<VxdID> friends610X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(5, 9, 0)};
+  const std::vector<VxdID> friends611X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 8, 0), VxdID(5, 9, 0)};
+  const std::vector<VxdID> friends612X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 9, 0), VxdID(5, 10, 0)};
+  const std::vector<VxdID> friends613X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(5, 11, 0)};
+  const std::vector<VxdID> friends614X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0)};
+  const std::vector<VxdID> friends615X = {VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0)};
+  const std::vector<VxdID> friends616X = {VxdID(3, 1, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 12, 0)};
+
+  friendSensorMap phiFriends;
+  phiFriends.insert(std::make_pair(VxdID(6, 1, 0), friends601X));
+  phiFriends.insert(std::make_pair(VxdID(6, 2, 0), friends602X));
+  phiFriends.insert(std::make_pair(VxdID(6, 3, 0), friends603X));
+  phiFriends.insert(std::make_pair(VxdID(6, 4, 0), friends604X));
+  phiFriends.insert(std::make_pair(VxdID(6, 5, 0), friends605X));
+  phiFriends.insert(std::make_pair(VxdID(6, 6, 0), friends606X));
+  phiFriends.insert(std::make_pair(VxdID(6, 7, 0), friends607X));
+  phiFriends.insert(std::make_pair(VxdID(6, 8, 0), friends608X));
+  phiFriends.insert(std::make_pair(VxdID(6, 9, 0), friends609X));
+  phiFriends.insert(std::make_pair(VxdID(6, 10, 0), friends610X));
+  phiFriends.insert(std::make_pair(VxdID(6, 11, 0), friends611X));
+  phiFriends.insert(std::make_pair(VxdID(6, 12, 0), friends612X));
+  phiFriends.insert(std::make_pair(VxdID(6, 13, 0), friends613X));
+  phiFriends.insert(std::make_pair(VxdID(6, 14, 0), friends614X));
+  phiFriends.insert(std::make_pair(VxdID(6, 15, 0), friends615X));
+  phiFriends.insert(std::make_pair(VxdID(6, 16, 0), friends616X));
+
+  // Just count over all the 80 cases.
+  std::vector<VxdID> friendSensors;
+  unsigned short layer6Ladder = 0, layer6Sensor = 0;
+
+  // loop over all phiFriends containing layer 6 ladders
+  for (auto& phiFriendPair : phiFriends) {
+    // get the according vector friends6XX0 for this phiFriendPair
+    std::vector<VxdID> phiFriendLadders = phiFriendPair.second;
+    layer6Ladder = phiFriendPair.first.getLadderNumber();
+    // loop over all thetafriends containing layer 6 sensors
+    for (auto& thetaFriendPair : thetaFriends) {
+      friendSensors.clear();
+      // get the according vector friends600Y
+      std::vector<VxdID> thetaFriendSensors = thetaFriendPair.second;
+      layer6Sensor = thetaFriendPair.first.getSensorNumber();
+
+      // loop over all the layers/ladders in this phifriends vector, one specific friends6XX0
+      for (auto& phiFriend : phiFriendLadders) {
+        // loop over all sensor number in the different layers 3-5, one specific friends600Y
+        for (auto& thetaFriend : thetaFriendSensors) {
+          if (phiFriend.getLayerNumber() == thetaFriend.getLayerNumber()) {
+            // get layer number of either phiFriend or thetaFriend, ladder number from phiFriend, and the sensor number from the thetaFriend
+            friendSensors.emplace_back(VxdID(phiFriend.getLayerNumber(), phiFriend.getLadderNumber(), thetaFriend.getSensorNumber()));
+          }
+        }
+      }
+
+      m_fullFriendMap.insert(std::make_pair(VxdID(6, layer6Ladder, layer6Sensor), friendSensors));
+    }
+  }
+}
+
+void FastInterceptFinder2D::fillThisSensorsHitMap(std::vector<hitTuple>& hits, const VxdID thisLayerSixSensor)
+{
+  const std::vector<VxdID>& friendSensors = m_fullFriendMap.at(thisLayerSixSensor);
+
+  for (auto& hit : hits) {
+    const VxdID& currentHitSensorID = std::get<1>(hit);
+    const unsigned short hitLayer               = currentHitSensorID.getLayerNumber();
+    const unsigned short sensorInLayerSixLadder = currentHitSensorID.getSensorNumber();
+    const double hitZPosition = std::get<4>(hit);
+
+    if (currentHitSensorID.getLayerNumber() < 6) {
+      for (auto& friendSensor : friendSensors) {
+        if (currentHitSensorID == friendSensor) {
+          switch (sensorInLayerSixLadder) {
+            case 1:
+              if (hitLayer == 3 && hitZPosition > 6.56) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > 13.99) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > 18.34) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              }
+              break;
+            case 2:
+              if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > 6.58 && hitZPosition < 14.99) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > 8.71 && hitZPosition < 19.34) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              }
+              break;
+            case 3:
+              if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > -0.83 && hitZPosition < 7.58) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > -0.92 && hitZPosition < 9.71) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              }
+              break;
+            case 4:
+              if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > -8.23 && hitZPosition < 0.17) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > -10.55 && hitZPosition < 0.08) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              }
+              break;
+            case 5:
+              if (hitLayer == 3  && hitZPosition < -3.27) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 4  && hitZPosition < -7.23) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition < -9.55) {
+                m_currentSensorsHitList.emplace_back(&hit);
+              }
+              break;
+          }
+        }
+      }
+    } else if (currentHitSensorID == thisLayerSixSensor) {
+      m_currentSensorsHitList.emplace_back(&hit);
+    }
+  }
+}
+
+
+void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
+                                                  uint currentRecursion)
+{
+  std::vector<const hitTuple*> containedHits;
+
+  if (currentRecursion == m_param_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
   const uint centerx = xmin + (uint)((xmax - xmin) / 2);
   const uint centery = ymin + (uint)((ymax - ymin) / 2);
-  uint xIndexCache[3] = {xmin, centerx, xmax};
-  uint yIndexCache[3] = {ymin, centery, ymax};
+  const uint xIndexCache[3] = {xmin, centerx, xmax};
+  const uint yIndexCache[3] = {ymin, centery, ymax};
 
   for (int i = 0; i < 2 ; ++i) {
     const uint left  = xIndexCache[i];
@@ -179,10 +327,10 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, s
 
     const double& localLeft   = m_HSXLUT[left];
     const double& localRight  = m_HSXLUT[right];
-    const short&  sinLeft     = m_HSSinValuesLUT[left];
-    const short&  cosLeft     = m_HSCosValuesLUT[left];
-    const short&  sinRight    = m_HSSinValuesLUT[right];
-    const short&  cosRight    = m_HSCosValuesLUT[right];
+    const double& sinLeft     = m_HSSinValuesLUT[left];
+    const double& cosLeft     = m_HSCosValuesLUT[left];
+    const double& sinRight    = m_HSSinValuesLUT[right];
+    const double& cosRight    = m_HSCosValuesLUT[right];
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
@@ -194,47 +342,53 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<std::pair<VxdID, s
       const uint lowerIndex = yIndexCache[j];
       const uint upperIndex = yIndexCache[j + 1];
 
-      const uint localIndexY = lowerIndex;
-      const long& localUpperCoordinate = m_HSYLUT[lowerIndex];
-      const long& localLowerCoordinate = m_HSYLUT[upperIndex];
-
       if (lowerIndex == upperIndex) continue;
 
+      const uint localIndexY = lowerIndex;
+      const double& localUpperCoordinate = m_HSYLUT[lowerIndex];
+      const double& localLowerCoordinate = m_HSYLUT[upperIndex];
+
       std::vector<bool> layerHits(8); /* For layer filter */
-      for (auto& hit : hits) {
-        const VxdID& sensor = hit.first;
+//       for (auto& hit : hits) {
+      for (const hitTuple* hit : hits) {
+        const VxdID& sensor = std::get<1>((*hit));
 
-        const long& m = hit.second.first;
-        const long& a = hit.second.second;
+        const double& m = std::get<2>((*hit));
+        const double& a = std::get<3>((*hit));
 
-        long yLeft   = m * cosLeft   + a * sinLeft;
-        long yRight  = m * cosRight  + a * sinRight;
-        long yCenter = m * cosCenter + a * sinCenter;
-        long derivativeyLeft   = m * -sinLeft   + a * cosLeft;
-        long derivativeyRight  = m * -sinRight  + a * cosRight;
-        long derivativeyCenter = m * -sinCenter + a * cosCenter;
+        const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
+        const double derivativeyRight  = m * -sinRight  + a * cosRight;
+        const double derivativeyCenter = m * -sinCenter + a * cosCenter;
+
+        // Only interested in the rising arm of the sinosoidal curves.
+        // Thus if derivative on both sides of the cell is negative, ignore and continue.
+        if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
+
+        const double yLeft   = m * cosLeft   + a * sinLeft;
+        const double yRight  = m * cosRight  + a * sinRight;
+        const double yCenter = m * cosCenter + a * sinCenter;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-        if (((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
-             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate && derivativeyCenter >= 0)) &&
-            (derivativeyLeft >= 0 || derivativeyRight >= 0 || derivativeyCenter >= 0)) {
-          layerHits[sensor.getLayerNumber()] = true; /* layer filter */
-          containedHits.emplace_back(hit);
+        if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
+            (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
+          layerHits[sensor.getLayerNumber()] = true;
+          containedHits.emplace_back(&(*hit));
         }
       }
 
       if (layerFilter(layerHits) > 0) {
-        // recursive call of fastInterceptFinder2d, until currentRecursion == m_maxRecursionLevel
-        if (currentRecursion < m_maxRecursionLevel) {
+        // recursive call of fastInterceptFinder2d, until currentRecursion == m_param_maxRecursionLevel
+        if (currentRecursion < m_param_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          m_SectorArray[localIndexY * m_nAngleSectors + localIndexX] = -layerFilter(layerHits);
-          m_activeSectorArray.push_back(std::make_pair(localIndexX, localIndexY));
+          m_SectorArray[localIndexY * m_param_nAngleSectors + localIndexX] = -layerFilter(layerHits);
+          m_activeSectors.emplace_back(localIndexX, localIndexY, containedHits);
         }
       }
     }
   }
 }
+
 
 void FastInterceptFinder2D::FindHoughSpaceCluster()
 {
@@ -257,35 +411,28 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
   // By setting the offset to the maximum allowed number of cells (2^14) and simplifying
   // (16384 - a.second) * 16384 + a.first < (16384 - b.second) * 16384 + b.first
   // we get the formula below
-  auto sortSectors = [](const std::pair<uint, uint> a, const std::pair<uint, uint> b) {
-    return ((int)b.second - (int)a.second) * 16384 < (int)b.first - (int)a.first;
+  auto sortSectors = [](const activeSector & a, const activeSector & b) {
+    return ((int)std::get<1>(b) - (int)std::get<1>(a)) * 16384 < (int)std::get<1>(b) - (int)std::get<0>(a);
   };
-  std::sort(m_activeSectorArray.begin(), m_activeSectorArray.end(), sortSectors);
+  std::sort(m_activeSectors.begin(), m_activeSectors.end(), sortSectors);
 
-  for (auto& currentCell : m_activeSectorArray) {
-    const uint currentIndex = currentCell.second * m_nAngleSectors + currentCell.first;
+  for (auto& currentCell : m_activeSectors) {
+//     const uint currentIndex = currentCell.second * m_param_nAngleSectors + currentCell.first;
+    const uint currentIndex = std::get<1>(currentCell) * m_param_nAngleSectors + std::get<0>(currentCell);
     if (m_SectorArray[currentIndex] > -1) continue;
 
-    m_clusterInitialPosition = currentCell;
-    m_clusterCoG = currentCell;
+    m_clusterInitialPosition = std::make_pair(std::get<0>(currentCell), std::get<1>(currentCell));
+    m_clusterCoG = std::make_pair(std::get<0>(currentCell), std::get<1>(currentCell));
     m_clusterSize = 1;
     m_SectorArray[currentIndex] = m_clusterCount;
     // Check for HS sectors connected to each other which could form a cluster
-    DepthFirstSearch(currentCell.first, currentCell.second);
+    DepthFirstSearch(std::get<0>(currentCell), std::get<1>(currentCell));
     // if cluster valid (i.e. not too small and not too big): finalize!
-    if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_minimumX;
-      double CoGY = m_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
+    if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
+      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_param_minimumX;
+      double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
 
-      double trackPhi = CoGX + M_PI_2;
-      if (trackPhi < -M_PI) trackPhi += 2 * M_PI;
-      if (trackPhi >  M_PI) trackPhi -= 2 * M_PI;
-
-      // 1./CoGY * 1e10 yields trackRadius in mm. To convert to µm, which all other values are in,
-      // multiplication by another 1e3 is required -> total of 1e13
-      double trackRadius = 1. / CoGY * 1e+13;
-
-      m_trackCandidates.emplace_back(std::make_pair(trackPhi, trackRadius));
+//       m_trackCandidates.emplace_back(std::make_pair(trackPhi, trackRadius));
 
       B2DEBUG(29, "m_clusterCoG.first: " << m_clusterCoG.first << " " << ((double)m_clusterCoG.first / (double)m_clusterSize) <<
               " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) << " CoGX: " << CoGX
@@ -297,25 +444,25 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
 
 void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
-  if (m_clusterSize >= m_MaximumHSClusterSize) return;
+  if (m_clusterSize >= m_param_MaximumHSClusterSize) return;
 
   for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
-    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
-        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
+    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_param_MaximumHSClusterSizeY or
+        m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexY > m_param_nVerticalSectors) return;
     for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
-      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
-          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
+      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_param_MaximumHSClusterSizeX or
+          m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexX > m_param_nAngleSectors) return;
 
       // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
       if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;
 
       // first check bounds to avoid out-of-bound array access
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
-      if (currentIndexX < m_nAngleSectors and currentIndexY < m_nVerticalSectors) {
+      if (currentIndexX < m_param_nAngleSectors and currentIndexY < m_param_nVerticalSectors) {
 
-        if (m_SectorArray[currentIndexY * m_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
+        if (m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_param_MaximumHSClusterSize*/) {
           // Only continue searching if the current cluster is smaller than the maximum cluster size
-          m_SectorArray[currentIndexY * m_nAngleSectors + currentIndexX] = m_clusterCount;
+          m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] = m_clusterCount;
           m_clusterCoG = std::make_pair(m_clusterCoG.first + currentIndexX, m_clusterCoG.second + currentIndexY);
           m_clusterSize++;
           // search in the next Hough Space cells...

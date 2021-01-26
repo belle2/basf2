@@ -22,7 +22,7 @@ DATCONFindlet::~DATCONFindlet() = default;
 DATCONFindlet::DATCONFindlet()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
-
+  addProcessingSignalListener(&m_interceptFinder);
 }
 
 void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -30,7 +30,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   Super::exposeParameters(moduleParamList, prefix);
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
-
+  m_interceptFinder.exposeParameters(moduleParamList, prefix);
 }
 
 void DATCONFindlet::beginEvent()
@@ -45,5 +45,7 @@ void DATCONFindlet::apply()
 {
   m_spacePointLoaderAndPreparer.apply(m_hits);
   B2DEBUG(29, "m_hits.size(): " << m_hits.size());
+
+  m_interceptFinder.apply(m_hits, m_trackCandidates);
 
 }

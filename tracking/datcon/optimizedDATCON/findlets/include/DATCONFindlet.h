@@ -56,7 +56,7 @@ namespace Belle2 {
     SpacePointLoaderAndPreparer m_spacePointLoaderAndPreparer;
 
     /// Hough Space intercept finding for u-side
-//     FastInterceptFinder2D m_interceptFinder;
+    FastInterceptFinder2D m_interceptFinder;
 
     /// hits are a combination of:
     /// pointer to a SpacePoint
@@ -64,6 +64,8 @@ namespace Belle2 {
     /// the conformal-transformed x and y coordinates of the SpacePoint
     /// and its z coordinate
     std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>> m_hits;
+
+    std::vector<const SpacePoint*> m_trackCandidates;
 
   };
 }

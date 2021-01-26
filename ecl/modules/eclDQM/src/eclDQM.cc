@@ -122,6 +122,7 @@ void ECLDQMModule::defineHisto()
     h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h->GetXaxis()->SetTitle("Cell ID");
+    h->GetYaxis()->SetTitle("Occupancy (hits / event_number)");
     h->SetOption("LIVE");
     h_cids.push_back(h);
   }
@@ -182,7 +183,11 @@ void ECLDQMModule::defineHisto()
     std::string h_title;
     std::string h_cell_name;
     if (id == "other") h_title = str(boost::format("Waveforms for %1%") % (id));
-    else h_title = str(boost::format("Fraction of waveforms for %1%") % (id));
+    if (id == "psd") h_title = "Fraction of saved waveforms over expected for high-energy hits (E > 50 MeV)";
+    if (id == "logic") h_title = "Fraction of saved waveforms over expected for every 1000th event";
+    if (id == "rand") h_title = "Fraction of saved waveforms over expected for random trigger events";
+    if (id == "dphy") h_title = "Fraction of saved waveforms over expected for delayed bhabha (DPHY) events";
+    if (id == "all") h_title = "Fraction of saved waveforms over expected for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
     TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h_cell->GetXaxis()->SetTitle("Cell ID");

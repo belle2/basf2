@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'trg', 'trg_gdl_dataobjects']
+env['LIBS'] = ['framework', 'trg', 'trg_gdl_dataobjects', 'ecl_dataobjects', 'mdst_dataobjects', 'mdst_dbobjects']
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
 #	                 'TRASAN_WINDOW_GTK_HOUGH':None})
 #env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')

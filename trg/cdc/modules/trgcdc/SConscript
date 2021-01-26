@@ -2,6 +2,7 @@ Import('env')
 
 env['LIBS'] = ['framework',
                'trg_trg',
+               'trg_trg_dataobjects',
                'mdst_dataobjects',
                'cdc_dataobjects',
                'cdc',

@@ -16,6 +16,7 @@
 #include <vector>
 
 namespace Belle2 {
+  class SpacePoint;
   class VxdID;
 
   class ModuleParamList;
@@ -24,9 +25,16 @@ namespace Belle2 {
    * Findlet for finging intersections of sinosoidal curves in the 2D Hough space by iteratively calling
    * fastInterceptFinder2d.
    */
-  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
+  class FastInterceptFinder2D : public
+    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
+    using Super = TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*>;
+
+    typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
+
+    typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
+
+    typedef std::tuple<uint, uint, std::vector<const hitTuple*>> activeSector;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -39,9 +47,16 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits, std::vector<std::pair<double, double>>& tracks) override;
+    void apply(std::vector<hitTuple>& hits, std::vector<const SpacePoint*>& trackCandidates) override;
 
   private:
+    /// fill the map of friend sensors for each L6 sensor to
+    void initializeSectorFriendMap();
+
+    /// Use the friend map to just fill the hits in the acceptance region of the current L6 sensor into
+    /// the m_currentSensorsHitList which is then used the Hough trafo track finding
+    void fillThisSensorsHitMap(std::vector<hitTuple>& hits, const VxdID thisLayerSixSensor);
+
     /// layer filter, checks if at least hits from 3 layers are in a set of hits
     /// @param layer bool-vector containing information whether there as a hit in a layer
     inline unsigned short layerFilter(std::vector<bool> layer)
@@ -58,8 +73,7 @@ namespace Belle2 {
     /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
     /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
     /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-    void fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
-                               uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion);
+    void fastInterceptFinder2d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion);
 
     /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
     /// the DepthFirstSearch function to recursively find the clusters
@@ -72,35 +86,44 @@ namespace Belle2 {
 
     // Parameters
     /// maximum number of recursive calls of fastInterceptFinder2d
-    uint m_maxRecursionLevel = 6;
+    uint m_param_maxRecursionLevel = 7;
 
     /// number of sectors of the Hough Space on the horizontal axis
-    uint m_nAngleSectors = 256;
+    uint m_param_nAngleSectors = 128;
 
     /// number of sectors of the Hough Space on the vertical axis
-    uint m_nVerticalSectors = 256;
+    uint m_param_nVerticalSectors = 128;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
-    double m_verticalHoughSpaceSize = 0.2;
+    double m_param_verticalHoughSpaceSize = 0.1;
 
     /// minimum x value of the Hough Space, defaults to the value for u-side
-    double m_minimumX = -3.168;
+    double m_param_minimumX = -3.168;
     /// maximum x value of the Hough Space, defaults to the value for u-side
-    double m_maximumX = 3.168;
+    double m_param_maximumX = 3.168;
+
+    /// minimum cluster size of sectors belonging to intercepts in the Hough Space
+    uint m_param_MinimumHSClusterSize = 3;
+    /// maximum cluster size of sectors belonging to intercepts in the Hough Space
+    uint m_param_MaximumHSClusterSize = 1000;
+    /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
+    uint m_param_MaximumHSClusterSizeX = 1000;
+    /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
+    uint m_param_MaximumHSClusterSizeY = 1000;
 
     /// HS unit size in x
     double m_unitX = 0;
     /// HS unit size in y
     double m_unitY = 0;
 
-    /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_MinimumHSClusterSize = 3;
-    /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSize = 1000;
-    /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSizeX = 1000;
-    /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSizeY = 1000;
+    /// friendMap for all the SVD L6 sensors
+    friendSensorMap m_fullFriendMap;
+
+    /// all possible L6 sensors to loop over
+    std::vector<VxdID> m_layerSixSensors;
+
+    /// hits that are in the acceptance region (= on friend sensors) for the current L6 senosr
+    std::vector<const hitTuple*> m_currentSensorsHitList;
 
     /// Look-Up-Tables for values as cache to speed up calculation
     /// sine values of the Hough Space sector boarder coordinates
@@ -120,13 +143,13 @@ namespace Belle2 {
     /// x values of the Hough Space sector centers
     std::array<double, 16384> m_HSXCenterLUT = {0};
 
-    /// vector containing only the 1D representation of active cells to speed up processing
-    std::vector<uint> m_SectorArray;
-    /// vector containing information for each cell whether it contained enough hits after m_maxRecursionLevel
-    /// to be "active".
-    /// The value will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
-    /// The value will be positive with the cluster number assigned to it after cluster finding
-    std::vector<std::pair<uint, uint>> m_activeSectorArray;
+    /// Vector containing only the 1D representation of active cells to speed up processing
+    /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
+    /// The value at each position will be positive with the cluster number assigned to it after cluster finding
+    std::vector<int> m_SectorArray;
+    /// Vector only containing active HS sectors, i.e. those with hits from enough layers contained in them.
+    /// The content are the indices of the HS cell, and the hit tuples in that cell
+    std::vector<activeSector> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
@@ -134,7 +157,7 @@ namespace Belle2 {
     uint m_clusterSize = 0;
 
     /// start cell of the recursive cluster finding in the Hough Space
-    std::pair<int, int> m_clusterInitialPosition = std::make_pair(0, 0);
+    std::pair<uint, uint> m_clusterInitialPosition = std::make_pair(0, 0);
     /// center of gravity containing describing the current best track parameters in the Hough Space
     std::pair<int, int> m_clusterCoG = std::make_pair(0, 0);
 

@@ -99,7 +99,7 @@ void ECLDQMModule::defineHisto()
   h_quality->SetOption("LIVE");
 
   h_quality_other = new TH1F("quality_other", "Fit quality flag for unexpectedly saved waveforms", 4, 0, 4);
-  h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good, 1-integer overflow, 2-low amplitude, 3-bad chi2");
+  h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
   h_quality_other->SetFillColor(kPink - 4);
   h_quality_other->SetOption("LIVE");
 
@@ -122,7 +122,7 @@ void ECLDQMModule::defineHisto()
     h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h->GetXaxis()->SetTitle("Cell ID");
-    h->GetYaxis()->SetTitle("Occupancy (hits / event_number)");
+    h->GetYaxis()->SetTitle("Occupancy (hits / events_count)");
     h->SetOption("LIVE");
     h_cids.push_back(h);
   }
@@ -130,9 +130,9 @@ void ECLDQMModule::defineHisto()
   for (const auto& id : m_TotalEnergyThresholds) {
     std::string h_name, h_title;
     h_name = str(boost::format("edep_Thr%1%MeV") % id);
-    h_title = str(boost::format("Total energy (E > %1% MeV)") % id);
+    h_title = str(boost::format("Total energy (thr = %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), (int)(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
-    h->GetXaxis()->SetTitle("energy, [GeV]");
+    h->GetXaxis()->SetTitle("Energy, [GeV]");
     h->SetOption("LIVE");
     h_edeps.push_back(h);
   }
@@ -182,12 +182,12 @@ void ECLDQMModule::defineHisto()
       B2WARNING("Waveform Options are not correctly assigned. They must be 'all', 'psd', 'logic', 'rand', 'dphy', 'other'!");
     std::string h_title;
     std::string h_cell_name;
-    if (id == "other") h_title = str(boost::format("Waveforms for %1%") % (id));
-    if (id == "psd") h_title = "Fraction of saved waveforms over expected for high-energy hits (E > 50 MeV)";
-    if (id == "logic") h_title = "Fraction of saved waveforms over expected for every 1000th event";
-    if (id == "rand") h_title = "Fraction of saved waveforms over expected for random trigger events";
-    if (id == "dphy") h_title = "Fraction of saved waveforms over expected for delayed bhabha (DPHY) events";
-    if (id == "all") h_title = "Fraction of saved waveforms over expected for all events";
+    if (id == "other") h_title = "Unexpectedly saved waveforms";
+    if (id == "psd") h_title = "#frac{Saved}{Expected} waveforms for high-energy hits (E > 50 MeV)";
+    if (id == "logic") h_title = "#frac{Saved}{Expected} waveforms for every 1000th event";
+    if (id == "rand") h_title = "#frac{Saved}{Expected} waveforms for random trigger events";
+    if (id == "dphy") h_title = "#frac{Saved}{Expected} waveforms for delayed bhabha (DPHY) events";
+    if (id == "all") h_title = "#frac{Saved}{Expected} waveforms for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
     TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h_cell->GetXaxis()->SetTitle("Cell ID");
@@ -221,19 +221,19 @@ void ECLDQMModule::defineHisto()
 
   h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs. Cell ID", 8736, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedmean_cellid->GetYaxis()->SetTitle("Pedestal average");
+  h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC counts, #approx 0.05 MeV)");
   h_pedmean_cellid->SetOption("LIVE");
 
   h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal rms vs. Cell ID",
                                  8736, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms");
+  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. rms (ADC counts, #approx 0.05 MeV)");
   h_pedrms_cellid->SetOption("LIVE");
 
   h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal rms vs. Theta ID",
                                   68, 0, 68);
-  h_pedrms_thetaid->GetXaxis()->SetTitle("Theta ID");
-  h_pedrms_thetaid->GetYaxis()->SetTitle("Pedestal rms");
+  h_pedrms_thetaid->GetXaxis()->SetTitle("Theta ID (0-12=FWD, 59-67=BWD endcap)");
+  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. rms (ADC counts, #approx 0.05 MeV)");
   h_pedrms_thetaid->SetOption("LIVE");
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);

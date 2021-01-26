@@ -103,8 +103,8 @@ void DQMHistAnalysisECLModule::initialize()
 
   //New DQM summary for logic test in CR shifter panel
   c_logic_summary = new TCanvas("ECL/c_logic_summary");
-  h_logic_summary = new TH2F("logic_summary", "FPGA - C++ fitter inconsistencies count", 52, 1, 53, 12, 1, 13);
-  h_logic_summary->SetTitle("FPGA - C++ fitter inconsistencies count; ECLCollector ID (same as Crate ID); Shaper ID inside the crate");
+  h_logic_summary = new TH2F("logic_summary", "FPGA <-> C++ fitter inconsistencies count", 52, 1, 53, 12, 1, 13);
+  h_logic_summary->SetTitle("FPGA <-> C++ fitter inconsistencies count; ECLCollector ID (same as Crate ID); Shaper ID inside the crate");
   h_logic_summary->SetCanExtend(TH1::kAllAxes);
   h_logic_summary->SetStats(0);
   for (unsigned short i = 0; i < 52; i++) h_logic_summary->GetXaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());

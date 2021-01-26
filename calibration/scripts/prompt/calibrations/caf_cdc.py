@@ -14,7 +14,12 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_names=[
+                                   "mumutight_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_filters={
+                                   "mumutight_calib": ["mumutight_calib", "Good", "On"],
+                                   "hadron_calib": ["hadron_calib", "Good", "On"],
+                                   "cosmic_calib": ["cosmic_calib", "Good", "On"]},
                                depends_on=[],
                                expert_config={
                                    "max_files_per_run": 100000,
@@ -22,7 +27,8 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "max_events_per_calibration": 200000,
                                    "max_events_per_calibration_for_xt_sr": 1000000,
                                    "max_events_per_file": 5000,
-                                   "max_events_per_file_hadron": 2500
+                                   "max_events_per_file_hadron": 2500,
+                                   "request_memory": 4,
                                })
 
 
@@ -105,15 +111,17 @@ def get_calibrations(input_data, **kwargs):
         max_events_per_calibration_for_xt_sr,
         max_events_per_file)
 
-    input_file_dict = {"mumutight_calib": chosen_files_mumu_for_xt_sr,
-                       "hadron_calib": chosen_files_hadron_for_xt_sr,
-                       "cosmic_calib": chosen_files_Bcosmics_for_xt_sr
-                       }
+    input_file_dict = {
+        "mumutight_calib": chosen_files_mumu_for_xt_sr,
+        "hadron_calib": chosen_files_hadron_for_xt_sr,
+        "cosmic_calib": chosen_files_Bcosmics_for_xt_sr
+    }
 
-    chosen_file_dict = {"mumutight_calib": chosen_files_mumu,
-                        "hadron_calib": chosen_files_hadron,
-                        "cosmic_calib": chosen_files_Bcosmics
-                        }
+    chosen_file_dict = {
+        "mumutight_calib": chosen_files_mumu,
+        "hadron_calib": chosen_files_hadron,
+        "cosmic_calib": chosen_files_Bcosmics
+    }
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
@@ -375,11 +383,13 @@ class CDCCalibration(Calibration):
                 collection = Collection(collector=collector(),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector_cr(max_events=max_events),
+                                        # max_files_per_collector_job=1
                                         )
             else:
                 collection = Collection(collector=collector(),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events),
+                                        # max_files_per_collector_job=1
                                         )
             self.add_collection(name=skim_type, collection=collection)
 

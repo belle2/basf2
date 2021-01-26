@@ -45,7 +45,7 @@ namespace Belle2::SVD {
      * Constructor to create an empty RawCluster
      * @param vxdID sensorID
      * @param isUside true if the RawCluster is on the U-side
-     * @param cutSee minimum SNR of the seed strip
+     * @param cutSeed minimum SNR of the seed strip
      * @param cutAdjacent minimum SNR of a strip belonging to the cluster
      */
     RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent);
@@ -55,7 +55,7 @@ namespace Belle2::SVD {
      * which are needed to get clustered samples.
      * @param vxdID sensorID
      * @param isUside true if the RawCluster is on the U-side
-     * @param cutSee minimum SNR of the seed strip
+     * @param cutSeed minimum SNR of the seed strip
      * @param cutAdjacent minimum SNR of a strip belonging to the cluster
      * @param storeShaperDigitsName name of the SVDShaperDigit StoreArray
      */
@@ -66,7 +66,7 @@ namespace Belle2::SVD {
      * Update the cluster seed strip.
      * @param vxdID sensorID
      * @param isUside true if the RawCluster is on the U-side
-     * @param StripInRawCluster aStrip to add to the cluster
+     * @param aStrip the raw strip to be added to the cluster
      * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
      */
     bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);

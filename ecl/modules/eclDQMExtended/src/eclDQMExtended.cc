@@ -505,15 +505,6 @@ void ECLDQMEXTENDEDModule::event()
     emulator(m_CellId, m_TrigTime, DspArray);
     ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
 
-    if ((m_AmpFit < (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
-      if (m_AmpFit != -128)
-        B2ERROR("ECL DQM logic test error: ECL Digit exists for A_emulator < Thr_skip"
-                << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
-                << LogVar("A_emulator", m_AmpFit)
-                << LogVar("A_data", aECLDigit->getAmp()));
-      else B2WARNING("ECL DQM logic test warning: A_emulator == -128");
-    }
-
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
       B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
               << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])

@@ -23,7 +23,7 @@ namespace Belle2 {
    * It will record some stat data of this DHP
    *
    */
-  class PXDDAQDHPStatus {
+  class PXDDAQDHPStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */

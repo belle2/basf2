@@ -107,12 +107,12 @@ Please follow the steps below to install the program.
 
   3. ``cd topoana``
 
-  4. Switch to the latest release with ``git checkout v02-08-06``
+  4. Switch to the latest release with ``git checkout vxx-yy-zz``
 
-     .. tip::
+     .. note::
 
-        The latest release is ``v02-08-06`` when the online textbook is being written.
-        Of course, the latest release evolves over time, and you can find it with ``git tag | tail -1``.
+        Here, ``vxx-yy-zz`` stands for the version number of the latest release.
+        Please replace it with the concrete version number, which you can find with ``git tag | tail -1``.
 
   5. Configure the package path with ``./Configure``
 
@@ -197,40 +197,41 @@ After the following steps:
 
 you can get an root file ``MCGenTopo.root`` containing a ``TTree`` object ``MCGenTopo``, which in return contains the MC truth information for topology analysis.
 With the ``C/C++`` interpreter of ``ROOT``, you can check and see the MC truth information as follows.
+Notably, the comments on the right side are the explanations on the command lines and the key variables.
 
 .. code-block:: none
 
-   [zhouxy@ccw04 test]$ root -l
-   root [0] TFile f("MCGenTopo.root")
+   [zhouxy@ccw04 test]$ root -l                         // Get into the interpreter
+   root [0] TFile f("MCGenTopo.root")                   // Open the root file
    (TFile &) Name: MCGenTopo.root Title: 
-   root [1] f.ls()
+   root [1] f.ls()                                      // List the objects in the root file
    TFile**         MCGenTopo.root  
     TFile*         MCGenTopo.root  
      KEY: TTree    MCGenTopo;1     
-   root [2] MCGenTopo->Show(0)
+   root [2] MCGenTopo->Show(0)                          // Show the first entry of the TTree object
    ======> EVENT:0
     __experiment__  = 1003
     __run__         = 0
     __event__       = 6735002
     __production__  = 0
     __weight__      = 1
-    nMCGen          = 94
+    nMCGen          = 94                                // nMCGen is the number of the particles
     MCGenPDG_0      = 300553
     MCGenMothIndex_0 = nan
     MCGenPDG_1      = -511
     MCGenMothIndex_1 = 0
-    MCGenPDG_2      = 511
-    MCGenMothIndex_2 = 0
+    MCGenPDG_2      = 511                               // MCGenPDG_i is the PDG code
+    MCGenMothIndex_2 = 0                                              of the i^th particle
 
     ...
 
-    MCGenPDG_197    = nan
-    MCGenMothIndex_197 = nan
+    MCGenPDG_197    = nan                               // MCGenMothIndex_i is the mother index
+    MCGenMothIndex_197 = nan                                                of the i^th particle
     MCGenPDG_198    = nan
     MCGenMothIndex_198 = nan
     MCGenPDG_199    = nan
     MCGenMothIndex_199 = nan
-   root [3] .q
+   root [3] .q                                          // Quit the interpreter
 
 .. tip:: 
 
@@ -318,6 +319,8 @@ Run the program
 
 With the card file, one can execute the program with the command line ``topoana.exe cardFileName``, where the argument ``cardFileName`` is optional and its default value is ``topoana.card``.
 
+... tip:: You can try to execute ``topoana.exe --help`` to see other optional arguments supported in the command line.
+
 After the following steps:
 
   1. Create a new card file named ``topoana.card`` under the ``test`` directory we made above, and copy and paste the content of the card file above into it.
@@ -357,41 +360,42 @@ The column headers expressed with abbreviations are explained as follows:
 In the table, ``iDcyTr`` is the topology tag for decay trees.
 Thus, it is also saved in the ``TTree`` object of the output root file.
 With the ``C/C++`` interpreter of ``ROOT``, you can check it as follow and see it at the end of the code block.
+Similarly, the right side presents the explanations on the command lines and the key variables.
 
 .. code-block:: none
 
-   [zhouxy@ccw04 test]$ root -l
-   root [0] TFile f("topoana.root")
-   (TFile &) Name: topoana.root Title: 
-   root [1] f.ls()
-   TFile**         topoana.root    
-    TFile*         topoana.root    
-     KEY: TTree    MCGenTopo;4     
-     KEY: TTree    MCGenTopo;3     
-   root [2] MCGenTopo->Show(0)
+   [zhouxy@ccw04 test]$ root -l                         // Get into the interpreter
+   root [0] TFile f("MCGenTopo.root")                   // Open the root file
+   (TFile &) Name: MCGenTopo.root Title:
+   root [1] f.ls()                                      // List the objects in the root file
+   TFile**         MCGenTopo.root
+    TFile*         MCGenTopo.root
+     KEY: TTree    MCGenTopo;1
+   root [2] MCGenTopo->Show(0)                          // Show the first entry of the TTree object
    ======> EVENT:0
     __experiment__  = 1003
     __run__         = 0
     __event__       = 6735002
     __production__  = 0
     __weight__      = 1
-    nMCGen          = 94
+    nMCGen          = 94                                // nMCGen is the number of the particles
     MCGenPDG_0      = 300553
     MCGenMothIndex_0 = nan
     MCGenPDG_1      = -511
     MCGenMothIndex_1 = 0
-    MCGenPDG_2      = 511
-    MCGenMothIndex_2 = 0
-   
+    MCGenPDG_2      = 511                               // MCGenPDG_i is the PDG code
+    MCGenMothIndex_2 = 0                                              of the i^th particle
+
     ...
-   
-    MCGenPDG_197    = nan
-    MCGenMothIndex_197 = nan
+
+    MCGenPDG_197    = nan                               // MCGenMothIndex_i is the mother index
+    MCGenMothIndex_197 = nan                                                of the i^th particle
     MCGenPDG_198    = nan
     MCGenMothIndex_198 = nan
     MCGenPDG_199    = nan
     MCGenMothIndex_199 = nan
-    iDcyTr          = 0         // This is the newly added topology tag!
+    iDcyTr          = 0                                 // This is the newly added topology tag!
+   root [3] .q                                          // Quit the interpreter
 
 .. tip::
 
@@ -405,26 +409,31 @@ The example above only introduces the basic usage of ``TopoAna``.
 You can refer to the documents we introduce in :numref:`TopologyAnalysis` for more descriptions of the tool. 
 At the end of this online textbook, we provide the following five exercises for you to further explore the usage of ``TopoAna``.
 You will benefit a lot when you accomplish these exercises.
-In the course of doing these exercises, you can refer to the quick-start tutorial and the user guide we introduce in :numref:`TopologyAnalysis`.
+To do these exercises, you need to look up the proper setting items in the quick-start tutorial or the user guide we introduce in :numref:`TopologyAnalysis`, add them to the card file, and re-run the program.
 
 .. admonition:: Exercise 1
    :class: exercise stacked
 
-   Try to understand the following setting item, add it to the card file, re-run the program, and check the changes of the output files.
-
-   .. code-block:: none
-
-      % Component analysis --- decay branches of particles
-      {
-        D*+        Dsp       10
-        J/psi      Jpsi      10
-      }
+   Try to examine the decay branches of :math:`D^{*+}` and the top ten decay branches of :math:`J/\psi` in the input sample.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
 
    * See Section 3 in the quick-start tutorial for the introduction of the setting item.
    * See Section 3.3 in the user guide for the description of the setting item.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Add the following setting item to the card file, re-run the program, and check the changes of the output files.
+
+   .. code-block:: none
+
+      % Component analysis --- decay branches of particles
+      {
+        D*+        Dsp
+        J/psi      Jpsi      10
+      }
 
 .. admonition:: Extension
    :class: toggle xhint
@@ -434,7 +443,18 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
 .. admonition:: Exercise 2
    :class: exercise stacked
 
-   Try to understand the following setting item, add it to the card file, re-run the program, and check the changes of the output files.
+   Try to identify the decay branches :math:`\bar{B}^{0} \rightarrow \mu^{-} \bar{\nu}_{\mu} D^{*+}` and :math:`B^{0} \rightarrow K_{S}^{0} J/\psi` in the input sample.
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   * See Section 4 in the quick-start tutorial for the introduction of the setting item.
+   * See Section 4.4 in the user guide for the description of the setting item.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Add the following setting item to the card file, re-run the program, and check the changes of the output files.
 
    .. code-block:: none
 
@@ -444,12 +464,6 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
         B0 --> K_S0  J/psi                    &       B2KsJpsi
       }
 
-.. admonition:: Hint
-   :class: toggle xhint stacked
-
-   * See Section 4 in the quick-start tutorial for the introduction of the setting item.
-   * See Section 4.4 in the user guide for the description of the setting item.
-
 .. admonition:: Extension
    :class: toggle xhint
 
@@ -458,7 +472,19 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
 .. admonition:: Exercise 3
    :class: exercise stacked
 
-   Try to understand the following setting item, add it to the card file, re-run the program, and check the changes of the output files.
+   In the previous example and the above two exercises, we did not consider charge conjugation, which is an important concept in high energy physics.
+   In this exercise, try to process the charge conjugate particles, decay branches, and decay trees together.
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   * See Section 5 in the quick-start tutorial for the introduction of the setting item.
+   * See Section 5.2.2 in the user guide for the description of the setting item.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Add the following setting item to the card file, re-run the program, and check the changes of the output files.
 
    .. code-block:: none
           
@@ -466,12 +492,6 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
       {
         Y
       }
-
-.. admonition:: Hint
-   :class: toggle xhint stacked
-
-   * See Section 5 in the quick-start tutorial for the introduction of the setting item.
-   * See Section 5.2.2 in the user guide for the description of the setting item.
 
 .. admonition:: Extension
    :class: toggle xhint
@@ -481,7 +501,17 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
 .. admonition:: Exercise 4
    :class: exercise stacked
 
-   Try to understand the following setting item, add it to the card file, re-run the program, and check the changes of the output files.
+   Try to impose some cuts to select events. For example, impose one cut to select only the events with 20 MC generated particles.
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   * See Section 5.1.1 in the user guide for the description of the setting item.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Add the following setting item to the card file, re-run the program, and check the changes of the output files.
 
    .. code-block:: none
 
@@ -489,11 +519,6 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
       {
         nMCGen==20
       }
-
-.. admonition:: Hint
-   :class: toggle xhint stacked
-
-   * See Section 5.1.1 in the user guide for the description of the setting item.
 
 .. admonition:: Extension
    :class: toggle xhint
@@ -503,7 +528,17 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
 .. admonition:: Exercise 5 
    :class: exercise stacked
 
-   Try to understand the following setting item, add it to the card file, re-run the program, and check the changes of the output files.
+   Try to remove the input ``TBranch`` objects ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``) from the output root files before the program terminates.
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   * See Section 5.3.2 in the user guide for the description of the setting item.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Add the following setting item to the card file, re-run the program, and check the changes of the output files.
 
    .. code-block:: none
 
@@ -511,11 +546,6 @@ In the course of doing these exercises, you can refer to the quick-start tutoria
       {
         Y
       }
-
-.. admonition:: Hint
-   :class: toggle xhint stacked
-
-   * See Section 5.3.2 in the user guide for the description of the setting item.
 
 .. admonition:: Extension
    :class: toggle xhint

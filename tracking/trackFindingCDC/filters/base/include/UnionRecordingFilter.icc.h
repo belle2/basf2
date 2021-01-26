@@ -107,7 +107,7 @@ namespace Belle2 {
 
       std::vector<std::string> filterNames;
       filterNames.reserve(filterNamesAndDescriptions.size());
-      for (const std::pair<std::string, std::string>& filterNameAndDescription :
+      for (const auto& filterNameAndDescription :
            filterNamesAndDescriptions) {
         const std::string& filterName = filterNameAndDescription.first;
         filterNames.push_back(filterName);

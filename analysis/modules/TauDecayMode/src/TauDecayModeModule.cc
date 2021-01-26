@@ -1,14 +1,14 @@
 /**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) 2020 - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: Leonardo Salinas                                         *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Leonardo Salinas , Swagato Banerjee , Atanu Pathak       *
+ *               Michel Hernandez, Eduard De la Cruz.                     *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#include <TauDecayModeModule.h>
+#include <analysis/modules/TauDecayMode/TauDecayModeModule.h>
 
 
 #include <framework/datastore/StoreArray.h>
@@ -20,17 +20,14 @@
 #include <utility>
 
 #include <framework/logging/Logger.h>
-#include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TMatrixFSymfwd.h>
 #include "TMath.h"
 #include "TCanvas.h"
-#include "TBox.h"
 
 #include "TColor.h"
 #include "TStyle.h"
 #include "TLatex.h"
-#include "TDirectory.h"
 #include "TKey.h"
 #include "TObject.h"
 
@@ -72,7 +69,7 @@ std::vector<std::string> parseString(std::string str, std::string sep)
 std::map<string, int> make_map()
 {
 
-  const char* fileName = "/home/evilgauss/Documentos/BelleII/TauolaBBB/workdir/map_tau_v4.txt";
+  const char* fileName = "map_tau_v4.txt";
 
   ifstream f;
   f.open(fileName);

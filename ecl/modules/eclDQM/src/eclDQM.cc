@@ -221,19 +221,19 @@ void ECLDQMModule::defineHisto()
 
   h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", 8736, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC counts, #approx 0.05 MeV)");
+  h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC units, #approx 0.05 MeV)");
   h_pedmean_cellid->SetOption("LIVE");
 
   h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
                                  8736, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC counts, #approx 0.05 MeV)");
+  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
   h_pedrms_cellid->SetOption("LIVE");
 
   h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal stddev vs #theta ID",
                                   68, 0, 68);
   h_pedrms_thetaid->GetXaxis()->SetTitle("#theta ID (0-12=FWD, 59-67=BWD endcap)");
-  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. stddev (ADC counts, #approx 0.05 MeV)");
+  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
   h_pedrms_thetaid->SetOption("LIVE");
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs Crate ID", 52, 1, 53, 145, 0, 145);

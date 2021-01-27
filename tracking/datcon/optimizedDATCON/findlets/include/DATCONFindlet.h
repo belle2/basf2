@@ -62,6 +62,8 @@ namespace Belle2 {
     /// Simple 1D Hough Space intercept finder
     FastInterceptFinder1D m_simpleInterceptFinder;
 
+    // container to share data between findlets
+
     /// hits are a combination of:
     /// pointer to a SpacePoint
     /// the VxdID of the SpacePoint
@@ -69,7 +71,13 @@ namespace Belle2 {
     /// and its z coordinate
     std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>> m_hits;
 
+    /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
+    /// will be created, which are stored in a vector themselves.
     std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
+
+    /// Parameter to switch between the 1D and 2D intercept finder options
+    /// Instead two findlets could be created that would only differ in the intercept finder findlet
+    bool m_param_use1DInterceptFinder = false;
 
   };
 }

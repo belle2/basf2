@@ -94,7 +94,7 @@ void FastInterceptFinder1D::initialize()
   initializeSectorFriendMap();
 
   //call for a geometry instance
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   for (auto& sensorID : aGeometry.getListOfSensors()) {
     if (sensorID.getLayerNumber() == 6) {
@@ -187,21 +187,19 @@ void FastInterceptFinder1D::initializeSectorFriendMap()
   phiFriends.insert(std::make_pair(VxdID(6, 15, 0), friends615X));
   phiFriends.insert(std::make_pair(VxdID(6, 16, 0), friends616X));
 
-  // Just count over all the 80 cases.
   std::vector<VxdID> friendSensors;
-  unsigned short layer6Ladder = 0, layer6Sensor = 0;
 
   // loop over all phiFriends containing layer 6 ladders
   for (auto& phiFriendPair : phiFriends) {
     // get the according vector friends6XX0 for this phiFriendPair
     std::vector<VxdID> phiFriendLadders = phiFriendPair.second;
-    layer6Ladder = phiFriendPair.first.getLadderNumber();
+    unsigned short layer6Ladder = phiFriendPair.first.getLadderNumber();
     // loop over all thetafriends containing layer 6 sensors
     for (auto& thetaFriendPair : thetaFriends) {
       friendSensors.clear();
       // get the according vector friends600Y
       std::vector<VxdID> thetaFriendSensors = thetaFriendPair.second;
-      layer6Sensor = thetaFriendPair.first.getSensorNumber();
+      unsigned short layer6Sensor = thetaFriendPair.first.getSensorNumber();
 
       // loop over all the layers/ladders in this phifriends vector, one specific friends6XX0
       for (auto& phiFriend : phiFriendLadders) {
@@ -341,7 +339,7 @@ void FastInterceptFinder1D::fastInterceptFinder1d(std::vector<const hitTuple*>& 
           (yCenter <= m_param_verticalHoughSpaceSize && yCenter >= -m_param_verticalHoughSpaceSize && derivativeyCenter >= 0)) {
         const VxdID& sensor = std::get<1>(*hit);
         layerHits[sensor.getLayerNumber()] = true;
-        containedHits.emplace_back(&(*hit));
+        containedHits.emplace_back(hit);
       }
     }
 

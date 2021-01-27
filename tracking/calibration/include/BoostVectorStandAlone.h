@@ -21,30 +21,35 @@
 #ifdef _PACKAGE_
 #include <tracking/calibration/Splitter.h>
 #else
-#include "Splitter.h"
+#include <Splitter.h>
 #endif
 
 namespace Belle2 {
   namespace BoostVectorCalib {
+
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+    static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
+    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+
     /** track parameters (neglecting curvature) */
     struct Track {
-      TVector3 p; ///< momentum vector of the track
-      double pid; ///< particle ID of mu/e separation
+      TVector3 p = vecNaN; ///< momentum vector of the track
+      double pid = realNaN; ///< particle ID of mu/e separation
     };
 
     /** Event containing two tracks */
     struct Event {
-      int exp;   ///< experiment number
-      int run;   ///< run number
-      int evtNo; ///< event number
+      int exp  = intNaN;  ///< experiment number
+      int run  = intNaN;  ///< run number
+      int evtNo = intNaN; ///< event number
 
 
       Track mu0; ///< track in the event
       Track mu1; ///< other track in the event
 
-      int nBootStrap; ///< random bootstrap weight (n=1 -> original sample)
-      bool isSig;     ///< is not removed by quality cuts?
-      double t;       ///< time of event [hours]
+      int nBootStrap = intNaN;///< random bootstrap weight (n=1 -> original sample)
+      bool isSig = false;     ///< is not removed by quality cuts?
+      double t = realNaN;     ///< time of event [hours]
 
     };
 

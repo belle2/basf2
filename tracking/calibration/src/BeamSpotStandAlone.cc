@@ -50,9 +50,9 @@
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>
 #else
-#include "BeamSpotStandAlone.h"
-#include "Splitter.h"
-#include "tools.h"
+#include <BeamSpotStandAlone.h>
+#include <Splitter.h>
+#include <tools.h>
 #endif
 
 

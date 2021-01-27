@@ -21,9 +21,9 @@
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>
 #else
-#include "InvariantMassStandAlone.h"
-#include "Splitter.h"
-#include "tools.h"
+#include <InvariantMassStandAlone.h>
+#include <Splitter.h>
+#include <tools.h>
 #endif
 
 using Eigen::MatrixXd;

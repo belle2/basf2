@@ -19,7 +19,7 @@
 #ifdef _PACKAGE_
 #include <tracking/calibration/Splitter.h>
 #else
-#include "Splitter.h"
+#include <Splitter.h>
 #endif
 
 namespace Belle2 {

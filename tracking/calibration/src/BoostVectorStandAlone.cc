@@ -22,10 +22,10 @@
 #include <tracking/calibration/tools.h>
 #include <tracking/calibration/minimizer.h>
 #else
-#include "BoostVectorStandAlone.h"
-#include "Splitter.h"
-#include "tools.h"
-#include "minimizer.h"
+#include <BoostVectorStandAlone.h>
+#include <Splitter.h>
+#include <tools.h>
+#include <minimizer.h>
 #endif
 
 using namespace std;

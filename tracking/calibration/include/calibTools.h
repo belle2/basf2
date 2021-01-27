@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "tracking/calibration/Splitter.h"
+#include <tracking/calibration/Splitter.h>
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 #include <functional>

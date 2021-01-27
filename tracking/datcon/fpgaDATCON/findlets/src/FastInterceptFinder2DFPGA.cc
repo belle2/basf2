@@ -212,7 +212,8 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
       if (lowerIndex == upperIndex) continue;
 
-      std::vector<bool> layerHits(8); /* For layer filter */
+      std::vector<bool> layerHits(7); /* For layer filter */
+      containedHits.clear();
       for (auto& hit : hits) {
         const VxdID& sensor = hit.first;
 

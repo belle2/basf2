@@ -69,7 +69,7 @@ namespace Belle2 {
     /// and its z coordinate
     std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>> m_hits;
 
-    std::vector<const SpacePoint*> m_trackCandidates;
+    std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
 
   };
 }

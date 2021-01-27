@@ -22,8 +22,11 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for finging intersections of sinosoidal curves in the 2D Hough space by iteratively calling
-   * fastInterceptFinder2d.
+   * Findlet for finding intersections of sinosoidal curves in the 2D Hough space by iteratively calling
+   * fastInterceptFinder2d. This is done 80 times for a subset of SVD sensors, one subset for each layer 6 sensor
+   * to reduce combinatorics in the Hough Space and to improve the purity of the found track candidates.
+   * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
+   * and stored in the output vector.
    */
   class FastInterceptFinder2D : public
     TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>> {

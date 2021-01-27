@@ -48,7 +48,7 @@ void DATCONFindlet::apply()
   m_spacePointLoaderAndPreparer.apply(m_hits);
   B2DEBUG(29, "m_hits.size(): " << m_hits.size());
 
-//   m_interceptFinder.apply(m_hits, m_trackCandidates);
-  m_simpleInterceptFinder.apply(m_hits, m_trackCandidates);
+  m_interceptFinder.apply(m_hits, m_trackCandidates);
+//   m_simpleInterceptFinder.apply(m_hits, m_trackCandidates);
 
 }

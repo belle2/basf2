@@ -90,7 +90,7 @@ void FastInterceptFinder2D::initialize()
            m_param_maxRecursionLevel <<
            ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
            m_param_maxRecursionLevel <= 14);
-  m_unitX = (m_param_maximumX - m_param_minimumX) / m_param_nAngleSectors;
+  m_unitX = (m_param_maximumX - m_param_minimumX) / (double)m_param_nAngleSectors;
   for (uint i = 0; i < m_param_nAngleSectors; i++) {
     double x = m_param_minimumX + m_unitX * (double)i;
     double xc = x + 0.5 * m_unitX;
@@ -128,17 +128,16 @@ void FastInterceptFinder2D::initialize()
 
 }
 
-void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<const SpacePoint*>& trackCandidates)
+void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates)
 {
   m_trackCandidates.clear();
 
-  for (auto& sensorID : m_layerSixSensors) {
+  for (auto& friends : m_fullFriendMap) {
     m_SectorArray.assign(m_param_nAngleSectors * m_param_nVerticalSectors, 0);
     m_activeSectors.clear();
-    m_activeSectors.reserve(4096);
 
     m_currentSensorsHitList.clear();
-    fillThisSensorsHitMap(hits, sensorID);
+    fillThisSensorsHitMap(hits, friends.first);
 
     fastInterceptFinder2d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
 
@@ -146,7 +145,7 @@ void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<const
   }
 
   for (auto& trackCand : m_trackCandidates) {
-//     trackCandidates.emplace_back(trackCand);
+    trackCandidates.emplace_back(trackCand);
   }
 
   B2DEBUG(29, "m_activeSectors.size: " << m_activeSectors.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
@@ -243,7 +242,7 @@ void FastInterceptFinder2D::fillThisSensorsHitMap(std::vector<hitTuple>& hits, c
   for (auto& hit : hits) {
     const VxdID& currentHitSensorID = std::get<1>(hit);
     const unsigned short hitLayer               = currentHitSensorID.getLayerNumber();
-    const unsigned short sensorInLayerSixLadder = currentHitSensorID.getSensorNumber();
+    const unsigned short sensorInLayerSixLadder = thisLayerSixSensor.getSensorNumber();
     const double hitZPosition = std::get<4>(hit);
 
     if (currentHitSensorID.getLayerNumber() < 6) {
@@ -334,8 +333,8 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const short   sinCenter   = sin((localLeft + localRight) / 2.);
-    const short   cosCenter   = cos((localLeft + localRight) / 2.);
+    const double sinCenter   = sin((localLeft + localRight) / 2.);
+    const double cosCenter   = cos((localLeft + localRight) / 2.);
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];
@@ -347,11 +346,12 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
       const double& localUpperCoordinate = m_HSYLUT[lowerIndex];
       const double& localLowerCoordinate = m_HSYLUT[upperIndex];
 
-      std::vector<bool> layerHits(6); /* For layer filter */
+      std::vector<bool> layerHits(7); /* For layer filter */
+      containedHits.clear();
       for (const hitTuple* hit : hits) {
 
-        const double& m = std::get<2>((*hit));
-        const double& a = std::get<3>((*hit));
+        const double& m = std::get<2>(*hit);
+        const double& a = std::get<3>(*hit);
 
         const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
         const double derivativeyRight  = m * -sinRight  + a * cosRight;
@@ -368,7 +368,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
-          const VxdID& sensor = std::get<1>((*hit));
+          const VxdID& sensor = std::get<1>(*hit);
           layerHits[sensor.getLayerNumber()] = true;
           containedHits.emplace_back(&(*hit));
         }
@@ -380,7 +380,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
           m_SectorArray[localIndexY * m_param_nAngleSectors + localIndexX] = -layerFilter(layerHits);
-          m_activeSectors.emplace_back(localIndexX, localIndexY, containedHits);
+          m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), containedHits});
         }
       }
     }
@@ -390,51 +390,35 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
 
 void FastInterceptFinder2D::FindHoughSpaceCluster()
 {
-  // cell content meanings:
-  // -3, -4  : active sector, not yet visited
-  // 0       : non-active sector (will never be visited, only checked)
-  // 1,2,3...: index of the clusters
-
   m_clusterCount = 1;
 
-  // this sorting makes sure the clusters can be searched from bottom left of the HS to top right
-  // normally, a C++ array looks like a matrix:
-  // (0   , 0) ... (maxX, 0   )
-  //    ...            ...
-  // (0, maxY) ... (maxX, maxY)
-  // but for sorting we want it to be like regular coordinates
-  // (0, maxY) ... (maxX, maxY)
-  //    ...            ...
-  // (0, 0   ) ... (maxX, 0   )
-  // By setting the offset to the maximum allowed number of cells (2^14) and simplifying
-  // (16384 - a.second) * 16384 + a.first < (16384 - b.second) * 16384 + b.first
-  // we get the formula below
-  auto sortSectors = [](const activeSector & a, const activeSector & b) {
-    return ((int)std::get<1>(b) - (int)std::get<1>(a)) * 16384 < (int)std::get<1>(b) - (int)std::get<0>(a);
-  };
-  std::sort(m_activeSectors.begin(), m_activeSectors.end(), sortSectors);
-
   for (auto& currentCell : m_activeSectors) {
-//     const uint currentIndex = currentCell.second * m_param_nAngleSectors + currentCell.first;
-    const uint currentIndex = std::get<1>(currentCell) * m_param_nAngleSectors + std::get<0>(currentCell);
+    const uint currentIndex = currentCell.first.second * m_param_nAngleSectors + currentCell.first.first;
+
+    // cell content meanings:
+    // -3, -4  : active sector, not yet visited
+    // 0       : non-active sector (will never be visited, only checked)
+    // 1,2,3...: index of the clusters
     if (m_SectorArray[currentIndex] > -1) continue;
 
-    m_clusterInitialPosition = std::make_pair(std::get<0>(currentCell), std::get<1>(currentCell));
-    m_clusterCoG = std::make_pair(std::get<0>(currentCell), std::get<1>(currentCell));
+    m_clusterInitialPosition = std::make_pair(currentCell.first.first, currentCell.first.second);
+//     m_clusterCoG = std::make_pair(currentCell.first.first, currentCell.first.second);
     m_clusterSize = 1;
     m_SectorArray[currentIndex] = m_clusterCount;
+
+    m_currentTrackCandidate.clear();
+    for (auto& hit : currentCell.second) {
+      m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
+    }
+
     // Check for HS sectors connected to each other which could form a cluster
-    DepthFirstSearch(std::get<0>(currentCell), std::get<1>(currentCell));
+    DepthFirstSearch(currentCell.first.first, currentCell.first.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
-      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_param_minimumX;
-      double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
+//       double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_param_minimumX;
+//       double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
 
-//       m_trackCandidates.emplace_back(std::make_pair(trackPhi, trackRadius));
-
-      B2DEBUG(29, "m_clusterCoG.first: " << m_clusterCoG.first << " " << ((double)m_clusterCoG.first / (double)m_clusterSize) <<
-              " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) << " CoGX: " << CoGX
-              << " CoGY: " << CoGY);
+      m_trackCandidates.emplace_back(m_currentTrackCandidate);
     }
     m_clusterCount++;
   }
@@ -461,8 +445,17 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
         if (m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_param_MaximumHSClusterSize*/) {
           // Only continue searching if the current cluster is smaller than the maximum cluster size
           m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] = m_clusterCount;
-          m_clusterCoG = std::make_pair(m_clusterCoG.first + currentIndexX, m_clusterCoG.second + currentIndexY);
+//           m_clusterCoG = std::make_pair(m_clusterCoG.first + currentIndexX, m_clusterCoG.second + currentIndexY);
           m_clusterSize++;
+
+          // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
+          // so it's certain the key exists.
+          for (auto& hit : m_activeSectors.at({currentIndexX, currentIndexY})) {
+            if (not TrackFindingCDC::is_in(std::get<0>(*hit), m_currentTrackCandidate)) {
+              m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
+            }
+          }
+
           // search in the next Hough Space cells...
           DepthFirstSearch(currentIndexX, currentIndexY);
         }

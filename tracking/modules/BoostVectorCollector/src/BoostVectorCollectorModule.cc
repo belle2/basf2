@@ -34,8 +34,6 @@ BoostVectorCollectorModule::BoostVectorCollectorModule() : CalibrationCollectorM
   m_exp(-99), m_run(-99), m_evt(-99),
   m_time(-99),
   m_mu0_pid(-99), m_mu1_pid(-99)
-  //m_mu0_px(-99), m_mu0_px(-99), m_mu0_pz(-99),
-  //m_mu1_px(-99), m_mu1_px(-99), m_mu1_pz(-99)
 {
   //Set module properties
 
@@ -94,12 +92,12 @@ void BoostVectorCollectorModule::collect()
 
   const Particle* part0 = Y4SParticles->getParticle(0)->getDaughter(0);
   const Particle* part1 = Y4SParticles->getParticle(0)->getDaughter(1);
-  //const TrackFitResult* tr0 = part0->getTrackFitResult();
-  //const TrackFitResult* tr1 = part1->getTrackFitResult();
 
+  // Get the mu/e PID
   m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
   m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
 
+  // get 3-vectors of the mu/e momenta
   m_mu0_p = part0->getMomentum();
   m_mu1_p = part1->getMomentum();
 

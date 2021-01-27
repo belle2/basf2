@@ -138,22 +138,19 @@ namespace Belle2 {
     /** Rapidities of particles with momenta vecs wrt the input boost vector (tanAngleX, tanAnlgeY) (in mili-units) */
     vector<double> getRapidities(vector<TVector3> vecs, vector<double> boostDir)
     {
-      TVector3 boost(boostDir[0] / 1e3, boostDir[1] / 1e3, 1);
+      TVector3 boost(boostDir[0], boostDir[1], 1);
       boost = boost.Unit();
 
       double th0 = vecs[0].Angle(boost);
       double th1 = vecs[1].Angle(boost);
 
-      double C0, C1;
-      double mL  = 105.6583745; //muon mass [MeV]
-      {
-        double pMu0 = vecs[0].Mag();
-        double pMu1 = vecs[1].Mag();
+      const double mL  = 105.6583745e-3; //muon mass [GeV]
 
-        C0 = 1. / sqrt(pow(1e-3 * mL / pMu0, 2) + 1);
-        C1 = 1. / sqrt(pow(1e-3 * mL / pMu1, 2) + 1);
-      }
+      double pMu0 = vecs[0].Mag();
+      double pMu1 = vecs[1].Mag();
 
+      double C0 = 1. / sqrt(pow(mL / pMu0, 2) + 1);
+      double C1 = 1. / sqrt(pow(mL / pMu1, 2) + 1);
 
       double y0 = atanh(cos(th0) * C0);
       double y1 = atanh(cos(th1) * C1);
@@ -174,7 +171,7 @@ namespace Belle2 {
         TVector3 n = vecs[0].Cross(vecs[1]);
         double phi = n.Phi();
         double angle = M_PI / 2 - n.Theta();
-        auto res = make_pair(phi, 1e3 * tan(angle));
+        auto res = make_pair(phi, tan(angle));
 
         for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
           vCos.push_back(cos(res.first));
@@ -189,7 +186,7 @@ namespace Belle2 {
       fun.mat = toMat({vCos, vSin, vData});
       fun.res.resize(vCos.size());
 
-      auto res = getMinimum(fun, 130 , 170, -20, 20);
+      auto res = getMinimum(fun, 130e-3 , 170e-3, -20e-3, 20e-3);
 
 
       return res;
@@ -285,19 +282,28 @@ namespace Belle2 {
     /** run boost vector calibration over evts */
     TVector3 getBoostVector(const vector<Event>& evts)
     {
+      // Get the direction of the boost vector (tanXZ and tanYZ)
       vector<double> boostDir = fitBoostFast(evts);
-      double yMag = fitBoostMagnitude(evts, boostDir);
-      double beta = tanh(yMag); //from rapidity to velocity
 
-      TVector3 bVec = TVector3(boostDir[0] / 1e3, boostDir[1] / 1e3, 1);
+      // Get the rapidity of the boost vector
+      double yMag = fitBoostMagnitude(evts, boostDir);
+
+      //from rapidity to velocity
+      double beta = tanh(yMag);
+
+      // Vector pointing in the boost vector direction
+      TVector3 bVec = TVector3(boostDir[0], boostDir[1], 1);
+
+      // Adding proper magnitude of the vector (in speed of light units)
       bVec = beta * bVec.Unit();
+
       return bVec;
     }
 
     /** run boost vector calibration for several bootstrap replicas to get unc. */
     pair<Vector3d, Matrix3d>  getBoostAndError(vector<Event> evts)
     {
-      evts = filter(evts, {151.986 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
+      evts = filter(evts, {151.986e-3 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
 
       vectorVar var;
 
@@ -360,14 +366,14 @@ namespace Belle2 {
         tie(boostVec[i], boostVecUnc[i]) =  getBoostAndError(evtsSep[i]);
 
 
-        // TanThetaXZ of boostVector
+        // TanThetaXZ of boostVector [mrad]
         double aX = 1e3 * boostVec[i][0] / boostVec[i][2];
-        // TanThetaYZ of boostVector
+        // TanThetaYZ of boostVector [mrad]
         double aY = 1e3 * boostVec[i][1] / boostVec[i][2];
 
-        // TanThetaXZ unc of boostVector
+        // TanThetaXZ unc of boostVector [mrad]
         double eX = 1e3 * sqrt(boostVecUnc[i](0, 0)) / boostVec[i](2);
-        // TanThetaYZ unc of boostVector
+        // TanThetaYZ unc of boostVector [mrad]
         double eY = 1e3 * sqrt(boostVecUnc[i](1, 1)) / boostVec[i](2);
 
         B2INFO(evtsSep[i][0].run << " " << i << " " <<  evtsSep[i].size() << " :  " << aX << "+-" << eX << "  " << aY << "+-" << eY <<

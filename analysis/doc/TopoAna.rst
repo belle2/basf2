@@ -65,3 +65,13 @@ As for the three documents, the quick-start tutorial is the briefest, the user g
    It is a good practice to learn how to use the tool via the examples 
    in the quick-start tutorial, user guide, and paper draft, 
    in addition to the online textbook in :numref:`onlinebook_topoana`.
+
+~~~~~~~~~~~~~~~~~~~~~
+Use cases at Belle II
+~~~~~~~~~~~~~~~~~~~~~
+
+At the end of this section, we list two use cases of ``TopoAna`` at Belle II: one for the semitauonic analysis and the other for the charm analysis.
+You can refer to them if you work in the related analysis groups.
+
+* `Using TopoAna with the semitauonic framework <https://confluence.desy.de/display/BI/Using+topoAna+with+the+semitauonic+framework>`_ by Hannah Marie Wakeling
+* `TopoAna Wrapper for Charm Analysis <https://stash.desy.de/projects/B2CHARM/repos/charm_topoanawrapper/browse>`_ by Guanda Gong

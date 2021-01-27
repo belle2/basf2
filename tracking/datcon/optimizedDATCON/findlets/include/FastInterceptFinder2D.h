@@ -26,15 +26,14 @@ namespace Belle2 {
    * fastInterceptFinder2d.
    */
   class FastInterceptFinder2D : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*> {
+    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*>;
+    using Super =
+      TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
     typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
-
-    typedef std::tuple<uint, uint, std::vector<const hitTuple*>> activeSector;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -47,7 +46,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<hitTuple>& hits, std::vector<const SpacePoint*>& trackCandidates) override;
+    void apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates) override;
 
   private:
     /// fill the map of friend sensors for each L6 sensor to
@@ -105,12 +104,13 @@ namespace Belle2 {
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
     uint m_param_MinimumHSClusterSize = 3;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSize = 1000;
+    uint m_param_MaximumHSClusterSize = 100;
     /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSizeX = 1000;
+    uint m_param_MaximumHSClusterSizeX = 100;
     /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSizeY = 1000;
+    uint m_param_MaximumHSClusterSizeY = 100;
 
+    // class variables
     /// HS unit size in x
     double m_unitX = 0;
     /// HS unit size in y
@@ -147,9 +147,28 @@ namespace Belle2 {
     /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
     /// The value at each position will be positive with the cluster number assigned to it after cluster finding
     std::vector<int> m_SectorArray;
+
+    /// this sorting makes sure the clusters can be searched from bottom left of the HS to top right
+    /// normally, a C++ array looks like a matrix:
+    /// (0   , 0) ... (maxX, 0   )
+    ///    ...            ...
+    /// (0, maxY) ... (maxX, maxY)
+    /// but for sorting we want it to be like regular coordinates
+    /// (0, maxY) ... (maxX, maxY)
+    ///    ...            ...
+    /// (0, 0   ) ... (maxX, 0   )
+    /// By setting the offset to the maximum allowed number of cells (2^14) and simplifying
+    /// (16384 - lhs.second) * 16384 + lhs.first < (16384 - rhs.second) * 16384 + rhs.first
+    /// to
+    /// (rhs.second - lhs.second) * 16384 < rhs.first - lhs.first
+    /// we get the formula below
+    struct paircompare {
+      bool operator()(const std::pair<uint, uint>& lhs, const std::pair<uint, uint>& rhs) const
+      {return ((int)rhs.second - (int)lhs.second) * 16384 < (int)rhs.first - (int)lhs.first;}
+    };
     /// Vector only containing active HS sectors, i.e. those with hits from enough layers contained in them.
     /// The content are the indices of the HS cell, and the hit tuples in that cell
-    std::vector<activeSector> m_activeSectors;
+    std::map<std::pair<uint, uint>, std::vector<const hitTuple*>, paircompare> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
@@ -161,8 +180,11 @@ namespace Belle2 {
     /// center of gravity containing describing the current best track parameters in the Hough Space
     std::pair<int, int> m_clusterCoG = std::make_pair(0, 0);
 
+    /// the current track candidate
+    std::vector<const SpacePoint*> m_currentTrackCandidate;
+
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<std::pair<double, double>> m_trackCandidates;
+    std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
 
   };
 }

@@ -26,15 +26,14 @@ namespace Belle2 {
    * fastInterceptFinder2d.
    */
   class FastInterceptFinder1D : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*> {
+    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, const SpacePoint*>;
+    using Super =
+      TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
     typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
-
-    typedef std::pair<uint, std::vector<const hitTuple*>> activeSector;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -47,7 +46,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<hitTuple>& hits, std::vector<const SpacePoint*>& trackCandidates) override;
+    void apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates) override;
 
   private:
     /// fill the map of friend sensors for each L6 sensor to
@@ -78,8 +77,8 @@ namespace Belle2 {
     void FindHoughSpaceCluster();
 
     /// Perform depth first search recursive algorithm to find clusters in the Hough Space
-    /// @param lastIndexX x-index of the last cell checked
-    void DepthFirstSearch(uint lastIndexX);
+    /// @param lastIndex (x-)index of the last cell checked
+    void DepthFirstSearch(uint lastIndex);
 
     // Parameters
     /// maximum number of recursive calls of fastInterceptFinder2d
@@ -99,8 +98,9 @@ namespace Belle2 {
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
     uint m_param_MinimumHSClusterSize = 3;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSize = 1000;
+    uint m_param_MaximumHSClusterSize = 10;
 
+    // class variables
     /// HS unit size in x
     double m_unitX = 0;
 
@@ -133,20 +133,18 @@ namespace Belle2 {
     std::vector<int> m_SectorArray;
     /// Vector only containing active HS sectors, i.e. those with hits from enough layers contained in them.
     /// The content are the indices of the HS cell, and the hit tuples in that cell
-    std::vector<activeSector> m_activeSectors;
+    std::map<uint, std::vector<const hitTuple*>> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
     /// size of the current cluster
     uint m_clusterSize = 0;
 
-    /// start cell of the recursive cluster finding in the Hough Space
-    uint m_clusterInitialPosition = 0;
-    /// center of gravity containing describing the current best track parameters in the Hough Space
-    int m_clusterCoG = 0;
+    /// the current track candidate
+    std::vector<const SpacePoint*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-//     std::vector<std::pair<double, double>> m_trackCandidates;
+    std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
 
   };
 }

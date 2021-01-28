@@ -781,7 +781,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
                                      The decay string determines the type of Particle
-                                     and determines the of the ParticleList.
+                                     and the name of the ParticleList.
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
@@ -801,14 +801,26 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [i[0] for i in decayStringsWithCuts])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
-    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
     for decayString, cut in decayStringsWithCuts:
-        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-            getBeamBackgroundProbabilityMVA(decayString, path)
+        decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+        if "->" in decayString:
+            if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
+                copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
+            if cut != "":
+                applyCuts(decayString.split(" ->")[0], cut, path)
+        elif len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+            copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+        if cut != "" and "->" not in decayString:
+            applyCuts(decayString, cut, path)
+        if decayString.startswith("gamma"):
+            if not loadPhotonsFromKLM:
+                applyCuts(decayString, 'isFromECL', path)
+            if loadPhotonBeamBackgroundMVA:
+                getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
@@ -873,13 +885,25 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
-    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-        getBeamBackgroundProbabilityMVA(decayString, path)
+    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+    if "->" in decayString:
+        if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
+            copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
+            if cut != "":
+                applyCuts(decayString.split(" ->")[0], cut, path)
+    elif len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+    if cut != "" and "->" not in decayString:
+        applyCuts(decayString, cut, path)
+    if decayString.startswith("gamma"):
+        if not loadPhotonsFromKLM:
+            applyCuts(decayString, 'isFromECL', path)
+        if loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -905,11 +929,16 @@ def fillParticleListWithTrackHypothesis(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
+    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
@@ -924,7 +953,7 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
         fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
 
     Parameters:
-        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+        decayString (str): Must be gamma to an e+e- pair. You must specify the daughter ordering.
                            Will also determine the name of the particleList.
         cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):   whether RootOutput module should save the created ParticleList
@@ -933,10 +962,15 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', True)
     pload.param('writeOut', writeOut)
     path.add_module(pload)
+    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
+        copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
+    if cut != "":
+        applyCuts(decayString.split(" ->")[0], cut, path)
 
 
 def fillParticleListFromROE(decayString,
@@ -967,13 +1001,18 @@ def fillParticleListFromROE(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param('roeMaskName', maskName)
     pload.param('useMissing', useMissing)
     pload.param('sourceParticleListName', sourceParticleListName)
     pload.param('useROEs', True)
     path.add_module(pload)
+    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'ROE':
+        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':ROE', writeOut, path)
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillParticleListFromMC(decayString,
@@ -999,12 +1038,17 @@ def fillParticleListFromMC(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'MC':
+        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':MC', writeOut, path)
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillParticleListsFromMC(decayStringsWithCuts,
@@ -1033,12 +1077,18 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [i[0] for i in decayStringsWithCuts])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+    for decayString, cut in decayStringsWithCuts:
+        decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
+        if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'MC':
+            copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':MC', writeOut, path)
+        if cut != "":
+            applyCuts(decayString, cut, path)
 
 
 def applyCuts(list_name, cut, path):

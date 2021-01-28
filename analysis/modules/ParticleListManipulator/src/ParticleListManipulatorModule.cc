@@ -81,6 +81,16 @@ namespace Belle2 {
 
     m_pdgCode  = mother->getPDGCode();
 
+    // For final state particles we protect the label "all" because it is already used for lists created by the ParticleLoader.
+    // Otherwise, very dangerous bugs could be introduced.
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode)))) {
+      string listLabel = mother->getLabel();
+      if (listLabel == "all")
+        B2FATAL("You have tried to create the list " << m_outputListName <<
+                " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
+                " It could introduce *very* dangerous bugs.");
+    }
+
     m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
     m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
 

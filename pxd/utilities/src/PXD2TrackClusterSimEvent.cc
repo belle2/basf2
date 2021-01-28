@@ -8,26 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#include <pxd/utilities/PXD2TrackClusterSimEvent.h>
 
-#include <pxd/utilities/PXDTuple.h>
-#include <pxd/utilities/PXD2TrackBase.h>
-
-
+/** To be implemented for the gain calibration method
+ * based on track cluster simulation.
+ */
 namespace Belle2 {
-
-  using namespace Belle2::PXD::Tuple;
-
-
-  /** Class PXD2TrackEvent: Event data container for performance and calibration studies.
-   * This class holds all required variables for TTree creation and
-   * the analysis, such that no relation lookup is needed.
-   *
-   * Caveat: this class is not placed in the dataobjects folder
-   * to avoid dependency cycles.
-   */
-  class PXD2TrackEvent : public PXD2TrackBase<Track_t >  {
-
-    ClassDef(PXD2TrackEvent, 1);
-  };
+  namespace PXD {
+    namespace Tuple {
+    } // end namespace Tuple
+  } // end namespace PXD
 } // end namespace Belle2

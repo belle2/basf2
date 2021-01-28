@@ -9,8 +9,11 @@
 #pragma link C++ struct Belle2::PXD::Tuple::Cluster_t;
 #pragma link C++ struct Belle2::PXD::Tuple::TrackPoint_t;
 #pragma link C++ struct Belle2::PXD::Tuple::TrackCluster_t;
-#pragma link C++ struct Belle2::PXD::Tuple::Track_t<Belle2::PXD::Tuple::TrackCluster_t>;
-#pragma link C++ class Belle2::PXD2TrackEvent+; // checksum=0x1727038f, version=1
-
+#pragma link C++ struct Belle2::PXD::Tuple::Track_t;
+#pragma link C++ struct Belle2::PXD::Tuple::TrackWithSim_t;
+#pragma link C++ class Belle2::PXD2TrackBase<Belle2::PXD::Tuple::Track_t >+; // checksum=0xdd18f387, version=1
+#pragma link C++ class Belle2::PXD2TrackEvent+; // checksum=0xbe2aa1b9, version=1
+#pragma link C++ class Belle2::PXD2TrackBase<Belle2::PXD::Tuple::TrackWithSim_t >+; // checksum=0x74ebe796, version=1
+#pragma link C++ class Belle2::PXD2TrackClusterSimEvent+; // checksum=0xcd2c4e0e, version=1
 
 #endif

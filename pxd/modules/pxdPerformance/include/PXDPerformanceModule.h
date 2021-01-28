@@ -34,7 +34,8 @@ namespace Belle2 {
   //namespace PXD {
 
   /** PXD Performance module.
-   * This module collects data from Belle II background simulation and produces a report
+   * This module collects data from cDSTs and save them into an event class
+   * for performance studies.
    */
   class PXDPerformanceModule: public Module {
 

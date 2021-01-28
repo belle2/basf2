@@ -11,9 +11,9 @@
 #include <pxd/utilities/PXDTuple.h>
 #include <framework/logging/Logger.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
+//#include <mdst/dataobjects/Track.h>
+//#include <mdst/dataobjects/HitPatternCDC.h>
+//#include <mdst/dataobjects/HitPatternVXD.h>
 
 namespace Belle2 {
   namespace PXD {
@@ -110,52 +110,16 @@ namespace Belle2 {
             cluster.setValues(aCluster);
             dU = aCluster.getU() - pxdIntercept.getCoorU();
             dV = aCluster.getV() - pxdIntercept.getCoorV();
+            usedInTrack = true;
             break;
           }
         }
+        // If usedInTrack is still false, we can loop all PXDClusters to find one closest to the track point. (To be implemented)
         return recoTrackPtr;
       }
 
-      template <typename TTrackCluster>
-      void Track_t<TTrackCluster>::setValues(const RecoTrack& recoTrack, const TVector3& ip)
-      {
-        // get Track pointer
-        auto trackPtr = recoTrack.getRelated<Track>("Tracks");
-        if (!trackPtr) {
-          B2ERROR("Expect a track for fitted recotracks. Found nothing!");
-        }
-
-        // get trackFitResult pointer
-        auto tfrPtr = trackPtr->getTrackFitResultWithClosestMass(Const::pion);
-        if (!tfrPtr) {
-          B2ERROR("expect a track fit result for pion. Found Nothing!");
-        }
-        nCDCHits = tfrPtr->getHitPatternCDC().getNHits();
-        nSVDHits = tfrPtr->getHitPatternVXD().getNSVDHits();
-        nPXDHits = tfrPtr->getHitPatternVXD().getNPXDHits();
-        tanLambda = tfrPtr->getCotTheta();
-        pt = tfrPtr->getMomentum().Perp();
-        d0 = tfrPtr->getD0();
-        z0 = tfrPtr->getZ0();
-        phi0 = tfrPtr->getPhi0();
-        if (ip != TVector3(0, 0, 0)) {
-          // get a helix and change coordinate origin to ip
-          auto uHelix = tfrPtr->getUncertainHelix();
-          uHelix.passiveMoveBy(ip);
-          d0p = uHelix.getD0();
-          z0p = uHelix.getZ0();
-        }
-
-        //RelationVector<PXDIntercept> pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
-        auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
-        for (auto& pxdIntercept : pxdIntercepts) {
-          TTrackCluster temp(pxdIntercept);
-          trackClusters.push_back(temp);
-        }
-      }
-
       // Explicit instantiation of templates
-      template struct Track_t<TrackCluster_t>;
+      //template struct TrackBase_t<TrackCluster_t>;
 
     } // end namespace Tuple
   } // end namespace PXD

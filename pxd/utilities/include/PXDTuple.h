@@ -22,6 +22,10 @@
 #include <vector>
 #include <math.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 namespace Belle2 {
 
   namespace PXD {
@@ -86,6 +90,12 @@ namespace Belle2 {
                sensorID.getSensorNumber();
       }
 
+      /** Helper function to get VxdID from DHE id like module iid */
+      inline VxdID getVxdIDFromPXDModuleID(const unsigned short& id)
+      {
+        return VxdID(id / 1000, (id % 1000) / 10, id % 10);
+      }
+
       /** Helper function to get a track state on a module
        * @param pxdSensorInfo of the PXD module intersecting with the track.
        * @param recoTrack the recoTrack to be extrapolated.
@@ -106,7 +116,7 @@ namespace Belle2 {
         /** Constructor
          * @param pxdCluster a PXDCluster object
          */
-        Cluster_t(const PXDCluster& pxdCluster) { setValues(pxdCluster);}
+        //Cluster_t(const PXDCluster& pxdCluster) { setValues(pxdCluster);}
 
         /** Update values from a PXDCluster
          * @param pxdCluster a PXDCluster object
@@ -133,7 +143,7 @@ namespace Belle2 {
         /** Constructor
          * @param pxdIntercept a PXDIntercept object
          */
-        TrackPoint_t(const PXDIntercept& pxdIntercept, const std::string recoTracksName) { setValues(pxdIntercept, recoTracksName);}
+        //TrackPoint_t(const PXDIntercept& pxdIntercept, const std::string recoTracksName) { setValues(pxdIntercept, recoTracksName);}
 
         /** Update values from a PXDCluster.
          * @param pxdIntercept a PXDIntercept object.
@@ -155,18 +165,18 @@ namespace Belle2 {
 
       struct TrackCluster_t {
         /** Default constructor */
-        TrackCluster_t(): dU(INFINITY), dV(INFINITY) {}
+        TrackCluster_t(): usedInTrack(false), dU(INFINITY), dV(INFINITY) {}
         //dV(std::numeric_limits<float>::infinity()) {}
 
         /** Constructor
          * @param pxdIntercept a PXDIntercept object
          */
-        TrackCluster_t(const PXDIntercept& pxdIntercept,
-                       const std::string recoTracksName = "",
-                       const std::string pxdTrackClustersName = "PXDClustersFromTracks")
-        {
-          setValues(pxdIntercept, recoTracksName, pxdTrackClustersName);
-        }
+        //TrackCluster_t(const PXDIntercept& pxdIntercept,
+        //const std::string recoTracksName = "",
+        //const std::string pxdTrackClustersName = "PXDClustersFromTracks")
+        //{
+        //setValues(pxdIntercept, recoTracksName, pxdTrackClustersName);
+        //}
 
         /** Update values from a PXDIntercept.
          * @param pxdIntercept a PXDIntercept object.
@@ -178,6 +188,7 @@ namespace Belle2 {
                              const std::string recoTracksName = "",
                              const std::string pxdTrackClustersName = "PXDClustersFromTracks");
 
+        bool usedInTrack;        /**< True if the cluster is used in tracking */
         float dU;                /**< Residual (meas - prediction) in U. */
         float dV;                /**< Residual (meas - prediciton) in V. */
         Cluster_t cluster;         /**< Cluster associated to the track. */
@@ -188,9 +199,9 @@ namespace Belle2 {
        * contains a vector of data type like TrackCluster.
        */
       template <typename TTrackCluster>
-      struct Track_t {
+      struct TrackBase_t {
         /** Default constructor */
-        Track_t(): d0(0.0), z0(0.0), phi0(0.0), pt(0.0), tanLambda(0.0),
+        TrackBase_t(): d0(0.0), z0(0.0), phi0(0.0), pt(0.0), tanLambda(0.0),
           nPXDHits(0), nSVDHits(0), nCDCHits(0) {}
 
         /** Update values from a RecoTrack.
@@ -211,6 +222,47 @@ namespace Belle2 {
         unsigned short nCDCHits; /**< Number of CDC Hits. */
         std::vector<TTrackCluster> trackClusters;
       };
+
+      typedef TrackBase_t<TrackCluster_t> Track_t;
+
+      template <typename TTrackCluster>
+      void TrackBase_t<TTrackCluster>::setValues(const RecoTrack& recoTrack, const TVector3& ip)
+      {
+        // get Track pointer
+        auto trackPtr = recoTrack.getRelated<Track>("Tracks");
+        if (!trackPtr) {
+          B2ERROR("Expect a track for fitted recotracks. Found nothing!");
+        }
+
+        // get trackFitResult pointer
+        auto tfrPtr = trackPtr->getTrackFitResultWithClosestMass(Const::pion);
+        if (!tfrPtr) {
+          B2ERROR("expect a track fit result for pion. Found Nothing!");
+        }
+        nCDCHits = tfrPtr->getHitPatternCDC().getNHits();
+        nSVDHits = tfrPtr->getHitPatternVXD().getNSVDHits();
+        nPXDHits = tfrPtr->getHitPatternVXD().getNPXDHits();
+        tanLambda = tfrPtr->getCotTheta();
+        pt = tfrPtr->getMomentum().Perp();
+        d0 = tfrPtr->getD0();
+        z0 = tfrPtr->getZ0();
+        phi0 = tfrPtr->getPhi0();
+        if (ip != TVector3(0, 0, 0)) {
+          // get a helix and change coordinate origin to ip
+          auto uHelix = tfrPtr->getUncertainHelix();
+          uHelix.passiveMoveBy(ip);
+          d0p = uHelix.getD0();
+          z0p = uHelix.getZ0();
+        }
+
+        //RelationVector<PXDIntercept> pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
+        auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
+        for (auto& pxdIntercept : pxdIntercepts) {
+          TTrackCluster temp;
+          temp.setValues(pxdIntercept);
+          trackClusters.push_back(temp);
+        }
+      }
 
     } // end namespace Tuple
   } // end namespace PXD

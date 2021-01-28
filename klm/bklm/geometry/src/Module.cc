@@ -280,7 +280,7 @@ const CLHEP::Hep3Vector Module::getPropagationDistance(const CLHEP::Hep3Vector& 
 {
   double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
   double dz = m_ZStripMax * m_ZStripWidth - local.z();
-  return CLHEP::Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
+  return CLHEP::Hep3Vector(0.0, dz, dy);
 }
 
 const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
@@ -289,10 +289,18 @@ const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& loc
   return CLHEP::Hep3Vector(0.0, proDist[1] / m_SignalSpeed, proDist[2] / m_SignalSpeed);
 }
 
-const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local, int strip) const
+double Module::getPropagationTime(const CLHEP::Hep3Vector& local, int strip,
+                                  bool phiReadout) const
 {
-  double distanceZ = getPropagationDistance(local, strip, false);
-  double distancePhi = getPropagationDistance(local, strip, true);
+  double distance = getPropagationDistance(local, strip, phiReadout);
+  return distance / m_SignalSpeed;
+}
+
+const CLHEP::Hep3Vector Module::getPropagationTimes(
+  const CLHEP::Hep3Vector& local, int stripZ, int stripPhi) const
+{
+  double distanceZ = getPropagationDistance(local, stripZ, false);
+  double distancePhi = getPropagationDistance(local, stripPhi, true);
   return CLHEP::Hep3Vector(0.0, distancePhi / m_SignalSpeed, distanceZ / m_SignalSpeed);
 }
 

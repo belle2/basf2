@@ -114,7 +114,8 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     }
     int trackID = track->GetTrackID();
     if (m->hasRPCs()) {
-      const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
+      const CLHEP::Hep3Vector propagationTimes =
+        m->getPropagationTimes(localPosition);
       int phiStripLower = -1;
       int phiStripUpper = -1;
       int zStripLower = -1;
@@ -143,20 +144,20 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
       }
     } else {
       int scint = hist->GetCopyNumber(depth - m_DepthScintillator);
-      const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition, scint);
+      bool phiPlane = (plane == BKLM_INNER);
+      double propagationTime =
+        m->getPropagationTime(localPosition, scint, phiPlane);
       BKLMElementNumbers::setStripInModule(moduleID, scint);
       BKLMStatus::setMaximalStrip(moduleID, scint);
-      double propTime;
-      if (plane == BKLM_INNER) {
+      if (phiPlane) {
         BKLMElementNumbers::setPlaneInModule(
           moduleID, BKLMElementNumbers::c_PhiPlane);
-        propTime = propagationTimes.y();
       } else {
         BKLMElementNumbers::setPlaneInModule(
           moduleID, BKLMElementNumbers::c_ZPlane);
-        propTime = propagationTimes.z();
       }
-      BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propTime, time, eDep);
+      BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propagationTime, time,
+                                               eDep);
       m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
       BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
       simHitPosition->addRelationTo(simHit);

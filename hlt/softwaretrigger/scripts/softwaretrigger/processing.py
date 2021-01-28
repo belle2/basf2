@@ -122,6 +122,7 @@ def start_zmq_path(args, location):
     input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
     reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
 
+    path.add_module('StatisticsSummary').set_name('Sum_Start_ZMQ')
     return path, reco_path
 
 
@@ -209,6 +210,7 @@ def add_hlt_processing(path,
     if prune_output:
         # And in the end remove everything which should not be stored
         path_utils.add_store_only_rawdata_path(path)
+    path.add_module('StatisticsSummary').set_name('Sum_Close_Event')
 
 
 def add_expressreco_processing(path,
@@ -317,3 +319,4 @@ def finalize_zmq_path(path, args, location):
         path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")
+    path.add_module('StatisticsSummary').set_name('Sum_Finalize_ZMQ')

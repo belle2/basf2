@@ -2,6 +2,6 @@ Import('env')
 
 env['LIBS'] = ['CLHEP','framework', 'analysis_dataobjects', 'analysis_OrcaKinFit', 
 	      'analysis_DecayDescriptor', 'mdst_dataobjects',
-	      'analysis', '$ROOT_LIBS']
+	      'analysis_utility', '$ROOT_LIBS']
 
 Return('env')

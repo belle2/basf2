@@ -7,7 +7,9 @@ import re
 
 
 image_path = 'build/module_io'
-files = os.listdir(image_path)
+files = []
+if os.path.isdir(image_path):
+    files = os.listdir(image_path)
 
 # list of modules with I/O plots, _without_ "Module" suffix
 modules_with_plots = [f[:-4] for f in files if re.match(r'.*.png', f) and os.stat(os.path.join(image_path, f)).st_size > 0]
@@ -29,7 +31,7 @@ try:
     # ok, we've got a header with corresponding plot
     module = modules_with_plots[found_idx]
     classname = module + 'Module'
-except:
+except Exception:
     pass
 
 belle2ns = False
@@ -47,7 +49,7 @@ for line in open(filename):
         if re.match(r'.*class ' + classname + '.*', line):
             # found class declaration, add comment before it
             print('''/**
-* \image html ''' + module + '''.png
+* \\image html ''' + module + '''.png
 */''')
 
     # end of belle2 namespace -> end grouping
@@ -81,9 +83,9 @@ for line in open(filename):
 # avoid some further errors with lost stdout/stderr
 try:
     sys.stdout.close()
-except:
+except Exception:
     pass
 try:
     sys.stderr.close()
-except:
+except Exception:
     pass

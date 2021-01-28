@@ -116,11 +116,19 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \cond
+    )
     #: Save histograms in a sub folder
-    save_histograms = refiners.save_histograms(outlier_z_score=5.0,
-                                               allow_discrete=True,
-                                               folder_name="histograms")
+    save_histograms = refiners.save_histograms(
+        #: \cond
+        outlier_z_score=5.0,
+        allow_discrete=True,
+        folder_name="histograms"
+        #: \cond
+    )
 
 
 def main():

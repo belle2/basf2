@@ -72,7 +72,6 @@ ntuple.param('fileName', methodPrefixEventLevel + "sampled0.root")
 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
 
 # Call variable aliases from flavor tagger
-ft.setBelleOrBelle2("Belle2")
 ft.set_FlavorTagger_pid_aliases()
 # Alias for pidProbabilityExpert(11, ALL)
 vm.addAlias(f"eid_ALL", f"pidProbabilityExpert(11, ALL)")

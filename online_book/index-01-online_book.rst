@@ -23,9 +23,16 @@ the software by following through a series of hands-on lessons.
    page, just below the logo. You can also change your version by clicking on
    `other versions <https://software.belle2.org/>`_.
 
-   **For the StarterKit workshop in October 2020, we use the online textbook
-   section of the software version called development**
-   (`take me there <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_).
+   If you are a new to all of this, we recommend you to select the
+   *recommended release version* (``release-xx-xx-xx (recommended)`` in the
+   above list).
+
+   You can also take a sneak peek at the most recent version of the documentation by selecting
+   the `development version <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_.
+   However not all of the code examples might work for you yet.
+
+   The earliest release version which contains this online book is
+   ``release-05-01-12``.
 
 .. warning::
 

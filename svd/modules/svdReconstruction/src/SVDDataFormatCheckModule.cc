@@ -56,9 +56,9 @@ void SVDDataFormatCheckModule::initialize()
   //there only if reconstructing data
   m_storeDAQ.isOptional(m_storeDAQName);
 
-  B2DEBUG(1, " COLLECTIONS:");
-  B2DEBUG(1, " -->  Digits:             " << m_storeShaperDigitsName);
-  B2DEBUG(1, " -->  Diagnostic:         " << m_storeDAQName);
+  B2DEBUG(29, " COLLECTIONS:");
+  B2DEBUG(29, " -->  Digits:             " << m_storeShaperDigitsName);
+  B2DEBUG(29, " -->  Diagnostic:         " << m_storeDAQName);
 }
 
 void SVDDataFormatCheckModule::beginRun()

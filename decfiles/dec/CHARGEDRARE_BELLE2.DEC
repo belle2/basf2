@@ -241,7 +241,7 @@ Decay B+Rare
 0.000026400   a_1+  pi0                                    SVS;  #[BF update - PG 09/2020]
 0.000006700   b_10  pi+                                    SVS;
 0.000010000   b_1+  pi0                                    SVS;
-0.000010000   rho+  f_0                                    SVS;
+0.000001900   rho+  f_0                                    SVS;  #Lower BF to be consistent with PDG UL. #[BF update - RM 12/2020]
 0.000010000   rho+  a_00                                   SVS;
 0.000002000   rho0  a_0+                                   SVS;
 0.000010000   f_0  pi+  pi0                                PHSP;
@@ -1386,7 +1386,7 @@ Decay B-Rare
 0.000026400   a_1-  pi0                                    SVS;  #[BF update - PG 09/2020]
 0.000006700   b_10  pi-                                    SVS;
 0.000010000   b_1-  pi0                                    SVS;
-0.000010000   rho-  f_0                                    SVS;
+0.000001900   rho-  f_0                                    SVS;  #Lower BF to be consistent with PDG UL. #[BF update - RM 12/2020]
 0.000010000   rho-  a_00                                   SVS;
 0.000002000   rho0  a_0-                                   SVS;
 0.000010000   f_0  pi-  pi0                                PHSP;

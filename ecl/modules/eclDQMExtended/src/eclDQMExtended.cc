@@ -109,9 +109,9 @@ void ECLDQMEXTENDEDModule::defineHisto()
   for (int i = 0; i < 4; i++) {
     std::string h_name_a, h_title_a, h_name_t, h_title_t;
     h_name_a = str(boost::format("amp_timefail_q%1%") % i);
-    h_title_a = str(boost::format("Amp for time mismatches w/ QualityData=%1%") % i);
+    h_title_a = str(boost::format("Amp for time mismatches w/ FPGA fit qual=%1%") % i);
     h_name_t = str(boost::format("time_ampfail_q%1%") % i);
-    h_title_t = str(boost::format("Time for amp mismatches w/ QualityData=%1%") % i);
+    h_title_t = str(boost::format("Time for amp mismatches w/ FPGA fit qual=%1%") % i);
     TH1F* h_a = new TH1F(h_name_a.c_str(), h_title_a.c_str(), 1200, 0, 262144);
     TH1F* h_t = new TH1F(h_name_t.c_str(), h_title_t.c_str(), 240, -2050, 2050);
     h_a->SetOption("LIVE");
@@ -125,9 +125,9 @@ void ECLDQMEXTENDEDModule::defineHisto()
       if (j != i) {
         std::string h_name_a, h_title_a, h_name_t, h_title_t;
         h_name_a = str(boost::format("amp_qf%1%_qd%2%") % i % j);
-        h_title_a = str(boost::format("Amp for QualityFit=%1% and QualityData=%2%") % i % j);
+        h_title_a = str(boost::format("Amp for C++ fit qual=%1% and FPGA fit qual=%2%") % i % j);
         h_name_t = str(boost::format("time_qf%1%_qd%2%") % i % j);
-        h_title_t = str(boost::format("Time for QualityFit=%1% and QualityData=%2%") % i % j);
+        h_title_t = str(boost::format("Time for C++ fit qual=%1% and FPGA fit qual=%2%") % i % j);
         TH1F* h_a = new TH1F(h_name_a.c_str(), h_title_a.c_str(), 1200, 0, 262144);
         TH1F* h_t = new TH1F(h_name_t.c_str(), h_title_t.c_str(), 240, -2050, 2050);
         h_a->SetOption("LIVE");
@@ -142,130 +142,130 @@ void ECLDQMEXTENDEDModule::defineHisto()
     h_time_qualityfail_raw.clear();
   }
 
-  h_ampfail_quality  = new TH1F("ampfail_quality", "Amp. control flags in bins of QualityData", 5, -1, 4);
-  h_ampfail_quality->GetXaxis()->SetTitle("QualityData");
+  h_ampfail_quality  = new TH1F("ampfail_quality", "Number of FPGA <-> C++ fitter #bf{amp} inconsistencies vs fit qual", 5, -1, 4);
+  h_ampfail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
   h_ampfail_quality->SetFillColor(kPink - 4);
   h_ampfail_quality->SetOption("LIVE");
 
-  h_timefail_quality  = new TH1F("timefail_quality", "Time control flags in bins of QualityData", 5, -1, 4);
+  h_timefail_quality  = new TH1F("timefail_quality", "Number of FPGA <-> C++ fitter #bf{time} inconsistencies vs fit qual", 5, -1, 4);
   h_timefail_quality->SetFillColor(kPink - 4);
-  h_timefail_quality->GetXaxis()->SetTitle("QualityData");
+  h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
   h_timefail_quality->SetOption("LIVE");
 
-  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ failed amps", 8736, 1, 8737);
+  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", 8736, 1, 8737);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_ampfail_cellid->SetOption("LIVE");
 
-  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ failed time", 8736, 1, 8737);
+  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies", 8736, 1, 8737);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_timefail_cellid->SetOption("LIVE");
 
-  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ failed times and amps", 8736, 1, 8737);
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies", 8736, 1, 8737);
   h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_amptimefail_cellid->SetOption("LIVE");
 
-  h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ failed amps", 624, 1, 625);
+  h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ amp inconsistencies", 624, 1, 625);
   h_ampfail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_ampfail_shaperid->SetOption("LIVE");
 
-  h_timefail_shaperid = new TH1F("timefail_shaperid", "Shaper IDs w/ failed time", 624, 1, 625);
+  h_timefail_shaperid = new TH1F("timefail_shaperid", "Shaper IDs w/ time inconsistencies", 624, 1, 625);
   h_timefail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_timefail_shaperid->SetOption("LIVE");
 
-  h_amptimefail_shaperid = new TH1F("amptimefail_shaperid", "Shaper IDs w/ failed times and amps", 624, 1, 625);
+  h_amptimefail_shaperid = new TH1F("amptimefail_shaperid", "Shaper IDs w/ time and amp inconsistencies", 624, 1, 625);
   h_amptimefail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_amptimefail_shaperid->SetOption("LIVE");
 
-  h_ampfail_crateid = new TH1F("ampfail_crateid", "Crate IDs w/ failed amps", 52, 1, 53);
-  h_ampfail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_ampfail_crateid = new TH1F("ampfail_crateid", "Crate IDs w/ amp inconsistencies", 52, 1, 53);
+  h_ampfail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_ampfail_crateid->SetOption("LIVE");
 
-  h_timefail_crateid = new TH1F("timefail_crateid", "Crate IDs w/ failed time", 52, 1, 53);
-  h_timefail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_timefail_crateid = new TH1F("timefail_crateid", "Crate IDs w/ time inconsistencies", 52, 1, 53);
+  h_timefail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_timefail_crateid->SetOption("LIVE");
 
-  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ failed times and amps", 52, 1, 53);
-  h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ time and amp inconsistencies", 52, 1, 53);
+  h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_amptimefail_crateid->SetOption("LIVE");
 
-  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ failed qualities", 8736, 1, 8737);
+  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies", 8736, 1, 8737);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_qualityfail_cellid->SetOption("LIVE");
 
-  h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ failed qualities", 624, 1, 625);
+  h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ fit qual inconsistencies", 624, 1, 625);
   h_qualityfail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_qualityfail_shaperid->SetOption("LIVE");
 
-  h_qualityfail_crateid = new TH1F("qualityfail_crateid", "Crate IDs w/ failed qualities", 52, 1, 53);
-  h_qualityfail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_qualityfail_crateid = new TH1F("qualityfail_crateid", "Crate IDs w/ fit qual inconsistencies", 52, 1, 53);
+  h_qualityfail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_qualityfail_crateid->SetOption("LIVE");
 
-  h_fail_shaperid = new TH1F("fail_shaperid", "Shaper IDs w/ failed logic", 624, 1, 625);
+  h_fail_shaperid = new TH1F("fail_shaperid", "Shaper IDs w/ inconsistencies", 624, 1, 625);
   h_fail_shaperid->GetXaxis()->SetTitle("Shaper ID");
   h_fail_shaperid->SetOption("LIVE");
 
-  h_fail_crateid = new TH1F("fail_crateid", "Crate IDs w/ failed logic", 52, 1, 53);
-  h_fail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_fail_crateid = new TH1F("fail_crateid", "Crate IDs w/ inconsistencies", 52, 1, 53);
+  h_fail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_fail_crateid->SetOption("LIVE");
 
 
   //2D histograms creation.
 
   if (m_SaveDetailedFitData) {
-    h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp. fails",
+    h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp inconsistencies",
                                 8736, 1, 8737, 239, -262143, 262143);
     h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
     h_ampdiff_cellid->SetOption("LIVE");
 
-    h_timediff_cellid = new TH2F("timediff_cellid", "Time diff.(Emulator-Data) for time fails",
+    h_timediff_cellid = new TH2F("timediff_cellid", "Time diff. (Emulator-Data) for time inconsistencies",
                                  8736, 1, 8737, 239, -4095, 4095);
     h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
     h_timediff_cellid->SetOption("LIVE");
 
     h_ampdiff_shaperid = new TH2F("ampdiff_shaper", "Amp. diff. (Emulator-Data) "
-                                  "for amp. fails in bins of Shaper Id",
+                                  "for amp inconsistencies vs Shaper Id",
                                   624, 1, 625, 239, -262143, 262143);
     h_ampdiff_shaperid->GetXaxis()->SetTitle("Shaper Id");
     h_ampdiff_shaperid->GetYaxis()->SetTitle("Amplitude difference");
     h_ampdiff_shaperid->SetOption("LIVE");
 
     h_timediff_shaperid = new TH2F("timediff_shaper", "Time diff. (Emulator-Data) "
-                                   "for time fails in bins of Shaper Id",
+                                   "for time inconsistencies vs Shaper Id",
                                    624, 1, 625, 239, -4095, 4095);
     h_timediff_shaperid->GetXaxis()->SetTitle("Shaper Id");
     h_timediff_shaperid->GetYaxis()->SetTitle("Time difference");
     h_timediff_shaperid->SetOption("LIVE");
   }
 
-  h_ampdiff_quality = new TH2F("ampdiff_quality", "Amp. diff. (Emulator-Data) for amp. fails in bins of QualityData", 4, 0, 4, 239,
+  h_ampdiff_quality = new TH2F("ampdiff_quality", "Amp. diff. (Emulator-Data) for amp. inconsistencies", 4, 0, 4, 239,
                                -262143, 262143);
-  h_ampdiff_quality->GetXaxis()->SetTitle("QualityData");
+  h_ampdiff_quality->GetXaxis()->SetTitle("FPGA fit quality. 0-good, 1-int overflow, 2-low amp, 3-bad chi2");
   h_ampdiff_quality->GetYaxis()->SetTitle("Amplitude difference");
   h_ampdiff_quality->SetOption("LIVE");
 
-  h_timediff_quality = new TH2F("timediff_quality", "Time diff. (Emulator-Data) for time fails in bins of QualityData", 4, 0, 4, 239,
+  h_timediff_quality = new TH2F("timediff_quality", "Time diff. (Emulator-Data) for time inconsistencies", 4, 0, 4, 239,
                                 -4095, 4095);
-  h_timediff_quality->GetXaxis()->SetTitle("QualityData");
+  h_timediff_quality->GetXaxis()->SetTitle("FPGA fit quality. 0-good, 1-int overflow, 2-low amp, 3-bad chi2");
   h_timediff_quality->GetYaxis()->SetTitle("Time difference");
   h_timediff_quality->SetOption("LIVE");
 
-  h_quality_fit_data = new TH2F("quality_fit_data", "QualityFit vs QualityData for quality fails", 4, 0, 4, 4, 0, 4);
-  h_quality_fit_data->GetXaxis()->SetTitle("QualityFit");
-  h_quality_fit_data->GetYaxis()->SetTitle("QualityData");
+  h_quality_fit_data = new TH2F("quality_fit_data", "C++ fitter vs FPGA, fit quality inconsistencies", 4, 0, 4, 4, 0, 4);
+  h_quality_fit_data->GetXaxis()->SetTitle("C++ fit qual. 0-good,1-int overflow,2-low amp,3-bad chi2");
+  h_quality_fit_data->GetYaxis()->SetTitle("FPGA fit qual. 0-good,1-int overflow,2-low amp,3-bad chi2");
   h_quality_fit_data->SetOption("LIVE");
 
-  h_ampflag_qualityfail = new TH2F("ampflag_qualityfail", "Amp flag (0/1) w/ failed qualities in bins of QualityData", 4, 0, 4, 4, -1,
+  h_ampflag_qualityfail = new TH2F("ampflag_qualityfail", "Amp flag (0/1) for fit qual inconsistencies", 4, 0, 4, 4, -1,
                                    3);
-  h_ampflag_qualityfail->GetXaxis()->SetTitle("QualityData");
-  h_ampflag_qualityfail->GetYaxis()->SetTitle("Amp flag");
+  h_ampflag_qualityfail->GetXaxis()->SetTitle("FPGA fit quality. 0-good,1-int overflow,2-low amp,3-bad chi2");
+  h_ampflag_qualityfail->GetYaxis()->SetTitle("Amp flag (0-amp consistent)");
   h_ampflag_qualityfail->SetOption("LIVE");
 
-  h_timeflag_qualityfail = new TH2F("timeflag_qualityfail", "Time flag (0/1) w/ failed qualities in bins of Quality Data", 4, 0, 4, 4,
+  h_timeflag_qualityfail = new TH2F("timeflag_qualityfail", "Time flag (0/1) for fit qual inconsistencies", 4, 0, 4, 4,
                                     -1, 3);
-  h_timeflag_qualityfail->GetXaxis()->SetTitle("QualityData");
-  h_timeflag_qualityfail->GetYaxis()->SetTitle("Time flag");
+  h_timeflag_qualityfail->GetXaxis()->SetTitle("FPGA fit quality. 0-good,1-int overflow,2-low amp,3-bad chi2");
+  h_timeflag_qualityfail->GetYaxis()->SetTitle("Time flag (0-time consistent)");
   h_timeflag_qualityfail->SetOption("LIVE");
 
   oldDir->cd();
@@ -504,15 +504,6 @@ void ECLDQMEXTENDEDModule::event()
 
     emulator(m_CellId, m_TrigTime, DspArray);
     ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
-
-    if ((m_AmpFit < (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
-      if (m_AmpFit != -128)
-        B2ERROR("ECL DQM logic test error: ECL Digit exists for A_emulator < Thr_skip"
-                << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
-                << LogVar("A_emulator", m_AmpFit)
-                << LogVar("A_data", aECLDigit->getAmp()));
-      else B2WARNING("ECL DQM logic test warning: A_emulator == -128");
-    }
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
       B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"

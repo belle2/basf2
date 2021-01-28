@@ -44,8 +44,7 @@ namespace Belle2 {
      * strip, given the number of ADC counts.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number - NOT USED
      * @param raw_time : raw ELS time in ns
@@ -60,11 +59,11 @@ namespace Belle2 {
       const int& bin
     ) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(),
-                              sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU),
-                              strip).calibratedValue(raw_time, bin);
+      return m_aDBObjPtr->getReference(sensorID.getLayerNumber(),
+                                       sensorID.getLadderNumber(),
+                                       sensorID.getSensorNumber(),
+                                       m_aDBObjPtr->sideIndex(isU),
+                                       strip).calibratedValue(raw_time, bin);
 
     }
 
@@ -80,4 +79,3 @@ namespace Belle2 {
     DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDCoGCalibrationFunction payload */
   };
 }
-

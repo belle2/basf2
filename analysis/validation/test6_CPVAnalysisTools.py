@@ -4,7 +4,7 @@
 """
 <header>
   <output>CPVToolsOutput.root</output>
-  <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
+  <contact>Thibaud Humair; thumair@mpp.mpg.de</contact>
   <description>This file employs all the time dependent CPV analysis tools. It reconstructs B0sig->J/PsiKs on the signal side
   and applies the flavor tagger on the ROE. The vertex of B0sig is reconstructed and the vertex of B0tag is reconstructed
   with the TagV module. </description>
@@ -40,7 +40,7 @@ ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:jpsiks', fillWithMostLikely=True, path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
-b2.use_central_database("analysis_tools_release-03-01-00")
+b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 ft.flavorTagger(

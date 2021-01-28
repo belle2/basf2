@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 from typing import Optional, Iterable, List
@@ -27,7 +26,7 @@ class MetaOptionParser:
         #: store the meta option list for usage in the functions below
         self.mo = meta_option_list  # type: List[str]
 
-    def has_option(self, option_name):
+    def has_option(self, option_name: str) -> bool:
         """
         Checks whether an option is contained in the
         meta options
@@ -37,21 +36,21 @@ class MetaOptionParser:
         """
         return option_name in self.mo
 
-    def pvalue_warn(self):
+    def pvalue_warn(self) -> float:
         """
         @return: The custom warning level for the pvalue setting of plot
                  comparison. None if no custom value was set for the plot.
         """
         return self.float_value("pvalue-warn")
 
-    def pvalue_error(self):
+    def pvalue_error(self) -> float:
         """
         @return: The custom error level for the pvalue setting of plot
                  comparison. None if no custom value was set for the plot.
         """
         return self.float_value("pvalue-error")
 
-    def float_value(self, key, default=None):
+    def float_value(self, key, default: Optional[float] = None) -> float:
         """
         Extract the float value from a meta option list
         @param key: the key to identify the value from the list
@@ -67,7 +66,7 @@ class MetaOptionParser:
         except ValueError:
             return default
 
-    def int_value(self, key, default=None):
+    def int_value(self, key, default: Optional[int] = None) -> int:
         """
         Extract the int value from a meta option list
         @param key: the key to identify the value from the list
@@ -83,7 +82,7 @@ class MetaOptionParser:
         except ValueError:
             return default
 
-    def parse_key_value(self, key):
+    def parse_key_value(self, key: str):
         """
         Searches the meta options list for a key value entry and parses it
         @param key: The key to look for

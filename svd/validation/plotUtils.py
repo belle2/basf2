@@ -1,5 +1,10 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+"""
+<header>
+<noexecute>Used as library.</noexecute>
+</header>
+"""
 
 import ROOT as R
 

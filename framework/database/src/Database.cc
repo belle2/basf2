@@ -23,9 +23,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
-#include <framework/database/DatabaseChain.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/PayloadFile.h>
 
@@ -261,98 +258,18 @@ namespace Belle2 {
     }
   }
 
-// we know LocalDatabase/ConditionsDatabase/DatabaseChain are deprecated, we don't want the warnings when compiling the service itself ...
-#ifdef __INTEL_COMPILER
-#pragma warning (disable:1478) //[[deprecated]]
-#pragma warning (disable:1786) //[[deprecated("message")]]
-#else
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
   void Database::exposePythonAPI()
   {
-    // to avoid confusion between std::arg and boost::python::arg we want a shorthand namespace as well
+    // To avoid confusion between std::arg and boost::python::arg we want a shorthand namespace as well
     namespace py = boost::python;
-    // make sure the default instance is created
+
+    // Make sure the default instance is created
     Database::Instance();
 
-    //don't show c++ signature in python doc to keep it simple
+    // Don't show c++ signature in python doc to keep it simple
     py::docstring_options options(true, true, false);
 
-    py::def("reset_database", &Database::reset, (py::arg("keep_config") = false),
-            R"DOC(Reset the database setup to have no database sources
-
-.. deprecated:: release-04-00-00
-   Please use `basf2.conditions` for all configuration of the conditions database)DOC");
-    py::def("use_database_chain", &DatabaseChain::createInstance,
-            (py::arg("resetIoVs") = true, py::arg("loglevel") = LogConfig::c_Warning, py::arg("invertLogging") = false),
-            R"DOCSTRING(
-Use a database chain. This function used to be necessary to enable usage of
-multiple globaltags but has been deprecated.
-
-.. deprecated:: release-04-00-00
-   This function is no longer needed and is just kept for compatibility.
-   In its current state it does nothing and ignores all arguments.
-   Please use `basf2.conditions` for all configuration of the conditions database
-)DOCSTRING");
-  py::def("use_local_database", &LocalDatabase::createInstance,
-      (py::arg("filename"), py::arg("directory")="", py::arg("readonly")=false,
-       py::arg("loglevel")=LogConfig::c_Warning, py::arg("invertLogging")=false),
-      R"DOCSTRING(
-Use a local database backend: a single file containing the payload information in plain text.
-
-Parameters:
-  filename (str): filename containing the payload information, defaults to
-        "database.txt". This file needs to exist.
-  directory (str): directory containing the payloads, defaults to the directory
-        of the database filename. This parameter doesn't have any effect anymore:
-        payloads **must** be in the same directory as the text file. If this parameter
-        is not empty and doesn't point to the same directory a error is raised.
-  readonly (bool): if True the database will refuse to create new payloads.
-        This parameter doesn't have any effect anymore. Local databases are always readonly
-  loglevel (LogLevel): The severity of messages from this backend when
-        payloads cannot be found. This parameter doesn't have any effect anymore.
-  invertLogging (bool): A flag to indicate whether logging of obtained
-        payloads should be inverted. This parameter doesn't have any effect anymore.
-
-.. deprecated:: release-04-00-00
-   Most of the parameters don't have any effect anymore and are kept for compatibility
-   Please use `basf2.conditions` for all configuration of the conditions database.
-)DOCSTRING");
-  {
-  //use_central_database has different signatures so the docstring confuses sphinx. Handcraft one complete docstring.
-  py::docstring_options subOptions(true, false, false);
-
-  py::def("use_central_database", &ConditionsDatabase::createDefaultInstance,
-      (py::arg("globalTag"), py::arg("loglevel")=LogConfig::c_Warning, py::arg("payloaddir")="centraldb"));
-  py::def("use_central_database", &ConditionsDatabase::createInstance,
-      (py::arg("globalTag"), py::arg("restBaseName"), py::arg("payloaddir"), py::arg("fileBaseLocal"),
-       py::arg("loglevel")=LogConfig::c_Warning, py::arg("invertLogging")=false),
-      R"DOCSTRING(use_central_database(globalTag, restBaseName=None, payloadDir="centraldb", fileBaseLocal=None, loglevel=LogLevel.WARNING, invertLogging=False)
-
-Use the central database to obtain conditions data. Usually users should only
-need to call this with one parameter which is the global tag to identify the
-payloads.
-
-Parameters:
-  globalTag (str): name of the global tag to use for payload lookup
-  restBaseName (str): base URL for the REST api. This parameter is no longer supported,
-      any value other than an empty string will lead to an error.
-  fileBaseName (str): base directory to look for payloads instead of
-      downloading them. This parameter is no longer supported,
-      any value other than an empty string will lead to an error.
-  payloaddir (str): directory where to save downloaded payloads.
-  loglevel (LogLevel): The LogLevel of messages from this backend when
-      payloads cannot be found. This parameter is no longer supported and is ignored.
-  invertLogging (bool): A flag to indicate whether logging of obtained
-      payloads should be inverted. This parameter is no longer supported and is ignored.
-
-.. deprecated:: release-04-00-00
-   Most of the parameters don't have any effect anymore and are kept for compatibility
-   Please use `basf2.conditions` for all configuration of the conditions database.
-)DOCSTRING");
-  }
-    // and expose our shiny configuration object
+    // Expose our shiny configuration object
     Conditions::Configuration::exposePythonAPI();
   }
 }

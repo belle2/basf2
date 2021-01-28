@@ -26,7 +26,10 @@ namespace Belle2 {
     SVDSummaryPlots():
       SVDSummaryPlots("", "") {}; /**< this is the default constructor */
 
-    /** Use @param template to initialize both the histograms*/
+    /**
+     * @param name histogram name
+     * @param title histogram title
+     */
     SVDSummaryPlots(TString name, TString title)
     {
       m_defaultHistogram = new TH2F(name.Data(), title.Data(),
@@ -77,20 +80,33 @@ namespace Belle2 {
       return getHistogram(view)->GetBinContent(bin);
     }
 
-    /** get the value contained in the corresponding bin, given layer, ladder, sensor and view*/
+    /** get the value contained in the corresponding bin, given
+     * @param layer
+     * @param ladder
+     * @param sensor
+     * @param view
+     */
     float getValue(int layer, int ladder, int sensor, int view)
     {
       int bin = m_histos[view]->FindBin(ladder, findBinY(layer, sensor));
       return getHistogram(view)->GetBinContent(bin);
     }
 
-    /** fill the histogram for @param vxdID side @param view with @param args*/
+    /** fill the histogram for
+     * @param layer
+     * @param ladder
+     * @param sensor
+     * @param view with
+     * @param value
+     */
     void fill(int layer, int ladder, int sensor, int view, float value)
     {
       getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
     }
 
-    /** fill the histogram for @param vxdID side @param view with @param args*/
+    /** fill the histogram for
+     * @param vxdID
+     * @param view with @param value*/
     void fill(const VxdID& vxdID, int view, float value)
     {
       int layer = vxdID.getLayerNumber();
@@ -101,7 +117,7 @@ namespace Belle2 {
 
     }
 
-    /** fill the histogram for @param vxdID side @param isU with @param args*/
+    /** fill the histogram for @param vxdID side @param isU with @param value*/
     void fill(const VxdID& vxdID, bool isU, float value)
     {
       int view = isU ? UIndex : VIndex;

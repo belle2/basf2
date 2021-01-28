@@ -56,7 +56,7 @@ namespace Belle2 {
 
       /** Constructor creates an empty fitter with default settings.
        * @param wave Wave function to use for fitting data
-       * @times array of points in time at which data are taken
+       * @param times array of points in time at which data are taken
        */
       WaveFitter(wave_function_type wave, std::array<double, 6> times):
         m_hasFit(false), m_times(times), m_wave(wave), m_fittedTime(0), m_fittedTimeError(), m_fittedLik(1.0e10), m_ndf(0)
@@ -168,8 +168,8 @@ namespace Belle2 {
        */
       double pSignal();
       /** Calculate likelihood ratio Lsignal/Lbackground for acceptance (signal) window given as arguments
-       * @param lower lower bound of the acceptance window
-       * @param upper upper bound of the acceptance window
+       * @param a lower bound of the acceptance window
+       * @param b upper bound of the acceptance window
        * @return L(in acc. w.)/L(out of acc. w.)
        */
       double lrSignal(double a, double b);

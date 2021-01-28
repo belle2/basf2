@@ -7,7 +7,6 @@ from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
 from grltrigger import add_grl_trigger
 from gdltrigger import add_gdl_trigger
-from effCalculation import EffCalculation
 
 
 def add_tsim(

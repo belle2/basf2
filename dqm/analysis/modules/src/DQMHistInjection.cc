@@ -53,6 +53,7 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionLERECL = new TCanvas("ECLINJ/c_InjectionLERECL");
   m_cBurstLERECL = new TCanvas("ECLINJ/c_BurstInjectionLERECL");
   m_cInjectionLERTOP = new TCanvas("TOP/c_InjectionLERTOP");
+  m_cInjectionLERARICH = new TCanvas("ARICH/c_InjectionLERARICH");
 
   m_cInjectionHERPXD = new TCanvas("PXDINJ/c_InjectionHERPXD");
   m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
@@ -61,6 +62,7 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
   m_cBurstHERECL = new TCanvas("ECLINJ/c_BurstInjectionHERECL");
   m_cInjectionHERTOP = new TCanvas("TOP/c_InjectionHERTOP");
+  m_cInjectionHERARICH = new TCanvas("ARICH/c_InjectionHERARICH");
 
   m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
@@ -73,6 +75,8 @@ void DQMHistInjectionModule::initialize()
                             20000, 0 , 20000);
   m_hInjectionLERTOP = new TH1F("HitInjectionLERTOP", "TOP Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
+  m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+                                  20000);
 
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
@@ -85,11 +89,13 @@ void DQMHistInjectionModule::initialize()
                             20000, 0 , 20000);
   m_hInjectionHERTOP = new TH1F("HitInjectionHERTOP", "TOP Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
+  m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+                                  20000);
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    m_nodes.resize(10);
+    m_nodes.resize(12);
     SEVCHK(ca_create_channel((m_pvPrefix + "LER:Triggers").data(), NULL, NULL, 10, &m_nodes[0].mychid), "ca_create_channel failure");
     m_nodes[0].histo = nullptr;
     SEVCHK(ca_create_channel((m_pvPrefix + "LER:PXD").data(), NULL, NULL, 10, &m_nodes[1].mychid), "ca_create_channel failure");
@@ -110,6 +116,10 @@ void DQMHistInjectionModule::initialize()
     m_nodes[8].histo = m_hInjectionLERSVD;
     SEVCHK(ca_create_channel((m_pvPrefix + "HER:SVD").data(), NULL, NULL, 10, &m_nodes[9].mychid), "ca_create_channel failure");
     m_nodes[9].histo = m_hInjectionHERSVD;
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER:ARICH").data(), NULL, NULL, 10, &m_nodes[10].mychid), "ca_create_channel failure");
+    m_nodes[10].histo = m_hInjectionLERARICH;
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER:ARICH").data(), NULL, NULL, 10, &m_nodes[11].mychid), "ca_create_channel failure");
+    m_nodes[11].histo = m_hInjectionHERARICH;
 
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
     cleanPVs();
@@ -384,6 +394,49 @@ void DQMHistInjectionModule::event()
   m_cInjectionHERTOP->Clear();
   m_cInjectionHERTOP->cd(0);
   m_hInjectionHERTOP->Draw("hist");
+
+
+
+  //ARICH
+  m_histogramDirectoryName = "ARICH";
+
+  locationHits = "ARICHOccInjLER";
+  if (m_histogramDirectoryName != "") {
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  }
+  Hits = (TH1*)findHist(locationHits.Data());
+  locationTriggers = "ARICHEOccInjLER";
+  if (m_histogramDirectoryName != "") {
+    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  }
+  Triggers = (TH1*)findHist(locationTriggers.Data());
+
+  if (Hits && Triggers) {
+    m_hInjectionLERARICH->Divide(Hits, Triggers);
+  }
+
+  m_cInjectionLERARICH->Clear();
+  m_cInjectionLERARICH->cd(0);
+  m_hInjectionLERARICH->Draw("hist");
+
+  locationHits = "ARICHOccInjHER";
+  if (m_histogramDirectoryName != "") {
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  }
+  Hits = (TH1*)findHist(locationHits.Data());
+  locationTriggers = "ARICHEOccInjHER";
+  if (m_histogramDirectoryName != "") {
+    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  }
+  Triggers = (TH1*)findHist(locationTriggers.Data());
+
+  if (Hits && Triggers) {
+    m_hInjectionHERARICH->Divide(Hits, Triggers);
+  }
+
+  m_cInjectionHERARICH->Clear();
+  m_cInjectionHERARICH->cd(0);
+  m_hInjectionHERARICH->Draw("hist");
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {

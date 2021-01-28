@@ -56,8 +56,7 @@ class SelectTRGTypes(basf2.Module):
 
 
 # Define global tag
-basf2.reset_database()
-basf2.use_central_database(global_tag)
+basf2.conditions.prepend_globaltag(global_tag)
 
 # Create paths
 main = basf2.create_path()

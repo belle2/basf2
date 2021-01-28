@@ -344,6 +344,10 @@ const Const::ParticleSet Const::clusterSet =
   Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)
   + Const::ParticleType(211) + Const::ParticleType(13) + Const::ParticleType(9900001);
 
+const Const::ParticleSet Const::finalStateParticlesSet =
+  Const::chargedStableSet + Const::photon + Const::Kshort + Const::Klong
+  + Const::Lambda + Const::antiLambda + Const::neutron;
+
 const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
 const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
 const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);

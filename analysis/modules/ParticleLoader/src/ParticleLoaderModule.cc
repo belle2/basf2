@@ -44,11 +44,9 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
-
-    addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see :ref:`DecayString` and `cut_strings_selections`).",
-             emptyDecayStringsAndCuts);
+    addParam("decayStrings", m_decayStrings,
+             "List of decay strings (see :ref:`DecayString` for syntax) that specify all output ParticleLists to be created by the module.",
+             {});
 
     addParam("useMCParticles", m_useMCParticles,
              "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
@@ -83,10 +81,6 @@ namespace Belle2 {
     addParam("enforceFitHypothesis", m_enforceFitHypothesis,
              "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
              m_enforceFitHypothesis);
-
-    addParam("loadPhotonsFromKLM", m_loadPhotonsFromKLM,
-             "If true, create photon candidates from KLM cluster.",
-             false);
   }
 
   void ParticleLoaderModule::initialize()
@@ -111,14 +105,10 @@ namespace Belle2 {
       m_mcparticles.isRequired();
     }
 
-    if (m_decayStringsWithCuts.empty()) {
-      B2WARNING("Obsolete usage of the ParticleLoader module (load all MDST objects as all possible Particle object types). Specify the particle type via decayStringsWithCuts module parameter instead.");
+    if (m_decayStrings.empty()) {
+      B2WARNING("Obsolete usage of the ParticleLoader module (load all MDST objects as all possible Particle object types). Specify the particle type via decayStrings module parameter instead.");
     } else {
-      for (auto decayStringCutTuple : m_decayStringsWithCuts) {
-
-        // parsing of the input tuple (DecayString, Cut)
-        string decayString = get<0>(decayStringCutTuple);
-        std::string cutParameter = get<1>(decayStringCutTuple);
+      for (auto decayString : m_decayStrings) {
 
         // obtain the output particle lists from the decay string
         bool valid = m_decaydescriptor.init(decayString);
@@ -127,16 +117,23 @@ namespace Belle2 {
 
         // Mother particle
         const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+        int nProducts = m_decaydescriptor.getNDaughters();
 
         int pdgCode  = mother->getPDGCode();
-        string listName = mother->getFullName();
+        // The default list name is "all"
+        string listName = mother->getName() + ":all";
+        // ROE particles get the label "ROE"
+        if (m_useROEs) listName = mother->getName() + ":ROE";
+        // MC particles get the label "MC"
+        else if (m_useMCParticles) listName = mother->getName() + ":MC";
+        // V0s get the label "V0"
+        else if (nProducts > 0) listName = mother->getName() + ":V0";
 
-        // special case. if the list is called "all" it may not have a
-        // corresponding cut string this can introduce very dangerous bugs
-        string listLabel = mother->getLabel();
-        if (listLabel == "all")
-          if (cutParameter != "")
-            B2FATAL("You have tried to create a list " << listName << " with cuts! This is *very* error prone, so it is now forbidden.");
+        StoreObjPtr<ParticleList> particleList(listName);
+        // if particle list already exists, we can skip further steps
+        if (particleList.isOptional()) {
+          continue;
+        }
 
         if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
@@ -148,7 +145,6 @@ namespace Belle2 {
              || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
           mdstSourceIsV0 = true;
 
-        int nProducts = m_decaydescriptor.getNDaughters();
         if (mdstSourceIsV0 == false) {
           if (nProducts > 0) {
             if (!m_useROEs) {
@@ -174,71 +170,55 @@ namespace Belle2 {
         string antiListName = ParticleListName::antiParticleListName(listName);
         bool isSelfConjugatedParticle = (listName == antiListName);
 
-        StoreObjPtr<ParticleList> particleList(listName);
-        if (!particleList.isOptional()) {
-          //if it doesn't exist:
-
-          DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-          particleList.registerInDataStore(flags);
-          if (!isSelfConjugatedParticle) {
-            StoreObjPtr<ParticleList> antiParticleList(antiListName);
-            antiParticleList.registerInDataStore(flags);
-          }
-        } else {
-          // TODO: test that this actually works
-          B2WARNING("The ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
-          continue;
+        DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+        particleList.registerInDataStore(flags);
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiParticleList(antiListName);
+          antiParticleList.registerInDataStore(flags);
         }
-
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutParameter));
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
         if (m_useROEs) {
           B2INFO("   -> MDST source: RestOfEvents");
-          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
         } else if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
-          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
         } else {
           bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
           if (chargedFSP) {
             B2INFO("   -> MDST source: Tracks");
-            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
-              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-              if (m_loadPhotonsFromKLM) {
-                m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-                B2INFO("   -> MDST source: ECLClusters and KLMClusters");
-              } else {
-                B2INFO("   -> MDST source: ECLClusters");
-              }
+              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+              m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+              B2INFO("   -> MDST source: ECLClusters and KLMClusters");
             } else {
               B2INFO("   -> MDST source: V0");
-              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
             }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
             B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
-            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
         }
-        B2INFO("   -> With cuts  : " << cutParameter);
       }
     }
 
@@ -352,10 +332,8 @@ namespace Belle2 {
     }
     for (auto roe2Plist : m_ROE2Plists) {
       string listName = get<c_PListName>(roe2Plist);
-      auto& cut = get<c_CutPointer>(roe2Plist);
       StoreObjPtr<ParticleList> plist(listName);
-      if (cut->check(newPart))
-        plist->addParticle(newPart);
+      plist->addParticle(newPart);
     }
 
   }
@@ -494,15 +472,11 @@ namespace Belle2 {
           v0P.appendDaughter(newDaugP, false);
         }
 
-        // append the particle to the Particle StoreArray and check that we pass
-        // any cuts before adding the new particle to the ParticleList
+        // append the particle to the Particle StoreArray and add the new particle to the ParticleList
         Particle* newPart = m_particles.appendNew(v0P);
         string listName = get<c_PListName>(v02Plist);
-        auto& cut = get<c_CutPointer>(v02Plist);
         StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
       }
     }
   }
@@ -544,7 +518,6 @@ namespace Belle2 {
       for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
         auto track2Plist = m_Tracks2Plists[ilist];
         string listName = get<c_PListName>(track2Plist);
-        auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
         // if no track hypothesis is requested, use the particle's own
@@ -589,8 +562,7 @@ namespace Belle2 {
             newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
           newPart->addRelationTo(trackFit);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
+          plist->addParticle(newPart);
 
         } // sanity check correct particle type
       } // particle lists
@@ -703,11 +675,9 @@ namespace Belle2 {
         }
 
 
-        // add particle to list if it passes the selection criteria
-        auto& cut = get<c_CutPointer>(eclCluster2Plist);
+        // add particle to list
         StoreObjPtr<ParticleList> plist(listName);
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
 
       } // loop over particle lists to be filled by ECLClusters
     } // loop over cluster
@@ -765,12 +735,9 @@ namespace Belle2 {
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
 
-        // add particle to list if it passes the selection criteria
-        auto&  cut = get<c_CutPointer>(klmCluster2Plist);
+        // add particle to list
         StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
       }
     }
   }
@@ -817,11 +784,8 @@ namespace Belle2 {
         if (m_addDaughters) appendDaughtersRecursive(newPart);
 
         string listName = get<c_PListName>(mcParticle2Plist);
-        auto&  cut = get<c_CutPointer>(mcParticle2Plist);
         StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
       }
     }
   }

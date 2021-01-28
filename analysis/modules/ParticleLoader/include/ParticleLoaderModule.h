@@ -15,7 +15,6 @@
 #include <framework/core/Module.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/VariableManager/Utility.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -76,14 +75,14 @@ namespace Belle2 {
 
     /**
      * tuple for collecting everything we know about the ParticlList to be created.
-     * The elements are: PDGCode, name, anti-list name, isListSelfConjugated, and the cut sequence
+     * The elements are: PDGCode, name, anti-list name, and isListSelfConjugated
      */
-    typedef std::tuple<int, std::string, std::string, bool, std::shared_ptr<Variable::Cut>> PList;
+    typedef std::tuple<int, std::string, std::string, bool> PList;
     /**
      * Enum for describing each element in the above tuple
      */
     enum PListIndex {
-      c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated, c_CutPointer
+      c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated
     };
 
   public:
@@ -180,9 +179,7 @@ namespace Belle2 {
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
-    std::vector<std::tuple<std::string, std::string>>
-                                                   m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
-
+    std::vector<std::string> m_decayStrings; /**< Input decay strings specifying the particles being created/loaded */
 
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
@@ -202,7 +199,6 @@ namespace Belle2 {
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
-    bool m_loadPhotonsFromKLM; /**< If true, create photon candidates from KLM cluster */
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
     std::vector<int> m_sameChargeDaughtersV0Counts; /**< internally used to count the number of V0s with same charge daughters*/
   };

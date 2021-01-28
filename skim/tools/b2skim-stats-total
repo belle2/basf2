@@ -224,7 +224,11 @@ def load_df(JSONPath, *, RequestedSkims):
     df["Requested"] = df.apply(lambda row: row["Skim"] in RequestedSkims, axis=1)
 
     # Filter into data and MC dataframes using sample labels
-    MCMask = df["Sample"] == "Combined MC BGx1"
+    df["Sample"] = df["Sample"].str.replace(r"^MC\d+_", "")
+    df["Sample"] = df["Sample"].str.replace("BGx", " BGx")
+    MCMask = df["Sample"].str.contains(
+        r"(mixed|charged|ccbar|uubar|ddbar|ssbar|taupair) BGx\d"
+    )
     DataMask = df["Sample"].str.contains("proc|bucket") & ~df["Sample"].str.contains(
         "offres"
     )
@@ -290,13 +294,17 @@ def totals_table(x, xlabel, df_Data, df_MC, *, markdown):
             "Data",
             f"{df_ReqData_SumsPerSample.mean():.1f} ± {df_ReqData_SumsPerSample.std():.1f}",
             f"{df_Data_SumsPerSample.mean():.1f} ± {df_Data_SumsPerSample.std():.1f}",
-        ],
-        [
-            "MC",
-            f"{df_MC.query('Requested')[x].sum():.1f}",
-            f"{df_MC[x].sum():.1f}",
-        ],
+        ]
     ]
+    for sample in sorted(set(df_MC["Sample"])):
+        df_sample = df_MC.query(f"Sample == '{sample}'")
+        table.append(
+            [
+                sample,
+                f"{df_sample.query('Requested')[x].sum():.1f}",
+                f"{df_sample[x].sum():.1f}",
+            ]
+        )
 
     tablefmt = "pipe" if markdown else "fancy_grid"
     print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")

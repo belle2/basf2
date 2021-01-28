@@ -15,6 +15,7 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/utilities/Utils.h>
 
 #include <algorithm>
 
@@ -42,6 +43,10 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
            "Vetoes on skims do not apply in filter plot and vice versa.",
            m_param_cutResultIdentifiersIgnored);
 
+  addParam("cutResultIdentifiersPerUnit", m_param_cutResultIdentifiersPerUnit,
+           "Which cuts should be reported per unit?",
+           m_param_cutResultIdentifiersPerUnit);
+
   addParam("variableIdentifiers", m_param_variableIdentifiers,
            "Which variables should be reported?",
            m_param_variableIdentifiers);
@@ -57,6 +62,10 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   addParam("createExpRunEventHistograms", m_param_create_exp_run_event_histograms,
            "Create exp/run/event histograms?",
            true);
+
+  addParam("createHLTUnitHistograms", m_param_create_hlt_unit_histograms,
+           "Create HLT unit histograms?",
+           false);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);
@@ -128,6 +137,20 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
   }
 
+  if (m_param_create_hlt_unit_histograms) {
+    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number", "HLT Unit Number", m_max_hlt_units, 0,
+                                                            m_max_hlt_units + 1));
+
+    for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
+      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
+                                           ("Events triggered per unit in HLT baseIdentifier: " + cutIdentifierPerUnit).c_str(), m_max_hlt_units, 0, m_max_hlt_units + 1));
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("bar");
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetFillStyle(0);
+    }
+
+  }
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
@@ -137,6 +160,11 @@ void SoftwareTriggerHLTDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
+
+  if (m_param_create_hlt_unit_histograms) {
+    std::string host = Utils::getCommandOutput("cat", {"/home/usr/hltdaq/HLT.UnitNumber"});
+    m_hlt_unit = atoi(host.substr(3, 2).c_str());
+  }
 }
 
 void SoftwareTriggerHLTDQMModule::event()
@@ -254,11 +282,33 @@ void SoftwareTriggerHLTDQMModule::event()
     m_runInfoHistograms["event_number"]->Fill(m_eventMetaData->getEvent());
     m_runInfoHistograms["experiment_number"]->Fill(m_eventMetaData->getExperiment());
   }
+
+  if (m_param_create_hlt_unit_histograms) {
+    m_runInfoHistograms["hlt_unit_number"]->Fill(m_hlt_unit);
+
+    if (m_triggerResult.isValid()) {
+      for (const std::string& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
+        const std::string& cutName = cutIdentifierPerUnit.substr(0, cutIdentifierPerUnit.find("\\"));
+        const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName("filter", cutName);
+
+        // check if the cutResult is in the list, be graceful when not available
+        const auto results = m_triggerResult->getResults();
+        auto const cutEntry = results.find(fullCutIdentifier);
+
+        if (cutEntry != results.end()) {
+          const int cutResult = cutEntry->second;
+          m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit, cutResult > 0);
+        }
+      }
+    }
+  }
 }
 
 void SoftwareTriggerHLTDQMModule::beginRun()
 {
   std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
+  [](auto & it) { it.second->Reset(); });
+  std::for_each(m_cutResultPerUnitHistograms.begin(), m_cutResultPerUnitHistograms.end(),
   [](auto & it) { it.second->Reset(); });
   std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
   [](auto & it) { it.second->Reset(); });

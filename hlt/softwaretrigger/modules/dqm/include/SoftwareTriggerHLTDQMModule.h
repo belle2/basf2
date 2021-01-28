@@ -52,12 +52,16 @@ namespace Belle2 {
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
       /// Which cuts should be ignored? This can be used to clear trigger lines from e.g. bhabha contamination.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
+      /// Which cuts should be reported per unit?
+      std::vector<std::string> m_param_cutResultIdentifiersPerUnit;
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
       /// Create total result histogram?
       bool m_param_create_total_result_histograms;
       /// Create exp/run/event number histograms?
       bool m_param_create_exp_run_event_histograms;
+      /// Create HLT unit number histograms?
+      bool m_param_create_hlt_unit_histograms;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;
@@ -65,9 +69,17 @@ namespace Belle2 {
       /// Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "softwaretrigger";
 
+      // Store HLT unit number on initialization
+      int m_hlt_unit = 0;
+      // Maximum number of HLT units used during the experiment
+      int m_max_hlt_units = 10;
+
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
       std::map<std::string, TH1F*> m_cutResultHistograms;
+
+      /// histograms for the final sw trigger decisions for each base identifier per unit
+      std::map<std::string, TH1F*> m_cutResultPerUnitHistograms;
 
       /// histograms for the software trigger variables in all calculators (although maybe not filled)
       std::map<std::string, TH1F*> m_triggerVariablesHistograms;

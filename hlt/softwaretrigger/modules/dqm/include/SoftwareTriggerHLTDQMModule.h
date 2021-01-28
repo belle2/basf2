@@ -69,9 +69,9 @@ namespace Belle2 {
       /// Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "softwaretrigger";
 
-      // Store HLT unit number on initialization
+      /// Store HLT unit number on initialization
       int m_hlt_unit = 0;
-      // Maximum number of HLT units used during the experiment
+      /// Maximum number of HLT units used during the experiment
       int m_max_hlt_units = 10;
 
       // Histograms

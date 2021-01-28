@@ -10,7 +10,6 @@
 """
 
 import basf2
-from ROOT import Belle2
 from beamparameters import add_beamparameters
 
 basf2.set_log_level(basf2.LogLevel.WARNING)
@@ -27,7 +26,7 @@ eventinfosetter.param('evtNumList', [1000])
 
 # Evtgen and beam parameters.
 evtgen = basf2.register_module('EvtGenInput')
-evtgen.param('userDECFile', Belle2.FileSystem.findFile('klm/validation/btojpsikl0.dec'))
+evtgen.param('userDECFile', basf2.find_file('klm/validation/btojpsikl0.dec'))
 beamparameters = add_beamparameters(main, "Y4S")
 
 # Geometry and Geant simulation

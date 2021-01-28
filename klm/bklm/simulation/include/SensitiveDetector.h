@@ -11,10 +11,15 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
 /* Belle 2 headers. */
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
@@ -38,11 +43,6 @@ namespace Belle2 {
       //! Process each step in the BKLM
       bool step(G4Step*, G4TouchableHistory*) override;
 
-      //! Tidy up at the end of each event
-      void EndOfEvent(G4HCofThisEvent*) override
-      {
-      }
-
     private:
 
       //! Find the ranges of matching RPC strips for each simulated hit
@@ -54,6 +54,21 @@ namespace Belle2 {
       //! maximum permissible hit time (based on overflow of LeCroy 1877 TDC)
       double m_HitTimeMax;
 
+      //! Section depth.
+      static constexpr int m_DepthSection = 2;
+
+      //! Sector depth.
+      static constexpr int m_DepthSector = 3;
+
+      //! Layer depth.
+      static constexpr int m_DepthLayer = 5;
+
+      //! Plane depth.
+      static constexpr int m_DepthPlane = 9;
+
+      //! Scintillator depth.
+      static constexpr int m_DepthScintillator = 10;
+
       //! Pointer to a sensitive-detector object used for beam-background steps
       BkgSensitiveDetector* m_BkgSensitiveDetector;
 
@@ -62,6 +77,18 @@ namespace Belle2 {
 
       //! Simulation parameters (from DB)
       DBObjPtr<BKLMSimulationPar> m_SimPar;
+
+      //! MC particles.
+      StoreArray<MCParticle> m_MCParticles;
+
+      //! BKLM simulated hits.
+      StoreArray<BKLMSimHit> m_SimHits;
+
+      //! BKLM simulated hit positions.
+      StoreArray<BKLMSimHitPosition> m_SimHitPositions;
+
+      //! Relation array between MCPartices and BKLMSimHits.
+      RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
 
     };
 

@@ -154,15 +154,13 @@ if __name__ == "__main__":
 
     # setup database if a tag is given
     if args.tag:
-        basf2.reset_database()
+        basf2.conditions.override_globaltags()
         tags = args.tag.split(':')
-        basf2.use_database_chain(False, basf2.LogLevel.DEBUG)
-
         for tag in tags:
             if tag.endswith('.txt'):
-                basf2.use_local_database(tag, readonly=True, loglevel=basf2.LogLevel.DEBUG)
+                basf2.conditions.append_testing_payloads(tag)
             else:
-                basf2.use_central_database(tag, basf2.LogLevel.DEBUG)
+                basf2.conditions.append_globaltag(tag)
 
     # parse runs argument
     runs = []

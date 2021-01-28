@@ -20,6 +20,7 @@
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
 """
 
+import b2bii
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 from basf2 import B2FATAL, B2INFO
 
@@ -29,10 +30,9 @@ def get_default_channels(
         hadronic=True,
         semileptonic=True,
         KLong=False,
-        baryonic=False,
+        baryonic=True,
         chargedB=True,
         neutralB=True,
-        convertedFromBelle=False,
         specific=False,
         removeSLD=False,
         strangeB=False):
@@ -44,10 +44,9 @@ def get_default_channels(
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
     @param KLong whether to include K_long decays into the training (default is False)
-    @param baryonic whether to include baryons into the training (default is False)
+    @param baryonic whether to include baryons into the training (default is True)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
-    @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
     @param strangeB if True, reconstruct B_s mesons in Upsilon5S decays (default is False)
@@ -62,14 +61,12 @@ def get_default_channels(
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
 
+    convertedFromBelle = b2bii.isB2BII()
+
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
-        # HOTFIX
-        from variables import variables
-        variables.addAlias('Kid_belle', 'atcPIDBelle(3,2)')
-        variables.addAlias('SigMBF', 'SigM')
 
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)',
@@ -167,11 +164,11 @@ def get_default_channels(
             pi0_cut += ' and isInRestOfEvent > 0.5'
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(BellePi0SigM)',
                                                    'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
                        PreCutConfiguration(userCut=pi0_cut,
-                                           bestCandidateVariable='abs(SigMBF)',
+                                           bestCandidateVariable='abs(BellePi0SigM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])
@@ -200,8 +197,8 @@ def get_default_channels(
                       MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
                                                   'useCMSFrame(E)', 'daughterAngle(0,1)',
                                                   'cosAngleBetweenMomentumAndVertexVector',
-                                                  'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
-                                                  'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'],
+                                                  'extraInfo(preCut_rank)', 'extraInfo(goodLambda)', 'extraInfo(ksnbVLike)',
+                                                  'extraInfo(ksnbNoLam)'],
                                        target='isSignal'),
                       PreCutConfiguration(userCut=Lam_cut,
                                           bestCandidateVariable='abs(dM)',
@@ -1222,11 +1219,11 @@ def get_fr_channels(convertedFromBelle=False):
     if convertedFromBelle:
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(BellePi0SigM)',
                                                    'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
                        PreCutConfiguration(userCut='0.08 < InvM < 0.18',
-                                           bestCandidateVariable='abs(SigMBF)',
+                                           bestCandidateVariable='abs(BellePi0SigM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])

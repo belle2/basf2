@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+import b2bii
 from modularAnalysis import setAnalysisConfigParams
 import os
 import re
@@ -52,26 +53,18 @@ def setupB2BIIDatabase(isMC=False):
     tagname = "B2BII%s" % ("_MC" if isMC else "")
     # and we want to cache them in a meaningful but separate directory
     payloaddir = tagname + "_database"
-    b2.reset_database()
-    b2.use_database_chain()
     # fallback to previously downloaded payloads if offline
     if not isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            True,
-            b2.LogLevel.ERROR)
+            payloaddir)
         # get payloads from central database
-        b2.use_central_database(tagname, b2.LogLevel.WARNING, payloaddir)
+        b2.conditions.prepend_globaltag(tagname)
     # unless they are already found locally
     if isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            False,
-            b2.LogLevel.WARNING)
+            payloaddir)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
@@ -83,7 +76,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=0):
+                                  SmearTrack=2):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -104,9 +97,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
         enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
-        SmearTrack (float): Smear the MC tracks to match real data. Does not work on real data.
-            Default value is 0 which does no smearing. The recommended value is 2 if you want track smearing.
-            Details can be found https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing
+        SmearTrack (float): Smear the MC tracks to match real data.
+            Apart from the recommended default value of 2 it can also be set to 1.
+            Details about the difference between those two options can be found
+            `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
+            Set to 0 to skip smearing (automatically set to 0 internally for real data).
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -124,6 +119,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     b2.B2INFO('Belle DB server is set to: ' + os.environ['BELLE_POSTGRES_SERVER'])
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+
+    b2bii.setB2BII()
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

@@ -259,6 +259,7 @@ class SVDCoGTimeCalibrationCheckModule(b2.Module):
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svd_evtInfo = Belle2.PyStoreObj(svd_EventInfo)
         clsTB = svd_evtInfo.getModeByte().getTriggerBin()
+        #: trigger bin
         self.TB = ord(clsTB)
 
         for svdCluster in svdCluster_list:

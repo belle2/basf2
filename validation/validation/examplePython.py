@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
+<description>
 This file contains example for generating validation plots using python
+</description>
+</header>
 """
 
 import basf2

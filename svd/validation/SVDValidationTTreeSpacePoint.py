@@ -40,12 +40,12 @@ class SVDValidationTTreeSpacePoint(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeSpacePoint, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeSpacePoint.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventDataSpacePoint class
         self.data = EventDataSpacePoint()
-        '''Instance of the EventDataSpacePoint class'''
 
         # Declare tree branches
         for key in EventDataSpacePoint.__dict__:

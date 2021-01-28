@@ -4,15 +4,16 @@
 #
 # 2014/01/28 : YI : 1st version
 
-from basf2 import *
+import basf2 as b2
+import os
 
 # ...suppress messages and warnings during processing...
-set_log_level(LogLevel.ERROR)
-set_random_seed(0)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.set_random_seed(0)
 
 # ...Register modules...
-eventinfosetter = register_module('EventInfoSetter')
-gdltrg = register_module('TRGGDL')
+eventinfosetter = b2.register_module('EventInfoSetter')
+gdltrg = b2.register_module('TRGGDL')
 
 # ...EventInfoSetter...
 eventinfosetter.param({'evtNumList': [5], 'runList': [1]})
@@ -24,14 +25,14 @@ gdltrg.param('ConfigFile',
                           "trg/gdl/data/ftd/0.01/ftd_0.01"))
 
 # ...Create paths...
-main = create_path()
+main = b2.create_path()
 
 # ...Add modules to paths...
 main.add_module(eventinfosetter)
 main.add_module(gdltrg)
 
 # ...Process events...
-process(main)
+b2.process(main)
 
 # ...Print call statistics...
-print(statistics)
+print(b2.statistics)

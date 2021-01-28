@@ -37,7 +37,7 @@ public:
    * @param charge  - unit charge of the particle
    * @param pid - particle identity - hypothesis with the highest maximum likelihood
    */
-  BParticle(float px, float py, float pz, float eenergy, float charge, SIMPLEPID pid);
+  BParticle(float px, float py, float pz, float energy, float charge, SIMPLEPID pid);
 
 //! Default destructor
   ~BParticle() {};

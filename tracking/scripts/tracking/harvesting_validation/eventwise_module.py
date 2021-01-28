@@ -158,13 +158,18 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
 
     #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(
+        # using cond to suppress false doxygen warnings
+        #: \cond
         folder_name="event_tree",
         name="event_tree",
         above_expert_level=default_expert_level
+        #: \endcond
     )
 
     #: Save selected hit counters
     save_clone_rate = refiners.save_fom(
+        # using cond to suppress false doxygen warnings
+        #: \cond
         name="{module.id}_hit_figures_of_merit",
         title="Hit sums in {module.title}",
         description="",  # to be given
@@ -178,4 +183,5 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
 
         aggregation=np.sum,
         key="{part_name}",
+        #: \endcond
     )

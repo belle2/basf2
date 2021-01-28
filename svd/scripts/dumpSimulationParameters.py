@@ -16,8 +16,10 @@ from ROOT import Belle2
 
 
 class printElectronicNoise(b2.Module):
+    """ print electronic noise """
 
     def beginRun(self):
+        """do everything here"""
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -36,9 +38,10 @@ class printElectronicNoise(b2.Module):
 
 
 class printAduEquivalent(b2.Module):
+    """ print ADU equivalent"""
 
     def beginRun(self):
-
+        """do everything here"""
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         print('printing AduEquivalent for all ladder = 1 sensors')

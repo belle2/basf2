@@ -42,7 +42,7 @@ namespace Belle2 {
     /** Constructor using a stl container of time bin probabilities.
      * @param sensorID Sensor VXD ID.
      * @param isU True if u strip, false if v.
-     * @param m_binEdges Array defining binning used by the time fitter.
+     * @param bins Array defining binning used by the time fitter.
      */
     template<typename T>
     SVDRecoTimeBase(VxdID sensorID, bool isU, const T& bins):

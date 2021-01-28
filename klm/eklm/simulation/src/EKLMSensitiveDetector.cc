@@ -35,11 +35,10 @@ EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name) :
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  StoreArray<MCParticle> particles;
+  m_MCParticles.isOptional();
   m_SimHits.registerInDataStore();
-  particles.registerRelationTo(m_SimHits);
-  RelationArray particleToSimHits(particles, m_SimHits);
-  registerMCParticleRelation(particleToSimHits);
+  m_MCParticles.registerRelationTo(m_SimHits);
+  registerMCParticleRelation(m_MCParticlesToSimHits);
 }
 
 EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
@@ -97,10 +96,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setLayer(layer);
   hit->setSection(section);
   hit->setVolumeID(stripGlobal);
-  /* Relation. */
-  StoreArray<MCParticle> particles;
-  RelationArray particleToSimHits(particles, m_SimHits);
-  particleToSimHits.add(track.GetTrackID(), m_SimHits.getEntries() - 1);
+  m_MCParticlesToSimHits.add(track.GetTrackID(), hit->getArrayIndex());
   return true;
 }
 

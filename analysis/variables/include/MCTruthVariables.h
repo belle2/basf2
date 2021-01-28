@@ -323,12 +323,6 @@ namespace Belle2 {
      */
     double particleClusterBestMCPDGCode(const Particle*);
 
-
-    /**
-     * returns True if the environment is MC and False for data
-     */
-    double isMC(const Particle*);
-
   }
 }
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import os
@@ -42,7 +41,7 @@ class ValidationFunctionstTest(unittest.TestCase):
         if local_dir:
             ret = validationfunctions.get_compact_git_hash(local_dir)
             self.assertTrue(ret is not None)
-            print("This source code has git hash {}".format(ret))
+            print(f"This source code has git hash {ret}")
 
 
 if __name__ == "__main__":

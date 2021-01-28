@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-##############################################################################
-#
-# This is a steering file to generate and analyze 10000 events used for ARICH
-# validation plots.
-# Author: Luka Santelj
-# 11.3.2014
-#
-##############################################################################
+"""
+<header>
+<contact>Luka Santelj</contact>
+<description>This is a steering file to generate and analyze 10000 events used for ARICH
+validation plots.
+</description>
+<output>../ARICHEvents.root</output>
+</header>
+"""
 
 import basf2 as b2
 from optparse import OptionParser

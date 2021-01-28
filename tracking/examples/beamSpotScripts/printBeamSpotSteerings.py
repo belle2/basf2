@@ -78,6 +78,7 @@ def storeSteering2(name, tag):
     fOut.write(']}')
     fOut.close()
 
+
 # Produce all the json steerings to the steering directory
 
 storeSteering2('steerings/input_data_exp8off.json',  '08off')

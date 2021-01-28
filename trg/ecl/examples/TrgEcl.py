@@ -7,8 +7,7 @@
 #        ex)
 #        commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
 # -------------------------------------------------------------------------------------------------------
-import os
-from basf2 import *
+import basf2 as b2
 from L1trigger import add_tsim
 ################
 import sys  # get argv
@@ -25,28 +24,28 @@ if argc == 3:
 
 ################
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
 # use_local_database('./trg_ecl/database.txt')
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
 # input
-rootinput1 = register_module('RootInput')
+rootinput1 = b2.register_module('RootInput')
 rootinput1.param('inputFileName', f_in_root)
 
 
 # output
-rootoutput = register_module('RootOutput')
+rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', f_out_root)
 
 # import random
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 main.add_module(rootinput1)
 
@@ -60,9 +59,9 @@ main.add_module(rootoutput, branchNames=["TRGECLTrgs", "TRGECLHits", "TRGECLClus
 
 
 # main
-process(main)
+b2.process(main)
 ###
 ###
 ###
-print(statistics)
+print(b2.statistics)
 # ===<END>

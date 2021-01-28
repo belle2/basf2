@@ -49,7 +49,7 @@ def get_working_groups():
         0: "Systematics",
         1: "SL + Missing Energy",
         2: "EWP",
-        3: "TCPV",
+        3: "TDCPV",
         4: "B→charm",
         5: "Bottomonium",
         6: "Quarkonium",
@@ -61,7 +61,10 @@ def get_working_groups():
 
 
 def get_argument_parser():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
 
     parser.add_argument(
         "StatsJSON",
@@ -229,7 +232,7 @@ def load_df(JSONPath, *, RequestedSkims):
     return df.loc[DataMask], df.loc[MCMask]
 
 
-def add_data_fields(df):
+def add_data_fields(df, add_lumi=False):
     """
     Add stats to dataframe for data samples.
 
@@ -243,20 +246,22 @@ def add_data_fields(df):
         axis=1,
     )
 
-    # Get luminosity associated with each
-    df["SampleIntLumi"] = df["SampleFile"].apply(
-        lambda SampleFile: get_luminosity(SampleFile)
-    )
+    # NOTE: very slow to query the DB multiple times, so don't do this if we don't need to
+    if add_lumi:
+        # Get luminosity associated with each
+        df["SampleIntLumi"] = df["SampleFile"].apply(
+            lambda SampleFile: get_luminosity(SampleFile)
+        )
 
-    # Remove rows for any data samples that the b2 tools couldn't get a luminosity for
-    df.dropna(subset=["SampleIntLumi"], inplace=True)
+        # Remove rows for any data samples that the b2 tools couldn't get a luminosity for
+        df.dropna(subset=["SampleIntLumi"], inplace=True)
 
-    # Scale down luminosity using fraction of file used in test
-    df["SampleIntLumiUsed"] = df["SampleIntLumi"] * df["FractionOfEventsUsed"]
+        # Scale down luminosity using fraction of file used in test
+        df["SampleIntLumiUsed"] = df["SampleIntLumi"] * df["FractionOfEventsUsed"]
 
-    # udstSize in MB, SampleIntLumiUsed in 1/fb
-    df["OutputFileSize_MBPerInvfb"] = df["udstSize"] / df["SampleIntLumiUsed"]
-    df["OutputFileSize_TBPerInvab"] = df["OutputFileSize_MBPerInvfb"] / 1024
+        # udstSize in MB, SampleIntLumiUsed in 1/fb
+        df["OutputFileSize_MBPerInvfb"] = df["udstSize"] / df["SampleIntLumiUsed"]
+        df["OutputFileSize_TBPerInvab"] = df["OutputFileSize_MBPerInvfb"] / 1024
 
     return df
 
@@ -320,23 +325,24 @@ def main():
     df_Data = add_data_fields(df_Data)
     df_MC = add_mc_fields(df_MC)
 
+    print("All stats displayed below are summed over skims.")
+    totals_table(
+        "HS06TimePerEvent",
+        "CPU time to process one input event (HS06)",
+        df_Data,
+        df_MC,
+        markdown=args.markdown,
+    )
     totals_table(
         "RetentionRate",
-        "Event-based total retention (%)",
+        "Event-based retention rate (%)",
         df_Data,
         df_MC,
         markdown=args.markdown,
     )
     totals_table(
-        "FilesizeRetentionRate",
-        "Filesize-based total retention (%)",
-        df_Data,
-        df_MC,
-        markdown=args.markdown,
-    )
-    totals_table(
-        "OutputFileSize_TBPerInvab",
-        "uDST size (TB per 1/ab)",
+        "udstSizePerSkimmedEvent",
+        "Size of one event in uDST format (kB)",
         df_Data,
         df_MC,
         markdown=args.markdown,

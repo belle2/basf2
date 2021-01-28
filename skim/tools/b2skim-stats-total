@@ -349,6 +349,13 @@ def main():
         markdown=args.markdown,
     )
     totals_table(
+        "FilesizeRetentionRate",
+        "Filesize-based retention rate (%)",
+        df_Data,
+        df_MC,
+        markdown=args.markdown,
+    )
+    totals_table(
         "udstSizePerSkimmedEvent",
         "Size of one event in uDST format (kB)",
         df_Data,

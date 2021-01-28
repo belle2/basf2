@@ -3,33 +3,28 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/pgun-roe-mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+ (mu-)
+[INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : isSignal == 1
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
+[INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists to be studied: 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts:  and eclCluster cuts: 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:conv (gamma:conv)
+[INFO]  o) creating (anti-)ParticleList with name: gamma:V0 (gamma:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : -0.1 < dM < 0.1
 [INFO] ParticleSelector: gamma:conv
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: gamma:conv and cut: 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : -0.1 < dM < 0.1
 [INFO] ParticleSelector: Lambda0
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: Lambda0 and cut: 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : -0.1 < dM < 0.1
 [INFO] ParticleSelector: K_S0
 [INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0 and cut: 

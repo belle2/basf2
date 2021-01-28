@@ -3,21 +3,17 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/pgun-roe-mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+ (mu-)
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: mu+ (1+0) + mu- (1+0)
 [INFO] collection=Particles

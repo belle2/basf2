@@ -2,9 +2,8 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [FATAL] Tree with the name "variables" already exists in the file "ntuple.root"
 
 You probably want to either set the output fileName or the treeName to something else:
@@ -23,13 +22,11 @@ You probably want to either set the output fileName or the treeName to something
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+ (pi-)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] Writing NTuple secondtree
 [INFO] Writing NTuple intermediate
 [INFO] Writing NTuple firsttree

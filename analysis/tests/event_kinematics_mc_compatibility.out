@@ -3,37 +3,22 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
+[INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+ (mu-)
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+ (pi-)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:MC (pi-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K+ (K-)
+[INFO]  o) creating (anti-)ParticleList with name: K+:MC (K-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: p+ (anti-p-)
+[INFO]  o) creating (anti-)ParticleList with name: p+:MC (anti-p-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : mcPrimary > 0 and nDaughters == 0
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information

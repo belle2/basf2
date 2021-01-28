@@ -3,101 +3,63 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+ (pi-)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K+ (K-)
+[INFO]  o) creating (anti-)ParticleList with name: K+:all (K-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: p+ (anti-p-)
+[INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+ (mu-)
+[INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:all (K_L0:all)
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
-[INFO]    -> MDST source: ECLClusters
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+:frommc (pi-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K+:frommc (K-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: p+:frommc (anti-p-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+:frommc (mu-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:frommc (K_S0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0:frommc (anti-Lambda0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:frommc (K_L0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:frommc (gamma:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0:frommc (anti-n0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: B0:frommc (anti-B0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
 [INFO]    -> MDST source: ECLClusters and KLMClusters
-[INFO]    -> With cuts  : isFromKLM
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]  o) creating (anti-)ParticleList with name: n0:all (anti-n0:all)
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: pi+:MC (pi-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K+:MC (K-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: p+:MC (anti-p-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:MC (K_L0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: n0:MC (anti-n0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: B0:MC (anti-B0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: D0:MC (anti-D0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S):ROE (Upsilon(4S):ROE)
 [INFO]    -> MDST source: RestOfEvents
-[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
@@ -114,12 +76,12 @@
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-   Upsilon(4S)( 0)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
+Upsilon(4S):ROE( 0)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
 
 [INFO] 
 ======================================================================
 Total Retention: 44199 events passing / 90000 events processed = 0.4911
-Total Number of Particles created in the DataStore: 16663097
+Total Number of Particles created in the DataStore: 15290263
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -134,7 +96,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] 
 ======================================================================
 Total Retention: 82457 events passing / 90000 events processed = 0.9162
-Total Number of Particles created in the DataStore: 16663097
+Total Number of Particles created in the DataStore: 15290263
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -142,18 +104,18 @@ Total Number of Particles created in the DataStore: 16663097
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
 
                   |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
-     e+:frommc( 0)| 1.0000| 0.9996| 0.8351| 0.5478| 0.9950| 0.5624| 0.1183| 0.5056| 0.9998| 0.9188| 0.4847| 0.8440| 0.0000|
-    pi+:frommc( 1)| 0.9997| 1.0000| 0.8350| 0.5479| 0.9949| 0.5624| 0.1183| 0.5055| 0.9998| 0.9189| 0.4847| 0.8441| 0.0000|
-     K+:frommc( 2)| 0.9998| 0.9996| 1.0000| 0.5500| 0.9964| 0.5263| 0.1150| 0.4759| 0.9998| 0.9205| 0.4740| 0.8615| 0.0000|
-     p+:frommc( 3)| 0.9998| 0.9998| 0.8384| 1.0000| 0.9954| 0.5566| 0.1873| 0.5257| 0.9999| 0.9418| 0.4898| 0.8347| 0.0000|
-    mu+:frommc( 4)| 0.9997| 0.9996| 0.8362| 0.5480| 1.0000| 0.5625| 0.1184| 0.5059| 0.9998| 0.9187| 0.4853| 0.8443| 0.0000|
-   K_S0:frommc( 5)| 0.9997| 0.9997| 0.7814| 0.5421| 0.9951| 1.0000| 0.1056| 0.4782| 0.9998| 0.9230| 0.5035| 0.8394| 0.0000|
-Lambda0:frommc( 6)| 0.9999| 0.9999| 0.8121| 0.8672| 0.9961| 0.5022| 1.0000| 0.5475| 1.0000| 0.9641| 0.4920| 0.7745| 0.0000|
-   K_L0:frommc( 7)| 0.9997| 0.9996| 0.7860| 0.5696| 0.9956| 0.5319| 0.1281| 1.0000| 0.9998| 0.9265| 0.5162| 0.8276| 0.0000|
-  gamma:frommc( 8)| 0.9997| 0.9996| 0.8350| 0.5478| 0.9949| 0.5624| 0.1183| 0.5056| 1.0000| 0.9188| 0.4846| 0.8440| 0.0000|
-     n0:frommc( 9)| 0.9997| 0.9998| 0.8365| 0.5615| 0.9949| 0.5650| 0.1241| 0.5098| 0.9998| 1.0000| 0.4861| 0.8436| 0.0000|
-     B0:frommc(10)| 0.9998| 0.9998| 0.8167| 0.5536| 0.9962| 0.5843| 0.1201| 0.5384| 0.9997| 0.9216| 1.0000| 0.7166| 0.0000|
-     D0:frommc(11)| 0.9996| 0.9997| 0.8523| 0.5417| 0.9952| 0.5593| 0.1085| 0.4957| 0.9998| 0.9183| 0.4115| 1.0000| 0.0000|
+         e+:MC( 0)| 1.0000| 0.9996| 0.8351| 0.5478| 0.9950| 0.5624| 0.1183| 0.5056| 0.9998| 0.9188| 0.4847| 0.8440| 0.0000|
+        pi+:MC( 1)| 0.9997| 1.0000| 0.8350| 0.5479| 0.9949| 0.5624| 0.1183| 0.5055| 0.9998| 0.9189| 0.4847| 0.8441| 0.0000|
+         K+:MC( 2)| 0.9998| 0.9996| 1.0000| 0.5500| 0.9964| 0.5263| 0.1150| 0.4759| 0.9998| 0.9205| 0.4740| 0.8615| 0.0000|
+         p+:MC( 3)| 0.9998| 0.9998| 0.8384| 1.0000| 0.9954| 0.5566| 0.1873| 0.5257| 0.9999| 0.9418| 0.4898| 0.8347| 0.0000|
+        mu+:MC( 4)| 0.9997| 0.9996| 0.8362| 0.5480| 1.0000| 0.5625| 0.1184| 0.5059| 0.9998| 0.9187| 0.4853| 0.8443| 0.0000|
+       K_S0:MC( 5)| 0.9997| 0.9997| 0.7814| 0.5421| 0.9951| 1.0000| 0.1056| 0.4782| 0.9998| 0.9230| 0.5035| 0.8394| 0.0000|
+    Lambda0:MC( 6)| 0.9999| 0.9999| 0.8121| 0.8672| 0.9961| 0.5022| 1.0000| 0.5475| 1.0000| 0.9641| 0.4920| 0.7745| 0.0000|
+       K_L0:MC( 7)| 0.9997| 0.9996| 0.7860| 0.5696| 0.9956| 0.5319| 0.1281| 1.0000| 0.9998| 0.9265| 0.5162| 0.8276| 0.0000|
+      gamma:MC( 8)| 0.9997| 0.9996| 0.8350| 0.5478| 0.9949| 0.5624| 0.1183| 0.5056| 1.0000| 0.9188| 0.4846| 0.8440| 0.0000|
+         n0:MC( 9)| 0.9997| 0.9998| 0.8365| 0.5615| 0.9949| 0.5650| 0.1241| 0.5098| 0.9998| 1.0000| 0.4861| 0.8436| 0.0000|
+         B0:MC(10)| 0.9998| 0.9998| 0.8167| 0.5536| 0.9962| 0.5843| 0.1201| 0.5384| 0.9997| 0.9216| 1.0000| 0.7166| 0.0000|
+         D0:MC(11)| 0.9996| 0.9997| 0.8523| 0.5417| 0.9952| 0.5593| 0.1085| 0.4957| 0.9998| 0.9183| 0.4115| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
@@ -161,23 +123,23 @@ Lambda0:frommc( 6)| 0.9999| 0.9999| 0.8121| 0.8672| 0.9961| 0.5022| 1.0000| 0.54
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-     e+:frommc( 0)|    0.9996|   8.0996|   8.1025|   4.6006|   4.6022|   3.4990|   3.5003|   0.0000|   0.0000|
-    pi+:frommc( 1)|    0.9996|   9.9370|   9.9408|   4.9454|   4.9473|   4.9916|   4.9935|   0.0000|   0.0000|
-     K+:frommc( 2)|    0.8350|   1.6240|   1.9450|   0.8129|   0.9736|   0.8111|   0.9714|   0.0000|   0.0000|
-     p+:frommc( 3)|    0.5477|   0.9387|   1.7138|   0.8225|   1.5017|   0.1162|   0.2121|   0.0000|   0.0000|
-    mu+:frommc( 4)|    0.9949|   4.7858|   4.8102|   3.8028|   3.8222|   0.9830|   0.9880|   0.0000|   0.0000|
-   K_S0:frommc( 5)|    0.5624|   0.7872|   1.3998|   0.0000|   0.0000|   0.0000|   0.0000|   0.7872|   1.3998|
-Lambda0:frommc( 6)|    0.1183|   0.1330|   1.1244|   0.0967|   0.8175|   0.0363|   0.3069|   0.0000|   0.0000|
-   K_L0:frommc( 7)|    0.5055|   0.6834|   1.3519|   0.0000|   0.0000|   0.0000|   0.0000|   0.6834|   1.3519|
-  gamma:frommc( 8)|    0.9998|  16.3277|  16.3311|   0.0000|   0.0000|   0.0000|   0.0000|  16.3277|  16.3311|
-     n0:frommc( 9)|    0.9188|   3.3937|   3.6938|   3.3068|   3.5992|   0.0869|   0.0946|   0.0000|   0.0000|
-     B0:frommc(10)|    0.4846|   0.9693|   2.0000|   0.4835|   0.9976|   0.4858|   1.0024|   0.0000|   0.0000|
-     D0:frommc(11)|    0.8440|   1.3977|   1.6560|   0.7004|   0.8298|   0.6974|   0.8262|   0.0000|   0.0000|
+         e+:MC( 0)|    0.9996|   8.0996|   8.1025|   4.6006|   4.6022|   3.4990|   3.5003|   0.0000|   0.0000|
+        pi+:MC( 1)|    0.9996|   9.9370|   9.9408|   4.9454|   4.9473|   4.9916|   4.9935|   0.0000|   0.0000|
+         K+:MC( 2)|    0.8350|   1.6240|   1.9450|   0.8129|   0.9736|   0.8111|   0.9714|   0.0000|   0.0000|
+         p+:MC( 3)|    0.5477|   0.9387|   1.7138|   0.8225|   1.5017|   0.1162|   0.2121|   0.0000|   0.0000|
+        mu+:MC( 4)|    0.9949|   4.7858|   4.8102|   3.8028|   3.8222|   0.9830|   0.9880|   0.0000|   0.0000|
+       K_S0:MC( 5)|    0.5624|   0.7872|   1.3998|   0.0000|   0.0000|   0.0000|   0.0000|   0.7872|   1.3998|
+    Lambda0:MC( 6)|    0.1183|   0.1330|   1.1244|   0.0967|   0.8175|   0.0363|   0.3069|   0.0000|   0.0000|
+       K_L0:MC( 7)|    0.5055|   0.6834|   1.3519|   0.0000|   0.0000|   0.0000|   0.0000|   0.6834|   1.3519|
+      gamma:MC( 8)|    0.9998|  16.3277|  16.3311|   0.0000|   0.0000|   0.0000|   0.0000|  16.3277|  16.3311|
+         n0:MC( 9)|    0.9188|   3.3937|   3.6938|   3.3068|   3.5992|   0.0869|   0.0946|   0.0000|   0.0000|
+         B0:MC(10)|    0.4846|   0.9693|   2.0000|   0.4835|   0.9976|   0.4858|   1.0024|   0.0000|   0.0000|
+         D0:MC(11)|    0.8440|   1.3977|   1.6560|   0.7004|   0.8298|   0.6974|   0.8262|   0.0000|   0.0000|
 
 [INFO] 
 ======================================================================
 Total Retention: 90000 events passing / 90000 events processed = 1.0000
-Total Number of Particles created in the DataStore: 16663097
+Total Number of Particles created in the DataStore: 15290263
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -185,16 +147,16 @@ Total Number of Particles created in the DataStore: 16663097
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
 
                   |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
-            e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
-           pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
-            K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
-            p+( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
-           mu+( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
-          K_S0( 5)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.9961| 1.0000| 1.0000| 1.0000| 0.0000|
-       Lambda0( 6)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.8806| 1.0000| 1.0000| 0.9999| 1.0000| 0.0000|
-          K_L0( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+        e+:all( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+       pi+:all( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+        K+:all( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+        p+:all( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+       mu+:all( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+       K_S0:V0( 5)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.9961| 1.0000| 1.0000| 1.0000| 0.0000|
+    Lambda0:V0( 6)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.8806| 1.0000| 1.0000| 0.9999| 1.0000| 0.0000|
+      K_L0:all( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
          gamma( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 1.0000| 1.0000| 0.0000|
-            n0( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
+        n0:all( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.4911| 0.5555| 1.0000| 0.9999| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
@@ -202,129 +164,91 @@ Total Number of Particles created in the DataStore: 16663097
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-            e+( 0)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
-           pi+( 1)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
-            K+( 2)|    1.0000|  12.4562|  12.4562|   6.4886|   6.4886|   5.9676|   5.9676|   0.0000|   0.0000|
-            p+( 3)|    1.0000|  12.4556|  12.4556|   6.4868|   6.4868|   5.9688|   5.9688|   0.0000|   0.0000|
-           mu+( 4)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
-          K_S0( 5)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
-       Lambda0( 6)|    0.5555|   2.3510|   4.2324|   1.1804|   2.1250|   1.1706|   2.1074|   0.0000|   0.0000|
-          K_L0( 7)|    1.0000|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|  14.8899|  14.8899|
+        e+:all( 0)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+       pi+:all( 1)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+        K+:all( 2)|    1.0000|  12.4562|  12.4562|   6.4886|   6.4886|   5.9676|   5.9676|   0.0000|   0.0000|
+        p+:all( 3)|    1.0000|  12.4556|  12.4556|   6.4868|   6.4868|   5.9688|   5.9688|   0.0000|   0.0000|
+       mu+:all( 4)|    1.0000|  12.4571|  12.4571|   6.4894|   6.4894|   5.9677|   5.9677|   0.0000|   0.0000|
+       K_S0:V0( 5)|    0.4911|   1.0199|   2.0768|   0.0000|   0.0000|   0.0000|   0.0000|   1.0199|   2.0768|
+    Lambda0:V0( 6)|    0.5555|   2.3510|   4.2324|   1.1804|   2.1250|   1.1706|   2.1074|   0.0000|   0.0000|
+      K_L0:all( 7)|    1.0000|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|  14.8899|  14.8899|
          gamma( 8)|    0.9999|  15.2537|  15.2551|   0.0000|   0.0000|   0.0000|   0.0000|  15.2537|  15.2551|
-            n0( 9)|    1.0000|  14.8899|  14.8899|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|
+        n0:all( 9)|    1.0000|  14.8899|  14.8899|  14.8899|  14.8899|   0.0000|   0.0000|   0.0000|   0.0000|
 
 [INFO] 
 ======================================================================
 Total Retention: 90000 events passing / 90000 events processed = 1.0000
-Total Number of Particles created in the DataStore: 16663097
+Total Number of Particles created in the DataStore: 15290263
 ======================================================================
 
-[WARNING] There were 518 v0s skipped because of same charge daughters for Lambda0
-[WARNING] There were 181 v0s skipped because of same charge daughters for K_S0
-[WARNING] There were 500 tracks skipped because of zero charge for mu+
-[WARNING] There were 632 tracks skipped because of zero charge for p+
-[WARNING] There were 581 tracks skipped because of zero charge for K+
-[WARNING] There were 500 tracks skipped because of zero charge for pi+
-[WARNING] There were 500 tracks skipped because of zero charge for e+
+[WARNING] There were 518 v0s skipped because of same charge daughters for Lambda0:V0
+[WARNING] There were 181 v0s skipped because of same charge daughters for K_S0:V0
+[WARNING] There were 500 tracks skipped because of zero charge for mu+:all
+[WARNING] There were 632 tracks skipped because of zero charge for p+:all
+[WARNING] There were 581 tracks skipped because of zero charge for K+:all
+[WARNING] There were 500 tracks skipped because of zero charge for pi+:all
+[WARNING] There were 500 tracks skipped because of zero charge for e+:all
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+ (pi-)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K+ (K-)
+[INFO]  o) creating (anti-)ParticleList with name: K+:all (K-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: p+ (anti-p-)
+[INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+ (mu-)
+[INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:all (K_L0:all)
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
-[INFO]    -> MDST source: ECLClusters
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+:frommc (pi-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K+:frommc (K-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: p+:frommc (anti-p-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu+:frommc (mu-:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:frommc (K_S0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Lambda0:frommc (anti-Lambda0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:frommc (K_L0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:frommc (gamma:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: n0:frommc (anti-n0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: B0:frommc (anti-B0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
-[INFO]    -> MDST source: MCParticles
-[INFO]    -> With cuts  : 
-[INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:fromKLM (gamma:fromKLM)
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
 [INFO]    -> MDST source: ECLClusters and KLMClusters
-[INFO]    -> With cuts  : isFromKLM
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S) (Upsilon(4S))
+[INFO]  o) creating (anti-)ParticleList with name: n0:all (anti-n0:all)
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: pi+:MC (pi-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K+:MC (K-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: p+:MC (anti-p-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:MC (K_L0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: n0:MC (anti-n0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: B0:MC (anti-B0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: D0:MC (anti-D0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Upsilon(4S):ROE (Upsilon(4S):ROE)
 [INFO]    -> MDST source: RestOfEvents
-[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists to be studied: 10 
 [INFO] Number of ParticleLists to be studied: 12 
 [INFO] Number of ParticleLists to be studied: 1 
@@ -333,7 +257,7 @@ Total Number of Particles created in the DataStore: 16663097
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: e+ (5+0) + e- (5+0)
+[INFO]  ParticleLists: e+:all (5+0) + e-:all (5+0)
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
  flavorType=1 particleSource=1 particleTypeUsedForFit=211
@@ -536,7 +460,7 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: pi+ (5+0) + pi- (5+0)
+[INFO]  ParticleLists: pi+:all (5+0) + pi-:all (5+0)
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
  flavorType=1 particleSource=1 particleTypeUsedForFit=211
@@ -739,7 +663,7 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: K+ (5+0) + K- (5+0)
+[INFO]  ParticleLists: K+:all (5+0) + K-:all (5+0)
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
  flavorType=1 particleSource=1 particleTypeUsedForFit=321
@@ -942,7 +866,7 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: p+ (5+0) + anti-p- (5+0)
+[INFO]  ParticleLists: p+:all (5+0) + anti-p-:all (5+0)
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
  flavorType=1 particleSource=1 particleTypeUsedForFit=321
@@ -1145,7 +1069,7 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: mu+ (5+0) + mu- (5+0)
+[INFO]  ParticleLists: mu+:all (5+0) + mu-:all (5+0)
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
  flavorType=1 particleSource=1 particleTypeUsedForFit=211
@@ -1348,7 +1272,7 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_L0 (0+8)
+[INFO]  ParticleList : K_L0:all (0+8)
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
  flavorType=0 particleSource=2 particleTypeUsedForFit=0
@@ -1594,11 +1518,11 @@ Total Number of Particles created in the DataStore: 16663097
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleLists: n0 (8+0) + anti-n0 (0+0)
+[INFO]  ParticleLists: n0:all (8+0) + anti-n0:all (0+0)
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=2 particleTypeUsedForFit=0
- mdstIndex=12 arrayIndex=62 identifier=1001 daughterIndices:  (none)
+ mdstIndex=12 arrayIndex=66 identifier=1001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, -0.02, 0.09) p=0.09314
  momentum scaling factor=1
@@ -1618,7 +1542,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=2 particleTypeUsedForFit=0
- mdstIndex=17 arrayIndex=63 identifier=6001 daughterIndices:  (none)
+ mdstIndex=17 arrayIndex=67 identifier=6001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.00, -0.02, 0.02) p=0.02535
  momentum scaling factor=1
@@ -1638,7 +1562,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=2 particleTypeUsedForFit=0
- mdstIndex=19 arrayIndex=64 identifier=8001 daughterIndices:  (none)
+ mdstIndex=19 arrayIndex=68 identifier=8001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.04, 0.09, 0.07) p=0.1225
  momentum scaling factor=1
@@ -1658,7 +1582,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=2 particleTypeUsedForFit=0
- mdstIndex=23 arrayIndex=65 identifier=13001 daughterIndices:  (none)
+ mdstIndex=23 arrayIndex=69 identifier=13001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.06, -0.12, -0.15) p=0.1977
  momentum scaling factor=1
@@ -1678,7 +1602,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=0 arrayIndex=66 identifier=0 daughterIndices:  (none)
+ mdstIndex=0 arrayIndex=70 identifier=0 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.08, -1.01, -0.35) p=1.075
  momentum scaling factor=1
@@ -1698,7 +1622,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=1 arrayIndex=67 identifier=1 daughterIndices:  (none)
+ mdstIndex=1 arrayIndex=71 identifier=1 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.25, -0.24, -0.25) p=0.43
  momentum scaling factor=1
@@ -1718,7 +1642,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=2 arrayIndex=68 identifier=2 daughterIndices:  (none)
+ mdstIndex=2 arrayIndex=72 identifier=2 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, 0.18, 0.11) p=0.215
  momentum scaling factor=1
@@ -1738,7 +1662,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
  flavorType=1 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=3 arrayIndex=69 identifier=3 daughterIndices:  (none)
+ mdstIndex=3 arrayIndex=73 identifier=3 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.00, -0.00, -0.00) p=0
  momentum scaling factor=1
@@ -1761,7 +1685,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=0 arrayIndex=121 identifier=0 daughterIndices:  (none)
+ mdstIndex=0 arrayIndex=62 identifier=0 daughterIndices:  (none)
  mass=0
  momentum=(0.08, -1.01, -0.35) p=1.075
  momentum scaling factor=1
@@ -1781,7 +1705,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=1 arrayIndex=122 identifier=1 daughterIndices:  (none)
+ mdstIndex=1 arrayIndex=63 identifier=1 daughterIndices:  (none)
  mass=0
  momentum=(0.25, -0.24, -0.25) p=0.43
  momentum scaling factor=1
@@ -1801,7 +1725,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=2 arrayIndex=123 identifier=2 daughterIndices:  (none)
+ mdstIndex=2 arrayIndex=64 identifier=2 daughterIndices:  (none)
  mass=0
  momentum=(-0.01, 0.18, 0.11) p=0.215
  momentum scaling factor=1
@@ -1821,7 +1745,7 @@ Total Number of Particles created in the DataStore: 16663097
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleSource=3 particleTypeUsedForFit=0
- mdstIndex=3 arrayIndex=124 identifier=3 daughterIndices:  (none)
+ mdstIndex=3 arrayIndex=65 identifier=3 daughterIndices:  (none)
  mass=0
  momentum=(0.00, -0.00, -0.00) p=0
  momentum scaling factor=1
@@ -1846,12 +1770,12 @@ Total Number of Particles created in the DataStore: 16663097
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-   Upsilon(4S)( 0)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+Upsilon(4S):ROE( 0)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
 
 [INFO] 
 ======================================================================
 Total Retention: 0 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 125
+Total Number of Particles created in the DataStore: 121
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -1866,7 +1790,7 @@ Total Number of Particles created in the DataStore: 125
 [INFO] 
 ======================================================================
 Total Retention: 1 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 125
+Total Number of Particles created in the DataStore: 121
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -1874,18 +1798,18 @@ Total Number of Particles created in the DataStore: 125
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
 
                   |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9|     10|     11| Unique|
-     e+:frommc( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-    pi+:frommc( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-     K+:frommc( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-     p+:frommc( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-    mu+:frommc( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-   K_S0:frommc( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
-Lambda0:frommc( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
-   K_L0:frommc( 7)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
-  gamma:frommc( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-     n0:frommc( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-     B0:frommc(10)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
-     D0:frommc(11)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000|
+         e+:MC( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+        pi+:MC( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+         K+:MC( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+         p+:MC( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+        mu+:MC( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+       K_S0:MC( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+    Lambda0:MC( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+       K_L0:MC( 7)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+      gamma:MC( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+         n0:MC( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+         B0:MC(10)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000|
+         D0:MC(11)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
@@ -1893,23 +1817,23 @@ Lambda0:frommc( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.00
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-     e+:frommc( 0)|    0.0000|   0.0002|  21.0000|   0.0001|   5.0000|   0.0002|  16.0000|   0.0000|   0.0000|
-    pi+:frommc( 1)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
-     K+:frommc( 2)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
-     p+:frommc( 3)|    0.0000|   0.0000|   1.0000|   0.0000|   0.0000|   0.0000|   1.0000|   0.0000|   0.0000|
-    mu+:frommc( 4)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
-   K_S0:frommc( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
-Lambda0:frommc( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
-   K_L0:frommc( 7)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
-  gamma:frommc( 8)|    0.0000|   0.0001|   5.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   5.0000|
-     n0:frommc( 9)|    0.0000|   0.0000|   2.0000|   0.0000|   2.0000|   0.0000|   0.0000|   0.0000|   0.0000|
-     B0:frommc(10)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
-     D0:frommc(11)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+         e+:MC( 0)|    0.0000|   0.0002|  21.0000|   0.0001|   5.0000|   0.0002|  16.0000|   0.0000|   0.0000|
+        pi+:MC( 1)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
+         K+:MC( 2)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+         p+:MC( 3)|    0.0000|   0.0000|   1.0000|   0.0000|   0.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+        mu+:MC( 4)|    0.0000|   0.0001|   7.0000|   0.0000|   4.0000|   0.0000|   3.0000|   0.0000|   0.0000|
+       K_S0:MC( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+    Lambda0:MC( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+       K_L0:MC( 7)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+      gamma:MC( 8)|    0.0000|   0.0001|   5.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   5.0000|
+         n0:MC( 9)|    0.0000|   0.0000|   2.0000|   0.0000|   2.0000|   0.0000|   0.0000|   0.0000|   0.0000|
+         B0:MC(10)|    0.0000|   0.0000|   2.0000|   0.0000|   1.0000|   0.0000|   1.0000|   0.0000|   0.0000|
+         D0:MC(11)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
 
 [INFO] 
 ======================================================================
 Total Retention: 1 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 125
+Total Number of Particles created in the DataStore: 121
 ======================================================================
 
 [INFO] ParticleStats Summary:
@@ -1917,16 +1841,16 @@ Total Number of Particles created in the DataStore: 125
  Pass matrix (for i, j: fraction passing selection i also passes selection j)
 
                   |      0|      1|      2|      3|      4|      5|      6|      7|      8|      9| Unique|
-            e+( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-           pi+( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-            K+( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-            p+( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-           mu+( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-          K_S0( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
-       Lambda0( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000|
-          K_L0( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+        e+:all( 0)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+       pi+:all( 1)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+        K+:all( 2)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+        p+:all( 3)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+       mu+:all( 4)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+       K_S0:V0( 5)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+    Lambda0:V0( 6)| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 0.0000| 1.0000| 0.0000| 0.0000| 0.0000| 0.0000|
+      K_L0:all( 7)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
          gamma( 8)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
-            n0( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
+        n0:all( 9)| 1.0000| 1.0000| 1.0000| 1.0000| 1.0000| 0.0000| 0.0000| 1.0000| 1.0000| 1.0000| 0.0000|
 
 [INFO] 
 ======================================================================
@@ -1934,20 +1858,20 @@ Total Number of Particles created in the DataStore: 125
 
                              |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
                   | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
-            e+( 0)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
-           pi+( 1)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
-            K+( 2)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
-            p+( 3)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
-           mu+( 4)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
-          K_S0( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
-       Lambda0( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
-          K_L0( 7)|    0.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   8.0000|
+        e+:all( 0)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+       pi+:all( 1)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+        K+:all( 2)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+        p+:all( 3)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+       mu+:all( 4)|    0.0000|   0.0001|  10.0000|   0.0001|   5.0000|   0.0001|   5.0000|   0.0000|   0.0000|
+       K_S0:V0( 5)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+    Lambda0:V0( 6)|    0.0000|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|   0.0000|     -nan|
+      K_L0:all( 7)|    0.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0001|   8.0000|
          gamma( 8)|    0.0000|   0.0000|   4.0000|   0.0000|   0.0000|   0.0000|   0.0000|   0.0000|   4.0000|
-            n0( 9)|    0.0000|   0.0001|   8.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|
+        n0:all( 9)|    0.0000|   0.0001|   8.0000|   0.0001|   8.0000|   0.0000|   0.0000|   0.0000|   0.0000|
 
 [INFO] 
 ======================================================================
 Total Retention: 1 events passing / 90000 events processed = 0.0000
-Total Number of Particles created in the DataStore: 125
+Total Number of Particles created in the DataStore: 121
 ======================================================================
 

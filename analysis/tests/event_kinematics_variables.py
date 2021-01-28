@@ -13,16 +13,16 @@ b2test_utils.configure_logging_for_tests()
 set_random_seed("1337")
 testinput = [b2test_utils.require_file('analysis/tests/mdst.root')]
 
-fsps = ['pi-', 'gamma']
+fsps = ['pi-:all', 'gamma:all']
 ###############################################################################
 # a new ParticleLoader for each fsp
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
-for fsp in fsps:
-    # There is an annoying warning in ParticleLoader about zero charged tracks
-    # If it will be removed in the future releases, the test log should be
-    # updated respectively.
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
+# There is an annoying warning in ParticleLoader about zero charged tracks
+# If it will be removed in the future releases, the test log should be
+# updated respectively.
+testpath.add_module('ParticleLoader', decayStrings=fsps)
+testpath.add_module('ParticleSelector', decayString='gamma:all', cut='isFromECL')
 
 # Variables created by event kinematics module
 event_kinematics = [

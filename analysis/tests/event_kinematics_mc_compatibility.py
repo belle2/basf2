@@ -19,9 +19,11 @@ fsps = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
 # a new ParticleLoader for each fsp
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
+testpath.add_module('ParticleLoader', decayStrings=fsps,
+                    addDaughters=True, skipNonPrimaryDaughters=True, useMCParticles=True)
 for fsp in fsps:
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, 'mcPrimary > 0 and nDaughters == 0')],
-                        addDaughters=True, skipNonPrimaryDaughters=True, useMCParticles=True)
+    testpath.add_module('ParticleListManipulator', outputListName=fsp,
+                        inputListNames=[fsp + ':MC'], cut='mcPrimary > 0 and nDaughters == 0')
 
 # Variables filled by event kinematics module
 event_kinematics = [

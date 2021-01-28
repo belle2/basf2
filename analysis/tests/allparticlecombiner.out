@@ -5,8 +5,9 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+:fromPV (pi-:fromPV)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : dr < 2 and abs(dz) < 5
 [INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : abs(dzFromMedianDz) < 0.05
@@ -29,5 +30,5 @@ Total Number of Particles created in the DataStore: 620
 ======================================================================
 
 [INFO] Writing NTuple ntuple
-[WARNING] There were 1 tracks skipped because of zero charge for pi+:fromPV
+[WARNING] There were 1 tracks skipped because of zero charge for pi+:all
 Test passed, cleaning up.

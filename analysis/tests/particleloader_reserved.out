@@ -5,11 +5,12 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[FATAL] You have tried to create a list e+:all with cuts! This is *very* error prone, so it is now forbidden.
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
+[INFO]    -> MDST source: Tracks
+[FATAL] You have tried to create the list e+:all but the label 'all' is forbidden for user-defined lists of final-state particles. It could introduce *very* dangerous bugs.

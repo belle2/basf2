@@ -384,6 +384,8 @@ print(output_file_path, "file was created successfully.")
 
 #-----------------------------------------------------
 
-print('''Please move the output file to your local "daq_dqm_gui" repository and push changes to the remote origin repository.''')
+print('''Please move the output file to your local "daq_dqm_gui" repository and push changes to the remote origin repository.
+
+Please remove the analysis file used as input if you do not need it anymore.''')
 
 #-----------------------------------------------------

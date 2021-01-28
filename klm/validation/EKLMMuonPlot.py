@@ -22,7 +22,7 @@ contact = 'Martina Laurenza (martina.laurenza@roma3.infn.it)'
 # Shifter Plots
 
 h2dtres = ROOT.TH1F('muon_h2dtres', 'EKLM muon 2d hits time resolution',
-                    100, -10, 10)
+                    200, -20, 10)
 h2dtres.SetXTitle('ns')
 h2dtres.SetYTitle('Events')
 tree.Draw('EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres')
@@ -33,14 +33,14 @@ functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
 eklm_digits_tres = ROOT.TH1F('eklm_digits_tres',
-                             'KLMDigits time resolution in EKLM', 250, -25, 25)
+                             'KLMDigits time resolution in EKLM', 500, -30, 70)
 eklm_digits_tres.SetXTitle('ns')
 eklm_digits_tres.SetYTitle('Events')
 tree.Draw('KLMDigits.m_Time-KLMDigits.m_MCTime>>eklm_digits_tres',
           'KLMDigits.getSubdetector()==2')
 functions = eklm_digits_tres.GetListOfFunctions()
 functions.Add(TNamed('Description', 'KLMDigits time resolution in EKLM'))
-functions.Add(TNamed('Check', 'Mean around -12 ns.'))
+functions.Add(TNamed('Check', 'A broad peak aroun -20 ns and a narrow peak around 45 ns.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -51,7 +51,7 @@ tree.Draw('EKLMHit2ds.getSection()>>Forward', '')
 functions = section.GetListOfFunctions()
 functions.Add(TNamed('Description',
                      'Flag indicating if a muon hit is in backward(1) or forward(2) EKLM'))
-functions.Add(TNamed('Check', '2D hits mostly backward.'))
+functions.Add(TNamed('Check', 'More hits in backward.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -61,7 +61,7 @@ sector.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getSector()>>Sector', '')
 functions = sector.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Sector number of muon hit'))
-functions.Add(TNamed('Check', '.'))
+functions.Add(TNamed('Check', 'More hits in sector 1, then mostly flat.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
@@ -71,7 +71,7 @@ layer.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getLayer()>>Layer', '')
 functions = layer.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Layer number of muon hit'))
-functions.Add(TNamed('Check', 'Number of events decrease with number of layer'))
+functions.Add(TNamed('Check', 'Number of events decreases with number of layer.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 

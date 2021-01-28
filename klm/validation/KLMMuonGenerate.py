@@ -32,7 +32,7 @@ basf2.B2INFO('The output file name is ' + output_filename)
 
 main_path = basf2.create_path()
 
-main_path.add_module('EventInfoSetter', evtNumList=1000)
+main_path.add_module('EventInfoSetter', evtNumList=2000)
 
 main_path.add_module('Progress')
 main_path.add_module('ProgressBar')

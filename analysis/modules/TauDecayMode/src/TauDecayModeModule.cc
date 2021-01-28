@@ -1,12 +1,13 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Leonardo Salinas , Swagato Banerjee , Atanu Pathak       *
- *               Michel Hernandez, Eduard De la Cruz.                     *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/*************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2020 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Leonardo Salinas, Swagato Banerjee                       *
+*               Michel Hernandez, Eduard De la Cruz.                     *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 #include <analysis/modules/TauDecayMode/TauDecayModeModule.h>
 
@@ -23,11 +24,7 @@
 #include <TLorentzVector.h>
 #include <TMatrixFSymfwd.h>
 #include "TMath.h"
-#include "TCanvas.h"
 
-#include "TColor.h"
-#include "TStyle.h"
-#include "TLatex.h"
 #include "TKey.h"
 #include "TObject.h"
 
@@ -40,7 +37,7 @@
 using namespace std;
 using namespace Belle2;
 
-// this part parse a string with a given separetor___________________________________________________________________________
+// this part parse a string with a given separetor [utility code recycled from the past]______________________________________
 std::vector<std::string> parseString(std::string str, std::string sep)
 {
   std::vector<std::string> parsed;
@@ -145,16 +142,17 @@ void TauDecayModeModule::event()
   vec_pim.clear(), vec_pip.clear(), vec_km.clear(), vec_kp.clear(), vec_apro.clear(), vec_pro.clear();
   vec_pi0.clear(), vec_k0s.clear(), vec_k0l.clear(), vec_gam.clear();
   vec_eta.clear(), vec_omega.clear(), vec_kstarp.clear(), vec_kstarm.clear(), vec_lambda.clear(), vec_lmb_br.clear();
-  vec_kstar.clear(), vec_kstar_br.clear(), vec_etapr.clear(), vec_a0m.clear(), vec_a0p.clear();
-  vec_b1m.clear(), vec_b1p.clear(), vec_phi.clear(), vec_f1.clear(), vec_a1m.clear(), vec_a1p.clear(), vec_rhom.clear(),
-                vec_rhop.clear();
+  vec_kstar.clear(), vec_kstar_br.clear(), vec_etapr.clear(), vec_a0m.clear(), vec_a0p.clear(), vec_a00.clear();
+  vec_b1m.clear(), vec_b1p.clear(), vec_phi.clear(), vec_f1.clear(), vec_a1m.clear(), vec_a1p.clear(),
+                vec_rhom.clear(), vec_rhop.clear();
   vec_K0.clear(), vec_K0_br.clear(), vec_rho0.clear(), vec_f0.clear();
   //
 
   for (int i = 0; i < MCParticles.getEntries(); i++) {
 
     MCParticle& p = *MCParticles[i];
-
+    if (!p.hasStatus(MCParticle::c_PrimaryParticle)) continue;
+    //
     if (p.getPDG() ==  11 && p.isInitial() == 0)  vec_em.push_back(i);
     if (p.getPDG() == -11 && p.isInitial() == 0)  vec_ep.push_back(i);
     //
@@ -196,6 +194,7 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 10311) vec_kstar.push_back(i);
     if (p.getPDG() == -10311) vec_kstar_br.push_back(i);
     if (p.getPDG() == 331) vec_etapr.push_back(i);
+    if (p.getPDG() == 9000111) vec_a00.push_back(i);
     if (p.getPDG() == 9000211) vec_a0p.push_back(i);
     if (p.getPDG() == -9000211) vec_a0m.push_back(i);
     if (p.getPDG() == -10213) vec_b1m.push_back(i);
@@ -232,6 +231,7 @@ void TauDecayModeModule::event()
     B2INFO("TauDecayMode:: vec_kstar.size()  = " << vec_kstar.size());
     B2INFO("TauDecayMode:: vec_kstar_br.size()  = " << vec_kstar_br.size());
     B2INFO("TauDecayMode:: vec_etapr.size()  = " << vec_etapr.size());
+    B2INFO("TauDecayMode:: vec_a00.size()  = " << vec_a00.size());
     B2INFO("TauDecayMode:: vec_a0p.size()  = " << vec_a0p.size());
     B2INFO("TauDecayMode:: vec_a0m.size()  = " << vec_a0m.size());
     B2INFO("TauDecayMode:: vec_b1m.size()  = " << vec_b1m.size());

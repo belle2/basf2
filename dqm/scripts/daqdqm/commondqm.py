@@ -83,6 +83,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            cutResultIdentifiers={},
+            histogramDirectoryName="softwaretrigger_before_filter",
+        )
+        path.add_module("StatisticsTimingHLTDQM")
+
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
         hlt_trigger_lines_in_plot = [
@@ -142,7 +153,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
            createExpRunEventHistograms=False,
            histogramDirectoryName="softwaretrigger_skim_nobhabha",
         )
-        path.add_module("StatisticsTimingHLTDQM")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT

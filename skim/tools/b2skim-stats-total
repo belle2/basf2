@@ -227,7 +227,7 @@ def load_df(JSONPath, *, RequestedSkims):
     df["Sample"] = df["Sample"].str.replace(r"^MC\d+_", "")
     df["Sample"] = df["Sample"].str.replace("BGx", " BGx")
     MCMask = df["Sample"].str.contains(
-        r"(mixed|charged|ccbar|uubar|ddbar|ssbar|taupair) BGx\d"
+        r"(mixed|charged|ccbar|uubar|ddbar|ssbar|taupair|ee|eeee|eemumu|mumu|gg) BGx\d"
     )
     DataMask = df["Sample"].str.contains("proc|bucket") & ~df["Sample"].str.contains(
         "offres"

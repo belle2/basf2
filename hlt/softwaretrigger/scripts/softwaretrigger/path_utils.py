@@ -40,6 +40,7 @@ def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms
         components=components,
         dqm_mode=dqm_mode.name,
         create_hlt_unit_histograms=create_hlt_unit_histograms)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components):
@@ -186,6 +187,8 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
+
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
@@ -212,6 +215,7 @@ def add_post_filter_reconstruction(path, run_type, components):
 
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
         pass
     else:

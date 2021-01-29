@@ -46,13 +46,14 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     histDir->cd();
   }
 
-  m_meanTimeHistogram = new TH1F("meanTimeHistogram", "Mean Processing Time;time/ms", m_param_overviewModuleList.size(), 0,
+  m_meanTimeHistogram = new TH1F("meanTimeHistogram", "Mean Processing Time [ms]", m_param_overviewModuleList.size(), 0,
                                  m_param_overviewModuleList.size());
   m_meanTimeHistogram->SetStats(false);
   m_meanMemoryHistogram = new TH1F("meanMemoryHistogram", "Mean Memory", m_param_overviewModuleList.size(), 0,
                                    m_param_overviewModuleList.size());
   m_meanMemoryHistogram->SetStats(false);
-  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Full Processing Time;time/ms", 100, 0, 4000);
+  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Budget Time [ms]", 250, 0, 10000);
+  m_processingTimeHistogram = new TH1F("processingTimeHistogram", "Processing Time [ms]", 125, 0, 5000);
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
     const std::string& moduleName = m_param_overviewModuleList[index];
@@ -106,6 +107,19 @@ void StatisticsTimingHLTDQMModule::event()
     m_meanMemoryHistogram->SetBinContent(index + 1, meanMemories[index]);
   }
 
+  double processingTimeSum = 0.0;
+  for (const ModuleStatistics& moduleStatistics : moduleStatisticsList) {
+    const std::string& statisticsName = moduleStatistics.getName();
+    const auto m_summaryModuleListIterator = std::find(m_summaryModuleList.begin(), m_summaryModuleList.end(),
+                                                       statisticsName);
+    if (m_summaryModuleListIterator == m_summaryModuleList.end()) {
+      continue;
+    }
+    processingTimeSum += moduleStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+  }
+  m_processingTimeHistogram->Fill(processingTimeSum - m_lastProcessingTimeSum);
+  m_lastProcessingTimeSum = processingTimeSum;
+
   const ModuleStatistics& fullStatistics = stats->getGlobal();
   const double fullTimeSum = fullStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   m_fullTimeHistogram->Fill(fullTimeSum - m_lastFullTimeSum);
@@ -114,12 +128,13 @@ void StatisticsTimingHLTDQMModule::event()
 
 void StatisticsTimingHLTDQMModule::beginRun()
 {
-  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram) {
+  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram || !m_processingTimeHistogram) {
     B2FATAL("Histograms were not created. Did you setup a HistoManager?");
   }
 
   m_meanTimeHistogram->Reset();
   m_meanMemoryHistogram->Reset();
   m_fullTimeHistogram->Reset();
+  m_processingTimeHistogram->Reset();
 }
 

@@ -267,7 +267,7 @@ void DQMHistAnalysisHLTModule::event()
       continue;
     }
 
-    for (int i = 1; i < m_max_hlt_units; i++) {
+    for (unsigned int i = 1; i <= m_max_hlt_units; i++) {
       double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
       if (totalUnitValue == 0) {
         histogram->Fill(i, 0);

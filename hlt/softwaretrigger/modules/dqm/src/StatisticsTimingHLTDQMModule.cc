@@ -68,13 +68,24 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_hlt_unit_histograms) {
-    m_fullTimePerUnitHistogram = new TH1F("fullTimePerUnitHistogram", "Mean Budget Time Per Unit [ms]", m_max_hlt_units + 1, 0,
-                                          m_max_hlt_units + 1);
-    m_fullTimePerUnitHistogram->SetStats(false);
-    m_processingTimePerUnitHistogram = new TH1F("processingTimePerUnitHistogram", "Mean Processing Time Per Unit [ms]",
-                                                m_max_hlt_units + 1, 0,
-                                                m_max_hlt_units + 1);
-    m_processingTimePerUnitHistogram->SetStats(false);
+    m_fullTimeMeanPerUnitHistogram = new TH1F("fullTimeMeanPerUnitHistogram", "Mean Budget Time Per Unit [ms]", m_max_hlt_units + 1, 0,
+                                              m_max_hlt_units + 1);
+    m_fullTimeMeanPerUnitHistogram->SetStats(false);
+    m_fullTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
+    m_processingTimeMeanPerUnitHistogram = new TH1F("processingTimeMeanPerUnitHistogram", "Mean Processing Time Per Unit [ms]",
+                                                    m_max_hlt_units + 1, 0,
+                                                    m_max_hlt_units + 1);
+    m_processingTimeMeanPerUnitHistogram->SetStats(false);
+    m_processingTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
+
+    for (unsigned int index = 1; index <= m_max_hlt_units; index++) {
+      m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
+                                                          ("Budget Time Per Unit [ms]: HLT" + std::to_string(index)).c_str(), 250, 0, 10000));
+      m_lastFullTimeSumPerUnit.emplace(index, 0);
+      m_processingTimePerUnitHistograms.emplace(index, new TH1F(("processingTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
+                                                                ("Processing Time Per Unit [ms]: HLT" + std::to_string(index)).c_str(), 125, 0, 5000));
+      m_lastProcessingTimeSumPerUnit.emplace(index, 0);
+    }
   }
 
   if (oldDirectory) {
@@ -150,10 +161,16 @@ void StatisticsTimingHLTDQMModule::event()
   m_lastFullTimeSum = fullTimeSum;
 
   if (m_param_create_hlt_unit_histograms) {
-    m_processingTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
+    m_processingTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
+
+    m_processingTimePerUnitHistograms[m_hlt_unit]->Fill(processingTimeSum - m_lastProcessingTimeSumPerUnit[m_hlt_unit]);
+    m_lastProcessingTimeSumPerUnit[m_hlt_unit] = processingTimeSum;
 
     const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
-    m_fullTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
+    m_fullTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
+
+    m_fullTimePerUnitHistograms[m_hlt_unit]->Fill(fullTimeSum - m_lastFullTimeSumPerUnit[m_hlt_unit]);
+    m_lastFullTimeSumPerUnit[m_hlt_unit] = fullTimeSum;
   }
 }
 
@@ -168,8 +185,12 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_fullTimeHistogram->Reset();
   m_processingTimeHistogram->Reset();
   if (m_param_create_hlt_unit_histograms) {
-    m_fullTimePerUnitHistogram->Reset();
-    m_processingTimePerUnitHistogram->Reset();
+    m_fullTimeMeanPerUnitHistogram->Reset();
+    m_processingTimeMeanPerUnitHistogram->Reset();
+    std::for_each(m_fullTimePerUnitHistograms.begin(), m_fullTimePerUnitHistograms.end(),
+    [](auto & it) { it.second->Reset(); });
+    std::for_each(m_processingTimePerUnitHistograms.begin(), m_processingTimePerUnitHistograms.end(),
+    [](auto & it) { it.second->Reset(); });
   }
 }
 

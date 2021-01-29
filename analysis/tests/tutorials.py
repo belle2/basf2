@@ -27,7 +27,7 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
-        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "*.py"))
+        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "/*.py"))
         for tutorial in all_tutorials:
             filename = os.path.basename(tutorial)
             if filename not in self.broken_tutorials:

@@ -167,7 +167,7 @@ def draw_bklmhists(file_chain):
 
     RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 210, -1, 20)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() <= 3')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
     RPC_bklmdigits_tres.SetXTitle('ns')
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
@@ -185,7 +185,7 @@ def draw_bklmhists(file_chain):
 
     Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 450, -15, 30)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() <= 3')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
     Sci_bklmdigits_tres.SetXTitle('ns')
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', 'First peak around -7 ns and a broad higher peak around 10 ns.'))
@@ -204,7 +204,7 @@ def draw_bklmhists(file_chain):
     timeSci.Write()
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, -0.5, 200.5)
-    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() <= 3')
+    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
     nPE.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 45, with mean at 47.'))

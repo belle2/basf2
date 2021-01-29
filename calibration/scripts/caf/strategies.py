@@ -641,14 +641,14 @@ class SequentialBoundaries(AlgorithmStrategy):
     Notice that boundaries cannot span multiple experiments.
 
     By default the algorithm will get the payload boundaries directly from the algorithm that need to
-    have inplemented the function `isBoundaryRequired`. If the desired boundaries are already known it
-    is possible to pass them directly setting the algorithm parameter `payload_boundaries` and avoid
-    the need to define the  `isBoundaryRequired` function.
+    have inplemented the function ``isBoundaryRequired``. If the desired boundaries are already known it
+    is possible to pass them directly setting the algorithm parameter ``payload_boundaries`` and avoid
+    the need to define the  ``isBoundaryRequired`` function.
 
-    `payload_boundaries` is a list [(exp1, run1), (exp2, run2), ...]. A boundary at the beginning of each
+    ``payload_boundaries`` is a list ``[(exp1, run1), (exp2, run2), ...]``. A boundary at the beginning of each
     experiment will be added if not already present. An empty list will thus produce a single payload for each
-    experiment. A `payload_boundaries` set to None is equivalent to not passing it and restores the default
-    behaviour where the boundaries are computed in the `isBoundaryRequired` function of the algorithm.
+    experiment. A ``payload_boundaries`` set to ``None`` is equivalent to not passing it and restores the default
+    behaviour where the boundaries are computed in the ``isBoundaryRequired`` function of the algorithm.
     """
     #: The params that you could set on the Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.

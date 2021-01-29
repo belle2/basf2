@@ -139,6 +139,14 @@ namespace Belle2 {
        */
       double getPDFValue(double time, double timeErr, double sigt = 0) const;
 
+      /**
+       * Returns integral of PDF from minTime to maxTime
+       * @param minTime integral lower limit
+       * @param maxTime integral upper limit
+       * @return integral of PDF
+       */
+      double getIntegral(double minTime, double maxTime) const;
+
     private:
 
       int m_pixelID = 0; /**< pixel ID */

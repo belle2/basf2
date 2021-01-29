@@ -87,7 +87,8 @@ namespace Belle2 {
       double tmin = TOPRecoManager::getMinTime();
       double tmax = TOPRecoManager::getMaxTime();
       double relEffi = m_background->getEfficiency();
-      m_numPhotons = photonYield(beta, PDGCode) * tlen * totalFraction(tmin, tmax) * relEffi;
+      m_fraction = totalFraction(tmin, tmax);
+      m_numPhotons = photonYield(beta, PDGCode) * tlen * m_fraction * relEffi;
     }
 
     double DeltaRayPDF::getPDFValue(int pixelID, double time) const

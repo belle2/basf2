@@ -38,4 +38,6 @@
 #pragma link C++ class Belle2::TOP::DeltaRayPDF-;
 #pragma link C++ class Belle2::TOP::TOPRecoManager-;
 #pragma link C++ class Belle2::TOP::PDFConstructor-;
+#pragma link C++ class Belle2::TOP::PDFConstructor::LogL-;
+#pragma link C++ class Belle2::TOP::PDFConstructor::Pull-;
 #endif

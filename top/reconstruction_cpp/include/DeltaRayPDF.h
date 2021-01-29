@@ -51,6 +51,12 @@ namespace Belle2 {
       double getNumPhotons() const {return m_numPhotons;}
 
       /**
+       * Returns fraction of delta-ray photons in the time window
+       * @return fraction of delta-ray photons in the time window
+       */
+      double getFraction() const {return m_fraction;}
+
+      /**
        * Returns PDF value at given time and pixel
        * @param pixelID pixel ID
        * @param time photon hit time
@@ -64,6 +70,14 @@ namespace Belle2 {
        * @return PDF value (projection to time axis)
        */
       double getPDFValue(double time) const;
+
+      /**
+       * Returns integral of PDF from minTime to maxTime
+       * @param minTime integral lower limit
+       * @param maxTime integral upper limit
+       * @return integral of PDF
+       */
+      double getIntegral(double minTime, double maxTime) const;
 
     private:
 
@@ -155,6 +169,7 @@ namespace Belle2 {
       double m_dirT0 = 0;   /**< minimal propagation time of direct photons */
       double m_reflT0 = 0;  /**< minimal propagation time of reflected photons */
       double m_TOF = 0;     /**< time-of-flight of particle */
+      double m_fraction = 0; /**< fraction of delta-ray photons within time window */
       double m_numPhotons = 0; /**< number of photons */
 
     };
@@ -183,6 +198,11 @@ namespace Belle2 {
       double pdfDirect = smearedTimeDistr(t, m_dirT0);
       double pdfReflec = smearedTimeDistr(t, m_reflT0);
       return m_dirFrac * pdfDirect + (1 - m_dirFrac) * pdfReflec;
+    }
+
+    inline double DeltaRayPDF::getIntegral(double minTime, double maxTime) const
+    {
+      return totalFraction(minTime, maxTime) / m_fraction;
     }
 
   } // namespace TOP

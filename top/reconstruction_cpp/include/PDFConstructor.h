@@ -49,6 +49,48 @@ namespace Belle2 {
         c_Full = 1     /**< also extra information */
       };
 
+      /**
+       * Useful data type for returning the results of log likelihood calculation
+       */
+      struct LogL {
+        double logL = 0; /**< extended log likelihood */
+        double expPhotons = 0; /**< expected number of photons */
+        unsigned numPhotons = 0; /**< detected number of photons */
+
+        /*
+         * Constructor
+         * @param phot expected number of photons
+         */
+        LogL(double phot): logL(-phot), expPhotons(phot)
+        {}
+      };
+
+      /**
+       * Data type for storing photon pull w.r.t PDF peak
+       */
+      struct Pull {
+        int pixelID = 0;    /**< pixel ID */
+        double time = 0;    /**< photon time */
+        double peakT0 = 0;  /**< PDF peak time (signal) or minimal PDF peak time in pixel (background) */
+        double ttsT0 = 0;   /**< TTS gaussian peak time (signal) or 0 (background) */
+        double sigma = 0;   /**< peak overall sigma (signal) or 0 (background) */
+        double phiCer = 0;  /**< azimuthal Cerenkov angle (signal) or 0 (background)*/
+        double wt = 0;      /**< weight */
+
+        /*
+         * Constructor
+         * @param pix pixel ID
+         * @param t photon time
+         * @param t0 PDF peak time
+         * @param tts0 TTS gaussian peak time
+         * @param sigma peak overall sigma
+         * @param phi azimuthal Cerenkov angle
+         * @param w weight
+         */
+        Pull(int pix, double t, double t0, double tts0, double sig, double phi, double w):
+          pixelID(pix), time(t), peakT0(t0), ttsT0(tts0), sigma(sig), phiCer(phi), wt(w)
+        {}
+      };
 
       /**
        * Class constructor
@@ -61,8 +103,8 @@ namespace Belle2 {
                      EPDFOption PDFOption = c_Optimal, EStoreOption storeOption = c_Reduced);
 
       /**
-       * Checks if the class instance is properly constructed
-       * @return true if properly constructed
+       * Checks the object status
+       * @return true if track is valid and all requited reconstruction objects are available
        */
       bool isValid() const {return m_valid;}
 
@@ -98,52 +140,87 @@ namespace Belle2 {
       const DeltaRayPDF& getDeltaRayPDF() const {return m_deltaRayPDF;}
 
       /**
-       * Returns the expected number of signal photons
+       * Returns the expected number of signal photons within the default time window
        * @return expected number of signal photons
        */
       double getExpectedSignalPhotons() const {return m_signalPhotons;}
 
       /**
-       * Returns the expected number of background photons
+       * Returns the expected number of background photons within the default time window
        * @return expected number of background photons
        */
       double getExpectedBkgPhotons() const {return m_bkgPhotons;}
 
       /**
-       * Returns the expected number of delta-ray photons
+       * Returns the expected number of delta-ray photons within the default time window
        * @return expected number of delta-ray photons
        */
       double getExpectedDeltaPhotons() const {return m_deltaPhotons;}
 
       /**
-       * Returns the expected number of photons (signal + background + delta-ray)
-       * @return expected number of photons
+       * Returns the expected number of photons within the default time window
+       * @return expected number of photons (signal + background + delta-ray)
        */
       double getExpectedPhotons() const {return m_signalPhotons + m_bkgPhotons + m_deltaPhotons;}
 
       /**
-       * Returns the number of photons used in log likelihood determination
-       * @return number of detected photons
-       */
-      unsigned getDetectedPhotons() const {return m_track.getSelectedHits().size();}
-
-      /**
        * Returns PDF value.
-       * Note: isValid() must be true, otherwise segmentation violation can occure
        * @param pixelID pixel ID
        * @param time photon hit time
        * @param timeErr uncertainty of hit time
-       * @param additional time smearing
+       * @param sigt additional time smearing
        * @return PDF value
        */
       double getPDFValue(int pixelID, double time, double timeErr, double sigt = 0) const;
 
       /**
-       * Returns extended log likelihood
-       * Note: isValid() must be true, otherwise segmentation violation can occure
+       * Returns extended log likelihood (using the default time window)
        * @return log likelihood
        */
-      double getLogL() const;
+      LogL getLogL() const;
+
+      /**
+       * Returns extended log likelihood for PDF shifted in time
+       * @param t0 time shift
+       * @param sigt additional time smearing
+       * @return log likelihood
+       */
+      LogL getLogL(double t0, double sigt = 0) const {return getLogL(t0, m_minTime, m_maxTime, sigt);}
+
+      /**
+       * Returns extended log likelihood for PDF shifted in time and using different time window
+       * @param t0 time shift
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @param sigt additional time smearing
+       * @return log likelihood
+       */
+      LogL getLogL(double t0, double minTime, double maxTime, double sigt = 0) const;
+
+      /**
+       * Returns extended log likelihoods in pixels for PDF shifted in time.
+       * @param t0 time shift
+       * @param sigt additional time smearing
+       * @return pixel log likelihoods (index = pixelID - 1)
+       */
+      const std::vector<LogL>& getPixelLogLs(double t0, double sigt = 0) const
+      {return getPixelLogLs(t0, m_minTime, m_maxTime, sigt);}
+
+      /**
+       * Returns extended log likelihoods in pixels for PDF shifted in time and using diferent time window
+       * @param t0 time shift
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @param sigt additional time smearing
+       * @return pixel log likelihoods (index = pixelID - 1)
+       */
+      const std::vector<LogL>& getPixelLogLs(double t0, double minTime, double maxTime, double sigt = 0) const;
+
+      /**
+       * Returns photon pulls w.r.t PDF peaks
+       * @return pulls
+       */
+      const std::vector<Pull>& getPulls() const;
 
       /**
        * Returns number of calls of template function setSignalPDF<T> for a given peak type
@@ -158,7 +235,6 @@ namespace Belle2 {
        * @return number of calls
        */
       int getNCalls_expandPDF(SignalPDF::EPeakType type) const {return m_ncallsExpandPDF[type];}
-
 
     private:
 
@@ -350,12 +426,35 @@ namespace Belle2 {
       double derivativeOfReflectedX(double x, double xe, double ze, double zd) const;
 
       /**
-       * Returns log of Poisson distribution without log(N!) term
-       * @param mean mean value
-       * @param N number of occurrences
-       * @return log Poisson
+       * Returns the value of PDF normalized to the number of expected photons.
+       * @param pixelID pixel ID
+       * @param time photon hit time
+       * @param timeErr uncertainty of hit time
+       * @param sigt additional time smearing
+       * @return PDF value
        */
-      double logPoisson(double mean, int N) const;
+      double pdfValue(int pixelID, double time, double timeErr, double sigt = 0) const;
+
+      /**
+       * Returns the expected number of photons within given time window
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return expected number of photons (signal + background + delta-ray)
+       */
+      double expectedPhotons(double minTime, double maxTime) const;
+
+      /**
+       * Initializes pixel log likelihoods
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       */
+      void initializePixelLogLs(double minTime, double maxTime) const;
+
+      /**
+       * Appends pulls of a photon hit
+       * @param hit photon hit
+       */
+      void appendPulls(const TOPTrack::SelectedHit& hit) const;
 
       int m_moduleID = 0; /**< slot ID */
       const TOPTrack& m_track;   /**< track at TOP */
@@ -365,6 +464,8 @@ namespace Belle2 {
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
       const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
       DeltaRayPDF m_deltaRayPDF; /**< delta-ray PDF */
+      EPDFOption m_PDFOption = c_Optimal; /**< signal PDF construction option */
+      EStoreOption m_storeOption = c_Reduced; /**< signal PDF storing option */
       bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are valid */
 
       double m_tof = 0; /**< time-of-flight from IP to average photon emission position */
@@ -374,8 +475,6 @@ namespace Belle2 {
       double m_minTime = 0; /**< time window lower edge */
       double m_maxTime = 0; /**< time window upper edge */
 
-      EPDFOption m_PDFOption = c_Optimal; /**< signal PDF construction option */
-      EStoreOption m_storeOption = c_Reduced; /**< signal PDF storing option */
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
       double m_bkgPhotons = 0; /**< expected number of background photons */
@@ -386,31 +485,29 @@ namespace Belle2 {
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< number of calls to setSignalPDF<T> */
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< number of calls to expandSignalPDF */
+      mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
+      mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
 
     };
 
-
     //--- inline functions ------------------------------------------------------------
 
-
-    inline double PDFConstructor::getPDFValue(int pixelID, double time, double timeErr, double sigt) const
+    inline double PDFConstructor::pdfValue(int pixelID, double time, double timeErr, double sigt) const
     {
       unsigned k = pixelID - 1;
-      if (k < m_signalPDFs.size()) {
+      if (k < m_signalPDFs.size() and m_valid) {
         double f = 0;
         f += m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
         f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
         f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID);
-        f /= getExpectedPhotons();
         return f;
       }
       return 0;
     }
 
-    inline double PDFConstructor::logPoisson(double mean, int N) const
+    inline double PDFConstructor::getPDFValue(int pixelID, double time, double timeErr, double sigt) const
     {
-      if (mean == 0 and N == 0) return 0;
-      return N * log(mean) - mean;
+      return pdfValue(pixelID, time, timeErr, sigt) / getExpectedPhotons();
     }
 
     inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma) const

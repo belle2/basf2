@@ -102,11 +102,11 @@ namespace Belle2 {
       /**
        * Constructor from mdst track - isValid() must be checked before using the object
        * @param track mdst track
-       * @param chargedStable hypothesis used in mdst track extrapolation
        * @param digitsName name of TOPDigits collection
+       * @param chargedStable hypothesis used in mdst track extrapolation
        */
-      explicit TOPTrack(const Track& track, const Const::ChargedStable& chargedStable = Const::pion,
-                        std::string digitsName = "");
+      explicit TOPTrack(const Track& track, std::string digitsName = "",
+                        const Const::ChargedStable& chargedStable = Const::pion);
 
       /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
@@ -217,9 +217,10 @@ namespace Belle2 {
       const std::vector<SelectedHit>& getSelectedHits() const {return m_selectedHits;}
 
       /**
-       * Returns number of selected hits in other slots (for BG estimation)
+       * Returns estimated background hit rate
+       * @return background hit rate per module
        */
-      unsigned getNumHitsOtherSlots() const {return m_numHitsOtherSlots;}
+      double getBkgRate() const {return m_bkgRate;}
 
       /**
        * Checks if scan method of YScanner is needed to construct PDF for a given pixel column.
@@ -256,7 +257,7 @@ namespace Belle2 {
       bool m_valid = false;  /**< true for properly defined track */
 
       std::vector<SelectedHit> m_selectedHits; /**< selected photon hits from TOPDigits belonging to this slot ID */
-      unsigned m_numHitsOtherSlots = 0; /**< number of selected hits in other slots (for BG estimate) */
+      double m_bkgRate = 0; /**< estimated background hit rate */
       std::unordered_multimap<unsigned, const SelectedHit*> m_columnHits; /**< selected hits mapped to pixel columns */
 
       /** assumed emission points in module local frame */

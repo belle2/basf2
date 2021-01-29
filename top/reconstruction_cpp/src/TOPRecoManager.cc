@@ -30,41 +30,45 @@ namespace Belle2 {
         m_fastRaytracers.push_back(FastRaytracer(moduleID));
         m_backgroundPDFs.push_back(BackgroundPDF(moduleID));
       }
+      const auto& tdc = geo->getNominalTDC();
+      m_minTime = tdc.getTimeMin();
+      m_maxTime = tdc.getTimeMax();
+      B2INFO("TOPRecoManager: time window = [" << m_minTime << ",  " << m_maxTime << "] ns");
     }
 
-    const InverseRaytracer* TOPRecoManager::inverseRaytracer(int moduleID)
+    const InverseRaytracer* TOPRecoManager::getInverseRaytracer(int moduleID)
     {
-      if (m_inverseRaytracers.empty()) set();
+      const auto& collection = getInstance().inverseRaytracers();
       unsigned k = moduleID - 1;
-      if (k < m_inverseRaytracers.size()) {
-        m_inverseRaytracers[k].clear();
-        return &m_inverseRaytracers[k];
+      if (k < collection.size()) {
+        collection[k].clear();
+        return &collection[k];
       }
 
       B2ERROR("TOPRecoManager::getInverseRaytracer: invalid moduleID" << LogVar("moduleID", moduleID));
       return 0;
     }
 
-    const FastRaytracer* TOPRecoManager::fastRaytracer(int moduleID)
+    const FastRaytracer* TOPRecoManager::getFastRaytracer(int moduleID)
     {
-      if (m_fastRaytracers.empty()) set();
+      const auto& collection = getInstance().fastRaytracers();
       unsigned k = moduleID - 1;
-      if (k < m_fastRaytracers.size()) {
-        m_fastRaytracers[k].clear();
-        return &m_fastRaytracers[k];
+      if (k < collection.size()) {
+        collection[k].clear();
+        return &collection[k];
       }
 
       B2ERROR("TOPRecoManager::getFastRaytracer: invalid moduleID" << LogVar("moduleID", moduleID));
       return 0;
     }
 
-    const YScanner* TOPRecoManager::yScanner(int moduleID)
+    const YScanner* TOPRecoManager::getYScanner(int moduleID)
     {
-      if (m_yScanners.empty()) set();
+      const auto& collection = getInstance().yScanners();
       unsigned k = moduleID - 1;
-      if (k < m_yScanners.size()) {
-        m_yScanners[k].clear();
-        return &m_yScanners[k];
+      if (k < collection.size()) {
+        collection[k].clear();
+        return &collection[k];
       }
 
       B2ERROR("TOPRecoManager::getYScanner: invalid moduleID" << LogVar("moduleID", moduleID));
@@ -72,32 +76,23 @@ namespace Belle2 {
     }
 
 
-    const BackgroundPDF* TOPRecoManager::backgroundPDF(int moduleID)
+    const BackgroundPDF* TOPRecoManager::getBackgroundPDF(int moduleID)
     {
-      if (m_backgroundPDFs.empty()) set();
-      if (m_redoBkg) {
-        for (auto& pdf : m_backgroundPDFs) pdf.set();
-        m_redoBkg = false;
-        B2INFO("background PDF's redone"); // TODO remove or change to debug level
-      }
+      const auto& collection = getInstance().backgroundPDFs();
       unsigned k = moduleID - 1;
-      if (k < m_backgroundPDFs.size()) {
-        return &m_backgroundPDFs[k];
+      if (k < collection.size()) {
+        return &collection[k];
       }
 
       B2ERROR("TOPRecoManager::getBackgroundPDF: invalid moduleID" << LogVar("moduleID", moduleID));
       return 0;
     }
 
-
     void TOPRecoManager::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                         const TOPAsicMask& asicMask)
     {
-      auto& yScanners = getInstance().m_yScanners;
-      if (yScanners.empty()) getInstance().set();
-
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
-      for (auto& yScanner : yScanners) {
+      for (auto& yScanner : getInstance().yScanners()) {
         auto& pixelMasks = yScanner.pixelMasks();
         int moduleID = pixelMasks.getModuleID();
         unsigned numChannels = pixelMasks.getNumPixels();
@@ -113,11 +108,8 @@ namespace Belle2 {
 
     void TOPRecoManager::setUncalibratedChannelsOff(const DBObjPtr<TOPCalChannelT0>& channelT0)
     {
-      auto& yScanners = getInstance().m_yScanners;
-      if (yScanners.empty()) getInstance().set();
-
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
-      for (auto& yScanner : yScanners) {
+      for (auto& yScanner : getInstance().yScanners()) {
         auto& pixelMasks = yScanner.pixelMasks();
         int moduleID = pixelMasks.getModuleID();
         unsigned numChannels = pixelMasks.getNumPixels();
@@ -134,12 +126,9 @@ namespace Belle2 {
 
     void TOPRecoManager::setUncalibratedChannelsOff(const DBObjPtr<TOPCalTimebase>& timebase)
     {
-      auto& yScanners = getInstance().m_yScanners;
-      if (yScanners.empty()) getInstance().set();
-
       const auto& ch_mapper = TOPGeometryPar::Instance()->getChannelMapper();
       const auto& fe_mapper = TOPGeometryPar::Instance()->getFrontEndMapper();
-      for (auto& yScanner : yScanners) {
+      for (auto& yScanner : getInstance().yScanners()) {
         auto& pixelMasks = yScanner.pixelMasks();
         int moduleID = pixelMasks.getModuleID();
         unsigned numChannels = pixelMasks.getNumPixels();
@@ -163,10 +152,7 @@ namespace Belle2 {
 
     void TOPRecoManager::setChannelEffi()
     {
-      auto& yScanners = getInstance().m_yScanners;
-      if (yScanners.empty()) getInstance().set();
-
-      for (auto& yScanner : yScanners) {
+      for (auto& yScanner : getInstance().yScanners()) {
         auto& pixelEfficiencies = yScanner.pixelEfficiencies();
         int moduleID = pixelEfficiencies.getModuleID();
         int numPixels = pixelEfficiencies.getNumPixels();

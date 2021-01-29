@@ -24,7 +24,7 @@ namespace Belle2 {
       m_dE(dE), m_Wy(dy / abs(dyde))
     {
       if (dy <= 0) {
-        B2FATAL("TOP::EnergyMask: dy must be > 0");
+        B2ERROR("TOP::EnergyMask: dy must be > 0");
         return;
       }
 

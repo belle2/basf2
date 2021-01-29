@@ -32,7 +32,7 @@ namespace Belle2 {
       m_PDFOption(PDFOption), m_storeOption(storeOption)
     {
       if (not track.isValid()) {
-        B2ERROR("TOP::PDFConstructor: TOPTrack is not valid");
+        B2ERROR("TOP::PDFConstructor: TOPTrack is not valid, cannot continue");
         return;
       }
 
@@ -58,13 +58,7 @@ namespace Belle2 {
       m_deltaRayPDF.prepare(track, hypothesis);
       m_deltaPhotons = m_deltaRayPDF.getNumPhotons();
 
-      double effi = m_backgroundPDF->getEfficiency();
-      double effiSum = TOPRecoManager::getEfficiencySum();
-      m_bkgPhotons = std::max(m_track.getNumHitsOtherSlots() * effi / (effiSum - effi), 0.1);
-      if (isnan(m_bkgPhotons)) { // in case all other modules are masked-out (very unlikely) TODO
-        B2WARNING("TOP::PDFConstructor: estimated number of background photons is NaN -> set to 0.1");
-        m_bkgPhotons = 0.1;
-      }
+      m_bkgPhotons = std::max(m_track.getBkgRate() * (m_maxTime - m_minTime), 0.1);
     }
 
 
@@ -222,7 +216,7 @@ namespace Belle2 {
 
     bool PDFConstructor::doRaytracingCorrections(const InverseRaytracer::Solution& sol, double dFic_dx, double xD)
     {
-      const double precision = 0.01; //TODO ?
+      const double precision = 0.01; //[cm]
 
       double x1 = 0;                    // x is dFic
       double y1 = deltaXD(x1, sol, xD); // y is the difference in xD
@@ -516,22 +510,153 @@ namespace Belle2 {
       return x * mirror.R + mirror.xc;
     }
 
+    // log likelihood calculation ------------------------------------------------------------------------
 
-    double PDFConstructor::getLogL() const
+    PDFConstructor::LogL PDFConstructor::getLogL() const
     {
-      double logL = 0;
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor::getLogL(): object status is invalid - cannot provide log likelihood");
+        return LogL(0);
+      }
+
+      LogL LL(getExpectedPhotons());
       for (const auto& hit : m_track.getSelectedHits()) {
-        double f = getPDFValue(hit.pixelID, hit.time, hit.timeErr);
+        if (hit.time < m_minTime or hit.time > m_maxTime) continue;
+        double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative" << LogVar("PDFValue", f));
+          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
           continue;
         }
-        logL += log(f);
+        LL.logL += log(f);
+        LL.numPhotons++;
       }
-      logL += logPoisson(getExpectedPhotons(), getDetectedPhotons());
-
-      return logL;
+      return LL;
     }
+
+
+    PDFConstructor::LogL PDFConstructor::getLogL(double t0, double minTime, double maxTime, double sigt) const
+    {
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor::getLogL(): object status is invalid - cannot provide log likelihood");
+        return LogL(0);
+      }
+
+      LogL LL(expectedPhotons(minTime - t0, maxTime - t0));
+      for (const auto& hit : m_track.getSelectedHits()) {
+        if (hit.time < minTime or hit.time > maxTime) continue;
+        double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
+        if (f <= 0) {
+          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          continue;
+        }
+        LL.logL += log(f);
+        LL.numPhotons++;
+      }
+      return LL;
+    }
+
+    const std::vector<PDFConstructor::LogL>&
+    PDFConstructor::getPixelLogLs(double t0, double minTime, double maxTime, double sigt) const
+    {
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor::getPixelLogLs(): object status is invalid - cannot provide log likelihoods");
+        return m_pixelLLs;
+      }
+
+      initializePixelLogLs(minTime - t0, maxTime - t0);
+
+      for (const auto& hit : m_track.getSelectedHits()) {
+        if (hit.time < minTime or hit.time > maxTime) continue;
+        double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
+        if (f <= 0) {
+          B2ERROR("TOP::PDFConstructor::getPixelLogLs(): PDF value is zero or negative"
+                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          continue;
+        }
+        unsigned k = hit.pixelID - 1;
+        auto& LL = m_pixelLLs[k];
+        LL.logL += log(f);
+        LL.numPhotons++;
+      }
+
+      return m_pixelLLs;
+    }
+
+    double PDFConstructor::expectedPhotons(double minTime, double maxTime) const
+    {
+      double ps = 0;
+      for (const auto& signalPDF : m_signalPDFs) {
+        ps += signalPDF.getIntegral(minTime, maxTime);
+      }
+      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
+
+      return ps * m_signalPhotons + pd * m_deltaPhotons + pb * m_bkgPhotons;
+    }
+
+    void PDFConstructor::initializePixelLogLs(double minTime, double maxTime) const
+    {
+      m_pixelLLs.clear();
+
+      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
+      double bfot = pd * m_deltaPhotons + pb * m_bkgPhotons;
+      const auto& pixelPDF = m_backgroundPDF->getPDF();
+      for (const auto& signalPDF : m_signalPDFs) {
+        double ps = signalPDF.getIntegral(minTime, maxTime);
+        unsigned k = signalPDF.getPixelID() - 1;
+        double phot = ps * m_signalPhotons + bfot * pixelPDF[k];
+        m_pixelLLs.push_back(LogL(phot));
+      }
+    }
+
+    const std::vector<PDFConstructor::Pull>& PDFConstructor::getPulls() const
+    {
+      if (m_pulls.empty() and m_valid) {
+        for (const auto& hit : m_track.getSelectedHits()) {
+          if (hit.time < m_minTime or hit.time > m_maxTime) continue;
+          appendPulls(hit);
+        }
+      }
+
+      return m_pulls;
+    }
+
+    void PDFConstructor::appendPulls(const TOPTrack::SelectedHit& hit) const
+    {
+      unsigned k = hit.pixelID - 1;
+      if (k >= m_signalPDFs.size()) return;
+      const auto& signalPDF = m_signalPDFs[k];
+
+      double sfot = m_signalPhotons + m_deltaPhotons + m_bkgPhotons;
+      double signalFract = m_signalPhotons / sfot;
+      double wid0 = hit.timeErr * hit.timeErr;
+      double minT0 = m_maxTime;
+      double sum = 0;
+      auto i0 = m_pulls.size();
+      for (const auto& peak : signalPDF.getPDFPeaks()) {
+        minT0 = std::min(minT0, peak.t0);
+        for (const auto& gaus : signalPDF.getTTS()->getTTS()) {
+          double sig2 = peak.wid + gaus.sigma * gaus.sigma + wid0; // sigma squared!
+          double x = pow(hit.time - peak.t0 - gaus.position, 2) / sig2;
+          if (x > 100) continue;
+          double wt = signalFract * peak.nph * gaus.fraction / sqrt(2 * M_PI * sig2) * exp(-x / 2);
+          sum += wt;
+          m_pulls.push_back(Pull(hit.pixelID, hit.time, peak.t0, gaus.position, sqrt(sig2), peak.fic - M_PI, wt));
+        }
+      }
+
+      double bg = (m_deltaPhotons * m_deltaRayPDF.getPDFValue(hit.pixelID, hit.time) +
+                   m_bkgPhotons * m_backgroundPDF->getPDFValue(hit.pixelID)) / sfot;
+      sum += bg;
+      m_pulls.push_back(Pull(hit.pixelID, hit.time, minT0, 0, 0, 0, bg));
+
+      if (sum == 0) return;
+      for (size_t i = i0; i < m_pulls.size(); i++) m_pulls[i].wt /= sum;
+    }
+
 
   } // namespace TOP
 } // namespace Belle2

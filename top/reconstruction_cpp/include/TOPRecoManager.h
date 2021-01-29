@@ -43,51 +43,34 @@ namespace Belle2 {
        * @param moduleID slot ID (1-based)
        * @return pointer to inverse ray-tracer or null pointer if moduleID is not valid
        */
-      static const InverseRaytracer* getInverseRaytracer(int moduleID)
-      {
-        return getInstance().inverseRaytracer(moduleID);
-      }
+      static const InverseRaytracer* getInverseRaytracer(int moduleID);
 
       /**
        * Returns fast ray-tracer of a given module
        * @param moduleID slot ID (1-based)
        * @return pointer to fast ray-tracer or null pointer if moduleID is not valid
        */
-      static const FastRaytracer* getFastRaytracer(int moduleID)
-      {
-        return getInstance().fastRaytracer(moduleID);
-      }
+      static const FastRaytracer* getFastRaytracer(int moduleID);
 
       /**
        * Returns y-scanner of a given module
        * @param moduleID slot ID (1-based)
        * @return pointer to y-scanner or null pointer if moduleID is not valid
        */
-      static const YScanner* getYScanner(int moduleID)
-      {
-        return getInstance().yScanner(moduleID);
-      }
+      static const YScanner* getYScanner(int moduleID);
 
       /**
        * Returns background PDF of a given module
        * @param moduleID slot ID (1-based)
        * @return pointer to background PDF or null pointer if moduleID is not valid
        */
-      static const BackgroundPDF* getBackgroundPDF(int moduleID)
-      {
-        return getInstance().backgroundPDF(moduleID);
-      }
+      static const BackgroundPDF* getBackgroundPDF(int moduleID);
 
       /**
-       * Returns the sum of average pixel relative efficiencies of all modules
-       * @return sum of average pixel relative efficiencies of all modules
+       * Returns background PDF's of all modules
+       * @return collection of background PDF's (index = moduleID - 1)
        */
-      static double getEfficiencySum()
-      {
-        double sum = 0;
-        for (const auto& bkg : getInstance().m_backgroundPDFs) sum += bkg.getEfficiency();
-        return sum;
-      }
+      static const std::vector<BackgroundPDF>& getBackgroundPDFs() {return getInstance().backgroundPDFs();}
 
       /**
        * Returns time window lower edge
@@ -108,20 +91,6 @@ namespace Belle2 {
       static double getTimeWindowSize()
       {
         return getInstance().m_maxTime - getInstance().m_minTime;
-      }
-
-      /**
-       * Sets time window for likelihood determination.
-       * This function must be called per each event to prevent confusions
-       * when different modules set time window differently.
-       * Window edges must not exceed those used during data taking or in simulation.
-       * @param minTime lower edge
-       * @param maxTime upper edge
-       */
-      static void setTimeWindow(double minTime, double maxTime)
-      {
-        getInstance().m_minTime = minTime;
-        getInstance().m_maxTime = maxTime;
       }
 
       /**
@@ -160,46 +129,76 @@ namespace Belle2 {
       /** Singleton: private destructor */
       ~TOPRecoManager() = default;
 
-      /** Sets the reconstruction objects in class memory */
+      /** Sets the reconstruction object collections */
       void set();
 
       /**
-       * Returns inverse ray-tracer of a given module
-       * @param moduleID slot ID
-       * @return inverse ray-tracer or null pointer for invalid module
+       * Interface to inverse ray-tracers of all modules.
+       * Any accesses to underlying collection must be made with this method.
+       * @return collection of inverse ray-tracers (index = moduleID - 1)
        */
-      const InverseRaytracer* inverseRaytracer(int moduleID);
+      std::vector<InverseRaytracer>& inverseRaytracers();
 
       /**
-       * Returns fast ray-tracer of a given module
-       * @param moduleID slot ID
-       * @return fast ray-tracer or null pointer for invalid moduleID
+       * Interface to fast ray-tracers of all modules.
+       * Any accesses to underlying collection must be made with this method.
+       * @return collection of fast ray-tracers (index = moduleID - 1)
        */
-      const FastRaytracer* fastRaytracer(int moduleID);
+      std::vector<FastRaytracer>& fastRaytracers();
 
       /**
-       * Returns y-scanner of a given module
-       * @param moduleID slot ID
-       * @return y-scanner or null pointer for invalid moduleID
+       * Interface to y-scanners of all modules.
+       * Any accesses to underlying collection must be made with this method.
+       * @return collection of y-scanners (index = moduleID - 1)
        */
-      const YScanner* yScanner(int moduleID);
+      std::vector<YScanner>& yScanners();
 
       /**
-       * Returns background PDF of a given module
-       * @param moduleID slot ID
-       * @return background PDF or null pointer for invalid moduleID
+       * Interface to background PDF's of all modules.
+       * Any accesses to underlying collection must be made with this method.
+       * @return collection of background PDF's (index = moduleID - 1)
        */
-      const BackgroundPDF* backgroundPDF(int moduleID);
+      std::vector<BackgroundPDF>& backgroundPDFs();
 
       std::vector<InverseRaytracer> m_inverseRaytracers; /**< collection of inverse raytracers */
       std::vector<FastRaytracer> m_fastRaytracers; /**< collection of fast raytracers */
       std::vector<YScanner> m_yScanners; /**< collection of y-scanners */
       std::vector<BackgroundPDF> m_backgroundPDFs; /**< collection of background PDF's */
-      double m_minTime = -20; /**< time window lower edge */
-      double m_maxTime = 75; /**< time window upper edge */
+      double m_minTime = 0; /**< time window lower edge */
+      double m_maxTime = 0; /**< time window upper edge */
       bool m_redoBkg = false; /**< flag to signal whether backgroundPDF has to be redone */
 
     };
+
+    //--- inline functions ------------------------------------------------------------
+
+    inline std::vector<InverseRaytracer>& TOPRecoManager::inverseRaytracers()
+    {
+      if (m_inverseRaytracers.empty()) set();
+      return m_inverseRaytracers;
+    }
+
+    inline std::vector<FastRaytracer>& TOPRecoManager::fastRaytracers()
+    {
+      if (m_fastRaytracers.empty()) set();
+      return m_fastRaytracers;
+    }
+
+    inline std::vector<YScanner>& TOPRecoManager::yScanners()
+    {
+      if (m_yScanners.empty()) set();
+      return m_yScanners;
+    }
+
+    inline std::vector<BackgroundPDF>& TOPRecoManager::backgroundPDFs()
+    {
+      if (m_backgroundPDFs.empty()) set();
+      if (m_redoBkg) {
+        for (auto& pdf : m_backgroundPDFs) pdf.set();
+        m_redoBkg = false;
+      }
+      return m_backgroundPDFs;
+    }
 
   } // namespace TOP
 } // namespace Belle2

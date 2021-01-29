@@ -18,6 +18,8 @@
 
 #include <TH1F.h>
 
+#include <framework/utilities/Utils.h>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -33,6 +35,10 @@ StatisticsTimingHLTDQMModule::StatisticsTimingHLTDQMModule() : HistoModule()
 
   addParam("m_param_overviewModuleList", m_param_overviewModuleList,
            "Which modules should be shown in the overview mean list", m_param_overviewModuleList);
+
+  addParam("createHLTUnitHistograms", m_param_create_hlt_unit_histograms,
+           "Create HLT unit histograms?",
+           false);
 }
 
 void StatisticsTimingHLTDQMModule::defineHisto()
@@ -61,6 +67,16 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     m_meanMemoryHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
   }
 
+  if (m_param_create_hlt_unit_histograms) {
+    m_fullTimePerUnitHistogram = new TH1F("fullTimePerUnitHistogram", "Mean Budget Time Per Unit [ms]", m_max_hlt_units + 1, 0,
+                                          m_max_hlt_units + 1);
+    m_fullTimePerUnitHistogram->SetStats(false);
+    m_processingTimePerUnitHistogram = new TH1F("processingTimePerUnitHistogram", "Mean Processing Time Per Unit [ms]",
+                                                m_max_hlt_units + 1, 0,
+                                                m_max_hlt_units + 1);
+    m_processingTimePerUnitHistogram->SetStats(false);
+  }
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
@@ -71,6 +87,11 @@ void StatisticsTimingHLTDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
+
+  if (m_param_create_hlt_unit_histograms) {
+    std::string host = Utils::getCommandOutput("cat", {"/home/usr/hltdaq/HLT.UnitNumber"});
+    m_hlt_unit = atoi(host.substr(3, 2).c_str());
+  }
 }
 
 void StatisticsTimingHLTDQMModule::event()
@@ -108,6 +129,7 @@ void StatisticsTimingHLTDQMModule::event()
   }
 
   double processingTimeSum = 0.0;
+  double processingTimeMean = 0.0;
   for (const ModuleStatistics& moduleStatistics : moduleStatisticsList) {
     const std::string& statisticsName = moduleStatistics.getName();
     const auto m_summaryModuleListIterator = std::find(m_summaryModuleList.begin(), m_summaryModuleList.end(),
@@ -116,19 +138,26 @@ void StatisticsTimingHLTDQMModule::event()
       continue;
     }
     processingTimeSum += moduleStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+    processingTimeMean += moduleStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   }
   m_processingTimeHistogram->Fill(processingTimeSum - m_lastProcessingTimeSum);
   m_lastProcessingTimeSum = processingTimeSum;
+
+  m_processingTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
 
   const ModuleStatistics& fullStatistics = stats->getGlobal();
   const double fullTimeSum = fullStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   m_fullTimeHistogram->Fill(fullTimeSum - m_lastFullTimeSum);
   m_lastFullTimeSum = fullTimeSum;
+
+  const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+  m_fullTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
 }
 
 void StatisticsTimingHLTDQMModule::beginRun()
 {
-  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram || !m_processingTimeHistogram) {
+  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram || !m_processingTimeHistogram
+      || !m_fullTimePerUnitHistogram || !m_processingTimePerUnitHistogram) {
     B2FATAL("Histograms were not created. Did you setup a HistoManager?");
   }
 
@@ -136,5 +165,7 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_meanMemoryHistogram->Reset();
   m_fullTimeHistogram->Reset();
   m_processingTimeHistogram->Reset();
+  m_fullTimePerUnitHistogram->Reset();
+  m_processingTimePerUnitHistogram->Reset();
 }
 

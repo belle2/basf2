@@ -92,7 +92,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
         )
-        path.add_module("StatisticsTimingHLTDQM")
+        path.add_module("StatisticsTimingHLTDQM",
+                        createHLTUnitHistograms=create_hlt_unit_histograms,
+                        )
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT

@@ -44,18 +44,29 @@ namespace Belle2 {
       TH1F* m_fullTimeHistogram;
       /// Processing time of the event
       TH1F* m_processingTimeHistogram;
+      /// Mean budget time of the event per unit
+      TH1F* m_fullTimePerUnitHistogram;
+      /// Mean processing time of the event per unit
+      TH1F* m_processingTimePerUnitHistogram;
 
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
       /// Storage for the last processing time sum
       double m_lastProcessingTimeSum = 0;
 
+      /// Parameter: Create HLT unit number histograms?
+      bool m_param_create_hlt_unit_histograms;
       /// Parameter: Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "timing_statistics";
       /// Parameter: which modules should be shown in the overview list
       std::vector<std::string> m_param_overviewModuleList = {"Sum_Start_ZMQ", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event", "Sum_Finalize_ZMQ"};
       /// Parameter: Summary modules of the actual processing
       std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
+
+      /// Store HLT unit number on initialization
+      int m_hlt_unit = 0;
+      /// Maximum number of HLT units used during the experiment
+      const int m_max_hlt_units = 10;
     };
 
   }

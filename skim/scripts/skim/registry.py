@@ -42,7 +42,10 @@ _RegisteredSkims = [
     ("12160400", "ewp", "inclusiveBplusToKplusNuNu"),
 
     # --- WG3: Time-dependent CP violation ---
-    ("13160100", "tdcpv", "TDCPV"),
+    ("13160100", "tdcpv", "TDCPV_ccs"),
+    ("13160110", "tdcpv", "TDCPV_ccsKs"),
+    ("13160120", "tdcpv", "TDCPV_ccsKL"),
+    ("13160200", "tdcpv", "TDCPV_qqs"),
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),

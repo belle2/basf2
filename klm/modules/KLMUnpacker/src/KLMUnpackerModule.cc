@@ -380,8 +380,8 @@ void KLMUnpackerModule::event()
         klmDigitEventInfo->setPreviousEventTriggerCTime(
           m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
-        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, hslb);
-        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, hslb);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, channelReadoutBoard);
+        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, channelReadoutBoard);
         int numHits = numDetNwords / hitLength;
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."

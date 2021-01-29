@@ -1010,9 +1010,9 @@ def fillParticleListFromROE(decayString,
     path.add_module(pload)
     decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
     if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'ROE':
-        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':ROE', writeOut, path)
+        copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':ROE', writeOut, path)
     if cut != "":
-        applyCuts(decayString, cut, path)
+        applyCuts(decayString.split(" ->")[0], cut, path)
 
 
 def fillParticleListFromMC(decayString,

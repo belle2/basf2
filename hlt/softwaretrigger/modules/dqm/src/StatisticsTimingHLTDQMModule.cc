@@ -143,21 +143,23 @@ void StatisticsTimingHLTDQMModule::event()
   m_processingTimeHistogram->Fill(processingTimeSum - m_lastProcessingTimeSum);
   m_lastProcessingTimeSum = processingTimeSum;
 
-  m_processingTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
 
   const ModuleStatistics& fullStatistics = stats->getGlobal();
   const double fullTimeSum = fullStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   m_fullTimeHistogram->Fill(fullTimeSum - m_lastFullTimeSum);
   m_lastFullTimeSum = fullTimeSum;
 
-  const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
-  m_fullTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
+  if (m_param_create_hlt_unit_histograms) {
+    m_processingTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
+
+    const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+    m_fullTimePerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
+  }
 }
 
 void StatisticsTimingHLTDQMModule::beginRun()
 {
-  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram || !m_processingTimeHistogram
-      || !m_fullTimePerUnitHistogram || !m_processingTimePerUnitHistogram) {
+  if (!m_meanTimeHistogram || !m_meanMemoryHistogram || !m_fullTimeHistogram || !m_processingTimeHistogram) {
     B2FATAL("Histograms were not created. Did you setup a HistoManager?");
   }
 
@@ -165,7 +167,9 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_meanMemoryHistogram->Reset();
   m_fullTimeHistogram->Reset();
   m_processingTimeHistogram->Reset();
-  m_fullTimePerUnitHistogram->Reset();
-  m_processingTimePerUnitHistogram->Reset();
+  if (m_param_create_hlt_unit_histograms) {
+    m_fullTimePerUnitHistogram->Reset();
+    m_processingTimePerUnitHistogram->Reset();
+  }
 }
 

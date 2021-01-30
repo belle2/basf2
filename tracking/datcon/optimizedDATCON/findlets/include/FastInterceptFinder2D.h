@@ -122,9 +122,6 @@ namespace Belle2 {
     /// friendMap for all the SVD L6 sensors
     friendSensorMap m_fullFriendMap;
 
-    /// all possible L6 sensors to loop over
-    std::vector<VxdID> m_layerSixSensors;
-
     /// hits that are in the acceptance region (= on friend sensors) for the current L6 senosr
     std::vector<const hitTuple*> m_currentSensorsHitList;
 

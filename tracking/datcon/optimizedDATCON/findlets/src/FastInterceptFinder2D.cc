@@ -116,16 +116,6 @@ void FastInterceptFinder2D::initialize()
           " unitY: " << m_unitY);
 
   initializeSectorFriendMap();
-
-  //call for a geometry instance
-  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-
-  for (auto& sensorID : aGeometry.getListOfSensors()) {
-    if (sensorID.getLayerNumber() == 6) {
-      m_layerSixSensors.emplace_back(sensorID);
-    }
-  }
-
 }
 
 void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates)
@@ -148,7 +138,7 @@ void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<std::
     trackCandidates.emplace_back(trackCand);
   }
 
-  B2DEBUG(29, "m_activeSectors.size: " << m_activeSectors.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
+  B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());
 
 }
 
@@ -227,7 +217,8 @@ void FastInterceptFinder2D::initializeSectorFriendMap()
           }
         }
       }
-
+      // add the layer 6 sensor to the list of its own friends to check the vector with std::find in fillThisSensorsHitMap
+      friendSensors.emplace_back(VxdID(6, layer6Ladder, layer6Sensor));
       m_fullFriendMap.insert(std::make_pair(VxdID(6, layer6Ladder, layer6Sensor), friendSensors));
     }
   }
@@ -236,71 +227,71 @@ void FastInterceptFinder2D::initializeSectorFriendMap()
 void FastInterceptFinder2D::fillThisSensorsHitMap(std::vector<hitTuple>& hits, const VxdID thisLayerSixSensor)
 {
   const std::vector<VxdID>& friendSensors = m_fullFriendMap.at(thisLayerSixSensor);
+  const unsigned short sensorInLayerSixLadder = thisLayerSixSensor.getSensorNumber();
 
   for (auto& hit : hits) {
     const VxdID& currentHitSensorID = std::get<1>(hit);
-    const unsigned short hitLayer               = currentHitSensorID.getLayerNumber();
-    const unsigned short sensorInLayerSixLadder = thisLayerSixSensor.getSensorNumber();
+
+    if (std::find(friendSensors.begin(), friendSensors.end(), currentHitSensorID) == friendSensors.end()) {
+      continue;
+    }
+    const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
     const double hitZPosition = std::get<4>(hit);
 
     if (currentHitSensorID.getLayerNumber() < 6) {
-      for (auto& friendSensor : friendSensors) {
-        if (currentHitSensorID == friendSensor) {
-          switch (sensorInLayerSixLadder) {
-            case 1:
-              if (hitLayer == 3 && hitZPosition > 6.56) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > 13.99) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > 18.34) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              }
-              break;
-            case 2:
-              if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > 6.58 && hitZPosition < 14.99) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > 8.71 && hitZPosition < 19.34) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              }
-              break;
-            case 3:
-              if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > -0.83 && hitZPosition < 7.58) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > -0.92 && hitZPosition < 9.71) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              }
-              break;
-            case 4:
-              if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > -8.23 && hitZPosition < 0.17) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > -10.55 && hitZPosition < 0.08) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              }
-              break;
-            case 5:
-              if (hitLayer == 3  && hitZPosition < -3.27) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 4  && hitZPosition < -7.23) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition < -9.55) {
-                m_currentSensorsHitList.emplace_back(&hit);
-              }
-              break;
+      switch (sensorInLayerSixLadder) {
+        case 1:
+          if (hitLayer == 3 && hitZPosition > 6.56) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 4 && hitZPosition > 13.99) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 5 && hitZPosition > 18.34) {
+            m_currentSensorsHitList.emplace_back(&hit);
           }
-        }
+          break;
+        case 2:
+          if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 4 && hitZPosition > 6.58 && hitZPosition < 14.99) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 5 && hitZPosition > 8.71 && hitZPosition < 19.34) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          }
+          break;
+        case 3:
+          if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 4 && hitZPosition > -0.83 && hitZPosition < 7.58) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 5 && hitZPosition > -0.92 && hitZPosition < 9.71) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          }
+          break;
+        case 4:
+          if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 4 && hitZPosition > -8.23 && hitZPosition < 0.17) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 5 && hitZPosition > -10.55 && hitZPosition < 0.08) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          }
+          break;
+        case 5:
+          if (hitLayer == 3  && hitZPosition < -3.27) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 4  && hitZPosition < -7.23) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          } else if (hitLayer == 5 && hitZPosition < -9.55) {
+            m_currentSensorsHitList.emplace_back(&hit);
+          }
+          break;
       }
-    } else if (currentHitSensorID == thisLayerSixSensor) {
+    } else {
+      // we already know that this is the correct L6 hit because of the std::find above
       m_currentSensorsHitList.emplace_back(&hit);
     }
   }
 }
-
 
 void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
                                                   uint currentRecursion)

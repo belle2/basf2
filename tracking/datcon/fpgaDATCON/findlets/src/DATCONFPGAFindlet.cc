@@ -25,8 +25,7 @@ DATCONFPGAFindlet::DATCONFPGAFindlet()
   addProcessingSignalListener(&m_uClusterizer);
   addProcessingSignalListener(&m_vClusterizer);
 
-//   addProcessingSignalListener(&m_clusterLoaderAndPreparer);
-  addProcessingSignalListener(&m_clusterLoaderAndPreparer2);
+  addProcessingSignalListener(&m_clusterLoaderAndPreparer);
 
   addProcessingSignalListener(&m_uInterceptFinder);
   addProcessingSignalListener(&m_vInterceptFinder);
@@ -43,8 +42,7 @@ void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const
   m_uClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
   m_vClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
 
-//   m_clusterLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
-  m_clusterLoaderAndPreparer2.exposeParameters(moduleParamList, prefix);
+  m_clusterLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
 
   m_uInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
   m_vInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
@@ -79,10 +77,8 @@ void DATCONFPGAFindlet::apply()
   m_vClusterizer.apply(m_vDigits, m_vClusters);
   B2DEBUG(29, "m_uClusters.size(): " << m_uClusters.size() << " m_vClusters.size(): " << m_vClusters.size());
 
-//   m_clusterLoaderAndPreparer.apply(m_uHits, m_vHits);
-//   B2DEBUG(29, "1: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
-  m_clusterLoaderAndPreparer2.apply(m_uClusters, m_vClusters, m_uHits, m_vHits);
-  B2DEBUG(29, "2: m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
+  m_clusterLoaderAndPreparer.apply(m_uClusters, m_vClusters, m_uHits, m_vHits);
+  B2DEBUG(29, "m_uHits.size(): " << m_uHits.size() << " m_vHits.size(): " << m_vHits.size());
 
   // hit vectors are empty in case of high occupancy, a warning is created in m_clusterLoader
   if (m_uHits.empty() or m_vHits.empty()) {

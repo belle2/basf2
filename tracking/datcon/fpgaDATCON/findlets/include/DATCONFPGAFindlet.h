@@ -14,7 +14,6 @@
 #include <tracking/datcon/fpgaDATCON/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
-#include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer2.h>
 #include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2DFPGA.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
@@ -27,8 +26,6 @@
 
 #include <string>
 #include <vector>
-
-// #include <tracking/dataobjects/DATCONSVDDigit.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -67,13 +64,9 @@ namespace Belle2 {
     /// Cluster v-side strips
     DATCONSVDClusterizer m_vClusterizer;
 
-    /// Load SVDCluster from DATCONSVDSimpleClusterizerModule and calculate the quantities
-    /// used in the Hough Trafo (intercept finding)
+    /// Load DATCON SVDCluster (still the class is just a SVDCluster) created by the DATCONSVDClusterizer
+    /// and calculate the quantities used in the Hough Trafo (intercept finding)
     DATCONSVDClusterLoaderAndPreparer m_clusterLoaderAndPreparer;
-
-    /// Load SVDCluster from the two DATCONSVDClusterizer Findlets and calculate the quantities
-    /// used in the Hough Trafo (intercept finding)
-    DATCONSVDClusterLoaderAndPreparer2 m_clusterLoaderAndPreparer2;
 
     /// Hough Space intercept finding for u-side
     FastInterceptFinder2DFPGA m_uInterceptFinder;

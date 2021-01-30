@@ -22,14 +22,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for loading SVDClusters that were created by the DATCONSVDSimpleClusterizerModule and prepare them
+   * Findlet for loading SVDClusters that were created by the DATCONSVDClusterizer findlet and prepare them
    * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
    * of coordinates for finding track candidates in r-phi and r-z.
    */
-  class DATCONSVDClusterLoaderAndPreparer : public TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>,
+  class DATCONSVDClusterLoaderAndPreparer : public
+    TrackFindingCDC::Findlet<SVDCluster, SVDCluster, std::pair<VxdID, std::pair<long, long>>,
         std::pair<VxdID, std::pair<long, long>>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>,
+    using Super = TrackFindingCDC::Findlet<SVDCluster, SVDCluster, std::pair<VxdID, std::pair<long, long>>,
           std::pair<VxdID, std::pair<long, long>>>;
 
   public:
@@ -43,23 +44,18 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load the SVDClusters and create two vectors containing the hits prepared for intercept finding
-    void apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& uHits,
+    /// This function takes uClusters and vClusters as distinct vectors which where created by the DATCONSVDClusterizer findlet
+    void apply(std::vector<SVDCluster>& uClusters, std::vector<SVDCluster>& vClusters,
+               std::vector<std::pair<VxdID, std::pair<long, long>>>& uHits,
                std::vector<std::pair<VxdID, std::pair<long, long>>>& vHits) override;
 
   private:
     // Parameters
-    /// StoreArray name of the input Track Store Array
-    std::string m_param_SVDClusterStoreArrayName = "DATCONSVDClusters";
-
     /// Cut value for aborting tracking if more than this number of clusters is found on one layer
     uint m_param_maxClustersPerLayer = 50;
 
-    // Store Arrays
-    /// Input SVDCluster Store Array
-    StoreArray<SVDCluster> m_SVDClusters;
-
     /// array containing the number of clusters per layer. If this exceeds a cut value, tracking is aborted
-    std::array<uint, 8> nClusterPerLayer = {0};
+    std::array<uint, 8> m_nClusterPerLayer = {0};
 
     // ATTENTION: all the values below are hardcoded and taken from svd/data/SVD-Components.xml
     /// Radii of the SVD layers, in µm

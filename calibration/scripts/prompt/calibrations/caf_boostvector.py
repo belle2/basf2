@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
 """
-Airflow script to perform BeamSpot calibration.
+Airflow script to perform BoostVector calibration.
 """
 
 from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
-    name="BeamSpot Calibrations",
+    name="BoostVector Calibrations",
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hlt_mumu"],
     expert_config={
-        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+        "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
     depends_on=[])
 
 ##############################
@@ -69,9 +69,10 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    from ROOT.Belle2 import BeamSpotAlgorithm
+    from ROOT.Belle2 import BoostVectorAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
+    import vertex
 
     ###################################################
     # Calibration setup
@@ -84,31 +85,32 @@ def get_calibrations(input_data, **kwargs):
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
-    ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
-    ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
+    ana.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
+    ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
+    vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
-    collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
-    algorithm_bs = BeamSpotAlgorithm()
-    algorithm_bs.setOuterLoss(kwargs['expert_config']['outerLoss'])
-    algorithm_bs.setInnerLoss(kwargs['expert_config']['innerLoss'])
+    collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
+    algorithm_bv = BoostVectorAlgorithm()
+    algorithm_bv.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_bv.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
-    calibration_bs = Calibration('BeamSpot',
-                                 collector=collector_bs,
-                                 algorithms=algorithm_bs,
+    calibration_bv = Calibration('BoostVector',
+                                 collector=collector_bv,
+                                 algorithms=algorithm_bv,
                                  input_files=input_files_physics,
                                  pre_collector_path=rec_path_1)
 
-    calibration_bs.strategies = SingleIOV
+    calibration_bv.strategies = SingleIOV
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in calibration_bs.algorithms:
+    for algorithm in calibration_bv.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [calibration_bs]
+    return [calibration_bv]
 
 ##############################

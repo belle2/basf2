@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Radek Zlebcik                                            *
@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <mdst/dbobjects/BeamSpot.h>
-#include <tracking/calibration/BeamSpotAlgorithm.h>
-#include <tracking/calibration/BeamSpotStandAlone.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <tracking/calibration/BoostVectorAlgorithm.h>
+#include <tracking/calibration/BoostVectorStandAlone.h>
 #include <tracking/calibration/calibTools.h>
 
 #include <Eigen/Dense>
@@ -20,33 +20,32 @@ using Eigen::Matrix3d;
 
 using namespace Belle2;
 
-using Belle2::BeamSpotCalib::getEvents;
-using Belle2::BeamSpotCalib::runBeamSpotAnalysis;
+using Belle2::BoostVectorCalib::getEvents;
+using Belle2::BoostVectorCalib::runBoostVectorAnalysis;
 
-BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector")
+
+BoostVectorAlgorithm::BoostVectorAlgorithm() : CalibrationAlgorithm("BoostVectorCollector")
 {
-  setDescription("BeamSpot calibration algorithm");
+  setDescription("BoostVector calibration algorithm");
 }
 
 
-/** Create BS object */
-static TObject* getBeamSpotObj(Vector3d ipVtx, Matrix3d  ipVtxUnc, Matrix3d  sizeMat)
+/** Create BoostVector object */
+static TObject* getBoostVectorObj(Vector3d vBoost, Matrix3d  vBoostUnc, Matrix3d /*vBoostSpread*/)
 {
-  auto payload = new BeamSpot();
-  payload->setIP(toTVector3(ipVtx), toTMatrixDSym(ipVtxUnc));
-  payload->setSizeCovMatrix(toTMatrixDSym(sizeMat));
+  auto payload = new CollisionBoostVector();
+  payload->setBoost(toTVector3(vBoost), toTMatrixDSym(vBoostUnc));
   TObject* obj  = static_cast<TObject*>(payload);
   return obj;
 }
 
 
 
-
 /* Main calibration method calling dedicated functions */
-CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
+CalibrationAlgorithm::EResult BoostVectorAlgorithm::calibrate()
 {
   TTree* tracks = getObjectPtr<TTree>("events").get();
-  return runCalibration(tracks,  "BeamSpot", getEvents,
-                        runBeamSpotAnalysis, getBeamSpotObj,
+  return runCalibration(tracks,  "CollisionBoostVector", getEvents,
+                        runBoostVectorAnalysis, getBoostVectorObj,
                         m_lossFunctionOuter, m_lossFunctionInner);
 }

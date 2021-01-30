@@ -13,9 +13,10 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
-#include <TMatrixD.h>
 #include <TString.h>
 #include <TRandom.h>
+
+#include <Eigen/Dense>
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
@@ -46,20 +47,20 @@ namespace Belle2 {
 
 
   /// std vector -> ROOT vector
-  inline TVectorD vec2vec(std::vector<double> vec)
+  inline Eigen::VectorXd vec2vec(std::vector<double> vec)
   {
-    TVectorD v(vec.size());
+    Eigen::VectorXd v(vec.size());
     for (unsigned i = 0; i < vec.size(); ++i) {
-      v(i) = vec[i];
+      v[i] = vec[i];
     }
     return v;
   }
 
   /// ROOT vector -> std vector
-  inline std::vector<double> vec2vec(TVectorD v)
+  inline std::vector<double> vec2vec(Eigen::VectorXd v)
   {
-    std::vector<double> vNew(v.GetNrows());
-    for (int i = 0; i < v.GetNrows(); ++i)
+    std::vector<double> vNew(v.rows());
+    for (int i = 0; i < v.rows(); ++i)
       vNew[i] = v(i);
     return vNew;
   }
@@ -67,9 +68,9 @@ namespace Belle2 {
 
 
   /// merge columns (from std::vectors) into ROOT matrix
-  inline TMatrixD vecs2mat(std::vector<std::vector<double>> vecs)
+  inline Eigen::MatrixXd vecs2mat(std::vector<std::vector<double>> vecs)
   {
-    TMatrixD m(vecs[0].size(), vecs.size());
+    Eigen::MatrixXd m(vecs[0].size(), vecs.size());
     for (unsigned i = 0; i < vecs[0].size(); ++i)
       for (unsigned j = 0; j < vecs.size(); ++j) {
         m(i, j) = vecs[j][i];

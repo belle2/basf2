@@ -14,34 +14,34 @@
 
 namespace Belle2 {
   /**
-   * Class implementing BeamSpot calibration algorithm
+   * Class implementing BoostVector calibration algorithm
    */
-  class BeamSpotAlgorithm : public CalibrationAlgorithm {
+  class BoostVectorAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to BeamSpotCollector
-    BeamSpotAlgorithm();
+    /// Constructor set the prefix to BoostVectorCollector
+    BoostVectorAlgorithm();
 
     /// Destructor
-    virtual ~BeamSpotAlgorithm() {}
+    virtual ~BoostVectorAlgorithm() {}
 
     /// Set outer loss function (for calibration intervals)
     void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }
 
     /// Set inner loss function (for calibration subintervals)
     void setInnerLoss(const std::string& loss) { m_lossFunctionInner = loss; }
+
   protected:
 
     /// Run algo on data
     virtual EResult calibrate() override;
 
   private:
-    /// Outer loss function (for calibration intervals of BeamSpot size parameters)
-    TString m_lossFunctionOuter = "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)";
+    /// Outer loss function (for calibration intervals of BoostVector spread parameters)
+    TString m_lossFunctionOuter = "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)";
 
-    /// Inner loss function (for calibration subintervals of BeamSpot position parameters)
-    TString m_lossFunctionInner = "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)";
-
+    /// Inner loss function (for calibraion subintervals of mean BoostVector values)
+    TString m_lossFunctionInner = "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)";
   };
 } // namespace Belle2
 

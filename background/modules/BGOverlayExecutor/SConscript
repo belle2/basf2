@@ -6,7 +6,6 @@ env['LIBS'] = ['framework',
                'cdc_dataobjects',
                'top_dataobjects',
                'arich_dataobjects',
-               'ecl_dataobjects',
                'klm_dataobjects',
                '$ROOT_LIBS']
 

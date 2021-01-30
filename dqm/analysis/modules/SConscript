@@ -4,10 +4,10 @@ Import('env')
 
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
-env['LIBS'] = ['framework', 'daq', 'dqm', 'RooFit', 'RooFitCore', 'vxd',
+env['LIBS'] = ['framework', 'daq', 'RooFit', 'RooFitCore', 'vxd',
                'boost_regex', 'arich',
                'klm_dataobjects', 'klm_dbobjects',
-               'dqm_dataobjects', 'svd_dataobjects',
+               'dqm_dataobjects', 'svd_dataobjects', 'vxd_dataobjects',
 	       'cdc_dataobjects','cdc']
 
 option = os.environ['BELLE2_OPTION']

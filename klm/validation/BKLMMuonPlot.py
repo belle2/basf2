@@ -165,11 +165,12 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 210, -1, 20)
+    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 410, -1, 40)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
     RPC_bklmdigits_tres.SetXTitle('ns')
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
+    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 10 ns.'))
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     RPC_bklmdigits_tres.Write()
@@ -183,12 +184,12 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
-    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 450, -15, 30)
+    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 210, -1, 20)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
                     'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
     Sci_bklmdigits_tres.SetXTitle('ns')
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
-    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', 'First peak around -7 ns and a broad higher peak around 10 ns.'))
+    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', '.'))
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     Sci_bklmdigits_tres.Write()
@@ -204,17 +205,17 @@ def draw_bklmhists(file_chain):
     timeSci.Write()
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, -0.5, 200.5)
-    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
+    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
-    nPE.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 45, with mean at 47.'))
+    nPE.GetListOfFunctions().Add(TNamed('Check', 'Peak around 50.'))
     nPE.GetListOfFunctions().Add(TNamed('Contact', contact))
     nPE.GetListOfFunctions().Add(TNamed('MetaOptions', ''))
     nPE.Write()
 
     # Expert plots
 
-    edep = TH1F('EnergyDeposit', 'Energy deposition for BKLMHit2ds', 250, 0.0, 25.0)
+    edep = TH1F('EnergyDeposit', 'Energy deposition for BKLMHit2ds', 260, -1.0, 25.0)
     file_chain.Draw('BKLMHit2ds.getEnergyDeposit()*1000.0>>EnergyDeposit', '')
     edep.GetXaxis().SetTitle('E (keV)')
     edep.GetListOfFunctions().Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))

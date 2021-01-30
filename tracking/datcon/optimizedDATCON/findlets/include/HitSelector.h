@@ -1,0 +1,105 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Wessel                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+// #include <framework/datastore/StoreArray.h>
+
+#include <vxd/dataobjects/VxdID.h>
+
+#include <string>
+#include <vector>
+
+namespace Belle2 {
+  class SpacePoint;
+  /**
+   * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
+   */
+  class HitSelector : public
+    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, VxdID, const std::tuple<const SpacePoint*, const VxdID, double, double, double>*> {
+
+    typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
+
+  public:
+    /// Load the hits in a sensor friend list for a given L6 sensor from hits and store them in selectedHits, which then are used for the Hough trafo and intercept finding
+    void apply(std::vector<hitTuple>& hits, std::vector<VxdID>& friendSensorList, std::vector<const hitTuple*>& selectedHits) override
+    {
+      const unsigned short sensorInLayerSixLadder = friendSensorList.back().getSensorNumber();
+
+      for (auto& hit : hits) {
+        const VxdID& currentHitSensorID = std::get<1>(hit);
+
+        if (std::find(friendSensorList.begin(), friendSensorList.end(), currentHitSensorID) == friendSensorList.end()) {
+          continue;
+        }
+        const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
+        const double hitZPosition = std::get<4>(hit);
+
+        // The hitZPosition cuts are based on simple geometrical calculations
+        // Take the gap between two L6 sensors, draw a straight line to the origin, check the intercepts
+        // with the other layers, and add / subtract 10 mm to account for a straight line not perfectly representing the boarders,
+        //  slight misalignment, boost, etc so that there is some overlap
+        if (currentHitSensorID.getLayerNumber() < 6) {
+          switch (sensorInLayerSixLadder) {
+            case 1:
+              if (hitLayer == 3 && hitZPosition > 6.06) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > 13.49) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > 17.84) {
+                selectedHits.emplace_back(&hit);
+              }
+              break;
+            case 2:
+              if (hitLayer == 3 && hitZPosition > 2.45 && hitZPosition < 8.06) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > 6.08 && hitZPosition < 15.49) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > 8.21 && hitZPosition < 19.84) {
+                selectedHits.emplace_back(&hit);
+              }
+              break;
+            case 3:
+              if (hitLayer == 3 && hitZPosition > -1.16 && hitZPosition < 4.45) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > -1.33 && hitZPosition < 8.08) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > -1.42 && hitZPosition < 10.21) {
+                selectedHits.emplace_back(&hit);
+              }
+              break;
+            case 4:
+              if (hitLayer == 3 && hitZPosition > -4.77 && hitZPosition < 0.84) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 4 && hitZPosition > -8.73 && hitZPosition < 0.67) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition > -11.05 && hitZPosition < 0.58) {
+                selectedHits.emplace_back(&hit);
+              }
+              break;
+            case 5:
+              if (hitLayer == 3  && hitZPosition < -2.77) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 4  && hitZPosition < -6.73) {
+                selectedHits.emplace_back(&hit);
+              } else if (hitLayer == 5 && hitZPosition < -9.05) {
+                selectedHits.emplace_back(&hit);
+              }
+              break;
+          }
+        } else {
+          // we already know that this is the correct L6 hit because of the std::find above
+          selectedHits.emplace_back(&hit);
+        }
+      }
+    }
+
+  };
+}

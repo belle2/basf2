@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -23,6 +22,7 @@ using namespace TrackFindingCDC;
 
 FastInterceptFinder1D::FastInterceptFinder1D() : Super()
 {
+  addProcessingSignalListener(&m_HitSelector);
 }
 
 void FastInterceptFinder1D::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -101,9 +101,9 @@ void FastInterceptFinder1D::apply(std::vector<hitTuple>& hits, std::vector<std::
   for (auto& friends : m_fullFriendMap) {
     m_SectorArray.assign(m_param_nAngleSectors, 0);
     m_activeSectors.clear();
-
     m_currentSensorsHitList.clear();
-    fillThisSensorsHitMap(hits, friends.first);
+
+    m_HitSelector.apply(hits, friends.second, m_currentSensorsHitList);
 
     fastInterceptFinder1d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0);
 
@@ -195,75 +195,6 @@ void FastInterceptFinder1D::initializeSectorFriendMap()
       }
 
       m_fullFriendMap.insert(std::make_pair(VxdID(6, layer6Ladder, layer6Sensor), friendSensors));
-    }
-  }
-}
-
-void FastInterceptFinder1D::fillThisSensorsHitMap(std::vector<hitTuple>& hits, const VxdID thisLayerSixSensor)
-{
-  const std::vector<VxdID>& friendSensors = m_fullFriendMap.at(thisLayerSixSensor);
-  const unsigned short sensorInLayerSixLadder = thisLayerSixSensor.getSensorNumber();
-
-  for (auto& hit : hits) {
-    const VxdID& currentHitSensorID = std::get<1>(hit);
-
-    if (std::find(friendSensors.begin(), friendSensors.end(), currentHitSensorID) == friendSensors.end()) {
-      continue;
-    }
-    const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
-    const double hitZPosition = std::get<4>(hit);
-
-    if (currentHitSensorID.getLayerNumber() < 6) {
-      switch (sensorInLayerSixLadder) {
-        case 1:
-          if (hitLayer == 3 && hitZPosition > 6.56) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 4 && hitZPosition > 13.99) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 5 && hitZPosition > 18.34) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          }
-          break;
-        case 2:
-          if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 4 && hitZPosition > 6.58 && hitZPosition < 14.99) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 5 && hitZPosition > 8.71 && hitZPosition < 19.34) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          }
-          break;
-        case 3:
-          if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 4 && hitZPosition > -0.83 && hitZPosition < 7.58) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 5 && hitZPosition > -0.92 && hitZPosition < 9.71) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          }
-          break;
-        case 4:
-          if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 4 && hitZPosition > -8.23 && hitZPosition < 0.17) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 5 && hitZPosition > -10.55 && hitZPosition < 0.08) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          }
-          break;
-        case 5:
-          if (hitLayer == 3  && hitZPosition < -3.27) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 4  && hitZPosition < -7.23) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          } else if (hitLayer == 5 && hitZPosition < -9.55) {
-            m_currentSensorsHitList.emplace_back(&hit);
-          }
-          break;
-      }
-    } else {
-      // we already know that this is the correct L6 hit because of the std::find above
-      m_currentSensorsHitList.emplace_back(&hit);
     }
   }
 }

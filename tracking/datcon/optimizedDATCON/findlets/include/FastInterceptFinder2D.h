@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
+#include <tracking/datcon/optimizedDATCON/findlets/HitSelector.h>
 
 #include <string>
 #include <vector>
@@ -52,12 +53,13 @@ namespace Belle2 {
     void apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates) override;
 
   private:
-    /// fill the map of friend sensors for each L6 sensor to
-    void initializeSectorFriendMap();
-
+    // sub-findlets
     /// Use the friend map to just fill the hits in the acceptance region of the current L6 sensor into
     /// the m_currentSensorsHitList which is then used the Hough trafo track finding
-    void fillThisSensorsHitMap(std::vector<hitTuple>& hits, const VxdID thisLayerSixSensor);
+    HitSelector m_HitSelector;
+
+    /// fill the map of friend sensors for each L6 sensor to
+    void initializeSectorFriendMap();
 
     /// layer filter, checks if at least hits from 3 layers are in a set of hits
     /// @param layer bool-vector containing information whether there as a hit in a layer

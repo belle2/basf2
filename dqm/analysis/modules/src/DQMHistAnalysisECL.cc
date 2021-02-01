@@ -52,12 +52,12 @@ void DQMHistAnalysisECLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisECL: initialized.");
 
   //new canvases for existing histograms
-  c_quality_analysis = new TCanvas("ECL_c_quality_analysis");
-  c_quality_other_analysis = new TCanvas("ECL_c_quality_other_analysis");
+  c_quality_analysis = new TCanvas("ECL/c_quality_analysis");
+  c_quality_other_analysis = new TCanvas("ECL/c_quality_other_analysis");
   c_bad_quality_analysis = new TCanvas("ECL/c_bad_quality_analysis");
   c_trigtag1_analysis = new TCanvas("ECL/c_trigtag1_analysis");
   c_trigtag2_analysis = new TCanvas("ECL/c_trigtag2_analysis");
-  c_adc_hits_analysis = new TCanvas("ECL_c_adc_hits_analysis");
+  c_adc_hits_analysis = new TCanvas("ECL/c_adc_hits_analysis");
   c_ampfail_quality_analysis = new TCanvas("ECL/c_ampfail_quality_analysis");
   c_timefail_quality_analysis = new TCanvas("ECL/c_timefail_quality_analysis");
   c_quality_fit_data_analysis = new TCanvas("ECL/c_quality_fit_data_analysis");
@@ -126,7 +126,11 @@ void DQMHistAnalysisECLModule::normalize(TCanvas* c, const std::string&  h_name,
   if (h != NULL) {
     for (unsigned short i = 0; i < h->GetNbinsX(); i++) {
       Double_t entries = h->GetBinContent(i + 1);
-      if (weight) h->SetBinContent(i + 1, entries / weight);
+      Double_t error = h->GetBinError(i + 1);
+      if (weight) {
+        h->SetBinContent(i + 1, entries / weight);
+        h->SetBinError(i + 1, error / weight);
+      }
     }
     h->Draw("HIST");
   }

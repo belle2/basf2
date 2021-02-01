@@ -630,7 +630,7 @@ class BaseSkim(ABC):
             dataDescription=self.additionalDataDescription,
             path=path,
         )
-        summaryOfLists(self.SkimLists, path=path)
+        summaryOfLists(self.SkimLists, f"{self.OutputFileName}_PartStat.json", path=path)
 
     def apply_hlt_hadron_cut_if_required(self, path):
         """Apply the ``hlt_hadron`` selection if the property ``ApplyHLTHadronCut`` is True.

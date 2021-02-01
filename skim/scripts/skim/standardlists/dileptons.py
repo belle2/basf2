@@ -47,13 +47,13 @@ def loadStdLooseJpsi2ee(persistent=True, path=None):
 
 def loadStdJpsiToee(persistent=True, path=None):
     """
-    Load the 'J/psi:ee' list from 'e+:all e-:all', with :math:`2.8 < M < 3.4~GeV`
+    Load the 'J/psi:ee' list from 'e+:bremCorr e-:bremCorr', with :math:`2.8 < M < 3.4~GeV` with electronID>0.01
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
 
-    ma.fillParticleList('e+:withCuts',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+    ma.fillParticleList('e+:withCuts', cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
     ma.fillParticleList(decayString='gamma:e+', cut="E < 1.0", path=path)
     ma.correctBrems(outputList='e+:bremCorr', inputList='e+:withCuts', gammaList='gamma:e+', multiplePhotons=False,
                     usePhotonOnlyOnce=True, writeOut=True, path=path)
@@ -70,12 +70,12 @@ def loadStdJpsiToee(persistent=True, path=None):
 def loadStdJpsiTomumu(persistent=True, path=None):
     """
     Load the 'J/psi:mumu' list from 'mu+:withCuts mu+:withCuts', with :math:`2.8 < M < 3.4~GeV`
-    where mu+:withCuts list is with cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01"
+    where mu+:withCuts list is with cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and muonID > 0.01"
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.fillParticleList('mu+:withCuts',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+    ma.fillParticleList('mu+:withCuts', cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
     ma.reconstructDecay(
         'J/psi:mumu -> mu+:withCuts mu-:withCuts',
         '2.8 < M < 3.4 and daughter(0, muonID) > 0.01 or daughter(1,muonID) > 0.01',

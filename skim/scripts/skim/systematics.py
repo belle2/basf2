@@ -690,13 +690,11 @@ class SystematicsJpsi(BaseSkim):
     def JpsimumuTagProbe(self, path):
         """Build JpsimumuTagProbe lists for systematics skims."""
         Cuts = "2.7 < M < 3.4"
-        ma.cutAndCopyList('mu+:tag', 'mu+:all', 'muonID>0.1', path=path)
-        ma.reconstructDecay("J/psi:mumutagprobe -> mu+:all mu-:tag", Cuts, 0, path=path)
         ma.reconstructDecay(
-            "J/psi:mumu -> mu+:all mu-:all",
+            "J/psi:systematics_mumu -> mu+:all mu-:all",
             f'{Cuts} and [daughter(0,muonID)>0.1 or daughter(1,muonID)>0.1]',
             path=path)
-        return "J/psi:mumu"
+        return "J/psi:systematics_mumu"
 
     def JpsieeTagProbe(self, path):
         """Build JpsieeTagProbe lists for systematics skims."""
@@ -705,10 +703,10 @@ class SystematicsJpsi(BaseSkim):
         ma.cutAndCopyList('gamma:brems', 'gamma:all', 'E<1', path=path)
         ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
         ma.reconstructDecay(
-            "J/psi:ee -> e+:brems_corrected e-:brems_corrected",
+            "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
             f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
             path=path)
-        return "J/psi:ee"
+        return "J/psi:systematics_ee"
 
 
 @fancy_skim_header

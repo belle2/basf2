@@ -626,14 +626,12 @@ class SystematicsFourLeptonHLT(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         label = "FourLeptonHLT"
         ma.copyList(f"pi+:{label}", "pi+:all", path=path)
-        ma.applyRandomCandidateSelection(f"pi+:{label}", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsFourLeptonHLT_randomRank", path=path)
 
-        # Select fraction of events
         path = self.skim_event_cuts(
             f"SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
         )
@@ -650,12 +648,11 @@ class SystematicsRadMuMuHLT(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         label = "RadMuMuHLT"
         ma.copyList(f"pi+:{label}", "pi+:all", path=path)
-        ma.applyRandomCandidateSelection(f"pi+:{label}", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuHLT_randomRank", path=path)
 
         path = self.skim_event_cuts(
             f"SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path

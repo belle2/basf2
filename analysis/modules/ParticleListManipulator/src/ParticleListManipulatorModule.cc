@@ -157,6 +157,7 @@ namespace Belle2 {
     // fill all particles from input lists that pass selection criteria into comparison list
     for (const auto& inputListName : m_inputListNames) {
       const StoreObjPtr<ParticleList> inPList(inputListName);
+      if (!inPList.isValid()) continue;
 
       std::vector<int> fsParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, false);
       const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);

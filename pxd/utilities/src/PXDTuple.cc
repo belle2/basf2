@@ -103,8 +103,14 @@ namespace Belle2 {
                                            const std::string pxdTrackClustersName)
       {
         auto recoTrackPtr = intersection.setValues(pxdIntercept, recoTracksName);
+        // sensor ID from intersectioon
+        //VxdID sensorID(pxdIntercept.getSensorID());
+        if (!recoTrackPtr) return nullptr; // return nullptr
+        // Always set cluster pxdID for saving module id of the intersection.
+        cluster.pxdID = getPXDModuleID(VxdID(pxdIntercept.getSensorID()));
         RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(recoTrackPtr, pxdTrackClustersName);
-        if (!pxdClusters.size()) return recoTrackPtr;
+        // Return nullptr (false) as no clusters associated;
+        if (!pxdClusters.size()) return nullptr;
         for (auto& aCluster : pxdClusters) {
           if (aCluster.getSensorID().getID() == pxdIntercept.getSensorID()) {
             cluster.setValues(aCluster);
@@ -114,7 +120,7 @@ namespace Belle2 {
             break;
           }
         }
-        // If usedInTrack is still false, we can loop all PXDClusters to find one closest to the track point. (To be implemented)
+        // If usedInTrack is still false, we can loop PXDClusters datastore to find one closest to the track point. (To be implemented)
         return recoTrackPtr;
       }
 

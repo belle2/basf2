@@ -29,7 +29,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                expert_config={
                                    "max_events_per_run": 4000000,
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0
-                                   "payload_boundaries": []
+                                   # "payload_boundaries": []
                                },
                                depends_on=[])
 
@@ -77,19 +77,16 @@ def get_calibrations(input_data, **kwargs):
 
     input_files_physics = list(reduced_file_to_iov_physics.keys())
 
-    # Create calibrations with required boundaries
-    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
-    # Now we can add the boundaries that exist in the expert config. They are extra boundaries, so that we don't have
-    # to set the initial one every time. If this is an empty list then we effectively run like the SingleIoV strategy.
-    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
-    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+    # payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    # payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    # basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']} ")
 
     cal = gain_calibration(
         # cal_name="PXDGainCalibration",
-        boundaries=vector_from_runs(payload_boundaries),
+        # boundaries=vector_from_runs(payload_boundaries),
         input_files=input_files_physics)
-    # cal.algorithms[0].params = {"iov_coverage": output_iov}
-    cal.algorithms[0].params["iov_coverage"] = output_iov
+    for alg in cal.algorithms:
+        alg.params["iov_coverage"] = output_iov
     cal_list.append(cal)
 
     # The number of calibrations depends on the 'chunking' above. We would like to make sure that the total number of

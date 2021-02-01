@@ -202,7 +202,7 @@ namespace Belle2 {
       struct TrackBase_t {
         /** Default constructor */
         TrackBase_t(): d0(0.0), z0(0.0), phi0(0.0), pt(0.0), tanLambda(0.0),
-          nPXDHits(0), nSVDHits(0), nCDCHits(0) {}
+          d0p(0.0), z0p(0.0), nPXDHits(0), nSVDHits(0), nCDCHits(0) {}
 
         /** Update values from a RecoTrack.
          * @param recoTrack A RecoTrack object.
@@ -225,6 +225,10 @@ namespace Belle2 {
 
       typedef TrackBase_t<TrackCluster_t> Track_t;
 
+
+      /**
+       * Template implementation
+       */
       template <typename TTrackCluster>
       void TrackBase_t<TTrackCluster>::setValues(const RecoTrack& recoTrack, const TVector3& ip)
       {
@@ -247,6 +251,8 @@ namespace Belle2 {
         d0 = tfrPtr->getD0();
         z0 = tfrPtr->getZ0();
         phi0 = tfrPtr->getPhi0();
+        d0p = d0;
+        z0p = z0;
         if (ip != TVector3(0, 0, 0)) {
           // get a helix and change coordinate origin to ip
           auto uHelix = tfrPtr->getUncertainHelix();
@@ -259,8 +265,9 @@ namespace Belle2 {
         auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
         for (auto& pxdIntercept : pxdIntercepts) {
           TTrackCluster temp;
-          temp.setValues(pxdIntercept);
-          trackClusters.push_back(temp);
+          // Only push a TrackCluster when setValues succeeds
+          if (temp.setValues(pxdIntercept))
+            trackClusters.push_back(temp);
         }
       }
 

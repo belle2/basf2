@@ -191,6 +191,23 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
 
   for (const auto& sensorID : pxdSensors) {
     for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
+
+      // Special treatement for the last vBin as Bhabha 2-track events
+      // have no enough statistics there if nBinsV = 6
+      if (vBin >= nBinsV / 6 * 5) {
+        for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+          auto gainForwardRegion = gainMapPar->getContent(sensorID.getID(), uBin, nBinsV / 6 * 5 - 1);
+          auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+          if (gain == 1.0 && gainForwardRegion != 1.0) {
+            gainMapPar->setContent(sensorID.getID(), uBin, vBin, gainForwardRegion);
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin <<
+                     ": Replace default gain with that from the closest vBin with non default value "
+                     << gainForwardRegion);
+
+          }
+        }
+      }
+
       float meanGain = 0;
       unsigned short nGood = 0;
       unsigned short nBad = 0;
@@ -214,8 +231,9 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
           auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
           if (gain == 1.0) {
             gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
-            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
-                     << meanGain);
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin <<
+                     ": Replace default gain with average "
+                     << meanGain << " of uBins with non-default gains.");
           }
         }
       }

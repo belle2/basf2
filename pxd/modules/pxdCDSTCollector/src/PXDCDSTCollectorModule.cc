@@ -17,7 +17,7 @@
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 
 #include <TTree.h>
-#include <TH2I.h>
+#include <TH1I.h>
 #include <TH2F.h>
 //#include <TEfficiency.h>
 
@@ -54,7 +54,7 @@ PXDCDSTCollectorModule::PXDCDSTCollectorModule() : CalibrationCollectorModule()
   //addParam("fillChargeHistogram", m_fillChargeHistogram, "Flag to fill Charge histograms", bool(false));
   addParam("fillEventTree", m_fillEventTree, "Flag to fill event tree for validation", bool(false));
 
-  // additional parameters for validation
+  // additional parameters for validation. Considering modularAnalysis for more flexible controls.
   addParam("minPt4Eff", m_minPt4Eff, "Minimum pt cut for efficiency validation", float(2.0));
   addParam("maxAbsVx", m_maxAbsVx, "Minimum abs(Vx) cut in cm for efficiency validation", float(0.03));
   addParam("maxAbsVy", m_maxAbsVy, "Minimum abs(Vy) cut in cm for efficiency validation", float(0.03));
@@ -64,7 +64,7 @@ PXDCDSTCollectorModule::PXDCDSTCollectorModule() : CalibrationCollectorModule()
   addParam("minSVDHits", m_minSVDHits, "Minimum number of SVD hits foor resolution validation", int(8));
   addParam("minCDCHits", m_minCDCHits, "Minimum number of CDC hits foor resolution validation", int(21));
   addParam("maxAbsLambda", m_maxAbsLambda, "Maximum absolute dip angle (lambda)", float(0.5));
-  addParam("minPBetaSinTheta3o2", m_minPBetaSinTheta3o2, "Minimum p*Beta*sinn(theta_0)^{3/2}", float(2));
+  addParam("minPBetaSinTheta3o2", m_minPBetaSinTheta3o2, "Minimum p*Beta*sin(theta_0)^{3/2}", float(2));
   addParam("maxAbsZ0", m_maxAbsZ0, "Maximum abs(z0)", float(1));
   addParam("maxAbsD0", m_maxAbsD0, "Maximum abs(d0)", float(0.3));
 
@@ -97,6 +97,16 @@ void PXDCDSTCollectorModule::prepare() // Do your initialise() stuff here
                                      m_nBinsU * m_nBinsV * nPXDSensors);
   hPXDClusterCounter->GetXaxis()->SetTitle("bin id");
   hPXDClusterCounter->GetYaxis()->SetTitle("Number of clusters");
+  auto hPXDTrackClusterCounter = new TH1I("hPXDTrackClusterCounter", "Number of clusters found in data sample",
+                                          m_nBinsU * m_nBinsV * nPXDSensors, 0,
+                                          m_nBinsU * m_nBinsV * nPXDSensors);
+  hPXDTrackClusterCounter->GetXaxis()->SetTitle("bin id");
+  hPXDTrackClusterCounter->GetYaxis()->SetTitle("Number of clusters");
+  auto hPXDTrackPointCounter = new TH1I("hPXDTrackPointCounter", "Number of clusters found in data sample",
+                                        m_nBinsU * m_nBinsV * nPXDSensors, 0,
+                                        m_nBinsU * m_nBinsV * nPXDSensors);
+  hPXDTrackPointCounter->GetXaxis()->SetTitle("bin id");
+  hPXDTrackPointCounter->GetYaxis()->SetTitle("Number of clusters");
   for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
     for (int uBin = 0; uBin < m_nBinsU; uBin++) {
       for (int vBin = 0; vBin < m_nBinsV; vBin++) {
@@ -104,10 +114,31 @@ void PXDCDSTCollectorModule::prepare() // Do your initialise() stuff here
         string sensorDescr = id;
         hPXDClusterCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
                                                     str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
+        hPXDTrackClusterCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
+                                                         str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
+        hPXDTrackPointCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
+                                                       str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
       }
     }
   }
+
   registerObject<TH1I>("PXDClusterCounter", hPXDClusterCounter);
+
+  //-------------------------------------------------------------------------------------
+  // PXDTrackClusterCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
+  //-------------------------------------------------------------------------------------
+  //auto hPXDTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackClusterCounter");
+  //hPXDTrackClusterCounter->SetTitle("Number of track clusters");
+  //hPXDTrackClusterCounter->GetYaxis()->SetTitle("Number of track clusters");
+  registerObject<TH1I>("PXDTrackClusterCounter", hPXDTrackClusterCounter);
+
+  //-------------------------------------------------------------------------------------
+  // PXDTrackPointCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
+  //-------------------------------------------------------------------------------------
+  //auto hPXDTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackPointCounter");
+  //hPXDTrackPointCounter->SetTitle("Number of track points");
+  //hPXDTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
+  registerObject<TH1I>("PXDTrackPointCounter", hPXDTrackPointCounter);
 
   //----------------------------------------------------------------------
   // PXDTrees for gain calibration: One tree to store the calibration data for each grid bin
@@ -161,8 +192,8 @@ void PXDCDSTCollectorModule::prepare() // Do your initialise() stuff here
   registerObject<TTree>("dbtree", dbtree);
 
   if (m_fillEventTree) {
-    auto tree = new TTree("pxd", "pxd");
-    tree->Branch<PXD2TrackEvent>("pxd2TrackEvent", &m_pxd2TrackEvent, 8000, 1);
+    auto tree = new TTree("pxd", "PXD 2-track events");
+    tree->Branch<PXD2TrackEvent>("PXD2TrackEvent", &m_pxd2TrackEvent, 8000, 1);
     registerObject<TTree>("pxd", tree);
   }
 }
@@ -256,14 +287,20 @@ void PXDCDSTCollectorModule::collectFromTrack(const PXD2TrackEvent::baseType& tr
     bool selectedCluster = true;
     auto cluster = trackCluster.cluster;
     auto intersection = trackCluster.intersection;
+    auto usedInTrack = trackCluster.usedInTrack;
 
     // Check for valid cluster and intersection
-    if (cluster.pxdID <= 0 || m_estimated <= 0)
+    if (!usedInTrack || intersection.chargeMPV <= 0)
       selectedCluster = false;
 
     // Apply cluster selection cuts
     if (cluster.charge < m_minClusterCharge || cluster.size < m_minClusterSize || cluster.size > m_maxClusterSize)
       selectedCluster = false;
+
+    if (cluster.pxdID <= 0) {
+      B2FATAL("Unexpected cluster module id : " << cluster.pxdID);
+
+    }
 
     // Fill tree or histograms for gain calibration
     if (selected4Gain && selectedCluster) {
@@ -292,9 +329,27 @@ void PXDCDSTCollectorModule::collectFromTrack(const PXD2TrackEvent::baseType& tr
 
     // Fill effciency
     if (m_selectedEff) {
-      auto phi = atan2(intersection.y, intersection.x);
+      auto x = intersection.x;
+      auto y = intersection.y;
+      auto phi = atan2(y, x);
       auto z = intersection.z;
-      auto usedInTrack = trackCluster.usedInTrack;
+
+      // Get uBin and vBin from a global point.
+      VxdID sensorID = Tuple::getVxdIDFromPXDModuleID(cluster.pxdID);
+      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      auto localPoint = Info.pointToLocal(TVector3(x, y, z));
+      auto uID = Info.getUCellID(localPoint.X());
+      auto vID = Info.getVCellID(localPoint.Y());
+      auto iSensor = gTools->getPXDSensorIndex(sensorID);
+      auto uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
+      auto vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
+
+      // Filling counters
+      getObjectPtr<TH1I>("PXDTrackPointCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
+      if (usedInTrack)
+        getObjectPtr<TH1I>("PXDTrackClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
+
+      // Filling 2D histograms
       if (cluster.pxdID < 2000) {
         //getObjectPtr<TEfficiency>("PXDLayer1Efficiency")->Fill(usedInTrack,phi,z);
         getObjectPtr<TH2F>("hTotalHitsLayer1")->Fill(phi, z);

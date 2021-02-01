@@ -8,6 +8,7 @@ Author: qingyuan.liu@desy.de
 
 from basf2 import register_module, create_path
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm, PXDAnalyticGainCalibrationAlgorithm
+from ROOT.Belle2 import PXDValidationAlgorithm
 from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SimpleRunByRun, SequentialBoundaries
 
@@ -160,20 +161,28 @@ def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundar
     algorithm.forceContinue = False         # Force continue the algorithm instead of return c_notEnoughData
     algorithm.strategy = 0                  # 0: medians, 1: landau fit
     algorithm.setPrefix("PXDCDSTCollector")
-    algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
+    # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
+
+    validation_alg = PXDValidationAlgorithm()
+    validation_alg.setPrefix("PXDCDSTCollector")
+    validation_alg.minTrackPoints = 10     # Minimum number of track points
+    validation_alg.save2DHists = True  # False     # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
+    # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config
 
     # Create the calibration instance
 
     cal = Calibration(
         name=cal_name,
         collector=collector,
-        algorithms=[algorithm],
+        algorithms=[validation_alg, algorithm],
         input_files=input_files)
     for global_tag in global_tags:
         cal.use_central_database(global_tag)
     for local_db in local_dbs:
         cal.use_local_database(local_db)
     cal.pre_collector_path = main
-    cal.strategies = SequentialBoundaries
+    # cal.strategies = SequentialBoundaries
+    cal.strategies = SequentialRunByRun
+    # cal.strategies = SimpleRunByRun
 
     return cal

@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'trg', 'trg_ecl_dataobjects','mdst_dataobjects','RooFit','RooFitCore']
+env['LIBS'] = ['framework', 'trg_ecl_dataobjects','mdst_dataobjects','RooFit','RooFitCore']
 #env.Append(CPPDEFINES = {'TRASAN_WINDOW_GTK':None,
 #	                 'TRASAN_WINDOW_GTK_HOUGH':None})
 #env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')

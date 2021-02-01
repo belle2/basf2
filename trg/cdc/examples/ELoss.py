@@ -11,7 +11,6 @@
 # --------------------------------------------------------------
 
 import os
-import sys
 
 os.system("patch -p0 < ELoss.patch")
 os.system("patch -p0 < CDC_SCons.patch")

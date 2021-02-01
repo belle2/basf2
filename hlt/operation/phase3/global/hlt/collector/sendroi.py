@@ -35,9 +35,8 @@ components = [
 ]
 
 # Local database access
-b2.reset_database()
 databasefile = "/dev/shm/LocalDB/database.txt"
-b2.use_local_database(databasefile, os.path.dirname(databasefile), True)
+b2.prepend_testing_payloads(databasefile)
 
 # Register modules to declare objects
 # register_simulation(components)

@@ -30,7 +30,6 @@ try:
     matplotlib.use('Agg')
 
     import matplotlib.pyplot as plt
-    import matplotlib.transforms as transforms
 except ImportError:
     raise ImportError("matplotlib is not installed in your basf2 environment. "
                       "You may install it with 'pip install matplotlib'")
@@ -96,8 +95,6 @@ def plot(tobject, **kwd):
 
     else:
         raise ValueError("Plotting to matplot lib only supported for TH1, TProfile, and THStack.")
-
-    return fig
 
 
 def use_style(plot_function):
@@ -509,7 +506,7 @@ def get_stats_from_th(th):
     return stats
 
 
-def compose_stats_label(title, additional_stats=Nnoe):
+def compose_stats_label(title, additional_stats=None):
     """Render the summary statistics to a label string."""
     if additional_stats is None:
         additional_stats = {}

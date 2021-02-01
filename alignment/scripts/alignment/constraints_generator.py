@@ -3,18 +3,17 @@ Created on 28 May 2018
 
 @author: kleinwrt
 '''
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 import os
 import sys
 import pickle
 
 # Needed for pickling of constraints
-from alignment.constraints import *
+from alignment.constraints import *  # noqa
 
 
-class ConstraintsGenerator(Module):
+class ConstraintsGenerator(b2.Module):
     """
     basf2 python module to generate a file with a single set of constraints
 
@@ -136,7 +135,7 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
         timedep_config = []
 
     if global_tags is None:
-        global_tags = [tag for tag in conditions.default_globaltags]
+        global_tags = [tag for tag in b2.conditions.default_globaltags]
 
     events = []
     for (labels, events_) in timedep_config:
@@ -156,23 +155,20 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
 
     print('Global tags:')
     print(global_tags)
-    print('Global tags reversed (this will be used for conditions.override_globaltags(...)):')
+    print('Global tags reversed (this will be used for b2.conditions.override_globaltags(...)):')
     print([tag for tag in reversed(global_tags)])
-
-    import os
-    import basf2
 
     for tag in [tag for tag in reversed(global_tags)]:
         if os.path.exists(tag):
-            basf2.conditions.append_testing_payloads(os.path.abspath(tag))
+            b2.conditions.append_testing_payloads(os.path.abspath(tag))
         else:
-            basf2.conditions.append_globaltag(tag)
+            b2.conditions.append_globaltag(tag)
 
     for index, event in enumerate(events):
         #  conditions.reset()
 
         ev, run, exp = event
-        path = create_path()
+        path = b2.create_path()
         path.add_module("EventInfoSetter",
                         skipNEvents=ev,
                         evtNumList=[ev + 1],
@@ -182,14 +178,14 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
         this_filename = fileName.format(exp, run, ev)
         path.add_module('RootOutput', outputFileName=this_filename, ignoreCommandLineOverride=True)
         files.append(this_filename)
-        process(path)
-        print(statistics)
+        b2.process(path)
+        print(b2.statistics)
 
     print(files)
 
     # conditions.override_globaltags(global_tags)
 
-    path = create_path()
+    path = b2.create_path()
     path.add_module("RootInput", inputFileNames=files, ignoreCommandLineOverride=True)
     path.add_module('HistoManager')
     path.add_module('Progress')
@@ -205,8 +201,8 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
         constraint_files.append(constraint_set.filename)
         path.add_module(ConstraintsGenerator(constraint_set))
 
-    process(path)
-    print(statistics)
+    b2.process(path)
+    print(b2.statistics)
 
     return [os.path.abspath(file) for file in constraint_files]
 
@@ -224,5 +220,6 @@ if __name__ == '__main__':
         print('Usage: basf2 constraints_generator.py config_filename')
         exit()
 
+    #: File name
     filename = sys.argv[1]
     gen_constraints_from_config(filename)

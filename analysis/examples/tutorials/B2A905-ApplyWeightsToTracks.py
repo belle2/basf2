@@ -36,9 +36,7 @@ if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
     b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
 db_location = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/database/'
-b2.use_local_database(db_location + 'database.txt',
-                      directory=db_location,
-                      readonly=True)
+b2.conditions.prepend_testing_payloads(db_location + 'database.txt')
 
 # We know what weight info will be added (see B2A904),
 # so we add aliases and add it to the tools

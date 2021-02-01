@@ -30,8 +30,7 @@ path.add_module("Gearbox")
 path.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, -1, -1])
 for field in ["", "Phase2", "Phase2QCSoff"]:
     basf2.set_module_parameters(path, "Geometry", components=[f"MagneticField{field}"])
-    basf2.reset_database()
-    basf2.use_local_database(f"localdb/MagneticField{field}.txt")
+    basf2.prepend_testing_payloads(f"localdb/MagneticField{field}.txt")
     safe_process(path)
     txtfile = open(f"localdb/MagneticField{field}.txt").readlines()
     with open(f"localdb/MagneticField{field}.txt", "w") as newfile:

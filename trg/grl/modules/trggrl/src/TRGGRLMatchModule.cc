@@ -19,6 +19,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
+#include <trg/grl/dataobjects/TRGGRLInnerTrack.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -72,6 +73,8 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
            std::string("TRGGRLObjects"));
   addParam("grlstCollectionName", m_grlstCollectionName, "Name of the output StoreArray of TRGGRLShortTrack.",
            std::string("TRGGRLShortTracks"));
+  addParam("grlitCollectionName", m_grlitCollectionName, "Name of the output StoreArray of TRGGRLInnerTrack.",
+           std::string("TRGGRLInnerTracks"));
 
 
 }
@@ -140,6 +143,9 @@ void TRGGRLMatchModule::initialize()
   StoreArray<TRGGRLShortTrack> grlst;
   grlst.registerInDataStore(m_grlstCollectionName);
 
+  StoreArray<TRGGRLInnerTrack> grlit;
+  grlit.registerInDataStore(m_grlitCollectionName);
+
   m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 //-- Fill the patterns for short tracking
@@ -181,6 +187,7 @@ void TRGGRLMatchModule::event()
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
   StoreArray<TRGGRLPHOTON> grlphoton(m_grlphotonlist);
   StoreArray<TRGGRLShortTrack> grlst(m_grlstCollectionName);
+  StoreArray<TRGGRLInnerTrack> grlit(m_grlitCollectionName);
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   trgInfo.create();
 
@@ -188,10 +195,24 @@ void TRGGRLMatchModule::event()
 
   track_phimap.clear();
   track_phimap_i.clear();
+  eecl_phimap.clear();
+  eecl_phimap_fwd.clear();
+  eecl_phimap_bwd.clear();
+  eklm_sectormap.clear();
+  eklm_sectormap_fwd.clear();
+  eklm_sectormap_bwd.clear();
 
   for (int i = 0; i < 36; i++) {
     track_phimap.push_back(false);
     track_phimap_i.push_back(false);
+    eecl_phimap.push_back(false);
+    eecl_phimap_fwd.push_back(false);
+    eecl_phimap_bwd.push_back(false);
+  }
+  for (int i = 0; i < 4; i++) {
+    eklm_sectormap.push_back(false);
+    eklm_sectormap_fwd.push_back(false);
+    eklm_sectormap_bwd.push_back(false);
   }
 
 //do 2d track match with cluster
@@ -315,10 +336,17 @@ void TRGGRLMatchModule::event()
     }
   }
 
+//endcap cluster map
+  make_eecl_map(clusterlist, eecl_phimap, eecl_phimap_fwd, eecl_phimap_bwd);
+
 // Short tracking
   std::vector<bool> map_veto(64, 0);
   make_veto_map(track2Dlist, map_veto);
-  short_tracking(tslist, map_veto, track_phimap_i, patterns_base0, patterns_base2, grlst, trgInfo);
+  short_tracking(tslist, map_veto, track_phimap_i, eecl_phimap_fwd, eecl_phimap_bwd, eklm_sectormap_fwd, eklm_sectormap_bwd,
+                 patterns_base0, patterns_base2, grlst, trgInfo);
+
+// Inner tracking
+  inner_tracking(tslist, track_phimap_i, eecl_phimap, eklm_sectormap, grlit, trgInfo);
 
 }
 
@@ -732,8 +760,43 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 
 }
 
+void TRGGRLMatchModule::make_eecl_map(StoreArray<TRGECLCluster> clusterlist,
+                                      std::vector<bool>& ecl_phimap, std::vector<bool>& ecl_phimap_fwd, std::vector<bool>& ecl_phimap_bwd)
+{
+
+  for (int iclst = 0; iclst < clusterlist.getEntries(); iclst++) {
+    //-- cluster/TRGECL information
+    double    _cluster_x = clusterlist[iclst]->getPositionX();
+    double    _cluster_y = clusterlist[iclst]->getPositionY();
+
+    // -- ECL phi angle
+    double phi_ECL = 0.0;
+    if (_cluster_x >= 0 && _cluster_y >= 0) {phi_ECL = atan(_cluster_y / _cluster_x);}
+    else if (_cluster_x < 0 && _cluster_y >= 0) {phi_ECL = atan(_cluster_y / _cluster_x) + M_PI;}
+    else if (_cluster_x < 0 && _cluster_y < 0) {phi_ECL = atan(_cluster_y / _cluster_x) + M_PI;}
+    else if (_cluster_x >= 0 && _cluster_y < 0) {phi_ECL = atan(_cluster_y / _cluster_x) + 2 * M_PI;}
+
+    int phi_ECL_d = 0;
+    // digitization on both angle
+    for (int i = 0; i < 36; i++) {
+      if (phi_ECL > i * M_PI / 18 && phi_ECL < (i + 1)*M_PI / 18) {phi_ECL_d = i;}
+    }
+
+    //fill endcap only
+    int _cluster_thetaid = clusterlist[iclst]->getMaxThetaId();
+    if (_cluster_thetaid < 4 || _cluster_thetaid > 15) ecl_phimap[phi_ECL_d] = true;
+    if (_cluster_thetaid < 4)  ecl_phimap_fwd[phi_ECL_d] = true;
+    if (_cluster_thetaid > 15) ecl_phimap_bwd[phi_ECL_d] = true;
+  }
+
+}
+
 void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto,
                                        std::vector<bool>  phimap_i,
+                                       std::vector<bool>  ecl_phimap_fwd,
+                                       std::vector<bool>  ecl_phimap_bwd,
+                                       std::vector<bool>  klm_sectormap_fwd,
+                                       std::vector<bool>  klm_sectormap_bwd,
                                        std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
                                        StoreArray<TRGGRLShortTrack> grlst,
                                        StoreObjPtr<TRGGRLInfo> trgInfo)
@@ -748,10 +811,12 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   std::vector<bool> ST2(64, 0);
   std::vector<int> patt_ID(64, -1);
 
-//  std::vector<bool> st_ec1(64, 0);
-//  std::vector<bool> st_ec1_36b(36, 0);
-//  std::vector<bool> st_ec2(64, 0);
-//  std::vector<bool> st_ec2_36b(36, 0);
+  std::vector<bool> st_ec1(64, 0);
+  std::vector<bool> st_ec1_36b(36, 0);
+  std::vector<bool> st_ec1_4b(4, 0);
+  std::vector<bool> st_ec2(64, 0);
+  std::vector<bool> st_ec2_36b(36, 0);
+  std::vector<bool> st_ec2_4b(4, 0);
 
 //-- collecting TSF info in SL0~4
   for (int i = 0; i < tslist.getEntries(); i++) {
@@ -938,21 +1003,19 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   }
 /////////
 //-- extrapolation
-  /*
-    for (int i = 0; i < 64; i++) {
-      if (patt_ID[i] == -1) continue;
+  for (int i = 0; i < 64; i++) {
+    if (patt_ID[i] == -1) continue;
 
-      int ec = 0, l = 0, r = 0;
-      extrapolation(patt_ID[i], l, r, ec);
-      if (ec == 1) {
-        for (int e = l; e <= r; e++) { st_ec1[N64(i + e)] = true; }
-      }
-      if (ec == 2) {
-        for (int e = l; e <= r; e++) { st_ec2[N64(i + e)] = true; }
-      }
-
+    int ec = 0, l = 0, r = 0;
+    extrapolation(patt_ID[i], l, r, ec);
+    if (ec == 1) {
+      for (int e = l; e <= r; e++) { st_ec1[N64(i + e)] = true; }
     }
-  */
+    if (ec == 2) {
+      for (int e = l; e <= r; e++) { st_ec2[N64(i + e)] = true; }
+    }
+
+  }
 //-- 64b into 36b
   for (int i = 0; i < 4; i++) {
     ST0_36b[0 + 9 * i] = ST0[0 + 16 * i] or ST0[1 + 16 * i];
@@ -964,39 +1027,64 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
     ST0_36b[6 + 9 * i] = ST0[10 + 16 * i] or ST0[11 + 16 * i] or ST0[12 + 16 * i];
     ST0_36b[7 + 9 * i] = ST0[12 + 16 * i] or ST0[13 + 16 * i] or ST0[14 + 16 * i];
     ST0_36b[8 + 9 * i] = ST0[14 + 16 * i] or ST0[15 + 16 * i];
-    /*
-        st_ec1_36b[0 + 9 * i] = st_ec1[0 + 16 * i] or st_ec1[1 + 16 * i];
-        st_ec1_36b[1 + 9 * i] = st_ec1[1 + 16 * i] or st_ec1[2 + 16 * i] or st_ec1[3 + 16 * i];
-        st_ec1_36b[2 + 9 * i] = st_ec1[3 + 16 * i] or st_ec1[4 + 16 * i] or st_ec1[5 + 16 * i];
-        st_ec1_36b[3 + 9 * i] = st_ec1[5 + 16 * i] or st_ec1[6 + 16 * i] or st_ec1[7 + 16 * i];
-        st_ec1_36b[4 + 9 * i] = st_ec1[7 + 16 * i] or st_ec1[8 + 16 * i];
-        st_ec1_36b[5 + 9 * i] = st_ec1[8 + 16 * i] or st_ec1[9 + 16 * i] or st_ec1[10 + 16 * i];
-        st_ec1_36b[6 + 9 * i] = st_ec1[10 + 16 * i] or st_ec1[11 + 16 * i] or st_ec1[12 + 16 * i];
-        st_ec1_36b[7 + 9 * i] = st_ec1[12 + 16 * i] or st_ec1[13 + 16 * i] or st_ec1[14 + 16 * i];
-        st_ec1_36b[8 + 9 * i] = st_ec1[14 + 16 * i] or st_ec1[15 + 16 * i];
+    st_ec1_36b[0 + 9 * i] = st_ec1[0 + 16 * i] or st_ec1[1 + 16 * i];
+    st_ec1_36b[1 + 9 * i] = st_ec1[1 + 16 * i] or st_ec1[2 + 16 * i] or st_ec1[3 + 16 * i];
+    st_ec1_36b[2 + 9 * i] = st_ec1[3 + 16 * i] or st_ec1[4 + 16 * i] or st_ec1[5 + 16 * i];
+    st_ec1_36b[3 + 9 * i] = st_ec1[5 + 16 * i] or st_ec1[6 + 16 * i] or st_ec1[7 + 16 * i];
+    st_ec1_36b[4 + 9 * i] = st_ec1[7 + 16 * i] or st_ec1[8 + 16 * i];
+    st_ec1_36b[5 + 9 * i] = st_ec1[8 + 16 * i] or st_ec1[9 + 16 * i] or st_ec1[10 + 16 * i];
+    st_ec1_36b[6 + 9 * i] = st_ec1[10 + 16 * i] or st_ec1[11 + 16 * i] or st_ec1[12 + 16 * i];
+    st_ec1_36b[7 + 9 * i] = st_ec1[12 + 16 * i] or st_ec1[13 + 16 * i] or st_ec1[14 + 16 * i];
+    st_ec1_36b[8 + 9 * i] = st_ec1[14 + 16 * i] or st_ec1[15 + 16 * i];
 
-        st_ec2_36b[0 + 9 * i] = st_ec2[0 + 16 * i] or st_ec2[1 + 16 * i];
-        st_ec2_36b[1 + 9 * i] = st_ec2[1 + 16 * i] or st_ec2[2 + 16 * i] or st_ec2[3 + 16 * i];
-        st_ec2_36b[2 + 9 * i] = st_ec2[3 + 16 * i] or st_ec2[4 + 16 * i] or st_ec2[5 + 16 * i];
-        st_ec2_36b[3 + 9 * i] = st_ec2[5 + 16 * i] or st_ec2[6 + 16 * i] or st_ec2[7 + 16 * i];
-        st_ec2_36b[4 + 9 * i] = st_ec2[7 + 16 * i] or st_ec2[8 + 16 * i];
-        st_ec2_36b[5 + 9 * i] = st_ec2[8 + 16 * i] or st_ec2[9 + 16 * i] or st_ec2[10 + 16 * i];
-        st_ec2_36b[6 + 9 * i] = st_ec2[10 + 16 * i] or st_ec2[11 + 16 * i] or st_ec2[12 + 16 * i];
-        st_ec2_36b[7 + 9 * i] = st_ec2[12 + 16 * i] or st_ec2[13 + 16 * i] or st_ec2[14 + 16 * i];
-        st_ec2_36b[8 + 9 * i] = st_ec2[14 + 16 * i] or st_ec2[15 + 16 * i];
-    */
+    st_ec2_36b[0 + 9 * i] = st_ec2[0 + 16 * i] or st_ec2[1 + 16 * i];
+    st_ec2_36b[1 + 9 * i] = st_ec2[1 + 16 * i] or st_ec2[2 + 16 * i] or st_ec2[3 + 16 * i];
+    st_ec2_36b[2 + 9 * i] = st_ec2[3 + 16 * i] or st_ec2[4 + 16 * i] or st_ec2[5 + 16 * i];
+    st_ec2_36b[3 + 9 * i] = st_ec2[5 + 16 * i] or st_ec2[6 + 16 * i] or st_ec2[7 + 16 * i];
+    st_ec2_36b[4 + 9 * i] = st_ec2[7 + 16 * i] or st_ec2[8 + 16 * i];
+    st_ec2_36b[5 + 9 * i] = st_ec2[8 + 16 * i] or st_ec2[9 + 16 * i] or st_ec2[10 + 16 * i];
+    st_ec2_36b[6 + 9 * i] = st_ec2[10 + 16 * i] or st_ec2[11 + 16 * i] or st_ec2[12 + 16 * i];
+    st_ec2_36b[7 + 9 * i] = st_ec2[12 + 16 * i] or st_ec2[13 + 16 * i] or st_ec2[14 + 16 * i];
+    st_ec2_36b[8 + 9 * i] = st_ec2[14 + 16 * i] or st_ec2[15 + 16 * i];
   }
+//-- 36b into 4b
+  st_ec1_4b[0] = st_ec1_36b[35] or st_ec1_36b[0] or st_ec1_36b[1] or st_ec1_36b[2] or st_ec1_36b[3] or st_ec1_36b[4] or st_ec1_36b[5]
+                 or st_ec1_36b[6] or st_ec1_36b[7] or st_ec1_36b[8] or st_ec1_36b[9];
+  st_ec1_4b[1] = st_ec1_36b[8]  or st_ec1_36b[9] or st_ec1_36b[10] or st_ec1_36b[11] or st_ec1_36b[12] or st_ec1_36b[13]
+                 or st_ec1_36b[14] or st_ec1_36b[15] or st_ec1_36b[16] or st_ec1_36b[17] or st_ec1_36b[18] or st_ec1_36b[19];
+  st_ec1_4b[2] = st_ec1_36b[18]  or st_ec1_36b[19] or st_ec1_36b[20] or st_ec1_36b[21] or st_ec1_36b[22] or st_ec1_36b[23]
+                 or st_ec1_36b[24] or st_ec1_36b[25] or st_ec1_36b[26] or st_ec1_36b[27] or st_ec1_36b[28];
+  st_ec1_4b[3] = st_ec1_36b[26]  or st_ec1_36b[27] or st_ec1_36b[28] or st_ec1_36b[29] or st_ec1_36b[30] or st_ec1_36b[31]
+                 or st_ec1_36b[32] or st_ec1_36b[33] or st_ec1_36b[34] or st_ec1_36b[35] or st_ec1_36b[0];
+  st_ec2_4b[0] = st_ec2_36b[35] or st_ec2_36b[0] or st_ec2_36b[1] or st_ec2_36b[2] or st_ec2_36b[3] or st_ec2_36b[4] or st_ec2_36b[5]
+                 or st_ec2_36b[6] or st_ec2_36b[7] or st_ec2_36b[8] or st_ec2_36b[9];
+  st_ec2_4b[1] = st_ec2_36b[8]  or st_ec2_36b[9] or st_ec2_36b[10] or st_ec2_36b[11] or st_ec2_36b[12] or st_ec2_36b[13]
+                 or st_ec2_36b[14] or st_ec2_36b[15] or st_ec2_36b[16] or st_ec2_36b[17] or st_ec2_36b[18] or st_ec2_36b[19];
+  st_ec2_4b[2] = st_ec2_36b[18]  or st_ec2_36b[19] or st_ec2_36b[20] or st_ec2_36b[21] or st_ec2_36b[22] or st_ec2_36b[23]
+                 or st_ec2_36b[24] or st_ec2_36b[25] or st_ec2_36b[26] or st_ec2_36b[27] or st_ec2_36b[28];
+  st_ec2_4b[3] = st_ec2_36b[26]  or st_ec2_36b[27] or st_ec2_36b[28] or st_ec2_36b[29] or st_ec2_36b[30] or st_ec2_36b[31]
+                 or st_ec2_36b[32] or st_ec2_36b[33] or st_ec2_36b[34] or st_ec2_36b[35] or st_ec2_36b[0];
+
+
 
 
 //-- Summary info
 
   int N_ST = 0;
+  int N_ST_fwd = 0;
+  int N_ST_bwd = 0;
   bool s2s3 = false;
   bool s2s5 = false;
   bool s2so = false;
   bool s2f3 = false;
   bool s2f5 = false;
   bool s2fo = false;
+  int secl = 0;
+  int secl_fwd = 0;
+  int secl_bwd = 0;
+  int sklm = 0;
+  int sklm_fwd = 0;
+  int sklm_bwd = 0;
 
 //-- short track counting on ST2
   for (int i = 0; i < 64; i++) {
@@ -1023,6 +1111,12 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
       st->set_TS_ID(3, stlist_buf[index][4]);
       st->set_TS_ID(4, stlist_buf[index][5]);
     }
+  }
+  for (int i = 0; i < 64; i++) {
+    if (st_ec1[i]) N_ST_fwd++;
+  }
+  for (int i = 0; i < 64; i++) {
+    if (st_ec2[i]) N_ST_bwd++;
   }
 
 //-- b2b info with ST0 and phi_i map
@@ -1054,8 +1148,28 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
                              or ST0_36b[N36(i + 9)] or ST0_36b[N36(i + 27)])) or s2fo ;
   }
 
+//short-ecl matching at endcap
+  for (int i = 0; i < 36; i++) {
+    if (ecl_phimap_fwd[i] and st_ec1_36b[i])secl_fwd++;
+  }
+  for (int i = 0; i < 36; i++) {
+    if (ecl_phimap_bwd[i] and st_ec2_36b[i])secl_bwd++;
+  }
+  secl = secl_fwd + secl_bwd;
+
+//short-klm matching at endcap
+  for (int i = 0; i < 4; i++) {
+    if (klm_sectormap_fwd[i] and st_ec1_4b[i])sklm_fwd++;
+  }
+  for (int i = 0; i < 4; i++) {
+    if (klm_sectormap_bwd[i] and st_ec2_4b[i])sklm_bwd++;
+  }
+  sklm = sklm_fwd + sklm_bwd;
+
 //-- set results
   trgInfo->setNshorttrk(N_ST);
+  trgInfo->setNshorttrk_fwd(N_ST_fwd);
+  trgInfo->setNshorttrk_bwd(N_ST_bwd);
   trgInfo->sets2s3(s2s3);
   trgInfo->sets2s5(s2s5);
   trgInfo->sets2so(s2so);
@@ -1068,9 +1182,201 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   trgInfo->setfwdnb(0);
   trgInfo->setbrlfb(0);
   trgInfo->setbrlnb(0);
+  trgInfo->setNsecl(secl);
+  trgInfo->setNsecl_fwd(secl_fwd);
+  trgInfo->setNsecl_bwd(secl_bwd);
+  trgInfo->setNsklm(sklm);
+  trgInfo->setNsklm_fwd(sklm_fwd);
+  trgInfo->setNsklm_bwd(sklm_bwd);
+
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  st_ec1[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  st_ec2[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  st_ec1_36b[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  st_ec2_36b[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  ecl_phimap_fwd[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  ecl_phimap_bwd[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << secl << " " << secl_fwd << " " << secl_bwd << std::endl;
 
 }
 
+
+void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
+                                       std::vector<bool>  phimap_i,
+                                       std::vector<bool>  ecl_phimap,
+                                       std::vector<bool>  klm_sectormap,
+                                       StoreArray<TRGGRLInnerTrack> grlit,
+                                       StoreObjPtr<TRGGRLInfo> trgInfo)
+{
+  std::vector<bool> SL0(64, 0);
+  std::vector<bool> SL1(64, 0);
+  std::vector<bool> SL2(64, 0);
+  std::vector<bool> IT0(64, 0);
+  std::vector<bool> IT0_36b(36, 0);
+  std::vector<bool> IT0_4b(4, 0);
+
+  //-- collecting TSF info in SL0~2
+  for (int i = 0; i < tslist.getEntries(); i++) {
+    int id = tslist[i]->getSegmentID();
+    int sl = 0;
+    if (id >= 0 * 32 && id < 5 * 32) {sl = 0; id -= 0;}
+    else if (id >= 5 * 32 && id < 10 * 32) {sl = 1; id -= 5 * 32;}
+    else if (id >= 10 * 32 && id < 16 * 32) {sl = 2; id -= 10 * 32;}
+    else continue;
+
+    if (sl == 0) {
+      int X = (int)(id / 5), Y = id % 5;
+      if (Y == 0 || Y == 1) { SL0[2 * X] = true; }
+      else if (Y == 3 || Y == 4) { SL0[2 * X + 1] = true; }
+      else  { SL0[2 * X] = true; SL0[2 * X + 1] = true; }
+    } else if (sl == 1) {
+      int X = (int)(id / 5), Y = id % 5;
+      if (Y == 0 || Y == 1) { SL1[2 * X] = true; }
+      else if (Y == 3 || Y == 4) { SL1[2 * X + 1] = true; }
+      else  { SL1[2 * X] = true; SL1[2 * X + 1] = true; }
+    } else if (sl == 2) {
+      int X = (int)(id / 3);
+      SL2[X] = true;
+    }
+  }
+
+
+  // -- Inner Track finding with SL0
+  for (int i = 0; i < 64; i++) {
+    int j1 = i - 4;
+    if (j1 < 0) j1 = j1 + 64;
+    int j2 = i - 3;
+    if (j2 < 0) j2 = j2 + 64;
+    int j3 = i - 2;
+    if (j3 < 0) j3 = j3 + 64;
+    int j4 = i - 1;
+    if (j4 < 0) j4 = j4 + 64;
+    int j5 = i;
+    int j6 = i + 1;
+    if (j6 > 63)j6 = j6 - 64;
+    int j7 = i + 2;
+    if (j7 > 63)j7 = j7 - 64;
+    if (
+      SL0[i] &&
+      (SL1[j1] || SL1[j2] || SL1[j3] || SL1[j4] || SL1[j5]) &&
+      (SL2[j3] || SL2[j4] || SL2[j5] || SL2[j6] || SL2[j7])
+    ) {
+      IT0[i] = true;
+    } else {
+      IT0[i] = false;
+    }
+  }
+
+  //-- 64b into 36b
+  for (int i = 0; i < 4; i++) {
+    IT0_36b[0 + 9 * i] = IT0[0 + 16 * i] or IT0[1 + 16 * i];
+    IT0_36b[1 + 9 * i] = IT0[1 + 16 * i] or IT0[2 + 16 * i] or IT0[3 + 16 * i];
+    IT0_36b[2 + 9 * i] = IT0[3 + 16 * i] or IT0[4 + 16 * i] or IT0[5 + 16 * i];
+    IT0_36b[3 + 9 * i] = IT0[5 + 16 * i] or IT0[6 + 16 * i] or IT0[7 + 16 * i];
+    IT0_36b[4 + 9 * i] = IT0[7 + 16 * i] or IT0[8 + 16 * i];
+    IT0_36b[5 + 9 * i] = IT0[8 + 16 * i] or IT0[9 + 16 * i] or IT0[10 + 16 * i];
+    IT0_36b[6 + 9 * i] = IT0[10 + 16 * i] or IT0[11 + 16 * i] or IT0[12 + 16 * i];
+    IT0_36b[7 + 9 * i] = IT0[12 + 16 * i] or IT0[13 + 16 * i] or IT0[14 + 16 * i];
+    IT0_36b[8 + 9 * i] = IT0[14 + 16 * i] or IT0[15 + 16 * i];
+  }
+
+  //-- 36b into 4b
+  IT0_4b[0] = IT0_36b[35] or IT0_36b[0] or IT0_36b[1] or IT0_36b[2] or IT0_36b[3] or IT0_36b[4] or IT0_36b[5] or IT0_36b[6]
+              or IT0_36b[7] or IT0_36b[8] or IT0_36b[9];
+  IT0_4b[1] = IT0_36b[8]  or IT0_36b[9] or IT0_36b[10] or IT0_36b[11] or IT0_36b[12] or IT0_36b[13] or IT0_36b[14] or IT0_36b[15]
+              or IT0_36b[16] or IT0_36b[17] or IT0_36b[18] or IT0_36b[19];
+  IT0_4b[2] = IT0_36b[18]  or IT0_36b[19] or IT0_36b[20] or IT0_36b[21] or IT0_36b[22] or IT0_36b[23] or IT0_36b[24] or IT0_36b[25]
+              or IT0_36b[26] or IT0_36b[27] or IT0_36b[28];
+  IT0_4b[3] = IT0_36b[26]  or IT0_36b[27] or IT0_36b[28] or IT0_36b[29] or IT0_36b[30] or IT0_36b[31] or IT0_36b[32] or IT0_36b[33]
+              or IT0_36b[34] or IT0_36b[36] or IT0_36b[0];
+
+  //-- Summary info
+  int N_IT = 0;
+  bool i2fo = false;
+  int iecl = 0;
+  int iklm = 0;
+
+  //-- inner track counting
+  for (int i = 0; i < 64; i++) {
+    if (IT0[i]) N_IT++;
+    TRGGRLInnerTrack* it = grlit.appendNew();
+    it->set_TS_ID(0, i);
+  }
+
+  //-- b2b info with IT0 and phi_i map
+  for (int i = 0; i < 36; i++) {
+    i2fo = (phimap_i[i] and (IT0_36b[N36(i + 18)] or IT0_36b[N36(i + 17)] or IT0_36b[N36(i + 19)]
+                             or IT0_36b[N36(i + 16)] or IT0_36b[N36(i + 20)]
+                             or IT0_36b[N36(i + 15)] or IT0_36b[N36(i + 21)]
+                             or IT0_36b[N36(i + 14)] or IT0_36b[N36(i + 22)]
+                             or IT0_36b[N36(i + 13)] or IT0_36b[N36(i + 23)]
+                             or IT0_36b[N36(i + 12)] or IT0_36b[N36(i + 24)]
+                             or IT0_36b[N36(i + 11)] or IT0_36b[N36(i + 25)]
+                             or IT0_36b[N36(i + 10)] or IT0_36b[N36(i + 26)]
+                             or IT0_36b[N36(i + 9)] or IT0_36b[N36(i + 27)])) or i2fo ;
+  }
+  //inner-ecl matching at endcap
+  for (int i = 0; i < 36; i++) {
+    if (ecl_phimap[i] and IT0_36b[i])iecl++;
+  }
+  //inner-klm matching at endcap
+  for (int i = 0; i < 4; i++) {
+    if (klm_sectormap[i] and IT0_4b[i])iklm++;
+  }
+  //-- set results
+  trgInfo->setNinnertrk(N_IT);
+  trgInfo->seti2fo(i2fo);
+  trgInfo->setNiecl(iecl);
+  trgInfo->setNiklm(iklm);
+
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  SL0[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  SL1[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  SL2[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 64; i++) {
+  //  std::cout <<  IT0[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  IT0_36b[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  phimap_i[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //for (int i = 0; i < 36; i++) {
+  //  std::cout <<  ecl_phimap[i] << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << i2fo << " " << iecl << std::endl;
+
+}
 
 void
 TRGGRLMatchModule::extrapolation(int pattern, int& l, int& r, int& ec)

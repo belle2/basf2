@@ -11,11 +11,13 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
+#include <rawdata/dataobjects/RawSVD.h>
 
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
@@ -42,6 +44,12 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
+      /** Input array for SVD/x-check HLT EODB . */
+      StoreArray<RawSVD> m_rawSVD;
+
+      /** Input array for TTD/FTSW */
+      StoreArray<RawFTSW> m_rawTTD;
+
       /** the geometry */
       VXD::GeoCache& m_vxdGeometry;
 
@@ -62,6 +70,20 @@ namespace Belle2 {
       std::map<VxdID, TH2D*> hDAQCM;/**< Common Mode per DHE to gate and DHP level */
       std::map<VxdID, TH1D*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
       std::map<int, TH1D*> hDAQDHCReduction;/**< DHC data reduction  */
+
+      TH1I* hEODBAfterInjLER{};          /**< Histogram of EODB after LER injection */
+      TH1I* hEODBAfterInjHER{};          /**< Histogram of EODB after HER injection */
+      TH1I* hCM63AfterInjLER{};          /**< Histogram of CM63 after LER injection */
+      TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
+      TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
+      TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
+      TH1I* hMissAfterInjLER{};          /**< Histogram MissFrame after LER injection */
+      TH1I* hMissAfterInjHER{};          /**< Histogram MissFrame after HER injection */
+      TH1I* hEODBTrgDiff{};          /**< Histogram of EODB after  last trigger */
+      TH1I* hCM63TrgDiff{};          /**< Histogram of CM63 after  last trigger */
+      TH1I* hTruncTrgDiff{};          /**< Histogram Truncation after  last trigger */
+      TH1I* hMissTrgDiff{};          /**< Histogram MissFrame after  last trigger */
+      TH1D* hDAQStat{};                 /**< Histogram for Truncation etc Stats */
 
       void initialize() override final;
 

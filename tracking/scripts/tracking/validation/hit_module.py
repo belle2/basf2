@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import collections
 import numpy as np
 
 # Need for B2WARNING for some reason
-import inspect
 
-from .pull import PullAnalysis
 from .fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit

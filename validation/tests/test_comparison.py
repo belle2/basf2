@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 import unittest
@@ -107,7 +106,7 @@ class TestComparison(unittest.TestCase):
         """
         Generates unique names for ROOT objects
         """
-        return "{}_{}".format(name, self.call_iteration)
+        return f"{name}_{self.call_iteration}"
 
     def setUp(self):
         """

@@ -49,8 +49,7 @@ namespace Belle2 {
      * strip, given the number of ADC counts.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param pulseADC : The ADC-pulse height, a double between 0 and 255 (included)
@@ -72,8 +71,7 @@ namespace Belle2 {
      * on that strip.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param charge: the charge in units [e] is also
@@ -96,8 +94,7 @@ namespace Belle2 {
      * on that strip.
      *
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param charge: the charge in units [e] is also
@@ -133,9 +130,9 @@ namespace Belle2 {
     inline float getPeakTime(const VxdID& sensorID, const bool& isU,
                              const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                                     sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
-                                     strip).peakTime;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                              sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
+                                              strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -157,8 +154,8 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                              m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
     }
 
@@ -183,8 +180,8 @@ namespace Belle2 {
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                              m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
 
     }
 
@@ -193,4 +190,3 @@ namespace Belle2 {
 
   };
 }
-

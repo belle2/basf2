@@ -12,6 +12,9 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <nlohmann/json.hpp>
+#include <fstream>
+
 
 using namespace Belle2;
 
@@ -22,6 +25,7 @@ ParticleStatsModule::ParticleStatsModule() : Module()
 {
   // Set module properties and parameters
   setDescription("Make a summary of specific ParticleLists.");
+  addParam("outputFile", m_outputFile, "Name of output file", std::string());
   addParam("printPassMatrix", m_printPassMatrix, "Should we also calculate and print the pass matrix?", true);
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", std::vector<std::string>());
 }
@@ -128,6 +132,8 @@ void ParticleStatsModule::terminate()
   B2INFO("ParticleStats Summary:");
   std::ostringstream stream;
 
+  nlohmann::json json;
+
   // divide every entry of the pass matrix by the number of events processed
   // (entrywise) to get the fraction of events
   for (unsigned iList = 0; iList < m_nLists; ++iList)
@@ -157,12 +163,21 @@ void ParticleStatsModule::terminate()
       stream <<  Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "|";
       // next N columns are particle list survival fractions (need to use tabs here)
       for (unsigned jList = 0; jList < m_nLists + 1; ++jList) { // matrix
-        if (iList != jList) stream << Form(" %6.4f|", (*m_PassMatrix)(iList, jList));
-        if (iList == jList) stream << Form(" %6.4f|", 1.0);
+        if (iList != jList) {
+          stream << Form(" %6.4f|", (*m_PassMatrix)(iList, jList));
+          std::string jName = (jList < m_nLists ? m_strParticleLists[jList].c_str() : "Unique");
+          json["Pass matrix"][m_strParticleLists[iList].c_str()][jName.c_str()] = (*m_PassMatrix)(iList, jList);
+        }
+        if (iList == jList) {
+          stream << Form(" %6.4f|", 1.0);
+          json["Pass matrix"][m_strParticleLists[iList].c_str()][m_strParticleLists[jList].c_str()] = 1.0;
+        }
+
       }
       stream << "\n";
     }
     B2INFO(stream.str()); // print the pass matrix table
+
 
   } // end if
 
@@ -182,10 +197,20 @@ void ParticleStatsModule::terminate()
     // second column is retention (no need to use tabs here because it can't be
     // more than 1.{followed by 4 digits})
     stream << Form("    %6.4f|", (*m_PassMatrix)(iList, iList));
+
+    std::string pName  = m_strParticleLists[iList].c_str();
+    float retRate = (*m_PassMatrix)(iList, iList);
+    json["Retention"][pName]["Retention"] = retRate;
+    std::string flavs[4] = {"All Particles", "Particles", "Anti Particles",  "Self-conjugates"};
     // now the ACM and ACMPE
     for (int iFlav = 0; iFlav < 4; ++iFlav) {
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents);
+      json["Retention"][pName][Form("%s ACM", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList, iFlav) / nEvents;
+
       stream << Form(" %8.4f|", (*m_MultiplicityMatrix)(iList, iFlav) / nEvents / (*m_PassMatrix)(iList, iList));
+      json["Retention"][pName][Form("%s ACPME", flavs[iFlav].c_str())] = (*m_MultiplicityMatrix)(iList,
+          iFlav) / nEvents / (*m_PassMatrix)(iList,
+                                             iList);
     }
     stream << "\n";
   }
@@ -198,7 +223,15 @@ void ParticleStatsModule::terminate()
          (float)m_nPass / (float)nEvents);
   stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
   stream << "\n======================================================================\n";
+  json["Total retention"] = m_nPass / nEvents;
+  json["Events passing"] = m_nPass;
+  json["Events processed"] = nEvents;
+  json["Total particles number"] = m_nParticles;
   B2INFO(stream.str());
+  if (m_outputFile != "") {
+    std::ofstream jsonFile(m_outputFile);
+    jsonFile << json.dump(2) << std::endl;
+  }
 
   delete m_PassMatrix;
   delete m_MultiplicityMatrix;

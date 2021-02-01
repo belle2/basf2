@@ -580,8 +580,8 @@ void CDCDedxPIDModule::event()
     // If this is a MC track, get the track-level dE/dx
     if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
-      double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosThetaTrue * dedxTrack->m_cosThetaTrue));
+      double mean = getMean(dedxTrack->m_pCDC / dedxTrack->m_mcmass);
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);

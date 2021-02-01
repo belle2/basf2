@@ -10,23 +10,23 @@
 
 import os
 import glob
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Event setting and info
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Fixed random seed
-set_random_seed(123456)
+b2.set_random_seed(123456)
 
 # single particle generator settings
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
     'nTracks': 1,
@@ -50,17 +50,17 @@ if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
     print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
+b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
 
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 
 # eclDataAnalysis module
-ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis = b2.register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', '../ECLClusterOutputBarrel_1000MeV.root')
 ecldataanalysis.param('doTracking', 1)
 ecldataanalysis.param('doDigits', 1)
 main.add_module(ecldataanalysis)
 
-process(main)
+b2.process(main)
 # print(statistics)

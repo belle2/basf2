@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
+<description>
 This file contains example for generating validation plots using python
+</description>
+</header>
 """
 
 import basf2
 import array
 import numpy as np
-from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency, TGraphErrors
+from ROOT import TEfficiency, TF1, TFile, TGraphErrors, TH1F, TH2F, TNamed, TNtuple, gRandom
 
 basf2.set_random_seed(1337)
 

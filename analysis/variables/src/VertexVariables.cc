@@ -9,7 +9,6 @@
 **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/database/DBObjPtr.h>
@@ -206,7 +205,7 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      auto trackFit = getTrackFitResultFromParticle(part);
+      auto trackFit = part->getTrackFitResult();
       if (!trackFit)
         return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
 

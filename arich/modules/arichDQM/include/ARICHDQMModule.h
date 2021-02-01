@@ -17,6 +17,9 @@
 #include <TH2F.h>
 #include <TH3F.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
+
 namespace Belle2 {
 
   /**
@@ -108,6 +111,13 @@ namespace Belle2 {
 
     TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
     TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
+
+    TH1* h_ARICHOccAfterInjLer = NULL; /**< Histogram Ndigits after LER injection */
+    TH1* h_ARICHOccAfterInjHer = NULL; /**< Histogram Ndigits after HER injection */
+    TH1* h_ARICHEOccAfterInjLer = NULL; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+    TH1* h_ARICHEOccAfterInjHer = NULL; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+    // dataobjects
+    StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
 
     //Monitoring parameters
 

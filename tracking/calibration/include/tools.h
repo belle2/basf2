@@ -13,9 +13,10 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
-#include <TMatrixD.h>
 #include <TString.h>
 #include <TRandom.h>
+
+#include <Eigen/Dense>
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
@@ -32,10 +33,10 @@
 
 namespace Belle2 {
 
-  // Get random string
+  /// Get random string
   inline TString rn() {return Form("%d", gRandom->Integer(1000000000)); }
 
-  //merge { vector<double> a, vector<double> b} into {a, b}
+  ///merge { vector<double> a, vector<double> b} into {a, b}
   inline std::vector<std::vector<double>> merge(std::vector<std::vector<std::vector<double>>> toMerge)
   {
     std::vector<std::vector<double>> allVecs;
@@ -45,31 +46,31 @@ namespace Belle2 {
   }
 
 
-  // std vector -> ROOT vector
-  inline TVectorD vec2vec(std::vector<double> vec)
+  /// std vector -> ROOT vector
+  inline Eigen::VectorXd vec2vec(std::vector<double> vec)
   {
-    TVectorD v(vec.size());
+    Eigen::VectorXd v(vec.size());
     for (unsigned i = 0; i < vec.size(); ++i) {
-      v(i) = vec[i];
+      v[i] = vec[i];
     }
     return v;
   }
 
-  // ROOT vector -> std vector
-  inline std::vector<double> vec2vec(TVectorD v)
+  /// ROOT vector -> std vector
+  inline std::vector<double> vec2vec(Eigen::VectorXd v)
   {
-    std::vector<double> vNew(v.GetNrows());
-    for (int i = 0; i < v.GetNrows(); ++i)
+    std::vector<double> vNew(v.rows());
+    for (int i = 0; i < v.rows(); ++i)
       vNew[i] = v(i);
     return vNew;
   }
 
 
 
-  // merge columns (from std::vectors) into ROOT matrix
-  inline TMatrixD vecs2mat(std::vector<std::vector<double>> vecs)
+  /// merge columns (from std::vectors) into ROOT matrix
+  inline Eigen::MatrixXd vecs2mat(std::vector<std::vector<double>> vecs)
   {
-    TMatrixD m(vecs[0].size(), vecs.size());
+    Eigen::MatrixXd m(vecs[0].size(), vecs.size());
     for (unsigned i = 0; i < vecs[0].size(); ++i)
       for (unsigned j = 0; j < vecs.size(); ++j) {
         m(i, j) = vecs[j][i];
@@ -77,7 +78,7 @@ namespace Belle2 {
     return m;
   }
 
-  // Equidistant range between xMin and xMax for spline of the first order
+  /// Equidistant range between xMin and xMax for spline of the first order
   inline std::vector<double> getRangeLin(int nVals, double xMin, double xMax)
   {
     B2ASSERT("At least one value in the spline required", nVals >= 1);
@@ -88,7 +89,7 @@ namespace Belle2 {
     return v;
   }
 
-  // Equidistant range between xMin and xMax for spline of the zero order
+  /// Equidistant range between xMin and xMax for spline of the zero order
   inline std::vector<double> getRangeZero(int nVals, double xMin, double xMax)
   {
     B2ASSERT("At least one value in the spline required", nVals >= 1);
@@ -100,7 +101,7 @@ namespace Belle2 {
   }
 
 
-  // put slice of original vector v[ind:ind+n] into new one
+  /// put slice of original vector v[ind:ind+n] into new one, n is number of elements
   inline std::vector<double> slice(std::vector<double> v, unsigned ind, unsigned n)
   {
     std::vector<double> vNew;
@@ -109,7 +110,7 @@ namespace Belle2 {
     return vNew;
   }
 
-  //To evaluate spline (zero order or first order)
+  /// Evaluate spline (zero order or first order) in point x
   inline double eval(const std::vector<double>& spl, const std::vector<double>& vals, double x)
   {
     int order = -1;

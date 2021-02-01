@@ -14,17 +14,14 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
-import random
-from basf2 import *
-from simulation import add_simulation
-from tracking import *
+import basf2 as b2
+from tracking import add_tracking_reconstruction
 
 # change to True if you want to use PXD hits (fairly small benefit, if any)
 use_pxd = False
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 
 # --------------------
 # generation
@@ -33,24 +30,24 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [50])
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('excludedComponents', ['EKLM'])
 
 # EvtGen to provide generic BB events
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 
 
 # --------------------
 # simulation
 # --------------------
 
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
+g4sim.logging.log_level = b2.LogLevel.ERROR
 
 
 # -------------------
@@ -58,7 +55,7 @@ g4sim.logging.log_level = LogLevel.ERROR
 # --------------------
 
 # set up the CDC dE/dx module
-cdcdedx = register_module('CDCDedxPID')
+cdcdedx = b2.register_module('CDCDedxPID')
 cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
     'removeLowest': 0.05,
@@ -70,7 +67,7 @@ cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
 cdcdedx.param(cdcdedx_params)
 
 # set up the VXD dE/dx module
-svddedx = register_module('VXDDedxPID')
+svddedx = b2.register_module('VXDDedxPID')
 svddedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
     'removeLowest': 0.05,
@@ -85,12 +82,12 @@ svddedx_params = {  # 'pdfFile': 'YourPDFFile.root',
 svddedx.param(svddedx_params)
 
 # write the results to file
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', 'dedxPID_evtgen.root')
 
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
 
 # add modules to paths
@@ -103,11 +100,11 @@ main.add_module(evtgeninput)
 main.add_module(g4sim)
 
 if use_pxd:
-    main.add_module(register_module('PXDDigitizer'))
-    main.add_module(register_module('PXDClusterizer'))
-main.add_module(register_module('SVDDigitizer'))
-main.add_module(register_module('SVDClusterizer'))
-main.add_module(register_module('CDCDigitizer'))
+    main.add_module(b2.register_module('PXDDigitizer'))
+    main.add_module(b2.register_module('PXDClusterizer'))
+main.add_module(b2.register_module('SVDDigitizer'))
+main.add_module(b2.register_module('SVDClusterizer'))
+main.add_module(b2.register_module('CDCDigitizer'))
 
 # tracking reconstruction does not include dE/dx measurements
 add_tracking_reconstruction(main)
@@ -118,5 +115,5 @@ main.add_module(svddedx)
 main.add_module(output)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

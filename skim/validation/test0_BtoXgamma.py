@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>BtoXgamma.dst.root</output>
+  <output>../BtoXgamma.dst.root</output>
   <contact>simon.wehle@desy.de</contact>
 </header>
 """

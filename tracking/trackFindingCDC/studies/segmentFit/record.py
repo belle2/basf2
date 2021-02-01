@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
 
-import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 
 import os
 import sys
 
-from tracking.run.utilities import NonstrictChoices
-from tracking.validation.utilities import prob, is_primary
-from tracking.validation.plot import ValidationPlot
+from tracking.validation.utilities import is_primary
 
 import tracking.harvest.peelers as peelers
 import tracking.harvest.harvesting as harvesting
@@ -21,7 +16,6 @@ from tracking.harvest.run import HarvestingRun
 
 import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
 
-import argparse
 
 import logging
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 import logging
@@ -111,12 +110,12 @@ class ClusterBase:
         with open(tmp_name, 'w+') as tmp_file:
             tmp_file.write('#!/bin/bash \n\n' +
                            'BELLE2_NO_TOOLS_CHECK=1 \n' +
-                           'source {0}/b2setup \n'.format(self.tools) +
-                           'cd {0} \n'.format(self.adjust_path(output_dir)) +
-                           '{0} \n'.format(command) +
-                           'echo $? > {0}/script_{1}.done \n'
+                           f'source {self.tools}/b2setup \n' +
+                           'cd {} \n'.format(self.adjust_path(output_dir)) +
+                           f'{command} \n' +
+                           'echo $? > {}/script_{}.done \n'
                            .format(self.path, job.name) +
-                           'rm {0} \n'.format(tmp_name))
+                           f'rm {tmp_name} \n')
 
         # Make the helpfile-shellscript executable
         st = os.stat(tmp_name)
@@ -169,4 +168,3 @@ class ClusterBase:
         @param path: The past that needs to be adjusted
         @return: The adjusted path
         """
-        pass

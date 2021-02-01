@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import tempfile
@@ -37,11 +36,11 @@ class ValidationScriptTest(unittest.TestCase):
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
 
-            self.assertEqual("description_text", script.header["description"])
-            self.assertEqual("Thomas Kuhr thomas.kuhr@lmu.de", script.header["contact"][0])
-            self.assertEqual(1, len(script.header["output"]))
-            self.assertEqual("EvtGenSim.root", script.header["output"][0])
-            self.assertEqual("release", script.header["interval"])
+            self.assertEqual("description_text", script.description)
+            self.assertEqual("Thomas Kuhr thomas.kuhr@lmu.de", script.contact[0])
+            self.assertEqual(1, len(script.output_files))
+            self.assertEqual("EvtGenSim.root", script.output_files[0])
+            self.assertEqual("release", script.interval)
 
 
 if __name__ == "__main__":

@@ -34,6 +34,8 @@ namespace Belle2 {
       /**
        * Constructs the plane for a given VXD Sensor
        * @param sensorID SensorID of the Sensor for which this plane should be build
+       * @param uTolerance tolerance in the u direction
+       * @param vTolerance tolerance in the v direction
        */
       SensorPlane(VxdID sensorID = 0, double uTolerance = 0, double vTolerance = 0):
         m_sensorID(sensorID), m_uTolerance(uTolerance), m_vTolerance(vTolerance), m_cosPhi(1.), m_sinPhi(0.), m_sensorInfo(0) {}

@@ -37,6 +37,8 @@ namespace Belle2 {
     //! Constructor with initial values
     //! @param hitPhi reconstructed BKLMHit1d along the phi-measuring direction
     //! @param hitZ reconstructed BKLMHit1d along the z-measuring direction
+    //! @param globalPos reconstructed position in global coordinates
+    //! @param time reconstructed time of the hit
     BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::Hep3Vector& globalPos, double time);
 
     //! Copy constructor

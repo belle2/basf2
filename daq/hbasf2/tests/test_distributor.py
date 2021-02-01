@@ -1,5 +1,3 @@
-import atexit
-import os
 from unittest import main
 import basf2
 

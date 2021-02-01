@@ -11,7 +11,6 @@ Note:
 """
 
 import basf2
-import ROOT
 from ROOT import Belle2
 
 import cProfile

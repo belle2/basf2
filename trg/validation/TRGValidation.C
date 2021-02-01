@@ -1,7 +1,7 @@
 /*
 <header>
   <input>TRGValidationGen.root</input>
-  <output>TRGValidation.root</input>
+  <output>TRGValidation.root</output>
   <contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
   <description>A script to generate histogram plots for trg validation.</description>
 </header>

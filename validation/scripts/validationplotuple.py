@@ -741,7 +741,7 @@ class Plotuple:
         # }
 
         precision = self._mop.int_value("float-precision", default=4)
-        format_str = "{{0:.{}f}}".format(precision)
+        format_str = f"{{0:.{precision}f}}"
 
         def value2str(obj):
             # assuming that I have a float

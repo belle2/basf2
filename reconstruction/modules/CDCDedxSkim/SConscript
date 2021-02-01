@@ -2,6 +2,6 @@ Import('env')
 
 # env['CONTINUE'] = False
 
-env['LIBS'] = ['framework', 'mdst_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'tracking_dataobjects', 'cdc_dataobjects']
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'tracking_dataobjects', 'cdc_dataobjects', 'klm_dataobjects']
 
 Return('env')

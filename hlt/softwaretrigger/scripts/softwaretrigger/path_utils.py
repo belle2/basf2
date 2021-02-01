@@ -37,6 +37,7 @@ def add_hlt_dqm(path, run_type, components, dqm_mode):
         dqm_environment=constants.Location.hlt.name,
         components=components,
         dqm_mode=dqm_mode.name)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_'+dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components):
@@ -125,14 +126,15 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
-    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
+    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', loadPhotonBeamBackgroundMVA=False, path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:loose", 'theta > 0.296706 and theta < 2.61799 and \
     [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
-    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ', path=path)
+    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]',
+                                     loadPhotonBeamBackgroundMVA=False, path=path)
     modularAnalysis.reconstructDecay('pi0:loose -> gamma:loose gamma:loose', '0.075 < M < 0.175', 1, True, path=path)
     modularAnalysis.cutAndCopyList('pi0:veryLooseFit', 'pi0:loose', '', True, path=path)
     vertex.kFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
@@ -159,7 +161,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
 
-def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
+def add_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -178,10 +180,12 @@ def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            abort_path=abort_path,
+            event_abort=hlt_event_abort,
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
+
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
@@ -208,7 +212,19 @@ def add_post_filter_reconstruction(path, run_type, components):
 
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
         pass
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+
+def hlt_event_abort(module, condition, error_flag):
+    """
+    Create a discard path suitable for HLT processing, i.e. set an error flag and
+    keep only the metadata.
+    """
+    p = basf2.Path()
+    p.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(p)
+    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)

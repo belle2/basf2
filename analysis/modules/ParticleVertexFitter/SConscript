@@ -2,6 +2,6 @@ Import('env')
 
 env['LIBS'] = ['framework', 'analysis_dataobjects',
 	      'analysis_VertexFitting', 'analysis_DecayDescriptor',
-	      'analysis_utility', '$ROOT_LIBS', 'CLHEP']
+	      'analysis_utility', '$ROOT_LIBS', 'CLHEP', 'mdst_dbobjects']
 
 Return('env')

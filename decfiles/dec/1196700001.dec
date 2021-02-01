@@ -1,0 +1,39 @@
+# EventType: 1196700001
+# Descriptor:  [B0 -> D'_1- l+ nu, D'_1- -> D pi pi ] cc 
+# NickName: Bd_Dprime1lnu_Dpipi
+# Documentation: b->c l nu process, D'1 mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+
+Alias D'_1-sig D'_1-
+Alias D'_1+sig D'_1+
+ChargeConj D'_1-sig D'_1+sig
+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.500  D'_1-sig  e+ nu_e    PHOTOS LLSW 0.68 -0.2 0.3;
+0.500  D'_1-sig  mu+ nu_mu  PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay anti-B0sig
+
+ 
+Decay D'_1-sig
+0.00021  D-      pi+ pi-                    PHOTOS PHSP;
+0.00014  anti-D0 pi- pi0                    PHOTOS PHSP;
+0.00014  D-      pi0 pi0                    PHOTOS PHSP;
+Enddecay
+CDecay D'_1+sig
+ 
+ 
+End
+

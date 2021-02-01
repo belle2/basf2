@@ -152,6 +152,8 @@ namespace Belle2 {
       /**
        * Draws CDCTracks.
        * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a stroke-width.
        */
       void drawTracks(const std::string& storeObjName,
                       const std::string& stroke,
@@ -170,6 +172,8 @@ namespace Belle2 {
       /**
        * Draw RecoTracks.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawRecoTracks(const std::string& storeArrayName,
                           const std::string& stroke,
@@ -178,6 +182,8 @@ namespace Belle2 {
       /**
        * Draw RecoTracks trajectories.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawRecoTrackTrajectories(const std::string& storeArrayName,
                                      const std::string& stroke,
@@ -186,6 +192,8 @@ namespace Belle2 {
       /**
        * Draw MCParticles.
        * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawMCParticleTrajectories(const std::string& storeArrayName,
                                       const std::string& stroke,
@@ -217,7 +225,7 @@ namespace Belle2 {
     public:
       /**
        * Draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle.
-       * @param storeArrayName The name of the StoreArray containing the CDCSimHits.
+       * @param simHitStoreArrayName  The name of the StoreArray containing the CDCSimHits.
        * @param stroke                Color of the lines to be drawn.
        * @param strokeWidth           Width of the lines to be drawn.
        */
@@ -283,7 +291,7 @@ namespace Belle2 {
        *
        * Needs to know the type of the objects in the StoreArray and the right styling for these objects.
        *
-       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @tparam a_drawTrajectories Switch to draw the fitted trajectory from the object instead.
        * @param  storeArrayName   The name of the StoreArray containing the objects.
        * @param  styling          Functional object to construct attributes for each object to be drawn
        */
@@ -295,8 +303,8 @@ namespace Belle2 {
        *
        * Needs to know the type of the objects in the store objects and the right styling for these objects.
        *
-       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
-       * @param storeVector      The StoreWrappedObjPtr containing the objects.
+       * @tparam a_drawTrajectories Switch to draw the fitted trajectory from the object instead.
+       * @param storeObjName     name of the StoreObject containing the objects.
        * @param styling          Functional object to construct attributes for each object to be drawn
        */
       template<class AItem, bool a_drawTrajectories = false>
@@ -305,7 +313,7 @@ namespace Belle2 {
       /**
        * Draw every element of an iterable object.
        * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
-       * @param  iterable         An iterable object (StoreArray, std::vector...).
+       * @param  items            An iterable object (StoreArray, std::vector...).
        * @param  styling          Styling object from which drawing attributes are constructed
        */
       template <bool a_drawTrajectory = false, class AIterable, class AStyling>

@@ -12,16 +12,6 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
                                             loadStdSkimHighEffF_0)
 
-# from skim.standardlists.charmless import (
-#     loadStdVeryLooseTracks,
-#     loadStdPi0ForBToCharmless,
-#     loadStdVeryLooseKstar0,
-#     loadStdVeryLooseRho0,
-#     loadStdVeryLooseKstarPlus,
-#     loadStdVeryLooseKstarPlusPi0,
-#     loadStdVeryLooseRhoPlus)
-
-
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import loadStdSkimPhoton, stdPhotons
@@ -35,7 +25,8 @@ __authors__ = [
     "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>"
 ]
 
-__liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
+# __liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
+__liaison__ = "Yoshiyuki ONUKI <onuki@hep.phys.s.u-tokyo.ac.jp>"
 
 
 @fancy_skim_header
@@ -69,23 +60,31 @@ class TDCPV_qqs(BaseSkim):
 
     **Particle lists used**:
 
-    * ``phi:veryloose``
-    * ``eta:veryloose``
+    * ``phi:SkimHighEff``
+    * ``eta':SkimHighEff``
+    * ``eta:SkimHighEff``
     * ``pi0:eff40_Jan2020``
     * ``pi0:skim``
-    * ``rho0:veryloose``
-    * ``pi+:veryloose``
-    * ``+:veryloose``
-    * ``omega:veryloose``
-    * ``K*0:veryloose``
+    * ``rho0:SkimHighEff``
+    * ``omega:SkimHighEff``
+    * ``f_0:SkimHighEff``
+    * ``pi+:SkimHighEff``
+    * ``K+:SkimHighEff``
+    * ``omega:SkimHighEff``
+    * ``K*0:SkimHighEff``
     * ``gamma:E15 , cut : 1.4 < E < 4``
     * ``k_S0:merged``
+    * ``K+:1%``
 
     **Cuts used**:
 
-    * ``veryloose tracks hetaInCDCAcceptance AND dr < 0.5 AND abs(dz) < 2 and PID>0.01``
+    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``visibleEnergyOfEventCMS>4"``,
+    * ``E_ECL_TDCPV<9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -212,21 +211,30 @@ class TDCPV_ccs(BaseSkim):
     * ``B0 -> psi(2s) (ee/mm) K_S0``
     * ``B0 -> J/psi (ee/mm) K*``
     * ``B+ -> J/psi (ee/mm) K+``
+    * ``B0 -> J/psi (ee/mm) KL``
 
     **Particle lists used**:
 
-    * ``k_S0:all``
+    * ``k_S0:merged``
     * ``pi+:all``
-    * ``J/psi: ee``
-    * ``J/psi: mumu``
-    * ``psi(2S): ee``
-    * ``psi(2S): mumu``
-    * ``K*0:loose``
+    * ``J/psi:ee``
+    * ``J/psi:mumu``
+    * ``psi(2S):ee``
+    * ``psi(2S):mumu``
+    * ``K*0:SkimHighEff``
+    * ``K+:SkimHighEff``
+    * ``K_L0:all``
 
     **Cuts used**:
 
-    * ``5.2 < Mbc < 5.29``
+    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
+    * ``5.2 < Mbc < 5.29 for Ks/K*``
+    * ``5.05 < Mbc < 5.29 for KL``
     * ``abs(deltaE) < 0.5``
+    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``visibleEnergyOfEventCMS>4"``,
+    * ``E_ECL_TDCPV<9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -346,7 +354,7 @@ class TDCPV_ccs(BaseSkim):
 @fancy_skim_header
 class TDCPV_ccsKs(BaseSkim):
     """
-    **Physics channels**:  bd → ccs
+    **Physics channels**:  bd → ccs with Ks or K* only
 
     **Decay Channels**:
 
@@ -357,18 +365,24 @@ class TDCPV_ccsKs(BaseSkim):
 
     **Particle lists used**:
 
-    * ``k_S0:all``
+    * ``k_S0:merged``
     * ``pi+:all``
-    * ``J/psi: ee``
-    * ``J/psi: mumu``
-    * ``psi(2S): ee``
-    * ``psi(2S): mumu``
-    * ``K*0:loose``
+    * ``J/psi:ee``
+    * ``J/psi:mumu``
+    * ``psi(2S):ee``
+    * ``psi(2S):mumu``
+    * ``K*0:SkimHighEff``
+    * ``K+:SkimHighEff``
 
     **Cuts used**:
 
-    * ``5.2 < Mbc < 5.29``
+    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
+    * ``5.2 < Mbc < 5.29 for Ks/K*``
     * ``abs(deltaE) < 0.5``
+    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``visibleEnergyOfEventCMS>4"``,
+    * ``E_ECL_TDCPV<9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -445,7 +459,6 @@ class TDCPV_ccsKs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            # "foxWolframR2_maskedNaN<0.4 and nTracks>=4",
             "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
@@ -487,8 +500,12 @@ class TDCPV_ccsKL(BaseSkim):
 
     **Cuts used**:
 
-    * ``5.2 < Mbc < 5.29``
+    * ``5.05 < Mbc < 5.29 for KL``
     * ``abs(deltaE) < 0.5``
+    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``visibleEnergyOfEventCMS>4"``,
+    * ``E_ECL_TDCPV<9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -538,14 +555,6 @@ class TDCPV_ccsKL(BaseSkim):
             ma.reconstructDecay('B0:TDCPV_JPsiKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
-        # bd_qqs_KL_Channels = ['phi:SkimHighEff K_L0:all',
-        #                       'eta\':SkimHighEff K_L0:all']
-
-        # bd_qqs_KL_List = []
-        # for chID, channel in enumerate(bd_qqs_KL_Channels):
-        #     ma.reconstructDecay('B0:TDCPV_qqsKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
-        #     bd_qqs_KL_List.append('B0:TDCPV_qqsKL' + str(chID))
-
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
                             cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
@@ -566,7 +575,6 @@ class TDCPV_ccsKL(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            # "foxWolframR2_maskedNaN<0.4 and nTracks>=4",
             "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
@@ -574,7 +582,7 @@ class TDCPV_ccsKL(BaseSkim):
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
-        tcpvLists = b0toJPsiKL_List  # + bd_qqs_KL_List
+        tcpvLists = b0toJPsiKL_List
 
         self.SkimLists = tcpvLists
 

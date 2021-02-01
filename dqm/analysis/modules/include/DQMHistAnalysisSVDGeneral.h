@@ -38,7 +38,7 @@ namespace Belle2 {
     virtual void endRun() override;
     virtual void terminate() override;
 
-    //parameters
+    // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_occError; /**<error level of the occupancy */
     float m_occWarning; /**< warning level of the occupancy */
@@ -47,10 +47,7 @@ namespace Belle2 {
     float m_onlineOccError; /**<error level of the onlineOccupancy */
     float m_onlineOccWarning; /**< warning level of the onlineOccupancy */
     float m_onlineOccEmpty; /**<empty level of the occupancy */
-    //! Parameters accesible from basf2 scripts
-    //  protected:
 
-    //! Data members
   private:
 
     /** Reference Histogram Root file name */
@@ -92,7 +89,7 @@ namespace Belle2 {
     TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
     TText* m_yTitle = nullptr; /**< y axis title text*/
 
-    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed befor throwing ERROR*/
+    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
@@ -100,9 +97,6 @@ namespace Belle2 {
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
-
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
-    TCanvas* m_c_avg_maxBin_UV = NULL; /**<Canvas with average max bin for U and V side*/
 
   };
 } // end namespace Belle2

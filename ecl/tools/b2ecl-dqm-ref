@@ -344,7 +344,7 @@ try:
 
 	#do not attach histograms to the input .root file
 	for name in hist_objects:
-		print(name) 
+		#print(name) 
 		hist_objects[name].SetDirectory(0)
 
 	input_file.Close()
@@ -355,7 +355,7 @@ try:
 	input_file.cd("ECL")
 	for hist in missing_hists:
 		hist_objects[hist[2].split('/')[1]] = input_file.FindObjectAny(hist[2].split('/')[1])
-		print(hist[2].split('/')[1])
+		#print(hist[2].split('/')[1])
 		hist_objects[hist[2].split('/')[1]].SetDirectory(0)
 	input_file.Close()
 
@@ -370,9 +370,7 @@ try:
 
 	output_file.Close()
 
-	print('point 1')
 	shutil.copyfile('./'+output_file_path, previous_ref_set.format(r_type = run_type))
-	print('point 2')
 
 except Exception as err:
 	print("Error:", err)

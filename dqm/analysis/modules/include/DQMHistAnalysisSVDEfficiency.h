@@ -74,10 +74,6 @@ namespace Belle2 {
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
-    TCanvas* m_c_found_tracks_UV = NULL; /**<Canvas with found tracks for U and V side*/
-    TCanvas* m_c_matched_clusters_UV = NULL; /**<Canvas with matched clusters for U and V side*/
-
   };
 } // end namespace Belle2
 

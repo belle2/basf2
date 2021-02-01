@@ -22,16 +22,12 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
-    # TODO fix up the codes
     ("10600800", "systematics", "SystematicsFourLeptonHLT"),
-    ("10600900", "systematics", "SystematicsRadmumuHLT"),
+    ("10600900", "systematics", "SystematicsRadMuMuHLT"),
     ("10611000", "systematics", "SystematicsJpsi"),
     ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
 
-    # TODO remove these. Exist as tests for the HLT skims while the HLT skims are inaccessible
-    ("10000001", "performance", "PerformanceFourLepton_Test"),
-    ("10000002", "performance", "PerformanceRadmumu_Test"),
 
 
     # --- WG1: SL + missing energy ---

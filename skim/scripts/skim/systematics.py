@@ -641,10 +641,10 @@ class SystematicsFourLeptonHLT(BaseSkim):
         self.SkimLists = [f"pi+:{label}"]
 
 
-class SystematicsRadmumuHLT(BaseSkim):
+class SystematicsRadMuMuHLT(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
-    __description__ = "Skim to select all events that pass the HLT Radmumu skim"
+    __description__ = "Skim to select all events that pass the HLT RadMuMu skim"
     __category__ = "systematics, leptonID"
     ApplyHLTHadronCut = False
 
@@ -653,7 +653,7 @@ class SystematicsRadmumuHLT(BaseSkim):
         stdPhotons("all", path=path)
 
     def build_lists(self, path):
-        label = "RadmumuHLT"
+        label = "RadMuMuHLT"
         ma.copyList(f"pi+:{label}", "pi+:all", path=path)
         ma.applyRandomCandidateSelection(f"pi+:{label}", path=path)
 

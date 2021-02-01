@@ -14,7 +14,7 @@ from tabulate import tabulate
 _RegisteredSkims = [
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
-    ("10600100", "systematics", "Systematics"),
+    ("10600100", "systematics", "SystematicsDstar"),
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
     ("10600500", "systematics", "SystematicsRadMuMu"),
@@ -25,9 +25,14 @@ _RegisteredSkims = [
     # TODO fix up the codes
     ("10600800", "systematics", "SystematicsFourLeptonHLT"),
     ("10600900", "systematics", "SystematicsRadmumuHLT"),
-    ("10601000", "systematics", "SystematicsJpsi"),
-    ("10601100", "systematics", "SystematicsKshort"),
+    ("10611000", "systematics", "SystematicsJpsi"),
+    ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
+
+    # TODO remove these. Exist as tests for the HLT skims while the HLT skims are inaccessible
+    ("10000001", "performance", "PerformanceFourLepton_Test"),
+    ("10000002", "performance", "PerformanceRadmumu_Test"),
+
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),

@@ -58,6 +58,9 @@ namespace Belle2::SVD {
     /** first frame, 3 selected sample */
     std::pair<int, std::vector<float>> m_result;
 
+    /**
+     * applies the algorithm
+     */
     void applyAlgorithm()
     {
 

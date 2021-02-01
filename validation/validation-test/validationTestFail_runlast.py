@@ -14,6 +14,8 @@ validation correctly detects and reports this.
 
 
 import sys
-print("This script will exit with code 20 on purpose")
 
-sys.exit(20)
+if __name__ == "__main__":
+    print("This script will exit with code 20 on purpose")
+
+    sys.exit(20)

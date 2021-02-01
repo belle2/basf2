@@ -11,66 +11,68 @@
 import array
 import ROOT
 
-tfile = ROOT.TFile("validationTestNTuple.root", "RECREATE")
 
-# Default precision
-# =================
+if __name__ == "__main__":
+    tfile = ROOT.TFile("validationTestNTuple.root", "RECREATE")
 
-tntuple = ROOT.TNtuple("ntuple_test", "ntuple test", "x:y:z:k")
+    # Default precision
+    # =================
 
-array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
-tntuple.Fill(array_of_values)
+    tntuple = ROOT.TNtuple("ntuple_test", "ntuple test", "x:y:z:k")
 
-tntuple.SetAlias('Description', "Test default precision")
-tntuple.SetAlias('Check', "Should display the default of 4 digits.")
-tntuple.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
-tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
+    array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+    tntuple.Fill(array_of_values)
 
-tntuple.Write()
+    tntuple.SetAlias('Description', "Test default precision")
+    tntuple.SetAlias('Check', "Should display the default of 4 digits.")
+    tntuple.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
+    tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
 
-# Expert
-# =================
+    tntuple.Write()
 
-tntuple = ROOT.TNtuple("ntuple_expert", "ntuple expert", "x:y:z:k")
+    # Expert
+    # =================
 
-array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
-tntuple.Fill(array_of_values)
+    tntuple = ROOT.TNtuple("ntuple_expert", "ntuple expert", "x:y:z:k")
 
-tntuple.SetAlias('Description', "Test expert ntuple")
-tntuple.SetAlias('Check', "Should be expert.")
+    array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+    tntuple.Fill(array_of_values)
 
-tntuple.Write()
+    tntuple.SetAlias('Description', "Test expert ntuple")
+    tntuple.SetAlias('Check', "Should be expert.")
 
-# High precision
-# =================
+    tntuple.Write()
 
-tntuple_hp = ROOT.TNtuple("ntuple_test_hp", "ntuple test", "x:y:z:k")
+    # High precision
+    # =================
 
-array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
-tntuple_hp.Fill(array_of_values)
+    tntuple_hp = ROOT.TNtuple("ntuple_test_hp", "ntuple test", "x:y:z:k")
 
-tntuple_hp.SetAlias('Description', "Test higher precision")
-tntuple_hp.SetAlias('Check', "Should display 8 digits per float.")
-tntuple_hp.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
-tntuple_hp.SetAlias('MetaOptions', "float-precision=8")
+    array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+    tntuple_hp.Fill(array_of_values)
 
-tntuple_hp.Write()
+    tntuple_hp.SetAlias('Description', "Test higher precision")
+    tntuple_hp.SetAlias('Check', "Should display 8 digits per float.")
+    tntuple_hp.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
+    tntuple_hp.SetAlias('MetaOptions', "float-precision=8")
 
-# Long
-# =================
+    tntuple_hp.Write()
 
-variables = "l" + "o" * 200 + "ngvariable"
-tntuple_hp = ROOT.TNtuple("ntuple_test_long_names", "ntuple test", variables)
+    # Long
+    # =================
 
-array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
-tntuple_hp.Fill(array_of_values)
+    variables = "l" + "o" * 200 + "ngvariable"
+    tntuple_hp = ROOT.TNtuple("ntuple_test_long_names", "ntuple test", variables)
 
-tntuple_hp.SetAlias('Description', "Test loooooong ntuples")
-tntuple_hp.SetAlias('Check', "Should display horizontal scrollbar.")
-tntuple_hp.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
+    array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0, 12, 15, 16])
+    tntuple_hp.Fill(array_of_values)
 
-tntuple_hp.Write()
+    tntuple_hp.SetAlias('Description', "Test loooooong ntuples")
+    tntuple_hp.SetAlias('Check', "Should display horizontal scrollbar.")
+    tntuple_hp.SetAlias('Contact', "Kilian Lieret, Kilian.Lieret@campus.lmu.de")
 
-# Closing
+    tntuple_hp.Write()
 
-tfile.Close()
+    # Closing
+
+    tfile.Close()

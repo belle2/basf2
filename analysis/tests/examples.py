@@ -27,7 +27,7 @@ class ExamplesTest(unittest.TestCase):
         """
         if broken is None:
             broken = []
-        all_egs = sorted(glob.glob(find_file(path_to_glob) + "*.py"))
+        all_egs = sorted(glob.glob(find_file(path_to_glob) + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
             if filename not in broken:

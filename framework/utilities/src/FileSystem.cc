@@ -55,6 +55,12 @@ bool FileSystem::isDir(const string& filename)
   return (fs::exists(fullPath)) && (fs::is_directory(fullPath));
 }
 
+bool FileSystem::isSymLink(const string& filename)
+{
+  fs::path fullPath = fs::absolute(filename);
+  return (fs::exists(fullPath)) && (fs::is_symlink(fullPath));
+}
+
 bool FileSystem::loadLibrary(std::string library, bool fullname)
 {
   if (!fullname) library = "lib" + library + ".so";
@@ -112,14 +118,25 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
   // check given directories
   string fullpath;
   for (auto dir : dirs) {
-    if (dir.empty()) continue;
+    if (dir.empty())
+      continue;
     fullpath = (fs::path(dir) / path).string();
-    if (fileExists(fullpath)) return fs::canonical(fullpath).string();
+    if (fileExists(fullpath)) {
+      if (isSymLink(fullpath) or isSymLink(dir))
+        return fullpath;
+      else
+        return fs::canonical(fullpath).string();
+    }
   }
 
   // check local directory
   fullpath = fs::absolute(path).string();
-  if (fileExists(fullpath)) return fs::canonical(fullpath).string();
+  if (fileExists(fullpath)) {
+    if (isSymLink(fullpath))
+      return fullpath;
+    else
+      return fs::canonical(fullpath).string();
+  }
 
   // nothing found
   if (!silent)

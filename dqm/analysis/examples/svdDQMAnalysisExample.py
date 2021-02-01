@@ -14,6 +14,7 @@ exp_nr = int(re.findall(r'\d+', inputFile)[0])
 run_nr = int(re.findall(r'\d+', inputFile)[1])
 nevt = int(sys.argv[2])  # number of events
 
+
 inroot = register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', inputFile)
 inroot.param('SelectHistograms', ['SVD*/*'])
@@ -23,7 +24,6 @@ inroot.param('EventsList', [nevt])
 mypath.add_module(inroot)
 
 dqmSVD = register_module('DQMHistAnalysisSVDOnMiraBelle')
-dqmSVD.set_log_level(LogLevel.INFO)
 mypath.add_module(dqmSVD)
 
 outroot = register_module('DQMHistAnalysisOutputMonObj')

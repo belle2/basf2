@@ -666,7 +666,7 @@ class SystematicsRadMuMuHLT(BaseSkim):
 @fancy_skim_header
 class SystematicsJpsi(BaseSkim):
     """
-    Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
+    J/psi skim for systematics studies. Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib", "Marcel Hohmann"]
     __description__ = ""
@@ -709,27 +709,6 @@ class SystematicsJpsi(BaseSkim):
             f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
             path=path)
         return "J/psi:ee"
-
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        histogramFilename = f"{self}_Validation.root"
-        email = ""
-        SkimList = self.SkimLists[0]
-
-        variables_1d = [
-            ("M", 100, 2.7, 3.4, "M", email),
-        ]
-
-        create_validation_histograms(
-            rootfile=histogramFilename,
-            particlelist=SkimList,
-            variables_1d=variables_1d,
-            variables_2d=[],
-            path=path
-        )
 
 
 @fancy_skim_header

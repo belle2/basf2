@@ -749,12 +749,13 @@ class SystematicsKshort(BaseSkim):
     def load_standard_lists(self, path):
         stdPi("all", path=path)
 
-    def __init__(self, prescale_all=1, **kwargs):
+    def __init__(self, prescale=1, **kwargs):
         """
         Parameters:
-            prescale_all (int): the global prescale for this skim.
+            prescale (int): the global prescale for this skim.
             **kwargs: Passed to constructor of `BaseSkim`.
         """
+        self.prescale = prescale
         super().__init__(**kwargs)
 
     def build_lists(self, path):
@@ -790,7 +791,7 @@ class SystematicsKshort(BaseSkim):
         # '[useAlternativeDaughterHypothesis(M, 0:p+) > 1.13068 and useAlternativeDaughterHypothesis(M, 0:pi-, 1:p+) > 1.13068]'
 
         ma.cutAndCopyList("K_S0:skim", "K_S0:merged", KS_cut, path=path)
-        path = self.skim_event_cuts(f'eventRandom < {(1/self.prescale_all):.6f}', path=path)
+        path = self.skim_event_cuts(f'eventRandom < {(1/self.prescale):.6f}', path=path)
         self.SkimLists = ['K_S0:skim']
 
 
@@ -814,12 +815,13 @@ class SystematicsBhabha(BaseSkim):
         stdMu("all", path=path)
         stdE("all", path=path)
 
-    def __init__(self, prescale_all=1, **kwargs):
+    def __init__(self, prescale=1, **kwargs):
         """
         Parameters:
-            prescale_all (int): the global prescale for this skim.
+            prescale (int): the global prescale for this skim.
             **kwargs: Passed to constructor of `BaseSkim`.
         """
+        self.prescale = prescale
         super().__init__(**kwargs)
 
     def build_lists(self, path):
@@ -831,7 +833,7 @@ class SystematicsBhabha(BaseSkim):
         recoil = "m2Recoil < 10"
         ma.reconstructDecay("vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
 
-        event_cuts = f"[nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 5) == 2] and [eventRandom < {(1/self.prescale_all):.6f}]"
+        event_cuts = f"[nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 5) == 2] and [eventRandom < {(1/self.prescale):.6f}]"
         path = self.skim_event_cuts(event_cuts, path=path)
 
         self.SkimLists = ["vpho:bhabha"]

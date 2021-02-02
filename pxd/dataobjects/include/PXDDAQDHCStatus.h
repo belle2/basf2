@@ -72,7 +72,7 @@ namespace Belle2 {
      * the PXD data from this DHC is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0);}
 
     /** Get DHC ID */
     unsigned short getDHCID(void) const { return m_dhcID;};

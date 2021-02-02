@@ -71,11 +71,11 @@ namespace Belle2 {
       unsigned int m_maxDHPFrameDiff{0};
 
       /** Critical error mask which defines return value of task */
-      uint64_t m_criticalErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_criticalErrorMask{};
       /** Mask for suppressing selected error messages */
-      uint64_t m_suppressErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_suppressErrorMask{};
       /** Mask for error which stop package unpacking directly */
-      uint64_t m_errorSkipPacketMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_errorSkipPacketMask{};
 
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr{0};

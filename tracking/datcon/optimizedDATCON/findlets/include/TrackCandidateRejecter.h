@@ -17,22 +17,19 @@
 
 namespace Belle2 {
   class SpacePoint;
+  class SpacePointTrackCand;
   class VxdID;
 
   class ModuleParamList;
 
   /**
-   * Findlet for finding intersections of sinosoidal curves in the 1D Hough space by iteratively calling
-   * fastInterceptFinder1d. This is done 80 times for a subset of SVD sensors, one subset for each layer 6 sensor
-   * to reduce combinatorics in the Hough Space and to improve the purity of the found track candidates.
-   * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
-   * and stored in the output vector.
+   * Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
    */
   class TrackCandidateRejecter : public
-    TrackFindingCDC::Findlet<std::vector<const SpacePoint*>> {
+    TrackFindingCDC::Findlet<SpacePointTrackCand> {
     /// Parent class
     using Super =
-      TrackFindingCDC::Findlet<std::vector<const SpacePoint*>>;
+      TrackFindingCDC::Findlet<SpacePointTrackCand>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -44,8 +41,8 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<std::vector<const SpacePoint*>>& trackCandidates) override;
+    /// Reject bad SpacePointTrackCands and bad hits inside the remaining
+    void apply(std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
 
@@ -53,7 +50,7 @@ namespace Belle2 {
 //     std::vector<const SpacePoint*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<std::vector<const SpacePoint*>> m_prunedTrackCandidates;
+    std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
 
   };
 }

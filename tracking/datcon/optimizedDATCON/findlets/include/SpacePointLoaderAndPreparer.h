@@ -42,7 +42,8 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load the SVDClusters and create two vectors containing the hits prepared for intercept finding
+    /// Load the SVD SpacePoints and create a tuple containing a pointer to each SpacePoint, and its VxdID,
+    /// conformal transformed x and y coordinates (x'=2x/(x^2+y^2), y'=2y/(x^2+y^2)) and its z coordinate as cache
     void apply(std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>>& hits) override;
 
   private:

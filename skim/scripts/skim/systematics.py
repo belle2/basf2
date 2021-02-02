@@ -775,10 +775,6 @@ class SystematicsKshort(BaseSkim):
 class SystematicsBhabha(BaseSkim):
     """
     Skim for selecting Bhabha events for leptonID studies.
-    As bhabha events are very common the retention rate is quite high. To avoid biasing the selection a prescale is required.
-
-    Prescales are given in standard trigger terms (reciprocal). A prescale of 50 will keep 2% of events.
-
     """
     __authors__ = ["Justin Skorupa"]
     __description__ = "Skim for Bhabha events for lepton ID study"
@@ -788,28 +784,20 @@ class SystematicsBhabha(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdMu("all", path=path)
         stdE("all", path=path)
 
-    def __init__(self, prescale=1, **kwargs):
-        """
-        Parameters:
-            prescale (int): the global prescale for this skim.
-            **kwargs: Passed to constructor of `BaseSkim`.
-        """
-        self.prescale = prescale
-        super().__init__(**kwargs)
-
     def build_lists(self, path):
-        goodtrack = "abs(dz) < 2.0 and abs(dr) < 5"
-        goodtrackwithPID = "%s and electronID > 0.95" % goodtrack
+        goodtrack = "abs(dz) < 5 and abs(dr) < 2"
+        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
+            " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
 
         recoil = "m2Recoil < 10"
-        ma.reconstructDecay("vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
+        ma.reconstructDecay(
+            "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
 
-        event_cuts = f"[nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 5) == 2] and [eventRandom < {(1/self.prescale):.6f}]"
-        path = self.skim_event_cuts(event_cuts, path=path)
+        event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"
+        ma.applyCuts("vpho:bhabha", event_cuts, path=path)
 
         self.SkimLists = ["vpho:bhabha"]

@@ -617,6 +617,7 @@ class Random(BaseSkim):
         self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]
 
 
+@fancy_skim_header
 class SystematicsFourLeptonHLT(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
@@ -639,6 +640,7 @@ class SystematicsFourLeptonHLT(BaseSkim):
         self.SkimLists = [f"pi+:{label}"]
 
 
+@fancy_skim_header
 class SystematicsRadMuMuHLT(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__

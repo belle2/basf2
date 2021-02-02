@@ -63,10 +63,11 @@ std::vector<std::string> parseString(std::string str, std::string sep)
   return parsed;
 }
 
-std::map<string, int> make_map()
+std::map<string, int> make_map(std::string file)
 {
-
-  const char* fileName = "map_tau_v4.txt";
+  std::string fileName;
+  if (file == "") {fileName = "map_tau_v4.txt";}
+  else {fileName = file;}
 
   ifstream f;
   f.open(fileName);
@@ -107,7 +108,8 @@ TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), 
   setDescription("");
   //Parameter definition
   addParam("printmode",      m_printmode,      "Printout more information from each event", 0);
-  //addParam("mapping", m_mapping , "txt map path");
+  addParam("file", m_file, "path for an alternative mapping", std::string(""));
+  addParam("particle", m_particle , "Add a particle with his pdg for clasification", std::string(""));
 }
 
 
@@ -119,8 +121,13 @@ void TauDecayModeModule::initialize()
   taum_no = -1;
   taup_no = -1;
   EventNumber = 1;
-  mode_decay = make_map();
+  mode_decay = make_map(m_file);
   m_tauDecay.registerInDataStore();
+  if (m_particle != "") {
+    std::vector<std::string> extra = parseString(m_particle, "="); "alpha=10000"
+    pdg_extra = atoi(extra[0].c_str());
+    name = extra[1];
+  }
 
 }
 void TauDecayModeModule::event()
@@ -142,10 +149,11 @@ void TauDecayModeModule::event()
   vec_pim.clear(), vec_pip.clear(), vec_km.clear(), vec_kp.clear(), vec_apro.clear(), vec_pro.clear();
   vec_pi0.clear(), vec_k0s.clear(), vec_k0l.clear(), vec_gam.clear();
   vec_eta.clear(), vec_omega.clear(), vec_kstarp.clear(), vec_kstarm.clear(), vec_lambda.clear(), vec_lmb_br.clear();
-  vec_kstar.clear(), vec_kstar_br.clear(), vec_etapr.clear(), vec_a0m.clear(), vec_a0p.clear(), vec_a00.clear();
+  vec_kstar.clear(), vec_kstar_br.clear(), vec_etapr.clear(), vec_a0m.clear(), vec_a0p.clear(), vec_a0.clear();
   vec_b1m.clear(), vec_b1p.clear(), vec_phi.clear(), vec_f1.clear(), vec_a1m.clear(), vec_a1p.clear(),
                 vec_rhom.clear(), vec_rhop.clear();
   vec_K0.clear(), vec_K0_br.clear(), vec_rho0.clear(), vec_f0.clear();
+  vec_extra.clear();
   //
 
   for (int i = 0; i < MCParticles.getEntries(); i++) {
@@ -194,7 +202,7 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 10311) vec_kstar.push_back(i);
     if (p.getPDG() == -10311) vec_kstar_br.push_back(i);
     if (p.getPDG() == 331) vec_etapr.push_back(i);
-    if (p.getPDG() == 9000111) vec_a00.push_back(i);
+    if (p.getPDG() == 9000111) vec_a0.push_back(i);
     if (p.getPDG() == 9000211) vec_a0p.push_back(i);
     if (p.getPDG() == -9000211) vec_a0m.push_back(i);
     if (p.getPDG() == -10213) vec_b1m.push_back(i);
@@ -207,6 +215,7 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 213) vec_rhop.push_back(i);
     if (p.getPDG() == 113) vec_rho0.push_back(i);
     if (p.getPDG() == 9010221) vec_f0.push_back(i);
+    if (m_particle != "" && p.getPDG() == pdg_extra) vec_extra.push_back(i);
   }
   //
   if (m_printmode < 0) {
@@ -231,7 +240,7 @@ void TauDecayModeModule::event()
     B2INFO("TauDecayMode:: vec_kstar.size()  = " << vec_kstar.size());
     B2INFO("TauDecayMode:: vec_kstar_br.size()  = " << vec_kstar_br.size());
     B2INFO("TauDecayMode:: vec_etapr.size()  = " << vec_etapr.size());
-    B2INFO("TauDecayMode:: vec_a00.size()  = " << vec_a00.size());
+    B2INFO("TauDecayMode:: vec_a0.size()  = " << vec_a0.size());
     B2INFO("TauDecayMode:: vec_a0p.size()  = " << vec_a0p.size());
     B2INFO("TauDecayMode:: vec_a0m.size()  = " << vec_a0m.size());
     B2INFO("TauDecayMode:: vec_b1m.size()  = " << vec_b1m.size());
@@ -247,6 +256,15 @@ void TauDecayModeModule::event()
   //
   vec_dau_tauminus.clear();
   vec_dau_tauplus.clear();
+  //
+  if (m_particle != "") {
+    for (unsigned int i = 0; i < vec_extra.size(); i++) {
+      int ii = vec_extra[i];
+      int chg = getRecursiveMotherCharge(MCParticles[ii]);
+      if (chg < 0) vec_dau_tauminus.push_back(ii);
+      if (chg > 0) vec_dau_tauplus.push_back(ii);
+    }
+  }
   //
   for (unsigned int i = 0; i < vec_em.size(); i++) {
     int ii = vec_em[i];
@@ -482,6 +500,15 @@ void TauDecayModeModule::event()
     if (chg > 0) vec_dau_tauplus.push_back(ii);
   }
   //
+
+  for (unsigned int i = 0; i < vec_a0.size(); i++) {
+    int ii = vec_a0[i];
+    int chg = getRecursiveMotherCharge(MCParticles[ii]);
+    if (chg < 0) vec_dau_tauminus.push_back(ii);
+    if (chg > 0) vec_dau_tauplus.push_back(ii);
+  }
+
+  //
   for (unsigned int i = 0; i < vec_a0p.size(); i++) {
     int ii = vec_a0p[i];
     int chg = getRecursiveMotherCharge(MCParticles[ii]);
@@ -591,6 +618,8 @@ void TauDecayModeModule::event()
 
     int pdg = p->getPDG();
     //
+    if (m_particle != "" && pdg == pdg_extra) m_tauminusdecaymode.append("." + name);
+    //
     if (pdg ==  16)  m_tauminusdecaymode.append(".nut");
     if (pdg == -16)  m_tauminusdecaymode.append(".anut");
     //
@@ -634,6 +663,7 @@ void TauDecayModeModule::event()
     if (pdg == 223) m_tauminusdecaymode.append(".|omega|");
     if (pdg == 323) m_tauminusdecaymode.append(".kstarp");
     if (pdg == -323) m_tauminusdecaymode.append(".kstarm");
+    if (pdg == 9000111) m_tauminusdecaymode.append(".|a0|");
     if (pdg == 9000211) m_tauminusdecaymode.append(".|a0p|");
     if (pdg == -9000211) m_tauminusdecaymode.append(".|a0m|");
     if (pdg == 10213) m_tauminusdecaymode.append(".|b1p|");
@@ -671,6 +701,8 @@ void TauDecayModeModule::event()
   for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {
     MCParticle* p = MCParticles[vec_dau_tauplus[i]];
     int pdg = p->getPDG();
+    //
+    if (m_particle != "" && pdg == pdg_extra) m_tauplusdecaymode.append("." + name);
     //
     if (pdg ==  16)   m_tauplusdecaymode.append(".nut");
     if (pdg == -16)   m_tauplusdecaymode.append(".anut");
@@ -715,6 +747,7 @@ void TauDecayModeModule::event()
     if (pdg == 223) m_tauplusdecaymode.append(".|omega|");
     if (pdg == 323) m_tauplusdecaymode.append(".|kstarp|");
     if (pdg == -323) m_tauplusdecaymode.append(".|kstarm|");
+    if (pdg == 9000111) m_tauplusdecaymode.append(".|a0|");
     if (pdg == 9000211) m_tauplusdecaymode.append(".|a0p|");
     if (pdg == -9000211) m_tauplusdecaymode.append(".|a0m|");
     if (pdg == 10213) m_tauplusdecaymode.append(".|b1p|");

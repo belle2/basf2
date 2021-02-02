@@ -82,6 +82,14 @@ namespace Belle2 {
     int idOfTauPlus;
     /** Index of the generated negative tau */
     int idOfTauMinus;
+    /** Alternative mapping */
+    std::string m_file;
+    /** Extra particle  */
+    std::string m_particle;
+
+    int pdg_extra;
+
+    std::string name;
 
     /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
     const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
@@ -97,19 +105,18 @@ namespace Belle2 {
     std::vector<int> vec_K0, vec_K0_br,  vec_rho0, vec_f0;
     std::vector<int> vec_dau_tauminus;
     std::vector<int> vec_dau_tauplus;
+    std::vector<int> vec_extra;
 
     /** Identifies if the event is a generated tau pair */
     void IdentifyTauPair();
     double getEnergyTauRestFrame(const MCParticle* mc, const int ichg);
     int getRecursiveMotherCharge(const MCParticle* mc);
-    //int getRecursiveMother(const MCParticle* mc);
     int TauBBBmode(std::string s, std::map<std::string, int> tau_map);
     int getProngOfDecay(const MCParticle& mc);
 
   protected:
 
     int m_printmode;
-    std::string m_mapping;
 
   };
 

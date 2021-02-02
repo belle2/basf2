@@ -108,39 +108,42 @@ namespace Belle2 {
       B2DEBUG(99, "ONSEN Trigger Frame TNRLO $" << std::hex << trignr0);
     };
 
-    void dhc_onsen_trigger_frame::check_error(PXDErrorFlags& errorMask, bool ignore_datcon_flag,
-                                              bool ignore_hltroi_magic_flag,
-                                              bool ignore_merger_mm_flag) const
+    PXDError::PXDErrorFlags dhc_onsen_trigger_frame::check_error(bool ignore_datcon_flag, bool ignore_hltroi_magic_flag,
+        bool ignore_merger_mm_flag) const
     {
+      PXDError::PXDErrorFlags m_errorMask = PXDError::EPXDErrMask::c_NO_ERROR;
       if ((magic1 & 0xFFFF0000) != 0xCAFE0000) {
         if (!ignore_hltroi_magic_flag) B2WARNING("ONSEN Trigger Magic 1 error $" << std::hex << magic1);
-        errorMask[c_nrHLTROI_MAGIC] = true;
+        m_errorMask |= PXDError::EPXDErrMask::c_HLTROI_MAGIC;
       }
       if ((magic2 & 0xFFFF0000) != 0xCAFE0000) {
         if (!ignore_hltroi_magic_flag) B2WARNING("ONSEN Trigger Magic 2 error $" << std::hex << magic2);
-        errorMask[c_nrHLTROI_MAGIC] = true;
+        m_errorMask |= PXDError::EPXDErrMask::c_HLTROI_MAGIC;
       }
       if (is_fake_datcon()) {
         if (!ignore_datcon_flag) B2INFO("ONSEN Trigger Frame: No DATCON data $" << std::hex << trignr1 << "!=$" << trignr2);
-        errorMask[c_nrNO_DATCON] = true;
+        m_errorMask |= PXDError::EPXDErrMask::c_NO_DATCON;
       } else {
         if (trignr1 != trignr2) {
           if (!ignore_merger_mm_flag) B2WARNING("ONSEN Trigger Frame Trigger Nr Mismatch $" << std::hex << trignr1 << "!=$" << trignr2);
-          errorMask[c_nrMERGER_TRIGNR] = true;
+          m_errorMask |= PXDError::EPXDErrMask::c_MERGER_TRIGNR;
         }
       }
+      return m_errorMask;
     };
 
-    void dhc_onsen_roi_frame::check_error(PXDErrorFlags& errorMask, int length, bool ignore_inv_size_flag) const
+    PXDError::PXDErrorFlags dhc_onsen_roi_frame::check_error(int length, bool ignore_inv_size_flag) const
     {
+      PXDError::PXDErrorFlags m_errorMask = PXDError::EPXDErrMask::c_NO_ERROR;
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       if (length < getMinSize()) {
         if (!ignore_inv_size_flag) B2WARNING("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
-        errorMask[c_nrROI_PACKET_INV_SIZE] = true;
+        m_errorMask |= PXDError::c_ROI_PACKET_INV_SIZE;
       } else if ((length - getMinSize()) % 8 != 0) {
         if (!ignore_inv_size_flag) B2WARNING("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
-        errorMask[c_nrROI_PACKET_INV_SIZE] = true;
+        m_errorMask |= PXDError::c_ROI_PACKET_INV_SIZE;
       }
+      return m_errorMask;
     };
     void dhc_onsen_roi_frame::print(void) const
     {
@@ -219,23 +222,24 @@ namespace Belle2 {
       }
     };
 
-    void dhc_frames::check_padding(PXDErrorFlags& errorMask)
+    PXDError::PXDErrorFlags dhc_frames::check_padding(void)
     {
       unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
       if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
         /// TODO many false positives, we should remove that check after we KNOW that it has been fixed in DHH Firmware
         B2INFO("Suspicious Padding $" << std::hex << crc);
-        errorMask[c_nrSUSP_PADDING] = true;
+        return PXDError::EPXDErrMask::c_SUSP_PADDING;
       }
+      return PXDError::EPXDErrMask::c_NO_ERROR;
     };
 
-    void dhc_frames::check_crc(PXDErrorFlags& errorMask, bool ignore_crc_flag)
+    PXDError::PXDErrorFlags dhc_frames::check_crc(bool ignore_crc_flag)
     {
       dhc_crc_32_type bocrc;
 
       if (length > 65536 * 16) {
         if (!ignore_crc_flag) B2WARNING("DHC Data Frame CRC not calculated because of too large packet (>1MB)!");
-        return; // such large packets should trigger an error elsewhere
+        return PXDError::EPXDErrMask::c_NO_ERROR; // such large packets should trigger an error elsewhere
       } else {
         bocrc.process_bytes(data, length - 4);
       }
@@ -253,8 +257,9 @@ namespace Belle2 {
                   << * (unsigned int*)(((unsigned char*)data) + length - 6) << " "
                   << * (unsigned int*)(((unsigned char*)data) + length - 4) << " len $" << length);
         }
-        errorMask[c_nrDHE_CRC] = true;
+        return PXDError::EPXDErrMask::c_DHE_CRC;
       }
+      return PXDError::EPXDErrMask::c_NO_ERROR;
     };
 
 

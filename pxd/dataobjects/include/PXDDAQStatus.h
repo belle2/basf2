@@ -105,7 +105,7 @@ namespace Belle2 {
      * the PXD data is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0) && !m_gated;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0 && !m_gated;}
 
     /** Add Data packet information including its DHC/DHE tree
      * @param daqpktstat Packet Status Object

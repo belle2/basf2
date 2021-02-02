@@ -351,8 +351,7 @@ namespace Belle2 {
       void print(void) const;
 
       /// check error and return error mask
-      void check_error(
-        PXDErrorFlags& errormask,
+      PXDError::PXDErrorFlags check_error(
         bool ignore_datcon_flag = false,
         bool ignore_hltroi_magic_flag = false,
         bool ignore_merger_mm_flag = false
@@ -397,8 +396,7 @@ namespace Belle2 {
         return trignr0;
       };
       /// check error and return error mask
-      void check_error(
-        PXDErrorFlags& errormask,
+      PXDError::PXDErrorFlags check_error(
         int length,
         bool ignore_inv_size_flag = false
       ) const;
@@ -407,7 +405,7 @@ namespace Belle2 {
       /// 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       inline int getMinSize(void) const {return 4 + 4 + 4;};
       /// check inner crc (currently not implemented/needed)
-      unsigned int check_inner_crc(PXDErrorFlags& /*errormask*/, unsigned int /*length*/) const
+      unsigned int check_inner_crc(unsigned int /*length*/) const
       {
         // Parts of the data are now in the ONSEN Trigger frame,
         // therefore the inner CRC cannot be checked that easily!
@@ -607,9 +605,9 @@ namespace Belle2 {
         return ((ubig16_t*)data)[1];
       };
       /// check padding and return it
-      void check_padding(PXDErrorFlags& errormask);
+      PXDError::PXDErrorFlags check_padding();
       /// check crc and return it
-      void check_crc(PXDErrorFlags& errormask, bool ignore_crc_flag = false);
+      PXDError::PXDErrorFlags check_crc(bool ignore_crc_flag = false);
 
       /// get fixed size
       unsigned int getFixedSize(void);

@@ -18,6 +18,7 @@
 
 namespace Belle2 {
   class SpacePoint;
+  class SpacePointTrackCand;
   class VxdID;
 
   class ModuleParamList;
@@ -30,10 +31,10 @@ namespace Belle2 {
    * and stored in the output vector.
    */
   class FastInterceptFinder2D : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>> {
+    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, SpacePointTrackCand> {
     /// Parent class
     using Super =
-      TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, std::vector<const SpacePoint*>>;
+      TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, SpacePointTrackCand>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
@@ -49,8 +50,8 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates) override;
+    /// Load in the prepared hits and create track candidates for further processing like hit filtering and fitting
+    void apply(std::vector<hitTuple>& hits, std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
     // sub-findlets

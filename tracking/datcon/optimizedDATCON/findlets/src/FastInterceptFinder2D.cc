@@ -9,7 +9,10 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
 
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -118,7 +121,7 @@ void FastInterceptFinder2D::initialize()
   initializeSectorFriendMap();
 }
 
-void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<std::vector<const SpacePoint*>>& trackCandidates)
+void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<SpacePointTrackCand>& trackCandidates)
 {
   m_trackCandidates.clear();
 
@@ -135,7 +138,15 @@ void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<std::
   }
 
   for (auto& trackCand : m_trackCandidates) {
-    trackCandidates.emplace_back(trackCand);
+    // sort for layer, and 2D radius in case of same layer before storing as SpacePointTrackCand
+    std::sort(trackCand.begin(), trackCand.end(),
+    [](const SpacePoint * a, const SpacePoint * b) {
+      return
+        (a->getVxdID().getLayerNumber() < b->getVxdID().getLayerNumber()) or
+        (a->getVxdID().getLayerNumber() == b->getVxdID().getLayerNumber() and a->getPosition().Perp() < b->getPosition().Perp());
+    });
+
+    trackCandidates.emplace_back(SpacePointTrackCand(trackCand));
   }
 
   B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());

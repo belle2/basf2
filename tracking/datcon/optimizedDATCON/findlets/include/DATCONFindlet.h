@@ -18,6 +18,7 @@
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -60,20 +61,22 @@ namespace Belle2 {
     FastInterceptFinder2D m_interceptFinder;
 
     /// Simple 1D Hough Space intercept finder
-    FastInterceptFinder1D m_simpleInterceptFinder;
+    FastInterceptFinder1D m_interceptFinder1D;
 
     // container to share data between findlets
 
     /// hits are a combination of:
-    /// pointer to a SpacePoint
-    /// the VxdID of the SpacePoint
-    /// the conformal-transformed x and y coordinates of the SpacePoint
-    /// and its z coordinate
+    /// * pointer to a SpacePoint
+    /// * the VxdID of the SpacePoint
+    /// * the conformal-transformed x and y coordinates of the SpacePoint
+    /// * and its z coordinate
+    /// The VxdID and coordinates are cached for faster access times
     std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>> m_hits;
 
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.
-    std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
+//     std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
+    std::vector<SpacePointTrackCand> m_trackCandidates;
 
     /// Parameter to switch between the 1D and 2D intercept finder options
     /// Instead two findlets could be created that would only differ in the intercept finder findlet

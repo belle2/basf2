@@ -10,8 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-// #include <framework/datastore/StoreArray.h>
-
 #include <vxd/dataobjects/VxdID.h>
 
 #include <string>
@@ -42,10 +40,10 @@ namespace Belle2 {
         const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
         const double hitZPosition = std::get<4>(hit);
 
-        // The hitZPosition cuts are based on simple geometrical calculations
+        // The hitZPosition cuts are based on simple geometrical calculations.
         // Take the gap between two L6 sensors, draw a straight line to the origin, check the intercepts
         // with the other layers, and add / subtract 10 mm to account for a straight line not perfectly representing the boarders,
-        //  slight misalignment, boost, etc so that there is some overlap
+        // slight misalignment, boost, etc so that there is some overlap
         if (currentHitSensorID.getLayerNumber() < 6) {
           switch (sensorInLayerSixLadder) {
             case 1:

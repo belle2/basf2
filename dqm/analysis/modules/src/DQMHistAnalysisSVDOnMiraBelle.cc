@@ -537,7 +537,7 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::highOccupancySensor(int 
   } else {
     B2DEBUG(20, "Layer out of range [3,6].");
   }
-  std::vector<float> avgOffOccUV(0.0);
+  std::vector<float> avgOffOccUV(2, 0.0);
   avgOffOccUV[0] = hU->GetBinContent(iBin) / 768 / nEvents * 100;
   avgOffOccUV[1] = hV->GetBinContent(iBin) / nStripsV / nEvents * 100;
   return avgOffOccUV;
@@ -555,7 +555,7 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyUV(int iLaye
   } else {
     B2DEBUG(20, "Layer out of range [3,6].");
   }
-  std::vector<float> avgOffOccUV(0.0);
+  std::vector<float> avgOffOccUV(2, 0.0);
   for (int bin = min; bin < max; bin++) {
     avgOffOccUV[0] += hU->GetBinContent(offset + step * bin) / 768 * 100;
     avgOffOccUV[1] += hV->GetBinContent(offset + step * bin) / nStripsV * 100;
@@ -569,9 +569,9 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyUV(int iLaye
 std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int minX,
     int maxX, int minY, int maxY) const
 {
-  std::vector<float> avgEffUV(0.0);
-  std::vector<float> sumMatchedClustersUV(0.0);
-  std::vector<float> sumFoundTracksUV(0.0);
+  std::vector<float> avgEffUV(2, 0.0);;
+  std::vector<float> sumMatchedClustersUV(2, 0.0);;
+  std::vector<float> sumFoundTracksUV(2, 0.0);;
   for (int binX = minX; binX < maxX + 1; binX++) {
     for (int binY = minY; binY < maxY + 1; binY++) {
       int binXY = hMCV->GetBin(binX, binY);

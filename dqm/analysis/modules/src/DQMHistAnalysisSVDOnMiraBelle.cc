@@ -637,9 +637,9 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyUV(int iLaye
 std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int minX,
     int maxX, int minY, int maxY) const
 {
-  std::vector<float> avgEffUV(2, 0.0);;
-  std::vector<float> sumMatchedClustersUV(2, 0.0);;
-  std::vector<float> sumFoundTracksUV(2, 0.0);;
+  std::vector<float> avgEffUV(2, 0.0);
+  std::vector<float> sumMatchedClustersUV(2, 0.0);
+  std::vector<float> sumFoundTracksUV(2, 0.0);
   for (int binX = minX; binX < maxX + 1; binX++) {
     for (int binY = minY; binY < maxY + 1; binY++) {
       int binXY = hMCV->GetBin(binX, binY);

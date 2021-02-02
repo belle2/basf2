@@ -4,7 +4,7 @@
    merges the relevant crystal payloads, and makes validation plots."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 from caf.utils import IoV
 
 
@@ -683,9 +683,6 @@ def get_calibrations(input_data, **kwargs):
                                          input_files=input_files_plotting)
         cal_ecl_timeShifts.add_collection(name="bhabha", collection=eclTCol)
 
-
-#         cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", collector="DummyCollector",
-#                                          algorithms=[tShifts_alg], input_files=input_files_first_last)
         cal_ecl_timeShifts.save_payloads = False
 
         #######################################################################

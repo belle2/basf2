@@ -59,7 +59,7 @@ namespace Belle2 {
       // cppcheck-suppress ignoredReturnValue
       std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(), LessOf<Second>());
 
-      for (const std::pair<ITrackType, size_t>& hitCountForMCTrackId : hitCountByMCTrackId) {
+      for (const auto& hitCountForMCTrackId : hitCountByMCTrackId) {
 
         nHits += hitCountForMCTrackId.second;
 

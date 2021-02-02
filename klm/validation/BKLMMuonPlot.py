@@ -132,7 +132,7 @@ def draw_bklmhists(file_chain):
     sector.SetMinimum(0.0)
     sector.Write()
 
-    layer = TH1F('Layer', 'Layer for BKLMHit2ds', 15, 0.5, 15.5)
+    layer = TH1F('Layer', 'Layer for BKLMHit2ds', 17, -0.5, 16.5)
     file_chain.Draw('BKLMHit2ds.getLayer()>>Layer', '')
     layer.GetXaxis().SetTitle('Layer #')
     layer.GetListOfFunctions().Add(TNamed('Description', 'Layer number of muon hit'))
@@ -165,9 +165,9 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 410, -1, 40)
+    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 210, -1, 20)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() > 2')
     RPC_bklmdigits_tres.SetXTitle('ns')
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 10 ns.'))
@@ -184,9 +184,9 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
-    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 210, -1, 20)
+    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 500, -15, 35)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() >= 3')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
     Sci_bklmdigits_tres.SetXTitle('ns')
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', '.'))
@@ -204,7 +204,7 @@ def draw_bklmhists(file_chain):
     timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeSci.Write()
 
-    nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, -0.5, 200.5)
+    nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, 0.0, 200)
     file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))

@@ -218,8 +218,8 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
   }
   B2INFO("-- PXD Packer Error Check for Event Nr: " << eventnr);
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-    uint64_t m;
-    m = 1ull << i; // ull is important!
+    PXDErrorFlags m;
+    m[i] = true;
     if ((m & (mask | expected)) == m) {
       if ((m & expected) == m && (m & mask) != m) {
         B2ERROR("Bit " << i << ": Was NOT Set: " << getPXDBitErrorName(i));
@@ -335,8 +335,8 @@ void PXDPackerErrModule::terminate()
     PXDErrorFlags mask = c_NO_ERROR;
     mask = std::accumulate(m_errors.begin(), m_errors.end(), mask, std::bit_or<PXDErrorFlags>());
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-      uint64_t m;
-      m = 1ull << i; // ull is important!
+      PXDErrorFlags m;
+      m[i] = true;
       if ((m & mask) == 0) {
         B2WARNING("Bit " << i << ": Not Covered   : " << getPXDBitErrorName(i));
       }

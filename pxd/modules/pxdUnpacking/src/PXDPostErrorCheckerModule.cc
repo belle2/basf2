@@ -165,12 +165,12 @@ void PXDPostErrorCheckerModule::event()
           if (dhe.getTriggerGate() != triggergate) {
             if (!m_ignoreTriggerGate) B2WARNING("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
                                                   triggergate) << LogVar("TriggerGate 2", dhe.getTriggerGate()));
-            mask |= EPXDErrMask::c_EVT_TRG_GATE_DIFFER;
+            mask [c_nrEVT_TRG_GATE_DIFFER] = true;
           }
           if (dhe.getFrameNr() != dheframenr) {
             if (!m_ignoreDHPFrame) B2WARNING("Frame Nr of DHEs not identical" << LogVar("FrameNr 1", dheframenr) << LogVar("FrameNr 2",
                                                dhe.getFrameNr()));
-            mask |= EPXDErrMask::c_EVT_TRG_FRM_NR_DIFFER;
+            mask [c_nrEVT_TRG_FRM_NR_DIFFER] = true;
           }
         } else {
           triggergate = dhe.getTriggerGate();

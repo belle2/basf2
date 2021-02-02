@@ -47,8 +47,8 @@ namespace Belle2 {
 
     double m_time; ///< event time
 
-    double m_mu0_pid; ///< stores PID of first muon
-    double m_mu1_pid; ///< stores PID of second muon
+    double m_mu0_pid; ///< particle ID of mu/e separation first muon
+    double m_mu1_pid; ///< particle ID of mu/e separation second muon
 
     TVector3 m_mu0_p; ///< three momentum of first muon
     TVector3 m_mu1_p; ///< three momentum of second muon

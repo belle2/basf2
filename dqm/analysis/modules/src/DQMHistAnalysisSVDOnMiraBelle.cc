@@ -293,6 +293,38 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   // average efficiency for mid plane: L6.X.4
   std::vector<float> avgEffL6X4 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 17, 17);
 
+  // average efficiency for high occupancy sensors
+
+  std::vector<float> avgEffL311UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 2,
+                                                    2); // L3.1.1
+
+  std::vector<float> avgEffL312UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 3,
+                                                    3); // L3.1.2
+
+  std::vector<float> avgEffL321UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 2, 2, 2,
+                                                    2); // L3.2.1
+
+  std::vector<float> avgEffL322UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 2, 2, 3,
+                                                    3); // L3.2.2
+
+  std::vector<float> avgEffL461UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 6, 6, 5,
+                                                    5); // L4.6.1
+
+  std::vector<float> avgEffL461UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 6, 6, 6,
+                                                    6); // L4.6.2
+
+  std::vector<float> avgEffL581UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 8, 8, 9,
+                                                    9); // L5.8.1
+
+  std::vector<float> avgEffL582UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 8, 8, 10,
+                                                    10); // L5.8.2
+
+  std::vector<float> avgEffL6101UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 10, 10, 14,
+                                                     14); // L6.10.1
+
+  std::vector<float> avgEffL6102UV = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 10, 10, 15,
+                                                     15); // L6.10.2
+
   // setting monitoring variables
   if (h_matched_clusU == NULL || h_found_tracksU == NULL) {
     B2INFO("Histograms needed for Average Efficiency on U side are not found");
@@ -310,9 +342,17 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL6X2U", -1);
     m_monObj->setVariable("avgEffL6X3U", -1);
     m_monObj->setVariable("avgEffL6X4U", -1);
+    m_monObj->setVariable("avgEffL311U", -1);
+    m_monObj->setVariable("avgEffL312U", -1);
+    m_monObj->setVariable("avgEffL321U", -1);
+    m_monObj->setVariable("avgEffL322U", -1);
+    m_monObj->setVariable("avgEffL461U", -1);
+    m_monObj->setVariable("avgEffL462U", -1);
+    m_monObj->setVariable("avgEffL581U", -1);
+    m_monObj->setVariable("avgEffL582U", -1);
+    m_monObj->setVariable("avgEffL6101U", -1);
+    m_monObj->setVariable("avgEffL6102U", -1);
   } else {
-    float avgEffU = h_matched_clusU->GetEntries() / h_found_tracksU->GetEntries();
-    m_monObj->setVariable("avgEffU", avgEffU);
     m_monObj->setVariable("avgEffL3U", avgEffL3[0]);
     m_monObj->setVariable("avgEffL4U", avgEffL4[0]);
     m_monObj->setVariable("avgEffL5U", avgEffL5[0]);
@@ -326,6 +366,16 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL6X2U", avgEffL6X2[0]);
     m_monObj->setVariable("avgEffL6X3U", avgEffL6X3[0]);
     m_monObj->setVariable("avgEffL6X4U", avgEffL6X4[0]);
+    m_monObj->setVariable("avgEffL311U", avgEffL311UV[0]);
+    m_monObj->setVariable("avgEffL312U", avgEffL312UV[0]);
+    m_monObj->setVariable("avgEffL321U", avgEffL321UV[0]);
+    m_monObj->setVariable("avgEffL322U", avgEffL322UV[0]);
+    m_monObj->setVariable("avgEffL461U", avgEffL461UV[0]);
+    m_monObj->setVariable("avgEffL462U", avgEffL462UV[0]);
+    m_monObj->setVariable("avgEffL581U", avgEffL581UV[0]);
+    m_monObj->setVariable("avgEffL582U", avgEffL582UV[0]);
+    m_monObj->setVariable("avgEffL6101U", avgEffL6101UV[0]);
+    m_monObj->setVariable("avgEffL6102U", avgEffL6102UV[0]);
   }
 
   if (h_matched_clusV == NULL || h_found_tracksV == NULL) {
@@ -344,9 +394,17 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL6X2V", -1);
     m_monObj->setVariable("avgEffL6X3V", -1);
     m_monObj->setVariable("avgEffL6X4V", -1);
+    m_monObj->setVariable("avgEffL311V", -1);
+    m_monObj->setVariable("avgEffL312V", -1);
+    m_monObj->setVariable("avgEffL321V", -1);
+    m_monObj->setVariable("avgEffL322V", -1);
+    m_monObj->setVariable("avgEffL461V", -1);
+    m_monObj->setVariable("avgEffL462V", -1);
+    m_monObj->setVariable("avgEffL581V", -1);
+    m_monObj->setVariable("avgEffL582V", -1);
+    m_monObj->setVariable("avgEffL6101V", -1);
+    m_monObj->setVariable("avgEffL6102V", -1);
   } else {
-    float avgEffV = h_matched_clusV->GetEntries() / h_found_tracksV->GetEntries();
-    m_monObj->setVariable("avgEffV", avgEffV);
     m_monObj->setVariable("avgEffL3V", avgEffL3[1]);
     m_monObj->setVariable("avgEffL4V", avgEffL4[1]);
     m_monObj->setVariable("avgEffL5V", avgEffL5[1]);
@@ -360,6 +418,16 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL6X2V", avgEffL6X2[1]);
     m_monObj->setVariable("avgEffL6X3V", avgEffL6X3[1]);
     m_monObj->setVariable("avgEffL6X4V", avgEffL6X4[1]);
+    m_monObj->setVariable("avgEffL311U", avgEffL311UV[1]);
+    m_monObj->setVariable("avgEffL312U", avgEffL312UV[1]);
+    m_monObj->setVariable("avgEffL321U", avgEffL321UV[1]);
+    m_monObj->setVariable("avgEffL322U", avgEffL322UV[1]);
+    m_monObj->setVariable("avgEffL461U", avgEffL461UV[1]);
+    m_monObj->setVariable("avgEffL462U", avgEffL462UV[1]);
+    m_monObj->setVariable("avgEffL581U", avgEffL581UV[1]);
+    m_monObj->setVariable("avgEffL582U", avgEffL582UV[1]);
+    m_monObj->setVariable("avgEffL6101U", avgEffL6101UV[1]);
+    m_monObj->setVariable("avgEffL6102U", avgEffL6102UV[1]);
   }
 
 

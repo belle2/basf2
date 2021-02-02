@@ -328,7 +328,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   // setting monitoring variables
   if (h_matched_clusU == NULL || h_found_tracksU == NULL) {
     B2INFO("Histograms needed for Average Efficiency on U side are not found");
-    m_monObj->setVariable("avgEffU", -1);
     m_monObj->setVariable("avgEffL3U", -1);
     m_monObj->setVariable("avgEffL4U", -1);
     m_monObj->setVariable("avgEffL5U", -1);
@@ -380,7 +379,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_matched_clusV == NULL || h_found_tracksV == NULL) {
     B2INFO("Histograms needed for Average Efficiency on V side are not found");
-    m_monObj->setVariable("avgEffV", -1);
     m_monObj->setVariable("avgEffL3V", -1);
     m_monObj->setVariable("avgEffL4V", -1);
     m_monObj->setVariable("avgEffL5V", -1);

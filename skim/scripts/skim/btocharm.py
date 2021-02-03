@@ -895,9 +895,9 @@ class B0toDD_Kpipi_Kspi(BaseSkim):
         This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi` and
         `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^-`
         channel is defined.
-
-        Because of the zero retention on the tau pair sample, this skim should not be run on that sample
     """
+
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     __authors__ = ["Chiara La Licata"]
     __description__ = ""
@@ -944,9 +944,6 @@ class B0toDstarD(BaseSkim):
     * ``abs(deltaE) < 0.3``
     * ``DM_Dstar_D < 0.16``
     * ``1.8 < M_D < 1.9``
-
-    Note:
-        Because of the zero retention on the tau pair sample, this skim should not be run on that sample
     """
 
     __authors__ = ["Chiara La Licata"]
@@ -955,6 +952,7 @@ class B0toDstarD(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         loadStdPi0ForBToHadrons(path=path)

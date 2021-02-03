@@ -390,17 +390,6 @@ namespace Belle2 {
       bool rangeOfX(double z, double& xmi, double& xma);
 
       /**
-       * Performs a clip on x w.r.t xmi and xma
-       * @param x true coordinate
-       * @param Nx signed number of reflections
-       * @param A bar width
-       * @param xmi lower limit on unfolded coordinate x
-       * @param xma upper limit on unfolded coordinate x
-       * @return clipped x
-       */
-      double clip(double x, int Nx, double A, double xmi, double xma) const;
-
-      /**
        * Finds the position on the mirror of the extreme reflection.
        * @param xE true emission position in x
        * @param zE emission position in z
@@ -508,14 +497,6 @@ namespace Belle2 {
     inline double PDFConstructor::getPDFValue(int pixelID, double time, double timeErr, double sigt) const
     {
       return pdfValue(pixelID, time, timeErr, sigt) / getExpectedPhotons();
-    }
-
-    inline double PDFConstructor::clip(double x, int Nx, double A, double xmi, double xma) const
-    {
-      x = func::unfold(x, Nx, A);
-      x = std::max(std::min(x, xma), xmi) - Nx * A;
-      if (Nx % 2 != 0) x = -x;
-      return x;
     }
 
     inline double PDFConstructor::deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD)

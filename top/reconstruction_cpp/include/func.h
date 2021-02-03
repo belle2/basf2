@@ -62,6 +62,23 @@ namespace Belle2 {
       }
 
       /**
+       * Performs a clip on x w.r.t xmi and xma
+       * @param x true coordinate
+       * @param Nx signed number of reflections
+       * @param A size for folding/unfolding
+       * @param xmi lower limit on unfolded coordinate x
+       * @param xma upper limit on unfolded coordinate x
+       * @return clipped x
+       */
+      inline double clip(double x, int Nx, double A, double xmi, double xma)
+      {
+        x = unfold(x, Nx, A);
+        x = std::max(std::min(x, xma), xmi) - Nx * A;
+        if (Nx % 2 != 0) x = -x;
+        return x;
+      }
+
+      /**
        * Returns number of even numbers in the range given by arguments
        * @param j1 first number
        * @param j2 last number (exclusive)
@@ -83,7 +100,6 @@ namespace Belle2 {
         if (angle < 0) angle += 2 * M_PI;
         return angle;
       }
-
 
     } // func
   } // TOP

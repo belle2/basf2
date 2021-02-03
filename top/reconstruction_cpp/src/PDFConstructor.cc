@@ -51,7 +51,7 @@ namespace Belle2 {
       m_minTime = TOPRecoManager::getMinTime();
       m_maxTime = TOPRecoManager::getMaxTime();
 
-      // prepare memory for storing PDF parametrization
+      // prepare memory for storing signal PDF parametrization
 
       const auto& pixelPositions = m_yScanner->getPixelPositions();
       int numPixels = pixelPositions.getNumPixels();
@@ -61,6 +61,8 @@ namespace Belle2 {
         const auto& tts = geo->getTTS(pmtType);
         m_signalPDFs.push_back(SignalPDF(pixelID, tts));
       }
+
+      // construct PDF
 
       if (m_yScanner->isAboveThreshold()) {
         setSignalPDF();
@@ -144,9 +146,9 @@ namespace Belle2 {
       double Ah = bar.A / 2;
       for (int k = kmi; k <= kma; k++) {
         double x0 = findReflectionExtreme(xE, zE, prism.zD, k, bar.A, mirror);
-        x0 = clip(x0, k, bar.A, xmi, xma);
-        double xL = clip(-Ah, k, bar.A, xmi, xma);
-        double xR = clip(Ah, k, bar.A, xmi, xma);
+        x0 = func::clip(x0, k, bar.A, xmi, xma);
+        double xL = func::clip(-Ah, k, bar.A, xmi, xma);
+        double xR = func::clip(Ah, k, bar.A, xmi, xma);
         if (x0 > xL) setSignalPDF_reflected(k, xL, x0);
         if (x0 < xR) setSignalPDF_reflected(k, x0, xR);
       }

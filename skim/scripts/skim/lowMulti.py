@@ -98,10 +98,11 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 @fancy_skim_header
 class LowMassTwoTrack(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}
+        * including the golden mode :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
-    __description__ = "Skim list for low mass two track events."
+    __description__ = "Skim list for low mass two track events including the golden mode ee->pipi(g)."
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 

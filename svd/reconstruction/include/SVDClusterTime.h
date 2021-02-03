@@ -30,8 +30,16 @@ namespace Belle2::SVD {
 
     /**
      * Constructor to create an empty Cluster Time Object
+     * by default returns the calibrated time
      */
-    SVDClusterTime() {};
+    SVDClusterTime() {m_returnRawClusterTime = false;};
+
+
+    /**
+     * set to return the raw cluster time instead of the calibrated one
+     */
+    void setReturnRawClusterTime()
+    {m_returnRawClusterTime = true;};
 
     /**
      * set the trigger bin
@@ -59,6 +67,9 @@ namespace Belle2::SVD {
     void applyELS3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame);
 
   protected:
+
+    /** to be used for time calibration  */
+    bool m_returnRawClusterTime = false;
 
     /** trigger bin */
     int m_triggerBin = std::numeric_limits<int>::quiet_NaN();

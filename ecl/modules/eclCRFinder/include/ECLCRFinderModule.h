@@ -96,6 +96,7 @@ namespace Belle2 {
     int m_tempCRId = -1; /**< Temporary CR ID*/
 
     /** Digit vectors. */
+    std::vector <int>  m_cellIdToCheckVec; /**< cellid -> check digit. */
     std::vector <int>  m_cellIdToSeedVec; /**< cellid -> seed digit. */
     std::vector <int>  m_cellIdToGrowthVec; /**< cellid -> growth digits. */
     std::vector <int>  m_cellIdToDigitVec; /**< cellid -> above threshold digits. */

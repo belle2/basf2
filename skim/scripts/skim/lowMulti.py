@@ -98,7 +98,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 @fancy_skim_header
 class LowMassTwoTrack(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h^{+}h^{-}`
         * including the golden mode :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}`
     """
     __authors__ = "Xing-Yu Zhou"

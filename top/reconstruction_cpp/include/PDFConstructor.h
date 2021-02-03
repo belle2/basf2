@@ -556,6 +556,16 @@ namespace Belle2 {
 
       int i0 = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(), cerenkovAngle());
       if (i0 < 0 or not m_inverseRaytracer->getStatus()) return;
+      int n = 0;
+      for (unsigned i = 0; i < 2; i++) {
+        if (not m_inverseRaytracer->getStatus(i)) continue;
+        const auto& solutions = m_inverseRaytracer->getSolutions(i);
+        const auto& sol = solutions[i0];
+        double time = m_tof + sol.len * m_groupIndex / Const::speedOfLight;
+        if (time > m_maxTime + 1.0) continue;
+        n++;
+      }
+      if (n == 0) return;
 
       // solutions with xD displaced by dx
 
@@ -574,7 +584,7 @@ namespace Belle2 {
         k++;
       }
 
-      // solutions with emission point dispaced by dL
+      // solutions with emission point displaced by dL
 
       double dL = 0.1; // cm
       int i_dL = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(dL), cerenkovAngle(), dL);
@@ -614,9 +624,6 @@ namespace Belle2 {
         if (not m_inverseRaytracer->getStatus(i)) continue;
         const auto& solutions = m_inverseRaytracer->getSolutions(i);
         const auto& sol = solutions[i0];
-        double time = m_tof + sol.len * m_groupIndex / Const::speedOfLight;
-        if (time > m_maxTime) continue;
-
         const auto& sol_dx = solutions[i_dx];
         const auto& sol_de = solutions[i_de];
         const auto& sol_dL = solutions[i_dL];
@@ -625,7 +632,7 @@ namespace Belle2 {
         bool ok = doRaytracingCorrections(sol, D.dFic_dx, xD);
         if (not ok) continue;
 
-        time = m_tof + m_fastRaytracer->getPropagationLen() * m_groupIndex / Const::speedOfLight;
+        double time = m_tof + m_fastRaytracer->getPropagationLen() * m_groupIndex / Const::speedOfLight;
         if (time > m_maxTime) continue;
 
         m_Fic = sol.getFic() + m_dFic;

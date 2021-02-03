@@ -51,6 +51,17 @@ namespace Belle2 {
       m_minTime = TOPRecoManager::getMinTime();
       m_maxTime = TOPRecoManager::getMaxTime();
 
+      // prepare memory for storing PDF parametrization
+
+      const auto& pixelPositions = m_yScanner->getPixelPositions();
+      int numPixels = pixelPositions.getNumPixels();
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
+        auto pmtType = pixelPositions.get(pixelID).pmtType;
+        const auto& tts = geo->getTTS(pmtType);
+        m_signalPDFs.push_back(SignalPDF(pixelID, tts));
+      }
+
       if (m_yScanner->isAboveThreshold()) {
         setSignalPDF();
       }
@@ -64,18 +75,6 @@ namespace Belle2 {
 
     void PDFConstructor::setSignalPDF()
     {
-      const auto& pixelPositions = m_yScanner->getPixelPositions();
-      int numPixels = pixelPositions.getNumPixels();
-
-      // prepare memory for storing PDF parametrization
-
-      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
-        auto pmtType = pixelPositions.get(pixelID).pmtType;
-        const auto& tts = geo->getTTS(pmtType);
-        m_signalPDFs.push_back(SignalPDF(pixelID, tts));
-      }
-
       // construct PDF analytically
 
       setSignalPDF_direct();

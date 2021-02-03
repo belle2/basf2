@@ -9,8 +9,7 @@ args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
 add_hlt_processing(reco_path, run_type=constants.RunTypes.beam,
-                   softwaretrigger_mode=constants.SoftwareTriggerModes.monitor,
-                   create_hlt_unit_histograms=True)
+                   softwaretrigger_mode=constants.SoftwareTriggerModes.monitor)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

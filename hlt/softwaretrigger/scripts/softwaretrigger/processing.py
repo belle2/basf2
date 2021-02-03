@@ -132,7 +132,7 @@ def add_hlt_processing(path,
                        prune_output=True,
                        unpacker_components=None,
                        reco_components=None,
-                       create_hlt_unit_histograms=False,
+                       create_hlt_unit_histograms=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines

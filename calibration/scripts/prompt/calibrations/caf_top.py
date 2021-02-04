@@ -39,10 +39,11 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
-           moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
-           moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
-           commonT0_calibration_BF(inputFiles)]
+    cal = [  # BS13d_calibration_cdst(inputFiles),  # this is run-dep
+        moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
+        #      moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
+        # commonT0_calibration_BF(inputFiles)
+    ]
 
     for c in cal:
         if c.strategies == SingleIOV:
@@ -50,7 +51,7 @@ def get_calibrations(input_data, **kwargs):
             # if payload boundaries are set, turn all the SingleIOV strategies into SequentialBoundaries
             # and set the iovs that were passed via expert_config
             if expert_config["payload_boundaries"] is not None:
-
+                c.strategies = SequentialBoundaries
                 payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
                 payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
                 basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
@@ -58,10 +59,8 @@ def get_calibrations(input_data, **kwargs):
                 for col in c.collectors:
                     col.param('granularity', 'run')
 
-                c.strategies = SequentialBoundaries
-                c.setBoundaries(vector_from_runs(payload_boundaries))
                 for alg in c.algorithms:
-                    alg.params = {'iov_coverage': output_iov}
+                    alg.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
 
             else:
                 for alg in c.algorithms:
@@ -70,10 +69,10 @@ def get_calibrations(input_data, **kwargs):
             for alg in c.algorithms:
                 alg.params = {"iov_coverage": output_iov}
 
-    cal[1].save_payloads = False
+    # cal[1].save_payloads = False
 
-    cal[1].depends_on(cal[0])
-    cal[2].depends_on(cal[1])
-    cal[3].depends_on(cal[2])
+    # cal[1].depends_on(cal[0])
+    # cal[2].depends_on(cal[1])
+    # cal[3].depends_on(cal[2])
 
     return cal

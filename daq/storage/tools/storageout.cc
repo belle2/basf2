@@ -36,11 +36,6 @@ int main(int argc, char** argv)
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000);
   int* evtbuf = new int[10000000];
-  unsigned int count_in = 0;
-  unsigned int count_out = 0;
-  unsigned int expno = 0;
-  unsigned int runno = 0;
-  unsigned int subno = 0;
   info.reportRunning();
   const int port = atoi(argv[3]);
   TCPServerSocket serversocket("0.0.0.0", port);
@@ -51,6 +46,12 @@ int main(int argc, char** argv)
   }
   try {
     while (true) {
+      unsigned int count_in = 0;
+      unsigned int count_out = 0;
+      unsigned int expno = 0;
+      unsigned int runno = 0;
+      unsigned int subno = 0;
+
       if (use_info) info.setOutputPort(0);
       TCPSocket socket = serversocket.accept();
       TCPSocketWriter writer(socket);
@@ -88,7 +89,7 @@ int main(int argc, char** argv)
           LogFile::warning("Lost connection to expreco %s", e.what());
           break;
         }
-        if (nbyte_out <= 0) {
+        if (nbyte_out == 0) {
           LogFile::warning("Connection to expreco broken.");
           if (use_info) info.setInputPort(0);
           info.reportError(RunInfoBuffer::SOCKET_OUT);

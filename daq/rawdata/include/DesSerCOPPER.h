@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual ~DesSerCOPPER();
 
     //! Module functions to be called from event process
-    void DataAcquisition();
+    void DataAcquisition() override;
 
     //! Read one event from COPPER
     int* readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word);

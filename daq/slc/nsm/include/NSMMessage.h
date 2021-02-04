@@ -107,8 +107,8 @@ namespace Belle2 {
     void push(const NSMMessage& msg);
 
   public:
-    virtual void readObject(Reader&);
-    virtual void writeObject(Writer&) const;
+    void readObject(Reader&) override;
+    void writeObject(Writer&) const override;
 
   public:
     size_t read(NSMcontext* nsmc);

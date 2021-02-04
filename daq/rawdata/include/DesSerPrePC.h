@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual ~DesSerPrePC();
 
     //! Module functions to be called from event process
-    void DataAcquisition();
+    void DataAcquisition() override;
 
   protected :
     //! Accept connection

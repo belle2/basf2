@@ -82,7 +82,7 @@ main(int argc, char **argv)
   int fd[4];
   int use[4];
   int readback[4];
-  int i, j;
+  int i;
   FILE *fp;
   int ch;
   int tem;
@@ -103,7 +103,7 @@ main(int argc, char **argv)
         break;
       }
 
-      j = argv[1][i] - 'a';
+      int j = argv[1][i] - 'a';
       if (use[j]) {
         fprintf(stderr, "HSLB %c is specified twice\n", 'a'+j);
         exit(1);

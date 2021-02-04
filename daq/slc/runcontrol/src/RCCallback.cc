@@ -34,13 +34,13 @@ namespace Belle2 {
     RCConfigHandler(RCCallback& callback,
                     const std::string& name, const std::string& val)
       : NSMVHandlerText(name, true, true, val), m_callback(callback) {}
-    bool handleGetText(std::string& val)
+    bool handleGetText(std::string& val) override
     {
       const DBObject& obj(m_callback.getDBObject());
       val = obj.getName();
       return true;
     }
-    bool handleSetText(const std::string& val)
+    bool handleSetText(const std::string& val) override
     {
       RCState state(m_callback.getNode().getState());
       RCState tstate(RCCommand::CONFIGURE.nextTState());

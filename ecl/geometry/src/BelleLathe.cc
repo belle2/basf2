@@ -242,7 +242,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   };
   fshape = getpolycone(GetName(), phi0, dphi, fcontour);
 #else
-  fshape = NULL;
+  fshape = nullptr;
 #endif
 //  StreamInfo(G4cout);
 }

@@ -122,7 +122,7 @@ class LowMassTwoTrack(BaseSkim):
     TestFiles = [get_test_file("MC13_mumuBGx1"), get_test_file("MC13_uubarBGx1")]
 
     def build_lists(self, path):
-        lable = "LowMassTwoTrack"
+        label = "LowMassTwoTrack"
 
         # Tracks from IP
         IPCut = "[abs(dz) < 5] and [abs(dr) < 2.0]"
@@ -130,8 +130,8 @@ class LowMassTwoTrack(BaseSkim):
         thetaCut = '0.296706 < theta < 2.61799'
         # Tracks of momenta greater than 0.5 GeV in the Lab frame
         pCut = "[p > 0.5]"
-        # Energy of hard ISR gamma greater than 3 GeV in the CMS frame
-        ISRECut = "[useCMSFrame(E) > 3]"
+        # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
+        ISRECut = "[useCMSFrame(E) > 2]"
         # Invariant mass of h+h- system less than 3.5 GeV
         hhMassWindow = "daughterInvM(1,2) < 3.5"
 
@@ -145,31 +145,29 @@ class LowMassTwoTrack(BaseSkim):
         ma.applyEventCuts(f"{nTracksCut} and {nHardISRPhotonCut}", path=path)
 
         # Reconstruct candidates
-        ma.fillParticleList(f"pi+:{lable}", f"{IPCut} and {pCut}", path=path)
-        ma.fillParticleList(f"K+:{lable}", f"{IPCut} and {pCut}", path=path)
-        ma.fillParticleList(f"p+:{lable}", f"{IPCut} and {pCut}", path=path)
-        ma.fillParticleList(f"gamma:{lable}_ISR", ISRECut, path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{IPCut} and {pCut}", path=path)
+        ma.fillParticleList(f"K+:{label}", f"{IPCut} and {pCut}", path=path)
+        ma.fillParticleList(f"p+:{label}", f"{IPCut} and {pCut}", path=path)
+        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
-            (f"vpho:{lable}_pipi", f" -> gamma:{lable}_ISR pi+:{lable} pi-:{lable}", hhMassWindow),
-            (f"vpho:{lable}_KK", f" -> gamma:{lable}_ISR K+:{lable} K-:{lable}", hhMassWindow),
+            (f"vpho:{label}_pipi", f" -> gamma:{label}_ISR pi+:{label} pi-:{label}", hhMassWindow),
+            (f"vpho:{label}_KK", f" -> gamma:{label}_ISR K+:{label} K-:{label}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR K pi and missing other final state particles
-            (f"vpho:{lable}_Kpi", f" -> gamma:{lable}_ISR K+:{lable} pi-:{lable}", hhMassWindow),
-            (f"vpho:{lable}_pp", f" -> gamma:{lable}_ISR p+:{lable} anti-p-:{lable}", hhMassWindow),
+            (f"vpho:{label}_Kpi", f" -> gamma:{label}_ISR K+:{label} pi-:{label}", hhMassWindow),
+            (f"vpho:{label}_pp", f" -> gamma:{label}_ISR p+:{label} anti-p-:{label}", hhMassWindow),
             # Useful for analysis for processes like ISR Lambda Lambda-bar (Sigma Sigma-bar) , and one wants to
-            # reconstruct ISR photon and one of the Lambda (Sigma), missing anthoer Lambda (Sigma)
-            (f"vpho:{lable}_ppi", f" -> gamma:{lable}_ISR p+:{lable} pi-:{lable}", hhMassWindow),
+            # reconstruct the hard ISR photon and one of the Lambda (Sigma), missing anthoer Lambda (Sigma)
+            (f"vpho:{label}_ppi", f" -> gamma:{label}_ISR p+:{label} pi-:{label}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR p K and missing other final state particles
-            (f"vpho:{lable}_ppi", f" -> gamma:{lable}_ISR p+:{lable} K-:{lable}", hhMassWindow),
+            (f"vpho:{label}_pK", f" -> gamma:{label}_ISR p+:{label} K-:{label}", hhMassWindow),
         ]
 
-        ChannelLists = []
+        self.SkimLists = []
         for dmID, (mode, decayString, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode + decayString, cut, dmID=dmID, path=path)
-            ChannelLists.append(mode)
-
-        self.SkimLists = ChannelLists
+            self.SkimLists.append(mode)
 
 
 @fancy_skim_header

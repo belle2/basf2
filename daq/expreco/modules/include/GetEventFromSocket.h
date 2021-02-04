@@ -1,13 +1,13 @@
 //+
-// File : GetEvent.h
+// File : GetEventFromSocket.h
 // Description : Module to receive event from socket
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 13 - Jan - 2021
 //-
 
-#ifndef GET_EVENT_MODULE_H
-#define GET_EVENT_MODULE_H
+#ifndef GET_EVENT_FROM_SOCKET_MODULE_H
+#define GET_EVENT_FROM_SOCKET_MODULE_H
 
 #include <framework/core/Module.h>
 #include <daq/dataflow/EvtSocket.h>
@@ -20,14 +20,14 @@ namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
 
-  class GetEventModule : public Module {
+  class GetEventFromSocketModule : public Module {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    GetEventModule();
-    virtual ~GetEventModule();
+    GetEventFromSocketModule();
+    virtual ~GetEventFromSocketModule();
 
     //! Module functions to be called from main process
     virtual void initialize();

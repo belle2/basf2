@@ -1,12 +1,12 @@
 //+
-// File : GetEvent.cc
+// File : GetEventFromSocket.cc
 // Description : Module to receive event from expreco
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 17 - Dec - 2013
 //-
 
-#include <daq/expreco/modules/GetEvent.h>
+#include <daq/expreco/modules/GetEventFromSocket.h>
 
 #include <TSystem.h>
 
@@ -27,22 +27,22 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GetEvent)
+REG_MODULE(GetEventFromSocket)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-GetEventModule::GetEventModule() : Module()
+GetEventFromSocketModule::GetEventFromSocketModule() : Module()
 {
   //Set module properties
-  setDescription("Get Event from ExpReco");
+  setDescription("Get Event from EvtSocket");
   //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
 
   vector<string> emptyhosts;
-  addParam("Hosts", m_hosts, "GetEvent hosts", emptyhosts);
+  addParam("Hosts", m_hosts, "GetEventFromSocket hosts", emptyhosts);
   vector<int> emptysocks;
-  addParam("Ports", m_ports, "GetEvent Ports", emptysocks);
+  addParam("Ports", m_ports, "GetEventFromSocket Ports", emptysocks);
   m_nrecv = 0;
   m_compressionLevel = 0;
 
@@ -51,11 +51,11 @@ GetEventModule::GetEventModule() : Module()
 }
 
 
-GetEventModule::~GetEventModule()
+GetEventFromSocketModule::~GetEventFromSocketModule()
 {
 }
 
-void GetEventModule::initialize()
+void GetEventFromSocketModule::initialize()
 {
   // Check event sources are not empty
   if (m_hosts.size() == 0) {
@@ -67,7 +67,8 @@ void GetEventModule::initialize()
 
   // Open receiving socekt
   for (int i = 0; i < (int)m_hosts.size(); i++) {
-    printf("Connecting to %s (port %d)\n", m_hosts[i].c_str(), m_ports[i]);
+    //    printf("Connecting to %s (port %d)\n", m_hosts[i].c_str(), m_ports[i]);
+    B2INFO("Connecting to " << m_hosts[i] << "(port " << m_ports[i] << ")");
     EvtSocketSend* evtsock = new EvtSocketSend(m_hosts[i].c_str(), m_ports[i]);
     m_socks.push_back(evtsock);
   }
@@ -76,7 +77,7 @@ void GetEventModule::initialize()
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
-  // Prefetch first record in GetEvent
+  // Prefetch first record in GetEventFromSocket
   EvtMessage* msg = receive();
   if (msg == NULL) {
     B2FATAL("Did not receive any data, stopping initialization.");
@@ -92,9 +93,10 @@ void GetEventModule::initialize()
   B2INFO("Rx initialized.");
 }
 
-EvtMessage* GetEventModule::receive()
+EvtMessage* GetEventFromSocketModule::receive()
 {
-  printf("GetEvent:receive here!\n");
+  //  printf("GetEventFromSocket:receive here!\n");
+  B2DEBUG(1001, "GetEventFromSocket:receive here!");
 
   fd_set fds;
   fd_set readfds;
@@ -119,18 +121,19 @@ EvtMessage* GetEventModule::receive()
         return msg;
       }
     }
-    printf("Select loop : should not come here. selstat = %d\n", selstat);
+    //    printf("Select loop : should not come here. selstat = %d\n", selstat);
+    B2ERROR("Select loop : should not come here. selstat = " << selstat);
     usleep(TIME_WAIT);
   }
 }
 
-void GetEventModule::beginRun()
+void GetEventFromSocketModule::beginRun()
 {
   B2INFO("beginRun called.");
 }
 
 
-void GetEventModule::event()
+void GetEventFromSocketModule::event()
 {
   m_nrecv++;
   // First event is already loaded
@@ -157,7 +160,7 @@ void GetEventModule::event()
   return;
 }
 
-void GetEventModule::endRun()
+void GetEventFromSocketModule::endRun()
 {
   //fill Run data
 
@@ -165,8 +168,9 @@ void GetEventModule::endRun()
 }
 
 
-void GetEventModule::terminate()
+void GetEventFromSocketModule::terminate()
 {
+  delete m_streamer;
   B2INFO("terminate called");
 }
 

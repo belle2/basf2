@@ -28,6 +28,7 @@ __liaison_leptonID__ = "Marcel Hohmann"
 @fancy_skim_header
 class SystematicsDstar(BaseSkim):
     """
+    Primarily used for hadron and lepton ID studies.
     Lists in this skim are those defined in `PiKFromDstarList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib"]
@@ -641,7 +642,7 @@ class SystematicsFourLeptonHLT(BaseSkim):
 
 
 @fancy_skim_header
-class SystematicsRadMuMuHLT(BaseSkim):
+class SystematicsRadMuMu(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
     __description__ = "Skim to select all events that pass the HLT RadMuMu skim"
@@ -711,7 +712,8 @@ class SystematicsJpsi(BaseSkim):
 @fancy_skim_header
 class SystematicsKshort(BaseSkim):
     """
-      K-short skim for systematics studies. As K-short candidates are abundant this skim has a high retention.
+      K-short skim for hadron and lepton ID systematics studies.
+      As K-short candidates are abundant this skim has a high retention.
       To meet the retention criteria a prescale is added. The prescale is given in standard trigger terms (reciprocal).
       A precale of 50 will keep 2% of events, etc.
     """
@@ -722,9 +724,6 @@ class SystematicsKshort(BaseSkim):
 
     ApplyHLTHadronCut = True
 
-    def load_standard_lists(self, path):
-        stdPi("all", path=path)
-
     def __init__(self, prescale=1, **kwargs):
         """
         Parameters:
@@ -733,6 +732,9 @@ class SystematicsKshort(BaseSkim):
         """
         self.prescale = prescale
         super().__init__(**kwargs)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
 
     def build_lists(self, path):
 
@@ -775,6 +777,8 @@ class SystematicsKshort(BaseSkim):
 class SystematicsBhabha(BaseSkim):
     """
     Skim for selecting Bhabha events for leptonID studies.
+    In case the retention exceeds 10% a prescale can be added.
+    The prescale is given in standard trigger terms (reciprocal).
     """
     __authors__ = ["Justin Skorupa"]
     __description__ = "Skim for Bhabha events for lepton ID study"
@@ -782,6 +786,15 @@ class SystematicsBhabha(BaseSkim):
     __category__ = "performance, leptonID"
 
     ApplyHLTHadronCut = False
+
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the global prescale for this skim.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        self.prescale = prescale
+        super().__init__(**kwargs)
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -797,7 +810,9 @@ class SystematicsBhabha(BaseSkim):
         ma.reconstructDecay(
             "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
 
-        event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"
+        event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"\
+                     f" and eventRandom < {(1/self.prescale):.6f}"
+
         ma.applyCuts("vpho:bhabha", event_cuts, path=path)
 
         self.SkimLists = ["vpho:bhabha"]

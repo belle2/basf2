@@ -219,3 +219,12 @@ void SVDRecoDigitCreatorModule::event()
 }
 
 
+void SVDRecoDigitCreatorModule::endRun()
+{
+
+  delete m_time6SampleClass;
+  delete m_time3SampleClass;
+  delete m_charge6SampleClass;
+  delete m_charge3SampleClass;
+
+}

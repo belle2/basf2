@@ -476,3 +476,14 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 
   return position;
 }
+void SVDClusterizerModule::endRun()
+{
+
+  delete m_time6SampleClass;
+  delete m_time3SampleClass;
+  delete m_charge6SampleClass;
+  delete m_charge3SampleClass;
+  delete m_position6SampleClass;
+  delete m_position3SampleClass;
+
+}

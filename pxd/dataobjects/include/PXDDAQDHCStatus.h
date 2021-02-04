@@ -147,7 +147,7 @@ namespace Belle2 {
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHCStatus, 4);
+    ClassDef(PXDDAQDHCStatus, 5);
 
   }; // class PXDDAQDHCStatus
 

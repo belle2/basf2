@@ -193,7 +193,7 @@ namespace Belle2 {
     std::vector < PXDDAQDHPComMode> m_commode;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHEStatus, 7);
+    ClassDef(PXDDAQDHEStatus, 8);
 
   }; // class PXDDAQDHEStatus
 

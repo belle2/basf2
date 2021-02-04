@@ -153,7 +153,7 @@ namespace Belle2 {
     /** Vector of packet informations beloning to this event */
     std::vector <PXDDAQPacketStatus> m_pxdPacket;
 
-    ClassDef(PXDDAQStatus, 2)
+    ClassDef(PXDDAQStatus, 3)
 
   }; // class PXDDAQStatus
 

@@ -32,9 +32,9 @@ Finally, for estimating the disk space per inverse attobarn, the calculations ar
 import argparse
 from functools import lru_cache
 import json
-from numpy import nan
 import pandas as pd
 from pathlib import Path
+import re
 from tempfile import TemporaryDirectory
 import subprocess
 import warnings
@@ -315,6 +315,7 @@ def aggregate_table(
     markdown,
     aggregator_function,
     aggregator_function_name,
+    fmt_string=".1f",
 ):
     headers = [f"{xlabel} [{aggregator_function_name}]", "Requested skims", "All skims"]
 
@@ -329,8 +330,8 @@ def aggregate_table(
     table = [
         [
             "Data",
-            f"{float(df_ReqData_AggPerSample.mean()):.1f} ± {float(df_ReqData_AggPerSample.std()):.1f}",
-            f"{float(df_Data_AggPerSample.mean()):.1f} ± {float(df_Data_AggPerSample.std()):.1f}",
+            f"{float(df_ReqData_AggPerSample.mean()):{fmt_string}} ± {float(df_ReqData_AggPerSample.std()):{fmt_string}}",
+            f"{float(df_Data_AggPerSample.mean()):{fmt_string}} ± {float(df_Data_AggPerSample.std()):{fmt_string}}",
         ]
     ]
     for sample in sorted(set(df_MC["Sample"])):
@@ -338,8 +339,8 @@ def aggregate_table(
         table.append(
             [
                 sample,
-                f"{df_sample.query('Requested')[x].agg(agg):.1f}",
-                f"{df_sample[x].agg(agg):.1f}",
+                f"{df_sample.query('Requested')[x].agg(agg):{fmt_string}}",
+                f"{df_sample[x].agg(agg):{fmt_string}}",
             ]
         )
 
@@ -347,33 +348,37 @@ def aggregate_table(
     print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")
 
 
-def total_table(x, xlabel, df_Data, df_MC, *, markdown):
+def total_table(*args, **kwargs):
     aggregate_table(
-        x=x,
-        xlabel=xlabel,
-        df_Data=df_Data,
-        df_MC=df_MC,
-        markdown=markdown,
-        aggregator_function=sum,
-        aggregator_function_name="total",
+        *args, aggregator_function=sum, aggregator_function_name="total", **kwargs,
     )
 
 
-def average_table(x, xlabel, df_Data, df_MC, *, markdown):
+def average_table(*args, **kwargs):
+    try:
+        # Average is about 75x smaller than total, so do some fancy regex footwork to
+        # add one more decimal place to fmt_string
+        kwargs["fmt_string"] = re.sub(
+            r"^(\d*\.)(\d+)(f)$",
+            lambda m: "{}{}{}".format(
+                m.groups()[0], int(m.groups()[1]) + 1, m.groups()[2]
+            ),
+            kwargs["fmt_string"],
+        )
+    except KeyError:
+        pass
+
     aggregate_table(
-        x=x,
-        xlabel=xlabel,
-        df_Data=df_Data,
-        df_MC=df_MC,
-        markdown=markdown,
+        *args,
         aggregator_function=lambda v: sum(v) / len(v),
         aggregator_function_name="average",
+        **kwargs,
     )
 
 
-def average_and_total_tables(x, xlabel, df_Data, df_MC, *, markdown):
-    average_table(x=x, xlabel=xlabel, df_Data=df_Data, df_MC=df_MC, markdown=markdown)
-    total_table(x=x, xlabel=xlabel, df_Data=df_Data, df_MC=df_MC, markdown=markdown)
+def average_and_total_tables(*args, **kwargs):
+    average_table(*args, **kwargs)
+    total_table(*args, **kwargs)
 
 
 def main():
@@ -410,13 +415,20 @@ def main():
         table_function = average_and_total_tables
 
     VariablesToPrint = (
-        ("HS06TimePerEvent", "CPU time to process one input event (HS06)"),
-        ("RetentionRate", "Event-based retention rate (%)"),
-        ("FilesizeRetentionRate", "Filesize-based retention rate (%)"),
-        ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)"),
+        ("HS06TimePerEvent", "CPU time to process one input event (HS06)", ".2f"),
+        ("RetentionRate", "Event-based retention rate (%)", ".1f"),
+        ("FilesizeRetentionRate", "Filesize-based retention rate (%)", ".1f"),
+        ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)", ".1f"),
     )
-    for variable, description in VariablesToPrint:
-        table_function(variable, description, df_Data, df_MC, markdown=args.markdown)
+    for variable, description, fmt_string in VariablesToPrint:
+        table_function(
+            variable,
+            description,
+            df_Data,
+            df_MC,
+            markdown=args.markdown,
+            fmt_string=fmt_string,
+        )
 
 
 if __name__ == "__main__":

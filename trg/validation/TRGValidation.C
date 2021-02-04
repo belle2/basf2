@@ -58,6 +58,7 @@ void TRGValidation()
                                             "Comparison on w (=0.00449/pt) of a track between CDC 2D finder output and MC."));
   d_w->GetListOfFunctions()->Add(new TNamed("Contact", "ytlai@post.kek.jp"));
   d_w->GetListOfFunctions()->Add(new TNamed("Check", "A clear peak at 0 with tail."));
+  d_w->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   d_w->GetXaxis()->SetTitle("#Deltaw");
   d_w->GetYaxis()->SetTitle("Events/(0.08)");
@@ -72,6 +73,7 @@ void TRGValidation()
   d_phi->GetListOfFunctions()->Add(new TNamed("Description", "Comparison on phi_i of a track between CDC 2D finder output and MC."));
   d_phi->GetListOfFunctions()->Add(new TNamed("Contact", "ytlai@post.kek.jp"));
   d_phi->GetListOfFunctions()->Add(new TNamed("Check", "A Gaussian peak at 0."));
+  d_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   d_phi->GetXaxis()->SetTitle("#Delta#phi [rad]");
   d_phi->GetYaxis()->SetTitle("Events/(0.02 rad)");
@@ -84,6 +86,7 @@ void TRGValidation()
   d_z0_3d->GetListOfFunctions()->Add(new TNamed("Description", "Comparison on z0 of a track between CDC 2D fitter output and MC."));
   d_z0_3d->GetListOfFunctions()->Add(new TNamed("Contact", "ytlai@post.kek.jp"));
   d_z0_3d->GetListOfFunctions()->Add(new TNamed("Check", "A Gaussian peak at 0 with small tail."));
+  d_z0_3d->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   d_z0_3d->GetXaxis()->SetTitle("#Deltaz0 [cm]");
   d_z0_3d->GetYaxis()->SetTitle("Events/(1 cm)");
@@ -96,6 +99,7 @@ void TRGValidation()
   d_z0_nn->GetListOfFunctions()->Add(new TNamed("Description", "Comparison on z0 of a track between CDC Neuro output and MC."));
   d_z0_nn->GetListOfFunctions()->Add(new TNamed("Contact", "ytlai@post.kek.jp"));
   d_z0_nn->GetListOfFunctions()->Add(new TNamed("Check", "A Gaussian peak at 0 with small tail."));
+  d_z0_nn->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   d_z0_nn->GetXaxis()->SetTitle("#Deltaz0 [cm]");
   d_z0_nn->GetYaxis()->SetTitle("Events/(1 cm)");
@@ -108,6 +112,7 @@ void TRGValidation()
   d_E_ECL->GetListOfFunctions()->Add(new TNamed("Description", "Comparison on deposit energy between ECL cluster output and MC."));
   d_E_ECL->GetListOfFunctions()->Add(new TNamed("Contact", "ytlai@post.kek.jp"));
   d_E_ECL->GetListOfFunctions()->Add(new TNamed("Check", "A peak around -0.5 ~ 0 with a tail toward -6."));
+  d_E_ECL->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   d_E_ECL->GetXaxis()->SetTitle("#DeltaE [GeV]");
   d_E_ECL->GetYaxis()->SetTitle("Events/(0.12 GeV)");

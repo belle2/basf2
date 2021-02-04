@@ -47,11 +47,14 @@ namespace Belle2 {
       /** Initialize the module */
       void initialize() override;
 
-      /** Initialize the module */
+      /** configure clustering */
       void beginRun() override;
 
       /** does the actual clustering */
       void event() override;
+
+      /** delete pointers */
+      void endRun() override;
 
     protected:
 

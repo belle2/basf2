@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2020 - Belle II Collaboration                             *
@@ -478,4 +477,17 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
   return position;
 }
 
+void SVDClusterizerModule::endRun()
+{
 
+  delete m_time6SampleClass;
+  delete m_time3SampleClass;
+  delete m_charge6SampleClass;
+  delete m_charge3SampleClass;
+  delete m_position6SampleClass;
+  delete m_position6SampleClass;
+  delete m_position6SampleClass;
+  delete m_position3SampleClass;
+  delete m_position3SampleClass;
+  delete m_position3SampleClass;
+}

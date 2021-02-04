@@ -429,7 +429,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   }
 
 
-
   // MPV cluster charge for clusters on track
   TH1F* h_clusterCharge_L3U = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterChargeU3");
   TH1F* h_clusterCharge_L3V = (TH1F*)findHist("SVDClsTrk/SVDTRK_ClusterChargeV3");
@@ -470,7 +469,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("MPVClusterChargeL3V", MPVClusterChargeL3V);
     m_monObj->setVariable("MPVClusterChargeL456V", MPVClusterChargeL456V);
   }
-
 
 
   // MPV SNR for the clusters on track
@@ -535,23 +533,35 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   float MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
   float MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
   float MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
+  float FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
+  float FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
+  float FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
+  float FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
 
   if (h_clusterTime_L3U == NULL || h_clusterTime_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster time on U side are not found");
     m_monObj->setVariable("MPVClusterTimeL3U", -1);
     m_monObj->setVariable("MPVClusterTimeL456U", -1);
+    m_monObj->setVariable("FWHMClusterTimeL3U", -1);
+    m_monObj->setVariable("FWHMClusterTimeL456U", -1);
   } else {
     m_monObj->setVariable("MPVClusterTimeL3U", MPVClusterTimeL3U);
     m_monObj->setVariable("MPVClusterTimeL456U", MPVClusterTimeL456U);
+    m_monObj->setVariable("FWHMClusterTimeL3U", FWHMClusterTimeL3U);
+    m_monObj->setVariable("FWHMClusterTimeL456U", FWHMClusterTimeL456U);
   }
 
   if (h_clusterTime_L3V == NULL || h_clusterTime_L456V == NULL) {
     B2INFO("Histograms needed for MPV cluster time on V side are not found");
     m_monObj->setVariable("MPVClusterTimeL3V", -1);
     m_monObj->setVariable("MPVClusterTimeL456V", -1);
+    m_monObj->setVariable("FWHMClusterTimeL3V", -1);
+    m_monObj->setVariable("FWHMClusterTimeL456V", -1);
   } else {
     m_monObj->setVariable("MPVClusterTimeL3V", MPVClusterTimeL3V);
     m_monObj->setVariable("MPVClusterTimeL456V", MPVClusterTimeL456V);
+    m_monObj->setVariable("FWHMClusterTimeL3V", FWHMClusterTimeL3V);
+    m_monObj->setVariable("FWHMClusterTimeL456V", FWHMClusterTimeL456V);
   }
 
 
@@ -570,7 +580,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     B2INFO("Histogram needed for Average MaxBin on U side is not found");
     m_monObj->setVariable("avgMaxBinU", -1);
   } else {
-    float avgMaxBinU = 1.*h_maxBinU->GetMean();
+    float avgMaxBinU = h_maxBinU->GetMean();
     m_monObj->setVariable("avgMaxBinU", avgMaxBinU);
   }
 
@@ -578,7 +588,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     B2INFO("Histogram needed for Average MaxBin on V side is not found");
     m_monObj->setVariable("avgMaxBinV", -1);
   } else {
-    float avgMaxBinV = 1.*h_maxBinV->GetMean();
+    float avgMaxBinV = h_maxBinV->GetMean();
     m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
   }
 
@@ -660,10 +670,17 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
   return avgEffUV;
 }
 
-double DQMHistAnalysisSVDOnMiraBelleModule::xForMaxY(TH1F* h) const
+float DQMHistAnalysisSVDOnMiraBelleModule::xForMaxY(TH1F* h) const
 {
   int maxY = h->GetMaximumBin();
-  double xMaxY = h->GetXaxis()->GetBinCenter(maxY);
+  float xMaxY = h->GetXaxis()->GetBinCenter(maxY);
   return xMaxY;
 }
 
+float DQMHistAnalysisSVDOnMiraBelleModule::histFWHM(TH1F* h) const
+{
+  int bin1 = h->FindFirstBinAbove(h->GetMaximum() / 2);
+  int bin2 = h->FindLastBinAbove(h->GetMaximum() / 2);
+  float fwhm = h->GetBinCenter(bin2) - h->GetBinCenter(bin1);
+  return fwhm;
+}

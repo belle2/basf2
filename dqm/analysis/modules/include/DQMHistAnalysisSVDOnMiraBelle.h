@@ -86,7 +86,14 @@ namespace Belle2 {
     * @param h pointer to histogram
     * @return x value for max Y bin
     */
-    double xForMaxY(TH1F* h) const;
+    float xForMaxY(TH1F* h) const;
+
+    /**
+    * Calculate full width at half maximum of histogram
+    * @param h pointer to histogram
+    * @return x value for fwhm
+    */
+    float histFWHM(TH1F* h) const;
 
   };
 }

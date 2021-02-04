@@ -53,8 +53,6 @@ namespace Belle2 {
       /** does the actual clustering */
       void event() override;
 
-      /** delete pointers */
-      void endRun() override;
 
     protected:
 

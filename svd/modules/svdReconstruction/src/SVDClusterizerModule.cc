@@ -60,6 +60,9 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   // 2. Clustering
   addParam("AdjacentSN", m_cutAdjacent,
            "SN for digits to be considered for clustering", m_cutAdjacent);
+  addParam("returnClusterRawTime", m_returnRawClusterTime,
+           "if true returns the raw cluster time, to be used for time calibration",
+           m_returnRawClusterTime);
   addParam("SeedSN", m_cutSeed,
            "SN for digits to be considered as seed", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
@@ -151,8 +154,8 @@ void SVDClusterizerModule::beginRun()
   };
 
 
-  m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
-  m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
+  m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm, m_returnRawClusterTime);
+  m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm, m_returnRawClusterTime);
   m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
   m_position6SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith6SamplesAlgorithm);
@@ -162,14 +165,17 @@ void SVDClusterizerModule::beginRun()
   m_position3SampleClass->set_stripChargeAlgo(m_stripChargeRecoWith3SamplesAlgorithm);
   m_position3SampleClass->set_stripTimeAlgo(m_stripTimeRecoWith3SamplesAlgorithm);
 
-
-  B2INFO("SVD  6-sample DAQ, cluster time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
+  string israwtime = "";
+  if (m_returnRawClusterTime) israwtime = " (raw)";
+  B2INFO("SVD  6-sample DAQ, cluster time algorithm: " << m_timeRecoWith6SamplesAlgorithm << israwtime <<
+         ", cluster charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith6SamplesAlgorithm);
   B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith6SamplesAlgorithm << " and strip time reconstructed with "
          <<
          m_stripTimeRecoWith6SamplesAlgorithm);
 
-  B2INFO("SVD  3-sample DAQ, cluster time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
+  B2INFO("SVD  3-sample DAQ, cluster time algorithm: " << m_timeRecoWith3SamplesAlgorithm << israwtime <<
+         ", cluster charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith3SamplesAlgorithm);
   B2INFO(" with strip charge reconstructed with " << m_stripChargeRecoWith3SamplesAlgorithm << " and strip time reconstructed with "
          <<
@@ -470,5 +476,14 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 
   return position;
 }
+void SVDClusterizerModule::endRun()
+{
 
+  delete m_time6SampleClass;
+  delete m_time3SampleClass;
+  delete m_charge6SampleClass;
+  delete m_charge3SampleClass;
+  delete m_position6SampleClass;
+  delete m_position3SampleClass;
 
+}

@@ -47,11 +47,14 @@ namespace Belle2 {
       /** Initialize the module */
       void initialize() override;
 
-      /** Initialize the module */
+      /** configure clustering */
       void beginRun() override;
 
       /** does the actual clustering */
       void event() override;
+
+      /** delete pointers */
+      void endRun() override;
 
     protected:
 
@@ -128,8 +131,9 @@ namespace Belle2 {
 
 
       // 4. Calibration Objects
+      bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
+
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
-      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
 

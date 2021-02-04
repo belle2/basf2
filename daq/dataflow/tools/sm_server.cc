@@ -18,6 +18,11 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
+
   // Open socket to accept connection
   SocketRecv recsock((unsigned short)(atoi(argv[1])));
 
@@ -42,4 +47,5 @@ int main(int argc, char** argv)
       }
     }
   }
+  return 0;
 }

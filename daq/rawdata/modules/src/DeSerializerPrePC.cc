@@ -297,7 +297,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
     //
     // Data length check
     //
-    int temp_length = 0;
+    unsigned temp_length = 0;
     for (int j = 0; j < each_buf_nodes[ i ] * each_buf_events[ i ]; j++) {
       int this_length = *((int*)((char*)temp_buf + total_recvd_byte - each_buf_nwords[ i ] * sizeof(int) + temp_length));
       temp_length += this_length * sizeof(int);

@@ -185,7 +185,7 @@ void ERecoMasterCallback::error(const char* nodename, const char* data)
   LogFile::warning("Error from unknwon node %s : %s)", nodename, data);
 }
 
-void ERecoMasterCallback::load(const DBObject& db, const std::string& runtype)
+void ERecoMasterCallback::load(const DBObject& /*db*/, const std::string& /*runtype*/)
 {
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
@@ -440,9 +440,9 @@ bool ERecoMasterCallback::perform(NSMCommunicator& com)
       RCCallback::setState(RCState::ABORTING_RS);
       abort();
       RCCallback::setState(RCState::NOTREADY_S);
-    } catch (const RCHandlerException& e) {
-      std::string emsg = StringUtil::form("Failed to abort : %s", e.what());
-      LogFile::fatal(emsg);
+    } catch (const RCHandlerException& ex) {
+      std::string exmsg = StringUtil::form("Failed to abort : %s", ex.what());
+      LogFile::fatal(exmsg);
     }
   } catch (const std::exception& e) {
     LogFile::fatal("Unknown exception: %s. terminating process", e.what());

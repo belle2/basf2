@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BelleCrystal_HH
-#define BelleCrystal_HH
+#pragma once
 
 #include "G4Types.hh"
 
@@ -135,4 +134,3 @@ namespace Belle2 {
 
   }
 }
-#endif

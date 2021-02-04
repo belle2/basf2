@@ -619,10 +619,10 @@ class Random(BaseSkim):
 
 
 @fancy_skim_header
-class SystematicsFourLeptonHLT(BaseSkim):
+class SystematicsFourLepton(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
-    __description__ = "Skim to select all events that pass the HLT Four Lepton skim"
+    __description__ = "Skim to select all events that pass the HLT Four Lepton skim for lepton ID studies"
     __category__ = "systematics, leptonID"
     ApplyHLTHadronCut = False
 
@@ -642,10 +642,10 @@ class SystematicsFourLeptonHLT(BaseSkim):
 
 
 @fancy_skim_header
-class SystematicsRadMuMu(BaseSkim):
+class SystematicsRadMuMuLeptonID(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
-    __description__ = "Skim to select all events that pass the HLT RadMuMu skim"
+    __description__ = "Skim to select all events that pass the HLT RadMuMu skim for lepton ID studies"
     __category__ = "systematics, leptonID"
     ApplyHLTHadronCut = False
 
@@ -653,9 +653,9 @@ class SystematicsRadMuMu(BaseSkim):
         stdPi("all", path=path)
 
     def build_lists(self, path):
-        label = "RadMuMuHLT"
+        label = "RadMuMuLeptonID"
         ma.copyList(f"pi+:{label}", "pi+:all", path=path)
-        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuHLT_randomRank", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuLeptonID_randomRank", path=path)
 
         path = self.skim_event_cuts(
             f"SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
@@ -666,7 +666,7 @@ class SystematicsRadMuMu(BaseSkim):
 @fancy_skim_header
 class SystematicsJpsi(BaseSkim):
     """
-    J/psi skim for systematics studies. Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
+    J/psi skim for lepton ID systematics studies. Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib", "Marcel Hohmann"]
     __description__ = ""

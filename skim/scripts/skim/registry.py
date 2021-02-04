@@ -22,12 +22,11 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
-    ("10600800", "systematics", "SystematicsFourLeptonHLT"),
-    ("10600900", "systematics", "SystematicsRadMuMuHLT"),
+    ("10600800", "systematics", "SystematicsFourLepton"),
+    ("10600900", "systematics", "SystematicsRadMuMuLeptonID"),
     ("10611000", "systematics", "SystematicsJpsi"),
     ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
-
 
 
     # --- WG1: SL + missing energy ---

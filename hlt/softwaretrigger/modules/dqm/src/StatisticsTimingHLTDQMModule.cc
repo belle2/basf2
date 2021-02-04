@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <hlt/softwaretrigger/modules/dqm/StatisticsTimingHLTDQMModule.h>
+#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ProcessStatistics.h>
@@ -19,6 +20,8 @@
 #include <TH1F.h>
 
 #include <framework/utilities/Utils.h>
+
+#include <fstream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -68,17 +71,18 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_hlt_unit_histograms) {
-    m_fullTimeMeanPerUnitHistogram = new TH1F("fullTimeMeanPerUnitHistogram", "Mean Budget Time Per Unit [ms]", m_max_hlt_units + 1, 0,
-                                              m_max_hlt_units + 1);
+    m_fullTimeMeanPerUnitHistogram = new TH1F("fullTimeMeanPerUnitHistogram", "Mean Budget Time Per Unit [ms]",
+                                              HLTUnit::m_max_hlt_units + 1, 0,
+                                              HLTUnit::m_max_hlt_units + 1);
     m_fullTimeMeanPerUnitHistogram->SetStats(false);
     m_fullTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
     m_processingTimeMeanPerUnitHistogram = new TH1F("processingTimeMeanPerUnitHistogram", "Mean Processing Time Per Unit [ms]",
-                                                    m_max_hlt_units + 1, 0,
-                                                    m_max_hlt_units + 1);
+                                                    HLTUnit::m_max_hlt_units + 1, 0,
+                                                    HLTUnit::m_max_hlt_units + 1);
     m_processingTimeMeanPerUnitHistogram->SetStats(false);
     m_processingTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
 
-    for (unsigned int index = 1; index <= m_max_hlt_units; index++) {
+    for (unsigned int index = 1; index <= HLTUnit::m_max_hlt_units; index++) {
       m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                           ("Budget Time Per Unit [ms]: HLT" + std::to_string(index)).c_str(), 250, 0, 10000));
       m_lastFullTimeSumPerUnit.emplace(index, 0);
@@ -100,8 +104,16 @@ void StatisticsTimingHLTDQMModule::initialize()
   REG_HISTOGRAM
 
   if (m_param_create_hlt_unit_histograms) {
-    std::string host = Utils::getCommandOutput("cat", {"/home/usr/hltdaq/HLT.UnitNumber"});
-    m_hlt_unit = atoi(host.substr(3, 2).c_str());
+    std::ifstream file;
+    file.open(HLTUnit::m_hlt_unit_file);
+    if (file.good()) {
+      std::string host;
+      getline(file, host);
+      m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      file.close();
+    } else {
+      B2WARNING("HLT unit number not found");
+    }
   }
 }
 
@@ -161,16 +173,18 @@ void StatisticsTimingHLTDQMModule::event()
   m_lastFullTimeSum = fullTimeSum;
 
   if (m_param_create_hlt_unit_histograms) {
-    m_processingTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
+    if (0 < m_hlt_unit) {
+      m_processingTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, processingTimeMean);
 
-    m_processingTimePerUnitHistograms[m_hlt_unit]->Fill(processingTimeSum - m_lastProcessingTimeSumPerUnit[m_hlt_unit]);
-    m_lastProcessingTimeSumPerUnit[m_hlt_unit] = processingTimeSum;
+      m_processingTimePerUnitHistograms[m_hlt_unit]->Fill(processingTimeSum - m_lastProcessingTimeSumPerUnit[m_hlt_unit]);
+      m_lastProcessingTimeSumPerUnit[m_hlt_unit] = processingTimeSum;
 
-    const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
-    m_fullTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
+      const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+      m_fullTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
 
-    m_fullTimePerUnitHistograms[m_hlt_unit]->Fill(fullTimeSum - m_lastFullTimeSumPerUnit[m_hlt_unit]);
-    m_lastFullTimeSumPerUnit[m_hlt_unit] = fullTimeSum;
+      m_fullTimePerUnitHistograms[m_hlt_unit]->Fill(fullTimeSum - m_lastFullTimeSumPerUnit[m_hlt_unit]);
+      m_lastFullTimeSumPerUnit[m_hlt_unit] = fullTimeSum;
+    }
   }
 }
 

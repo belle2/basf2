@@ -69,10 +69,9 @@ namespace Belle2 {
       /// Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "softwaretrigger";
 
-      /// Store HLT unit number on initialization
+      /// HLT unit number of the machine used
       int m_hlt_unit = 0;
-      /// Maximum number of HLT units used during the experiment
-      const unsigned int m_max_hlt_units = 10;
+
 
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
@@ -102,6 +101,22 @@ namespace Belle2 {
 
       /// Dataobjects
       DBObjPtr<TRGGDLDBFTDLBits> m_l1NameLookup;
+    };
+
+    /// HLT unit number information.
+    class HLTUnit {
+    public:
+      //! Constructor
+      HLTUnit();
+
+      //! Destructor
+      ~HLTUnit();
+
+      /// Maximum number of HLT units used during the experiment
+      static constexpr unsigned int m_max_hlt_units = 10;
+
+      /// Location of HLT unit number information
+      static constexpr char m_hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
     };
   }
 }

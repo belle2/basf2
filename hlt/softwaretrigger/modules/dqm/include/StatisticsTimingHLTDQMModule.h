@@ -73,8 +73,6 @@ namespace Belle2 {
 
       /// Store HLT unit number on initialization
       int m_hlt_unit = 0;
-      /// Maximum number of HLT units used during the experiment
-      const unsigned int m_max_hlt_units = 10;
     };
 
   }

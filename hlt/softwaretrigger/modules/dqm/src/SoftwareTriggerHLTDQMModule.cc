@@ -18,6 +18,7 @@
 #include <framework/utilities/Utils.h>
 
 #include <algorithm>
+#include <fstream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -138,12 +139,13 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_hlt_unit_histograms) {
-    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number", "HLT Unit Number", m_max_hlt_units, 0,
-                                                            m_max_hlt_units + 1));
+    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number", "HLT Unit Number", HLTUnit::m_max_hlt_units, 0,
+                                                            HLTUnit::m_max_hlt_units + 1));
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
       m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
-                                           ("Events triggered per unit in HLT baseIdentifier: " + cutIdentifierPerUnit).c_str(), m_max_hlt_units, 0, m_max_hlt_units + 1));
+                                           ("Events triggered per unit in HLT baseIdentifier: " + cutIdentifierPerUnit).c_str(), HLTUnit::m_max_hlt_units, 0,
+                                           HLTUnit::m_max_hlt_units + 1));
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("bar");
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetFillStyle(0);
@@ -162,8 +164,16 @@ void SoftwareTriggerHLTDQMModule::initialize()
   REG_HISTOGRAM
 
   if (m_param_create_hlt_unit_histograms) {
-    std::string host = Utils::getCommandOutput("cat", {"/home/usr/hltdaq/HLT.UnitNumber"});
-    m_hlt_unit = atoi(host.substr(3, 2).c_str());
+    std::ifstream file;
+    file.open(HLTUnit::m_hlt_unit_file);
+    if (file.good()) {
+      std::string host;
+      getline(file, host);
+      m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      file.close();
+    } else {
+      B2WARNING("HLT unit number not found");
+    }
   }
 }
 
@@ -317,3 +327,4 @@ void SoftwareTriggerHLTDQMModule::beginRun()
   std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
   [](auto & it) { it.second->Reset(); });
 }
+

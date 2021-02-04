@@ -3,10 +3,11 @@
 """CDC tracking calibration. Performs the T0 determination using HLT skimmed raw data."""
 
 from prompt import CalibrationSettings
-from prompt.utils import events_in_basf2_file
+from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
 from random import choice
 from caf.framework import Calibration
+from caf import strategies
 
 
 #: Tells the automated system some details of this script
@@ -22,7 +23,9 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "max_events_per_calibration": 200000,
                                    "max_events_per_calibration_for_xt_sr": 1000000,
                                    "max_events_per_file": 5000,
-                                   "max_events_per_file_hadron": 2500
+                                   "max_events_per_file_hadron": 2500,
+                                   "payload_boundaries": [],
+                                   "request_memory": 4
                                })
 
 
@@ -75,6 +78,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_hadron = input_data["hlt_hadron"]
     file_to_iov_Bcosmics = input_data["Bcosmics"]
 
+    # read expert_config values
     expert_config = kwargs.get("expert_config")
     max_files_per_run = expert_config["max_files_per_run"]
     min_events_per_file = expert_config["min_events_per_file"]
@@ -82,6 +86,9 @@ def get_calibrations(input_data, **kwargs):
     max_events_per_calibration_for_xt_sr = expert_config["max_events_per_calibration_for_xt_sr"]  # for xt, sr calib.
     max_events_per_file = expert_config["max_events_per_file"]
     max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
+    payload_boundaries = []
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {payload_boundaries}")
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -105,25 +112,38 @@ def get_calibrations(input_data, **kwargs):
         max_events_per_calibration_for_xt_sr,
         max_events_per_file)
 
-    input_file_dict = {"hlt_mumu": chosen_files_mumu_for_xt_sr, "hlt_hadron": chosen_files_hadron_for_xt_sr,
-                       "Bcosmics": chosen_files_Bcosmics_for_xt_sr}
+    input_file_dict = {
+        "hlt_mumu": chosen_files_mumu_for_xt_sr,
+        "hlt_hadron": chosen_files_hadron_for_xt_sr,
+        "Bcosmics": chosen_files_Bcosmics_for_xt_sr
+    }
 
-    chosen_file_dict = {"hlt_mumu": chosen_files_mumu, "hlt_hadron": chosen_files_hadron,
-                        "Bcosmics": chosen_files_Bcosmics}
+    chosen_file_dict = {
+        "hlt_mumu": chosen_files_mumu,
+        "hlt_hadron": chosen_files_hadron,
+        "Bcosmics": chosen_files_Bcosmics
+    }
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
 
     from caf.utils import IoV
-    # The actuall IoV we want for any prompt request is open-ended
+    # The actual IoV we want for any prompt request is open-ended
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+
+    # for SingleIOV stratrgy, it's better to set the granularity to 'all' so that the collector jobs will run faster
+    collector_granularity = 'all'
+    if payload_boundaries:
+        basf2.B2INFO('Found payload_boundaries: set collector granularity to run')
+        collector_granularity = 'run'
 
     # t0
     cal0 = CDCCalibration(name='tz0',
                           algorithms=[tz_algo()],
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
-                          max_events=max_events_per_file
+                          max_events=max_events_per_file,
+                          collector_granularity=collector_granularity
                           )
 
     # tw
@@ -132,6 +152,7 @@ def get_calibrations(input_data, **kwargs):
                           input_file_dict=chosen_file_dict,
                           max_iterations=2,
                           max_events=max_events_per_file,
+                          collector_granularity=collector_granularity,
                           dependencies=[cal0]
                           )
 
@@ -140,6 +161,7 @@ def get_calibrations(input_data, **kwargs):
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
                           max_events=max_events_per_file,
+                          collector_granularity=collector_granularity,
                           dependencies=[cal1]
                           )
 
@@ -148,6 +170,7 @@ def get_calibrations(input_data, **kwargs):
                           algorithms=[xt_algo()],
                           input_file_dict=input_file_dict,
                           max_iterations=1,
+                          collector_granularity=collector_granularity,
                           dependencies=[cal2]
                           )
 
@@ -156,6 +179,7 @@ def get_calibrations(input_data, **kwargs):
                           algorithms=[sr_algo()],
                           input_file_dict=input_file_dict,
                           max_iterations=1,
+                          collector_granularity=collector_granularity,
                           dependencies=[cal3]
                           )
     # t0
@@ -164,23 +188,40 @@ def get_calibrations(input_data, **kwargs):
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
                           max_events=max_events_per_file,
+                          collector_granularity=collector_granularity,
                           dependencies=[cal4]
                           )
 
-    # Force the output payload IoV to be correct.
-    # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal0.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal1.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal2.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal3.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal4.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal5.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+    if payload_boundaries:
+        basf2.B2INFO(f"Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        cal0.strategies = strategies.SequentialBoundaries
+        for algorithm in cal0.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+        for algorithm in cal1.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+        for algorithm in cal2.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+        for algorithm in cal3.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+        for algorithm in cal4.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+        for algorithm in cal5.algorithms:
+            algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+    else:
+        # Force the output payload IoV to be correct.
+        # It may be different if you are using another strategy like SequentialRunByRun
+        for algorithm in cal0.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
+        for algorithm in cal1.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
+        for algorithm in cal2.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
+        for algorithm in cal3.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
+        for algorithm in cal4.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
+        for algorithm in cal5.algorithms:
+            algorithm.params = {"apply_iov": output_iov}
 
     return [cal0, cal1, cal2, cal3, cal4, cal5]
 
@@ -262,7 +303,7 @@ def pre_collector_cr(max_events=None):
     return reco_path
 
 
-def collector(bField=True, is_cosmic=False):
+def collector(bField=True, is_cosmic=False, granularity='all'):
     """
     Create a cdc calibration collector
     Parameters:
@@ -274,7 +315,7 @@ def collector(bField=True, is_cosmic=False):
     """
     from basf2 import register_module
     col = register_module('CDCCalibrationCollector',
-                          granularity='all',
+                          granularity=granularity,
                           calExpectedDriftTime=True,
                           eventT0Extraction=True,
                           bField=bField,
@@ -356,7 +397,8 @@ class CDCCalibration(Calibration):
                  input_file_dict,
                  max_iterations=5,
                  dependencies=None,
-                 max_events=5000):
+                 max_events=5000,
+                 collector_granularity='All'):
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -368,12 +410,12 @@ class CDCCalibration(Calibration):
 
         for skim_type, file_list in input_file_dict.items():
             if skim_type is "Bcosmics":
-                collection = Collection(collector=collector(),
+                collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector_cr(max_events=max_events),
                                         )
             else:
-                collection = Collection(collector=collector(),
+                collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events),
                                         )

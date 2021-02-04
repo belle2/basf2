@@ -326,7 +326,6 @@ class TDCPV_ccs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            # "foxWolframR2_maskedNaN<0.4 and nTracks>=4",
             "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
@@ -339,13 +338,10 @@ class TDCPV_ccs(BaseSkim):
         self.SkimLists = tcpvLists
 
     def validation_histograms(self, path):
-        Kres = 'K_10'
-        ma.applyCuts('gamma:loose', '1.4 < E < 4', path=path)
-
-        ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
-        ma.reconstructDecay("B0:signal -> " + Kres + ":all gamma:loose",
-                            "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+        ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        ma.reconstructDecay('B0:jpsimumu -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
         ma.matchMCTruth('B0:signal', path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
-        ma.variablesToHistogram('B0:signal', variableshisto, filename='TDCPV_Validation.root', path=path)
+        ma.variablesToHistogram('B0:jpsiee', variableshisto, filename='TDCPV_ccs_Validation.root', path=path)
+        ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename='TDCPV_ccs_Validation.root', path=path)

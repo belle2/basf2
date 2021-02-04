@@ -22,7 +22,6 @@ using namespace Belle2;
 bool DAQLogDB::createLog(DBInterface& db, const std::string& tablename,
                          const DAQLogMessage& log)
 {
-  std::stringstream ss;
   try {
     if (!db.isConnected()) db.connect();
   } catch (const DBHandlerException& e) {

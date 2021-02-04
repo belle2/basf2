@@ -25,7 +25,7 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    DesSerPrePC(std::string host_recv, int port_recv, std::string host_send, int port_send, int shmflag,
+    DesSerPrePC(std::string host_recv, int port_recv, const std::string& host_send, int port_send, int shmflag,
                 const std::string& nodename, int nodeid);
     //    DesSerPrePC();
     virtual ~DesSerPrePC();

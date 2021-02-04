@@ -60,7 +60,6 @@ unsigned long
 xor(unsigned long * start, int wordlen)
 {
     unsigned long ret = 0;
-    int i;
     while (wordlen--) {
         ret ^= *(start++);
     }
@@ -73,7 +72,6 @@ main()
 {
     int event=0;
     int ret, i = 0;
-    fd_set rfds, efds;
     int fd[4];
     
     int j=1;
@@ -117,12 +115,12 @@ main()
      }
     while (1) {
 /*        printf("before redo.\n"); */
-	int redo;
 /*        printf("                         after redo.\n"); */
 #if 0
 	/* If you want to test select() */
         FD_ZERO(&rfds); FD_SET(cprfd, &rfds);
         printf("after Rfds.\n");
+        fd_set rfds, efds;
         FD_ZERO(&efds); FD_SET(cprfd, &efds);
         printf("                         after Efds.\n");
         ret = select(1+fd, &rfds, NULL, &efds, NULL);

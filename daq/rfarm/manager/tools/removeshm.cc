@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     printf("[removeshm] No such RingBuffer : %s\n", argv[1]);
     exit(-1);
   }
-  int shmid, semid;
+  int shmid;
   fscanf(fd, "%d", &shmid);
   fclose(fd);
 

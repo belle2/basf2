@@ -24,7 +24,7 @@ using namespace Belle2;
 //----------------------------------------------------------------
 //                 Implementation
 //----------------------------------------------------------------
-DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
                          const std::string& nodename, int nodeid)
 {
 

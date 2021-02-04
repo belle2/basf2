@@ -83,10 +83,7 @@ main(int argc, char **argv)
   int use[4];
   int readback[4];
   int i;
-  FILE *fp;
-  int ch;
-  int tem;
-  int k = 0, l;
+  int k = 0;
   int val;
   int feetype,feehwv,feefwv;
   time_t   lt;
@@ -376,5 +373,5 @@ main(int argc, char **argv)
      usage();
      exit(1);
    }
+   return 0;
 }  
-  

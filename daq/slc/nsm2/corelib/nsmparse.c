@@ -716,7 +716,6 @@ nsmlib_parsestr(const char *datname, int revision,
 		const char *filebuf, const char *filepath, char *fmtstr,
                 int *revisionp)
 {
-  char *datlist;
   char *strbegin;
   int ret;
   off_t filelen;
@@ -780,7 +779,6 @@ NSMparse *
 nsmlib_parsefile(const char *datname, int revision, const char *incpath,
 		 char *fmtstr, int *revisionp)
 {
-  off_t filelen;
   char *filepath;
   char *filebuf;
   NSMparse *parsep;

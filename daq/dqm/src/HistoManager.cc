@@ -80,9 +80,9 @@ bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
 
 TH1* HistoManager::get(string& subdir, string& name, int pid)
 {
-  map<string, map<int, TH1*>>& dirlist = m_subdir[subdir];
-  map<int, TH1*>& hlist = dirlist[name];
-  TH1* hist = hlist[pid];
+  const map<string, map<int, TH1*>>& dirlist = m_subdir[subdir];
+  const map<int, TH1*>& hlist = dirlist.at(name);
+  TH1* hist = hlist.at(pid);
   return hist;
 }
 

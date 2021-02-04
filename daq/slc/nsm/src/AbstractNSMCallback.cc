@@ -29,7 +29,7 @@ int AbstractNSMCallback::addDB(const DBObject& obj)
   obj.search(list, "", true);
   int id = 0;
   for (DBObject::NameValueList::iterator it = list.begin();
-       it != list.end(); it++) {
+       it != list.end(); ++it) {
     const std::string& name(it->name);
     if (name.size() == 0 || name.at(0) == '$') continue;
     switch (it->type) {
@@ -302,7 +302,7 @@ bool AbstractNSMCallback::get(DBObject& obj)
   DBObject::NameValueList list;
   obj.search(list);
   for (DBObject::NameValueList::iterator it = list.begin();
-       it != list.end(); it++) {
+       it != list.end(); ++it) {
     const std::string& name(it->name);
     if (name.size() == 0 || name.at(0) == '$') continue;
     int vi = 0;

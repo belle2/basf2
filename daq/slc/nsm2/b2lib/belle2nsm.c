@@ -268,7 +268,6 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
 {
   char name_uprcase[NSMSYS_NAME_SIZ+1];
   int ret;
-  int oldsig;
   
   if (! nsm) {
     if (logfp) {
@@ -305,7 +304,6 @@ b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
   int ret;
   char node_uprcase[NSMSYS_NAME_SIZ+1];
   char req_uprcase[NSMSYS_NAME_SIZ+1];
-  int oldsig;
 
   if (! nsm) return -1;
   xuprcpy(node_uprcase, node, NSMSYS_NAME_SIZ+1);

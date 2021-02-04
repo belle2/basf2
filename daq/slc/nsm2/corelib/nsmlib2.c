@@ -521,9 +521,7 @@ nsmlib_nodename(NSMcontext *nsmc, int nodeid)
 int
 nsmlib_nodeid(NSMcontext *nsmc, const char *nodename)
 {
-  int i;
   NSMsys *sysp;
-  const char *namep;
   int hash;
   NSMnod *nodp;
   
@@ -555,7 +553,6 @@ nsmlib_nodepid(NSMcontext *nsmc, const char *nodename)
 int
 nsmlib_nodeproc(NSMcontext *nsmc, const char *nodename)
 {
-  int i;
   NSMsys *sysp;
   if (! nsmc || ! (sysp = nsmc->sysp)) return -1;
 
@@ -1343,7 +1340,6 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   int writelen;
   int err = 0;
   int i;
-  int oldsig;
 
   DBS(nsmc,1100);
   
@@ -1574,7 +1570,6 @@ nsmlib_register_request(NSMcontext *nsmc, const char *name)
 {
   NSMmsg msg;
   int ret;
-  int reqid;
   memset(&msg, 0, sizeof(msg));
   msg.req   = NSMCMD_NEWREQ;
   msg.node  = -1;
@@ -1603,8 +1598,6 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   char fmtstr[256];
   NSMsys *sysp = nsmc->sysp;
   NSMmem *memp = nsmc->memp;
-  NSMmsg msg;
-  int ret;
   int datid;
   NSMdat *datp;
   int newrevision = -1;
@@ -1861,7 +1854,6 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
 {
   NSMmsg msg;
   int ret;
-  int reqid;
   char fmtstr[256];
   char *p;
   NSMsys *sysp = nsmc->sysp;

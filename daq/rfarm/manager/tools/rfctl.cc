@@ -122,7 +122,7 @@ xlogtime(char* buf)
 int
 xgetargs(char* buf, char* argv[])
 {
-  int i, argc = 0, inword = 0, inquote = 0;
+  int argc = 0, inword = 0, inquote = 0;
   char* p = buf;
 
   while (*p) {
@@ -196,8 +196,6 @@ main(int argc, char** argv)
   char* av[128];
   int ac;
   char* prompt;
-
-  int ret;
 
   //  xreopenlog();
   master_logfp = stdout;

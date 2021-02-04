@@ -41,7 +41,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   buf += m_mutex.size();
   m_cond = MCond(buf);
   buf += m_cond.size();
-  m_header = (Header*)buf;
+  m_header = reinterpret_cast<Header*>(buf);
   buf += sizeof(Header);
   m_buf = (int*)buf;
   if (recreate) init();

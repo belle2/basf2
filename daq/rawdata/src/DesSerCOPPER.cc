@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
                            const std::string& nodename, int nodeid, int finesse_bitflag)
 {
   m_finesse_bit_flag = finesse_bitflag;
@@ -399,7 +399,7 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
     if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
 
-      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read less bytes(%d) than expected(%lu:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ]);
@@ -408,7 +408,7 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
     }
   } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %lu %lu %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);

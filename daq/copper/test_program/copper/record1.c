@@ -57,7 +57,6 @@ main()
 {   
     FILE *fpr;  // for file read modified by Jingzhou Zhao
     char SaveFile[100];// SaveFile
-    int irun;
     char timebuf[100];
     time_t t;//             
 
@@ -116,7 +115,6 @@ main()
 
     while (1) {
 /*        printf("before redo.\n"); */
-	int redo;
 /*        printf("                         after redo.\n"); */
 #if 0
 	/* If you want to test select() */

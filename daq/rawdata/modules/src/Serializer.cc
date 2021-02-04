@@ -515,7 +515,7 @@ int SerializerModule::checkRunPause()
 {
 
 #ifdef NONSTOP_SLC
-  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  const RunInfoBuffer& status(DeSerializerModule::getStatus());
   if (status.getState() == status.PAUSING) {
 #else
   if (*m_ptr) {

@@ -51,7 +51,7 @@ namespace Belle2 {
       } catch (const IOException& e) {
         throw (RCHandlerException(e.what()));
       }
-      DBObject& obj(m_callback.getDBObject());
+      const DBObject& obj(m_callback.getDBObject());
       obj.getName();
       m_callback.configure(obj);
       m_callback.setState(state);
@@ -288,11 +288,11 @@ std::string RCCallback::dbdump()
 {
   std::stringstream ss;
   StringList& hnames(getHandlerNames());
-  NSMVHandlerList& handlers(getHandlers());
+  const NSMVHandlerList& handlers(getHandlers());
   for (StringList::iterator it = hnames.begin();
-       it != hnames.end(); it++) {
+       it != hnames.end(); ++it) {
     std::string hname = *it;
-    NSMVHandler& handler(*handlers[hname]);
+    NSMVHandler& handler(*handlers.at(hname));
     std::string vname = StringUtil::replace(hname, "@", "");
     if (!handler.useGet()) {
       continue;
@@ -405,7 +405,7 @@ void RCCallback::configure_raw(int length, const char* data)
 
 void RCCallback::dbload(int /*length*/, const char* /*data*/)
 {
-  NSMNode& node(getNode());
+  const NSMNode& node(getNode());
   m_rcconfig = node.getName() + "@RC:" + m_rcconfig_org;
   LogFile::debug("Loading '%s'", m_rcconfig.c_str());
   if (m_file.size() > 0) {

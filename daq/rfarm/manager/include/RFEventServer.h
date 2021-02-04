@@ -28,7 +28,7 @@ namespace Belle2 {
     ~RFEventServer();
 
     // Instance of singleton
-    static RFEventServer& Create(std::string conffile);
+    static RFEventServer& Create(const std::string& conffile);
     static RFEventServer& Instance();
 
     // Functions to be hooked to NSM

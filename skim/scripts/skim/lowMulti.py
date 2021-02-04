@@ -115,7 +115,7 @@ class LowMassTwoTrack(BaseSkim):
         6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
     """
     __authors__ = "Xing-Yu Zhou"
-    __description__ = "Skim list for low mass events with at least two tracks in its final state."
+    __description__ = "Skim list for low mass events with at least two tracks in final state."
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
@@ -150,7 +150,7 @@ class LowMassTwoTrack(BaseSkim):
         ma.fillParticleList(f"p+:{lable}", f"{IPCut} and {pCut}", path=path)
         ma.fillParticleList(f"gamma:{lable}_ISR", ISRECut, path=path)
 
-        # the mass hypothesis is different for p+, pi+, K+ list, so it is good to write them separately.
+        # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
             (f"vpho:{lable}_pipi", f" -> gamma:{lable}_ISR pi+:{lable} pi-:{lable}", hhMassWindow),
             (f"vpho:{lable}_KK", f" -> gamma:{lable}_ISR K+:{lable} K-:{lable}", hhMassWindow),
@@ -158,7 +158,7 @@ class LowMassTwoTrack(BaseSkim):
             (f"vpho:{lable}_Kpi", f" -> gamma:{lable}_ISR K+:{lable} pi-:{lable}", hhMassWindow),
             (f"vpho:{lable}_pp", f" -> gamma:{lable}_ISR p+:{lable} anti-p-:{lable}", hhMassWindow),
             # Useful for analysis for processes like ISR Lambda Lambda-bar (Sigma Sigma-bar) , and one wants to
-            # reconstruct ISR and one of the Lambda (Sigma), missing anthoer Lambda (Sigma)
+            # reconstruct ISR photon and one of the Lambda (Sigma), missing anthoer Lambda (Sigma)
             (f"vpho:{lable}_ppi", f" -> gamma:{lable}_ISR p+:{lable} pi-:{lable}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR p K and missing other final state particles
             (f"vpho:{lable}_ppi", f" -> gamma:{lable}_ISR p+:{lable} K-:{lable}", hhMassWindow),

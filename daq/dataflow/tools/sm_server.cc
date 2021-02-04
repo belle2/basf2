@@ -39,11 +39,11 @@ int main(int argc, char** argv)
     } else if (is == 1) {
       int datbuf;
       vector<int>& socklist = sockman.connected_socket_list();
-      printf("no. of connected sockets = %d\n", socklist.size());
+      printf("no. of connected sockets = %u\n", socklist.size());
       for (vector<int>::iterator it = socklist.begin(); it != socklist.end(); ++it) {
         int fd = *it;
-        int is = read(fd, &datbuf, 4);
-        printf("Data read from sock %d (%d), ret = %d\n", fd, count++, is);
+        int isNow = read(fd, &datbuf, 4);
+        printf("Data read from sock %d (%d), ret = %d\n", fd, count++, isNow);
       }
     }
   }

@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
   // remove id file
   char fname[1024];
-  sscanf(fname, "/tmp/SHM%d-SEM0-SHM_%s", argv[1]);
+  sscanf(fname, "/tmp/SHM%d-SEM0-SHM_%s", argv[1]); //TODO too few arguments!
   unlink(fname);
 }
 

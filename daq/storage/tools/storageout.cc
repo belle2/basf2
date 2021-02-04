@@ -80,8 +80,8 @@ int main(int argc, char** argv)
         }
         unsigned long long nbyte_out = 0;
         try {
-          unsigned int nbyte = htonl(evtbuf[0]);
-          nbyte_out = writer.write(&nbyte, sizeof(int));
+          unsigned int nByte = htonl(evtbuf[0]);
+          nbyte_out = writer.write(&nByte, sizeof(int));
           nbyte_out += writer.write(evtbuf, evtbuf[0]);
           //std::cout << "[DEBUG] In : "<< ntohl(nbyte) << " evtbuf[0] : " << evtbuf[0] << std::endl;
         } catch (const IOException& e) {

@@ -66,8 +66,8 @@ bool DAQLogDB::createLog(DBInterface& db, const std::string& tablename,
     } else {
       db.execute("insert into log_node (name, category) values ('" + log.getNodeName() +
                  "', " + StringUtil::form("%d", log.getCategory()) + ") returning id,category;");
-      DBRecordList record(db.loadRecords());
-      id = record[0].getInt("id");
+      DBRecordList recordNow(db.loadRecords());
+      id = recordNow[0].getInt("id");
       //cid = record[0].getInt("category");
     }
     db.execute("insert into %s (node, priority, date, message) values "

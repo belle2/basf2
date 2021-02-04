@@ -104,7 +104,7 @@ int  nsmlib_currecursive;
 static int *nsmlib_checkpoints;
 static int  nsmlib_nskipped;
 static NSMtcphead nsmlib_lastskipped;
-/* static int nsmlib_alloccnt = 0; /* (2018.0709.0934 memory leak search) */
+/* static int nsmlib_alloccnt = 0;  (2018.0709.0934 memory leak search) */
 
 typedef struct NSMrecvqueue_struct {
   struct NSMrecvqueue_struct *next;
@@ -493,6 +493,7 @@ nsmlib_addincpath(const char *path)
     if (nsmlib_incpath) nsmlib_free(nsmlib_incpath);
     nsmlib_incpath = q;
   }
+  return 0; //TODO is the return values ok?
 }
 
 /* -- nsmlib_nodename ------------------------------------------------ */
@@ -1702,8 +1703,6 @@ nsmlib_openmem(NSMcontext *nsmc,
   int ret;
   int datid;
   NSMdat *datp;
-  int refid;
-  NSMref *refp;
   int newrevision = -1;
   
   if (! fmtname) fmtname = datname;
@@ -1752,7 +1751,7 @@ nsmlib_openmem(NSMcontext *nsmc,
   }
 
   /* check locally before asking nsmd2 */
-  for (refid = 0; refid < NSMSYS_MAX_REF; refid++) {
+  for (int refid = 0; refid < NSMSYS_MAX_REF; refid++) {
     NSMref *refp = sysp->ref + refid;
     if (ntohs(refp->refdat) == datid &&
         ntohs(refp->refnod) == nsmc->nodeid) {
@@ -1950,6 +1949,7 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
   nsmlib_free(nsmc);
   nsmc = 0;
   sleep(1); /* one second penalty */
+  return 0; // TODO is the return value OK?
 }
 /* -- nsmlib_init ------------------------------------------------------- */
 /*    node is anonymous when nodename = 0                                 */

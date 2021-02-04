@@ -444,10 +444,10 @@ const
           }
         }
       } else {
-        size_t length = getNObjects(name);
-        if (length > 1) {
+        size_t lengthCur = getNObjects(name);
+        if (lengthCur > 1) {
           const DBObjectList& objs(getObjects(name));
-          for (size_t i = 0; i < length; i++) {
+          for (size_t i = 0; i < lengthCur; i++) {
             objs[i].search(map, StringUtil::form("%s[%d]", name_out.c_str(), i), isfull);
           }
         } else {

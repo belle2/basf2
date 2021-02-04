@@ -403,9 +403,9 @@ int main(int argc, char** argv)
     //  }
 
     for (int i = 1 ; i <= NUM_CLIENTS ; i++) {
-      int ret = 0;
-      if ((ret = write(client[i].fd, buff, total_words * sizeof(int))) <= 0) {
-        printf("[FATAL] Return value %d\n", ret);
+      int Ret = 0;
+      if ((Ret = write(client[i].fd, buff, total_words * sizeof(int))) <= 0) {
+        printf("[FATAL] Return value %d\n", Ret);
         fflush(stdout);
         exit(1);
       }

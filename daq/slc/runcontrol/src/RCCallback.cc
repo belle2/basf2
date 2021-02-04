@@ -200,15 +200,15 @@ bool RCCallback::perform(NSMCommunicator& com)
         log(LogFile::FATAL, "Failed to recover/abort : %s", e.what());
       }
     }
-    RCState state = cmd.nextState();
+    RCState State = cmd.nextState();
     if (getNode().getState() == tstate &&
-        state != Enum::UNKNOWN && m_auto) {
-      setState(state);
+        State != Enum::UNKNOWN && m_auto) {
+      setState(State);
     }
-    state = getNode().getState();
-    if (state != Enum::UNKNOWN) {
+    State = getNode().getState();
+    if (State != Enum::UNKNOWN) {
       if ((cmd == RCCommand::START &&
-           (state == RCState::RUNNING_S || state == RCState::STARTING_TS)) ||
+           (State == RCState::RUNNING_S || State == RCState::STARTING_TS)) ||
           ((cmd == RCCommand::STOP || cmd == RCCommand::ABORT)
            && state_org == RCState::RUNNING_S))  {
         try {

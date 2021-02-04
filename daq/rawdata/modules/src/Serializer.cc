@@ -261,7 +261,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[WARNING] WRITEVa error.(%s) : sent %d bytes, header %d bytes body %d trailer %d : %s %s %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEVa error.(%s) : sent %d bytes, header %u bytes body %u trailer %u : %s %s %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP

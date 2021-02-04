@@ -13,6 +13,9 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vector>
 
+// ROOT
+#include <TH1.h>
+
 
 namespace Belle2 {
   /**
@@ -39,6 +42,9 @@ namespace Belle2 {
     /// strategy to used for gain calibration, 0 for medians, 1 for landau fit
     int strategy;
 
+    /// Flag to use histogram of charge ratio (relative to expected MPV)
+    bool useChargeRatioHistogram;
+
     /// Setter for boundaries
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 
@@ -63,13 +69,19 @@ namespace Belle2 {
   private:
 
     /// Estimate gain as ratio of medians from MC and data for a part of PXD
-    double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+    double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin, TH1* hist = nullptr);
 
-    /// Calculate a median from unsorted signal vector. The input vector gets sorted.
-    double CalculateMedian(std::vector<double>& signals);
+    ///// Calculate a median from unsorted signal vector. The input vector gets sorted.
+    //double CalculateMedian(std::vector<double>& signals);
 
-    /// Calculate MPV from signal vector using a landau fit.
-    double FitLandau(std::vector<double>& signals);
+    ///// Calculate a median from a histogram.
+    //double CalculateMedian(TH1* hist);
+
+    ///// Calculate MPV from signal vector using a landau fit.
+    //double FitLandau(std::vector<double>& signals);
+
+    ///// Calculate MPV from a histogram.
+    //double FitLandau(TH1* hist);
 
     /// Retrive current gain value from pulled in data base payload
     double GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);

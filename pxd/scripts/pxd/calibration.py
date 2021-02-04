@@ -13,6 +13,7 @@ from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SimpleRunByRun, SequentialBoundaries
 
 run_types = ['beam', 'physics', 'cosmic', 'all']
+gain_methods = ['analytic', 'generic_mc', 'cluster_sim', '']
 
 
 def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration", run_type=None, global_tags=None, local_dbs=None):
@@ -74,7 +75,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
     algorithm.setPrefix("PXDRawHotPixelMaskCollector")
-    if run_type == 'cosmic':
+    if run_type.lower() == 'cosmic':
         algorithm.forceContinueMasking = True
 
     # Create the calibration instance
@@ -93,13 +94,15 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
 
     # Run type dependent configurations
 
-    if run_type == 'cosmic':
+    if run_type.lower() == 'cosmic':
         cal.strategies = SimpleRunByRun
 
     return cal
 
 
-def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundaries=None, global_tags=None, local_dbs=None):
+def gain_calibration(input_files, cal_name="PXDGainCalibration",
+                     boundaries=None, global_tags=None, local_dbs=None,
+                     gain_method="Analytic", validation=True):
     """
     Parameters:
       input_files (list): A list of input files to be assigned to calibration.input_files
@@ -110,6 +113,13 @@ def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundar
 
       local_dbs   (list): A list of local databases
 
+      gain_method (str): A string of gain algorithm in
+        ['analytic', 'generic_mc', 'cluster_sim', '']. Empty str means to skip gain
+        calibration and validation has to be True otherwise no algorithm will be used.
+        Caveat: Only the analytic method is now implemented.
+
+      validation (bool): Adding validation algorithm if True (default)
+
     Return:
       A caf.framework.Calibration obj.
     """
@@ -118,6 +128,10 @@ def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundar
         global_tags = []
     if local_dbs is None:
         local_dbs = []
+    if gain_method is None:
+        gain_method = 'analytic'
+    if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
+        raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
 
     # Create BASF2 path
 
@@ -144,7 +158,7 @@ def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundar
 
     # Collector setup
 
-    collector = register_module("PXDCDSTCollector")
+    collector = register_module("PXDPerformanceCollector")
     collector.param("granularity", "run")
     collector.param("minClusterCharge", 8)
     collector.param("minClusterSize", 1)
@@ -152,29 +166,35 @@ def gain_calibration(input_files, cal_name="PXDAnalyticGainCalibration", boundar
     collector.param("nBinsU", 4)
     collector.param("nBinsV", 6)
     collector.param("fillEventTree", False)
+    collector.param("fillChargeRatioHistogram", True)
 
     # Algorithm setup
+    algorithms = []
+    if validation:
+        validation_alg = PXDValidationAlgorithm()
+        validation_alg.setPrefix("PXDPerformanceCollector")
+        validation_alg.minTrackPoints = 10     # Minimum number of track points
+        validation_alg.save2DHists = True      # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
+        algorithms.append(validation_alg)
 
-    algorithm = PXDAnalyticGainCalibrationAlgorithm()  # Getting a calibration algorithm instanced
-    algorithm.minClusters = 100             # Minimum number of clusters in each region
-    algorithm.safetyFactor = 22             # Safety factor x minClusters/region -> <minClusters> for module
-    algorithm.forceContinue = False         # Force continue the algorithm instead of return c_notEnoughData
-    algorithm.strategy = 0                  # 0: medians, 1: landau fit
-    algorithm.setPrefix("PXDCDSTCollector")
-    # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
-
-    validation_alg = PXDValidationAlgorithm()
-    validation_alg.setPrefix("PXDCDSTCollector")
-    validation_alg.minTrackPoints = 10     # Minimum number of track points
-    validation_alg.save2DHists = True  # False     # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
     # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config
+    if (gain_method != ''):
+        algorithm = PXDAnalyticGainCalibrationAlgorithm()  # Getting a calibration algorithm instanced
+        algorithm.minClusters = 100             # Minimum number of clusters in each region
+        algorithm.safetyFactor = 22             # Safety factor x minClusters/region -> <minClusters> for module
+        algorithm.forceContinue = False         # Force continue the algorithm instead of return c_notEnoughData
+        algorithm.strategy = 0                  # 0: medians, 1: landau fit
+        algorithm.useChargeRatioHistogram = True  # Use Charge ratio histograms for the calibration
+        algorithm.setPrefix("PXDPerformanceCollector")
+        # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
+        algorithms.append(algorithm)
 
     # Create the calibration instance
 
     cal = Calibration(
         name=cal_name,
         collector=collector,
-        algorithms=[validation_alg, algorithm],
+        algorithms=algorithms,
         input_files=input_files)
     for global_tag in global_tags:
         cal.use_central_database(global_tag)

@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include <pxd/utilities/PXDTuple.h>
+#include <pxd/utilities/PXDPerformanceStructs.h>
 #include <pxd/utilities/PXD2TrackBase.h>
 
 
 namespace Belle2 {
 
-  using namespace Belle2::PXD::Tuple;
+  using namespace Belle2::PXD;
 
 
   /** Class PXD2TrackEvent: Event data container for performance and calibration studies.

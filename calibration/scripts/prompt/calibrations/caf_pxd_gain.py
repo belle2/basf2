@@ -27,6 +27,8 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                # "physics", "Good"]
                                # },
                                expert_config={
+                                   "total_jobs": 1000,
+                                   "gain_method": "analytic",
                                    "max_events_per_run": 4000000,
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0
                                    # "payload_boundaries": []
@@ -56,6 +58,7 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     expert_config = kwargs.get("expert_config")
+    gain_method = kwargs.get("gain_method")
     max_events_per_run = expert_config["max_events_per_run"]
     max_files_per_run = expert_config["max_files_per_run"]
     min_files_per_chunk = 10
@@ -66,7 +69,10 @@ def get_calibrations(input_data, **kwargs):
 
     # Reduce data and create calibration instances for different data categories
     cal_list = []
-    if max_events_per_run <= 0:
+    if max_events_per_run < 0:
+        basf2.B2INFO("No file reduction applied.")
+        reduced_file_to_iov_physics = file_to_iov_physics
+    elif max_events_per_run == 0:
         basf2.B2INFO(f"Reducing to a maximum of {max_files_per_run} files per run.")
         reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics,
                                                                   max_files_per_run, min_events_per_file)
@@ -82,7 +88,8 @@ def get_calibrations(input_data, **kwargs):
     # basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']} ")
 
     cal = gain_calibration(
-        # cal_name="PXDGainCalibration",
+        cal_name="PXDAnalyticGainCalibration",
+        gain_method=gain_method,
         # boundaries=vector_from_runs(payload_boundaries),
         input_files=input_files_physics)
     for alg in cal.algorithms:
@@ -94,7 +101,7 @@ def get_calibrations(input_data, **kwargs):
     # So we define 1000 total jobs and split this between the calibrations depending on the fraction of total input files
     # in the calibrations.
 
-    total_jobs = 1000
+    total_jobs = expert_config["total_jobs"]
     total_input_files = len(reduced_file_to_iov_physics)
 
     for cal in cal_list:

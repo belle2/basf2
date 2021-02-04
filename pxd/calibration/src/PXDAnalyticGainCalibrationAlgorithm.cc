@@ -9,25 +9,18 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDAnalyticGainCalibrationAlgorithm.h>
+#include <pxd/calibration/PXDCalibrationUtilities.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
-
-#include <string>
-#include <algorithm>
-#include <set>
-
-#include <sstream>
-#include <iostream>
 
 #include <boost/format.hpp>
 
 //ROOT
-#include <TRandom.h>
-#include <TH1.h>
-#include <TF1.h>
+#include <TH2F.h>
 
 using namespace std;
 using boost::format;
 using namespace Belle2;
+using namespace Belle2::PXD;
 
 
 // Anonymous namespace for data objects used by PXDAnalyticGainCalibrationAlgorithm class
@@ -41,67 +34,12 @@ namespace {
   int m_run;
   /** Experiment number to be stored in dbtree */
   int m_exp;
-
-  /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
-  void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
-  {
-    set<unsigned short> uBinSet;
-    set<unsigned short> vBinSet;
-
-    // Loop over all bins of input histo
-    for (auto histoBin = 1; histoBin <= histo_ptr->GetXaxis()->GetNbins(); histoBin++) {
-      // The bin label contains the vxdid, uBin and vBin
-      string label = histo_ptr->GetXaxis()->GetBinLabel(histoBin);
-
-      // Parse label string format to read sensorID, uBin and vBin
-      istringstream  stream(label);
-      string token;
-      getline(stream, token, '_');
-      getline(stream, token, '_');
-      unsigned short uBin = std::stoi(token);
-
-      getline(stream, token, '_');
-      unsigned short vBin = std::stoi(token);
-
-      uBinSet.insert(uBin);
-      vBinSet.insert(vBin);
-    }
-
-    if (uBinSet.empty() || vBinSet.empty()) {
-      B2FATAL("Not able to determine the grid size. Something is wrong with collected data.");
-    } else {
-      nBinsU = *uBinSet.rbegin() + 1;
-      nBinsV = *vBinSet.rbegin() + 1;
-    }
-  }
-
-  /** Helper function to extract number of sensors from counter histogram labels. */
-  unsigned short getNumberOfSensors(const std::shared_ptr<TH1I>& histo_ptr)
-  {
-    set<unsigned short> sensorSet;
-
-    // Loop over all bins of input histo
-    for (auto histoBin = 1; histoBin <= histo_ptr->GetXaxis()->GetNbins(); histoBin++) {
-      // The bin label contains the vxdid, uBin and vBin
-      string label = histo_ptr->GetXaxis()->GetBinLabel(histoBin);
-
-      // Parse label string format to read sensorID, uBin and vBin
-      istringstream  stream(label);
-      string token;
-      getline(stream, token, '_');
-      VxdID sensorID(token);
-      sensorSet.insert(sensorID.getID());
-    }
-    return sensorSet.size();
-  }
-
 }
 
 
 PXDAnalyticGainCalibrationAlgorithm::PXDAnalyticGainCalibrationAlgorithm():
-  CalibrationAlgorithm("PXDCDSTCollector"),
-
-  minClusters(1000), safetyFactor(2.0), forceContinue(false), strategy(0)
+  CalibrationAlgorithm("PXDPerformanceCollector"),
+  minClusters(1000), safetyFactor(2.0), forceContinue(false), strategy(0), useChargeRatioHistogram(true)
 {
   setDescription(
     " -------------------------- PXDAnalyticGainCalibrationAlgorithm ---------------------------------\n"
@@ -110,8 +48,6 @@ PXDAnalyticGainCalibrationAlgorithm::PXDAnalyticGainCalibrationAlgorithm():
     " ----------------------------------------------------------------------------------------\n"
   );
 }
-
-
 
 
 CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
@@ -172,9 +108,15 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
     // Only perform estimation, when enough data is available
     if (numberOfHits >= minClusters) {
 
+      double gain = 1.0;
       // Estimate the gain on a certain part of PXD
-      auto gain = EstimateGain(sensorID, uBin, vBin);
-
+      if (useChargeRatioHistogram) {
+        auto hClusterChargeRatio = getObjectPtr<TH2F>("PXDClusterChargeRatio");
+        TH1D* hRatios = hClusterChargeRatio->ProjectionY("proj", histoBin, histoBin);
+        gain = EstimateGain(sensorID, uBin, vBin, hRatios);
+      } else {
+        gain = EstimateGain(sensorID, uBin, vBin);
+      }
       // Store the gain
       gainMapPar->setContent(sensorID.getID(), uBin, vBin, gain);
     } else {
@@ -250,33 +192,46 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
 }
 
 
-double PXDAnalyticGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+double PXDAnalyticGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin, TH1* hist)
 {
-  // Construct a tree name for requested part of PXD
-  auto layerNumber = sensorID.getLayerNumber();
-  auto ladderNumber = sensorID.getLadderNumber();
-  auto sensorNumber = sensorID.getSensorNumber();
-  const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-  // Vector with ratios (cluster charge to its estimation)
-  vector<double> ratios;
+  double gain = 1.0; // default gain
 
-  auto tree = getObjectPtr<TTree>(treename);
-  tree->SetBranchAddress("signal", &m_signal);
-  tree->SetBranchAddress("estimated", &m_estimated);
-
-  // Loop over tree
-  const auto nEntries_MC = tree->GetEntries();
-  for (int i = 0; i < nEntries_MC; ++i) {
-    tree->GetEntry(i);
-
-    ratios.push_back(double(m_signal) / m_estimated);
+  // function pointers for different strategy
+  double (*estimateGainFromHist)(TH1*);
+  double (*estimateGainFromVec)(std::vector<double>&);
+  if (strategy == 0) {
+    estimateGainFromVec = &CalculateMedian;
+    estimateGainFromHist = &CalculateMedian;
+  } else if (strategy == 1) {
+    estimateGainFromVec = &FitLandau;
+    estimateGainFromHist = &FitLandau;
+  } else {
+    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
   }
 
-  double gain = 1.0;
-  if (strategy == 0) gain = CalculateMedian(ratios);
-  else if (strategy == 1) gain = FitLandau(ratios);
-  else {
-    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
+  // Do estimation
+  if (hist) { // estimate gain from existing histogram
+    gain = estimateGainFromHist(hist);
+  } else { // estimate from TTree
+    // Construct a tree name for requested part of PXD
+    auto layerNumber = sensorID.getLayerNumber();
+    auto ladderNumber = sensorID.getLadderNumber();
+    auto sensorNumber = sensorID.getSensorNumber();
+    const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+    // Vector with ratios (cluster charge to its estimation)
+    vector<double> ratios;
+
+    auto tree = getObjectPtr<TTree>(treename);
+    tree->SetBranchAddress("signal", &m_signal);
+    tree->SetBranchAddress("estimated", &m_estimated);
+
+    // Loop over tree
+    const auto nEntries_MC = tree->GetEntries();
+    for (int i = 0; i < nEntries_MC; ++i) {
+      tree->GetEntry(i);
+      ratios.push_back(double(m_signal) / m_estimated);
+    }
+    gain = estimateGainFromVec(ratios);
   }
 
   // check if gain makes sense
@@ -286,7 +241,7 @@ double PXDAnalyticGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigne
     return 1.0;
   }
 
-
+  // calculate and return the absolute gain
   double gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
   B2DEBUG(10, "Gain from db used in PXDDigitizer is " << gainFromDB);
   B2DEBUG(10, "New gain correction derived is " << gain);
@@ -320,59 +275,6 @@ double PXDAnalyticGainCalibrationAlgorithm::GetCurrentGainFromDB(VxdID sensorID,
   gainMapPtr = nullptr;
 
   return sum / counter;
-}
-
-
-double PXDAnalyticGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
-{
-  auto size = signals.size();
-
-  if (size == 0) {
-    return 0.0;  // Undefined, really.
-  } else {
-    sort(signals.begin(), signals.end());
-    if (size % 2 == 0) {
-      return (signals[size / 2 - 1] + signals[size / 2]) / 2;
-    } else {
-      return signals[size / 2];
-    }
-  }
-}
-
-double PXDAnalyticGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
-{
-  auto size = signals.size();
-  if (size == 0) return 0.0; // Undefined, really.
-
-  // get max and min values of signal vector
-  double max = *max_element(signals.begin(), signals.end());
-  double min = *min_element(signals.begin(), signals.end());
-
-  // create histogram to hold signals and fill it
-  TH1D* hist_signals = new TH1D("", "", max - min, min, max);
-  for (auto it = signals.begin(); it != signals.end(); ++it) {
-    hist_signals->Fill(*it);
-  }
-
-  // create fit function
-  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
-  landau->SetParNames("MPV", "sigma", "scale");
-  landau->SetParameters(1, 0.2, 1000);
-
-  // do fit and get results
-  Int_t status = hist_signals->Fit("landau", "Lq", "", min, max);
-  double MPV = landau->GetParameter("MPV");
-
-  // clean up
-  delete hist_signals;
-  delete landau;
-
-  // check fit status
-  if (status == 0) return MPV;
-  else {
-    B2WARNING("Fit failed!. using default value.");
-    return 0.0;
-  }
 }
 
 bool PXDAnalyticGainCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)

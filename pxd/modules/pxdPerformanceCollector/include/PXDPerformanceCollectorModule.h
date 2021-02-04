@@ -41,14 +41,14 @@ namespace Belle2 {
    * cluster charge / expected value, in the calibration algorithm.
    *
    */
-  class PXDCDSTCollectorModule : public CalibrationCollectorModule {
+  class PXDPerformanceCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDCDSTCollectorModule();
+    PXDPerformanceCollectorModule();
     void prepare() override final;
     void collect() override final;
     void startRun() override final;
@@ -104,8 +104,10 @@ namespace Belle2 {
     int m_nBinsV;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
-    /** Flag to fill cluster charge histograms*/
-    //bool m_fillChargeHistogram;
+    /** Flag to fill cluster charge ratio (relative to expected MPV) histograms*/
+    bool m_fillChargeRatioHistogram;
+    /** Flag to fill cluster charge and its estimated MPV in TTree*/
+    bool m_fillChargeTree;
 
     /** Flag to fill event tree for validation */
     bool m_fillEventTree;

@@ -32,10 +32,12 @@ Finally, for estimating the disk space per inverse attobarn, the calculations ar
 import argparse
 from functools import lru_cache
 import json
+from numpy import nan
 import pandas as pd
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import subprocess
+import warnings
 
 from tabulate import tabulate
 
@@ -62,12 +64,13 @@ def get_working_groups():
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
-        "StatsJSON",
+        "-j",
+        "--stats-json",
+        dest="StatsJSON",
         help="JSON file of stats produced by ``b2skim-stats-print``.",
     )
     parser.add_argument(
@@ -77,8 +80,9 @@ def get_argument_parser():
         help="If passed, print tables in Markdown format.",
     )
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    requested = parser.add_mutually_exclusive_group(required=True)
+    requested.add_argument(
+        "-r",
         "--requested-skims",
         nargs="+",
         metavar="SKIM",
@@ -89,13 +93,28 @@ def get_argument_parser():
             "based on the skims that are actually requested."
         ),
     )
-    group.add_argument(
+    requested.add_argument(
+        "-f",
         "--requested-skims-file",
         help=(
             "File containing list of all skims that are requested for production. "
             "This list will be used to produce resource usage estimates "
             "based on the skims that are actually requested."
         ),
+    )
+
+    requested = parser.add_mutually_exclusive_group(required=True)
+    requested.add_argument(
+        "-a", "--average-tables", action="store_true", help="Print tables of averages."
+    )
+    requested.add_argument(
+        "-t", "--total-tables", action="store_true", help="Print tables of totals."
+    )
+    requested.add_argument(
+        "-b",
+        "--both-tables",
+        action="store_true",
+        help="Print both tables of averages and tables of totals.",
     )
 
     return parser
@@ -243,6 +262,9 @@ def add_data_fields(df, add_lumi=False):
     In particular, add luminosity of full file and luminosity actually used in test.
     """
 
+    # Policy of dealing with NaN: replace with zeros
+    df = df.fillna(0)
+
     # Add columns with info about input file
     df["SampleFile"] = df["Sample"].apply(lambda sample: get_test_file(sample))
     df["FractionOfEventsUsed"] = df.apply(
@@ -274,26 +296,41 @@ def add_mc_fields(df):
     """
     Add stats to dataframe for data samples.
     """
+
+    # Policy of dealing with NaN: replace with zeros
+    df = df.fillna(0)
+
     df["OutputFileSize_TBPerInvab"] = (
         df["udstSizePerInputEvent"] * get_nEvents_per_invab() / 1024 ** 3
     )
     return df
 
 
-def totals_table(x, xlabel, df_Data, df_MC, *, markdown):
-    headers = [xlabel, "Requested skims", "All skims"]
+def aggregate_table(
+    x,
+    xlabel,
+    df_Data,
+    df_MC,
+    *,
+    markdown,
+    aggregator_function,
+    aggregator_function_name,
+):
+    headers = [f"{xlabel} [{aggregator_function_name}]", "Requested skims", "All skims"]
 
-    # Sum over skims and average over data samples
-    df_Data_SumsPerSample = df_Data.groupby(["Sample"], as_index=False).sum()[x]
-    df_ReqData_SumsPerSample = (
-        df_Data.query("Requested").groupby(["Sample"], as_index=False).sum()[x]
+    agg = aggregator_function  # Short alias for aggregator_function
+
+    # Aggregate over skims and average over data samples
+    df_Data_AggPerSample = df_Data.groupby(["Sample"], as_index=False).agg(agg)[x]
+    df_ReqData_AggPerSample = (
+        df_Data.query("Requested").groupby(["Sample"], as_index=False).agg(agg)[x]
     )
 
     table = [
         [
             "Data",
-            f"{df_ReqData_SumsPerSample.mean():.1f} ± {df_ReqData_SumsPerSample.std():.1f}",
-            f"{df_Data_SumsPerSample.mean():.1f} ± {df_Data_SumsPerSample.std():.1f}",
+            f"{float(df_ReqData_AggPerSample.mean()):.1f} ± {float(df_ReqData_AggPerSample.std()):.1f}",
+            f"{float(df_Data_AggPerSample.mean()):.1f} ± {float(df_Data_AggPerSample.std()):.1f}",
         ]
     ]
     for sample in sorted(set(df_MC["Sample"])):
@@ -301,13 +338,42 @@ def totals_table(x, xlabel, df_Data, df_MC, *, markdown):
         table.append(
             [
                 sample,
-                f"{df_sample.query('Requested')[x].sum():.1f}",
-                f"{df_sample[x].sum():.1f}",
+                f"{df_sample.query('Requested')[x].agg(agg):.1f}",
+                f"{df_sample[x].agg(agg):.1f}",
             ]
         )
 
     tablefmt = "pipe" if markdown else "fancy_grid"
     print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")
+
+
+def total_table(x, xlabel, df_Data, df_MC, *, markdown):
+    aggregate_table(
+        x=x,
+        xlabel=xlabel,
+        df_Data=df_Data,
+        df_MC=df_MC,
+        markdown=markdown,
+        aggregator_function=sum,
+        aggregator_function_name="total",
+    )
+
+
+def average_table(x, xlabel, df_Data, df_MC, *, markdown):
+    aggregate_table(
+        x=x,
+        xlabel=xlabel,
+        df_Data=df_Data,
+        df_MC=df_MC,
+        markdown=markdown,
+        aggregator_function=lambda v: sum(v) / len(v),
+        aggregator_function_name="average",
+    )
+
+
+def average_and_total_tables(x, xlabel, df_Data, df_MC, *, markdown):
+    average_table(x=x, xlabel=xlabel, df_Data=df_Data, df_MC=df_MC, markdown=markdown)
+    total_table(x=x, xlabel=xlabel, df_Data=df_Data, df_MC=df_MC, markdown=markdown)
 
 
 def main():
@@ -320,6 +386,8 @@ def main():
     else:
         with open(args.requested_skims_file) as f:
             RequestedSkims = list(filter(None, f.read().split("\n")))
+            # Remove any surrounding whitespace from names
+            RequestedSkims = [skim.strip() for skim in RequestedSkims]
         # Check that all skims are valid
         InvalidSkims = [skim for skim in RequestedSkims if skim not in Registry.names]
         if InvalidSkims:
@@ -333,36 +401,24 @@ def main():
     df_Data = add_data_fields(df_Data)
     df_MC = add_mc_fields(df_MC)
 
-    print("All stats displayed below are summed over skims.")
-    totals_table(
-        "HS06TimePerEvent",
-        "CPU time to process one input event (HS06)",
-        df_Data,
-        df_MC,
-        markdown=args.markdown,
+    # Select a table printing function based on the flag passed to the script
+    if args.average_tables:
+        table_function = average_table
+    elif args.total_tables:
+        table_function = total_table
+    elif args.both_tables:
+        table_function = average_and_total_tables
+
+    VariablesToPrint = (
+        ("HS06TimePerEvent", "CPU time to process one input event (HS06)"),
+        ("RetentionRate", "Event-based retention rate (%)"),
+        ("FilesizeRetentionRate", "Filesize-based retention rate (%)"),
+        ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)"),
     )
-    totals_table(
-        "RetentionRate",
-        "Event-based retention rate (%)",
-        df_Data,
-        df_MC,
-        markdown=args.markdown,
-    )
-    totals_table(
-        "FilesizeRetentionRate",
-        "Filesize-based retention rate (%)",
-        df_Data,
-        df_MC,
-        markdown=args.markdown,
-    )
-    totals_table(
-        "udstSizePerSkimmedEvent",
-        "Size of one event in uDST format (kB)",
-        df_Data,
-        df_MC,
-        markdown=args.markdown,
-    )
+    for variable, description in VariablesToPrint:
+        table_function(variable, description, df_Data, df_MC, markdown=args.markdown)
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore", "This pattern has match groups")
     main()

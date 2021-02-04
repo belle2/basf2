@@ -160,5 +160,3 @@ namespace Belle2 {
     };
   }
 }
-#endif
-

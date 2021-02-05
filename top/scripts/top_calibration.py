@@ -121,11 +121,11 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         main.add_module('TOPChannelMasker')
         main.add_module('TOPBunchFinder', subtractRunningOffset=False)
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
 
     #   collector module
     collector = basf2.register_module('TOPAsicShiftsBS13dCollector',

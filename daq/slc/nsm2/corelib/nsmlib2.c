@@ -291,12 +291,12 @@ nsmlib_debuglevel(int val)
 static void
 nsmlib_debug(const char *fmt, ...)
 {
-  va_list ap;
   if (! nsmlib_logfp) return;
   if (! nsmlib_debugflag) return;
 
   if (LOGSIZ > 256) {
     LOGCAT("[DBG] ");
+    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
     LOGCAT("\n");
@@ -306,9 +306,9 @@ nsmlib_debug(const char *fmt, ...)
 void
 nsmlib_lognl(const char *fmt, ...)
 {
-  va_list ap;
   if (! nsmlib_logfp) return;
   if (LOGSIZ > 256) {
+    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
     LOGCAT("\n");
@@ -318,9 +318,9 @@ nsmlib_lognl(const char *fmt, ...)
 void
 nsmlib_log(const char *fmt, ...)
 {
-  va_list ap;
   if (! nsmlib_logfp) return;
   if (LOGSIZ > 256) {
+    va_list ap;
     VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
     LOGFWD;
   }
@@ -750,7 +750,7 @@ nsmlib_initnet(NSMcontext *nsmc, const char *unused, int port)
       nsmc->errn = errno;
       return NSMERDUID;
     }
-    if (ret < sizeof(nsmd_euid)) return NSMERDCLOSE;
+    if (ret < (int) sizeof(nsmd_euid)) return NSMERDCLOSE;
     break;
   }
   
@@ -1114,7 +1114,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
 /* -- nsmlib_handler ------------------------------------------------- */
 static void
 #ifdef SIGRTMIN
-nsmlib_handler(int sig, siginfo_t *info, void *ignored)
+nsmlib_handler(int sig, siginfo_t * info, void *ignored)
 #else
 nsmlib_handler(int sig)
 #endif
@@ -1255,7 +1255,7 @@ nsmlib_usesig(NSMcontext *nsmc, int usesig)
 }
 /* -- nsmlib_delclient ----------------------------------------------- */
 void
-nsmlib_delclient(NSMmsg *msg, NSMcontext *nsmc)
+nsmlib_delclient(NSMmsg * msg, NSMcontext * nsmc)
 {
   LOG("killed by nsmd2");
   exit(1);
@@ -1787,8 +1787,6 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
   NSMmsg msg;
   NSMsys *sysp;
   size_t ppos;
-  size_t dpos = 0;
-  size_t dsiz = 0;
   int nnext;
   int n = 0; /* to check inf-loop */
   int ret;
@@ -1811,8 +1809,8 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
   nnext = (int16_t)ntohs(sysp->nod[nsmc->nodeid].noddat);
   while (nnext >= 0 && nnext < NSMSYS_MAX_DAT) {
     NSMdat *datp = sysp->dat + nnext;
-    dpos = (int32_t)ntohl(datp->dtpos);
-    dsiz = (int16_t)ntohs(datp->dtsiz);
+    size_t dpos = (int32_t)ntohl(datp->dtpos);
+    size_t dsiz = (int16_t)ntohs(datp->dtsiz);
     DBG("flushmem: ppos=%d dpos=%d ppos+psiz=%d dpos+dsiz=%d",
         (int)ppos, (int)dpos, (int)(ppos+psiz), (int)(dpos+dsiz));
     if (ppos == dpos && psiz == 0) psiz = dsiz;
@@ -1952,11 +1950,10 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
 /*                                                                        */
 /* ---------------------------------------------------------------------- */
 NSMcontext *
-nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
+nsmlib_init(const char *nodename, const char * unused, int port, int shmkey)
 {
   NSMcontext *nsmc;
   int ret = 0;
-  int i;
 
   if (! nsmlib_logfp) nsmlib_logfp = stdout;
 
@@ -1964,7 +1961,7 @@ nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
   if (nodename) {
     if (! *nodename) ret = -1;
     if (strlen(nodename) > NSMSYS_NAME_SIZ) ret = -1;
-    for (i=0; ret == 0 && nodename[i]; i++) {
+    for (int i=0; ret == 0 && nodename[i]; i++) {
       if (! isalnum(nodename[i]) && nodename[i] != '_') ret = -1;
     }
   }

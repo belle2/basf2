@@ -69,9 +69,8 @@ int main(int argc, char** argv)
     int bufno = std::rand() % nevt;
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbuf->insq((int*)evbuf[bufno], (is - 1) / 4 + 1);
+      int irb = rbuf->insq((int*)evbuf[bufno], (is - 1) / 4 + 1);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

@@ -350,10 +350,8 @@ b2nsm_sendreq(const char *node, const char *req, int npar, int32_t *pars)
 int
 b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
 {
-  va_list ap;
   const char *node = nsmlib_nodename(nsm, msg->node);
   char buf[32+256];
-  char *str = 0;
   int  len;
   int  pars[2];
   
@@ -369,10 +367,11 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
   }
   
   if (fmt) {
+    va_list ap;
     va_start(ap, fmt);
     vsnprintf(buf + len, 256, fmt, ap);
     va_end(ap);
-    str = buf + len;
+    char *str = buf + len;
     len += strlen(buf + len) + 1;
   }
 

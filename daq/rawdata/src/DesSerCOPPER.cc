@@ -57,7 +57,6 @@ DesSerCOPPER::~DesSerCOPPER()
 void DesSerCOPPER::DataAcquisition()
 {
   // For data check
-  unsigned int eve_copper_0 = 0;
   //  B2INFO("initializing...");
   printf("[DEBUG] initializing...\n"); fflush(stdout);
   initialize(false);
@@ -109,11 +108,10 @@ void DesSerCOPPER::DataAcquisition()
       //
       // Receive data from COPPER
       //
-      eve_copper_0 = 0;
-      int delete_flag_from =
-        0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
-      int delete_flag_to =
-        0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
+      //int delete_flag_from =
+      //0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
+      //int delete_flag_to =
+      //0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
       RawDataBlockFormat temp_rawdatablk;
       try {
 
@@ -546,8 +544,8 @@ int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
 {
 
   int n = 0;
-  int read_size = 0;
   while (1) {
+    int read_size = 0;
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;

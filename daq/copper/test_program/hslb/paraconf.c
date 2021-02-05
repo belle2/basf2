@@ -82,9 +82,7 @@ main(int argc, char **argv)
   int fd[4];
   int use[4];
   int readback[4];
-  int j;
   int tem;
-  int k = 0;
   readback[0] = readback[1] = readback[2] = readback [3] = 0;
   use[0] = use[1] = use[2] = use[3] = 0;
   fd[0]  = fd[1]  = fd[2]  = fd[3]  = -1;
@@ -97,7 +95,7 @@ main(int argc, char **argv)
       break;
     }
 
-    j = argv[1][i] - 'a';
+    int j = argv[1][i] - 'a';
     if (use[j]) {
       fprintf(stderr, "HSLB %c is specified twice\n", 'a'+j);
       exit(1);
@@ -116,11 +114,11 @@ main(int argc, char **argv)
   for ( i=0; i<4; i++) {
     if (! use[i]) continue;
     if (fd[i] < 0) {
-      char DEVICE[256];
-      sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + i);
-      if ((fd[i] = open(DEVICE,O_RDWR)) < 0) {
+      char dev[256];
+      sprintf(dev, "/dev/copper/fngeneric:%c", 'a' + i);
+      if ((fd[i] = open(dev,O_RDWR)) < 0) {
         fprintf(stderr, "%s: cannot open %s: %s\n",
-            ARGV0, DEVICE, strerror(errno));
+            ARGV0, dev, strerror(errno));
         exit(1);
       }
       if ( ( tem =  rdmgt( fd[i] , 0x7d ) )  != FirmwareVersion ) {
@@ -136,6 +134,7 @@ main(int argc, char **argv)
     argv++;
     argc--;
     int val;
+    int k;
     for(k = 1 ; k < argc ; k++) {
       for(i=0; i<sizeof(regs)/sizeof(regs[0]);i++) {
         if(!strcmp(regs[i].name, argv[k])) {
@@ -191,7 +190,6 @@ main(int argc, char **argv)
     }
 
     while(argc > 1){
-      int val;
       if(argc <2) {
         usage();
         exit(1);
@@ -203,8 +201,8 @@ main(int argc, char **argv)
       }
       for(i= 0; i<4; i++) {
         if(!use[i]) continue;
-        val = rdmgt(fd[i], adr);
-        printf("value of parameter  %s on HSLB:%c : %x \n",argv[1],'a'+ i ,val);
+        int Val = rdmgt(fd[i], adr);
+        printf("value of parameter  %s on HSLB:%c : %x \n",argv[1],'a'+ i ,Val);
       }
       argv++;
       argc--; 

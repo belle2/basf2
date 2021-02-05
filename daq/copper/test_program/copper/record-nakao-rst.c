@@ -63,7 +63,6 @@ main(int argc, char **argv)
   int ret, i = 0;
   int iii;
   int istop;
-  int istart;    
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
@@ -168,6 +167,7 @@ main(int argc, char **argv)
   //
   // Main routine
   //
+  int istart;    
   while (1) {
     /*        printf("before redo.\n"); */
     /*        printf("                         after redo.\n"); */

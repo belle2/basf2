@@ -74,7 +74,6 @@ int
 main(int argc, char **argv)
 {   
   //FILE *fpr;  // for file read modified by Jingzhou Zhao
-  time_t t;//             
 
   int event=0;
   int ret, i = 0;
@@ -125,10 +124,11 @@ main(int argc, char **argv)
   //
   // Open an output file
   //
-  time(&t);
+  time_t tt;//             
+  time(&tt);
 #ifdef FILE_OUT 
   char timebuf[100];
-  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&t));
+  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&tt));
   char SaveFile[100];// SaveFile
   strcpy(SaveFile,timebuf);
   strcat(SaveFile,".dat");

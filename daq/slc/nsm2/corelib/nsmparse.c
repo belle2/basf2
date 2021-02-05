@@ -140,7 +140,6 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   char *filebuf;
   int fd;
   int i;
-  int len;
   int blksiz = 65536;
   
   if (filelenp) *filelenp = 0;
@@ -169,7 +168,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
   
   for (i = 0; i < statbuf.st_size; i += blksiz) {
     int siz = (i + blksiz < statbuf.st_size) ? blksiz : statbuf.st_size - i;
-    len = read(fd, filebuf + i, siz);
+    int len = read(fd, filebuf + i, siz);
     if (len != siz) {
       printf("can't read at %d bytes\n", i + (len > 0 ? len : 0));
       close(fd);

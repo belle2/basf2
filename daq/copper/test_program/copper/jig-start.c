@@ -94,13 +94,12 @@ show_intcsr(plx9054_intcsr csr)
 void
 check_pci_error(int plxfd)
 {
-    int ret;
-    plx9054_intcsr intcsr;
-    ret = ioctl(plxfd, PLXIOGET_INTCSR, &intcsr, sizeof(intcsr));
-    if (intcsr.bit.pci_error)
-	printf("pci_error (%08x)\n", intcsr.val);
-    intcsr.bit.pci_error = 1;
-    ret = ioctl(plxfd, PLXIOSET_INTCSR, &intcsr, sizeof(intcsr));
+  plx9054_intcsr intcsr;
+  ioctl(plxfd, PLXIOGET_INTCSR, &intcsr, sizeof(intcsr));
+  if (intcsr.bit.pci_error)
+    printf("pci_error (%08x)\n", intcsr.val);
+  intcsr.bit.pci_error = 1;
+  ioctl(plxfd, PLXIOSET_INTCSR, &intcsr, sizeof(intcsr));
 }
 
 #define	SETJIG(n, m)	change_jig_regs(jigfd, #n, FNIOSET_##n, FNIOGET_##n, m)
@@ -149,14 +148,14 @@ int main()
   /* check copper FF_STA */
   {
     char * p = getenv("FINESSE_SLOT");
-    int val = 0;
+    int valNow = 0;
     if (p) {
-      if (strchr(p, 'A') || strchr(p, 'a')) val |= 1;
-      if (strchr(p, 'B') || strchr(p, 'b')) val |= 2;
-      if (strchr(p, 'C') || strchr(p, 'c')) val |= 4;
-      if (strchr(p, 'D') || strchr(p, 'd')) val |= 8;
+      if (strchr(p, 'A') || strchr(p, 'a')) valNow |= 1;
+      if (strchr(p, 'B') || strchr(p, 'b')) valNow |= 2;
+      if (strchr(p, 'C') || strchr(p, 'c')) valNow |= 4;
+      if (strchr(p, 'D') || strchr(p, 'd')) valNow |= 8;
     } else {
-      val = 0xF;
+      valNow = 0xF;
     }
     ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &val, sizeof(val));
   }

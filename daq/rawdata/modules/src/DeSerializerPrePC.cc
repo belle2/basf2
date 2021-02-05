@@ -110,8 +110,8 @@ void DeSerializerPrePCModule::initialize()
 int DeSerializerPrePCModule::recvFD(int sock, char* buf, int data_size_byte, int flag)
 {
   int n = 0;
-  int read_size = 0;
   while (1) {
+    int read_size = 0;
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
       if (errno == EINTR) {
         continue;
@@ -226,8 +226,6 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
   // Read Header and obtain data size
   //
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
-  int temp_num_events = 0;
-  int temp_num_nodes = 0;
 
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {
@@ -237,8 +235,8 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
 
-    temp_num_events = send_hdr.GetNumEventsinPacket();
-    temp_num_nodes = send_hdr.GetNumNodesinPacket();
+    int temp_num_events = send_hdr.GetNumEventsinPacket();
+    int temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
 
 

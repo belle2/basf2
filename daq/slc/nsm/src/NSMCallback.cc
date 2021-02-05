@@ -215,13 +215,13 @@ void NSMCallback::vset(NSMCommunicator& com, const NSMVar& var)
     NSMVHandler* handler_p = getHandler_p(var.getNode(), var.getName());
     if (handler_p) {
       NSMVHandler& handler(*handler_p);
-      bool result = false;
       if (var.getName() == handler.getName() &&
           (var.getNode() == handler.getNode() ||
            (var.getNode().size() == 0 && handler.getNode() == getNode().getName()) ||
            (handler.getNode().size() == 0 && var.getNode() == getNode().getName())) &&
           handler.useSet()) {
         NSMNode node(msg.getNodeName());
+        bool result = false;
         if ((result = handler.handleSet(var)) &&
             (var.getNode().size() == 0 || var.getNode() == getNode().getName())) {
           notify(var);

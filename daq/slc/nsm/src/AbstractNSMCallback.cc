@@ -297,7 +297,7 @@ bool AbstractNSMCallback::set(const NSMNode& node, const std::string& name,
   return set(node, NSMVar(name, val), timeout);
 }
 
-bool AbstractNSMCallback::get(DBObject& obj)
+bool AbstractNSMCallback::get(const DBObject& obj)
 {
   DBObject::NameValueList list;
   obj.search(list);

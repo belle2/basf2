@@ -64,11 +64,11 @@ int SocketIO::write_data(int sock, char* data, int len)
   errno = 0;
   char* ptr = data;
   int bcount = 0;
-  int br = 0;
 
   //  printf("write_data( sock=%d. data=%p. len=%d )\n", sock, data, len);
 
   while (bcount < len) {
+    int br = 0;
     if ((br =::write(sock, ptr, len - bcount)) > 0) {
       bcount += br;
       ptr += br;
@@ -163,9 +163,9 @@ int SocketIO::read_data(int sock, char* data, int len)
 {
   char* buf = data;
   int bcount = 0;
-  int br = 0;
 
   while (bcount < len) {
+    int br = 0;
     if ((br =::read(sock, buf, len - bcount)) > 0) {
       bcount += br;
       buf += br;

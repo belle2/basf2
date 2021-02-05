@@ -51,9 +51,8 @@ int main(int argc, char** argv)
     }
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbuf->insq((int*)evbuf, (isN - 1) / 4 + 1);
+      int irb = rbuf->insq((int*)evbuf, (isN - 1) / 4 + 1);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

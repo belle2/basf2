@@ -33,15 +33,11 @@ void closefile( )
 void
 show_event(unsigned long * head, int len)
 {
-  char* temp_buf = (char*)buffer;
   for (int i=0; i<(len/4); i+= 8) {
     printf("%08d %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
 	   buffer[i], buffer[i+1], buffer[i+2], buffer[i+3],
 	   buffer[i+4], buffer[i+5], buffer[i+6], buffer[i+7]);
   }
-
-  
-
 }
 
 
@@ -60,7 +56,6 @@ int cprfd;
 int
 main(int argc, char **argv)
 {   
-  time_t t;//             
 
   int event=0;
   int ret, i = 0;
@@ -111,10 +106,11 @@ main(int argc, char **argv)
   //
   // Open an output file
   //
-  time(&t);
+  time_t tt;//             
+  time(&tt);
 #ifdef FILE_OUT 
   char timebuf[100];
-  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&t));
+  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&tt));
   char SaveFile[100];// SaveFile
   strcpy(SaveFile,timebuf);
   strcat(SaveFile,".dat");

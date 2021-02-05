@@ -62,10 +62,10 @@ int SocketManager::examine()
     return -1;
 
   // Accept if new connection request
-  int t;
   if (FD_ISSET(m_sock, &m_rset)) { // New connection request
     //    int fd  = (m_recv->sock())->accept();
 
+    int t;
     struct sockaddr_in isa;
     socklen_t i = sizeof(isa);
     getsockname(m_sock, (struct sockaddr*)&isa, &i);

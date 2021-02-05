@@ -4,12 +4,9 @@ env['LIBS'] = [
     'boost_chrono',
     'framework',
     'mdst_dataobjects',
-    'pxd_dataobjects',
     'svd_dataobjects',
     'vxd',
-    'genfit2',
-    'tracking',
-    'tracking_dataobjects',
+    'tracking'
 ]
 
 Return('env')

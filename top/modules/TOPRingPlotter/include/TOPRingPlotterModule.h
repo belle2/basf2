@@ -18,8 +18,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <top/reconstruction/TOPreco.h>
 
-using namespace Belle2::Variable;
-
 namespace Belle2 {
   /**
    * A module to plot the x-t images from TOP, and in general study the distribution of the digits associated to the particles in a particleList.

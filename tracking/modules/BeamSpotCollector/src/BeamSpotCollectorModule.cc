@@ -45,7 +45,7 @@ BeamSpotCollectorModule::BeamSpotCollectorModule() : CalibrationCollectorModule(
 void BeamSpotCollectorModule::prepare()
 {
   B2INFO("Init of the trees");
-  std::string objectName = "tracks";
+  std::string objectName = "events";
   //Data object creation --------------------------------------------------
   TTree* tree = new TTree(objectName.c_str(), "");
 
@@ -112,6 +112,6 @@ void BeamSpotCollectorModule::collect()
   m_mu1_omega     = tr1->getOmega();
 
 
-  getObjectPtr<TTree>("tracks")->Fill();
+  getObjectPtr<TTree>("events")->Fill();
 
 }

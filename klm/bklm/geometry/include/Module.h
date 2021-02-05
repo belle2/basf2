@@ -209,13 +209,24 @@ namespace Belle2 {
       double getPropagationDistance(const CLHEP::Hep3Vector& local,
                                     int strip, bool phiReadout) const;
 
+      //! Convert local coordinates to signal-propagation distance (cm)
+      //! Version for scintillators.
+      const CLHEP::Hep3Vector getPropagationDistance(
+        const CLHEP::Hep3Vector&, int stripZ, int stripPhi) const;
+
       //! Convert local coordinates to signal-propagation time (ns)
       //! Version for RPCs.
       const CLHEP::Hep3Vector getPropagationTimes(const CLHEP::Hep3Vector&) const;
 
       //! Convert local coordinates to signal-propagation time (ns)
       //! Version for scintillators.
-      const CLHEP::Hep3Vector getPropagationTimes(const CLHEP::Hep3Vector&, int strip) const;
+      double getPropagationTime(const CLHEP::Hep3Vector& local,
+                                int strip, bool phiReadout) const;
+
+      //! Convert local coordinates to signal-propagation time (ns)
+      //! Version for scintillators.
+      const CLHEP::Hep3Vector getPropagationTimes(
+        const CLHEP::Hep3Vector&, int stripZ, int stripPhi) const;
 
       //! Return phi strip (including fractional part) corresponding to local phi coordinate
       double getPhiStrip(const CLHEP::Hep3Vector& p) const

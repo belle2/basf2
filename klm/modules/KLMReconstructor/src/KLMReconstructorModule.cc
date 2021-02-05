@@ -253,7 +253,20 @@ void KLMReconstructorModule::reconstructBKLMHits()
       const BKLMHit1d* phiHit = m_bklmHit1ds[phiIndex];
       const BKLMHit1d* zHit = m_bklmHit1ds[zIndex];
       CLHEP::Hep3Vector local = m->getLocalPosition(phiHit->getStripAve(), zHit->getStripAve());
-      CLHEP::Hep3Vector propagationDist = m->getPropagationDistance(local);
+      CLHEP::Hep3Vector propagationDist;
+      if (m_bklmHit1ds[i]->getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
+        if (isPhiReadout) {
+          propagationDist = m->getPropagationDistance(
+                              local, m_bklmHit1ds[j]->getStripMin(),
+                              m_bklmHit1ds[i]->getStripMin());
+        } else {
+          propagationDist = m->getPropagationDistance(
+                              local, m_bklmHit1ds[i]->getStripMin(),
+                              m_bklmHit1ds[j]->getStripMin());
+        }
+      } else {
+        propagationDist = m->getPropagationTimes(local);
+      }
       double effC = phiHit->inRPC() ? m_effC_RPC : m_effC_bklm;
       double phiTime = phiHit->getTime() - propagationDist.y() / effC;
       double zTime = zHit->getTime() - propagationDist.z() / effC;

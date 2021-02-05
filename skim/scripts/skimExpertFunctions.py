@@ -310,6 +310,18 @@ class BaseSkim(ABC):
     be applied to the skim lists when the skim is added to the path.
     """
 
+    produce_on_tau_samples = True
+    """If this property is set to False, then ``b2skim-prod`` will not produce data
+    production requests for this skim on taupair MC samples. This decision may be made
+    for one of two reasons:
+
+    * The retention rate of the skim on taupair samples is basically zero, so there is
+      no point producing the skim for these samples.
+
+    * The retention rate of the skim on taupair samples is too high (>20%), so the
+      production system may struggle to handle the jobs.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -808,6 +820,30 @@ class CombinedSkim(BaseSkim):
         """
         b2.B2ERROR("Skim flags are not defined for combined skims.")
         return NotImplemented
+
+    @property
+    def produce_on_tau_samples(self):
+        """
+        Corresponding value of this attribute for each individual skim.
+
+        Raises:
+            RuntimeError: Raised if the individual skims in combined skim contain a mix
+                of True and False for this property.
+        """
+        produce_on_tau = [skim.produce_on_tau_samples for skim in self.Skims]
+        if all(produce_on_tau):
+            return True
+        elif all(not TauBool for TauBool in produce_on_tau):
+            return False
+        else:
+            raise RuntimeError(
+                "The individual skims in the combined skim contain a mix of True and "
+                "False for the attribute `produce_on_tau_samples`.\n"
+                "    It is unclear what should be done in this situation."
+                "Please reorganise the combined skims to address this.\n"
+                "    Skims included in the problematic combined skim: "
+                f"{', '.join(skim.name for skim in self.Skims)}"
+            )
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

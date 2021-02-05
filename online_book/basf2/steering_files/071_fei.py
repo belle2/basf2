@@ -16,8 +16,8 @@ good_track = (
     "dr < 0.5 and abs(dz) < 2 and nCDCHits > 20 and thetaInCDCAcceptance"
 )
 
-ma.fillParticleList("mu-", "muonID > 0.9 and" + good_track, path=main)
-ma.fillParticleList("pi-", "pionID > 0.5 and" + good_track, path=main)
+ma.fillParticleList("mu-", "muonID > 0.9 and " + good_track, path=main)
+ma.fillParticleList("pi-", "pionID > 0.5 and " + good_track, path=main)
 
 ma.reconstructDecay("B0:signal -> pi- mu+ ?nu", cut="", path=main)
 

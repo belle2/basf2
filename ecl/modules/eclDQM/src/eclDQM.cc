@@ -93,35 +93,36 @@ void ECLDQMModule::defineHisto()
   h_evtot = new TH1F("event", "Total event bank", 1, 0, 1);
   h_evtot->SetOption("LIVE");
 
-  h_quality = new TH1F("quality", "Fit quality flag (0-good, 1- large amplitude, 2 - w/o time,  3 - bad chi2)", 4, 0, 4);
+  h_quality = new TH1F("quality", "Fit quality flag. 0-good, 1-integer overflow, 2-low amplitude, 3-bad chi2", 4, 0, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
   h_quality->SetFillColor(kPink - 4);
   h_quality->SetOption("LIVE");
 
-  h_quality_other = new TH1F("quality_other", "Fit quality flag for waveform type 'other'", 4, 0, 4);
-  h_quality_other->GetXaxis()->SetTitle("Flag number");
+  h_quality_other = new TH1F("quality_other", "Fit quality flag for unexpectedly saved waveforms", 4, 0, 4);
+  h_quality_other->GetXaxis()->SetTitle("Flag number. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
   h_quality_other->SetFillColor(kPink - 4);
   h_quality_other->SetOption("LIVE");
 
-  h_bad_quality = new TH1F("bad_quality", "Fraction of Cell IDs w/ bad quality flag (=3) above Thr. = 1 GeV", 8736, 1, 8737);
-  h_bad_quality->GetXaxis()->SetTitle("Cell IDs");
+  h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID", 8736, 1, 8737);
+  h_bad_quality->GetXaxis()->SetTitle("Cell ID");
   h_bad_quality->SetOption("LIVE");
 
-  h_trigtag1 = new TH1F("trigtag1", "Trigger tag flag # 1", 2, 0, 2);
-  h_trigtag1->GetXaxis()->SetTitle("Trigger tag flag #1");
+  h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
+  h_trigtag1->GetXaxis()->SetTitle("Flag number");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 
-  h_adc_hits = new TH1F("adc_hits", "Fraction of hits above ADC threshold", 1001, 0, 1.001);
-  h_adc_hits->GetXaxis()->SetTitle("fraction");
+  h_adc_hits = new TH1F("adc_hits", "Fraction of high-energy hits (E > 50 MeV)", 1001, 0, 1.001);
+  h_adc_hits->GetXaxis()->SetTitle("Fraction");
   h_adc_hits->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {
     std::string h_name, h_title;
     h_name = str(boost::format("cid_Thr%1%MeV") % id);
-    h_title = str(boost::format("Crystal ID (SW Thr  = %1% MeV)") % id);
+    h_title = str(boost::format("Occupancy per Cell ID (E > %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h->GetXaxis()->SetTitle("Cell ID");
+    h->GetYaxis()->SetTitle("Occupancy (hits / events_count)");
     h->SetOption("LIVE");
     h_cids.push_back(h);
   }
@@ -129,9 +130,9 @@ void ECLDQMModule::defineHisto()
   for (const auto& id : m_TotalEnergyThresholds) {
     std::string h_name, h_title;
     h_name = str(boost::format("edep_Thr%1%MeV") % id);
-    h_title = str(boost::format("Total energy (SW Thr = %1% MeV)") % id);
+    h_title = str(boost::format("Total energy (thr = %1% MeV)") % id);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), (int)(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
-    h->GetXaxis()->SetTitle("energy, [GeV]");
+    h->GetXaxis()->SetTitle("Energy, [GeV]");
     h->SetOption("LIVE");
     h_edeps.push_back(h);
   }
@@ -140,13 +141,13 @@ void ECLDQMModule::defineHisto()
     std::string h_bar_name, h_bar_title;
     std::string h_end_name, h_end_title;
     h_bar_name = str(boost::format("time_barrel_Thr%1%MeV") % id);
-    h_bar_title = str(boost::format("Reconstructed time for ECL barrel (sw Thr = %1% MeV)") % id);
+    h_bar_title = str(boost::format("Reconstructed time for ECL barrel (E > %1% MeV)") % id);
     h_end_name = str(boost::format("time_endcaps_Thr%1%MeV") % id);
-    h_end_title = str(boost::format("Reconstructed time for ECL endcaps (sw Thr = %1% MeV)") % id);
+    h_end_title = str(boost::format("Reconstructed time for ECL endcaps (E > %1% MeV)") % id);
     TH1F* h_time_barrel = new TH1F(h_bar_name.c_str(), h_bar_title.c_str(), 206, -1030, 1030);
     TH1F* h_time_endcap = new TH1F(h_end_name.c_str(), h_end_title.c_str(), 206, -1030, 1030);
-    h_time_barrel->GetXaxis()->SetTitle("time, [nsec]");
-    h_time_endcap->GetXaxis()->SetTitle("time, [nsec]");
+    h_time_barrel->GetXaxis()->SetTitle("Time, [ns]");
+    h_time_endcap->GetXaxis()->SetTitle("Time, [ns]");
     h_time_barrel->SetOption("LIVE");
     h_time_endcap->SetOption("LIVE");
     h_time_barrels.push_back(h_time_barrel);
@@ -158,7 +159,7 @@ void ECLDQMModule::defineHisto()
     boost::tie(id1, id2) = id;
     std::string h_name, h_title;
     h_name = str(boost::format("ncev_Thr%1%MeV") % id1);
-    h_title = str(boost::format("Number of hits in event (sw Thr = %1% MeV)") % id1);
+    h_title = str(boost::format("Number of hits in event (E > %1% MeV)") % id1);
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), id2, 0, id2);
     h->GetXaxis()->SetTitle("Number of hits");
     h->SetOption("LIVE");
@@ -169,9 +170,9 @@ void ECLDQMModule::defineHisto()
     int crate = i + 1;
     std::string h_name, h_title;
     h_name = str(boost::format("time_crate_%1%_Thr1GeV") % (crate));
-    h_title = str(boost::format("Reconstructed time for ECL crate #%1% with Thr = 1 GeV") % (crate));
+    h_title = str(boost::format("Reconstructed time for ECL crate #%1% with E > 1 GeV") % (crate));
     TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 400, -100, 100);
-    h->GetXaxis()->SetTitle("time [ns]");
+    h->GetXaxis()->SetTitle("Time [ns]");
     h->SetOption("LIVE");
     h_time_crate_Thr1GeV.push_back(h);
   }
@@ -181,8 +182,12 @@ void ECLDQMModule::defineHisto()
       B2WARNING("Waveform Options are not correctly assigned. They must be 'all', 'psd', 'logic', 'rand', 'dphy', 'other'!");
     std::string h_title;
     std::string h_cell_name;
-    if (id == "other") h_title = str(boost::format("Waveforms for %1%") % (id));
-    else h_title = str(boost::format("Fraction of waveforms for %1%") % (id));
+    if (id == "other") h_title = "Unexpectedly saved waveforms";
+    if (id == "psd") h_title = "#frac{Saved}{Expected} waveforms for high-energy hits (E > 50 MeV)";
+    if (id == "logic") h_title = "#frac{Saved}{Expected} waveforms for every 1000th event";
+    if (id == "rand") h_title = "#frac{Saved}{Expected} waveforms for random trigger events";
+    if (id == "dphy") h_title = "#frac{Saved}{Expected} waveforms for delayed bhabha (DPHY) events";
+    if (id == "all") h_title = "#frac{Saved}{Expected} waveforms for all events";
     h_cell_name = str(boost::format("wf_cid_%1%") % (id));
     TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
     h_cell->GetXaxis()->SetTitle("Cell ID");
@@ -208,31 +213,32 @@ void ECLDQMModule::defineHisto()
 
   //2D histograms creation.
 
-  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Crate ID", 52, 1, 53, 11, -1, 10);
-  h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID");
-  h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
+  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Internal data consistency vs crate. 0-good, 1-data corruption",
+                               52, 1, 53, 11, -1, 10);
+  h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
+  h_trigtag2_trigid->GetYaxis()->SetTitle("Data consistency flag");
   h_trigtag2_trigid->SetOption("LIVE");
 
-  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs. Cell ID", 8736, 1, 8737);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs Cell ID", 8736, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedmean_cellid->GetYaxis()->SetTitle("Pedestal Average");
+  h_pedmean_cellid->GetYaxis()->SetTitle("Ped. average (ADC units, #approx 0.05 MeV)");
   h_pedmean_cellid->SetOption("LIVE");
 
-  h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal rms error vs. Cell ID",
+  h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal stddev vs Cell ID",
                                  8736, 1, 8737);
   h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-  h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
+  h_pedrms_cellid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
   h_pedrms_cellid->SetOption("LIVE");
 
-  h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal rms error vs. Theta ID",
+  h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal stddev vs #theta ID",
                                   68, 0, 68);
-  h_pedrms_thetaid->GetXaxis()->SetTitle("Theta ID");
-  h_pedrms_thetaid->GetYaxis()->SetTitle("Pedestal rms error");
+  h_pedrms_thetaid->GetXaxis()->SetTitle("#theta ID (0-12=FWD, 59-67=BWD endcap)");
+  h_pedrms_thetaid->GetYaxis()->SetTitle("Ped. stddev (ADC units, #approx 0.05 MeV)");
   h_pedrms_thetaid->SetOption("LIVE");
 
-  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
-  h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
-  h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time");
+  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs Crate ID", 52, 1, 53, 145, 0, 145);
+  h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
+  h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time (only even, 0-142)");
   h_trigtime_trigid->SetOption("LIVE");
 
   //cd into parent directory.
@@ -327,7 +333,7 @@ void ECLDQMModule::event()
     int tg = (int)itrg - 2 * ((int)itrg / 8);
     h_trigtime_trigid->Fill(aECLTrig.getTrigId(), tg); //Trigger time histogram filling.
     trigtag1 += aECLTrig.getTrigTag();
-    h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Trigger tag flag #2 histogram filling.
+    h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Data consistency histogram filling.
   }
 
   if (m_ECLTrigs.getEntries() > 0) {
@@ -393,7 +399,7 @@ void ECLDQMModule::event()
 
     for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
     m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
-    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal rms histogram filling.
+    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal stddev histogram filling.
     m_geom->Mapping(i);
     h_pedrms_thetaid->Fill(m_geom->GetThetaID(), m_PedestalRms[i]);
 
@@ -420,7 +426,7 @@ void ECLDQMModule::event()
     }
   }
   if (m_ECLDigits.getEntries() > 0)
-    h_adc_hits->Fill((double)NDigits / (double)m_ECLDigits.getEntries()); //Fraction of hits above ADC threshold
+    h_adc_hits->Fill((double)NDigits / (double)m_ECLDigits.getEntries()); //Fraction of high-energy hits
 }
 
 void ECLDQMModule::endRun()

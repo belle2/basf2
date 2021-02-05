@@ -128,7 +128,7 @@ but {min_files_per_chunk} required!")
             # From the second chunk within the requested range, we have the iov defined by the first run
         specific_iov = first_iov if iCal > 0 else output_iov
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
-        cal_name = f"{iCal+1}_PXDAnalyticGainCalibration"
+        cal_name = f"{ichunk+1}_PXDAnalyticGainCalibration"
         if (not debug):
             cal = gain_calibration(
                 cal_name=cal_name,

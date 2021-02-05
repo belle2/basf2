@@ -39,7 +39,7 @@ namespace {
 
 PXDAnalyticGainCalibrationAlgorithm::PXDAnalyticGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDPerformanceCollector"),
-  minClusters(1000), safetyFactor(2.0), forceContinue(false), strategy(0), useChargeRatioHistogram(true)
+  minClusters(1000), safetyFactor(2.0), forceContinue(false), strategy(0), useChargeRatioHistogram(true), correctForward(false)
 {
   setDescription(
     " -------------------------- PXDAnalyticGainCalibrationAlgorithm ---------------------------------\n"
@@ -132,23 +132,37 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
   // values (1.0) by local averages of neighboring sensor parts.
 
   for (const auto& sensorID : pxdSensors) {
-    for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
 
-      // Special treatement for the last vBin as Bhabha 2-track events
-      // have no enough statistics there if nBinsV = 6
-      if (vBin >= nBinsV / 6 * 5) {
-        for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
-          auto gainForwardRegion = gainMapPar->getContent(sensorID.getID(), uBin, nBinsV / 6 * 5 - 1);
-          auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
-          if (gain == 1.0 && gainForwardRegion != 1.0) {
-            gainMapPar->setContent(sensorID.getID(), uBin, vBin, gainForwardRegion);
-            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin <<
-                     ": Replace default gain with that from the closest vBin with non default value "
-                     << gainForwardRegion);
-
+    // Special treatement for the last 2 vBin as Bhabha 2-track events
+    // have no enough statistics there if nBinsV = 6
+    if (correctForward && sensorID.getSensorNumber() == 1)
+      for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+        // Search for a vaid gain along v
+        double gainForwardRegion = 1.0;
+        unsigned short vBinToCheck = nBinsV - 1;
+        for (unsigned short vBinGood = nBinsV - 2; vBinGood >= 1; --vBinGood) {
+          auto temp = gainMapPar->getContent(sensorID.getID(), uBin, vBinGood);
+          if (temp != 1.0) {
+            gainForwardRegion = temp;
+            vBinToCheck = vBinGood + 1;
+            break;
           }
         }
+        // loop part of the forward regions and check values
+        if (gainForwardRegion != 1.0)
+          for (unsigned short vBin = nBinsV - 1; vBin >= vBinToCheck; --vBin) {
+            auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+            if (gain == 1.0) {
+              gainMapPar->setContent(sensorID.getID(), uBin, vBin, gainForwardRegion);
+              B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin <<
+                       ": Replace default gain with that from the closest vBin with non default value "
+                       << gainForwardRegion);
+            }
+          }
       }
+
+    // general value check
+    for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
 
       float meanGain = 0;
       unsigned short nGood = 0;

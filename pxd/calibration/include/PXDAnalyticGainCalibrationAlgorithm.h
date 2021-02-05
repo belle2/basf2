@@ -45,6 +45,9 @@ namespace Belle2 {
     /// Flag to use histogram of charge ratio (relative to expected MPV)
     bool useChargeRatioHistogram;
 
+    /// Flag to update default gains in forward region due to low statistics
+    bool correctForward;
+
     /// Setter for boundaries
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 

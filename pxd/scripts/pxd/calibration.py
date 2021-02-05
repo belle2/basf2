@@ -180,10 +180,11 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config
     if (gain_method != ''):
         algorithm = PXDAnalyticGainCalibrationAlgorithm()  # Getting a calibration algorithm instanced
-        algorithm.minClusters = 100             # Minimum number of clusters in each region
-        algorithm.safetyFactor = 22             # Safety factor x minClusters/region -> <minClusters> for module
-        algorithm.forceContinue = False         # Force continue the algorithm instead of return c_notEnoughData
-        algorithm.strategy = 0                  # 0: medians, 1: landau fit
+        algorithm.minClusters = 200            # Minimum number of clusters in each region
+        algorithm.safetyFactor = 11            # Safety factor x minClusters/region -> <minClusters> for module
+        algorithm.forceContinue = False        # Force continue the algorithm instead of return c_notEnoughData
+        algorithm.strategy = 0                 # 0: medians, 1: landau fit
+        algorithm.correctForward = True        # Correct default gains in forward regions due to low statistics
         algorithm.useChargeRatioHistogram = True  # Use Charge ratio histograms for the calibration
         algorithm.setPrefix("PXDPerformanceCollector")
         # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config

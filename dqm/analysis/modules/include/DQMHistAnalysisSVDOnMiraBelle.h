@@ -20,25 +20,29 @@
 #include <TH2F.h>
 
 namespace Belle2 {
-  /**
-  * Class for SVD histogram analysis.
-  */
+  /*! Class for SVD monitoring variables at MiraBelle */
   class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
 
+    // Public methods
   public:
 
+    //! Constructor / Destructor
     DQMHistAnalysisSVDOnMiraBelleModule();
     virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
 
+    //! Module functions to be called from main process
     virtual void initialize() override;
+
+    //! Module functions to be called from event process
     virtual void beginRun() override;
     virtual void event() override;
     virtual void endRun() override;
     virtual void terminate() override;
 
+    // Private methods and attributes
   private:
 
-    // list of canvases to be added to MonitoringObject
+    // List of canvases to be added to MonitoringObject
     TCanvas* m_c_avgEfficiency = nullptr; /**< matched clusters and track clusters */
     TCanvas* m_c_avgOffOccupancy = nullptr; /**< number of ZS5 fired strips */
     TCanvas* m_c_MPVChargeClusterOnTrack = nullptr; /**< charge for clusters on track */
@@ -96,7 +100,7 @@ namespace Belle2 {
     float histFWHM(TH1F* h) const;
 
   };
-}
+} // end namespace Belle2
 
 
 

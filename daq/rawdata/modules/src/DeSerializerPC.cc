@@ -287,7 +287,6 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
   // Read Header and obtain data size
   //
   int send_hdr_buf[ SendHeader::SENDHDR_NWORDS ];
-  int temp_num_nodes = 0;
 
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {

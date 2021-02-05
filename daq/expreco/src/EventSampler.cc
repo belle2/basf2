@@ -33,7 +33,7 @@ EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int 
     }
     fflush(stdout);
   }
-  printf("EventSampler : init : socklist = %u\n", m_socklist.size());
+  printf("EventSampler : init : socklist = %lu\n", m_socklist.size());
   fflush(stdout);
 }
 

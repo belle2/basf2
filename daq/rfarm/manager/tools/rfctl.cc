@@ -251,16 +251,16 @@ main(int argc, char** argv)
       strcpy(prev, input);
     }
 #else
-    static char buf[1024];
-    buf[0] = 0;
+    static char buffer[1024];
+    buffer[0] = 0;
     printf("%s", prompt);
     do {
-      fgets(buf, sizeof(buf), stdin);
-    } while (! buf[0]); /* to cope with EINTR */
+      fgets(buffer, sizeof(buffer), stdin);
+    } while (! buffer[0]); /* to cope with EINTR */
 #endif
 
     int ac;
-    if ((ac = xgetargs(buf, av)) <= 0)
+    if ((ac = xgetargs(buf, av)) <= 0) //TODO should there be buf or buffer?
       continue;
     printf("ac=%d av[0]=%s\n", ac, av[0]);
 

@@ -186,7 +186,7 @@ int SocketIO::read_data(int sock, char* data, int len)
           continue;
         default:
           perror("SocketIO:read");
-          fprintf(stderr, "sock = %d, buf=%x, len = %d\n", sock, (unsigned int*)buf, len - bcount);
+          fprintf(stderr, "sock = %d, buf=%p, len = %d\n", sock, buf, len - bcount);
           return -1;
       }
     }

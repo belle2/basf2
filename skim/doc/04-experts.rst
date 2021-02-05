@@ -319,6 +319,19 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :nogroupsections:
 
 
+.. _b2skim-stats-total:
+
+``b2skim-stats-total``: Produce summary statistics for skim package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/b2skim-stats-total
+   :func: get_argument_parser
+   :prog: b2skim-stats-total
+   :nodefaultconst:
+   :nogroupsections:
+
+
 .. _lpns2yaml:
 
 ``lpns2yaml.py``: Convert lists of LPNs to format expected by ``b2skim-prod``

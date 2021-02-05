@@ -5,27 +5,12 @@
 Tool for producing summary statistics of skims for the distributed computing group.
 The expected input is the JSON output of :ref`b2skim-stats-print<b2skim-stats-print>`.
 
-The estimates for event-based retention rate and filesize-based retention rate are
-averaged over the test samples, in the following way:
-
-* For data, the statistics are summed over skims, and then averaged over the data
-  samples. The standard deviation of the sum over skims is also calculated, and printed
-  as an uncertainty. This is done to take into account the variability of the test
-  results on the data runs used.
-
-* For MC, this script uses a weighted sum over the samples (that is, weighted by the
-  cross section of each process), and the results are summed over all skims. Only the
-  BGx1 value is displayed in the printed tables.
-
-Finally, for estimating the disk space per inverse attobarn, the calculations are:
-
-* For data, find the luminosity of each test data file using ``b2file-metadata-show``
-  and ``b2info-luminosity``, and use that to scale the file size up to one inverse
-  attobarn.
-
-* For MC, calculate the number of BBbar, qqbar and taupair events per inverse attobarn
-  (using the process cross sections) and multiply this number by the output file size
-  per input event (which is itself calculated as a cross section-weighted average).
+The values produced by the script are aggregated over all skims (either averaged or
+summed, depending on the flag passed by the user). For MC samples, this aggregate is
+printed per-sample. For data, the values are first aggregated over all skims per test
+data file, and then those values are averaged and are attached an uncertainty given by
+the standard deviation of the individual aggregated values. This is done to account for
+the wide variation in skim performance when tested on data samples from different runs.
 """
 
 
@@ -107,7 +92,9 @@ def get_argument_parser():
         help=(
             "File containing list of all skims that are requested for production. "
             "This list will be used to produce resource usage estimates "
-            "based on the skims that are actually requested."
+            "based on the skims that are actually requested. "
+            "The expected format of this file is *one skim name per line*, with "
+            "each skim name exactly matching a name in the skim registry."
         ),
     )
 

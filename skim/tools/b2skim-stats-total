@@ -73,7 +73,15 @@ def get_argument_parser():
         dest="StatsJSON",
         help="JSON file of stats produced by ``b2skim-stats-print``.",
     )
-    parser.add_argument(
+
+    table_format = parser.add_mutually_exclusive_group()
+    table_format.add_argument(
+        "-C",
+        "--confluence",
+        action="store_true",
+        help="If passed, print tables in Confluence-friendly format.",
+    )
+    table_format.add_argument(
         "-M",
         "--markdown",
         action="store_true",
@@ -312,7 +320,7 @@ def aggregate_table(
     df_Data,
     df_MC,
     *,
-    markdown,
+    tablefmt,
     aggregator_function,
     aggregator_function_name,
     fmt_string=".1f",
@@ -344,7 +352,6 @@ def aggregate_table(
             ]
         )
 
-    tablefmt = "pipe" if markdown else "fancy_grid"
     print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")
 
 
@@ -406,6 +413,14 @@ def main():
     df_Data = add_data_fields(df_Data)
     df_MC = add_mc_fields(df_MC)
 
+    # Select the table printing format based on flag
+    if args.confluence:
+        tablefmt = "jira"
+    elif args.markdown:
+        tablefmt = "pipe"
+    else:
+        tablefmt = "fancy_grid"
+
     # Select a table printing function based on the flag passed to the script
     if args.average_tables:
         table_function = average_table
@@ -426,7 +441,7 @@ def main():
             description,
             df_Data,
             df_MC,
-            markdown=args.markdown,
+            tablefmt=tablefmt,
             fmt_string=fmt_string,
         )
 

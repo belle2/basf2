@@ -4,7 +4,7 @@
 Airflow script for TOP post-tracking calibration:
    BS13d carrier shifts, module T0 and common T0
 
-Author: Marko Staric
+Author: Marko Staric, Umberto Tamponi
 """
 
 from prompt import CalibrationSettings
@@ -37,42 +37,39 @@ def get_calibrations(input_data, **kwargs):
     sample = 'bhabha'
     inputFiles = list(file_to_iov.keys())
     requested_iov = kwargs.get("requested_iov", None)
+    expert_config = kwargs.get("expert_config")
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    cal = [  # BS13d_calibration_cdst(inputFiles),  # this is run-dep
-        moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
-        #      moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
-        # commonT0_calibration_BF(inputFiles)
-    ]
+    cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
+           moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
+           moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
+           commonT0_calibration_BF(inputFiles)]
 
     for c in cal:
-        if c.strategies == SingleIOV:
+        # If it's a SequentialBoundary calibration, check if there is any boundary in the config file
+        if c.strategies[0] == SequentialBoundaries:
 
-            # if payload boundaries are set, turn all the SingleIOV strategies into SequentialBoundaries
-            # and set the iovs that were passed via expert_config
+            # Default boundaries. If there are no boundaries in the config file, this calibration will give a single IoV
+            payload_boundaries = [[output_iov.exp_low, output_iov.run_low], [-1, -1]]
+
+            # user-defined boundaries are set here.
             if expert_config["payload_boundaries"] is not None:
-                c.strategies = SequentialBoundaries
-                payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
-                payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
-                basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+                payload_boundaries = expert_config["payload_boundaries"]
 
-                for col in c.collectors:
-                    col.param('granularity', 'run')
+            # Set the actual boundaries.
+            for alg in c.algorithms:
+                alg.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
 
-                for alg in c.algorithms:
-                    alg.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
-
-            else:
-                for alg in c.algorithms:
-                    alg.params = {"apply_iov": output_iov}
+        # If it's not a SequentialBoundary calbration, just set the IoV coverage
         else:
             for alg in c.algorithms:
                 alg.params = {"iov_coverage": output_iov}
 
-    # cal[1].save_payloads = False
+    # Don't save the rough moduleT0 result
+    cal[1].save_payloads = False
 
-    # cal[1].depends_on(cal[0])
-    # cal[2].depends_on(cal[1])
-    # cal[3].depends_on(cal[2])
+    cal[1].depends_on(cal[0])
+    cal[2].depends_on(cal[1])
+    cal[3].depends_on(cal[2])
 
     return cal

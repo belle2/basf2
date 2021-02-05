@@ -115,7 +115,8 @@ class LowMassTwoTrack(BaseSkim):
         6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
     """
     __authors__ = "Xing-Yu Zhou"
-    __description__ = "Skim list for low mass events with at least two tracks in final state."
+    __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
+                      " in final state."
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
@@ -124,30 +125,26 @@ class LowMassTwoTrack(BaseSkim):
     def build_lists(self, path):
         label = "LowMassTwoTrack"
 
-        # Tracks from IP
-        IPCut = "[abs(dz) < 5] and [abs(dr) < 2.0]"
-        # Tracks in CDC acceptance
-        thetaCut = '0.296706 < theta < 2.61799'
-        # Tracks of momenta greater than 0.5 GeV in the Lab frame
-        pCut = "[p > 0.5]"
+        # Momenta of tracks greater than 0.5 GeV in the Lab frame
+        pCut = "p > 0.5"
         # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
-        ISRECut = "[useCMSFrame(E) > 2]"
+        ISRECut = "useCMSFrame(E) > 2"
         # Invariant mass of h+h- system less than 3.5 GeV
         hhMassWindow = "daughterInvM(1,2) < 3.5"
 
         # Event based cut
-        # Number of cleaned tracks should be greater than or equal to to 2
-        nTracksCut = f"[nCleanedTracks({IPCut} and {pCut})] >= 2"
+        # Number of tracks passing the selection criteria, should be greater than or equal to to 2
+        nTracksCut = f"nCleanedTracks({pCut}) >= 2"
         # Require at least one hard photon
-        nHardISRPhotonCut = f"[nCleanedECLClusters({ISRECut})] > 0"
+        nHardISRPhotonCut = f"nCleanedECLClusters({ISRECut}) > 0"
 
         # Apply event based cuts
         ma.applyEventCuts(f"{nTracksCut} and {nHardISRPhotonCut}", path=path)
 
         # Reconstruct candidates
-        ma.fillParticleList(f"pi+:{label}", f"{IPCut} and {pCut}", path=path)
-        ma.fillParticleList(f"K+:{label}", f"{IPCut} and {pCut}", path=path)
-        ma.fillParticleList(f"p+:{label}", f"{IPCut} and {pCut}", path=path)
+        ma.fillParticleList(f"pi+:{label}", pCut, path=path)
+        ma.fillParticleList(f"K+:{label}", pCut, path=path)
+        ma.fillParticleList(f"p+:{label}", pCut, path=path)
         ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
@@ -157,8 +154,9 @@ class LowMassTwoTrack(BaseSkim):
             # Might be useful when one wants to reconstruct ISR K pi and missing other final state particles
             (f"vpho:{label}_Kpi", f" -> gamma:{label}_ISR K+:{label} pi-:{label}", hhMassWindow),
             (f"vpho:{label}_pp", f" -> gamma:{label}_ISR p+:{label} anti-p-:{label}", hhMassWindow),
-            # Useful for analysis for processes like ISR Lambda Lambda-bar (Sigma Sigma-bar) , and one wants to
-            # reconstruct the hard ISR photon and one of the Lambda (Sigma), missing anthoer Lambda (Sigma)
+            # Useful for analyses for processes like ISR Lambda Lambda-bar (Sigma Sigma-bar) , especially when
+            # one wants to reconstruct the hard ISR photon and one of the Lambda (Sigma), missing anthoer
+            # Lambda (Sigma)
             (f"vpho:{label}_ppi", f" -> gamma:{label}_ISR p+:{label} pi-:{label}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR p K and missing other final state particles
             (f"vpho:{label}_pK", f" -> gamma:{label}_ISR p+:{label} K-:{label}", hhMassWindow),

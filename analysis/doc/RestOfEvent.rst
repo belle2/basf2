@@ -9,6 +9,7 @@ To study these kinds of events we have to reconstruct at least one hadron decay 
 look for another hadron in the rest of the event. Such use case is one of the possible 
 application of the Rest Of Event (ROE) modules in the basf2 analysis framework.
 
+.. tip:: For an introductory hands-on lesson, take a look at :numref:`onlinebook_roe`.
 
 Overview
 --------

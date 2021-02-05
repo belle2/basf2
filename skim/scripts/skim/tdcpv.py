@@ -57,6 +57,7 @@ class TDCPV_qqs(BaseSkim):
     * ``B0 -> pi+ pi- K_S0 gamma``
     * ``B0 -> pi0  K_S0 gamma``
     * ``B+ -> eta' K+``
+    * ``B+ -> phi K+``
 
     **Particle lists used**:
 
@@ -142,6 +143,7 @@ class TDCPV_qqs(BaseSkim):
 
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
+            'phi:SkimHighEff K+:SkimHighEff',
         ]
 
         bd_qqs_List = []
@@ -188,16 +190,20 @@ class TDCPV_qqs(BaseSkim):
         self.SkimLists = tcpvLists
 
     def validation_histograms(self, path):
+        ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+
         Kres = 'K_10'
-        ma.applyCuts('gamma:loose', '1.4 < E < 4', path=path)
+        ma.applyCuts('gamma:E15', '1.4 < E < 4', path=path)
 
         ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
-        ma.reconstructDecay("B0:signal -> " + Kres + ":all gamma:loose",
+        ma.reconstructDecay("B0:Kspipig -> " + Kres + ":all gamma:E15",
                             "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
-        ma.matchMCTruth('B0:signal', path=path)
+        ma.matchMCTruth('B0:Kspipig', path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
-        ma.variablesToHistogram('B0:signal', variableshisto, filename='TDCPV_Validation.root', path=path)
+
+        ma.variablesToHistogram('B0:etap', variableshisto, filename='TDCPV_qqs_Validation.root', path=path, directory="etap")
+        ma.variablesToHistogram('B0:Kspipig', variableshisto, filename='TDCPV_qqs_Validation.root', path=path, directory="Kspipig")
 
 
 @fancy_skim_header
@@ -340,8 +346,12 @@ class TDCPV_ccs(BaseSkim):
     def validation_histograms(self, path):
         ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
         ma.reconstructDecay('B0:jpsimumu -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
-        ma.matchMCTruth('B0:signal', path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
-        ma.variablesToHistogram('B0:jpsiee', variableshisto, filename='TDCPV_ccs_Validation.root', path=path)
-        ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename='TDCPV_ccs_Validation.root', path=path)
+        ma.variablesToHistogram('B0:jpsiee', variableshisto, filename='TDCPV_ccs_Validation.root', path=path, directory="jpsiee")
+        ma.variablesToHistogram(
+            'B0:jpsimumu',
+            variableshisto,
+            filename='TDCPV_ccs_Validation.root',
+            path=path,
+            directory="jpsimumu")

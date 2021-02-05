@@ -27,7 +27,7 @@ CDecay anti-B0sig
 
 Decay J/psisig
 0.500    e+    e-     PHOTOS     VLL;
-0.500.   mu+   mu-   PHOTOS     VLL;
+0.500   mu+   mu-   PHOTOS     VLL;
 Enddecay
 
 End

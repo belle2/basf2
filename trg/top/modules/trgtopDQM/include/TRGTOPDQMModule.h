@@ -204,6 +204,12 @@ namespace Belle2 {
     TH1I* h_gdl_cdctop_timing_diff_5ns[nskim_topdqm] = {nullptr};
 
     TH1I* h_gdl_ecltop_timing_diff_2ns[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_ecltop_timing_diff_grl_matched_2ns[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_ecltop_timing_diff_no_grl_matched_2ns[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_ecltop_timing_diff_no_grl_at_all_2ns[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_nslots_2ns[nskim_topdqm] = {nullptr};
+    TH1I* h_top_ecltop_timing_diff_combined_2ns[nskim_topdqm] = {nullptr};
+    TH1I* h_top_ecltop_timing_diff_best_slot_2ns[nskim_topdqm] = {nullptr};
     TH1I* h_gdl_cdctop_timing_diff_2ns[nskim_topdqm] = {nullptr};
 
     TH1I* h_top_ecltop_timing_diff_2ns[nskim_topdqm][nHistClasses] = {nullptr};
@@ -267,6 +273,8 @@ namespace Belle2 {
     TH2I* h_gdl_top_l1_vs_grl_top_l1 = {nullptr};
 
     TH2I* h_grl_ntopslots_vs_ncdcslots = {nullptr};
+    TH1I* h_grl_ncdctopslots_matched = {nullptr};
+    TH2I* h_grl_topslots_vs_cdcslots_match = {nullptr};
 
     //condition database for GDL unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;
@@ -349,7 +357,7 @@ namespace Belle2 {
     bool m_requireEclBarrel;
     bool m_requireEclBarrelB2B;
 
-    bool m_requireCDC2DSegment;
+    bool m_requireCDC2DTrack;
 
     // names of skims from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_topdqm] = {

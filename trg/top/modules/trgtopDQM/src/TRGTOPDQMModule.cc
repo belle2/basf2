@@ -1200,10 +1200,10 @@ void TRGTOPDQMModule::event()
 
   if (trgeclHitArray) {
 
-    bool barrelEcl = false;
-    bool barrelEclB2B = false;
-
     if (m_doECLCorrelations) {
+
+      bool barrelEcl = false;
+      bool barrelEclB2B = false;
 
       tcEclList.clear();
 

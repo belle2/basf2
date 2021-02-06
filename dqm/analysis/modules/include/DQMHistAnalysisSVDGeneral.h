@@ -104,9 +104,6 @@ namespace Belle2 {
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
-    TCanvas* m_c_avg_maxBin_UV = NULL; /**<Canvas with average max bin for U and V side*/
-
   };
 } // end namespace Belle2
 

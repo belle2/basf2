@@ -223,14 +223,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  // add MonitoringObject and canvases
-  m_monObj = getMonitoringObject("svd");
-
-  m_c_avg_maxBin_UV = new TCanvas("svd_avg_maxBin_UV");
-
-  // add canvases to MonitoringObject
-  m_monObj->addCanvas(m_c_avg_maxBin_UV);
-
 }
 
 
@@ -693,67 +685,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 void DQMHistAnalysisSVDGeneralModule::endRun()
 {
   B2INFO("DQMHistAnalysisSVDGeneral:  endRun called");
-
-  // get existing histograms produced by DQM modules
-
-  // average maxBin
-  TH1F* h_maxBinU = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinUAll");
-  TH1F* h_maxBinV = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinVAll");
-
-  m_c_avg_maxBin_UV->Clear();
-  m_c_avg_maxBin_UV->Divide(2, 1);
-  m_c_avg_maxBin_UV->cd(1);
-  if (h_maxBinU) h_maxBinU->Draw();
-  m_c_avg_maxBin_UV->cd(2);
-  if (h_maxBinV) h_maxBinV->Draw();
-
-  if (h_maxBinU == NULL) {
-    B2INFO("Histogram needed for Average MaxBin on U side is not found");
-    m_monObj->setVariable("avgMaxBinU", -1);
-  } else {
-    double avgMaxBinU = 1.*h_maxBinU->GetMean();
-    m_monObj->setVariable("avgMaxBinU", avgMaxBinU);
-  }
-
-  if (h_maxBinV == NULL) {
-    B2INFO("Histogram needed for Average MaxBin on V side is not found");
-    m_monObj->setVariable("avgMaxBinV", -1);
-  } else {
-    double avgMaxBinV = 1.*h_maxBinV->GetMean();
-    m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
-  }
-
-
-  // offline occupancy - integrated number of ZS5 fired strips
-  TH1F* h_zs5countsU = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
-  TH1F* h_zs5countsV = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsV");
-  TH1F* h_events = (TH1F*)findHist("SVDExpReco/SVDDQM_nEvents");
-
-  // average occupancies for 3rd layer
-  int nEvents = h_events->GetEntries();
-  double avgOffOccL3U = 0.0;
-  double avgOffOccL3V = 0.0;
-  for (int bin = 1; bin < 14 + 1; bin++) {
-    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) * 1.0 / 768 * 100; // 768 strips for u side
-    avgOffOccL3V += h_zs5countsV->GetBinContent(bin) * 1.0 / 768 * 100;
-  }
-  avgOffOccL3U /= (14 * nEvents); // 14 sensors in 3rd layer
-  avgOffOccL3V /= (14 * nEvents);
-
-  if (h_zs5countsU == NULL || h_events == NULL) {
-    B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
-    m_monObj->setVariable("avgOffOccL3U", -1);
-  } else {
-    m_monObj->setVariable("avgOffOccL3U", avgOffOccL3U);
-  }
-
-  if (h_zs5countsV == NULL || h_events == NULL) {
-    B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
-    m_monObj->setVariable("avgOffOccL3V", -1);
-  } else {
-    m_monObj->setVariable("avgOffOccL3V", avgOffOccL3V);
-  }
-
 }
 
 

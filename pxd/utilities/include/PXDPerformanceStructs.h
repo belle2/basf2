@@ -38,11 +38,6 @@ namespace Belle2 {
       Cluster_t(): pxdID(0), charge(0), size(0),
         uSize(0), vSize(0), posU(0.0), posV(0.0) {}
 
-      /** Constructor
-       * @param pxdCluster a PXDCluster object
-       */
-      //Cluster_t(const PXDCluster& pxdCluster) { setValues(pxdCluster);}
-
       /** Update values from a PXDCluster
        * @param pxdCluster a PXDCluster object
        */
@@ -65,11 +60,6 @@ namespace Belle2 {
       TrackPoint_t(): x(0.0), y(0.0), z(0.0),
         tol(0.0), chargeMPV(0.0) {}
 
-      /** Constructor
-       * @param pxdIntercept a PXDIntercept object
-       */
-      //TrackPoint_t(const PXDIntercept& pxdIntercept, const std::string recoTracksName) { setValues(pxdIntercept, recoTracksName);}
-
       /** Update values from a PXDCluster.
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
@@ -91,17 +81,6 @@ namespace Belle2 {
     struct TrackCluster_t {
       /** Default constructor */
       TrackCluster_t(): usedInTrack(false), dU(INFINITY), dV(INFINITY) {}
-      //dV(std::numeric_limits<float>::infinity()) {}
-
-      /** Constructor
-       * @param pxdIntercept a PXDIntercept object
-       */
-      //TrackCluster_t(const PXDIntercept& pxdIntercept,
-      //const std::string recoTracksName = "",
-      //const std::string pxdTrackClustersName = "PXDClustersFromTracks")
-      //{
-      //setValues(pxdIntercept, recoTracksName, pxdTrackClustersName);
-      //}
 
       /** Update values from a PXDIntercept.
        * @param pxdIntercept a PXDIntercept object.
@@ -133,7 +112,11 @@ namespace Belle2 {
        * @param recoTrack A RecoTrack object.
        * @param ip The interaction point for correcting d0 and z0
        */
-      void setValues(const RecoTrack& recoTrack, const TVector3& ip = TVector3(0, 0, 0));
+      void setValues(const RecoTrack& recoTrack, const TVector3& ip = TVector3(0, 0, 0),
+                     const std::string recoTracksName = "",
+                     const std::string pxdInterceptsName = "",
+                     const std::string pxdTrackClustersName = "PXDClustersFromTracks"
+                    );
 
       float d0;        /**< Impact parameter in r-phi. */
       float z0;        /**< Impact parameter in z. */
@@ -155,7 +138,12 @@ namespace Belle2 {
      * Template implementation
      */
     template <typename TTrackCluster>
-    void TrackBase_t<TTrackCluster>::setValues(const RecoTrack& recoTrack, const TVector3& ip)
+    void TrackBase_t<TTrackCluster>::setValues(
+      const RecoTrack& recoTrack, const TVector3& ip,
+      const std::string recoTracksName,
+      const std::string pxdInterceptsName,
+      const std::string pxdTrackClustersName
+    )
     {
       // get Track pointer
       auto trackPtr = recoTrack.getRelated<Track>("Tracks");
@@ -187,11 +175,11 @@ namespace Belle2 {
       }
 
       //RelationVector<PXDIntercept> pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
-      auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
+      auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>(pxdInterceptsName);
       for (auto& pxdIntercept : pxdIntercepts) {
         TTrackCluster temp;
         // Only push a TrackCluster when setValues succeeds
-        if (temp.setValues(pxdIntercept))
+        if (temp.setValues(pxdIntercept, recoTracksName, pxdTrackClustersName))
           trackClusters.push_back(temp);
       }
     }

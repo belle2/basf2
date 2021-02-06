@@ -33,7 +33,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "min_files_per_chunk": 10,
                                    "min_events_per_file": 1000,  # avoid empty files
                                    "max_events_per_run": 4000000,
-                                   "max_files_per_run": 20,  # only valid when max_events/run <= 0
+                                   "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
                                depends_on=[])

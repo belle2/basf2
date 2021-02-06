@@ -64,18 +64,22 @@ void PXDPerformanceModule::initialize()
 
 void PXDPerformanceModule::beginRun()
 {
-  B2DEBUG(1, "||| PXDPerformanceModule Parameters:");
-  B2DEBUG(1, "    PXDClustersFromTracksName = " << m_storeClustersFromTracksName);
-  B2DEBUG(1, "    PXDInterceptsName         = " << m_storeInterceptsName);
-  B2DEBUG(1, "    RecoTracksName            = " << m_storeRecoTracksName);
-  B2DEBUG(1, "    TracksName                = " << m_storeTracksName);
+  B2DEBUG(20, "||| PXDPerformanceModule Parameters:");
+  B2DEBUG(20, "    PXDClustersFromTracksName = " << m_storeClustersFromTracksName);
+  B2DEBUG(20, "    PXDInterceptsName         = " << m_storeInterceptsName);
+  B2DEBUG(20, "    RecoTracksName            = " << m_storeRecoTracksName);
+  B2DEBUG(20, "    TracksName                = " << m_storeTracksName);
 }
 
 void PXDPerformanceModule::event()
 {
   PXD2TrackEvent eventHolder;
   B2DEBUG(1, "PXD2TrackEvent created");
-  bool good = eventHolder.setValues(m_recoTracks);
+  bool good = eventHolder.setValues(m_recoTracks,
+                                    m_storeRecoTracksName,
+                                    m_storeInterceptsName,
+                                    m_storeClustersFromTracksName
+                                   );
   B2DEBUG(1, "PXD2TrackEvent update status: " << good);
   if (good) {
     m_pxd2TrackEvents.appendNew(eventHolder);

@@ -76,7 +76,11 @@ namespace Belle2 {
 
     /** Set values from RecoTrack collection */
     //bool setValues(const RelationVector<RecoTrack>& recoTracks);
-    virtual bool setValues(const StoreArray<RecoTrack>& recoTracks);
+    virtual bool setValues(const StoreArray<RecoTrack>& recoTracks,
+                           const std::string recoTracksName = "",
+                           const std::string pxdInterceptsName = "",
+                           const std::string pxdTrackClustersName = "PXDClustersFromTracks"
+                          );
 
   protected:
     float m_vx;   /**< Position of the vertex in x. */
@@ -89,7 +93,11 @@ namespace Belle2 {
   };
 
   template <class T>
-  bool PXD2TrackBase<T>::setValues(const StoreArray<RecoTrack>& recoTracks)
+  bool PXD2TrackBase<T>::setValues(const StoreArray<RecoTrack>& recoTracks,
+                                   const std::string recoTracksName,
+                                   const std::string pxdInterceptsName,
+                                   const std::string pxdTrackClustersName
+                                  )
   {
     // Exactly 2 tracks
     //if(recoTracks.size() != 2) return false;
@@ -142,11 +150,11 @@ namespace Belle2 {
     DBObjPtr<BeamSpot> beamSpotDB; // beam spot is required to correct d0/z0
     auto ip = beamSpotDB->getIPPosition();
     if (tfr1Ptr->getChargeSign() > 0) {
-      m_track_p.setValues(*recoTracks[0], ip);
-      m_track_m.setValues(*recoTracks[1], ip);
+      m_track_p.setValues(*recoTracks[0], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
+      m_track_m.setValues(*recoTracks[1], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
     } else {
-      m_track_p.setValues(*recoTracks[1], ip);
-      m_track_m.setValues(*recoTracks[0], ip);
+      m_track_p.setValues(*recoTracks[1], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
+      m_track_m.setValues(*recoTracks[0], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
     }
     return true;
   }

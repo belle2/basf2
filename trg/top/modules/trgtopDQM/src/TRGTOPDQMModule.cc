@@ -1153,8 +1153,6 @@ void TRGTOPDQMModule::event()
 
   if (m_doGRLCorrelations) {
 
-    int grlTimeL1 = -1;
-
     StoreObjPtr<TRGGRLUnpackerStore> grlEventInfo("TRGGRLUnpackerStore");
 
     // make sure first that GDL information could be retrieved
@@ -1162,7 +1160,7 @@ void TRGTOPDQMModule::event()
 
       grlInfoAvailable = true;
 
-      grlTimeL1 = grlEventInfo->m_coml1 - grlEventInfo->m_revoclk;
+      int grlTimeL1 = grlEventInfo->m_coml1 - grlEventInfo->m_revoclk;
 
       grlTOPL1 = (grlEventInfo->m_TOPL1_count + grlTimeL1 - 0.5) * (-clk127To1ns);
 
@@ -1296,9 +1294,7 @@ void TRGTOPDQMModule::event()
           }
         }
       }
-    }
 
-    if (m_doECLCorrelations) {
       if (m_requireEclBarrel) {
         if (!barrelEcl) return;
       }
@@ -1717,12 +1713,6 @@ void TRGTOPDQMModule::event()
       int segmentSlotBest = 0;
       int logLSlotBest = 0;
 
-      int slotSlotBest2 = 0;
-      int segmentSlotBest2 = 0;
-      int logLSlotBest2 = 0;
-      int nHitsSlotBest2 = 0;
-      int t0SlotBest2 = -1;
-
       // sort slots according to their nHits
       sort(slotDecisionList.begin(), slotDecisionList.end(), largestNHits());
 
@@ -1739,11 +1729,11 @@ void TRGTOPDQMModule::event()
         ++it;
         const slotDecision& slotDecisionBest2 = *it;
 
-        slotSlotBest2 = slotDecisionBest2.slot;
-        segmentSlotBest2 = slotDecisionBest2.segment;
-        logLSlotBest2 = slotDecisionBest2.logL;
-        nHitsSlotBest2 = slotDecisionBest2.nHits;
-        t0SlotBest2 = slotDecisionBest2.t0;
+        int slotSlotBest2 = slotDecisionBest2.slot;
+        int segmentSlotBest2 = slotDecisionBest2.segment;
+        int logLSlotBest2 = slotDecisionBest2.logL;
+        int nHitsSlotBest2 = slotDecisionBest2.nHits;
+        int t0SlotBest2 = slotDecisionBest2.t0;
 
         if (m_histLevel > 1) {
           if (t0DecisionNumber == 0) {

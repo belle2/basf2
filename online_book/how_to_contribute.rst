@@ -42,7 +42,7 @@ Submitting a PR
 
 You need to 
 
-1. Clone the software repository or create a development setup as explained in
+1. Create a development setup as explained in
    :ref:`build/tools_doc/index-01-tools:Development Setup`
 2. Change to a new branch ``feature/...`` or ``bugfix/...``
 3. Make your changes

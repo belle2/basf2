@@ -634,16 +634,15 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
                   << " CM $" << hex << dhp_cm);
 
-          /*if (m_verbose) {
-            B2DEBUG(29, "raw    |   " << hex << d[i]);
-            B2DEBUG(29, "row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
-                   << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-            B2DEBUG(29, "dhe_ID " << dhe_ID);
-            B2DEBUG(29, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-          };*/
-
-          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+          if (dhp_adc == 0) {
+            // if !supress error flag
+            B2WARNING("DHE Event truncation in DHE " << dhe_ID << " DHP " << dhp_dhp_id);
+            // m_errorMask |= c_DHE_EVENT_TRUNC;
+            daqpktstat.dhc_back().dhe_back().dhp_back().setTruncated();
+          } else {
+            if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
+                                                          (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+          }
         }
       }
     }

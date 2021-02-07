@@ -619,7 +619,7 @@ class Random(BaseSkim):
 
 
 @fancy_skim_header
-class SystematicsFourLepton(BaseSkim):
+class SystematicsFourLeptonFromHLTFlag(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
     __description__ = "Skim to select all events that pass the HLT Four Lepton skim for lepton ID studies"
@@ -642,7 +642,7 @@ class SystematicsFourLepton(BaseSkim):
 
 
 @fancy_skim_header
-class SystematicsRadMuMuLeptonID(BaseSkim):
+class SystematicsRadMuMuFromHLTFlag(BaseSkim):
     __authors__ = "Marcel Hohmann"
     __contact__ = __liaison_leptonID__
     __description__ = "Skim to select all events that pass the HLT RadMuMu skim for lepton ID studies"
@@ -715,7 +715,7 @@ class SystematicsKshort(BaseSkim):
       K-short skim for hadron and lepton ID systematics studies.
       As K-short candidates are abundant this skim has a high retention.
       To meet the retention criteria a prescale is added. The prescale is given in standard trigger terms (reciprocal).
-      A precale of 50 will keep 2% of events, etc.
+      A prescale of 50 will keep 2% of events, etc.
     """
     __authors__ = ["Marcel Hohmann"]
     __description__ = "Skim for K-short events for performance studies"

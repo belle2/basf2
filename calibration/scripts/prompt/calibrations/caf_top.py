@@ -50,7 +50,7 @@ def get_calibrations(input_data, **kwargs):
         if c.strategies[0] == SequentialBoundaries:
 
             # Default boundaries. If there are no boundaries in the config file, this calibration will give a single IoV
-            payload_boundaries = [[output_iov.exp_low, output_iov.run_low], [-1, -1]]
+            payload_boundaries = [[output_iov.exp_low, output_iov.run_low]]
 
             # user-defined boundaries are set here.
             if expert_config["payload_boundaries"] is not None:

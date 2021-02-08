@@ -108,6 +108,9 @@ namespace Belle2 {
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
+    TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
+    TString runtype = nullptr; /**< string with runtype: physics or cosmic */
+
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 

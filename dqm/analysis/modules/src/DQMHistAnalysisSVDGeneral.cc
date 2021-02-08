@@ -230,6 +230,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
+  rtype = findHist("DQMInfo/rtype");
+  runtype = rtype ? rtype->GetTitle() : "";
 }
 
 
@@ -330,12 +332,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
     if (nEvents > m_statThreshold) {
-      float threshold_physics = m_refRCTP / sqrt(m_statThreshold);
-      float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
-      float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
-      float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
-      if ((difference_physics > threshold_physics) && (difference_cosmic > threshold_cosmic)) {
-        hasError = true;
+      if (runtype == "physics") {
+        float threshold_physics = m_refRCTP / sqrt(m_statThreshold);
+        float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
+        if (difference_physics > threshold_physics) {
+          hasError = true;
+        }
+      }
+      if (runtype == "cosmic") {
+        float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
+        float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
+        if (difference_cosmic > threshold_cosmic) {
+          hasError = true;
+        }
       }
     }
     if (! hasError) {

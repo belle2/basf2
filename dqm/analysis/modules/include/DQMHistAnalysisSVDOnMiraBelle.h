@@ -20,29 +20,29 @@
 #include <TH2F.h>
 
 namespace Belle2 {
-  /*! Class for SVD monitoring variables at MiraBelle */
+  /** Class for SVD monitoring variables at MiraBelle */
   class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
 
-    // Public methods
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
+    /** Destructor */
     virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
-
-    //! Module functions to be called from main process
+    /** Module function initialize */
     virtual void initialize() override;
-
-    //! Module functions to be called from event process
+    /** Module function beginRun */
     virtual void beginRun() override;
+    /** Module function event */
     virtual void event() override;
+    /** Module function endRun */
     virtual void endRun() override;
+    /** Module function terminate */
     virtual void terminate() override;
 
-    // Private methods and attributes
   private:
 
-    // List of canvases to be added to MonitoringObject
+    /** List of canvases to be added to MonitoringObject */
     TCanvas* m_c_avgEfficiency = nullptr; /**< matched clusters and track clusters */
     TCanvas* m_c_avgOffOccupancy = nullptr; /**< number of ZS5 fired strips */
     TCanvas* m_c_MPVChargeClusterOnTrack = nullptr; /**< charge for clusters on track */
@@ -51,7 +51,7 @@ namespace Belle2 {
     TCanvas* m_c_avgMaxBinClusterOnTrack =
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
 
-    // Monitoring Object
+    /** Monitoring Object, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module */
 
     /**

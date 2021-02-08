@@ -15,6 +15,9 @@
 #include <TString.h>
 #include <TAxis.h>
 
+#include <TMath.h>
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 
@@ -43,7 +46,11 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("onlineOccLevel_Empty", m_onlineOccEmpty, "Maximum OnlineOccupancy (%) for which the sensor is considered empty",
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
-
+  addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
+  addParam("refMCTP", m_refMCTP, "Mean of Cluster Time from Physics reference run", float(-1.939)); // e14r826
+  addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
+  addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
+  addParam("refRCTC", m_refRCTC, "RMS of Cluster Time from Cosmic reference run", float(15.77)); // e14r1182
 }
 
 
@@ -314,7 +321,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_printCanvas)
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
-  // cluster time for cluster of track
+  // cluster time for clusters of track
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
@@ -322,8 +329,15 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
-    if (fabs(m_hClusterOnTrackTime_L456V.GetMean()) > 4)
-      hasError = true;
+    if (nEvents > m_statThreshold) {
+      float threshold_physics = m_refRCTP / sqrt(m_statThreshold);
+      float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
+      float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
+      float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
+      if ((difference_physics > threshold_physics) && (difference_cosmic > threshold_cosmic)) {
+        hasError = true;
+      }
+    }
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
       m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);

@@ -47,6 +47,13 @@ namespace Belle2 {
     float m_onlineOccError; /**<error level of the onlineOccupancy */
     float m_onlineOccWarning; /**< warning level of the onlineOccupancy */
     float m_onlineOccEmpty; /**<empty level of the occupancy */
+
+    int m_statThreshold; /**< minimal number of events to compare histograms */
+    float m_refMCTP; /**< mean of Cluster Time from Physics reference run */
+    float m_refRCTP; /**< rms of Cluster Time from Physics reference run */
+    float m_refMCTC; /**< mean of Cluster Time from Cosmic reference run */
+    float m_refRCTC; /**< rms of Cluster Time from Cosmic reference run */
+
     //! Parameters accesible from basf2 scripts
     //  protected:
 

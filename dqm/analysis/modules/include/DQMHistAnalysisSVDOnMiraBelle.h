@@ -20,7 +20,8 @@
 #include <TH2F.h>
 
 namespace Belle2 {
-  /** Class for SVD monitoring variables at MiraBelle */
+
+  /** Class derived from HistoModule, for SVD monitoring variables at MiraBelle */
   class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
 
   public:
@@ -51,14 +52,13 @@ namespace Belle2 {
     TCanvas* m_c_avgMaxBinClusterOnTrack =
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
 
-    /** Monitoring Object, which contain defined canvases and monitoring variables */
-    MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module */
+    /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
+    MonitoringObject* m_monObj = nullptr;
 
     /**
     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
     * @param iLayer index of layer
-    * @param hU pointer to histogram
-    * @param hU pointer to histogram
+    * @param hU, hV pointers to histograms
     * @param iBin index of bin corresponding to sensor (layer, ladder, sensor)
     * @param nEvents number of events
     * @return vector with values for U and V sides
@@ -68,9 +68,10 @@ namespace Belle2 {
     /**
     * Calculate avg offline occupancy for specified sensors
     * @param iLayer index of layer
-    * @param hU pointer to histogram
-    * @param hU pointer to histogram
-    * @param ibin index of bin corresponding to sensor (layer, ladder, sensor)
+    * @param hU, hV pointers to histograms
+    * @param min, max range of ladders
+    * @param offset first bin of relevant sensor
+    * @param step depends on number of sensor in each layer
     * @param nEvents number of events
     * @return vector with values for U and V sides
     */
@@ -79,7 +80,7 @@ namespace Belle2 {
     /**
     * Calculate avg efficiency for specified sensors
     * @param hMCU, hMCV, hFTU, hFTV pointers to histograms
-    * @param minX, minY range of ladders
+    * @param minX, maxX range of ladders
     * @param minY, maxY range of sensors
     * @return vector with values for U and V sides
     */

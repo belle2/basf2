@@ -338,13 +338,14 @@ void DQMHistAnalysisSVDGeneralModule::event()
         if (difference_physics > threshold_physics) {
           hasError = true;
         }
-      }
-      if (runtype == "cosmic") {
+      } else if (runtype == "cosmic") {
         float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
         float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
         if (difference_cosmic > threshold_cosmic) {
           hasError = true;
         }
+      } else {
+        B2WARNING("Run type:" << runtype);
       }
     }
     if (! hasError) {

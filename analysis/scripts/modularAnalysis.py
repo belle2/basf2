@@ -2015,18 +2015,18 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     """
     if inputParticlelists is None:
         inputParticlelists = []
-    fillParticleList('pi+:roe_default', '', path=path)
+    fillParticleList('pi+:all', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     import b2bii
     if not b2bii.isB2BII():
-        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('gamma:all', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+        inputParticlelists += ['pi+:all', 'gamma:all', 'K_L0:roe_default']
     else:
-        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
+        inputParticlelists += ['pi+:all', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

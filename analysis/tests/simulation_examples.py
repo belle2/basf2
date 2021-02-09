@@ -40,52 +40,6 @@ class ExamplesTest(unittest.TestCase):
                         sys.stdout.buffer.write(result.stdout)
                     self.assertEqual(result.returncode, 0)
 
-    def test_calibration_examples(self):
-        """
-        Test supported calibration examples.
-        """
-        skip_test_if_light(self)  # calibration dataobjects not supported in light releases
-
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_cal_egs = ['B2CAL901-cDSTECLTRG.py'  # BII-4276
-                          ]
-
-        self._test_examples_dir('analysis/examples/calibration/', broken_cal_egs)
-
-    def test_fei_examples(self):
-        """
-        Test supported FEI examples.
-        """
-
-        self._test_examples_dir('analysis/examples/FEI/')
-
-    def test_fitting_examples(self):
-        """
-        Test supported fitting examples.
-        """
-
-        self._test_examples_dir('analysis/examples/fitting/')
-
-    def test_mva_examples(self):
-        """
-        Test supported mva examples.
-        """
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_mva_egs = ['B2A711-DeepContinuumSuppression_Input.py',  # BII-4279
-                          'B2A713-DeepContinuumSuppression_MVAExpert.py',  # BII-4279
-                          'B2A712-DeepContinuumSuppression_MVATrain.py',  # BII-4279
-                          'B2A714-DeepContinuumSuppression_MVAModel.py'  # BII-4279
-                          ]
-
-        self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
-
-    def test_reconstruction_examples(self):
-        """
-        Test supported reconstruction examples.
-        """
-
-        self._test_examples_dir('analysis/examples/reconstruction/')
-
     def test_simulation_examples(self):
         """
         Test supported simulation examples.
@@ -97,27 +51,6 @@ class ExamplesTest(unittest.TestCase):
                           ]
 
         self._test_examples_dir('analysis/examples/simulations/', broken_sim_egs)
-
-    def test_tagging_examples(self):
-        """
-        Test supported tagging examples.
-        """
-
-        self._test_examples_dir('analysis/examples/tagging/')
-
-    def test_variablemanager_examples(self):
-        """
-        Test supported variable manager examples.
-        """
-
-        self._test_examples_dir('analysis/examples/VariableManager/')
-
-    def test_postmdstidentification_examples(self):
-        """
-        Test supported PostMdstIdentification examples.
-        """
-
-        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
 
 
 if __name__ == '__main__':

@@ -14,6 +14,7 @@ class TestStdV0(unittest.TestCase):
             std_function=stdV0s.stdKshorts,
             expected_modules=[
                 "ParticleLoader",
+                "ParticleListManipulator",
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleLoader",
@@ -21,7 +22,7 @@ class TestStdV0(unittest.TestCase):
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleListManipulator"],
-            expected_lists=['V0', 'all', 'RD', 'merged']):
+            expected_lists=['V0', 'V0_MassWindow', 'all', 'RD', 'merged']):
         """check that a given function works"""
         testpath = create_path()
         std_function(path=testpath)
@@ -71,6 +72,7 @@ class TestStdV0(unittest.TestCase):
     def test_stdlambdas_list(self):
         """check that the builder function works with the stdLambdas list"""
         expected_modules = ["ParticleLoader",
+                            "ParticleListManipulator",
                             "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
@@ -83,7 +85,7 @@ class TestStdV0(unittest.TestCase):
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleListManipulator"]
-        expected_lists = ['V0', 'all', 'all', 'RD', 'merged']
+        expected_lists = ['V0', 'V0_MassWindow', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
 

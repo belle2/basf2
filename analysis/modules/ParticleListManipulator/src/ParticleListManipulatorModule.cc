@@ -81,14 +81,22 @@ namespace Belle2 {
 
     m_pdgCode  = mother->getPDGCode();
 
-    // For final state particles we protect the label "all" because it is already used for lists created by the ParticleLoader.
+    // Some labels are reserved for the particle loader which loads all particles of the corresponding type.
+    // If people apply cuts or merge particle lists, the resulting particle lists are not allowed to have these names.
     // Otherwise, very dangerous bugs could be introduced.
-    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode)))) {
-      string listLabel = mother->getLabel();
-      if (listLabel == "all")
-        B2FATAL("You have tried to create the list " << m_outputListName <<
-                " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
-                " It could introduce *very* dangerous bugs.");
+    string listLabel = mother->getLabel();
+    // For final state particles we protect the label "all".
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all") {
+      B2FATAL("You have tried to create the list " << m_outputListName <<
+              " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
+              " It could introduce *very* dangerous bugs.");
+    } else if (listLabel == "MC" or listLabel == "ROE" or
+               (listLabel == "V0" and not("K_S0:mdst" == m_inputListNames[0] or "Lambda0:mdst" == m_inputListNames[0]
+                                          or "gamma:v0mdst" == m_inputListNames[0]))) {
+      // the labels MC, ROE, and V0 are also protected
+      // copying of some B2BII V0 lists has to be allowed to not break the FEI
+      B2FATAL("You have tried to create the list " << m_outputListName <<
+              " but the label " << listLabel << " is not allowed for merged or copied particle lists.");
     }
 
     m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);

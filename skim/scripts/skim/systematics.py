@@ -738,7 +738,6 @@ class SystematicsKshort(BaseSkim):
 
     def build_lists(self, path):
 
-        # this is equivalent to the std Kshort Merged but with a wider mass window
         ma.cutAndCopyList(
             'pi+:sel',
             'pi+:all',
@@ -746,12 +745,14 @@ class SystematicsKshort(BaseSkim):
             path=path)
         ma.reconstructDecay(
             'K_S0:reco -> pi+:sel pi-:sel',
-            '[0.40 < M < 0.60]',
+            '[0.30 < M < 0.70]',
             path=path)
+
         vertex.treeFit('K_S0:reco', 0.0, path=path)
+        ma.applyCuts('K_S0:reco', '0.4 < M < 0.6', path=path)
 
         ma.fillParticleList('K_S0:V0 -> pi+ pi-',
-                            '[0.40 < M < 0.60] and '
+                            '[0.30 < M < 0.70] and '
                             '[[[abs(daughter(0, dz))<5 and abs(daughter(0,dr))<2 and daughter(0, p)>0.1]  and '
                             '  [abs(daughter(1, dz))<5 and abs(daughter(1,dr))<2 and daughter(1, p)>0.1]] or '
                             '[[abs(daughter(0, z0))<4 and daughter(0, nCDCHits)>0] and '
@@ -759,6 +760,7 @@ class SystematicsKshort(BaseSkim):
                             True,
                             path=path)
         vertex.treeFit('K_S0:V0', 0.0, path=path)
+        ma.applyCuts('K_S0:V0', '0.4 < M < 0.6', path=path)
 
         ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0', 'K_S0:reco'],
                                        variable='particleSource', preferLowest=True, path=path)

@@ -2785,7 +2785,7 @@ def getBeamBackgroundProbabilityMVA(
     @param path       modules are added to this path
     """
 
-    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module(
         'MVAExpert',
         listNames=particleList,
@@ -3021,7 +3021,7 @@ def labelTauPairMC(printDecayInfo=False, path=None):
 def tagCurlTracks(particleLists,
                   mcTruth=False,
                   responseCut=0.324,
-                  selectorType='cUt',
+                  selectorType='cut',
                   ptCut=0.6,
                   train=False,
                   path=None):

@@ -90,9 +90,8 @@ namespace Belle2 {
       B2FATAL("You have tried to create the list " << m_outputListName <<
               " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
               " It could introduce *very* dangerous bugs.");
-    } else if (listLabel == "MC" or listLabel == "ROE" or
-               (listLabel == "V0" and not("K_S0:mdst" == m_inputListNames[0] or "Lambda0:mdst" == m_inputListNames[0]
-                                          or "gamma:v0mdst" == m_inputListNames[0]))) {
+    } else if ((listLabel == "MC") or (listLabel == "ROE") or (listLabel == "V0" and not(("K_S0:mdst" == m_inputListNames[0])
+                                                               or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))) {
       // the labels MC, ROE, and V0 are also protected
       // copying of some B2BII V0 lists has to be allowed to not break the FEI
       B2FATAL("You have tried to create the list " << m_outputListName <<

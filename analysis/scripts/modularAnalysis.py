@@ -1967,7 +1967,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
@@ -2779,7 +2779,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
                 applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
@@ -3212,6 +3212,22 @@ def scaleError(outputListName, inputListName,
     scale_error.param('scaleFactors', scaleFactors)
     scale_error.param('minErrors', minErrors)
     path.add_module(scale_error)
+
+
+def energyBiasCorrection(inputListNames, scale, path=None):
+    """
+    Scale enrgy of the particles according to the scaling factor.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        path (basf2.Path): module is added to this path
+    """
+
+    energybiascorrection = register_module('EnergyBiasCorrection')
+    energybiascorrection.param('particleLists', inputListNames)
+    energybiascorrection.param('scale', scale)
+    path.add_module(energybiascorrection)
 
 
 def getAnalysisGlobaltag():

@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = [ 'framework', 'pxd_dataobjects', 'tracking_dataobjects', 'mdst_dataobjects', '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'pxd_dataobjects', 'tracking_dataobjects', '$ROOT_LIBS', 'pxd_utilities']
 
 Return('env')

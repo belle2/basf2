@@ -1,7 +1,7 @@
 # EventType: 1190520004
 # Descriptor: [B0 -> Xs e+ e-]cc
 # NickName: Bd_Xsee_highpF
-# Documentation: Rare b->s l+ l- process. pF = 0.48 GeV
+# Documentation: Rare b->s l+ l- process. pF = 0.498 GeV
 # Tested: Yes
 # PhysicsWG: EWP
 # Responsible: Yo Sato
@@ -16,11 +16,11 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.      Xsd  e+   e-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.48;
+1.      Xsd  e+   e-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.498;
 Enddecay
 #
 Decay anti-B0sig
-1.     anti-Xsd  e+   e-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.48;
+1.     anti-Xsd  e+   e-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.498;
 Enddecay
 #
 End

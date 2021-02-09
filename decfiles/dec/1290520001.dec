@@ -17,11 +17,11 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0  Xsu e+ e- PHOTOS BTOXSLL 4.65 0.2 0.0 0.41;
+1.0  Xsu e+ e- PHOTOS BTOXSLL 4.65 0.2 0.0 0.461;
 Enddecay
 #
 Decay B-sig
-1.0  anti-Xsu e+ e- PHOTOS BTOXSLL 4.65 0.2 0.0 0.41;
+1.0  anti-Xsu e+ e- PHOTOS BTOXSLL 4.65 0.2 0.0 0.461;
 Enddecay
 #
 End

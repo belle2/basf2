@@ -26,6 +26,7 @@ _RegisteredSkims = [
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
+    ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
@@ -67,6 +68,8 @@ _RegisteredSkims = [
     ("14140200", "btocharm", "BtoD0h_Kshh"),
     ("14141000", "btocharm", "BtoD0rho_Kpi"),
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
+    ("14141002", "btocharm", "B0toDD_Kpipi_Kspi"),
+    ("14141003", "btocharm", "B0toDstarD"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -107,6 +110,7 @@ _RegisteredSkims = [
     ("18020300", "dark", "ALP3Gamma"),
     ("18020400", "dark", "EGammaControlDark"),
     ("18000000", "dark", "InelasticDarkMatter"),
+    ("18000001", "dark", "RadBhabhaV0Control"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),

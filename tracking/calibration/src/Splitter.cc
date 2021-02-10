@@ -26,21 +26,13 @@
 #ifdef _PACKAGE_
 #include <tracking/calibration/Splitter.h>
 #else
-#include "Splitter.h"
+#include <Splitter.h>
 #endif
 
 
 using namespace std;
 
 namespace Belle2 {
-
-
-  /// Slice the vector to contain only elements with indeces s .. e (included)
-  static vector<pair<double, double>> slice(vector<pair<double, double>> vec, int s, int e)
-  {
-    return vector<pair<double, double>>(vec.begin() + s, vec.begin() + e + 1);
-  }
-
 
 
   //return filtered runs intervals (remove very short runs)
@@ -89,7 +81,7 @@ namespace Belle2 {
   }
 
   /// get the range of interval with nIntervals and breaks stored in a vector
-  static pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
+  pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
   {
     B2ASSERT("There must be at least one interval", nIntervals >= 1);
     B2ASSERT("Interval index must be positive", indx >= 0);
@@ -141,29 +133,39 @@ namespace Belle2 {
   }
 
   /// the lossFunction formula (it can be modified according to the user's taste)
-  double Splitter::lossFunction(const vector<pair<double, double>>&  vec, int s, int e) const
+  double Splitter::lossFunction(const vector<Atom>&  vec, int s, int e) const
   {
 
     //raw time
-    double rawTime = vec[e].second - vec[s].first;
+    double rawTime = vec[e].t2 - vec[s].t1;
 
     //max gap
-    double gapMax = 0;
+    double maxGap = 0;
     for (int i = s; i <= e - 1; ++i) {
-      double d = vec[i + 1].first - vec[i].second;
-      gapMax = max(gapMax, d);
+      double d = vec[i + 1].t1 - vec[i].t2;
+      maxGap = max(maxGap, d);
     }
 
-    //net gap
-    //double netTime = 0;
-    //for (int i = s; i <= e; ++i) {
-    //  netTime += vec[i].second - vec[i].first;
-    //}
+    //net time
+    double netTime = 0;
+    for (int i = s; i <= e; ++i) {
+      netTime += vec[i].t2 - vec[i].t1;
+    }
 
+    // Number of events
+    double nEv = 0;
+    for (int i = s; i <= e; ++i) {
+      nEv += vec[i].nEv;
+    }
+    if (nEv == 0) nEv = 0.1;
 
-    double loss = pow(rawTime - tBest, 2) + gapPenalty * pow(gapMax, 2);
+    //double loss = pow(rawTime - tBest, 2) + gapPenalty * pow(maxGap, 2);
+    //double loss = 1./nEv  + timePenalty * pow(rawTime, 2);
 
-    return loss;
+    lossFun->SetParameters(rawTime, netTime, maxGap, nEv);
+    double lossNew = lossFun->Eval(0);
+
+    return lossNew;
   }
 
 
@@ -192,8 +194,10 @@ namespace Belle2 {
 
 
 
+
+
   // Get the optimal clustering of the atoms with indeces 0 .. e (recursive function with cache)
-  double Splitter::getMinLoss(const vector<pair<double, double>>&  vec, int e, vector<int>& breaks)
+  double Splitter::getMinLoss(const vector<Atom>&  vec, int e, vector<int>& breaks)
   {
     // If entry in cache (speed up)
     if (cache[e].first >= 0) {
@@ -230,7 +234,7 @@ namespace Belle2 {
   }
 
   //Get the indexes of the break-points
-  vector<int> Splitter::dynamicBreaks(vector<pair<double, double>>  runs)
+  vector<int> Splitter::dynamicBreaks(const vector<Atom>& runs)
   {
     //reset cache
     cache.resize(runs.size());
@@ -244,28 +248,6 @@ namespace Belle2 {
     return breaks;
   }
 
-
-  /** Convert breaks to intervals, notice that the count of the output intervals is one more than number of the input breaks.
-   *  I.e. this function merge non-divisible intervals defined in currVec into bigger clusters according to the integer indexes of the breaks.
-   * @param currVec: vector with time limits of the atoms (small non-divisible time intervals)
-   * @param breaks: integer indexes where to break the whole currVec. Notice that index 0 means break between first and second atom
-   * @return: Vector with times of the intervals, each intervals is defined by it's start- and end-time.
-   **/
-  static vector<pair<double, double>> breaks2intervals(vector<pair<double, double>> currVec, vector<int> breaks)
-  {
-
-    vector<pair<double, double>> splitsNow;
-    for (int i = 0; i < int(breaks.size()) + 1; ++i) {
-      int s, e;
-      tie(s, e) = getStartEndIndexes(currVec.size(), breaks, i);
-      double sVal = currVec[s].first;
-      double eVal = currVec[e].second;
-
-      splitsNow.push_back({sVal, eVal});
-    }
-
-    return splitsNow;
-  }
 
 
   /** Get exp number + run number from time
@@ -291,14 +273,8 @@ namespace Belle2 {
 
 
 
-  /** Get calibration intervals according to the indexes of the breaks
-   * @param runsMap: map defining the time ranges of the runs
-   * @param currVec: vector with time intervals of the atoms (small non-divisible time intervals)
-   * @param breaks: vector with integer indexes of the breaks
-   * @return: a vector of the calib. interwas where each interval is a map with exp-run as a key and start- end-time as a value
-   **/
-  static vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(const map<ExpRun, pair<double, double>>& runsMap,
-      const vector<pair<double, double>>& currVec, const vector<int>& breaks)
+  vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(const map<ExpRun, pair<double, double>>& runsMap,
+      const vector<Atom>& currVec, const vector<int>& breaks)
   {
     vector<map<ExpRun, pair<double, double>>> splitsNow(breaks.size() + 1);
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
@@ -307,13 +283,13 @@ namespace Belle2 {
 
       // loop over atoms in single calib interval
       for (int k = s; k <= e; ++k) {
-        ExpRun r = getRun(runsMap, (currVec[k].first + currVec[k].second) / 2.); //runexp of the atom
+        ExpRun r = getRun(runsMap, (currVec[k].t1 + currVec[k].t2) / 2.); //runexp of the atom
         if (splitsNow[i].count(r)) { //if already there
-          splitsNow[i].at(r).first  = min(splitsNow[i].at(r).first, currVec[k].first);
-          splitsNow[i].at(r).second = max(splitsNow[i].at(r).second, currVec[k].second);
+          splitsNow[i].at(r).first  = min(splitsNow[i].at(r).first, currVec[k].t1);
+          splitsNow[i].at(r).second = max(splitsNow[i].at(r).second, currVec[k].t2);
         } else { //if new
-          splitsNow[i][r].first  = currVec[k].first;
-          splitsNow[i][r].second = currVec[k].second;
+          splitsNow[i][r].first  = currVec[k].t1;
+          splitsNow[i][r].second = currVec[k].t2;
         }
       }
     }
@@ -337,56 +313,5 @@ namespace Belle2 {
     return I;
   }
 
-  //Get the optimal time intervals with two levels of segmentation
-  vector<vector<map<ExpRun, pair<double, double>>>>  Splitter::getIntervals(const map<ExpRun, pair<double, double>>& runs,
-      double tBestSize,
-      double tBestVtx, double GapPenalty)
-  {
-    // Divide into small intervals
-    auto smallRuns = splitToSmall(runs, 0.1);
-
-    gapPenalty = GapPenalty;
-
-    // Calculate breaks for SizeIntervals
-    tBest = tBestSize;
-    vector<int> breaksSize = dynamicBreaks(smallRuns);
-
-
-    vector<vector<pair<double, double>>> splits; //split intervals
-    vector<vector<map<ExpRun, pair<double, double>>>> splitsRun; //split intervals with runNumber info
-
-
-    // Calculate breaks for VtxIntervals
-    tBest = tBestVtx;
-    vector<int> breaksVtx;
-    for (int i = 0; i < int(breaksSize.size()) + 1; ++i) { //loop over all size intervals
-      int s, e;
-      tie(s, e) = getStartEndIndexes(smallRuns.size(), breaksSize, i);
-
-      // Store only atoms in the current BS-size calib. intervals
-      auto currVec = slice(smallRuns, s, e);
-
-      // Get optimal breaks in particular BS-size calib. interval
-      vector<int> breaksSmall = dynamicBreaks(currVec);
-
-      // Transform breaks to the time intervals
-      vector<pair<double, double>> splitsNow = breaks2intervals(currVec, breaksSmall);
-
-      // Incorporate the runNumber information
-      auto splitSeg = breaks2intervalsSep(runs, currVec, breaksSmall);
-
-      // Put the vector of VtxInterval (representing division of BS-size interval)
-      // into the vector
-      splitsRun.push_back(splitSeg);
-      splits.push_back(splitsNow);
-
-      if (s != 0) breaksVtx.push_back(s - 1);
-      for (auto b : breaksSmall)
-        breaksVtx.push_back(b + s);
-      if (e != int(breaksSize.size())) breaksVtx.push_back(e);
-    }
-
-    return splitsRun;
-  }
 
 }

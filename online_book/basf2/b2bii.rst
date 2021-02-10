@@ -135,7 +135,10 @@ signal MC samples.
 Now we will learn how to use the ``mcproduzh`` package to generate signal MC in Belle.
 This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and
 it consists of generation, simulation, and reconstruction based on ``evtgen`` and
-``gsim`` scripts.
+``gsim`` scripts (``gsim`` is Belle slang for the simulated detector response
+that results from the use of ``Geant3`` within the Belle analysis software
+framework ``basf`` – the output of ``gsim`` scripts are Belle mdst files).
+
 It will create MC samples for a list of experiments, normalized by their
 :math:`N(B\overline{B})` or integrated luminosity.
 

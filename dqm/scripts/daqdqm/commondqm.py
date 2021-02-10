@@ -178,6 +178,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
+        # TRGTOP
+        trgtopdqm = b2.register_module('TRGTOPDQM')
+        trgtopdqm.param('skim', 0)
+        path.add_module(trgtopdqm)
         # TRGGRL
         trggrldqm = b2.register_module('TRGGRLDQM')
         path.add_module(trggrldqm)
@@ -212,6 +216,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
+        # TRGTOP
+        trgtopdqm_skim = b2.register_module('TRGTOPDQM')
+        trgtopdqm_skim.param('skim', 1)
+        path.add_module(trgtopdqm_skim)
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):

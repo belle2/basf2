@@ -9,7 +9,8 @@
 
 import basf2
 from caf.framework import Calibration, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV
+from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun, SequentialBoundaries
+from ROOT import Belle2
 from ROOT.Belle2 import TOP
 from math import ceil
 
@@ -120,11 +121,11 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         main.add_module('TOPChannelMasker')
         main.add_module('TOPBunchFinder', subtractRunningOffset=False)
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
 
     #   collector module
     collector = basf2.register_module('TOPAsicShiftsBS13dCollector',
@@ -180,7 +181,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0DeltaTCollector')
-    collector.param('granularity', 'all')
+    collector.param('granularity', 'run')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
@@ -195,7 +196,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.strategies = SingleIOV
+    cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
 
     return cal
 
@@ -234,7 +235,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     #   collector module
     collector = basf2.register_module('TOPModuleT0LLCollector')
     collector.param('sample', sample)
-    collector.param('granularity', 'all')
+    collector.param('granularity', 'run')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0LLAlgorithm()
@@ -249,7 +250,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.strategies = SingleIOV
+    cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
 
     return cal
 
@@ -471,7 +472,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
     # so that the total adds up to something reasonable e.g. ~1600
     total_jobs = 1600
     number_of_slots = 16
-    jobs_per_collection = ceil(total_jobs/number_of_slots)
+    jobs_per_collection = ceil(total_jobs / number_of_slots)
 
     #   add collections
     for slot in range(1, 17):

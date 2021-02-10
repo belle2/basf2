@@ -47,45 +47,46 @@ def generate_gaus(title, options, distort=0.):
     gaus.Write()
 
 
-tfile = TFile("validationTestColorScheme.root", "RECREATE")
+if __name__ == "__main__":
+    tfile = TFile("validationTestColorScheme.root", "RECREATE")
 
-TNamed(
-    "Description",
-    "These plots test the color scheme. Make sure to also check the 'expert' "
-    "plot checkbox to see the color scheme for expert plots."
-).Write()
+    TNamed(
+        "Description",
+        "These plots test the color scheme. Make sure to also check the 'expert' "
+        "plot checkbox to see the color scheme for expert plots."
+    ).Write()
 
-mop_expert = {
-    'Description': "Test color scheme",
-    'Check': "Check color",
-    'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
-    'MetaOptions': "pvalue-error=0.6"
-}
-mop_shifter = mop_expert.copy()
-mop_shifter['MetaOptions'] += ", shifter"
+    mop_expert = {
+        'Description': "Test color scheme",
+        'Check': "Check color",
+        'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
+        'MetaOptions': "pvalue-error=0.6"
+    }
+    mop_shifter = mop_expert.copy()
+    mop_shifter['MetaOptions'] += ", shifter"
 
-generate_reference = False
+    generate_reference = False
 
-if not generate_reference:
-    # No reference files for the plots that have to be checked manually
-    generate_gaus("manual", mop_shifter)
-    generate_gaus("manual expert", mop_expert)
+    if not generate_reference:
+        # No reference files for the plots that have to be checked manually
+        generate_gaus("manual", mop_shifter)
+        generate_gaus("manual expert", mop_expert)
 
-if generate_reference:
-    # The reference will contain the normal (undistorted) histogram
-    # always.
-    generate_gaus("pass", mop_shifter)
-    generate_gaus("pass expert", mop_expert)
-    generate_gaus("warn", mop_shifter)
-    generate_gaus("fail", mop_shifter)
-    generate_gaus("warn expert", mop_expert)
-    generate_gaus("fail expert", mop_expert)
-else:
-    generate_gaus("pass", mop_shifter, distort=0.1)
-    generate_gaus("pass expert", mop_expert, distort=0.1)
-    generate_gaus("warn", mop_shifter, distort=0.5)
-    generate_gaus("fail", mop_shifter, distort=1)
-    generate_gaus("warn expert", mop_expert, distort=0.5)
-    generate_gaus("fail expert", mop_expert, distort=1)
+    if generate_reference:
+        # The reference will contain the normal (undistorted) histogram
+        # always.
+        generate_gaus("pass", mop_shifter)
+        generate_gaus("pass expert", mop_expert)
+        generate_gaus("warn", mop_shifter)
+        generate_gaus("fail", mop_shifter)
+        generate_gaus("warn expert", mop_expert)
+        generate_gaus("fail expert", mop_expert)
+    else:
+        generate_gaus("pass", mop_shifter, distort=0.1)
+        generate_gaus("pass expert", mop_expert, distort=0.1)
+        generate_gaus("warn", mop_shifter, distort=0.5)
+        generate_gaus("fail", mop_shifter, distort=1)
+        generate_gaus("warn expert", mop_expert, distort=0.5)
+        generate_gaus("fail expert", mop_expert, distort=1)
 
-tfile.Close()
+    tfile.Close()

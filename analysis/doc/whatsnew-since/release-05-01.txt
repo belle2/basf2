@@ -87,6 +87,11 @@ Modules
    of the B which should fly in the direction of the Btube.
  * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles
    and stores them in a new list.
+ * In :b2:mod:`ParticleStats` add functionaly to produce a json containing the information printed on stdout. Added also a tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
+ * The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
+   that case the momenta of all track-based daughter particles are scaled by the provided factor.
+ * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
+   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
 
 Full Event Interpretation
 +++++++++++++++++++++++++

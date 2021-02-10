@@ -14,6 +14,10 @@ exp_nr = int(re.findall(r'\d+', inputFile)[0])
 run_nr = int(re.findall(r'\d+', inputFile)[1])
 nevt = int(sys.argv[2])  # number of events
 
+# setup database
+b2conditions.reset()
+b2conditions.override_globaltags()
+b2conditions.globaltags = ["online"]
 
 inroot = register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', inputFile)

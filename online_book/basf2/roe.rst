@@ -148,7 +148,7 @@ For our example, let's start by defining the following selection cut strings:
 
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
-     :emphasize-lines: 49-50
+     :emphasize-lines: 3-4
      :lineno-start: 47
 
 

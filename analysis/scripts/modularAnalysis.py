@@ -638,7 +638,7 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
-def trackingEfficiency(inputListNames, fraction, path=None):
+def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=None):
     """
     Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
     Takes care of the duplicates, if any.
@@ -655,9 +655,12 @@ def trackingEfficiency(inputListNames, fraction, path=None):
     path.add_module(trackingefficiency)
 
 
-def trackingMomentum(inputListNames, scale, path=None):
+def scaleTrackMomenta(inputListNames, scale, path=None):
     """
-    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Scale momenta of the particles according to the scaling factor scale.
+    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
@@ -1823,16 +1826,20 @@ def findMCDecay(
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, path):
+def summaryOfLists(particleLists, outputFile=None, path=None):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
+    If an output file name is provided the statistics is also dumped into a json file with that name.
 
     @param particleLists list of input ParticleLists
+    @param outputFile output file name (not created by default)
     """
 
     particleStats = register_module('ParticleStats')
     particleStats.param('particleLists', particleLists)
+    if outputFile is not None:
+        particleStats.param('outputFile', outputFile)
     path.add_module(particleStats)
 
 

@@ -67,21 +67,11 @@ The likelihood of having the matched-hit range and transverse-scattering :math:`
 distribution is obtained from pre-calculated probability density functions (PDFs). There are
 separate PDFs for each charged-particle hypothesis and charge and for each extrapolation outcome.
 
-* The *longitudinal-profile* PDF value :math:`P_{L}(\vec{x}; O, l, H)` for extrapolation ending
-outcome :math:`O` and outermost layer :math:`l` and for particle hypothesis :math:`H \in {\mu^{\pm},
-\pi^{\pm}, K^{\pm}, e^{\pm}, p, \bar{p}, d, \bar{d}}` is sampled according to the measurement vector
-:math:`\vec{c}` given by: (a) the pattern of of all KLM layers touched during the extrapolation (not
-just the outermost one) and (b) the pattern of matched hits in the touched layers. Sample PDF for
-exiting tracks are shown in :numref:`LongitudinalPdfs` for muons and pions.
- |
 
-* The *transverse-scattering* probability density function :math:`P_{L}(\chi^2, n; D, H)`  for KLM
-region :math:`D` (barrel-only, endcap-only, or overlap) and particle hypothesis :math:`H` is sampled
-according to the measurement of :math:`\chi^{2}` from the Kalman filter and the number of degrees of
-freedom, which is twice the number of matched hits. The muon-hypothesis PDF is very close to the
-ideal :math:`\chi^2` distribution for the given number of degrees of freedom, while the the non-muon
-hypothesis PDFs are considerably broader for low degrees of freedom. Sample PDFs are shown in
-:numref:`rchiSquared` for muons and pions.
+* The *longitudinal-profile* PDF value :math:`P_{L}(\vec{x}; O, l, H)` for extrapolation ending outcome :math:`O` and outermost layer :math:`l` and for particle hypotesis :math:`H \in {\mu^{\pm}, \pi^{\pm}, K^{\pm}, e^{\pm}, p, \bar{p}, d, \bar{d}}` is sampled according to the measurement vector :math:`\vec{c}` given by: (a) the pattern of of all KLM layers touched during the extrapolation (not just the outermost one) and (b) the pattern of matched hits in the touched layers. Sample PDF for exiting tracks are shown in :numref:`LongitudinalPdfs` for muons and pions.
+|
+* The *transverse-scattering* probability density function :math:`P_{L}(\chi^2, n; D, H)`  for KLM region :math:`D` (barrel-only, endcap-only, or overlap) and particle hypotesis :math:`H` is sampled according to the measurement of :math:`\chi^{2}` from the Kalman filter and the number of degrees of freedom, which is twice the number of matched hits. The muon-hypothesis PDF is very close to the ideal :math:`\chi^2` distribution for the given number of degrees of freedom, while the the non-muon hypothesis PDFs are considerably broader for low degrees of freedom. Sample PDFs are shown in :numref:`rchiSquared` for muons and pions.
+
 
  .. _LongitudinalPdfs:
 

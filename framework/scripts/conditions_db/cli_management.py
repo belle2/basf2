@@ -135,8 +135,8 @@ def command_tag_merge(args, db=None):
                           help="Can be for numbers to limit the run range to put"
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
-        args.add_argument("-j", type=int, default=1, dest="nprocess",
-                          help="Number of concurrent processes to use for "
+        args.add_argument("-j", type=int, default=10, dest="nthreads",
+                          help="Number of concurrent threads to use for "
                           "creating payloads into the output globaltag.")
         return
 
@@ -206,7 +206,7 @@ def command_tag_merge(args, db=None):
         B2INFO(f'Now copying the {len(final)} payloads into {args.output} to create {len(table)-1} iovs ...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
         try:
-            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+            with ThreadPoolExecutor(max_workers=args.nthreads) as pool:
                 start = time.monotonic()
                 for payload, _ in enumerate(pool.map(create_iov, final), 1):
                     eta = (time.monotonic() - start) / payload * (len(final) - payload)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @cond SUPPRESS_DOXYGEN
 
 """
 <header>
@@ -242,3 +243,5 @@ if __name__ == "__main__":
     gaus_h.FillRandom("gaus", 500)
     gaus_h.Write()
     tfile.Close()
+
+# @endcond

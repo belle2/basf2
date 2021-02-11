@@ -81,6 +81,12 @@ namespace Belle2 {
       double getPropagationLen() const;
 
       /**
+       * Returns total propagation length difference between true and flipped prism
+       * @return propagation length difference (or 0 if averaging is OFF)
+       */
+      double getPropagationLenDelta() const;
+
+      /**
        * Returns unfolded position in x at virtual Detector plane.
        * If averaging is ON the return value equals to arithmetic average of true and flipped prism.
        * Reliable only if propagation status is true.

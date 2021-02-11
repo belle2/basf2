@@ -281,6 +281,9 @@ namespace Belle2 {
       double Len = m_fastRaytracer->getPropagationLen();
       double avSpeedOfLight = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
 
+      // difference of propagation times of true and fliped prism
+      double dTime = m_fastRaytracer->getPropagationLenDelta() / avSpeedOfLight;
+
       // derivatives: dt/de, dt/dx, dt/dL
       double dt_de = (D.dLen_de + Len * m_groupIndexDerivative / m_groupIndex) / avSpeedOfLight; // for chromatic
       double dt_dx =  D.dLen_dx / avSpeedOfLight; // for channel x-size
@@ -292,9 +295,9 @@ namespace Belle2 {
       const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
       double L = m_yScanner->getTrackLengthInQuartz();
 
-      // sigma squared: channel x-size, parallax, multiple scattering
-      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2)) / 12 + pow(sigmaScat, 2);
-      // sigma squared: channel x-size, parallax, multiple scattering, chromatic
+      // sigma squared: channel x-size, parallax, propagation time difference, multiple scattering
+      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2);
+      // sigma squared: adding chromatic contribution
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
 
       double yB = m_fastRaytracer->getYB();

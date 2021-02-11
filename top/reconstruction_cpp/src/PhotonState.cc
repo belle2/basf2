@@ -277,7 +277,7 @@ namespace Belle2 {
             if (len < 0 or len > s_maxLen) return;
             double ky = m_ky * win.sy + m_kz * win.sz;
             double kz = m_kz * win.sy - m_ky * win.sz;
-            func::fold(m_x + len * m_kx, prism.A, m_x, m_kx, m_nx);
+            m_x += len * m_kx;
             m_y = y;
             m_ky = ky;
             m_ny = k - prism.k0;
@@ -301,7 +301,7 @@ namespace Belle2 {
 success:
       double len = (prism.zD - m_z) / m_kz;
       if (len < 0 or len > s_maxLen) return;
-      m_x += len * m_kx;
+      func::fold(m_x + len * m_kx, prism.A, m_x, m_kx, m_nx);
       m_y += len * m_ky;
       m_z = prism.zD;
       m_propLen += len;

@@ -148,17 +148,18 @@ namespace Belle2 {
     {
       // for parametrizations see B2GM/TOP Software status, June 2020
       const double averagePDE = 1.06404889; // relative to nominal PDE
+      const double scaleFactor = 0.79;
 
       if (abs(PDGCode) == 11) { // electorns and positrons
-        return 5.30 / averagePDE;
+        return 5.30 * scaleFactor / averagePDE;
       } else if (PDGCode == -2212) { // anti-protons
         double par[] = {13.5859, -28.0625, 17.2684};
         double f = par[0] + par[1] * beta + par[2] * beta * beta;
-        return f / averagePDE;
+        return f * scaleFactor / averagePDE;
       } else { // other charged particles
         double par[] = { -8.15871, 10.0082, -1.25140, -120.225, 120.210};
         double f = exp(par[0] + par[1] * beta + par[2] * beta * beta) + exp(par[3] + par[4] * beta);
-        return f / averagePDE;
+        return f * scaleFactor / averagePDE;
       }
     }
 

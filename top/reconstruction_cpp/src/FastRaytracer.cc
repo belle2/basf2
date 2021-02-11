@@ -98,7 +98,13 @@ namespace Belle2 {
     {
       if (m_photonStates.empty()) return 0;
       if (m_extraStates.empty()) return m_photonStates.back().getPropagationLen();
-      return (m_photonStates.back().getPropagationLen() + m_extraStates.back().getPropagationLen()) / 2; //TODO:check
+      return (m_photonStates.back().getPropagationLen() + m_extraStates.back().getPropagationLen()) / 2;
+    }
+
+    double FastRaytracer::getPropagationLenDelta() const
+    {
+      if (m_photonStates.empty() or m_extraStates.empty()) return 0;
+      return (m_photonStates.back().getPropagationLen() - m_extraStates.back().getPropagationLen());
     }
 
     double FastRaytracer::getXD() const

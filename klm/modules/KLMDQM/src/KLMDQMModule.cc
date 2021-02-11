@@ -34,6 +34,10 @@ KLMDQMModule::KLMDQMModule() :
   m_bklmHit2dsZ{nullptr},
   m_BklmDigitsNumber{nullptr},
   m_KlmDigitsNumber{nullptr},
+  m_KlmDigitsAfterLERInj{nullptr},
+  m_TriggersLERInj{nullptr},
+  m_KlmDigitsAfterHERInj{nullptr},
+  m_TriggersHERInj{nullptr},
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -188,12 +192,27 @@ void KLMDQMModule::defineHisto()
                            97, -172.22, 266.22);
   m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
   m_bklmHit2dsZ->SetOption("LIVE");
+  /* Number of digits after injection */
+  /* For the histograms below, we use the same style as for other subdetectors. */
+  m_KlmDigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+                                    4000, 0, 20000);
+  m_KlmDigitsAfterLERInj->SetOption("LIVE");
+  m_TriggersLERInj = new TH1F("KLMOEccInjLER", "KLMEOccInjLER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+                              4000, 0, 20000);
+  m_TriggersLERInj->SetOption("LIVE");
+  m_KlmDigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLMOccInjHER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+                                    4000, 0, 20000);
+  m_KlmDigitsAfterHERInj->SetOption("LIVE");
+  m_TriggersHERInj = new TH1F("KLMEOccInjHER", "KLMEOccInjHER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+                              4000, 0, 20000);
+  m_TriggersHERInj->SetOption("LIVE");
   oldDirectory->cd();
 }
 
 void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM;
+  m_RawFtsws.isOptional();
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
@@ -234,6 +253,11 @@ void KLMDQMModule::beginRun()
   m_BklmDigitsNumber->Reset();
   /* BKLM 2d hits. */
   m_bklmHit2dsZ->Reset();
+  /* Injection information. */
+  m_KlmDigitsAfterLERInj->Reset();
+  m_TriggersLERInj->Reset();
+  m_KlmDigitsAfterHERInj->Reset();
+  m_TriggersHERInj->Reset();
 }
 
 void KLMDQMModule::event()
@@ -322,6 +346,21 @@ void KLMDQMModule::event()
       m_PlaneBKLMPhi->Fill(layerGlobal);
     else
       m_PlaneBKLMZ->Fill(layerGlobal);
+  }
+  /* Injection information. */
+  for (RawFTSW& rawFtsw : m_RawFtsws) {
+    unsigned int difference = rawFtsw.GetTimeSinceLastInjection(0);
+    if (difference != 0x7FFFFFFF) {
+      /* 127 MHz clock ticks to us, inexact rounding. */
+      float differenceInUs = difference / 127.;
+      if (rawFtsw.GetIsHER(0)) {
+        m_KlmDigitsAfterHERInj->Fill(differenceInUs, nDigits);
+        m_TriggersHERInj->Fill(differenceInUs);
+      } else {
+        m_KlmDigitsAfterLERInj->Fill(differenceInUs, nDigits);
+        m_TriggersLERInj->Fill(differenceInUs);
+      }
+    }
   }
 }
 

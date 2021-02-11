@@ -203,8 +203,12 @@ def command_tag_merge(args, db=None):
     if not args.dry_run:
         B2INFO(f'Now copying the payloads into {args.output}...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
-        with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
-            pool.map(create_iov, final)
+        try:
+            with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
+                list(pool.map(create_iov, final))
+        except MergeTagError:
+            B2ERROR('One of the jobs in ProcessPoolExecutor failed. Please run the command again.')
+            return 1
 
     return 0
 

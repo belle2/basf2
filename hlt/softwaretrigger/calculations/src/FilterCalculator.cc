@@ -664,9 +664,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     thetaFlatten = negativeTrack.p4Lab.Theta() * TMath::RadToDeg();
 
     // Two tracks but (exactly) 1 high energy cluster
-    if (invMass > 9. and
-        ((negativeTrack.clusterEnergySumCMS > 4.5 and positiveTrack.clusterEnergySumCMS < 1.) or
-         (negativeTrack.clusterEnergySumCMS < 1. and positiveTrack.clusterEnergySumCMS > 4.5))) {
+    const bool missNegClust = positiveTrack.clusterEnergySumCMS > 4.5 and negativeTrack.clusterEnergySumCMS < 1.;
+    const bool missPosClust = negativeTrack.clusterEnergySumCMS > 4.5 and positiveTrack.clusterEnergySumCMS < 1.;
+    if ((invMass > 9.) and (missNegClust or missPosClust)) {
       calculationResult["eeOneClust"] = 1;
     }
   }

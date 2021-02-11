@@ -124,6 +124,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -223,6 +224,7 @@ class B0toDpi_Kspi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)
@@ -260,6 +262,7 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
@@ -294,6 +297,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         loadStdPi0ForBToHadrons(path=path)
@@ -386,6 +390,7 @@ class B0toDrho_Kspi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -430,6 +435,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -477,6 +483,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)

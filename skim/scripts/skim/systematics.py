@@ -741,7 +741,7 @@ class SystematicsKshort(BaseSkim):
         ma.cutAndCopyList(
             'pi+:sel',
             'pi+:all',
-            '[[abs(dz)<5 and abs(dr)<2.0 and p>0.1] or [abs(z0) < 4 and nCDCHits>0]]',
+            '',
             path=path)
         ma.reconstructDecay(
             'K_S0:reco -> pi+:sel pi-:sel',
@@ -752,11 +752,7 @@ class SystematicsKshort(BaseSkim):
         ma.applyCuts('K_S0:reco', '0.4 < M < 0.6', path=path)
 
         ma.fillParticleList('K_S0:V0 -> pi+ pi-',
-                            '[0.30 < M < 0.70] and '
-                            '[[[abs(daughter(0, dz))<5 and abs(daughter(0,dr))<2 and daughter(0, p)>0.1]  and '
-                            '  [abs(daughter(1, dz))<5 and abs(daughter(1,dr))<2 and daughter(1, p)>0.1]] or '
-                            '[[abs(daughter(0, z0))<4 and daughter(0, nCDCHits)>0] and '
-                            '  [abs(daughter(1, z0))<4 and daughter(1, nCDCHits)>0]]]',
+                            '[0.30 < M < 0.70]',
                             True,
                             path=path)
         vertex.treeFit('K_S0:V0', 0.0, path=path)

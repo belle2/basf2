@@ -19,6 +19,8 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <iostream>
 
+#include <fstream>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -126,7 +128,6 @@ void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<Space
   m_trackCandidates.clear();
 
   for (auto& friends : m_fullFriendMap) {
-    m_SectorArray.assign(m_param_nAngleSectors * m_param_nVerticalSectors, 0);
     m_activeSectors.clear();
     m_currentSensorsHitList.clear();
 
@@ -135,6 +136,20 @@ void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<Space
     fastInterceptFinder2d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
 
     FindHoughSpaceCluster();
+
+//     if (m_breakFlag) {
+//       gnuplotoutput(m_currentSensorsHitList);
+//       uint count = 0;
+//       for (auto& hit : hits) {
+// //         B2INFO("hit " << count << ": " << std::get<2>(hit) << " " << std::get<3>(hit) << " " << std::get<4>(hit) << " on sensor: " << std::get<1>(hit));
+//         double X = std::get<0>(hit)->getPosition().X();
+//         double Y = std::get<0>(hit)->getPosition().Y();
+//         double Z = std::get<0>(hit)->getPosition().Z();
+//         B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << std::get<1>(hit));
+//         count++;
+//       }
+//       B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
+//     }
   }
 
   for (auto& trackCand : m_trackCandidates) {
@@ -240,6 +255,8 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
                                                   uint currentRecursion)
 {
   std::vector<const hitTuple*> containedHits;
+  containedHits.reserve(32);
+  std::bitset<8> layerHits; /* For layer filter */
 
   if (currentRecursion == m_param_maxRecursionLevel + 1) return;
 
@@ -256,8 +273,6 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
 
     if (left == right) continue;
 
-    const double& localLeft   = m_HSXLUT[left];
-    const double& localRight  = m_HSXLUT[right];
     const double& sinLeft     = m_HSSinValuesLUT[left];
     const double& cosLeft     = m_HSCosValuesLUT[left];
     const double& sinRight    = m_HSSinValuesLUT[right];
@@ -265,8 +280,8 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = sin((localLeft + localRight) / 2.);
-    const double cosCenter   = cos((localLeft + localRight) / 2.);
+    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
+    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];
@@ -278,7 +293,8 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
       const double& localUpperCoordinate = m_HSYLUT[lowerIndex];
       const double& localLowerCoordinate = m_HSYLUT[upperIndex];
 
-      std::vector<bool> layerHits(7); /* For layer filter */
+      // reset layerHits and containedHits
+      layerHits = 0;
       containedHits.clear();
       for (const hitTuple* hit : hits) {
 
@@ -300,8 +316,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
-          const VxdID& sensor = std::get<1>(*hit);
-          layerHits[sensor.getLayerNumber()] = true;
+          layerHits[std::get<1>(*hit).getLayerNumber()] = true;
           containedHits.emplace_back(hit);
         }
       }
@@ -311,8 +326,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
         if (currentRecursion < m_param_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          m_SectorArray[localIndexY * m_param_nAngleSectors + localIndexX] = -layerFilter(layerHits);
-          m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), containedHits});
+          m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), std::make_pair(-layerFilter(layerHits), containedHits) });
         }
       }
     }
@@ -325,21 +339,19 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
   m_clusterCount = 1;
 
   for (auto& currentCell : m_activeSectors) {
-    const uint currentIndex = currentCell.first.second * m_param_nAngleSectors + currentCell.first.first;
 
     // cell content meanings:
     // -3, -4  : active sector, not yet visited
     // 0       : non-active sector (will never be visited, only checked)
     // 1,2,3...: index of the clusters
-    if (m_SectorArray[currentIndex] > -1) continue;
+    if (currentCell.second.first > -1) continue;
 
     m_clusterInitialPosition = std::make_pair(currentCell.first.first, currentCell.first.second);
-//     m_clusterCoG = std::make_pair(currentCell.first.first, currentCell.first.second);
     m_clusterSize = 1;
-    m_SectorArray[currentIndex] = m_clusterCount;
+    currentCell.second.first = m_clusterCount;
 
     m_currentTrackCandidate.clear();
-    for (auto& hit : currentCell.second) {
+    for (auto& hit : currentCell.second.second) {
       m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
     }
 
@@ -347,10 +359,13 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     DepthFirstSearch(currentCell.first.first, currentCell.first.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
-//       double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_param_minimumX;
-//       double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
+//       if (m_currentTrackCandidate.size() > 30) {
+//         m_breakFlag = true;
+//         gnuplotoutput(m_currentTrackCandidate);
+//       }
+      m_currentTrackCandidate.clear();
     }
     m_clusterCount++;
   }
@@ -374,15 +389,15 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
       if (currentIndexX < m_param_nAngleSectors and currentIndexY < m_param_nVerticalSectors) {
 
-        if (m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_param_MaximumHSClusterSize*/) {
-          // Only continue searching if the current cluster is smaller than the maximum cluster size
-          m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] = m_clusterCount;
-//           m_clusterCoG = std::make_pair(m_clusterCoG.first + currentIndexX, m_clusterCoG.second + currentIndexY);
+        auto activeSector = m_activeSectors.find({currentIndexX, currentIndexY});
+        // Only continue searching if the current cluster is smaller than the maximum cluster size
+        if (activeSector != m_activeSectors.end() and activeSector->second.first < 0 /*and m_clusterSize < m_param_MaximumHSClusterSize*/) {
+          activeSector->second.first = m_clusterCount;
           m_clusterSize++;
 
           // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
           // so it's certain the key exists.
-          for (auto& hit : m_activeSectors.at({currentIndexX, currentIndexY})) {
+          for (auto& hit : activeSector->second.second) {
             if (not TrackFindingCDC::is_in(std::get<0>(*hit), m_currentTrackCandidate)) {
               m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
             }
@@ -395,4 +410,68 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
       }
     }
   }
+}
+
+
+void FastInterceptFinder2D::gnuplotoutput(const std::vector<const hitTuple*>& hits)
+{
+  std::ofstream outstream;
+  outstream.open("gnuplotlog.plt", std::ios::trunc);
+  outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
+  outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
+  outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
+  outstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
+  outstream << std::endl;
+
+  uint count = 0;
+  for (auto& hit : hits) {
+    double x = std::get<2>(*hit);
+    double y = std::get<3>(*hit);
+    VxdID id = std::get<1>(*hit);
+    int layer = id.getLayerNumber();
+    double X = std::get<0>(*hit)->X();
+    double Y = std::get<0>(*hit)->Y();
+    double Z = std::get<0>(*hit)->Z();
+
+    outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
+              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;
+    if (count < hits.size() - 1) outstream << "re";
+    count++;
+  }
+
+  outstream << std::endl << "pause -1" << std::endl;
+  outstream.close();
+}
+
+
+void FastInterceptFinder2D::gnuplotoutput(const std::vector<const SpacePoint*>& hits)
+{
+  std::ofstream outstream;
+  outstream.open("gnuplotlogSPTC.plt", std::ios::trunc);
+  outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
+  outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
+  outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
+  outstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
+  outstream << std::endl;
+
+  uint count = 0;
+  for (auto& hit : hits) {
+    double x = hit->getPosition().X();
+    double y = hit->getPosition().Y();
+    x = 2.*x / (x * x + y * y);
+    y = 2.*y / (x * x + y * y);
+    VxdID id = hit->getVxdID();
+    int layer = id.getLayerNumber();
+    double X = hit->getPosition().X();
+    double Y = hit->getPosition().Y();
+    double Z = hit->getPosition().Z();
+
+    outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
+              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;
+    if (count < hits.size() - 1) outstream << "re";
+    count++;
+  }
+
+  outstream << std::endl << "pause -1" << std::endl;
+  outstream.close();
 }

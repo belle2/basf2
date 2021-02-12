@@ -63,10 +63,10 @@ namespace Belle2 {
     void initializeSectorFriendMap();
 
     /// layer filter, checks if at least hits from 3 layers are in a set of hits
-    /// @param layer bool-vector containing information whether there as a hit in a layer
-    inline unsigned short layerFilter(std::vector<bool> layer)
+    /// @param layer bitset containing information whether there as a hit in a layer
+    inline unsigned short layerFilter(std::bitset<8>& layer)
     {
-      uint layercount = std::count(layer.begin(), layer.end(), true);
+      uint layercount = layer.count();
       return (layercount >= 3 ? layercount : 0);
     }
 
@@ -94,10 +94,10 @@ namespace Belle2 {
     uint m_param_maxRecursionLevel = 7;
 
     /// number of sectors of the Hough Space on the horizontal axis
-    uint m_param_nAngleSectors = 128;
+    uint m_param_nAngleSectors = 256;
 
     /// number of sectors of the Hough Space on the vertical axis
-    uint m_param_nVerticalSectors = 128;
+    uint m_param_nVerticalSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
     double m_param_verticalHoughSpaceSize = 0.1;
@@ -108,7 +108,7 @@ namespace Belle2 {
     double m_param_maximumX = 3.168;
 
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MinimumHSClusterSize = 3;
+    uint m_param_MinimumHSClusterSize = 6;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
     uint m_param_MaximumHSClusterSize = 100;
     /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
@@ -146,11 +146,6 @@ namespace Belle2 {
     /// x values of the Hough Space sector centers
     std::array<double, 16384> m_HSXCenterLUT = {0};
 
-    /// Vector containing only the 1D representation of active cells to speed up processing
-    /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
-    /// The value at each position will be positive with the cluster number assigned to it after cluster finding
-    std::vector<int> m_SectorArray;
-
     /// this sorting makes sure the clusters can be searched from bottom left of the HS to top right
     /// normally, a C++ array looks like a matrix:
     /// (0   , 0) ... (maxX, 0   )
@@ -169,9 +164,13 @@ namespace Belle2 {
       bool operator()(const std::pair<uint, uint>& lhs, const std::pair<uint, uint>& rhs) const
       {return ((int)rhs.second - (int)lhs.second) * 16384 < (int)rhs.first - (int)lhs.first;}
     };
+    /// TODO: improve docu
     /// Vector only containing active HS sectors, i.e. those with hits from enough layers contained in them.
     /// The content are the indices of the HS cell, and the hit tuples in that cell
-    std::map<std::pair<uint, uint>, std::vector<const hitTuple*>, paircompare> m_activeSectors;
+//     /// Vector containing only the 1D representation of active cells to speed up processing
+    /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
+    /// The value at each position will be positive with the cluster number assigned to it after cluster finding
+    std::map<std::pair<uint, uint>, std::pair<int, std::vector<const hitTuple*>>, paircompare> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
@@ -188,6 +187,11 @@ namespace Belle2 {
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
     std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
+
+
+    void gnuplotoutput(const std::vector<const hitTuple*>& hits);
+    void gnuplotoutput(const std::vector<const SpacePoint*>& hits);
+    bool m_breakFlag = false;
 
   };
 }

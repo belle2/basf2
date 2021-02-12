@@ -63,10 +63,10 @@ namespace Belle2 {
     void initializeSectorFriendMap();
 
     /// layer filter, checks if at least hits from 3 layers are in a set of hits
-    /// @param layer bool-vector containing information whether there as a hit in a layer
-    inline unsigned short layerFilter(std::vector<bool> layer)
+    /// @param layer bitset containing information whether there as a hit in a layer
+    inline unsigned short layerFilter(std::bitset<8>& layer)
     {
-      uint layercount = std::count(layer.begin(), layer.end(), true);
+      uint layercount = layer.count();
       return (layercount >= 3 ? layercount : 0);
     }
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     uint m_param_maxRecursionLevel = 7;
 
     /// number of sectors of the Hough Space on the horizontal axis
-    uint m_param_nAngleSectors = 128;
+    uint m_param_nAngleSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
     double m_param_verticalHoughSpaceSize = 0.1;
@@ -102,9 +102,9 @@ namespace Belle2 {
     double m_param_maximumX = 3.168;
 
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MinimumHSClusterSize = 3;
+    uint m_param_MinimumHSClusterSize = 5;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSize = 10;
+    uint m_param_MaximumHSClusterSize = 20;
 
     // class variables
     /// HS unit size in x

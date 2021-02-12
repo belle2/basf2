@@ -213,6 +213,8 @@ void FastInterceptFinder1D::initializeSectorFriendMap()
 void FastInterceptFinder1D::fastInterceptFinder1d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint currentRecursion)
 {
   std::vector<const hitTuple*> containedHits;
+  containedHits.reserve(32);
+  std::bitset<8> layerHits; /* For layer filter */
 
   if (currentRecursion == m_param_maxRecursionLevel + 1) return;
 
@@ -227,8 +229,8 @@ void FastInterceptFinder1D::fastInterceptFinder1d(std::vector<const hitTuple*>& 
 
     if (left == right) continue;
 
-    const double& localLeft   = m_HSXLUT[left];
-    const double& localRight  = m_HSXLUT[right];
+//     const double& localLeft   = m_HSXLUT[left];
+//     const double& localRight  = m_HSXLUT[right];
     const double& sinLeft     = m_HSSinValuesLUT[left];
     const double& cosLeft     = m_HSCosValuesLUT[left];
     const double& sinRight    = m_HSSinValuesLUT[right];
@@ -236,10 +238,13 @@ void FastInterceptFinder1D::fastInterceptFinder1d(std::vector<const hitTuple*>& 
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = sin((localLeft + localRight) / 2.);
-    const double cosCenter   = cos((localLeft + localRight) / 2.);
+//     const double sinCenter   = sin((localLeft + localRight) / 2.);
+    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
+//     const double cosCenter   = cos((localLeft + localRight) / 2.);
+    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
 
-    std::vector<bool> layerHits(7); /* For layer filter */
+    // reset layerHits and containedHits
+    layerHits = 0;
     containedHits.clear();
     for (const hitTuple* hit : hits) {
 
@@ -306,6 +311,7 @@ void FastInterceptFinder1D::FindHoughSpaceCluster()
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_param_MinimumHSClusterSize /*and m_clusterSize <= m_param_MaximumHSClusterSize*/) {
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
+      m_currentTrackCandidate.clear();
     }
     m_clusterCount++;
   }

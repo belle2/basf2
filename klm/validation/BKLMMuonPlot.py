@@ -165,16 +165,6 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 210, -1, 20)
-    file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() > 2')
-    RPC_bklmdigits_tres.SetXTitle('ns')
-    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
-    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', 'Broad peak around 10 ns.'))
-    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
-    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
-    RPC_bklmdigits_tres.Write()
-
     timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
@@ -183,16 +173,6 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('Contact', contact))
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
-
-    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 500, -15, 35)
-    file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
-    Sci_bklmdigits_tres.SetXTitle('ns')
-    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
-    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Check', '.'))
-    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
-    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
-    Sci_bklmdigits_tres.Write()
 
     timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 150, 0, 15.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeSci', 'BKLMHit2ds.inRPC()==0')

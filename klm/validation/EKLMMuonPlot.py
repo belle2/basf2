@@ -32,18 +32,6 @@ functions.Add(TNamed('Check', 'No bias.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-eklm_digits_tres = ROOT.TH1F('eklm_digits_tres',
-                             'KLMDigits time resolution in EKLM', 500, -30, 70)
-eklm_digits_tres.SetXTitle('ns')
-eklm_digits_tres.SetYTitle('Events')
-tree.Draw('KLMDigits.m_Time-KLMDigits.m_MCTime>>eklm_digits_tres',
-          'KLMDigits.getSubdetector()==2')
-functions = eklm_digits_tres.GetListOfFunctions()
-functions.Add(TNamed('Description', 'KLMDigits time resolution in EKLM'))
-functions.Add(TNamed('Check', 'A broad peak aroun -20 ns and a narrow peak around 45 ns.'))
-functions.Add(TNamed('Contact', contact))
-functions.Add(TNamed('MetaOptions', 'shifter'))
-
 section = ROOT.TH1F('Forward', 'Section for EKLMHit2ds', 2, 0.5, 2.5)
 section.GetXaxis().SetTitle('1=backward  2=forward')
 section.GetYaxis().SetTitle('Events')
@@ -110,7 +98,6 @@ functions.Add(TNamed('MetaOptions', 'expert'))
 
 output_file.cd()
 h2dtres.Write()
-eklm_digits_tres.Write()
 section.Write()
 sector.Write()
 layer.Write()

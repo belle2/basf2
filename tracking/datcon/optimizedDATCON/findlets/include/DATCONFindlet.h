@@ -13,7 +13,6 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
-#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder1D.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
 
@@ -76,9 +75,6 @@ namespace Belle2 {
     /// Hough Space intercept finder
     FastInterceptFinder2D m_interceptFinder;
 
-    /// Simple 1D Hough Space intercept finder
-    FastInterceptFinder1D m_interceptFinder1D;
-
 
     // container to share data between findlets
 
@@ -93,10 +89,6 @@ namespace Belle2 {
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.
     std::vector<SpacePointTrackCand> m_trackCandidates;
-
-    /// Parameter to switch between the 1D and 2D intercept finder options
-    /// Instead two findlets could be created that would only differ in the intercept finder findlet
-    bool m_param_use1DInterceptFinder = false;
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name

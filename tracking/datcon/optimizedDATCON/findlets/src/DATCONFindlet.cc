@@ -23,7 +23,6 @@ DATCONFindlet::DATCONFindlet()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
   addProcessingSignalListener(&m_interceptFinder);
-  addProcessingSignalListener(&m_interceptFinder1D);
 
   initializeHists();
 
@@ -33,14 +32,8 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "use1DInterceptFinder"),
-                                m_param_use1DInterceptFinder,
-                                "Set to true to use 1D intercept finder, else false.",
-                                m_param_use1DInterceptFinder);
-
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
-  m_interceptFinder1D.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simpleInterceptFinder"));
 }
 
 // void DATCONFindlet::initialize()
@@ -71,11 +64,7 @@ void DATCONFindlet::apply()
   m_spacePointLoaderAndPreparer.apply(m_hits);
   B2DEBUG(29, "m_hits.size(): " << m_hits.size());
 
-  if (m_param_use1DInterceptFinder) {
-    m_interceptFinder1D.apply(m_hits, m_trackCandidates);
-  } else {
-    m_interceptFinder.apply(m_hits, m_trackCandidates);
-  }
+  m_interceptFinder.apply(m_hits, m_trackCandidates);
   B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());
   analyseSPTCs();
 }

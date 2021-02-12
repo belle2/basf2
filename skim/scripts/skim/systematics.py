@@ -738,13 +738,8 @@ class SystematicsKshort(BaseSkim):
 
     def build_lists(self, path):
 
-        ma.cutAndCopyList(
-            'pi+:sel',
-            'pi+:all',
-            '',
-            path=path)
         ma.reconstructDecay(
-            'K_S0:reco -> pi+:sel pi-:sel',
+            'K_S0:reco -> pi+:all pi-:all',
             '[0.30 < M < 0.70]',
             path=path)
 

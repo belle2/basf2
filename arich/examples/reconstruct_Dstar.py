@@ -28,7 +28,10 @@ end_run = argvs[3]
 # Set the global log level
 # set_log_level(LogLevel.INFO)
 
-b2.use_central_database('data_reprocessing_proc9')
+# set specific database tag
+# b2.conditions.override_globaltags(["tagname"])
+# use local database
+# b2.conditions.testing_payloads = ["localdb/database.txt"]
 
 main_path = b2.create_path()
 

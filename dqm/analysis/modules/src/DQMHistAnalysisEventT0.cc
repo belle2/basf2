@@ -139,6 +139,7 @@ void DQMHistAnalysisEventT0Module::event()
   if (m_printCanvas)
     m_cMumuECLTRG->Print(Form("c_%s.pdf", tag.Data()));
 
+
   // --- CDCTRG ---
 
   //find TOP EventT0 Hadrons CDCTRG histogram and process it
@@ -221,13 +222,15 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h, TF1* fitf, TString t
 {
 
   if (h == NULL) {
-    B2WARNING("h == NULL");
-    return false;
+    B2DEBUG(50, "h == NULL");
+    m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
+    return  false;
   }
 
   int nToFit = h->GetEntries();// - h->GetBinContent(0) - h->GetBinContent(h->GetNbinsX()+1);
   if (nToFit < m_nEntriesMin) {
-    B2WARNING("not enough entries");
+    B2DEBUG(50, "not enough entries");
+    m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return false;
   }
 
@@ -236,7 +239,8 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h, TF1* fitf, TString t
   h->Scale(1. / h->GetEntries());
 
   if (h->Fit(fitf, "SR+") != 0) {
-    B2WARNING("failed fit");
+    B2DEBUG(50, "failed fit");
+    m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return false;
   }
 
@@ -259,18 +263,13 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h, TF1* fitf, TString t
   g2->SetLineStyle(kDashed);
   g2->SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
 
-  m_monObj->setVariable(Form("N_%s", tag.Data()), h->GetEntries());
-  m_monObj->setVariable(Form("f_%s", tag.Data()), par[1]);
-  m_monObj->setVariable(Form("mean1_%s", tag.Data()), par[2]);
-  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), par[3]);
-  m_monObj->setVariable(Form("mean2_%s", tag.Data()), par[4]);
-  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), par[5]);
-  m_monObj->setVariable(Form("dN_%s", tag.Data()), parErr[0]);
-  m_monObj->setVariable(Form("df_%s", tag.Data()), parErr[1]);
-  m_monObj->setVariable(Form("dmean1_%s", tag.Data()), parErr[2]);
-  m_monObj->setVariable(Form("dsigma1_%s", tag.Data()), parErr[3]);
-  m_monObj->setVariable(Form("dmean2_%s", tag.Data()), parErr[4]);
-  m_monObj->setVariable(Form("dsigma2_%s", tag.Data()), parErr[5]);
+  m_monObj->setVariable(Form("fit_%s", tag.Data()), 1);
+  m_monObj->setVariable(Form("N_%s", tag.Data()), h->GetEntries(), TMath::Sqrt(h->GetEntries()));
+  m_monObj->setVariable(Form("f_%s", tag.Data()), par[1], parErr[1]);
+  m_monObj->setVariable(Form("mean1_%s", tag.Data()), par[2], parErr[2]);
+  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), par[3], parErr[3]);
+  m_monObj->setVariable(Form("mean2_%s", tag.Data()), par[4], parErr[4]);
+  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), par[5], parErr[5]);
 
   h->Draw();
   fitf->Draw("same");
@@ -280,3 +279,4 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h, TF1* fitf, TString t
   return true;
 
 }
+

@@ -21,9 +21,14 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
 #include <vector>
+
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TFile.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -51,7 +56,18 @@ namespace Belle2 {
     /// Clear the object pools
     void beginEvent() override;
 
+    /// Write ROOT file and terminate.
+    /// Will be deleted when ROOT stuff is deleted.
+    void terminate() override;
+
   private:
+
+    /// Initialize ROOT histograms that are for debugging.
+    /// Will be deleted when ROOT stuff is deleted.
+    void initializeHists();
+    /// Analyze track candidates.
+    void analyseSPTCs();
+
     /// Findlets:
     /// Load SVDSpacePoints and prepare them for Hough-based tracking
     /// by calculating the conformal mapped x and y values of the 3D SpacePoint
@@ -62,6 +78,7 @@ namespace Belle2 {
 
     /// Simple 1D Hough Space intercept finder
     FastInterceptFinder1D m_interceptFinder1D;
+
 
     // container to share data between findlets
 
@@ -75,12 +92,38 @@ namespace Belle2 {
 
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.
-//     std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
     std::vector<SpacePointTrackCand> m_trackCandidates;
 
     /// Parameter to switch between the 1D and 2D intercept finder options
     /// Instead two findlets could be created that would only differ in the intercept finder findlet
     bool m_param_use1DInterceptFinder = false;
 
+    /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
+    /// ROOT file name
+    TFile* m_rootFile;
+    /// see histogram name for description
+    TH1D* m_nMCParticlesPerEvent;
+    /// see histogram name for description
+    TH1D* m_nSVDSPsPerEvent;
+    /// see histogram name for description
+    TH1D* m_trackCandsPerEvent;
+    /// see histogram name for description
+    TH1D* m_DiffSPTCsMCParticlesPerEvent;
+    /// see histogram name for description
+    TH1D* m_hitsPerTrackCand;
+
+    /// see histogram name for description
+    TH2D* m_nTrackCandsvsnMCParticles2D;
+    /// see histogram name for description
+    TH2D* m_nTrackCandsvsnSVDSpacePoints2D;
+    /// see histogram name for description
+    TH2D* m_nDiffTrackCandsMCParticlesvsnSVDSpacePoints2D;
+    /// see histogram name for description
+    TH2D* m_trackCands2D;
+
+    /// StoreArrays needed for analysing and debugging during development
+    StoreArray<MCParticle> m_storeMCParticles;
+    /// StoreArrays needed for analysing and debugging during development
+    StoreArray<SpacePoint> m_storeSVDSpacePoints;
   };
 }

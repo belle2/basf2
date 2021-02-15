@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
 
+#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
@@ -123,7 +125,7 @@ void FastInterceptFinder2D::initialize()
   initializeSectorFriendMap();
 }
 
-void FastInterceptFinder2D::apply(std::vector<hitTuple>& hits, std::vector<SpacePointTrackCand>& trackCandidates)
+void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<SpacePointTrackCand>& trackCandidates)
 {
   m_trackCandidates.clear();
 
@@ -251,11 +253,11 @@ void FastInterceptFinder2D::initializeSectorFriendMap()
 }
 
 
-void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
-                                                  uint currentRecursion)
+void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<const HitDataCache*>& hits, uint xmin, uint xmax, uint ymin,
+                                                  uint ymax, uint currentRecursion)
 {
-  std::vector<const hitTuple*> containedHits;
-  containedHits.reserve(32);
+  std::vector<const HitDataCache*> containedHits;
+  containedHits.reserve(64);
   std::bitset<8> layerHits; /* For layer filter */
 
   if (currentRecursion == m_param_maxRecursionLevel + 1) return;
@@ -296,10 +298,10 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
       // reset layerHits and containedHits
       layerHits = 0;
       containedHits.clear();
-      for (const hitTuple* hit : hits) {
+      for (const HitDataCache* hit : hits) {
 
-        const double& m = std::get<2>(*hit);
-        const double& a = std::get<3>(*hit);
+        const double& m = hit->xConformal;
+        const double& a = hit->yConformal;
 
         const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
         const double derivativeyRight  = m * -sinRight  + a * cosRight;
@@ -316,7 +318,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(std::vector<const hitTuple*>& 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
-          layerHits[std::get<1>(*hit).getLayerNumber()] = true;
+          layerHits[hit->sensorID.getLayerNumber()] = true;
           containedHits.emplace_back(hit);
         }
       }
@@ -352,7 +354,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
 
     m_currentTrackCandidate.clear();
     for (auto& hit : currentCell.second.second) {
-      m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
+      m_currentTrackCandidate.emplace_back(hit->spacePoint);
     }
 
     // Check for HS sectors connected to each other which could form a cluster
@@ -398,8 +400,8 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
           // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
           // so it's certain the key exists.
           for (auto& hit : activeSector->second.second) {
-            if (not TrackFindingCDC::is_in(std::get<0>(*hit), m_currentTrackCandidate)) {
-              m_currentTrackCandidate.emplace_back(std::get<0>(*hit));
+            if (not TrackFindingCDC::is_in(hit->spacePoint, m_currentTrackCandidate)) {
+              m_currentTrackCandidate.emplace_back(hit->spacePoint);
             }
           }
 
@@ -413,7 +415,7 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 }
 
 
-void FastInterceptFinder2D::gnuplotoutput(const std::vector<const hitTuple*>& hits)
+void FastInterceptFinder2D::gnuplotoutput(const std::vector<const HitDataCache*>& hits)
 {
   std::ofstream outstream;
   outstream.open("gnuplotlog.plt", std::ios::trunc);
@@ -425,13 +427,13 @@ void FastInterceptFinder2D::gnuplotoutput(const std::vector<const hitTuple*>& hi
 
   uint count = 0;
   for (auto& hit : hits) {
-    double x = std::get<2>(*hit);
-    double y = std::get<3>(*hit);
-    VxdID id = std::get<1>(*hit);
+    double x = hit->x;
+    double y = hit->y;
+    VxdID id = hit->sensorID;
     int layer = id.getLayerNumber();
-    double X = std::get<0>(*hit)->X();
-    double Y = std::get<0>(*hit)->Y();
-    double Z = std::get<0>(*hit)->Z();
+    double X = hit->spacePoint->X();
+    double Y = hit->spacePoint->Y();
+    double Z = hit->spacePoint->Z();
 
     outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
               " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;

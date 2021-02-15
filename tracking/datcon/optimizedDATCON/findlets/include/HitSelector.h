@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -20,25 +22,23 @@ namespace Belle2 {
   /**
    * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
    */
-  class HitSelector : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, VxdID, const std::tuple<const SpacePoint*, const VxdID, double, double, double>*> {
-
-    typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
+  class HitSelector : public TrackFindingCDC::Findlet<HitDataCache, VxdID, const HitDataCache*> {
 
   public:
     /// Load the hits in a sensor friend list for a given L6 sensor from hits and store them in selectedHits, which then are used for the Hough trafo and intercept finding
-    void apply(std::vector<hitTuple>& hits, std::vector<VxdID>& friendSensorList, std::vector<const hitTuple*>& selectedHits) override
+    void apply(std::vector<HitDataCache>& hits, std::vector<VxdID>& friendSensorList,
+               std::vector<const HitDataCache*>& selectedHits) override
     {
       const unsigned short sensorInLayerSixLadder = friendSensorList.back().getSensorNumber();
 
       for (auto& hit : hits) {
-        const VxdID& currentHitSensorID = std::get<1>(hit);
+        const VxdID& currentHitSensorID = hit.sensorID;
 
         if (std::find(friendSensorList.begin(), friendSensorList.end(), currentHitSensorID) == friendSensorList.end()) {
           continue;
         }
         const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
-        const double hitZPosition = std::get<4>(hit);
+        const double hitZPosition = hit.z;
 
         // The hitZPosition cuts are based on simple geometrical calculations.
         // Take the gap between two L6 sensors, draw a straight line to the origin, check the intercepts with the other layers,

@@ -20,6 +20,7 @@ namespace Belle2 {
   class SpacePoint;
   class SpacePointTrackCand;
   class VxdID;
+  class HitDataCache;
 
   class ModuleParamList;
 
@@ -30,15 +31,11 @@ namespace Belle2 {
    * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
    * and stored in the output vector.
    */
-  class FastInterceptFinder2D : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, SpacePointTrackCand> {
+  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitDataCache, SpacePointTrackCand> {
     /// Parent class
-    using Super =
-      TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>, SpacePointTrackCand>;
+    using Super = TrackFindingCDC::Findlet<HitDataCache, SpacePointTrackCand>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
-
-    typedef std::tuple<const SpacePoint*, const VxdID, double, double, double> hitTuple;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -51,7 +48,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create track candidates for further processing like hit filtering and fitting
-    void apply(std::vector<hitTuple>& hits, std::vector<SpacePointTrackCand>& trackCandidates) override;
+    void apply(std::vector<HitDataCache>& hits, std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
     // sub-findlets
@@ -78,7 +75,8 @@ namespace Belle2 {
     /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
     /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
     /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-    void fastInterceptFinder2d(std::vector<const hitTuple*>& hits, uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion);
+    void fastInterceptFinder2d(const std::vector<const HitDataCache*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
+                               uint currentRecursion);
 
     /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
     /// the DepthFirstSearch function to recursively find the clusters
@@ -126,7 +124,7 @@ namespace Belle2 {
     friendSensorMap m_fullFriendMap;
 
     /// hits that are in the acceptance region (= on friend sensors) for the current L6 senosr
-    std::vector<const hitTuple*> m_currentSensorsHitList;
+    std::vector<const HitDataCache*> m_currentSensorsHitList;
 
     /// Look-Up-Tables for values as cache to speed up calculation
     /// sine values of the Hough Space sector boarder coordinates
@@ -170,7 +168,7 @@ namespace Belle2 {
 //     /// Vector containing only the 1D representation of active cells to speed up processing
     /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
     /// The value at each position will be positive with the cluster number assigned to it after cluster finding
-    std::map<std::pair<uint, uint>, std::pair<int, std::vector<const hitTuple*>>, paircompare> m_activeSectors;
+    std::map<std::pair<uint, uint>, std::pair<int, std::vector<const HitDataCache*>>, paircompare> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
@@ -188,9 +186,11 @@ namespace Belle2 {
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
     std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
 
-
-    void gnuplotoutput(const std::vector<const hitTuple*>& hits);
+    /// save debug information for checking sinosoidal lines in gnuplot
+    void gnuplotoutput(const std::vector<const HitDataCache*>& hits);
+    /// save debug information for checking sinosoidal lines in gnuplot
     void gnuplotoutput(const std::vector<const SpacePoint*>& hits);
+    /// flag to indicate when to stop because of high occupancy
     bool m_breakFlag = false;
 
   };

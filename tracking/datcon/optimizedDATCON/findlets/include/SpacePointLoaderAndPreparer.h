@@ -12,14 +12,14 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <framework/geometry/B2Vector3.h>
+
 #include <string>
 #include <vector>
-#include <tuple>
 
 namespace Belle2 {
-  class SpacePoint;
-  class VxdID;
-
   class ModuleParamList;
 
   /**
@@ -27,10 +27,9 @@ namespace Belle2 {
    * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
    * of coordinates for finding track candidates in r-phi and r-z.
    */
-  class SpacePointLoaderAndPreparer : public
-    TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>> {
+  class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<HitDataCache> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::tuple<const SpacePoint*, const VxdID, double, double, double>>;
+    using Super = TrackFindingCDC::Findlet<HitDataCache>;
 
   public:
     /// Load clusters and prepare them for intercept finding
@@ -42,9 +41,18 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load the SVD SpacePoints and create a tuple containing a pointer to each SpacePoint, and its VxdID,
-    /// conformal transformed x and y coordinates (x'=2x/(x^2+y^2), y'=2y/(x^2+y^2)) and its z coordinate as cache
-    void apply(std::vector<std::tuple<const SpacePoint*, const VxdID, double, double, double>>& hits) override;
+    /// Load the SVD SpacePoints and create a HitDataCache object for each hit
+    void apply(std::vector<HitDataCache>& hits) override
+    {
+      if (m_storeSpacePoints.getEntries() == 0) return;
+
+      for (auto& spacePoint : m_storeSpacePoints) {
+        const B2Vector3D& hitPos = spacePoint.getPosition();
+        const double hitRadiusSquared = hitPos.Perp() * hitPos.Perp();
+        hits.emplace_back(&spacePoint, spacePoint.getVxdID(), hitPos.X(), hitPos.Y(), hitPos.Z(),
+                          2.*hitPos.X() / hitRadiusSquared, 2.*hitPos.Y() / hitRadiusSquared);
+      }
+    };
 
   private:
     // Parameters

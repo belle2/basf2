@@ -58,15 +58,19 @@ void ECLDQMInjectionModule::defineHisto()
   hEBurstsAfterInjHER = new TH1F("ECLEBurstsInjHER", "ECLEBurstsInjHER/Time;Time in #mus;Triggers/Time (1 #mus bins)", 20000, 0,
                                  20000);
   hVetoAfterInjLER = new TH2F("ECLVetoAfterInjLER",
-                              "ECL Hits for LER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+                              "ECL Hits for LER veto tuning (E > 20 MeV);"
+                              "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hVetoAfterInjHER = new TH2F("ECLVetoAfterInjHER",
-                              "ECL Hits for HER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+                              "ECL Hits for HER veto tuning (E > 20 MeV);"
+                              "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
-                             "ECL Occupancy after LER injection; Time since last injection in #mus;Occupancy (Nhits/8736) [%]", 100, 0, 20000, 98, 2, 100);
+                             "ECL Occupancy after LER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
+                             100, 0, 20000, 98, 2, 100);
   hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
-                             "ECL Occupancy after HER injection; Time since last injection in #mus;Occupancy (Nhits/8736) [%]", 100, 0, 20000, 98, 2, 100);
+                             "ECL Occupancy after HER injection (E > 1 MeV); Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
+                             100, 0, 20000, 98, 2, 100);
 
   // cd back to root directory
   oldDir->cd();

@@ -24,7 +24,7 @@ namespace Belle2 {
       genfit::SharedPlanePtr sensorPlaneSptr(new genfit::DetPlane(centerP, normalV));
 
       // genfit track and measured state on plane
-      genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+      const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
       auto statePtr = std::make_shared<TrackState>();
 
       try {

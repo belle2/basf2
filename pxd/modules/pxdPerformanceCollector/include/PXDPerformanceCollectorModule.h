@@ -53,7 +53,15 @@ namespace Belle2 {
     void collect() override final;
     void startRun() override final;
 
+    /**
+     * Collect info on track level
+     * @param track the track struct defined in PXD2TrackEvent
+     */
     void collectFromTrack(const PXD2TrackEvent::baseType& track);
+    /**
+     * Collect info for impact parameter study on event level
+     * @param event PXD2TrackEvent
+     */
     void collectDeltaIP(const PXD2TrackEvent& event);
 
   private:

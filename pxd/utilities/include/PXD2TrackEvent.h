@@ -28,6 +28,6 @@ namespace Belle2 {
    */
   class PXD2TrackEvent : public PXD2TrackBase<Track_t >  {
 
-    ClassDef(PXD2TrackEvent, 1);
+    ClassDef(PXD2TrackEvent, 1)
   };
 } // end namespace Belle2

@@ -299,17 +299,20 @@ void ECLDQMModule::event()
   for (auto& value : ecltot) value = 0;
   for (auto& value : nhits) value = 0;
 
+  m_iEvent = -1;
   if (m_eventmetadata.isValid()) {
-    m_iEvent = m_eventmetadata->getEvent();
-    h_evtot->Fill(0);
-    for (const auto& id : m_WaveformOption) {
-      if (id == "logic" && m_iEvent % 1000 == 999) h_evtot_logic->Fill(0);
-      if (id == "rand" && m_l1Trigger.isValid() &&
-          m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
-      if (id == "dphy" && m_l1Trigger.isValid() &&
-          m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
+    if (m_eventmetadata->getErrorFlag() != 0x10) {
+      m_iEvent = m_eventmetadata->getEvent();
+      h_evtot->Fill(0);
+      for (const auto& id : m_WaveformOption) {
+        if (id == "logic" && m_iEvent % 1000 == 999) h_evtot_logic->Fill(0);
+        if (id == "rand" && m_l1Trigger.isValid() &&
+            m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
+        if (id == "dphy" && m_l1Trigger.isValid() &&
+            m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
+      }
     }
-  } else m_iEvent = -1;
+  }
 
   for (auto& aECLDigit : m_ECLDigits) {
     int i = aECLDigit.getCellId() - 1;

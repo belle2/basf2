@@ -263,12 +263,12 @@ void DQMHistInjectionModule::event()
   //ECL
   m_histogramDirectoryName = "ECLINJ";
 
-  locationHits = "ECLOccInjLER";
+  locationHits = "ECLHitsInjLER";
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
   Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEOccInjLER";
+  locationTriggers = "ECLEHitsInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
@@ -288,12 +288,12 @@ void DQMHistInjectionModule::event()
   m_cInjectionLERECL->cd(0);
   m_hInjectionLERECL->Draw("hist");
 
-  locationHits = "ECLOccInjHER";
+  locationHits = "ECLHitsInjHER";
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
   Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEOccInjHER";
+  locationTriggers = "ECLEHitsInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }

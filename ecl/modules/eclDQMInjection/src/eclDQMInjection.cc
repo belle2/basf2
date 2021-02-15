@@ -47,10 +47,10 @@ void ECLDQMInjectionModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
 
-  hOccAfterInjLER  = new TH1F("ECLOccInjLER", "ECLOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  hOccAfterInjHER  = new TH1F("ECLOccInjHER", "ECLOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  hEOccAfterInjLER  = new TH1F("ECLEOccInjLER", "ECLEOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
-  hEOccAfterInjHER  = new TH1F("ECLEOccInjHER", "ECLEOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hHitsAfterInjLER  = new TH1F("ECLHitsInjLER", "ECLHitsInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hHitsAfterInjHER  = new TH1F("ECLHitsInjHER", "ECLHitsInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+  hEHitsAfterInjLER  = new TH1F("ECLEHitsInjLER", "ECLEHitsInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
+  hEHitsAfterInjHER  = new TH1F("ECLEHitsInjHER", "ECLEHitsInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
   hBurstsAfterInjLER = new TH1F("ECLBurstsInjLER", "ECLBurstsInjLER/Time;Time in #mus;Count/Time (1 #mus bins)", 20000, 0, 20000);
   hBurstsAfterInjHER = new TH1F("ECLBurstsInjHER", "ECLBurstsInjHER/Time;Time in #mus;Count/Time (1 #mus bins)", 20000, 0, 20000);
   hEBurstsAfterInjLER = new TH1F("ECLEBurstsInjLER", "ECLEBurstsInjLER/Time;Time in #mus;Triggers/Time (1 #mus bins)", 20000, 0,
@@ -63,6 +63,10 @@ void ECLDQMInjectionModule::defineHisto()
   hVetoAfterInjHER = new TH2F("ECLVetoAfterInjHER",
                               "ECL Hits for HER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
+  hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
+                             "ECL Occupancy after LER injection; Time since last injection in #mus;Occupancy (Nhits/8736) [%]", 100, 0, 20000, 98, 2, 100);
+  hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
+                             "ECL Occupancy after HER injection; Time since last injection in #mus;Occupancy (Nhits/8736) [%]", 100, 0, 20000, 98, 2, 100);
 
   // cd back to root directory
   oldDir->cd();
@@ -85,16 +89,18 @@ void ECLDQMInjectionModule::initialize()
 void ECLDQMInjectionModule::beginRun()
 {
   // Assume that everthing is non-yero ;-)
-  hOccAfterInjLER->Reset();
-  hOccAfterInjHER->Reset();
-  hEOccAfterInjLER->Reset();
-  hEOccAfterInjHER->Reset();
+  hHitsAfterInjLER->Reset();
+  hHitsAfterInjHER->Reset();
+  hEHitsAfterInjLER->Reset();
+  hEHitsAfterInjHER->Reset();
   hBurstsAfterInjLER->Reset();
   hBurstsAfterInjHER->Reset();
   hEBurstsAfterInjLER->Reset();
   hEBurstsAfterInjHER->Reset();
   hVetoAfterInjLER->Reset();
   hVetoAfterInjHER->Reset();
+  hOccAfterInjHER->Reset();
+  hOccAfterInjLER->Reset();
 }
 
 void ECLDQMInjectionModule::event()
@@ -128,8 +134,10 @@ void ECLDQMInjectionModule::event()
   }
 
   unsigned int ECLDigitsAboveThr = 0; // Threshold is set to 20 MeV
+  unsigned int ECLDigitsAboveThr1MeV = 0;
   for (auto& aECLDigit : m_storeHits) {
     if (aECLDigit.getAmp() > m_ECLThresholdforVetoTuning) ECLDigitsAboveThr += 1;
+    if (aECLDigit.getAmp() > 20) ECLDigitsAboveThr1MeV += 1;
   }
 
   for (auto& it : m_rawTTD) {
@@ -144,17 +152,19 @@ void ECLDQMInjectionModule::event()
       unsigned int all = m_storeHits.getEntries();
       float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
-        hOccAfterInjHER->Fill(diff2, all);
-        hEOccAfterInjHER->Fill(diff2);
+        hHitsAfterInjHER->Fill(diff2, all);
+        hEHitsAfterInjHER->Fill(diff2);
         hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjHER->Fill(diff2);
         hVetoAfterInjHER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
+        if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / 8736.*100.);
       } else {
-        hOccAfterInjLER->Fill(diff2, all);
-        hEOccAfterInjLER->Fill(diff2);
+        hHitsAfterInjLER->Fill(diff2, all);
+        hEHitsAfterInjLER->Fill(diff2);
         hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjLER->Fill(diff2);
         hVetoAfterInjLER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
+        if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / 8736.*100.);
       }
     }
 

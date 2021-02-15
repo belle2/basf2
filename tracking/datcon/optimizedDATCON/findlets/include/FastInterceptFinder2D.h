@@ -31,9 +31,9 @@ namespace Belle2 {
    * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
    * and stored in the output vector.
    */
-  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitDataCache, SpacePointTrackCand> {
+  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitDataCache, std::vector<HitDataCache>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<HitDataCache, SpacePointTrackCand>;
+    using Super = TrackFindingCDC::Findlet<HitDataCache, std::vector<HitDataCache>>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
@@ -48,7 +48,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create track candidates for further processing like hit filtering and fitting
-    void apply(std::vector<HitDataCache>& hits, std::vector<SpacePointTrackCand>& trackCandidates) override;
+    void apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache>>& rawTrackCandidates) override;
 
   private:
     // sub-findlets
@@ -181,10 +181,10 @@ namespace Belle2 {
     std::pair<int, int> m_clusterCoG = std::make_pair(0, 0);
 
     /// the current track candidate
-    std::vector<const SpacePoint*> m_currentTrackCandidate;
+    std::vector<const HitDataCache*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<std::vector<const SpacePoint*>> m_trackCandidates;
+    std::vector<std::vector<const HitDataCache*>> m_trackCandidates;
 
     /// save debug information for checking sinosoidal lines in gnuplot
     void gnuplotoutput(const std::vector<const HitDataCache*>& hits);

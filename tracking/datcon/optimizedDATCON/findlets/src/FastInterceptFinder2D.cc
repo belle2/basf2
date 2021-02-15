@@ -125,7 +125,8 @@ void FastInterceptFinder2D::initialize()
   initializeSectorFriendMap();
 }
 
-void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<SpacePointTrackCand>& trackCandidates)
+
+void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
 
@@ -157,13 +158,18 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<S
   for (auto& trackCand : m_trackCandidates) {
     // sort for layer, and 2D radius in case of same layer before storing as SpacePointTrackCand
     std::sort(trackCand.begin(), trackCand.end(),
-    [](const SpacePoint * a, const SpacePoint * b) {
+    [](const HitDataCache * a, const HitDataCache * b) {
       return
-        (a->getVxdID().getLayerNumber() < b->getVxdID().getLayerNumber()) or
-        (a->getVxdID().getLayerNumber() == b->getVxdID().getLayerNumber() and a->getPosition().Perp() < b->getPosition().Perp());
+        (a->sensorID.getLayerNumber() < b->sensorID.getLayerNumber()) or
+        (a->sensorID.getLayerNumber() == b->sensorID.getLayerNumber()
+         and a->spacePoint->getPosition().Perp() < b->spacePoint->getPosition().Perp());
     });
 
-    trackCandidates.emplace_back(SpacePointTrackCand(trackCand));
+    std::vector<HitDataCache> convertedTrackCand;
+    for (const HitDataCache* hit : trackCand)
+      convertedTrackCand.emplace_back(*hit);
+
+    rawTrackCandidates.emplace_back(convertedTrackCand);
   }
 
   B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());
@@ -353,8 +359,8 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     currentCell.second.first = m_clusterCount;
 
     m_currentTrackCandidate.clear();
-    for (auto& hit : currentCell.second.second) {
-      m_currentTrackCandidate.emplace_back(hit->spacePoint);
+    for (const HitDataCache* hit : currentCell.second.second) {
+      m_currentTrackCandidate.emplace_back(hit);
     }
 
     // Check for HS sectors connected to each other which could form a cluster
@@ -399,9 +405,9 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 
           // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
           // so it's certain the key exists.
-          for (auto& hit : activeSector->second.second) {
-            if (not TrackFindingCDC::is_in(hit->spacePoint, m_currentTrackCandidate)) {
-              m_currentTrackCandidate.emplace_back(hit->spacePoint);
+          for (const HitDataCache* hit : activeSector->second.second) {
+            if (not TrackFindingCDC::is_in(hit, m_currentTrackCandidate)) {
+              m_currentTrackCandidate.emplace_back(hit);
             }
           }
 

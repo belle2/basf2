@@ -82,6 +82,9 @@ namespace Belle2 {
     /// Vector containing the cached hit information
     std::vector<HitDataCache> m_hits;
 
+    /// Vector containint raw track candidates
+    std::vector<std::vector<HitDataCache>> m_rawTrackCandidates;
+
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.
     std::vector<SpacePointTrackCand> m_trackCandidates;
@@ -96,7 +99,7 @@ namespace Belle2 {
     /// see histogram name for description
     TH1D* m_trackCandsPerEvent;
     /// see histogram name for description
-    TH1D* m_DiffSPTCsMCParticlesPerEvent;
+    TH1D* m_DiffTrackCandsMCParticlesPerEvent;
     /// see histogram name for description
     TH1D* m_hitsPerTrackCand;
 

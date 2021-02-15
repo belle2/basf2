@@ -166,6 +166,7 @@ class RunningTagUpdater:
             "payloads start after first valid run": 0,
             "payloads end after first valid run": 0
         }
+        earliest_valid_from = (0, 0)
         for p in payloads:
             iov = IntervalOfValidity(p.iov)
             # starting of a validity is simple ... it needs to be below the first valid run
@@ -178,6 +179,14 @@ class RunningTagUpdater:
                 B2ERROR(f"Payload in running tag '{tagname}' ends after first valid run",
                         payload=p.name, iov=p.iov, **{"first valid run": self._valid_from})
                 errors["payloads end after first valid run"] += 1
+
+            earliest_valid_from = max(earliest_valid_from, iov.first)
+            if iov.final != IntervalOfValidity.always().final:
+                earliest_valid_from = max(earliest_valid_from, iov.final)
+
+        if self._dry_run:
+            B2INFO("Earliest possible update of the running tag would be exp "
+                   f"{earliest_valid_from[0]}, run {earliest_valid_from[1] + 1}")
 
         # show errors if we have any ...
         if any(errors.values()):

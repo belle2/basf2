@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ######################################################
 # This steering file shows how to use the statistics
@@ -89,7 +88,7 @@ print('Total processing time: %.3f ms' % (framework_total / 1e6))
 # Calculate estimate for framework overhead
 modules_total = sum(e.time_sum(statistics.TOTAL) for e in statistics.modules)
 overhead = framework_total - modules_total
-print('Framework overhead: %.3f ms (%.2f %%)' % (
+print('Framework overhead: {:.3f} ms ({:.2f} %)'.format(
     overhead / 1e6,
     100 * overhead / framework_total,
 ))

@@ -91,12 +91,12 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
     for plist in track_lists:
         for rank in range(5):
             for var in track_specific_variables:
-                variables.append('{}_{}{}'.format(var, plist, rank))
+                variables.append(f'{var}_{plist}{rank}')
 
     for plist in cluster_lists:
         for rank in range(10):
             for var in cluster_specific_variables:
-                variables.append('{}_{}{}'.format(var, plist, rank))
+                variables.append(f'{var}_{plist}{rank}')
 
     if use_continuum_features:
         variables += contVar

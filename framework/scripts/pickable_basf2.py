@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Pickable basf2
@@ -24,7 +23,7 @@ sys.modules['original_basf2'] = sys.modules['basf2']  # noqa
 import original_basf2
 
 
-class BASF2StateRecorder(object):
+class BASF2StateRecorder:
     """ Drop-in replacement of the basf2 module, which keeps track of all functions calls """
 
     def __getattr__(self, name):

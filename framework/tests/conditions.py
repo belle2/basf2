@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Script to make sure the conditions database interface is behaving as expected.
@@ -111,7 +110,9 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             # gt info
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
-                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+                return self.reply(
+                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
+                        gtname, self.globaltags[gtname]))
             else:
                 return self.send_error(404)
 

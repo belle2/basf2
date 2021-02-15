@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2 import B2ERROR
 from modularAnalysis import fillParticleList
@@ -181,5 +180,5 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     if custom_cuts != '':
         trackQuality = custom_cuts
     for name in _chargednames:
-        fillParticleList('%s+:%s' % (name, _mostLikelyList+suffix),
-                         'pidIsMostLikely(%s) > 0 and %s' % (args, trackQuality), True, path=path)
+        fillParticleList('{}+:{}'.format(name, _mostLikelyList+suffix),
+                         f'pidIsMostLikely({args}) > 0 and {trackQuality}', True, path=path)

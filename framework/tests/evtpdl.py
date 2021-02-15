@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Check reading and writing of evt.pdl files as well as errors when creating new particles.

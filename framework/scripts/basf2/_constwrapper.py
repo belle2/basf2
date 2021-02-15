@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Modify the PyDBObj and PyDBArray classes to return read only objects to prevent
@@ -72,7 +71,7 @@ def _make_tobject_const(obj):
 
         def proxy(self, *args):
             """raise attribute error when called"""
-            raise AttributeError("%s is readonly and method '%s' is not const" % (obj, name))
+            raise AttributeError(f"{obj} is readonly and method '{name}' is not const")
         return proxy
 
     def __setattr(self, name, value):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 basf2.pickle_path - Functions necessary to pickle and unpickle a Path

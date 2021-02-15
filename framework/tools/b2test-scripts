@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 Run basf2 framework tests of the given packages.  If no argument is given all
@@ -84,7 +83,7 @@ def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
             open(template_file, "rb").read().splitlines()[ignore_lines:],
             log.splitlines()[ignore_lines:],
             fromfile=template.encode(),
-            tofile=("std%s of 'basf2 %s'" % (logtype, name)).encode(),
+            tofile=(f"std{logtype} of 'basf2 {name}'").encode(),
             lineterm=b'',
             n=0,
             ))
@@ -118,7 +117,7 @@ def format_output(name, out, err):
 def report_test_result(result, extra, name, message):
     """ print out the result of one test"""
     result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-    print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
+    print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
 
 
 def run_test(argument):
@@ -131,7 +130,7 @@ def run_test(argument):
     elif ext == ".py":
         return run_test_py(argument)
     else:
-        print("Testfile {} with extension {} not supported".format(name, ext))
+        print(f"Testfile {name} with extension {ext} not supported")
 
 
 def run_test_ipynb(argument):
@@ -161,7 +160,7 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = "Error while executing cell: {}".format(ce)
+        message = f"Error while executing cell: {ce}"
     except TimeoutError as te:
         result = False
         message = f"{te}"
@@ -209,7 +208,7 @@ def run_test_py(argument):
             pass
         elif process.returncode != 0:
             # check for skipped test
-            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
+            skipped = re.search(br"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
             if skipped:
                 result = None
                 message = skipped.group(1).decode()
@@ -356,7 +355,7 @@ if __name__ == "__main__":
         try:
             re_filter = re.compile(options.filter)
         except Exception as e:
-            print("The --filter argument %r is not a valid regular expression: %s" % (options.filter, e))
+            print(f"The --filter argument {options.filter!r} is not a valid regular expression: {e}")
             sys.exit(1)
         all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
 

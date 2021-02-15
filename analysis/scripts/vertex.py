@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2 import register_module
 from basf2 import B2WARNING
@@ -189,7 +188,7 @@ def raveFit(
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
     # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if constraint is '':
+    if constraint == '':
         message_if = ""
     else:
         message_if = (

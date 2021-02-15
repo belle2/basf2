@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from variables.utils import create_aliases
 from variables import variables
 

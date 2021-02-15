@@ -10,7 +10,7 @@
     50660c5d4af97405 383c1a95ff621534 b78b83daff779d4a 63af5d85a64ce92e
     c3d0485d4fbd1829 e2dc541dc570e8c0 c6b79e71d605e7f5 acad7927cf4eb495
     12586191e477aef7 5321514edf23d1a0 39fc05782c5ef830 35902de3347b9b6d
-    01ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
+    1ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
 [DEBUG:200] Random Generator 'independent generator' State info:
   seed (16):
     74 68 69 73 20 69 73 20 74 68 65 20 73 65 65 64 
@@ -22,7 +22,7 @@
     50660c5d4af97405 383c1a95ff621534 b78b83daff779d4a 63af5d85a64ce92e
     c3d0485d4fbd1829 e2dc541dc570e8c0 c6b79e71d605e7f5 acad7927cf4eb495
     12586191e477aef7 5321514edf23d1a0 39fc05782c5ef830 35902de3347b9b6d
-    01ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
+    1ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
 [INFO] The random number seed is set to "this is the seed"
 [INFO] Starting event processing, random seed is set to 'this is the seed'
 [DEBUG:31] DataStore::reset(): Removing all elements from DataStore
@@ -42,7 +42,7 @@
   event info (mode=0): 
     barrier:1
   event bytes (4):
-    00 00 00 01 
+    00 00 00 1 
   state (index=0): 
     2e6eb2af7edda047 0b6c4cd9f5f7544c 7a2920bd5e12b2b4 580c92308d76b793
     61b3cfa2dbf2effb d4b7720c49b0c2ac 58e5746b1527ac54 5748458d1b9abc1a
@@ -60,7 +60,7 @@
   event info (mode=2): 
     barrier:0 EXP:291 RUN:286397204 EVT:1
   event bytes (16):
-    00 00 00 00 00 00 01 23 11 12 13 14 00 00 00 01 
+    00 00 00 00 00 00 1 23 11 12 13 14 00 00 00 1 
   state (index=0): 
     a6c72344b8a66ff7 c41cfc43b4702a6a 11637a8509209bd7 5e225207fc56c673
     5f6864fb02d208ee 2afc2cf0376bcd57 e52cbe05e8352625 d254715e3455976d
@@ -72,7 +72,7 @@
   event info (mode=1): 
     barrier:0 EXP:291 RUN:286397204
   event bytes (12):
-    00 00 00 00 00 00 01 23 11 12 13 14 
+    00 00 00 00 00 00 1 23 11 12 13 14 
   state (index=0): 
     b3f87f1944d070fc 4140971f13fcc18e 3bb84b7916fa8d0a dacd8ec2cd532f65
     9297d9636fc0c8a5 890783020be1effe f6efae34a74a2966 56e2bf1ca31d3b50
@@ -93,7 +93,7 @@
   event info (mode=1): 
     barrier:1 EXP:291 RUN:286397204
   event bytes (12):
-    00 00 00 01 00 00 01 23 11 12 13 14 
+    00 00 00 1 00 00 1 23 11 12 13 14 
   state (index=0): 
     efce3d007b9bee50 b47261de2c62246e cadc6295acc55ce9 44783fb39667bf5b
     6ed496abc24ea344 22ae3f7bc91aa012 dc08351d6c3ad7cd b17c8ca886401a79
@@ -118,9 +118,9 @@
   event info (mode=2): 
     barrier:1 EXP:291 RUN:286397204 EVT:1
   event bytes (16):
-    00 00 00 01 00 00 01 23 11 12 13 14 00 00 00 01 
+    00 00 00 1 00 00 1 23 11 12 13 14 00 00 00 1 
   state (index=0): 
-    86711dbb32583b38 0865270c2b412ca6 2890742eb52279c0 b2c1736acba3f9f5
+    86711dbb32583b38 0o865270c2b412ca6 2890742eb52279c0 b2c1736acba3f9f5
     69022acd4e968cfd e46e6f02176a5197 f3e4a66fd5a98871 92306f18948a2d37
     4e019e647e0decbc 1578e421004495ae ff39c025b44c1f73 f29cac47074845b1
     7c802877cac90914 69ae876c608b74a3 4768a3ce6d9c4e9a 13e1e597e818aa0a
@@ -137,7 +137,7 @@
   event info (mode=2): 
     barrier:0 EXP:291 RUN:286397204 EVT:2
   event bytes (16):
-    00 00 00 00 00 00 01 23 11 12 13 14 00 00 00 02 
+    00 00 00 00 00 00 1 23 11 12 13 14 00 00 00 2 
   state (index=0): 
     20baf0cd35eef78c 39a0d4f7142535a1 971757586f2d5978 823d1b35754d1ae2
     13d27f92c0898239 5e94e1e2ea7a76bf 610515aecc55a928 ff0894fa7bbaef55
@@ -156,7 +156,7 @@
   event info (mode=2): 
     barrier:1 EXP:291 RUN:286397204 EVT:2
   event bytes (16):
-    00 00 00 01 00 00 01 23 11 12 13 14 00 00 00 02 
+    00 00 00 1 00 00 1 23 11 12 13 14 00 00 00 2 
   state (index=0): 
     46153e6ede1e3bd4 4d52c46a7d4b90f8 d897d14af4fd611d 3dc0abe6d1117fa5
     b4b62ad89fd305b4 a5c12e8beebbafb7 c26802cfdcd772d4 58e8316db677f3e2
@@ -175,10 +175,10 @@
   event info (mode=2): 
     barrier:0 EXP:291 RUN:286397204 EVT:3
   event bytes (16):
-    00 00 00 00 00 00 01 23 11 12 13 14 00 00 00 03 
+    00 00 00 00 00 00 1 23 11 12 13 14 00 00 00 3 
   state (index=0): 
     5afa58db5a30ee9e b6176def2b7da7e4 97fd9cc4db7e3780 2283ec655051d431
-    6f08bdd70652bd08 09d70c2eceada0ff 305f7bcc0335e233 c90ea3f44a26b403
+    6f08bdd70652bd08 9d70c2eceada0ff 305f7bcc0335e233 c90ea3f44a26b403
     4707fd40de646da9 155e3242ed19c20b 27d15b4f5418a97e ac5fc527f9d78b40
     d525629286ccb1bd cbaeb2123ffd2d37 95c282aaa5cc2494 f7544f70d27d3777
 [INFO] EXP:      291        RUN: 286397204        EVT:        3
@@ -194,10 +194,10 @@
   event info (mode=2): 
     barrier:1 EXP:291 RUN:286397204 EVT:3
   event bytes (16):
-    00 00 00 01 00 00 01 23 11 12 13 14 00 00 00 03 
+    00 00 00 1 00 00 1 23 11 12 13 14 00 00 00 3 
   state (index=0): 
     f68e179a2d395942 2eb709845f3b281e c6aca358754515f8 e05ab3657ba1ff8d
-    a4f9a19fa4ddf247 a13dce610779e01c 007919f8d65e2a6f a757417132e346e7
+    a4f9a19fa4ddf247 a13dce610779e01c 0o07919f8d65e2a6f a757417132e346e7
     70df53c6997b3bd1 4724d5142a0737b5 7ca9ea1ae6d88d75 e17857b8d205628a
     7e1628ffc3f42ea4 b6461e3da4812708 ff26128e2a6d269a bc682760061f3b36
 [INFO] First 20 random values in test2::event()
@@ -213,7 +213,7 @@
   event info (mode=2): 
     barrier:0 EXP:564 RUN:555885348 EVT:1
   event bytes (16):
-    00 00 00 00 00 00 02 34 21 22 23 24 00 00 00 01 
+    00 00 00 00 00 00 2 34 21 22 23 24 00 00 00 1 
   state (index=0): 
     8b0ea0e12c157b1b 082e111c98b3d709 9d2930c1f1bf6a8c ddc63b570bc2530f
     ddc1622d90c92b20 287ca5324b6a1b17 bf24354af0219f87 78615b52854c98f4
@@ -225,7 +225,7 @@
   event info (mode=1): 
     barrier:-2147483648 EXP:291 RUN:286397204
   event bytes (12):
-    80 00 00 00 00 00 01 23 11 12 13 14 
+    80 00 00 00 00 00 1 23 11 12 13 14 
   state (index=0): 
     1478784b061054da d63fec13bc95849f ec16426f076a4ceb 81e0a97bfe460a14
     bb93fd2f897869c1 101fd31df2708bc7 b1220e6394187135 c33b6fb05db73e26
@@ -246,12 +246,12 @@
   event info (mode=1): 
     barrier:-2147483647 EXP:291 RUN:286397204
   event bytes (12):
-    80 00 00 01 00 00 01 23 11 12 13 14 
+    80 00 00 1 00 00 1 23 11 12 13 14 
   state (index=0): 
     6ca9c952a759bea1 d96aa207ea17808f 9dd8557c98e82a01 99e4ca8dfbf8efbd
     c937da46d3d43bcf 8987a877c92f4dc8 5bb9b6a2b147db74 b80cbbc02e92a17b
     1a8d71597a484316 3eb6e96839a2791f 184be16c69b2fd31 84d194a28432ec6c
-    06a6c1521dee73be 099969f83e1c7185 dd1b743f03a61a7d 9e7c37d8cdb8934b
+    6a6c1521dee73be 0o99969f83e1c7185 dd1b743f03a61a7d 9e7c37d8cdb8934b
 [INFO] First 20 random values in test2::endRun()
   3FEC6F303292E8D2, 3FDA5826C4DC0AC8, 3FD56512A595DD3C, 3FDFDB3923B0B12C
   3FDD4C3AEF92E0C8, 3FEB1A224CEFDB16, 3FEAD6B72E79051E, 3FE1DB63E4D6DBAA
@@ -264,10 +264,10 @@
   event info (mode=1): 
     barrier:0 EXP:564 RUN:555885348
   event bytes (12):
-    00 00 00 00 00 00 02 34 21 22 23 24 
+    00 00 00 00 00 00 2 34 21 22 23 24 
   state (index=0): 
     a6c66f5639dfdc82 1b7f99d1eba11aa7 533b1b804b58dc45 bb593036f88f456e
-    078c1f0035ed9d70 94e601baf2afc026 ca232ccfd79a74d0 2159b2ed5e226ecc
+    0o78c1f0035ed9d70 94e601baf2afc026 ca232ccfd79a74d0 2159b2ed5e226ecc
     dae8255c6498770d f24d8f527c2fcd96 e79473fc990b62db 1abe3e2bbe3d90b1
     195ab8c1a9f09bd2 a1144a311caa695f 10fb9a3587b04809 56ad7e5b03f727d5
 [INFO] ========================================================================
@@ -285,7 +285,7 @@
   event info (mode=1): 
     barrier:1 EXP:564 RUN:555885348
   event bytes (12):
-    00 00 00 01 00 00 02 34 21 22 23 24 
+    00 00 00 1 00 00 2 34 21 22 23 24 
   state (index=0): 
     63d4e3b5342e45a5 639ec7b8362f5b71 17f3427c2dd48610 174c8a5dda17d22b
     cabb081fb2b76c33 8d26c77f34b54f16 969d0bb6e62858b7 4fca8403feeb06d0
@@ -310,10 +310,10 @@
   event info (mode=2): 
     barrier:1 EXP:564 RUN:555885348 EVT:1
   event bytes (16):
-    00 00 00 01 00 00 02 34 21 22 23 24 00 00 00 01 
+    00 00 00 1 00 00 2 34 21 22 23 24 00 00 00 1 
   state (index=0): 
     3c450823d52dfd13 996096da3547c57e d105be1b7f92004b e1a0f86b5edf573b
-    d5dd1804b947fc0e a56b352c2bbc6033 08da97a01f696d91 5a70a68ce8dc8961
+    d5dd1804b947fc0e a56b352c2bbc6033 8da97a01f696d91 5a70a68ce8dc8961
     07e2a89e55e8cb77 7b2485122b4c2735 8ea280c5b8156054 fcdf9a7b1344d003
     9f8069fc7032d767 5c52b38b21b2ad7a 6f5af5b2bc18cd14 820b0f403d19b276
 [INFO] First 20 random values in test2::event()
@@ -329,7 +329,7 @@
   event info (mode=2): 
     barrier:0 EXP:564 RUN:555885348 EVT:2
   event bytes (16):
-    00 00 00 00 00 00 02 34 21 22 23 24 00 00 00 02 
+    00 00 00 00 00 00 2 34 21 22 23 24 00 00 00 2 
   state (index=0): 
     de04dff0f313fd55 6eac3f03a93f930a b1796429413b4251 72fa30a0df2ce033
     eb74ba471947c151 4cef58c70a6dc32a f954f784a3cb34f3 4d82005411f8d284
@@ -348,10 +348,10 @@
   event info (mode=2): 
     barrier:1 EXP:564 RUN:555885348 EVT:2
   event bytes (16):
-    00 00 00 01 00 00 02 34 21 22 23 24 00 00 00 02 
+    00 00 00 1 00 00 2 34 21 22 23 24 00 00 00 2 
   state (index=0): 
     6190e3883f2415cd 9b87eba9da9135b5 9f9b77d1617c2908 5deb68d009b709e9
-    05d4387985eab483 eceb49bb69044d5b ff166bc957a6a20d 82e2e68faede5e40
+    5d4387985eab483 eceb49bb69044d5b ff166bc957a6a20d 82e2e68faede5e40
     f8317a56cf94160f 34b5dcbdda42a476 4cdf6c7472abada4 81f54f69f80dae4a
     473fe2c6d3ff127e adccb26472293d31 278b2ad75a8e6f58 115f0ec349e7f590
 [INFO] First 20 random values in test2::event()
@@ -367,12 +367,12 @@
   event info (mode=2): 
     barrier:0 EXP:564 RUN:555885348 EVT:3
   event bytes (16):
-    00 00 00 00 00 00 02 34 21 22 23 24 00 00 00 03 
+    00 00 00 00 00 00 2 34 21 22 23 24 00 00 00 3 
   state (index=0): 
     fb01877908f11f74 64668714faac7abc 7fbd1cacd4c56bb3 37cd3013e160586e
     9cd2f01a19e99224 e43b211bf4483112 72c39506d75b73ac c42b1aa39b3a1347
     daab0603e2ad7188 ca1305107d5af16a a79e90784ee14a2c dca8157fb6ba966e
-    3ed81a117e8ce248 03afa828e615717c 65a733f49560de0e 85d0b589745a75c5
+    3ed81a117e8ce248 3afa828e615717c 65a733f49560de0e 85d0b589745a75c5
 [INFO] EXP:      564        RUN: 555885348        EVT:        3
 [INFO] First 20 random values in test1::event()
   3FA3B198781C66A0, 3FEFB472B38E94D2, 3FC048B73B7611B8, 3FEB08A866C7844E
@@ -386,12 +386,12 @@
   event info (mode=2): 
     barrier:1 EXP:564 RUN:555885348 EVT:3
   event bytes (16):
-    00 00 00 01 00 00 02 34 21 22 23 24 00 00 00 03 
+    00 00 00 1 00 00 2 34 21 22 23 24 00 00 00 3 
   state (index=0): 
     da433efa6c3d023f 7b868a7428ad4eb4 d5e953051a508c22 8f717cbc992cbcb3
     26dda97a3109b3d1 d0a816351b2b5e0c ea614538639a3d25 157a42f34ccd5810
-    f55bbf69578a14ef 0821c1f746c8f9f9 dc4fe476d999272b 1702de4dfa55ff56
-    5fbb8c8d68ab3df0 015099a1330c5598 f2bc4a5fb08d9b7d 0b41e9097a39a323
+    f55bbf69578a14ef 0o821c1f746c8f9f9 dc4fe476d999272b 1702de4dfa55ff56
+    5fbb8c8d68ab3df0 0o15099a1330c5598 f2bc4a5fb08d9b7d 0b41e9097a39a323
 [INFO] First 20 random values in test2::event()
   3FECB2F58013DFF6, 3FCB09F3DB86AA20, 3FE293E37D99177E, 3FEFB065E18E2CEA
   3FEBA4E8643DE628, 3FE7E8E3F2F26560, 3FE7577A96100FAE, 3FEC43C133158B5C
@@ -405,10 +405,10 @@
   event info (mode=2): 
     barrier:0 EXP:564 RUN:555885348 EVT:4
   event bytes (16):
-    00 00 00 00 00 00 02 34 21 22 23 24 00 00 00 04 
+    00 00 00 00 00 00 2 34 21 22 23 24 00 00 00 4 
   state (index=0): 
     bb041be6fc760bd0 cd60b64bb0c6ecea cc07be2e720c2ef7 35ee9d03ef59a58d
-    53710c65c22d4d0f d65781bec445f121 ff17cea6cbd12769 03d195f8e67c38cf
+    53710c65c22d4d0f d65781bec445f121 ff17cea6cbd12769 3d195f8e67c38cf
     c5211ec2040121ef 3e2b6e295e26a8ad fc25ec181403a6ba b9044b0b877336a1
     5093c089e49878c0 b17f69443bb4c6e5 1e3b79be0c38f32c a0d55268229c30b7
 [INFO] EXP:      564        RUN: 555885348        EVT:        4
@@ -424,10 +424,10 @@
   event info (mode=2): 
     barrier:1 EXP:564 RUN:555885348 EVT:4
   event bytes (16):
-    00 00 00 01 00 00 02 34 21 22 23 24 00 00 00 04 
+    00 00 00 1 00 00 2 34 21 22 23 24 00 00 00 4 
   state (index=0): 
     e38bcd823f347d41 f6bd1d5ed979c35b 614495b72eb9517e 93e5a1a0f20a66ca
-    b8d2ecd99b1c079c 8a305a6151d23164 50cf6d76f148d28a 087584c7460cad40
+    b8d2ecd99b1c079c 8a305a6151d23164 50cf6d76f148d28a 0o87584c7460cad40
     0a13402a25fec9a7 9d04f1cc8a09e691 7e21801d4584badc 0c0baaa4b0d886d1
     98738675fc397beb 2b7913b6761064b6 571c3f866da015a1 16c313d94f75c94e
 [INFO] First 20 random values in test2::event()
@@ -443,19 +443,19 @@
   event info (mode=2): 
     barrier:0 EXP:837 RUN:825373492 EVT:1
   event bytes (16):
-    00 00 00 00 00 00 03 45 31 32 33 34 00 00 00 01 
+    00 00 00 00 00 00 3 45 31 32 33 34 00 00 00 1 
   state (index=0): 
-    0364db54c6980419 167cedbd7b627fcb 9146dfc0e24da2f1 44098bdc51d2c4bb
+    0o364db54c6980419 167cedbd7b627fcb 9146dfc0e24da2f1 44098bdc51d2c4bb
     54317b0a774dd1c6 13a0e5d2e16894c2 e4e915f8bf568282 6a563d1cb4a485a6
     e53ae12f5b272c47 741376c928c9454c 8da82526c9a00ce0 b72d5c69370bd7f1
-    1f63a4f8ed4c7f17 e335af0e619f8880 093b0ce3488d73b6 efc3354492276e96
+    1f63a4f8ed4c7f17 e335af0e619f8880 0o93b0ce3488d73b6 efc3354492276e96
 [DEBUG:200] Random Generator 'independent generator' State info:
   seed (16):
     74 68 69 73 20 69 73 20 74 68 65 20 73 65 65 64 
   event info (mode=1): 
     barrier:-2147483648 EXP:564 RUN:555885348
   event bytes (12):
-    80 00 00 00 00 00 02 34 21 22 23 24 
+    80 00 00 00 00 00 2 34 21 22 23 24 
   state (index=0): 
     bd453437814a741b f855275554dd4771 920ce4416761b472 7af795401c16045f
     22a659b93408aab0 e5e29dc2f82680f5 94eeda53bbfc9abb 0e5e7748a580d873
@@ -476,7 +476,7 @@
   event info (mode=1): 
     barrier:-2147483647 EXP:564 RUN:555885348
   event bytes (12):
-    80 00 00 01 00 00 02 34 21 22 23 24 
+    80 00 00 1 00 00 2 34 21 22 23 24 
   state (index=0): 
     5a6f97b70615998c 38b4bc163507b3f2 a0f856e55a03758e 9bba27597b6999d7
     1571b06ad4443ffd d03e1b2f43810ab2 7f58e92d30b74c08 94ebcdb3a0d174d5
@@ -494,7 +494,7 @@
   event info (mode=1): 
     barrier:0 EXP:837 RUN:825373492
   event bytes (12):
-    00 00 00 00 00 00 03 45 31 32 33 34 
+    00 00 00 00 00 00 3 45 31 32 33 34 
   state (index=0): 
     a03a5d6bbcd71e87 802fa4784c61d097 494052896a25e1fe 8d44aff2d8edcda0
     e99d0210607c797f 0c0e7e6bb5f2db27 c248cc8fd1ccb78e 3afd03951759870c
@@ -515,7 +515,7 @@
   event info (mode=1): 
     barrier:1 EXP:837 RUN:825373492
   event bytes (12):
-    00 00 00 01 00 00 03 45 31 32 33 34 
+    00 00 00 1 00 00 3 45 31 32 33 34 
   state (index=0): 
     ae3e051be6ead1a7 552b86a591f668e4 3b451bf6a5ae5893 29ab9a52e2afb717
     8ef875da810eab7e e578c905408387d8 8173f1b839338e25 ab49e76bdacf718b
@@ -540,10 +540,10 @@
   event info (mode=2): 
     barrier:1 EXP:837 RUN:825373492 EVT:1
   event bytes (16):
-    00 00 00 01 00 00 03 45 31 32 33 34 00 00 00 01 
+    00 00 00 1 00 00 3 45 31 32 33 34 00 00 00 1 
   state (index=0): 
     a3d15051bb32d8c4 1a78468c01d6d0ec 9f337655151f5fcb f3b4c46907ac7afd
-    6d2ff170bc83b0b7 094beca84e7c24a0 5c40ee898e74adeb 2b38c639e8912cd7
+    6d2ff170bc83b0b7 0o94beca84e7c24a0 5c40ee898e74adeb 2b38c639e8912cd7
     d62657ee5c26ebc7 9f0bb07ff0249529 dbbbf3640f44d194 fadb5ea6674d9e25
     bcaeeafc0e487087 fd1637a3d3a32aeb e2fe1dc9e3c11f77 cce7eed2eaa5f1fb
 [INFO] First 20 random values in test2::event()
@@ -559,7 +559,7 @@
   event info (mode=2): 
     barrier:0 EXP:837 RUN:825373492 EVT:2
   event bytes (16):
-    00 00 00 00 00 00 03 45 31 32 33 34 00 00 00 02 
+    00 00 00 00 00 00 3 45 31 32 33 34 00 00 00 2 
   state (index=0): 
     b21c7530e52f35f4 8003bfbb3ce089c5 e8725094b88d695e 5f53337f6789266d
     6f1cb49ef358cc41 33345be3a3981740 60bee14fc99288a6 ad094c05a9f3a11e
@@ -578,7 +578,7 @@
   event info (mode=2): 
     barrier:1 EXP:837 RUN:825373492 EVT:2
   event bytes (16):
-    00 00 00 01 00 00 03 45 31 32 33 34 00 00 00 02 
+    00 00 00 1 00 00 3 45 31 32 33 34 00 00 00 2 
   state (index=0): 
     de7784793084796d 7fb1bca70bff1f88 2954deb46adc6046 78a1ac032bd3554e
     69b94285424b4dcb 5b00ec35244ae4a3 4c316c1b99b8f93e de87501e40850856
@@ -597,7 +597,7 @@
   event info (mode=2): 
     barrier:0 EXP:837 RUN:825373492 EVT:3
   event bytes (16):
-    00 00 00 00 00 00 03 45 31 32 33 34 00 00 00 03 
+    00 00 00 00 00 00 3 45 31 32 33 34 00 00 00 3 
   state (index=0): 
     244e81ebf83d856c 2c5aae17af1530ed cb5dd2e5568fc31d 84042c27a0edf476
     43e18a112e81b652 db05aee1fbb7ca50 f7d9f54d74e6f4a0 2120cd1d9e212913
@@ -616,7 +616,7 @@
   event info (mode=2): 
     barrier:1 EXP:837 RUN:825373492 EVT:3
   event bytes (16):
-    00 00 00 01 00 00 03 45 31 32 33 34 00 00 00 03 
+    00 00 00 1 00 00 3 45 31 32 33 34 00 00 00 3 
   state (index=0): 
     ee636023adcfc06f f0598f013719a5fb 83c57d8fae2c827e 9b0e7ebc61aa6d4f
     424e1201fc242052 588c95820d580120 ba261e43ec060dcf 6e48e3c31900e09b
@@ -635,12 +635,12 @@
   event info (mode=2): 
     barrier:0 EXP:837 RUN:825373492 EVT:4
   event bytes (16):
-    00 00 00 00 00 00 03 45 31 32 33 34 00 00 00 04 
+    00 00 00 00 00 00 3 45 31 32 33 34 00 00 00 4 
   state (index=0): 
     b97550bceaa6b770 7824506a2978e86f c77cc3d0635e0ea3 17a280b08274a4da
     6e2381e1a06bd85c 3620c15ab60f40ef 2e9d034bb8876123 b2d36affa4b33468
     836c38589f8ed31c ef54710f9846d429 bd09abe99439403f 196aa68875cbd74b
-    bd0381a6cb9143a6 f45004ab6ac8516d 0034ddb8080e0c26 e7b877877e96e918
+    bd0381a6cb9143a6 f45004ab6ac8516d 0o034ddb8080e0c26 e7b877877e96e918
 [INFO] EXP:      837        RUN: 825373492        EVT:        4
 [INFO] First 20 random values in test1::event()
   3FC42E7D91B7FC98, 3FDC509F16CD9210, 3FEF9F49FA3719B0, 3FA2F87B1CC73920
@@ -654,7 +654,7 @@
   event info (mode=2): 
     barrier:1 EXP:837 RUN:825373492 EVT:4
   event bytes (16):
-    00 00 00 01 00 00 03 45 31 32 33 34 00 00 00 04 
+    00 00 00 1 00 00 3 45 31 32 33 34 00 00 00 4 
   state (index=0): 
     789806ce75384b4d 4ae9a9dace706ddf 2621c08c556015e4 88f3df8bbe336012
     f48d5800cb5899b3 3401f6ba0f4903b1 1d09a4c17233746f 74edb7a4bdc59b74
@@ -673,7 +673,7 @@
   event info (mode=2): 
     barrier:0 EXP:837 RUN:825373492 EVT:5
   event bytes (16):
-    00 00 00 00 00 00 03 45 31 32 33 34 00 00 00 05 
+    00 00 00 00 00 00 3 45 31 32 33 34 00 00 00 5 
   state (index=0): 
     002e5d3b10a8eefb 7dcf1aa922d14cee 921734fcfc17dd5f 4091ec42f3f0f193
     105e47c24f2991cd 9d61b705083f7b7d b8dedc7a9afc8c6c 3f5d64b4d1d9d07f
@@ -692,11 +692,11 @@
   event info (mode=2): 
     barrier:1 EXP:837 RUN:825373492 EVT:5
   event bytes (16):
-    00 00 00 01 00 00 03 45 31 32 33 34 00 00 00 05 
+    00 00 00 1 00 00 3 45 31 32 33 34 00 00 00 5 
   state (index=0): 
     210d60ea4e7e80be 88a0bfe3517193e0 3b741a4d305a4c96 77bf3f2ad3d01430
     5dadf5a74fe9701c cbaf480d8595509d 49f9453296416aa0 e9b835855acf9688
-    fbe3885eb6962842 85cc4c37ed007769 4ffc42e4b4d08787 09606bf66cdc5a5b
+    fbe3885eb6962842 85cc4c37ed007769 4ffc42e4b4d08787 0o9606bf66cdc5a5b
     2e4969ddc8050a91 5eefe914f50d4dd8 43e3703b7cf60ea7 98316c2ee80a7452
 [INFO] First 20 random values in test2::event()
   3FD05C64210734A4, 3FEB407B6F4D37E6, 3FE11E78D0C0597E, 3FE0E533DF00B16E
@@ -712,7 +712,7 @@
   event info (mode=1): 
     barrier:-2147483648 EXP:837 RUN:825373492
   event bytes (12):
-    80 00 00 00 00 00 03 45 31 32 33 34 
+    80 00 00 00 00 00 3 45 31 32 33 34 
   state (index=0): 
     2cb8d6ffa3f23894 e1e9348daa63b5de 4763216820078bca 74e1b6f4dde17f7c
     ceeb3a014f03b3ac cdf9672043ef233a 9935e258c77c4463 80916d4b6a8b10ec
@@ -733,11 +733,11 @@
   event info (mode=1): 
     barrier:-2147483647 EXP:837 RUN:825373492
   event bytes (12):
-    80 00 00 01 00 00 03 45 31 32 33 34 
+    80 00 00 1 00 00 3 45 31 32 33 34 
   state (index=0): 
     7ec8f61b542f4865 6a65ab3aa8b2fcfd 1955ec16af6c3734 f8f476aef83c9776
     91bc1dfe682d42b9 ea4ff7bf636a00ca 7cbde9e5c23b9982 60e82838b9cc2365
-    069dd2e61884142a 51fb6d01af417e43 ce9040719d59bd20 b4853dd26342e52c
+    0o69dd2e61884142a 51fb6d01af417e43 ce9040719d59bd20 b4853dd26342e52c
     e31ea010948d7b1f c63f28e0b17f604b 1ab168100fc66818 547a7c70e1e1b287
 [INFO] First 20 random values in test2::endRun()
   3FE6CC121009F1B6, 3FCECBB989343DF8, 3FD6CF54F23459FC, 3FEB0188244EE358

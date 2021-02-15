@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 iov_conditional - Functions to Execute Paths Depending on Experiment Phases
 ===========================================================================

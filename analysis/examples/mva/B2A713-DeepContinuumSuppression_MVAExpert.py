@@ -167,7 +167,7 @@ for rank in range(10):
                 '{}_{}{}'.format(
                     variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
                     particlelist, variable, rank + 1))
-            variables.append('{}_{}{}'.format(variable, shortcut, rank))
+            variables.append(f'{variable}_{shortcut}{rank}')
 
 for rank in range(5):
     for shortcut, particlelist in [('TProe', 'pi+:chargedProe'), ('TPsig', 'pi+:chargedPsignal'),
@@ -177,7 +177,7 @@ for rank in range(5):
                 '{}_{}{}'.format(
                     variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
                     particlelist, variable, rank + 1))
-            variables.append('{}_{}{}'.format(variable, shortcut, rank))
+            variables.append(f'{variable}_{shortcut}{rank}')
 
 # MVAExpert
 # In this path there are already several trained weightfiles. Look at README for a short explanation

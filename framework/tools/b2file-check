@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 Check a given basf2 root file for problems. This program checks a given output root file for the following problems
@@ -126,7 +125,7 @@ def checkFile(args):
             dev = abs(size_kib_per_event / exp_size_kib - 1)
             checks_passed['eventsize_eq_expectation'] = dev < rel_uncertainty
             if not checks_passed['eventsize_eq_expectation']:
-                print('Size per event (%g kiB) differs from expectation (deviation: %g >= %g)' % (size_kib_per_event, dev, rel_uncertainty))
+                print(f'Size per event ({size_kib_per_event:g} kiB) differs from expectation (deviation: {dev:g} >= {rel_uncertainty:g})')
 
         checks_passed['all_entries_readable'] = read_tree(tree) and read_tree(persistent)
     except:

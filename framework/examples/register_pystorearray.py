@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ######################################################
 # Demonstrates using PyStoreArray and PyStoreObj to

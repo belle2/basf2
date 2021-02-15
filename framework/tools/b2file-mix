@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 This program is inteded to merge a set of basf2 output files and to make them
@@ -85,7 +84,7 @@ def open_rootfile(filename):
         except AttributeError as e:
             raise Exception("Cannot find FileMetaData")
     except Exception as e:
-        basf2.B2ERROR("{}: {}".format(filename, e))
+        basf2.B2ERROR(f"{filename}: {e}")
         return None
 
     return (events, filemeta, tfile)
@@ -118,7 +117,7 @@ if __name__ == "__main__":
     parser = create_argumentparser()
     args = parser.parse_args()
     if os.path.exists(args.output) and not args.overwrite:
-        basf2.B2FATAL("Output file '{}' already exists, please specify -f to overwrite".format(args.output))
+        basf2.B2FATAL(f"Output file '{args.output}' already exists, please specify -f to overwrite")
 
     if args.seed is not None:
         basf2.set_random_seed(args.seed)
@@ -261,8 +260,8 @@ if __name__ == "__main__":
         total_mcevents += meta.getMcEvents()
         # make it a bit easer to fine the input files again by adding them to
         # the data description. Also add the number of events
-        filemeta.setDataDescription("inputfile_{}_lfn".format(index), meta.getLfn())
-        filemeta.setDataDescription("inputfile_{}_events".format(index), str(meta.getNEvents()))
+        filemeta.setDataDescription(f"inputfile_{index}_lfn", meta.getLfn())
+        filemeta.setDataDescription(f"inputfile_{index}_events", str(meta.getNEvents()))
 
     filemeta.setMcEvents(total_mcevents)
     # we could add the order of the events to the datadescription but this is a

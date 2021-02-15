@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test the parallel processing functionality by simulating a few events
 # using 2 processes (so nothing too taxing)

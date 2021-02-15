@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Check that random numbers don't change and are consistent.
@@ -28,14 +27,14 @@ class RandomTestModule(basf2.Module):
 
     def __init__(self, name):
         """Make sure we can run in multiple processes"""
-        super(RandomTestModule, self).__init__()
+        super().__init__()
         self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         #: save a name for the module to print it
         self.name = name
 
     def get_numbers(self, name):
         """Print the first 20 random numbers"""
-        numbers = ["First 20 random values in %s::%s()" % (self.name, name)]
+        numbers = [f"First 20 random values in {self.name}::{name}()"]
         for row in range(5):
             numbers.append(", ".join(double_to_hex(gRandom.Rndm()) for i in range(4)))
         basf2.B2INFO("\n  ".join(numbers))

@@ -162,12 +162,11 @@ namespace Belle2 {
       bool operator()(const std::pair<uint, uint>& lhs, const std::pair<uint, uint>& rhs) const
       {return ((int)rhs.second - (int)lhs.second) * 16384 < (int)rhs.first - (int)lhs.first;}
     };
-    /// TODO: improve docu
-    /// Vector only containing active HS sectors, i.e. those with hits from enough layers contained in them.
-    /// The content are the indices of the HS cell, and the hit tuples in that cell
-//     /// Vector containing only the 1D representation of active cells to speed up processing
-    /// The value at each position will be (- number of hits) for an active cell after fastInterceptFinder2d or 0 for an inactive cell,
-    /// The value at each position will be positive with the cluster number assigned to it after cluster finding
+    /// Map containing only active HS sectors, i.e. those with hits from enough layers contained in them.
+    /// The keys are the indices of the HS cell, and the custom sort function above is used to sort the content.
+    /// The value is a pair consisting of the (negative) number of layers hit in a given cell,
+    /// and a vector containing the hit information of all hits that are contained in this cell.
+    /// During cluster finding the first value of the value-pair will be assigned the current cluster number.
     std::map<std::pair<uint, uint>, std::pair<int, std::vector<const HitDataCache*>>, paircompare> m_activeSectors;
 
     /// count the clusters
@@ -188,8 +187,6 @@ namespace Belle2 {
 
     /// save debug information for checking sinosoidal lines in gnuplot
     void gnuplotoutput(const std::vector<const HitDataCache*>& hits);
-    /// save debug information for checking sinosoidal lines in gnuplot
-    void gnuplotoutput(const std::vector<const SpacePoint*>& hits);
     /// flag to indicate when to stop because of high occupancy
     bool m_breakFlag = false;
 

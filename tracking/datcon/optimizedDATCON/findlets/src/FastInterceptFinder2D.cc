@@ -140,19 +140,19 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
 
     FindHoughSpaceCluster();
 
-//     if (m_breakFlag) {
-//       gnuplotoutput(m_currentSensorsHitList);
-//       uint count = 0;
-//       for (auto& hit : hits) {
-// //         B2INFO("hit " << count << ": " << std::get<2>(hit) << " " << std::get<3>(hit) << " " << std::get<4>(hit) << " on sensor: " << std::get<1>(hit));
-//         double X = std::get<0>(hit)->getPosition().X();
-//         double Y = std::get<0>(hit)->getPosition().Y();
-//         double Z = std::get<0>(hit)->getPosition().Z();
-//         B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << std::get<1>(hit));
-//         count++;
-//       }
-//       B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
-//     }
+    if (m_breakFlag) {
+      gnuplotoutput(m_currentSensorsHitList);
+      uint count = 0;
+      for (auto& hit : hits) {
+//         B2INFO("hit " << count << ": " << std::get<2>(hit) << " " << std::get<3>(hit) << " " << std::get<4>(hit) << " on sensor: " << std::get<1>(hit));
+        double X = hit.x;
+        double Y = hit.y;
+        double Z = hit.z;
+        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.sensorID);
+        count++;
+      }
+      B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
+    }
   }
 
   for (auto& trackCand : m_trackCandidates) {
@@ -369,10 +369,10 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
-//       if (m_currentTrackCandidate.size() > 30) {
+      if (m_currentTrackCandidate.size() > 100) {
 //         m_breakFlag = true;
-//         gnuplotoutput(m_currentTrackCandidate);
-//       }
+        gnuplotoutput(m_currentTrackCandidate);
+      }
       m_currentTrackCandidate.clear();
     }
     m_clusterCount++;
@@ -440,39 +440,6 @@ void FastInterceptFinder2D::gnuplotoutput(const std::vector<const HitDataCache*>
     double X = hit->spacePoint->X();
     double Y = hit->spacePoint->Y();
     double Z = hit->spacePoint->Z();
-
-    outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
-              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;
-    if (count < hits.size() - 1) outstream << "re";
-    count++;
-  }
-
-  outstream << std::endl << "pause -1" << std::endl;
-  outstream.close();
-}
-
-
-void FastInterceptFinder2D::gnuplotoutput(const std::vector<const SpacePoint*>& hits)
-{
-  std::ofstream outstream;
-  outstream.open("gnuplotlogSPTC.plt", std::ios::trunc);
-  outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
-  outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
-  outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
-  outstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
-  outstream << std::endl;
-
-  uint count = 0;
-  for (auto& hit : hits) {
-    double x = hit->getPosition().X();
-    double y = hit->getPosition().Y();
-    x = 2.*x / (x * x + y * y);
-    y = 2.*y / (x * x + y * y);
-    VxdID id = hit->getVxdID();
-    int layer = id.getLayerNumber();
-    double X = hit->getPosition().X();
-    double Y = hit->getPosition().Y();
-    double Z = hit->getPosition().Z();
 
     outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
               " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;

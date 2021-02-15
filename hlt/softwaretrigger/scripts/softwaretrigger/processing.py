@@ -208,7 +208,7 @@ def add_hlt_processing(path,
     # However, if we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
-    path.add_module('StatisticsSummary').set_name('Sum_ROI_Assembler')
+    path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,

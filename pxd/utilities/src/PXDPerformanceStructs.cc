@@ -27,7 +27,7 @@ namespace Belle2 {
       posV = pxdCluster.getV();
     }
 
-    RecoTrack* TrackPoint_t::setValues(const PXDIntercept& pxdIntercept, const std::string recoTracksName)
+    RecoTrack* TrackPoint_t::setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName)
     {
       // Construct VxdID from its baseType (unsigned short)
       VxdID sensorID(pxdIntercept.getSensorID());
@@ -66,8 +66,8 @@ namespace Belle2 {
     }
 
     RecoTrack* TrackCluster_t::setValues(const PXDIntercept& pxdIntercept,
-                                         const std::string recoTracksName,
-                                         const std::string pxdTrackClustersName)
+                                         const std::string& recoTracksName,
+                                         const std::string& pxdTrackClustersName)
     {
       auto recoTrackPtr = intersection.setValues(pxdIntercept, recoTracksName);
       // sensor ID from intersectioon

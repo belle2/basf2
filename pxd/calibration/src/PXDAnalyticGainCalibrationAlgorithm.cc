@@ -211,8 +211,8 @@ double PXDAnalyticGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigne
   double gain = 1.0; // default gain
 
   // function pointers for different strategy
-  double (*estimateGainFromHist)(TH1*);
-  double (*estimateGainFromVec)(std::vector<double>&);
+  double (*estimateGainFromHist)(TH1*) = nullptr;
+  double (*estimateGainFromVec)(std::vector<double>&) = nullptr;
   if (strategy == 0) {
     estimateGainFromVec = &CalculateMedian;
     estimateGainFromHist = &CalculateMedian;

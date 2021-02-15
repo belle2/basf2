@@ -65,7 +65,7 @@ namespace Belle2 {
        * @param recoTracksName Name of RecoTrack collection
        * @return the pointer of the related RecoTrack object.
        */
-      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string recoTracksName = "");
+      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "");
 
       float x;         /**< Global position in x. */
       float y;         /**< Global position in y. */
@@ -78,6 +78,7 @@ namespace Belle2 {
       float chargeMPV; /**< Expected charge in ADU. */
     }; // end struct TrackPoint_t
 
+    /** Struct to hold variables for track clusters. */
     struct TrackCluster_t {
       /** Default constructor */
       TrackCluster_t(): usedInTrack(false), dU(INFINITY), dV(INFINITY) {}
@@ -89,8 +90,8 @@ namespace Belle2 {
        * @return the pointer of the related RecoTrack object.
        */
       RecoTrack* setValues(const PXDIntercept& pxdIntercept,
-                           const std::string recoTracksName = "",
-                           const std::string pxdTrackClustersName = "PXDClustersFromTracks");
+                           const std::string& recoTracksName = "",
+                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks");
 
       bool usedInTrack;        /**< True if the cluster is used in tracking */
       float dU;                /**< Residual (meas - prediction) in U. */
@@ -111,6 +112,9 @@ namespace Belle2 {
       /** Update values from a RecoTrack.
        * @param recoTrack A RecoTrack object.
        * @param ip The interaction point for correcting d0 and z0
+       * @param recoTracksName Name of RecoTrack collection
+       * @param pxdInterceptsName Name of PXDIntercept collection
+       * @param pxdTrackClustersName Name of track matched PXDClusters
        */
       void setValues(const RecoTrack& recoTrack, const TVector3& ip = TVector3(0, 0, 0),
                      const std::string recoTracksName = "",
@@ -128,9 +132,10 @@ namespace Belle2 {
       unsigned short nPXDHits; /**< Number of PXD Hits. */
       unsigned short nSVDHits; /**< Number of SVD Hits. */
       unsigned short nCDCHits; /**< Number of CDC Hits. */
-      std::vector<TTrackCluster> trackClusters;
+      std::vector<TTrackCluster> trackClusters; /**< Vector of track cluster structs */
     };
 
+    /** Typedef TrackBase_t<TrackCluster_t> Track_t */
     typedef TrackBase_t<TrackCluster_t> Track_t;
 
 

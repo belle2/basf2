@@ -87,13 +87,15 @@ namespace Belle2 {
       return VxdID(id / 1000, (id % 1000) / 10, id % 10);
     }
 
+    /** Typedef TrackState (genfit::MeasuredStateOnPlane) */
+    typedef genfit::MeasuredStateOnPlane TrackState;
+
     /** Helper function to get a track state on a module
      * @param pxdSensorInfo of the PXD module intersecting with the track.
      * @param recoTrack the recoTrack to be extrapolated.
      * @param lambda the extrapolation length from track POCA.
      * @return the shared pointer of the intersection track state on the module.
      */
-    typedef genfit::MeasuredStateOnPlane TrackState;
     std::shared_ptr<TrackState> getTrackStateOnModule(const VXD::SensorInfoBase& pxdSensorInfo,
                                                       RecoTrack& recoTrack, double lambda = 0.0);
 

@@ -127,6 +127,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', loadPhotonBeamBackgroundMVA=False, path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', True, path=path)
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
@@ -140,7 +141,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     D0_Cut = '1.7 < M < 2.1'
     D0_Ch = ['K-:dstSkim pi+:dstSkim',
              'K-:dstSkim pi+:dstSkim pi0:veryLooseFit',
-             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim']
+             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim',
+             'K_S0:dstSkim pi+:dstSkim pi-:dstSkim']
 
     for chID, channel in enumerate(D0_Ch):
         chID += 1

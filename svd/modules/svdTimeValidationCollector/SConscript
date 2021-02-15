@@ -5,7 +5,6 @@ env['LIBS'] = [
     'tracking_dataobjects',
     'mdst_dataobjects',
     'vxd',
-    'svd',
     'svd_dataobjects',
     'vxd_dataobjects',
     '$ROOT_LIBS',

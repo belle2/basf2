@@ -30,12 +30,6 @@ from optparse import OptionParser
 from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
-b2.reset_database()
-b2.use_database_chain()
-
-# set DB tag with correct merger numbers, etc. (phase3 start)
-b2.use_central_database('online')
-b2.use_central_database('ARICH_phase3_test')
 
 # parameters
 parser = OptionParser()
@@ -50,6 +44,12 @@ parser.add_option('-t', '--tracking', dest='tracking', default=0)
 parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
 parser.add_option('-g', '--gdl', dest='gdl', default=0)
 (options, args) = parser.parse_args()
+
+
+# set specific database tag
+# b2.conditions.override_globaltags(["tagname"])
+# use local database
+# b2.conditions.testing_payloads = ["localdb/database.txt"]
 
 # create paths
 main = b2.create_path()

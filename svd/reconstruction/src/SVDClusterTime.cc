@@ -62,8 +62,9 @@ namespace Belle2 {
         if (isnan(m_triggerBin))
           B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
-        // calibrate strip time (cellID not used)
-        stripTime =  m_CoG6TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, stripTime, m_triggerBin);
+        if (! m_returnRawClusterTime)
+          // calibrate strip time (cellID not used)
+          stripTime =  m_CoG6TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, stripTime, m_triggerBin);
 
         //update cluster time
         time += stripTime * strip.maxSample;
@@ -102,8 +103,11 @@ namespace Belle2 {
       if (isnan(m_triggerBin))
         B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
-      //cellID not used for calibration
-      time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
+      if (m_returnRawClusterTime)
+        time = rawtime;
+      else
+        //cellID not used for calibration
+        time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
 
     }
 
@@ -141,7 +145,11 @@ namespace Belle2 {
       if (isnan(m_triggerBin))
         B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
-      time = m_ELS3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
+      if (m_returnRawClusterTime)
+        time = rawtime;
+      else
+        time = m_ELS3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
+
     }
 
   }  //SVD namespace

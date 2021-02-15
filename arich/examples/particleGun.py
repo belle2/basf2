@@ -20,7 +20,10 @@ parser.add_option('-f', '--file', dest='filename',
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
-# use_local_database("local_db/database.txt","localdb")
+# set specific database tag
+# b2.conditions.override_globaltags(["tagname"])
+# use local database
+# b2.conditions.testing_payloads = ["localdb/database.txt"]
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)

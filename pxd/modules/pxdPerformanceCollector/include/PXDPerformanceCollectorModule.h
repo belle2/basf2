@@ -49,8 +49,11 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     PXDPerformanceCollectorModule();
+    /** Prepare */
     void prepare() override final;
+    /** Collect */
     void collect() override final;
+    /** Start run */
     void startRun() override final;
 
     /**

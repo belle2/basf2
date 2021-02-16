@@ -457,7 +457,7 @@ class CDCCalibration(Calibration):
             else:
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
-                                        pre_collector_paath=pre_collector(max_events=max_events),
+                                        pre_collector_path=pre_collector(max_events=max_events),
                                         )
             self.add_collection(name=skim_type, collection=collection)
 

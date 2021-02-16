@@ -871,7 +871,7 @@ This can be done with `addAlias`.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    How can you replace ``daughter(daughter(0, E))`` with ``mup_E``?
+    How can you replace ``daughter(0, daughter(0, E))`` with ``mup_E``?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -884,7 +884,9 @@ This can be done with `addAlias`.
     .. code-block:: python
 
         from variables import variables as vm
-        vm.addAlias("mup_E", "daughter(daughter(0, E))")
+
+
+        vm.addAlias("mup_E", "daughter(0, daughter(0, E))")
 
 However, this can quickly fill up many, many lines. Therefore, there are utils
 to easily create aliases. The most useful is probably

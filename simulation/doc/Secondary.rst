@@ -119,33 +119,41 @@ the list of constants implemented in *Geant4 v9.6*. They used the same list for 
 .. table:: Physics Process and its subtype
    :widths: auto
 
-   ============================    ==========================   =======================
-   enum G4EmProcessSubType         enum G4HadronicProcessType   enum G4DecayProcessType
-   ============================    ==========================   =======================
-   fCoulombScattering = 1          fHadronElastic = 111         DECAY = 201
-   fIonisation = 2                 fHadronInelastic = 121       DECAY_WithSpin
-   fBremsstrahlung = 3             fCapture = 131               DECAY_PionMakeSpin
-   fPairProdByCharged = 4          fFission = 141               DECAY_Unknown = 211
-   fAnnihilation = 5               fHadronAtRest = 151          DECAY_External = 231
-   fAnnihilationToMuMu = 6         fChargeExchange = 161
-   fAnnihilationToHadrons = 7      fRadioactiveDecay = 210
-   fNuclearStopping = 8
-   fMultipleScattering = 10
-   fRayleigh = 11
-   fPhotoElectricEffect = 12
-   fComptonScattering = 13
-   fGammaConversion = 14
-   fGammaConversionToMuMu = 15
-   fCerenkov = 21
-   fScintillation = 22
-   fSynchrotronRadiation = 23
-   fTransitionRadiation = 24
-   ============================    ==========================   =======================
+   ============================    ==========================    =======================
+   enum G4EmProcessSubType         enum G4HadronicProcessType    enum G4DecayProcessType
+   ============================    ==========================    =======================
+   fCoulombScattering      =  1    fHadronElastic       = 111    DECAY             = 201
+   fIonisation             =  2    fHadronInelastic     = 121    DECAY_WithSpin,
+   fBremsstrahlung         =  3    fCapture             = 131    DECAY_PionMakeSpin,
+   fPairProdByCharged      =  4    fMuAtomicCapture     = 132    DECAY_Unknown     = 211
+   fAnnihilation           =  5    fFission             = 141    DECAY_MuAtom      = 221
+   fAnnihilationToMuMu     =  6    fHadronAtRest        = 151    DECAY_External    = 231
+   fAnnihilationToHadrons  =  7    fLeptonAtRest        = 152    
+   fNuclearStopping        =  8    fChargeExchange      = 161
+   fElectronGeneralProcess =  9    fRadioactiveDecay    = 210
+   fMultipleScattering     = 10
+   fRayleigh               = 11
+   fPhotoElectricEffect    = 12
+   fComptonScattering      = 13
+   fGammaConversion        = 14
+   fGammaConversionToMuMu  = 15
+   fGammaGeneralProcess    = 16
+   fCerenkov               = 21
+   fScintillation          = 22
+   fSynchrotronRadiation   = 23
+   fTransitionRadiation    = 24
+   ============================    ==========================    =======================
 
+Release note (new feature since) :
 
-In addition, 
+- G4DecayProcessType    : fElectronGeneralProcess and fGammaGeneralProcess since v10.5
+- G4HadronicProcessType : fMuAtomicCapture and fLeptonAtRest since v10.4
+- G4DecayProcessType    : DECAY_MuAtom since v10.4
 
-- If the MCParticles entry is a primary particle, "0" is assigned.
-- When the *Geant4* does not give the physics process subtype information, "-1" is assigned. This happens rarely.
+.. note::
+        - If the MCParticles entry is a primary particle, "0" is assigned.
+        - When the *Geant4* does not give the physics process subtype information, "-1" is assigned. This happens rarely.
 
-
+.. warning::
+        fElectronGeneralProcess and fGammaGeneralprocess are internal Geant4 parameters, which general users are not supposed to see. If you see any of those, please contact the software convener of Geant4 team. 
+ 

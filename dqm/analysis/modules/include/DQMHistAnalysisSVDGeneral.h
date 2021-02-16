@@ -38,7 +38,7 @@ namespace Belle2 {
     virtual void endRun() override;
     virtual void terminate() override;
 
-    //parameters
+    // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_occError; /**<error level of the occupancy */
     float m_occWarning; /**< warning level of the occupancy */
@@ -57,7 +57,7 @@ namespace Belle2 {
     //! Parameters accesible from basf2 scripts
     //  protected:
 
-    //! Data members
+
   private:
 
     /** Reference Histogram Root file name */
@@ -102,7 +102,7 @@ namespace Belle2 {
     TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
     TText* m_yTitle = nullptr; /**< y axis title text*/
 
-    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed befor throwing ERROR*/
+    Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/

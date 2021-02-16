@@ -146,7 +146,7 @@ namespace Belle2 {
 
     /// this sorting makes sure the clusters can be searched from bottom left of the HS to top right
     /// normally, a C++ array looks like a matrix:
-    /// (0   , 0) ... (maxX, 0   )
+    /// (0, 0   ) ... (maxX, 0   )
     ///    ...            ...
     /// (0, maxY) ... (maxX, maxY)
     /// but for sorting we want it to be like regular coordinates

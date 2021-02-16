@@ -36,17 +36,6 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
 }
 
-// void DATCONFindlet::initialize()
-// {
-// //   m_rootFile = new TFile("trackCandStats.root", "RECREATE");
-// //   m_rootFile->cd();
-// //   m_hitsPerTrackCand = new TH1D("hitsPerTrackCand", "SpacePoints per SPTC", 20, 0, 20);
-// //   m_trackCandsPerEvent = new TH1D("trackCandsPerEvent", "SPTCS per event", 100, 0, 100);
-//
-//   m_storeMCParticles.isOptional();
-//
-// }
-
 void DATCONFindlet::beginEvent()
 {
   Super::beginEvent();

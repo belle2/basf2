@@ -369,7 +369,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
-      if (m_currentTrackCandidate.size() > 100) {
+      if (m_currentTrackCandidate.size() > 200) {
 //         m_breakFlag = true;
         gnuplotoutput(m_currentTrackCandidate);
       }
@@ -433,15 +433,15 @@ void FastInterceptFinder2D::gnuplotoutput(const std::vector<const HitDataCache*>
 
   uint count = 0;
   for (auto& hit : hits) {
-    double x = hit->x;
-    double y = hit->y;
+    double xc = hit->xConformal;
+    double yc = hit->yConformal;
     VxdID id = hit->sensorID;
     int layer = id.getLayerNumber();
     double X = hit->spacePoint->X();
     double Y = hit->spacePoint->Y();
     double Z = hit->spacePoint->Z();
 
-    outstream << "plot " << x << " * -sin(x) + " << y << " * cos(x) > 0 ? " << x << " * cos(x) + " << y <<
+    outstream << "plot " << xc << " * -sin(x) + " << yc << " * cos(x) > 0 ? " << xc << " * cos(x) + " << yc <<
               " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;
     if (count < hits.size() - 1) outstream << "re";
     count++;

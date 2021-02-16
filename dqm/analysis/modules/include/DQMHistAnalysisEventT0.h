@@ -17,26 +17,30 @@
 #include <TF1.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
 
+  /** Class definition for the output module of Sequential ROOT I/O */
   class DQMHistAnalysisEventT0Module : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     DQMHistAnalysisEventT0Module();
+    /** Destructor */
     virtual ~DQMHistAnalysisEventT0Module();
 
-    //! Module functions to be called from main process
+    /** create TCanvas and MonitoringObject */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /** clear TCanvas */
     virtual void beginRun() override;
-    virtual void event() override;
+
+    /** fit the histograms */
+    virtual void endRun() override;
+
+    /** delete pointers */
     virtual void terminate() override;
 
-    //parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
 
   private:
@@ -50,17 +54,20 @@ namespace Belle2 {
      * @param tag to distinguish results
      * @return false if the histogram is not found or the fit is not converged
      **/
-    bool processHistogram(TH1* h, TF1* fitf, TString tag);
+    bool processHistogram(TH1* h, TString tag);
 
     /** double gaussian fitting function for the jitter distribution*/
     static double fDoubleGaus(double* x, double* par);
 
-    TCanvas* m_cHadronECLTRG = nullptr; /**< TOP EventT0 for Hadron ECLTRG canvas */
-    TCanvas* m_cBhabhaECLTRG = nullptr; /**< TOP EventT0 for Bhabha ECLTRG canvas */
-    TCanvas* m_cMumuECLTRG = nullptr; /**< TOP EventT0 for Mumu ECLTRG canvas */
-    TCanvas* m_cHadronCDCTRG = nullptr; /**< TOP EventT0 for Hadron CDCTRG canvas */
-    TCanvas* m_cBhabhaCDCTRG = nullptr; /**< TOP EventT0 for Bhabha CDCTRG canvas */
-    TCanvas* m_cMumuCDCTRG = nullptr; /**< TOP EventT0 for Mumu CDCTRG canvas */
+    TCanvas* m_cECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */
+    TCanvas* m_cCDCTRG = nullptr; /**< TOP EventT0 for Hadron CDCTRG plots canvas */
+    TPad* m_pad1ECLTRG = nullptr; /**< pad for ECLTRG hadrons */
+    TPad* m_pad2ECLTRG = nullptr; /**< pad for ECLTRG bhabhas */
+    TPad* m_pad3ECLTRG = nullptr; /**< pad for ECLTRG mumuss */
+
+    TPad* m_pad1CDCTRG = nullptr; /**< pad for CDCTRG hadrons */
+    TPad* m_pad2CDCTRG = nullptr; /**< pad for CDCTRG bhabhas */
+    TPad* m_pad3CDCTRG = nullptr; /**< pad for CDCTRG mumus */
 
     MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
   };

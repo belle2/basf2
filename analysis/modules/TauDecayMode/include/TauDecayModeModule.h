@@ -101,7 +101,7 @@ namespace Belle2 {
     std::vector<int> vec_pi0, vec_k0s, vec_k0l, vec_gam;
     std::vector<int> vec_eta, vec_omega, vec_kstarp, vec_kstarm;
     std::vector<int> vec_lambda, vec_lmb_br, vec_kstar, vec_kstar_br, vec_etapr;//new particle vector
-    std::vector<int> vec_a00, vec_a0p, vec_a0m, vec_b1m, vec_b1p, vec_phi, vec_f1, vec_a1m, vec_a1p, vec_rhom, vec_rhop ;
+    std::vector<int> vec_a0, vec_a0p, vec_a0m, vec_b1m, vec_b1p, vec_phi, vec_f1, vec_a1m, vec_a1p, vec_rhom, vec_rhop ;
     std::vector<int> vec_K0, vec_K0_br,  vec_rho0, vec_f0;
     std::vector<int> vec_dau_tauminus;
     std::vector<int> vec_dau_tauplus;

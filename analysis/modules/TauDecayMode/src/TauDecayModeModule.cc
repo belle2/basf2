@@ -124,7 +124,7 @@ void TauDecayModeModule::initialize()
   mode_decay = make_map(m_file);
   m_tauDecay.registerInDataStore();
   if (m_particle != "") {
-    std::vector<std::string> extra = parseString(m_particle, "="); "alpha=10000"
+    std::vector<std::string> extra = parseString(m_particle, "=");
     pdg_extra = atoi(extra[0].c_str());
     name = extra[1];
   }

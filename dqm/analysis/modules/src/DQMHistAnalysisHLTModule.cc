@@ -71,7 +71,7 @@ void DQMHistAnalysisHLTModule::initialize()
   }
 
   for (const std::string& filterLine : m_retentionPerUnit) {
-    m_hretentionPerUnit.emplace(filterLine, std::make_pair(
+    m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
                                   new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
                                   new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(), m_max_hlt_units, 1,
                                            m_max_hlt_units + 1)
@@ -96,7 +96,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->Draw("hist");
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hretentionPerUnit) {
+  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
@@ -127,7 +127,7 @@ void DQMHistAnalysisHLTModule::beginRun()
     canvas->Clear();
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hretentionPerUnit) {
+  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
@@ -257,7 +257,7 @@ void DQMHistAnalysisHLTModule::event()
   }
 
   for (const std::string& filterLine : m_retentionPerUnit) {
-    auto* histogram = m_hretentionPerUnit.at(filterLine).second;
+    auto* histogram = m_hRetentionPerUnit.at(filterLine).second;
     histogram->Reset();
 
     auto* filterLineHistogram = findHist("softwaretrigger/" + filterLine + "_per_unit");
@@ -300,7 +300,7 @@ void DQMHistAnalysisHLTModule::event()
     canvas->Update();
   }
 
-  for (auto& nameAndCanvasAndHisto : m_hretentionPerUnit) {
+  for (auto& nameAndCanvasAndHisto : m_hRetentionPerUnit) {
     auto* canvas = nameAndCanvasAndHisto.second.first;
     auto* histogram = nameAndCanvasAndHisto.second.second;
 

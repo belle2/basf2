@@ -854,7 +854,7 @@ recursively.
     What does ``daughter(0, daughter(0, E))`` denote?
 
 .. admonition:: Solution
-    :class: toggle stacked
+    :class: toggle solution
 
     It's the energy of the positive muon.
 

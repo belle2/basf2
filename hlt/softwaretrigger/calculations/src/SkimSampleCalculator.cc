@@ -741,7 +741,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   unsigned int nDstp1 = 0;
   unsigned int nDstp2 = 0;
   unsigned int nDstp3 = 0;
-
+  unsigned int nDstp4 = 0;
 
   if (m_DstParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
     for (unsigned int i = 0; i < m_DstParticles->getListSize(); i++) {
@@ -750,6 +750,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (dstDecID == 1.) nDstp1++;
       if (dstDecID == 2.) nDstp2++;
       if (dstDecID == 3.) nDstp3++;
+      if (dstDecID == 4.) nDstp4++;
     }
   }
 
@@ -770,6 +771,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     calculationResult["Dstp3"] = 1;
   } else {
     calculationResult["Dstp3"] = 0;
+  }
+
+  if (nDstp4 > 0) {
+    calculationResult["Dstp4"] = 1;
+  } else {
+    calculationResult["Dstp4"] = 0;
   }
 
   // nTracksOffIP

@@ -91,7 +91,16 @@ C     IFCURR4PI = 3  CLEO initialization
       INTEGER IFCURR4PI
       DATA    IFCURR4PI /0/
       COMMON /IFCURR4PI/ IFCURR4PI
-C
+
+      REAL    AMINVI            ! mass
+      DATA    AMINVI /0/
+      INTEGER ISPNVI            ! spin
+      DATA    ISPNVI /0/
+      REAL    VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      DATA    VCINVI /0.0/      ! suggested value: 0.5
+      DATA    ACINVI /0.0/      ! suggested value: 0.5
+      COMMON /AMINVI/ AMINVI,ISPNVI,VCINVI,ACINVI
+C     
 C     Optional test flag to decay Lambda or not inside TAUOLA
 C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned off by default]   
       INTEGER LAMDEC
@@ -133,7 +142,16 @@ C  KeyA1 is used for formfactors actually not in use
 C     Print functional flags
       WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
      $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
-        
+
+      AMINVI    = XPAR(ITAUXPAR+911)
+      ISPNVI    = INT(XPAR(ITAUXPAR+912))
+      VCINVI    = XPAR(ITAUXPAR+913)
+      ACINVI    = XPAR(ITAUXPAR+914)
+C     Print flags for invisible particle
+      IF (VCINVI.NE.0.0.OR.ACINVI.NE.0.0)
+     $   WRITE(iout,*) 'AMINVI, ISPNVI, VCINVI, ACINVI = ',
+     $                  AMINVI, ISPNVI, VCINVI, ACINVI
+      
 C     Print optional flags 
       WRITE(iout,*) 'IFEQUALBR, LAMDEC = ',
      $               IFEQUALBR, LAMDEC
@@ -643,6 +661,11 @@ C
       REAL              XRANGE,XRANGE1,XRANGE15,XRANGE2,XRANGE25,XRANGE3
       REAL              QQBRWG
       EXTERNAL          QQBRWG
+      REAL              AMINVI            ! mass
+      INTEGER           ISPNVI            ! spin
+      REAL              VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      COMMON /AMINVI/   AMINVI,ISPNVI,VCINVI,ACINVI
+C
       XRANGE=IRANGE
       XRANGE1=XRANGE
       IF (XRANGE1.GT.1.0)  XRANGE1=1.0
@@ -735,6 +758,8 @@ C
          APKMAS=QQBRWG(0.980,0.045,XRANGE25)    ! a00(980)
       ELSEIF  (ABS(IDENT).EQ.9010221) THEN
          APKMAS=QQBRWG(0.9856,0.0342,XRANGE)    ! f00(980)
+      ELSEIF  (ABS(IDENT).EQ.94144) THEN
+         APKMAS=AMINVI                          ! invi   
       ELSEIF  (ABS(IDENT).EQ.0) THEN 
          APKMAS=0
       ELSE
@@ -845,6 +870,8 @@ C
          IPKDEF=ABS(IDENT)! a00(980)
       ELSEIF  (ABS(IDENT).EQ.9010221) THEN
          IPKDEF=ABS(IDENT)! f00(980)
+      ELSEIF  (ABS(IDENT).EQ.94144) THEN
+         IPKDEF=ABS(IDENT)! invi
       ELSE
         PRINT *, 'STOP IN IPKDEF, WRONG IDENT=',IDENT
         STOP

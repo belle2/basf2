@@ -742,6 +742,7 @@ C HV IS DEFINED FOR TAU-    WITH GAMMA=B+HV*POL
         DO  I=1,3
          HV(I)=0.0
         ENDDO
+        HV(4)=1.0
         AMPLIT= GFERMI**2       
 
       ELSEIF (IME.EQ.1) THEN ! flat phase space
@@ -749,6 +750,7 @@ C        FLAT PHASE SPACE ONLY;
         DO  I=1,3
          HV(I)=0.0
         ENDDO
+        HV(4)=1.0
         AMPLIT=GFERMI**2 
         RETURN
       ELSE
@@ -2161,7 +2163,7 @@ C
      &      +(GV**2-GA**2)*AMTAU*AMF0*AMF1**2
         DO 40 I=1,3
 40      HV(I)=2*GA*GV*AMTAU*(2*PKK(I)*QXN-PNU(I)*AMF1**2)/BRAK
-        HV(4)=1
+        HV(4)=1.0
 
 C WARNING: 2-BODY PHASE SPACE FACTOR IS INCLUDED !
 
@@ -2188,6 +2190,7 @@ C CALL ALTERN1(INUM,PNU,PKK,GAMM,HV)
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
         ENDIF
 
        ELSEIF (IME.EQ.4) THEN
@@ -2198,18 +2201,24 @@ C CALL ALTERN1(INUM,PNU,PKK,GAMM,HV)
      $             -4*AMF1**2*AMF0**2           )/AMTAU**2
        ENDIF
        ELSEIF (IME.EQ.5) THEN       
-         CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
+          CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
+          GAMM=1./(16.*PI)*AMTAU**3*
+     $        (GAMM/AMTAU**4)*
+     $        SQRT((AMTAU**2-AMF1**2-AMF0**2)**2
+     $             -4*AMF1**2*AMF0**2           )/AMTAU**2
          RETURN
        ELSEIF (IME.EQ.0) THEN    ! not initialized
          GAMM=GFERMI**2
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
        ELSE    ! any other; flat phase space
          GAMM=GFERMI**2
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
        ENDIF
 
       END
@@ -4123,6 +4132,51 @@ C            4- default ME wrapped curr., 5- wrapped ME
 
       SUBROUTINE DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
       REAL  PKK(4),PNU(4),HV(4)
+C
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+C
+      REAL    AMINVI            ! mass
+      INTEGER ISPNVI            ! spin
+      REAL    VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      COMMON /AMINVI/ AMINVI,ISPNVI,VCINVI,ACINVI
+C
+      REAL  QN
+C
+      IF (INUM.NE.70.AND.INUM.NE.71) RETURN
+C
+      QN = PKK(4) * PNU(4)
+     $   - PKK(1) * PNU(1) - PKK(2) * PNU(2)- PKK(3) * PNU(3)
+
+!     Following is written for covariant vectors HV(k) (namely h_i, likewise 3.25 Comp. Phys. Commun. 64 (1991) 275).
+!     It is assumed that HV(4) corresponds to h_0
+
+      IF (ISPNVI.EQ.0) THEN      ! scalar case
+         GAMM = 2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
+     $        + 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU
+         DO K=1,3
+            HV(K)= 4 * VCINVI * ACINVI * AMTAU * PNU(K)/GAMM
+         ENDDO
+         HV(4)=1
+         GAMM= GAMM*0.5*AMTAU**2
+      ELSEIF (ISPNVI.EQ.1) THEN  ! vector case
+         GAMM = 2 * (VCINVI**2 + ACINVI**2)
+     $            * (2 * AMTAU * PKK(4) * QN + AMTAU * PNU(4) * AMF1**2)
+     $        - 6 * (VCINVI**2 - ACINVI**2) * AMTAU * AMF0 * AMF1**2
+         DO K=1,3
+            HV(K) = 4 * VCINVI * ACINVI * AMTAU * PNU(K) * (AMF1**2 - 2 * QN)/GAMM
+         ENDDO
+         HV(4)=1
+         GAMM= GAMM*0.5*AMTAU**2/AMF1**2
+      ENDIF
+      GAMM=GAMM*GFERMI**2
       RETURN
       END
 

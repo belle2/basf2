@@ -11,6 +11,8 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <TROOT.h>
 
+#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -73,8 +75,9 @@ void DQMHistAnalysisHLTModule::initialize()
   for (const std::string& filterLine : m_retentionPerUnit) {
     m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
                                   new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
-                                  new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(), m_max_hlt_units, 1,
-                                           m_max_hlt_units + 1)
+                                  new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(),
+                                           SoftwareTrigger::HLTUnit::max_hlt_units, 1,
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1)
                                 ));
   }
 
@@ -267,7 +270,7 @@ void DQMHistAnalysisHLTModule::event()
       continue;
     }
 
-    for (unsigned int i = 1; i <= m_max_hlt_units; i++) {
+    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units; i++) {
       double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
       if (totalUnitValue == 0) {
         histogram->Fill(i, 0);

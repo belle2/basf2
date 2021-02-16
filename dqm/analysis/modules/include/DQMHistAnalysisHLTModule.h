@@ -55,9 +55,6 @@ namespace Belle2 {
     std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hl1Ratios;
     /// Histogram with retention rate per unit of some hlt filter lines
     std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hRetentionPerUnit;
-    // Maximum number of HLT units used during the experiment
-    const unsigned int m_max_hlt_units = 10;
-
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

@@ -74,17 +74,17 @@ void StatisticsTimingHLTDQMModule::defineHisto()
 
   if (m_param_create_hlt_unit_histograms) {
     m_fullTimeMeanPerUnitHistogram = new TH1F("fullTimeMeanPerUnitHistogram", "Mean Budget Time Per Unit [ms]",
-                                              HLTUnit::m_max_hlt_units + 1, 0,
-                                              HLTUnit::m_max_hlt_units + 1);
+                                              HLTUnit::max_hlt_units + 1, 0,
+                                              HLTUnit::max_hlt_units + 1);
     m_fullTimeMeanPerUnitHistogram->SetStats(false);
     m_fullTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
     m_processingTimeMeanPerUnitHistogram = new TH1F("processingTimeMeanPerUnitHistogram", "Mean Processing Time Per Unit [ms]",
-                                                    HLTUnit::m_max_hlt_units + 1, 0,
-                                                    HLTUnit::m_max_hlt_units + 1);
+                                                    HLTUnit::max_hlt_units + 1, 0,
+                                                    HLTUnit::max_hlt_units + 1);
     m_processingTimeMeanPerUnitHistogram->SetStats(false);
     m_processingTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
 
-    for (unsigned int index = 1; index <= HLTUnit::m_max_hlt_units; index++) {
+    for (unsigned int index = 1; index <= HLTUnit::max_hlt_units; index++) {
       m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                           ("Budget Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_fullTimeNBins, 0, m_fullTimeMax));
       m_lastFullTimeSumPerUnit.emplace(index, 0);
@@ -107,7 +107,7 @@ void StatisticsTimingHLTDQMModule::initialize()
 
   if (m_param_create_hlt_unit_histograms) {
     std::ifstream file;
-    file.open(HLTUnit::m_hlt_unit_file);
+    file.open(HLTUnit::hlt_unit_file);
     if (file.good()) {
       std::string host;
       getline(file, host);

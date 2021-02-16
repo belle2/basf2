@@ -112,19 +112,12 @@ namespace Belle2 {
     };
 
     /// HLT unit number information.
-    class HLTUnit {
-    public:
-      //! Constructor
-      HLTUnit();
-
-      //! Destructor
-      ~HLTUnit();
-
+    namespace HLTUnit {
       /// Maximum number of HLT units used during the experiment
-      static constexpr unsigned int m_max_hlt_units = 10;
+      static constexpr unsigned int max_hlt_units = 10;
 
       /// Location of HLT unit number information
-      static constexpr char m_hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
+      static constexpr char hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
     };
   }
 }

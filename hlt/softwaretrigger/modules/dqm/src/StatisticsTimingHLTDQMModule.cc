@@ -68,6 +68,9 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     const std::string& moduleName = m_param_overviewModuleList[index];
     m_meanTimeHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
     m_meanMemoryHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
+    m_moduleTimeHistograms.emplace(moduleName, new TH1F((moduleName + "_time").c_str(),
+                                                        ("Time spent in: " + moduleName).c_str(), 125, 0, 5000));
+    m_lastModuleTimeSum.emplace(moduleName, 0);
   }
 
   if (m_param_create_hlt_unit_histograms) {
@@ -140,10 +143,14 @@ void StatisticsTimingHLTDQMModule::event()
 
     const double statisticsTime = moduleStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
     const double statisticsMemory = moduleStatistics.getMemoryMean(ModuleStatistics::EStatisticCounters::c_Event);
+    const double statisticsTime_sum = moduleStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
 
     const int m_param_overviewModuleListIndex = std::distance(m_param_overviewModuleList.begin(), m_param_overviewModuleListIterator);
     meanTimes[m_param_overviewModuleListIndex] += statisticsTime;
     meanMemories[m_param_overviewModuleListIndex] += statisticsMemory;
+
+    m_moduleTimeHistograms[statisticsName]->Fill(statisticsTime_sum - m_lastModuleTimeSum[statisticsName]);
+    m_lastModuleTimeSum[statisticsName] = statisticsTime_sum;
   }
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
@@ -196,6 +203,8 @@ void StatisticsTimingHLTDQMModule::beginRun()
 
   m_meanTimeHistogram->Reset();
   m_meanMemoryHistogram->Reset();
+  std::for_each(m_moduleTimeHistograms.begin(), m_moduleTimeHistograms.end(),
+  [](auto & it) { it.second->Reset(); });
   m_fullTimeHistogram->Reset();
   m_processingTimeHistogram->Reset();
   if (m_param_create_hlt_unit_histograms) {

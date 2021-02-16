@@ -40,6 +40,8 @@ namespace Belle2 {
       TH1F* m_meanTimeHistogram;
       /// Mean memory of certain modules
       TH1F* m_meanMemoryHistogram;
+      /// Time distribution of certain modules
+      std::map<std::string, TH1F*> m_moduleTimeHistograms;
       /// Budget time distribution of all events
       TH1F* m_fullTimeHistogram;
       /// Processing time distribution of all events
@@ -61,6 +63,8 @@ namespace Belle2 {
       double m_lastProcessingTimeSum = 0;
       /// Storage for the last processing time sum per unit
       std::map<unsigned int, double> m_lastProcessingTimeSumPerUnit;
+      /// Storage for the last time sum of certain modules
+      std::map<std::string, double> m_lastModuleTimeSum;
 
       /// Parameter: Create HLT unit number histograms?
       bool m_param_create_hlt_unit_histograms;

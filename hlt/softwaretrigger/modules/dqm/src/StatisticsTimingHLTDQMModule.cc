@@ -56,12 +56,17 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   m_meanTimeHistogram = new TH1F("meanTimeHistogram", "Mean Processing Time [ms]", m_param_overviewModuleList.size(), 0,
                                  m_param_overviewModuleList.size());
   m_meanTimeHistogram->SetStats(false);
-  m_meanMemoryHistogram = new TH1F("meanMemoryHistogram", "Mean Memory", m_param_overviewModuleList.size(), 0,
+  m_meanMemoryHistogram = new TH1F("meanMemoryHistogram", "Mean Memory [KB]", m_param_overviewModuleList.size(), 0,
                                    m_param_overviewModuleList.size());
   m_meanMemoryHistogram->SetStats(false);
   m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Budget Time [ms]", m_fullTimeNBins, 0, m_fullTimeMax);
   m_processingTimeHistogram = new TH1F("processingTimeHistogram", "Processing Time [ms]", m_processingTimeNBins, 0,
                                        m_processingTimeMax);
+  m_fullMemoryHistogram = new TH1F("fullMemoryHistogram", "Total memory used [KB]", m_fullMemoryNBins, m_fullMemoryMin,
+                                   m_fullMemoryMax);
+  m_processingMemoryHistogram = new TH1F("processingMemoryHistogram", "Memory used for processing [KB]", m_processingMemoryNBins,
+                                         m_processingMemoryMin,
+                                         m_processingMemoryMax);
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
     const std::string& moduleName = m_param_overviewModuleList[index];
@@ -70,6 +75,9 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     m_moduleTimeHistograms.emplace(moduleName, new TH1F((moduleName + "_time").c_str(),
                                                         ("Time spent in: " + moduleName + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
     m_lastModuleTimeSum.emplace(moduleName, 0);
+    m_moduleMemoryHistograms.emplace(moduleName, new TH1F((moduleName + "_memory").c_str(),
+                                                          ("Memory used in: " + moduleName + " [KB]").c_str(), m_processingMemoryNBins, m_processingMemoryMin, m_processingMemoryMax));
+    m_lastModuleMemorySum.emplace(moduleName, 0);
   }
 
   if (m_param_create_hlt_unit_histograms) {
@@ -91,6 +99,16 @@ void StatisticsTimingHLTDQMModule::defineHisto()
       m_processingTimePerUnitHistograms.emplace(index, new TH1F(("processingTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                                 ("Processing Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
       m_lastProcessingTimeSumPerUnit.emplace(index, 0);
+      m_fullMemoryPerUnitHistograms.emplace(index, new TH1F(("fullMemoryPerUnitHistogram_HLT" + std::to_string(index)).c_str(),
+                                                            ("Total Memory Used Per Unit: HLT" + std::to_string(index) + " [KB]").c_str(), m_fullMemoryNBins, m_fullMemoryMin,
+                                                            m_fullMemoryMax));
+      m_lastFullMemorySumPerUnit.emplace(index, 0);
+      m_processingMemoryPerUnitHistograms.emplace(index,
+                                                  new TH1F(("processingMemoryPerUnitHistogram_HLT" + std::to_string(index)).c_str(),
+                                                           ("Memory Used For Processing Per Unit: HLT" + std::to_string(index) + " [KB]").c_str(), m_processingMemoryNBins,
+                                                           m_processingMemoryMin,
+                                                           m_processingMemoryMax));
+      m_lastProcessingMemorySumPerUnit.emplace(index, 0);
     }
   }
 
@@ -143,6 +161,7 @@ void StatisticsTimingHLTDQMModule::event()
     const double statisticsTime = moduleStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
     const double statisticsMemory = moduleStatistics.getMemoryMean(ModuleStatistics::EStatisticCounters::c_Event);
     const double statisticsTime_sum = moduleStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+    const double statisticsMemory_sum = moduleStatistics.getMemorySum(ModuleStatistics::EStatisticCounters::c_Event);
 
     const int m_param_overviewModuleListIndex = std::distance(m_param_overviewModuleList.begin(), m_param_overviewModuleListIterator);
     meanTimes[m_param_overviewModuleListIndex] += statisticsTime;
@@ -150,6 +169,8 @@ void StatisticsTimingHLTDQMModule::event()
 
     m_moduleTimeHistograms[statisticsName]->Fill(statisticsTime_sum - m_lastModuleTimeSum[statisticsName]);
     m_lastModuleTimeSum[statisticsName] = statisticsTime_sum;
+    m_moduleMemoryHistograms[statisticsName]->Fill(statisticsMemory_sum - m_lastModuleMemorySum[statisticsName]);
+    m_lastModuleMemorySum[statisticsName] = statisticsMemory_sum;
   }
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
@@ -159,6 +180,7 @@ void StatisticsTimingHLTDQMModule::event()
 
   double processingTimeSum = 0.0;
   double processingTimeMean = 0.0;
+  double processingMemorySum = 0.0;
   for (const ModuleStatistics& moduleStatistics : moduleStatisticsList) {
     const std::string& statisticsName = moduleStatistics.getName();
     const auto m_summaryModuleListIterator = std::find(m_summaryModuleList.begin(), m_summaryModuleList.end(),
@@ -168,15 +190,20 @@ void StatisticsTimingHLTDQMModule::event()
     }
     processingTimeSum += moduleStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
     processingTimeMean += moduleStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
+    processingMemorySum += moduleStatistics.getMemorySum(ModuleStatistics::EStatisticCounters::c_Event);
   }
   m_processingTimeHistogram->Fill(processingTimeSum - m_lastProcessingTimeSum);
   m_lastProcessingTimeSum = processingTimeSum;
-
+  m_processingMemoryHistogram->Fill(processingMemorySum - m_lastProcessingMemorySum);
+  m_lastProcessingMemorySum = processingMemorySum;
 
   const ModuleStatistics& fullStatistics = stats->getGlobal();
   const double fullTimeSum = fullStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   m_fullTimeHistogram->Fill(fullTimeSum - m_lastFullTimeSum);
   m_lastFullTimeSum = fullTimeSum;
+  const double fullMemorySum = fullStatistics.getMemorySum(ModuleStatistics::EStatisticCounters::c_Event);
+  m_fullMemoryHistogram->Fill(fullMemorySum - m_lastFullMemorySum);
+  m_lastFullMemorySum = fullMemorySum;
 
   if (m_param_create_hlt_unit_histograms) {
     if (0 < m_hlt_unit) {
@@ -185,11 +212,17 @@ void StatisticsTimingHLTDQMModule::event()
       m_processingTimePerUnitHistograms[m_hlt_unit]->Fill(processingTimeSum - m_lastProcessingTimeSumPerUnit[m_hlt_unit]);
       m_lastProcessingTimeSumPerUnit[m_hlt_unit] = processingTimeSum;
 
+      m_processingMemoryPerUnitHistograms[m_hlt_unit]->Fill(processingMemorySum - m_lastProcessingMemorySumPerUnit[m_hlt_unit]);
+      m_lastProcessingMemorySumPerUnit[m_hlt_unit] = processingMemorySum;
+
       const double fullTimeMean = fullStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
       m_fullTimeMeanPerUnitHistogram->SetBinContent(m_hlt_unit + 1, fullTimeMean);
 
       m_fullTimePerUnitHistograms[m_hlt_unit]->Fill(fullTimeSum - m_lastFullTimeSumPerUnit[m_hlt_unit]);
       m_lastFullTimeSumPerUnit[m_hlt_unit] = fullTimeSum;
+
+      m_fullMemoryPerUnitHistograms[m_hlt_unit]->Fill(fullMemorySum - m_lastFullMemorySumPerUnit[m_hlt_unit]);
+      m_lastFullMemorySumPerUnit[m_hlt_unit] = fullMemorySum;
     }
   }
 }
@@ -204,14 +237,22 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_meanMemoryHistogram->Reset();
   std::for_each(m_moduleTimeHistograms.begin(), m_moduleTimeHistograms.end(),
   [](auto & it) { it.second->Reset(); });
+  std::for_each(m_moduleMemoryHistograms.begin(), m_moduleMemoryHistograms.end(),
+  [](auto & it) { it.second->Reset(); });
   m_fullTimeHistogram->Reset();
   m_processingTimeHistogram->Reset();
+  m_fullMemoryHistogram->Reset();
+  m_processingMemoryHistogram->Reset();
   if (m_param_create_hlt_unit_histograms) {
     m_fullTimeMeanPerUnitHistogram->Reset();
     m_processingTimeMeanPerUnitHistogram->Reset();
     std::for_each(m_fullTimePerUnitHistograms.begin(), m_fullTimePerUnitHistograms.end(),
     [](auto & it) { it.second->Reset(); });
     std::for_each(m_processingTimePerUnitHistograms.begin(), m_processingTimePerUnitHistograms.end(),
+    [](auto & it) { it.second->Reset(); });
+    std::for_each(m_fullMemoryPerUnitHistograms.begin(), m_fullMemoryPerUnitHistograms.end(),
+    [](auto & it) { it.second->Reset(); });
+    std::for_each(m_processingMemoryPerUnitHistograms.begin(), m_processingMemoryPerUnitHistograms.end(),
     [](auto & it) { it.second->Reset(); });
   }
 }

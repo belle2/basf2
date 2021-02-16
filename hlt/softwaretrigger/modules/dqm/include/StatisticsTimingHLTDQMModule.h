@@ -44,11 +44,22 @@ namespace Belle2 {
 
       /// Time distribution of certain modules
       std::map<std::string, TH1F*> m_moduleTimeHistograms;
+
+      /// Memory distribution of certain modules
+      std::map<std::string, TH1F*> m_moduleMemoryHistograms;
+
       /// Budget time distribution of all events
       TH1F* m_fullTimeHistogram;
 
       /// Processing time distribution of all events
       TH1F* m_processingTimeHistogram;
+
+      /// Total memory usage distribution of all events
+      TH1F* m_fullMemoryHistogram;
+
+      /// Memory used for processing distribution of all events
+      TH1F* m_processingMemoryHistogram;
+
       /// Mean budget time of events per unit
       TH1F* m_fullTimeMeanPerUnitHistogram;
 
@@ -60,6 +71,12 @@ namespace Belle2 {
 
       /// Processing time distribution of events per unit
       std::map<unsigned int, TH1F*> m_processingTimePerUnitHistograms;
+
+      /// Total memory distribution of events per unit
+      std::map<unsigned int, TH1F*> m_fullMemoryPerUnitHistograms;
+
+      /// Memory used for processing distribution of events per unit
+      std::map<unsigned int, TH1F*> m_processingMemoryPerUnitHistograms;
 
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
@@ -75,6 +92,21 @@ namespace Belle2 {
 
       /// Storage for the last time sum of certain modules
       std::map<std::string, double> m_lastModuleTimeSum;
+
+      /// Storage for the last full memory sum
+      double m_lastFullMemorySum = 0;
+
+      /// Storage for the last full memory sum per unit
+      std::map<unsigned int, double> m_lastFullMemorySumPerUnit;
+
+      /// Storage for the last processing memory sum
+      double m_lastProcessingMemorySum = 0;
+
+      /// Storage for the last processing memory sum per unit
+      std::map<unsigned int, double> m_lastProcessingMemorySumPerUnit;
+
+      /// Storage for the last memory sum of certain modules
+      std::map<std::string, double> m_lastModuleMemorySum;
 
       /// Parameter: Create HLT unit number histograms?
       bool m_param_create_hlt_unit_histograms;
@@ -102,6 +134,24 @@ namespace Belle2 {
 
       /// Number of bins for the histograms of processingTime
       const double m_processingTimeNBins = 125;
+
+      /// Minimum for the histograms of fullMemory
+      const double m_fullMemoryMin = -100000;
+
+      /// Maximum for the histograms of fullMemory
+      const double m_fullMemoryMax = 100000;
+
+      /// Number of bins for the histograms of fullMemory
+      const double m_fullMemoryNBins = 500;
+
+      /// Minimum for the histograms of processingMemory
+      const double m_processingMemoryMin = -100000;
+
+      /// Maximum for the histograms of processingMemory
+      const double m_processingMemoryMax = 100000;
+
+      /// Number of bins for the histograms of processingMemory
+      const double m_processingMemoryNBins = 500;
     };
 
   }

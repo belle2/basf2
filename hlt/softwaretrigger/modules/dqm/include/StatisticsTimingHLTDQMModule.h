@@ -77,6 +77,16 @@ namespace Belle2 {
 
       /// Store HLT unit number on initialization
       int m_hlt_unit = 0;
+
+
+      /// Maximum for the histograms of fullTime
+      const double m_fullTimeMax = 10000;
+      /// Number of bins for the histograms of fullTime
+      const double m_fullTimeNBins = 250;
+      /// Maximum for the histograms of processingTime
+      const double m_processingTimeMax = 5000;
+      /// Number of bins for the histograms of processingTime
+      const double m_processingTimeNBins = 125;
     };
 
   }

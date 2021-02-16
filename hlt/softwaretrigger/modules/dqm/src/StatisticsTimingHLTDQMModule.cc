@@ -61,15 +61,16 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   m_meanMemoryHistogram = new TH1F("meanMemoryHistogram", "Mean Memory", m_param_overviewModuleList.size(), 0,
                                    m_param_overviewModuleList.size());
   m_meanMemoryHistogram->SetStats(false);
-  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Budget Time [ms]", 250, 0, 10000);
-  m_processingTimeHistogram = new TH1F("processingTimeHistogram", "Processing Time [ms]", 125, 0, 5000);
+  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Budget Time [ms]", m_fullTimeNBins, 0, m_fullTimeMax);
+  m_processingTimeHistogram = new TH1F("processingTimeHistogram", "Processing Time [ms]", m_processingTimeNBins, 0,
+                                       m_processingTimeMax);
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
     const std::string& moduleName = m_param_overviewModuleList[index];
     m_meanTimeHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
     m_meanMemoryHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
     m_moduleTimeHistograms.emplace(moduleName, new TH1F((moduleName + "_time").c_str(),
-                                                        ("Time spent in: " + moduleName).c_str(), 125, 0, 5000));
+                                                        ("Time spent in: " + moduleName + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
     m_lastModuleTimeSum.emplace(moduleName, 0);
   }
 
@@ -87,10 +88,10 @@ void StatisticsTimingHLTDQMModule::defineHisto()
 
     for (unsigned int index = 1; index <= HLTUnit::m_max_hlt_units; index++) {
       m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
-                                                          ("Budget Time Per Unit [ms]: HLT" + std::to_string(index)).c_str(), 250, 0, 10000));
+                                                          ("Budget Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_fullTimeNBins, 0, m_fullTimeMax));
       m_lastFullTimeSumPerUnit.emplace(index, 0);
       m_processingTimePerUnitHistograms.emplace(index, new TH1F(("processingTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
-                                                                ("Processing Time Per Unit [ms]: HLT" + std::to_string(index)).c_str(), 125, 0, 5000));
+                                                                ("Processing Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
       m_lastProcessingTimeSumPerUnit.emplace(index, 0);
     }
   }

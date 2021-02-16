@@ -88,7 +88,7 @@ def get_calibrations(input_data, **kwargs):
     max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
-    basf2.B2INFO(f"Expert set payload boundaries are: {payload_boundaries}")
+    basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -241,11 +241,31 @@ def pre_collector(max_events=None):
     from basf2 import create_path, register_module
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=[
+                "RawCDCs",
+                "RawSVDs",
+                "RawPXDs",
+                "RawTOPs",
+                "RawARICHs",
+                "RawKLMs",
+                "RawECLs",
+                "RawTRGs"])
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=[
+                "RawCDCs",
+                "RawSVDs",
+                "RawPXDs",
+                "RawTOPs",
+                "RawARICHs",
+                "RawKLMs",
+                "RawECLs",
+                "RawTRGs"],
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -278,11 +298,31 @@ def pre_collector_cr(max_events=None):
     from basf2 import create_path, register_module
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=[
+                "RawCDCs",
+                "RawSVDs",
+                "RawPXDs",
+                "RawTOPs",
+                "RawARICHs",
+                "RawKLMs",
+                "RawECLs",
+                "RawTRGs"])
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=[
+                "RawCDCs",
+                "RawSVDs",
+                "RawPXDs",
+                "RawTOPs",
+                "RawARICHs",
+                "RawKLMs",
+                "RawECLs",
+                "RawTRGs"],
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -417,7 +457,7 @@ class CDCCalibration(Calibration):
             else:
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
-                                        pre_collector_path=pre_collector(max_events=max_events),
+                                        pre_collector_paath=pre_collector(max_events=max_events),
                                         )
             self.add_collection(name=skim_type, collection=collection)
 

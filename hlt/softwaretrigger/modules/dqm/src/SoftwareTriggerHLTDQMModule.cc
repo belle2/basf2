@@ -15,7 +15,6 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/utilities/Utils.h>
 
 #include <algorithm>
 #include <fstream>

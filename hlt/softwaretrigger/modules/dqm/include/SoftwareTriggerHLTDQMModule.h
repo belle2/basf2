@@ -50,16 +50,22 @@ namespace Belle2 {
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
+
       /// Which cuts should be ignored? This can be used to clear trigger lines from e.g. bhabha contamination.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
+
       /// Which cuts should be reported per unit?
       std::vector<std::string> m_param_cutResultIdentifiersPerUnit;
+
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
+
       /// Create total result histogram?
       bool m_param_create_total_result_histograms;
+
       /// Create exp/run/event number histograms?
       bool m_param_create_exp_run_event_histograms;
+
       /// Create HLT unit number histograms?
       bool m_param_create_hlt_unit_histograms;
 
@@ -71,7 +77,6 @@ namespace Belle2 {
 
       /// HLT unit number of the machine used
       int m_hlt_unit = 0;
-
 
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
@@ -92,10 +97,13 @@ namespace Belle2 {
       // Datastore members
       /// STM cut results
       StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
+
       /// L1 cut results
       StoreObjPtr<TRGSummary> m_l1TriggerResult;
+
       /// STM cut variables
       StoreObjPtr<SoftwareTriggerVariables> m_variables;
+
       /// Event Info
       StoreObjPtr<EventMetaData> m_eventMetaData;
 

@@ -19,8 +19,6 @@
 
 #include <TH1F.h>
 
-#include <framework/utilities/Utils.h>
-
 #include <fstream>
 
 using namespace Belle2;

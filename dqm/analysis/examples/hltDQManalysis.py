@@ -21,7 +21,12 @@ path.add_module('DQMHistAnalysisHLT', bhabhaName="accept_bhabha_all", columnMapp
     "accept_offip": "accept_offip",
     "accept_tau_2trk": "accept_tau_2trk",
     "accept_tau_Ntrk": "accept_tau_Ntrk",
-}, l1Histograms=["fff", "ffo", "lml0", "ffb", "fp"])
+}, l1Histograms=["fff", "ffo", "lml0", "ffb", "fp"],
+    retentionPerUnit=[
+    "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+    "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
+    "selectee",
+    "Estargt2_GeV_cluster", ])
 path.add_module('DQMHistAnalysisOutputFile', SaveHistos=False, SaveCanvases=True)
 
 basf2.print_path(path)

@@ -7,7 +7,7 @@ from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
 
-def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care"):
+def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
     """
     This function adds DQMs which are common for Cosmic runs and Collion runs
 
@@ -26,6 +26,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+    @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
+                                         Should be True only when running on the HLT servers
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
     # Check components.
@@ -81,6 +83,19 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            cutResultIdentifiers={},
+            histogramDirectoryName="softwaretrigger_before_filter",
+        )
+        path.add_module("StatisticsTimingHLTDQM",
+                        createHLTUnitHistograms=create_hlt_unit_histograms,
+                        )
+
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
         hlt_trigger_lines_in_plot = [
@@ -90,8 +105,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             "2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx",
             "single_muon\\10",
             "singleTagLowMass",
+            "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
+            "selectee",
+            "Estargt2_GeV_cluster",
         ]
-
         hlt_skim_lines_in_plot = [
             "accept_hadron",
             "accept_hadronb2",
@@ -105,6 +122,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             "accept_tau_2trk",
             "accept_tau_Ntrk",
         ]
+        hlt_trigger_lines_per_unit_in_plot = [
+            "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+            "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
+            "selectee",
+            "Estargt2_GeV_cluster",
+        ]
 
         # Default plot
         path.add_module(
@@ -113,7 +136,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 "filter": hlt_trigger_lines_in_plot,
                 "skim": hlt_skim_lines_in_plot,
             },
-            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"]
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
@@ -130,7 +155,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
            createExpRunEventHistograms=False,
            histogramDirectoryName="softwaretrigger_skim_nobhabha",
         )
-        path.add_module("StatisticsTimingHLTDQM")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT

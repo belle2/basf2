@@ -7,7 +7,7 @@ from geometry import check_components
 import reconstruction
 
 
-def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
+def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add DQM plots for a specific run type and dqm environment
     """
@@ -17,9 +17,11 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
     from daqdqm.cosmicdqm import add_cosmic_dqm
 
     if run_type == constants.RunTypes.beam:
-        add_collision_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment,
+                          dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
-        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
+                       dqm_mode=dqm_mode)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
@@ -27,7 +29,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
 
 
-def add_hlt_dqm(path, run_type, components, dqm_mode):
+def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add all the DQM modules for HLT to the path
     """
@@ -36,8 +38,9 @@ def add_hlt_dqm(path, run_type, components, dqm_mode):
         run_type=run_type,
         dqm_environment=constants.Location.hlt.name,
         components=components,
-        dqm_mode=dqm_mode.name)
-    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_'+dqm_mode.name)
+        dqm_mode=dqm_mode.name,
+        create_hlt_unit_histograms=create_hlt_unit_histograms)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components):

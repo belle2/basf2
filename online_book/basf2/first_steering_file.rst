@@ -198,12 +198,20 @@ files.
     Check out the location of the files mentioned above. Which two settings of
     MC are provided?
 
+.. admonition:: Hint
+    :class: xhint toggle stacked
+
+    Remember the ``ls`` (and ``cd``) bash command?
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. code-block:: bash
 
         ls /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
+
+    Alternatively, you can first navigate to the directory with ``cd`` and then
+    just call ``ls`` without any arguments.
 
     There are each 100 files with and without beam background (BGx1 and BGx0).
     Their names only differ by the final suffix, which is an integer between 0
@@ -269,6 +277,18 @@ having to change anything in the script itself.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
+    Get the integer from the command line with
+
+    .. code-block:: python
+
+        import sys
+
+
+        filenumber = sys.argv[1]
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
     Rather than concatenating strings with ``+`` (``"file_" + str(filenumber) + ".root"``),
     you can also use so-called f-strings: ``f"file_{filenumber}.root"``. They
     are great for both readability and performance.
@@ -279,6 +299,21 @@ having to change anything in the script itself.
     .. literalinclude:: steering_files/011_first_steering_file.py
         :linenos:
         :emphasize-lines: 8, 14
+
+
+.. admonition:: Tip
+
+    Make sure that from now on you always supply a number every time you run your
+    steering file, e.g. ``basf2 myanalysis.py 1``.
+
+    Else you will get an exception like
+
+    .. code-block::
+
+        Traceback (most recent call last):
+          File "myanalysis.py", line 3, in <module>
+            filenumber = sys.argv[1]
+        IndexError: list index out of range
 
 Filling particle lists
 ----------------------

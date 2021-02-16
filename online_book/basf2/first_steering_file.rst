@@ -845,12 +845,28 @@ information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
 name as input arguments. The integer (0-based) counts through the daughter
 particles, ``daughter(0, p)`` would for example be the momentum of the first
-daughter, in our case of the :math:`J/\Psi`. The function can be used
-recursively, so ``daughter(daughter(0, E))`` is the energy of the positive
-muon. In principle, one can add these nested variables directly to the ntuple
-but the brackets have to be escaped and the resulting variable name in the
-ntuple is not very user-friendly or intuitive. Instead, one can define aliases
-to translate the variables using `addAlias`.
+daughter, in our case of the :math:`J/\Psi`. This function can also be used
+recursively.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    What does ``daughter(0, daughter(0, E))`` denote?
+
+.. admonition:: Solution
+    :class: toggle stacked
+
+    It's the energy of the positive muon.
+
+In principle, one can add these nested variables directly to the ntuple
+but the brackets have to be escaped (i.e. replaced with "normal" characters)
+and the resulting variable name in the ntuple is not very user-friendly or
+intuitive. For example ``daughter(0, daughter(0, E))`` becomes
+``daughter__bo0__cm__spdaughter__bo0__cm__spE__bc__bc``. Not exactly pretty,
+right?
+
+So instead, let's define aliases to translate the variable names!
+This can be done with `addAlias`.
 
 .. admonition:: Exercise
     :class: exercise stacked

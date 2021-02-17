@@ -89,6 +89,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createHLTUnitHistograms=create_hlt_unit_histograms,
             createTotalResultHistograms=False,
             createExpRunEventHistograms=False,
+            createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
         )
@@ -98,44 +99,40 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
-        hlt_trigger_lines_in_plot = [
-            "ge3_loose_tracks_inc_1_tight_not_ee2leg",
-            "selectmumu",
-            "ECLMuonPair",
-            "2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx",
-            "single_muon\\10",
-            "singleTagLowMass",
-            "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
-            "selectee",
-            "Estargt2_GeV_cluster",
-        ]
-        hlt_skim_lines_in_plot = [
-            "accept_hadron",
-            "accept_hadronb2",
-            "accept_bhabha_all",
-            "accept_bhabha",
-            "accept_gamma_gamma",
-            "accept_mumu_2trk",
-            "accept_mumutight",
-            "accept_radmumu",
-            "accept_offip",
-            "accept_tau_2trk",
-            "accept_tau_Ntrk",
-        ]
+        hlt_trigger_lines_in_plot = []
+        hlt_skim_lines_in_plot = []
+
         hlt_trigger_lines_per_unit_in_plot = [
             "ge3_loose_tracks_inc_1_tight_not_ee2leg",
             "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
             "selectee",
             "Estargt2_GeV_cluster",
         ]
+        cutResultIdentifiers = {}
+
+        from softwaretrigger import filter_categories, skim_categories
+
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False]
+        skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
+
+        def read_lines(category):
+            return [i.split(" ", 1)[1].replace(" ", "_") for i in category]
+
+        for i in filter_cat:
+            cutResultIdentifiers[i] = {"filter": read_lines(getattr(filter_categories, i))}
+            hlt_trigger_lines_in_plot += read_lines(getattr(filter_categories, i))
+
+        for i in skim_cat:
+            cutResultIdentifiers[i] = {"skim": read_lines(getattr(skim_categories, i))}
+            hlt_skim_lines_in_plot += read_lines(getattr(skim_categories, i))
+
+        cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
+        cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
 
         # Default plot
         path.add_module(
             "SoftwareTriggerHLTDQM",
-            cutResultIdentifiers={
-                "filter": hlt_trigger_lines_in_plot,
-                "skim": hlt_skim_lines_in_plot,
-            },
+            cutResultIdentifiers=cutResultIdentifiers,
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
@@ -144,7 +141,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(
            "SoftwareTriggerHLTDQM",
            cutResultIdentifiers={
-               "skim": hlt_skim_lines_in_plot,
+               "skim": {"skim": hlt_skim_lines_in_plot},
            },
            cutResultIdentifiersIgnored={
                "skim": [

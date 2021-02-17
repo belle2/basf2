@@ -19,12 +19,14 @@ namespace Belle2 {
 
   namespace ECL {
 
-    // This struct is returned by the fit algorithm that fits the
-    // first 16 samples of the waveform (pedestal points) to find
-    // a peak there (that corresponds to background).
-    //
-    // Currently it only contains peak amplitude but potentially
-    // we can add more values here later.
+    /**
+     * This struct is returned by the `pedestalFit` method that fits the
+     * first 16 samples of the waveform (pedestal points) to find a peak
+     * there (that corresponds to background).
+     *
+     * Currently it only contains peak amplitude but potentially
+     * we can add more values here later.
+     */
     typedef struct ECLPedestalFit {
       /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
       int amp;
@@ -40,6 +42,7 @@ namespace Belle2 {
        * @brief Convert ECLDspData from *.dat file to Root object.
        *
        * @param[in] raw_file Path to dsp??.dat file.
+       * @param[in] boardNumber Number of shaperDSP board, from 1 to 52*12
        * @return ECLDspData object
        */
       static ECLDspData* readEclDsp(const char* raw_file, int boardNumber);
@@ -95,9 +98,9 @@ namespace Belle2 {
       /** Flag indicating whether arrays fg31,fg32 are filled */
       static int pedestal_fit_initialized;
       /** DSP coefficients used to determine amplitude in pedestalFit */
-      static float fg31[768];
+      static float pedfit_fg31[768];
       /** DSP coefficients used to determine time in pedestalFit */
-      static float fg32[768];
+      static float pedfit_fg32[768];
 
       /**
        * Private constructor since class only contains static methods,

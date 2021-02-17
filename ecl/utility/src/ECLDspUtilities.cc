@@ -30,8 +30,8 @@ using namespace ECL;
 const short ECLDSP_FORMAT_VERSION = 1;
 
 int ECLDspUtilities::pedestal_fit_initialized = 0;
-float ECLDspUtilities::fg31[768] = {};
-float ECLDspUtilities::fg32[768] = {};
+float ECLDspUtilities::pedfit_fg31[768] = {};
+float ECLDspUtilities::pedfit_fg32[768] = {};
 
 /**
  * @brief Read data from file to ptr.
@@ -334,8 +334,8 @@ void ECLDspUtilities::initPedestalFit()
   //== Load DSP coefficients used in pedestal fitting
   for (int i = 0; i < nentries; i++) {
     tree->GetEntry(i);
-    fg31[i] = fg31_i;
-    fg32[i] = fg32_i;
+    pedfit_fg31[i] = fg31_i;
+    pedfit_fg32[i] = fg32_i;
   }
   file->Close();
 
@@ -372,8 +372,8 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     amp = 0;
     tim = 0;
     for (int j = 0; j < 16; j++) {
-      amp += fg31[j + time_index * 16] * adc[j];
-      tim += fg32[j + time_index * 16] * adc[j];
+      amp += pedfit_fg31[j + time_index * 16] * adc[j];
+      tim += pedfit_fg32[j + time_index * 16] * adc[j];
     }
     tim = tim / amp;
     time_index -= tim * 4;
@@ -381,9 +381,6 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     if (time_index > 47) time_index = 47;
     if (time_index < 0)  time_index = 0;
   }
-  // Estimate time from 0th sample to peak (in denominated microseconds)
-  // (1 denom. microsecond = 0.56594/0.5 us)
-  tim = time_index * 0.5 - tim + 0.5;
 
   ECLPedestalFit result;
   result.amp = amp;

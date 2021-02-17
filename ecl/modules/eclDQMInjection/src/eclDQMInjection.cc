@@ -122,6 +122,8 @@ void ECLDQMInjectionModule::defineHisto()
     }
   }
 
+  // Initialize coefficients used by pedestalFit function
+  ECLDspUtilities::initPedestalFit();
 
   // cd back to root directory
   oldDir->cd();

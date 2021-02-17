@@ -323,6 +323,9 @@ void ECLDspUtilities::initPedestalFit()
 {
   std::string path = FileSystem::findFile("ecl/data/ecl_pedestal_peak_fit.root");
   TFile* file = new TFile(path.c_str(), "read");
+  if (!file->IsOpen()) {
+    B2FATAL("Unable to load coefficients for ECL pedestal fit");
+  }
   TTree* tree = (TTree*)file->Get("dsp_coefs");
   int nentries = tree->GetEntries();
   float fg31_i, fg32_i;

@@ -345,8 +345,7 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     initPedestalFit();
   }
 
-  // TODO: Fix 'set but not used' for pedestal and ped_max_pos
-  float amp, tim, pedestal;
+  float amp, tim;
 
   //== Find maximum in the pedestal
 
@@ -358,6 +357,8 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
       ped_max_pos = i;
     }
   }
+
+  //== Get first position estimate from maximum location
 
   int time_index = ped_max_pos * 4 - 8;
   if (time_index > 47) time_index = 47;
@@ -379,9 +380,7 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
   }
   // Estimate time from 0th sample to peak (in denominated microseconds)
   // (1 denom. microsecond = 0.56594/0.5 us)
-  tim      = time_index * 0.5 - tim + 0.5;
-  // Estimate pedestal (assuming peak is not in first four samples)
-  pedestal = (adc[0] + adc[1] + adc[2] + adc[3]) / 4.;
+  tim = time_index * 0.5 - tim + 0.5;
 
   ECLPedestalFit result;
   result.amp = amp;

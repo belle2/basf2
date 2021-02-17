@@ -31,6 +31,8 @@
 
 namespace Belle2 {
 
+  class ECLDsp;
+
   namespace ECL {
     /** The ECL Occ after Injection DQM module.
      *
@@ -63,6 +65,8 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_storeHits;
       /** Input array for ECL burst suppresions. */
       StoreArray<ECLTrig> m_ECLTrigs;
+      /** Input array for ECL waveform data */
+      StoreArray<ECLDsp> m_ECLDsps;
 
       /** PSD waveform amplitude threshold. */
       DBObjPtr<ECLCrystalCalib> m_calibrationThrApsd;
@@ -95,6 +99,18 @@ namespace Belle2 {
 
       TH2F* hOccAfterInjLER{};         /**< Histogram Occupancy after LER injection */
       TH2F* hOccAfterInjHER{};         /**< Histogram Occupancy after HER injection */
+
+      /**
+       * Injection time range (in ms) for h_ped_peak histograms
+       */
+      std::vector<float> m_ped_peak_range = {};
+      /**
+       * Distribution of pedestal peak (peak in first 16 waveform samples)
+       * after HER/LER injection, with separate histograms for forward endcap,
+       * barrel and backward, also separated by time range after the injection
+       * (m_ped_peak_range defines these time ranges)
+       */
+      std::vector<TH1F*> h_ped_peak = {};
 
       void initialize() override final; /**< initialize function */
 

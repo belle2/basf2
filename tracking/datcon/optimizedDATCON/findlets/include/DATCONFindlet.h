@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:  Christian Wessel                                        *
@@ -13,8 +13,12 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
+
+
+// #include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -76,6 +80,8 @@ namespace Belle2 {
     /// Hough Space intercept finder
     FastInterceptFinder2D m_interceptFinder;
 
+    /// Raw track candidate cleaner
+    RawTrackCandCleaner m_rawTCCleaner;
 
     // container to share data between findlets
 
@@ -83,7 +89,7 @@ namespace Belle2 {
     std::vector<HitDataCache> m_hits;
 
     /// Vector containint raw track candidates
-    std::vector<std::vector<HitDataCache>> m_rawTrackCandidates;
+    std::vector<std::vector<HitDataCache*>> m_rawTrackCandidates;
 
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.

@@ -15,6 +15,7 @@
 #include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <string>
 #include <vector>
@@ -46,11 +47,15 @@ namespace Belle2 {
     {
       if (m_storeSpacePoints.getEntries() == 0) return;
 
+//       auto& geoCache = VXD::GeoCache::getInstance();
       for (auto& spacePoint : m_storeSpacePoints) {
         const B2Vector3D& hitPos = spacePoint.getPosition();
         const double hitRadiusSquared = hitPos.Perp() * hitPos.Perp();
-        hits.emplace_back(&spacePoint, spacePoint.getVxdID(), hitPos.X(), hitPos.Y(), hitPos.Z(),
-                          2.*hitPos.X() / hitRadiusSquared, 2.*hitPos.Y() / hitRadiusSquared);
+        hits.emplace_back(&spacePoint, spacePoint.getVxdID(),
+                          spacePoint.getVxdID().getLayerNumber(), spacePoint.getVxdID().getLadderNumber(),
+                          hitPos.X(), hitPos.Y(), hitPos.Z(),
+                          2.*hitPos.X() / hitRadiusSquared, 2.*hitPos.Y() / hitRadiusSquared,
+                          spacePoint.getNormalizedLocalU(), spacePoint.getNormalizedLocalV(), hitPos.Phi(), hitPos.Theta());
       }
     };
 

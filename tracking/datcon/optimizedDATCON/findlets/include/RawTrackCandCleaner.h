@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -10,39 +10,54 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
+// #include <framework/datastore/StoreArray.h>
+
+#include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.dcl.h>
+#include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <string>
 #include <vector>
 
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TFile.h>
+
+
 namespace Belle2 {
+  class HitDataCache;
   class SpacePoint;
   class SpacePointTrackCand;
   class VxdID;
 
   class ModuleParamList;
 
-  /**
-   * Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-   */
-  class TrackCandidateRejecter : public
-    TrackFindingCDC::Findlet<SpacePointTrackCand> {
+  /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
+  class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<HitDataCache*>, SpacePointTrackCand> {
     /// Parent class
-    using Super =
-      TrackFindingCDC::Findlet<SpacePointTrackCand>;
+    using Super =  TrackFindingCDC::Findlet<std::vector<HitDataCache*>, SpacePointTrackCand>;
 
   public:
     /// Find intercepts in the 2D Hough space
-    TrackCandidateRejecter();
+    RawTrackCandCleaner();
+
+    /// Default destructor
+    ~RawTrackCandCleaner();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Create the store arrays
-    void initialize() override;
+//     void initialize() override;
+
+    /// Begin the event and reset containers
+//     void beginEvent() override;
+
+    /// End run and write Root file
+    void endRun() override;
 
     /// Reject bad SpacePointTrackCands and bad hits inside the remaining
-    void apply(std::vector<SpacePointTrackCand>& trackCandidates) override;
+    void apply(std::vector<std::vector<HitDataCache*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
 
@@ -50,7 +65,23 @@ namespace Belle2 {
 //     std::vector<const SpacePoint*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
+//     std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
+
+    std::vector<TrackFindingCDC::WeightedRelation<HitDataCache>> m_relations;
+
+    RelationCreator<HitDataCache, ChooseableRelationFilter> m_relationCreator;
+
+
+    /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
+    /// ROOT file name
+    TFile* m_rootFile;
+
+    TH1D* m_nRelationsPerRawTrackCand;
+    TH1D* m_nRelationsPerEvent;
+    TH2D* m_nRelationsVsRawTrackCand;
+    TH2D* m_nRelationsVsRawTrackCandSize;
+
+    void initializeHists();
 
   };
 }

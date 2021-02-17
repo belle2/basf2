@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONFindlet.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
@@ -23,6 +24,7 @@ DATCONFindlet::DATCONFindlet()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
   addProcessingSignalListener(&m_interceptFinder);
+  addProcessingSignalListener(&m_rawTCCleaner);
 
   initializeHists();
 
@@ -34,6 +36,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
+  m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
 }
 
 void DATCONFindlet::beginEvent()
@@ -41,8 +44,8 @@ void DATCONFindlet::beginEvent()
   Super::beginEvent();
 
   m_hits.clear();
-  m_trackCandidates.clear();
   m_rawTrackCandidates.clear();
+  m_trackCandidates.clear();
 
 }
 
@@ -57,6 +60,8 @@ void DATCONFindlet::apply()
   m_interceptFinder.apply(m_hits, m_rawTrackCandidates);
   B2DEBUG(29, "m_rawTrackCandidates.size: " << m_rawTrackCandidates.size());
   analyseSPTCs();
+
+  m_rawTCCleaner.apply(m_rawTrackCandidates, m_trackCandidates);
 }
 
 void DATCONFindlet::initializeHists()

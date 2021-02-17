@@ -126,7 +126,7 @@ void FastInterceptFinder2D::initialize()
 }
 
 
-void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache>>& rawTrackCandidates)
+void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache*>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
 
@@ -165,11 +165,12 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
          and a->spacePoint->getPosition().Perp() < b->spacePoint->getPosition().Perp());
     });
 
-    std::vector<HitDataCache> convertedTrackCand;
-    for (const HitDataCache* hit : trackCand)
-      convertedTrackCand.emplace_back(*hit);
-
-    rawTrackCandidates.emplace_back(convertedTrackCand);
+    rawTrackCandidates.emplace_back(trackCand);
+//     std::vector<HitDataCache> convertedTrackCand;
+//     for (const HitDataCache* hit : trackCand)
+//       convertedTrackCand.emplace_back(*hit);
+//
+//     rawTrackCandidates.emplace_back(convertedTrackCand);
   }
 
   B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());
@@ -259,11 +260,11 @@ void FastInterceptFinder2D::initializeSectorFriendMap()
 }
 
 
-void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<const HitDataCache*>& hits, uint xmin, uint xmax, uint ymin,
+void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitDataCache*>& hits, uint xmin, uint xmax, uint ymin,
                                                   uint ymax, uint currentRecursion)
 {
-  std::vector<const HitDataCache*> containedHits;
-  containedHits.reserve(64);
+  std::vector<HitDataCache*> containedHits;
+  containedHits.reserve(hits.size());
   std::bitset<8> layerHits; /* For layer filter */
 
   if (currentRecursion == m_param_maxRecursionLevel + 1) return;
@@ -304,7 +305,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<const HitDat
       // reset layerHits and containedHits
       layerHits = 0;
       containedHits.clear();
-      for (const HitDataCache* hit : hits) {
+      for (HitDataCache* hit : hits) {
 
         const double& m = hit->xConformal;
         const double& a = hit->yConformal;
@@ -359,7 +360,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     currentCell.second.first = m_clusterCount;
 
     m_currentTrackCandidate.clear();
-    for (const HitDataCache* hit : currentCell.second.second) {
+    for (HitDataCache* hit : currentCell.second.second) {
       m_currentTrackCandidate.emplace_back(hit);
     }
 
@@ -405,7 +406,7 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 
           // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
           // so it's certain the key exists.
-          for (const HitDataCache* hit : activeSector->second.second) {
+          for (HitDataCache* hit : activeSector->second.second) {
             if (not TrackFindingCDC::is_in(hit, m_currentTrackCandidate)) {
               m_currentTrackCandidate.emplace_back(hit);
             }
@@ -421,7 +422,7 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 }
 
 
-void FastInterceptFinder2D::gnuplotoutput(const std::vector<const HitDataCache*>& hits)
+void FastInterceptFinder2D::gnuplotoutput(const std::vector<HitDataCache*>& hits)
 {
   std::ofstream outstream;
   outstream.open("gnuplotlog.plt", std::ios::trunc);

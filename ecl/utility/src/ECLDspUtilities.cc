@@ -377,7 +377,6 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     }
     tim = tim / amp;
     time_index -= tim * 4;
-    // time_index -= (tim / amp) * 4;
     if (time_index > 47) time_index = 47;
     if (time_index < 0)  time_index = 0;
   }

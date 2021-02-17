@@ -73,7 +73,9 @@ namespace Belle2 {
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
+    //! RooFit Workspace
     RooWorkspace* m_rfws{};
+    //! RooFit variable
     RooRealVar* m_x{};
 
     //! Fit the Mean for all modules

@@ -26,6 +26,9 @@
 #include <TFile.h>
 #include <TH2.h>
 
+#include <RooRealVar.h>
+#include <RooWorkspace.h>
+
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
@@ -57,6 +60,7 @@ namespace Belle2 {
     TH1* GetHisto(TString histoname);
 
     // Data members
+
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
@@ -65,18 +69,13 @@ namespace Belle2 {
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
-    //! fit range before peak
-    double m_peakBefore;
-    //! fit range after peak
-    double m_peakAfter;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //! only one fit function for all Landaus
-    TF1Convolution* m_fConv = nullptr;
-    //! only one fit function for all Landaus
-    TF1* m_fFit = nullptr;
+    RooWorkspace* m_rfws{};
+    RooRealVar* m_x{};
+
     //! Fit the Mean for all modules
     TF1* m_fMean = nullptr;
     //! Graph covering all modules

@@ -348,7 +348,7 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     initPedestalFit();
   }
 
-  float amp, tim;
+  float amp;
 
   //== Find maximum in the pedestal
 
@@ -370,7 +370,7 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
   //== Run two iterations of chi2 minimization
   for (int iter = 0; iter < 2; iter++) {
     amp = 0;
-    tim = 0;
+    float tim = 0;
     for (int j = 0; j < 16; j++) {
       amp += pedfit_fg31[j + time_index * 16] * adc[j];
       tim += pedfit_fg32[j + time_index * 16] * adc[j];

@@ -2201,9 +2201,11 @@ C CALL ALTERN1(INUM,PNU,PKK,GAMM,HV)
      $             -4*AMF1**2*AMF0**2           )/AMTAU**2
        ENDIF
        ELSEIF (IME.EQ.5) THEN       
-          CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
-          GAMM=1./(16.*PI)*AMTAU**3*
-     $        (GAMM/AMTAU**4)*
+          CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,BRAK,HV)
+C we introduce ad hoc normalization factor (GFERMI**2*AMTAU**4),
+C to have couplings relative to W   boson mediated ones
+          GAMM=(GFERMI**2*AMTAU**4)/(16.*PI)*AMTAU**3*
+     $        (BRAK/AMTAU**4)*
      $        SQRT((AMTAU**2-AMF1**2-AMF0**2)**2
      $             -4*AMF1**2*AMF0**2           )/AMTAU**2
          RETURN
@@ -4130,7 +4132,7 @@ C            4- default ME wrapped curr., 5- wrapped ME
       END
 
 
-      SUBROUTINE DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
+      SUBROUTINE DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,OMEGA,HV)
       REAL  PKK(4),PNU(4),HV(4)
 C
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
@@ -4158,25 +4160,21 @@ C
 !     Following is written for covariant vectors HV(k) (namely h_i, likewise 3.25 Comp. Phys. Commun. 64 (1991) 275).
 !     It is assumed that HV(4) corresponds to h_0
 
-      IF (ISPNVI.EQ.0) THEN      ! scalar case
-         GAMM = 2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
-     $        + 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU
+      IF (ISPNVI.EQ.0) THEN     ! scalar case
+         OMEGA = 2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
+     $         + 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU
          DO K=1,3
-            HV(K)= 4 * VCINVI * ACINVI * AMTAU * PNU(K)/GAMM
+            HV(K)= 4 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
          ENDDO
          HV(4)=1
-         GAMM= GAMM*0.5*AMTAU**2
-      ELSEIF (ISPNVI.EQ.1) THEN  ! vector case
-         GAMM = 2 * (VCINVI**2 + ACINVI**2)
-     $            * (2 * AMTAU * PKK(4) * QN + AMTAU * PNU(4) * AMF1**2)
-     $        - 6 * (VCINVI**2 - ACINVI**2) * AMTAU * AMF0 * AMF1**2
+      ELSEIF (ISPNVI.EQ.1) THEN ! vector case
+         OMEGA = 2 * (2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
+     $              - 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU )
          DO K=1,3
-            HV(K) = 4 * VCINVI * ACINVI * AMTAU * PNU(K) * (AMF1**2 - 2 * QN)/GAMM
+            HV(K)= 8 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
          ENDDO
          HV(4)=1
-         GAMM= GAMM*0.5*AMTAU**2/AMF1**2
       ENDIF
-      GAMM=GAMM*GFERMI**2
       RETURN
       END
 

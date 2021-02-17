@@ -239,31 +239,17 @@ def pre_collector(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
         root_input = register_module(
             'RootInput',
-            branchNames=[
-                "RawCDCs",
-                "RawSVDs",
-                "RawPXDs",
-                "RawTOPs",
-                "RawARICHs",
-                "RawKLMs",
-                "RawECLs",
-                "RawTRGs"])
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
         root_input = register_module(
             'RootInput',
-            branchNames=[
-                "RawCDCs",
-                "RawSVDs",
-                "RawPXDs",
-                "RawTOPs",
-                "RawARICHs",
-                "RawKLMs",
-                "RawECLs",
-                "RawTRGs"],
+            branchNames=HLT_INPUT_OBJECTS,
             entrySequences=[
                 '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
@@ -296,31 +282,17 @@ def pre_collector_cr(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
         root_input = register_module(
             'RootInput',
-            branchNames=[
-                "RawCDCs",
-                "RawSVDs",
-                "RawPXDs",
-                "RawTOPs",
-                "RawARICHs",
-                "RawKLMs",
-                "RawECLs",
-                "RawTRGs"])
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
         root_input = register_module(
             'RootInput',
-            branchNames=[
-                "RawCDCs",
-                "RawSVDs",
-                "RawPXDs",
-                "RawTOPs",
-                "RawARICHs",
-                "RawKLMs",
-                "RawECLs",
-                "RawTRGs"],
+            branchNames=HLT_INPUT_OBJECTS,
             entrySequences=[
                 '0:{}'.format(max_events)])
     reco_path.add_module(root_input)

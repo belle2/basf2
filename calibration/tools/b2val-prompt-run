@@ -17,7 +17,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import basf2
-from basf2 import B2ERROR, B2INFO, B2WARNING
+from basf2 import B2ERROR, B2INFO, B2WARNING, B2FATAL
 import json
 import importlib
 from pathlib import Path
@@ -140,7 +140,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
         expert_config = {**expert_config, **validation_config["expert_config"]}
 
-    validation_result_path = Path(current_directory, 'validation_results')
+    validation_result_path = Path(current_directory, 'validation_results', 'validations')
 
     try:
         validation_result_path.mkdir(parents=True)

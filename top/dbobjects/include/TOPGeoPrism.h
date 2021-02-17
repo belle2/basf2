@@ -72,7 +72,7 @@ namespace Belle2 {
     TOPGeoPrism(double width, double thickness, double length,
                 double exitThickness, double flatLength,
                 const std::string& material,
-                const std::string& name = "TOPPrism"):
+                const std::string& name = "TOPPrism_"):
       TOPGeoBarSegment(width, thickness, length, material, name),
       m_exitThickness(exitThickness), m_flatLength(flatLength)
     {}

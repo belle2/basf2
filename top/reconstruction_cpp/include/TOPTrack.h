@@ -13,6 +13,7 @@
 #include <TVector3.h>
 #include <framework/gearbox/Const.h>
 #include <top/reconstruction_cpp/HelixSwimmer.h>
+#include <top/reconstruction_cpp/RaytracerBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
 
@@ -166,7 +167,7 @@ namespace Belle2 {
 
       /**
        * Returns assumed photon emission position and track direction
-       * @param dL length difference to the average emission position (for numerical derivative calculations)
+       * @param dL length difference to the average emission position
        * @return assumed photon emission position and track direction in local frame
        */
       const TOPTrack::AssumedEmission& getEmissionPoint(double dL = 0) const;
@@ -240,6 +241,18 @@ namespace Belle2 {
        * @return true if quartz bar intersection exists
        */
       bool setHelix(const TRotation& rotation, const TVector3& translation);
+
+      /**
+       * Calculates intersection of trajectory with prism
+       * @param lengths trajectory lengths relative to extHit position of intersection points [in/out]
+       * @param positions positions of intersection points in module local frame [in/out]
+       * @param prism prism geometry data
+       * @param rotation rotation matrix from local to nominal frame (rotation first ...)
+       * @param translation translation vector from local to nominal frame (... then translation)
+       * @return true if intersection exists
+       */
+      bool xsecPrism(std::vector<double>& lengths, std::vector<TVector3>& positions,
+                     const RaytracerBase::Prism& prism, const TRotation& rotation, const TVector3& translation);
 
       int m_moduleID = 0;  /**< slot ID */
       double m_momentum = 0; /**< track momentum magnitude */

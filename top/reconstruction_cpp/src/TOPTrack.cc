@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/reconstruction_cpp/TOPTrack.h>
-#include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/geometry/BFieldManager.h>
@@ -106,7 +105,7 @@ namespace Belle2 {
         }
       }
 
-      // background rate estimation (TODO must be improved)
+      // background rate estimation (TODO to be improved ...)
 
       const auto& backgroundPDFs = TOPRecoManager::getBackgroundPDFs();
       unsigned k = m_moduleID - 1;
@@ -125,6 +124,7 @@ namespace Belle2 {
 
       m_valid = effi > 0; // no sense to provide PID for this track if the module is fully inefficient
     }
+
 
     bool TOPTrack::setHelix(const TRotation& rotation, const TVector3& translation)
     {
@@ -171,22 +171,22 @@ namespace Belle2 {
         if (isnan(t)) return false;
         auto r = m_helix.getPosition(t);
         if (abs(r.X()) > bar.A / 2) {
-          auto k = (r.X() > bar.A / 2) ? 3 : 2;
+          auto k = (r.X() > 0) ? 3 : 2;
           t = m_helix.getDistanceToPlane(points[k], normals[k]);
           if (isnan(t)) return false;
           r = m_helix.getPosition(t);
-          if (abs(r.Y()) > bar.B / 2) return false;
+          if (r.Z() >= bar.zL and abs(r.Y()) > bar.B / 2) return false;
         }
         lengths.push_back(t);
         positions.push_back(r);
       }
-      if (lengths.size() != 2) return false;
 
       // crossing prism?
 
       if (positions[0].Z() < bar.zL or positions[1].Z() < bar.zL) {
-        // TODO: track crossing prism needs special treatment
-        return false;
+        const RaytracerBase::Prism prism(module);
+        bool ok = xsecPrism(lengths, positions, prism, rotation, translation);
+        if (not ok) return false;
       }
 
       // crossing mirror surface?
@@ -228,8 +228,98 @@ namespace Belle2 {
       return m_length > bar.B / 2; // require minimal track lenght inside quartz (more than half of bar thickness)
     }
 
+
+    bool TOPTrack::xsecPrism(std::vector<double>& lengths, std::vector<TVector3>& positions,
+                             const RaytracerBase::Prism& prism, const TRotation& rotation,
+                             const TVector3& translation)
+    {
+      std::vector<TVector3> points;
+      std::vector<TVector3> normals;
+
+      points.push_back(rotation * TVector3(0, prism.yDown, 0) + translation); // lower-most surface
+      normals.push_back(rotation * TVector3(0, -1, 0));
+
+      points.push_back(rotation * TVector3(0, prism.yUp, 0) + translation); // upper surface
+      normals.push_back(rotation * TVector3(0, 1, 0));
+
+      points.push_back(rotation * TVector3(-prism.A / 2, 0, 0) + translation); // left-side surface
+      normals.push_back(rotation * TVector3(-1, 0, 0));
+
+      points.push_back(rotation * TVector3(prism.A / 2, 0, 0) + translation); // right-side surface
+      normals.push_back(rotation * TVector3(1, 0, 0));
+
+      double slantedSlope = (prism.yDown + prism.B / 2) / (prism.zFlat - prism.zR);
+
+      for (size_t i = 0; i < 2; i++) {
+        if (positions[i].Z() < prism.zR) {
+          double t = m_helix.getDistanceToPlane(points[i], normals[i]);
+          if (isnan(t)) return false;
+          auto r = m_helix.getPosition(t);
+          if (i == 0 and r.Z() > prism.zFlat) { // intersection with slanted surface -> find it using bisection
+            auto point = rotation * TVector3(0, -prism.B / 2, 0) + translation;
+            double t1 = m_helix.getDistanceToPlane(point, normals[0]);
+            if (isnan(t1)) return false;
+            double t2 = t;
+            for (int iter = 0; iter < 20; iter++) {
+              t = (t1 + t2) / 2;
+              r = m_helix.getPosition(t);
+              double ySlanted = prism.yDown + slantedSlope * (r.Z() - prism.zFlat);
+              if (r.Y() < ySlanted) t2 = t;
+              else t1 = t;
+            }
+            t = (t1 + t2) / 2;
+          }
+          if (abs(r.X()) > prism.A / 2) { // intersection on the side surface
+            auto k = (r.X() > 0) ? 3 : 2;
+            t = m_helix.getDistanceToPlane(points[k], normals[k]);
+            if (isnan(t)) return false;
+            r = m_helix.getPosition(t);
+            if (r.Z() < prism.zR) { // yes, it's on the prism side
+              if (r.Y() > prism.yUp or r.Y() < prism.yDown) return false;
+              double ySlanted = prism.yDown + slantedSlope * (r.Z() - prism.zFlat);
+              if (r.Y() < ySlanted) return false;
+            } else { // no, it's on the prism entrance but outside the bar exit window -> find it using bisection
+              double t1 = lengths[i];
+              double t2 = t;
+              for (int iter = 0; iter < 20; iter++) {
+                t = (t1 + t2) / 2;
+                r = m_helix.getPosition(t);
+                if (r.Z() < prism.zR) t1 = t;
+                else t2 = t;
+              }
+              t = (t1 + t2) / 2;
+            }
+          }
+          lengths[i] = t;
+          positions[i] = m_helix.getPosition(t);
+        }
+      }
+
+      if (positions[0].Z() < prism.zL and positions[1].Z() < prism.zL) return false;
+
+      if (positions[0].Z() < prism.zL or positions[1].Z() < prism.zL) { // intersection is on exit window
+        int i0 = (positions[0].Z() < prism.zL) ? 0 : 1;
+        double t1 = lengths[i0];
+        double t2 = lengths[(i0 + 1) % 2];
+        for (int iter = 0; iter < 20; iter++) {
+          double t = (t1 + t2) / 2;
+          auto r = m_helix.getPosition(t);
+          if (r.Z() < prism.zL) t1 = t;
+          else t2 = t;
+        }
+        double t = (t1 + t2) / 2;
+        lengths[i0] = t;
+        positions[i0] = m_helix.getPosition(t);
+      }
+
+      return true;
+    }
+
+
     const TOPTrack::AssumedEmission& TOPTrack::getEmissionPoint(double dL) const
     {
+      if (m_emissionPoints.size() > 1000) m_emissionPoints.clear(); // prevent blow-up
+
       auto& emissionPoint = m_emissionPoints[dL];
       if (not emissionPoint.isSet) {
         emissionPoint.position = m_helix.getPosition(dL);

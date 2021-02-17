@@ -18,12 +18,20 @@
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
+#include <framework/utilities/FileSystem.h>
+// ROOT
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace Belle2;
 using namespace ECL;
 
 /** Version of ECL DSP file format */
 const short ECLDSP_FORMAT_VERSION = 1;
+
+int ECLDspUtilities::pedestal_fit_initialized = 0;
+float ECLDspUtilities::fg31[768] = {};
+float ECLDspUtilities::fg32[768] = {};
 
 /**
  * @brief Read data from file to ptr.
@@ -311,4 +319,73 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   return result;
 }
 
+void ECLDspUtilities::initPedestalFit()
+{
+  std::string path = FileSystem::findFile("ecl/data/ecl_pedestal_peak_fit.root");
+  TFile* file = new TFile(path.c_str(), "read");
+  TTree* tree = (TTree*)file->Get("dsp_coefs");
+  int nentries = tree->GetEntries();
+  float fg31_i, fg32_i;
+  tree->SetBranchAddress("fg31", &fg31_i);
+  tree->SetBranchAddress("fg32", &fg32_i);
+  //== Load DSP coefficients used in pedestal fitting
+  for (int i = 0; i < nentries; i++) {
+    tree->GetEntry(i);
+    fg31[i] = fg31_i;
+    fg32[i] = fg32_i;
+  }
+  file->Close();
+
+  pedestal_fit_initialized = 1;
+}
+
+ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
+{
+  if (!pedestal_fit_initialized) {
+    initPedestalFit();
+  }
+
+  // TODO: Fix 'set but not used' for pedestal and ped_max_pos
+  float amp, tim, pedestal;
+
+  //== Find maximum in the pedestal
+
+  int ped_max = 0;
+  int ped_max_pos = 0;
+  for (int i = 0; i < 16; i++) {
+    if (adc[i] > ped_max) {
+      ped_max = adc[i];
+      ped_max_pos = i;
+    }
+  }
+
+  int time_index = ped_max_pos * 4 - 8;
+  if (time_index > 47) time_index = 47;
+  if (time_index < 0)  time_index = 0;
+
+  //== Run two iterations of chi2 minimization
+  for (int iter = 0; iter < 2; iter++) {
+    amp = 0;
+    tim = 0;
+    for (int j = 0; j < 16; j++) {
+      amp += fg31[j + time_index * 16] * adc[j];
+      tim += fg32[j + time_index * 16] * adc[j];
+    }
+    tim = tim / amp;
+    time_index -= tim * 4;
+    // time_index -= (tim / amp) * 4;
+    if (time_index > 47) time_index = 47;
+    if (time_index < 0)  time_index = 0;
+  }
+  // Estimate time from 0th sample to peak (in denominated microseconds)
+  // (1 denom. microsecond = 0.56594/0.5 us)
+  tim      = time_index * 0.5 - tim + 0.5;
+  // Estimate pedestal (assuming peak is not in first four samples)
+  pedestal = (adc[0] + adc[1] + adc[2] + adc[3]) / 4.;
+
+  ECLPedestalFit result;
+  result.amp = amp;
+
+  return result;
+}
 

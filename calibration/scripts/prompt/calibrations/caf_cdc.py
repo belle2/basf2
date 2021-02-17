@@ -88,7 +88,7 @@ def get_calibrations(input_data, **kwargs):
     max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
-    basf2.B2INFO(f"Expert set payload boundaries are: {payload_boundaries}")
+    basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -239,13 +239,19 @@ def pre_collector(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS,
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -276,13 +282,19 @@ def pre_collector_cr(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS,
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')

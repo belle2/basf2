@@ -72,6 +72,8 @@ ECLDQMModule::ECLDQMModule()
            "Upper limit (# of hits) to display hit multiplicity", std::vector<double> {10000, 1000, 700, 200});
   addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy,other) to display waveform flow",
            m_WaveformOption);
+  addParam("DPHYTTYP", m_DPHYTTYP,
+           "Flag to control trigger of delayed bhabha events; 0 - select events by 'bha_delay' trigger bit, 1 - select by TTYP_DPHY", false);
 }
 
 ECLDQMModule::~ECLDQMModule()
@@ -298,6 +300,10 @@ void ECLDQMModule::event()
   int NDigits = 0;
   for (auto& value : ecltot) value = 0;
   for (auto& value : nhits) value = 0;
+  bool bhatrig = false;
+
+  if (m_l1Trigger.isValid() && m_DPHYTTYP) bhatrig = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) bhatrig = m_l1Trigger->testInput("bha_delay");
 
   m_iEvent = -1;
   if (m_eventmetadata.isValid()) {
@@ -309,7 +315,7 @@ void ECLDQMModule::event()
         if (id == "rand" && m_l1Trigger.isValid() &&
             m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
         if (id == "dphy" && m_l1Trigger.isValid() &&
-            m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
+            bhatrig) h_evtot_dphy->Fill(0);
       }
     }
   }
@@ -323,7 +329,7 @@ void ECLDQMModule::event()
       if (id != "psd") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                               (m_l1Trigger.isValid() &&  bhatrig) ||
                                aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
@@ -413,16 +419,16 @@ void ECLDQMModule::event()
       if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                               (m_l1Trigger.isValid() &&  bhatrig) ||
                                !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       else if (id == "logic" && m_iEvent % 1000 != 999) continue;
       else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
                                 m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
       else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                !m_l1Trigger->testInput("bha_delay"))) continue;
+                                !bhatrig)) continue;
       else if (id == "other" && (m_iEvent % 1000 == 999 ||
                                  (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                                 (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                                 (m_l1Trigger.isValid() &&  bhatrig) ||
                                  (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
       if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());

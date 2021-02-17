@@ -99,6 +99,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
+    /** Flag to select events triggered by delayed bhabha. */
+    bool m_DPHYTTYP{0};
 
     /** Parameters for hit occ. histograms. */
     std::vector<double> m_HitThresholds = {};

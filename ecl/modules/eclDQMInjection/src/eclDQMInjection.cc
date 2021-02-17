@@ -39,6 +39,9 @@ ECLDQMInjectionModule::ECLDQMInjectionModule()
   // beam-revolution cycle (5120 RF bunches in one cycle).
   addParam("BeamRevolutionCycle", m_revolutionTime, "Beam revolution cycle in musec", 5120 / 508.);
   addParam("ECLThresholdforVetoTuning", m_ECLThresholdforVetoTuning, "ECL Threshold for injection veto tuning, ADC channels", 400.);
+  addParam("DPHYTTYP", m_DPHYTTYP,
+           "Flag to control trigger of delayed bhabha events; 0 - select events by 'bha_delay' trigger bit, 1 - select by TTYP_DPHY", false);
+
 }
 
 void ECLDQMInjectionModule::defineHisto()
@@ -109,7 +112,12 @@ void ECLDQMInjectionModule::beginRun()
 
 void ECLDQMInjectionModule::event()
 {
-  if (m_eventmetadata.isValid()) {
+  bool bhatrig = false;
+
+  if (m_l1Trigger.isValid() && m_DPHYTTYP) bhatrig = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) bhatrig = m_l1Trigger->testInput("bha_delay");
+
+  if (m_eventmetadata.isValid() && m_eventmetadata->getErrorFlag() != 0x10) {
     m_iEvent = m_eventmetadata->getEvent();
   } else m_iEvent = -1;
   int discarded_wfs = 0;
@@ -122,7 +130,7 @@ void ECLDQMInjectionModule::event()
       bool shaper_bit = suppress & 1;
       if (shaper_bit) {
         if (m_iEvent % 1000 == 999 || (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-            (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY)) {
+            (m_l1Trigger.isValid() && bhatrig)) {
           for (int channel_pos = 0; channel_pos < 16; channel_pos ++) {
             if (mapper.getCellId(crate, shaper_pos, channel_pos) > 0) discarded_wfs += 1;
           }

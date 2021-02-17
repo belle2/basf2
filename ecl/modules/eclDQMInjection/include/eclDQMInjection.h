@@ -69,6 +69,10 @@ namespace Belle2 {
 
       /** Global event number. */
       int m_iEvent{ -1};
+      /** Flag to select events triggered by delayed bhabha. */
+      bool m_DPHYTTYP{0};
+
+
 
       /** Vector to store psd wf amplitude threshold. */
       std::vector<int> v_totalthrApsd = {};

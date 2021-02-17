@@ -181,6 +181,9 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     # Set-up re-processing path
     path = b2.create_path()
 
+    # Read from file only what is needed
+    path.add_module("RootInput", branchNames=['RawCDCs', 'RawPXDs', 'RawSVDs', 'RawTRGs'])
+
     # unpack raw data to do the tracking
     if not isMC:
         raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])

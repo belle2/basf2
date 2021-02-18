@@ -115,8 +115,6 @@ void ECLDQMInjectionModule::defineHisto()
         auto h = new TH1F(name.c_str(), title.c_str(), 300, 0.0, 0.3);
         h->GetXaxis()->SetTitle("Peak height in first 16 points [GeV]");
 
-        h->SetOption("LIVE");
-
         h_ped_peak.push_back(h);
       }
     }

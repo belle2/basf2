@@ -15,6 +15,11 @@
 #include <vxd/geometry/GeoCache.h>
 #include <TKey.h>
 
+#include <RooDataHist.h>
+#include <RooAbsPdf.h>
+#include <RooPlot.h>
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -34,14 +39,13 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
-  addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 10.);
-  addParam("RangeHigh", m_rangeHigh, "High border for fit", 100.);
-  addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
-  addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
+  addParam("RangeLow", m_rangeLow, "Lower border for fit", 20.);
+  addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
+
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
@@ -65,6 +69,14 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  m_rfws = new RooWorkspace("w");
+  m_rfws->factory("Landau::landau(x[0,100],ml[20,10,50],sl[5,1,30])");
+  m_rfws->factory("Gaussian::gauss(x,mg[0],sg[2,0.1,10])");
+  m_rfws->factory("FCONV::lxg(x,landau,gauss)");
+
+  m_x = m_rfws->var("x");
+  m_x->setRange("signal", m_rangeLow, m_rangeHigh);
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -127,18 +139,6 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_line_low->SetLineWidth(3);
   m_line_low->SetLineStyle(7);
 
-  m_fConv = new TF1Convolution("landau", "gaus", m_rangeLow, m_rangeHigh);
-  m_fConv->SetRange(m_rangeLow, m_rangeHigh);
-  m_fFit = new TF1("fitfunc", *m_fConv, m_rangeLow, m_rangeHigh, m_fConv->GetNpar());
-  m_fFit->SetRange(m_rangeLow, m_rangeHigh);
-
-  m_fFit->SetParameter(0, 1000);
-  m_fFit->SetParLimits(0, 10, 1e7);
-  m_fConv->SetNofPointsFFT(1000);
-  m_fFit->SetNpx(100);
-  m_fFit->SetNumberFitPoints(100);
-  m_fFit->SetParNames("N", "MPV", "width", "mean", "sigma");
-
   m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
   m_fMean->SetLineColor(kYellow);
@@ -176,6 +176,15 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
   bool enough = false;
+
+//   auto landau = m_rfws->pdf("landau");
+//   auto gauss = m_rfws->pdf("gauss");
+  auto model = m_rfws->pdf("lxg");
+
+  auto ml = m_rfws->var("ml");
+//   auto sl = m_rfws->var("sl");
+//   auto mg = m_rfws->var("mg");
+//   auto sg = m_rfws->var("sg");
 
   {
     m_cTrackedClusters->Clear();
@@ -239,28 +248,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     TH1* hh1 = findHist(m_histogramDirectoryName, name);
     if (hh1) {
 
-      if (hh1->GetEntries() > 100) {
-        m_fFit->SetParameter(0, 1000);
-        m_fFit->SetParLimits(0, 10, 1e9);
-        m_fFit->SetParameter(1, 50);
-        m_fFit->SetParLimits(1, 10, 80);
-        m_fFit->SetParameter(2, 10);
-        m_fFit->SetParLimits(2, 1, 100);
-        m_fFit->FixParameter(3, 0);
-        m_fFit->SetParameter(4, 10);
-        m_fFit->SetParLimits(4, 1, 50);
+      if (hh1->GetEntries() > 50) {
 
-        for (int f = 0; f < 5; f++) {
-          hh1->Fit(m_fFit, "R");
-          m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-          m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-        }
+        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+        auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
+        /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
+
+        model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9));
+        hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+        model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+
+        plot->Draw("");
+
+//            model->Print("");
+//            ml->Print("");
+//            sl->Print("");
+//            mg->Print("");
+//            sg->Print("");
+//            cout << "ZZZ , " << Form("%d%02d%d ,", std::get<0>(t), std::get<1>(t), std::get<2>(t)) << ml->getValV() << "," << ml->getError() << "," << sl->getValV() << "," << sl->getError() << "," << sg->getValV() << "," << sg->getError() << endl;
+
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.49, m_fFit->GetParameter(1));
-        m_gCharge->SetPointError(p, 0.1, m_fFit->GetParError(1)); // error in x is useless
-        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fFit->GetParameter(1),
-                              m_fFit->GetParError(1));
+        m_gCharge->SetPoint(p, i + 0.49, ml->getValV());
+        m_gCharge->SetPointError(p, 0.1, ml->getError()); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
@@ -331,23 +342,18 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         TH1* hh1 = findHist(m_histogramDirectoryName, name);
         if (hh1) {
           double mpv = 0.0;
-          if (hh1->GetEntries() > 100) {
-            m_fFit->SetParameter(0, 1000);
-            m_fFit->SetParLimits(0, 10, 1e9);
-            m_fFit->SetParameter(1, 50);
-            m_fFit->SetParLimits(1, 10, 80);
-            m_fFit->SetParameter(2, 10);
-            m_fFit->SetParLimits(2, 1, 100);
-            m_fFit->FixParameter(3, 0);
-            m_fFit->SetParameter(4, 10);
-            m_fFit->SetParLimits(4, 1, 50);
+          if (hh1->GetEntries() > 50) {
+            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+            /*auto plot =*/ m_x->frame(RooFit::Title(hh1->GetTitle()));
+            /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
-            for (int f = 0; f < 5; f++) {
-              hh1->Fit(m_fFit, "R");
-              m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-              m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-            }
-            mpv = m_fFit->GetParameter(1);
+//             model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9) );
+//             hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+//             model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+//
+//             plot->Draw("");
+
+            mpv = ml->getValV();
           }
 
           if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {

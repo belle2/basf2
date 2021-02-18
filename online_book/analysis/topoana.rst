@@ -195,7 +195,7 @@ After the following steps:
 
   4. ``basf2 MCGenTopo.py`` 
 
-you can get an root file ``MCGenTopo.root`` containing a ``TTree`` object ``MCGenTopo``, which in return contains the MC truth information for topology analysis.
+you get a root file ``MCGenTopo.root`` containing a ``TTree`` object ``MCGenTopo``, which in return contains the MC truth information for topology analysis.
 With the ``C/C++`` interpreter of ``ROOT``, you can check and see the MC truth information as follows.
 Notably, the comments on the right side are the explanations on the command lines and the key variables.
 
@@ -277,7 +277,7 @@ Below is an example of the card file.
    }
 
 In the card file, ``#``, ``%``, and the pair of ``{`` and ``}``, are used for commenting, prompting, and grouping, respectively.
-The first two, third, and last one items are set for the input, functionality, and output of the program, respectively.
+The first two items defines the input, the third one specifies the functionality, and the last one sets the name of the program's output.
 
 Below are some detailed explanations on these setting items.
 
@@ -319,7 +319,7 @@ Run the program
 
 With the card file, one can execute the program with the command line ``topoana.exe cardFileName``, where the argument ``cardFileName`` is optional and its default value is ``topoana.card``.
 
-... tip:: You can try to execute ``topoana.exe --help`` to see other optional arguments supported in the command line.
+.. tip:: You can try to execute ``topoana.exe --help`` to see other optional arguments supported in the command line.
 
 After the following steps:
 

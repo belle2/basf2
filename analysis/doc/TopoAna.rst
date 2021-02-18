@@ -36,7 +36,7 @@ Documents
 .. seealso::
 
    The introduction to the documents can also be found in the file ``README.md`` in the ``TopoAna`` package, which should be the first document to be read on ``TopoAna``.
-   For your convenience, a pdf and a html versions of the README file are provided in the ``TopoAna`` package as ``share/README.pdf`` and ``share/README.html``, respectively.
+   For your convenience, a pdf and a html version of the README file are provided in the ``TopoAna`` package as ``share/README.pdf`` and ``share/README.html``, respectively.
 
 The following three documents of ``TopoAna`` are provided in its package.
 
@@ -70,7 +70,7 @@ As for the three documents, the quick-start tutorial is the briefest, the user g
 Use cases at Belle II
 ~~~~~~~~~~~~~~~~~~~~~
 
-At the end of this section, we list two use cases of ``TopoAna`` at Belle II: one for the semitauonic analysis and the other for the charm analysis.
+At the end of this section, we list two use cases of ``TopoAna`` at Belle II: one for semitauonic analyses and the other for charm analyses.
 You can refer to them if you work in the related analysis groups.
 
 * `Using TopoAna with the semitauonic framework <https://confluence.desy.de/display/BI/Using+topoAna+with+the+semitauonic+framework>`_ by Hannah Marie Wakeling

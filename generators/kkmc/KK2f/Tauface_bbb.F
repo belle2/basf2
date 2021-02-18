@@ -209,7 +209,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=0.1479
         AMRB(MNUM) =0.001
         GAMRB(MNUM)=0.005
-        IF (AMDARK.GT.0.0D0) THEN
+        IF (AMDARK.GT.1.0D-6) THEN
            AMRX (MNUM) = 2*AMDARK
            GAMRX(MNUM) = AMDARK
            AMRA (MNUM) = AMDARK
@@ -226,7 +226,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=0.1479
         AMRB(MNUM) =0.27
         GAMRB(MNUM)=0.2
-        IF (AMDARK.GT.0.0D0) THEN
+        IF (AMDARK.GT.1.0D-6) THEN
            AMRX (MNUM) = 2*AMDARK
            GAMRX(MNUM) = AMDARK
            AMRA (MNUM) = AMDARK
@@ -325,7 +325,7 @@ C initialization for 4 scalars
         GAMRA(INUM)=GAMRO
       ENDIF
       IF (INUM.GE.3.AND.INUM.LE.6) THEN
-         IF (AMDARK.GT.0.0D0) THEN
+         IF (AMDARK.GT.1.0D-6) THEN
             AMRA(INUM) = AMDARK
             GAMRA(INUM) = 2.0D0*GMDARK
          ENDIF

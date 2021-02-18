@@ -2297,7 +2297,7 @@ C --- Variables below are arguments of this or other routines
       PRC2=0.0d0     ! Probability for two scalars resonance presampler
       AMKUBA=0.001d0 ! Its mass
       GKUBA=0.001d0  ! and width
-      IF (AMDARK.GT.0.0D0) THEN
+      IF (AMDARK.GT.1.0D-6) THEN
          AMKUBA = AMDARK
          GKUBA  = GMDARK
       ENDIF         
@@ -2321,7 +2321,7 @@ C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       AMP4=DCDMAS(IDFFIN(4,JNPI),0)    ! mass for  PIZ
 
       IF (AMP3+AMP4.LE.0.002d0) PRC2=0.8d0 ! only for electron pair in final state
-      IF (AMDARK.GT.0.0D0)      PRC2=0.8d0 ! also for dark photons in final state
+      IF (AMDARK.GT.1.0D-6)     PRC2=0.8d0 ! also for dark photons in final state
  
       CALL CHOICE4(JNPI,PROB1,PROB2,AMROP,GAMROP,AMRX,GAMRX)
 
@@ -4205,7 +4205,7 @@ C
       VUD = CCABIB 
       CE = 16.*GFERMI * GFERMI * AMTAUD * AMTAUD * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
       AMPLIT = AMPLITD * CE
-      IF (AMDARK.GT.0.0D0) THEN
+      IF (AMDARK.GT.1.0D-6) THEN
          AMPLIT = AMPLIT*EPDARK**2*16.
       ENDIF
       DO I = 1,4
@@ -4248,7 +4248,7 @@ C
          ENDDO
          CALL eemu(AMDARK,GMDARK,AMTAUD,PTD,PND,PIM1D,PIM2D,PIM3D,PIM4D,AMPLITD,HVD)
          AMPLIT=AMPLITD* 32.*(GFERMI * GFERMI / 2.0)*4.*(16.*ACOS(-1.) * ACOS(-1.) / 137. / 137.)
-         IF (AMDARK.GT.0.0D0) THEN
+         IF (AMDARK.GT.1.0D-6) THEN
             AMPLIT = AMPLIT*EPDARK**2*16.
          ENDIF
          DO I=1,4

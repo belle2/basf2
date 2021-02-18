@@ -336,7 +336,7 @@ void eepi_(const double& m_dark, const double& dark_width, const double& Mlep, c
     double amplit_redone;
     iflag = 1;
     eepi_(m_dark, dark_width, Mlep, Mpion, pt_new, pn_new, p1_new, p2_new, p3_new, amplit_redone, hv, iflag);
-    //
+    /*
     cout << "amplit = " << amplit << " amplit_redone = " << amplit_redone ;//<< endl;
     if (Mlep < 0.1) {
       cout << " e_neg = " << e_neg << " e_all = " << e_all;
@@ -344,7 +344,7 @@ void eepi_(const double& m_dark, const double& dark_width, const double& Mlep, c
       cout << " m_neg = " << m_neg << " m_all = " << m_all;
     }
     cout << endl;
-    //
+    */
     // The last resort : for now at least
     //
     amplit = 0.0;

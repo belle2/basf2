@@ -149,7 +149,7 @@ C     Print optional flags
      $               IFEQUALBR, LAMDEC
 
       AMDARK = DBLE(XPAR(ITAUXPAR+907)) ! Note: unless mass > 0, epsilon = 1
-      IF (AMDARK.GT.0.0D0) THEN
+      IF (AMDARK.GT.1.0D-6) THEN
          EPDARK = DBLE(XPAR(ITAUXPAR+908))
          GMDARK = DARKWIDTH(AMDARK,EPDARK)
       ENDIF

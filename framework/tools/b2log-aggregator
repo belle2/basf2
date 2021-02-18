@@ -95,7 +95,10 @@ class LogAggregator():
 
         # forward or print the message
         if self.forward_socket:
-            self.forward_socket.sendto(bytes(json.dumps(data), "utf-8"), (self.forward_host, self.forward_port))
+            try:
+                self.forward_socket.sendto(bytes(json.dumps(data), "utf-8"), (self.forward_host, self.forward_port))
+            except:
+                print(f'[ERROR] Failed to forward log message to {self.forward_host} port {self.forward_port}.')
         else:
             print(f'[{data["level"]}] {message}')
 
@@ -113,7 +116,10 @@ class LogHandler(socketserver.BaseRequestHandler):
         This method is called for each received UDP message.
         It interprets the json and forwards it to the log aggregator
         """
-        data = json.loads(self.request[0].strip())
+        try:
+            data = json.loads(self.request[0].strip())
+        except:
+            data = {'level': 'ERROR', 'message': 'Invalid data received', 'variables': {'data': self.request[0].strip()}, 'module': 'LogAggregator', 'package': 'framework'}
         aggregator.handle(data)
 
 

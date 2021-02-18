@@ -26,13 +26,15 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/variables/AcceptanceVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip"),
+  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info")
 {
 
 }
@@ -781,4 +783,16 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // nTracksOffIP
   calculationResult["nTracksOffIP"] = m_offIpParticles->getListSize();
+
+  // Flag for events with Trigger B2Link information
+  calculationResult["NeuroTRG"] = 0;
+
+  StoreObjPtr<SoftwareTriggerResult> filter_result;
+  if (filter_result.isValid()) {
+    const std::map<std::string, int>& nonPrescaledResults = filter_result->getNonPrescaledResults();
+    if (nonPrescaledResults.find(m_filterL1TrgNN) != nonPrescaledResults.end()) {
+      const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
+      if (hasNN) calculationResult["NeuroTRG"] = 1;
+    }
+  }
 }

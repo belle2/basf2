@@ -206,7 +206,7 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                help=("Jobs should be submitted using this univese."
                                      " e.g. vanilla"))
 
-    condor_parser.add_argument("--path-prefix", dest="path_prefix", metavar="",
+    condor_parser.add_argument("--path-prefix", dest="path_prefix", metavar="", default="",
                                help=("The string that should be pre-appended to file path given to backend"
                                      " e.g. root://dcbldoor.sdcc.bnl.gov:1096"))
 

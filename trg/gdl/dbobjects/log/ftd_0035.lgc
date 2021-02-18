@@ -1,0 +1,171 @@
+(t2_2 or t2_3) and !veto
+(t2_2 or t2_3) and cdc_open90 and !veto
+(t2_1 or t2_2 or t2_3) and (ts_0 or ts_1 or ts_2 or ts_3) and !veto
+(t2_0 or t2_1 or t2_2 or t2_3) and (ts_1 or ts_2 or ts_3) and !veto
+(ts_2 or ts_3) and !veto
+(t2_2 or t2_3) and (t3_0 or t3_1 or t3_2 or t3_3) and !veto
+(t2_2 or t2_3) and (t3_1 or t3_2 or t3_3) and !veto
+(t3_2 or t3_3) and !veto
+(t2_2 or t2_3) and (ty_0 or ty_1 or ty_2 or ty_3) and !veto
+(t2_2 or t2_3) and (ty_1 or ty_2 or ty_3) and !veto
+(ty_2 or ty_3) and !veto
+(t2_1 or t2_2 or t2_3) and !bha_veto and !veto
+(t2_0 or t2_1 or t2_2 or t2_3) and (ts_0 or ts_1 or ts_2 or ts_3) and !bha_veto and !veto
+(ts_1 or ts_2 or ts_3) and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (t3_0 or t3_1 or t3_2 or t3_3) and !bha_veto and !veto
+(t3_1 or t3_2 or t3_3) and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (ty_0 or ty_1 or ty_2 or ty_3) and !bha_veto and !veto
+(ty_1 or ty_2 or ty_3) and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and cdc_open90 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and clst>0 and cdc_open90 and !bha_veto and !veto
+(t2_0 or t2_1 or t2_2 or t2_3) and (ts_0 or ts_1 or ts_2 or ts_3) and s2fo and !bha_veto and !veto
+(ts_1 or ts_2 or ts_3) and s2so and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (t3_0 or t3_1 or t3_2 or t3_3) and cdc_open90 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (ty_0 or ty_1 or ty_2 or ty_3) and cdc_open90 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and cdc_b2b5 and !bha_veto and !veto
+(t2_0 or t2_1 or t2_2 or t2_3) and (ts_0 or ts_1 or ts_2 or ts_3) and s2f5 and !bha_veto and !veto
+(ts_1 or ts_2 or ts_3) and s2s5 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (t3_0 or t3_1 or t3_2 or t3_3) and cdc_b2b5 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (ty_0 or ty_1 or ty_2 or ty_3) and cdc_b2b5 and !bha_veto and !veto
+(ts_0 or ts_1 or ts_2 or ts_3) and (ty_0 or ty_1 or ty_2 or ty_3) and s2fo and !bha_veto and !veto
+(ts_0 or ts_1 or ts_2 or ts_3) and (ty_0 or ty_1 or ty_2 or ty_3) and s2f5 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and f2f30 and !bha_veto and !veto
+(t2_0 or t2_1 or t2_2 or t2_3) and (ts_0 or ts_1 or ts_2 or ts_3) and s2f30 and !bha_veto and !veto
+(ts_1 or ts_2 or ts_3) and s2s30 and !bha_veto and !veto
+(t2_1 or t2_2 or t2_3) and (ty_0 or ty_1 or ty_2 or ty_3) and f2f30 and !bha_veto and !veto
+cdc_b2b5 and !bha_veto and !veto
+(ta_2 or ta_3) and !veto
+(ta_2 or ta_3) and cdc_open90 and !veto
+(ta_1 or ta_2 or ta_3) and cdc_open90 and !bha_veto and !veto
+(ta_1 or ta_2 or ta_3) and cdc_b2b5 and !bha_veto and !veto
+(ta_1 or ta_2 or ta_3) and !bha_veto and !veto
+ehigh and !bha_veto and !veto
+elow and !bha_veto and !veto
+elum and !veto
+elum and !bha_veto and !veto
+clst>1 and !bha_veto and !veto
+clst>2 and !bha_veto and !veto
+clst>3 and !bha_veto and !veto
+clst>4 and !bha_veto and !veto
+ecl_3dbha and !veto
+ecl_bha and !veto
+ecl_bhapur and !veto
+ecl_bhapur and bha_theta=3 and !veto
+ecl_bhapur and bha_theta=0 and !veto
+ecl_bhapur and bha_theta=1 and !veto
+ecl_bhapur and bha_theta=2 and !veto
+ecl_mumu and !bha_veto and !veto
+ecl_oflo and !veto
+ecl_bst and !veto
+brlnb2 and !veto
+ecl_3dbha and (!trkbha1 and !trkbha2) and bha_intrk and !veto
+ehigh and !track and !veto
+clst=1 and !track and !veto
+clst=2 and !track and !veto
+klm>0 and (t2_1 or t2_2 or t2_3) and !veto
+klmb2b and !veto
+klm_hit and !veto
+eklm>0 and !veto
+eklmb2b and !veto
+eklm_hit and !veto
+klm>1 and !bha_veto and !veto
+eklm>1 and !bha_veto and !veto
+eklm=1 and klm=1 and !bha_veto and !veto
+top_active and !veto
+ecl_active and !veto
+cdc_active and !veto
+revo and !veto
+pseud_rand and !veto
+bha_delay and !veto
+plsin and !veto
+poissonin and !veto
+poissonin
+veto
+ecl_lml_0 and !veto
+ecl_lml_1 and !veto
+ecl_lml_2 and !veto
+ecl_lml_3 and !veto
+ecl_lml_4 and !veto
+ecl_lml_5 and !veto
+ecl_lml_6 and !veto
+ecl_lml_7 and !veto
+ecl_lml_8 and !veto
+ecl_lml_9 and !veto
+ecl_lml_10 and !veto
+ecl_lml_12 and !veto
+ecl_lml_13 and !veto
+typ and !bha_veto and !veto
+typ and cdcecl>0 and !bha_veto and !veto
+ty>0 and cdcecl>0 and !bha_veto and !veto
+secl and !bha_veto and !veto
+iecl_0 and !bha_veto and !veto
+t2>0 and ti and i2fo and iecl_0 and !bha_veto and !veto
+itsfb2b and !veto
+i2io and ti and iecl_0 and !bha_veto and !veto
+i2io and ti and iecl_1 and !bha_veto and !veto
+t2_1 and cdcecl_1 and d5 and !bha_veto and !veto
+t2_0 and cdcecl_0 and d5 and !bha_veto and !veto
+t2_0 and p5 and !bha_veto and !veto
+ts_0 and p5 and !bha_veto and !veto
+t3_0 and p5 and !bha_veto and !veto
+ty_0 and p5 and !bha_veto and !veto
+d5 and !bha_veto and !veto
+samhem and !veto
+opohem and !bha_veto and !veto
+cdcecl_0 and !bha_veto and !veto
+cdcecl_1 and !bha_veto and !veto
+cdcecl_2 and !veto
+cdcecl_3 and !veto
+c2gev_0 and !bha_veto and !veto
+c2gev_1 and !bha_veto and !veto
+c2gev_2 and !veto
+c2gev_3 and !veto
+clst=1 and ehigh and !veto
+clst=1 and elum and !veto
+clst=1 and ehigh and !track and !veto
+clst=1 and elum and !track and !veto
+clst=3 and ehigh and !veto
+clst=3 and elum and !veto
+clst=3 and ehigh and !track and !veto
+clst=3 and elum and !track and !veto
+clst>1 and ehigh and !bha_veto and !veto
+cdctop_0 and !bha_veto and !veto
+cdctop_1 and !bha_veto and !veto
+cdctop_2 and !veto
+cdctop_3 and !veto
+cdcklm_0 and !bha_veto and !veto
+cdcklm_1 and !bha_veto and !veto
+seklm_0 and !bha_veto and !veto
+seklm_1 and !bha_veto and !veto
+ieklm and !bha_veto and !veto
+fwd_s and eklm_hit and !veto
+bwd_s and eklm_hit and !veto
+ecleklm and !bha_veto and !veto
+t2>0 and !bha_veto and !veto
+ts>0 and !bha_veto and !veto
+t3>0 and !bha_veto and !veto
+ty>0 and !bha_veto and !veto
+ta>0 and !bha_veto and !veto
+t2>0 and !veto
+ts>0 and !veto
+t3>0 and !veto
+ty>0 and !veto
+ta>0 and !veto
+(t2_1 or t2_2 or t2_3) and cdc_open90 and !veto
+ehigh and !veto
+(t3_2 or t3_3)
+(ty_2 or ty_3)
+(t2_2 or t2_3)
+(t3_1 or t3_2 or t3_3) and !bha_veto
+(ty_1 or ty_2 or ty_3) and !bha_veto
+(t2_1 or t2_2 or t2_3) and cdc_open90 and !bha_veto
+(t2_2 or t2_3) and cdc_open90
+ehigh and !bha_veto
+elum
+clst>3 and !bha_veto
+ecl_bha
+klm>0 and (t2_1 or t2_2 or t2_3)
+ecl_3dbha
+typ and !bha_veto
+typ and cdcecl>0 and !bha_veto
+nimin0 and nimin1 and !veto

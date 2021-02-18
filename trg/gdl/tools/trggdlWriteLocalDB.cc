@@ -30,13 +30,13 @@
 
 using namespace Belle2;
 
-#define ONLINE 0
-//#define ONLINE 1
+//#define ONLINE 0
+#define ONLINE 1
 //#define ONLINE 2    //end of exp12 for MC14
 
 
 /* common for setalg, setinputbits, setftdlbits */
-const int N_FTD_VERS = 19;
+const int N_FTD_VERS = 21;
 const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end run
   0,  0,     6,   -1, //  0
   7,  0,     7, 2102, //  1 11
@@ -56,10 +56,12 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   14,    0, 14,  637, // 15 29
   14,  638, 14, 1952, // 16 30
   14, 1953, 14, 2040, // 17 32
-  14, 2041, -1,   -1  // 18 33
+  14, 2041, 16,   20, // 18 33
+  16,   21, 16,  183, // 19 34
+  14,  184, -1,   -1  // 20 35
 };
 const int ftd_version[] = {
-  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30, 32, 33
+  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30, 32, 33, 34, 35
 };
 
 

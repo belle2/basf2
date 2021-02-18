@@ -789,7 +789,10 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   StoreObjPtr<SoftwareTriggerResult> filter_result;
   if (filter_result.isValid()) {
-    const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
-    if (hasNN) calculationResult["NeuroTRG"] = 1;
+    const std::map<std::string, int>& nonPrescaledResults = filter_result->getNonPrescaledResults();
+    if (nonPrescaledResults.find(m_filterL1TrgNN) != nonPrescaledResults.end()) {
+      const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
+      if (hasNN) calculationResult["NeuroTRG"] = 1;
+    }
   }
 }

@@ -101,6 +101,12 @@ Install the program
 
 Please follow the steps below to install the program.
 
+.. note::
+
+   ``TopoAna`` is a software based on ``ROOT``.
+   Thus, to install ``TopoAna``, you should have ``ROOT`` first installed on your machine.
+   If you work in the ``basf2`` environment, you do not have to consider the issue since ``ROOT`` is already installed.
+
   1. ``cd yourDirectoryForTopoAna``
 
   2. Clone the ``TopoAna`` repository from Stash with ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``

@@ -141,7 +141,7 @@ Please follow the steps below to install the program.
 Get the input data
 ------------------
 
-As we mention in :numref:`TopologyAnalysis`, `MCGenTopo <https://stash.desy.de/projects/B2/repos/software/browse/analysis/scripts/variables/MCGenTopo.py>`_ is the interface of ``basf2`` to ``TopoAna``.
+As we mention in :numref:`TopologyAnalysis`, ``MCGenTopo`` is the interface of ``basf2`` to ``TopoAna``.
 In the following we introduce the steps to get the input data to ``TopoAna`` with the interface.
 
   1. Append the following statement at the beginning part of your python steering script

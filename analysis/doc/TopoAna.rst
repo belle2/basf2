@@ -2,20 +2,76 @@
 Topology analysis
 -----------------
 
-This section provides some information on the repositories and documents of ``TopoAna``, 
+This section provides some information on the interface, repositories, and documents of ``TopoAna``,
 which is a generic tool for the event type analysis of inclusive MC samples in high energy physics experiments,
 and hence a powerful tool for analysts to investigate the signals and backgrounds involved in their works.
 ``TopoAna`` is an offline tool independent of ``basf2``.
 It can take the output root files of the :ref:`Analysis <analysis>` module as input.
-The MC truth information for the event type analysis can be stored in the root files with the utility `MCGenTopo <https://stash.desy.de/projects/B2/repos/software/browse/analysis/scripts/variables/MCGenTopo.py>`_ in ``basf2``.
-Thus, `MCGenTopo <https://stash.desy.de/projects/B2/repos/software/browse/analysis/scripts/variables/MCGenTopo.py>`_ is the interface of ``basf2`` to ``TopoAna``.
+The MC truth information for the event type analysis can be stored in the root files with the utility ``MCGenTopo`` in ``basf2``.
+Thus, ``MCGenTopo`` is the interface of ``basf2`` to ``TopoAna``.
 
 .. note::
 
-   This section only introduces the ``TopoAna`` resources outside the Belle 2 Software Documentation.
+   Apart from the interface, this section only introduces the ``TopoAna`` resources outside the Belle 2 Software Documentation.
    Inside the documentation, please see :numref:`onlinebook_topoana` for the online textbook on ``TopoAna``.
    It is a good idea to start learning the usage of ``TopoAna`` with this online textbook.
    Please feel free to contact Xingyu Zhou (zhouxy@buaa.edu.cn) if you have any questions or comments on ``TopoAna``.
+
+~~~~~~~~~~~~~
+The interface
+~~~~~~~~~~~~~
+
+As we mention above, ``MCGenTopo`` is the interface of ``basf2`` to ``TopoAna``.
+To be specific, the interface implements the following parameter function ``mc_gen_topo(n)``.
+
+.. py:function:: mc_gen_topo(n=200)
+
+   .. docstring::
+     :lines: 2,-1
+
+     def mc_gen_topo(n=200):
+         """
+         Gets the list of variables containing the raw topology information of MC generated events.
+         To be specific, the list including the following variables:
+
+         * ``nMCGen``: number of MC generated particles in a given event,
+
+         * ``MCGenPDG_i`` (i=0, 1, ... n-2, n-1): PDG code of the :math:`{\rm i}^{\rm th}` MC generated particle in a given event,
+         * ``MCGenMothIndex_i`` (i=0, 1, ... n-2, n-1): mother index of the :math:`{\rm i}^{\rm th}` MC generated particle in a given event.
+
+         .. tip::
+
+            * Internally, ``nMCGen``, ``MCGenPDG_i`` and ``MCGenMothIndex_i`` are just aliases of ``nMCParticles``, ``genParticle(i, varForMCGen(PDG))`` and ``genParticle(i, varForMCGen(mcMother(mdstIndex)))``, respectively.
+            * For more details on the variables, please refer to the documentations of :b2:var:`nMCParticles`, :b2:var:`genParticle`, :b2:var:`varForMCGen`, :b2:var:`PDG`, :b2:var:`mcMother`, and :b2:var:`mdstIndex`.
+
+         Parameters:
+             n (int): number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables. Its default value is 200.
+
+         .. note::
+
+            * To completely examine the topology information of the events in an MC sample, the parameter ``n`` should be greater than or equal to the maximum of ``nMCGen`` in the sample.
+            * Normally, the maximum of ``nMCGen`` in the MC samples at Belle II is less than 200.
+              Hence, if you have no idea about the maximum of ``nMCGen`` in your own MC sample, it is usually a safe choice to use the default parameter value 200.
+            * However, an overlarge parameter value leads to unncessary waste of disk space and redundant variables with inelegant ``nan`` values.
+              Hence, if you know the maximum of ``nMCGen`` in your own MC sample, it is a better choice to assign the parameter a proper value.
+
+         """
+
+Below are the steps to use ``mc_gen_topo(n)`` to get the input data to ``TopoAna``.
+
+  1. Append the following statement at the beginning part of your python steering script
+
+     .. code-block:: python
+
+        from variables.MCGenTopo import mc_gen_topo
+
+  2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the steering function ``variablesToNtuple`` as follow
+
+     .. code-block:: python
+
+        variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
+
+  3. Run your python steering script with ``basf2``
 
 ~~~~~~~~~~~~
 Repositories

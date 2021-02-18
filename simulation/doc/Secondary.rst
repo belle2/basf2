@@ -144,7 +144,7 @@ the list of constants implemented in *Geant4 v9.6*. They used the same list for 
    fTransitionRadiation    = 24
    ============================    ==========================    =======================
 
-Release note (newely included parameters since) :
+Release note (newly included parameters since) :
 
 - G4DecayProcessType    : fElectronGeneralProcess and fGammaGeneralProcess since v10.5
 - G4HadronicProcessType : fMuAtomicCapture and fLeptonAtRest since v10.4
@@ -156,6 +156,6 @@ Release note (newely included parameters since) :
 
 .. warning::
         fElectronGeneralProcess and fGammaGeneralprocess are internal Geant4 parameters, which 
-        general users are not supposed to see. If you see any of those, please contact the simulatinon convener 
+        general users are not supposed to see. If you see any of these, please contact the simulation convener 
         or Geant4 team. 
  

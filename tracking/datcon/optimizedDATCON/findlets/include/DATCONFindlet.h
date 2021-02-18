@@ -17,9 +17,6 @@
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
 
-
-// #include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
-
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>

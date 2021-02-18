@@ -50,11 +50,10 @@ namespace Belle2 {
 //       auto& geoCache = VXD::GeoCache::getInstance();
       for (auto& spacePoint : m_storeSpacePoints) {
         const B2Vector3D& hitPos = spacePoint.getPosition();
-        const double hitRadiusSquared = hitPos.Perp() * hitPos.Perp();
         hits.emplace_back(&spacePoint, spacePoint.getVxdID(),
                           spacePoint.getVxdID().getLayerNumber(), spacePoint.getVxdID().getLadderNumber(),
                           hitPos.X(), hitPos.Y(), hitPos.Z(),
-                          2.*hitPos.X() / hitRadiusSquared, 2.*hitPos.Y() / hitRadiusSquared,
+                          2.*hitPos.X() / hitPos.Perp2(), 2.*hitPos.Y() / hitPos.Perp2(),
                           spacePoint.getNormalizedLocalU(), spacePoint.getNormalizedLocalV(), hitPos.Phi(), hitPos.Theta());
       }
     };

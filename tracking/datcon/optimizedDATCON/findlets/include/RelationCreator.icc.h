@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.dcl.h>
-// #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -29,17 +29,14 @@ namespace Belle2 {
   void RelationCreator<AState, ARelationFilter>::exposeParameters(ModuleParamList* moduleParamList,
       const std::string& prefix)
   {
-    m_relationFilter.exposeParameters(moduleParamList, prefix);
+    m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("twoHitRelation", prefix));
   }
 
   template<class AState, class ARelationFilter>
   void RelationCreator<AState, ARelationFilter>::apply(std::vector<AState*>& states,
                                                        std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations)
   {
-    // Just some arbitrary number...
-//     relations.reserve(8192);
-
     // relations += states -> states
-    TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, states, states, relations, 1000000);
+    TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, states, states, relations, 100000);
   }
 }

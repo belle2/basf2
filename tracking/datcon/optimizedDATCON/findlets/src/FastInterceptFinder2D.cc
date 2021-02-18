@@ -144,7 +144,6 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
       gnuplotoutput(m_currentSensorsHitList);
       uint count = 0;
       for (auto& hit : hits) {
-//         B2INFO("hit " << count << ": " << std::get<2>(hit) << " " << std::get<3>(hit) << " " << std::get<4>(hit) << " on sensor: " << std::get<1>(hit));
         double X = hit.x;
         double Y = hit.y;
         double Z = hit.z;
@@ -157,20 +156,16 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
 
   for (auto& trackCand : m_trackCandidates) {
     // sort for layer, and 2D radius in case of same layer before storing as SpacePointTrackCand
+    // outer hit goes first, as later on tracks are build from outside to inside
     std::sort(trackCand.begin(), trackCand.end(),
     [](const HitDataCache * a, const HitDataCache * b) {
       return
-        (a->sensorID.getLayerNumber() < b->sensorID.getLayerNumber()) or
+        (a->sensorID.getLayerNumber() > b->sensorID.getLayerNumber()) or
         (a->sensorID.getLayerNumber() == b->sensorID.getLayerNumber()
-         and a->spacePoint->getPosition().Perp() < b->spacePoint->getPosition().Perp());
+         and a->spacePoint->getPosition().Perp() > b->spacePoint->getPosition().Perp());
     });
 
     rawTrackCandidates.emplace_back(trackCand);
-//     std::vector<HitDataCache> convertedTrackCand;
-//     for (const HitDataCache* hit : trackCand)
-//       convertedTrackCand.emplace_back(*hit);
-//
-//     rawTrackCandidates.emplace_back(convertedTrackCand);
   }
 
   B2DEBUG(29, "m_trackCandidates.size: " << m_trackCandidates.size());

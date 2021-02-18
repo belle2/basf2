@@ -110,14 +110,14 @@ std::string LogMessage::toJSON(bool complete) const
     buffer << ",\"proc\":" << ProcHandler::EvtProcID();
   if (complete) {
     buffer << ",\"count\":" << m_count;
-    static StoreObjPtr<EventMetaData> eventMetaData;
+    StoreObjPtr<EventMetaData> eventMetaData;
     if (eventMetaData.isValid()) {
       buffer << ",\"experiment\":" << eventMetaData->getExperiment();
       buffer << ",\"run\":" << eventMetaData->getRun();
       buffer << ",\"subrun\":" << eventMetaData->getSubrun();
       buffer << ",\"event\":" << eventMetaData->getEvent();
     }
-    static StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+    StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
     if (processStatistics.isValid()) {
       const auto& stats = processStatistics->getGlobal();
       buffer << ",\"nruns\":" << int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_BeginRun));

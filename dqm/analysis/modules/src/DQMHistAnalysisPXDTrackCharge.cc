@@ -339,27 +339,27 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i] + Form("_sw%d_dcd%d", s, d);
         std::replace(name.begin(), name.end(), '.', '_');
 
+        if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
+        }
+
         TH1* hh1 = findHist(m_histogramDirectoryName, name);
         if (hh1) {
           double mpv = 0.0;
           if (hh1->GetEntries() > 50) {
             auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
-            /*auto plot =*/ m_x->frame(RooFit::Title(hh1->GetTitle()));
+            auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
             /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
-//             model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9) );
-//             hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
-//             model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
-//
-//             plot->Draw("");
+            if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+              model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9));
+              hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+              model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+            }
+            plot->Draw("");
 
             mpv = ml->getValV();
-          }
-
-          if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
-            hh1->Draw("hist");
           }
 
           if (m_hChargeModASIC2d[aVxdID]) {

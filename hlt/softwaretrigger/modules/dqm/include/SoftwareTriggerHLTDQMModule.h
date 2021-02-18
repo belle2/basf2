@@ -49,7 +49,7 @@ namespace Belle2 {
     private:
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.
-      std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
+      std::map<std::string, std::map<std::string, std::vector<std::string>>> m_param_cutResultIdentifiers;
 
       /// Which cuts should be ignored? This can be used to clear trigger lines from e.g. bhabha contamination.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
@@ -68,6 +68,9 @@ namespace Belle2 {
 
       /// Create HLT unit number histograms?
       bool m_param_create_hlt_unit_histograms;
+
+      /// Create error flag histograms?
+      bool m_param_create_error_flag_histograms;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;

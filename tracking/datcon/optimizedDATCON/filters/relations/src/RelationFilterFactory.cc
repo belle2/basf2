@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/relations/RelationFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/relations/SimpleRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -32,7 +33,7 @@ std::string RelationFilterFactory::getIdentifier() const
 
 std::string RelationFilterFactory::getFilterPurpose() const
 {
-  return "Reject SVD hit pairs. ";
+  return "Rejects SVD hit pairs. ";
 }
 
 std::map<std::string, std::string> RelationFilterFactory::getValidFilterNamesAndDescriptions() const
@@ -40,6 +41,7 @@ std::map<std::string, std::string> RelationFilterFactory::getValidFilterNamesAnd
   return {
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
+    {"simple", "very simple filtering"},
   };
 }
 
@@ -52,6 +54,10 @@ RelationFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseRelationFilter>>();
+  }
+
+  if (filterName == "simple") {
+    return std::make_unique<SimpleRelationFilter>();
   }
 
   return Super::create(filterName);

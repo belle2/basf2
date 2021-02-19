@@ -11,6 +11,7 @@ env['LIBS'] = [
     "framework",
     "mdst_dataobjects",
     "mdst_dbobjects",
+    "trg_cdc_dataobjects"
     ]
 
 Return('env')

@@ -37,7 +37,8 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   fdEdxMin(0.0),
   fdEdxMax(5.0),
   fTrucMin(0.05),
-  fTrucMax(0.75)
+  fTrucMax(0.75),
+  fStartRun(0)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -56,6 +57,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   const auto expRun = getRunList()[0];
   updateDBObjPtrs(1, expRun.second, expRun.first);
+  fStartRun = expRun.second;
 
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
@@ -77,8 +79,10 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   if (!isLTruc) {
 
-    TH1D* hILayer = new TH1D("hILayer", "Inner Layer;dedxhit;entries", fdEdxBins, fdEdxMin, fdEdxMax);
-    TH1D* hOLayer = new TH1D("hOLayer", "Outer Layer;dedxhit;entries", fdEdxBins, fdEdxMin, fdEdxMax);
+    TH1D* hILayer = new TH1D(Form("hILayer_%d", fStartRun), Form("Inner Layer (start run: %d);dedxhit;entries", fStartRun), fdEdxBins,
+                             fdEdxMin, fdEdxMax);
+    TH1D* hOLayer = new TH1D(Form("hOLayer_%d", fStartRun), Form("Outer Layer (start run: %d);dedxhit;entries", fStartRun), fdEdxBins,
+                             fdEdxMin, fdEdxMax);
 
     for (unsigned int jwire = 0; jwire < 14336; ++jwire) {
       for (unsigned int jdedxhit = 0; jdedxhit < wirededx[jwire].size(); ++jdedxhit) {
@@ -99,7 +103,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       double upedge = hILayer->GetXaxis()->GetBinUpEdge(hBinILayer);
       hILayer->SetTitle(Form("%s, trunc range: %0.02f - %0.02f", hILayer->GetTitle(), lowedge, upedge));
       hILayer->Draw("histo");
-      TH1D* hILayerClone = (TH1D*)hILayer->Clone("hILClone");
+      TH1D* hILayerClone = (TH1D*)hILayer->Clone(Form("hILClone_frun%d", fStartRun));
       hILayerClone->GetXaxis()->SetRange(lBinILayer, hBinILayer);
       hILayerClone->SetFillColor(kAzure + 1);
       hILayerClone->Draw("same histo");
@@ -109,22 +113,22 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       hOLayer->SetTitle(Form("%s trunc range: %0.02f - %0.02f", hOLayer->GetTitle(), lowedge, upedge));
       hOLayer->SetFillColor(kYellow);
       hOLayer->Draw("histo");
-      TH1D* hOLayerClone = (TH1D*)hOLayer->Clone("hOLClone");
+      TH1D* hOLayerClone = (TH1D*)hOLayer->Clone(Form("hOLClone_frun%d", fStartRun));
       hOLayerClone->GetXaxis()->SetRange(lBinOLayer, hBinOLayer);
       hOLayerClone->SetFillColor(kAzure + 1);
       hOLayerClone->Draw("same histo");
-      ctem->SaveAs("cdcdedx_wiregain_layerdists.pdf");
+      ctem->SaveAs(Form("cdcdedx_wiregain_layerdists_frun%d.pdf", fStartRun));
     }
   }
 
 
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
-  std::stringstream psname; psname << "cdcdedx_wiregain_wiredists.pdf[";
+  std::stringstream psname; psname << Form("cdcdedx_wiregain_wiredists_frun%d.pdf[", fStartRun);
   if (isMakePlots) {
     ctmp->Divide(4, 4);
     ctmp->SetBatch(kTRUE);
     ctmp->Print(psname.str().c_str());
-    psname.str(""); psname << "cdcdedx_wiregain_wiredists.pdf";
+    psname.str(""); psname << Form("cdcdedx_wiregain_wiredists_frun%d.pdf", fStartRun);
   }
 
   //initialisation of wire gains
@@ -134,12 +138,12 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   }
 
   //Calculations part
-  TH1D* htempPerWire = new TH1D("htempPerWire", "blah-blah", fdEdxBins, fdEdxMin, fdEdxMax);
+  TH1D* htempPerWire = new TH1D(Form("htempPerWire_frun%d", fStartRun), "blah-blah", fdEdxBins, fdEdxMin, fdEdxMax);
 
   for (unsigned int jwire = 0; jwire < 14336; ++jwire) {
 
-    htempPerWire->SetName(Form("htempPerWire_%d", jwire));
-    htempPerWire->SetTitle(Form("dedxhit-dist, wire # = %d;dedxhit;entries", jwire));
+    htempPerWire->SetName(Form("htempPerWire_%d_run%d", jwire, fStartRun));
+    htempPerWire->SetTitle(Form("dedxhit-dist, wire # = %d (start run: %d);dedxhit;entries", jwire, fStartRun));
     for (unsigned int jdedxhit = 0; jdedxhit < wirededx[jwire].size(); ++jdedxhit) {
       htempPerWire->Fill(wirededx[jwire][jdedxhit]);
     }
@@ -181,7 +185,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       htempPerWire->SetFillColor(kYellow);
       htempPerWire->SetTitle(Form("%s, rel. #mu_{truc} %0.04f", htempPerWire->GetTitle(), iWireTruncMean[jwire]));
       htempPerWire->DrawCopy("hist");
-      TH1D* htempPerWireClone = (TH1D*)htempPerWire->Clone(Form("htempPerWireClone_%d", jwire));
+      TH1D* htempPerWireClone = (TH1D*)htempPerWire->Clone(Form("htempPerWireClone_%d_frun%d", jwire, fStartRun));
       htempPerWireClone->GetXaxis()->SetRange(startfrom, endat);
       htempPerWireClone->SetFillColor(kAzure + 1);
       htempPerWireClone->Draw("same histo");
@@ -193,7 +197,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   delete htempPerWire;
   if (isMakePlots) {
-    psname.str(""); psname << "cdcdedx_wiregain_wiredists.pdf]";
+    psname.str(""); psname << Form("cdcdedx_wiregain_wiredists_frun%d.pdf]", fStartRun);
     ctmp->Print(psname.str().c_str());
     delete ctmp;
 
@@ -203,16 +207,18 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     cstats->cd(1);
     auto hestats = getObjectPtr<TH1I>("hestats");
     if (hestats) {
+      hestats->SetName(Form("hestats_frun%d", fStartRun));
       hestats->SetStats(0);
       hestats->DrawCopy("");
     }
     cstats->cd(2);
     auto htstats = getObjectPtr<TH1I>("htstats");
     if (htstats) {
+      hestats->SetName(Form("htstats_frun%d", fStartRun));
       htstats->DrawCopy("");
       hestats->SetStats(0);
     }
-    cstats->Print(Form("cdcdedx_wiregain_stats.pdf"));
+    cstats->Print(Form("cdcdedx_wiregain_stats_frun%d.pdf", fStartRun));
     delete cstats;
 
   }
@@ -266,24 +272,27 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
   if (isMakePlots) {
 
     TCanvas* cLConst = new TCanvas("cLConst", "cLConst", 1600, 1000);
-    std::stringstream psnameL; psnameL << "cdcdedx_wiregain_layerconst.pdf[";
+    std::stringstream psnameL; psnameL << Form("cdcdedx_wiregain_layerconst_frun%d.pdf[", fStartRun);
     cLConst->Divide(2, 2);
     cLConst->SetBatch(kTRUE);
     cLConst->Print(psnameL.str().c_str());
-    psnameL.str(""); psnameL << "cdcdedx_wiregain_layerconst.pdf";
+    psnameL.str(""); psnameL << Form("cdcdedx_wiregain_layerconst_frun%d.pdf", fStartRun);
 
-    TH1D* hWGConst = new TH1D("hWGConst", "wiregain constant; wire numbers;<dedxhit>", 14336, -0.5, 14335.5);
+    TH1D* hWGConst = new TH1D(Form("hWGConst_frun%d", fStartRun), Form("wiregain constant (start run: %d); wire numbers;<dedxhit>",
+                              fStartRun), 14336, -0.5, 14335.5);
     if (isMergePayload)hWGConst->SetTitle(Form("abs-const: %s", hWGConst->GetTitle()));
     else hWGConst->SetTitle(Form("rel-const: %s", hWGConst->GetTitle()));
-    TH1D* hWGConstVar = new TH1D("hWGConstVar", "wiregain variation; wire gains; nentries", 400, -0.5, 3.5);
+
+    TH1D* hWGConstVar = new TH1D(Form("hWGConstVar_frun%d", fStartRun), Form("wiregain variation (start run: %d); wire gains; nentries",
+                                 fStartRun), 400, -0.5, 3.5);
     if (isMergePayload)hWGConstVar->SetTitle(Form("abs-const: %s", hWGConstVar->GetTitle()));
     else hWGConstVar->SetTitle(Form("rel-const: %s", hWGConstVar->GetTitle()));
 
     std::ofstream fBadWG_New;
-    fBadWG_New.open(Form("cdcdedx_wiregain_deadwirenew.txt"));
+    fBadWG_New.open(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun));
 
     std::ofstream fBadWG_Old;
-    fBadWG_Old.open(Form("cdcdedx_wiregain_badwireold.txt"));
+    fBadWG_Old.open(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun));
 
     int toWire = 0;
     int countwire = 0, allbadwire = 0, allbadwireold = 0;
@@ -296,9 +305,10 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
       int fromWire = countwire;
       toWire = toWire + nWireiLayer;
 
-      TH1D* hLayerConst = new TH1D(Form("hWireConst_L%d", iLayer), "blah-blah", nWireiLayer, fromWire * 1.0, toWire * 1.0);
-      if (isMergePayload)hLayerConst->SetTitle(Form("abs-const: Layer = %d; wire numbers;<dedxhit>", iLayer));
-      else hLayerConst->SetTitle(Form("rel-const: Layer = %d; wire numbers;<dedxhit>", iLayer));
+      TH1D* hLayerConst = new TH1D(Form("hWireConst_L%d_frun%d", iLayer, fStartRun), "blah-blah", nWireiLayer, fromWire * 1.0,
+                                   toWire * 1.0);
+      if (isMergePayload)hLayerConst->SetTitle(Form("abs-const: Layer = %d (start run: %d); wire numbers;<dedxhit>", iLayer, fStartRun));
+      else hLayerConst->SetTitle(Form("rel-const: Layer = %d (start run: %d); wire numbers;<dedxhit>", iLayer, fStartRun));
 
       int iwire = 0, layerbadwire = 0, layerbadwireold = 0;
       for (int jwire = fromWire; jwire < toWire; jwire++) {
@@ -351,7 +361,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
       delete hLayerConst;
     }
 
-    psnameL.str(""); psnameL << "cdcdedx_wiregain_layerconst.pdf]";
+    psnameL.str(""); psnameL << Form("cdcdedx_wiregain_layerconst_frun%d.pdf]", fStartRun);
     cLConst->Print(psnameL.str().c_str());
     delete cLConst;
 
@@ -368,7 +378,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     // hWGConst->SetStats(0);
     hWGConst->LabelsDeflate();
     hWGConst->Draw("");
-    cConst->SaveAs("cdcdedx_wiregain_allconstants.pdf");
+    cConst->SaveAs(Form("cdcdedx_wiregain_allconstants_frun%d.pdf", fStartRun));
 
     TCanvas* cConstvar = new TCanvas("cConstvar", "cConstvar", 500, 400);
     cConstvar->cd();
@@ -380,7 +390,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     //hWGConst->SetStats(0);
     hWGConstVar->SetFillColorAlpha(kAzure, 0.10);
     hWGConstVar->Draw("");
-    cConstvar->SaveAs("cdcdedx_wiregain_constantsvar.pdf");
+    cConstvar->SaveAs(Form("cdcdedx_wiregain_constantsvar_frun%d.pdf", fStartRun));
 
     fBadWG_New.close();
     fBadWG_Old.close();
@@ -427,7 +437,8 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
   int toWire = 0;
   int countwire = 0, OutActLayer = 0;
 
-  TH1D* hLayerAvg = new TH1D("hLayerAvg", "Layer vs trunc mean avg; layer numbers;<dedxhit>", 56, -0.5, 55.5);
+  TH1D* hLayerAvg = new TH1D(Form("hLayerAvg_frun%d", fStartRun),
+                             Form("Layer vs trunc mean avg (star run: %d); layer numbers;<dedxhit>", fStartRun), 56, -0.5, 55.5);
 
   for (int iLayer = 0; iLayer < 56; iLayer++) {
 
@@ -484,7 +495,7 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
     tl->SetX1(-0.5); tl->SetX2(55.5);
     tl->SetY1(OutLayerMeanAvg); tl->SetY2(OutLayerMeanAvg);
     tl->DrawClone("same");
-    cLAvg->SaveAs("cdcdedx_wiregain_layeravg.pdf");
+    cLAvg->SaveAs(Form("cdcdedx_wiregain_layeravg_frun%d.pdf", fStartRun));
   }
   return OutLayerMeanAvg;
 }
@@ -492,7 +503,7 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
 void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
 {
 
-  TCanvas* cCDCWires = new TCanvas("cCDCWires", "CDC dE/dx bad wire status", 800, 800);
+  TCanvas* cCDCWires = new TCanvas(Form("cCDCWires_frun%d", fStartRun), "CDC dE/dx bad wire status", 800, 800);
   TH2F* hxyAll = getHistoPattern("all", "allwires");
   hxyAll->SetMarkerStyle(20);
   hxyAll->SetMarkerSize(0.2);
@@ -500,7 +511,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyOldBad = getHistoPattern("cdcdedx_wiregain_badwireold.txt", "old dead");
+  TH2F* hxyOldBad = getHistoPattern(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun), "old dead");
   if (hxyOldBad) {
     hxyOldBad->SetTitle("");
     hxyOldBad->SetMarkerStyle(20);
@@ -510,7 +521,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
     hxyOldBad->Draw("same");
   }
 
-  TH2F* hxyNewDead = getHistoPattern("cdcdedx_wiregain_deadwirenew.txt", "new dead");
+  TH2F* hxyNewDead = getHistoPattern(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun), "new dead");
   if (hxyNewDead) {
     hxyNewDead->SetTitle("");
     hxyNewDead->SetMarkerStyle(20);
@@ -539,7 +550,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   t1->SetTextColor(kGray + 1);
   pt->Draw("same");
 
-  cCDCWires->SaveAs("cdcdedx_wiregain_wirestatus.pdf");
+  cCDCWires->SaveAs(Form("cdcdedx_wiregain_wirestatus_frun%d.pdf", fStartRun));
 }
 
 TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suffix = "")
@@ -551,7 +562,8 @@ TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suf
   std::ifstream infile;
   infile.open(Form("%s", badFileName.Data()));
 
-  TH2F* temp = new TH2F(Form("temp_%s", suffix.Data()), "wire status", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
+  TH2F* temp = new TH2F(Form("temp_%s_frun%d", suffix.Data(), fStartRun), Form("wire status (start run: %d)", fStartRun), 2400, -1.2,
+                        1.2, 2400, -1.2, 1.2);
   if (!infile.fail()) {
     int bwires = 0;
     while (infile >> bwires) {

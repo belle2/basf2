@@ -65,6 +65,11 @@ namespace Belle2 {
     void setHistBins(int value = 600) {fdEdxBins = value;}
 
     /**
+    * function to set dedx gain adjustment
+    */
+    void setAdjustment(double value = 1.0) {fAdjust = value;}
+
+    /**
     * function to set dedx hist range
     */
     void setHistRange(double min = 0.0, double max = 3.0) {fdEdxMin = min; fdEdxMax = max;}
@@ -87,5 +92,6 @@ namespace Belle2 {
     int fdEdxBins; /**< number of bins for dedx histogram */
     double fdEdxMin; /**< min dedx range for gain cal */
     double fdEdxMax; /**< max dedx range for gain cal */
+    double fAdjust; /**< factor to adjust dedx gain  */
   };
 } // namespace Belle2

@@ -30,7 +30,8 @@ CDCDedxRunGainAlgorithm::CDCDedxRunGainAlgorithm() :
   fSigLim(2.5),
   fdEdxBins(500),
   fdEdxMin(0.0),
-  fdEdxMax(2.5)
+  fdEdxMax(2.5),
+  fAdjust(1.00)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx run gains");
@@ -175,9 +176,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 void CDCDedxRunGainAlgorithm::generateNewPayloads(double RGrel_Mean, double ExistingRG)
 {
   if (isMergePayload) {
-    B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RGrel_Mean << ", Merged (saved) = " << RGrel_Mean *
+    B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RGrel_Mean << ", Adjustment = " << fAdjust <<
+           ", Merged (saved) = " << RGrel_Mean *
            ExistingRG);
     RGrel_Mean *= ExistingRG;
+    RGrel_Mean *= fAdjust; //default is 1.0
   } else {
     B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative (saved) = " << RGrel_Mean);
   }

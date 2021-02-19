@@ -114,6 +114,7 @@ namespace Belle2 {
     double fdEdxMax; /**< max dedx range for wiregain cal */
     double fTrucMin; /**< min trunc range for mean */
     double fTrucMax; /**< max trunc range for mean */
+    int fStartRun; /**< boundary start at this run */
     std::vector<double> flayerAvg; /**< layer wire avg of trun mean */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */

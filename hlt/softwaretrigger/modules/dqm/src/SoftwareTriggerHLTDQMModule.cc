@@ -256,10 +256,12 @@ void SoftwareTriggerHLTDQMModule::event()
       }
 
       if (m_param_create_total_result_histograms) {
-        const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
-        const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
+        if (title == baseIdentifier) {
+          const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
+          const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-        m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+        }
       }
     }
 

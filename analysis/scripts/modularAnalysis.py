@@ -3214,9 +3214,11 @@ def scaleError(outputListName, inputListName,
     path.add_module(scale_error)
 
 
-def energyBiasCorrection(inputListNames, scale, path=None):
+def energyBiasCorrection(inputListNames, tableName, path=None):
     """
     Scale enrgy of the particles according to the scaling factor.
+    If the particle list contains composite particles, the energy of the daughters are scaled.
+    Subsequently, the energy of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
@@ -3226,7 +3228,7 @@ def energyBiasCorrection(inputListNames, scale, path=None):
 
     energybiascorrection = register_module('EnergyBiasCorrection')
     energybiascorrection.param('particleLists', inputListNames)
-    energybiascorrection.param('scale', scale)
+    energybiascorrection.param('tableName', tableName)
     path.add_module(energybiascorrection)
 
 

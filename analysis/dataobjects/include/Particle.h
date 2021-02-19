@@ -459,7 +459,7 @@ namespace Belle2 {
      */
     float getEnergy() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz + m_mass * m_mass);
+      return sqrt(m_momentumScale * m_px * m_px + m_momentumScale * m_py * m_py + m_momentumScale * m_pz * m_pz + m_mass * m_mass);
     }
 
     /**

@@ -26,6 +26,7 @@ To be specific, the interface implements the following parameter function ``mc_g
 
 .. automodule:: variables.MCGenTopo
    :members:
+   :noindex:
 
 Below are the steps to use ``mc_gen_topo(n)`` to get the input data to ``TopoAna``.
 

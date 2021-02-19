@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014-2019 - Belle II Collaboration                        *
+ * Copyright(C) 2014-2021 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kota Nakagiri, Yuma Uematsu                              *
+ * Contributors: Kota Nakagiri, Yuma Uematsu, Varghese Babu               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -197,6 +197,60 @@ namespace Belle2 {
     /** helper function to get pull of the helix parameters of the V0 daughter tracks with the origin as the pivot */
     double getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex);
+
+    /** helper function to do some basic sanity checks before calculating converted photon variables */
+    int convertedPhoton_errorChecks(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /** helper function to load helix parameters for calculating converted photon variables */
+    void convertedPhoton_loadHelixParams(const Particle* gamma, int daughter_index1, int daughter_index2, double& Phi0_1, double& D0_1,
+                                         double& Omega_1, double& Z0_1, double& TanLambda_1, double& Phi0_2, double& D0_2, double& Omega_2, double& Z0_2,
+                                         double& TanLambda_2);
+
+    /**
+     * returns the invariant-mass of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the discriminating variable Delta-TanLambda of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonDelTanLambda(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the discriminating variable Delta-R of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonDelR(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /** helper function that returns the estimated Z-coordinates of the two helices at the vertex */
+    TVector2 convertedPhotonZ1Z2(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the discriminating variable Delta-Z of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonDelZ(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the estimated Z-coordinate of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /** helper function that returns the estimated vertex in the transverse plane */
+    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the estimated X-coordinate of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonX(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the estimated Y-coordinate of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonY(const Particle* gamma, const std::vector<double>& daughter_indexes);
+
+    /**
+     * returns the estimated Rho of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughter_indexes);
 
   }
 } // Belle2 namespace

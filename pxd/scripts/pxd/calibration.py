@@ -10,7 +10,7 @@ from basf2 import register_module, create_path
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm, PXDAnalyticGainCalibrationAlgorithm
 from ROOT.Belle2 import PXDValidationAlgorithm
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun, SimpleRunByRun, SequentialBoundaries
+from caf.strategies import SequentialRunByRun, SimpleRunByRun
 
 run_types = ['beam', 'physics', 'cosmic', 'all']
 gain_methods = ['analytic', 'generic_mc', 'cluster_sim', '']

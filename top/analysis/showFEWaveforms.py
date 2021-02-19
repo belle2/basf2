@@ -52,12 +52,8 @@ class WFDisplay(b2.Module):
         ''' wait for user respond '''
 
         try:
-            q = 0
-            Q = 0
-            p = 1
-            P = 1
-            abc = eval(input('Type <CR> to continue, P to print or Q to quit '))
-            if abc == 1:
+            user_input = input("Press Enter to continue, or P then Enter to print.\n").lower().strip()
+            if user_input == "p":
                 filename = self.pdfFile + '.pdf'
                 self.c1.SaveAs(filename)
                 print('Canvas saved to file:', filename)
@@ -129,7 +125,7 @@ class WFDisplay(b2.Module):
         waveforms = Belle2.PyStoreArray('TOPRawWaveforms')
 
         k = 0
-        nHits = 0
+        # nHits = 0
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
         #: output file name
         self.pdfFile = fname

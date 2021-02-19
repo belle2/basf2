@@ -27,7 +27,7 @@ class Basf2Object(ObjectDescription):
         # check fi we have arguments
         try:
             name, args = sig.split("(", 1)
-        except Exception as e:
+        except ValueError:
             name = sig
             args = None
 

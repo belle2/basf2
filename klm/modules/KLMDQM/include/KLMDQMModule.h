@@ -23,6 +23,7 @@
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 /* ROOT headers. */
@@ -132,6 +133,18 @@ namespace Belle2 {
     /** Number of KLM Digits. */
     TH1F* m_KlmDigitsNumber;
 
+    /** Number of KLM Digits after LER injection. */
+    TH1F* m_KlmDigitsAfterLERInj;
+
+    /** Histogram to be used for normalization of occupancy after LER injection. */
+    TH1F* m_TriggersLERInj;
+
+    /** Number of KLM Digits after LER injection. */
+    TH1F* m_KlmDigitsAfterHERInj;
+
+    /** Histogram to be used for normalization of occupancy after HER injection. */
+    TH1F* m_TriggersHERInj;
+
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
@@ -143,6 +156,9 @@ namespace Belle2 {
 
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
+
+    /** Raw FTSW. */
+    StoreArray<RawFTSW> m_RawFtsws;
 
     /** Raw KLM. */
     StoreArray<RawKLM> m_RawKlms;

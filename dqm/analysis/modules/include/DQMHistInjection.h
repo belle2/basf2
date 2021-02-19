@@ -93,6 +93,10 @@ namespace Belle2 {
     TH1F* m_hInjectionLERARICH = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERARICH = nullptr;
+    //! KLM occupancy after LER injection
+    TH1F* m_hInjectionLERKLM = nullptr;
+    //! Canvas for KLM occupancy after LER injection
+    TCanvas* m_cInjectionLERKLM = nullptr;
     //! PXD Hits
     TH1F* m_hInjectionHERPXD = nullptr;
     //! Final Canvas
@@ -125,6 +129,10 @@ namespace Belle2 {
     TH1F* m_hInjectionHERARICH = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERARICH = nullptr;
+    //! KLM occupancy after HER injection
+    TH1F* m_hInjectionHERKLM = nullptr;
+    //! Canvas for KLM occupancy after HER injection
+    TCanvas* m_cInjectionHERKLM = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! EPICS PVs

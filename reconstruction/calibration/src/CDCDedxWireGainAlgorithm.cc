@@ -118,6 +118,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       hOLayerClone->SetFillColor(kAzure + 1);
       hOLayerClone->Draw("same histo");
       ctem->SaveAs(Form("cdcdedx_wiregain_layerdists_frun%d.pdf", fStartRun));
+      delete ctem;
     }
   }
 
@@ -379,6 +380,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     hWGConst->LabelsDeflate();
     hWGConst->Draw("");
     cConst->SaveAs(Form("cdcdedx_wiregain_allconstants_frun%d.pdf", fStartRun));
+    delete cConst;
 
     TCanvas* cConstvar = new TCanvas("cConstvar", "cConstvar", 500, 400);
     cConstvar->cd();
@@ -391,6 +393,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     hWGConstVar->SetFillColorAlpha(kAzure, 0.10);
     hWGConstVar->Draw("");
     cConstvar->SaveAs(Form("cdcdedx_wiregain_constantsvar_frun%d.pdf", fStartRun));
+    delete cConstvar;
 
     fBadWG_New.close();
     fBadWG_Old.close();
@@ -496,6 +499,7 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
     tl->SetY1(OutLayerMeanAvg); tl->SetY2(OutLayerMeanAvg);
     tl->DrawClone("same");
     cLAvg->SaveAs(Form("cdcdedx_wiregain_layeravg_frun%d.pdf", fStartRun));
+    delete cLAvg;
   }
   return OutLayerMeanAvg;
 }
@@ -551,6 +555,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   pt->Draw("same");
 
   cCDCWires->SaveAs(Form("cdcdedx_wiregain_wirestatus_frun%d.pdf", fStartRun));
+  delete cCDCWires;
 }
 
 TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suffix = "")

@@ -460,8 +460,8 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 1, 1, 0,   0, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
-     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
+     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 5,
+     a                5, 0, 0, 0, 0,   0, 0, 0, 0, 0/
       DATA KEYstrt2 / 2, 2, 2, 2, 1,   1, 1, 1, 1, 1, 
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
@@ -693,8 +693,8 @@ C AJWMOD fix sign bug, 2/22/99
      o          9000111,0,-11,   0,0,0,3*0, 9000111,0,-11,   0,0,0,3*0, ! new (may 2020) !65
      o          9000111,0,-13,   0,0,0,3*0, 9000111,0,-13,   0,0,0,3*0, ! new (may 2020) !67
      o          9000111,0,-13,   0,0,0,3*0, 9000111,0,-13,   0,0,0,3*0, ! new (may 2020) !69
-     o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !71
-     o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !73
+     o            94144,0,-11, 0, 0, 0,3*0,   94144,0,-13,   0,0,0,3*0, ! new (may 2020) !71
+     o            94144,0,-11, 0, 0, 0,3*0,   94144,0,-13,   0,0,0,3*0, ! new (may 2020) !73
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !75
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !77
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !79
@@ -1210,8 +1210,8 @@ C=================================================
         IF(II.EQ.67) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 369 ! a0(980)->pi0eta(pi0pi0pi0) 
         IF(II.EQ.68) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 370 ! a0(980)->pi0eta(pi+pi-pi0) 
         IF(II.EQ.69) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 371 ! a0(980)->pi0eta(pi+pi-gamma) 
-        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 372
-        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 373
+        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  invi    !nu_tau' ! TauDecayModeBBB = 372
+        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- invi    !nu_tau' ! TauDecayModeBBB = 373
         IF(II.EQ.72) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 374
         IF(II.EQ.73) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 375
         IF(II.EQ.74) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 376

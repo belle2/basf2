@@ -515,7 +515,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyOldBad = getHistoPattern(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun), "old dead");
+  TH2F* hxyOldBad = getHistoPattern(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun), "olddead");
   if (hxyOldBad) {
     hxyOldBad->SetTitle("");
     hxyOldBad->SetMarkerStyle(20);
@@ -525,7 +525,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
     hxyOldBad->Draw("same");
   }
 
-  TH2F* hxyNewDead = getHistoPattern(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun), "new dead");
+  TH2F* hxyNewDead = getHistoPattern(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun), "newdead");
   if (hxyNewDead) {
     hxyNewDead->SetTitle("");
     hxyNewDead->SetMarkerStyle(20);
@@ -539,8 +539,8 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   legend->SetBorderSize(0);
   legend->SetLineWidth(3);
   legend->SetHeader(Form("Total Dead: %d (~%0.02f%%)", nDeadwires, 100.*(nDeadwires) / 14336.0));
-  legend->AddEntry(hxyOldBad, Form("old bad  %d" , oBadwires), "p");
-  legend->AddEntry(hxyNewDead, Form("new dead  %d" , nDeadwires), "p");
+  legend->AddEntry(hxyOldBad, Form("oldbad  %d" , oBadwires), "p");
+  legend->AddEntry(hxyNewDead, Form("newdead  %d" , nDeadwires), "p");
   legend->Draw();
 
   gStyle->SetLegendTextSize(0.025);

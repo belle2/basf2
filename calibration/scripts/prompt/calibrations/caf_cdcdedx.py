@@ -29,7 +29,7 @@ settings = CalibrationSettings(name="CDC dedx",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["bhabha_all_calib"],
-                               expert_config={"payload_boundaries": None},
+                               expert_config={"payload_boundaries": None, "adjustment": 1.01},
                                depends_on=[])
 
 # REQUIRED FUNCTION used b2caf-prompt-run tool #
@@ -77,6 +77,8 @@ def get_calibrations(input_data, **kwargs):
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+
+    adjustment = expert_config["adjustment"]
 
     # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
     # Rungain Precollector path
@@ -270,7 +272,7 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Algorithm setup
     Algorithm_RG = CDCDedxRunGainAlgorithm()
     Algorithm_RG.setMonitoringPlots(True)
-    Algorithm_RG.setAdjustment(1.010)
+    Algorithm_RG.setAdjustment(adjustment)
 
     # Rungain Calibration setup
     Calibration_RG = Calibration(

@@ -411,7 +411,7 @@ class HarvestingModule(basf2.Module):
             output_tdirectory = None
 
         try:
-            with root_cd(output_tdirectory) as tdirectory:
+            with root_cd(output_tdirectory):
                 for refiner in self.refiners:
                     refiner(self, crops, tdirectory=output_tdirectory, **kwds)
 

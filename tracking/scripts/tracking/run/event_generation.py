@@ -180,8 +180,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
         # early write out if simulation output was requested
         if self.simulation_output:
-            root_output_module = path.add_module('RootOutput',
-                                                 outputFileName=self.simulation_output)
+            path.add_module('RootOutput',
+                            outputFileName=self.simulation_output)
 
         return path
 

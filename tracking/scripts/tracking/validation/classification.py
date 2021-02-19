@@ -577,14 +577,14 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
         sorting_indices = np.argsort(estimates)
         if self.cut_direction_ < 0:  # reject low
             # Keep a reference to keep the content alive
-            orginal_sorting_indices = sorting_indices
+            # orginal_sorting_indices = sorting_indices
             sorting_indices = sorting_indices[::-1]
 
         sorted_truths = truths[sorting_indices]
         sorted_estimates = estimates[sorting_indices]
 
         sorted_n_accepted_signals = np.cumsum(sorted_truths, dtype=float)
-        sorted_efficiencies = sorted_n_accepted_signals / n_signals
+        # sorted_efficiencies = sorted_n_accepted_signals / n_signals
 
         sorted_n_rejected_signals = n_signals - sorted_n_accepted_signals
         sorted_n_rejects = np.arange(len(estimates) + 1, 1, -1)

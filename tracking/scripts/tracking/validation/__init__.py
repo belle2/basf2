@@ -1,5 +1,3 @@
-import sys
-
 # Mimics legacy behaviour - use  import tracking.harvest.harvesting instead
 # from ..harvest import harvesting
 # sys.modules["tracking.validation.harvesting"] = harvesting

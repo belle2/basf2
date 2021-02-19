@@ -123,7 +123,7 @@ class ResolutionAnalysis(object):
 
         quantity_name = self.quantity_name
 
-        axis_label = compose_axis_label(quantity_name, self.unit)
+        # axis_label = compose_axis_label(quantity_name, self.unit)
 
         plot_name_prefix = self.plot_name_prefix
         outlier_z_score = self.outlier_z_score
@@ -191,7 +191,7 @@ class ResolutionAnalysis(object):
                     params = fit_res.GetParams()
                     errs = fit_res.Errors()
 
-                    gaus_mean = params[1]
+                    # gaus_mean = params[1]
                     gaus_sigma = params[2]
                     gaus_sigma_err = errs[2]
 

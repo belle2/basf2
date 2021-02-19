@@ -308,7 +308,6 @@ class TrackingValidationModule(basf2.Module):
             z0_estimate = float('nan')
             pt_estimate = float('nan')
 
-            momentum_pt = float('nan')
             momentum = float('nan')
 
             # store seed information, they are always available from the pattern reco

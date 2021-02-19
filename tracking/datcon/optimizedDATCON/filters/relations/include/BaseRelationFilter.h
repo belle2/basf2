@@ -10,9 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 namespace Belle2 {
-  /// Base filter for hits stored in the HitDataCache
-  using BaseRelationFilter = TrackFindingCDC::Filter<std::pair<const HitDataCache*, const HitDataCache*>>;
+  /// Base filter for hits stored in the HitData
+  using BaseRelationFilter = TrackFindingCDC::Filter<std::pair<const HitData*, const HitData*>>;
 }

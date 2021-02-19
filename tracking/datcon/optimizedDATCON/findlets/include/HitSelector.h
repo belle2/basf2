@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -22,29 +22,31 @@ namespace Belle2 {
   /**
    * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
    */
-  class HitSelector : public TrackFindingCDC::Findlet<HitDataCache, VxdID, HitDataCache*> {
+  class HitSelector : public TrackFindingCDC::Findlet<HitData, VxdID, HitData*> {
 
   public:
     /// Load the hits in a sensor friend list for a given L6 sensor from hits and store them in selectedHits, which then are used for the Hough trafo and intercept finding
-    void apply(std::vector<HitDataCache>& hits, std::vector<VxdID>& friendSensorList,
-               std::vector<HitDataCache*>& selectedHits) override
+    void apply(std::vector<HitData>& hits, std::vector<VxdID>& friendSensorList,
+               std::vector<HitData*>& selectedHits) override
     {
       const unsigned short sensorInLayerSixLadder = friendSensorList.back().getSensorNumber();
 
       for (auto& hit : hits) {
-        const VxdID& currentHitSensorID = hit.sensorID;
+
+        const HitData::DataCache& hitData = hit.getDataCache();
+        const VxdID& currentHitSensorID = hitData.sensorID;
 
         if (std::find(friendSensorList.begin(), friendSensorList.end(), currentHitSensorID) == friendSensorList.end()) {
           continue;
         }
-        const unsigned short hitLayer = currentHitSensorID.getLayerNumber();
-        const double hitZPosition = hit.z;
+        const unsigned short hitLayer = hitData.layer;
+        const double hitZPosition = hitData.z;
 
         // The hitZPosition cuts are based on simple geometrical calculations.
         // Take the gap between two L6 sensors, draw a straight line to the origin, check the intercepts with the other layers,
         // and add / subtract {5, 7.5, 10} mm for L3, L4, L5 to account for a straight line not perfectly representing the boarders,
         // slight misalignment, boost, etc so that there is some overlap
-        if (currentHitSensorID.getLayerNumber() < 6) {
+        if (hitLayer < 6) {
           switch (sensorInLayerSixLadder) {
             case 1:
               if (hitLayer == 3 && hitZPosition > 6.56) {

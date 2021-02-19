@@ -32,7 +32,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-  class HitDataCache;
+  class HitData;
 
   /**
    * Findlet for performing the DATCON ROI calculation.
@@ -83,10 +83,10 @@ namespace Belle2 {
     // container to share data between findlets
 
     /// Vector containing the cached hit information
-    std::vector<HitDataCache> m_hits;
+    std::vector<HitData> m_hits;
 
     /// Vector containint raw track candidates
-    std::vector<std::vector<HitDataCache*>> m_rawTrackCandidates;
+    std::vector<std::vector<HitData*>> m_rawTrackCandidates;
 
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.

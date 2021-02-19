@@ -43,28 +43,30 @@ namespace Belle2 {
   LayerRelationFilter<AFilter>::~LayerRelationFilter() = default;
 
   template <class AFilter>
-  std::vector<HitDataCache*>
-  LayerRelationFilter<AFilter>::getPossibleTos(HitDataCache* currentHit, const std::vector<HitDataCache*>& hits) const
+  std::vector<HitData*>
+  LayerRelationFilter<AFilter>::getPossibleTos(HitData* currentHit, const std::vector<HitData*>& hits) const
   {
-    std::vector<HitDataCache*> possibleNextHits;
+    std::vector<HitData*> possibleNextHits;
     possibleNextHits.reserve(hits.size());
 
-    const unsigned int currentLayer = currentHit->geoLayer;
+    const HitData::DataCache& currentHitData = currentHit->getDataCache();
+    const unsigned int currentLayer = currentHitData.layer;
     const unsigned int nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
 
-    for (HitDataCache* nextHit : hits) {
+    for (HitData* nextHit : hits) {
       if (currentHit == nextHit) {
         continue;
       }
 
-      const unsigned int nextLayer = nextHit->geoLayer;
+      const HitData::DataCache& nextHitData = nextHit->getDataCache();
+      const unsigned int nextLayer = nextHitData.layer;
 
       if (std::max(currentLayer, nextPossibleLayer) >= nextLayer and nextLayer >= std::min(currentLayer, nextPossibleLayer)) {
 
         if (currentLayer == nextLayer) {
           // next layer is an overlap one, so lets return all hits from the same layer, that are on a
           // ladder which is below the last added hit.
-          const unsigned int fromLadderNumber = currentHit->ladder;
+          const unsigned int fromLadderNumber = currentHitData.ladder;
           const unsigned int maximumLadderNumber = m_maximalLadderCache.at(currentLayer);
 
           // the reason for this strange formula is the numbering scheme in the VXD.
@@ -76,7 +78,7 @@ namespace Belle2 {
           const unsigned int overlappingLadder =
             ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
-          if (nextHit->ladder != overlappingLadder) {
+          if (nextHitData.ladder != overlappingLadder) {
             continue;
           }
 
@@ -89,11 +91,11 @@ namespace Belle2 {
           //               ----|----                    ----|----                    ----|----
           //  This is fine:         X        This not:                X   This not:          X
           //                      ----|----                    ----|----                    ----|----
-          if (currentHit->localNormalizedu > 0.2) {
+          if (currentHitData.localNormalizedu > 0.2) {
             continue;
           }
 
-          if (nextHit->localNormalizedu <= 0.8) {
+          if (nextHitData.localNormalizedu <= 0.8) {
             continue;
           }
         }
@@ -115,7 +117,7 @@ namespace Belle2 {
   }
 
   template <class AFilter>
-  TrackFindingCDC::Weight LayerRelationFilter<AFilter>::operator()(const HitDataCache& from, const HitDataCache& to)
+  TrackFindingCDC::Weight LayerRelationFilter<AFilter>::operator()(const HitData& from, const HitData& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

@@ -10,16 +10,16 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <array>
 
 namespace Belle2 {
-  /// Base filter for hits in HitDataCache
+  /// Base filter for hits in HitData
   template <class AFilter>
-  class LayerRelationFilter : public TrackFindingCDC::RelationFilter<HitDataCache> {
+  class LayerRelationFilter : public TrackFindingCDC::RelationFilter<HitData> {
     /// The parent class
-    using Super = TrackFindingCDC::RelationFilter<HitDataCache>;
+    using Super = TrackFindingCDC::RelationFilter<HitData>;
 
   public:
     using Super::operator();
@@ -31,12 +31,12 @@ namespace Belle2 {
     ~LayerRelationFilter();
 
     /// Return all states the given state is possible related to.
-    std::vector<HitDataCache*> getPossibleTos(HitDataCache* from, const std::vector<HitDataCache*>& states) const final;
+    std::vector<HitData*> getPossibleTos(HitData* from, const std::vector<HitData*>& states) const final;
 
     /// Expose the parameters of the filter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-    TrackFindingCDC::Weight operator()(const HitDataCache& from, const HitDataCache& to) final;
+    TrackFindingCDC::Weight operator()(const HitData& from, const HitData& to) final;
 
     /// Initialize the maximal ladder cache
     void beginRun() final;

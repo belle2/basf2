@@ -20,7 +20,7 @@ namespace Belle2 {
   class SpacePoint;
   class SpacePointTrackCand;
   class VxdID;
-  class HitDataCache;
+  class HitData;
 
   class ModuleParamList;
 
@@ -31,9 +31,9 @@ namespace Belle2 {
    * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
    * and stored in the output vector.
    */
-  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitDataCache, std::vector<HitDataCache*>> {
+  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitData, std::vector<HitData*>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<HitDataCache, std::vector<HitDataCache*>>;
+    using Super = TrackFindingCDC::Findlet<HitData, std::vector<HitData*>>;
 
     typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
@@ -48,7 +48,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create track candidates for further processing like hit filtering and fitting
-    void apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache*>>& rawTrackCandidates) override;
+    void apply(std::vector<HitData>& hits, std::vector<std::vector<HitData*>>& rawTrackCandidates) override;
 
   private:
     // sub-findlets
@@ -75,7 +75,7 @@ namespace Belle2 {
     /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
     /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
     /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-    void fastInterceptFinder2d(const std::vector<HitDataCache*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
+    void fastInterceptFinder2d(const std::vector<HitData*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
                                uint currentRecursion);
 
     /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
@@ -124,7 +124,7 @@ namespace Belle2 {
     friendSensorMap m_fullFriendMap;
 
     /// hits that are in the acceptance region (= on friend sensors) for the current L6 senosr
-    std::vector<HitDataCache*> m_currentSensorsHitList;
+    std::vector<HitData*> m_currentSensorsHitList;
 
     /// Look-Up-Tables for values as cache to speed up calculation
     /// sine values of the Hough Space sector boarder coordinates
@@ -167,7 +167,7 @@ namespace Belle2 {
     /// The value is a pair consisting of the (negative) number of layers hit in a given cell,
     /// and a vector containing the hit information of all hits that are contained in this cell.
     /// During cluster finding the first value of the value-pair will be assigned the current cluster number.
-    std::map<std::pair<uint, uint>, std::pair<int, std::vector<HitDataCache*>>, paircompare> m_activeSectors;
+    std::map<std::pair<uint, uint>, std::pair<int, std::vector<HitData*>>, paircompare> m_activeSectors;
 
     /// count the clusters
     uint m_clusterCount = 0;
@@ -180,13 +180,13 @@ namespace Belle2 {
     std::pair<int, int> m_clusterCoG = std::make_pair(0, 0);
 
     /// the current track candidate
-    std::vector<HitDataCache*> m_currentTrackCandidate;
+    std::vector<HitData*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<std::vector<HitDataCache*>> m_trackCandidates;
+    std::vector<std::vector<HitData*>> m_trackCandidates;
 
     /// save debug information for checking sinosoidal lines in gnuplot
-    void gnuplotoutput(const std::vector<HitDataCache*>& hits);
+    void gnuplotoutput(const std::vector<HitData*>& hits);
     /// flag to indicate when to stop because of high occupancy
     bool m_breakFlag = false;
 

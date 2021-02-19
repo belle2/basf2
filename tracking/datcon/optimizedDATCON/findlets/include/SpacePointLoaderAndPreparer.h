@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.h>
 #include <vxd/geometry/GeoCache.h>
@@ -28,9 +28,9 @@ namespace Belle2 {
    * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
    * of coordinates for finding track candidates in r-phi and r-z.
    */
-  class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<HitDataCache> {
+  class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<HitData> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<HitDataCache>;
+    using Super = TrackFindingCDC::Findlet<HitData>;
 
   public:
     /// Load clusters and prepare them for intercept finding
@@ -42,19 +42,15 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Load the SVD SpacePoints and create a HitDataCache object for each hit
-    void apply(std::vector<HitDataCache>& hits) override
+    /// Load the SVD SpacePoints and create a HitData object for each hit
+    void apply(std::vector<HitData>& hits) override
     {
       if (m_storeSpacePoints.getEntries() == 0) return;
 
-//       auto& geoCache = VXD::GeoCache::getInstance();
+      hits.reserve(m_storeSpacePoints.getEntries());
+
       for (auto& spacePoint : m_storeSpacePoints) {
-        const B2Vector3D& hitPos = spacePoint.getPosition();
-        hits.emplace_back(&spacePoint, spacePoint.getVxdID(),
-                          spacePoint.getVxdID().getLayerNumber(), spacePoint.getVxdID().getLadderNumber(),
-                          hitPos.X(), hitPos.Y(), hitPos.Z(),
-                          2.*hitPos.X() / hitPos.Perp2(), 2.*hitPos.Y() / hitPos.Perp2(),
-                          spacePoint.getNormalizedLocalU(), spacePoint.getNormalizedLocalV(), hitPos.Phi(), hitPos.Theta());
+        hits.emplace_back(HitData(&spacePoint));
       }
     };
 

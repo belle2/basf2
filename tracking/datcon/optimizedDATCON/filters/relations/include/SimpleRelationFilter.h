@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/filters/relations/BaseRelationFilter.h>
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 #include <math.h>
 
 namespace Belle2 {
@@ -18,7 +18,7 @@ namespace Belle2 {
   class SimpleRelationFilter : public BaseRelationFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
-    TrackFindingCDC::Weight operator()(const std::pair<const HitDataCache*, const HitDataCache*>& relation) override;
+    TrackFindingCDC::Weight operator()(const std::pair<const HitData*, const HitData*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

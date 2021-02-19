@@ -25,7 +25,7 @@
 
 
 namespace Belle2 {
-  class HitDataCache;
+  class HitData;
   class SpacePoint;
   class SpacePointTrackCand;
   class VxdID;
@@ -33,9 +33,9 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-  class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<HitDataCache*>, SpacePointTrackCand> {
+  class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<HitData*>, SpacePointTrackCand> {
     /// Parent class
-    using Super =  TrackFindingCDC::Findlet<std::vector<HitDataCache*>, SpacePointTrackCand>;
+    using Super =  TrackFindingCDC::Findlet<std::vector<HitData*>, SpacePointTrackCand>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -57,7 +57,7 @@ namespace Belle2 {
     void endRun() override;
 
     /// Reject bad SpacePointTrackCands and bad hits inside the remaining
-    void apply(std::vector<std::vector<HitDataCache*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
+    void apply(std::vector<std::vector<HitData*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
 
@@ -67,9 +67,9 @@ namespace Belle2 {
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
 //     std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
 
-    std::vector<TrackFindingCDC::WeightedRelation<HitDataCache>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelation<HitData>> m_relations;
 
-    RelationCreator<HitDataCache, ChooseableRelationFilter> m_relationCreator;
+    RelationCreator<HitData, ChooseableRelationFilter> m_relationCreator;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.

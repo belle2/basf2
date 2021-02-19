@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
 
-#include <tracking/datcon/optimizedDATCON/entities/HitDataCache.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -126,7 +126,7 @@ void FastInterceptFinder2D::initialize()
 }
 
 
-void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<std::vector<HitDataCache*>>& rawTrackCandidates)
+void FastInterceptFinder2D::apply(std::vector<HitData>& hits, std::vector<std::vector<HitData*>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
 
@@ -144,10 +144,10 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
       gnuplotoutput(m_currentSensorsHitList);
       uint count = 0;
       for (auto& hit : hits) {
-        double X = hit.x;
-        double Y = hit.y;
-        double Z = hit.z;
-        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.sensorID);
+        double X = hit.getDataCache().x;
+        double Y = hit.getDataCache().y;
+        double Z = hit.getDataCache().z;
+        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.getDataCache().sensorID);
         count++;
       }
       B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
@@ -158,11 +158,11 @@ void FastInterceptFinder2D::apply(std::vector<HitDataCache>& hits, std::vector<s
     // sort for layer, and 2D radius in case of same layer before storing as SpacePointTrackCand
     // outer hit goes first, as later on tracks are build from outside to inside
     std::sort(trackCand.begin(), trackCand.end(),
-    [](const HitDataCache * a, const HitDataCache * b) {
+    [](const HitData * a, const HitData * b) {
       return
-        (a->sensorID.getLayerNumber() > b->sensorID.getLayerNumber()) or
-        (a->sensorID.getLayerNumber() == b->sensorID.getLayerNumber()
-         and a->spacePoint->getPosition().Perp() > b->spacePoint->getPosition().Perp());
+        (a->getDataCache().layer > b->getDataCache().layer) or
+        (a->getDataCache().layer == b->getDataCache().layer
+         and a->getHit()->getPosition().Perp() > b->getHit()->getPosition().Perp());
     });
 
     rawTrackCandidates.emplace_back(trackCand);
@@ -255,10 +255,10 @@ void FastInterceptFinder2D::initializeSectorFriendMap()
 }
 
 
-void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitDataCache*>& hits, uint xmin, uint xmax, uint ymin,
+void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitData*>& hits, uint xmin, uint xmax, uint ymin,
                                                   uint ymax, uint currentRecursion)
 {
-  std::vector<HitDataCache*> containedHits;
+  std::vector<HitData*> containedHits;
   containedHits.reserve(hits.size());
   std::bitset<8> layerHits; /* For layer filter */
 
@@ -300,10 +300,11 @@ void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitDataCache
       // reset layerHits and containedHits
       layerHits = 0;
       containedHits.clear();
-      for (HitDataCache* hit : hits) {
+      for (HitData* hit : hits) {
 
-        const double& m = hit->xConformal;
-        const double& a = hit->yConformal;
+        const HitData::DataCache& hitData = hit->getDataCache();
+        const double& m = hitData.xConformal;
+        const double& a = hitData.yConformal;
 
         const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
         const double derivativeyRight  = m * -sinRight  + a * cosRight;
@@ -320,7 +321,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitDataCache
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
-          layerHits[hit->sensorID.getLayerNumber()] = true;
+          layerHits[hitData.layer] = true;
           containedHits.emplace_back(hit);
         }
       }
@@ -355,7 +356,7 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     currentCell.second.first = m_clusterCount;
 
     m_currentTrackCandidate.clear();
-    for (HitDataCache* hit : currentCell.second.second) {
+    for (HitData* hit : currentCell.second.second) {
       m_currentTrackCandidate.emplace_back(hit);
     }
 
@@ -401,7 +402,7 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 
           // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
           // so it's certain the key exists.
-          for (HitDataCache* hit : activeSector->second.second) {
+          for (HitData* hit : activeSector->second.second) {
             if (not TrackFindingCDC::is_in(hit, m_currentTrackCandidate)) {
               m_currentTrackCandidate.emplace_back(hit);
             }
@@ -417,7 +418,7 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 }
 
 
-void FastInterceptFinder2D::gnuplotoutput(const std::vector<HitDataCache*>& hits)
+void FastInterceptFinder2D::gnuplotoutput(const std::vector<HitData*>& hits)
 {
   std::ofstream outstream;
   outstream.open("gnuplotlog.plt", std::ios::trunc);
@@ -425,20 +426,22 @@ void FastInterceptFinder2D::gnuplotoutput(const std::vector<HitDataCache*>& hits
   outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
   outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
   outstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
+  outstream << "set xrange [-pi-0.5:pi+0.5]" << std::endl;
   outstream << std::endl;
 
   uint count = 0;
   for (auto& hit : hits) {
-    double xc = hit->xConformal;
-    double yc = hit->yConformal;
-    VxdID id = hit->sensorID;
-    int layer = id.getLayerNumber();
-    double X = hit->spacePoint->X();
-    double Y = hit->spacePoint->Y();
-    double Z = hit->spacePoint->Z();
+    const HitData::DataCache& hitData = hit->getDataCache();
+    double xc = hitData.xConformal;
+    double yc = hitData.yConformal;
+    VxdID id = hitData.sensorID;
+    int layer = hitData.layer;
+    double x = hitData.x;
+    double y = hitData.y;
+    double z = hitData.z;
 
     outstream << "plot " << xc << " * -sin(x) + " << yc << " * cos(x) > 0 ? " << xc << " * cos(x) + " << yc <<
-              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << X << "   " << Y << "   " << Z << std::endl;
+              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << x << "   " << y << "   " << z << std::endl;
     if (count < hits.size() - 1) outstream << "re";
     count++;
   }

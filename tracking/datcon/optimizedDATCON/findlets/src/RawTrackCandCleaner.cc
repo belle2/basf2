@@ -56,7 +56,7 @@ void RawTrackCandCleaner::exposeParameters(ModuleParamList* moduleParamList, con
 // //   m_relations.clear();
 // }
 
-void RawTrackCandCleaner::apply(std::vector<std::vector<HitDataCache*>>& rawTrackCandidates,
+void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCandidates,
                                 std::vector<SpacePointTrackCand>& trackCandidates)
 {
   m_relations.reserve(8192);

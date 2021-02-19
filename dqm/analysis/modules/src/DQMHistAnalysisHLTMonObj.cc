@@ -83,7 +83,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   if (h_budget) bgt = h_budget->GetMean();
   m_monObj->setVariable("budget_time", bgt);
 
-  m_monObj->setVariable("n_l1_x_budget_time ", n_l1 * bgt);
+  m_monObj->setVariable("n_l1_x_budget_time", n_l1 * bgt);
 
   double procTime = 0.;
   if (h_processing) procTime = h_processing->GetMean();

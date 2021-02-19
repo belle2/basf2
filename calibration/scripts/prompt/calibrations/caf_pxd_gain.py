@@ -69,6 +69,7 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = expert_config["max_files_per_run"]
     min_files_per_chunk = expert_config["min_files_per_chunk"]
     min_events_per_file = expert_config["min_events_per_file"]
+    cal_kwargs = expert_config.get("kwargs", {})
 
     # print all config
     basf2.B2INFO(f"Requested iov: {requested_iov} ")
@@ -134,7 +135,8 @@ but {min_files_per_chunk} required!")
                 cal_name=cal_name,
                 gain_method=gain_method,
                 # boundaries=vector_from_runs(payload_boundaries),
-                input_files=input_files)
+                input_files=input_files,
+                **cal_kwargs)
             for alg in cal.algorithms:
                 alg.params["iov_coverage"] = specific_iov
             cal_list.append(cal)

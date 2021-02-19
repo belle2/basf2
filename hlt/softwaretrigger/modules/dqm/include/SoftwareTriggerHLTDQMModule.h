@@ -49,15 +49,28 @@ namespace Belle2 {
     private:
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.
-      std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
+      std::map<std::string, std::map<std::string, std::vector<std::string>>> m_param_cutResultIdentifiers;
+
       /// Which cuts should be ignored? This can be used to clear trigger lines from e.g. bhabha contamination.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
+
+      /// Which cuts should be reported per unit?
+      std::vector<std::string> m_param_cutResultIdentifiersPerUnit;
+
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
+
       /// Create total result histogram?
       bool m_param_create_total_result_histograms;
+
       /// Create exp/run/event number histograms?
       bool m_param_create_exp_run_event_histograms;
+
+      /// Create HLT unit number histograms?
+      bool m_param_create_hlt_unit_histograms;
+
+      /// Create error flag histograms?
+      bool m_param_create_error_flag_histograms;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;
@@ -65,9 +78,15 @@ namespace Belle2 {
       /// Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "softwaretrigger";
 
+      /// HLT unit number of the machine used
+      int m_hlt_unit = 0;
+
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
       std::map<std::string, TH1F*> m_cutResultHistograms;
+
+      /// histograms for the final sw trigger decisions for each base identifier per unit
+      std::map<std::string, TH1F*> m_cutResultPerUnitHistograms;
 
       /// histograms for the software trigger variables in all calculators (although maybe not filled)
       std::map<std::string, TH1F*> m_triggerVariablesHistograms;
@@ -81,15 +100,27 @@ namespace Belle2 {
       // Datastore members
       /// STM cut results
       StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
+
       /// L1 cut results
       StoreObjPtr<TRGSummary> m_l1TriggerResult;
+
       /// STM cut variables
       StoreObjPtr<SoftwareTriggerVariables> m_variables;
+
       /// Event Info
       StoreObjPtr<EventMetaData> m_eventMetaData;
 
       /// Dataobjects
       DBObjPtr<TRGGDLDBFTDLBits> m_l1NameLookup;
+    };
+
+    /// HLT unit number information.
+    namespace HLTUnit {
+      /// Maximum number of HLT units used during the experiment
+      static constexpr unsigned int max_hlt_units = 10;
+
+      /// Location of HLT unit number information
+      static constexpr char hlt_unit_file[] = "/home/usr/hltdaq/HLT.UnitNumber";
     };
   }
 }

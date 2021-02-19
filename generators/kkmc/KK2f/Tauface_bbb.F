@@ -89,7 +89,10 @@ C
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1                
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
 
-C initialization for 3 scalars
+      REAL*8  AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
+
+C     initialization for 3 scalars
       AMROP=1.1
       GAMROP=0.36
       AMOM=.782
@@ -197,7 +200,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=GAMKST
         AMRB(MNUM) =1.43
         GAMRB(MNUM)=0.9
-       ELSEIF (MNUM.EQ.47) THEN ! piee, 0.0, 0.8, 0.16, 0.1, 0.7759, 0.1479, 0.001, 0.005
+       ELSEIF (MNUM.EQ.47) THEN  ! piee, 0.0, 0.8, 0.16, 0.1, 0.7759, 0.1479, 0.001, 0.005
         PROB1(MNUM)=0.0
         PROB2(MNUM)=0.8
         AMRX (MNUM)=0.16
@@ -206,7 +209,15 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=0.1479
         AMRB(MNUM) =0.001
         GAMRB(MNUM)=0.005
-       ELSEIF (MNUM.EQ.48) THEN ! pimumu, 0.0, 0.8, 0.7, 0.4, 0.7759, 0.1479, 0.27, 0.2
+        IF (AMDARK.GT.1.0D-6) THEN
+           AMRX (MNUM) = 2*AMDARK
+           GAMRX(MNUM) = AMDARK
+           AMRA (MNUM) = AMDARK
+           GAMRA(MNUM) = GMDARK
+           AMRB (MNUM) = AMDARK
+           GAMRB(MNUM) = GMDARK
+        ENDIF
+      ELSEIF (MNUM.EQ.48) THEN  ! pimumu, 0.0, 0.8, 0.7, 0.4, 0.7759, 0.1479, 0.27, 0.2
         PROB1(MNUM)=0.0
         PROB2(MNUM)=0.8
         AMRX (MNUM)=0.7
@@ -215,6 +226,14 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=0.1479
         AMRB(MNUM) =0.27
         GAMRB(MNUM)=0.2
+        IF (AMDARK.GT.1.0D-6) THEN
+           AMRX (MNUM) = 2*AMDARK
+           GAMRX(MNUM) = AMDARK
+           AMRA (MNUM) = AMDARK
+           GAMRA(MNUM) = GMDARK
+           AMRB (MNUM) = AMDARK
+           GAMRB(MNUM) = GMDARK
+        ENDIF
        ELSE
         PROB1(MNUM)=0.0
         PROB2(MNUM)=0.0
@@ -241,8 +260,8 @@ C
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1                
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
 
-
-
+      REAL*8  AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
 
 C initialization for 4 scalars
       DO INUM=1,NM4
@@ -283,13 +302,13 @@ C initialization for 4 scalars
         GAMRX(INUM)=0.9
         AMRA(INUM) =0.15
         GAMRA(INUM)=0.1
-       ELSE IF (INUM.EQ.6) THEN ! muee, 0.0, 0.8, 1.0, 0.9, 0.15, 0.1
+       ELSE IF (INUM.EQ.6) THEN ! muee, 0.0, 0.8, 1.0, 0.9, 0.03, 0.07
         PROB1(INUM)=0.0
         PROB2(INUM)=0.8
         AMRX(INUM) =1.0
         GAMRX(INUM)=0.9
-        AMRA(INUM) =0.15
-        GAMRA(INUM)=0.1
+        AMRA(INUM) =0.03
+        GAMRA(INUM)=0.07
        ELSEIF((INUM.GT.6.AND.INUM.LE.12).OR.(INUM.GE.28.AND.INUM.LE.31)) THEN
         PROB1(INUM)=0.0
         PROB2(INUM)=0.0
@@ -304,7 +323,13 @@ C initialization for 4 scalars
         GAMRX(INUM)=GAMA1
         AMRA(INUM) =AMRO
         GAMRA(INUM)=GAMRO
-       ENDIF
+      ENDIF
+      IF (INUM.GE.3.AND.INUM.LE.6) THEN
+         IF (AMDARK.GT.1.0D-6) THEN
+            AMRA(INUM) = AMDARK
+            GAMRA(INUM) = 2.0D0*GMDARK
+         ENDIF
+      ENDIF
       ENDDO
       END
 

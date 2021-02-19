@@ -118,7 +118,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrU = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrU");
   m_cEfficiencyErrV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV");
 
-
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
 
@@ -329,6 +328,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
+  if (m_printCanvas) {
+    m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
+    m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
+    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
+    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
+  }
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
@@ -348,17 +353,18 @@ void DQMHistAnalysisSVDEfficiencyModule::terminate()
   delete m_cEfficiencyErrV;
 }
 
+// return y coordinate in TH2F histogram for specified sensor
 Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
 {
-
   if (layer == 3)
-    return sensor; //2
+    return sensor; //2 -> 1,2
   if (layer == 4)
-    return 2 + 1 + sensor; //6
+    return 2 + 1 + sensor; //6 -> 4,5,6
   if (layer == 5)
-    return 6 + 1 + sensor; // 11
+    return 6 + 1 + sensor; // 11 -> 8, 9, 10, 11
   if (layer == 6)
-    return 11 + 1 + sensor; // 17
+    return 11 + 1 + sensor; // 17 -> 13, 14, 15, 16, 17
   else
     return -1;
 }
+

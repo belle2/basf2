@@ -708,7 +708,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
 void DQMHistAnalysisSVDGeneralModule::endRun()
 {
-  B2INFO("DQMHistAnalysisSVDGeneral:  endRun called");
+  B2INFO("DQMHistAnalysisSVDGeneral: endRun called");
 }
 
 
@@ -754,10 +754,8 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cClusterOnTrackTime_L456V;
 }
 
-
 Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
 {
-
   if (layer == 3)
     return sensor; //2
   if (layer == 4)
@@ -769,3 +767,4 @@ Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
   else
     return -1;
 }
+

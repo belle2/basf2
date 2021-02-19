@@ -198,12 +198,20 @@ files.
     Check out the location of the files mentioned above. Which two settings of
     MC are provided?
 
+.. admonition:: Hint
+    :class: xhint toggle stacked
+
+    Remember the ``ls`` (and ``cd``) bash command?
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. code-block:: bash
 
         ls /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
+
+    Alternatively, you can first navigate to the directory with ``cd`` and then
+    just call ``ls`` without any arguments.
 
     There are each 100 files with and without beam background (BGx1 and BGx0).
     Their names only differ by the final suffix, which is an integer between 0
@@ -269,6 +277,18 @@ having to change anything in the script itself.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
+    Get the integer from the command line with
+
+    .. code-block:: python
+
+        import sys
+
+
+        filenumber = sys.argv[1]
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
     Rather than concatenating strings with ``+`` (``"file_" + str(filenumber) + ".root"``),
     you can also use so-called f-strings: ``f"file_{filenumber}.root"``. They
     are great for both readability and performance.
@@ -279,6 +299,21 @@ having to change anything in the script itself.
     .. literalinclude:: steering_files/011_first_steering_file.py
         :linenos:
         :emphasize-lines: 8, 14
+
+
+.. admonition:: Tip
+
+    Make sure that from now on you always supply a number every time you run your
+    steering file, e.g. ``basf2 myanalysis.py 1``.
+
+    Else you will get an exception like
+
+    .. code-block::
+
+        Traceback (most recent call last):
+          File "myanalysis.py", line 3, in <module>
+            filenumber = sys.argv[1]
+        IndexError: list index out of range
 
 Filling particle lists
 ----------------------
@@ -845,17 +880,33 @@ information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
 name as input arguments. The integer (0-based) counts through the daughter
 particles, ``daughter(0, p)`` would for example be the momentum of the first
-daughter, in our case of the :math:`J/\Psi`. The function can be used
-recursively, so ``daughter(daughter(0, E))`` is the energy of the positive
-muon. In principle, one can add these nested variables directly to the ntuple
-but the brackets have to be escaped and the resulting variable name in the
-ntuple is not very user-friendly or intuitive. Instead, one can define aliases
-to translate the variables using `addAlias`.
+daughter, in our case of the :math:`J/\Psi`. This function can also be used
+recursively.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    How can you replace ``daughter(daughter(0, E))`` with ``mup_E``?
+    What does ``daughter(0, daughter(0, E))`` denote?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    It's the energy of the positive muon.
+
+In principle, one can add these nested variables directly to the ntuple
+but the brackets have to be escaped (i.e. replaced with "normal" characters)
+and the resulting variable name in the ntuple is not very user-friendly or
+intuitive. For example ``daughter(0, daughter(0, E))`` becomes
+``daughter__bo0__cm__spdaughter__bo0__cm__spE__bc__bc``. Not exactly pretty,
+right?
+
+So instead, let's define aliases to translate the variable names!
+This can be done with `addAlias`.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How can you replace ``daughter(0, daughter(0, E))`` with ``mup_E``?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -868,7 +919,9 @@ to translate the variables using `addAlias`.
     .. code-block:: python
 
         from variables import variables as vm
-        vm.addAlias("mup_E", "daughter(daughter(0, E))")
+
+
+        vm.addAlias("mup_E", "daughter(0, daughter(0, E))")
 
 However, this can quickly fill up many, many lines. Therefore, there are utils
 to easily create aliases. The most useful is probably

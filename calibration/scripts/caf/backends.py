@@ -45,6 +45,7 @@ def get_input_data():
 
 def monitor_jobs(args, jobs):
     unfinished_jobs = jobs[:]
+    failed_jobs = 0
     while unfinished_jobs:
         B2INFO(f"Updating statuses of unfinished jobs...")
         for j in unfinished_jobs:
@@ -52,12 +53,19 @@ def monitor_jobs(args, jobs):
         B2INFO(f"Checking if jobs are ready...")
         for j in unfinished_jobs[:]:
             if j.ready():
-                B2INFO(f"{j} is finished")
+                if j.status == "failed":
+                    B2ERROR(f"{j} is failed")
+                    failed_jobs += 1
+                else:
+                    B2INFO(f"{j} is finished")
                 unfinished_jobs.remove(j)
         if unfinished_jobs:
             B2INFO(f"Not all jobs done yet, waiting {args.heartbeat} seconds before re-checking...")
             time.sleep(args.heartbeat)
-    B2INFO(f"All jobs finished")
+    if failed_jobs > 0:
+        B2ERROR(f"{failed_jobs} jobs failed")
+    else:
+        B2INFO('All jobs finished successfully')
 
 
 class ArgumentsGenerator():
@@ -440,7 +448,11 @@ class Job:
         """
         Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == 'failed':
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -669,8 +681,13 @@ class SubJob(Job):
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == failed:
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property

@@ -38,10 +38,14 @@ namespace Belle2 {
       /// Destructor
       ~PXDReadRawBonnDAQModule() override final;
 
+      /** Initialize */
       void initialize() override final;
-      void event() override final;
-      void terminate() override final;
 
+      /** Event */
+      void event() override final;
+
+      /** Terminate */
+      void terminate() override final;
 
       // Data members
 

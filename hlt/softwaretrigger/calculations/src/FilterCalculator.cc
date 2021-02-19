@@ -61,11 +61,18 @@ struct SelectedECLCluster {
 /// the boundaries for the eeFlatXX cuts
 const double flatBoundaries[10] = {0., 19., 22., 25., 30., 35., 45., 60., 90., 180.};
 
+
+FilterCalculator::FilterCalculator() : m_bitsNN("CDCTriggerNNBits")
+{
+
+}
+
 void FilterCalculator::requireStoreArrays()
 {
   m_tracks.isRequired();
   m_eclClusters.isRequired();
   m_l1Trigger.isOptional();
+  m_bitsNN.isOptional();
 }
 
 void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -142,14 +149,26 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeFlat6"] = 0;
   calculationResult["eeFlat7"] = 0;
   calculationResult["eeFlat8"] = 0;
+  calculationResult["eeOneClust"] = 0;
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
     calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
     calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+
+    calculationResult["bha3d"] = m_l1Trigger->testPsnm("bha3d");
+    calculationResult["bhapur"] = m_l1Trigger->testPsnm("bhapur");
+    calculationResult["bhapur_lml1"] = m_l1Trigger->testPsnm("lml1") and m_l1Trigger->testFtdl("bhapur");
   } else {
-    calculationResult["l1_trigger_random"] = -1;
-    calculationResult["l1_trigger_delayed_bhabha"] = -1;
+    calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
+    calculationResult["l1_trigger_delayed_bhabha"] = 0;
+    calculationResult["bha3d"] = 0;
+    calculationResult["bhapur"] = 0;
+    calculationResult["bhapur_lml1"] = 0;
   }
+
+  // Every 256th event has CDC NN trigger information
+  calculationResult["l1_trg_NN_info"] = 0;
+  if (m_bitsNN.isValid() and m_bitsNN.getEntries() > 0) {calculationResult["l1_trg_NN_info"] = 1;}
 
   calculationResult["true"] = 1;
   calculationResult["false"] = 0;
@@ -643,6 +662,13 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
 
     thetaFlatten = negativeTrack.p4Lab.Theta() * TMath::RadToDeg();
+
+    // Two tracks but (exactly) 1 high energy cluster
+    const bool missNegClust = positiveTrack.clusterEnergySumCMS > 4.5 and negativeTrack.clusterEnergySumCMS < 1.;
+    const bool missPosClust = negativeTrack.clusterEnergySumCMS > 4.5 and positiveTrack.clusterEnergySumCMS < 1.;
+    if ((invMass > 9.) and (missNegClust or missPosClust)) {
+      calculationResult["eeOneClust"] = 1;
+    }
   }
 
   if (calculationResult["selectee1leg1trk"] == 1 or calculationResult["selectee1leg1clst"] == 1) {

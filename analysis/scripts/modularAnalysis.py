@@ -3222,7 +3222,7 @@ def energyBiasCorrection(inputListNames, tableName, path=None):
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        scale (float): scaling factor (1.0 -- no scaling)
+        tableName : stored in localdb and created using ParticleWeightingLookUpCreator
         path (basf2.Path): module is added to this path
     """
 

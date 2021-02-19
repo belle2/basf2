@@ -40,7 +40,7 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     file_to_iov_physics = input_data["bhabha_all_calib"]
 
-    fulldataMode = True
+    fulldataMode = False
 
     if fulldataMode:
         input_files_rungain = list(file_to_iov_physics.keys())

@@ -45,7 +45,7 @@ def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
     # scope guard to avoid side effects by changing the global gDirectory
     # in modules ...
     # noinspection PyUnusedLocal
-    directory_guard = ROOT.TDirectory.TContext(rootfile)
+    directory_guard = ROOT.TDirectory.TContext(rootfile)  # noqa
     desc = ROOT.TNamed("Description", description)
     desc.Write()
     if opened:
@@ -161,7 +161,7 @@ def validation_metadata_update(
     # scope guard to avoid side effects by changing the global gDirectory
     # in modules ...
     # noinspection PyUnusedLocal
-    directory_guard = ROOT.TDirectory.TContext(rootfile)
+    directory_guard = ROOT.TDirectory.TContext(rootfile)  # noqa
     obj.Write("", ROOT.TObject.kOverwrite)
     if opened:
         rootfile.Close()

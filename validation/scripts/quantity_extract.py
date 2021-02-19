@@ -40,7 +40,7 @@ def default_extractor():
         # only get the first entry for now
         results = []
         if ntuple_obj.GetEntries() > 0:
-            ent0 = ntuple_obj.GetEntry(0)
+            # ent0 = ntuple_obj.GetEntry(0)
             for branch in ntuple_obj.GetListOfBranches():
                 branch_name = branch.GetName()
                 # create tuple with the branch name and value

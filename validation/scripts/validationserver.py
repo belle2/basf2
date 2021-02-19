@@ -53,7 +53,7 @@ def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
     for r_file in found_revs:
         # try loading json file
         with open(r_file) as json_file:
-            data = json.load(json_file)
+            data = json.load(json_file)  # noqa
 
             # always use the folder name as label
             found_rev_labels.append(

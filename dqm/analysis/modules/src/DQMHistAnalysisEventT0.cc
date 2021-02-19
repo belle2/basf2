@@ -34,6 +34,7 @@ DQMHistAnalysisEventT0Module::DQMHistAnalysisEventT0Module()
 {
   //Parameter definition
   addParam("min_nEntries", m_nEntriesMin, "minimum numeber of entries to process the histogram", m_nEntriesMin);
+  addParam("prefixCanvas", m_prefixCanvas, "prefix to be added to canvas filename when saved as pdf", std::string("c"));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
 }
 
@@ -82,6 +83,11 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad1ECLTRG->SetFillColor(0);
     m_pad1ECLTRG->Modified();
     m_pad1ECLTRG->Update();
+    m_cECLTRG->cd();
+    m_pad1ECLTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
@@ -96,6 +102,11 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad2ECLTRG->SetFillColor(0);
     m_pad2ECLTRG->Modified();
     m_pad2ECLTRG->Update();
+    m_cECLTRG->cd();
+    m_pad2ECLTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
@@ -111,19 +122,19 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad3ECLTRG->SetFillColor(0);
     m_pad3ECLTRG->Modified();
     m_pad3ECLTRG->Update();
+    m_cECLTRG->cd();
+    m_pad3ECLTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
     m_pad3ECLTRG->SetFillColor(kGray);
   }
 
-  m_cECLTRG->cd();
-  m_pad1ECLTRG->Draw();
-  m_pad2ECLTRG->Draw();
-  m_pad3ECLTRG->Draw();
-
   if (m_printCanvas)
-    m_cECLTRG->Print("c_ECLTRG.pdf");
+    m_cECLTRG->Print(Form("%s_ECLTRG.pdf", m_prefixCanvas.c_str()));
 
 
   // --- CDCTRG ---
@@ -136,6 +147,11 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad1CDCTRG->SetFillColor(0);
     m_pad1CDCTRG->Modified();
     m_pad1CDCTRG->Update();
+    m_cCDCTRG->cd();
+    m_pad1CDCTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
@@ -150,6 +166,11 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad2CDCTRG->SetFillColor(0);
     m_pad2CDCTRG->Modified();
     m_pad2CDCTRG->Update();
+    m_cCDCTRG->cd();
+    m_pad2CDCTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
@@ -165,19 +186,19 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_pad3CDCTRG->SetFillColor(0);
     m_pad3CDCTRG->Modified();
     m_pad3CDCTRG->Update();
+    m_cCDCTRG->cd();
+    m_pad3CDCTRG->Draw();
+    delete m_fitf;
+    delete m_gauss1;
+    delete m_gauss2;
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     h->Draw();
     m_pad3CDCTRG->SetFillColor(kGray);
   }
 
-  m_cCDCTRG->cd();
-  m_pad1CDCTRG->Draw();
-  m_pad2CDCTRG->Draw();
-  m_pad3CDCTRG->Draw();
-
   if (m_printCanvas)
-    m_cCDCTRG->Print("c_CDCTRG.pdf");
+    m_cCDCTRG->Print(Form("%s_CDCTRG.pdf", m_prefixCanvas.c_str()));
 
 
 }
@@ -206,15 +227,15 @@ double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
 bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
 {
 
-  if (h == NULL) {
-    B2DEBUG(50, "h == NULL");
+  if (h == nullptr) {
+    B2DEBUG(20, "h == nullptr");
     m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return  false;
   }
 
   int nToFit = h->GetEntries();// - h->GetBinContent(0) - h->GetBinContent(h->GetNbinsX()+1);
   if (nToFit < m_nEntriesMin) {
-    B2DEBUG(50, "not enough entries");
+    B2DEBUG(20, "not enough entries");
     m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return false;
   }
@@ -225,37 +246,37 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
   h->GetXaxis()->SetRangeUser(-50, 50);
 
   //define the fitting function
-  TF1* fitf = new TF1("fit", DQMHistAnalysisEventT0Module::fDoubleGaus, -50, 50, 6);
-  fitf->SetParNames("N", "f_{1}", "#mu_{1}", "#sigma_{1}", "#mu_{2}", "#sigma_{2}");
-  fitf->SetParameters(0.1, 0.8, 0, 5, 0, 15);
-  fitf->SetParLimits(1, 0, 1); //fraction
-  fitf->SetParLimits(3, 0, 100); //sigma1
-  fitf->SetParLimits(5, 0, 100); //sigma2
+  m_fitf = new TF1("fit", DQMHistAnalysisEventT0Module::fDoubleGaus, -50, 50, 6);
+  m_fitf->SetParNames("N", "f_{1}", "#mu_{1}", "#sigma_{1}", "#mu_{2}", "#sigma_{2}");
+  m_fitf->SetParameters(0.1, 0.8, 0, 5, 0, 15);
+  m_fitf->SetParLimits(1, 0, 1); //fraction
+  m_fitf->SetParLimits(3, 0, 100); //sigma1
+  m_fitf->SetParLimits(5, 0, 100); //sigma2
 
-  if (h->Fit(fitf, "SR+") != 0) {
-    B2DEBUG(50, "failed fit");
+  if (h->Fit(m_fitf, "SR+") != 0) {
+    B2DEBUG(20, "failed fit");
     m_monObj->setVariable(Form("fit_%s", tag.Data()), 0);
     return false;
   }
 
   Double_t par[6];
-  fitf->GetParameters(&par[0]);
+  m_fitf->GetParameters(&par[0]);
   Double_t parErr[6];
   for (int i = 0; i < 6; i++)
-    parErr[i] = fitf->GetParError(i) ;
+    parErr[i] = m_fitf->GetParError(i) ;
 
 
   //define gaussian components
-  TF1* g1 = new TF1("gauss1", "gaus", -100, 100);
-  TF1* g2 = new TF1("gauss2", "gaus", -100, 100);
+  m_gauss1 = new TF1("gauss1", "gaus", -100, 100);
+  m_gauss2 = new TF1("gauss2", "gaus", -100, 100);
 
-  g1->SetLineColor(kBlue);
-  g1->SetLineStyle(kDashed);
-  g1->SetParameters(par[0]*par[1], par[2], par[3]);
+  m_gauss1->SetLineColor(kBlue);
+  m_gauss1->SetLineStyle(kDashed);
+  m_gauss1->SetParameters(par[0]*par[1], par[2], par[3]);
 
-  g2->SetLineColor(kBlue);
-  g2->SetLineStyle(kDashed);
-  g2->SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
+  m_gauss2->SetLineColor(kBlue);
+  m_gauss2->SetLineStyle(kDashed);
+  m_gauss2->SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
 
   m_monObj->setVariable(Form("fit_%s", tag.Data()), 1);
   m_monObj->setVariable(Form("N_%s", tag.Data()), h->GetEntries(), TMath::Sqrt(h->GetEntries()));
@@ -269,9 +290,9 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
   gStyle->SetOptFit(1111);
 
   h->Draw();
-  fitf->Draw("same");
-  g1->Draw("same");
-  g2->Draw("same");
+  m_fitf->Draw("same");
+  m_gauss1->Draw("same");
+  m_gauss2->Draw("same");
 
   return true;
 

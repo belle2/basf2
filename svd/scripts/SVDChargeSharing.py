@@ -30,8 +30,8 @@ class SVDChargeSharing(b2.Module):
     def event(self):
         """Find clusters with a truehit and print some stats."""
 
-        truehits = Belle2.PyStoreArray('SVDTrueHits')
-        nTruehits = truehits.getEntries()
+        # truehits = Belle2.PyStoreArray('SVDTrueHits')
+        # nTruehits = truehits.getEntries()
         clusters = Belle2.PyStoreArray('SVDClusters')
         nClusters = clusters.getEntries()
         print("nClusters = "+str(nClusters))

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-from ROOT import Belle2
 import sys
 
 
@@ -12,7 +11,7 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Fal
         clusterizerName = '__ROISVDClusterizer'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
-        recoDigitsName = '__ROIsvdRecoDigits'
+        # recoDigitsName = '__ROIsvdRecoDigits'
         clustersName = '__ROIsvdClusters'
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
@@ -20,7 +19,7 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Fal
         clusterizerName = 'SVDClusterizer'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
-        recoDigitsName = ""
+        # recoDigitsName = ""
         clustersName = ""
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'

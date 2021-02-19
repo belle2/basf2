@@ -14,7 +14,9 @@
 </header>
 """
 
-from plotUtils import *
+import ROOT as R
+
+import plotUtils as pu
 
 inputC = R.TFile.Open("../SVDValidationTTreeCluster.root")
 
@@ -23,7 +25,7 @@ treeC = inputC.Get("tree")
 hists = R.TFile.Open("SVDTimeEventT0Performance.root", "recreate")
 
 
-ploter(
+pu.plotter(
     name='ClusterTime_eventt0',
     title='Cluster time - EventT0',
     nbins=200,
@@ -31,17 +33,17 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='cluster_clsTime - eventt0_all',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='Time difference between cluster time and EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
 
-ploter(
+pu.plotter(
     name='ClusterTime_eventt0_top',
     title='Cluster time - EventT0_TOP',
     nbins=200,
@@ -49,17 +51,17 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='cluster_clsTime - eventt0_top',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='Time difference between cluster time and EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
 
-ploter(
+pu.plotter(
     name='ClusterTime_eventt0_cdc',
     title='Cluster time - EventT0_CDC',
     nbins=200,
@@ -67,17 +69,17 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='cluster_clsTime - eventt0_cdc',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='Time difference between cluster time and EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
 
-ploter(
+pu.plotter(
     name='ClusterTime_eventt0_ecl',
     title='Cluster time - EventT0_ECL',
     nbins=200,
@@ -85,17 +87,17 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='cluster_clsTime - eventt0_ecl',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='Time difference between cluster time and EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
 
-ploter(
+pu.plotter(
     name='Eventt0_all',
     title='EventT0',
     nbins=200,
@@ -103,16 +105,16 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='eventt0_all',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
-ploter(
+pu.plotter(
     name='Eventt0_TOP',
     title='EventT0_TOP',
     nbins=200,
@@ -120,16 +122,16 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='eventt0_top',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='TOP EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
-ploter(
+pu.plotter(
     name='Eventt0_CDC',
     title='EventT0_CDC',
     nbins=200,
@@ -137,16 +139,16 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='eventt0_cdc',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='CDC EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
-ploter(
+pu.plotter(
     name='Eventt0_ECL',
     title='EventT0_ECL',
     nbins=200,
@@ -154,10 +156,10 @@ ploter(
     xmax=100,
     x_label='Cluster time (ns)',
     y_label='counts',
-    granules=g_L3_V,
+    granules=pu.g_L3_V,
     tree=treeC,
     expr='eventt0_ecl',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='ECL EventT0 time.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',

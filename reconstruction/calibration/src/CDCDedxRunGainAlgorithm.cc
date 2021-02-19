@@ -178,7 +178,7 @@ void CDCDedxRunGainAlgorithm::generateNewPayloads(double RGrel_Mean, double Exis
   if (isMergePayload) {
     B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RGrel_Mean << ", Adjustment = " << fAdjust <<
            ", Merged (saved) = " << RGrel_Mean *
-           ExistingRG);
+           ExistingRG * fAdjust);
     RGrel_Mean *= ExistingRG;
     RGrel_Mean *= fAdjust; //default is 1.0
   } else {

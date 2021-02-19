@@ -440,7 +440,11 @@ class Job:
         """
         Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == self.statuses[3]:
+            B2ERROR(f"Setting {self.name} status to {status}")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -669,8 +673,13 @@ class SubJob(Job):
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == self.statuses[3]:
+            B2ERROR(f"Setting {self.name} status to {status}")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property

@@ -92,6 +92,16 @@ C     IFCURR4PI = 3  CLEO initialization
       DATA    IFCURR4PI /0/
       COMMON /IFCURR4PI/ IFCURR4PI
 C
+C     DarkPhoton parameters: epsilon (kinematic mixing), mass and width
+C     
+      REAL*8  AMDARK, GMDARK, EPDARK
+      DATA    AMDARK /0.0D0/
+      DATA    GMDARK /0.0D0/
+      DATA    EPDARK /1.0D0/
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
+      REAL*8 DARKWIDTH
+      EXTERNAL DARKWIDTH
+C     
 C     Optional test flag to decay Lambda or not inside TAUOLA
 C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned off by default]   
       INTEGER LAMDEC
@@ -138,6 +148,13 @@ C     Print optional flags
       WRITE(iout,*) 'IFEQUALBR, LAMDEC = ',
      $               IFEQUALBR, LAMDEC
 
+      AMDARK = DBLE(XPAR(ITAUXPAR+907)) ! Note: unless mass > 0, epsilon = 1
+      IF (AMDARK.GT.1.0D-6) THEN
+         EPDARK = DBLE(XPAR(ITAUXPAR+908))
+         GMDARK = DARKWIDTH(AMDARK,EPDARK)
+      ENDIF
+      WRITE(iout,*) 'AMDARK, GMDARK, EPDARK = ',AMDARK,GMDARK,EPDARK
+      
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)
       endif
@@ -901,6 +918,97 @@ C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         QQBRWG = CEN + FWID/2. * TAN(RRR(1)*(YMAX-YMIN)+YMIN)
         IF (QQBRWG.GT.XMAX) QQBRWG=XMAX
         IF (QQBRWG.LT.XMIN) QQBRWG=XMIN
+      ENDIF
+      RETURN
+      END
+      FUNCTION DARKWIDTH(AMDARK,EPDARK)
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IMPLICIT NONE
+      INTEGER I, IFIRST, II
+      REAL*8 DARKWIDTH
+      REAL*8 AMDARK             ! in GeV
+      REAL*8 M(24),W(24)
+      REAL*8 EPDARK
+      DATA IFIRST/0/
+      SAVE IFIRST, M, W
+C     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IF (IFIRST.EQ.0) THEN
+C     A' mass
+         M( 1) =  1.1 * 1D-3    ! GeV
+         M( 2) =    3 * 1D-3    ! GeV
+         M( 3) =    5 * 1D-3    ! GeV
+         M( 4) =    7 * 1D-3    ! GeV
+         M( 5) =   10 * 1D-3    ! GeV
+         M( 6) =   15 * 1D-3    ! GeV
+         M( 7) =   20 * 1D-3    ! GeV
+         M( 8) =   30 * 1D-3    ! GeV
+         M( 9) =   40 * 1D-3    ! GeV
+         M(10) =   50 * 1D-3    ! GeV
+         M(11) =   60 * 1D-3    ! GeV
+         M(12) =   70 * 1D-3    ! GeV
+         M(13) =   80 * 1D-3    ! GeV
+         M(14) =   90 * 1D-3    ! GeV
+         M(15) =  100 * 1D-3    ! GeV
+         M(16) =  150 * 1D-3    ! GeV
+         M(17) =  200 * 1D-3    ! GeV
+         M(18) =  250 * 1D-3    ! GeV
+         M(19) =  500 * 1D-3    ! GeV
+         M(20) =  750 * 1D-3    ! GeV
+         M(21) = 1000 * 1D-3    ! GeV
+         M(22) = 1250 * 1D-3    ! GeV
+         M(23) = 1500 * 1D-3    ! GeV
+         M(24) = 1750 * 1D-3    ! GeV
+C     A' Width
+         W( 1) = 1.416700D-06   ! GeV
+         W( 2) = 7.258800D-06   ! GeV
+         W( 3) = 1.215400D-05   ! GeV
+         W( 4) = 6.129800D-05   ! GeV
+         W( 5) = 9.525400D-05   ! GeV
+         W( 6) = 2.447360D-04   ! GeV
+         W( 7) = 3.364170D-04   ! GeV
+         W( 8) = 5.096410D-04   ! GeV
+         W( 9) = 6.805850D-04   ! GeV
+         W(10) = 8.510900D-04   ! GeV
+         W(11) = 1.021460D-03   ! GeV
+         W(12) = 1.191780D-03   ! GeV
+         W(13) = 1.362080D-03   ! GeV
+         W(14) = 1.532350D-03   ! GeV
+         W(15) = 1.702640D-03   ! GeV
+         W(16) = 2.554060D-03   ! GeV
+         W(17) = 3.405280D-03   ! GeV
+         W(18) = 6.123390D-03   ! GeV
+         W(19) = 1.349763D-02   ! GeV
+         W(20) = 2.041647D-02   ! GeV
+         W(21) = 2.728802D-02   ! GeV
+         W(22) = 3.414587D-02   ! GeV
+         W(23) = 4.099777D-02   ! GeV
+         W(24) = 5.000000D-02   ! GeV
+C
+         IFIRST = 1
+      ENDIF
+      II=0
+      DO I = 1,24
+         IF (AMDARK.GT.M(I)) THEN
+            II = I
+         ELSE
+            GO TO 100
+         ENDIF
+      ENDDO
+ 100  CONTINUE
+      IF (II.EQ.0) THEN
+         DARKWIDTH = 1D-3
+      ELSE IF (II.GT.0.AND.II.LT.24) THEN
+        DARKWIDTH=W(II)+((AMDARK-M(II))/(M(II+1)-M(II)))*(W(II+1)-W(II))
+      ELSE
+         DARKWIDTH = 5.0D-2
+      ENDIF
+      IF (DARKWIDTH.LT.1.0D-3) DARKWIDTH = 1D-3
+      IF (EPDARK.EQ.-1.0D0.AND.AMDARK.GT.1000D-3) THEN
+         DARKWIDTH = DARKWIDTH/10.
+         EPDARK = 1.0D0
+      ELSEIF (EPDARK.EQ.-1.0D1.AND.AMDARK.GT.1000D-3) THEN
+         DARKWIDTH = DARKWIDTH/100.
+         EPDARK = 1.0D0
       ENDIF
       RETURN
       END

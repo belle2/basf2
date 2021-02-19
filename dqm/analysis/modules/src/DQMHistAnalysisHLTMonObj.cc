@@ -90,12 +90,12 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   m_monObj->setVariable("processing_time", procTime);
 
   TH1* h_budgetUnit = nullptr;
-  double bgunit = 0.;
+
   for (unsigned int index = 1; index <= SoftwareTrigger::HLTUnit::max_hlt_units; index++) {
     // add budget time per unit
     h_budgetUnit = findHist(("timing_statistics/fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str());
+    double bgunit = 0.;
     if (h_budgetUnit) bgunit = h_budgetUnit->GetMean();
-    else bgunit = 0.;
     m_monObj->setVariable(("budget_time_HLT" + std::to_string(index)).c_str(), bgunit);
     // add processing time per unit
     h_budgetUnit = findHist(("timing_statistics/processingTimePerUnitHistogram_HLT" + std::to_string(index)).c_str());

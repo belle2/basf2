@@ -64,7 +64,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_l1 = findHist("softwaretrigger_before_filter/hlt_unit_number");
 
   double n_hlt = 0.;
-  if (h_hlt) n_hlt = (double)h_hlt->GetBinContent(1);
+  if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
   m_monObj->setVariable("n_hlt", n_hlt);
   double n_l1 = 0.;
   if (h_l1) n_l1 = h_l1->GetEntries();

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 // #include <framework/datastore/StoreArray.h>
 
-#include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.dcl.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.h>
 #include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 

@@ -28,17 +28,26 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<AState*, TrackFindingCDC::WeightedRelation<AState>>;
 
     /// Construct this findlet and add the subfindlet as listener
-    RelationCreator();
+    RelationCreator()
+    {
+      Super::addProcessingSignalListener(&m_relationFilter);
+    };
 
     /// Default destructor
-    ~RelationCreator();
+    ~RelationCreator() = default;
 
     /// Expose the parameters of the subfindlet
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
+      m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("twoHitRelation", prefix));
+    };
 
     /// Apply both filters for creating state-hit and hit-hit relations
     void apply(std::vector<AState*>& states,
-               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override;
+               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override
+    {
+      // relations += states -> states
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, states, states, relations, 100000);
+    };
 
   private:
     /// Subfindlet for the relation checking between seed and hits

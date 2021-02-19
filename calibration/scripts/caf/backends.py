@@ -46,10 +46,10 @@ def get_input_data():
 def monitor_jobs(args, jobs):
     unfinished_jobs = jobs[:]
     while unfinished_jobs:
-        B2INFO(f"Updating statuses of unfinished jobs...")
+        B2INFO("Updating statuses of unfinished jobs...")
         for j in unfinished_jobs:
             j.update_status()
-        B2INFO(f"Checking if jobs are ready...")
+        B2INFO("Checking if jobs are ready...")
         for j in unfinished_jobs[:]:
             if j.ready():
                 B2INFO(f"{j} is finished")
@@ -57,7 +57,7 @@ def monitor_jobs(args, jobs):
         if unfinished_jobs:
             B2INFO(f"Not all jobs done yet, waiting {args.heartbeat} seconds before re-checking...")
             time.sleep(args.heartbeat)
-    B2INFO(f"All jobs finished")
+    B2INFO("All jobs finished")
 
 
 class ArgumentsGenerator():
@@ -573,7 +573,7 @@ class Job:
                 else:
                     B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
         if self.input_files and not existing_input_files:
-            B2WARNING(f"No valid input file paths found for {job}, but some were requested.")
+            B2WARNING(f"No valid input file paths found for {self.name}, but some were requested.")
 
         # Replace the Job's input files with the ones that exist + duplicates removed
         self.input_files = existing_input_files
@@ -610,11 +610,11 @@ class Job:
             self.setup_cmds.append(f"BACKEND_B2SETUP={os.environ['BELLE2_TOOLS']}/b2setup")
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
             self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
-            self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
-            self.setup_cmds.append(f"source $BACKEND_B2SETUP")
+            self.setup_cmds.append("pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
+            self.setup_cmds.append("source $BACKEND_B2SETUP")
             # b2code-option has to be executed only after the source of the tools.
-            self.setup_cmds.append(f"b2code-option $BACKEND_BELLE2_OPTION")
-            self.setup_cmds.append(f"popd > /dev/null")
+            self.setup_cmds.append("b2code-option $BACKEND_BELLE2_OPTION")
+            self.setup_cmds.append("popd > /dev/null")
 
 
 class SubJob(Job):
@@ -942,7 +942,7 @@ class Local(Backend):
         #: Internal attribute of max_processes
         self._max_processes = value
         if self.pool:
-            B2INFO(f"New max_processes requested. But a pool already exists.")
+            B2INFO("New max_processes requested. But a pool already exists.")
             self.join()
         B2INFO(f"Starting up new Pool with {self.max_processes} processes")
         self.pool = mp.Pool(processes=self.max_processes)
@@ -1194,7 +1194,7 @@ class Batch(Backend):
         job.check_input_data_files()
         # Add any required backend args that are missing (I'm a bit hesitant to actually merge with job.backend_args)
         # just in case you want to resubmit the same job with different backend settings later.
-        job_backend_args = {**self.backend_args, **job.backend_args}
+        # job_backend_args = {**self.backend_args, **job.backend_args}
 
         # If there's no splitter then we just submit the Job with no SubJobs
         if not job.splitter:
@@ -1253,7 +1253,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
+                B2INFO("Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this
@@ -1424,7 +1424,7 @@ class PBS(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1676,7 +1676,7 @@ class LSF(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1882,7 +1882,7 @@ class HTCondor(Batch):
             print(f'log = {Path(job.output_dir, "htcondor.log").as_posix()}', file=submit_file)
             print(f'output = {Path(job.working_dir, _STDOUT_FILE).as_posix()}', file=submit_file)
             print(f'error = {Path(job.working_dir, _STDERR_FILE).as_posix()}', file=submit_file)
-            print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
+            print('transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
             print(f'universe = {job_backend_args["universe"]}', file=submit_file)
             print(f'getenv = {job_backend_args["getenv"]}', file=submit_file)
             print(f'request_memory = {job_backend_args["request_memory"]}', file=submit_file)
@@ -2029,7 +2029,7 @@ class HTCondor(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 

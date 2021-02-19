@@ -14,7 +14,6 @@ class Test_Prompt(TestCase):
         """
         tool_name = "b2val-prompt-check"
         import subprocess
-        output = ""
         try:
             subprocess.check_output(tool_name, stderr=subprocess.STDOUT, universal_newlines=True)
         except subprocess.CalledProcessError as e:

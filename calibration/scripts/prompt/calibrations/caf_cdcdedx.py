@@ -60,13 +60,13 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
         if not input_files_coscorr:
             raise ValueError(
-                f"Cosine: all requested (%d) events not found" % max_events_per_dataset)
+                f"Cosine: all requested ({max_events_per_dataset}) events not found")
 
         input_files_wiregain = input_files_coscorr
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
         if not input_files_wiregain:
             raise ValueError(
-                f"WireGain: all requested (%d) events not found" % max_events_per_dataset)
+                f"WireGain: all requested ({max_events_per_dataset}) events not found")
 
     requested_iov = kwargs.get("requested_iov", None)
     from caf.utils import IoV

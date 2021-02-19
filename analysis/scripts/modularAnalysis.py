@@ -139,18 +139,18 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
         # make sure the last database setup is the magnetic field for MC8-10
         from basf2 import conditions
         conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
-    elif environmentType is 'None':
+    elif environmentType == 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
         environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
-    if environmentType is 'Belle':
+    if environmentType == 'Belle':
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
         import b2bii
         b2bii.setB2BII()
-    if environmentType is 'MC5':
+    if environmentType == 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
     # fixECLCluster for MC5/MC6/MC7

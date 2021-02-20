@@ -113,7 +113,9 @@ void BelleMCOutputModule::event()
                      (2.0 * 0.1 * Const::speedOfLight);
   for (const MCParticle& particle : m_MCParticles) {
     Belle::Gen_hepevt& hepevt = hepevtManager.add();
-    if (particle.hasStatus(MCParticle::c_StableInGenerator))
+    if (particle.hasStatus(MCParticle::c_Initial))
+      hepevt.isthep(3);
+    else if (particle.hasStatus(MCParticle::c_StableInGenerator))
       hepevt.isthep(1);
     else
       hepevt.isthep(2);

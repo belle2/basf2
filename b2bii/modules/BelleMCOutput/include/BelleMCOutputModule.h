@@ -1,0 +1,92 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2021  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+/* Belle headers. */
+#include <belle_legacy/panther/panther_group.h>
+
+namespace Belle2 {
+
+  /**
+   * KLM digitization module.
+   */
+  class BelleMCOutputModule : public Module {
+
+  public:
+
+    /**
+     * Constructor.
+     */
+    BelleMCOutputModule();
+
+    /**
+     * Destructor
+     */
+    virtual ~BelleMCOutputModule();
+
+    /**
+     * Initializer.
+     */
+    virtual void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
+    virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    virtual void terminate() override;
+
+  private:
+
+    /** Output file name. */
+    std::string m_OutputFileName;
+
+    /** MC particles. */
+    StoreArray<MCParticle> m_MCParticles;
+
+    /** Initial particles. */
+    StoreObjPtr<MCInitialParticles> m_MCInitialParticles;
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
+
+    /** Beam parameters. */
+    DBObjPtr<BeamParameters> m_BeamParameters;
+
+    /** Belle file input-output handler. */
+    Belle::Panther_FileIO* m_BelleFile;
+
+  };
+
+}

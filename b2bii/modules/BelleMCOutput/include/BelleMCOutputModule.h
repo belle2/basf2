@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 /* Belle headers. */
 #include <belle_legacy/panther/panther_group.h>
@@ -69,6 +70,15 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Add particle to graph. Daughters of particles that are stable in basf
+     * are removed.
+     * @param[in]     particle Particle.
+     * @param[in]     mother   Mother particle
+     */
+    void addParticle(const MCParticle* particle,
+                     MCParticleGraph::GraphParticle* mother);
+
     /** Output file name. */
     std::string m_OutputFileName;
 
@@ -83,6 +93,9 @@ namespace Belle2 {
 
     /** Beam parameters. */
     DBObjPtr<BeamParameters> m_BeamParameters;
+
+    /** MC particle graph. */
+    MCParticleGraph m_MCParticleGraph;
 
     /** Belle file input-output handler. */
     Belle::Panther_FileIO* m_BelleFile = nullptr;

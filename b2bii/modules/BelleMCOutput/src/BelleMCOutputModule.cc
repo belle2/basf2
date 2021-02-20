@@ -100,6 +100,29 @@ void BelleMCOutputModule::beginRun()
   m_BelleFile->write(BBS_BEGIN_RUN, 0);
 }
 
+void BelleMCOutputModule::addParticle(
+  const MCParticle* particle, MCParticleGraph::GraphParticle* mother)
+{
+  MCParticleGraph::GraphParticle& part = m_MCParticleGraph.addParticle();
+  part = *particle;
+  if (mother != nullptr)
+    part.comesFrom(*mother);
+  int pdg = abs(particle->getPDG());
+  if ((pdg == Const::muon.getPDGCode()) ||
+      (pdg == Const::pion.getPDGCode()) ||
+      (pdg == Const::kaon.getPDGCode()) ||
+      (pdg == Const::Kshort.getPDGCode()) ||
+      (pdg == Const::Klong.getPDGCode()) ||
+      (pdg == Const::neutron.getPDGCode()) ||
+      (pdg == Const::Lambda.getPDGCode())) {
+    part.addStatus(MCParticle::c_StableInGenerator);
+    return;
+  }
+  std::vector<MCParticle*> daughters = particle->getDaughters();
+  for (const MCParticle* daughter : daughters)
+    addParticle(daughter, &part);
+}
+
 void BelleMCOutputModule::event()
 {
   Belle::Gen_hepevt_Manager& hepevtManager =
@@ -114,6 +137,19 @@ void BelleMCOutputModule::event()
   double timeShift = (m_MCInitialParticles->getVertex().Z() -
                       m_BeamParameters->getVertex().Z()) /
                      Unit::mm / (2.0 * 0.1 * Const::speedOfLight);
+  /*
+   * Regeneration of MCParticle array. It is necesary because in basf the
+   * long-lived particles (K_S0, K_L0, Lambda, neutron, pi, K, mu)
+   * are decayed by GEANT3.
+   */
+  m_MCParticleGraph.clear();
+  for (const MCParticle& particle : m_MCParticles) {
+    if (particle.getMother() == nullptr)
+      addParticle(&particle, nullptr);
+  }
+  m_MCParticleGraph.generateList("", MCParticleGraph::c_setDecayInfo |
+                                 MCParticleGraph::c_checkCyclic |
+                                 MCParticleGraph::c_clearParticles);
   for (const MCParticle& particle : m_MCParticles) {
     Belle::Gen_hepevt& hepevt = hepevtManager.add();
     if (particle.hasStatus(MCParticle::c_Initial))

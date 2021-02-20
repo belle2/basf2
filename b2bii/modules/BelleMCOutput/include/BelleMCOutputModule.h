@@ -85,7 +85,7 @@ namespace Belle2 {
     DBObjPtr<BeamParameters> m_BeamParameters;
 
     /** Belle file input-output handler. */
-    Belle::Panther_FileIO* m_BelleFile;
+    Belle::Panther_FileIO* m_BelleFile = nullptr;
 
   };
 

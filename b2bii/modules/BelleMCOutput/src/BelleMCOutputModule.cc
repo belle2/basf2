@@ -108,9 +108,12 @@ void BelleMCOutputModule::event()
   /*
    * The time shift applied by basf module "evtgen" (file beam.cc) is
    * vertex z coordinate [mm] / (2.0 * 2.99792458).
+   * The vertex coordinate is calculated relative to the IP position.
+   * The position correction happens at the simulation stage (bpsmear) in basf.
    */
-  double timeShift = m_MCInitialParticles->getVertex().Z() / Unit::mm /
-                     (2.0 * 0.1 * Const::speedOfLight);
+  double timeShift = (m_MCInitialParticles->getVertex().Z() -
+                      m_BeamParameters->getVertex().Z()) /
+                     Unit::mm / (2.0 * 0.1 * Const::speedOfLight);
   for (const MCParticle& particle : m_MCParticles) {
     Belle::Gen_hepevt& hepevt = hepevtManager.add();
     if (particle.hasStatus(MCParticle::c_Initial))

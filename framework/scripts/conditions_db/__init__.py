@@ -360,7 +360,7 @@ class ConditionsDB:
         """
         info = {"name": name, "description": description, "modifiedBy": user, "isDefault": False}
         try:
-            req = self.request("POST", f"/globalTag/DEV", f"Creating globaltag {name}", json=info)
+            req = self.request("POST", "/globalTag/DEV", f"Creating globaltag {name}", json=info)
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Could not create globaltag {name}: {e}")
             return None
@@ -571,7 +571,7 @@ class ConditionsDB:
         try:
             req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
                                .format(globalTagName=encode_name(globalTagName)))
-        except ConditionsDB.RequestError as e:
+        except ConditionsDB.RequestError:
             # there could be just no iovs so no error
             return {}
 
@@ -811,7 +811,7 @@ class ConditionsDB:
                 description += f"|*Forward compatibility* | \\#{data['forward-compatibility']} |\n"
             description += '|*Details* |' + ''.join(data['details']) + ' |\n'
             if data['task'] == 'online':
-                description += f'|*Impact on data taking*|' + ''.join(data['data_taking']) + ' |\n'
+                description += '|*Impact on data taking*|' + ''.join(data['data_taking']) + ' |\n'
 
         # add information about uploaded payloads/IoVs
         description += '\nPayloads\n||Name||Revision||IoV||\n'

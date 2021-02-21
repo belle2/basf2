@@ -99,13 +99,13 @@ Generally, the functionalities of the program are as follows.
 Install the program
 -------------------
 
-Please follow the steps below to install the program.
-
 .. note::
 
    ``TopoAna`` is a software based on ``ROOT``.
    Thus, to install ``TopoAna``, you should have ``ROOT`` first installed on your machine.
    If you work in the ``basf2`` environment, you do not have to consider the issue since ``ROOT`` is already installed.
+
+Please follow the steps below to install the program.
 
   1. ``cd yourDirectoryForTopoAna``
 
@@ -116,8 +116,6 @@ Please follow the steps below to install the program.
   4. Switch to the latest release with ``git checkout vxx-yy-zz``
 
      .. note::
-
-        Here, ``vxx-yy-zz`` stands for the version number of the latest release.
         Please replace it with the concrete version number, which you can find with ``git tag | tail -1``.
 
   5. Configure the package path with ``./Configure``

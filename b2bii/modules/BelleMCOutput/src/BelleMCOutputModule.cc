@@ -13,6 +13,7 @@
 
 /* Belle2 headers. */
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
 /* Belle headers. */
 #include <belle_legacy/tables/belletdf.h>
@@ -44,6 +45,26 @@ void BelleMCOutputModule::initialize()
   m_BelleFile->save_br("BELLE_RUNHEAD");
   m_BelleFile->save_br("BELLE_NOMINAL_BEAM");
   m_BelleFile->save("GEN_HEPEVT");
+  B2WARNING(
+    "************ ATTENTION! ************\n"
+    "\n"
+    "  Belle MC generation differs from Belle II. In order to generate MC "
+    "correctly, you must do the following:\n"
+    "\n"
+    "  1. Enable vertex and beam-momentum smearing by adding the module "
+    "\"OverrideGenerationFlags\" before the generator.\n"
+    "  2. Disable smearing in Belle simulation by removing the module "
+    "\"bpsmear\" from basf gsim scripts.\n"
+    "  3. By default, decays of long-lived particles are removed and particles "
+    "are declared to be stable in generator (ISTHEP == 1 in basf) because "
+    "such decays are simulated by GEANT3 in basf. However, you may choose "
+    "to decay such particles via module parameters. This results in direct "
+    "passing of the decay products to simulation, i.e. material effects are "
+    "ignored. In this case, you may need to perform an additional study "
+    "of the difference between data and MC.\n"
+    "\n"
+    "************************************\n"
+  );
 }
 
 void BelleMCOutputModule::beginRun()

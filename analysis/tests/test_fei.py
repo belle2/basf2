@@ -17,7 +17,6 @@ from fei.config import Particle
 
 import numpy as np
 
-import ROOT
 import basf2_mva
 import pdg
 
@@ -129,7 +128,7 @@ class TestTrainingDataInformation(unittest.TestCase):
         particles = fei.get_unittest_channels()
         x = fei.core.TrainingDataInformation(particles)
         self.assertEqual(x.available(), False)
-        f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')
+        f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')  # noqa
         self.assertEqual(x.available(), True)
 
     def test_get_mc_counts(self):
@@ -1030,7 +1029,7 @@ class TestGetPath(unittest.TestCase):
     def test_get_path_default_cache(self):
         particles = fei.get_unittest_channels()
         config = fei.config.FeiConfiguration(training=True)
-        x = fei.core.Teacher(particles, config)
+        x = fei.core.Teacher(particles, config)  # noqa
 
         # Should try to create mcParticlesCount
         # -> Returns at stage 0
@@ -1117,7 +1116,7 @@ class TestGetPath(unittest.TestCase):
     def test_get_path(self):
         particles = fei.get_unittest_channels()
         config = fei.config.FeiConfiguration(cache=-1, training=True)
-        x = fei.core.Teacher(particles, config)
+        x = fei.core.Teacher(particles, config)  # noqa
 
         # Should try to create mcParticlesCount
         # -> Returns at stage 0

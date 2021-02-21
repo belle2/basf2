@@ -14,7 +14,7 @@ from rawdata import add_unpackers
 
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
-from tracking import (
+from tracking import (  # noqa
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
     add_cr_tracking_reconstruction,

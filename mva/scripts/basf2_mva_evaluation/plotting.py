@@ -862,12 +862,14 @@ class Overtraining(Plotter):
         distribution.add(data, column, test_mask & signal_mask, weight_column)
         distribution.add(data, column, test_mask & bckgrd_mask, weight_column)
 
-        distribution.set_plot_options({'color': distribution.plots[0][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[0][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
-        distribution.set_plot_options({'color': distribution.plots[1][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[1][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 

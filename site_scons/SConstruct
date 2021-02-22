@@ -174,8 +174,9 @@ if GetOption('extralibpath'):
 if GetOption('extraccflags'):
     global_env.Append(CCFLAGS=GetOption('extraccflags').split())
 
-# check for debug flag
+# check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
+print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')

@@ -77,7 +77,7 @@ class TOPDisplay(b2.Module):
         self.c1.Update()
 
         # wait for user respond
-        user_input = input("Press Enter to continue or Q to quit.\n").lower().strip()
+        user_input = input("Press Enter to continue or Q to quit ").lower().strip()
         if user_input == "q":
             evtMetaData = Belle2.PyStoreObj('EventMetaData')
             evtMetaData.obj().setEndOfData()

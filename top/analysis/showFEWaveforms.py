@@ -51,7 +51,7 @@ class WFDisplay(b2.Module):
     def wait(self):
         ''' wait for user respond '''
 
-        user_input = input("Press Enter to continue, P to print, or Q to quit.\n").lower().strip()
+        user_input = input("Press Enter to continue, P to print, or Q to quit ").lower().strip()
         if user_input == "p":
             filename = self.pdfFile + '.pdf'
             self.c1.SaveAs(filename)

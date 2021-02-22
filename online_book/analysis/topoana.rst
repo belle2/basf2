@@ -12,9 +12,8 @@ Topology analysis
 Introduction
 ------------
 
-In the data analysis of high energy physics experiments, to select signals with a higher efficiency and meanwhile suppress backgrounds to a lower level, a comprehensive understanding of the inclusive/generic MC samples is required. 
-In particular, a clear knowledge of the physics processes, or event types, involved in the samples is quite helpful.
-To be specific, the physics process information includes the types of processes and the number of processes in each type, involved both in the entire samples and in the individual events.
+In the data analysis of high energy physics experiments, a comprehensive understanding of the inclusive/generic MC samples is required to select signals with a higher efficiency and meanwhile suppress backgrounds to a lower level.
+In particular, a clear knowledge of the physics processes, namely the event types, involved in the samples is quite helpful.
 
 With the physics process information, we can figure out the main backgrounds (especially the peaking ones).
 Then, we can optimize the selection criteria further by analyzing the differences between the main backgrounds and the signals.
@@ -31,10 +30,10 @@ Occasionally, we have to pick out some decay branches in order to re-weight them
    :width: 40em
    :align: center
 
-Topology diagrams of (a) :math:`e^+ e^- \to J/\psi`, :math:`J/\psi \to \rho^+ \pi^-`, :math:`\rho^+ \to \pi^+ \pi^0`, :math:`\pi^0 \to \gamma \gamma` and (b) :math:`e^+ e^- \to \Upsilon(4S)`, :math:`\Upsilon(4S) \to B^0 \bar{B}^0`, :math:`B^0 \to K_S^0 J/\psi`, :math:`\bar{B}^0 \to \mu^- D^{*+} \nu_{\mu}`, :math:`K_S^0 \to \pi^+ \pi^-`, :math:`J/\psi \to e^+ e^-`, :math:`D^{*+} \to D^0 \pi^+`, :math:`D^0 \to \pi^0 \pi^+ K^-`, :math:`\pi^0 \to \gamma \gamma`.
+   Topology diagrams of (a) :math:`e^+ e^- \to J/\psi`, :math:`J/\psi \to \rho^+ \pi^-`, :math:`\rho^+ \to \pi^+ \pi^0`, :math:`\pi^0 \to \gamma \gamma` and (b) :math:`e^+ e^- \to \Upsilon(4S)`, :math:`\Upsilon(4S) \to B^0 \bar{B}^0`, :math:`B^0 \to K_S^0 J/\psi`, :math:`\bar{B}^0 \to \mu^- D^{*+} \nu_{\mu}`, :math:`K_S^0 \to \pi^+ \pi^-`, :math:`J/\psi \to e^+ e^-`, :math:`D^{*+} \to D^0 \pi^+`, :math:`D^0 \to \pi^0 \pi^+ K^-`, :math:`\pi^0 \to \gamma \gamma`.
 
 Processes in high energy physics can be visualized with topology diagrams.
-As an example, the figure above shows the topology diagrams of two typical physics processes occurring at :math:`e^+e^-` colliders.
+As an example, :numref:`topology_diagrams` shows the topology diagrams of two typical physics processes occurring at :math:`e^+e^-` colliders.
 From the figure, the hierarchies of the processes and the relationships among the particles are clearly illustrated with the diagrams.
 Though the complexities of topology diagrams vary with physics processes, there is only one diagram corresponding to each process.
 For this reason, we refer to the physics process information/analysis mentioned thereinbefore as topology information/analysis hereinafter.
@@ -160,29 +159,8 @@ In the following we introduce the steps to get the input data to ``TopoAna`` wit
 
 Below is an example of the python steering script.
 
-.. code-block:: python
-
-   #!/usr/bin/env python3
-   # -*- coding: utf-8 -*-
-   
-   import basf2
-   from modularAnalysis import inputMdst
-   from modularAnalysis import variablesToNtuple
-   from variables.MCGenTopo import mc_gen_topo
-   
-   mypath = basf2.Path()
-   
-   # load input ROOT file
-   inputMdst('default', '/group/belle2/dataprod/MC/SkimTraining/mixed_BGx1.mdst_000001_prod00009434_task10020000001.root', path=mypath)
-   
-   # Output the variables to a ntuple
-   variablesToNtuple('', mc_gen_topo(200), 'MCGenTopo', 'MCGenTopo.root', path=mypath)
-   
-   # Process the events
-   basf2.process(mypath)
-   
-   # print out the summary
-   print(basf2.statistics)
+.. literalinclude:: topoana/MCGenTopo.py
+   :language: python
 
 .. note::
    

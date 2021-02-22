@@ -418,7 +418,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 .. admonition:: Exercise 1
    :class: exercise stacked
 
-   Try to examine the decay branches of :math:`D^{*+}` and the top ten decay branches of :math:`J/\psi` in the input sample.
+   Try to examine the top 30 decay branches of :math:`B^{0}` and all the decay branches of :math:`D^{*+}` in the input sample.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -435,8 +435,8 @@ To do these exercises, you need to look up the proper setting items in the quick
 
       % Component analysis --- decay branches of particles
       {
+        B0         B0        30
         D*+        Dsp
-        J/psi      Jpsi      10
       }
 
 .. admonition:: Extension
@@ -447,7 +447,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 .. admonition:: Exercise 2
    :class: exercise stacked
 
-   Try to identify the decay branches :math:`\bar{B}^{0} \rightarrow \mu^{-} \bar{\nu}_{\mu} D^{*+}` and :math:`B^{0} \rightarrow K_{S}^{0} J/\psi` in the input sample.
+   Try to identify the decay branches :math:`B^{0} \rightarrow \pi^{0} \bar{D}^{0}` and :math:`\bar{B}^{0} \rightarrow \mu^{-} \bar{\nu}_{\mu} D^{*+}` in the input sample.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -464,8 +464,8 @@ To do these exercises, you need to look up the proper setting items in the quick
 
       % Signal identification --- decay branches
       {
+        B0 --> pi0 anti-D0                    &       B2pi0D0bar
         anti-B0 --> D*+ mu- anti-nu_mu        &       B2munuDsp
-        B0 --> K_S0  J/psi                    &       B2KsJpsi
       }
 
 .. admonition:: Extension
@@ -505,7 +505,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 .. admonition:: Exercise 4
    :class: exercise stacked
 
-   Try to impose some cuts to select events. For example, impose one cut to select only the events with 20 MC generated particles.
+   Try to impose some cuts to select events. For example, impose one cut to select only the events with ``nMCGen>=20 && nMCGen<=40``.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -521,7 +521,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 
       % Cut to select entries
       {
-        nMCGen==20
+        nMCGen>=20 && nMCGen<=40
       }
 
 .. admonition:: Extension

@@ -776,22 +776,3 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 validation_plots.append(profile_plot)
 
         return validation_plots
-
-
-def main():
-    from tracking.run.tracked_event_generation import StandardReconstructionEventsRun
-    standard_reco_run = StandardReconstructionEventsRun()
-    standard_reco_run.configure_from_commandline()
-
-    validation_module = SeparatedTrackingValidationModule(name="test_run",
-                                                          contact="dummy",
-                                                          output_file_name="test_separated_module.root",
-                                                          expert_level=0)
-
-    standard_reco_run.add_module(validation_module)
-    standard_reco_run.execute()
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    main()

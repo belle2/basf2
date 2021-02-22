@@ -24,7 +24,7 @@ class Basf2Object(ObjectDescription):
     def handle_signature(self, sig, signode):
         signode.clear()
 
-        # check fi we have arguments
+        # check if we have arguments
         try:
             name, args = sig.split("(", 1)
         except ValueError:

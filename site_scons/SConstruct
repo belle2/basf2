@@ -176,7 +176,7 @@ if GetOption('extraccflags'):
 
 # check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
-print(f'Environment setup for this build: {option}')
+print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')

@@ -6,22 +6,20 @@ import sys
 from ROOT import Belle2
 import rawdata as raw
 import simulation as sim
+import reconstruction as rec
 import basf2 as b2
+
+
 path_to_output = 'rawdata/tests/digits.root'
-
-
 b2.set_random_seed("L1V0RN0")
 b2.set_log_level(b2.LogLevel.WARNING)
 # Disable tag replay, we want to test current packers
 # independent of when the digits were created
 b2.conditions.disable_globaltag_replay()
 
-# This function create a secondary path to create the digits
-
 
 def create_digits():
     """Create the file 'digits.root' needed for testing the packers if it does not exist"""
-
     child_path = b2.create_path()
     child_path.add_module('EventInfoSetter',
                           evtNumList=[10])
@@ -31,15 +29,7 @@ def create_digits():
         'RootOutput',
         outputFileName='${BELLE2_LOCAL_DIR}/' +
         path_to_output,
-        branchNames=[
-            'ARICHDigits',
-            'CDCHits',
-            'ECLDigits',
-            'KLMDigits',
-            'PXDDigits',
-            'SVDEventInfoSim',
-            'SVDShaperDigits',
-            'TOPRawDigits'])
+        branchNames=rec.DIGITS_OBJECTS)
     child_path.add_module('Progress')
     b2.process(child_path)
     print(b2.statistics)

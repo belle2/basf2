@@ -31,6 +31,95 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
+CDST_FULL_OBJECTS = mdst.MDST_OBJECTS + [
+    'RecoTracks',
+    'EventT0',
+    'PXDClustersFromTracks',
+    'SVDEventInfo',
+    'SVDShaperDigits',
+    'SVDRecoDigits',
+    'SVDClusters',
+    'CDCDedxTracks',
+    'TOPDigits',
+    'ExtHits',
+    'TOPLikelihoods',
+    'TOPRecBunch',
+    'TOPTimeZeros',
+    'TOPAsicMask',
+    'ECLDigits',
+    'ECLCalDigits',
+    'TRGECLClusters',
+    'TRGECLUnpackerStores',
+    'TRGECLUnpackerEvtStores',
+    'TRGGRLUnpackerStore',
+    'CDCTriggerSegmentHits',
+    'CDCTrigger2DFinderTracks',
+    'CDCTrigger2DFinderClones',
+    'CDCTriggerNNInputSegmentHits',
+    'CDCTriggerNNInput2DFinderTracks',
+    'CDCTriggerNeuroTracks',
+    'CDCTriggerNeuroTracksInput',
+    'CDCTriggerNNInputFinderTracks',
+    'CDCTriggerNNInputBits',
+    'CDCTriggerNNOutputBits',
+    'TRGGDLUnpackerStores',
+    'TRGTOPUnpackerStores',
+    'RecoHitInformations',
+    'RecoHitInformationsToBKLMHit2ds',
+    'TracksToARICHLikelihoods',
+    'TracksToExtHits',
+    'ARICHDigits',
+    'ARICHInfo',
+    'ARICHTracks',
+    'ARICHLikelihoods',
+    'ARICHTracksToExtHits',
+    'SoftwareTriggerVariables',
+    'KLMDigits',
+    'KLMMuidLikelihoods',
+    'TracksToKLMMuidLikelihoods',
+    'BKLMHit1ds',
+    'BKLMHit1dsToKLMDigits',
+    'BKLMHit2ds',
+    'BKLMHit2dsToBKLMHit1ds',
+    'EKLMAlignmentHits',
+    'EKLMHit2ds',
+    'EKLMHit2dsToKLMDigits',
+    'TracksToBKLMHit2ds',
+    'TracksToEKLMHit2ds',
+    'SVDShaperDigitsFromTracks',
+    'TRGGDLUnpackerStores',
+    'VXDDedxTracks',
+    'VXDDedxLikelihoods',
+]
+
+
+CDST_TRACKING_OBJECTS = [
+    'RecoTracks',
+    'Tracks',
+    'V0s',
+    'TrackFitResults',
+    'EventT0',
+    'CDCDedxTracks',
+    'SVDShaperDigitsFromTracks',
+    'PXDClustersFromTracks',
+    'VXDDedxTracks',
+    'CDCDedxLikelihoods',
+    'VXDDedxLikelihoods'
+]
+
+
+DIGITS_OBJECTS = [
+    'ARICHDigits',
+    'CDCHits',
+    'ECLDigits',
+    'KLMDigits',
+    'PXDDigits',
+    'SVDEventInfoSim',
+    'SVDShaperDigits',
+    'TOPRawDigits'
+]
+
+
 def default_event_abort(module, condition, error_flag):
     """Default event abort outside of HLT: Ignore the error flag and just stop
     processing by giving an empty path"""
@@ -402,110 +491,32 @@ def add_cdst_output(
            Needed when a conditional path is passed as input.
     """
 
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'EventLevelTrackingInfo',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracksNamedBremsstrahlung',
-        'EventLevelClusteringInfo',
-        'TracksToECLClusters',
-        'KLMClusters',
-        'KlIds',
-        'KLMClustersToKlIds',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-        'RecoTracks',
-        'EventT0',
-        'PXDClustersFromTracks',
-        'SVDEventInfo',
-        'SVDShaperDigits',
-        'SVDRecoDigits',
-        'SVDClusters',
-        'CDCDedxTracks',
-        'TOPDigits',
-        'ExtHits',
-        'TOPLikelihoods',
-        'TOPRecBunch',
-        'TOPTimeZeros',
-        'TOPAsicMask',
-        'ECLDigits',
-        'ECLCalDigits',
-        'TRGECLClusters',
-        'TRGECLUnpackerStores',
-        'TRGECLUnpackerEvtStores',
-        'TRGGRLUnpackerStore',
-        'CDCTriggerSegmentHits',
-        'CDCTrigger2DFinderTracks',
-        'CDCTrigger2DFinderClones',
-        'CDCTriggerNNInputSegmentHits',
-        'CDCTriggerNNInput2DFinderTracks',
-        'CDCTriggerNeuroTracks',
-        'CDCTriggerNeuroTracksInput',
-        'CDCTriggerNNInputFinderTracks',
-        'CDCTriggerNNInputBits',
-        'CDCTriggerNNOutputBits',
-        'TRGGDLUnpackerStores',
-        'TRGTOPUnpackerStores',
-        'RecoHitInformations',
-        'RecoHitInformationsToBKLMHit2ds',
-        'TracksToARICHLikelihoods',
-        'TracksToExtHits',
-        'ARICHDigits',
-        'ARICHInfo',
-        'ARICHTracks',
-        'ARICHLikelihoods',
-        'ARICHTracksToExtHits',
-        'SoftwareTriggerVariables',
-        'KLMDigits',
-        'KLMMuidLikelihoods',
-        'TracksToKLMMuidLikelihoods',
-        'BKLMHit1ds',
-        'BKLMHit1dsToKLMDigits',
-        'BKLMHit2ds',
-        'BKLMHit2dsToBKLMHit1ds',
-        'EKLMAlignmentHits',
-        'EKLMHit2ds',
-        'EKLMHit2dsToKLMDigits',
-        'TracksToBKLMHit2ds',
-        'TracksToEKLMHit2ds',
-        'SVDShaperDigitsFromTracks',
-        'TRGGDLUnpackerStores',
-        'VXDDedxTracks',
-        'VXDDedxLikelihoods',
-    ]
+    branches = []
+    persistentBranches = ['FileMetaData']
 
     if rawFormat:
-        branches = ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
-            'RecoTracks',
-            'Tracks',
-            'V0s',
-            'TrackFitResults',
-            'EventT0',
-            'TRGECLClusters',
-            'CDCDedxTracks',
-            'SVDShaperDigitsFromTracks',
-            'PXDClustersFromTracks',
-            'VXDDedxTracks',
-            'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods'
+        branches += CDST_TRACKING_OBJECTS
+        if not mc:
+            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
+                'TRGECLClusters'
             ]
-
+        else:
+            branches += DIGITS_OBJECTS + [
+                'SoftwareTriggerResult',
+                'TRGSummary']
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
             basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
+    else:
+        branches += CDST_FULL_OBJECTS
 
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
 
-    persistentBranches = ['FileMetaData']
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        branches += ['MCParticles']
         persistentBranches += ['BackgroundInfo']
+
     branches += additionalBranches
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,

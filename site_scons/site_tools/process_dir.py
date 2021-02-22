@@ -195,7 +195,15 @@ def process_dir(
 
     # loop over subdirs
     entries = os.listdir(dir_name)
+    exclude_dirs = set()
+    if (os.path.exists('.excluded_directories')):
+        f = open('.excluded_directories', 'r')
+        for line in f.readlines():
+            exclude_dirs.add(line.rstrip('\n'))
+        f.close()
     for entry in entries:
+        if entry in exclude_dirs:
+            continue
         if entry.find('.') == -1 \
             and not os.path.isfile(os.path.join(dir_name, entry)) and entry not in [
             'include',

@@ -8,8 +8,8 @@ import simulation
 import generators
 import beamparameters
 
-from . import utilities
-from .minimal import MinimalRun
+from tracking.run import utilities
+from tracking.run.minimal import MinimalRun
 import tracking.adjustments as adjustments
 
 import argparse

@@ -6,7 +6,7 @@ import re
 import functools
 import numpy as np
 import collections
-from .plot import ValidationPlot
+from tracking.validation.plot import ValidationPlot
 
 import logging
 

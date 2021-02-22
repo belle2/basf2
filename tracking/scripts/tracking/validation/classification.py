@@ -6,12 +6,11 @@ import collections
 import numbers
 import copy
 
-from . import scores
-from . import statistics
+from tracking.validation import scores, statistics
 
-from .plot import ValidationPlot, compose_axis_label
-from .fom import ValidationFiguresOfMerit
-from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+from tracking.validation.plot import ValidationPlot, compose_axis_label
+from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 

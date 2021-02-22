@@ -7,12 +7,12 @@ import numpy as np
 
 from tracking.root_utils import root_save_name
 
-from .plot import ValidationPlot, compose_axis_label
+from tracking.validation.plot import ValidationPlot, compose_axis_label
 
-from .pull import PullAnalysis
-from .resolution import ResolutionAnalysis
-from .fom import ValidationFiguresOfMerit
-from .utilities import (
+from tracking.validation.pull import PullAnalysis
+from tracking.validation.resolution import ResolutionAnalysis
+from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.utilities import (
     getHelixFromMCParticle,
     getSeedTrackFitResult,
     is_primary,
@@ -21,8 +21,6 @@ from .utilities import (
 )
 
 import basf2
-
-import logging
 
 import ROOT
 from ROOT import Belle2

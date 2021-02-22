@@ -13,7 +13,7 @@ import basf2
 
 from tracking.root_utils import root_cd, root_save_name
 
-from . import statistics
+from tracking.validation import statistics
 
 import logging
 

@@ -4,14 +4,12 @@
 import collections
 import numpy as np
 
-# Need for B2WARNING for some reason
-
-from .fom import (
+from tracking.validation.fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
 )
 
-from .module import (
+from tracking.validation.module import (
     AlwaysPassFilter,
     TrackingValidationModule
 )

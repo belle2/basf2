@@ -13,7 +13,7 @@ import basf2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
-from .refiners import Refiner
+from tracking.harvest.refiners import Refiner
 from tracking.root_utils import root_cd, root_browse
 
 import logging

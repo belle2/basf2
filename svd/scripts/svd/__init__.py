@@ -76,7 +76,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
-        add_svd_reconstruction_tb(path, isROIsimulation)
+        add_svd_reconstruction_CoG(path, isROIsimulation)
     elif(useNN):
         add_svd_reconstruction_nn(path, isROIsimulation)
 
@@ -180,43 +180,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
-
-
-def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
-
-    if direct:
-        if(isROIsimulation):
-            clusterizerName = '__ROISVDClusterizerDirect'
-            clusterName = '__ROIsvdClusters'
-        else:
-            clusterizerName = 'SVDClusterizerDirect'
-            clusterName = ""
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDClusterizerDirect')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-    else:
-        if(isROIsimulation):
-            fitterName = '__ROISVDNNShapeReconstructor'
-            clusterizerName = '__ROISVDNNClusterizer'
-            clusterName = '__ROIsvdClusters'
-        else:
-            fitterName = 'SVDNNShapeReconstructor'
-            clusterizerName = 'SVDNNClusterizer'
-            clusterName = ''
-
-        if fitterName not in [e.name() for e in path.modules()]:
-            fitter = b2.register_module('SVDNNShapeReconstructor')
-            fitter.set_name(fitterName)
-            path.add_module(fitter)
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDNNClusterizer')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
 
 
 def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):

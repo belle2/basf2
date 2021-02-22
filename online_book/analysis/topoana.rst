@@ -98,38 +98,40 @@ Generally, the functionalities of the program are as follows.
 Install the program
 -------------------
 
-.. note::
-
-   ``TopoAna`` is a software based on ``ROOT``.
-   Thus, to install ``TopoAna``, you should have ``ROOT`` first installed on your machine.
-   If you work in the ``basf2`` environment, you do not have to consider the issue since ``ROOT`` is already installed.
-
 Please follow the steps below to install the program.
 
-  1. ``cd yourDirectoryForTopoAna``
+  1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
 
-  2. Clone the ``TopoAna`` repository from Stash with ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
+     .. note::
 
-  3. ``cd topoana``
+        This guarantees you have ``ROOT`` installed in your environment.
+        It does not mean ``TopoAna`` is a software based on ``basf2``.
+        Instead, the software is only based on ``ROOT``.
 
-  4. Switch to the latest release with ``git checkout vxx-yy-zz``
+  2. ``cd yourDirectoryForTopoAna``
+
+  3. Clone the ``TopoAna`` repository from Stash with ``git clone ssh://git@stash.desy.de:7999/~zhouxy/topoana.git topoana``
+
+  4. ``cd topoana``
+
+  5. Switch to the latest release with ``git checkout vxx-yy-zz``
 
      .. note::
         Please replace it with the concrete version number, which you can find with ``git tag | tail -1``.
 
-  5. Configure the package path with ``./Configure``
+  6. Configure the package path with ``./Configure``
 
      .. note::
 
         You need to manually set up the environment variable ``PATH`` according to the guidelines printed out by the command.
 
-  6. Compile and link the program with ``make``
+  7. Compile and link the program with ``make``
 
      .. tip::
 
         The installation succeeds if you see the following line: ``"topoana.exe" installed successfully!``
      
-  7. Set up the experiment name with ``./Setup Belle_II``
+  8. Set up the experiment name with ``./Setup Belle_II``
 
      .. note::
 
@@ -164,7 +166,7 @@ Below is an example of the python steering script.
 
 .. note::
    
-   In practice, we usually use the interface `MCGenTopo <https://stash.desy.de/projects/B2/repos/software/browse/analysis/scripts/variables/MCGenTopo.py>`_ together with detailed particle lists and variable lists for specific physics analyses.
+   In practice, we usually use the interface ``MCGenTopo`` together with detailed particle lists and variable lists for specific physics analyses.
    For the sake of simplification, we do not include the latter in this script.
 
 After the following steps:
@@ -309,12 +311,32 @@ After the following steps:
 
   2. ``topoana.exe topoana.card``
 
-     .. tip:: Since the name of the card file is the default one, you can just execute ``topoana.exe``.
+     .. tip:: 
+
+        * Since the name of the card file is the default one, you can just execute ``topoana.exe``.
+
+        * If you encounter the following error,
+
+          .. code-block:: none
+
+             topoana.exe: error while loading shared libraries: libCore.so: cannot open shared object file: No such file or directory
+
+          setting up ``basf2`` before executing the command solves the problem, 
+          in cases that you installed ``TopoAna`` in the ``basf2`` environment previously.
 
 you can get the following four output files: ``topoana.txt``, ``topoana.tex``, ``topoana.pdf``, and ``topoana.root``.
 As we mention above, the program outputs the topology maps to the first three files.
 Although in different formats, the three files have the same information.
 You can check and see them.
+
+.. tip::
+
+   If you are working on a remote server, you have two options to take a look at the pdf file:
+
+     1. Copy the pdf file to your computer with ``scp`` (see :ref:`onlinebook_ssh`),
+
+     2. Start a jupyter server with ``jupyter notebook`` and open the pdf file in the browser with the web interface (see :ref:`onlinebook_python`).
+
 Below is only the screenshot of the first part of the table in the pdf file.
 
 .. _decay_trees:

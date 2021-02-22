@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import multiprocessing as mp
-import os
 import sys
 from ROOT import Belle2
 import rawdata as raw

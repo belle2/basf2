@@ -194,17 +194,17 @@ Notably, the comments on the right side are the explanations on the command line
      KEY: TTree    MCGenTopo;1     
    root [2] MCGenTopo->Show(0)                          // Show the first entry of the TTree object
    ======> EVENT:0
-    __experiment__  = 1003
+    __experiment__  = 0
     __run__         = 0
-    __event__       = 6735002
+    __event__       = 1
     __production__  = 0
     __weight__      = 1
-    nMCGen          = 94                                // nMCGen is the number of the particles
+    nMCGen          = 59                                // nMCGen is the number of the particles
     MCGenPDG_0      = 300553
     MCGenMothIndex_0 = nan
-    MCGenPDG_1      = -511
+    MCGenPDG_1      = 511
     MCGenMothIndex_1 = 0
-    MCGenPDG_2      = 511                               // MCGenPDG_i is the PDG code
+    MCGenPDG_2      = -511                              // MCGenPDG_i is the PDG code
     MCGenMothIndex_2 = 0                                              of the i^th particle
 
     ...
@@ -377,17 +377,17 @@ Similarly, the right side presents the explanations on the command lines and the
      KEY: TTree    MCGenTopo;1
    root [2] MCGenTopo->Show(0)                          // Show the first entry of the TTree object
    ======> EVENT:0
-    __experiment__  = 1003
+    __experiment__  = 0
     __run__         = 0
-    __event__       = 6735002
+    __event__       = 1
     __production__  = 0
     __weight__      = 1
-    nMCGen          = 94                                // nMCGen is the number of the particles
+    nMCGen          = 59                                // nMCGen is the number of the particles
     MCGenPDG_0      = 300553
     MCGenMothIndex_0 = nan
-    MCGenPDG_1      = -511
+    MCGenPDG_1      = 511
     MCGenMothIndex_1 = 0
-    MCGenPDG_2      = 511                               // MCGenPDG_i is the PDG code
+    MCGenPDG_2      = -511                              // MCGenPDG_i is the PDG code
     MCGenMothIndex_2 = 0                                              of the i^th particle
 
     ...

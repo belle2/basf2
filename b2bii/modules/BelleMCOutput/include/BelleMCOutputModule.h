@@ -82,6 +82,12 @@ namespace Belle2 {
     /** Output file name. */
     std::string m_OutputFileName;
 
+    /** Decay K_S0 in generator. */
+    bool m_DecayKsInGenerator;
+
+    /** Decay Lambda in generator. */
+    bool m_DecayLambdaInGenerator;
+
     /** MC particles. */
     StoreArray<MCParticle> m_MCParticles;
 

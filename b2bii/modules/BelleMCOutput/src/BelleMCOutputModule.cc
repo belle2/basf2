@@ -31,6 +31,10 @@ BelleMCOutputModule::BelleMCOutputModule() :
   setPropertyFlags(c_Output);
   addParam("outputFileName", m_OutputFileName,
            "Output file name.", std::string("belle_mc.mdst"));
+  addParam("decayKsInGenerator", m_DecayKsInGenerator,
+           "Decay K_S0 in generator.", false);
+  addParam("decayLambdaInGenerator", m_DecayLambdaInGenerator,
+           "Decay Lambda in generator.", false);
 }
 
 BelleMCOutputModule::~BelleMCOutputModule()
@@ -132,10 +136,15 @@ void BelleMCOutputModule::addParticle(
   if ((pdg == Const::muon.getPDGCode()) ||
       (pdg == Const::pion.getPDGCode()) ||
       (pdg == Const::kaon.getPDGCode()) ||
-      (pdg == Const::Kshort.getPDGCode()) ||
+      ((pdg == Const::Kshort.getPDGCode()) && !m_DecayKsInGenerator) ||
       (pdg == Const::Klong.getPDGCode()) ||
       (pdg == Const::neutron.getPDGCode()) ||
-      (pdg == Const::Lambda.getPDGCode())) {
+      ((pdg == Const::Lambda.getPDGCode()) && !m_DecayLambdaInGenerator) ||
+      (pdg == 3222) || // Sigma+
+      (pdg == 3112) || // Sigma-
+      (pdg == 3322) || // Xi0
+      (pdg == 3312) || // Xi-
+      (pdg == 3334)) { // Omega-
     part.addStatus(MCParticle::c_StableInGenerator);
     return;
   }

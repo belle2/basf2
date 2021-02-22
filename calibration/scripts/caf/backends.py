@@ -210,7 +210,7 @@ class MaxFilesSplitter(SubjobSplitter):
             return
 
         for i, subjob_input_files in enumerate(grouper(self.max_files_per_subjob, job.input_files)):
-            subjob = job.create_subjob(i, input_files=subjob_input_files)
+            job.create_subjob(i, input_files=subjob_input_files)
 
         self.assign_arguments(job)
 
@@ -253,7 +253,7 @@ class MaxSubjobsSplitter(SubjobSplitter):
             for i in range(num_input_files):
                 subjob_input_files.append(remaining_input_files.popleft())
             # Create the actual subjob
-            subjob = job.create_subjob(subjob_i, input_files=subjob_input_files)
+            job.create_subjob(subjob_i, input_files=subjob_input_files)
             subjob_i += 1
             available_subjobs -= 1
 

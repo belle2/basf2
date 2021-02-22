@@ -684,7 +684,7 @@ class SubJob(Job):
         Sets the status of this Job.
         """
         # Print an error only if the job failed.
-        if status == failed:
+        if status == "failed":
             B2ERROR(f"Setting {self.name} status to failed")
         else:
             B2INFO(f"Setting {self.name} status to {status}")

@@ -464,6 +464,18 @@ If you know an answer to a question: answer it!
 A bit more about working with stash and JIRA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. seealso:: Take a look at stash
+
+    .. raw:: html
+
+        <iframe width="640" height="400" src="https://rebrand.ly/axdfhy4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+.. seealso:: Take a look at JIRA
+
+    .. raw:: html
+
+        <iframe width="640" height="400" src="https://rebrand.ly/zzbewnf" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 .. admonition:: Exercise
      :class: exercise stacked
 

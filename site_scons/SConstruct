@@ -311,6 +311,11 @@ if analysis:
 else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
+    if (os.path.exists('.excluded_directories')):
+        f = open('.excluded_directories', 'r')
+        for line in f.lines:
+            exclude_dirs.add(line)
+        f.close()
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:

@@ -77,12 +77,10 @@ class TOPDisplay(b2.Module):
         self.c1.Update()
 
         # wait for user respond
-        try:
-            input("Press Enter to continue...\n")
+        user_input = input("Press Enter to continue or Q to quit.\n").lower().strip()
+        if user_input == "q":
             evtMetaData = Belle2.PyStoreObj('EventMetaData')
             evtMetaData.obj().setEndOfData()
-        except BaseException:
-            pass
 
 
 # Check if the display is set (needed for canvas)

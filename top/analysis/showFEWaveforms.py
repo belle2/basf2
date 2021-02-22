@@ -51,18 +51,17 @@ class WFDisplay(b2.Module):
     def wait(self):
         ''' wait for user respond '''
 
-        try:
-            user_input = input("Press Enter to continue, or P then Enter to print.\n").lower().strip()
-            if user_input == "p":
-                filename = self.pdfFile + '.pdf'
-                self.c1.SaveAs(filename)
-                print('Canvas saved to file:', filename)
-                return False
-            else:
-                evtMetaData = Belle2.PyStoreObj('EventMetaData')
-                evtMetaData.obj().setEndOfData()
-                return True
-        except BaseException:
+        user_input = input("Press Enter to continue, P to print, or Q to quit.\n").lower().strip()
+        if user_input == "p":
+            filename = self.pdfFile + '.pdf'
+            self.c1.SaveAs(filename)
+            print('Canvas saved to file:', filename)
+            return False
+        elif user_input == "q":
+            evtMetaData = Belle2.PyStoreObj('EventMetaData')
+            evtMetaData.obj().setEndOfData()
+            return True
+        else:
             return False
 
     def draw(self, k, event, run):

@@ -21,7 +21,7 @@ if len(sys.argv) not in [2, 3]:
     sys.exit('Must provide an input file and (optionally) an output file')
 
 inFile = sys.argv[1]
-if len(sys.argv) is 3:
+if len(sys.argv) == 3:
     outFile = sys.argv[2]
 else:
     outFile = './truth_charged.root'

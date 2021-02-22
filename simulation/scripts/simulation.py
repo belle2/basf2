@@ -48,7 +48,7 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     """
 
     # SVD reconstruction
-    svd_cluster = '__ROIsvdClusters'
+    # svd_cluster = '__ROIsvdClusters'
     add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking

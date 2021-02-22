@@ -97,14 +97,14 @@ class CheckNumbering(basf2.Module):
         sensor = idOfFirstPXDSensor.getSensorNumber()
         if layer != self.gTools.getFirstPXDLayer() or ladder != 1 or sensor != 1:
             basf2.B2ERROR('Mismatch in first PXD sensor placement:\n' +
-                          'Expected {0}/{1}/{2}\nGot: {3|/{4}/{5}'.format(
+                          'Expected {0}/{1}/{2}\nGot: {3}/{4}/{5}'.format(
                               layer, ladder, sensor,
                               self.gTools.getFirstPXDLayer(), 1, 1))
         idOfLastPXDSensor = self.gTools.getSensorIDFromPXDIndex(self.gTools.getNumberOfPXDSensors() - 1)
         layer = idOfLastPXDSensor.getLayerNumber()
         if layer != self.gTools.getLastPXDLayer():
             basf2.B2ERROR('Mismatch in last PXD sensor placement:\n' +
-                          'Expected layer {0} got layer {1|'.format(
+                          'Expected layer {0} got layer {1}'.format(
                               layer, self.gTools.getLastPXDLayer()))
         # SVD
         # First SVD sensor should be (first PXD layer)/1/1,
@@ -173,9 +173,8 @@ class CheckNumbering(basf2.Module):
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR(
                 'PXD sensor index neighbourhood test failure: \n' +
-                'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n ' +
-                'Index: {3}.'.format(init_sensorID, next_expected_sensorID,
-                                     next_sensorID, init_sensor_index + 1))
+                f'Initial id: {init_sensorID} \n Expected id: {next_expected_sensorID} \n Actual id: {next_sensorID} \n ' +
+                f'Index: {init_sensor_index + 1}.')
         # 2c. Sensor counting
         num_sensors_expected = 40
         if (self.gTools.getNumberOfPXDSensors() != num_sensors_expected):
@@ -203,8 +202,8 @@ class CheckNumbering(basf2.Module):
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR(
-                'SVD sensor index neighbourhood test failure: \n' +
-                'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n ' +
+                'SVD sensor index neighbourhood test failure: \n'
+                'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n '
                 'Index: {3}.'.format(init_sensorID, next_expected_sensorID,
                                      next_sensorID, init_sensor_index + 1))
         # 3c. Sensor counting

@@ -17,7 +17,6 @@ from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth
 from stdPhotons import stdPhotons
 from stdCharged import stdPi
 from validation_tools.metadata import create_validation_histograms
-from variables import variables as vm  # shorthand for the variable manager instance
 
 DECAY_MODE_ID = 1110021010
 INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID

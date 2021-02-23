@@ -12,7 +12,7 @@ The computing system
 
         * An internet browser
         * :ref:`onlinebook_basf2_introduction`
-        * :ref:`onlinebook_hep_analyses`
+        * :ref:`onlinebook_fundamentals`
 
     **Questions**:
 
@@ -181,4 +181,3 @@ You will learn a lot about the computing system, and it is a very important serv
 .. topic:: Author of this lesson
 
     Michel Villanueva
-

@@ -193,7 +193,7 @@ def get_calibrations(input_data, **kwargs):
                           )
 
     if payload_boundaries:
-        basf2.B2INFO(f"Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         cal0.strategies = strategies.SequentialBoundaries
         for algorithm in cal0.algorithms:
             algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
@@ -421,7 +421,7 @@ class CDCCalibration(Calibration):
         from caf.framework import Collection
 
         for skim_type, file_list in input_file_dict.items():
-            if skim_type is "Bcosmics":
+            if skim_type == "Bcosmics":
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector_cr(max_events=max_events),

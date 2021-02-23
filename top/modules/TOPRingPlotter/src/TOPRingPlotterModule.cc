@@ -221,7 +221,8 @@ void TOPRingPlotterModule::initialize()
 
   // Check the list of pdg hypotheses
   for (auto pdg : m_pdgHyp) {
-    if ((pdg != 11) & (pdg != 211) & (pdg != 321) & (pdg != 13) & (pdg != 2212))
+    if ((pdg != Const::electron.getPDGCode()) & (pdg != Const::pion.getPDGCode()) & (pdg != Const::kaon.getPDGCode()) &
+        (pdg != Const::muon.getPDGCode()) & (pdg != Const::proton.getPDGCode()))
       B2FATAL("Invalid PDG hypothesis for the PDF evaluation: " << pdg);
     short duplicateCount = 0;
     for (auto pdg2 : m_pdgHyp) {
@@ -246,15 +247,15 @@ void TOPRingPlotterModule::initialize()
 
   if (m_saveHistograms) {
     for (auto pdg : m_pdgHyp) {
-      if (pdg == 11)
+      if (pdg == Const::electron.getPDGCode())
         m_tree->Branch("hitMapMCE", "TH2F", &m_hitMapMCE, 32000, 0);
-      else if (pdg == 13)
+      else if (pdg == Const::muon.getPDGCode())
         m_tree->Branch("hitMapMCMU", "TH2F", &m_hitMapMCMU, 32000, 0);
-      else if (pdg == 211)
+      else if (pdg == Const::pion.getPDGCode())
         m_tree->Branch("hitMapMCPI", "TH2F", &m_hitMapMCPI, 32000, 0);
-      else if (pdg == 321)
+      else if (pdg == Const::kaon.getPDGCode())
         m_tree->Branch("hitMapMCK", "TH2F", &m_hitMapMCK, 32000, 0);
-      else if (pdg == 2212)
+      else if (pdg == Const::proton.getPDGCode())
         m_tree->Branch("hitMapMCP", "TH2F", &m_hitMapMCP, 32000, 0);
     }
   }
@@ -440,15 +441,15 @@ void TOPRingPlotterModule::event()
     // Save the PDF samplings
     if (isFromTrack) {
       for (auto pdg : m_pdgHyp) {
-        if (pdg == 11)
+        if (pdg == Const::electron.getPDGCode())
           fillPDF(Belle2::Const::electron, track, m_hitMapMCE, m_pdfPixelE, m_pdfTimeE, m_pdfSamplesE, m_pdfToysE);
-        else if (pdg == 13)
+        else if (pdg == Const::muon.getPDGCode())
           fillPDF(Belle2::Const::muon, track, m_hitMapMCMU, m_pdfPixelMU, m_pdfTimeMU, m_pdfSamplesMU, m_pdfToysMU);
-        else if (pdg == 211)
+        else if (pdg == Const::pion.getPDGCode())
           fillPDF(Belle2::Const::pion, track, m_hitMapMCPI, m_pdfPixelPI, m_pdfTimePI, m_pdfSamplesPI, m_pdfToysPI);
-        else if (pdg == 321)
+        else if (pdg == Const::kaon.getPDGCode())
           fillPDF(Belle2::Const::kaon, track, m_hitMapMCK, m_pdfPixelK, m_pdfTimeK, m_pdfSamplesK, m_pdfToysK);
-        else if (pdg == 2212)
+        else if (pdg == Const::proton.getPDGCode())
           fillPDF(Belle2::Const::proton, track, m_hitMapMCP, m_pdfPixelP, m_pdfTimeP, m_pdfSamplesP, m_pdfToysP);
       }
     }

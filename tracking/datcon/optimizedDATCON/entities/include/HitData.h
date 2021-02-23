@@ -40,16 +40,18 @@ namespace Belle2 {
       m_dataCache.layer = hit->getVxdID().getLayerNumber();
       m_dataCache.ladder = hit->getVxdID().getLadderNumber();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(hit->getVxdID());
-      m_dataCache.x = hit->getPosition().X();
-      m_dataCache.y = hit->getPosition().Y();
-      m_dataCache.z = hit->getPosition().Z();
-      m_dataCache.xConformal = 2. * hit->getPosition().X() / hit->getPosition().Perp2();
-      m_dataCache.yConformal = 2. * hit->getPosition().Y() / hit->getPosition().Perp2();
+      m_dataCache.x = hit->X();
+      m_dataCache.y = hit->Y();
+      m_dataCache.z = hit->Z();
+      m_dataCache.xConformal = 2. * hit->X() / hit->getPosition().Perp2();
+      m_dataCache.yConformal = 2. * hit->Y() / hit->getPosition().Perp2();
       m_dataCache.localNormalizedu = hit->getNormalizedLocalU();
       m_dataCache.localNormalizedv = hit->getNormalizedLocalV();
       m_dataCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
       m_dataCache.phi = hit->getPosition().Phi();
       m_dataCache.theta = hit->getPosition().Theta();
+      m_dataCache.uTime = hit->TimeU();
+      m_dataCache.vTime = hit->TimeV();
     }
 
     /// Return the SP this state is related to. May be nullptr.
@@ -87,6 +89,10 @@ namespace Belle2 {
       double phi = std::numeric_limits<double>::quiet_NaN();
       /// Theta value of SpacePoint
       double theta = std::numeric_limits<double>::quiet_NaN();
+      /// Time of the u-side cluster
+      double uTime = std::numeric_limits<double>::quiet_NaN();
+      /// Time of the v-side cluster
+      double vTime = std::numeric_limits<double>::quiet_NaN();
     };
     /// Get the cached data of this state
     const DataCache getDataCache() const { return m_dataCache; }

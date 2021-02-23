@@ -144,9 +144,9 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
       if (abs(d.getPDG()) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
           MCParticle& e = *m_MCParticles[j - 1];
-          if (e.getPDG() != 22) ret++;
+          if (e.getPDG() != Const::photon.getPDGCode()) ret++;
         }
-      } else if (d.getPDG() != 22) ret++;
+      } else if (d.getPDG() != Const::photon.getPDGCode()) ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {

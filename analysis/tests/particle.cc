@@ -77,7 +77,7 @@ namespace {
     {
       TLorentzVector momentum(1, 2, 3, 4);
       Particle p(momentum, 22, Particle::c_Unflavored, Particle::c_MCParticle, 123);
-      EXPECT_EQ(22, p.getPDGCode());
+      EXPECT_EQ(Const::photon.getPDGCode(), p.getPDGCode());
       EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
       EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
       EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
@@ -95,7 +95,7 @@ namespace {
       cluster->setEnergy(1337);
 
       Particle p(cluster);
-      EXPECT_EQ(22, p.getPDGCode());
+      EXPECT_EQ(Const::photon.getPDGCode(), p.getPDGCode());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
       EXPECT_EQ(Particle::c_ECLCluster, p.getParticleSource());
       EXPECT_FLOAT_EQ(1337, p.getEnergy());
@@ -110,7 +110,7 @@ namespace {
       V0* v0 = v0s.appendNew(V0());
       TLorentzVector momentum(1, 2, 3, 4);
       Particle p(momentum, 310, Particle::c_Unflavored, Particle::c_V0, 0);
-      EXPECT_EQ(310, p.getPDGCode());
+      EXPECT_EQ(Const::Kshort.getPDGCode(), p.getPDGCode());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
       EXPECT_EQ(Particle::c_V0, p.getParticleSource());
       EXPECT_EQ(0u, p.getMdstArrayIndex());
@@ -331,7 +331,7 @@ namespace {
                                                         Particle::c_ECLCluster,
                                                         3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
-    MC1Pion->setPDG(211);
+    MC1Pion->setPDG(Const::pion.getPDGCode());
     MC1Pion->set4Vector(TLorentzVector(0, 0, 0, 0));
     Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 
@@ -668,7 +668,7 @@ namespace {
       cluster->setEnergyRaw(2.);
 
       Particle p(cluster, Const::Klong);
-      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_EQ(Const::Klong.getPDGCode(), p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(std::sqrt(4. + 0.497614 * 0.497614), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
@@ -684,7 +684,7 @@ namespace {
       cluster->setEnergyRaw(2.);
 
       Particle p(cluster, Const::neutron);
-      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_EQ(Const::neutron.getPDGCode(), p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(std::sqrt(4. + 0.93956536 * 0.93956536), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());

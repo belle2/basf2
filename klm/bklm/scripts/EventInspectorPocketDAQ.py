@@ -363,7 +363,7 @@ class EventInspectorPocketDAQ:
             ctime = items[3]  # this is revo9 time for RPCs, ctime for scintillators
             flag = 1 if (lane > 2) else 2
             isRPC = (flag == 1)
-            # isScint = (flag == 2)
+            isScint = (flag == 2)
             laneAxisChannel = (((lane << 1) + axis) << 7) + channel
             if laneAxisChannel not in channelMultiplicity:
                 countAll = countAll + 2
@@ -379,10 +379,10 @@ class EventInspectorPocketDAQ:
             axis = items[2]
             ctime = items[3]  # this is revo9 time for RPCs, ctime for scintillators
             tdc = items[4]
-            # charge = items[5]
+            charge = items[5]
             flag = 1 if (lane > 2) else 2
             isRPC = (flag == 1)
-            # isScint = (flag == 2)
+            isScint = (flag == 2)
             laneAxisChannel = (((lane << 1) + axis) << 7) + channel
             laneAxis = axis if ((lane < 1) or (lane > 20)) else ((lane << 1) + axis)
             if laneAxisChannel in channelMultiplicity:

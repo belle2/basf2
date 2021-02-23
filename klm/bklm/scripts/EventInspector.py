@@ -1497,7 +1497,7 @@ class EventInspector(basf2.Module):
                     axis = (word0 >> 23) & 0x01
                     lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)
                     flag = (word0 >> 30) & 0x03  # identifies scintillator or RPC hit
-                    # adc = word1 & 0x0fff
+                    adc = word1 & 0x0fff
                     tdc = (word1 >> 16) & 0x07ff
                     isRPC = (flag == 1)
                     isScint = (flag == 2)
@@ -1564,7 +1564,7 @@ class EventInspector(basf2.Module):
                     lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)
                     flag = (word0 >> 30) & 0x03  # 1 for RPCs, 2 for scints
                     electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
-                    # adc = word1 & 0x0fff
+                    adc = word1 & 0x0fff
                     tdc = (word1 >> 16) & 0x07ff
                     tdcExtra = (word1 >> 27) & 0x1f
                     adcExtra = (word1 >> 12) & 0x0f

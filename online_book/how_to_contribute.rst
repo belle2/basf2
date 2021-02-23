@@ -48,5 +48,5 @@ You need to
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`
 5. Push your branch
-6. Create a PR
+6. Create a PR following the guidelines outlined at :ref:`pr_best_practices`
 

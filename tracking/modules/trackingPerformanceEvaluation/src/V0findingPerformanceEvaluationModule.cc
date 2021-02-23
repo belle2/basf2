@@ -18,6 +18,8 @@
 
 #include <mdst/dataobjects/Track.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <framework/geometry/BFieldManager.h>
 
 #include <root/TAxis.h>
@@ -77,7 +79,8 @@ void V0findingPerformanceEvaluationModule::initialize()
   m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per V0s", 5, -0.5, 4.5,
                                                 "# MCParticles", m_histoList_multiplicity);
 
-  m_MCParticlePDGcode = createHistogram1D("h1PDGcode", "PDG code of MCParticles", 6244, -3122, 3122,
+  m_MCParticlePDGcode = createHistogram1D("h1PDGcode", "PDG code of MCParticles", 6244, -Const::Lambda.getPDGCode(),
+                                          Const::Lambda.getPDGCode(),
                                           "PDG code", m_histoList_multiplicity);
 
 
@@ -363,11 +366,11 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
 {
 
   bool isGamma = false;
-  if (abs(the_mcParticle.getPDG()) == 22)
+  if (abs(the_mcParticle.getPDG()) == Const::photon.getPDGCode())
     isGamma = true;
 
   bool isK_S0 = false;
-  if (abs(the_mcParticle.getPDG()) == 310)
+  if (abs(the_mcParticle.getPDG()) == Const::Kshort.getPDGCode())
     isK_S0 = true;
 
   bool isK_0 = false;
@@ -375,7 +378,7 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
     isK_0 = true;
 
   bool isLambda = false;
-  if (abs(the_mcParticle.getPDG()) == 3122)
+  if (abs(the_mcParticle.getPDG()) == Const::Lambda.getPDGCode())
     isLambda = true;
 
   bool twoProngs = false;

@@ -187,7 +187,7 @@ For this concept you need to complete the next section.
 Branches (intermediate)
 =======================
 
-. seealso::
+.. seealso::
 
   While we'd encourage you to work through this section by yourself, we've also
   prepared a video to help. Please stop it at every exercise to think and try to

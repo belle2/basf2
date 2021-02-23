@@ -151,10 +151,11 @@ With all of these tools, it might be hard to work out where to go to get help.
 
 .. hint::
 
-    If you get stuck or have any questions during a StarterKit workshop you don't need
+    If you get stuck or have any questions during a StarterKit workshop or with
+    the training lessons in the online book you don't need
     to think about where to ask:
     The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-    in our chat will provide instant help.
+    in our chat will provide fast help.
     Please also check out the quick tips section below: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 ... meta
@@ -216,9 +217,10 @@ Asking a question in #starterkit-workshop
 .. note::
 
     The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-    is usually only active during the StarterKit workshop.
-    After the workshop, we recommend you to try one of the other alternatives
-    (but you can always try, of course).
+    is for beginner's questions about the online book material and for everything
+    that happens during a StarterKit workshop.
+    It's not the right place for specific or very detailed questions about your
+    own analysis.
 
 Our chat works like any other chat with a couple of nice features. For example you can
 put small parts of code in backticks ```print("hello world")``` and you can add larger
@@ -598,7 +600,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. tip:: Bugs do exist, don't hesitate too much to report them.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author(s) of this lesson
 

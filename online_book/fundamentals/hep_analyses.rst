@@ -1255,7 +1255,7 @@ V0
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
    material than expected and the multiple scattering corrections must be updated.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author(s) of this lesson
 

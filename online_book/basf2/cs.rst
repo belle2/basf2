@@ -3,7 +3,7 @@
 Continuum Suppression (CS)
 ==========================
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude
 
 .. sidebar:: Overview
     :class: overview

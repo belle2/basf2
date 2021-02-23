@@ -1,4 +1,4 @@
 ROOT
 ====
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

@@ -295,7 +295,7 @@ to continue your training even after the StarterKit. It will not be time wasted!
   helps you and you still feel uncomfortable in the command line, you might
   want to try them out!
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

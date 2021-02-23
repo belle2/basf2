@@ -47,13 +47,16 @@ the software by following through a series of hands-on lessons.
 
 .. tip::
 
-   If you get stuck or have any questions during a StarterKit workshop, the
+   If you get stuck or have any questions to the online book material, the
    `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-   in our chat is full of nice people who will provide instant help.
+   in our chat is full of nice people who will provide fast help.
+   However this is not the place for specific or very detailed questions about
+   your own analysis.
 
    The first lesson of this book (:ref:`onlinebook_collaborative_tools`) will show
    several other places where you can get help later on.
-   It also includes a quick tips section about the chat: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
+   It also includes a quick tips section about the chat:
+   :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 .. toctree::
    :maxdepth: 2

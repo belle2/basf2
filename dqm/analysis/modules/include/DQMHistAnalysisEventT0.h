@@ -41,6 +41,7 @@ namespace Belle2 {
     /** delete pointers */
     virtual void terminate() override;
 
+    std::string m_prefixCanvas; /**< prefix to be added to canvas name when saved as pdf*/
     bool m_printCanvas; /**< if true print the pdf of the canvases */
 
   private:
@@ -69,7 +70,7 @@ namespace Belle2 {
     TPad* m_pad2CDCTRG = nullptr; /**< pad for CDCTRG bhabhas */
     TPad* m_pad3CDCTRG = nullptr; /**< pad for CDCTRG mumus */
 
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
+    MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
   };
 } // end namespace Belle2
 

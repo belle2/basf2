@@ -12,6 +12,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/geometry/SensorInfo.h>

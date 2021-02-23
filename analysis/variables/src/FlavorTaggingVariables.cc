@@ -1069,7 +1069,7 @@ namespace Belle2 {
         // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
 
         bool isQQbarMesonInChain = false;
-        if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8 || index == Const::electron.getPDGCode()) && mothersPDG.size() > 1)
+        if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8 || index == 11) && mothersPDG.size() > 1)
         {
           for (auto& iMCMotherPDG : mothersPDG) {
             if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {

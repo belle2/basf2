@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 

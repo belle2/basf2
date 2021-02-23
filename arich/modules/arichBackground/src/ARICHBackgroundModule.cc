@@ -137,7 +137,7 @@ namespace Belle2 {
         modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
         en = arichhit->getEnergy();
 
-        if (phPDG == 2112) {
+        if (phPDG == Const::neutron.getPDGCode()) {
           phnw = arichhit->getNeutronWeight();
           trlen = arichhit->getTrackLength();
         }

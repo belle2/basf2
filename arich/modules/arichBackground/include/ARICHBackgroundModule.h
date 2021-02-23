@@ -15,6 +15,7 @@
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 #include <string>
 

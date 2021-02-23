@@ -31,7 +31,7 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
-CDST_FULL_OBJECTS = mdst.MDST_OBJECTS + [
+cdst_full_objects = mdst.mdst_objects + [
     'RecoTracks',
     'EventT0',
     'PXDClustersFromTracks',
@@ -93,7 +93,7 @@ CDST_FULL_OBJECTS = mdst.MDST_OBJECTS + [
 ]
 
 
-CDST_TRACKING_OBJECTS = [
+cdst_tracking_objects = [
     'RecoTracks',
     'Tracks',
     'V0s',
@@ -108,7 +108,7 @@ CDST_TRACKING_OBJECTS = [
 ]
 
 
-DIGITS_OBJECTS = [
+digits_objects = [
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
@@ -495,19 +495,19 @@ def add_cdst_output(
     persistentBranches = ['FileMetaData']
 
     if rawFormat:
-        branches += CDST_TRACKING_OBJECTS
+        branches += cdst_tracking_objects
         if not mc:
             branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
                 'TRGECLClusters'
             ]
         else:
-            branches += DIGITS_OBJECTS + [
+            branches += digits_objects + [
                 'SoftwareTriggerResult',
                 'TRGSummary']
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
             basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
     else:
-        branches += CDST_FULL_OBJECTS
+        branches += cdst_full_objects
 
     if dataDescription is None:
         dataDescription = {}

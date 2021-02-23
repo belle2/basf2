@@ -12,6 +12,7 @@
 #define ANALYSISPHASE1STUDYMODULE_H
 
 #include <framework/core/HistoModule.h>
+#include <framework/gearbox/Const.h>
 
 #include <TH1.h>
 #include <TH2.h>

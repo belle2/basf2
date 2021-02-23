@@ -180,11 +180,11 @@ void AnalysisPhase1StudyModule::event()
     float phi = mcParticle.getMomentum().Phi() * TMath::RadToDeg();
     int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    if (PDG == 11) partID[0] = 1; //positron
-    else if (PDG == -11) partID[1] = 1; //electron
-    else if (PDG == 22) partID[2] = 1; //photon
-    else if (PDG == 2112) partID[3] = 1; //neutron
-    else if (PDG == 2212) partID[4] = 1; //proton
+    if (PDG == Const::electron.getPDGCode()) partID[0] = 1; //positron
+    else if (PDG == -Const::electron.getPDGCode()) partID[1] = 1; //electron
+    else if (PDG == Const::photon.getPDGCode()) partID[2] = 1; //photon
+    else if (PDG == Const::neutron.getPDGCode()) partID[3] = 1; //neutron
+    else if (PDG == Const::proton.getPDGCode()) partID[4] = 1; //proton
     else if (PDG == 1000080160) partID[5] = 1; // O
     else if (PDG == 1000060120) partID[6] = 1; // C
     else if (PDG == 1000020040) partID[7] = 1; // He

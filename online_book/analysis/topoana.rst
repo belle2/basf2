@@ -95,10 +95,34 @@ Generally, the functionalities of the program are as follows.
 
        * The plain text file is convenient to be checked with text processing commands as well as text editors.
 
-Install the program
--------------------
+.. note::
 
-Please follow the steps below to install the program.
+   Below are some general remarks on the relationship between the ``TopoAna``
+   program and the :ref:`mcmatching` module in ``basf2``, namely
+   :b2:mod:`MCMatcherParticles`.
+
+     1. As we introduce in :numref:`TopologyAnalysis`, ``TopoAna`` is an offline
+        tool independent of ``basf2``. It gets the human-friendly topology
+        information on its own from the raw MC truth information obtained with
+        the interface ``MCGenTopo``. Obviously, it does not rely on
+        :b2:mod:`MCMatcherParticles`.
+
+     2. On the other hand, in order to analyze some backgrounds more effectively,
+        a series of newly developed parameters in a few functionality items in
+        ``TopoAna`` can make use of the MC matching results obtained with
+        :b2:mod:`MCMatcherParticles`. For more details, please see Section 5.2.3
+        (titled **Reconstruction restrictions on truth particles**) in the user
+        guide we introduce in :numref:`TopologyAnalysis`.
+
+     3. In addition, there are some functionality overlaps betweeen ``TopoAna``
+        and :b2:mod:`MCMatcherParticles`. If highly needed, in the future we could
+        also develop some new functionalities in ``TopoAna`` for the cross-checks
+        of the MC matching results obtained with :b2:mod:`MCMatcherParticles`.
+
+Install the software
+--------------------
+
+Please follow the steps below to install the software.
 
   1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
 
@@ -411,11 +435,41 @@ Exercises
 
 The example above only introduces the basic usage of ``TopoAna``.
 You can refer to the documents we introduce in :numref:`TopologyAnalysis` for more descriptions of the tool. 
-At the end of this online textbook, we provide the following five exercises for you to further explore the usage of ``TopoAna``.
+At the end of this online textbook, we provide the following six exercises for you to further explore the usage of ``TopoAna``.
 You will benefit a lot when you accomplish these exercises.
-To do these exercises, you need to look up the proper setting items in the quick-start tutorial or the user guide we introduce in :numref:`TopologyAnalysis`, add them to the card file, and re-run the program.
+To do these exercises (except for the first one), you need to look up the proper setting items in the quick-start tutorial or the user guide we introduce in :numref:`TopologyAnalysis`, add them to the card file, and re-run the program.
 
 .. admonition:: Exercise 1
+   :class: exercise stacked
+
+   In the example above, we execute ``basf2 MCGenTopo.py`` and ``topoana.exe
+   topoana.card`` in two steps. This is a regular practice and does not take
+   too much efforts. However, sometimes you may want to execute the two command
+   lines in one step. Could you figure out a way to do this?
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   Use the ``system`` function of the ``os`` module in your python steering script.
+
+.. admonition:: Solution
+   :class: toggle solution stacked
+
+   Reivse your python steering script by adding ``import os`` to the end of its
+   preamble and appending ``os.system('topoana.exe topoana.card')`` at its end, and then run
+   the script with ``basf2``.
+
+   Below is an example of the revised script.
+
+   .. literalinclude:: topoana/topoana.py
+      :language: python
+
+.. admonition:: Extension
+   :class: toggle xhint
+
+   Could you think of another way to do this? For example, with a shell script?
+
+.. admonition:: Exercise 2
    :class: exercise stacked
 
    Try to examine the top 30 decay branches of :math:`B^{0}` and all the decay branches of :math:`D^{*+}` in the input sample.
@@ -444,7 +498,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 
    * See Section 3 in the user guide for the description of other similar setting items.
 
-.. admonition:: Exercise 2
+.. admonition:: Exercise 3
    :class: exercise stacked
 
    Try to identify the decay branches :math:`B^{0} \rightarrow \pi^{0} \bar{D}^{0}` and :math:`\bar{B}^{0} \rightarrow \mu^{-} \bar{\nu}_{\mu} D^{*+}` in the input sample.
@@ -473,7 +527,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 
    * See Section 4 in the user guide for the description of other similar setting items.
 
-.. admonition:: Exercise 3
+.. admonition:: Exercise 4
    :class: exercise stacked
 
    In the previous example and the above two exercises, we did not consider charge conjugation, which is an important concept in high energy physics.
@@ -502,7 +556,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 
    * See Section 5.2 in the user guide for the description of other similar setting items.
 
-.. admonition:: Exercise 4
+.. admonition:: Exercise 5
    :class: exercise stacked
 
    Try to impose some cuts to select events. For example, impose one cut to select only the events with ``nMCGen>=20 && nMCGen<=40``.
@@ -529,7 +583,7 @@ To do these exercises, you need to look up the proper setting items in the quick
 
    * See Section 5.1 in the user guide for the description of other similar setting items.
 
-.. admonition:: Exercise 5 
+.. admonition:: Exercise 6
    :class: exercise stacked
 
    Try to remove the input ``TBranch`` objects ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``) from the output root files before the program terminates.

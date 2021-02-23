@@ -79,7 +79,7 @@ void V0findingPerformanceEvaluationModule::initialize()
   m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per V0s", 5, -0.5, 4.5,
                                                 "# MCParticles", m_histoList_multiplicity);
 
-  m_MCParticlePDGcode = createHistogram1D("h1PDGcode", "PDG code of MCParticles", 6244, -Const::Lambda.getPDGCode(),
+  m_MCParticlePDGcode = createHistogram1D("h1PDGcode", "PDG code of MCParticles", 6244, Const::antiLambda.getPDGCode(),
                                           Const::Lambda.getPDGCode(),
                                           "PDG code", m_histoList_multiplicity);
 

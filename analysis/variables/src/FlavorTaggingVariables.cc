@@ -134,7 +134,7 @@ namespace Belle2 {
     double lambdaFlavor(const Particle* particle)
     {
       if (particle->getPDGCode() == Const::Lambda.getPDGCode()) return 1.0; //Lambda0
-      else if (particle->getPDGCode() == -Const::Lambda.getPDGCode()) return -1.0; //Anti-Lambda0
+      else if (particle->getPDGCode() == Const::antiLambda.getPDGCode()) return -1.0; //Anti-Lambda0
       else return 0.0;
     }
 

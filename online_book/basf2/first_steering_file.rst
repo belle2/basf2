@@ -530,7 +530,9 @@ The wrapper function (convenience function) for the `ParticleCombiner` is
 called `reconstructDecay`. Its first argument is a `DecayString`, which is a
 combination of a mother particle (list), an arrow, and daughter particles. The
 `DecayString` has its own grammar with several markers, keywords, and arrow
-types. It is especially useful for inclusive reconstructions. Follow the
+types. It is especially useful for inclusive reconstructions (reconstructions
+in which only part of the decay products are specified, e.g. only requiring
+charged leptons in the final state; opposite: exclusive). Follow the
 provided link if you want to learn more about the `DecayString`. For the
 purpose of this tutorial we do not need any of those fancy extensions, the
 default arrow type ``->`` suffices. However, it is important to know how the

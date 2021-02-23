@@ -25,7 +25,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>

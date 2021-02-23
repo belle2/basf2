@@ -11,6 +11,7 @@
 #include <analysis/modules/TauDecayMarker/TauDecayMarkerModule.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/utility/DecayTree.h>
+#include <framework/gearbox/Const.h>
 
 #include <stdexcept>
 

@@ -14,6 +14,9 @@
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 
+// framework aux
+#include <framework/gearbox/Const.h>
+
 // dataonjects
 #include <mdst/dataobjects/MCParticle.h>
 

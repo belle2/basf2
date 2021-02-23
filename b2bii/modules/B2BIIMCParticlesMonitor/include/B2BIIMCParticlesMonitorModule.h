@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
-#include <framework/gearbox/Const.h>
 #include "TH1F.h"
 
 namespace Belle2 {

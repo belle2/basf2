@@ -28,6 +28,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace boost;

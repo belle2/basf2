@@ -7,6 +7,7 @@
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/dataobjects/BackgroundMetaData.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>

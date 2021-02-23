@@ -11,7 +11,6 @@
 #pragma once
 
 #include <analysis/utility/DecayNode.h>
-#include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <string>

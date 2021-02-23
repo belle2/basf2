@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/gearbox/Const.h>
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <mdst/dataobjects/PIDLikelihood.h>

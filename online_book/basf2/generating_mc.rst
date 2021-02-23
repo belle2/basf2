@@ -3,7 +3,7 @@
 Generating MC
 =============
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude
 
 .. sidebar:: Overview
     :class: overview

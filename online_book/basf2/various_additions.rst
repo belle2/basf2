@@ -478,7 +478,7 @@ random seed.
     * From light release ``light-2008-kronos``, a new helper function can be
       used to perform random candidate selection: `applyRandomCandidateSelection`
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

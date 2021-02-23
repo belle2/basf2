@@ -84,6 +84,17 @@ here when you are done.
 What are the key concepts of python?
 ------------------------------------
 
+.. seealso::
+
+  While we'd encourage you to work through this section by yourself, we've also
+  prepared a video to help. Please stop it at every exercise to think and try to
+  do all steps by yourself as well.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/46pihb0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 Welcome back! Now we're going to test you on your new-found knowledge
 in Python.
 
@@ -193,6 +204,17 @@ Great! Well done! 😁 You can now create python scripts in your terminal!
 
 Practising Python: Jupyter notebooks
 -------------------------------------
+
+.. seealso::
+
+  While we'd encourage you to work through this section by yourself, we've also
+  prepared a video to help. Please stop it at every exercise to think and try to
+  do all steps by yourself as well.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/5jctlx7" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 We will work in a jupyter notebook to allow you to
 practice using your python skills further.

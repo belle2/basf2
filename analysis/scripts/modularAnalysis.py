@@ -3198,17 +3198,19 @@ def scaleError(outputListName, inputListName,
     '''
     This module creates a new charged particle list.
     The helix errors of the new particles are scaled by constant factors.
-    The scale factors defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
-    Impact parameter resolution can be defined in a pseudo-momentum dependent form,
-    which limits d0 and z0 errors so that they do not shrink below the resolution.
-    Should be used for low-momentum (0-3 GeV/c) tracks in BBbar events.
+    These scale factors are defined for each helix parameter (d0, phi0, omega, z0, tanlambda).
+    The impact parameter resolution can be defined in a pseudo-momentum dependent form,
+    which limits the d0 and z0 errors so that they do not shrink below the resolution.
+    This module is supposed to be used for low-momentum (0-3 GeV/c) tracks in BBbar events.
     Details will be documented in a Belle II note by the Belle II Japan ICPV group.
 
     @param inputListName Name of input charged particle list to be scaled
     @param outputListName Name of output charged particle list with scaled error
     @param scaleFactors List of five constants to be multiplied to each of helix errors
-    @param d0Resolution Defines d0 resolution (a [cm],b [cm/(GeV/c)]) -> a (+) b / (p*beta*sinTheta**1.5)
-    @param z0Resolution Defines z0 resolution (a [cm],b [cm/(GeV/c)]) -> a (+) b / (p*beta*sinTheta**2.5)
+    @param d0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining d0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
+    @param z0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining z0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
     '''
     scale_error = register_module("HelixErrorScaler")
     scale_error.set_name('ScaleError_' + inputListName)

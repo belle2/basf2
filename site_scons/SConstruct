@@ -316,6 +316,7 @@ else:
         for line in f.readlines():
             exclude_dirs.add(line.rstrip('\n'))
         f.close()
+        print(f'Excluded directories: {exclude_dirs}')
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:

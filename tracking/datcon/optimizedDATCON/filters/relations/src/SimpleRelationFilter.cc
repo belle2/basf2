@@ -25,15 +25,15 @@ SimpleRelationFilter::operator()(const std::pair<const HitData*, const HitData*>
   // intended: (theta1 - theta2) / mean(theta1, theta2), so theoretically this is
   // (theta1 - theta2) / ((theta1 + theta2) / 2) = 2 * (theta1 - theta2) / (theta1 + theta2)
   // but skip the additional factor 2 and just account for this in the cut value
-  double normalizedLambdaDiff = (currentHitData.theta - nextHitData.theta) / (currentHitData.theta + nextHitData.theta);
+//   const double normalizedLambdaDiff = abs((currentHitData.theta - nextHitData.theta) / (currentHitData.theta + nextHitData.theta));
+  const double normalizedLambdaDiff = abs(currentHitData.theta - nextHitData.theta);
 
-  // if the connection is possible in u, it should also be possible in v
-  // but as there could in principle be a chance between sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1)
-  // check for a similar theta value instead of v
+  // if the connection is possible in u, it should also be possible in v, but as there could in principle be a chance that the hits
+  // are on different sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1) check for a similar theta value instead of v
   if (currentHitData.layer == nextHitData.layer) {
-    if (fabs(normalizedLambdaDiff) > m_param_SimpleThetaOverlayRegionCut) {
-//       B2INFO("same layer c: " << currentHitData.sensorID << "   " << currentHitData.x << "  " << currentHitData.y << "  " << currentHitData.z << "   " << currentHitData.phi << "  " << currentHitData.theta << "    " << normalizedLambdaDiff);
-//       B2INFO("same layer n: " <<    nextHitData.sensorID << "   " <<    nextHitData.x << "  " <<    nextHitData.y << "  " <<    nextHitData.z << "   " <<    nextHitData.phi << "  " <<    nextHitData.theta);
+    if (normalizedLambdaDiff > m_param_SimpleThetaCutDeltaL0) {
+//       B2INFO("same layer c: " << currentHitData.sensorID << "   " << currentHitData.x << "  " << currentHitData.y << "  " << currentHitData.z << "  " << currentHitData.theta << "    " << normalizedLambdaDiff);
+//       B2INFO("same layer n: " <<    nextHitData.sensorID << "   " <<    nextHitData.x << "  " <<    nextHitData.y << "  " <<    nextHitData.z << "  " <<    nextHitData.theta);
       return NAN;
     }
     // The hits are on the same layer but neighbouring ladders and in the overlap region they are in close proximity in phi.
@@ -42,26 +42,32 @@ SimpleRelationFilter::operator()(const std::pair<const HitData*, const HitData*>
     return 1.0;
   }
 
-  double phiDiff = currentHitData.phi - nextHitData.phi;
-  while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
-  while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
-
-  if (!(fabs(phiDiff) < m_param_SimplePhiCut and fabs(normalizedLambdaDiff) < m_param_SimpleThetaCut)) {
-//     B2INFO("c: " << currentHitData.sensorID << "   " << currentHitData.x << "  " << currentHitData.y << "  " << currentHitData.z << "   " << currentHitData.phi << "  " << currentHitData.theta << "    " << normalizedLambdaDiff);
-//     B2INFO("n: " <<    nextHitData.sensorID << "   " <<    nextHitData.x << "  " <<    nextHitData.y << "  " <<    nextHitData.z << "   " <<    nextHitData.phi << "  " <<    nextHitData.theta);
-    return NAN;
+  const ushort absLayerDiff = abs(currentHitData.layer - nextHitData.layer);
+  if ((absLayerDiff == 1 and normalizedLambdaDiff < m_param_SimpleThetaCutDeltaL1) or
+      (absLayerDiff == 2 and normalizedLambdaDiff < m_param_SimpleThetaCutDeltaL2)) {
+//     B2INFO("c: " << currentHitData.sensorID << "   " << currentHitData.x << "  " << currentHitData.y << "  " << currentHitData.z << "   "  << currentHitData.theta << "    " << normalizedLambdaDiff);
+//     B2INFO("n: " <<    nextHitData.sensorID << "   " <<    nextHitData.x << "  " <<    nextHitData.y << "  " <<    nextHitData.z << "   "  <<    nextHitData.theta);
+    return 1.0;
   }
 
-  return 1.0;
+  return NAN;
+
+//   if (!(fabs(phiDiff) < m_param_SimplePhiCut and fabs(normalizedLambdaDiff) < m_param_SimpleThetaCut)) {
+// //     B2INFO("c: " << currentHitData.sensorID << "   " << currentHitData.x << "  " << currentHitData.y << "  " << currentHitData.z << "   "  << currentHitData.theta << "    " << normalizedLambdaDiff);
+// //     B2INFO("n: " <<    nextHitData.sensorID << "   " <<    nextHitData.x << "  " <<    nextHitData.y << "  " <<    nextHitData.z << "   "  <<    nextHitData.theta);
+//     return NAN;
+//   }
+//
+//   return 1.0;
 }
 
 void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaOverlayCut"), m_param_SimpleThetaOverlayRegionCut,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL0"), m_param_SimpleThetaCutDeltaL0,
                                 "Simple cut in theta for the overlay region of different ladders in the same layer.",
-                                m_param_SimpleThetaOverlayRegionCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simplePhiCut"), m_param_SimplePhiCut,
-                                "Simple cut in phi for relations between hits.", m_param_SimplePhiCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCut"), m_param_SimpleThetaCut,
-                                "Simple cut in theta for relations between hits.", m_param_SimpleThetaCut);
+                                m_param_SimpleThetaCutDeltaL0);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL1"), m_param_SimpleThetaCutDeltaL1,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_SimpleThetaCutDeltaL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL2"), m_param_SimpleThetaCutDeltaL2,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_SimpleThetaCutDeltaL2);
 }

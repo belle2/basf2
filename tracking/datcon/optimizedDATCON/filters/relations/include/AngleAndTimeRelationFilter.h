@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  class SimpleRelationFilter : public BaseRelationFilter {
+  class AngleAndTimeRelationFilter : public BaseRelationFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const std::pair<const HitData*, const HitData*>& relation) override;
@@ -24,10 +24,14 @@ namespace Belle2 {
 
   private:
     /// Cut on relations in theta for overlay region on same layer but different ladder
-    double m_param_SimpleThetaCutDeltaL0 = 0.05;
+    double m_param_ThetaCutDeltaL0 = 0.05;
     /// Filter relations in theta between hit states where the layer difference is +-1
-    double m_param_SimpleThetaCutDeltaL1 = 0.1;
+    double m_param_ThetaCutDeltaL1 = 0.1;
     /// Filter relations in theta between hit states where the layer difference is +-2
-    double m_param_SimpleThetaCutDeltaL2 = 0.2;
+    double m_param_ThetaCutDeltaL2 = 0.2;
+    /// Cut on difference in u-side cluster time of the two hits
+    double m_param_DeltaTU = 10; // ns
+    /// Cut on difference in v-side cluster time of the two hits
+    double m_param_DeltaTV = 10; // ns
   };
 }

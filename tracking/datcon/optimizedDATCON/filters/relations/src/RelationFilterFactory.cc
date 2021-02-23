@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/relations/RelationFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/relations/AngleAndTimeRelationFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/relations/SimpleRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
@@ -41,7 +42,8 @@ std::map<std::string, std::string> RelationFilterFactory::getValidFilterNamesAnd
   return {
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
-    {"simple", "very simple filtering"},
+    {"angleAndTime", "filter relation based on their theta value and the hit time"},
+    {"simple", "very simple filtering based on theta of the hits in question"},
   };
 }
 
@@ -54,6 +56,10 @@ RelationFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseRelationFilter>>();
+  }
+
+  if (filterName == "angleAndTime") {
+    return std::make_unique<AngleAndTimeRelationFilter>();
   }
 
   if (filterName == "simple") {

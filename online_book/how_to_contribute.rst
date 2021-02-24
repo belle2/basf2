@@ -41,9 +41,16 @@ You need to
 
 1. Create a development setup as explained in
    :ref:`build/tools_doc/index-01-tools:Development Setup`
-2. Change to a new branch ``feature/...`` or ``bugfix/...``
+2. Change to a new branch ``feature/describe-your-change`` or ``bugfix/something`` (if your PR is based on a
+   JIRA issue ``BII-XXXX`` you can include it in the name ``feature/BII-XXXX-improve-docs``).
+   You will not be able to push your branch if it isn't prefixed with ``feature/`` or ``bugfix/``
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`
 5. Push your branch
 6. Create a PR following the guidelines outlined at :ref:`pr_best_practices`
+
+.. seealso::
+
+    You already opened a PR for a test repository in :ref:`onlinebook_git`, remember?
+    Basically this is exactly the same procedure.
 

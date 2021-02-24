@@ -3,13 +3,34 @@
 Join us
 =======
 
-Hi there, thanks for completing the online book! We wish you all the best for
-your journey in Belle II!
+.. sidebar:: Overview
+ :class: overview
+
+ **Learning**: Does learning on the job count?
+
+ **Exercises**: No end to them
+
+ **Prerequisites**: Motivation
+
+ **Questions**:
+
+   * What is an easy way to get my first commit in the software repo?
+   * How does this documentation work internally?
+
+ **Objectives**:
+
+   * Improve the life of newcomers and veterans!
+   * Profit by learning about our tools!
+
+ ..  image:: cat_hat_angry_point.jpg
+
+Hi there, thanks for completing the online book! The _Software Training & Documentation Group_
+wishes you all the best for your journey in Belle II!
 
 Before you go though, please consider staying in touch with us and contributing
 to the training and documentation resources. :ref:`onlinebook_contribute`
-explains why this is a win-win situation for everyone (and why "but I just started!"
-is not an acceptable excuse ;))
+explains why this is a win-win situation for everyone (and why "but I'm new here!"
+is not an acceptable excuse :P).
 
 If you're interested in getting to know us better,
 

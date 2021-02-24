@@ -24,7 +24,7 @@ ma.inputMdst(environmentType='default',
              path=my_path)
 
 # ID of weight table is taken from B2A907
-weight_table_id = "PhotonEnergyBiasCorrection_Feb2021:TestEnergy"
+weight_table_id = "Feb2021:TestEnergy"
 
 if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
     b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")

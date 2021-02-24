@@ -173,26 +173,12 @@ namespace Belle2 {
      */
     double v0DaughterTrackParamCov5x5AtIPPerigee(const Particle* part, const std::vector<double>& params);
 
-
     /**
      * helper function to get the number of hits associated to a track for given tracking detector
      * If given particle is not created out of the Track, the return value is 0.
-     * Not registered in variable mananger
+     * Not registered in variable manager
      */
     double getV0DaughterTrackDetNHits(const Particle* particle, const double daughterID, const Const::EDetector& det);
-
-    /** helper function to get track fit result from V0 object */
-    const TrackFitResult* getTrackFitResultFromV0DaughterParticle(const Particle* particle, const double daughterID);
-
-    /** helper function to get the helix parameters of the V0 daughter tracks*/
-    double getv0DaughterTrackParamAtIndex(const Particle* particle, const double daughterID, const int tauIndex);
-
-    /** helper function to get error of the helix parameters of the V0 daughter tracks*/
-    double getv0DaughterTrackParamErrorAtIndex(const Particle* particle, const double daughterID, const int tauIndex);
-
-    /** helper function to get pull of the helix parameters of the V0 daughter tracks with the true V0 vertex as the pivot */
-    double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
-        const int tauIndex);
 
     /** helper function to get pull of the helix parameters of the V0 daughter tracks with the origin as the pivot */
     double getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(const Particle* particle, const double daughterID,

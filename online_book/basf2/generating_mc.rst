@@ -372,6 +372,16 @@ is that the particle names are defined in the fourth column of each line (``add 
 	End
 
 
+.. admonition:: Key points
+    :class: key-points
+
+    * Producing MC samples by ourselves should be used only for running quick tests or debugging. 
+
+    * Producing MC signal samples is not a trivial task, because the correct branching fractions and decay models
+      must be used for all the final states under study. Contact the contact the `Data Production liason`_ of your 
+      physics Working Group for producing large MC signal samples in the correct way.
+
+
 .. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson

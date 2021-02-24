@@ -1221,7 +1221,7 @@ namespace Belle2 {
         } else if (index == 10 && qTarget == qMC)   // MaximumPstar
         {
           return 1.0;
-        } else if (index == Const::electron.getPDGCode() && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
+        } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
                    && mcPDG == Const::pion.getPDGCode() && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
         {
           return 1.0;

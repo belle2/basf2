@@ -24,7 +24,7 @@ Join us
 
  ..  image:: cat_hat_angry_point.jpg
 
-Hi there, thanks for completing the online book! The _Software Training & Documentation Group_
+Hi there, thanks for completing the online book! The *Software Training & Documentation Group*
 wishes you all the best for your journey in Belle II!
 
 Before you go though, please consider staying in touch with us and contributing

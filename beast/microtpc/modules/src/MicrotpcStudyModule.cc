@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Const.h>
 #include <cmath>
 #include <boost/foreach.hpp>
 
@@ -325,8 +326,8 @@ void MicrotpcStudyModule::event()
       if (PDGid == 1000080160) ORec[detNb] = true;
       if (PDGid == 1000060120) CRec[detNb] = true;
       if (PDGid == 1000020040) HeRec[detNb] = true;
-      if (PDGid == 2212) pRec[detNb] = true;
-      if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
+      if (PDGid == Const::proton.getPDGCode()) pRec[detNb] = true;
+      if (fabs(PDGid) == Const::electron.getPDGCode() || PDGid == Const::photon.getPDGCode()) xRec[detNb] = true;
 
       double edep = aHit->getEnergyDep();
       double niel = aHit->getEnergyNiel();
@@ -374,11 +375,11 @@ void MicrotpcStudyModule::event()
             h_ttvp_He[detNb]->Fill(theta, phi);
             h_tevtrl_He[detNb]->Fill(ioniz, trl);
             }
-            if (PDGid == 2212) {
+            if (PDGid == Const::proton.getPDGCode()) {
             h_ttvp_p[detNb]->Fill(theta, phi);
             h_tevtrl_p[detNb]->Fill(ioniz, trl);
             }
-            if (fabs(PDGid) == 11 || PDGid == 22) {
+            if (fabs(PDGid) == Const::electron.getPDGCode() || PDGid == Const::photon.getPDGCode()) {
             h_ttvp_x[detNb]->Fill(theta, phi);
             h_tevtrl_x[detNb]->Fill(ioniz, trl);
             }
@@ -430,11 +431,11 @@ void MicrotpcStudyModule::event()
         h_ttvp_He[i]->Fill(theta, phi);
         h_tevtrl_He[i]->Fill(ioni, trl);
       }
-      if (PDGid == 2212) {
+      if (PDGid == Const::proton.getPDGCode()) {
         h_ttvp_p[i]->Fill(theta, phi);
         h_tevtrl_p[i]->Fill(ioni, trl);
       }
-      if (fabs(PDGid) == 11 || PDGid == 22) {
+      if (fabs(PDGid) == Const::electron.getPDGCode() || PDGid == Const::photon.getPDGCode()) {
         h_ttvp_x[i]->Fill(theta, phi);
         h_tevtrl_x[i]->Fill(ioni, trl);
       }
@@ -477,7 +478,7 @@ void MicrotpcStudyModule::event()
     }
 
     // the only part that is actually used at the moment // Santelj 28.2.2019
-    if (PDG == 2112) {
+    if (PDG == Const::neutron.getPDGCode()) {
       double trlen = abs(2. / TMath::Sin(mom.Theta()));
       if (trlen > 10) trlen = 10.;
       int irecoil = 0;
@@ -493,17 +494,17 @@ void MicrotpcStudyModule::event()
     }
     //------------------------------------------------------
 
-    if (PDG == 11) partID[0] = 1; //positron
-    else if (PDG == -11) partID[1] = 1; //electron
-    else if (PDG == 22) partID[2] = 1; //photon
-    else if (PDG == 2112) partID[3] = 1; //neutron
-    else if (PDG == 2212) partID[4] = 1; //proton
+    if (PDG == Const::electron.getPDGCode()) partID[0] = 1; //positron
+    else if (PDG == -Const::electron.getPDGCode()) partID[1] = 1; //electron
+    else if (PDG == Const::photon.getPDGCode()) partID[2] = 1; //photon
+    else if (PDG == Const::neutron.getPDGCode()) partID[3] = 1; //neutron
+    else if (PDG == Const::proton.getPDGCode()) partID[4] = 1; //proton
     else if (PDG == 1000080160) partID[5] = 1; // O
     else if (PDG == 1000060120) partID[6] = 1; // C
     else if (PDG == 1000020040) partID[7] = 1; // He
     else partID[8] = 1;
 
-    if (PDG == 2112) {
+    if (PDG == Const::neutron.getPDGCode()) {
 
       if (r < 10.0) {
         h_mctpc_kinetic[9]->Fill(detNb, kin);

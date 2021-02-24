@@ -415,7 +415,7 @@ void SVDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
+  if (m_currentHit->getPDGcode() == Const::photon.getPDGCode() || trackLength < 0.1 * Unit::um) {
     //Photons deposit energy at the end of their step
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::electron);
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::hole);

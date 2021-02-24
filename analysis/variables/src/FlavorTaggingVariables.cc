@@ -133,8 +133,8 @@ namespace Belle2 {
 
     double lambdaFlavor(const Particle* particle)
     {
-      if (particle->getPDGCode() == 3122) return 1.0; //Lambda0
-      else if (particle->getPDGCode() == -3122) return -1.0; //Anti-Lambda0
+      if (particle->getPDGCode() == Const::Lambda.getPDGCode()) return 1.0; //Lambda0
+      else if (particle->getPDGCode() == Const::antiLambda.getPDGCode()) return -1.0; //Anti-Lambda0
       else return 0.0;
     }
 
@@ -142,7 +142,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return 0.0;
-      return (abs(mcparticle->getPDG()) == 3122);
+      return (abs(mcparticle->getPDG()) == Const::Lambda.getPDGCode());
     }
 
     double lambdaZError(const Particle* particle)
@@ -924,56 +924,56 @@ namespace Belle2 {
 
         //direct electron
         if (index == 0
-            && mcPDG == 11
+            && mcPDG == Const::electron.getPDGCode()
             && mothersPDG[0] == 511)
         {
           return 1.0;
           //intermediate electron
         } else if (index == 1
-                   && mcPDG == 11 && mothersPDG.size() > 1
+                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //direct muon
         } else if (index == 2
-                   && mcPDG == 13 && mothersPDG[0] == 511)
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
           //intermediate muon
         } else if (index == 3
-                   && mcPDG == 13 && mothersPDG.size() > 1
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //KinLepton
         } else if (index == 4
-                   && (mcPDG == 13 || mcPDG == 11) && mothersPDG[0] == 511)
+                   && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1.0;
           //IntermediateKinLepton
         } else if (index == 5
-                   && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1
+                   && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //kaon
         } else if (index == 6
-                   && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1.0;
           //slow pion
         } else if (index == 7
-                   && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
+                   && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1.0;
           //high momentum hadrons
         } else if (index == 8
-                   && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                        && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1.0;
           //lambdas
-        } else if (index == 9 && mcPDG == 3122 && isCharmedBaryonInChain == true)
+        } else if (index == 9 && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1.0;
         } else return 0.0;
@@ -1128,7 +1128,7 @@ namespace Belle2 {
               const MCParticle* mcSlowPion = targetSlowPion ->getMCParticle();
               //               SlowPion_q = targetSlowPion -> getCharge();
               if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
-                  && abs(mcSlowPion->getPDG()) == 211 && abs(mcSlowPion->getMother()->getPDG()) == 413) {
+                  && abs(mcSlowPion->getPDG()) == Const::pion.getPDGCode() && abs(mcSlowPion->getMother()->getPDG()) == 413) {
                 mcSlowPionMother = mcSlowPion->getMother();
               }
             }
@@ -1175,58 +1175,58 @@ namespace Belle2 {
 
         // ------------------------------  Outputs  -----------------------------------
         if (index == 0 // Electron
-            && qTarget == qMC && mcPDG == 11 && mothersPDG[0] == 511)
+            && qTarget == qMC && mcPDG == Const::electron.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
         } else if (index == 1 // IntermediateElectron
-                   && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1
+                   && qTarget != qMC && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 2 // Muon
-                   && qTarget == qMC && mcPDG == 13 && mothersPDG[0] == 511)
+                   && qTarget == qMC && mcPDG == Const::muon.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
         } else if (index == 3 // IntermediateMuon
-                   && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1
+                   && qTarget != qMC && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
         }  else if (index == 4 // KinLepton
-                    && qTarget == qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG[0] == 511)
+                    && qTarget == qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1.0;
         }  else if (index == 5 // IntermediateKinLepton
-                    && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1
+                    && qTarget != qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG.size() > 1
                     && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 6 && qTarget == qMC // Kaon
-                   && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1.0;
         } else if (index == 7 && qTarget != qMC // SlowPion
-                   && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
+                   && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1.0;
         } else if (index == 8 && qTarget == qMC // FastHadron
-                   && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                        && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1.0;
         } else if (index == 9  && qTarget == qMC // KaonPion
-                   && mcPDG == 321 && haveKaonPionSameMother == true)
+                   && mcPDG == Const::kaon.getPDGCode() && haveKaonPionSameMother == true)
         {
           return 1.0;
         } else if (index == 10 && qTarget == qMC)   // MaximumPstar
         {
           return 1.0;
-        } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
-                   && mcPDG == 211 && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
+        } else if (index == Const::electron.getPDGCode() && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
+                   && mcPDG == Const::pion.getPDGCode() && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 12 && (particle->getPDGCode() / abs(particle->getPDGCode())) != qMC // Lambda
-                   && mcPDG == 3122 && isCharmedBaryonInChain == true)
+                   && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1.0;
         } else {

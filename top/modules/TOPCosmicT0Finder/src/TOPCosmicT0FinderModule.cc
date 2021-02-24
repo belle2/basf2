@@ -123,7 +123,7 @@ namespace Belle2 {
       const auto extHits = track.getRelationsWith<ExtHit>();
       const ExtHit* extHit0 = 0;
       for (const auto& extHit : extHits) {
-        if (abs(extHit.getPdgCode()) != 13) continue;
+        if (abs(extHit.getPdgCode()) != Const::muon.getPDGCode()) continue;
         if (extHit.getDetectorID() != Const::EDetector::TOP) continue;
         double dot = extHit.getPosition() * extHit.getMomentum();
         if (m_useIncomingTrack) {

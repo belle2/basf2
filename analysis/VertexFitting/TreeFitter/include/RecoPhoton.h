@@ -83,6 +83,8 @@ namespace TreeFitter {
     /**  another random index */
     int m_i3;
 
+    /** scale the momentum / energy by this correction factor */
+    const float m_momentumScalingFactor;
   };
 
 }

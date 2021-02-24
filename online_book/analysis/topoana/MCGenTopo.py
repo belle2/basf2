@@ -14,5 +14,5 @@ variablesToNtuple('', mc_gen_topo(200), 'MCGenTopo', 'MCGenTopo.root', path=mypa
 # Process the events
 basf2.process(mypath)
 
-# print out the summary
+# Print out the summary
 print(basf2.statistics)

@@ -1,6 +1,6 @@
-.. _onlinebook_how_to_contribute:
-
 Why contribute? Read our propaganda at :doc:`/online_book/contribute`.
+
+.. _onlinebook_how_to_contribute:
 
 How to contribute
 =================
@@ -13,9 +13,6 @@ How to contribute
     or per email. You can either assign the JIRA ticket to someone you like or submit a pull request for it yourself (preferred).
   * If it is already marked as a todo item, check if someone else is working on it (search on JIRA) and if not,
     submit a pull request
-
-Technical side
-==============
 
 Understanding Sphinx and RST
 ----------------------------

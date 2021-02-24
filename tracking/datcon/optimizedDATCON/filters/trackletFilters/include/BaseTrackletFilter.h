@@ -10,9 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   /// Base filter for hits stored in the HitData
-  using BaseThreeHitFilter = TrackFindingCDC::Filter<std::tuple<const HitData*, const HitData*, const HitData*>>;
+  using BaseTrackletFilter = TrackFindingCDC::Filter<SpacePointTrackCand>;
 }

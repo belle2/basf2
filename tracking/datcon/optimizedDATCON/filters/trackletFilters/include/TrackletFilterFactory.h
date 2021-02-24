@@ -9,25 +9,24 @@
  **************************************************************************/
 #pragma once
 
-// #include <tracking/datcon/optimizedDATCON/filters/hitCombinations/BaseThreeHitFilter.h>
-#include <tracking/datcon/optimizedDATCON/filters/hitCombinations/BaseHitCombinationFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/trackletFilters/BaseTrackletFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class ThreeHitFilterFactory : public TrackFindingCDC::FilterFactory<BaseThreeHitFilter> {
+  class TrackletFilterFactory : public TrackFindingCDC::FilterFactory<BaseTrackletFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseThreeHitFilter>;
+    using Super = TrackFindingCDC::FilterFactory<BaseTrackletFilter>;
 
   public:
     /// Constructor forwarding the default filter name
-    explicit ThreeHitFilterFactory(const std::string& defaultFilterName = "all");
+    explicit TrackletFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
-    ~ThreeHitFilterFactory();
+    ~TrackletFilterFactory();
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;
@@ -39,6 +38,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<BaseThreeHitFilter> create(const std::string& filterName) const override;
+    std::unique_ptr<BaseTrackletFilter> create(const std::string& filterName) const override;
   };
 }

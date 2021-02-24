@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/filters/hitCombinations/twoHitVariables.h>
+#include <tracking/datcon/optimizedDATCON/filters/twoHitFilters/TwoHitVariables.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.>
 
@@ -100,6 +100,7 @@ namespace Belle2 {
     double b2 = cHit.Y() + outY * 0.5 - (iHit.Y() + inY * 0.5);
 
 //       if (a11 * a22 == a12 * a21) { throw Straight_Line(); }
+//     if (a11 * a22 == a12 * a21) { return B2Vector3D(1e30, 1e30, 1e30); }
     if (a11 * a22 == a12 * a21) { return NAN; }
 
     double s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero if the three hits are on a line in (x,y).
@@ -111,12 +112,13 @@ namespace Belle2 {
   /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
   double getCircleDistanceIP(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
-    B2Vector3D cCenter = getCircleCenterXY(oHit, cHit, iHit);
-    double circleRadius = calcAvgDistanceXY(oHit, cHit, iHit, cCenter);
+    B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
+    double circleRadius = calcAvgDistanceXY(oHit, cHit, iHit, circleCenter);
 
     // distance of closest approach of circle to the IP :
     // WARNING only valid for IP=0,0,X
-    return (fabs(cCenter.Perp() - circleRadius));
+    return (fabs(circleCenter.Perp() - circleRadius));
   } // return unit: cm
 
 
@@ -124,6 +126,7 @@ namespace Belle2 {
   double getCircleRadius(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
     B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
     return calcAvgDistanceXY(oHit, cHit, iHit, circleCenter);
   } // return unit: cm
 
@@ -169,6 +172,7 @@ namespace Belle2 {
   double getDeltaSlopeZoverS(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
     B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
     double circleRadius = calcAvgDistanceXY(oHit, cHit, iHit, cCenter);
     B2Vector3D vecOuter2cC  = oHit - circleCenter;
     B2Vector3D vecCenter2cC = cHit - circleCenter;
@@ -191,6 +195,7 @@ namespace Belle2 {
   double getDeltaSoverZ(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
     B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
     B2Vector3D vecOuter2cC  = oHit - circleCenter;
     B2Vector3D vecCenter2cC = cHit - circleCenter;
     B2Vector3D vecInner2cC  = iHit - circleCenter;
@@ -213,6 +218,7 @@ namespace Belle2 {
   double performHelixParamterFit(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
     B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
 
     B2Vector3D vecOuter2cC  = oHit - circleCenter;
     B2Vector3D vecCenter2cC = cHit - circleCenter;
@@ -231,13 +237,13 @@ namespace Belle2 {
   /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
   double getSimplePTEstimate(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
-//       B2Vector3D circleCenter = CircleCenterXY<B2Vector3D>::value(oHit, cHit, iHit);
-//       double circleRadius = CircleRadius<B2Vector3D>::calcAvgDistanceXY(oHit, cHit, iHit, circleCenter);
     B2Vector3D circleCenter = getCircleCenterXY(oHit, cHit, iHit);
+    if (std::isnan(circleCenter)) return NAN;
     double circleRadius = calcAvgDistanceXY(oHit, cHit, iHit, circleCenter);
 
     // 0.3 * B * R, but with R in cm instead of m -> (0.3 -> 0.003)
-    return circleRadius * 0.00299792458 * 1.5;
+    // 0.00299792458 * 1.5 = 0.00449688687
+    return 0.00449688687 * circleRadius;
   } // return unit: GeV/c
 
 
@@ -245,11 +251,11 @@ namespace Belle2 {
   * a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
   * 0 means that it is exactly straight or that two hits are identical.
   * first vector should be outer hit, second = center hit, third is inner hit. */
-  int getCurvatureSign(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c)
+  int getCurvatureSign(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
   {
     using boost::math::sign;
-    B2Vector3D ba(a.X() - b.X(), a.Y() - b.Y(), 0.0);
-    B2Vector3D bc(b.X() - c.X(), b.Y() - c.Y(), 0.0);
+    B2Vector3D ba(oHit.X() - cHit.X(), oHit.Y() - cHit.Y(), 0.0);
+    B2Vector3D bc(cHit.X() - iHit.X(), cHit.Y() - iHit.Y(), 0.0);
     return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
   }
 }

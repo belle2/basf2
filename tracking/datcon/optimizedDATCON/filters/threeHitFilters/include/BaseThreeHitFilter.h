@@ -9,10 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/filters/hitCombinations/ThreeHitFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 namespace Belle2 {
-  /// A chooseable filter for picking out the relations between states
-  using ChooseableHitCombinationnFilter = TrackFindingCDC::ChooseableFilter<ThreeHitFilterFactory>;
+  /// Base filter for hits stored in the HitData
+  using BaseThreeHitFilter = TrackFindingCDC::Filter<std::array<const HitData*, 3>>;
 }

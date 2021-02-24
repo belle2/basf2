@@ -41,6 +41,8 @@ this is one of the duty of the Data Production group.
 Each physics Working Group has a dedicated person (the `Data Production liason`_) to assist the analysers
 and to collect their requests concerning the MC production.
 
+.. _Data production liason: https://confluence.desy.de/display/BI/Data+production+WebHome
+
 There are several reasons for discouraging the self-production of very large MC samples:
 
 * our own-generated MC sample may use an inconsistent version of the software (or conditions database, beam
@@ -81,8 +83,6 @@ detector simulation, or we want to test the efficiency of a new trigger line, an
 
    Don't generate larger samples yourself, contact the `Data Production liason`_ of your physics Working Group
    if you need a large production of MC signal samples!
-
-.. _Data production liason: https://confluence.desy.de/display/BI/Data+production+WebHome
 
 
 Main steps for the MC production
@@ -298,7 +298,7 @@ Looking at this simple decay file, it is not difficult to understand its structu
 .. warning::
 
    It may be complicated figuring out which decay model you have to use for a specific decay channel. You can
-   always refer to our `main decay file`_ or, even better, you can contact the `Data Production liasons`_ of your
+   always refer to our `main decay file`_ or, even better, you can contact the `Data Production liason`_ of your
    physics working group.
 
 
@@ -344,7 +344,7 @@ is that the particle names are defined in the fourth column of each line (``add 
      :class: toggle xhint stacked
 
      Have a look to the `evt.pdl`_ file to identify the names to be used for :math:`\phi`, :math:`K^+`
-     and :math:`pi^0`.
+     and :math:`\pi^0`.
 
 .. admonition:: Solution
      :class: toggle solution

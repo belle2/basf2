@@ -57,7 +57,7 @@ var1 = ['M',
 
 ma.variablesToNtuple(decayString='gamma:sel',
                      variables=var1,
-                     filename='gamma_{}.root'.format(test),
+                     filename=f'gamma_{test}.root',
                      path=my_path)
 
 # process the events

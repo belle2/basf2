@@ -45,7 +45,7 @@ def make_3D_bin(bin_x, bin_y, bin_z):
 #  1-2| 1 | 3 | 5 |
 #     -------------
 
-weightsDB = '/nfs/dust/belle2/user/kovalch/energyBiasCorrFiles/PhotonEnergyBiasCorrection_Feb2021.txt'
+weightsDB = '/nfs/dust/belle2/user/kovalch/energyBiasCorrFiles/Feb2021.txt'
 df_weightDB = pd.read_csv(weightsDB, delimiter=r"\s+")
 
 bins_x = []
@@ -73,20 +73,20 @@ outOfRangeWeightInfo["StatErr"] = -1
 addtable = b2.register_module('ParticleWeightingLookUpCreator')
 addtable.param('tableIDSpec', tableIDSpec)
 addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
-addtable.param('experimentHigh', 1000)
+addtable.param('experimentHigh', -1)
 addtable.param('experimentLow', 0)
-addtable.param('runHigh', 1000)
+addtable.param('runHigh', -1)
 addtable.param('runLow', 0)
-addtable.param('tableName', "PhotonEnergyBiasCorrection_Feb2021:TestEnergy")
+addtable.param('tableName', "Feb2021:TestEnergy")
 
 addtable2 = b2.register_module('ParticleWeightingLookUpCreator')
 addtable2.param('tableIDNotSpec', tableIDNotSpec)
 addtable2.param('outOfRangeWeight', outOfRangeWeightInfo)
-addtable2.param('experimentHigh', 1000)
+addtable2.param('experimentHigh', -1)
 addtable2.param('experimentLow', 0)
-addtable2.param('runHigh', 1000)
+addtable2.param('runHigh', -1)
 addtable2.param('runLow', 0)
-addtable2.param('tableName', "PhotonEnergyBiasCorrection_Feb2021:TestEnergy2")
+addtable2.param('tableName', "Feb2021:TestEnergy2")
 
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])

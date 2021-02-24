@@ -3216,7 +3216,7 @@ def scaleError(outputListName, inputListName,
 
 def energyBiasCorrection(inputListNames, tableName, path=None):
     """
-    Scale enrgy of the particles according to the scaling factor.
+    Scale energy of the particles according to the scaling factor.
     If the particle list contains composite particles, the energy of the daughters are scaled.
     Subsequently, the energy of the mother particle is updated as well.
 

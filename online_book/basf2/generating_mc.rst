@@ -187,6 +187,13 @@ Now we have to add to the steering path the relevant functions for:
         :lines: 1-35
 
 
+.. tip::
+
+   To monitor the status of the script execution, it is advisable to add to the steering path the 
+   `Progress` module. It periodically prints a message on the screen about the number of processed events. 
+   You can add it wherever you like between ``main.add_module('EventInfoSetter')`` and ``b2.process(path=main)``.
+
+
 .. warning::
 
    Do not try to generate a large sample: it will take a lot of time! For the exercise, limit the number

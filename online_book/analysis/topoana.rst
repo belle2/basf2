@@ -738,3 +738,9 @@ setting items in the quick-start tutorial or the user guide we introduce in
 
    * See Section 5.3 in the user guide for the description of other similar
      setting items.
+
+.. include:: ../lesson_footer.rstinclude
+
+.. topic:: Author(s) of this lesson
+
+   Xing-Yu Zhou

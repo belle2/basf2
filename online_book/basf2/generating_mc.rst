@@ -28,7 +28,7 @@ Generating Montecarlo
 Why do we need Montecarlo simulated data?
 -----------------------------------------
 
-Montecarlo (MC) data are widely used in High Energy Physics. MC simulations allow us to mimic what happens in the
+Monte Carlo (MC) data are widely used in High Energy Physics. MC simulations allow us to mimic what happens in the
 Belle II detector after the collisions to understand the experimental conditions and performance. MC data
 are processed as real data in both reconstruction and physics analyses, with the advantage that we know the "truth"
 (e.g. if a track observed in the CDC was originated by a muon or a pion). The more realistic the MC simulation,
@@ -122,7 +122,7 @@ As usual, one has to start by importing ``basf2`` and creating a main path.
    main = b2.Path()
 
 
-Then, the first module to be added to the main path *must* be `EventInfoSetter`. This module is necessary for 
+Then, the first module to be added to the main path **must** be `EventInfoSetter`. This module is necessary for 
 correctly setting some of the production parameters, like the number of events to be produced or the experiment 
 number.
 
@@ -235,7 +235,7 @@ How to generate a signal MC sample and the decay files
 ------------------------------------------------------
 
 In the last exercise we learnt how to generate a generic :math:`B^0 \bar{B}^0` event. Probably you are wondering
-where the decay channels of the :math:`B^0` / :math:`\bar{B}^0`) and the respective branching fractions are defined,
+where the decay channels of the :math:`B^0` / :math:`\bar{B}^0` and the respective branching fractions are defined,
 or if it possible to specify one or few specific decay channels for the generated particles.
 
 All the known decay channels of the generated :math:`B^0` and :math:`\bar{B}^0` mesons are defined in our
@@ -303,6 +303,14 @@ Looking at this simple decay file, it is not difficult to understand its structu
 
 
 .. warning::
+ 
+   This particular decay file will produce two signal particles per event. Usually, for a signal sample we want to 
+   generate one "signal particle" (namely: one particle decaying following exactly your signal decay file) and one 
+   "generic particle" (one particle whose decay is instead driven by the `main decay file`_). This can be achieved
+   by using "particle aliases" in the decay file. This is documented in the `EvtGen generator`_ website.
+
+
+.. warning::
 
    It may be complicated figuring out which decay model you have to use for a specific decay channel. You can
    always refer to our `main decay file`_ or, even better, you can contact the `Data Production liason`_ of your
@@ -310,11 +318,29 @@ Looking at this simple decay file, it is not difficult to understand its structu
 
 
 Probably you are also wondering where all the particle names are defined (while for ``B0`` and ``mu+`` the naming
-scheme is quite obvious, this is not the same for ``K_S0``). These names are defined in the `evt.pdl`_ file.
-Unfortunately this file is a bit complicated to fully understand at this stage, but the most important thing to note 
-is that the particle names are defined in the fourth column of each line (``add particle P name``).
+scheme is quite obvious, this is not the same for ``K_S0``). These names are defined in the `evt.pdl`_ file, but
+luckily you do not have to go through it, because we have a dedicated tool that parses the file and allows you to
+easily get all the relevant information: `b2help-particles`.
 
 .. _evt.pdl: https://stash.desy.de/projects/B2/repos/software/browse/framework/particledb/data/evt.pdl
+
+.. admonition:: Question
+     :class: exercise stacked
+
+     Before moving on... how many particles having a mass between :math:`3.0\;\text{GeV/c}^2` and 
+     :math:`3.6\;\text{GeV/c}^2` are defined in the `evt.pdf`_ file?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Can you use `b2help-particles` for this?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     Running ``b2help-particles --min 3.0 --max 3.6`` shows that there are 7 particles in this particular mass range:
+     :math:`J/\Psi`, :math:`\Xi_{cc}^+`, :math:`\bar{\Xi}_{cc}^+` :math:`\chi_{c0}`, :math:`\chi_{c1}`, 
+     :math:`\chi_{c2}` and :math:`h_c`.
 
 
 .. admonition:: Question
@@ -350,8 +376,10 @@ is that the particle names are defined in the fourth column of each line (``add 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Have a look to the `evt.pdl`_ file to identify the names to be used for :math:`\phi`, :math:`K^+`
-     and :math:`\pi^0`.
+     Use `b2help-particles` to identify the names to be used for :math:`\phi`, :math:`K^+` and :math:`\pi^0`.
+     Probably you want to check their `PDG codes`_ if you do not remember them...
+
+.. _PDG codes: https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
 
 .. admonition:: Solution
      :class: toggle solution

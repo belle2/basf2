@@ -56,9 +56,9 @@ namespace Belle2 {
     {
       H* returnValue = m_defaultHistogram;
       try {
-        auto layer = m_histograms.at(vxdID.getLayerNumber());
-        auto ladder = layer.at(vxdID.getLadderNumber());
-        auto sensor = ladder.at(vxdID.getSensorNumber());
+        auto& layer = m_histograms.at(vxdID.getLayerNumber());
+        auto& ladder = layer.at(vxdID.getLadderNumber());
+        auto& sensor = ladder.at(vxdID.getSensorNumber());
         returnValue = sensor.at(view);
       } catch (...) {
         B2WARNING("Unexpected VxdID /view. VxdID: " << (std::string)(vxdID)
@@ -106,10 +106,10 @@ namespace Belle2 {
     void clean()
     {
 
-      for (auto layer : m_histograms)
-        for (auto ladder : layer)
-          for (auto sensor : ladder)
-            for (auto view : sensor)
+      for (auto& layer : m_histograms)
+        for (auto& ladder : layer)
+          for (auto& sensor : ladder)
+            for (auto& view : sensor)
               delete view;
     }
 

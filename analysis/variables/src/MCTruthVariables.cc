@@ -868,6 +868,41 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
+    double isBBCrossfeed(const Particle* particle)
+    {
+      if (particle == nullptr)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      int nDaughters = int(particle->getNDaughters());
+      int mother_ids[nDaughters];
+      printf("New Particle with %i daughters\n", nDaughters);
+      for (int j = 0; j < nDaughters; ++j) {
+        const MCParticle* curMCParticle = particle->getDaughter(j)->getMCParticle();
+        while (curMCParticle != nullptr) {
+          int m_pdg = curMCParticle->getPDG();
+          printf("m_pdg %i in daughter %i \n", m_pdg, j);
+          if (abs(m_pdg) == 521 || abs(m_pdg) == 511) {
+            mother_ids[j] = curMCParticle->getArrayIndex();
+            break;
+          }
+          const MCParticle* curMCMother = curMCParticle->getMother();
+          curMCParticle = curMCMother;
+          printf("mothered \n");
+        }
+        if (curMCParticle == nullptr) {
+          printf("Dead particle \n");
+          return -4;//std::numeric_limits<float>::quiet_NaN();
+        }
+      }
+
+      printf("Checking for Crossfeed \n");
+      for (int j = 1; j < nDaughters; ++j) {
+        if (mother_ids[j] != mother_ids[0])
+          return 1;
+      }
+      return 0;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -892,7 +927,8 @@ namespace Belle2 {
     // genMotherPDG and genMotherID are overloaded (each are two C++ functions
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
-
+    REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
+                      "Check whether there is Crossfeed in the reconstruction of a B meson");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,

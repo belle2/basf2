@@ -863,9 +863,12 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin();
        genIterator != genMgr.end(); ++genIterator) {
     Belle::Gen_hepevt hep = *genIterator;
+    // Select particles without mother.
     if (!(hep.moFirst() == 0 && hep.moLast() == 0))
       continue;
-    // Particle has no mother, put the particle in the graph.
+    // Ignore particles with code 911, they are used for CDC data.
+    if (hep.idhep() == 911)
+      continue;
     int position = m_particleGraph.size();
     m_particleGraph.addParticle();
     genHepevtToMCParticle[hep.get_ID()] = position;
@@ -1749,7 +1752,8 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 
   // TODO: do not change 911 to 22
   if (idHep == 0 || idHep == 911) {
-    B2WARNING("[B2BIIConvertMdstModule] Trying to convert Gen_hepevt with idhep = " << idHep << ". This should enver happen.");
+    B2WARNING("Trying to convert Gen_hepevt with idhep = " << idHep <<
+              ". This should never happen.");
     mcParticle->setPDG(22);
   } else {
     mcParticle->setPDG(idHep);

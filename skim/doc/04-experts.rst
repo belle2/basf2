@@ -74,7 +74,7 @@ With all of these steps followed, you will now be able to run your skim using th
 
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
-10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+10. Define validation histograms for your skim by overriding the method ``validation_histograms``, and running `b2skim-generate-validation<b2skim-generate-validation>` to auto-generate a steering file in the skim validation directory. Please see the source code of various skims for examples of the ``validation_histograms`` method.
 
 
 .. _skim-steering-file:
@@ -195,6 +195,19 @@ In the skim package, there are command-line tools available for running skims, d
    :prog: b2skim-generate
    :nodefaultconst:
    :nogroupsections:
+
+.. _b2skim-generate-validation:
+
+``b2skim-generate-validation``: Generate skim validation scripts
+................................................................
+
+.. argparse::
+   :filename: skim/tools/b2skim-generate-validation
+   :func: get_argument_parser
+   :prog: b2skim-generate-validation
+   :nodefaultconst:
+   :nogroupsections:
+
 
 Skim tutorial
 ~~~~~~~~~~~~~

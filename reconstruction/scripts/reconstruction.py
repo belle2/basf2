@@ -14,7 +14,7 @@ from rawdata import add_unpackers
 
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
-from tracking import (  # noqa
+from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
@@ -102,7 +102,7 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
                                  event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
-    Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
+    Consists of essential tracking and the functionality provided by :func:`add_posttracking_reconstruction()`.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.

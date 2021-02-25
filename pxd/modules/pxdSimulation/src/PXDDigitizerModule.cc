@@ -15,6 +15,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -392,7 +393,7 @@ void PXDDigitizerModule::processHit()
   // Set magnetic field to save calls to getBField()
   m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength2 <= 0.01 * Unit::um * Unit::um) {
+  if (m_currentHit->getPDGcode() == Const::photon.getPDGCode() || trackLength2 <= 0.01 * Unit::um * Unit::um) {
     //Photons deposit the energy at the end of their step
     driftCharge(stopPoint, m_currentHit->getElectrons());
   } else {

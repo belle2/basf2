@@ -683,7 +683,7 @@ and explanations on the code structure.
     * FEI Purity and efficiency are controlled by a cut on ``extraInfo(SignalProbability)``
     * The B\ :sub:`tag` from the FEI can be used to construct a complete ϒ(4S) event.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

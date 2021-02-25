@@ -27,6 +27,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 // utility
 #include <analysis/utility/ReferenceFrame.h>
@@ -1650,7 +1651,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
           int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-          if (absPDG == 11 || absPDG == 13 || absPDG == 15) {
+          if (absPDG == Const::electron.getPDGCode() || absPDG == Const::muon.getPDGCode() || absPDG == 15) {
             pLep = particle->getDaughter(i)->get4Vector();
             break;
           }

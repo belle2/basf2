@@ -1110,11 +1110,10 @@ def reconstructDecay(decayString,
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is reconstructed as well
     (meaning that the charge conjugated mother list is created as well) but this can be deactivated.
 
-    One can use an ``@``-sign to mark a particle as unspecified, e.g. in form of a DecayString: :code:`\@Xsd -> K+ pi-`. If the
-    particle is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into
-    the correct daughters will be flagged as correct. For example the DecayString :code:`\@Xsd -> K+ pi-` would match all particles
-    which decay into a kaon and a pion, for example :math:`K^*`, :math:`B^0`, :math:`D^0`. Still the daughters need to be stated
-    correctly so this can be used for "sum of exclusive" decays.
+    One can use an ``@``-sign to mark a particle as unspecified for inclusive analyses,
+    e.g. in a DecayString: :code:`'@Xsd -> K+ pi-'`.
+
+    .. seealso:: :ref:`Marker_of_unspecified_particle`
 
     .. warning::
         The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
@@ -1967,7 +1966,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
@@ -2779,7 +2778,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
                 applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)

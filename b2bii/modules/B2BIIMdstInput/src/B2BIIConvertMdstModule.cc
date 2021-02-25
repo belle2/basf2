@@ -1754,7 +1754,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
   if (idHep == 0 || idHep == 911) {
     B2WARNING("Trying to convert Gen_hepevt with idhep = " << idHep <<
               ". This should never happen.");
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
   } else {
     mcParticle->setPDG(idHep);
   }

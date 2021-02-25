@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <utility>
 #include <map>
@@ -132,8 +133,8 @@ namespace VXDTFObserversTest {
         newSP->addRelationTo(pxdCluster);
       }
 
-      mcParticleData[0]->setPDG(11);
-      mcParticleData[1]->setPDG(13);
+      mcParticleData[0]->setPDG(Const::electron.getPDGCode());
+      mcParticleData[1]->setPDG(Const::muon.getPDGCode());
       mcParticleData[1]->addStatus(MCParticle::c_PrimaryParticle);
 
 

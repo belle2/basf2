@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework utilities
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // analysis dataobjects
@@ -334,7 +335,7 @@ namespace Belle2 {
       B2DEBUG(17, "ParticleKinematicFitterModule: adding a particle to the fitter!");
 
       if (m_add3CPhoton && index == 0) {
-        if (particle -> getPDGCode() != 22) {
+        if (particle -> getPDGCode() != Const::photon.getPDGCode()) {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 

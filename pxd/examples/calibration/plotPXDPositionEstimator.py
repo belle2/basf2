@@ -237,7 +237,6 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
         # Read corrections data
         offsetMap = shape_classifier.getOffsetMap()
         likelyhoodMap = shape_classifier.getLikelyhoodMap()
-        shapeLikelyhoodMap = shape_classifier.getShapeLikelyhoodMap()
 
         # Some counters
         nCorrections = 0
@@ -247,7 +246,6 @@ class PlotClusterPositionEstimatorPayload(b2.Module):
         for item in offsetMap:
             shape_index = item.first
             offsets_array = item.second
-            shape_likelyhood = shapeLikelyhoodMap[shape_index]
 
             nShapes += 1
 

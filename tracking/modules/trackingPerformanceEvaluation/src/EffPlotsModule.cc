@@ -15,6 +15,8 @@
 
 #include <framework/geometry/BFieldManager.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
@@ -533,10 +535,10 @@ void EffPlotsModule::event()
 
       std::vector< MCParticle* > MCPart_dau = mcParticle.getDaughters();
 
-      if (abs(MCPart_dau[0]->getPDG()) == 211 && abs(MCPart_dau[1]->getPDG()) == 2212) {
+      if (abs(MCPart_dau[0]->getPDG()) == Const::pion.getPDGCode() && abs(MCPart_dau[1]->getPDG()) == Const::proton.getPDGCode()) {
         mc_dau0 = MCPart_dau[0];
         mc_dau1 = MCPart_dau[1];
-      } else if (abs(MCPart_dau[0]->getPDG()) == 2212 && abs(MCPart_dau[1]->getPDG()) == 211) {
+      } else if (abs(MCPart_dau[0]->getPDG()) == Const::proton.getPDGCode() && abs(MCPart_dau[1]->getPDG()) == Const::pion.getPDGCode()) {
         mc_dau0 = MCPart_dau[1];
         mc_dau1 = MCPart_dau[0];
       } else B2INFO("Lambda daughters != pi & p");
@@ -548,10 +550,10 @@ void EffPlotsModule::event()
 
       std::vector< MCParticle* > MCPart_dau = mcParticle.getDaughters();
 
-      if (MCPart_dau[0]->getPDG() == 211 && MCPart_dau[1]->getPDG() == -211) {
+      if (MCPart_dau[0]->getPDG() == Const::pion.getPDGCode() && MCPart_dau[1]->getPDG() == -Const::pion.getPDGCode()) {
         mc_dau0 = MCPart_dau[0];
         mc_dau1 = MCPart_dau[1];
-      } else if (MCPart_dau[0]->getPDG() == -211 && MCPart_dau[1]->getPDG() == 211) {
+      } else if (MCPart_dau[0]->getPDG() == -Const::pion.getPDGCode() && MCPart_dau[1]->getPDG() == Const::pion.getPDGCode()) {
         mc_dau0 = MCPart_dau[1];
         mc_dau1 = MCPart_dau[0];
       } else B2INFO("Ks daughters != pi+ & pi-");
@@ -1268,14 +1270,16 @@ bool EffPlotsModule::isK_Short(const MCParticle& the_mcParticle)
 {
 
   bool isK_S0 = false;
-  if (abs(the_mcParticle.getPDG()) == 310)
+  if (abs(the_mcParticle.getPDG()) == Const::Kshort.getPDGCode())
     isK_S0 = true;
 
   bool twoChargedProngs = false;
 
   if (the_mcParticle.getDaughters().size() == 2 &&
-      ((the_mcParticle.getDaughters()[0]->getPDG() == 211 && the_mcParticle.getDaughters()[1]->getPDG() == -211) ||
-       (the_mcParticle.getDaughters()[0]->getPDG() == -211 && the_mcParticle.getDaughters()[1]->getPDG() == 211)))
+      ((the_mcParticle.getDaughters()[0]->getPDG() == Const::pion.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == -Const::pion.getPDGCode()) ||
+       (the_mcParticle.getDaughters()[0]->getPDG() == -Const::pion.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == Const::pion.getPDGCode())))
     twoChargedProngs = true;
 
   return (isK_S0 && twoChargedProngs);
@@ -1286,16 +1290,20 @@ bool EffPlotsModule::isLambda0(const MCParticle& the_mcParticle)
 {
 
   bool isLambda = false;
-  if (abs(the_mcParticle.getPDG()) == 3122)
+  if (abs(the_mcParticle.getPDG()) == Const::Lambda.getPDGCode())
     isLambda = true;
 
   bool twoChargedProngs = false;
 
   if (the_mcParticle.getDaughters().size() == 2 &&
-      ((the_mcParticle.getDaughters()[0]->getPDG() == 211 && the_mcParticle.getDaughters()[1]->getPDG() == -2212) ||
-       (the_mcParticle.getDaughters()[0]->getPDG() == -211 && the_mcParticle.getDaughters()[1]->getPDG() == 2212) ||
-       (the_mcParticle.getDaughters()[0]->getPDG() == 2212 && the_mcParticle.getDaughters()[1]->getPDG() == -211) ||
-       (the_mcParticle.getDaughters()[0]->getPDG() == -2212 && the_mcParticle.getDaughters()[1]->getPDG() == 211)))
+      ((the_mcParticle.getDaughters()[0]->getPDG() == Const::pion.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == -Const::proton.getPDGCode()) ||
+       (the_mcParticle.getDaughters()[0]->getPDG() == -Const::pion.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == Const::proton.getPDGCode()) ||
+       (the_mcParticle.getDaughters()[0]->getPDG() == Const::proton.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == -Const::pion.getPDGCode()) ||
+       (the_mcParticle.getDaughters()[0]->getPDG() == -Const::proton.getPDGCode()
+        && the_mcParticle.getDaughters()[1]->getPDG() == Const::pion.getPDGCode())))
     twoChargedProngs = true;
 
   return (isLambda && twoChargedProngs);

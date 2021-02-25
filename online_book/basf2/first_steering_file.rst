@@ -1010,7 +1010,7 @@ or `matchedMC`.
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

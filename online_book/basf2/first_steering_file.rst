@@ -155,7 +155,7 @@ former.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
-files. They should be available on in the
+files. They should be available in the
 ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, DESY and
 other servers.
 
@@ -199,7 +199,7 @@ other servers.
     Alternatively, you can first navigate to the directory with ``cd`` and then
     just call ``ls`` without any arguments.
 
-    There are each 100 files with and without beam background (BGx1 and BGx0).
+    There are each 10 files with and without beam background (BGx1 and BGx0).
     Their names only differ by the final suffix, which is an integer between 0
     and 9.
 

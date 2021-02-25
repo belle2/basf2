@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni, Giulia Casarosa                         *
+ * Contributors: Eugenio Paoloni, Giulia Casarosa, Ludovico Massaccesi    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  * WARNING! Have the potential to cause addiction, but not always...      *
@@ -113,7 +113,15 @@ namespace Belle2 {
               delete view;
     }
 
-
+    /** Call Reset() on all histograms */
+    void reset()
+    {
+      for (auto& layer : m_histograms)
+        for (auto& ladder : layer)
+          for (auto& sensor : ladder)
+            for (auto& view : sensor)
+              view->Reset();
+    }
 
 
   private:

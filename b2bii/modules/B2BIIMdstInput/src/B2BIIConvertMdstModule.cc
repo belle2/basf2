@@ -894,8 +894,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
 
-    // skip particle with idhep = 0
-    if (currDaughter.idhep() == 0)
+    // Skip particles with idhep = 0 or 911 (CDC data).
+    if (currDaughter.idhep() == 0 || currDaughter.idhep() == 911)
       continue;
 
     //putting the daughter in the graph:
@@ -975,17 +975,15 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
         hep = &gen_level(hep0);
         break;
     }
-    if (hep->idhep() != 911) {
-      // Step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
-        int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
-        // Step 3: set the relation
-        eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
-        testMCRelation(*hep, m_mcParticles[matchedMCParticleID], "ECLCluster");
-      } else {
-        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
-        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
-      }
+    // Step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
+      // Step 3: set the relation
+      eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
+      testMCRelation(*hep, m_mcParticles[matchedMCParticleID], "ECLCluster");
+    } else {
+      B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
     }
   }
 }
@@ -1749,9 +1747,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 
   // updating the GraphParticle information from the Gen_hepevt information
   const int idHep = recoverMoreThan24bitIDHEP(genHepevt.idhep());
-
-  // TODO: do not change 911 to 22
-  if (idHep == 0 || idHep == 911) {
+  if (idHep == 0) {
     B2WARNING("Trying to convert Gen_hepevt with idhep = " << idHep <<
               ". This should never happen.");
     mcParticle->setPDG(Const::photon.getPDGCode());
@@ -1972,7 +1968,7 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
   if (bellePDGCode == 0)
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to Gen_hepevt with idhep = 0.");
 
-  if (bellePDGCode != belleIIPDGCode && bellePDGCode != 911)
+  if (bellePDGCode != belleIIPDGCode)
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<
               belleIIPDGCode);
 

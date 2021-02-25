@@ -924,8 +924,7 @@ main(int argc, char* argv[])
         int mod = *triggers.begin() % hltcount;
         if (triggers.empty()) {
           // workaround for empty vector, but keep same structure for monitor parsing (kibana)
-          ERR_FPRINTF(stderr,
-                      "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d EMPTY\n",
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
                       event_number_max, event_number_max, missing_walk_index, triggers.size(),
                       0, event_number_max, mod, hlts[mod]);
         } else {

@@ -59,6 +59,13 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   updateDBObjPtrs(1, expRun.second, expRun.first);
   fStartRun = expRun.second;
 
+  //checking existing payload pointer
+  if (!m_DBBadWires.isValid())
+    B2FATAL("There is no valid payload for CDCDedxBadWires");
+
+  if (!m_DBWireGains.isValid())
+    B2FATAL("There is no valid payload for CDCDedxWireGain");
+
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
   ttree->SetBranchAddress("wire", &wire);
@@ -153,7 +160,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     int startfrom = 1, endat = 1;
 
     if (htempPerWire->Integral() <= 50 || m_DBBadWires->getBadWireStatus(jwire)) {
-      truncMean  = 0.0; //dead wire or active
+      truncMean  = 0.0; //dead or bad wire
     } else if (htempPerWire->Integral() > 50 && htempPerWire->Integral() < 1000) {
       truncMean  = 1.0; //partial dead wire
     } else {

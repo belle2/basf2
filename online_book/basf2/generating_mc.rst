@@ -85,8 +85,8 @@ detector simulation, or we want to test the efficiency of a new trigger line, an
    if you need a large production of MC signal samples!
 
 
-Main steps for the MC production
---------------------------------
+Main steps for the Monte Carlo production
+-----------------------------------------
 
 The production of a MC sample can be divided in three main steps:
 
@@ -108,8 +108,8 @@ The production of a MC sample can be divided in three main steps:
    intended for some MC production will result in a ``basf2`` crash.
 
 
-How to write a steering file for the MC production
---------------------------------------------------
+How to write a steering file for the Monte Carlo production
+-----------------------------------------------------------
 
 Of course, for the production of a MC sample we have to write ``basf2`` a steering file. Let's see how to write it.
 
@@ -231,8 +231,8 @@ Now we have to add to the steering path the relevant functions for:
 .. _MC production repository: https://stash.desy.de/projects/B2P/repos/mc/browse
 
 
-How to generate a signal MC sample and the decay files
-------------------------------------------------------
+How to write a decay file and to generate a signal Monte Carlo sample
+---------------------------------------------------------------------
 
 In the last exercise we learnt how to generate a generic :math:`B^0 \bar{B}^0` event. Probably you are wondering
 where the decay channels of the :math:`B^0` / :math:`\bar{B}^0` and the respective branching fractions are defined,
@@ -320,7 +320,7 @@ Looking at this simple decay file, it is not difficult to understand its structu
 Probably you are also wondering where all the particle names are defined (while for ``B0`` and ``mu+`` the naming
 scheme is quite obvious, this is not the same for ``K_S0``). These names are defined in the `evt.pdl`_ file, but
 luckily you do not have to go through it, because we have a dedicated tool that parses the file and allows you to
-easily get all the relevant information: `b2help-particles`.
+easily get all the relevant information: :ref:`b2help-particles`.
 
 .. _evt.pdl: https://stash.desy.de/projects/B2/repos/software/browse/framework/particledb/data/evt.pdl
 
@@ -328,12 +328,12 @@ easily get all the relevant information: `b2help-particles`.
      :class: exercise stacked
 
      Before moving on... how many particles having a mass between :math:`3.0\;\text{GeV/c}^2` and 
-     :math:`3.6\;\text{GeV/c}^2` are defined in the `evt.pdf`_ file?
+     :math:`3.6\;\text{GeV/c}^2` are defined in the `evt.pdl`_ file?
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Can you use `b2help-particles` for this?
+     Can you use :help:`b2help-particles` for this?
 
 .. admonition:: Solution
      :class: toggle solution
@@ -376,7 +376,7 @@ easily get all the relevant information: `b2help-particles`.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use `b2help-particles` to identify the names to be used for :math:`\phi`, :math:`K^+` and :math:`\pi^0`.
+     Use :ref:`b2help-particles` to identify the names to be used for :math:`\phi`, :math:`K^+` and :math:`\pi^0`.
      Probably you want to check their `PDG codes`_ if you do not remember them...
 
 .. _PDG codes: https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf

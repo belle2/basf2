@@ -868,34 +868,36 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
-    double isBBCrossfeed(const Particle* particle)
+    double isBBCrossfeed(const Particle* particle, const std::vector<double>& args)
     {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
+      unsigned int B_pdg;
+      if (args.empty())
+        B2FATAL("PDG-Code of searched common parent not given, but needed to find crossfeed!");
+      else
+        B_pdg = abs(args[0]);
 
-      int nDaughters = int(particle->getNDaughters());
+      std::vector<const Particle*> Daughters = particle->getFinalStateDaughters();
+      int nDaughters = Daughters.size();
       int mother_ids[nDaughters];
-      printf("New Particle with %i daughters\n", nDaughters);
+
       for (int j = 0; j < nDaughters; ++j) {
-        const MCParticle* curMCParticle = particle->getDaughter(j)->getMCParticle();
+        const MCParticle* curMCParticle = Daughters[j]->getMCParticle();
         while (curMCParticle != nullptr) {
           int m_pdg = curMCParticle->getPDG();
-          printf("m_pdg %i in daughter %i \n", m_pdg, j);
-          if (abs(m_pdg) == 521 || abs(m_pdg) == 511) {
+          if (abs(m_pdg) == B_pdg) {
             mother_ids[j] = curMCParticle->getArrayIndex();
             break;
           }
           const MCParticle* curMCMother = curMCParticle->getMother();
           curMCParticle = curMCMother;
-          printf("mothered \n");
         }
         if (curMCParticle == nullptr) {
-          printf("Dead particle \n");
-          return -4;//std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
 
-      printf("Checking for Crossfeed \n");
       for (int j = 1; j < nDaughters; ++j) {
         if (mother_ids[j] != mother_ids[0])
           return 1;

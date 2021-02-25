@@ -20,7 +20,6 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
-from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
@@ -115,40 +114,6 @@ class PRsemileptonicUntagged(BaseSkim):
 
         self.SkimLists = ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"]
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        ma.cutAndCopyLists("B0:PRSemileptonic_semileptonic",
-                           ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"], "", path=path)
-
-        ma.buildRestOfEvent("B0:PRSemileptonic_semileptonic", path=path)
-        ma.appendROEMask("B0:PRSemileptonic_semileptonic", "basic",
-                         "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
-                         "E>0.05",
-                         path=path)
-        ma.buildContinuumSuppression("B0:PRSemileptonic_semileptonic", "basic", path=path)
-
-        vm.addAlias("d0_p", "daughter(0, p)")
-        vm.addAlias("d1_p", "daughter(1, p)")
-        vm.addAlias("MissM2", "weMissM2(basic,0)")
-
-        histogramFilename = f"{self}_Validation.root"
-        email = "Phil Grace <philip.grace@adelaide.edu.au>"
-
-        create_validation_histograms(
-            rootfile=histogramFilename,
-            particlelist="B0:PRSemileptonic",
-            variables_1d=[
-                ("Mbc", 100, 4.0, 5.3, "Mbc", email, "", ""),
-                ("d0_p", 100, 0, 5.2, "Signal-side pion momentum", email, "", ""),
-                ("d1_p", 100, 0, 5.2, "Signal-side lepton momentum", email, "", ""),
-                ("MissM2", 100, -5, 5, "Missing mass squared", email, "", "")
-            ],
-            variables_2d=[("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", email, "", "")],
-            path=path)
-
 
 @fancy_skim_header
 class SLUntagged(BaseSkim):
@@ -227,37 +192,3 @@ class SLUntagged(BaseSkim):
             b0List.append(f"B0:SLUntagged_{chID}")
 
         self.SkimLists = b0List + bplusList
-
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        ma.cutAndCopyLists("B+:SLUntagged",
-                           ["B+:SLUntagged_0", "B+:SLUntagged_1", "B+:SLUntagged_2", "B+:SLUntagged_3"],
-                           "", path=path)
-
-        ma.buildRestOfEvent("B+:SLUntagged", path=path)
-        ma.appendROEMask("B+:SLUntagged", "basic",
-                         "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
-                         "E>0.05",
-                         path=path)
-        ma.buildContinuumSuppression("B+:SLUntagged", "basic", path=path)
-
-        vm.addAlias("d1_p", "daughter(1,p)")
-        vm.addAlias("MissM2", "weMissM2(basic,0)")
-
-        histogramFilename = f"{self}_Validation.root"
-        myEmail = "Phil Grace <philip.grace@adelaide.edu.au>"
-
-        create_validation_histograms(
-            rootfile=histogramFilename,
-            particlelist="B+:SLUntagged",
-            variables_1d=[
-                ("cosThetaBetweenParticleAndNominalB", 100, -6.0, 4.0, "cosThetaBY", myEmail, "", ""),
-                ("Mbc", 100, 4.0, 5.3, "Mbc", myEmail, "", ""),
-                ("d1_p", 100, 0, 5.2, "Signal-side lepton momentum", myEmail, "", ""),
-                ("MissM2", 100, -5, 5, "Missing mass squared", myEmail, "", "")
-            ],
-            variables_2d=[("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", myEmail, "", "")],
-            path=path)

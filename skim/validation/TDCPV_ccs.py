@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output></output>
+    <output>TDCPV_ccs_Validation.root</output>
     <contact>onuki@hep.phys.s.u-tokyo.ac.jp</contact>
 </header>
 """

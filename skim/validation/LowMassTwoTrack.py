@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output></output>
+    <output>LowMassTwoTrack_Validation.root</output>
     <contact>xing-yu.zhou@desy.de</contact>
 </header>
 """

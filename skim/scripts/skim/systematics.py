@@ -586,7 +586,7 @@ class SystematicsPhiGamma(BaseSkim):
         vm.addAlias("K_S0_mass", "M")
         vm.addAlias("phi_mass", "M")
 
-        histoRootFile = '{self}_Validation.root'
+        histoRootFile = f'{self}_Validation.root'
         variableshisto = [('gamma_E', 120, 2.5, 8.5),
                           ('gamma_E_CMS', 100, 2.0, 7.0),
                           ('nTracks', 15, 0, 15),

@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output></output>
+    <output>SystematicsPhiGamma_Validation.root</output>
     <contact>giuseppe.finocchiaro@lnf.infn.it</contact>
 </header>
 """

@@ -120,7 +120,7 @@ def get_output_validation_files(skim):
     OutputFiles = [
         param.values
         for module in path.modules()
-        if module.name() == "VariablesToHistogram"
+        if module.type() == "VariablesToHistogram"
         for param in module.available_params()
         if param.name == "fileName"
     ]

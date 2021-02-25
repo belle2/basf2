@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output></output>
+    <output>BtoDh_Kshh_Validation.root</output>
     <contact>yi.zhang2@desy.de</contact>
 </header>
 """

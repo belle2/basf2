@@ -87,8 +87,8 @@ class LeptonicUntagged(BaseSkim):
         vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
-        histogramFilename = "LeptonicUntagged_Validation.root"
-        contact = "Phil Grace <philip.grace@adelaide.edu.au>"
+        histogramFilename = f"{self}_Validation.root"
+        contact = __liaison__
 
         create_validation_histograms(
             rootfile=histogramFilename,

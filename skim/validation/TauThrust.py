@@ -3,7 +3,7 @@
 
 """
 <header>
-    <output>TauGeneric_Validation.root</output>
+    <output>TauThrust_Validation.root</output>
     <contact>kenji.inami@desy.de</contact>
 </header>
 """

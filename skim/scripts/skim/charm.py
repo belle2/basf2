@@ -20,7 +20,6 @@ from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
-from variables import variables as vm
 
 __liaison__ = "Guanda Gong <gonggd@mail.ustc.edu.cn>"
 

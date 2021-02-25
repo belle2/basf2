@@ -133,19 +133,18 @@ class PRsemileptonicUntagged(BaseSkim):
         vm.addAlias('d1_p', 'daughter(1, p)')
         vm.addAlias('MissM2', 'weMissM2(basic,0)')
 
-        histogramFilename = 'PRsemileptonicUntagged_Validation.root'
-        myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'
+        histogramFilename = f'{self}_Validation.root'
 
         create_validation_histograms(
             rootfile=histogramFilename,
             particlelist='B0:all',
             variables_1d=[
-                ('Mbc', 100, 4.0, 5.3, 'Mbc', myEmail, '', ''),
-                ('d0_p', 100, 0, 5.2, 'Signal-side pion momentum', myEmail, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', myEmail, '', ''),
-                ('MissM2', 100, -5, 5, 'Missing mass squared', myEmail, '', '')
+                ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
+                ('d0_p', 100, 0, 5.2, 'Signal-side pion momentum', __liaison__, '', ''),
+                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
-            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
+            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
             path=path)
 
 
@@ -244,17 +243,16 @@ class SLUntagged(BaseSkim):
         vm.addAlias('d1_p', 'daughter(1,p)')
         vm.addAlias('MissM2', 'weMissM2(basic,0)')
 
-        histogramFilename = 'SLUntagged_Validation.root'
-        myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'
+        histogramFilename = f'{self}_Validation.root'
 
         create_validation_histograms(
             rootfile=histogramFilename,
             particlelist='B+:all',
             variables_1d=[
-                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', myEmail, '', ''),
-                ('Mbc', 100, 4.0, 5.3, 'Mbc', myEmail, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', myEmail, '', ''),
-                ('MissM2', 100, -5, 5, 'Missing mass squared', myEmail, '', '')
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', __liaison__, '', ''),
+                ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
+                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
-            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
+            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
             path=path)

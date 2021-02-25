@@ -229,7 +229,7 @@ class CharmoniumPsi(BaseSkim):
 
         # Print histograms.
         create_validation_histograms(
-            rootfile='CharmoniumPsi_Validation.root',
+            rootfile=f'{self}_Validation.root',
             particlelist='J/psi:ll',
             variables_1d=[(
                 'InvM', 65, 2.7, 4.0,

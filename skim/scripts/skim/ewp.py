@@ -84,8 +84,7 @@ class BtoXgamma(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        histogram_filename = 'BtoXgamma_Validation.root'
-        my_email = 'Trevor Shillington <trshillington@hep.physics.mcgill.ca>'
+        histogram_filename = f'{self}_Validation.root'
 
         stdK('all', path=path)
         stdPhotons('cdc', path=path)
@@ -99,9 +98,9 @@ class BtoXgamma(BaseSkim):
             rootfile=histogram_filename,
             particlelist='B0:sig',
             variables_1d=[
-                ('Mbc', 100, 5.2, 5.3, 'Signal B0 Mbc', my_email,
+                ('Mbc', 100, 5.2, 5.3, 'Signal B0 Mbc', __liaison__,
                  'Mbc of the signal B0', '', 'Mbc [GeV/c^2]', 'Candidates'),
-                ('deltaE', 100, -1, 1, 'Signal B0 deltaE', my_email,
+                ('deltaE', 100, -1, 1, 'Signal B0 deltaE', __liaison__,
                  'deltaE of the signal B0', '', 'deltaE [GeV]', 'Candidates')
             ],
             variables_2d=[],
@@ -203,9 +202,7 @@ class BtoXll(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        my_email = 'Trevor Shillington <trshillington@hep.physics.mcgill.ca>'
-
-        histogram_filename = 'BtoXll_Validation.root'
+        histogram_filename = f'{self}_Validation.root'
 
         stdK(listtype='good', path=path)
         stdMu(listtype='good', path=path)
@@ -216,9 +213,9 @@ class BtoXll(BaseSkim):
             rootfile=histogram_filename,
             particlelist='B+:signal',
             variables_1d=[
-                ('deltaE', 100, -0.5, 0.5, 'Signal B deltaE', my_email,
+                ('deltaE', 100, -0.5, 0.5, 'Signal B deltaE', __liaison__,
                  'deltaE of the Signal B', '', 'deltaE [GeV]', 'Candidates'),
-                ('Mbc', 100, 5.2, 5.3, 'Signal B Mbc', my_email,
+                ('Mbc', 100, 5.2, 5.3, 'Signal B Mbc', __liaison__,
                  'Mbc of the signal B', '', 'Mbc [GeV/c^2]', 'Candidates')],
             variables_2d=[],
             path=path)

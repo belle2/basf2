@@ -92,7 +92,7 @@ class BtoD0h_Kspi0(BaseSkim):
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
         ma.variablesToHistogram(
-            filename='BtoDh_Kspi0_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -163,7 +163,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
         ma.variablesToHistogram(
-            filename='BtoDh_Kspipipi0_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -766,7 +766,7 @@ class BtoD0h_Kshh(BaseSkim):
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
 
         ma.variablesToHistogram(
-            filename='BtoDh_Kshh_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),

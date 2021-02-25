@@ -202,7 +202,7 @@ class TauLFV(BaseSkim):
 
         # the variables that are printed out are: M, deltaE
         create_validation_histograms(
-            rootfile='TauLFV_Validation.root',
+            rootfile=f'{self}_Validation.root',
             particlelist='tau+:LFV',
             variables_1d=[
                 ('M', 100, 1.00, 2.00, '', contact, '', ''),
@@ -340,7 +340,7 @@ class TauGeneric(BaseSkim):
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         create_validation_histograms(
-            rootfile='TauGeneric_Validation.root',
+            rootfile=f'{self}_Validation.root',
             particlelist='',
             variables_1d=[
                 ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
@@ -447,7 +447,7 @@ class TauThrust(BaseSkim):
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         create_validation_histograms(
-            rootfile='TauGeneric_Validation.root',
+            rootfile=f'{self}_Validation.root',
             particlelist='',
             variables_1d=[
                 ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),

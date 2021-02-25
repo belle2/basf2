@@ -336,7 +336,7 @@ class feiHadronicB0(BaseFEISkim):
         vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
         vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
-        histogramFilename = 'feiHadronicB0_Validation.root'
+        histogramFilename = f"{self}_Validation.root"
 
         create_validation_histograms(
             rootfile=histogramFilename,
@@ -415,7 +415,7 @@ class feiHadronicBplus(BaseFEISkim):
         vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
         vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
-        histogramFilename = 'feiHadronicBplus_Validation.root'
+        histogramFilename = f"{self}_Validation.root"
 
         create_validation_histograms(
             rootfile=histogramFilename,
@@ -497,7 +497,7 @@ class feiSLB0(BaseFEISkim):
         vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
         vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
-        histogramFilename = 'feiSLB0_Validation.root'
+        histogramFilename = f"{self}_Validation.root"
 
         create_validation_histograms(
             rootfile=histogramFilename,
@@ -574,7 +574,7 @@ class feiSLBplus(BaseFEISkim):
         vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
         vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
-        histogramFilename = 'feiSLBplus_Validation.root'
+        histogramFilename = f"{self}_Validation.root"
 
         create_validation_histograms(
             rootfile=histogramFilename,

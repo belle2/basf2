@@ -46,12 +46,11 @@ bool got_sigterm = false;
 void
 dump_binary(FILE* fp, const void* ptr, const size_t size)
 {
-  int i;
   const unsigned int* p = (const unsigned int*)ptr;
   const size_t _size = size / sizeof(unsigned int);
 
 
-  for (i = 0; i < _size; i++) {
+  for (size_t i = 0; i < _size; i++) {
     fprintf(fp, "%08x ", p[i]);
     if (i % 8 == 7) fprintf(fp, "\n");
   }
@@ -923,9 +922,17 @@ main(int argc, char* argv[])
       if (event_count % 10000 == 0) {
         int hltcount = hltused.size();
         int mod = *triggers.begin() % hltcount;
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
-                    *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
-                    *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
+        if (triggers.empty()) {
+          // workaround for empty vector, but keep same structure for monitor parsing (kibana)
+          ERR_FPRINTF(stderr,
+                      "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d EMPTY\n",
+                      event_number_max, event_number_max, missing_walk_index, triggers.size(),
+                      0, event_number_max, mod, hlts[mod]);
+        } else {
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+                      *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
+                      *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
+        }
       }
     }
   }

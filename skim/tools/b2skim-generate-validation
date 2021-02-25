@@ -124,13 +124,9 @@ def get_output_validation_files(skim):
         for param in module.available_params()
         if param.name == "fileName"
     ]
-    if sorted(OutputFiles) != sorted(set(sorted(OutputFiles))):
-        module = Registry.get_skim_module(skim)
-        raise RuntimeError(
-            f"skim.{module}.{skim}.validation_histograms attempts to write to the same "
-            "output file in two separate calls of VariablesToHistogram."
-        )
-    return OutputFiles
+
+    # Remove duplicates before returning
+    return list(dict.fromkeys(OutputFiles))
 
 
 def get_contact(skim):

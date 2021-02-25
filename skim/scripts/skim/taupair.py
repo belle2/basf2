@@ -190,6 +190,26 @@ class TauLFV(BaseSkim):
         tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list
         self.SkimLists = tau_lfv_lists
 
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.copyLists('tau+:LFV', self.SkimLists, path=path)
+
+        # add contact information to histogram
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+        # the variables that are printed out are: M, deltaE
+        create_validation_histograms(
+            rootfile='TauLFV_Validation.root',
+            particlelist='tau+:LFV',
+            variables_1d=[
+                ('M', 100, 1.00, 2.00, '', contact, '', ''),
+                ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],
+            variables_2d=[('M', 50, 1.00, 2.00, 'deltaE', 60, -1.6, 0.6, '', contact, '', '')],
+            path=path)
+
 
 @fancy_skim_header
 class TauGeneric(BaseSkim):
@@ -309,6 +329,30 @@ class TauGeneric(BaseSkim):
 
         self.SkimLists = eventParticle
 
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+
+        # add contact information to histogram
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+        create_validation_histograms(
+            rootfile='TauGeneric_Validation.root',
+            particlelist='',
+            variables_1d=[
+                ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+                ('E_ECLtrk', 70, 0, 7, '', contact, '', ''),
+                ('maxPt', 30, 0, 6, '', contact, '', ''),
+                ('invMS1', 60, 0, 3, '', contact, '', '', '', ''),
+                ('invMS2', 60, 0, 3, '', contact, '', ''),
+                ('Theta_miss', 30, 0, 180, '', contact, '', '')],
+            variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3, '', contact, '', '')],
+            path=path)
+
 
 @fancy_skim_header
 class TauThrust(BaseSkim):
@@ -394,3 +438,19 @@ class TauThrust(BaseSkim):
         ma.applyCuts("tau+:thrust", "thrust < 0.99 or nGoodTracksThrust!=2", path=path)
 
         self.SkimLists = eventParticle
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+        create_validation_histograms(
+            rootfile='TauGeneric_Validation.root',
+            particlelist='',
+            variables_1d=[
+                ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+                ('thrust', 50, 0.75, 1, '', contact, '', '')],
+            path=path)

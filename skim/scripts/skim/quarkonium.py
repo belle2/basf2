@@ -216,6 +216,33 @@ class CharmoniumPsi(BaseSkim):
                           'J/psi:eebrems2', 'psi(2S):eebrems2',
                           'J/psi:mumu', 'psi(2S):mumu']
 
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
+        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid e-:loosepid', '', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
+
+        # Print histograms.
+        create_validation_histograms(
+            rootfile='CharmoniumPsi_Validation.root',
+            particlelist='J/psi:ll',
+            variables_1d=[(
+                'InvM', 65, 2.7, 4.0,
+                'J/#psi mass',
+                __liaison__,
+                'J/psi mass',
+                'J/psi peak is seen.',
+                'M [GeV/c^{2}]', 'Events / (20 MeV/c^{2})',
+                'shifter'
+            )],
+            path=path
+        )
+
 
 @fancy_skim_header
 class InclusiveLambda(BaseSkim):

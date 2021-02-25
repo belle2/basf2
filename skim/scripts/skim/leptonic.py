@@ -14,6 +14,7 @@ __authors__ = [
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
+from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
@@ -65,6 +66,50 @@ class LeptonicUntagged(BaseSkim):
         ma.applyCuts("B-:LeptonicUntagged_1", "nTracks>=3", path=path)
         lepList = ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"]
         self.SkimLists = lepList
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"], "", path=path)
+
+        ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)
+        ma.appendROEMask(
+            "B-:LeptonicUntagged",
+            "basic",
+            "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
+            "E>0.05",
+            path=path,
+        )
+        vm.addAlias("d0_p", "daughter(0,p)")
+        vm.addAlias("d0_electronID", "daughter(0,electronID)")
+        vm.addAlias("d0_muonID", "daughter(0,muonID)")
+        vm.addAlias("MissP", "weMissP(basic,0)")
+
+        histogramFilename = "LeptonicUntagged_Validation.root"
+        contact = "Phil Grace <philip.grace@adelaide.edu.au>"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B-:LeptonicUntagged",
+            variables_1d=[
+                ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
+                ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
+                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
+                 contact, "", ""),
+                ("d0_muonID", 100, 0, 1, "electronID of signal-side lepton", contact,
+                 "", ""),
+                ("R2", 100, 0, 1, "R2", contact, "", ""),
+                ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
+                 "", ""),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", contact,
+                 "", "")
+            ],
+            path=path,
+        )
 
 
 @fancy_skim_header
@@ -118,12 +163,12 @@ class dilepton(BaseSkim):
 
         ma.applyEventCuts(cut='foxWolframR2 < 0.5 and nTracks > 3', path=path)
 
-        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid',   'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)
         ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
 
-        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid',   'M < 15', path=path)
-        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid', 'M < 15', path=path)
         ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
 
         ma.copyLists(outputListName='Upsilon(4S):ll',

@@ -12,13 +12,13 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables as va
 import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts, stdLambdas
+from variables import variables as vm
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
@@ -518,10 +518,10 @@ class SystematicsLambda(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
-        va.variables.addAlias("pMom", "daughter(0,p)")
-        va.variables.addAlias("piMom", "daughter(1,p)")
-        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
+        vm.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
+        vm.addAlias("pMom", "daughter(0,p)")
+        vm.addAlias("piMom", "daughter(1,p)")
+        vm.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
         ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
@@ -572,6 +572,33 @@ class SystematicsPhiGamma(BaseSkim):
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         self.SkimLists = ["gamma:PhiSystematics"]
+
+    def validation_histograms(self, path):
+        stdKshorts(path=path)
+        ma.fillParticleList('K+:all', "", writeOut=True, path=path)
+        ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
+
+        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
+
+        vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
+        vm.addAlias("gamma_E", "E")
+        vm.addAlias("K_S0_mass", "M")
+        vm.addAlias("phi_mass", "M")
+
+        histoRootFile = '{self}_Validation.root'
+        variableshisto = [('gamma_E', 120, 2.5, 8.5),
+                          ('gamma_E_CMS', 100, 2.0, 7.0),
+                          ('nTracks', 15, 0, 15),
+                          ]
+        variableshistoKS = [('K_S0_mass', 200, 0.4, 0.6),
+                            ]
+        variableshistoPhi = [('phi_mass', 200, 0.8, 1.2),
+                             ]
+
+        ma.variablesToHistogram('gamma:sig', variableshisto, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('K_S0:merged', variableshistoKS, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('phi:KK', variableshistoPhi, filename=histoRootFile, path=path)
 
 
 @fancy_skim_header

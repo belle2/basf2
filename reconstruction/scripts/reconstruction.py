@@ -474,7 +474,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
-    rawFormat=False,
+    rawFormat=True,
     ignoreInputModulesCheck=False
 ):
     """

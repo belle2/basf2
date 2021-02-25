@@ -171,15 +171,13 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
 
-    Up to now, we add the full reconstruction, but this will change in the future.
-
     Please note that this function adds the HLT decision, but does not branch
     according to it.
     """
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_reconstruction(
+        reconstruction.add_prefilter_reconstruction(
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
@@ -210,12 +208,15 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
-    Up to now, this only includes the skim part, but this will
-    change in the future.
+    This includes reconstruction modules not essential
+    to calculate filter decision and then the skim calculation.
     """
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
+        reconstruction.add_postfilter_reconstruction(path, components=components, add_trigger_calculation=False,
+                                                     pruneTracks=False)
+
         add_skim_software_trigger(path, store_array_debug_prescale=1)
         path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:

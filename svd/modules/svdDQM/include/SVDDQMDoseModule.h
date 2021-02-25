@@ -15,6 +15,7 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
+#include <svd/dataobjects/SVDHistograms.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <string>
@@ -50,9 +51,12 @@ namespace Belle2 {
       StoreArray<SVDShaperDigit> m_digits; /**< Input: raw hits. */
 
       // Outputs (histograms)
-      TH1F* h_occupancy = nullptr; /**< Hist of the instantaneous occupancy distribution. */
-      TH2F* h_nHitsVsTime = nullptr; /**< Hist of the total hits vs time since inj. and time in cycle. */
-      TH2F* h_nEvtsVsTime = nullptr; /**< Hist of the total evts vs time since inj. and time in cycle. */
+      /** Hists of the instantaneous occupancy distrib. per sensor. */
+      SVDHistograms<TH1F>* m_occupancy = nullptr;
+      /** Hists of the total hits in each time bin (time since inj. and time in cycle) per sensor. */
+      SVDHistograms<TH2F>* m_nHitsVsTime = nullptr;
+      /** Hist of the total evts in each time bin (time since inj. and time in cycle). */
+      TH2F* h_nEvtsVsTime = nullptr;
     };
   }
 }

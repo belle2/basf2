@@ -1,7 +1,7 @@
 .. _onlinebook_generating_mc:
 
-Generating Montecarlo
-=====================
+Generating Monte Carlo
+======================
 
 .. sidebar:: Overview
     :class: overview
@@ -25,8 +25,8 @@ Generating Montecarlo
 	* Write a simple decay file and generate signal events
 
 
-Why do we need Montecarlo simulated data?
------------------------------------------
+Why do we need Monte Carlo simulated data?
+------------------------------------------
 
 Monte Carlo (MC) data are widely used in High Energy Physics. MC simulations allow us to mimic what happens in the
 Belle II detector after the collisions to understand the experimental conditions and performance. MC data

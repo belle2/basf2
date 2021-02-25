@@ -21,7 +21,8 @@ SVDDQMDoseModule::SVDDQMDoseModule() : HistoModule()
   addParam("ShaperDigits", m_SVDShaperDigitsName,
            "Name of the SVDShaperDigits to use for computing occupancy.",
            std::string(""));
-  // TODO parameters ...
+  addParam("BeamRevolutionCycle", m_revolutionTime,
+           "Beam revolution cycle in musec", 5120 / 508.0);
 }
 
 void SVDDQMDoseModule::defineHisto()
@@ -32,7 +33,20 @@ void SVDDQMDoseModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
-  // TODO histograms ...
+  h_occupancy = new TH1F(
+    "SVDInstOccupancy",
+    "SVD Instantaneous Occupancy Distribution;Occupancy [%];Count / (0.05%)",
+    100, 0, 5);
+  h_nHitsVsTime = new TH2F(
+    "SVDHitsVsInjTime2",
+    "SVD Hits;Time since last injection [#mus];Time in beam cycle [#mus]",
+    500, 0, 30e3, 100, 0, m_revolutionTime
+  );
+  h_nEvtsVsTime = new TH2F(
+    "SVDEvtsVsInjTime2",
+    "SVD Events;Time since last injection [#mus];Time in beam cycle [#mus]",
+    500, 0, 30e3, 100, 0, m_revolutionTime
+  );
 
   oldDir->cd();
 }
@@ -43,16 +57,13 @@ void SVDDQMDoseModule::initialize()
 
   m_rawTTD.isOptional();
   m_digits.isOptional(m_SVDShaperDigitsName);
-  // TODO parameters ...
 }
 
 void SVDDQMDoseModule::beginRun()
 {
-  // TODO reset histograms ...
-
-  // Force re-checking masked strips
-  m_nActiveStripsU = 0;
-  m_nActiveStripsV = 0;
+  h_occupancy->Reset();
+  h_nHitsVsTime->Reset();
+  h_nEvtsVsTime->Reset();
 }
 
 void SVDDQMDoseModule::event()
@@ -67,43 +78,24 @@ void SVDDQMDoseModule::event()
     return;
   }
 
-  // Count masked strips (if not already done)
-  // TODO Move this part to beginRun? (and also initialize?)
-  if (m_nActiveStripsU == 0) {
-    if (!m_maskedStrips.isValid()) {
-      B2WARNING("Missing SVDFADCMaskedStrips, SVDDQMDose is skipped.");
-      return;
-    }
-    GeoCache& geo = GeoCache::getInstance();
-    // TODO more filtering on layer, ladder, sensor? Depending on parameters?
-    for (const VxdID& layerID : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-      for (const VxdID& ladderID : geo.getLadders(layerID)) {
-        for (const VxdID& sensorID : geo.getSensors(ladderID)) {
-          const SVD::SensorInfo& sInfo = dynamic_cast<const SVD::SensorInfo&>(GeoCache::get(sensorID));
-          for (unsigned short strip = 0; strip < sInfo.getUCells(); strip++)
-            if (!m_maskedStrips.isMasked(sensorID, true, strip))
-              m_nActiveStripsU++;
-          for (unsigned short strip = 0; strip < sInfo.getVCells(); strip++)
-            if (!m_maskedStrips.isMasked(sensorID, false, strip))
-              m_nActiveStripsV++;
-        }
-      }
-    }
-  }
-
   if (m_rawTTD.getEntries() == 0)
     return;
   RawFTSW* theTTD = m_rawTTD[0];
+  // 127 MHz is the (inexactly rounded) clock of the ticks
+  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / 127.0;
+  const double timeInCycle = timeSinceInj - (int)(timeSinceInj / m_revolutionTime) * m_revolutionTime;
 
   // Count hits
   unsigned int nHitsU = 0, nHitsV = 0;
   for (const SVDShaperDigit& hit : m_digits) {
     // TODO filtering on layer, ladder sensor? Dependin on parameters?
-    if (hit.passesZS(1 /* TODO is it 1? */, 5)) {
+    if (hit.passesZS(1, 5)) {
       if (hit.isUStrip()) nHitsU++;
-      else nHitsV++;
+      // else nHitsV++;
     }
   }
 
-  // TODO fill histograms ...
+  h_occupancy->Fill(nHitsU * 100.0 / 768.0 / 172.0); // TODO Use SensorInfo::getUCells()
+  h_nHitsVsTime->Fill(timeSinceInj, timeInCycle, nHitsU);
+  h_nEvtsVsTime->Fill(timeSinceInj, timeInCycle);
 }

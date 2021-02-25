@@ -43,20 +43,16 @@ namespace Belle2 {
       // Steerable data members (parameters)
       std::string m_histogramDirectoryName; /**< Name of the histograms' directory in the ROOT file. */
       std::string m_SVDShaperDigitsName; /**< Name of the StoreArray of SVDShaperDigit to use. */
-      // TODO ...
+      double m_revolutionTime;
 
       // Inputs
       StoreArray<RawFTSW> m_rawTTD; /**< Input: DAQ status. */
       StoreArray<SVDShaperDigit> m_digits; /**< Input: raw hits. */
-      SVDFADCMaskedStrips m_maskedStrips; /**< Input: masked strips. */
 
       // Outputs (histograms)
-      // TODO ...
-
-      // Other stuff
-      unsigned int m_nActiveStripsU = 0;
-      unsigned int m_nActiveStripsV = 0;
-
+      TH1F* h_occupancy = nullptr; /**< Hist of the instantaneous occupancy distribution. */
+      TH2F* h_nHitsVsTime = nullptr; /**< Hist of the total hits vs time since inj. and time in cycle. */
+      TH2F* h_nEvtsVsTime = nullptr; /**< Hist of the total evts vs time since inj. and time in cycle. */
     };
   }
 }

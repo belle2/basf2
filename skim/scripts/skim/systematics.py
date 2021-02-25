@@ -549,7 +549,7 @@ class SystematicsPhiGamma(BaseSkim):
         ":math:`\\phi` decays into two charged tracks "
         "(:math:`K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
     )
-    __contact__ = __liaison__
+    __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
 
     def load_standard_lists(self, path):

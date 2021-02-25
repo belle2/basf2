@@ -136,7 +136,7 @@ number.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Execute ``basf2 -m EventInfoSetter`` to look at the names of the module's parameters.
+     Check the documentation (`EventInfoSetter`) to identify the module's parameters and their names.
 
 .. admonition:: Solution
      :class: toggle solution
@@ -153,6 +153,12 @@ number.
      .. code-block:: bash
 
         basf2 my_steering_file.py -n 10 --experiment 0
+
+
+.. tip::
+
+   You can also use `b2help-modules`_ to look at a module's parameters. For example, you can run on your shell
+   ``b2help-modules EventInfoSetter``.
 
 
 Now we have to add to the steering path the relevant functions for:

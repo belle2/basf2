@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/filters/twoHitFilters/TwoHitVariables.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/TwoHitVariables.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.>
 

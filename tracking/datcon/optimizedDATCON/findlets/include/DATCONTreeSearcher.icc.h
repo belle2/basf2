@@ -20,24 +20,33 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
-  template <class AState, class AStateRejecter, class AResult>
-  DATCONTreeSearcher<AState, AStateRejecter, AResult>::DATCONTreeSearcher() : Super()
+//   template <class AState, class APathFilter, class AResult>
+//   DATCONTreeSearcher<AState, APathFilter, AResult>::DATCONTreeSearcher() : Super()
+  template <class AState, class APathFilter>
+  DATCONTreeSearcher<AState, APathFilter>::DATCONTreeSearcher() : Super()
   {
-    Super::addProcessingSignalListener(&m_stateRejecter);
+    Super::addProcessingSignalListener(&m_pathFilter);
   };
 
-  template <class AState, class AStateRejecter, class AResult>
-  void DATCONTreeSearcher<AState, AStateRejecter, AResult>::exposeParameters(ModuleParamList* moduleParamList,
+//   template <class AState, class APathFilter, class AResult>
+//   void DATCONTreeSearcher<AState, APathFilter, AResult>::exposeParameters(ModuleParamList* moduleParamList,
+//       const std::string& prefix)
+  template <class AState, class APathFilter>
+  void DATCONTreeSearcher<AState, APathFilter>::exposeParameters(ModuleParamList* moduleParamList,
       const std::string& prefix)
   {
-    m_stateRejecter.exposeParameters(moduleParamList, prefix);
+    m_pathFilter.exposeParameters(moduleParamList, prefix);
   }
 
-  template <class AState, class AStateRejecter, class AResult>
-  void DATCONTreeSearcher<AState, AStateRejecter, AResult>::apply(const std::vector<AState>& seededStates,
-      std::vector<AState>& hitStates,
-      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
-      std::vector<AResult>& results)
+//   template <class AState, class APathFilter, class AResult>
+//   void DATCONTreeSearcher<AState, APathFilter, AResult>::apply(const std::vector<AState>& seededStates,
+//       std::vector<AState>& hitStates,
+//       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+//       std::vector<AResult>& results)
+  template <class AState, class APathFilter>
+  void DATCONTreeSearcher<AState, APathFilter>::apply(const std::vector<AState>& seededStates,
+                                                      std::vector<AState>& hitStates,
+                                                      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations)
   {
     B2ASSERT("Expected relation to be sorted",
              std::is_sorted(relations.begin(), relations.end()));
@@ -51,7 +60,8 @@ namespace Belle2 {
       B2DEBUG(29, "Starting with new seed...");
 
       path.emplace_back(&state, 0);
-      traverseTree(path, relations, results);
+//       traverseTree(path, relations, results);
+      traverseTree(path, relations);
       path.pop_back();
       B2ASSERT("Something went wrong during the path traversal", path.empty());
 
@@ -59,11 +69,15 @@ namespace Belle2 {
     }
   }
 
-  template <class AState, class AStateRejecter, class AResult>
-  void DATCONTreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>&
-      path,
-      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
-      std::vector<AResult>& results)
+//   template <class AState, class APathFilter, class AResult>
+//   void DATCONTreeSearcher<AState, APathFilter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>&
+//       path,
+//       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+//       std::vector<AResult>& results)
+  template <class AState, class APathFilter>
+  void DATCONTreeSearcher<AState, APathFilter>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>&
+                                                             path,
+                                                             const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations)
   {
     // Implement only graph traversal logic and leave the extrapolation and selection to the
     // rejecter.
@@ -87,10 +101,10 @@ namespace Belle2 {
     }
 
     // Apply three-hit-filters, so the path has to contain at least to hits to form >= triplet with the child states
-    if (path.size() >= 2) {
+    if (path.size() > 2) {
       // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
       const std::vector<TrackFindingCDC::WithWeight<const AState*>>& constPath = path;
-      m_stateRejecter.apply(constPath, childStates);
+//       m_pathFilter.apply(constPath, childStates);
 
       if (childStates.empty()) {
         B2DEBUG(29, "Terminating this route, as there are no possible child states.");
@@ -107,7 +121,8 @@ namespace Belle2 {
     B2DEBUG(29, "Having found " << childStates.size() << " child states.");
     for (const TrackFindingCDC::WithWeight<AState*>& childState : childStates) {
       path.emplace_back(childState, childState.getWeight());
-      traverseTree(path, relations, results);
+//       traverseTree(path, relations, results);
+      traverseTree(path, relations);
       path.pop_back();
     }
   }

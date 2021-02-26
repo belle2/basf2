@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
-  extern template class LayerRelationFilter<TrackFindingCDC::ChooseableFilter<RelationFilterFactory>>;
+//   extern template class LayerRelationFilter<TrackFindingCDC::ChooseableFilter<RelationFilterFactory>>;
   /// A chooseable filter for picking out the relations between states
   using ChooseableRelationFilter = LayerRelationFilter<TrackFindingCDC::ChooseableFilter<RelationFilterFactory>>;
 }

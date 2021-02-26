@@ -31,12 +31,12 @@ namespace Belle2 {
    * that the states are traversed in the correct order without overriding each other.
    * It is however crucial, that the relations do not create cycles in the graph!
    */
-  template <class AState, class AStateRejecter, class AResult>
+  template <class AState, class APathFilter/*, class AResult*/>
   class DATCONTreeSearcher : public
-    TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult> {
+    TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>/*, AResult*/> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult>;
+    using Super = TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>/*, AResult*/>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -51,20 +51,25 @@ namespace Belle2 {
      * ATTENTION: As described above, the states themselves can be altered during the tree
      * traversal.
      */
+//     void apply(const std::vector<AState>& seededStates,
+//                std::vector<AState>& hitStates,
+//                const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+//                std::vector<AResult>& results) final;
     void apply(const std::vector<AState>& seededStates,
                std::vector<AState>& hitStates,
-               const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
-               std::vector<AResult>& results) final;
+               const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) final;
 
   private:
     /// Implementation of the traverseTree function
+//     void traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
+//                       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+//                       std::vector<AResult>& results);
     void traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
-                      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
-                      std::vector<AResult>& results);
+                      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations);
 
   private:
     /// State rejecter to decide which available continuations should be traversed next.
-    AStateRejecter m_stateRejecter;
+    APathFilter m_pathFilter;
 
     /// Findlet for adding a recursion cell state to the states
     TrackFindingCDC::CellularAutomaton<AState> m_automaton;

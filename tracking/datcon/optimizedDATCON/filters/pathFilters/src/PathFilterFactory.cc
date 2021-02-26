@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/optimizedDATCON/filters/fourHitFilters/FourHitFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/PathFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -18,24 +18,24 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FourHitFilterFactory::FourHitFilterFactory(const std::string& defaultFilterName)
+PathFilterFactory::PathFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
 
-FourHitFilterFactory::~FourHitFilterFactory() = default;
+PathFilterFactory::~PathFilterFactory() = default;
 
-std::string FourHitFilterFactory::getIdentifier() const
+std::string PathFilterFactory::getIdentifier() const
 {
   return "SVD Hit Pair";
 }
 
-std::string FourHitFilterFactory::getFilterPurpose() const
+std::string PathFilterFactory::getFilterPurpose() const
 {
   return "Rejects SVD hit pairs. ";
 }
 
-std::map<std::string, std::string> FourHitFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"all", "all combinations are valid"},
@@ -43,15 +43,15 @@ std::map<std::string, std::string> FourHitFilterFactory::getValidFilterNamesAndD
   };
 }
 
-std::unique_ptr<BaseFourHitFilter>
-FourHitFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BasePathFilter>
+PathFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseFourHitFilter>>();
+    return std::make_unique<TrackFindingCDC::AllFilter<BasePathFilter>>();
   }
 
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseFourHitFilter>>();
+    return std::make_unique<TrackFindingCDC::NoneFilter<BasePathFilter>>();
   }
 
   return Super::create(filterName);

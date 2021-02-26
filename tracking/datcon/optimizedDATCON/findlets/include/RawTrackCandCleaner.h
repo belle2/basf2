@@ -10,10 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-// #include <framework/datastore/StoreArray.h>
 
 #include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.h>
+#include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.dcl.h>
+
 #include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ChooseablePathFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <string>
@@ -70,6 +73,8 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<HitData>> m_relations;
 
     RelationCreator<HitData, ChooseableRelationFilter> m_relationCreator;
+
+    DATCONTreeSearcher<HitData, ChooseablePathFilter> m_treeSearcher;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.

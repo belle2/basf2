@@ -14,6 +14,10 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <tracking/datcon/optimizedDATCON/filters/relations/LayerRelationFilter.icc.h>
+#include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.icc.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
 #include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>

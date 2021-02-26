@@ -9,24 +9,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/filters/fourHitFilters/BaseFourHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class FourHitFilterFactory : public TrackFindingCDC::FilterFactory<BaseFourHitFilter> {
+  class PathFilterFactory : public TrackFindingCDC::FilterFactory<BasePathFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseFourHitFilter>;
+    using Super = TrackFindingCDC::FilterFactory<BasePathFilter>;
 
   public:
     /// Constructor forwarding the default filter name
-    explicit FourHitFilterFactory(const std::string& defaultFilterName = "all");
+    explicit PathFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
-    ~FourHitFilterFactory();
+    ~PathFilterFactory();
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;
@@ -38,6 +38,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<BaseFourHitFilter> create(const std::string& filterName) const override;
+    std::unique_ptr<BasePathFilter> create(const std::string& filterName) const override;
   };
 }

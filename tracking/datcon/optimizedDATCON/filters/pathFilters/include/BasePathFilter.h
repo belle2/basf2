@@ -9,10 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 namespace Belle2 {
   /// Base filter for hits stored in the HitData
-  using BaseThreeHitFilter = TrackFindingCDC::Filter<std::array<const HitData*, 3>>;
+  using BasePathFilter = TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const HitData*>>, HitData*>>;
 }

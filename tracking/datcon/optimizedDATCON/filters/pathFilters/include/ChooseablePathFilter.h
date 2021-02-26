@@ -9,10 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/datcon/optimizedDATCON/filters/threeHitFilters/ThreeHitFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/PathFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
-  using ChooseableThreeHitFilter = TrackFindingCDC::ChooseableFilter<ThreeHitFilterFactory>;
+  using ChooseablePathFilter = TrackFindingCDC::ChooseableFilter<PathFilterFactory>;
 }

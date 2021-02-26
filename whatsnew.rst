@@ -19,7 +19,7 @@ Changes since release-05
 
 .. rubric:: MC reconstruction and MC matching
 
-The MCTruthVariable isCrossfeed checks for crossfeed in the reconstruction of the given B meson. Returns 1 for crossfeed and 0 for no crossfeed. It interates over final the state daughters of the given B meson and searches for an identical B meson ancestor at generator level.
+The MCTruthVariable isBBCrossfeed checks for crossfeed in the reconstruction of the given B meson. Returns 1 for crossfeed and 0 for no crossfeed. It interates over final the state daughters of the given B meson and searches for an identical B meson ancestor at generator level.
 
 .. rubric:: Removal of old and deprecated database functions
 

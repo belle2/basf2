@@ -1,4 +1,4 @@
-# EventType: 1112560101
+# EventType: 1112560100
 # Descriptor: [B0 -> (KS0 -> pi+ pi-) (psi(2S) -> (J/psi -> e+ e-) pi+ pi-) ]
 # NickName: Bd_KsPsi2s_4pi+pi-Jpsi_e+e-
 # Tested: Yes
@@ -19,16 +19,16 @@ Enddecay
 CDecay anti-B0sig
 
 Decay psi(2S)sig
- 1.000 J/psisig   pi+     pi-                             VVPIPI; #[Reconstructed PDG2011]
+ 1.000 J/psisig   pi+     pi-                             VVPIPI;
 Enddecay
 
 Decay J/psisig
-1.000 e+ e-                                     PHOTOS   VLL; #[Reconstructed PDG2011]
+1.000 e+ e-                                     PHOTOS   VLL;
 
 Enddecay
 
 Decay K_S0sig
-1.000 pi+     pi-                                     PHSP; #[Reconstructed PDG2011]
+1.000 pi+     pi-                                     PHSP;
 Enddecay
 
 End

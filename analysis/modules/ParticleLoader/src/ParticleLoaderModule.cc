@@ -129,10 +129,18 @@ namespace Belle2 {
         // V0s get the label "V0"
         else if (nProducts > 0) listName = mother->getName() + ":V0";
 
+        string antiListName = ParticleListName::antiParticleListName(listName);
+        bool isSelfConjugatedParticle = (listName == antiListName);
+
         StoreObjPtr<ParticleList> particleList(listName);
-        // if particle list already exists, we can skip further steps
-        if (particleList.isOptional()) {
-          continue;
+        // if the particle list doesn't exist, we have to register it
+        if (!particleList.isOptional()) {
+          DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+          particleList.registerInDataStore(flags);
+          if (!isSelfConjugatedParticle) {
+            StoreObjPtr<ParticleList> antiParticleList(antiListName);
+            antiParticleList.registerInDataStore(flags);
+          }
         }
 
         if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
@@ -165,16 +173,6 @@ namespace Belle2 {
             if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
               B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
           }
-        }
-
-        string antiListName = ParticleListName::antiParticleListName(listName);
-        bool isSelfConjugatedParticle = (listName == antiListName);
-
-        DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-        particleList.registerInDataStore(flags);
-        if (!isSelfConjugatedParticle) {
-          StoreObjPtr<ParticleList> antiParticleList(antiListName);
-          antiParticleList.registerInDataStore(flags);
         }
 
         // add PList to corresponding collection of Lists

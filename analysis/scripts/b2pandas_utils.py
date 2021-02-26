@@ -59,9 +59,9 @@ class VariablesToHDF5(basf2.Module):
 
         dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
                  ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
-        for v in self._var_objects:
+        for name in varnames:
             # only float variables for now
-            dtype.append((v.name, np.float64))
+            dtype.append((name, np.float64))
 
         #: The data type
         self._dtype = dtype

@@ -127,14 +127,9 @@ namespace Belle2 {
     void tracksToParticles();
 
     /**
-     * Loads ECLCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
+     * Loads ECLCluster and KLMCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
      */
-    void eclClustersToParticles();
-
-    /**
-     * Loads KLMCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
-     */
-    void klmClustersToParticles();
+    void eclAndKLMClustersToParticles();
 
     /**
      * Loads V0 object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
@@ -185,8 +180,8 @@ namespace Belle2 {
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
     std::vector<PList> m_V02Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
-    std::vector<PList> m_ECLClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters */
-    std::vector<PList> m_KLMClusters2Plists; /**< Collection of PLists that will collect Particles created from KLMClusters */
+    std::vector<PList>
+    m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */

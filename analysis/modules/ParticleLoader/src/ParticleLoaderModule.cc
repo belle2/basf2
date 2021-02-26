@@ -192,8 +192,7 @@ namespace Belle2 {
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
-              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
-              m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+              m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
               B2INFO("   -> MDST source: ECLClusters and KLMClusters");
             } else {
               B2INFO("   -> MDST source: V0");
@@ -208,8 +207,7 @@ namespace Belle2 {
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
             B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
-            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
-            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+            m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
@@ -237,8 +235,7 @@ namespace Belle2 {
       mcParticlesToParticles();
     else {
       tracksToParticles();
-      eclClustersToParticles();
-      klmClustersToParticles();
+      eclAndKLMClustersToParticles();
       v0sToParticles();
     }
   }
@@ -333,7 +330,6 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> plist(listName);
       plist->addParticle(newPart);
     }
-
   }
 
 
@@ -567,9 +563,9 @@ namespace Belle2 {
     } // loop over tracks
   }
 
-  void ParticleLoaderModule::eclClustersToParticles()
+  void ParticleLoaderModule::eclAndKLMClustersToParticles()
   {
-    if (m_ECLClusters2Plists.empty()) // nothing to do
+    if (m_ECLKLMClusters2Plists.empty()) // nothing to do
       return;
 
     // create and register all ParticleLists

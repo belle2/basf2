@@ -111,14 +111,18 @@ void BelleMCOutputModule::beginRun()
   beam.sigma_p_high(sqrt(herCovariance[0][0]));
   TMatrixDSym lerCovariance = m_BeamParameters->getCovLER();
   beam.sigma_p_low(sqrt(lerCovariance[0][0]));
+  /*
+   * The vertex parameters are in cm, as in basf2.
+   * The unit is not the same as for particles in GEN_HEPEVT.
+   */
   TVector3 vertex = m_BeamParameters->getVertex();
-  beam.ip_x(vertex.X() / Unit::mm);
-  beam.ip_y(vertex.Y() / Unit::mm);
-  beam.ip_z(vertex.Z() / Unit::mm);
+  beam.ip_x(vertex.X());
+  beam.ip_y(vertex.Y());
+  beam.ip_z(vertex.Z());
   TMatrixDSym vertexCovariance = m_BeamParameters->getCovVertex();
-  beam.sigma_ip_x(sqrt(vertexCovariance[0][0]) / Unit::mm);
-  beam.sigma_ip_y(sqrt(vertexCovariance[1][1]) / Unit::mm);
-  beam.sigma_ip_z(sqrt(vertexCovariance[2][2]) / Unit::mm);
+  beam.sigma_ip_x(sqrt(vertexCovariance[0][0]));
+  beam.sigma_ip_y(sqrt(vertexCovariance[1][1]));
+  beam.sigma_ip_z(sqrt(vertexCovariance[2][2]));
   beam.cang_high(momentumHER.Vect().Theta());
   beam.cang_low(M_PI - momentumLER.Vect().Theta());
   beam.angle_ip_zx(momentumHER.Vect().Theta() / 2);

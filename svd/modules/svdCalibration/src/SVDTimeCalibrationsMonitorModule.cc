@@ -115,7 +115,11 @@ void SVDTimeCalibrationsMonitorModule::event()
 
           for (m_triggerBin = 0; m_triggerBin < 4; m_triggerBin++) {
 
-            float f0, f1, f2, f4;
+            float f0 = -99;
+            float f1 = -99;
+            float f2 = -99;
+            float f4 = -99;
+
             if (TString(m_timeAlgo).Contains("CoG6")) {
               f0 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 0 /*raw time*/, m_triggerBin);
               f1 = m_CoG6TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);

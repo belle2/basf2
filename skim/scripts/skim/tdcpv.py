@@ -4,8 +4,8 @@
 """"""
 
 import modularAnalysis as ma
-from skim.standardlists.dileptons import (loadStdDiLeptons, loadStdJpsiToee,
-                                          loadStdJpsiTomumu, loadStdPsi2s2lepton)
+from skim.standardlists.dileptons import (loadStdJpsiToee, loadStdJpsiTomumu,
+                                          loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
                                             loadStdSkimHighEffEta, loadStdSkimHighEffKstar0,
@@ -14,7 +14,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
 
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
-from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPhotons import stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm

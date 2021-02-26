@@ -11,6 +11,7 @@
 #pragma once
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <reconstruction/dbobjects/CDCDedxBadWires.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 #include <string>
@@ -70,7 +71,7 @@ namespace Belle2 {
     /**
     * function to plot bad wire status (then and now)
     */
-    void plotBadWires(int nDeadwires, int oBadwires);
+    void plotBadWires(int nDeadwires, int oDeadwires, int Badwires);
 
     /**
     * function to plot wires in hist with input file
@@ -118,5 +119,6 @@ namespace Belle2 {
     std::vector<double> flayerAvg; /**< layer wire avg of trun mean */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */
   };
 } // namespace Belle2

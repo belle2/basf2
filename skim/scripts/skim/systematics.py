@@ -662,7 +662,7 @@ class SystematicsFourLeptonFromHLTFlag(BaseSkim):
         ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsFourLeptonHLT_randomRank", path=path)
 
         path = self.skim_event_cuts(
-            f"SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
         )
 
         self.SkimLists = [f"pi+:{label}"]
@@ -685,7 +685,7 @@ class SystematicsRadMuMuFromHLTFlag(BaseSkim):
         ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuLeptonID_randomRank", path=path)
 
         path = self.skim_event_cuts(
-            f"SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
         )
         self.SkimLists = [f"pi+:{label}"]
 

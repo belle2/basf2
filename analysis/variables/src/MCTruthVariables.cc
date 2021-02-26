@@ -868,26 +868,23 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
-    double isBBCrossfeed(const Particle* particle, const std::vector<double>& args)
+    double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
-      unsigned int B_pdg;
-      if (args.empty())
-        B2FATAL("PDG-Code of searched common parent not given, but needed to find crossfeed!");
-      else
-        B_pdg = abs(args[0]);
 
       std::vector<const Particle*> Daughters = particle->getFinalStateDaughters();
       int nDaughters = Daughters.size();
-      int mother_ids[nDaughters];
+      if (nDaughters <= 1)
+        return 0;
+      std::vector<int> mother_ids;
 
       for (int j = 0; j < nDaughters; ++j) {
         const MCParticle* curMCParticle = Daughters[j]->getMCParticle();
         while (curMCParticle != nullptr) {
           int m_pdg = curMCParticle->getPDG();
-          if (abs(m_pdg) == B_pdg) {
-            mother_ids[j] = curMCParticle->getArrayIndex();
+          if (abs(m_pdg) == 511 || abs(m_pdg) == 521 || abs(m_pdg) == 531) {
+            mother_ids.emplace_back(curMCParticle->getArrayIndex());
             break;
           }
           const MCParticle* curMCMother = curMCParticle->getMother();
@@ -898,11 +895,11 @@ namespace Belle2 {
         }
       }
 
-      for (int j = 1; j < nDaughters; ++j) {
-        if (mother_ids[j] != mother_ids[0])
-          return 1;
-      }
-      return 0;
+      std::set<int> distinctIDs = std::set(mother_ids.begin(), mother_ids.end());
+      if (distinctIDs.size() == 1)
+        return 0;
+      else
+        return 1;
     }
 
     VARIABLE_GROUP("MC matching and MC truth");
@@ -930,7 +927,7 @@ namespace Belle2 {
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
-                      "Check whether there is Crossfeed in the reconstruction of a B meson");
+                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,

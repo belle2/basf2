@@ -17,6 +17,10 @@ be adapted when changing to the new release.
 Changes since release-05
 ========================
 
+.. rubric:: MC reconstruction and MC matching
+
+The MCTruthVariable isCrossfeed checks for crossfeed in the reconstruction of the given B meson. Returns 1 for crossfeed and 0 for no crossfeed. It interates over final the state daughters of the given B meson and searches for an identical B meson ancestor at generator level.
+
 .. rubric:: Removal of old and deprecated database functions
 
 Some functions used in the past to handle the conditions database (like ``basf2.use_local_database`` or ``basf2.reset_database``) are removed, and any script using them does not work anymore.

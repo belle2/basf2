@@ -323,6 +323,11 @@ namespace Belle2 {
      */
     double particleClusterBestMCPDGCode(const Particle*);
 
+    /**
+     * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed.
+     * Interates over final state daughters of a given B meson and searches for identical B meson ancestor at                        * generator level.
+     */
+    double isBBCrossfeed(const Particle*);
   }
 }
 

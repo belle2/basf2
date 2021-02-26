@@ -8,7 +8,7 @@ from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, final
 args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)
-add_hlt_processing(path, run_type=constants.RunTypes.cosmic,
+add_hlt_processing(reco_path, run_type=constants.RunTypes.cosmic,
                    softwaretrigger_mode=constants.SoftwareTriggerModes.monitor,
                    data_taking_period="early_phase3")
 finalize_zmq_path(path, args, location=constants.Location.hlt)

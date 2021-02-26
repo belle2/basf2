@@ -10,6 +10,7 @@ flavor of the not reconstructed :math:`B^0` meson in events with a neutral
 :math:`B` meson pair. It can be used also in addition to continuum suppression in events
 with a charged :math:`B` meson pair.
 
+.. tip:: For an introductory hands-on lesson, take a look at :numref:`onlinebook_flavor_tagging`.
 
 Flavor Tagging Principle
 ------------------------

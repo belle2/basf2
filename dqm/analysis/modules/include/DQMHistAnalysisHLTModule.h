@@ -41,6 +41,8 @@ namespace Belle2 {
     std::map<std::string, std::string> m_columnMapping;
     /// Which l1 triggers to show
     std::vector<std::string> m_l1Histograms;
+    /// Which HLT filter lines to use for calculation retention rate per unit
+    std::vector<std::string> m_retentionPerUnit;
     /// Histogram with final efficiencies to HLT
     std::pair<TCanvas*, TH1F*> m_hEfficiency = {nullptr, nullptr};
     /// Histogram with final efficiencies to all events
@@ -51,6 +53,8 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1F*> m_hRatios = {nullptr, nullptr};
     /// Histogram with hlt&l1 ratios to l1 numbers
     std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hl1Ratios;
+    /// Histogram with retention rate per unit of some hlt filter lines
+    std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hRetentionPerUnit;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

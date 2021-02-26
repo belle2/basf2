@@ -46,11 +46,14 @@ namespace Belle2 {
       /** Initialize the module */
       void initialize() override;
 
-      /** Initialize the module */
+      /** configure strip reconstruction */
       void beginRun() override;
 
-      /** does the actual clustering */
+      /** does the actual strip reconstruction */
       void event() override;
+
+      /** delete pointers */
+      void endRun() override;
 
     protected:
 

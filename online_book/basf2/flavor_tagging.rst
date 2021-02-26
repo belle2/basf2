@@ -175,7 +175,7 @@ it to ``FBDT_qrCombined``!
     * The output is of the form :math:`\pm 1` times the confidence between 0 and
       1.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

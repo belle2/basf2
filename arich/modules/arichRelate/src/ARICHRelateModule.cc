@@ -73,8 +73,6 @@ namespace Belle2 {
         continue;
       }
 
-      int pdg = 211;
-
       // Find the track produced by MCParticle
       const Track* track = DataStore::getRelated<Track>(particle);
       if (!track) continue;
@@ -86,7 +84,7 @@ namespace Belle2 {
       Const::EDetector myDetID = Const::EDetector::ARICH;
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
-        if (abs(extHit->getPdgCode()) != pdg) continue;
+        if (abs(extHit->getPdgCode()) != Const::pion.getPDGCode()) continue;
         if (extHit->getDetectorID() != myDetID) continue;
         if (extHit->getCopyID() != 6789) continue; // aerogel Al support plate
         if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate

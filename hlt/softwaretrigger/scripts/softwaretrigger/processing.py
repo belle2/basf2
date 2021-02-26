@@ -132,6 +132,7 @@ def add_hlt_processing(path,
                        prune_output=True,
                        unpacker_components=None,
                        reco_components=None,
+                       create_hlt_unit_histograms=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -165,7 +166,8 @@ def add_hlt_processing(path,
     path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
 
     # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
+                           create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:
@@ -192,7 +194,12 @@ def add_hlt_processing(path,
     accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
-    path_utils.add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
+    path_utils.add_hlt_dqm(
+        accept_path,
+        run_type=run_type,
+        components=reco_components,
+        dqm_mode=constants.DQMModes.filtered,
+        create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
@@ -201,10 +208,11 @@ def add_hlt_processing(path,
     # However, if we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
-    path.add_module('StatisticsSummary').set_name('Sum_ROI_Assembler')
+    path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
+                           create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if prune_output:
         # And in the end remove everything which should not be stored

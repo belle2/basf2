@@ -19,14 +19,14 @@
 </header>
 """
 
+import sys
+import argparse
+
 import ROOT
 ROOT.gROOT.SetBatch(ROOT.kTRUE)  # noqa
 
-from ROOT import TFile, TChain, TH1F, TH2F, TNamed, gStyle, PyConfig
+from ROOT import TFile, TChain, TH1F, TNamed, gStyle, PyConfig  # noqa
 PyConfig.IgnoreCommandLineOptions = True  # noqa
-
-import sys
-import argparse
 
 # contact person information
 # is added to the plot descriptions

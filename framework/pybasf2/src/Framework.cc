@@ -28,9 +28,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <boost/python.hpp>
 
 #include <set>
+#include <vector>
 
 using namespace boost::python;
 using namespace Belle2;
@@ -193,6 +196,26 @@ void Framework::setStreamingObjects(const boost::python::list& streamingObjects)
   auto vec = PyObjConvUtils::convertPythonObject(streamingObjects, std::vector<std::string>());
   Environment::Instance().setStreamingObjects(vec);
 }
+
+void Framework::setRealm(const std::string& realm)
+{
+  int irealm = -1;
+  std::vector<std::string> realms;
+  for (int i = LogConfig::c_None; i <= LogConfig::c_Production; i++) {
+    std::string thisRealm = LogConfig::logRealmToString((LogConfig::ELogRealm)i);
+    realms.push_back(thisRealm);
+    if (boost::iequals(realm, thisRealm)) { //case-insensitive
+      irealm = i;
+      break;
+    }
+  }
+  if (irealm < 0) {
+    B2ERROR("Invalid realm! Needs to be one of " << boost::join(realms, ", "));
+  } else {
+    Environment::Instance().setRealm((LogConfig::ELogRealm)irealm);
+  }
+}
+
 
 std::string Framework::findFile(const std::string& filename, const std::string& type, bool ignore_errors)
 {
@@ -375,7 +398,14 @@ Returns:
 Raises:
   will raise a `ModuleNotCreatedError` if there is any problem creating the module.
 )DOCSTRING");
-    def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
+  def("set_realm", &Framework::setRealm, R"DOCSTRING(
+Set the basf2 execution realm.
+
+The severity of log messages sometimes depends on where basf2 runs. This is controlled by the execution realm.
+
+Usually the realm does not have to be set explicitly. On the HLT or express reco it should be set to 'online' and for official productions to 'production'.
+)DOCSTRING", args("realm"));
+  def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
 Processes up to max_events events by starting with the first module in the specified path.
 
  This method starts processing events only if there is a module in the path

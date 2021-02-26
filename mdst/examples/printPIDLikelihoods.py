@@ -54,13 +54,9 @@ class printPIDLikelihoods(b2.Module):
             print()
 
         # wait for user respond
-        try:
-            q = 0
-            Q = 0
-            abc = input('Type <CR> to continue or Q to quit ')
+        response = input("Type Enter to continue or Q to quit.\n").lower().strip()
+        if response == "q":
             evtMetaData.obj().setEndOfData()
-        except BaseException:
-            abc = ''  # dummy line to terminate try-except
 
 
 b2.set_log_level(b2.LogLevel.ERROR)

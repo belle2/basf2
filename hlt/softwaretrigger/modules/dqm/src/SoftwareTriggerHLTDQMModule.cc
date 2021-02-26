@@ -17,6 +17,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <algorithm>
+#include <fstream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -31,7 +32,7 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   // Fill in the default values of the module parameters
   m_param_variableIdentifiers = {};
 
-  m_param_cutResultIdentifiers["filter"] = {"total_result"};
+  m_param_cutResultIdentifiers["filter"]["filter"] = {"total_result"};
 
   addParam("cutResultIdentifiers", m_param_cutResultIdentifiers,
            "Which cuts should be reported? Please remember to include the total_result also, if wanted.",
@@ -41,6 +42,10 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
            "Which cuts should be ignored? This will display cleaner trigger lines, e.g. to clear them from bhabha contamination. "
            "Vetoes on skims do not apply in filter plot and vice versa.",
            m_param_cutResultIdentifiersIgnored);
+
+  addParam("cutResultIdentifiersPerUnit", m_param_cutResultIdentifiersPerUnit,
+           "Which cuts should be reported per unit?",
+           m_param_cutResultIdentifiersPerUnit);
 
   addParam("variableIdentifiers", m_param_variableIdentifiers,
            "Which variables should be reported?",
@@ -57,6 +62,14 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   addParam("createExpRunEventHistograms", m_param_create_exp_run_event_histograms,
            "Create exp/run/event histograms?",
            true);
+
+  addParam("createHLTUnitHistograms", m_param_create_hlt_unit_histograms,
+           "Create HLT unit histograms?",
+           false);
+
+  addParam("createErrorFlagHistograms", m_param_create_error_flag_histograms,
+           "Create Error Flag histograms?",
+           false);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);
@@ -82,16 +95,26 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
-    const std::string& baseIdentifier = cutIdentifier.first;
-    const int numberOfFlags = cutIdentifier.second.size();
 
-    m_cutResultHistograms.emplace(baseIdentifier,
-                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), numberOfFlags, 0,
-                                           numberOfFlags));
-    m_cutResultHistograms[baseIdentifier]->SetXTitle("");
-    m_cutResultHistograms[baseIdentifier]->SetOption("bar");
-    m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
-    m_cutResultHistograms[baseIdentifier]->SetStats(false);
+    const std::string& title = cutIdentifier.first;
+    const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
+    const std::string& baseIdentifier = mapVal.first;
+    const int numberOfFlags = mapVal.second.size();
+
+    if (title == baseIdentifier)
+      m_cutResultHistograms.emplace(title,
+                                    new TH1F(title.c_str(), ("Events triggered in HLT " + baseIdentifier).c_str(),
+                                             numberOfFlags, 0,
+                                             numberOfFlags));
+    else
+      m_cutResultHistograms.emplace(title,
+                                    new TH1F((baseIdentifier + "_" + title).c_str(), ("Events triggered in HLT " + baseIdentifier + " : " + title).c_str(),
+                                             numberOfFlags, 0,
+                                             numberOfFlags));
+    m_cutResultHistograms[title]->SetXTitle("");
+    m_cutResultHistograms[title]->SetOption("bar");
+    m_cutResultHistograms[title]->SetFillStyle(0);
+    m_cutResultHistograms[title]->SetStats(false);
   }
 
   // We add one for the total result
@@ -128,6 +151,28 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
   }
 
+  if (m_param_create_hlt_unit_histograms) {
+    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number", "HLT Unit Number", HLTUnit::max_hlt_units, 0,
+                                                            HLTUnit::max_hlt_units + 1));
+
+    for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
+      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
+                                           ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units, 0,
+                                           HLTUnit::max_hlt_units + 1));
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("bar");
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetFillStyle(0);
+    }
+
+  }
+
+  if (m_param_create_error_flag_histograms) {
+    m_runInfoHistograms.emplace("error_flag", new TH1F("error_flag", "Error Flag", 4, 0, 4));
+    m_runInfoHistograms["error_flag"]->SetOption("bar");
+    m_runInfoHistograms["error_flag"]->SetFillStyle(0);
+    m_runInfoHistograms["error_flag"]->SetStats(false);
+  }
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
@@ -137,6 +182,19 @@ void SoftwareTriggerHLTDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
+
+  if (m_param_create_hlt_unit_histograms) {
+    std::ifstream file;
+    file.open(HLTUnit::hlt_unit_file);
+    if (file.good()) {
+      std::string host;
+      getline(file, host);
+      m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      file.close();
+    } else {
+      B2WARNING("HLT unit number not found");
+    }
+  }
 }
 
 void SoftwareTriggerHLTDQMModule::event()
@@ -160,8 +218,10 @@ void SoftwareTriggerHLTDQMModule::event()
 
   if (m_triggerResult.isValid()) {
     for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
-      const std::string& baseIdentifier = cutIdentifier.first;
-      const auto& cuts = cutIdentifier.second;
+      const std::string& title = cutIdentifier.first;
+      const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
+      const std::string& baseIdentifier = mapVal.first;
+      const auto& cuts = mapVal.second;
 
       // check if we want to ignore it
       bool skip = false;
@@ -191,15 +251,17 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != results.end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0 and not skip);
+          m_cutResultHistograms[title]->Fill(cutTitle.c_str(), cutResult > 0 and not skip);
         }
       }
 
       if (m_param_create_total_result_histograms) {
-        const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
-        const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
+        if (title == baseIdentifier) {
+          const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
+          const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-        m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+        }
       }
     }
 
@@ -226,8 +288,10 @@ void SoftwareTriggerHLTDQMModule::event()
       }
 
       for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
-        const std::string& baseIdentifier = cutIdentifier.first;
-        const auto& cuts = cutIdentifier.second;
+        const std::string& title = cutIdentifier.first;
+        const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
+        const std::string& baseIdentifier = mapVal.first;
+        const auto& cuts = mapVal.second;
 
         for (const std::string& cutTitle : cuts) {
           const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
@@ -254,11 +318,44 @@ void SoftwareTriggerHLTDQMModule::event()
     m_runInfoHistograms["event_number"]->Fill(m_eventMetaData->getEvent());
     m_runInfoHistograms["experiment_number"]->Fill(m_eventMetaData->getExperiment());
   }
+
+  if (m_eventMetaData.isValid() and m_param_create_error_flag_histograms) {
+    m_runInfoHistograms["error_flag"]->Fill("B2LinkPacketCRCError",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkPacketCRCError));
+    m_runInfoHistograms["error_flag"]->Fill("B2LinkEventCRCError",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkEventCRCError));
+    m_runInfoHistograms["error_flag"]->Fill("HLTCrash",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash));
+    m_runInfoHistograms["error_flag"]->Fill("ReconstructionAbort",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort));
+  }
+
+  if (m_param_create_hlt_unit_histograms) {
+    m_runInfoHistograms["hlt_unit_number"]->Fill(m_hlt_unit);
+
+    if (m_triggerResult.isValid()) {
+      for (const std::string& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
+        const std::string& cutName = cutIdentifierPerUnit.substr(0, cutIdentifierPerUnit.find("\\"));
+        const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName("filter", cutName);
+
+        // check if the cutResult is in the list, be graceful when not available
+        const auto results = m_triggerResult->getResults();
+        auto const cutEntry = results.find(fullCutIdentifier);
+
+        if (cutEntry != results.end()) {
+          const int cutResult = cutEntry->second;
+          m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit, cutResult > 0);
+        }
+      }
+    }
+  }
 }
 
 void SoftwareTriggerHLTDQMModule::beginRun()
 {
   std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
+  [](auto & it) { it.second->Reset(); });
+  std::for_each(m_cutResultPerUnitHistograms.begin(), m_cutResultPerUnitHistograms.end(),
   [](auto & it) { it.second->Reset(); });
   std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
   [](auto & it) { it.second->Reset(); });
@@ -267,3 +364,4 @@ void SoftwareTriggerHLTDQMModule::beginRun()
   std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
   [](auto & it) { it.second->Reset(); });
 }
+

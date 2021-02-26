@@ -27,7 +27,7 @@ namespace Belle2 {
    * It will record if the data of sensors (readout by this DHC) is useable.
    *
    */
-  class PXDDAQDHCStatus {
+  class PXDDAQDHCStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */

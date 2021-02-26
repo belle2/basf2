@@ -139,18 +139,18 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
         # make sure the last database setup is the magnetic field for MC8-10
         from basf2 import conditions
         conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
-    elif environmentType is 'None':
+    elif environmentType == 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
         environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
-    if environmentType is 'Belle':
+    if environmentType == 'Belle':
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
         import b2bii
         b2bii.setB2BII()
-    if environmentType is 'MC5':
+    if environmentType == 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
     # fixECLCluster for MC5/MC6/MC7
@@ -638,7 +638,7 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
-def trackingEfficiency(inputListNames, fraction, path=None):
+def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=None):
     """
     Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
     Takes care of the duplicates, if any.
@@ -655,9 +655,12 @@ def trackingEfficiency(inputListNames, fraction, path=None):
     path.add_module(trackingefficiency)
 
 
-def trackingMomentum(inputListNames, scale, path=None):
+def scaleTrackMomenta(inputListNames, scale, path=None):
     """
-    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Scale momenta of the particles according to the scaling factor scale.
+    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
@@ -1212,11 +1215,10 @@ def reconstructDecay(decayString,
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is reconstructed as well
     (meaning that the charge conjugated mother list is created as well) but this can be deactivated.
 
-    One can use an ``@``-sign to mark a particle as unspecified, e.g. in form of a DecayString: :code:`\@Xsd -> K+ pi-`. If the
-    particle is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into
-    the correct daughters will be flagged as correct. For example the DecayString :code:`\@Xsd -> K+ pi-` would match all particles
-    which decay into a kaon and a pion, for example :math:`K^*`, :math:`B^0`, :math:`D^0`. Still the daughters need to be stated
-    correctly so this can be used for "sum of exclusive" decays.
+    One can use an ``@``-sign to mark a particle as unspecified for inclusive analyses,
+    e.g. in a DecayString: :code:`'@Xsd -> K+ pi-'`.
+
+    .. seealso:: :ref:`Marker_of_unspecified_particle`
 
     .. warning::
         The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
@@ -2069,7 +2071,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
@@ -2881,7 +2883,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
                 applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)

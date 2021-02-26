@@ -30,9 +30,11 @@ namespace Belle2 {
     PXDDQMClustersModule();
 
   private:
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
 
     /**

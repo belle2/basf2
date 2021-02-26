@@ -1,0 +1,26 @@
+# EventType: 1190420006
+# Descriptor: [B0 -> Xs mu+ mu-]cc
+# NickName: Bd_Xsmumu_highMXs
+# Documentation: Rare b->s l+ l- process. min_MXs = 1.2 GeV
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Yo Sato
+# Email: yosato@epx.phys.tohoku.ac.jp
+# Cuts: None
+# Date: 20200825
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.      Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.461 1.2;
+Enddecay
+#
+Decay anti-B0sig
+1.     anti-Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.461 1.2;
+Enddecay
+#
+End

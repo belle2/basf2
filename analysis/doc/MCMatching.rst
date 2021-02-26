@@ -323,3 +323,6 @@ Photon matching
 ---------------
 Details of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
 
+.. _TopologyAnalysis:
+
+.. include:: TopoAna.rst

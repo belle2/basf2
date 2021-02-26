@@ -54,7 +54,6 @@ if __name__ == "__main__":
 
     import basf2 as b2
     import modularAnalysis as ma
-    from variables import variables
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()

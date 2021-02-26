@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,8 +27,8 @@ V0DaughterMassUpdaterModule::V0DaughterMassUpdaterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
-  addParam("pdgCodeOfV0posDaughter", m_pdg_pos_dau, "PDG code of daughter with positive charge", 11);
-  addParam("pdgCodeOfV0negDaughter", m_pdg_neg_dau, "PDG code of daughter with negative charge", 11);
+  addParam("pdgCodeOfV0posDaughter", m_pdg_pos_dau, "PDG code of daughter with positive charge", Const::electron.getPDGCode());
+  addParam("pdgCodeOfV0negDaughter", m_pdg_neg_dau, "PDG code of daughter with negative charge", Const::electron.getPDGCode());
 
 }
 

@@ -64,7 +64,7 @@ def fitLaserResolution(
     if maxPeaks > 2 or maxPeaks < 1:
         b2.B2FATAL('Usupported value for the maximum number for peaks (maxPeaks = ' +
                    str(maxPeaks) + '). Please set maxPeak o either 1 or 2.')
-    if pdfType is not 'cb' and pdfType is not 'gaus' and pdfType is not 'gausExpo':
+    if pdfType != 'cb' and pdfType != 'gaus' and pdfType != 'gausExpo':
         b2.B2FATAL(
             'Unknown PDF type ' +
             pdfType +
@@ -116,7 +116,7 @@ def fitLaserResolution(
     histoData = tFileData.Get('LaserTimingVSChannel')
 
     # Prepares the output file and tree
-    tFileOut = TFile(outputFile, "RECREATE")
+    # tFileOut = TFile(outputFile, "RECREATE")
     outTree = TTree("tree", "tree")
 
     # Slot ID (1-based)

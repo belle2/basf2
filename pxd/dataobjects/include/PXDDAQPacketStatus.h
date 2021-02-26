@@ -26,7 +26,7 @@ namespace Belle2 {
    * It will record if the data of DHC/DHE/sensors (readout by this packet) is useable.
    *
    */
-  class PXDDAQPacketStatus {
+  class PXDDAQPacketStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */

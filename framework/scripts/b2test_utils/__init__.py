@@ -353,6 +353,6 @@ def skip_test_if_light(py_case=None):
             native unittest then pass the TestCase instance
     """
     try:
-        import generators
+        import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)

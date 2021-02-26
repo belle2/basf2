@@ -148,7 +148,7 @@ For our example, let's start by defining the following selection cut strings:
 
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
-     :emphasize-lines: 49-50
+     :emphasize-lines: 3-4
      :lineno-start: 47
 
 
@@ -419,7 +419,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
       continuum suppression or flavor tag.
     * Usage of ROE without a mask is **not** recommended.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

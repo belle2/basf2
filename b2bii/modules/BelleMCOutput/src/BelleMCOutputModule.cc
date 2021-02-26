@@ -20,6 +20,9 @@
 #include <belle_legacy/tables/hepevt.h>
 #include <belle_legacy/tables/filespec.h>
 
+/* ROOT headers. */
+#include <TMatrixD.h>
+
 using namespace Belle2;
 
 REG_MODULE(BelleMCOutput)
@@ -120,12 +123,30 @@ void BelleMCOutputModule::beginRun()
   beam.ip_y(vertex.Y());
   beam.ip_z(vertex.Z());
   TMatrixDSym vertexCovariance = m_BeamParameters->getCovVertex();
-  beam.sigma_ip_x(sqrt(vertexCovariance[0][0]));
-  beam.sigma_ip_y(sqrt(vertexCovariance[1][1]));
-  beam.sigma_ip_z(sqrt(vertexCovariance[2][2]));
   beam.cang_high(momentumHER.Vect().Theta());
   beam.cang_low(M_PI - momentumLER.Vect().Theta());
-  beam.angle_ip_zx(momentumHER.Vect().Theta() / 2);
+  double angleIPZX = momentumHER.Vect().Theta() / 2;
+  beam.angle_ip_zx(angleIPZX);
+  /*
+   * Transformation of error matrix. It is inverse to the transformation in
+   * belle_legacy/ip/IpProfile.cc.
+   */
+  TRotation rotationY;
+  rotationY.RotateY(-angleIPZX);
+  TMatrixD rotationMatrix(3, 3);
+  rotationMatrix[0][0] = rotationY.XX();
+  rotationMatrix[0][1] = rotationY.XY();
+  rotationMatrix[0][2] = rotationY.XZ();
+  rotationMatrix[1][0] = rotationY.YX();
+  rotationMatrix[1][1] = rotationY.YY();
+  rotationMatrix[1][2] = rotationY.YZ();
+  rotationMatrix[2][0] = rotationY.ZX();
+  rotationMatrix[2][1] = rotationY.ZY();
+  rotationMatrix[2][2] = rotationY.ZZ();
+  TMatrixDSym vertexCovariance2 = vertexCovariance.Similarity(rotationMatrix);
+  beam.sigma_ip_x(sqrt(vertexCovariance2[0][0]));
+  beam.sigma_ip_y(sqrt(vertexCovariance2[1][1]));
+  beam.sigma_ip_z(sqrt(vertexCovariance2[2][2]));
   m_BelleFile->write(BBS_BEGIN_RUN, 0);
 }
 

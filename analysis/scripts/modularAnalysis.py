@@ -916,8 +916,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         # the list to name/format that user wants and optionally apply a cut
         if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
             copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
-            if cut != "":
-                applyCuts(decayString.split(" ->")[0], cut, path)
+        if cut != "":
+            applyCuts(decayString.split(" ->")[0], cut, path)
     elif len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
         # then we have a non-V0 particle which the particle loader automatically calls "all"
         # as with the special V0 case we have to copy over the list to the name/format requested

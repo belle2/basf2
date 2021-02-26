@@ -39,10 +39,10 @@ class VariablesToHDF5(basf2.Module):
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
-        # get variables from manager
-        varnames = variable_manager.resolveCollections(std_vector(*self._variables))
+        #: variable names
+        self._varnames = variable_manager.resolveCollections(std_vector(*self._variables))
         #: variable objects for each variable
-        self._var_objects = [variable_manager.getVariable(n) for n in varnames]
+        self._var_objects = [variable_manager.getVariable(n) for n in self._varnames]
 
         #: Event metadata
         self._evtmeta = Belle2.PyStoreObj("EventMetaData")
@@ -59,7 +59,7 @@ class VariablesToHDF5(basf2.Module):
 
         dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
                  ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
-        for name in varnames:
+        for name in self._varnames:
             # only float variables for now
             dtype.append((name, np.float64))
 
@@ -85,11 +85,11 @@ class VariablesToHDF5(basf2.Module):
         buf["icand"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
-            for v in self._var_objects:
+            for name, v in zip(self._varnames, self._var_objects):
                 # pyroot proxy not working with callables, we should fix this.
                 # For now we need to go back by name and call it.
                 # should be `row[v.name] = v.func(p)`
-                row[v.name] = variable_manager.evaluate(v.name, p)
+                row[name] = variable_manager.evaluate(v.name, p)
 
         self._table.append(buf)
 

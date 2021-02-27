@@ -746,14 +746,14 @@ class SystematicsKshort(BaseSkim):
         vertex.treeFit('K_S0:reco', 0.0, path=path)
         ma.applyCuts('K_S0:reco', '0.4 < M < 0.6', path=path)
 
-        ma.fillParticleList('K_S0:V0 -> pi+ pi-',
+        ma.fillParticleList('K_S0:v0 -> pi+ pi-',
                             '[0.30 < M < 0.70]',
                             True,
                             path=path)
-        vertex.treeFit('K_S0:V0', 0.0, path=path)
-        ma.applyCuts('K_S0:V0', '0.4 < M < 0.6', path=path)
+        vertex.treeFit('K_S0:v0', 0.0, path=path)
+        ma.applyCuts('K_S0:v0', '0.4 < M < 0.6', path=path)
 
-        ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0', 'K_S0:reco'],
+        ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:v0', 'K_S0:reco'],
                                        variable='particleSource', preferLowest=True, path=path)
 
         KS_cut = '[[cosAngleBetweenMomentumAndVertexVector>0.998] or '\

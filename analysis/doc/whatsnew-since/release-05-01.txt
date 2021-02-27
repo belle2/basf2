@@ -51,6 +51,8 @@ Variables
    theme.
  * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
    :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.
+   
+ * New MCTruthVariable isBBCrossfeed checks for crossfeed in the reconstruction of the given B meson. Returns 1 for crossfeed, 0 for no crossfeed and nan for no true B meson or failed truthmatching. Interates over final state daughters of a given B meson and searches for common identical (i.e. same MC ID) B meson ancestor at generator level.
 
 Modules
 +++++++

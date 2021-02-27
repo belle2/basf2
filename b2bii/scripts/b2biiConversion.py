@@ -69,6 +69,7 @@ def setupB2BIIDatabase(isMC=False):
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
+                                  convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
@@ -85,6 +86,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
         useBelleDBServer (str): None to use the recommended BelleDB server.
+        convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
         path (basf2.Path): Path to add modules in.
@@ -168,6 +170,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         b2.B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
     # Convert MDST Module
     convert = b2.register_module('B2BIIConvertMdst')
+    convert.param('convertBeamParameters', convertBeamParameters)
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)

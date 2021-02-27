@@ -809,25 +809,26 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
     for decayString, cut in decayStringsWithCuts:
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
         # need to check some logic to unpack possible scenarios
-        decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-        if "->" in decayString:
+        if decayDescriptor.getNDaughters() > 0:
             # ... then we have an actual decay in the decay string which must be a V0
             # the particle loader automatically calls this "V0" so we have to copy over
-            # the list to name/format that user wants and optionally apply a cut
-            if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
-                copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
-            if cut != "":
-                applyCuts(decayString.split(" ->")[0], cut, path)
-        elif len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+            # the list to name/format that user wants
+            if decayDescriptor.getMother().getLabel() != 'V0':
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+        elif decayDescriptor.getMother().getLabel() != 'all':
             # then we have a non-V0 particle which the particle loader automatically calls "all"
             # as with the special V0 case we have to copy over the list to the name/format requested
-            copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+            copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
-        # optionally apply a cut to anything except V0s where we've handled them already
-        if cut != "" and "->" not in decayString:
-            applyCuts(decayString, cut, path)
+        # optionally apply a cut
+        if cut != "":
+            applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
         if decayString.startswith("gamma"):
             # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
@@ -909,23 +910,24 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     path.add_module(pload)
 
     # need to check some logic to unpack possible scenarios
-    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-    if "->" in decayString:
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getNDaughters() > 0:
         # ... then we have an actual decay in the decay string which must be a V0
         # the particle loader automatically calls this "V0" so we have to copy over
-        # the list to name/format that user wants and optionally apply a cut
-        if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
-            copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
-        if cut != "":
-            applyCuts(decayString.split(" ->")[0], cut, path)
-    elif len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+        # the list to name/format that user wants
+        if decayDescriptor.getMother().getLabel() != 'V0':
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+    elif decayDescriptor.getMother().getLabel() != 'all':
         # then we have a non-V0 particle which the particle loader automatically calls "all"
         # as with the special V0 case we have to copy over the list to the name/format requested
-        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
-    # optionally apply a cut to anything except V0s where we've handled them already
-    if cut != "" and "->" not in decayString:
-        applyCuts(decayString, cut, path)
+    # optionally apply a cut
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
     if decayString.startswith("gamma"):
         # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
@@ -968,11 +970,14 @@ def fillParticleListWithTrackHypothesis(decayString,
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
-    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'all':
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'all':
         # the particle loader automatically calls particle lists of charged FSPs "all"
         # so we have to copy over the list to the name/format requested
-        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':all', writeOut, path)
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
@@ -1005,15 +1010,18 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
     pload.param('writeOut', writeOut)
     path.add_module(pload)
 
-    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'V0':
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'V0':
         # the particle loader automatically calls converted photons "V0" so we have to copy over
         # the list to name/format that user wants
-        copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':V0', writeOut, path)
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
-        applyCuts(decayString.split(" ->")[0], cut, path)
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromROE(decayString,
@@ -1052,15 +1060,18 @@ def fillParticleListFromROE(decayString,
     pload.param('useROEs', True)
     path.add_module(pload)
 
-    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'ROE':
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'ROE':
         # the particle loader automatically uses the label "ROE" for particles built from the ROE
         # so we have to copy over the list to name/format that user wants
-        copyList(decayString.split(" ->")[0], decayStringSeparatedIntoNameAndLabel[0] + ':ROE', writeOut, path)
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':ROE', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
-        applyCuts(decayString.split(" ->")[0], cut, path)
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromMC(decayString,
@@ -1093,11 +1104,14 @@ def fillParticleListFromMC(decayString,
     pload.param('useMCParticles', True)
     path.add_module(pload)
 
-    decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-    if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'MC':
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'MC':
         # the particle loader automatically uses the label "MC" for particles built from MCParticles
         # so we have to copy over the list to name/format that user wants
-        copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':MC', writeOut, path)
+        copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
@@ -1137,12 +1151,15 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('useMCParticles', True)
     path.add_module(pload)
 
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
     for decayString, cut in decayStringsWithCuts:
-        decayStringSeparatedIntoNameAndLabel = decayString.split()[0].split(':')
-        if len(decayStringSeparatedIntoNameAndLabel) == 1 or decayStringSeparatedIntoNameAndLabel[1] != 'MC':
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
+        if decayDescriptor.getMother().getLabel() != 'MC':
             # the particle loader automatically uses the label "MC" for particles built from MCParticles
             # so we have to copy over the list to name/format that user wants
-            copyList(decayString, decayStringSeparatedIntoNameAndLabel[0] + ':MC', writeOut, path)
+            copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
 
         # apply a cut if a non-empty cut string is provided
         if cut != "":

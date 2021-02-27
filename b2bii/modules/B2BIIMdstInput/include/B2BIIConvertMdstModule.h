@@ -131,6 +131,9 @@ namespace Belle2 {
     // false = mc
     bool m_realData;
 
+    //! Convert beam parameters or use information stored in Belle II database.
+    bool m_convertBeamParameters;
+
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
     // false = use 5x5 (helix parameters) covariance matrix

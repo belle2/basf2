@@ -70,7 +70,7 @@ void BelleMCOutputModule::initialize()
     "(convertBeamParameters = False). Since the format of the table "
     "BELLE_NOMINAL_BEAM is not sufficient to store an arbitrary covariance "
     "matrix, the covariance matrix of IP position (BeamSpot) is not guaranteed "
-    "to be exactly the same after conversion.\m"
+    "to be exactly the same after conversion.\n"
     "  2. By default, decays of long-lived particles are removed and particles "
     "are declared to be stable in generator (ISTHEP == 1 in basf) because "
     "such decays are simulated by GEANT3 in basf. However, you may choose "

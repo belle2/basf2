@@ -112,7 +112,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         from softwaretrigger import filter_categories, skim_categories
 
-        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False]
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
         skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
 
         def read_lines(category):
@@ -139,18 +139,18 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
-           "SoftwareTriggerHLTDQM",
-           cutResultIdentifiers={
-               "skim": {"skim": hlt_skim_lines_in_plot},
-           },
-           cutResultIdentifiersIgnored={
-               "skim": [
-                   "accept_bhabha_all",
-                   ]
-           },
-           createTotalResultHistograms=False,
-           createExpRunEventHistograms=False,
-           histogramDirectoryName="softwaretrigger_skim_nobhabha",
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers={
+                "skim": {"skim": hlt_skim_lines_in_plot},
+            },
+            cutResultIdentifiersIgnored={
+                "skim": [
+                    "accept_bhabha_all",
+                ]
+            },
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            histogramDirectoryName="softwaretrigger_skim_nobhabha",
         )
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):

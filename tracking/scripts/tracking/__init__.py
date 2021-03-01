@@ -70,7 +70,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     add_prefilter_tracking_reconstruction(
         path,
         components=components,
-        pruneTracks=pruneTracks,
         skipGeometryAdding=skipGeometryAdding,
         mcTrackFinding=mcTrackFinding,
         trackFitHypotheses=trackFitHypotheses,
@@ -85,11 +84,15 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI)
 
-    add_postfilter_tracking_reconstruction(path, components=components,
-                                           pruneTracks=pruneTracks, fit_tracks=fit_tracks, reco_tracks=reco_tracks)
+    add_postfilter_tracking_reconstruction(path,
+                                           components=components,
+                                           pruneTracks=pruneTracks,
+                                           fit_tracks=fit_tracks,
+                                           reco_tracks=reco_tracks,
+                                           prune_temporary_tracks=prune_temporary_tracks)
 
 
-def add_prefilter_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
+def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
                                           mcTrackFinding=False, trackFitHypotheses=None,
                                           reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
@@ -101,7 +104,6 @@ def add_prefilter_tracking_reconstruction(path, components=None, pruneTracks=Fal
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
@@ -178,11 +180,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, pruneTracks=Fal
                                                   reco_tracks=reco_tracks,
                                                   add_mva_quality_indicator=add_recoTrack_QI)
 
-    if prune_temporary_tracks or pruneTracks:
-        path.add_module("PruneRecoHits")
 
-
-def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks"):
+def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
+                                           prune_temporary_tracks=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -192,10 +192,15 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param fit_tracks: If false, the V0 module module will no be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
     """
 
     if fit_tracks:
         add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+
+    if prune_temporary_tracks or pruneTracks:
+        path.add_module("PruneRecoHits")
 
 
 def add_time_extraction(path, components=None):

@@ -143,7 +143,6 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
     # Add prefilter tracking reconstruction modules
     add_prefilter_tracking_reconstruction(path,
                                           components=components,
-                                          pruneTracks=False,
                                           mcTrackFinding=False,
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,

@@ -871,11 +871,11 @@ namespace Belle2 {
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
 
       int pdg = particle->getPDGCode();
       if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
 
       std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
       int nDaughters = daughters.size();
@@ -895,7 +895,7 @@ namespace Belle2 {
           curMCParticle = curMCMother;
         }
         if (curMCParticle == nullptr) {
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         }
       }
 
@@ -931,7 +931,7 @@ namespace Belle2 {
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
-                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and nan for no true B meson or failed truthmatching.");
+                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,

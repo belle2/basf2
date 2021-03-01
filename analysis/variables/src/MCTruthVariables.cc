@@ -873,17 +873,21 @@ namespace Belle2 {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
 
-      std::vector<const Particle*> Daughters = particle->getFinalStateDaughters();
-      int nDaughters = Daughters.size();
+      int pdg = particle->getPDGCode();
+      if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
+      int nDaughters = daughters.size();
       if (nDaughters <= 1)
         return 0;
       std::vector<int> mother_ids;
 
       for (int j = 0; j < nDaughters; ++j) {
-        const MCParticle* curMCParticle = Daughters[j]->getMCParticle();
+        const MCParticle* curMCParticle = daughters[j]->getMCParticle();
         while (curMCParticle != nullptr) {
-          int m_pdg = curMCParticle->getPDG();
-          if (abs(m_pdg) == 511 || abs(m_pdg) == 521 || abs(m_pdg) == 531) {
+          pdg = curMCParticle->getPDG();
+          if (abs(pdg) == 511 || abs(pdg) == 521 || abs(pdg) == 531) {
             mother_ids.emplace_back(curMCParticle->getArrayIndex());
             break;
           }

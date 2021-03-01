@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Tests to ensure that the structure of the skim package is maintained.
+"""
+
+
 from importlib import import_module
 from inspect import getmembers, isclass
 from pathlib import Path
@@ -13,8 +18,8 @@ from skimExpertFunctions import BaseSkim
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
 
 
-class TestSkimCodes(unittest.TestCase):
-    """Test case for skim registry."""
+class TestSkimFramework(unittest.TestCase):
+    """Test case for skim framework."""
 
     ExistentModulePaths = Path(find_file("skim/scripts/skim")).glob("*.py")
     ExistentModules = [
@@ -198,6 +203,16 @@ class TestSkimCodes(unittest.TestCase):
                     "`validation_histograms` method defined."
                 ),
             )
+
+    def test_validation_samples(self):
+        """
+        Check that all ``validation_sample`` attributes of skims point to existing files.
+        """
+        for skim in Registry.names:
+            try:
+                find_file(Registry.get_skim_function(skim).validation_sample, data_type="validation")
+            except FileNotFoundError:
+                self.fail(f"{skim}.validation_sample does not point to an existing validation file.")
 
 
 if __name__ == "__main__":

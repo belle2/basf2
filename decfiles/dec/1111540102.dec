@@ -17,7 +17,7 @@ Decay B0sig
 Enddecay
 Decay anti-B0sig
 
-Decay psi(2S)_sig
+Decay psi(2S)sig
 1.0 e+ e- PHOTOS VLL;
 Enddecay
 

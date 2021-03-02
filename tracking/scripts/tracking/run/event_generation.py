@@ -8,8 +8,8 @@ import simulation
 import generators
 import beamparameters
 
-from . import utilities
-from .minimal import MinimalRun
+from tracking.run import utilities
+from tracking.run.minimal import MinimalRun
 import tracking.adjustments as adjustments
 
 import argparse
@@ -180,8 +180,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
         # early write out if simulation output was requested
         if self.simulation_output:
-            root_output_module = path.add_module('RootOutput',
-                                                 outputFileName=self.simulation_output)
+            path.add_module('RootOutput',
+                            outputFileName=self.simulation_output)
 
         return path
 

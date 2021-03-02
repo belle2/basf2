@@ -576,7 +576,7 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
         sorting_indices = np.argsort(estimates)
         if self.cut_direction_ < 0:  # reject low
             # Keep a reference to keep the content alive
-            # orginal_sorting_indices = sorting_indices
+            original_sorting_indices = sorting_indices  # noqa
             sorting_indices = sorting_indices[::-1]
 
         sorted_truths = truths[sorting_indices]

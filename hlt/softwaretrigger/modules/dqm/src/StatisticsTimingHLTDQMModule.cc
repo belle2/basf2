@@ -60,13 +60,17 @@ void StatisticsTimingHLTDQMModule::defineHisto()
                                    m_param_overviewModuleList.size());
   m_meanMemoryHistogram->SetStats(false);
   m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Budget Time [ms]", m_fullTimeNBins, 0, m_fullTimeMax);
+  m_fullTimeHistogram->StatOverflows(true);
   m_processingTimeHistogram = new TH1F("processingTimeHistogram", "Processing Time [ms]", m_processingTimeNBins, 0,
                                        m_processingTimeMax);
+  m_processingTimeHistogram->StatOverflows(true);
   m_fullMemoryHistogram = new TH1F("fullMemoryHistogram", "Total memory used [KB]", m_fullMemoryNBins, m_fullMemoryMin,
                                    m_fullMemoryMax);
+  m_fullMemoryHistogram->StatOverflows(true);
   m_processingMemoryHistogram = new TH1F("processingMemoryHistogram", "Memory used for processing [KB]", m_processingMemoryNBins,
                                          m_processingMemoryMin,
                                          m_processingMemoryMax);
+  m_processingMemoryHistogram->StatOverflows(true);
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
     const std::string& moduleName = m_param_overviewModuleList[index];
@@ -74,9 +78,11 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     m_meanMemoryHistogram->GetXaxis()->SetBinLabel(index + 1, moduleName.c_str());
     m_moduleTimeHistograms.emplace(moduleName, new TH1F((moduleName + "_time").c_str(),
                                                         ("Time spent in: " + moduleName + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
+    m_moduleTimeHistograms[moduleName]->StatOverflows(true);
     m_lastModuleTimeSum.emplace(moduleName, 0);
     m_moduleMemoryHistograms.emplace(moduleName, new TH1F((moduleName + "_memory").c_str(),
                                                           ("Memory used in: " + moduleName + " [KB]").c_str(), m_processingMemoryNBins, m_processingMemoryMin, m_processingMemoryMax));
+    m_moduleMemoryHistograms[moduleName]->StatOverflows(true);
     m_lastModuleMemorySum.emplace(moduleName, 0);
   }
 
@@ -95,19 +101,23 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     for (unsigned int index = 1; index <= HLTUnit::max_hlt_units; index++) {
       m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                           ("Budget Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_fullTimeNBins, 0, m_fullTimeMax));
+      m_fullTimePerUnitHistograms[index]->StatOverflows(true);
       m_lastFullTimeSumPerUnit.emplace(index, 0);
       m_processingTimePerUnitHistograms.emplace(index, new TH1F(("processingTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                                 ("Processing Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_processingTimeNBins, 0, m_processingTimeMax));
+      m_processingTimePerUnitHistograms[index]->StatOverflows(true);
       m_lastProcessingTimeSumPerUnit.emplace(index, 0);
       m_fullMemoryPerUnitHistograms.emplace(index, new TH1F(("fullMemoryPerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                             ("Total Memory Used Per Unit: HLT" + std::to_string(index) + " [KB]").c_str(), m_fullMemoryNBins, m_fullMemoryMin,
                                                             m_fullMemoryMax));
+      m_fullMemoryPerUnitHistograms[index]->StatOverflows(true);
       m_lastFullMemorySumPerUnit.emplace(index, 0);
       m_processingMemoryPerUnitHistograms.emplace(index,
                                                   new TH1F(("processingMemoryPerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                            ("Memory Used For Processing Per Unit: HLT" + std::to_string(index) + " [KB]").c_str(), m_processingMemoryNBins,
                                                            m_processingMemoryMin,
                                                            m_processingMemoryMax));
+      m_processingMemoryPerUnitHistograms[index]->StatOverflows(true);
       m_lastProcessingMemorySumPerUnit.emplace(index, 0);
     }
   }

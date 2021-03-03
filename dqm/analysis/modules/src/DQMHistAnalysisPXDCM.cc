@@ -70,11 +70,11 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_hCommonMode = new TH2D("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
-  m_hCommonModeDelta = new TH2D("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
+  m_hCommonModeDelta = new TH2D("CommonModeAdhoc", "CommonMode Adhoc; Module; CommonMode", m_PXDModules.size(), 0,
                                 m_PXDModules.size(), 63, 0, 63);
   m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeDelta->SetStats(false);
-  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
+  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonMode Old; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(),
                               63, 0, 63);
   m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeOld->SetStats(false);
@@ -205,28 +205,31 @@ void DQMHistAnalysisPXDCMModule::event()
         Double_t mean_adhoc = 0.;
         Double_t entries_adhoc = 0.;
         Double_t outside_adhoc = 0.;
-        // CM values, not bin
+        // Attention, Bins
         for (int cm_y = 0; cm_y < 16; cm_y++) {
-          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i, cm_y));
+          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
-          mean_adhoc += v * cm_y;
+          mean_adhoc += v * (cm_y + 1);
         }
-        // CM values, not bin
+        // Attention, Bins
         for (int cm_y = 16; cm_y < 64; cm_y++) {
-          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i, cm_y));
+          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           outside_adhoc += v;
         }
-        if (entries_adhoc > 0) mean_adhoc /= entries_adhoc; // calculate mean_adhoc
-        warn_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
-        error_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
-        m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+        if (entries_adhoc > 0) { // ignore 1.3.2
+          mean_adhoc /= entries_adhoc; // calculate mean
+          warn_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
+          error_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
+          m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
-        if (m_useEpics) {
-          auto my = mychid_mean[m_PXDModules[i]];
-          if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
-        }
+          if (m_useEpics) {
+            auto my = mychid_mean[m_PXDModules[i]];
+            // B2ERROR("Mean "<< name << " " << mean_adhoc << " " << outside_adhoc << " " << entries_adhoc << " " <<warn_adhoc_flag <<error_adhoc_flag );
+            if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
+          }
 #endif
+        }
       }
     }
   }

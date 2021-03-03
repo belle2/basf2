@@ -21,6 +21,7 @@
 #include <TH2.h>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace Belle2 {
   namespace SVD {
@@ -43,10 +44,27 @@ namespace Belle2 {
       void defineHisto() override final; /**< Overrides HistoModule::defineHisto */
 
     private:
+      /** A struct to define non-trivial histograms in a human-readable way. */
+      typedef struct SensorGroup {
+        /**< The name will be "SVDInstOccupancy_@nameSuffix@side". */
+        const char* nameSuffix;
+        /**< The title will be "SVD Instantaneous Occupancy @titleSuffix @side;Occupancy [%];Count / bin". */
+        const char* titleSuffix;
+        int nBins;
+        double xMin;
+        double xMax;
+        /** Function that says if a sensor is in this group. */
+        std::function<bool(const VxdID&)> contains;
+        /** Total number of U-side strips in this group. Set to zero, will be computed in initialize(). */
+        mutable int nStripsU;
+        /** Total number of V-side strips in this group. Set to zero, will be computed in initialize(). */
+        mutable int nStripsV;
+      } SensorGroup;
+
       // Steerable data members (parameters)
       std::string m_histogramDirectoryName; /**< Name of the histograms' directory in the ROOT file. */
       std::string m_SVDShaperDigitsName; /**< Name of the StoreArray of SVDShaperDigit to use. */
-      double m_revolutionTime;
+      double m_revolutionTime; /**< Beam revolution time in microseconds. */
 
       // Inputs
       StoreArray<RawFTSW> m_rawTTD; /**< Input: DAQ status. */
@@ -59,83 +77,36 @@ namespace Belle2 {
       SVDHistograms<TH2F>* m_nHitsVsTime = nullptr;
       /** Hist of the total evts in each time bin (time since inj. and time in cycle). */
       TH2F* h_nEvtsVsTime = nullptr;
+      /** Hists of the instantaneous occupancy per sensor group (see c_sensorGroups), U-side. */
+      std::vector<TH1F*> m_groupOccupanciesU;
+      /** Hists of the instantaneous occupancy per sensor group (see c_sensorGroups), V-side. */
+      std::vector<TH1F*> m_groupOccupanciesV;
 
-      /** Hists of the instantaneous occupancy distribution for L3 U side.
-       *  - `h_occupancyL3[0]`: averaged on all layer 3
-       *  - `h_occupancyL3[1]`: L3.X.1 averaged on ladders
-       *  - `h_occupancyL3[2]`: L3.X.2 averaged on ladders
-       */
-      TH1F* h_occupancyL3U[3] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L4 U side.
-       *  - `h_occupancyL4[0]`: averaged on all layer 4
-       *  - `h_occupancyL4[1]`: L4.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL4[3]`: L4.X.3 averaged on ladders
-       */
-      TH1F* h_occupancyL4U[4] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L5 U side.
-       *  - `h_occupancyL4[0]`: averaged on all layer 5
-       *  - `h_occupancyL5[1]`: L5.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL5[4]`: L5.X.4 averaged on ladders
-       */
-      TH1F* h_occupancyL5U[5] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L6 U side.
-       *  - `h_occupancyL6[0]`: averaged on all layer 6
-       *  - `h_occupancyL6[1]`: L6.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL6[5]`: L6.X.5 averaged on ladders
-       */
-      TH1F* h_occupancyL6U[6] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L3 V side.
-       *  - `h_occupancyL3[0]`: averaged on all layer 3
-       *  - `h_occupancyL3[1]`: L3.X.1 averaged on ladders
-       *  - `h_occupancyL3[2]`: L3.X.2 averaged on ladders
-       */
-      TH1F* h_occupancyL3V[3] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L4 V side.
-       *  - `h_occupancyL4[0]`: averaged on all layer 4
-       *  - `h_occupancyL4[1]`: L4.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL4[3]`: L4.X.3 averaged on ladders
-       */
-      TH1F* h_occupancyL4V[4] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L5 V side.
-       *  - `h_occupancyL4[0]`: averaged on all layer 5
-       *  - `h_occupancyL5[1]`: L5.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL5[4]`: L5.X.4 averaged on ladders
-       */
-      TH1F* h_occupancyL5V[5] = {0}; // Init to all zeros
-      /** Hists of the instantaneous occupancy distribution for L6 V side.
-       *  - `h_occupancyL6[0]`: averaged on all layer 6
-       *  - `h_occupancyL6[1]`: L6.X.1 averaged on ladders
-       *  - ...
-       *  - `h_occupancyL6[5]`: L6.X.5 averaged on ladders
-       */
-      TH1F* h_occupancyL6V[6] = {0}; // Init to all zeros
-
-      /** L3 mid plane U-side instant. occupancy average (L3.1.X and L3.2.X). */
-      TH1F* h_occupancyL3Umid = nullptr;
-      /** L4 mid plane U-side instant. occupancy average (L4.6.1 and L4.6.2). */
-      TH1F* h_occupancyL4Umid = nullptr;
-      /** L5 mid plane U-side instant. occupancy average (L5.8.1 and L5.8.2). */
-      TH1F* h_occupancyL5Umid = nullptr;
-      /** L6 mid plane U-side instant. occupancy average (L6.10.1 and L6.10.2). */
-      TH1F* h_occupancyL6Umid = nullptr;
-      /** L3 mid plane V-side instant. occupancy average (L3.1.X and L3.2.X). */
-      TH1F* h_occupancyL3Vmid = nullptr;
-      /** L4 mid plane V-side instant. occupancy average (L4.6.1 and L4.6.2). */
-      TH1F* h_occupancyL4Vmid = nullptr;
-      /** L5 mid plane V-side instant. occupancy average (L5.8.1 and L5.8.2). */
-      TH1F* h_occupancyL5Vmid = nullptr;
-      /** L6 mid plane V-side instant. occupancy average (L6.10.1 and L6.10.2). */
-      TH1F* h_occupancyL6Vmid = nullptr;
-
-      const std::vector<VxdID> c_L3midSensors {VxdID(3, 1, 1), VxdID(3, 1, 2), VxdID(3, 2, 1), VxdID(3, 2, 2)};
-      const std::vector<VxdID> c_L4midSensors {VxdID(4, 6, 1), VxdID(4, 6, 2)};
-      const std::vector<VxdID> c_L5midSensors {VxdID(5, 8, 1), VxdID(5, 8, 2)};
-      const std::vector<VxdID> c_L6midSensors {VxdID(6, 10, 1), VxdID(6, 10, 2)};
+      // Other stuff
+      /** List of interesting groups of sensors to average over. */
+      const std::vector<SensorGroup> c_sensorGroups{
+        {"L3XX", "L3 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3; }, 0, 0},
+        {"L3X1", "L3.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 1; }, 0, 0},
+        {"L3X2", "L3.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 2; }, 0, 0},
+        {"L4XX", "L4 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4; }, 0, 0},
+        {"L4X1", "L4.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 1; }, 0, 0},
+        {"L4X2", "L4.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 2; }, 0, 0},
+        {"L4X3", "L4.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 3; }, 0, 0},
+        {"L5XX", "L5 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5; }, 0, 0},
+        {"L5X1", "L5.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 1; }, 0, 0},
+        {"L5X2", "L5.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 2; }, 0, 0},
+        {"L5X3", "L5.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 3; }, 0, 0},
+        {"L5X4", "L5.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 4; }, 0, 0},
+        {"L6XX", "L6 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6; }, 0, 0},
+        {"L6X1", "L6.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 1; }, 0, 0},
+        {"L6X2", "L6.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 2; }, 0, 0},
+        {"L6X3", "L6.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 3; }, 0, 0},
+        {"L6X4", "L6.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 4; }, 0, 0},
+        {"L6X5", "L6.X.5", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 5; }, 0, 0},
+        {"L3mid", "L3 mid plane (L3.1.X and L3.2.X)", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() < 3; }, 0, 0},
+        {"L4mid", "L4 mid plane (L4.6.1 and L4.6.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getLadderNumber() == 6 && s.getSensorNumber() < 3; }, 0, 0},
+        {"L5mid", "L5 mid plane (L5.8.1 and L5.8.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getLadderNumber() == 8 && s.getSensorNumber() < 3; }, 0, 0},
+        {"L6mid", "L6 mid plane (L6.10.1 and L6.10.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getLadderNumber() == 10 && s.getSensorNumber() < 3; }, 0, 0}};
     };
   }
 }

@@ -354,6 +354,11 @@ void KLMDQMModule::event()
         m_TriggersLERInj->Fill(differenceInUs);
       }
     }
+    /*
+     * Usually, only one RawFTSW object is stored per event.
+     * If there are more, ignore the others.
+     */
+    break;
   }
 }
 

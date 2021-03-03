@@ -1,5 +1,5 @@
 //---------------------------------------------------------------
-// $id$
+// $Id$
 //---------------------------------------------------------------
 // Filename : TRGTOPDQMModule.cc
 // Section  : TRG TOP
@@ -622,47 +622,51 @@ void TRGTOPDQMModule::defineHisto()
 
     //------------------------
 
+    for (int histClass = 0; histClass < m_nHistClassesActual; histClass++) {
+
+      // max N of combined t0 decisions (over past ~us) = N windows in circular buffer
+      h_N_decision[iskim][histClass]  = new TH1I(Form("h_N_decisions_%d_%s", histClass, skim_smap[iskim].c_str()),
+                                                 "N t0 decisions in 1 us before GDL L1", 5, 1,
+                                                 6);
+      h_N_decision[iskim][histClass]->GetXaxis()->SetTitle("TOPTRG N combined t0 decisions");
+
+      //-------------
+
+      h_topNHitVsNhit[iskim][histClass] = new TH2I(Form("h_nhit_vs_nhit_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
+                                                   "First decision: N hits vs N hits", 20, 0, 100, 20, 0, 100);
+      h_topNHitVsNhit[iskim][histClass]->GetXaxis()->SetTitle("N hits for slot with largest N hits");
+      h_topNHitVsNhit[iskim][histClass]->GetYaxis()->SetTitle("N hits for slot with next to the largest N hits");
+
+      h_topSlotVsSlot[iskim][histClass] = new TH2I(Form("h_slot_vs_slot_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
+                                                   "First decision: slot # vs slot #", 16, 1, 17, 16, 1, 17);
+      h_topSlotVsSlot[iskim][histClass]->GetXaxis()->SetTitle("Slot # for slot with largest N hits");
+      h_topSlotVsSlot[iskim][histClass]->GetYaxis()->SetTitle("Slot # for slot with next to the largest N hits");
+
+      h_topT0VsT0[iskim][histClass] = new TH2I(Form("h_t0_vs_t0_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
+                                               "First decision: T0 vs T0", 100, 0, 100000, 100, 0, 100000);
+      h_topT0VsT0[iskim][histClass]->GetXaxis()->SetTitle("T0 for slot with largest N hits");
+      h_topT0VsT0[iskim][histClass]->GetYaxis()->SetTitle("T0 for slot with next to the largest N hits");
+
+      h_topSegmentVsSegment[iskim][histClass] = new TH2I(Form("h_segment_vs_segment_first_decision_%d_%s", histClass,
+                                                              skim_smap[iskim].c_str()),
+                                                         "First decision: segment # vs segment #", 10, 1, 11, 10, 1, 11);
+      h_topSegmentVsSegment[iskim][histClass]->GetXaxis()->SetTitle("Segment # for slot with largest N hits");
+      h_topSegmentVsSegment[iskim][histClass]->GetYaxis()->SetTitle("Segment # for slot with next to the largest N hits");
+
+      h_topLogLVsLogL[iskim][histClass] = new TH2I(Form("h_logl_vs_logl_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
+                                                   "First decision: log L vs log L", 100, 0, 60000, 100, 0, 60000);
+      h_topLogLVsLogL[iskim][histClass]->GetXaxis()->SetTitle("log L for slot with largest N hits");
+      h_topLogLVsLogL[iskim][histClass]->GetYaxis()->SetTitle("log L for slot with next to the largest N hits");
+
+    }
+
+    //------------------------
+
     if (m_histLevel > 1) {
 
       // these two for loops are nested in this particular way to simplify browsing through the histograms
 
       for (int histClass = 0; histClass < m_nHistClassesActual; histClass++) {
-
-        // max N of combined t0 decisions (over past ~us) = N windows in circular buffer
-        h_N_decision[iskim][histClass]  = new TH1I(Form("h_N_decisions_%d_%s", histClass, skim_smap[iskim].c_str()),
-                                                   "N t0 decisions in 1 us before GDL L1", 5, 1,
-                                                   6);
-        h_N_decision[iskim][histClass]->GetXaxis()->SetTitle("TOPTRG N combined t0 decisions");
-
-        //-------------
-
-        h_topNHitVsNhit[iskim][histClass] = new TH2I(Form("h_nhit_vs_nhit_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
-                                                     "First decision: N hits vs N hits", 20, 0, 100, 20, 0, 100);
-        h_topNHitVsNhit[iskim][histClass]->GetXaxis()->SetTitle("N hits for slot with largest N hits");
-        h_topNHitVsNhit[iskim][histClass]->GetYaxis()->SetTitle("N hits for slot with next to the largest N hits");
-
-        h_topSlotVsSlot[iskim][histClass] = new TH2I(Form("h_slot_vs_slot_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
-                                                     "First decision: slot # vs slot #", 16, 1, 17, 16, 1, 17);
-        h_topSlotVsSlot[iskim][histClass]->GetXaxis()->SetTitle("Slot # for slot with largest N hits");
-        h_topSlotVsSlot[iskim][histClass]->GetYaxis()->SetTitle("Slot # for slot with next to the largest N hits");
-
-        h_topT0VsT0[iskim][histClass] = new TH2I(Form("h_t0_vs_t0_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
-                                                 "First decision: T0 vs T0", 100, 0, 100000, 100, 0, 100000);
-        h_topT0VsT0[iskim][histClass]->GetXaxis()->SetTitle("T0 for slot with largest N hits");
-        h_topT0VsT0[iskim][histClass]->GetYaxis()->SetTitle("T0 for slot with next to the largest N hits");
-
-        h_topSegmentVsSegment[iskim][histClass] = new TH2I(Form("h_segment_vs_segment_first_decision_%d_%s", histClass,
-                                                                skim_smap[iskim].c_str()),
-                                                           "First decision: segment # vs segment #", 10, 1, 11, 10, 1, 11);
-        h_topSegmentVsSegment[iskim][histClass]->GetXaxis()->SetTitle("Segment # for slot with largest N hits");
-        h_topSegmentVsSegment[iskim][histClass]->GetYaxis()->SetTitle("Segment # for slot with next to the largest N hits");
-
-        h_topLogLVsLogL[iskim][histClass] = new TH2I(Form("h_logl_vs_logl_first_decision_%d_%s", histClass, skim_smap[iskim].c_str()),
-                                                     "First decision: log L vs log L", 100, 0, 60000, 100, 0, 60000);
-        h_topLogLVsLogL[iskim][histClass]->GetXaxis()->SetTitle("log L for slot with largest N hits");
-        h_topLogLVsLogL[iskim][histClass]->GetYaxis()->SetTitle("log L for slot with next to the largest N hits");
-
-        //-------------
 
         h_topCombinedTimingTop[iskim][histClass]  = new TH1I(Form("h_t0_%d_%s",  histClass, skim_smap[iskim].c_str()),
                                                              "TOP combined t0 decision", 100, 0,
@@ -1053,16 +1057,18 @@ void TRGTOPDQMModule::beginRun()
     h_top_ecltop_timing_diff_best_slot_2ns[iskim]->Reset();
     h_gdl_cdctop_timing_diff_2ns[iskim]->Reset();
 
+    for (int histClass = 0; histClass < m_nHistClassesActual; histClass++) {
+      h_N_decision[iskim][histClass]->Reset();
+
+      h_topNHitVsNhit[iskim][histClass]->Reset();
+      h_topSlotVsSlot[iskim][histClass]->Reset();
+      h_topT0VsT0[iskim][histClass]->Reset();
+      h_topSegmentVsSegment[iskim][histClass]->Reset();
+      h_topLogLVsLogL[iskim][histClass]->Reset();
+    }
+
     if (m_histLevel > 1) {
       for (int histClass = 0; histClass < m_nHistClassesActual; histClass++) {
-        h_N_decision[iskim][histClass]->Reset();
-
-        h_topNHitVsNhit[iskim][histClass]->Reset();
-        h_topSlotVsSlot[iskim][histClass]->Reset();
-        h_topT0VsT0[iskim][histClass]->Reset();
-        h_topSegmentVsSegment[iskim][histClass]->Reset();
-        h_topLogLVsLogL[iskim][histClass]->Reset();
-
         h_topCombinedTimingTop[iskim][histClass]->Reset();
         h_topNSlotsCombinedTimingTop[iskim][histClass]->Reset();
         h_topNHitSum[iskim][histClass]->Reset();
@@ -1212,6 +1218,26 @@ void TRGTOPDQMModule::event()
   if (!trgtopCombinedTimingArray) return;
   if (!trgtopCombinedTimingArray.getEntries()) return;
 
+  // prepare histograms according to HLT decisions
+  skim.clear();
+
+  //Get skim type from SoftwareTriggerResult
+  for (int iskim = start_skim_topdqm; iskim < end_skim_topdqm; iskim++) {
+    if (iskim == 0) skim.push_back(iskim);
+  }
+
+  StoreObjPtr<SoftwareTriggerResult> result_soft;
+  if (result_soft.isValid()) {
+    const std::map<std::string, int>& skim_map = result_soft->getResults();
+    for (int iskim = start_skim_topdqm; iskim < end_skim_topdqm; iskim++) {
+      if (iskim == 0);
+      else if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
+        const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
+        if (accepted) skim.push_back(iskim);
+      }
+    }
+  }
+
   bool gdlInfoAvailable = false;
   bool grlInfoAvailable = false;
 
@@ -1323,6 +1349,20 @@ void TRGTOPDQMModule::event()
         int tcThetaId2 = tc2.tcThetaId;
         int tcPhiId2 = tc2.tcPhiId;
 
+        //  poor physicist's barrel b2b
+        //      if (tcId1 >= 81 && tcId1 <= 512) {
+        //  if (tcId2 >= 81 && tcId2 <= 512) {
+        //    if (abs(tcId2-tcId1-220) <= 50) {
+
+        if (tcThetaId1 >= 4 && tcThetaId1 <= 15) {
+          barrelEcl = true;
+          if (tcThetaId2 >= 4 && tcThetaId2 <= 15) {
+            if (abs(tcPhiId1 - tcPhiId2) >= 12 && abs(tcPhiId1 - tcPhiId2) <= 24) {
+              barrelEclB2B = true;
+            }
+          }
+        }
+
         for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
 
           h_topTC2IdVsTC1IdAll[skim[ifill]]->Fill(tcId1, tcId2);
@@ -1341,31 +1381,21 @@ void TRGTOPDQMModule::event()
             h_topTCPhiIdVsTCThetaIdGRLAll[skim[ifill]]->Fill(tcThetaId2, tcPhiId2, 1);
           }
 
-          //  poor physicist's barrel b2b
-          //      if (tcId1 >= 81 && tcId1 <= 512) {
-          //  if (tcId2 >= 81 && tcId2 <= 512) {
-          //    if (abs(tcId2-tcId1-220) <= 50) {
+          if (barrelEclB2B) {
 
-          if (tcThetaId1 >= 4 && tcThetaId1 <= 15) {
-            barrelEcl = true;
-            if (tcThetaId2 >= 4 && tcThetaId2 <= 15) {
-              if (abs(tcPhiId1 - tcPhiId2) >= 12 && abs(tcPhiId1 - tcPhiId2) <= 24) {
-                barrelEclB2B = true;
-                h_topTC2IdVsTC1Id[skim[ifill]]->Fill(tcId1, tcId2);
-                h_topTC2EnergyVsTC1Energy[skim[ifill]]->Fill(tc1.tcEnergy, tc2.tcEnergy);
-                h_topTC2ThetaIdVsTC1ThetaId[skim[ifill]]->Fill(tcThetaId1, tcThetaId2);
-                h_topTC2PhiIdVsTC1PhiId[skim[ifill]]->Fill(tcPhiId1, tcPhiId2);
-                h_topTCPhiIdVsTCThetaId[skim[ifill]]->Fill(tcThetaId1, tcPhiId1, 0);
-                h_topTCPhiIdVsTCThetaId[skim[ifill]]->Fill(tcThetaId2, tcPhiId2, 1);
-                if (nCDCSlotsGRL > 0) {
-                  h_topTC2IdVsTC1IdGRL[skim[ifill]]->Fill(tcId1, tcId2);
-                  h_topTC2EnergyVsTC1EnergyGRL[skim[ifill]]->Fill(tc1.tcEnergy, tc2.tcEnergy);
-                  h_topTC2ThetaIdVsTC1ThetaIdGRL[skim[ifill]]->Fill(tcThetaId1, tcThetaId2);
-                  h_topTC2PhiIdVsTC1PhiIdGRL[skim[ifill]]->Fill(tcPhiId1, tcPhiId2);
-                  h_topTCPhiIdVsTCThetaIdGRL[skim[ifill]]->Fill(tcThetaId1, tcPhiId1, 0);
-                  h_topTCPhiIdVsTCThetaIdGRL[skim[ifill]]->Fill(tcThetaId2, tcPhiId2, 1);
-                }
-              }
+            h_topTC2IdVsTC1Id[skim[ifill]]->Fill(tcId1, tcId2);
+            h_topTC2EnergyVsTC1Energy[skim[ifill]]->Fill(tc1.tcEnergy, tc2.tcEnergy);
+            h_topTC2ThetaIdVsTC1ThetaId[skim[ifill]]->Fill(tcThetaId1, tcThetaId2);
+            h_topTC2PhiIdVsTC1PhiId[skim[ifill]]->Fill(tcPhiId1, tcPhiId2);
+            h_topTCPhiIdVsTCThetaId[skim[ifill]]->Fill(tcThetaId1, tcPhiId1, 0);
+            h_topTCPhiIdVsTCThetaId[skim[ifill]]->Fill(tcThetaId2, tcPhiId2, 1);
+            if (nCDCSlotsGRL > 0) {
+              h_topTC2IdVsTC1IdGRL[skim[ifill]]->Fill(tcId1, tcId2);
+              h_topTC2EnergyVsTC1EnergyGRL[skim[ifill]]->Fill(tc1.tcEnergy, tc2.tcEnergy);
+              h_topTC2ThetaIdVsTC1ThetaIdGRL[skim[ifill]]->Fill(tcThetaId1, tcThetaId2);
+              h_topTC2PhiIdVsTC1PhiIdGRL[skim[ifill]]->Fill(tcPhiId1, tcPhiId2);
+              h_topTCPhiIdVsTCThetaIdGRL[skim[ifill]]->Fill(tcThetaId1, tcPhiId1, 0);
+              h_topTCPhiIdVsTCThetaIdGRL[skim[ifill]]->Fill(tcThetaId2, tcPhiId2, 1);
             }
           }
         }
@@ -1422,26 +1452,6 @@ void TRGTOPDQMModule::event()
   }
   cout << "DEBUG---------------------------------------------------------------------------------------------------------------------" << endl;
   */
-
-  // prepare histograms according to HLT decisions
-  skim.clear();
-
-  //Get skim type from SoftwareTriggerResult
-  for (int iskim = start_skim_topdqm; iskim < end_skim_topdqm; iskim++) {
-    if (iskim == 0) skim.push_back(iskim);
-  }
-
-  StoreObjPtr<SoftwareTriggerResult> result_soft;
-  if (result_soft.isValid()) {
-    const std::map<std::string, int>& skim_map = result_soft->getResults();
-    for (int iskim = start_skim_topdqm; iskim < end_skim_topdqm; iskim++) {
-      if (iskim == 0);
-      else if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
-        const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
-        if (accepted) skim.push_back(iskim);
-      }
-    }
-  }
 
   // investigate GDL-TOP correlations if asked to do so
 
@@ -1639,10 +1649,8 @@ void TRGTOPDQMModule::event()
   if (m_nHistClassesActual == 2 && histClass == 2) histClass = 1;
 
   // prepare histograms for TOP alone
-  if (m_histLevel > 1) {
-    for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-      h_N_decision[skim[ifill]][histClass]->Fill(nT0Decisions);
-    }
+  for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    h_N_decision[skim[ifill]][histClass]->Fill(nT0Decisions);
   }
 
   // info from GDL
@@ -1818,15 +1826,13 @@ void TRGTOPDQMModule::event()
         int nHitsSlotBest2 = slotDecisionBest2.nHits;
         int t0SlotBest2 = slotDecisionBest2.t0;
 
-        if (m_histLevel > 1) {
-          if (t0DecisionNumber == 0) {
-            for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-              h_topNHitVsNhit[skim[ifill]][histClass]->Fill(nHitsSlotBest, nHitsSlotBest2);
-              h_topSlotVsSlot[skim[ifill]][histClass]->Fill(slotSlotBest, slotSlotBest2);
-              h_topT0VsT0[skim[ifill]][histClass]->Fill(t0SlotBest, t0SlotBest2);
-              h_topSegmentVsSegment[skim[ifill]][histClass]->Fill(segmentSlotBest, segmentSlotBest2);
-              h_topLogLVsLogL[skim[ifill]][histClass]->Fill(logLSlotBest, logLSlotBest2);
-            }
+        if (t0DecisionNumber == 0) {
+          for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+            h_topNHitVsNhit[skim[ifill]][histClass]->Fill(nHitsSlotBest, nHitsSlotBest2);
+            h_topSlotVsSlot[skim[ifill]][histClass]->Fill(slotSlotBest, slotSlotBest2);
+            h_topT0VsT0[skim[ifill]][histClass]->Fill(t0SlotBest, t0SlotBest2);
+            h_topSegmentVsSegment[skim[ifill]][histClass]->Fill(segmentSlotBest, segmentSlotBest2);
+            h_topLogLVsLogL[skim[ifill]][histClass]->Fill(logLSlotBest, logLSlotBest2);
           }
         }
       }

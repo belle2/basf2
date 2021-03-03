@@ -161,7 +161,7 @@ def add_simulation(
             # add the PXD background generator module to path
             add_pxd_background_generator(path, pxd_background_generator)
         else:
-            b2.B2WARN('PXD simulation is not enabled - skipping PXD background generation')
+            b2.B2WARNING('PXD simulation is not enabled - skipping PXD background generation')
 
     # geometry parameter database
     if 'Gearbox' not in path:

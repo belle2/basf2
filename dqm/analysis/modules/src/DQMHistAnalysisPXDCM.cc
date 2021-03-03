@@ -298,8 +298,9 @@ void DQMHistAnalysisPXDCMModule::event()
                 status_adhoc = 1;*/
       }
     }
-    if (anyupdate) SEVCHK(ca_put(DBR_INT, mychid[3], (void*)&status_adhoc), "ca_set failure");
-
+#ifdef _BELLE2_EPICS
+    if (m_useEpics && anyupdate) SEVCHK(ca_put(DBR_INT, mychid[3], (void*)&status_adhoc), "ca_set failure");
+#endif
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
       m_line1->Draw();

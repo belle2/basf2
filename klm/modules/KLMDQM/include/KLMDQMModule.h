@@ -124,14 +124,17 @@ namespace Belle2 {
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;
 
-    /** Axial position of muon hit. */
-    TH1F* m_bklmHit2dsZ;
+    /** Number of digits: whole KLM. */
+    TH1F* m_DigitsKLM;
 
-    /** Number of BKLM Digits. */
-    TH1F* m_BklmDigitsNumber;
+    /** Number of digits: BKLM RPCs. */
+    TH1F* m_DigitsRPC;
 
-    /** Number of KLM Digits. */
-    TH1F* m_KlmDigitsNumber;
+    /** Number of digits: BKLM scintillators. */
+    TH1F* m_DigitsScintillatorBKLM;
+
+    /** Number of digits: EKLM scintillators. */
+    TH1F* m_DigitsScintillatorEKLM;
 
     /** Number of KLM Digits after LER injection. */
     TH1F* m_KlmDigitsAfterLERInj;

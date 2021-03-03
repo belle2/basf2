@@ -5,10 +5,10 @@ PXD Background Generator
 
 Generate PXD background data on-the-fly using a pre-trained generator model.
 
-The package provides a PXD background generator `basf2.Module` module that
-can be added to the module execution path to generate PXD digits on-the-fly
+The package provides a PXD background generator :py:class:`basf2.Module` module
+that can be added to the module execution path to generate PXD digits on-the-fly
 and store them into a background digit collection. The module is designed to
-replace the collection stored by the `BGOverlayInput` module.
+replace the collection stored by the :any:`!BGOverlayInput` module.
 
 Two proof-of-concept generator models are currently implemented and
 can be used to generate PXD background data. They are based on the
@@ -44,7 +44,7 @@ version 1.4.0 is included in the basf2 externals
 v01-09-01, thus, no installation is necessary.
 
 The PXD background generator module can be used
-in simulation by first creating a :class:`Specs` container object
+in simulation by first creating a :py:class:`Specs` container object
 with the generator specifications. This object is then passed
 as an argument to the function :py:func:`simulation.add_simulation`
 which will automatically add the PXD background generator module
@@ -58,7 +58,7 @@ to the execution path:
 An example steering file for generating, simulating,
 and reconstructing :math:`B\\bar{B}` events
 using the PXD background generator module is
-provided in `pxd/examples/background_generator.py`.
+provided in ``pxd/examples/background_generator.py``.
 
 """
 import os.path
@@ -249,7 +249,7 @@ class BackgroundGenerator(basf2.Module):
         prior to the execution of this module are deleted.
 
     :param specs: Generator specifications container
-    :type specs: :class:`Specs`
+    :type specs: :py:class:`Specs`
     """
 
     def __init__(self, specs: Specs):
@@ -308,9 +308,9 @@ def add_pxd_background_generator(path: basf2.Path, specs: Specs = None):
     """Add the PXD background generator module to the execution path.
 
     :param path: Module execution path
-    :type path: :class:`basf2.Path`
+    :type path: :py:class:`basf2.Path`
     :param specs: Generator specifications, defaults to None
-    :type specs: :class:`Specs`, optional
+    :type specs: :py:class:`Specs`, optional
     """
     if specs is not None:
         # add the module to the path

@@ -39,7 +39,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["physics"]
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

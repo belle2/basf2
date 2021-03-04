@@ -76,7 +76,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2):
+                                  SmearTrack=2, enableLocalDB=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -102,6 +102,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             Details about the difference between those two options can be found
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
+        enableLocalDB (bool): Enables to use local payloads.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -121,6 +122,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
     b2bii.setB2BII()
+
+    if enableLocalDB is True:
+        b2.B2WARNING("B2BII is running with local payloads.\n"
+                     "If you use FlavorTagger or FEI, please set enableLocalDB to be False.")
+        b2.conditions.metadata_providers = ["/sw/old/belle/b2bii/database/conditions/b2bii.sqlite"]
+        b2.conditions.payload_locations = ["/sw/old/belle/b2bii/database/conditions/"]
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

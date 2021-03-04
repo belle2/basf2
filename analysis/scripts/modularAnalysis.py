@@ -432,15 +432,18 @@ def correctBrems(outputList,
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
 
     Information:
+        A detailed description of how the weights are set can be found directly at the documentation of the
+        `BremsFinder` module.
+
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
+        The ``inputList`` should contain particles with associated tracks. Otherwise, the module will exit with an error.
 
-        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
+        The ``gammaList`` should contain photons. Otherwise, the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles
     @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*

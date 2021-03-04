@@ -195,14 +195,14 @@ void KLMDQMModule::defineHisto()
   m_DigitsScintillatorEKLM->SetOption("LIVE");
   /* Trigger bits. */
   m_TriggerBitsBKLM = new TH1F("trigger_bits_bklm", "Trigger bits of multi-strip digits (BKLM)",
-                               (double)c_0x1, (double)c_0x8 - 1.0, (double)c_0x1);
+                               (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
   m_TriggerBitsBKLM->SetOption("LIVE");
   m_TriggerBitsEKLM = new TH1F("trigger_bits_eklm", "Trigger bits of multi-strip digits (EKLM)",
-                               (double)c_0x1, (double)c_0x8 - 1.0, (double)c_0x1);
+                               (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");

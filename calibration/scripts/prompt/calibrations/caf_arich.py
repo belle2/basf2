@@ -9,9 +9,9 @@ from prompt import CalibrationSettings
 settings = CalibrationSettings(name="ARICH channel masks",
                                expert_username="luka",
                                description=__doc__,
-                               input_data_formats=["cdst"],
+                               input_data_formats=["raw"],
                                input_data_names=["bhabha_all_calib"],
-                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib", "physics", "Good Or Recoverable"], }
+                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib", "physics", "Good Or Recoverable"]},
                                depends_on=[])
 
 ##############################

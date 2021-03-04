@@ -289,7 +289,7 @@ void KLMDQMModule::event()
      */
     if (!digit.isGood())
       continue;
-    if (digit.getSubdetector() != KLMElementNumbers::c_EKLM) {
+    if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
       nDigitsScintillatorEKLM++;
       int section = digit.getSection();
       int sector = digit.getSector();
@@ -325,7 +325,7 @@ void KLMDQMModule::event()
             m_TriggerBitsEKLM->Fill(c_0x8);
         }
       }
-    } else if (digit.getSubdetector() != KLMElementNumbers::c_BKLM) {
+    } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
       int section = digit.getSection();
       int sector = digit.getSector();
       int layer = digit.getLayer();

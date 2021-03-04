@@ -184,3 +184,28 @@ void SVDDQMDoseModule::event()
     m_groupOccupanciesV[i]->Fill(groupHitsV[i] * 100.0 / c_sensorGroups[i].nStripsV);
   }
 }
+
+const std::vector<SVDDQMDoseModule::SensorGroup> SVDDQMDoseModule::c_sensorGroups = {
+  {"L3XX", "L3 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3; }},
+  {"L3X1", "L3.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 1; }},
+  {"L3X2", "L3.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 2; }},
+  {"L4XX", "L4 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4; }},
+  {"L4X1", "L4.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 1; }},
+  {"L4X2", "L4.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 2; }},
+  {"L4X3", "L4.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 3; }},
+  {"L5XX", "L5 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5; }},
+  {"L5X1", "L5.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 1; }},
+  {"L5X2", "L5.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 2; }},
+  {"L5X3", "L5.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 3; }},
+  {"L5X4", "L5.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 4; }},
+  {"L6XX", "L6 all", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6; }},
+  {"L6X1", "L6.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 1; }},
+  {"L6X2", "L6.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 2; }},
+  {"L6X3", "L6.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 3; }},
+  {"L6X4", "L6.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 4; }},
+  {"L6X5", "L6.X.5", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 5; }},
+  {"L3mid", "L3 mid plane (L3.1.X and L3.2.X)", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() < 3; }},
+  {"L4mid", "L4 mid plane (L4.6.1 and L4.6.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getLadderNumber() == 6 && s.getSensorNumber() < 3; }},
+  {"L5mid", "L5 mid plane (L5.8.1 and L5.8.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getLadderNumber() == 8 && s.getSensorNumber() < 3; }},
+  {"L6mid", "L6 mid plane (L6.10.1 and L6.10.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getLadderNumber() == 10 && s.getSensorNumber() < 3; }}
+};

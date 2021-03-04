@@ -15,6 +15,8 @@ from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
+__validation_sample___ = "mdst14.root"
+
 
 @fancy_skim_header
 class TwoTrackLeptonsForLuminosity(BaseSkim):
@@ -122,6 +124,7 @@ class LowMassTwoTrack(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     TestFiles = [get_test_file("MC13_mumuBGx1"), get_test_file("MC13_uubarBGx1")]
+    validation_sample = __validation_sample___
 
     def build_lists(self, path):
         label = "LowMassTwoTrack"

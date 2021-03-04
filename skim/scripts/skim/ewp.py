@@ -20,6 +20,7 @@ from stdPhotons import stdPhotons
 from variables import variables as vm
 
 __liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
+__validation_sample___ = "mdst14.root"
 
 
 @fancy_skim_header
@@ -45,6 +46,8 @@ class BtoXgamma(BaseSkim):
     __description__ = ":math:`B\\to X\\gamma` inclusive skim."
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
+
+    validation_sample = __validation_sample___
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -146,6 +149,8 @@ class BtoXll(BaseSkim):
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
+
+    validation_sample = __validation_sample___
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -341,6 +346,7 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     NoisyModules = ["ParticleCombiner"]
+    validation_sample = __validation_sample___
 
     def build_lists(self, path):
 

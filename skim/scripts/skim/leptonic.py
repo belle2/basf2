@@ -17,6 +17,7 @@ from stdCharged import stdE, stdMu
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+__validation_sample___ = "mdst14.root"
 
 
 @fancy_skim_header
@@ -40,6 +41,8 @@ class LeptonicUntagged(BaseSkim):
         ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"
     )
     __category__ = "physics, leptonic"
+
+    validation_sample = __validation_sample___
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

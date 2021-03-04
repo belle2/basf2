@@ -23,6 +23,7 @@ from variables import variables as vm
 # TODO: Add liaison name and email address
 __liaison__ = ""
 __liaison_leptonID__ = "Marcel Hohmann"
+__validation_sample___ = "mdst14.root"
 
 
 @fancy_skim_header
@@ -552,12 +553,13 @@ class SystematicsPhiGamma(BaseSkim):
     __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
 
+    TestFiles = [get_test_file("phigamma_neutral")]
+    validation_sample = __validation_sample___
+
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
         stdKshorts(path=path)
-
-    TestFiles = [get_test_file("phigamma_neutral")]
 
     def build_lists(self, path):
         EventCuts = [

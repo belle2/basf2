@@ -22,6 +22,7 @@ from stdPhotons import stdPhotons
 import vertex as vertex
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+__validation_sample___ = "mdst14.root"
 
 
 @fancy_skim_header

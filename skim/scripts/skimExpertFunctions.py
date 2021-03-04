@@ -322,7 +322,7 @@ class BaseSkim(ABC):
       production system may struggle to handle the jobs.
     """
 
-    validation_sample = "mdst14.root"
+    validation_sample = None
     """
     MDST sample to use for validation histograms. Must be a valid location of a
     validation dataset (see documentation for `basf2.find_file`).

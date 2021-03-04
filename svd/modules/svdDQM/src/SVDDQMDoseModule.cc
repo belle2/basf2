@@ -75,6 +75,10 @@ void SVDDQMDoseModule::initialize()
   m_digits.isOptional(m_SVDShaperDigitsName);
 
   // Total number of strips per group
+  static bool nStripsComputed = false; // Compute only once
+  if (nStripsComputed)
+    return;
+  nStripsComputed = true;
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (const auto& layer : geo.getLayers(VXD::SensorInfoBase::SVD)) {
     for (const auto& ladder : geo.getLadders(layer)) {

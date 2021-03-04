@@ -51,6 +51,8 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
   addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
   addParam("refRCTC", m_refRCTC, "RMS of Cluster Time from Cosmic reference run", float(15.77)); // e14r1182
+  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
+           float(4); // 4 ns
 }
 
 
@@ -328,25 +330,25 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
     if (nEvents > m_statThreshold) {
       if (runtype == "physics") {
-        float threshold_physics = m_refRCTP / sqrt(m_statThreshold);
         float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
-        if (difference_physics > threshold_physics) {
+        if (difference_physics > m_timeThreshold) {
           hasError = true;
         }
       } else if (runtype == "cosmic") {
-        float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
         float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
-        if (difference_cosmic > threshold_cosmic) {
+        if (difference_cosmic > m_timeThreshold) {
           hasError = true;
         }
       } else {
         B2WARNING("Run type:" << runtype);
       }
+    } else {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
     }
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);

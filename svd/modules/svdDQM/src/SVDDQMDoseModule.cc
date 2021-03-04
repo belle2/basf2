@@ -15,14 +15,19 @@ SVDDQMDoseModule::SVDDQMDoseModule() : HistoModule()
 {
   setDescription("Monitor SVD dose TODO...");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("eventTypeFilter", m_eventFilter,
+           "Types of events to include in the plots (see SVDDQMDoseModule::EEventType).", 7U);
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed in the ROOT file.",
            std::string("SVDDose"));
   addParam("offlineZSShaperDigits", m_SVDShaperDigitsName,
            "Name of the SVDShaperDigits to use for computing occupancy (with ZS5).",
            std::string("SVDShaperDigitsZS5"));
-  addParam("BeamRevolutionCycle", m_revolutionTime,
-           "Beam revolution cycle in musec", 5120 / 508.0);
+  addParam("noInjectionTimeout", m_noInjectionTime,
+           "Time (microseconds) since last injection after which an event is considered \"No Injection\".",
+           30e3);
+  addParam("beamRevolutionCycle", m_revolutionTime,
+           "Beam revolution cycle in microseconds.", 5120 / 508.0);
 }
 
 void SVDDQMDoseModule::defineHisto()
@@ -130,8 +135,11 @@ void SVDDQMDoseModule::event()
   RawFTSW* theTTD = m_rawTTD[0];
   // 127 MHz is the (inexactly rounded) clock of the ticks
   const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / 127.0;
-  const double timeInCycle = timeSinceInj - (int)(timeSinceInj / m_revolutionTime) * m_revolutionTime;
   const bool isHER = theTTD->GetIsHER(0);
+  const EEventType eventType = timeSinceInj > m_noInjectionTime ? c_NoInjection : (isHER ? c_HERInjection : c_LERInjection);
+  if (((unsigned int)eventType & m_eventFilter) == 0U)
+    return;
+  const double timeInCycle = timeSinceInj - (int)(timeSinceInj / m_revolutionTime) * m_revolutionTime;
 
   // Reset counters
   for (auto& [sensor, count] : hitsU) count = 0;

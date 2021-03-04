@@ -36,6 +36,13 @@ namespace Belle2 {
      */
     class SVDDQMDoseModule : public HistoModule {
     public:
+      /** Bits definition for the bitmask that selects the events to put in the histograms. */
+      enum EEventType {
+        c_HERInjection = 1,
+        c_LERInjection = 2,
+        c_NoInjection = 4
+      };
+
       SVDDQMDoseModule(); /**< Default constructor, defines parameters. */
 
       void initialize() override final; /**< Overrides HistoModule::initialize */
@@ -62,8 +69,10 @@ namespace Belle2 {
       } SensorGroup;
 
       // Steerable data members (parameters)
+      unsigned int m_eventFilter; /**< Bitmask for event type selection, see EEventType . */
       std::string m_histogramDirectoryName; /**< Name of the histograms' directory in the ROOT file. */
       std::string m_SVDShaperDigitsName; /**< Name of the StoreArray of SVDShaperDigit to use. */
+      double m_noInjectionTime; /**< After this time (in microseconds) from last injection the event falls in the "No Injection" category. */
       double m_revolutionTime; /**< Beam revolution time in microseconds. */
 
       // Inputs

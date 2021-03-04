@@ -17,7 +17,7 @@ from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -168,7 +168,7 @@ class CharmoniumPsi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE('loosepid', path=path)

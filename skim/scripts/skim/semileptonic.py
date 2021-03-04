@@ -23,7 +23,7 @@ from stdV0s import stdKshorts
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -66,7 +66,7 @@ class PRsemileptonicUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -181,7 +181,7 @@ class SLUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

@@ -20,7 +20,7 @@ from skimExpertFunctions import BaseSkim, _sphinxify_decay, fancy_skim_header
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 def _merge_boolean_dicts(*dicts):
@@ -308,7 +308,7 @@ class feiHadronicB0(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -388,7 +388,7 @@ class feiHadronicBplus(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": False,
@@ -469,7 +469,7 @@ class feiSLB0(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -547,7 +547,7 @@ class feiSLBplus(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": False,

@@ -37,7 +37,7 @@ from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -64,7 +64,7 @@ class BtoD0h_Kspi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -130,7 +130,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
 
     ApplyHLTHadronCut = True
     produce_on_tau_samples = False  # retention is very close to zero on taupair
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -556,7 +556,7 @@ class BtoD0h_hh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
@@ -740,7 +740,7 @@ class BtoD0h_Kshh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)

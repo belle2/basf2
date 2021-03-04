@@ -22,7 +22,7 @@ from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
 
 __liaison__ = "Guanda Gong <gonggd@mail.ustc.edu.cn>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header

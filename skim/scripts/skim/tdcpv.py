@@ -27,7 +27,7 @@ __authors__ = [
 
 # __liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
 __liaison__ = "Yoshiyuki ONUKI <onuki@hep.phys.s.u-tokyo.ac.jp>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -95,7 +95,7 @@ class TDCPV_qqs(BaseSkim):
     __category__ = "physics, TDCPV"
 
     ApplyHLTHadronCut = True
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -251,7 +251,7 @@ class TDCPV_ccs(BaseSkim):
     __category__ = "physics, TDCPV"
 
     ApplyHLTHadronCut = True
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

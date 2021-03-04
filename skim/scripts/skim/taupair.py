@@ -16,7 +16,7 @@ from stdPhotons import stdPhotons
 from variables import variables as vm
 
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -38,7 +38,7 @@ class TauLFV(BaseSkim):
     __category__ = "physics, tau"
 
     produce_on_tau_samples = False  # retention is too high on taupair
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -248,7 +248,7 @@ class TauGeneric(BaseSkim):
     __category__ = "physics, tau"
 
     produce_on_tau_samples = False  # retention is too high on taupair
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -377,7 +377,7 @@ class TauThrust(BaseSkim):
     __category__ = "physics, tau"
 
     produce_on_tau_samples = False  # retention is too high on taupair
-    validation_sample = __validation_sample___
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)

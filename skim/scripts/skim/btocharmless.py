@@ -23,7 +23,7 @@ from skim.standardlists.charmless import (
 
 
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
-__validation_sample___ = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header

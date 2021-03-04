@@ -126,8 +126,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     if enableLocalDB is True:
         b2.B2WARNING("B2BII is running with local payloads.\n"
                      "If you use FlavorTagger or FEI, please set enableLocalDB to be False.")
-        b2.conditions.metadata_providers = ["/sw/old/belle/b2bii/database/conditions/b2bii.sqlite"]
-        b2.conditions.payload_locations = ["/sw/old/belle/b2bii/database/conditions/"]
+        b2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+        b2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

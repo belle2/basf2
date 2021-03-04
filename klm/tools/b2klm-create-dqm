@@ -172,6 +172,9 @@ if __name__ == "__main__":
         # KLM reconstruction
         main.add_module('KLMReconstructor')
 
+    else:
+        basf2.B2WARNING('The DQM histograms related to the trigger bits may not be filled.')
+
     # DQM
     main.add_module('KLMDQM')
 

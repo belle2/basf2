@@ -156,7 +156,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Initialization')
 
     # Unpack the event content
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # Build one path for all accepted events...

@@ -78,6 +78,9 @@ namespace Belle2 {
       /// Memory used for processing distribution of events per unit
       std::map<unsigned int, TH1F*> m_processingMemoryPerUnitHistograms;
 
+      /// Number of processes per unit
+      TH1F* m_processesPerUnitHistogram;
+
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
 

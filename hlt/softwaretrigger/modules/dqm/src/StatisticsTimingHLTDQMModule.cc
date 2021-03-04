@@ -120,6 +120,11 @@ void StatisticsTimingHLTDQMModule::defineHisto()
       m_processingMemoryPerUnitHistograms[index]->StatOverflows(true);
       m_lastProcessingMemorySumPerUnit.emplace(index, 0);
     }
+
+    m_processesPerUnitHistogram = new TH1F("processesPerUnitHistogram", "Number of Processes Per Unit",
+                                           HLTUnit::max_hlt_units + 1, 0,
+                                           HLTUnit::max_hlt_units + 1);
+    m_processesPerUnitHistogram->SetStats(false);
   }
 
   if (oldDirectory) {
@@ -264,6 +269,9 @@ void StatisticsTimingHLTDQMModule::beginRun()
     [](auto & it) { it.second->Reset(); });
     std::for_each(m_processingMemoryPerUnitHistograms.begin(), m_processingMemoryPerUnitHistograms.end(),
     [](auto & it) { it.second->Reset(); });
+    m_processesPerUnitHistogram->Reset();
+
+    m_processesPerUnitHistogram->Fill(1);
   }
 }
 

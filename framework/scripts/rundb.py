@@ -29,6 +29,7 @@ class RunDB:
 
     def __init__(self, apikey=None, username=None):
         """Create an object and setup authentication."""
+        #: session object for connection to the RunDB
         self._session = requests.Session()
         if apikey is None:
             # If no specific username use the local system username

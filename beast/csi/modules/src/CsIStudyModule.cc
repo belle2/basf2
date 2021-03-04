@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Const.h>
 #include <beast/csi/modules/CsiModule.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 #include <beast/csi/dataobjects/CsiHit.h>
@@ -158,7 +159,7 @@ void CsIStudyModule::event()
       h_CrystalRadDoseSH->Fill(m_cellID, eventWeight * edep * edeptodose);
 
       // To get the Number of photons per GeV (divide by total edep before plotting)
-      if (22 == aCsIHit->getPDGCode()) {
+      if (Const::photon.getPDGCode() == aCsIHit->getPDGCode()) {
         h_LightYieldCrystal->Fill(m_cellID, eventWeight);
       }
     }

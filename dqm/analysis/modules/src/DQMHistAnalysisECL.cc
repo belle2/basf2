@@ -40,7 +40,7 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy) to display waveform flow",
            m_WaveformOption);
   addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
-  addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 10);
+  addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 50);
 }
 
 
@@ -52,12 +52,12 @@ void DQMHistAnalysisECLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisECL: initialized.");
 
   //new canvases for existing histograms
-  c_quality_analysis = new TCanvas("ECL_c_quality_analysis");
-  c_quality_other_analysis = new TCanvas("ECL_c_quality_other_analysis");
+  c_quality_analysis = new TCanvas("ECL/c_quality_analysis");
+  c_quality_other_analysis = new TCanvas("ECL/c_quality_other_analysis");
   c_bad_quality_analysis = new TCanvas("ECL/c_bad_quality_analysis");
   c_trigtag1_analysis = new TCanvas("ECL/c_trigtag1_analysis");
   c_trigtag2_analysis = new TCanvas("ECL/c_trigtag2_analysis");
-  c_adc_hits_analysis = new TCanvas("ECL_c_adc_hits_analysis");
+  c_adc_hits_analysis = new TCanvas("ECL/c_adc_hits_analysis");
   c_ampfail_quality_analysis = new TCanvas("ECL/c_ampfail_quality_analysis");
   c_timefail_quality_analysis = new TCanvas("ECL/c_timefail_quality_analysis");
   c_quality_fit_data_analysis = new TCanvas("ECL/c_quality_fit_data_analysis");
@@ -97,14 +97,14 @@ void DQMHistAnalysisECLModule::initialize()
   c_crate_time_offsets = new TCanvas("ECL/c_crate_time_offsets");
   h_crate_time_offsets = new TGraphErrors();
   h_crate_time_offsets->SetName("t_off");
-  h_crate_time_offsets->SetTitle("Crate time offsets (Thr = 1 GeV); Crate ID; Time offsets [nsec]");
+  h_crate_time_offsets->SetTitle("Crate time offset (E > 1 GeV); Crate ID (same as ECLCollector ID); Time offset [ns]");
   h_crate_time_offsets->SetMarkerColor(kBlue);
   h_crate_time_offsets->SetMarkerStyle(20);
 
   //New DQM summary for logic test in CR shifter panel
   c_logic_summary = new TCanvas("ECL/c_logic_summary");
-  h_logic_summary = new TH2F("logic_summary", "ECL logic summary", 52, 1, 53, 12, 1, 13);
-  h_logic_summary->SetTitle("ECL logic summary; Collector ID; Shaper ID inside the crate");
+  h_logic_summary = new TH2F("logic_summary", "FPGA <-> C++ fitter inconsistencies count", 52, 1, 53, 12, 1, 13);
+  h_logic_summary->SetTitle("FPGA <-> C++ fitter inconsistencies count; ECLCollector ID (same as Crate ID); Shaper ID inside the crate");
   h_logic_summary->SetCanExtend(TH1::kAllAxes);
   h_logic_summary->SetStats(0);
   for (unsigned short i = 0; i < 52; i++) h_logic_summary->GetXaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
@@ -126,7 +126,11 @@ void DQMHistAnalysisECLModule::normalize(TCanvas* c, const std::string&  h_name,
   if (h != NULL) {
     for (unsigned short i = 0; i < h->GetNbinsX(); i++) {
       Double_t entries = h->GetBinContent(i + 1);
-      if (weight) h->SetBinContent(i + 1, entries / weight);
+      Double_t error = h->GetBinError(i + 1);
+      if (weight) {
+        h->SetBinContent(i + 1, entries / weight);
+        h->SetBinError(i + 1, error / weight);
+      }
     }
     h->Draw("HIST");
   }

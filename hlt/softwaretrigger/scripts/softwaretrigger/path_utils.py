@@ -7,7 +7,7 @@ from geometry import check_components
 import reconstruction
 
 
-def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
+def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add DQM plots for a specific run type and dqm environment
     """
@@ -17,9 +17,11 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
     from daqdqm.cosmicdqm import add_cosmic_dqm
 
     if run_type == constants.RunTypes.beam:
-        add_collision_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment,
+                          dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
-        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
+                       dqm_mode=dqm_mode)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
@@ -27,7 +29,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
 
 
-def add_hlt_dqm(path, run_type, components, dqm_mode):
+def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add all the DQM modules for HLT to the path
     """
@@ -36,7 +38,9 @@ def add_hlt_dqm(path, run_type, components, dqm_mode):
         run_type=run_type,
         dqm_environment=constants.Location.hlt.name,
         components=components,
-        dqm_mode=dqm_mode.name)
+        dqm_mode=dqm_mode.name,
+        create_hlt_unit_histograms=create_hlt_unit_histograms)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
 def add_expressreco_dqm(path, run_type, components):
@@ -127,6 +131,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', loadPhotonBeamBackgroundMVA=False, path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', True, path=path)
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
@@ -140,7 +145,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     D0_Cut = '1.7 < M < 2.1'
     D0_Ch = ['K-:dstSkim pi+:dstSkim',
              'K-:dstSkim pi+:dstSkim pi0:veryLooseFit',
-             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim']
+             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim',
+             'K_S0:dstSkim pi+:dstSkim pi-:dstSkim']
 
     for chID, channel in enumerate(D0_Ch):
         chID += 1
@@ -183,6 +189,8 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
+
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
@@ -209,6 +217,7 @@ def add_post_filter_reconstruction(path, run_type, components):
 
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
         pass
     else:

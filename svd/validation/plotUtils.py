@@ -1,5 +1,10 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+"""
+<header>
+<noexecute>Used as library.</noexecute>
+</header>
+"""
 
 import ROOT as R
 
@@ -69,6 +74,8 @@ granulesTD = ((cut_L3, 'L3-L4'),
               (cut_L5, 'L5-L6'))
 
 granulesL3456 = ((cut_L3, 'L3456'),)  # characteristic of track saved in 3rd layer cluster
+
+g_L3_V = ((cut_L3 + cut_V, 'L3_V'),)
 
 
 def ploter(name, title, nbins, xmin, xmax, x_label, y_label,

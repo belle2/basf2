@@ -72,7 +72,6 @@ class DownloadableDatabase:
         from ROOT import Belle2
         Belle2.DBStore.Instance().reset()
 
-        basf2.reset_database(False)
         basf2.conditions.override_globaltags()
 
         for database in self._database:

@@ -502,7 +502,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     // Ignore baryons, except for deuteron.  The purpose is mainly to
     // avoid an error message when getCharge() is called below.
     if (abs(aMcParticlePtr->getPDG()) > 1000000000
-        && abs(aMcParticlePtr->getPDG()) != 1000010020) {
+        && abs(aMcParticlePtr->getPDG()) != Const::deuteron.getPDGCode()) {
       B2DEBUG(20, "Skipped Baryon.");
       continue; //goto next mcParticle, do not make track candidate
 

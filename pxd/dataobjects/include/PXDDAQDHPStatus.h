@@ -23,11 +23,11 @@ namespace Belle2 {
    * It will record some stat data of this DHP
    *
    */
-  class PXDDAQDHPStatus {
+  class PXDDAQDHPStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHPStatus() : m_chipID(0), m_frameNr(0) {}
+    PXDDAQDHPStatus() : m_chipID(0), m_frameNr(0), m_truncated(false) {}
 
     /** constructor setting the error mask, dhcid, raw and reduced data counters, ...
      * @param chipid DHP chip id (2 bit)
@@ -48,13 +48,19 @@ namespace Belle2 {
     /** get Readout Frame number */
     uint16_t getFrameNr(void) const { return  m_frameNr;};
 
+    /** set Truncation */
+    void setTruncated(void) { m_truncated = true;};
+    /** get Truncation */
+    bool getTruncated(void) { return  m_truncated;};
+
   private:
 
-    uint8_t m_chipID;/**< Chip ID as delivered by DAQ.*/
-    uint16_t m_frameNr; /**< Frame number (low bits) from DHP header */
+    uint8_t m_chipID{0};/**< Chip ID as delivered by DAQ.*/
+    uint16_t m_frameNr{0}; /**< Frame number (low bits) from DHP header */
+    bool m_truncated{false}; /**< DHE reports truncated frame */
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHPStatus, 1);
+    ClassDef(PXDDAQDHPStatus, 2);
 
   }; // class PXDDAQDHPStatus
 

@@ -4,7 +4,7 @@
 
 import basf2
 
-from . import utilities
+from tracking.run import utilities
 
 import argparse
 import logging

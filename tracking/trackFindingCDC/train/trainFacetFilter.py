@@ -114,9 +114,9 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
                 "chi2_accept",
             ]
 
-        wire_hit_preparer = path.add_module("TFCDC_WireHitPreparer",
-                                            flightTimeEstimation="outwards",
-                                            UseNLoops=1.0)
+        path.add_module("TFCDC_WireHitPreparer",
+                        flightTimeEstimation="outwards",
+                        UseNLoops=1.0)
 
         path.add_module("TFCDC_ClusterPreparer")
 

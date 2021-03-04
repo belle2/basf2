@@ -32,6 +32,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 using namespace std;
 
@@ -60,7 +61,11 @@ namespace Belle2 {
       cellId = 24,
       mcenergy = 25,
       usedforenergy = 26,
-      R_geom = 27 // Requires a geometry environment
+      R_geom = 27, // Requires a geometry environment
+      phiOffset = 30,
+      thetaOffset = 31,
+      phiPointing = 32,
+      thetaPointing = 33
     };
 
     // enum with available center types
@@ -350,6 +355,64 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getExtCellExpert(const Particle* particle, int varid, bool front)
+    {
+      ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
+      if (!geometry) {
+        B2ERROR("Geometry not found!");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      const Track* track = particle->getTrack();
+      if (track) {
+        ExtHit* edgeExtHit = nullptr;
+        if (front) {
+          for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
+            if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
+            if (extHit.getStatus() != EXT_ENTER) continue;
+            int crystalID = extHit.getCopyID() - 1;
+            if (crystalID == -1) continue;
+            edgeExtHit = new ExtHit(extHit);
+            break;
+          }
+        } else {
+          auto extHits = track->getRelationsTo<ExtHit>();
+          for (unsigned int iextHit(extHits.size() - 1); iextHit > 0; --iextHit) {
+            const auto extHit = extHits[iextHit];
+            if (extHit->getDetectorID() != Const::EDetector::ECL) continue;
+            if (extHit->getStatus() != EXT_EXIT) continue;
+            int crystalID = extHit->getCopyID() - 1;
+            if (crystalID == -1) break;
+            edgeExtHit = new ExtHit(*extHit);
+            break;
+          }
+        }
+
+        if (!edgeExtHit) return std::numeric_limits<double>::quiet_NaN();
+        const TVector3& extHitPosition = edgeExtHit->getPosition();
+        const TVector3& trackPointing = edgeExtHit->getMomentum();
+
+        geometry->Mapping(edgeExtHit->getCopyID() - 1);
+        const int thetaID = geometry->GetThetaID();
+        const int phiID = geometry->GetPhiID();
+
+        const TVector3& crystalCenterPosition = geometry->GetCrystalPos(geometry->GetCellID(thetaID, phiID));
+        const TVector3& crystalOrientation = geometry->GetCrystalVec(geometry->GetCellID(thetaID, phiID));
+        const TVector3& crystalPositionOnSurface = crystalCenterPosition - (crystalCenterPosition - extHitPosition).Dot(
+                                                     crystalOrientation.Unit()) * crystalOrientation.Unit();
+
+        if (varid == varType::phiOffset) {
+          return extHitPosition.DeltaPhi(crystalPositionOnSurface);
+        } else if (varid == varType::thetaOffset) {
+          return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
+        } else if (varid == varType::phiPointing) {
+          return trackPointing.DeltaPhi(crystalOrientation);
+        } else if (varid == varType::thetaPointing) {
+          return trackPointing.Theta() - crystalOrientation.Theta();
+        }
+      }
+
+      return std::numeric_limits<double>::quiet_NaN();
+    }
   }
 
   namespace Variable {
@@ -1102,6 +1165,46 @@ namespace Belle2 {
 
     }
 
+    double getExtFrontPositionPhiOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiOffset, true);
+    }
+
+    double getExtFrontPositionThetaOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaOffset, true);
+    }
+
+    double getExtFrontPositionPhiPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiPointing, true);
+    }
+
+    double getExtFrontPositionThetaPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing, true);
+    }
+
+    double getExtBackPositionPhiOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiOffset, false);
+    }
+
+    double getExtBackPositionThetaOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaOffset, false);
+    }
+
+    double getExtBackPositionPhiPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiPointing, false);
+    }
+
+    double getExtBackPositionThetaPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing, false);
+    }
+
     //! @returns the eclcaldigit Phi by digit energy rank
     double getPhiByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
@@ -1241,6 +1344,23 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track");
+
+    REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiOffset", getExtFrontPositionPhiOffset,
+                      "[calibration] Returns the difference in the azimuthal angle (in radians)"
+                      "between the position where the track hit the front face of the ECL and the"
+                      "center of the struck crystal projected onto the front surface.");
+    REGISTER_VARIABLE("eclcaldigitExtFrontPositionThetaOffset", getExtFrontPositionThetaOffset,
+                      "[calibration] Returns the difference in the polar angle (in radians)"
+                      "between the position where the track hit the front face of the ECL and the"
+                      "center of the struck crystal projected onto the front surface.");
+    REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiPointing", getExtFrontPositionPhiPointing,
+                      "[calibration] Returns the difference in the azimuthal angle (in radians)"
+                      "between the momentum direction when the track hit the front face of the ECL and the"
+                      "orientation of the struck crystal.");
+    REGISTER_VARIABLE("eclcaldigitExtFrontPositionThetaPointing", getExtFrontPositionThetaPointing,
+                      "[calibration] Returns the difference in the polar angle (in radians)"
+                      "between the momentum direction when the track hit the front face of the ECL and the"
+                      "orientation of the struck crystal.");
 
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentFitType(i, j)", getExtECLCalDigitTwoComponentFitType,
                       "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");

@@ -128,6 +128,10 @@ namespace Belle2 {
 
     h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
 
+    h_ARICHOccAfterInjLer = new TH1F("ARICHOccInjLER", " ARICHOccInjLER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHOccAfterInjHer = new TH1F("ARICHOccInjHER", " ARICHOccInjHER /Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjLer = new TH1F("ARICHEOccInjLER", "ARICHEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+    h_ARICHEOccAfterInjHer = new TH1F("ARICHEOccInjHER", "ARICHEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");
@@ -159,6 +163,10 @@ namespace Belle2 {
       h_secTheta[i]->SetOption("LIVE");
       h_secHitsPerTrack[i]->SetOption("LIVE");
     }
+    h_ARICHOccAfterInjLer->SetOption("LIVE");
+    h_ARICHEOccAfterInjLer->SetOption("LIVE");
+    h_ARICHOccAfterInjHer->SetOption("LIVE");
+    h_ARICHEOccAfterInjHer->SetOption("LIVE");
 
     //Set the minimum to 0
     h_chDigit->SetMinimum(0);
@@ -179,6 +187,10 @@ namespace Belle2 {
     h_hitsPerEvent->SetMinimum(0);
     h_theta->SetMinimum(0);
     h_hitsPerTrack->SetMinimum(0);
+    h_ARICHOccAfterInjLer->SetMinimum(0);
+    h_ARICHEOccAfterInjLer->SetMinimum(0);
+    h_ARICHOccAfterInjHer->SetMinimum(0);
+    h_ARICHEOccAfterInjHer->SetMinimum(0);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetMinimum(0);
@@ -205,7 +217,7 @@ namespace Belle2 {
     arichAeroHits.isOptional();
     StoreArray<ARICHLikelihood> likelihoods;
     likelihoods.isOptional();
-
+    m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
   }
 
   void ARICHDQMModule::beginRun()
@@ -244,6 +256,10 @@ namespace Belle2 {
       h_secHitsPerTrack[i]->Reset();
     }
 
+    h_ARICHOccAfterInjLer->Reset();
+    h_ARICHEOccAfterInjLer->Reset();
+    h_ARICHOccAfterInjHer->Reset();
+    h_ARICHEOccAfterInjHer->Reset();
   }
 
   void ARICHDQMModule::event()
@@ -415,6 +431,24 @@ namespace Belle2 {
     }
 
     h_trackPerEvent->Fill(ntrk);
+
+    for (auto& it : m_rawFTSW) {
+      B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+              (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+              it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+      auto difference = it.GetTimeSinceLastInjection(0);
+      if (difference != 0x7FFFFFFF) {
+        unsigned int nentries = arichDigits.getEntries();
+        float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+        if (it.GetIsHER(0)) {
+          h_ARICHOccAfterInjHer->Fill(diff2, nentries);
+          h_ARICHEOccAfterInjHer->Fill(diff2);
+        } else {
+          h_ARICHOccAfterInjLer->Fill(diff2, nentries);
+          h_ARICHEOccAfterInjLer->Fill(diff2);
+        }
+      }
+    }
 
   }
 

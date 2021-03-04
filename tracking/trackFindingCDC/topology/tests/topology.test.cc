@@ -47,9 +47,9 @@ TEST_P(SecondaryWireNeighborhoodTest, IsSymmetric)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(SecondaryWireNeighborhoodTest_IsSymmetric,
-                        SecondaryWireNeighborhoodTest,
-                        ::testing::Range(0, 12));
+INSTANTIATE_TEST_SUITE_P(SecondaryWireNeighborhoodTest_IsSymmetric,
+                         SecondaryWireNeighborhoodTest,
+                         ::testing::Range(0, 12));
 
 
 TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)

@@ -10,9 +10,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-import svd.validation_utils as vu
-
 from prompt import ValidationSettings
+import svd.validation_utils as vu
 
 import ROOT as r
 r.PyConfig.IgnoreCommandLineOptions = True
@@ -23,7 +22,7 @@ plt.style.use("belle2")
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name="caf_svd_time",
                               description=__doc__,
-                              download_files=['SVDTimeValidation_output', 'stdout'],
+                              download_files=[],
                               expert_config=None)
 
 

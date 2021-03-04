@@ -48,7 +48,7 @@ class FitValidationModule(HarvestingModule):
 
         cdc_hit_store_array = self.cdcHits
 
-        observations_variance = Belle2.TrackFindingCDC.CDCObservations2D()
+        # observations_variance = Belle2.TrackFindingCDC.CDCObservations2D()
         observations = Belle2.TrackFindingCDC.CDCObservations2D()
         hits = ROOT.std.vector("Belle2::TrackFindingCDC::TrackHit*")()
 

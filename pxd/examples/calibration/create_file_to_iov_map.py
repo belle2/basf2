@@ -20,6 +20,7 @@
 
 import pickle
 from pprint import PrettyPrinter
+import sys
 import argparse
 parser = argparse.ArgumentParser(
     description="Make a mapping file of file paths -> IoV")

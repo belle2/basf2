@@ -16,6 +16,7 @@ from ROOT.Belle2 import SVDTimeValidationAlgorithm
 import basf2 as b2
 
 import rawdata as raw
+from softwaretrigger.constants import HLT_INPUT_OBJECTS
 from tracking import add_tracking_reconstruction
 
 from caf.framework import Calibration
@@ -180,6 +181,9 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     """
     # Set-up re-processing path
     path = b2.create_path()
+
+    # Read from file only what is needed
+    path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
 
     # unpack raw data to do the tracking
     if not isMC:

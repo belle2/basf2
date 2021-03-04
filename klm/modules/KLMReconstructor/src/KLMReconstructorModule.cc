@@ -119,6 +119,8 @@ void KLMReconstructorModule::initialize()
 
 void KLMReconstructorModule::beginRun()
 {
+  if (!m_ChannelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
   if (!m_TimeWindow.isValid())
     B2FATAL("KLM time window data are not available.");
   m_CoincidenceWindow = m_TimeWindow->getCoincidenceWindow();
@@ -226,7 +228,20 @@ void KLMReconstructorModule::reconstructBKLMHits()
       const BKLMHit1d* phiHit = m_bklmHit1ds[phiIndex];
       const BKLMHit1d* zHit = m_bklmHit1ds[zIndex];
       CLHEP::Hep3Vector local = m->getLocalPosition(phiHit->getStripAve(), zHit->getStripAve());
-      CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(local);
+      CLHEP::Hep3Vector propagationTimes;
+      if (m_bklmHit1ds[i]->getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
+        if (isPhiReadout) {
+          propagationTimes = m->getPropagationTimes(
+                               local, m_bklmHit1ds[j]->getStripMin(),
+                               m_bklmHit1ds[i]->getStripMin());
+        } else {
+          propagationTimes = m->getPropagationTimes(
+                               local, m_bklmHit1ds[i]->getStripMin(),
+                               m_bklmHit1ds[j]->getStripMin());
+        }
+      } else {
+        propagationTimes = m->getPropagationTimes(local);
+      }
       double phiTime = phiHit->getTime() - propagationTimes.y();
       double zTime = zHit->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_CoincidenceWindow)

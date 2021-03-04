@@ -53,26 +53,18 @@ def setupB2BIIDatabase(isMC=False):
     tagname = "B2BII%s" % ("_MC" if isMC else "")
     # and we want to cache them in a meaningful but separate directory
     payloaddir = tagname + "_database"
-    b2.reset_database()
-    b2.use_database_chain()
     # fallback to previously downloaded payloads if offline
     if not isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            True,
-            b2.LogLevel.ERROR)
+            payloaddir)
         # get payloads from central database
-        b2.use_central_database(tagname, b2.LogLevel.WARNING, payloaddir)
+        b2.conditions.prepend_globaltag(tagname)
     # unless they are already found locally
     if isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            False,
-            b2.LogLevel.WARNING)
+            payloaddir)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,

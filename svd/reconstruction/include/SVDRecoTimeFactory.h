@@ -30,17 +30,31 @@ namespace Belle2::SVD {
      * static function that returns the
      * class to compute the cluster time
      */
-    static SVDClusterTime* NewTime(const std::string& description)
+    static SVDClusterTime* NewTime(const std::string& description, const bool& returnRawClusterTime)
     {
-      if (description == "CoG6")
-        return new SVDCoG6Time;
-      if (description == "CoG3")
-        return new SVDCoG3Time;
-      if (description == "ELS3")
-        return new SVDELS3Time;
-
+      if (description == "CoG6") {
+        SVDCoG6Time* cog6 = new SVDCoG6Time();
+        if (returnRawClusterTime)
+          cog6->setReturnRawClusterTime();
+        return cog6;
+      }
+      if (description == "CoG3") {
+        SVDCoG3Time* cog3 = new SVDCoG3Time();
+        if (returnRawClusterTime)
+          cog3->setReturnRawClusterTime();
+        return cog3;
+      }
+      if (description == "ELS3") {
+        SVDELS3Time* els3 = new SVDELS3Time();
+        if (returnRawClusterTime)
+          els3->setReturnRawClusterTime();
+        return els3;
+      }
       B2WARNING("the SVD cluster time algorithm is not recognized, using SVDCoG6Time!");
-      return new SVDCoG6Time;
+      SVDCoG6Time* cog6 = new SVDCoG6Time();
+      if (returnRawClusterTime)
+        cog6->setReturnRawClusterTime();
+      return cog6;
     }
   };
 

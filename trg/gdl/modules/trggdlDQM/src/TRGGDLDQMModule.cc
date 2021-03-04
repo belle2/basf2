@@ -1124,8 +1124,8 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool ffy_fired = isFired("ffy");
     bool fyo_fired = isFired("fyo");
     bool fyb_fired = isFired("fyb");
-    bool bha2D_fired = isFired("BHA");
-    bool bha3D_fired = isFired("BHA3D");
+    bool bha2D_fired = isFired("bhabha");
+    bool bha3D_fired = isFired("bha3d");
     bool lml0_fired  = isFired("LML0");
     bool lml1_fired  = isFired("LML1");
     bool lml2_fired  = isFired("LML2");
@@ -1150,6 +1150,17 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool cdcecl2_fired = isFired("cdcecl2");
     bool cdcecl3_fired = isFired("cdcecl3");
     bool cdcecl4_fired = isFired("cdcecl4");
+    bool fso_fired = isFired("fso");
+    bool fsb_fired = isFired("fsb");
+    bool syo_fired = isFired("syo");
+    bool syb_fired = isFired("syb");
+    bool x_fired = isFired("x");
+    bool fioiecl1_fired = isFired("fioiecl1");
+    bool ecleklm1_fired = isFired("ecleklm1");
+    bool seklm1_fired = isFired("seklm1");
+    bool seklm2_fired = isFired("seklm2");
+    bool ieklm_fired = isFired("ieklm");
+    bool iecl_fired = isFired("iecl");
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
@@ -1337,7 +1348,42 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (cdcecl4_fired && lml_fired) {
       h_psn_extra[skim[ifill]]->Fill(61.5);
     }
+    if (fso_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(62.5);
+    }
+    if (fsb_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(63.5);
+    }
+    if (syo_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(64.5);
+    }
+    if (syb_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(65.5);
+    }
+    if (x_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(66.5);
+    }
+    if (fioiecl1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(67.5);
+    }
+    if (ecleklm1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(68.5);
+    }
+    if (seklm1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(69.5);
+    }
+    if (seklm2_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(70.5);
+    }
+    if (ieklm_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(71.5);
+    }
+    if (iecl_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(72.5);
+    }
   }
+
+
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
     //fill efficiency values
@@ -1437,7 +1483,8 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "lml2&(fff|ffo|ffb)", "lml3&(fff|ffo|ffb)", "lml4&(fff|ffo|ffb)", "lml5&(fff|ffo|ffb)", "lml6&(fff|ffo|ffb)", "lml7&(fff|ffo|ffb)", "lml8&(fff|ffo|ffb)", "lml9&(fff|ffo|ffb)", "lml10&(fff|ffo|ffb)", "lml12&(fff|ffo|ffb)",
   "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)", "mu_b2b&(fff|ffo|ffb)", "mu_eb2b&(fff|ffo|ffb)", "cdcklm1&(fff|ffo|ffb)", "cdcklm2&(fff|ffo|ffb)", "klm_hit&(fff|ffo|ffb)", "eklm_hit&(fff|ffo|ffb)", "mu_b2b&(lml|eclmumu)", "mu_eb2b&(lml|eclmumu)",
   "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
-  "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)"
+  "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)", "fso&(lml|eclmumu)", "fsb&(lml|eclmumu)", "syo&(lml|eclmumu)", "syb&(lml|eclmumu)", "x&(lml|eclmumu)", "fioiecl1&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "seklm1&(lml|eclmumu)",
+  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)"
 };
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {

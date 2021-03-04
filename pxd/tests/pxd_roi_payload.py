@@ -58,7 +58,7 @@ class PxdROIPayloadTestModule(b2.Module):
         unpackedrois = self.sortROIs(unpackedroisuns)
 
         # For some unknown reason, the ROI array contains a lot of
-        # doubles. For creating the paload, thesehave been removed. to make a 1:1
+        # doubles. For creating the payload, these have been removed. to make a 1:1
         # comparison, we have to skip the following check and lateron skip ROIs
         # which are identical to the one before (ordered array).
 
@@ -93,17 +93,12 @@ class PxdROIPayloadTestModule(b2.Module):
             if i != 0 and f(org) == f(orgrois[i - 1]):
                 b2.B2WARNING("Found the same ROI a second time (Double ROI)!")
                 b2.B2WARNING(
-                    "Check Org $%X %3d %3d %3d %3d Unp $%X %3d %3d %3d %3d" %
+                    "Check $%X %3d %3d %3d %3d" %
                     (org.getSensorID().getID(),
                      org.getMinUid(),
                         org.getMaxUid(),
                         org.getMinVid(),
-                        org.getMaxVid(),
-                        unp.getSensorID().getID(),
-                        unp.getMinUid(),
-                        unp.getMaxUid(),
-                        unp.getMinVid(),
-                        unp.getMaxVid()))
+                        org.getMaxVid()))
             if i == 0 or f(org) != f(orgrois[i - 1]):
                 if j == len(unpackedrois):
                     b2.B2FATAL("Unpacked ROIs comparison exceeds array limit!")
@@ -151,8 +146,6 @@ particlegun.param('nTracks', 40)
 # Create Event information
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10]})
-# Show progress of processing
-progress = b2.register_module('Progress')
 
 main = b2.create_path()
 # init path
@@ -170,18 +163,13 @@ roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0,
 
 main.add_module(roiPayloadAssembler)
 
-main.add_module(progress)
+# Show progress of processing
+main.add_module('Progress')
 
 main.add_module(PXDROIUnpackerModule.PXDPayloadROIUnpackerModule())
 
-# run custom test module to check if the PXDDigits and the
-# pxd_digits_pack_unpack_collection collections are equal
+# run custom test module to check ROI befor and after packing/unpacking
 main.add_module(PxdROIPayloadTestModule())
-
-# simpleoutput = register_module('RootOutput')
-# simpleoutput.param('outputFileName', 'testout.root')
-# simpleoutput.param('compressionLevel', 0)
-# main.add_module(simpleoutput)
 
 # Process events
 b2.process(main)

@@ -17,6 +17,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/utilities/Conversion.h>
+#include <framework/gearbox/Const.h>
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
@@ -39,8 +40,8 @@ namespace Belle2 {
 
         for (auto& idaughter : daughters) {
           if (idaughter -> getNDaughters() == 2) {
-            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11
-                && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == 11) {
+            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == Const::electron.getPDGCode()
+                && std::abs(idaughter -> getDaughters()[1]-> getPDGCode()) == Const::electron.getPDGCode()) {
               isOneConversion = true;
             }
           }
@@ -107,7 +108,7 @@ namespace Belle2 {
         TLorentzVector pGamma;
 
         for (auto& idaughter : daughters) {
-          if (std::abs(idaughter -> getPDGCode()) == 22) pGamma = frame.getMomentum(idaughter);
+          if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) pGamma = frame.getMomentum(idaughter);
         }
 
         pGamma.Boost(motherBoost);

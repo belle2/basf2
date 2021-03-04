@@ -271,10 +271,10 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         """Aggregate the track and MC information for track-segment analysis"""
         mc_segment_lookup = self.mc_segment_lookup
 
-        from_segment = segment_pair.getFromSegment()
+        # from_segment = segment_pair.getFromSegment()
         to_segment = segment_pair.getToSegment()
 
-        mc_particle = mc_segment_lookup.getMCParticle(from_segment)
+        # mc_particle = mc_segment_lookup.getMCParticle(from_segment)
 
         # Take the fit best at the middle of the segment pair
         fit3d_truth = mc_segment_lookup.getTrajectory3D(to_segment)

@@ -2,14 +2,12 @@ import os
 
 Import('env')
 
-#env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
-#env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
-env['LIBS'] = ['framework', 'daq', 'RooFit', 'RooFitCore', 'vxd',
-               'boost_regex', 'arich',
-               'klm_dataobjects', 'klm_dbobjects',
-               'dqm_dataobjects', 'svd_dataobjects', 'vxd_dataobjects',
-               'cdc_dataobjects', 'cdc']
+env['LIBS'] = ['framework', 'daq', 'boost_regex',
+               'arich', 'cdc', 'dqm_dataobjects',
+               'klm_dbobjects', 'svd_dataobjects',
+               'RooFit', 'RooFitCore', 'ca', 'Com']
 
+# this check is not completely save if new options are added with clang
 if os.environ['BELLE2_OPTION'] == 'clang':
     env.Append(CPPPATH=['$EPICS_BASE/include/compiler/clang'])
 else:
@@ -21,8 +19,6 @@ env['EPICS_HOST_ARCH'] = os.environ['EPICS_HOST_ARCH']
 env.Append(CPPDEFINES=['_BELLE2_EPICS'])
 env.Append(CPPPATH=['$EPICS_BASE/include'])
 env.Append(CPPPATH=['$EPICS_BASE/include/os/Linux'])
-
 env.Append(LIBPATH=['$EPICS_BASE/lib/$EPICS_HOST_ARCH'])
-env.Append(LIBS=['ca', 'Com'])
 
 Return('env')

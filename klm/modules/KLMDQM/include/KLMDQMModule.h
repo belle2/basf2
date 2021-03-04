@@ -80,6 +80,23 @@ namespace Belle2 {
 
   private:
 
+    /** Bins for the trigger bits historgrams. */
+    enum TriggerBitsBin {
+
+      /** 0x8. */
+      c_0x8 = 1,
+
+      /** 0x4. */
+      c_0x4 = 2,
+
+      /** 0x2. */
+      c_0x2 = 3,
+
+      /** 0x1. */
+      c_0x1 = 4,
+
+    };
+
     /** Number of channel hit histograms per sector for BKLM. */
     const int m_ChannelHitHistogramsBKLM = 2;
 
@@ -135,6 +152,12 @@ namespace Belle2 {
 
     /** Number of digits: EKLM scintillators. */
     TH1F* m_DigitsScintillatorEKLM;
+
+    /** Trigger bits: BKLM scintillators. */
+    TH1F* m_TriggerBitsBKLM;
+
+    /** Trigger bits: EKLM scintillators. */
+    TH1F* m_TriggerBitsEKLM;
 
     /** Number of KLM Digits after LER injection. */
     TH1F* m_KlmDigitsAfterLERInj;

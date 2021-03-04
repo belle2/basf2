@@ -166,7 +166,8 @@ if __name__ == "__main__":
         main.add_module('Geometry')
 
         # Unpacker
-        main.add_module('KLMUnpacker')
+        main.add_module('KLMUnpacker',
+                        WriteDigitRaws=True)
 
         # KLM reconstruction
         main.add_module('KLMReconstructor')

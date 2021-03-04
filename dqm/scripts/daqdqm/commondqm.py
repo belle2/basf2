@@ -187,6 +187,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(topdqm)
     # KLM
     if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+        # To fully run the KLMDQM module online we need to store the KLMDigitRaw objects.
+        b2.set_module_parameters(path=main, type='KLMUnpacker', WriteDigitRaws=True)
         klmdqm = b2.register_module("KLMDQM")
         path.add_module(klmdqm)
 

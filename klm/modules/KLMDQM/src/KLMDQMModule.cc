@@ -13,6 +13,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
 
 /* ROOT headers. */
 #include <TDirectory.h>
@@ -35,6 +36,8 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsRPC{nullptr},
   m_DigitsScintillatorBKLM{nullptr},
   m_DigitsScintillatorEKLM{nullptr},
+  m_TriggerBitsBKLM{nullptr},
+  m_TriggerBitsEKLM{nullptr},
   m_KlmDigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
   m_KlmDigitsAfterHERInj{nullptr},
@@ -196,6 +199,21 @@ void KLMDQMModule::defineHisto()
                                       250.0, 0.0, 250.0);
   m_DigitsScintillatorEKLM->GetXaxis()->SetTitle("Number of digits");
   m_DigitsScintillatorEKLM->SetOption("LIVE");
+  /* Trigger bits. */
+  m_TriggerBitsBKLM = new TH1F("trigger_bits_bklm", "Trigger bits of multi-strip digits (BKLM)",
+                               (double)c_0x1, (double)c_0x8 - 1.0, (double)c_0x1);
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+  m_TriggerBitsBKLM->SetOption("LIVE");
+  m_TriggerBitsEKLM = new TH1F("trigger_bits_eklm", "Trigger bits of multi-strip digits (EKLM)",
+                               (double)c_0x1, (double)c_0x8 - 1.0, (double)c_0x1);
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+  m_TriggerBitsEKLM->SetOption("LIVE");
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
   m_KlmDigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
@@ -257,6 +275,9 @@ void KLMDQMModule::beginRun()
   m_DigitsRPC->Reset();
   m_DigitsScintillatorBKLM->Reset();
   m_DigitsScintillatorEKLM->Reset();
+  /* Trigger bits. */
+  m_TriggerBitsBKLM->Reset();
+  m_TriggerBitsEKLM->Reset();
   /* Injection information. */
   m_KlmDigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
@@ -297,6 +318,20 @@ void KLMDQMModule::event()
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
+      if (digit.isMultiStrip()) {
+        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+        if (digitRaw) {
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x1) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x1);
+          if ((triggerBits & 0x2) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x2);
+          if ((triggerBits & 0x4) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x4);
+          if ((triggerBits & 0x8) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x8);
+        }
+      }
     } else if (digit.getSubdetector() != KLMElementNumbers::c_BKLM) {
       int section = digit.getSection();
       int sector = digit.getSector();
@@ -320,6 +355,20 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
+      }
+      if (digit.isMultiStrip()) {
+        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+        if (digitRaw) {
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x1) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x1);
+          if ((triggerBits & 0x2) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x2);
+          if ((triggerBits & 0x4) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x4);
+          if ((triggerBits & 0x8) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x8);
+        }
       }
     } else
       B2FATAL("Not a BKLM or a EKLM digit, something went really wrong.");

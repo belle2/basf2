@@ -52,12 +52,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLM"));
-  addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
-           "Directory for EKLM DQM histograms in ROOT file.",
-           std::string("EKLM"));
-  addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
-           "Directory for BKLM DQM histograms in ROOT file.",
-           std::string("BKLM"));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -238,7 +232,6 @@ void KLMDQMModule::initialize()
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
-  m_BklmHit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()

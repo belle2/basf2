@@ -13,7 +13,6 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -106,12 +105,6 @@ namespace Belle2 {
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
-    /** Directory for EKLM DQM histograms in ROOT file. */
-    std::string m_HistogramDirectoryNameEKLM;
-
-    /** Directory for BKLM DQM histograms in ROOT file. */
-    std::string m_HistogramDirectoryNameBKLM;
-
     /** KLM DAQ inclusion. */
     TH1F* m_DAQInclusion;
 
@@ -194,9 +187,6 @@ namespace Belle2 {
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_BklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_BklmHit2ds;
 
   };
 

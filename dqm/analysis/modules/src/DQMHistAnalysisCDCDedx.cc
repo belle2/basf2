@@ -87,6 +87,8 @@ void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
 
   TH1* hh1 = findHist("CDCDedx/hdEdx_PerRun");
   if (hh1 != NULL) {
+    c_CDCdedxMean->Clear();
+    c_CDCdedxMean->cd();
     //Copy bins and X ranges as well as bin-content (Clone and Copy histogram not working here)
     h_CDCdedxMean->SetBins(int(hh1->GetXaxis()->GetNbins()), double(hh1->GetXaxis()->GetXmin()), double(hh1->GetXaxis()->GetXmax()));
     h_CDCdedxMean->SetTitle(hh1->GetTitle());
@@ -114,8 +116,6 @@ void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
       }
     }
 
-    c_CDCdedxMean->Clear();
-    c_CDCdedxMean->cd();
     h_CDCdedxMean->GetXaxis()->SetRangeUser(0.0, 2.0);
     h_CDCdedxMean->SetTitle(Form("Run #: %s, Status: %s, mean: %0.04f, sigma: %0.04f", runnumber.data(), runstatus.data(), dedxmean,
                                  dedxsigma));

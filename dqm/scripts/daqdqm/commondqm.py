@@ -92,7 +92,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
-        )
+        ).set_name("SoftwareTriggerHLTDQM_before_filter")
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -139,19 +139,19 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
-            "SoftwareTriggerHLTDQM",
-            cutResultIdentifiers={
-                "skim": {"skim": hlt_skim_lines_in_plot},
-            },
-            cutResultIdentifiersIgnored={
-                "skim": [
-                    "accept_bhabha_all",
-                ]
-            },
-            createTotalResultHistograms=False,
-            createExpRunEventHistograms=False,
-            histogramDirectoryName="softwaretrigger_skim_nobhabha",
-        )
+           "SoftwareTriggerHLTDQM",
+           cutResultIdentifiers={
+               "skim": {"skim": hlt_skim_lines_in_plot},
+           },
+           cutResultIdentifiersIgnored={
+               "skim": [
+                   "accept_bhabha_all",
+                   ]
+           },
+           createTotalResultHistograms=False,
+           createExpRunEventHistograms=False,
+           histogramDirectoryName="softwaretrigger_skim_nobhabha",
+        ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT

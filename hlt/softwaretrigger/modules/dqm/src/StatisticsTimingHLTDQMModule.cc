@@ -271,7 +271,7 @@ void StatisticsTimingHLTDQMModule::beginRun()
     [](auto & it) { it.second->Reset(); });
     m_processesPerUnitHistogram->Reset();
 
-    m_processesPerUnitHistogram->Fill(1);
+    m_processesPerUnitHistogram->Fill(m_hlt_unit);
   }
 }
 

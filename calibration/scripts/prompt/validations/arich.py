@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Validation of KLM strip efficiency calibration.
+Validation of ARICH channel masking calibration.
 '''
 
 
@@ -18,42 +18,13 @@ import math
 settings = ValidationSettings(name='ARICH channel mask',
                               description=__doc__,
                               download_files=['stdout'],
-                              expert_config={"max_events_per_file": 100})
-
-
-def save_graph_to_root(graph_name):
-    '''
-    Save a TGraph in a ROOT file.
-    '''
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetName(graph_name)
-    graph.Write()
-
-
-def save_graph_to_pdf(canvas, root_file, graph_name, exp, chunk):
-    '''
-    Save a drawn TGraph in a PDF file.
-    '''
-    graph = root_file.Get(graph_name)
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetMarkerStyle(ROOT.EMarkerStyle.kFullDotSmall)
-    graph.SetMarkerColor(ROOT.EColor.kRed + 1)
-    graph.GetXaxis().SetTitle(f'Exp. {exp} -- Run number')
-    graph.GetYaxis().SetTitle('# of masked channels')
-    graph.SetMinimum(0.)
-    graph.SetMaximum(1.)
-    graph.Draw('AP')
-    ROOT.gPad.SetGridy()
-    canvas.SaveAs(f'channel_mask_exp{exp}_chunk{chunk}_{graph_name}.pdf')
+                              expert_config={"chunk_size": 100})
 
 
 def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
     '''
     Run the validation.
-    Nota bene:
-      - job_path will be replaced with path/to/calibration_results
-      - input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
+
     '''
 
     # TODO: replace it with an expert dictionary when it will be possible.
@@ -61,10 +32,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
 
     # Ignore the ROOT command line options.
     ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
+
     # Run ROOT in batch mode.
     ROOT.gROOT.SetBatch(True)
-    # Set the Belle II style.
-    ROOT.gROOT.SetStyle("BELLE2")
     # And unset the stat box.
     ROOT.gStyle.SetOptStat(0)
 
@@ -95,7 +65,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             if run_list[0] == 0 and run_list[1] > 5:
                 run_list[0] = run_list[1] - 5
 
-    # Run the KLMCalibrationChecker class.
+    # Run the ARICHCalibrationChecker class.
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
             checker = ARICHCalibrationChecker()
@@ -111,7 +81,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
         chunks = math.ceil(len(run_list) / chunk_size)
         for chunk in range(chunks):
             file_name = f'channel_mask_exp{exp}_chunk{chunk}.root'
-            run_file_names = [f'channel_mask_exp{exp}_run{run}.root' for run in run_list[chunk:(chunk + chunk_size)]]
+            run_file_names = [
+                f'channel_mask_exp{exp}_run{run}.root' for run in run_list[chunk * chunk_size:(chunk + 1) * chunk_size]]
             subprocess.run(['hadd', '-f', file_name] + run_file_names, check=True)
             input_file = ROOT.TFile(f'{file_name}')
             output_file = ROOT.TFile(f'histograms_{file_name}', 'recreate')
@@ -120,11 +91,44 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             assert isinstance(tree, ROOT.TTree) == 1
             canvas = ROOT.TCanvas(f'canvas_exp{exp}_chunk{chunk}', 'canvas', 800, 500)
             canvas.cd()
-            tree.Draw('frac_masked:run')
-            save_graph_to_root("channel_mask")
-            save_graph_to_pdf(canvas, output_file, "channel_mask", exp, chunk)
+            graphs = []
+            mg = ROOT.TMultiGraph("mg", "ARICH masked channels")
+            leg = ROOT.TLegend(0.9, 0.5, 0.98, 0.9)
+
+            # draw graphs for each sector
+            for i in range(0, 6):
+                n = tree.Draw(f'frac_masked_sector[{i}]:run', "", "goff")
+                graphs.append(ROOT.TGraph(n, tree.GetV2(), tree.GetV1()))
+                graphs[i].SetMarkerStyle(7)
+                graphs[i].SetMarkerColor(i + 1)
+                graphs[i].SetLineWidth(0)
+                graphs[i].SetTitle(f'sector {i+1}')
+                leg.AddEntry(graphs[i])
+                mg.Add(graphs[i])
+
+            # draw graph for total
+            n = tree.Draw(f'frac_masked:run', "", "goff")
+            graphs.append(ROOT.TGraph(n, tree.GetV2(), tree.GetV1()))
+            graphs[6].SetMarkerStyle(20)
+            graphs[6].SetMarkerColor(6 + 1)
+            graphs[6].SetLineWidth(0)
+            graphs[6].SetTitle('total')
+            leg.AddEntry(graphs[6])
+            mg.Add(graphs[6])
+
+            mg.Draw("ap")
+            mg.GetXaxis().SetTitle('Exp. 12 -- Run number')
+            mg.GetYaxis().SetTitle('fraction of masked channels')
+            leg.Draw()
+            ROOT.gPad.SetGridx()
+            ROOT.gPad.SetGridy()
+            canvas.Write()
+            canvas.SaveAs(file_name.replace("root", "pdf"))
+
             input_file.Close()
             output_file.Close()
+            # delete run files
+            subprocess.run(['rm', '-rf'] + run_file_names, check=True)
 
 
 if __name__ == "__main__":

@@ -3,14 +3,12 @@
  * Copyright(C) 2020  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giacomo De Pietro                                        *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
-
-/* ARICH headers. */
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -76,12 +74,13 @@ namespace Belle2 {
     void checkChannelMask();
 
     /**
-     * Create channel mask histograms.
+     * Get HAPD sector number
      */
-    void createChannelMaskHistograms();
-
     int getSector(int modID);
 
+    /**
+     * Get HAPD ring number
+     */
     int getRing(int modID);
 
   private:
@@ -120,7 +119,7 @@ namespace Belle2 {
     /** Global Tag name. */
     std::string m_GlobalTagName = "";
 
-    /** Output file for alignment results. */
+    /** Output file for channel mask results. */
     std::string m_channelMaskResultsFile = "channel_mask.root";
 
     /** Event metadata. */

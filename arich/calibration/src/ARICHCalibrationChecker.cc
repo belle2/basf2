@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giacomo De Pietro                                        *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -114,7 +114,7 @@ void ARICHCalibrationChecker::checkChannelMask()
     B2FATAL("ARICHChannelMask is not valid.");
   if (m_GlobalTagName != "")
     printPayloadInformation(channelMask);
-  /* Create trees with strip efficiency measurement results. */
+  /* Create tree with fractions of masked channels in each sector. */
   float frac_masked_sector[6] = {0.};
   float frac_masked = 0.;
   TFile* channelMaskResults =
@@ -140,79 +140,5 @@ void ARICHCalibrationChecker::checkChannelMask()
   delete maskTree;
   delete channelMaskResults;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
-  resetDatabase();
-}
-
-void ARICHCalibrationChecker::createChannelMaskHistograms()
-{
-  /* Initialize the database. */
-  initializeDatabase();
-  /* Now we can read the payload. */
-  /* DBObjPtr<ARICHStripEfficiency> stripEfficiency;
-  if (not stripEfficiency.isValid())
-    B2FATAL("Strip efficiency data are not valid.");
-  if (m_GlobalTagName != "")
-    printPayloadInformation(stripEfficiency);
-
-  ARICHChannelIndex arichSectors(ARICHChannelIndex::c_IndexLevelSector);
-  TCanvas* canvas = new TCanvas();
-  for (ARICHChannelIndex& arichSector : arichSectors) {
-    int subdetector = arichSector.getSubdetector();
-    int section = arichSector.getSection();
-    int sector = arichSector.getSector();
-
-    TH1F* hist = new TH1F("plane_histogram", "", 30, 0.5, 30.5);
-    hist->GetYaxis()->SetTitle("Efficiency");
-    hist->SetMinimum(0.4);
-    hist->SetMaximum(1.);
-    hist->SetMarkerStyle(20);
-    hist->SetMarkerSize(0.5);
-    TString title;
-    if (subdetector == ARICHElementNumbers::c_BARICH) {
-      if (section == BARICHElementNumbers::c_BackwardSection)
-        title.Form("BARICH backward sector %d", sector);
-      else
-        title.Form("BARICH forward sector %d", sector);
-      hist->SetTitle(title.Data());
-      hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane + 1");
-      for (int layer = 1; layer <= BARICHElementNumbers::getMaximalLayerNumber(); layer++) {
-        for (int plane = 0; plane <= BARICHElementNumbers::getMaximalPlaneNumber(); plane++) {
-          int bin = (layer - 1) * 2 + plane + 1;
-          float efficiency = stripEfficiency->getBarrelEfficiency(section, sector, layer, plane, 2);
-          float efficiencyError = stripEfficiency->getBarrelEfficiencyError(section, sector, layer, plane, 2);
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinError(bin, efficiencyError);
-        }
-      }
-    } else {
-      if (section == EARICHElementNumbers::c_BackwardSection) {
-        hist->SetBins(24, 0.5, 24.5);
-        title.Form("EARICH backward sector %d", sector);
-      } else {
-        hist->SetBins(28, 0.5, 28.5);
-        title.Form("EARICH forward sector %d", sector);
-      }
-      hist->SetTitle(title.Data());
-      hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane");
-      const EARICHElementNumbers* elementNumbersEARICH = &(EARICHElementNumbers::Instance());
-      for (int layer = 1; layer <= elementNumbersEARICH->getMaximalDetectorLayerNumber(section); layer++) {
-        for (int plane = 1; plane <= EARICHElementNumbers::getMaximalPlaneNumber(); plane++) {
-          int bin = (layer - 1) * 2 + plane;
-          float efficiency = stripEfficiency->getEndcapEfficiency(section, sector, layer, plane, 2);
-          float efficiencyError = stripEfficiency->getEndcapEfficiencyError(section, sector, layer, plane, 2);
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinError(bin, efficiencyError);
-        }
-      }
-    }
-    hist->Draw("e");
-    TString name;
-    name.Form("efficiency_subdetector_%d_section_%d_sector_%d.pdf", subdetector, section, sector);
-    canvas->Print(name.Data());
-    canvas->Update();
-    delete hist;
-  }
-  delete canvas;
-  */
   resetDatabase();
 }

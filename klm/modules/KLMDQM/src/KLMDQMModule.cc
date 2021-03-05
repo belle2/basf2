@@ -36,6 +36,8 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsRPC{nullptr},
   m_DigitsScintillatorBKLM{nullptr},
   m_DigitsScintillatorEKLM{nullptr},
+  m_DigitsMultiStripBKLM{nullptr},
+  m_DigitsMultiStripEKLM{nullptr},
   m_TriggerBitsBKLM{nullptr},
   m_TriggerBitsEKLM{nullptr},
   m_KlmDigitsAfterLERInj{nullptr},
@@ -193,6 +195,14 @@ void KLMDQMModule::defineHisto()
                                       250.0, 0.0, 250.0);
   m_DigitsScintillatorEKLM->GetXaxis()->SetTitle("Number of digits");
   m_DigitsScintillatorEKLM->SetOption("LIVE");
+  m_DigitsMultiStripBKLM = new TH1F("digits_multi_bklm", "Number of multi-strip digits (BKLM)",
+                                    50.0, 0.0, 50.0);
+  m_DigitsMultiStripBKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
+  m_DigitsMultiStripBKLM->SetOption("LIVE");
+  m_DigitsMultiStripEKLM = new TH1F("digits_multi_eklm", "Number of multi-strip digits (EKLM)",
+                                    50.0, 0.0, 50.0);
+  m_DigitsMultiStripEKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
+  m_DigitsMultiStripEKLM->SetOption("LIVE");
   /* Trigger bits. */
   m_TriggerBitsBKLM = new TH1F("trigger_bits_bklm", "Trigger bits of multi-strip digits (BKLM)",
                                (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
@@ -268,6 +278,8 @@ void KLMDQMModule::beginRun()
   m_DigitsRPC->Reset();
   m_DigitsScintillatorBKLM->Reset();
   m_DigitsScintillatorEKLM->Reset();
+  m_DigitsMultiStripBKLM->Reset();
+  m_DigitsMultiStripEKLM->Reset();
   /* Trigger bits. */
   m_TriggerBitsBKLM->Reset();
   m_TriggerBitsEKLM->Reset();
@@ -282,6 +294,7 @@ void KLMDQMModule::event()
 {
   int nDigits = m_Digits.getEntries();
   int nDigitsRPC = 0, nDigitsScintillatorBKLM = 0, nDigitsScintillatorEKLM = 0;
+  int nDigitsMultiStripBKLM = 0, nDigitsMultiStripEKLM = 0;
   for (const KLMDigit& digit : m_Digits) {
     /*
      * Reject digits that are below the threshold (such digits may appear
@@ -296,18 +309,20 @@ void KLMDQMModule::event()
       int layer = digit.getLayer();
       int plane = digit.getPlane();
       int strip = digit.getStrip();
-      uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
-      uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-      uint16_t channel = m_ElementNumbers->channelNumberEKLM(
-                           section, sector, layer, plane, strip);
-      uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
-      for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
-        double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
-        double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
-        if ((xMin > channelIndex) || (xMax < channelIndex))
-          continue;
-        m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
-      }
+      if (not digit.isMultiStrip()) {
+        uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
+        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        uint16_t channel = m_ElementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
+        uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
+        for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
+          double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
+          double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
+          if ((xMin > channelIndex) || (xMax < channelIndex))
+            continue;
+          m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
+        }
+      } else
+        nDigitsMultiStripEKLM++;
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
@@ -331,17 +346,20 @@ void KLMDQMModule::event()
       int layer = digit.getLayer();
       int plane = digit.getPlane();
       int strip = digit.getStrip();
-      uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-      uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-      uint16_t channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
-      uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
-      for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
-        double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
-        double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
-        if ((xMin > channelIndex) || (xMax < channelIndex))
-          continue;
-        m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
-      }
+      if (not digit.isMultiStrip()) {
+        uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        uint16_t channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
+        uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
+        for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
+          double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
+          double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
+          if ((xMin > channelIndex) || (xMax < channelIndex))
+            continue;
+          m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
+        }
+      } else
+        nDigitsMultiStripBKLM++;
       if (digit.inRPC()) {
         nDigitsRPC++;
         m_TimeRPC->Fill(digit.getTime());
@@ -382,6 +400,10 @@ void KLMDQMModule::event()
   m_DigitsRPC->Fill((double)nDigitsRPC);
   m_DigitsScintillatorBKLM->Fill((double)nDigitsScintillatorBKLM);
   m_DigitsScintillatorEKLM->Fill((double)nDigitsScintillatorEKLM);
+  if (nDigitsMultiStripBKLM > 0)
+    m_DigitsMultiStripBKLM->Fill((double)nDigitsMultiStripBKLM);
+  if (nDigitsMultiStripEKLM > 0)
+    m_DigitsMultiStripEKLM->Fill((double)nDigitsMultiStripEKLM);
   /* Injection information. */
   for (RawFTSW& rawFtsw : m_RawFtsws) {
     unsigned int difference = rawFtsw.GetTimeSinceLastInjection(0);

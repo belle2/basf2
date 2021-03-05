@@ -146,6 +146,12 @@ namespace Belle2 {
     /** Number of digits: EKLM scintillators. */
     TH1F* m_DigitsScintillatorEKLM;
 
+    /** Number of multi-strip digits: BKLM scintillators. */
+    TH1F* m_DigitsMultiStripBKLM;
+
+    /** Number of multi-strip digits: EKLM scintillators. */
+    TH1F* m_DigitsMultiStripEKLM;
+
     /** Trigger bits: BKLM scintillators. */
     TH1F* m_TriggerBitsBKLM;
 

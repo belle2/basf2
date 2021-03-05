@@ -18,8 +18,6 @@ import pstats
 
 import logging
 
-from ROOT import Belle2
-
 
 def get_logger():
     return logging.getLogger(__name__)

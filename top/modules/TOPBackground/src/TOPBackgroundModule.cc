@@ -25,6 +25,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -266,7 +267,7 @@ namespace Belle2 {
       barID++;
 
 
-      if (tophit->getPDG() == 2112) {
+      if (tophit->getPDG() == Const::neutron.getPDGCode()) {
         double w = tophit->getNeutronWeight();
         double tlen = tophit->getTrackLength();
 
@@ -285,12 +286,12 @@ namespace Belle2 {
       int PDG = toptrk->getPDG();
       int barID = toptrk->getModuleID();
 
-      if (PDG == 2112) {
+      if (PDG == Const::neutron.getPDGCode()) {
         nflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
                         1. / 917.65 / m_TimeOfSimulation * yearns * 2.);
         norigin->Fill(toptrk->getProductionPoint().Z());
       } else {
-        if (PDG == 22) {
+        if (PDG == Const::photon.getPDGCode()) {
           gflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,
                           1. / 917.65 / m_TimeOfSimulation * 2.);
           gorigin->Fill(toptrk->getProductionPoint().Z());

@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 // here's where the functions are hidden
 #include <reconstruction/modules/KlId/KLMExpert/KlId.h>
@@ -136,7 +137,7 @@ void KlongValidationModule::event()
     } else {
       m_isBeamBKG = 0;
       while (!(mcpart -> getMother() == nullptr)) {
-        if (mcpart -> getPDG() == 130) {
+        if (mcpart -> getPDG() == Const::Klong.getPDGCode()) {
           m_isKl = 1;
           break;
         }

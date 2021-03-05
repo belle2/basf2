@@ -30,7 +30,9 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
   fCosMax(1.0),
   fHistbins(600),
   fdEdxMin(0.0),
-  fdEdxMax(3.0)
+  fdEdxMax(3.0),
+  fStartRun(0)
+
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx electron cos(theta) dependence");
@@ -53,6 +55,10 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   ttree->SetBranchAddress("costh", &costh);
   ttree->SetBranchAddress("charge", &charge);
 
+  const auto expRun = getRunList()[0];
+  updateDBObjPtrs(1, expRun.second, expRun.first);
+  fStartRun = expRun.second;
+
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, but for now just make uniform bins
   TH1D* hdEdx_elCosbin[fCosbins], *hdEdx_poCosbin[fCosbins], *hdEdx_epCosbin[fCosbins];
@@ -62,26 +68,29 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
     double coslow = i * binW + fCosMin,  coshigh = coslow + binW;
 
-    hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d", i), "", fHistbins, fdEdxMin, fdEdxMax);
-    hdEdx_elCosbin[i]->SetTitle(Form("dE/dx dist (e-) in costh (%0.02f, %0.02f)", coslow, coshigh));
+    hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_elCosbin[i]->SetTitle(Form("dE/dx dist (e-) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_elCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e-)");
     hdEdx_elCosbin[i]->GetYaxis()->SetTitle("Entries");
 
-    hdEdx_poCosbin[i] = new TH1D(Form("hdEdx_poCosbin%d", i), "", fHistbins, fdEdxMin, fdEdxMax);
-    hdEdx_poCosbin[i]->SetTitle(Form("dE/dx dist (e+) in costh (%0.02f, %0.02f)", coslow, coshigh));
+    hdEdx_poCosbin[i] = new TH1D(Form("hdEdx_poCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_poCosbin[i]->SetTitle(Form("dE/dx dist (e+) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_poCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e+)");
     hdEdx_poCosbin[i]->GetYaxis()->SetTitle("Entries");
 
-    hdEdx_epCosbin[i] = new TH1D(Form("hdEdx_epCosbin%d", i), "", fHistbins, fdEdxMin, fdEdxMax);
-    hdEdx_epCosbin[i]->SetTitle(Form("dE/dx dist (e-,e+) in costh (%0.02f, %0.02f)", coslow, coshigh));
+    hdEdx_epCosbin[i] = new TH1D(Form("hdEdx_epCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_epCosbin[i]->SetTitle(Form("dE/dx dist (e-,e+) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_epCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e-,e+)");
     hdEdx_epCosbin[i]->GetYaxis()->SetTitle("Entries");
   }
 
   // fill histograms, bin size may be arbitrary
-  TH1D* hCosth_el = new TH1D("hCosth_el", "cos(#theta) dist (e- and e+); cos(#theta); Entries", fCosbins, fCosMin, fCosMax);
-  TH1D* hCosth_po = new TH1D("hCosth_po", "cos(#theta) dist (e+); cos(#theta); Entries", fCosbins, fCosMin, fCosMax);
-  TH1D* hCosth_ep = new TH1D("hCosth_ep", "cos(#theta) dist (e- and e+); cos(#theta); Entries", fCosbins, fCosMin, fCosMax);
+  TH1D* hCosth_el = new TH1D(Form("hCosth_el_fRun%d", fStartRun),
+                             Form("cos(#theta) dist (e- and e+), start run: %d; cos(#theta); Entries", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosth_po = new TH1D(Form("hCosth_po_fRun%d", fStartRun), Form("cos(#theta) dist (e+), start run: %d; cos(#theta); Entries",
+                             fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosth_ep = new TH1D(Form("hCosth_ep_fRun%d", fStartRun),
+                             Form("cos(#theta) dist (e- and e+), start run: %d; cos(#theta); Entries", fStartRun), fCosbins, fCosMin, fCosMax);
 
   for (int i = 0; i < ttree->GetEntries(); ++i) {
 
@@ -111,20 +120,20 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   }
 
   //Plot constants
-  TH1D* hdEdxMeanvsCos_po = new TH1D("hdEdxMeanvsCos_po", "dE/dx(e+) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins, fCosMin,
-                                     fCosMax);
-  TH1D* hdEdxSigmavsCos_po = new TH1D("hdEdxSigmavsCos_po", "dE/dx(e+) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins, fCosMin,
-                                      fCosMax);
+  TH1D* hdEdxMeanvsCos_po = new TH1D(Form("hdEdxMeanvsCos_po_fRun%d", fStartRun),
+                                     Form("dE/dx(e+) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_po = new TH1D(Form("hdEdxSigmavsCos_po_fRun%d", fStartRun),
+                                      Form("dE/dx(e+) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
 
-  TH1D* hdEdxMeanvsCos_el = new TH1D("hdEdxMeanvsCos_el", "dE/dx(e-) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins, fCosMin,
-                                     fCosMax);
-  TH1D* hdEdxSigmavsCos_el = new TH1D("hdEdxSigmavsCos_el", "dE/dx(e-) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins, fCosMin,
-                                      fCosMax);
+  TH1D* hdEdxMeanvsCos_el = new TH1D(Form("hdEdxMeanvsCos_el_fRun%d", fStartRun),
+                                     Form("dE/dx(e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_el = new TH1D(Form("hdEdxSigmavsCos_el_fRun%d", fStartRun),
+                                      Form("dE/dx(e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
 
-  TH1D* hdEdxMeanvsCos_ep = new TH1D("hdEdxMeanvsCos_ep", "dE/dx(e+, e-) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins,
-                                     fCosMin, fCosMax);
-  TH1D* hdEdxSigmavsCos_ep = new TH1D("hdEdxSigmavsCos_ep", "dE/dx(e+, e-) rel means; cos(#theta); dE/dx (#mu_{fit})", fCosbins,
-                                      fCosMin, fCosMax);
+  TH1D* hdEdxMeanvsCos_ep = new TH1D(Form("hdEdxMeanvsCos_ep_fRun%d", fStartRun),
+                                     Form("dE/dx(e+, e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_ep = new TH1D(Form("hdEdxSigmavsCos_ep_fRun%d", fStartRun),
+                                      Form("dE/dx(e+, e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
 
   // more validation plots
   TCanvas* ctmp_ep = new TCanvas("ctmp_ep", "ctmp_ep", 800, 400);
@@ -137,10 +146,10 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   //validation plots: individual bin dedx dist and fits
   if (isMakePlots) {
-    psname_ep << "cdcdedx_coscal_fits.pdf[";
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf[", fStartRun);
     ctmp_ep->Print(psname_ep.str().c_str());
     psname_ep.str("");
-    psname_ep << "cdcdedx_coscal_fits.pdf";
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf", fStartRun);
   }
 
   // fit histograms to get gains in bins of cos(theta)
@@ -279,7 +288,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   if (isMakePlots) {
 
     psname_ep.str("");
-    psname_ep << "cdcdedx_coscal_fits.pdf]";
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf]", fStartRun);
     ctmp_ep->Print(psname_ep.str().c_str());
     delete ctmp_ep;
 
@@ -289,16 +298,18 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     cstats->cd(1);
     auto hestats = getObjectPtr<TH1I>("hestats");
     if (hestats) {
+      hestats->SetName(Form("hestats_fRun%d", fStartRun));
       hestats->SetStats(0);
       hestats->DrawCopy("");
     }
     cstats->cd(2);
     auto htstats = getObjectPtr<TH1I>("htstats");
     if (htstats) {
+      hestats->SetName(Form("htstats_fRun%d", fStartRun));
       htstats->DrawCopy("");
       hestats->SetStats(0);
     }
-    cstats->Print(Form("cdcdedx_coscal_stats.pdf"));
+    cstats->Print(Form("cdcdedx_coscal_stats_frun%d.pdf", fStartRun));
     delete cstats;
 
     TCanvas* ctmp_epConst = new TCanvas("ctmp_epConst", "ctmp_epConst", 800, 400);
@@ -385,11 +396,11 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       hCosth_ep->DrawCopy("same");
     }
 
-    ctmp_epCosth->SaveAs("cdcdedx_coscal_costhdist.pdf");
+    ctmp_epCosth->SaveAs(Form("cdcdedx_coscal_costhdist_frun%d.pdf", fStartRun));
     delete ctmp_epCosth;
 
-    ctmp_epConst->SaveAs("cdcdedx_coscal_relmeans.pdf");
-    ctmp_epConst->SaveAs("cdcdedx_coscal_relmeans.root");
+    ctmp_epConst->SaveAs(Form("cdcdedx_coscal_relmeans_frun%d.pdf", fStartRun));
+    ctmp_epConst->SaveAs(Form("cdcdedx_coscal_relmeans_frun%d.root", fStartRun));
     delete ctmp_epConst;
   }
 
@@ -400,10 +411,13 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
 {
 
-  TH1D* hCosCorrOld = new TH1D("hCosCorrOld", "cos corr const comparison (red=old, blue=new);cos(#theta);dE/dx #mu_{fit}", fCosbins,
-                               fCosMin, fCosMax);
-  TH1D* hCosCorrNew = new TH1D("hCosCorrNew", "coss corr ;cos(#theta);dE/dx #mu_{fit}", fCosbins, fCosMin, fCosMax);
-  TH1D* hCosCorrRel = new TH1D("hCosCorrRel", "new relative cos corr;cos(#theta);dE/dx #mu_{fit}", fCosbins, fCosMin, fCosMax);
+  TH1D* hCosCorrOld = new TH1D(Form("hCosCorrOld_fRun%d", fStartRun),
+                               Form("cos corr const comparison (red=old, blue=new), start run: %d;cos(#theta);dE/dx #mu_{fit}", fStartRun), fCosbins, fCosMin,
+                               fCosMax);
+  TH1D* hCosCorrNew = new TH1D(Form("hCosCorrNew_fRun%d", fStartRun), Form("coss corr, start run: %d;cos(#theta);dE/dx #mu_{fit}",
+                               fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosCorrRel = new TH1D(Form("hCosCorrRel_fRun%d", fStartRun),
+                               Form("new relative cos corr, start run: %d;cos(#theta);dE/dx #mu_{fit}", fStartRun), fCosbins, fCosMin, fCosMax);
 
   if (isMergePayload) {
     const auto expRun = getRunList()[0];
@@ -442,8 +456,8 @@ void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
     hCosCorrRel->SetLineColor(kBlack);
     hCosCorrRel->DrawCopy("");
 
-    ctmp_const->SaveAs("cdcdedx_coscal_constants.pdf");
-    ctmp_const->SaveAs("cdcdedx_coscal_constants.root");
+    ctmp_const->SaveAs(Form("cdcdedx_coscal_constants_frun%d.pdf", fStartRun));
+    ctmp_const->SaveAs(Form("cdcdedx_coscal_constants_frun%d.root", fStartRun));
     delete ctmp_const;
   }
 

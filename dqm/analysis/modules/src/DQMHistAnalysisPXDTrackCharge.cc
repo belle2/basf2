@@ -41,6 +41,8 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower border for fit", 20.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
+//   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
+//   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
@@ -294,34 +296,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         canvas->cd();
 
         // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-        if (abs(hist2->Integral()) > 0)
-          h->Scale(hh1->Integral() / hist2->Integral());
+        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
-        h->SetFillColor(kWhite);
         h->SetStats(kFALSE);
-        hh1->SetFillColor(kWhite);
-        if (h->GetMaximum() > hh1->GetMaximum())
-          hh1->SetMaximum(1.1 * h->GetMaximum());
-        hh1->Draw("hist");
-        h->Draw("same hist");
-
-        canvas->Pad()->SetFrameFillColor(10);
-        if (m_color) {
-          if (hh1->GetEntries() < 1000) {
-            // not enough Entries
-            canvas->Pad()->SetFillColor(kGray);
-          } else {
-            canvas->Pad()->SetFillColor(kGreen);
-          }
-        } else {
-          canvas->Pad()->SetFillColor(kWhite);// White
-        }
-
+        h->Draw("same,hist");
       }
+
+      // add coloring, cuts? based on fit, compare with ref?
+      canvas->Pad()->SetFrameFillColor(10);
+      if (m_color) {
+        if (hh1->GetEntries() < 100) {
+          // not enough Entries
+          canvas->Pad()->SetFillColor(kGray);
+        } else {
+          canvas->Pad()->SetFillColor(kGreen);
+        }
+      } else {
+        canvas->Pad()->SetFillColor(kWhite);// White
+      }
+
       canvas->Modified();
       canvas->Update();
 
+      // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
       if (hh1->GetEntries() >= 1000) enough = true;
     }
   }
@@ -339,27 +337,27 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i] + Form("_sw%d_dcd%d", s, d);
         std::replace(name.begin(), name.end(), '.', '_');
 
+        if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
+        }
+
         TH1* hh1 = findHist(m_histogramDirectoryName, name);
         if (hh1) {
           double mpv = 0.0;
           if (hh1->GetEntries() > 50) {
             auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
-            /*auto plot =*/ m_x->frame(RooFit::Title(hh1->GetTitle()));
+            auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
             /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
-//             model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9) );
-//             hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
-//             model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
-//
-//             plot->Draw("");
+            if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+              model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9));
+              hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+              model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+            }
+            plot->Draw("");
 
             mpv = ml->getValV();
-          }
-
-          if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
-            hh1->Draw("hist");
           }
 
           if (m_hChargeModASIC2d[aVxdID]) {

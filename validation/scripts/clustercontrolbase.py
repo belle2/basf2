@@ -83,7 +83,7 @@ class ClusterBase:
             os.makedirs(output_dir)
 
         # Path where log file is supposed to be created
-        log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
+        # log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
 
         # Remove any left over done files
         donefile_path = self.createDoneFileName(job)

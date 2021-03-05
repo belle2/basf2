@@ -8,8 +8,8 @@ Author: Marko Staric, Umberto Tamponi
 """
 
 from prompt import CalibrationSettings
-from caf.utils import vector_from_runs, IoV, ExpRun
-from caf.strategies import SingleIOV, SequentialBoundaries
+from caf.utils import IoV
+from caf.strategies import SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF

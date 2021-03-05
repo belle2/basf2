@@ -41,7 +41,7 @@ def main(argv):
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SingleIOV, SequentialRunByRun, SimpleRunByRun, SequentialBoundaries
+    from caf.strategies import SingleIOV, SequentialRunByRun, SimpleRunByRun, SequentialBoundaries  # noqa
     # The default value is SingleIOV, you don't have to set this, it is done automatically.
     # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
     # You can use granularity='run' or granularity='all' for the collector when using this strategy.

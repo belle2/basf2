@@ -67,9 +67,8 @@ def linkdef_emitter(target, source, env):
         match = linkdef_class_re.search(line)
         if match is None:
             raise RuntimeError(
-                "%s contains '%s' which we couldn't parse. The syntax may be incorrect," +
-                " or the build system may lack support for the feature you're using." %
-                (str(linkdef), line))
+                f"{linkdef} contains '{line}' which we couldn't parse. The syntax may be incorrect,"
+                " or the build system may lack support for the feature you're using.")
 
         namespace = match.group(1)  # or possibly a class, but it might match the header file
         classname = match.group(2)

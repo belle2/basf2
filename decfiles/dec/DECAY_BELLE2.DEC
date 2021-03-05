@@ -2157,7 +2157,7 @@ Decay anti-B0
 0.001300000   D_1+  tau-  anti-nu_tau                      LLSW 0.71 -1.6 -0.5 2.9;
 0.001300000   D_0*+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
 0.002000000   D'_1+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
-0.002000000   D_2*+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
+0.002000000   D_2*+  tau-  anti-nu_tau                     LLSW 0.71 -1.6 -0.5 2.9;
 
 # B -> cc= s
 #

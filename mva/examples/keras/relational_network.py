@@ -90,7 +90,6 @@ if __name__ == "__main__":
     from root_pandas import to_root
     import tempfile
     import json
-    import numpy as np
 
     import basf2_mva
     import basf2_mva_util

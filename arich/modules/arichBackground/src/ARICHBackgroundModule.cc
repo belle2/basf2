@@ -28,6 +28,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace boost;
@@ -137,7 +138,7 @@ namespace Belle2 {
         modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
         en = arichhit->getEnergy();
 
-        if (phPDG == 2112) {
+        if (phPDG == Const::neutron.getPDGCode()) {
           phnw = arichhit->getNeutronWeight();
           trlen = arichhit->getTrackLength();
         }

@@ -174,8 +174,9 @@ if GetOption('extralibpath'):
 if GetOption('extraccflags'):
     global_env.Append(CCFLAGS=GetOption('extraccflags').split())
 
-# check for debug flag
+# check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
+print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
@@ -311,6 +312,12 @@ if analysis:
 else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
+    if (os.path.exists('.excluded_directories')):
+        f = open('.excluded_directories', 'r')
+        for line in f.readlines():
+            exclude_dirs.add(line.rstrip('\n'))
+        f.close()
+        print(f'Excluded directories: {exclude_dirs}')
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:

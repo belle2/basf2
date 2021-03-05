@@ -12,7 +12,8 @@
 import basf2
 from modularAnalysis import inputMdst
 from variables import variables
-from modularAnalysis import variablesToHistogram
+from modularAnalysis import copyLists, variablesToHistogram
+from skim.lowMulti import LowMassTwoTrackPions
 
 LowMassTwoTrackPions_path = basf2.Path()
 
@@ -37,6 +38,9 @@ variablesHist = [
                   ('Mpipi', 80, 0., 4.),
                   ('M', 60, 6., 12.)
                 ]
+
+# Merge all skim lists into a single list
+copyLists('vpho:LowMassTwoTrackPions', LowMassTwoTrackPions().get_skim_list_names(), path=path)
 
 # Output the variables to histograms
 variablesToHistogram(

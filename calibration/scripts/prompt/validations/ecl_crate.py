@@ -3,7 +3,6 @@
 ECL Crate Validation
 """
 
-import basf2
 from prompt import ValidationSettings
 import sys
 
@@ -60,7 +59,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     ggEntries = EnVsCrysID.GetEntries()
     crossSection = 3990000.  # fb
     lumi = ggEntries/crossSection
-    nomUnc = 0.5  # percent
+    # nomUnc = 0.5  # percent
     nomLum = 2.36  # fb-1
     estUnc = 0.5*np.sqrt(nomLum/lumi)
 
@@ -205,7 +204,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     # Summarize fit status
     hStatusmumu = mumu.Get("hStatus")
     success = 100.*(hStatusmumu.GetBinContent(22) + hStatusmumu.GetBinContent(14))/8736.
-    print("\nSummary of muon pair fit status. \%.1f good fits:\n", success)
+    print("\nSummary of muon pair fit status. %.1f good fits:\n" % success)
     print("16 good fit:   %.4f \n" % (hStatusmumu.GetBinContent(22)))
     print(" 8 iterations: %.4f \n" % (hStatusmumu.GetBinContent(14)))
     print(" 4 at limit:   %.4f \n" % (hStatusmumu.GetBinContent(10)))
@@ -217,7 +216,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     # Muon pair/gg comparison
     print("\n---------------------------------------- \nMuon pair to gamma comparison: \n\n")
     StatusVsCrysIDmumu = mumu.Get("StatusVsCrysID")
-    AverageInitCalibmumu = mumu.Get("AverageInitCalib")
+    # AverageInitCalibmumu = mumu.Get("AverageInitCalib")
     CalibVsCrysIDmumu = mumu.Get("CalibVsCrysID")
 
     nPo = 0
@@ -316,6 +315,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     one.Draw()
 
     fout.Close()
+
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])

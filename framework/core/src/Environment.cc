@@ -61,6 +61,12 @@ bool Environment::isMC() const
   return true;
 }
 
+void Environment::setRealm(LogConfig::ELogRealm realm)
+{
+  m_realm = realm;
+  B2INFO("Execution realm: " << LogConfig::logRealmToString(realm));
+}
+
 std::string Environment::consumeOutputFileOverride(const std::string& module)
 {
   std::string s{""};

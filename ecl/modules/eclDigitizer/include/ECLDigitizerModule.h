@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 
 //ECL
 #include <ecl/digitization/EclConfiguration.h>
@@ -149,6 +150,7 @@ namespace Belle2 {
 
     /** dbobject for hadron signal shapes*/
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+    DBArray<ECLWaveformData> m_waveformParameters;
 
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();

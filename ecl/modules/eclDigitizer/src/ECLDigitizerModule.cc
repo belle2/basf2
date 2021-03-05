@@ -47,7 +47,8 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC")
+ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
+  m_waveformParameters("ECLWaveformData")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -156,7 +157,7 @@ void ECLDigitizerModule::beginRun()
   // Initialize channel mapper at run start to account for possible
   // changes in ECL mapping between runs.
   if (!m_eclMapper.initFromDB()) {
-    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
+    B2FATAL("ECLDigitizer: Can't initialize eclChannelMapper!");
   }
 }
 

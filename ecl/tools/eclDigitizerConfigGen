@@ -23,6 +23,7 @@ import sys
 import os
 import ROOT
 from ROOT import Belle2
+from ROOT.Belle2 import Database
 from array import array
 
 def printUsageInfo():
@@ -53,24 +54,28 @@ def main():
     #=== Load mapping to 217 groups of Cell IDs with similar covariance matrices
     f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
     groups = []
-    for line in f.readlines():
-        if len(line.strip()) == 0: continue
-        cid0, group = [int(x) for x in line.split()]
-        new_len = group + 1
-        while new_len > len(groups): groups.append(list())
-        groups[group].append(cid0 + 1)
+    USE_8736_PARAMETERS = True
+    if USE_8736_PARAMETERS:
+        groups = [[x + 1] for x in range(8736)]
+    else:
+        for line in f.readlines():
+            if len(line.strip()) == 0: continue
+            cid0, group = [int(x) for x in line.split()]
+            new_len = group + 1
+            while new_len > len(groups): groups.append(list())
+            groups[group].append(cid0 + 1)
 
     #=== Load covariance matrix data
 
     # Folder with inverse covariance matrices and waveform parameters
-    PATH_PREFIX = sys.argv[1]#'/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
+    PATH_PREFIX = sys.argv[1] # '/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
     # Folder with time shift data
-    PATH_PREFIX_TID = sys.argv[2]#'/home/belle/avbobrov/eclshaper_sp/file/tid'
+    PATH_PREFIX_TID = sys.argv[2] # '/home/belle/avbobrov/eclshaper_sp/file/tid'
 
     # Cell ID-indexed list (0..8735) of ECLWaveformData objects
     # (waveform parameters and inv cov matrices)
     wf_data_by_cid = [None] * 8736
-    # Shaper ID-indexed list (0..8736) of ECLWFAlgoParams objects
+    # Shaper ID-indexed list (0..8735) of ECLWFAlgoParams objects
     # (fit algorithm parameters)
     algo_params_by_cid = [None] * 8736
 
@@ -115,7 +120,7 @@ def main():
     t2.Branch("Algopars", Belle2.ECLWFAlgoParams())
     ncellId2 = array('i', [0])
     cellId2  = array('i', [1] * 8736)
-    t2.Branch("ncellId", ncellId2, "ncellId/I");
+    t2.Branch("ncellId", ncellId2, "ncellId/I")
     t2.Branch("cellId", cellId2, 'cellId[ncellId]/I')
 
     t3.Branch("NoiseM", Belle2.ECLNoiseData())
@@ -156,6 +161,17 @@ def main():
 
     t3.SetBranchAddress("NoiseM", ROOT.AddressOf(noise_data))
     t3.Fill()
+
+    arr1 = ROOT.TClonesArray('Belle2::ECLWaveformData', 8736)
+    for cid0, wf_data in enumerate(wf_data_by_cid):
+        arr1[cid0] = wf_data_by_cid[cid0]
+    arr2 = ROOT.TClonesArray('Belle2::ECLWFAlgoParams', 8736)
+    for cid0, wf_data in enumerate(algo_params_by_cid):
+        arr2[cid0] = algo_params_by_cid[cid0]
+
+    db = Database.Instance()
+    db.storeData('ECLWaveformData', arr1, Belle2.IntervalOfValidity(0, 0, -1, -1))
+    db.storeData('ECLWFAlgoParams', arr2, Belle2.IntervalOfValidity(0, 0, -1, -1))
 
     t1.Write()
     t2.Write()
@@ -222,10 +238,11 @@ def adjustParameters(path, wf_data_list):
     default_parameters = [0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752]
     timeshifts = [float(x) for x in open(path).readlines()]
     for wf_data, shift in zip(wf_data_list, timeshifts):
-        # t0 = wf_data.getWaveformPar(0)
-        # wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
-        for i, par in enumerate(default_parameters):
-            wf_data.setWaveformPar(i, par)
+        t0 = wf_data.getWaveformPar(0)
+        wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
+        # NOTE: In case the same shape parameters are used for all channels, set these parameters
+        # for i, par in enumerate(default_parameters):
+        #     wf_data.setWaveformPar(i, par)
     return wf_data_list
 
 

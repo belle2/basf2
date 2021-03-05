@@ -364,8 +364,6 @@ void SVDDigitizerModule::event()
       m_backplaneCapacitanceV = info.getBackplaneCapacitanceV();
       m_interstripCapacitanceV = info.getInterstripCapacitanceV();
       m_couplingCapacitanceV = info.getCouplingCapacitanceV();
-      m_elNoiseU = info.getElectronicNoiseU();
-      m_elNoiseV = info.getElectronicNoiseV();
 
       m_currentSensor = &m_sensors[sensorID];
       B2DEBUG(20,
@@ -682,9 +680,8 @@ void SVDDigitizerModule::saveDigits()
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
-    double elNoiseU = info.getElectronicNoiseU();
     double aduEquivalentU = info.getAduEquivalentU();
-    double charge_thresholdU = m_SNAdjacent * elNoiseU;
+    double elNoiseU = info.getElectronicNoiseU();
     // Add noisy digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -705,6 +702,7 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
+      // FIXME noise in e- from xml
       if (s.isNoise()) {
         double pSelect = 1.0 / nAPV25Samples;
         for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
@@ -716,7 +714,8 @@ void SVDDigitizerModule::saveDigits()
       } else {
         double t = initTime;
         for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t), elNoiseU));
+          //          samples.push_back(addNoise(s(t), elNoiseU));
+          samples.push_back(s(t)); //no noise on top of signal here (e-)
           t += m_samplingTime;
         }
         for (int iSample = nAPV25Samples; iSample < 6; iSample++)
@@ -727,14 +726,21 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
 
       // Save SVDShaperDigits
+
       // 1. Convert to ADU
       SVDShaperDigit::APVRawSamples rawSamples;
       std::transform(samples.begin(), samples.end(), rawSamples.begin(),
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
       });
+
+      // X.1 add noise in ADC on the samples
+      double adcNoiseU = m_NoiseCal.getNoise(sensorID, true, iStrip);
+      for (int bin = 0; bin < (int)samples.size(); bin++)
+        samples[bin] = addNoise(samples[bin], adcNoiseU);
+
       // 2.a Check if over threshold
-      auto rawThreshold = charge_thresholdU / aduEquivalentU;
+      auto rawThreshold = m_SNAdjacent * adcNoiseU;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)
@@ -765,7 +771,7 @@ void SVDDigitizerModule::saveDigits()
     // v-side digits:
     double elNoiseV = info.getElectronicNoiseV();
     double aduEquivalentV = info.getAduEquivalentV();
-    double charge_thresholdV = m_SNAdjacent * elNoiseV;
+
     // Add noise digits
     if (m_applyNoise) {
       double fraction = 1.0 - m_noiseFraction;
@@ -786,6 +792,7 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
+      // FIXME noise in e- from xml
       if (s.isNoise()) {
         double pSelect = 1.0 / nAPV25Samples;
         for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
@@ -797,7 +804,8 @@ void SVDDigitizerModule::saveDigits()
       } else {
         double t = initTime;
         for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t), elNoiseV));
+          //          samples.push_back(addNoise(s(t), elNoiseV));
+          samples.push_back(s(t)); //no noise on top of signal here (e-)
           t += m_samplingTime;
         }
         for (int iSample = nAPV25Samples; iSample < 6; iSample++)
@@ -814,8 +822,13 @@ void SVDDigitizerModule::saveDigits()
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
       });
+      // X.1 add noise in ADC
+      double adcNoiseV = m_NoiseCal.getNoise(sensorID, false, iStrip);
+      for (int bin = 0; bin < (int)samples.size(); bin++)
+        samples[bin] = addNoise(samples[bin], adcNoiseV);
+
       // 2.a Check if over threshold
-      auto rawThreshold = charge_thresholdV / aduEquivalentV;
+      auto rawThreshold = m_SNAdjacent * adcNoiseV;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)

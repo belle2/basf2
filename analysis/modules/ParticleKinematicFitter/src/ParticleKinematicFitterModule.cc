@@ -275,6 +275,7 @@ namespace Belle2 {
       }
 
       delete pfitter;
+      delete m_textTracer;
       return true;
     }
 

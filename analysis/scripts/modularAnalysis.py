@@ -1989,7 +1989,7 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-       >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> appendROEMask('B+:sig', 'IPtracks', '[abs(dr) < 2] and [abs(dz) < 5]', '')
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
@@ -2023,7 +2023,7 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
+       >>> ipTracks     = ('IPtracks', '[abs(dr) < 2] and [abs(dz) < 5]', '', '')
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
        >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')

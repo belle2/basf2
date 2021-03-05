@@ -682,7 +682,7 @@ class Box(Plotter):
             mask = numpy.ones(len(data)).astype('bool')
         x = data[column][mask]
         if weight_column is not None:
-            weight = data[weight_column][mask]
+            # weight = data[weight_column][mask]
             B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
@@ -1428,7 +1428,7 @@ class CorrelationMatrix(Plotter):
         cRdBu = plt.get_cmap('RdBu')
         new_RdBu = truncate_colormap(cRdBu, 0.15, 0.85)
         signal_heatmap = self.signal_axis.pcolor(mirrored_signal_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
-        bckgrd_heatmap = self.bckgrd_axis.pcolor(mirrored_bckgrd_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
+        # bckgrd_heatmap = self.bckgrd_axis.pcolor(mirrored_bckgrd_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
 
         # cvir = plt.get_cmap('viridis_r')
         # new_cvir = truncate_colormap(cvir, 0, 0.75)

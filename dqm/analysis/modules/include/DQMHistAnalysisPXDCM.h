@@ -17,6 +17,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
+#include <map>
 #include <TH2.h>
 #include <TCanvas.h>
 #include <TLine.h>
@@ -50,6 +51,10 @@ namespace Belle2 {
     std::string m_pvPrefix;
     /** Update entry intervall */
     int m_minEntries = 10000;
+    /** warn level for mean adhoc plot */
+    double m_warnMeanAdhoc{};
+    /** error level for mean adhoc plot */
+    double m_errorMeanAdhoc{};
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -80,6 +85,8 @@ namespace Belle2 {
 #ifdef _BELLE2_EPICS
     //! epics PVs
     std::vector <chid> mychid;
+    //! epics PVs
+    std::map <VxdID, chid> mychid_mean;
 #endif
   };
 } // end namespace Belle2

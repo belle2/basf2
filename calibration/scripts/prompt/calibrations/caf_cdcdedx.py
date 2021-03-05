@@ -15,7 +15,7 @@ import ROOT
 from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun
+from caf.strategies import SequentialRunByRun, SequentialBoundaries
 from prompt import CalibrationSettings
 import reconstruction as recon
 from softwaretrigger.path_utils import (add_filter_software_trigger, add_skim_software_trigger)
@@ -28,7 +28,8 @@ settings = CalibrationSettings(name="CDC dedx",
                                expert_username="jikumar",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha"],
+                               input_data_names=["bhabha_all_calib"],
+                               expert_config={"payload_boundaries": None, "adjustment": 1.01},
                                depends_on=[])
 
 # REQUIRED FUNCTION used b2caf-prompt-run tool #
@@ -37,7 +38,7 @@ settings = CalibrationSettings(name="CDC dedx",
 def get_calibrations(input_data, **kwargs):
 
     import basf2
-    file_to_iov_physics = input_data["hlt_bhabha"]
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     fulldataMode = False
 
@@ -60,17 +61,24 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
         if not input_files_coscorr:
             raise ValueError(
-                f"Cosine: all requested (%d) events not found" % max_events_per_dataset)
+                f"Cosine: all requested ({max_events_per_dataset}) events not found")
 
         input_files_wiregain = input_files_coscorr
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
         if not input_files_wiregain:
             raise ValueError(
-                f"WireGain: all requested (%d) events not found" % max_events_per_dataset)
+                f"WireGain: all requested ({max_events_per_dataset}) events not found")
 
     requested_iov = kwargs.get("requested_iov", None)
-    from caf.utils import IoV
+    from caf.utils import ExpRun, IoV
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+
+    expert_config = kwargs.get("expert_config")
+    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+
+    adjustment = expert_config["adjustment"]
 
     # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
     # Rungain Precollector path
@@ -171,6 +179,8 @@ def get_calibrations(input_data, **kwargs):
     Collector_CC = basf2.register_module('CDCDedxElectronCollector')
     CollParam_CC = {'cleanupCuts': True, 'IsCharge': True, 'IsCosth': True,  'granularity': 'all', }
     Collector_CC.param(CollParam_CC)
+    if expert_config["payload_boundaries"] is not None:
+        Collector_CC.param("granularity", "run")
 
     # Cosine Algorithm setup
     Algorithm_CC = CDCDedxCosineAlgorithm()
@@ -184,7 +194,12 @@ def get_calibrations(input_data, **kwargs):
         input_files=input_files_coscorr)
     Calibration_CC.pre_collector_path = Calibrate_CC
     Calibration_CC.depends_on(Calibration_RGPre)
-    Calibration_CC.algorithms[0].params = {"apply_iov": output_iov}
+    if expert_config["payload_boundaries"] is not None:
+        Calibration_CC.strategies = SequentialBoundaries
+        basf2.B2INFO(f"Calibration_CC: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        Calibration_CC.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+    else:
+        Calibration_CC.algorithms[0].params = {"apply_iov": output_iov}
 
     # ----------3. WireGain Gain
     # WireGain Precollector path
@@ -208,6 +223,8 @@ def get_calibrations(input_data, **kwargs):
     Collector_WG = basf2.register_module('CDCDedxElectronCollector')
     CollParam_WG = {'cleanupCuts': True, 'IsWire': True, 'Isdedxhit': True, 'granularity': 'all', }
     Collector_WG.param(CollParam_WG)
+    if expert_config["payload_boundaries"] is not None:
+        Collector_WG.param("granularity", "run")
 
     # WireGain Algorithm setup
     Algorithm_WG = CDCDedxWireGainAlgorithm()
@@ -222,7 +239,12 @@ def get_calibrations(input_data, **kwargs):
     Calibration_WG.pre_collector_path = Calibrate_WG
     Calibration_WG.depends_on(Calibration_RGPre)
     Calibration_WG.depends_on(Calibration_CC)
-    Calibration_WG.algorithms[0].params = {"apply_iov": output_iov}
+    if expert_config["payload_boundaries"] is not None:
+        Calibration_WG.strategies = SequentialBoundaries
+        basf2.B2INFO(f"Calibration_WG: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        Calibration_WG.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
+    else:
+        Calibration_WG.algorithms[0].params = {"apply_iov": output_iov}
 
     # ----------4. Final Run Gain to take Wire and Cosine correction in effect
     # Rungain Precollector path
@@ -250,6 +272,7 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Algorithm setup
     Algorithm_RG = CDCDedxRunGainAlgorithm()
     Algorithm_RG.setMonitoringPlots(True)
+    Algorithm_RG.setAdjustment(adjustment)
 
     # Rungain Calibration setup
     Calibration_RG = Calibration(

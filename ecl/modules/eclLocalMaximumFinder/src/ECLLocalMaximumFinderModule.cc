@@ -441,15 +441,16 @@ void ECLLocalMaximumFinderModule::getEnteringMother(const MCParticle& particle, 
   };
 
   // For photon mother: are they from a pi0? This can be used to improved overlap/merged pi0 reconstruction.
-  if (m_mcParticles[index]->getPDG() == 22) {
-    if (m_mcParticles[index]->getMother()->getPDG() == 111) {
+  if (m_mcParticles[index]->getPDG() == Const::photon.getPDGCode()) {
+    if (m_mcParticles[index]->getMother()->getPDG() == Const::pi0.getPDGCode()) {
       pi0index = m_mcParticles[index]->getMother()->getArrayIndex();
     }
   }
 
   // Dont include mother if its energy is too low or if its a photon from a neutron interaction.
   if ((m_mcParticles[index]->getEnergy() < 5.0 * Belle2::Unit::MeV)
-      or (m_mcParticles[index]->getPDG() == 22 and abs(m_mcParticles[index]->getMother()->getPDG()) == 2212)) {
+      or (m_mcParticles[index]->getPDG() == Const::photon.getPDGCode()
+          and abs(m_mcParticles[index]->getMother()->getPDG()) == Const::proton.getPDGCode())) {
     pdg = -1;
     arrayindex = -1;
     pi0arrayindex = -1;
@@ -517,7 +518,7 @@ void ECLLocalMaximumFinderModule::addToSignalEnergy(int motherpdg, int motherind
 {
 
   // for the LM training and CR/LM debugging
-  if (motherpdg == 22) {
+  if (motherpdg == Const::photon.getPDGCode()) {
     if (pi0index >= 0) { // photon from pi0
       int idpos = getIdPosition(1, motherindex);
       m_signalEnergy[1][idpos] += weight;

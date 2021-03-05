@@ -81,7 +81,7 @@ def get_calibrations(input_data, **kwargs):
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
-    file_to_iov_Bcosmics = input_data["Bcosmics"]
+    # file_to_iov_Bcosmics = input_data["Bcosmics"]
 
     max_files_per_run = 10
     min_events_per_file = 1000

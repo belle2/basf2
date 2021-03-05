@@ -14,6 +14,9 @@
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 
+// framework aux
+#include <framework/gearbox/Const.h>
+
 // dataonjects
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -92,9 +95,9 @@ void B2BIIMCParticlesMonitorModule::event()
     int mcparticle_pdg = mcparticle->getPDG();
 
     if (mcparticle->getMother()) {
-      if (mcparticle_pdg == 211) mcPiPlusMother->Fill(mcparticle->getMother()->getPDG());
-      if (mcparticle_pdg == -211) mcPiMinusMother->Fill(mcparticle->getMother()->getPDG());
-      if (mcparticle_pdg == 111) mcPi0Mother->Fill(mcparticle->getMother()->getPDG());
+      if (mcparticle_pdg == Const::pion.getPDGCode()) mcPiPlusMother->Fill(mcparticle->getMother()->getPDG());
+      if (mcparticle_pdg == -Const::pion.getPDGCode()) mcPiMinusMother->Fill(mcparticle->getMother()->getPDG());
+      if (mcparticle_pdg == Const::pi0.getPDGCode()) mcPi0Mother->Fill(mcparticle->getMother()->getPDG());
     }
 
     mcNDau->Fill(mcparticle->getNDaughters());

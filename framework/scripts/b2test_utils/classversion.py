@@ -53,7 +53,7 @@ def check_dictionary(classname):
     """Make sure we have a dictionary for the class and all its members"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     streamerinfo = tclass.GetStreamerInfo()
     if streamerinfo:
         for element in streamerinfo.GetElements():
@@ -67,7 +67,7 @@ def get_class_version(classname):
     """Get the Class version and checksum for a fully qualified C++ class name"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     # good time to also check base classes
     check_base_classes(tclass)
     version = tclass.GetClassVersion()

@@ -120,7 +120,7 @@ language = None
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
 # If we want to create the light release documentation then we need t exclude anything not in the light release.
-if tags.has('light'):
+if tags.has('light'):  # noqa
     light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
     for entry in os.listdir("../../"):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:

@@ -75,7 +75,6 @@ import re
 import functools
 import subprocess
 import multiprocessing
-import pickle
 
 # Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')

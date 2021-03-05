@@ -3,4 +3,4 @@
 htcondor
 ========
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

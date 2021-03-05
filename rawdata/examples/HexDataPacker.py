@@ -17,24 +17,24 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('HexDataPacker')
+input = b2.register_module('HexDataPacker')
 # input = register_module('SeqRootInput')
 # input.param('inputFileName', 'RootOutput1.root')
 
 # dump
 # dump = register_module('PrintDataTemplate')
-dump = register_module('SeqRootOutput')
+dump = b2.register_module('SeqRootOutput')
 dump.param('outputFileName', 'temp.dat')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -42,4 +42,4 @@ main.add_module(input)
 main.add_module(dump)
 # main.add_module(prog)
 # Process all events
-process(main)
+b2.process(main)

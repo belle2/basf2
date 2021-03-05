@@ -75,9 +75,9 @@ We now want to reconstruct the Rest of Event of the :math:`B^0`.
      :class: toggle solution
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 47-48
+         :lines: 46-47
          :emphasize-lines: 2
-         :lineno-start: 47
+         :lineno-start: 46
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in the :math:`B^0`
@@ -117,8 +117,8 @@ Remember that we were collecting all variables in the ``b_vars`` list.
 Let's include the following lines to have a useful selection of them:
 
 .. literalinclude:: steering_files/029_roe.py
-     :lines: 61-68
-     :lineno-start: 61
+     :lines: 60-67
+     :lineno-start: 60
 
 .. admonition:: Exercise
      :class: exercise
@@ -147,10 +147,9 @@ to be applied on the ROE particles.
 For our example, let's start by defining the following selection cut strings:
 
 .. literalinclude:: steering_files/029_roe.py
-     :lines: 47-50
+     :lines: 46-49
      :emphasize-lines: 3-4
-     :lineno-start: 47
-
+     :lineno-start: 46
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,
 because of different methods of measurement used to detect these particles.
@@ -178,8 +177,8 @@ because of different methods of measurement used to detect these particles.
 
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 47-52
-         :lineno-start: 47
+         :lines: 46-51
+         :lineno-start: 46
          :emphasize-lines: 5-6
 
 Now we have created a mask with a name ``my_mask``, that will only allow track-based
@@ -230,8 +229,8 @@ loop to insert this argument.
      :class: solution toggle
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 62-73
-         :lineno-start: 62
+         :lines: 61-72
+         :lineno-start: 61
          :emphasize-lines: 9-12
 
 
@@ -253,7 +252,7 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :emphasize-lines: 47-52,61-73
+         :emphasize-lines: 46-51,60-72
          :linenos:
 
 
@@ -419,7 +418,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
       continuum suppression or flavor tag.
     * Usage of ROE without a mask is **not** recommended.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

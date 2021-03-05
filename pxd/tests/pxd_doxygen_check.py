@@ -11,4 +11,4 @@ if __name__ == "__main__":
     #: Ignore nothing
     ignoreme = 'IGNORE_NOTHING'
     check_error_free("b2code-doxygen-warnings", "doxygen", "pxd",
-                     lambda x: re.findall(ignoreme, x) or x is "'", ["-j4"])
+                     lambda x: re.findall(ignoreme, x) or x == "'", ["-j4"])

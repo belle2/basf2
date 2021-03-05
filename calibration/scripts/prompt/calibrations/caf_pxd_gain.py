@@ -9,7 +9,7 @@ import basf2
 from pxd.calibration import gain_calibration
 from prompt.utils import filter_by_max_files_per_run, filter_by_max_events_per_run
 from prompt import CalibrationSettings
-from caf.utils import vector_from_runs, ExpRun, IoV
+from caf.utils import ExpRun, IoV
 from itertools import groupby
 from itertools import chain
 from math import ceil, inf

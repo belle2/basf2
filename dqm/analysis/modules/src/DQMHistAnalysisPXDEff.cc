@@ -194,9 +194,10 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
+  m_cEffAll->Clear();
+  m_cEffAllUpdate->Clear();
+
   // no way to reset TEfficiency, do it bin by bin
-  // m_cEffAll->Clear();
-  // m_cEffAllUpdate->Clear();
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     int j = i + 1;
     m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
@@ -272,8 +273,8 @@ void DQMHistAnalysisPXDEffModule::event()
 
   double imatch = 0.0, ihit = 0.0;
   int ieff = 0;
-//   int ccnt = 1;
 
+  std::map <VxdID, bool> updated{}; // init to false
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
@@ -289,7 +290,7 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        if (j == 6) continue; // wrkaround for 1.3.2 module
+        if (j == 6) continue; // workaround for 1.3.2 module
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -307,15 +308,17 @@ void DQMHistAnalysisPXDEffModule::event()
         m_hEffAllUpdate->SetPassedEvents(j, nmatch);
         m_hEffAllLastTotal->SetBinContent(j, nhit);
         m_hEffAllLastPassed->SetBinContent(j, nmatch);
+        updated[aModule] = true;
       } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
         m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
         m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
         m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
         m_hEffAllLastTotal->SetBinContent(j, nhit);
         m_hEffAllLastPassed->SetBinContent(j, nmatch);
+        updated[aModule] = true;
       }
 
-      if (j == 6) continue; // wrkaround for 1.3.2 module
+      if (j == 6) continue; // workaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
@@ -449,10 +452,13 @@ void DQMHistAnalysisPXDEffModule::event()
 #ifdef _BELLE2_EPICS
       if (m_useEpics) {
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          Double_t x, y;// we assume that double and Double_t are same!
-          gr->GetPoint(i, x, y);
-          auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
-          SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
+          if (updated[m_PXDModules[i]]) {
+            Double_t x, y;// we assume that double and Double_t are same!
+            gr->GetPoint(i, x, y);
+            auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
+            // we should only write if it was updated!
+            SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
+          }
         }
       }
 #endif
@@ -462,7 +468,7 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min + 0.15, "1.3.2 Module is excluded, please ignore");
+    auto tt = new TLatex(5.5, scale_min, "1.3.2 Module is excluded, please ignore");
     tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
@@ -503,7 +509,8 @@ void DQMHistAnalysisPXDEffModule::event()
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
+    // only update if statistics is reasonable, we dont want "0" drops between runs!
+    if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

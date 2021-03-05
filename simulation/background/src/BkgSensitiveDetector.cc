@@ -12,6 +12,7 @@
 #include <simulation/background/BkgNeutronWeight.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -103,7 +104,7 @@ namespace Belle2 {
       int pdgCode = track.GetDefinition()->GetPDGEncoding();
       double endEnergy = track.GetKineticEnergy() * Unit::MeV;
       double neutWeight = 0;
-      if (pdgCode == 2112) {
+      if (pdgCode == Const::neutron.getPDGCode()) {
         BkgNeutronWeight& wt = BkgNeutronWeight::getInstance();
         neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
       }

@@ -3,4 +3,4 @@
 Pandas
 ======
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

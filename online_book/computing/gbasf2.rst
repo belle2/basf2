@@ -698,7 +698,7 @@ Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBas
 
 You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

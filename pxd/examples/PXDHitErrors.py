@@ -39,16 +39,16 @@ class PXDHitErrors(b2.Module):
         """Find clusters with a truehit and print some stats."""
 
         truehits = Belle2.PyStoreArray('PXDTrueHits')
-        nTruehits = truehits.getEntries()
+        # nTruehits = truehits.getEntries()
         clusters = Belle2.PyStoreArray('PXDClusters')
         nClusters = clusters.getEntries()
-        digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
+        # digits = Belle2.PyStoreArray('PXDDigits')
+        # nDigits = digits.getEntries()
         relClustersToTrueHits = \
             Belle2.PyRelationArray('PXDClustersToPXDTrueHits')
-        nClusterRelations = relClustersToTrueHits.getEntries()
-        relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
-        nDigitRelations = relClustersToDigits.getEntries()
+        # nClusterRelations = relClustersToTrueHits.getEntries()
+        # relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
+        # nDigitRelations = relClustersToDigits.getEntries()
 
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
@@ -96,7 +96,7 @@ class PXDHitErrors(b2.Module):
                         / cluster.getUSigma()
                     cluster_pull_v = (cluster.getV() - truehit.getV()) \
                         / cluster.getVSigma()
-                except ZeroDivisionError as e:
+                except ZeroDivisionError:
                     if cluster.getUSigma() < 1.0e-8:
                         b2.B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
                     else:

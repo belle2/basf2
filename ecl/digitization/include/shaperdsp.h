@@ -162,7 +162,7 @@ namespace Belle2 {
        *  If unitscale is set to negative value, it is calculated dynamically
        *  based on shape parameters.
        */
-      void init(const std::vector<double>& s, double u = 27.7221);
+      void init(const std::vector<double>& s, double u = -1);
       /** wrapper of the function */
       double operator()(double) const;
       /** TF1 ROOT interface */

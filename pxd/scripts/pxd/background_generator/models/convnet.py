@@ -8,7 +8,10 @@ import torch.nn as nn
 
 
 class Model(nn.Module):
+    """"""
+
     def __init__(self):
+        """"""
         super().__init__()
         self.fc = nn.Linear(96, 98304)
         self.features = nn.Sequential(
@@ -44,10 +47,20 @@ class Model(nn.Module):
         )
 
     def forward(self, z):
+        """"""
         return self.features(self.fc(z).view(-1, 512, 8, 24)).tanh_()
+
+    ##
+    # @var fc
+    # Fully-connected layer
+
+    ##
+    # @var features
+    # Sequential layer (composite)
 
 
 def generate(model):
+    """"""
     # infer the device that is in use
     device = next(model.parameters()).device
     # without computing gradients

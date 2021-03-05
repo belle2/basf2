@@ -19,6 +19,7 @@ from typing import Callable, Type
 
 
 def _get_model_cls(model: str) -> Type:
+    """"""
     cls = None
     try:
         cls = import_module(f".{model}", __name__).Model
@@ -32,6 +33,7 @@ def _get_model_cls(model: str) -> Type:
 
 
 def _get_generate_func(model: str) -> Callable:
+    """"""
     func = None
     try:
         func = import_module(f".{model}", __name__).generate
@@ -44,6 +46,8 @@ def _get_generate_func(model: str) -> Callable:
     return func
 
 
+##
+# container for model names (should be the same as module names)
 MODELS = (
     "convnet",
     "resnet",

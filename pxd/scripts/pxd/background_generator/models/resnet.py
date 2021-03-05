@@ -9,7 +9,10 @@ import torch.nn.functional as F
 
 
 class ResidualBlock(nn.Module):
+    """"""
+
     def __init__(self, ninput, noutput, upsample=True):
+        """"""
         super().__init__()
         self.upsample = upsample
         # shortcut branch
@@ -23,6 +26,7 @@ class ResidualBlock(nn.Module):
         self.conv2 = nn.Conv2d(noutput, noutput, 3, 1, 1)
 
     def forward(self, x):
+        """"""
         # residual branch
         h = x
         h = self.norm1(h)
@@ -41,9 +45,36 @@ class ResidualBlock(nn.Module):
         # return sum of both
         return h + x
 
+    ##
+    # @var upsample
+    # Whether to double the height and width of inputs
+
+    ##
+    # @var conv
+    # Convolutional layer in 2D - shortcut branch
+
+    ##
+    # @var norm1
+    # Batch normalization layer in 2D - residual branch
+
+    ##
+    # @var conv1
+    # Convolutional layer in 2D - residual branch
+
+    ##
+    # @var norm2
+    # Batch normalization layer in 2D - residual branch
+
+    ##
+    # @var conv2
+    # Convolutional layer in 2D - residual branch
+
 
 class Model(nn.Module):
+    """"""
+
     def __init__(self):
+        """"""
         super().__init__()
         # fully-connected inputs
         self.fc = nn.Linear(96, 49152)
@@ -68,6 +99,7 @@ class Model(nn.Module):
         self.conv = nn.Conv2d(16, 1, 3, 1, 1)
 
     def forward(self, z):
+        """"""
         z = self.fc(z)
         z = z.view(-1, 256, 8, 24)
         for block in self.blocks:
@@ -77,8 +109,25 @@ class Model(nn.Module):
         z = self.conv(z)
         return z.tanh_()
 
+    ##
+    # @var fc
+    # Fully-connected layer
+
+    ##
+    # @var blocks
+    # Sequence of residual blocks
+
+    ##
+    # @var norm
+    # Batch normalization in 2D
+
+    ##
+    # @var conv
+    # Convolutional layer in 2D
+
 
 def generate(model):
+    """"""
     # infer the device that is in use
     device = next(model.parameters()).device
     # without computing gradients

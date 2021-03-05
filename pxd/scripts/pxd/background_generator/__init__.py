@@ -75,6 +75,8 @@ from ROOT.Belle2 import VxdID, PXDDigit
 from .models import MODELS
 from .models import _get_model_cls, _get_generate_func
 
+##
+# VxdID arguments describing all distinct PXD sensors; format: (layer, ladder, sensor)
 VXDID_ARGS = tuple(
     tuple(product([1], [ladder + 1 for ladder in range(8)], [1, 2]))
     + tuple(product([2], [ladder + 1 for ladder in range(12)], [1, 2]))
@@ -112,6 +114,7 @@ class Specs:
 
     @staticmethod
     def _validate_model(model: str) -> str:
+        """"""
         if not isinstance(model, str):
             raise TypeError("expecting type str `model`")
         elif model not in MODELS:
@@ -121,6 +124,7 @@ class Specs:
 
     @staticmethod
     def _validate_checkpoint(checkpoint: Union[None, str, pathlib.Path]) -> str:
+        """"""
         if not isinstance(checkpoint, (type(None), str, pathlib.Path)):
             raise TypeError("expecting None or type str `checkpoint`")
         if checkpoint is None:
@@ -132,6 +136,7 @@ class Specs:
 
     @staticmethod
     def _validate_seed(seed: int) -> int:
+        """"""
         if not isinstance(seed, int):
             raise TypeError("expecting type int `seed`")
         elif not 0 <= seed < 2 ** 63:
@@ -140,6 +145,7 @@ class Specs:
 
     @staticmethod
     def _validate_nintra(nintra: int) -> int:
+        """"""
         if not isinstance(nintra, int):
             raise TypeError("expecting type int `nintra`")
         elif not nintra > 0:
@@ -148,6 +154,7 @@ class Specs:
 
     @staticmethod
     def _validate_ninter(ninter: int) -> int:
+        """"""
         if not isinstance(ninter, int):
             raise TypeError("expecting type int `ninter`")
         elif not ninter > 0:
@@ -156,12 +163,14 @@ class Specs:
 
     @staticmethod
     def _validate_globaltag(globaltag: str) -> str:
+        """"""
         if not isinstance(globaltag, str):
             raise TypeError("expecting type str `globaltag`")
         return globaltag
 
     @staticmethod
     def _validate_extension(extension: str) -> str:
+        """"""
         if not isinstance(extension, str):
             raise TypeError("expecting type str `extension`")
         return extension
@@ -176,6 +185,7 @@ class Specs:
         globaltag: str = "PXDBackgroundGenerator",
         extension: str = "_beamBG",
     ):
+        """"""
         # process `model`
         self.model = type(self)._validate_model(model)
 
@@ -200,6 +210,7 @@ class Specs:
         self.extension = extension
 
     def _instantiate(self):
+        """"""
         try:
             import torch
         except ImportError as exc:
@@ -240,6 +251,36 @@ class Specs:
         # return the instantiated model and the generation function as a tuple
         return generator, generate_func
 
+    ##
+    # @var model
+    # Name of the generator model
+
+    ##
+    # @var checkpoint
+    # Path to the file with the pre-trained model weights
+
+    ##
+    # @var seed
+    # Integer number used as the initial seed for the
+    # internal pseudo-random number generator
+
+    ##
+    # @var nintra
+    # Number of intra-op threads to be utilized for the generation
+
+    ##
+    # @var ninter
+    # Number of inter-op threads to be utilized for the generation
+
+    ##
+    # @var globaltag
+    # Global tag in the conditions database which is used to
+    # download the model checkpoints automatically
+
+    ##
+    # @var extension
+    # Name extension of the background digit collection
+
 
 class BackgroundGenerator(basf2.Module):
     """Generates PXD background data on-the-fly.
@@ -253,6 +294,7 @@ class BackgroundGenerator(basf2.Module):
     """
 
     def __init__(self, specs: Specs):
+        """"""
         super().__init__()
         if not isinstance(specs, Specs):
             raise TypeError(f"expecting type {Specs.__module__}.Specs `specs`")
@@ -302,6 +344,26 @@ class BackgroundGenerator(basf2.Module):
         """"""
         # delete the reference to the generator instance
         del self.generator
+
+    ##
+    # @var specs
+    # Generator specifications container
+
+    ##
+    # @var storearr
+    # Digit collection
+
+    ##
+    # @var vxdids
+    # VxdID objects describing all distinct PXD sensors
+
+    ##
+    # @var generator
+    # Generator model instance
+
+    ##
+    # @var generate_func
+    # Generation function
 
 
 def add_pxd_background_generator(path: basf2.Path, specs: Specs = None):

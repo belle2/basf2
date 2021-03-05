@@ -58,7 +58,7 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   14, 1953, 14, 2040, // 17 32
   14, 2041, 16,   20, // 18 33
   16,   21, 16,  183, // 19 34
-  14,  184, -1,   -1  // 20 35
+  16,  184, -1,   -1  // 20 35
 };
 const int ftd_version[] = {
   24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30, 32, 33, 34, 35
@@ -492,6 +492,9 @@ void setftdlbits()
       std::ifstream isinp(logname, std::ios::in);
       std::string str;
       int j = 0;
+      if (i == N_FTD_VERS - 1) {
+        printf("i(%d), logname(%s)\n", i, logname);
+      }
       while (std::getline(isinp, str)) {
         int bitnum;
         std::string bitname;
@@ -499,6 +502,10 @@ void setftdlbits()
         strS >> bitnum >> bitname;
         ftdlbits->setoutbitname(j, bitname.data());
         ++j;
+        if (i == N_FTD_VERS - 1) {
+          printf("i(%d), j(%d), bitname(%s), str(%s)\n",
+                 i, j, bitname.c_str(), str.c_str());
+        }
       }
       isinp.close();
       ftdlbits->setnoutbit(j);

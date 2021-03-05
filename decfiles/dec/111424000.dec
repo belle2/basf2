@@ -1,4 +1,4 @@
-# EventType:
+# EventType: 111424000
 # Descriptor: [B0 -> [D*- [ D0 -> K- pi+] e+ nu] pi+]
 # NickName: Bd_Dstenu_DsttoDpi-_DtoK-pi+
 # Documentation:
@@ -16,7 +16,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.000 D*-sig e+ nu_e PHOTOS HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
+1.000 D*-sig e+ nu_e BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346;
 Enddecay
 CDecay anti-B0sig
 
@@ -28,7 +28,7 @@ CDecay D*+sig
 
 
 Decay anti-D0sig
-1.000 K+ pi- PHSP; #[Reconstructed PDG2011]
+1.000 K+ pi- PHSP;
 Enddecay
 CDecay D0sig
 

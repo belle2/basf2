@@ -146,9 +146,7 @@ def add_mdst_dump(path, print_untested=False):
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
             "getInputBits": range(10),
             "getFtdlBits": range(10),
-            "getPsnmBits": range(10),
-            "getInputBitNumber": ["veto", "ecl_active"],
-            "getOutputBitNumber": ["c4", "cdctiming", "ecltiming"]
+            "getPsnmBits": range(10)
         }, array=False),
         DataStorePrinter("SoftwareTriggerResult", ["getResults", "getNonPrescaledResults"], array=False),
         DataStorePrinter("MCParticle", [

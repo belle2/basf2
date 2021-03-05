@@ -90,6 +90,8 @@ Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
+Untested method TRGSummary::getInputBitNumber
+Untested method TRGSummary::getOutputBitNumber
 Untested method TRGSummary::setFtdlBits
 Untested method TRGSummary::setInputBits
 Untested method TRGSummary::setPoissonInInjectionVeto
@@ -3757,8 +3759,6 @@ TRGSummary:
   getFtdlBits(7): 0
   getFtdlBits(8): 0
   getFtdlBits(9): 0
-  getInputBitNumber(veto): 98
-  getInputBitNumber(ecl_active): 53
   getInputBits(0): 531638280
   getInputBits(1): 237076480
   getInputBits(2): 655416
@@ -3769,9 +3769,6 @@ TRGSummary:
   getInputBits(7): 0
   getInputBits(8): 0
   getInputBits(9): 0
-  getOutputBitNumber(c4): 38
-  getOutputBitNumber(cdctiming): 64
-  getOutputBitNumber(ecltiming): 63
   getPreScale(0,0): 1
   getPreScale(0,1): 100
   getPreScale(0,2): 0
@@ -12222,8 +12219,6 @@ TRGSummary:
   getFtdlBits(7): 0
   getFtdlBits(8): 0
   getFtdlBits(9): 0
-  getInputBitNumber(veto): 98
-  getInputBitNumber(ecl_active): 53
   getInputBits(0): 535824392
   getInputBits(1): 237076480
   getInputBits(2): 1179696
@@ -12234,9 +12229,6 @@ TRGSummary:
   getInputBits(7): 0
   getInputBits(8): 0
   getInputBits(9): 0
-  getOutputBitNumber(c4): 38
-  getOutputBitNumber(cdctiming): 64
-  getOutputBitNumber(ecltiming): 63
   getPreScale(0,0): 1
   getPreScale(0,1): 100
   getPreScale(0,2): 0
@@ -18928,8 +18920,6 @@ TRGSummary:
   getFtdlBits(7): 0
   getFtdlBits(8): 0
   getFtdlBits(9): 0
-  getInputBitNumber(veto): 98
-  getInputBitNumber(ecl_active): 53
   getInputBits(0): 267388936
   getInputBits(1): 237076480
   getInputBits(2): 917504
@@ -18940,9 +18930,6 @@ TRGSummary:
   getInputBits(7): 0
   getInputBits(8): 0
   getInputBits(9): 0
-  getOutputBitNumber(c4): 38
-  getOutputBitNumber(cdctiming): 64
-  getOutputBitNumber(ecltiming): 63
   getPreScale(0,0): 1
   getPreScale(0,1): 100
   getPreScale(0,2): 0

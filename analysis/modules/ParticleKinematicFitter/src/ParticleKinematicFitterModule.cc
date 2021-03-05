@@ -13,14 +13,12 @@
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
-#include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
 #include <analysis/OrcaKinFit/OPALFitterGSL.h>
 #include <analysis/OrcaKinFit/JetFitObject.h>
 #include <analysis/OrcaKinFit/NewtonFitterGSL.h>
 #include <analysis/OrcaKinFit/NewFitterGSL.h>
 #include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 
@@ -35,13 +33,8 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-// CLHEP
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/LorentzVector.h>
-
 using namespace CLHEP;
 using namespace std;
-//using namespace OrcaKinFit;
 
 namespace Belle2 {
   namespace OrcaKinFit {
@@ -107,7 +100,6 @@ namespace Belle2 {
       unsigned int n = m_plist->getListSize();
 
       for (unsigned i = 0; i < n; i++) {
-//       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
         Particle* particle = m_plist->getParticle(i);
 
         if (m_updateDaughters == true) {

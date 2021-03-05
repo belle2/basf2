@@ -138,8 +138,7 @@ def add_mdst_dump(path, print_untested=False):
         }),
         DataStorePrinter("KlId", ["isKLM", "isECL", "getKlId"]),
         DataStorePrinter("TRGSummary", [
-            "getTimType", "getTimQuality", "getInputBitNumber",
-            "getOutputBitNumber", "isPoissonInInjectionVeto"
+            "getTimType", "getTimQuality", "isPoissonInInjectionVeto"
         ], {
             "getTRGSummary": range(10),
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],

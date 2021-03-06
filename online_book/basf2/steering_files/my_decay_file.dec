@@ -5,11 +5,11 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0
-1.0 Jpsi K_S0 PHSP;
+1.0 J/psi K_S0 PHSP;
 Enddecay
 CDecay anti-B0
 
-Decay Jpsi
+Decay J/psi
 1.0 mu+ mu- VLL;
 Enddecay
 

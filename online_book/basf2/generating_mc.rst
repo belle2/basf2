@@ -260,30 +260,8 @@ Suppose that we want to study the :math:`B^0 \to J/\Psi K^0_S` decay, with :math
 :math:`K^0_S \to \pi^+ \pi^-`. A decay file that we can use is the following one (copy it into a file named
 ``my_decay_file.dec`` or something similar):
 
-
-.. code-block::
-
-   # This is my signal decay file.
-
-   Decay Upsilon(4S)
-   1.0 B0 anti-B0  VSS_BMIX dm;
-   Enddecay
-
-   Decay B0
-   1.0 Jpsi K_S0 PHSP;
-   Enddecay
-   CDecay anti-B0
-
-   Decay Jpsi
-   1.0 mu+ mu- VLL;
-   Enddecay
-
-   Decay K_S0
-   1.0 pi+ pi- PHSP;
-   Enddecay
-
-   End
-
+.. literalinclude:: steering_files/my_deca_file.dec
+    :linenos:
 
 Looking at this simple decay file, it is not difficult to understand its structure:
 
@@ -353,23 +331,15 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :class: exercise stacked
 
      Which line of the previous steering file has to be modified in order to generate our signal sample? And how
-     it has to be modified?
+     does it have to be modified? Run the resulting steering file again.
 
 .. admonition:: Solution
      :class: toggle solution
 
-     The line to be modified is:
-
-     .. code-block:: python
-
-        ge.add_evtgen_generator(path=main, finalstate='mixed')
-
-     and it has to be replaced with:
-
-     .. code-block:: python
-
-        ge.add_evtgen_generator(path=main, finalstate='signal',
-                                signaldecfile=b2.find_file('/path/to/my_decay_file.dec'))
+     .. literalinclude:: steering_files/065_generate_mc.py
+        :language: python
+        :highlight: 17-21
+        :linenos:
 
 
 .. admonition:: Question
@@ -391,26 +361,27 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :class: toggle solution
 
      .. code-block::
+        :linenos:
 
-	Decay Upsilon(4S)
-	1.0 B0 anti-B0  VSS_BMIX dm;
-	Enddecay
+        Decay Upsilon(4S)
+        1.0 B0 anti-B0  VSS_BMIX dm;
+        Enddecay
 
-	Decay B0
-	1.0 phi K_S0 PHSP;
-	Enddecay
-	CDecay anti-B0
+        Decay B0
+        1.0 phi K_S0 PHSP;
+        Enddecay
+        CDecay anti-B0
 
-	Decay phi
-	1.0 K+ K- VSS;
-	Enddecay
+        Decay phi
+        1.0 K+ K- VSS;
+        Enddecay
 
-	Decay K_S0
-	0.7 pi+ pi- PHSP;
-	0.3 pi0 pi0 PHSP;
-	Enddecay
+        Decay K_S0
+        0.7 pi+ pi- PHSP;
+        0.3 pi0 pi0 PHSP;
+        Enddecay
 
-	End
+        End
 
 
 .. admonition:: Key points

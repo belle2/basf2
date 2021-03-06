@@ -64,7 +64,7 @@ There are several reasons for discouraging the self-production of very large MC 
      of :math:`10\;\text{kB}`.
 
 .. admonition:: Hint
-     :class: xhint toggle
+     :class: xhint toggle stacked
 
      The only other input we need is the cross section for for the production of :math:`B^0 \bar{B}^0` events.
 
@@ -338,7 +338,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
 
      .. literalinclude:: steering_files/065_generate_mc.py
         :language: python
-        :highlight: 17-21
+        :emphasize-lines:highlight: 17-21
         :linenos:
 
 

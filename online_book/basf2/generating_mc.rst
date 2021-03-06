@@ -188,7 +188,7 @@ Now we have to add to the steering path the relevant functions for:
 .. admonition:: Solution
      :class: toggle solution
 
-     .. literalinclude:: steering_files/069_generate_mc.py
+     .. literalinclude:: steering_files/065_generate_mc.py
         :language: python
         :linenos:
 

@@ -100,7 +100,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
            m_shapingTime);
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns", m_samplingTime);
+           "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload", m_samplingTime);
   addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", m_startSampling);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
@@ -262,6 +262,12 @@ void SVDDigitizerModule::beginRun()
 {
 
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  //read sampling time from HardwareClockSettings
+  if (m_samplingTime == -1 && m_hwClock.isValid())
+    m_samplingTime = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+  else if (m_samplingTime == -1)
+    m_samplingTime = 16000. / 509;
 
   //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not

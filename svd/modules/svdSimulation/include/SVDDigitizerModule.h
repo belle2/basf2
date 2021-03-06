@@ -18,6 +18,7 @@
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
 
@@ -135,10 +136,12 @@ namespace Belle2 {
       double m_noiseFraction = 0.01;
 
       // 4. Timing
+      /** Hardware Clocks*/
+      DBObjPtr<HardwareClockSettings> m_hwClock;
       /** Shaping time of the APV25 shapers.*/
       double m_shapingTime = 250.0;
-      /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 16000. / 509.;
+      /** Interval between two waveform samples, by default taken from HardwareClockSettings */
+      double m_samplingTime = -1;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.

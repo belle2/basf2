@@ -336,10 +336,10 @@ easily get all the relevant information: :ref:`b2help-particles`.
 .. admonition:: Solution
      :class: toggle solution
 
-     .. literalinclude:: steering_files/065_generate_mc.py
+     .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
-        :emphasize-lines:highlight: 17-21
         :linenos:
+        :emphasize-lines: 17-21
 
 
 .. admonition:: Question

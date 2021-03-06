@@ -49,6 +49,7 @@ namespace Belle2 {
     float m_onlineOccEmpty; /**<empty level of the occupancy */
 
     int m_statThreshold; /**< minimal number of events to compare histograms */
+    float m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
     float m_refMCTP; /**< mean of Cluster Time from Physics reference run */
     float m_refRCTP; /**< rms of Cluster Time from Physics reference run */
     float m_refMCTC; /**< mean of Cluster Time from Cosmic reference run */

@@ -47,12 +47,12 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
+  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
+           float(4)); // 4 ns
   addParam("refMCTP", m_refMCTP, "Mean of Cluster Time from Physics reference run", float(-1.939)); // e14r826
   addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
   addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
   addParam("refRCTC", m_refRCTC, "RMS of Cluster Time from Cosmic reference run", float(15.77)); // e14r1182
-  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
-           float(4); // 4 ns
 }
 
 

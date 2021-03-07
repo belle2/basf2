@@ -3,7 +3,8 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Zbynek Drasal, Martin Ritter, Peter Kvasnicka            *
+ * Contributors: Zbynek Drasal, Martin Ritter, Peter Kvasnicka,           *
+ *               Giulia Casarosa
  *                                                                        *
  **************************************************************************/
 
@@ -388,8 +389,8 @@ void SVDDigitizerModule::event()
               << " --> Backplane cap.V: " << m_currentSensorInfo->getBackplaneCapacitanceV() << endl
               << " --> Interstrip cap.V:" << m_currentSensorInfo->getInterstripCapacitanceV() << endl
               << " --> Coupling cap.V:  " << m_currentSensorInfo->getCouplingCapacitanceV() << endl
-              << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
-              << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
+              //              << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
+              //              << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
              );
 
     }
@@ -665,9 +666,9 @@ void SVDDigitizerModule::saveDigits()
                                       m_relShaperDigitTrueHitName);
 
   //Get time of the first sample
-  const double bunchTimeSep = 2 * 1.96516; //in ns
+  const double bunchTimeSep = 2 * 1.96516; //in ns //not true! depends on the filling pattern!
   int triggerBin = modeByte.getTriggerBin();
-  int bunchXingsSinceAPVstart  = 2 * triggerBin;
+  int bunchXingsSinceAPVstart  = 2 * triggerBin; //FIXME: this one  must be provided by SimClockState.
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   //Get SVD config from SVDEventInfo
@@ -686,18 +687,9 @@ void SVDDigitizerModule::saveDigits()
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
-    double aduEquivalentU = info.getAduEquivalentU();
-    double elNoiseU = info.getElectronicNoiseU();
-    // Add noisy digits
-    if (m_applyNoise) {
-      double fraction = 1.0 - m_noiseFraction;
-      int nU = info.getUCells();
-      int uNoisyStrips = gRandom->Poisson(fraction * nU);
-      for (short ns = 0; ns < uNoisyStrips; ++ns) {
-        short iStrip = gRandom->Integer(nU);
-        sensor.second.first[iStrip].add(0, -1, 0, 0, 0);
-      } // for ns
-    } // Add noise digits
+    double aduEquivalentU =
+      info.getAduEquivalentU(); //used to convert signal samples from e- to ADC - FIXME: use gain in SVDPulseShapeCalibrations x scale factor in new payload
+
     // Cycle through signals and generate samples
     for (StripSignals::value_type& stripSignal : sensor.second.first) {
       short int iStrip = stripSignal.first;
@@ -707,26 +699,14 @@ void SVDDigitizerModule::saveDigits()
       // ... to store digit-digit relations
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
-      // For noise digits, just generate random variates on randomly selected samples
-      // FIXME noise in e- from xml
-      if (s.isNoise()) {
-        double pSelect = 1.0 / nAPV25Samples;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
-          if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1, elNoiseU));
-          else
-            samples.push_back(gRandom->Gaus(0, elNoiseU));
-        }
-      } else {
-        double t = initTime;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          //          samples.push_back(addNoise(s(t), elNoiseU));
-          samples.push_back(s(t)); //no noise on top of signal here (e-)
-          t += m_samplingTime;
-        }
-        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
-          samples.push_back(0);
+
+      double t = initTime;
+      for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
+        samples.push_back(s(t)); //no noise on top of signal here (e-)
+        t += m_samplingTime;
       }
+      for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -775,19 +755,9 @@ void SVDDigitizerModule::saveDigits()
     } // for stripSignals
 
     // v-side digits:
-    double elNoiseV = info.getElectronicNoiseV();
-    double aduEquivalentV = info.getAduEquivalentV();
+    double aduEquivalentV =
+      info.getAduEquivalentV(); //used to convert signal samples from e- to ADC - FIXME: use gain in SVDPulseShapeCalibrations x scale factor in new payload
 
-    // Add noise digits
-    if (m_applyNoise) {
-      double fraction = 1.0 - m_noiseFraction;
-      int nV = info.getVCells();
-      int vNoisyStrips = gRandom->Poisson(fraction * nV);
-      for (short ns = 0; ns < vNoisyStrips; ++ns) {
-        short iStrip = gRandom->Integer(nV);
-        sensor.second.second[iStrip].add(0, -1, 0, 0, 0);
-      } // for ns
-    } // Add noise digits
     // Cycle through signals and generate samples
     for (StripSignals::value_type& stripSignal : sensor.second.second) {
       short int iStrip = stripSignal.first;
@@ -797,26 +767,14 @@ void SVDDigitizerModule::saveDigits()
       // ... to store digit-digit relations
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
-      // For noise digits, just generate random variates on randomly selected samples
-      // FIXME noise in e- from xml
-      if (s.isNoise()) {
-        double pSelect = 1.0 / nAPV25Samples;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
-          if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1, elNoiseV));
-          else
-            samples.push_back(gRandom->Gaus(0, elNoiseV));
-        }
-      } else {
-        double t = initTime;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          //          samples.push_back(addNoise(s(t), elNoiseV));
-          samples.push_back(s(t)); //no noise on top of signal here (e-)
-          t += m_samplingTime;
-        }
-        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
-          samples.push_back(0);
+
+      double t = initTime;
+      for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
+        samples.push_back(s(t)); //no noise on top of signal here (e-)
+        t += m_samplingTime;
       }
+      for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();

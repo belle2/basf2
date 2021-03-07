@@ -122,7 +122,7 @@ namespace Belle2 {
       double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
-      /** Whether or not to apply poisson fluctuation of charge */
+      /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
       bool  m_applyNoise = false;

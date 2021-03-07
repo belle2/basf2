@@ -259,11 +259,11 @@ class TrainingData(object):
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = f'Monitor_TrainingData_{channel.label}.root'
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
+                    hist_filename = f'Monitor_TrainingData.root'
+                    ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=config.removeJPsiSlash(hist_filename), path=path)
+                                            filename=config.removeJPsiSlash(hist_filename),
+                                            directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 
                 teacher = basf2.register_module('VariablesToNtuple')
                 teacher.set_name('VariablesToNtuple_' + channel.name)
@@ -321,11 +321,11 @@ class PreReconstruction(object):
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_BeforeRanking.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
                 if channel.preCutConfig.bestCandidateMode == 'lowest':
                     ma.rankByLowest(channel.name,
@@ -343,7 +343,7 @@ class PreReconstruction(object):
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
-                    filename = f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -351,7 +351,7 @@ class PreReconstruction(object):
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
                 elif self.config.training:
@@ -383,11 +383,11 @@ class PreReconstruction(object):
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_AfterVertex_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_AfterVertex.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
         return path
 
@@ -466,11 +466,11 @@ class PostReconstruction(object):
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root'
+                    filename = f'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
             cutstring = ''
             if particle.postCutConfig.value > 0.0:
@@ -484,20 +484,26 @@ class PostReconstruction(object):
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = f'Monitor_PostReconstruction_BeforePostCut_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_BeforePostCut.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
             ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = f'Monitor_PostReconstruction_BeforeRanking_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_BeforeRanking.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
             ma.rankByHighest(particle.identifier, 'extraInfo(SignalProbability)',
                              particle.postCutConfig.bestCandidateCut, 'postCut_rank', path=path)
@@ -508,11 +514,14 @@ class PostReconstruction(object):
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = f'Monitor_PostReconstruction_AfterRanking_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_AfterRanking.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
@@ -522,9 +531,9 @@ class PostReconstruction(object):
                 elif 'B' in particle.name:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
-                filename = f'Monitor_Final_{particle.identifier}.root'
-                ma.variablesToNtuple(particle.identifier, variables, treename='variables',
-                                     filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_Final.root'
+                ma.variablesToNtuple(particle.identifier, variables, treename=config.removeJPsiSlash(
+                    f'{particle.identifier} variables'), filename=config.removeJPsiSlash(filename), path=path)
         return path
 
 

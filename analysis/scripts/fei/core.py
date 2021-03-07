@@ -128,7 +128,7 @@ class TrainingDataInformation(object):
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
-        root_file = ROOT.TFile(self.filename)
+        root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
 
         Belle2.Variable.Manager
@@ -147,6 +147,7 @@ class TrainingDataInformation(object):
 
         mc_counts[0] = {}
         mc_counts[0]['sum'] = hist.GetEntries()
+        root_file.Close()
         return mc_counts
 
 
@@ -239,7 +240,7 @@ class TrainingData(object):
                 nSignal /= 10000
 
             for channel in particle.channels:
-                filename = f'{channel.label}.root'
+                filename = 'training_input.root'
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
@@ -267,7 +268,7 @@ class TrainingData(object):
                 teacher = basf2.register_module('VariablesToNtuple')
                 teacher.set_name('VariablesToNtuple_' + channel.name)
                 teacher.param('fileName', filename)
-                teacher.param('treeName', 'variables')
+                teacher.param('treeName', f'{channel.label} variables')
                 teacher.param('variables', channel.mvaConfig.variables + spectators)
                 teacher.param('particleList', channel.name)
                 teacher.param('sampling', (channel.mvaConfig.target, inverseSamplingRates))
@@ -609,59 +610,57 @@ class Teacher(object):
         Do all trainings for which we find training data
         """
         job_list = []
-        for particle in self.particles:
-            for channel in particle.channels:
-                filename = f'{channel.label}.root'
-                # weightfile = self.config.prefix + '_' + channel.label
-                weightfile = channel.label + '.xml'
-                if not basf2_mva.available(weightfile) and os.path.isfile(filename):
-                    f = ROOT.TFile(filename)
-                    if not f:
-                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
-                                  f"Ignoring channel {channel.label}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    keys = [m for m in f.GetListOfKeys()]
-                    if not keys:
-                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
-                                  f"Ignoring channel {channel.label}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    tree = keys[0].ReadObj()
-                    nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
-                    nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
-                    if nSig < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed. "
-                                  f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    if nBg < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed. "
-                                  f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    variable_str = "' '".join(channel.mvaConfig.variables)
+        filename = 'training_input.root'
+        f = ROOT.TFile.Open(filename, 'read')
+        if not f:
+            B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
+                      "No weight files will be provided.")
+        else:
+            for particle in self.particles:
+                for channel in particle.channels:
+                    # filename = f'{channel.label}.root'
+                    # weightfile = self.config.prefix + '_' + channel.label
+                    weightfile = channel.label + '.xml'
+                    if not basf2_mva.available(weightfile):
+                        keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
+                        if len(keys) == 0:
+                            # B2WARNING("Training of MVC failed. ROOT file does not contain required tree. "
+                            #          f"Ignoring channel {channel.label}. No weight file will be provided.")
+                            # self.create_fake_weightfile(channel.label)
+                            # self.upload(channel.label)
+                            continue
+                        tree = keys[0].ReadObj()
+                        nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
+                        nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
+                        if nSig < Teacher.MinimumNumberOfMVASamples:
+                            B2WARNING("Training of MVC failed. "
+                                      f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                            self.create_fake_weightfile(channel.label)
+                            self.upload(channel.label)
+                            continue
+                        if nBg < Teacher.MinimumNumberOfMVASamples:
+                            B2WARNING("Training of MVC failed. "
+                                      f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                            self.create_fake_weightfile(channel.label)
+                            self.upload(channel.label)
+                            continue
+                        variable_str = "' '".join(channel.mvaConfig.variables)
 
-                    command = (f"{self.config.externTeacher}"
-                               f" --method '{channel.mvaConfig.method}'"
-                               f" --target_variable '{channel.mvaConfig.target}'"
-                               f" --treename variables --datafile '{channel.label}.root'"
-                               f" --signal_class 1 --variables '{variable_str}'"
-                               f" --identifier '{channel.label}.xml'"
-                               f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
-                    B2INFO(f"Used following command to invoke teacher: \n {command}")
-                    job_list.append((channel.label, command))
-
+                        command = (f"{self.config.externTeacher}"
+                                   f" --method '{channel.mvaConfig.method}'"
+                                   f" --target_variable '{channel.mvaConfig.target}'"
+                                   f" --treename '{channel.label} variables' --datafile 'training_input.root'"
+                                   f" --signal_class 1 --variables '{variable_str}'"
+                                   f" --identifier '{channel.label}.xml'"
+                                   f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
+                        B2INFO(f"Used following command to invoke teacher: \n {command}")
+                        job_list.append((channel.label, command))
+        f.Close()
         p = multiprocessing.Pool(None, maxtasksperchild=1)
         func = functools.partial(subprocess.call, shell=True)
         p.map(func, [c for _, c in job_list])
         p.close()
         p.join()
-
         weightfiles = []
         for name, _ in job_list:
             if not basf2_mva.available(name + '.xml'):

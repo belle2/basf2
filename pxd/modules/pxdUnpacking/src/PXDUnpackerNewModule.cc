@@ -286,7 +286,7 @@ void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx)
       m_errorMask |= c_FRAME_SIZE;
     } else {
       B2DEBUG(29, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      if (m_firmware < 10) {
+      if (m_firmware > 0 && m_firmware < 10) {
         /// 1--9 is reserved for old firmware
         unpack_dhc_frame_v01(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
       } else if (m_firmware >= 10) {

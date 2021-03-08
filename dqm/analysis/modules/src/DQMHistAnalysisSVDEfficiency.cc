@@ -37,6 +37,7 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
+  addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
@@ -141,7 +142,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //  gStyle->SetTitleY(.97);
 
   //check MODULE EFFICIENCY
-  m_effUstatus = 0;
+  m_effUstatus = 0; // 0: good; 1: low stat; 2: warning; 3: error;
   m_effVstatus = 0;
   m_effUErrstatus = 0;
   m_effVErrstatus = 0;
@@ -158,10 +159,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
 
-  Float_t effU;
-  Float_t effV;
-  Float_t erreffU;
-  Float_t erreffV;
+  Float_t effU = 0.0;
+  Float_t effV = 0.0;
+  Float_t erreffU = 0.0;
+  Float_t erreffV = 0.0;
 
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -190,7 +191,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
-      if (effU <= m_effEmpty) {
+      if (effU <= m_effEmpty || denU < m_statThreshold) {
         if (m_effUstatus < 1) m_effUstatus = 1;
       } else if (effU < m_effWarning) {
         if (effU > m_effError) {
@@ -231,7 +232,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
-      if (effV <= m_effEmpty) {
+      if (effV <= m_effEmpty || denV < m_statThreshold) {
         if (m_effVstatus < 1) m_effVstatus = 1;
       } else if (effV < m_effWarning) {
         if (effV > m_effError) {
@@ -243,12 +244,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
-
   //update summary
   m_cEfficiencyU->cd();
-
-
-
   m_hEfficiency->getHistogram(1)->Draw("text");
 
   if (m_effUstatus == 0) {

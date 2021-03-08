@@ -36,7 +36,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
-  addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
 }
 
@@ -319,18 +318,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
-  if (m_printCanvas) {
-    m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
-    m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
-    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
-    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
-  }
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()

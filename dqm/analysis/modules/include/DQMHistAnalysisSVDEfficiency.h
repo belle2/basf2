@@ -37,7 +37,6 @@ namespace Belle2 {
     virtual void terminate() override;
 
     //parameters
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
     float m_effEmpty; /**<empty level of the efficiency */

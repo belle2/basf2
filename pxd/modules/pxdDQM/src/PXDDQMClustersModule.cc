@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
+ * Contributors: Björn Spruck,                                            *
  *                                                                        *
  * Prepared for Belle II geometry                                         *
  *                                                                        *
@@ -183,7 +183,7 @@ void PXDDQMClustersModule::defineHisto()
     // Number of fired pixels per frame
     //----------------------------------------------------------------
     string name = str(format("DQM_PXD_%1%_Fired") % sensorDescr);
-    string title = str(format("DQM PXD Sensor %1% Fired pixels") % sensorDescr);
+    string title = str(format("PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = new TH1D(name.c_str(), title.c_str(), 50, 0, 50);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
@@ -191,7 +191,7 @@ void PXDDQMClustersModule::defineHisto()
     // Number of good fired pixels per frame
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_GoodFired") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Good Fired pixels") % sensorDescr);
+    title = str(format("PXD Sensor %1% Good Fired pixels") % sensorDescr);
     m_goodfired[i] = new TH1D(name.c_str(), title.c_str(), 50, 0, 50);
     m_goodfired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_goodfired[i]->GetYaxis()->SetTitle("counts");
@@ -199,7 +199,7 @@ void PXDDQMClustersModule::defineHisto()
     // Number of clusters per frame
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_Clusters") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Number of clusters") % sensorDescr);
+    title = str(format("PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = new TH1D(name.c_str(), title.c_str(), 20, 0, 20);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
@@ -207,7 +207,7 @@ void PXDDQMClustersModule::defineHisto()
     // Number of good clusters per frame
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_GoodClusters") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Number of good clusters") % sensorDescr);
+    title = str(format("PXD Sensor %1% Number of good clusters") % sensorDescr);
     m_goodclusters[i] = new TH1D(name.c_str(), title.c_str(), 20, 0, 20);
     m_goodclusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_goodclusters[i]->GetYaxis()->SetTitle("counts");
@@ -215,7 +215,7 @@ void PXDDQMClustersModule::defineHisto()
     // Start row distribution
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_StartRow") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Start row distribution") % sensorDescr);
+    title = str(format("PXD Sensor %1% Start row distribution") % sensorDescr);
 
     m_startRow[i] = new TH1D(name.c_str(), title.c_str(), nVPixels / 4, 0.0, nVPixels);
     m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
@@ -224,12 +224,12 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
+    title = str(format("PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
     m_chargStartRow[i] = new TH1D(name.c_str(), title.c_str(), nVPixels / 4, 0.0, nVPixels);
     m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
     name = str(format("DQM_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
+    title = str(format("PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
     m_startRowCount[i] = new TH1D(name.c_str(), title.c_str(), nVPixels / 4, 0.0, nVPixels);
     m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_startRowCount[i]->GetYaxis()->SetTitle("count");
@@ -237,7 +237,7 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster Charge
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterCharge") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Cluster Charge") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Charge") % sensorDescr);
     m_clusterCharge[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_clusterCharge[i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("counts");
@@ -245,7 +245,7 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster Energy
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterEnergy") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Cluster Energy") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Energy") % sensorDescr);
     m_clusterEnergy[i] = new TH1D(name.c_str(), title.c_str(), 100, 0, 50);
     m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [keV]");
     m_clusterEnergy[i]->GetYaxis()->SetTitle("counts");
@@ -253,7 +253,7 @@ void PXDDQMClustersModule::defineHisto()
     // Pixel Signal
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_PixelSignal") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Pixel Signal") % sensorDescr);
+    title = str(format("PXD Sensor %1% Pixel Signal") % sensorDescr);
     m_pixelSignal[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_pixelSignal[i]->GetXaxis()->SetTitle("signal of pixels [ADU]");
     m_pixelSignal[i]->GetYaxis()->SetTitle("counts");
@@ -261,7 +261,7 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster Size in U
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Cluster Size U") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size U") % sensorDescr);
     m_clusterSizeU[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("counts");
@@ -269,7 +269,7 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster Size in V
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Cluster Size V") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size V") % sensorDescr);
     m_clusterSizeV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("counts");
@@ -277,7 +277,7 @@ void PXDDQMClustersModule::defineHisto()
     // Cluster Size in U+V
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterSizeUV") % sensorDescr);
-    title = str(format("DQM PXD Sensor %1% Cluster Size U+V") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size U+V") % sensorDescr);
     m_clusterSizeUV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeUV[i]->GetXaxis()->SetTitle("size of u+v clusters");
     m_clusterSizeUV[i]->GetYaxis()->SetTitle("counts");

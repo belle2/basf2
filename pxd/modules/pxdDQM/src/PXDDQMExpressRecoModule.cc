@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
+ * Contributors: Björn Spruck, Peter Kodys                                *
  *                                                                        *
  * Prepared for Belle II geometry                                         *
  *                                                                        *
@@ -100,7 +100,7 @@ void PXDDQMExpressRecoModule::defineHisto()
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
 
-  m_hitMapClFilterCounts = new TH1D("DQM_PXD_ClusterHitmapFilterCounts", "PXD Integrated number of filtered clusters per sensor",
+  m_hitMapClFilterCounts = new TH1D("DQMER_PXD_ClusterHitmapFilterCounts", "PXD Integrated number of filtered clusters per sensor",
                                     nPXDSensors, 0, nPXDSensors);
   m_hitMapClFilterCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClFilterCounts->GetYaxis()->SetTitle("counts");
@@ -200,7 +200,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // FIXME: expert level, remove here at some point
     //----------------------------------------------------------------
     //name = str(format("DQMER_PXD_%1%_StartRow") % sensorDescr);
-    //title = str(format("DQM ER PXD Sensor %1% Start row distribution") % sensorDescr);
+    //title = str(format("PXD Sensor %1% Start row distribution") % sensorDescr);
 
     //int nPixels;/** Number of pixels on PXD v direction */
     //nPixels = SensorInfo.getVCells();
@@ -211,12 +211,12 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
     //name = str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-    //title = str(format("DQM ER PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
+    //title = str(format("PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
     //m_chargStartRow[i] = new TH1D(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
     //m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     //m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
     //name = str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-    //title = str(format("DQM ER PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
+    //title = str(format("PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
     //m_startRowCount[i] = new TH1D(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
     //m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     //m_startRowCount[i]->GetYaxis()->SetTitle("count");
@@ -224,7 +224,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Cluster Charge
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Cluster Charge") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Charge") % sensorDescr);
     m_clusterCharge[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_clusterCharge[i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("counts");
@@ -232,7 +232,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Pixel Signal
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Pixel Signal") % sensorDescr);
+    title = str(format("PXD Sensor %1% Pixel Signal") % sensorDescr);
     m_pixelSignal[i] = new TH1D(name.c_str(), title.c_str(), 256, 0, 256);
     m_pixelSignal[i]->GetXaxis()->SetTitle("signal of pixels [ADU]");
     m_pixelSignal[i]->GetYaxis()->SetTitle("counts");
@@ -240,7 +240,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Cluster Size in U
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Cluster Size U") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size U") % sensorDescr);
     m_clusterSizeU[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("counts");
@@ -248,7 +248,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Cluster Size in V
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Cluster Size V") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size V") % sensorDescr);
     m_clusterSizeV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("counts");
@@ -256,7 +256,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Cluster Size in U+V
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Cluster Size U+V") % sensorDescr);
+    title = str(format("PXD Sensor %1% Cluster Size U+V") % sensorDescr);
     m_clusterSizeUV[i] = new TH1D(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeUV[i]->GetXaxis()->SetTitle("size of u+v clusters");
     m_clusterSizeUV[i]->GetYaxis()->SetTitle("counts");

@@ -422,10 +422,10 @@ class BaseSkim(ABC):
             "the skim object."
         )
         if udstOutput is not None:
-            b2.WARNING(warning.format(arg="udstOutput"))
+            b2.B2WARNING(warning.format(arg="udstOutput"))
             self._udstOutput = udstOutput
         if validation is not None:
-            b2.WARNING(warning.format(arg="validation"))
+            b2.B2WARNING(warning.format(arg="validation"))
             self._validation = validation
 
         self._MainPath = path

@@ -94,55 +94,55 @@ namespace Belle2 {
 
     /** Combined t0 decisions: all, the earliest and second best **/
 
-    TH1I* h_topSlotSegment[16] = {nullptr};
-    TH1I* h_topSlotNHits[16] = {nullptr};
-    TH1I* h_topSlotLogL[16] = {nullptr};
-    TH1I* h_topSlotT0[16] = {nullptr};
+    TH1I* h_topSlotSegment[nskim_topdqm][16] = {nullptr};
+    TH1I* h_topSlotNHits[nskim_topdqm][16] = {nullptr};
+    TH1I* h_topSlotLogL[nskim_topdqm][16] = {nullptr};
+    TH1I* h_topSlotT0[nskim_topdqm][16] = {nullptr};
 
-    TH1I* h_topSlotAll = {nullptr};
-    TH1I* h_topSegmentAll = {nullptr};
-    TH1I* h_topNHitsAll = {nullptr};
-    TH1I* h_topLogLAll = {nullptr};
-    TH1I* h_topT0All = {nullptr};
+    TH1I* h_topSlotAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topSegmentAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topNHitsAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topLogLAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topT0All[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topSlotVsSegment = {nullptr};
+    TH2I* h_topSlotVsSegment[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topSlotVsNHits = {nullptr};
-    TH2I* h_topSlotVsLogL = {nullptr};
-    TH2I* h_topSlotVsT0 = {nullptr};
+    TH2I* h_topSlotVsNHits[nskim_topdqm] = {nullptr};
+    TH2I* h_topSlotVsLogL[nskim_topdqm] = {nullptr};
+    TH2I* h_topSlotVsT0[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topSegmentVsNHits = {nullptr};
-    TH2I* h_topSegmentVsLogL = {nullptr};
-    TH2I* h_topSegmentVsT0 = {nullptr};
+    TH2I* h_topSegmentVsNHits[nskim_topdqm] = {nullptr};
+    TH2I* h_topSegmentVsLogL[nskim_topdqm] = {nullptr};
+    TH2I* h_topSegmentVsT0[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topNHitsVsLogL = {nullptr};
-    TH2I* h_topNHitsVsT0 = {nullptr};
-    TH2I* h_topLogLVsT0 = {nullptr};
+    TH2I* h_topNHitsVsLogL[nskim_topdqm] = {nullptr};
+    TH2I* h_topNHitsVsT0[nskim_topdqm] = {nullptr};
+    TH2I* h_topLogLVsT0[nskim_topdqm] = {nullptr};
 
-    TH1I* h_ecl_gdl_top_timing_diff_both = {nullptr};
-    TH1I* h_ecl_top_top_timing_diff_both = {nullptr};
+    TH1I* h_ecl_gdl_top_timing_diff_both[nskim_topdqm] = {nullptr};
+    TH1I* h_ecl_top_top_timing_diff_both[nskim_topdqm] = {nullptr};
 
-    TH2I* h_decisionNumberVsNumberDecisionsGood = {nullptr};
-    TH2I* h_decisionNumberVsNumberDecisionsBad = {nullptr};
+    TH2I* h_decisionNumberVsNumberDecisionsGood[nskim_topdqm] = {nullptr};
+    TH2I* h_decisionNumberVsNumberDecisionsBad[nskim_topdqm] = {nullptr};
 
-    TH1I* h_ecl_gdl_top_timing_diff_good = {nullptr};
-    TH1I* h_ecl_top_top_timing_diff_good = {nullptr};
+    TH1I* h_ecl_gdl_top_timing_diff_good[nskim_topdqm] = {nullptr};
+    TH1I* h_ecl_top_top_timing_diff_good[nskim_topdqm] = {nullptr};
 
-    TH2I* h_top_ecltop_timing_diff_vs_toptop_good = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_toptop_good = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_good = {nullptr};
+    TH2I* h_top_ecltop_timing_diff_vs_toptop_good[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_toptop_good[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_good[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topCombinedTimingTopGood = {nullptr};
-    TH1I* h_topNSlotsCombinedTimingTopGood = {nullptr};
-    TH1I* h_topNHitSumGood = {nullptr};
-    TH1I* h_topLogLSumGood = {nullptr};
+    TH1I* h_topCombinedTimingTopGood[nskim_topdqm] = {nullptr};
+    TH1I* h_topNSlotsCombinedTimingTopGood[nskim_topdqm] = {nullptr};
+    TH1I* h_topNHitSumGood[nskim_topdqm] = {nullptr};
+    TH1I* h_topLogLSumGood[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topCombinedTimingTopAll = {nullptr};
-    TH1I* h_topNSlotsCombinedTimingTopAll = {nullptr};
-    TH1I* h_topNHitSumAll = {nullptr};
-    TH1I* h_topLogLSumAll = {nullptr};
+    TH1I* h_topCombinedTimingTopAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topNSlotsCombinedTimingTopAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topNHitSumAll[nskim_topdqm] = {nullptr};
+    TH1I* h_topLogLSumAll[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topNSlotsCombinedTimingVsNHitsTopAll = {nullptr};
+    TH2I* h_topNSlotsCombinedTimingVsNHitsTopAll[nskim_topdqm] = {nullptr};
 
     TH2I* h_topNHitVsNhit[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_topSlotVsSlot[nskim_topdqm][nHistClasses] = {nullptr};
@@ -150,48 +150,48 @@ namespace Belle2 {
     TH2I* h_topSegmentVsSegment[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_topLogLVsLogL[nskim_topdqm][nHistClasses] = {nullptr};
 
-    TH1I* h_topTrigType = {nullptr};
-    TH1I* h_topTimingResiduals = {nullptr};
-    TH1I* h_topTimingVariance = {nullptr};
+    TH1I* h_topTrigType[nskim_topdqm] = {nullptr};
+    TH1I* h_topTimingResiduals[nskim_topdqm] = {nullptr};
+    TH1I* h_topTimingVariance[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topRvcDiff1All = {nullptr};
-    TH1I* h_topRvcDiff2All = {nullptr};
-    TH1I* h_topRvcDiff3All = {nullptr};
-    TH1I* h_topRvcDiff4All = {nullptr};
+    TH1I* h_topRvcDiff1All[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff2All[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff3All[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff4All[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topGdlRvcDiff1All = {nullptr};
-    TH1I* h_topGdlRvcDiff2All = {nullptr};
-    TH1I* h_topGdlRvcDiff3All = {nullptr};
+    TH1I* h_topGdlRvcDiff1All[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff2All[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff3All[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topRvcDiff1Good = {nullptr};
-    TH1I* h_topRvcDiff2Good = {nullptr};
-    TH1I* h_topRvcDiff3Good = {nullptr};
-    TH1I* h_topRvcDiff4Good = {nullptr};
+    TH1I* h_topRvcDiff1Good[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff2Good[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff3Good[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff4Good[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topGdlRvcDiff1Good = {nullptr};
-    TH1I* h_topGdlRvcDiff2Good = {nullptr};
-    TH1I* h_topGdlRvcDiff3Good = {nullptr};
+    TH1I* h_topGdlRvcDiff1Good[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff2Good[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff3Good[nskim_topdqm] = {nullptr};
 
-    TH1I* h_ecl_gdl_top_timing_diff_bad = {nullptr};
-    TH1I* h_ecl_top_top_timing_diff_bad = {nullptr};
+    TH1I* h_ecl_gdl_top_timing_diff_bad[nskim_topdqm] = {nullptr};
+    TH1I* h_ecl_top_top_timing_diff_bad[nskim_topdqm] = {nullptr};
 
-    TH2I* h_top_ecltop_timing_diff_vs_toptop_bad = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_toptop_bad = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_bad = {nullptr};
+    TH2I* h_top_ecltop_timing_diff_vs_toptop_bad[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_toptop_bad[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_bad[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topCombinedTimingTopBad = {nullptr};
-    TH1I* h_topNSlotsCombinedTimingTopBad = {nullptr};
-    TH1I* h_topNHitSumBad = {nullptr};
-    TH1I* h_topLogLSumBad = {nullptr};
+    TH1I* h_topCombinedTimingTopBad[nskim_topdqm] = {nullptr};
+    TH1I* h_topNSlotsCombinedTimingTopBad[nskim_topdqm] = {nullptr};
+    TH1I* h_topNHitSumBad[nskim_topdqm] = {nullptr};
+    TH1I* h_topLogLSumBad[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topRvcDiff1Bad = {nullptr};
-    TH1I* h_topRvcDiff2Bad = {nullptr};
-    TH1I* h_topRvcDiff3Bad = {nullptr};
-    TH1I* h_topRvcDiff4Bad = {nullptr};
+    TH1I* h_topRvcDiff1Bad[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff2Bad[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff3Bad[nskim_topdqm] = {nullptr};
+    TH1I* h_topRvcDiff4Bad[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topGdlRvcDiff1Bad = {nullptr};
-    TH1I* h_topGdlRvcDiff2Bad = {nullptr};
-    TH1I* h_topGdlRvcDiff3Bad = {nullptr};
+    TH1I* h_topGdlRvcDiff1Bad[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff2Bad[nskim_topdqm] = {nullptr};
+    TH1I* h_topGdlRvcDiff3Bad[nskim_topdqm] = {nullptr};
 
     TH1I* h_topCombinedTimingTop[nskim_topdqm][nHistClasses] = {nullptr};
     TH1I* h_topNSlotsCombinedTimingTop[nskim_topdqm][nHistClasses] = {nullptr};
@@ -221,60 +221,60 @@ namespace Belle2 {
     TH2I* h_gdl_ecltop_timing_diff_vs_ecltop[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_best_slot[nskim_topdqm][nHistClasses] = {nullptr};
 
-    TH2I* h_gdl_top_rvc_vs_top_timing = {nullptr};
+    TH2I* h_gdl_top_rvc_vs_top_timing[nskim_topdqm] = {nullptr};
 
-    TH1I* h_gdl_ecltop_rvc_diff = {nullptr};
-    TH1I* h_gdl_cdctop_rvc_diff = {nullptr};
+    TH1I* h_gdl_ecltop_rvc_diff[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_cdctop_rvc_diff[nskim_topdqm] = {nullptr};
 
-    TH1I* h_gdl_gdltop_rvc_diff_all = {nullptr};
-    TH1I* h_gdl_comtop_rvc_diff_all = {nullptr};
+    TH1I* h_gdl_gdltop_rvc_diff_all[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_comtop_rvc_diff_all[nskim_topdqm] = {nullptr};
 
-    TH1I* h_gdl_gdltop_rvc_diff_good = {nullptr};
-    TH1I* h_gdl_comtop_rvc_diff_good = {nullptr};
+    TH1I* h_gdl_gdltop_rvc_diff_good[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_comtop_rvc_diff_good[nskim_topdqm] = {nullptr};
 
-    TH1I* h_gdl_gdltop_rvc_diff_bad = {nullptr};
-    TH1I* h_gdl_comtop_rvc_diff_bad = {nullptr};
+    TH1I* h_gdl_gdltop_rvc_diff_bad[nskim_topdqm] = {nullptr};
+    TH1I* h_gdl_comtop_rvc_diff_bad[nskim_topdqm] = {nullptr};
 
-    TH2I* h_gdl_ecltop_timing_diff_vs_slot = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_segment = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_nhits = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_logl = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_slot[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_segment[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_nhits[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_logl[nskim_topdqm] = {nullptr};
 
     TH2I* h_gdl_ecltop_timing_diff_vs_slot_2ns[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_gdl_ecltop_timing_diff_vs_segment_2ns[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_gdl_ecltop_timing_diff_vs_nhits_2ns[nskim_topdqm][nHistClasses] = {nullptr};
     TH2I* h_gdl_ecltop_timing_diff_vs_logl_2ns[nskim_topdqm][nHistClasses] = {nullptr};
 
-    TH2I* h_topTC2IdVsTC1IdAll = {nullptr};
-    TH2I* h_topTC2EnergyVsTC1EnergyAll = {nullptr};
-    TH2I* h_topTC2ThetaIdVsTC1ThetaIdAll = {nullptr};
-    TH2I* h_topTC2PhiIdVsTC1PhiIdAll = {nullptr};
-    TH3I* h_topTCPhiIdVsTCThetaIdAll = {nullptr};
+    TH2I* h_topTC2IdVsTC1IdAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2EnergyVsTC1EnergyAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2ThetaIdVsTC1ThetaIdAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2PhiIdVsTC1PhiIdAll[nskim_topdqm] = {nullptr};
+    TH3I* h_topTCPhiIdVsTCThetaIdAll[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topTC2IdVsTC1IdGRLAll = {nullptr};
-    TH2I* h_topTC2EnergyVsTC1EnergyGRLAll = {nullptr};
-    TH2I* h_topTC2ThetaIdVsTC1ThetaIdGRLAll = {nullptr};
-    TH2I* h_topTC2PhiIdVsTC1PhiIdGRLAll = {nullptr};
-    TH3I* h_topTCPhiIdVsTCThetaIdGRLAll = {nullptr};
+    TH2I* h_topTC2IdVsTC1IdGRLAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2EnergyVsTC1EnergyGRLAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2ThetaIdVsTC1ThetaIdGRLAll[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2PhiIdVsTC1PhiIdGRLAll[nskim_topdqm] = {nullptr};
+    TH3I* h_topTCPhiIdVsTCThetaIdGRLAll[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topTC2IdVsTC1Id = {nullptr};
-    TH2I* h_topTC2EnergyVsTC1Energy = {nullptr};
-    TH2I* h_topTC2ThetaIdVsTC1ThetaId = {nullptr};
-    TH2I* h_topTC2PhiIdVsTC1PhiId = {nullptr};
-    TH3I* h_topTCPhiIdVsTCThetaId = {nullptr};
+    TH2I* h_topTC2IdVsTC1Id[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2EnergyVsTC1Energy[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2ThetaIdVsTC1ThetaId[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2PhiIdVsTC1PhiId[nskim_topdqm] = {nullptr};
+    TH3I* h_topTCPhiIdVsTCThetaId[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topTC2IdVsTC1IdGRL = {nullptr};
-    TH2I* h_topTC2EnergyVsTC1EnergyGRL = {nullptr};
-    TH2I* h_topTC2ThetaIdVsTC1ThetaIdGRL = {nullptr};
-    TH2I* h_topTC2PhiIdVsTC1PhiIdGRL = {nullptr};
-    TH3I* h_topTCPhiIdVsTCThetaIdGRL = {nullptr};
+    TH2I* h_topTC2IdVsTC1IdGRL[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2EnergyVsTC1EnergyGRL[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2ThetaIdVsTC1ThetaIdGRL[nskim_topdqm] = {nullptr};
+    TH2I* h_topTC2PhiIdVsTC1PhiIdGRL[nskim_topdqm] = {nullptr};
+    TH3I* h_topTCPhiIdVsTCThetaIdGRL[nskim_topdqm] = {nullptr};
 
-    TH2I* h_gdl_ecltop_timing_diff_vs_grl_top_l1 = {nullptr};
-    TH2I* h_gdl_top_l1_vs_grl_top_l1 = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_grl_top_l1[nskim_topdqm] = {nullptr};
+    TH2I* h_gdl_top_l1_vs_grl_top_l1[nskim_topdqm] = {nullptr};
 
-    TH2I* h_grl_ntopslots_vs_ncdcslots = {nullptr};
-    TH1I* h_grl_ncdctopslots_matched = {nullptr};
-    TH2I* h_grl_topslots_vs_cdcslots_match = {nullptr};
+    TH2I* h_grl_ntopslots_vs_ncdcslots[nskim_topdqm] = {nullptr};
+    TH1I* h_grl_ncdctopslots_matched[nskim_topdqm] = {nullptr};
+    TH2I* h_grl_topslots_vs_cdcslots_match[nskim_topdqm] = {nullptr};
 
     //condition database for GDL unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;

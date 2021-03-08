@@ -3191,25 +3191,33 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
 
 def scaleError(outputListName, inputListName,
                scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
-               minErrors=[0.00140, 0, 0, 0.00157, 0],
+               d0Resolution=[12.2e-4, 14.1e-4],
+               z0Resolution=[13.4e-4, 15.3e-4],
                path=None):
     '''
     This module creates a new charged particle list.
     The helix errors of the new particles are scaled by constant factors.
-    Lower bounds can be set so that helix errors are confined above the limit.
-    The scale factors and lower bounds are defined for each helix parameters (d0, phi0, omega, z0, tanlambda).
+    These scale factors are defined for each helix parameter (d0, phi0, omega, z0, tanlambda).
+    The impact parameter resolution can be defined in a pseudo-momentum dependent form,
+    which limits the d0 and z0 errors so that they do not shrink below the resolution.
+    This module is supposed to be used for low-momentum (0-3 GeV/c) tracks in BBbar events.
+    Details will be documented in a Belle II note by the Belle II Japan ICPV group.
 
     @param inputListName Name of input charged particle list to be scaled
     @param outputListName Name of output charged particle list with scaled error
     @param scaleFactors List of five constants to be multiplied to each of helix errors
-    @param minErrors Lower bound can be set for each helix error.
+    @param d0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining d0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
+    @param z0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining z0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
     '''
     scale_error = register_module("HelixErrorScaler")
     scale_error.set_name('ScaleError_' + inputListName)
     scale_error.param('inputListName', inputListName)
     scale_error.param('outputListName', outputListName)
     scale_error.param('scaleFactors', scaleFactors)
-    scale_error.param('minErrors', minErrors)
+    scale_error.param('d0ResolutionParameters', d0Resolution)
+    scale_error.param('z0ResolutionParameters', z0Resolution)
     path.add_module(scale_error)
 
 

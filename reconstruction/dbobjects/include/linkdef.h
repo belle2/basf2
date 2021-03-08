@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::CDCDedxBadWires+; // checksum=0xa97f8b15, version=1
 #pragma link C++ class Belle2::CDCDedxScaleFactor+; // checksum=0x48702a09, version=1
 #pragma link C++ class Belle2::CDCDedxWireGain+; // checksum=0xd666624, version=5
 #pragma link C++ class Belle2::CDCDedxRunGain+; // checksum=0x41943637, version=4

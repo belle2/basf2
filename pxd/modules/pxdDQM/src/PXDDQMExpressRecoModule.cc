@@ -171,8 +171,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of good fired pixels per frame
     //----------------------------------------------------------------
-    name = str(format("DQMER_PXD_%1%_Fired") % sensorDescr);
-    title = str(format("PXD Sensor %1% Fired pixels") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_GoodFired") % sensorDescr);
+    title = str(format("PXD Sensor %1% Good pixels") % sensorDescr);
     m_goodfired[i] = new TH1D(name.c_str(), title.c_str(), 200, 0, 200);
     m_goodfired[i]->SetCanExtend(TH1::kAllAxes);
     m_goodfired[i]->GetXaxis()->SetTitle("# of fired pixels");
@@ -181,7 +181,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     // Number of clusters per frame
     //----------------------------------------------------------------
     name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
-    title = str(format("PXD Sensor %1% Number of clusters") % sensorDescr);
+    title = str(format("PXD Sensor %1% Clusters") % sensorDescr);
     m_clusters[i] = new TH1D(name.c_str(), title.c_str(), 200, 0, 200);
     m_clusters[i]->SetCanExtend(TH1::kAllAxes);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
@@ -189,8 +189,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of good clusters per frame
     //----------------------------------------------------------------
-    name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
-    title = str(format("PXD Sensor %1% Number of clusters") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_GoodClusters") % sensorDescr);
+    title = str(format("PXD Sensor %1% Good clusters") % sensorDescr);
     m_goodclusters[i] = new TH1D(name.c_str(), title.c_str(), 200, 0, 200);
     m_goodclusters[i]->SetCanExtend(TH1::kAllAxes);
     m_goodclusters[i]->GetXaxis()->SetTitle("# of clusters");

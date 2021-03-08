@@ -158,10 +158,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
 
-  Float_t effU = 0.0;
-  Float_t effV = 0.0;
-  Float_t erreffU = 0.0;
-  Float_t erreffV = 0.0;
+  Float_t effU;
+  Float_t effV;
+  Float_t erreffU;
+  Float_t erreffV;
 
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");

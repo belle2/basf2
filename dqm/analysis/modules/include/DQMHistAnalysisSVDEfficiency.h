@@ -65,8 +65,6 @@ namespace Belle2 {
 
     Int_t m_effUstatus; /**< number representing the status of the efficiency U side */
     Int_t m_effVstatus;/**< number representing the status of the efficiency V side */
-    Int_t m_effUErrstatus; /**< number representing the status of the efficiency error U side */
-    Int_t m_effVErrstatus; /**< number representing the status of the efficiency error V side */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

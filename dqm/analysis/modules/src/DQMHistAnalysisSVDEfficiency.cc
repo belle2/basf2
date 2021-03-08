@@ -143,8 +143,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //check MODULE EFFICIENCY
   m_effUstatus = 0; // 0: good; 1: low stat; 2: warning; 3: error;
   m_effVstatus = 0;
-  m_effUErrstatus = 0;
-  m_effVErrstatus = 0;
 
   //set dedicate gStyle
   //  const Int_t colNum = 4;
@@ -191,12 +189,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
       if (effU <= m_effEmpty || denU < m_statThreshold) {
-        if (m_effUstatus < 1) m_effUstatus = 1;
-      } else if (effU < m_effWarning) {
-        if (effU > m_effError) {
-          if (m_effUstatus < 2) m_effUstatus = 2;
+        if (m_effUstatus < 1) m_effUstatus = 1; // low statistics
+      } else if (effU + erreffU < m_effWarning) {
+        if (effU > m_effError || effU + erreffU > m_effError) {
+          if (m_effUstatus < 2) m_effUstatus = 2; // warning
         } else {
-          if (m_effUstatus < 3) m_effUstatus = 3;
+          if (m_effUstatus < 3) m_effUstatus = 3; // error
         }
       }
     }
@@ -233,8 +231,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       if (effV <= m_effEmpty || denV < m_statThreshold) {
         if (m_effVstatus < 1) m_effVstatus = 1;
-      } else if (effV < m_effWarning) {
-        if (effV > m_effError) {
+      } else if (effV + erreffV < m_effWarning) {
+        if (effV > m_effError || effV + erreffV > m_effError) {
           if (m_effVstatus < 2) m_effVstatus = 2;
         } else {
           if (m_effVstatus < 3) m_effVstatus = 3;

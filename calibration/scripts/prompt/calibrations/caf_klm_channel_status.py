@@ -23,7 +23,8 @@ settings = CalibrationSettings(
     expert_username='zhai',
     description=__doc__,
     input_data_formats=['raw'],
-    input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],
+    input_data_names=['raw_physics'],
+    input_data_filters={'raw_physics': ['hadron_calib', 'physics', 'Good']},
     depends_on=[])
 
 ##############################

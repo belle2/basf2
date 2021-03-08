@@ -472,7 +472,7 @@ void PXDUnpackerNewModule::unpack_dhp_v01(void* data, unsigned int frame_len, un
   unsigned int dhp_dhp_id       = 0;
 
   // cppcheck-suppress unreadVariable
-  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  unsigned int dhp_row = 0, dhp_col = 0, dhp_cm = 0;
 //  unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
@@ -648,7 +648,7 @@ void PXDUnpackerNewModule::unpack_dhp_v01(void* data, unsigned int frame_len, un
             }
             m_errorMask |= c_COL_OVERFLOW;
           }
-          dhp_adc = dhp_pix[i] & 0xFF;
+          auto dhp_adc = dhp_pix[i] & 0xFF;
           B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
                   << " CM $" << hex << dhp_cm);
 
@@ -694,7 +694,7 @@ void PXDUnpackerNewModule::unpack_dhp_v10(void* data, unsigned int frame_len, un
   int last_gate = -1; // workaround to recalc a relative frame number
 
   // cppcheck-suppress unreadVariable
-  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  unsigned int dhp_row = 0, dhp_col = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
@@ -874,7 +874,7 @@ void PXDUnpackerNewModule::unpack_dhp_v10(void* data, unsigned int frame_len, un
             }
             m_errorMask |= c_COL_OVERFLOW;
           }
-          dhp_adc = dhp_pix[i] & 0xFF;
+          auto dhp_adc = dhp_pix[i] & 0xFF;
           B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
                   << " CM $" << hex << dhp_cm);
 

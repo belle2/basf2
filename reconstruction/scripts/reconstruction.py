@@ -436,9 +436,7 @@ def add_cdst_output(
     if rawFormat:
         branches += cdst_tracking_objects
         if not mc:
-            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
-                'TRGECLClusters'
-            ]
+            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
         else:
             branches += digits_objects + [
                 'SoftwareTriggerResult',

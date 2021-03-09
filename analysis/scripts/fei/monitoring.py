@@ -144,7 +144,7 @@ class MonitoringHist(object):
     and puts them into a more accessible format.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, dirname):
         """
         Reads histograms from the given file
         @param filename the name of the ROOT file
@@ -162,8 +162,10 @@ class MonitoringHist(object):
             return
 
         f = ROOT.TFile(filename)
+        print(dirname)
+        d = f.Get(Belle2.makeROOTCompatible(dirname))
 
-        for key in f.GetListOfKeys():
+        for key in d.GetListOfKeys():
             name = Belle2.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
@@ -240,7 +242,7 @@ class MonitoringNTuple(object):
     Reads the ntuple named variables from a ROOT file
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, treenameprefix):
         """
         Reads ntuple from the given file
         @param filename the name of the ROOT file
@@ -252,7 +254,7 @@ class MonitoringNTuple(object):
         #: Reference to the ROOT file, so it isn't closed
         self.f = ROOT.TFile(filename)
         #: Reference to the tree named variables inside the ROOT file
-        self.tree = self.f.variables
+        self.tree = self.f.Get(f'{treenameprefix} variables')
         #: Filename so we can use it later
         self.filename = filename
 
@@ -584,30 +586,30 @@ class MonitoringParticle(object):
         self.ignored_channels = {}
 
         for channel in self.particle.channels:
-            hist = MonitoringHist(f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_BeforeRanking.root', f'{channel.label}')
             self.before_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking.root', f'{channel.label}')
             self.after_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_MatchParticleList_AfterVertex_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_MatchParticleList_AfterVertex.root', f'{channel.label}')
             self.after_vertex[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA.root', f'{channel.label}')
             self.after_classifier[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
             if hist.valid and hist.sum(channel.mvaConfig.target) > 0:
                 self.reconstructed_number_of_channels += 1
                 self.ignored_channels[channel.label] = False
             else:
                 self.ignored_channels[channel.label] = True
-            hist = MonitoringHist(f'Monitor_TrainingData_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_TrainingData.root', f'{channel.label}')
             self.training_data[channel.label] = hist
 
         plist = removeJPsiSlash(particle.identifier)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforePostCut_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforePostCut.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction before the postcut
         self.before_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforeRanking_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforeRanking.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction before the ranking postcut
         self.before_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_AfterRanking_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_AfterRanking.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction after the ranking postcut
         self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
         #: Statistic object before unique tagging of signals
@@ -615,7 +617,7 @@ class MonitoringParticle(object):
         #: Statistic object after unique tagging of signals
         self.after_tag = self.calculateUniqueStatistic(hist)
         #: Reference to the final ntuple
-        self.final_ntuple = MonitoringNTuple(f'Monitor_Final_{plist}.root')
+        self.final_ntuple = MonitoringNTuple(f'Monitor_Final.root', f'{plist}')
 
     def calculateStatistic(self, hist, target):
         """

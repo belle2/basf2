@@ -31,68 +31,6 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
-cdst_full_objects = mdst.mdst_objects + [
-    'RecoTracks',
-    'EventT0',
-    'PXDClustersFromTracks',
-    'SVDEventInfo',
-    'SVDShaperDigits',
-    'SVDRecoDigits',
-    'SVDClusters',
-    'CDCDedxTracks',
-    'TOPDigits',
-    'ExtHits',
-    'TOPLikelihoods',
-    'TOPRecBunch',
-    'TOPTimeZeros',
-    'TOPAsicMask',
-    'ECLDigits',
-    'ECLCalDigits',
-    'TRGECLClusters',
-    'TRGECLUnpackerStores',
-    'TRGECLUnpackerEvtStores',
-    'TRGGRLUnpackerStore',
-    'CDCTriggerSegmentHits',
-    'CDCTrigger2DFinderTracks',
-    'CDCTrigger2DFinderClones',
-    'CDCTriggerNNInputSegmentHits',
-    'CDCTriggerNNInput2DFinderTracks',
-    'CDCTriggerNeuroTracks',
-    'CDCTriggerNeuroTracksInput',
-    'CDCTriggerNNInputFinderTracks',
-    'CDCTriggerNNInputBits',
-    'CDCTriggerNNOutputBits',
-    'TRGGDLUnpackerStores',
-    'TRGTOPUnpackerStores',
-    'RecoHitInformations',
-    'RecoHitInformationsToBKLMHit2ds',
-    'TracksToARICHLikelihoods',
-    'TracksToExtHits',
-    'ARICHDigits',
-    'ARICHInfo',
-    'ARICHTracks',
-    'ARICHLikelihoods',
-    'ARICHTracksToExtHits',
-    'SoftwareTriggerVariables',
-    'KLMDigits',
-    'KLMMuidLikelihoods',
-    'TracksToKLMMuidLikelihoods',
-    'BKLMHit1ds',
-    'BKLMHit1dsToKLMDigits',
-    'BKLMHit2ds',
-    'BKLMHit2dsToBKLMHit1ds',
-    'EKLMAlignmentHits',
-    'EKLMHit2ds',
-    'EKLMHit2dsToKLMDigits',
-    'TracksToBKLMHit2ds',
-    'TracksToEKLMHit2ds',
-    'SVDShaperDigitsFromTracks',
-    'TRGGDLUnpackerStores',
-    'VXDDedxTracks',
-    'VXDDedxLikelihoods',
-]
-
-
 cdst_tracking_objects = [
     'RecoTracks',
     'Tracks',
@@ -508,7 +446,10 @@ def add_cdst_output(
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
             basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
     else:
-        branches += cdst_full_objects
+        if not additionalBranches:
+            B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
+                      'This is equivalent to calling add_mdst_output().')
+        branches += mdst.mdst_objects
 
     if dataDescription is None:
         dataDescription = {}

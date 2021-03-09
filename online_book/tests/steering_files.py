@@ -9,6 +9,7 @@ import sys
 import subprocess
 import unittest
 import glob
+from typing import Optional, List
 
 # basf2
 from basf2 import find_file
@@ -18,23 +19,32 @@ from b2test_utils import clean_working_directory
 class SteeringFileTest(unittest.TestCase):
     """ Test steering files """
 
-    def _test_examples_dir(self, path_to_glob, broken=None, additional_arguments=None):
+    def _test_examples_dir(
+        self,
+        path_to_glob: str,
+        broken: Optional[List[str]] = None,
+        additional_arguments: Optional[List[str]] = None,
+        change_working_directory=True,
+    ):
         """
         Internal function to test a directory full of example scripts with an
         optional list of broken scripts to be skipped.
 
         Parameters:
-            path_to_glob (str): the path to search for scripts
+            path_to_glob (str): the path to a directory to search for python
+                scripts (must end in .py)
             broken (list(str)): (optional) scripts that are known to be broken
                 and can be skipped
             additional_arguments (list(str)): (optional) additional arguments
                 for basf2 to be passed when testing the scripts
+            change_working_directory: Change to path_to_glob for execution
         """
         if additional_arguments is None:
             additional_arguments = []
         if broken is None:
             broken = []
-        all_egs = sorted(glob.glob(find_file(path_to_glob) + "/*.py"))
+        working_dir = find_file(path_to_glob)
+        all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
             if filename not in broken:
@@ -43,6 +53,7 @@ class SteeringFileTest(unittest.TestCase):
                         ["basf2", "-n1", eg, *additional_arguments],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
+                        cwd=working_dir,
                     )
                     if result.returncode != 0:
                         # failure running example so let's print the output
@@ -55,9 +66,13 @@ class SteeringFileTest(unittest.TestCase):
     #   files to the examples/validation directory
     @unittest.skipIf(
         not os.path.exists(
-            find_file("starterkit/2021/1111540100_eph3_BGx0_1.root", "examples", silent=True)
+            find_file(
+                "starterkit/2021/1111540100_eph3_BGx0_1.root",
+                "examples",
+                silent=True,
+            )
         ),
-        "Test data files not found."
+        "Test data files not found.",
     )
     def test_lessons_1_to_5(self):
         """Test lesson on basf2 basics."""

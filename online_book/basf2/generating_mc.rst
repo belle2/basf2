@@ -271,7 +271,7 @@ Looking at this simple decay file, it is not difficult to understand its structu
   defining a decay channel must end with a ``;``;
 
 * a decay channel is fully identified by: its branching fraction (``1.0`` in all the cases above), its final state
-  (for the ``B0`` case it is ``Jpsi K_S0``) and the `EvtGen decay model`_ that we want to use for that specific
+  (for the ``B0`` case it is ``J/psi K_S0``) and the `EvtGen decay model`_ that we want to use for that specific
   final state; in this case we used several models: ``VSS_BMIX dm`` is a model for vector particles decaying into two
   scalars in which the :math:`B^0` / :math:`\bar{B}^0` mesons mixing is turned on, ``VLL`` is a model for vector
   particles decaying into two leptons, while ``PHSP`` is a simple phase space decay model.

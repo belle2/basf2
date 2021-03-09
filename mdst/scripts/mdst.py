@@ -5,7 +5,7 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 from ROOT.Belle2 import Const
 
 
-mdst_objects = [
+MDST_OBJECTS = (
     'ECLClusters',
     'ECLClustersToTracksNamedBremsstrahlung',
     'EventLevelClusteringInfo',
@@ -18,7 +18,7 @@ mdst_objects = [
     'Tracks',
     'TRGSummary',
     'V0s',
-]
+)
 
 
 def add_mdst_output(
@@ -40,7 +40,7 @@ def add_mdst_output(
         dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
-    branches = mdst_objects
+    branches = list(MDST_OBJECTS)
     persistentBranches = ['FileMetaData']
     if mc:
         branches += ['MCParticles']

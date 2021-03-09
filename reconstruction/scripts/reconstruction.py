@@ -31,7 +31,7 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
-cdst_tracking_objects = [
+CDST_TRACKING_OBJECTS = (
     'RecoTracks',
     'Tracks',
     'V0s',
@@ -43,10 +43,10 @@ cdst_tracking_objects = [
     'VXDDedxTracks',
     'CDCDedxLikelihoods',
     'VXDDedxLikelihoods'
-]
+)
 
 
-digits_objects = [
+DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
@@ -55,7 +55,7 @@ digits_objects = [
     'SVDEventInfoSim',
     'SVDShaperDigits',
     'TOPRawDigits'
-]
+)
 
 
 def default_event_abort(module, condition, error_flag):
@@ -434,11 +434,11 @@ def add_cdst_output(
     persistentBranches = ['FileMetaData']
 
     if rawFormat:
-        branches += cdst_tracking_objects
+        branches += list(CDST_TRACKING_OBJECTS)
         if not mc:
             branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
         else:
-            branches += digits_objects + [
+            branches += list(DIGITS_OBJECTS) + [
                 'SoftwareTriggerResult',
                 'TRGSummary']
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
@@ -447,7 +447,7 @@ def add_cdst_output(
         if not additionalBranches:
             B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
                       'This is equivalent to calling add_mdst_output().')
-        branches += mdst.mdst_objects
+        branches += list(mdst.MDST_OBJECTS)
 
     if dataDescription is None:
         dataDescription = {}

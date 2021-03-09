@@ -29,7 +29,7 @@ def create_digits():
         'RootOutput',
         outputFileName='${BELLE2_LOCAL_DIR}/' +
         path_to_output,
-        branchNames=rec.digits_objects)
+        branchNames=list(rec.DIGITS_OBJECTS))
     child_path.add_module('Progress')
     b2.process(child_path)
     print(b2.statistics)

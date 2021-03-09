@@ -507,7 +507,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyV->SetBinContent(bin, onlineOccV);
 
-      for (int b = 0; b < htmp->GetNbinsX() + 1; b++) {
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
@@ -545,7 +545,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyU->SetBinContent(bin, onlineOccU);
 
-      for (int b = 0; b < htmp->GetNbinsX() + 1; b++) {
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");

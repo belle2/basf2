@@ -117,7 +117,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             mg.Add(graphs[6])
 
             mg.Draw("ap")
-            mg.GetXaxis().SetTitle('Exp. 12 -- Run number')
+            mg.GetXaxis().SetTitle(f'Exp. {exp} -- Run number')
             mg.GetYaxis().SetTitle('fraction of masked channels')
             leg.Draw()
             ROOT.gPad.SetGridx()

@@ -163,8 +163,10 @@ namespace Belle2 {
           if (m_debug) febHead.print();
 
           if (/*febHead.type != head.type ||*/ febHead.version != head.version || febHead.mergerID != head.mergerID
-                                               || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in header " << LogVar("FEB ID", (unsigned)febHead.FEBSlot) <<
-                                                     " not consistent with data in header " << LogVar("merger ID", (unsigned)head.mergerID));
+                                               || febHead.trigger != head.trigger) {
+            B2ERROR("ARICHUnpackerModule: data in header " << LogVar("FEB ID", (unsigned)febHead.FEBSlot) <<
+                    " not consistent with data in header " << LogVar("merger ID", (unsigned)head.mergerID)); break;
+          }
 
           // feb header shift
           ibyte += ARICHFEB_HEADER_SIZE;

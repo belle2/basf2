@@ -76,8 +76,10 @@ class SteeringFileTest(unittest.TestCase):
     )
     def test_lessons_1_to_5(self):
         """Test lesson on basf2 basics."""
+        # Pass 1 for a potentially expected first argument (file number) and
+        # -n 10 for e.g. the "generating MC" lesson
         self._test_examples_dir(
-            "online_book/basf2/steering_files", additional_arguments=["1"]
+            "online_book/basf2/steering_files", additional_arguments=["1", "-n", "10"]
         )
 
 

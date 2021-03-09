@@ -204,10 +204,10 @@ class SVDValidationTTreeCluster(b2.Module):
                     self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
                     self.data.truehit_time = truehit.getGlobalTime()
                     #
-                    self.data.eventt0_all = -50
-                    self.data.eventt0_top = -50
-                    self.data.eventt0_cdc = -30
-                    self.data.eventt0_ecl = -60
+                    self.data.eventt0_all = -1
+                    self.data.eventt0_top = -1
+                    self.data.eventt0_cdc = -1
+                    self.data.eventt0_ecl = -1
                     top = Belle2.Const.DetectorSet(Belle2.Const.EDetector.TOP)
                     cdc = Belle2.Const.DetectorSet(Belle2.Const.EDetector.CDC)
                     ecl = Belle2.Const.DetectorSet(Belle2.Const.EDetector.ECL)

@@ -13,6 +13,8 @@
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <TVector3.h>
 #include <TDatabasePDG.h>
 
@@ -87,7 +89,7 @@ void InclusiveDstarReconstructionModule::initialize()
   */
   int d_pdg_code = 0;
   if (abs(m_dstar_pdg_code) == 413) {
-    d_pdg_code = (pion_pdg_code == 111) ? 411 : 421;
+    d_pdg_code = (pion_pdg_code == Const::pi0.getPDGCode()) ? 411 : 421;
   } else {
     d_pdg_code = 421;
   }
@@ -170,11 +172,11 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
 bool InclusiveDstarReconstructionModule::pionCompatibleWithDstar(int pion_pdg_code)
 {
   bool is_compatible = false;
-  if (pion_pdg_code == 111) {
+  if (pion_pdg_code == Const::pi0.getPDGCode()) {
     is_compatible = true;
-  } else if (pion_pdg_code == 211) {
+  } else if (pion_pdg_code == Const::pion.getPDGCode()) {
     is_compatible = (m_dstar_pdg_code == 413);
-  } else if (pion_pdg_code == -211) {
+  } else if (pion_pdg_code == -Const::pion.getPDGCode()) {
     is_compatible = (m_dstar_pdg_code == -413);
   }
   return is_compatible;

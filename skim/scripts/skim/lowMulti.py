@@ -220,11 +220,11 @@ class SingleTagPseudoScalar(BaseSkim):
 
         particles = [
             f"pi0:{label}_highE",
-            f"eta:gg",
-            f"eta:pipipi0",
-            f"eta:pipig",
-            f"eta':pipieta_gg",
-            f"eta':pipig"
+            "eta:gg",
+            "eta:pipipi0",
+            "eta:pipig",
+            "eta':pipieta_gg",
+            "eta':pipig"
         ]
         ModeSum = " + ".join(f"nParticlesInList({particle})" for particle in particles)
         presel = f"nParticlesInList(e+:{label}) == 1 and nParticlesInList(pi+:{label}) <= 2"

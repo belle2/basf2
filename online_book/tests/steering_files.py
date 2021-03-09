@@ -55,8 +55,7 @@ class SteeringFileTest(unittest.TestCase):
     #   files to the examples/validation directory
     @unittest.skipIf(
         not os.path.exists(
-            "/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/"
-            "1111540100_eph3_BGx0_1.root"
+            find_file("starterkit/2021/1111540100_eph3_BGx0_1.root", "examples", silent=True)
         ),
         "Test data files not found."
     )

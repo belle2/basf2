@@ -9,8 +9,7 @@
 
 import basf2
 from caf.framework import Calibration, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun, SequentialBoundaries
-from ROOT import Belle2
+from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
 from math import ceil
 

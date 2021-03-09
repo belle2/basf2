@@ -965,7 +965,7 @@ Good luck.
     `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

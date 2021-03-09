@@ -15,7 +15,7 @@ def command_local(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of Local backend")
+    B2INFO("Requested use of Local backend")
     backend = Local(max_processes=args.max_processes, backend_args=backend_args)
     return backend
 
@@ -29,7 +29,7 @@ def command_lsf(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of LSF backend")
+    B2INFO("Requested use of LSF backend")
     command_line_backend_args = {"queue": args.queue}
     # If any backend_args are None then they shouldn't overwrite
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
@@ -51,7 +51,7 @@ def command_pbs(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of PBS backend")
+    B2INFO("Requested use of PBS backend")
     command_line_backend_args = {"queue": args.queue}
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
@@ -72,7 +72,7 @@ def command_condor(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of HTCondor backend")
+    B2INFO("Requested use of HTCondor backend")
     command_line_backend_args = {
                                  "universe": args.universe,
                                  "getenv": args.getenv,
@@ -200,7 +200,7 @@ def add_backends_subparsers(parser, default_max_processes=4,
 
     condor_parser.add_argument("--getenv", dest="getenv", metavar="",
                                help=("Should jobs inherit the submitting environment (doesn't always work as expected)."
-                                     f" e.g. false"))
+                                     " e.g. false"))
 
     condor_parser.add_argument("--universe", dest="universe", metavar="",
                                help=("Jobs should be submitted using this univese."

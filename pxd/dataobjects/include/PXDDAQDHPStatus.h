@@ -33,7 +33,10 @@ namespace Belle2 {
      * @param chipid DHP chip id (2 bit)
      * @param fn (absolute) Readout Frame Number, lower 16 bits only
      */
-    PXDDAQDHPStatus(uint8_t chipid, uint16_t fn) : m_chipID(chipid), m_frameNr(fn) {}
+    explicit PXDDAQDHPStatus(uint8_t chipid, uint16_t fn) : m_chipID(chipid), m_frameNr(fn) {}
+
+    /** destructor */
+    virtual ~PXDDAQDHPStatus() {};
 
     /** Set Chip ID of DHP */
     void setChipID(uint8_t chipid) { m_chipID = chipid;};

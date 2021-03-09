@@ -30,13 +30,13 @@
 
 using namespace Belle2;
 
-#define ONLINE 0
-//#define ONLINE 1
+//#define ONLINE 0
+#define ONLINE 1
 //#define ONLINE 2    //end of exp12 for MC14
 
 
 /* common for setalg, setinputbits, setftdlbits */
-const int N_FTD_VERS = 19;
+const int N_FTD_VERS = 21;
 const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end run
   0,  0,     6,   -1, //  0
   7,  0,     7, 2102, //  1 11
@@ -47,20 +47,21 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   8,  1286,  8, 1505, //  6 14 gdl0070p2
   8,  1506,  8, 2043, //  7 15 gdl0070r
   8,  2044,  8, 2782, //  8 16 +{tsf[12]b2b,sl[12]b2b,sl12b2b}
-  8,  2783,  8,   -1, //  9 17 +{t_a(4),ecl_bst,a,aa,aao,aab,aaao,aaa,eclbst}
+  8,  2783, 10,  134, //  9 17 +{t_a(4),ecl_bst,a,aa,aao,aab,aaao,aaa,eclbst}
   10, 135,  10, 2539, // 10 22 +{ecl_lml_13,ecl_lml_12,injv,hade,vetout}, -ecl_lml_11
   10, 2540, 10, 4600, // 11 23 {t_a,ecl_bst,ecl_3dbha,injv,tsf[12]b2b,ecl_lml_13} moved,
-  //      +{s2[sf][35o],grl{gg,bb}} -nimin[23], #klm  reduced
   10, 4601, 12, 1659, // 12 24 o and b for short trk chged to s2[sf][o5]
   12, 1660, 12, 1858, // 13 25 +{bff,bhie}
   12, 1859, 13,   -1, // 14 26 trk req removed from mu_pair
   14,    0, 14,  637, // 15 29
   14,  638, 14, 1952, // 16 30
   14, 1953, 14, 2040, // 17 32
-  14, 2041, -1,   -1  // 18 33
+  14, 2041, 16,   20, // 18 33
+  16,   21, 16,  183, // 19 34
+  16,  184, -1,   -1  // 20 35
 };
 const int ftd_version[] = {
-  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30, 32, 33
+  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29, 30, 32, 33, 34, 35
 };
 
 
@@ -82,12 +83,12 @@ void setprescale()
     3, 2001,  3, 2313,
     3, 2314,  3, 3503,
     3, 3504,  3, 5340,
-    3, 5341,  3, -1,
+    3, 5341,  7,  919,
     7,  920,  7, 1371,
     7, 1372,  7, 1478,
     7, 1479,  7, 3215,
     7, 3216,  8, 1201,
-    8, 1202,  8, -1,    // fffo:0->1, ftd unchanged.
+    8, 1202,  10, 3128,    // fffo:0->1, ftd unchanged.
     10, 3129, 10, 3130,
     10, 3131, 10, 3436,
     10, 3437, 10, 3442,
@@ -102,7 +103,7 @@ void setprescale()
     12, 2134, 12, 2334,
     12, 2335, 12, 2719,
     12, 2720, 12, 6372,
-    12, 6373, 12,   -1,
+    12, 6373, 13,   -1,
     14,    0, 14,  639,
     14,  640, 14,  648,
     14,  649, 14,  784,
@@ -491,6 +492,9 @@ void setftdlbits()
       std::ifstream isinp(logname, std::ios::in);
       std::string str;
       int j = 0;
+      if (i == N_FTD_VERS - 1) {
+        printf("i(%d), logname(%s)\n", i, logname);
+      }
       while (std::getline(isinp, str)) {
         int bitnum;
         std::string bitname;
@@ -498,6 +502,10 @@ void setftdlbits()
         strS >> bitnum >> bitname;
         ftdlbits->setoutbitname(j, bitname.data());
         ++j;
+        if (i == N_FTD_VERS - 1) {
+          printf("i(%d), j(%d), bitname(%s), str(%s)\n",
+                 i, j, bitname.c_str(), str.c_str());
+        }
       }
       isinp.close();
       ftdlbits->setnoutbit(j);
@@ -613,7 +621,7 @@ void setunpacker()
     5,    1, 6,   -1,
     7,    0, 7, 1560,
     7, 1561, 7, 2102,
-    7, 2103, 10,  -1,
+    7, 2103, 11,  -1,
     12,   0, 13, 500,
     13, 501, -1,  -1 //14,[15]
   };
@@ -1944,7 +1952,7 @@ void setdelay()
     3, 5557, 3, 5592,
     3, 5594, 3, 5869,
     3, 5870, 3, 5959,
-    3, 5975, -1,   0
+    3, 5975, -1,  -1
   };
 
   const int data_num[N_DELAY_ARRAY] = {

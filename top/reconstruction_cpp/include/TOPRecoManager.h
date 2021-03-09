@@ -19,6 +19,7 @@
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dataobjects/TOPAsicMask.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <vector>
 
@@ -76,22 +77,19 @@ namespace Belle2 {
        * Returns time window lower edge
        * @return time window lower edge
        */
-      static double getMinTime() {return getInstance().m_minTime;}
+      static double getMinTime() {return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMin();}
 
       /**
        * Returns time window upper edge
        * @return time window upper edge
        */
-      static double getMaxTime() {return getInstance().m_maxTime;}
+      static double getMaxTime() {return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMax();}
 
       /**
        * Returns size of time window
        * @return size of time window
        */
-      static double getTimeWindowSize()
-      {
-        return getInstance().m_maxTime - getInstance().m_minTime;
-      }
+      static double getTimeWindowSize() {return getMaxTime() - getMinTime();}
 
       /**
        * Sets channel masks
@@ -164,8 +162,6 @@ namespace Belle2 {
       std::vector<FastRaytracer> m_fastRaytracers; /**< collection of fast raytracers */
       std::vector<YScanner> m_yScanners; /**< collection of y-scanners */
       std::vector<BackgroundPDF> m_backgroundPDFs; /**< collection of background PDF's */
-      double m_minTime = 0; /**< time window lower edge */
-      double m_maxTime = 0; /**< time window upper edge */
       bool m_redoBkg = false; /**< flag to signal whether backgroundPDF has to be redone */
 
     };

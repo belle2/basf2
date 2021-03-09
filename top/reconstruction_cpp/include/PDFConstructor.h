@@ -239,6 +239,16 @@ namespace Belle2 {
     private:
 
       /**
+       * Solution of inverse raytracing in prism
+       */
+      struct PrismSolution {
+        double len = 0;    /**< propagation length */
+        double L = 0;      /**< emission position distance along particle trajectory */
+        double cosFic = 0; /**< cosine of azimuthal Cerenkov angle */
+        double sinFic = 0; /**< sine of azimuthal Cerenkov angle */
+      };
+
+      /**
        * Structure that enables defining a template function: direct photons
        */
       struct InverseRaytracerDirect {
@@ -323,6 +333,11 @@ namespace Belle2 {
        * Sets signal PDF for reflected photons
        */
       void setSignalPDF_reflected();
+
+      /**
+       * Sets signal PDF for track crossing prism
+       */
+      void setSignalPDF_prism();
 
       /**
        * Sets signal PDF for reflected photons at given reflection number
@@ -415,6 +430,33 @@ namespace Belle2 {
       double derivativeOfReflectedX(double x, double xe, double ze, double zd) const;
 
       /**
+       * Do forward raytracing of inverse raytracing solution in prism
+       * @param sol solution of inverse raytracing in prism
+       * @param dL step in length along trajectory for derivative calculation
+       * @param dFic step in Cherenkov azimuthal angle for derivative calculation
+       * @param de step in photon energy for derivative calculation
+       * @return true on success
+       */
+      bool prismRaytrace(const PrismSolution& sol, double dL = 0, double dFic = 0, double de = 0);
+
+      /**
+       * General solution of inverse raytracing in prism: iterative procedure calling basic solution
+       * @param pixel pixel data
+       * @param k index of unfolded prism exit window
+       * @param nx number of reflections in x
+       * @return solution
+       */
+      PrismSolution prismSolution(const PixelPositions::PixelData& pixel, unsigned k, int nx);
+
+      /**
+       * Basic solution of inverse raytracing in prism: assuming straight line particle trajectory
+       * @param rD unfolded pixel position
+       * @param L emission position distance along particle trajectory
+       * @return solution
+       */
+      PrismSolution prismSolution(const TVector3& rD, double L);
+
+      /**
        * Returns the value of PDF normalized to the number of expected photons.
        * @param pixelID pixel ID
        * @param time photon hit time
@@ -457,6 +499,7 @@ namespace Belle2 {
       EStoreOption m_storeOption = c_Reduced; /**< signal PDF storing option */
       bool m_valid = false; /**< cross-check flag, true if track is valid and all the pointers above are valid */
 
+      double m_beta = 0; /**< particle hypothesis beta */
       double m_tof = 0; /**< time-of-flight from IP to average photon emission position */
       double m_groupIndex = 0; /**< group refractive index at mean photon energy */
       double m_groupIndexDerivative = 0; /**< derivative (dn_g/dE) of group refractive index at mean photon energy */
@@ -509,9 +552,8 @@ namespace Belle2 {
 
     inline double PDFConstructor::getCosCerenkovAngle(double E) const
     {
-      double beta = m_yScanner->getBeta();
       double refind = TOPGeometryPar::Instance()->getPhaseIndex(E);
-      return std::min(1 / beta / refind, 1.0);
+      return std::min(1 / m_beta / refind, 1.0);
     }
 
     inline const InverseRaytracer::CerenkovAngle& PDFConstructor::cerenkovAngle(double dE)

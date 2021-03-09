@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/reconstruction_cpp/TOPRecoManager.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -30,10 +29,6 @@ namespace Belle2 {
         m_fastRaytracers.push_back(FastRaytracer(moduleID));
         m_backgroundPDFs.push_back(BackgroundPDF(moduleID));
       }
-      const auto& tdc = geo->getNominalTDC();
-      m_minTime = tdc.getTimeMin();
-      m_maxTime = tdc.getTimeMax();
-      B2INFO("TOPRecoManager: time window = [" << m_minTime << ",  " << m_maxTime << "] ns");
     }
 
     const InverseRaytracer* TOPRecoManager::getInverseRaytracer(int moduleID)

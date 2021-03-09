@@ -80,6 +80,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
+      m_cosx = abs(m_kx);
+      m_cosy = abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_BarSegment;
@@ -106,6 +108,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
+      m_cosx = abs(m_kx);
+      m_cosy = abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_MirrorSegment;
@@ -170,6 +174,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
+      m_cosx = abs(m_kx);
+      m_cosy = abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_MirrorSegment;
@@ -241,21 +247,26 @@ namespace Belle2 {
 
       m_status = false;
 
+      m_cosx = abs(m_kx);
       m_A = prism.A;
       m_B = prism.yUp - prism.yDown;
       m_y0 = (prism.yUp + prism.yDown) / 2;
       m_type = c_Prism;
 
-      if (m_kz > 0) return;
-
+      if (m_kz > 0) {
+        if (m_z >= prism.zR or abs(m_ky / m_kz) < abs(prism.slope)) return;
+        if (abs(m_y + m_ky / m_kz * (prism.zR - m_z)) < prism.B / 2) return;
+      }
       double ky_in = m_ky;
       double kz_in = m_kz;
 
       if (m_z > prism.zFlat) {
 
         int step = 1;
+        int ii = 0;
         if (m_ky < 0) {
           step = -1;
+          ii = 1;
           m_y = std::min(m_y, prism.yUp);
         }
 
@@ -265,6 +276,7 @@ namespace Belle2 {
           double s = m_ky * win.sz - m_kz * win.sy;
           if (s == 0) {
             k += step;
+            ii = (ii + 1) % 2;
             continue;
           }
           double len = ((win.y0 - m_y) * win.sz - (win.z0 - m_z) * win.sy) / s;
@@ -286,7 +298,9 @@ namespace Belle2 {
             m_propLen += len;
             goto success;
           }
+          m_cosy = std::max(m_cosy, abs(ky_in * win.nsy[ii] + kz_in * win.nsz[ii]));
           k += step;
+          ii = (ii + 1) % 2;
         }
         B2WARNING("PhotonState::propagate: unfolded prism window not found"
                   << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown)

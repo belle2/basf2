@@ -43,13 +43,19 @@ namespace Belle2 {
       double z0 = 0; /**< window origin in z */
       double sy = 0; /**< window surface direction in y */
       double sz = 0; /**< window surface direction in z */
+      double ny = 0; /**< normal to window surface, y component */
+      double nz = 0; /**< normal to window surface, z component */
+      double nsy[2] = {0, 0}; /** normals to upper [0] and slanted [1] surfaces, y component */
+      double nsz[2] = {0, 0}; /** normals to upper [0] and slanted [1] surfaces, z component */
 
       /**
        * constructor
        * @param orig window origin
-       * @param dir window surface direction
+       * @param dir window surface direction (= upper surface normal)
+       * @param norm window surface normal (pointing out of prism)
+       * @param slanted slanted surface normal
        */
-      UnfoldedWindow(const TVector2& orig, const TVector2& dir);
+      UnfoldedWindow(const TVector2& orig, const TVector2& dir, const TVector2& norm, const TVector2& slanted);
     };
 
 
@@ -255,11 +261,13 @@ namespace Belle2 {
      * @param normals normals of upper and slanted surfaces
      * @param orig origin of exit window
      * @param surf exit window surface direction
+     * @param norm exit window surface normal
+     * @param slanted slanted surface normal
      * @param k index of the surface to start unfolding (0 or 1)
      * @param result the result of unfolding
      */
     void reflect(const TVector2* points, const TVector2* normals,
-                 const TVector2& orig, const TVector2& surf, int k,
+                 const TVector2& orig, const TVector2& surf, const TVector2& norm, const TVector2& slanted, int k,
                  std::vector<UnfoldedWindow>& result) const;
 
     float m_exitThickness = 0; /**< thickness at PMT side */

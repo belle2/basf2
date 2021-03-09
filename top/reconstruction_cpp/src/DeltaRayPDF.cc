@@ -32,6 +32,8 @@ namespace Belle2 {
         return;
       }
 
+      m_pixelPositions = &(yScanner->getPixelPositions());
+
       m_zD = yScanner->getPrism().zD;
       m_zM = yScanner->getBars().back().zR;
       double meanE = yScanner->getMeanEnergyBeta1();
@@ -64,10 +66,13 @@ namespace Belle2 {
 
     void DeltaRayPDF::prepare(const TOPTrack& track, const Const::ChargedStable& hypothesis)
     {
-      double z = track.getEmissionPoint().position.Z();
-      m_dirFrac = directFraction(z);
-      m_dirT0 = (z - m_zD) * m_groupIndex / Const::speedOfLight;
-      m_reflT0 = (2 * m_zM - m_zD - z) * m_groupIndex / Const::speedOfLight;
+      const auto& emi = track.getEmissionPoint().position;
+      m_xE = emi.X();
+      m_yE = emi.Y();
+      m_zE = emi.Z();
+      m_dirFrac = directFraction(m_zE);
+      m_dirT0 = (m_zE - m_zD) * m_groupIndex / Const::speedOfLight;
+      m_reflT0 = (2 * m_zM - m_zD - m_zE) * m_groupIndex / Const::speedOfLight;
       m_TOF = track.getTOF(hypothesis);
 
       if (m_dirT0 < 0) {
@@ -89,6 +94,17 @@ namespace Belle2 {
       double relEffi = m_background->getEfficiency();
       m_fraction = totalFraction(tmin, tmax);
       m_numPhotons = photonYield(beta, PDGCode) * tlen * m_fraction * relEffi;
+
+      for (const auto& pixel : m_pixelPositions->getPixels()) {
+        double dfi_dx = abs(m_zD - m_zE) / (pow(pixel.xc - m_xE, 2) + pow(pixel.yc - m_yE, 2) + pow(m_zD - m_zE, 2));
+        m_pixelAcceptances.push_back(dfi_dx * pixel.Dx);
+      }
+      double sum = 0;
+      const auto& pixelPDF = m_background->getPDF();
+      for (size_t k = 0; k < m_pixelAcceptances.size(); k++) {
+        sum += m_pixelAcceptances[k] * pixelPDF[k];
+      }
+      for (auto& x : m_pixelAcceptances) x /= sum;
     }
 
     double DeltaRayPDF::getPDFValue(int pixelID, double time) const
@@ -96,7 +112,10 @@ namespace Belle2 {
       const auto& pixelPDF = m_background->getPDF();
       unsigned k = pixelID - 1;
       if (k < pixelPDF.size()) {
-        return getPDFValue(time) * pixelPDF[k];
+        const auto& pixel = m_pixelPositions->get(pixelID);
+        double t0 = sqrt(pow(pixel.xc - m_xE, 2) + pow(pixel.yc - m_yE, 2) + pow(m_zD - m_zE, 2))
+                    * m_groupIndex / Const::speedOfLight;
+        return getPDFValue(time, t0 - m_dirT0, m_pixelAcceptances[k]) * pixelPDF[k];
       }
       return 0;
     }

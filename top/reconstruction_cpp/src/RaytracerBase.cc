@@ -63,6 +63,7 @@ namespace Belle2 {
       double cookieThickness = pmtArray.getCookieThickness();
       double pmtWindow = pmtArray.getPMT().getWinThickness();
       zD = zL - filterThickness - cookieThickness - pmtWindow;
+      slope = (-B / 2 - yDown) / (zR - zFlat);
 
       k0 = prism.getK0();
       unfoldedWindows = prism.getUnfoldedWindows();

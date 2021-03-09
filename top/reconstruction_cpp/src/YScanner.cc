@@ -131,7 +131,7 @@ namespace Belle2 {
 
       // set number of Cerenkov photons per azimuthal angle
 
-      m_numPhotons = 370 * area * length / (2 * M_PI);
+      m_numPhotons = 370 * area / (2 * M_PI);
 
       // set photon energy distribution convoluted with multiple scattering
 
@@ -385,16 +385,9 @@ namespace Belle2 {
     double YScanner::prismEntranceY(double y, int k, double dydz) const
     {
       const auto& win = m_prism.unfoldedWindows[k];
-      double z1 = y * win.sz + win.z0;
-      double y1 = y * win.sy + win.y0;
-      double dz = (m_prism.zD - m_prism.zFlat);
-      if ((k - m_prism.k0) % 2 == 0) {
-        z1 += win.sy * dz;
-        y1 -= win.sz * dz;
-      } else {
-        z1 -= win.sy * dz;
-        y1 += win.sz * dz;
-      }
+      double dz = abs(m_prism.zD - m_prism.zFlat);
+      double z1 = y * win.sz + win.z0 + win.nz * dz;
+      double y1 = y * win.sy + win.y0 + win.ny * dz;
       return y1 + dydz * (m_prism.zR - z1);
     }
 

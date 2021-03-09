@@ -11,6 +11,7 @@
 #pragma once
 
 #include <top/reconstruction_cpp/BackgroundPDF.h>
+#include <top/reconstruction_cpp/PixelPositions.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <vector>
 #include <cmath>
@@ -67,9 +68,11 @@ namespace Belle2 {
       /**
        * Returns PDF value at given time and integrated over all pixels
        * @param time photon hit time
+       * @param dt0 direct peak position correction
+       * @param acc acceptance correction factor for direct peak
        * @return PDF value (projection to time axis)
        */
-      double getPDFValue(double time) const;
+      double getPDFValue(double time, double dt0 = 0, double acc = 1) const;
 
       /**
        * Returns integral of PDF from minTime to maxTime
@@ -155,6 +158,7 @@ namespace Belle2 {
       // variables set in constructor (slot dependent)
       int m_moduleID; /**< slot ID */
       const BackgroundPDF* m_background = 0; /**< background PDF */
+      const PixelPositions* m_pixelPositions = 0; /**< pixel positions */
       double m_zD = 0; /**< detector (photo-cathode) position in z */
       double m_zM = 0; /**< spherical mirror position in z */
       double m_phaseIndex = 0; /**< phase refractive index */
@@ -165,12 +169,16 @@ namespace Belle2 {
       std::vector<GausXY> m_tableGaus; /**< table of normal (Gaussian) distribution */
 
       // variables set in prepare method (track/hypothesis dependent)
+      double m_xE;  /**< average photon emission position in x */
+      double m_yE;  /**< average photon emission position in y */
+      double m_zE;  /**< average photon emission position in z */
       double m_dirFrac = 0; /**< fraction of direct photons */
       double m_dirT0 = 0;   /**< minimal propagation time of direct photons */
       double m_reflT0 = 0;  /**< minimal propagation time of reflected photons */
       double m_TOF = 0;     /**< time-of-flight of particle */
       double m_fraction = 0; /**< fraction of delta-ray photons within time window */
       double m_numPhotons = 0; /**< number of photons */
+      std::vector<double> m_pixelAcceptances; /** pixel angular acceptances for direct peak (index = pixelID - 1) */
 
     };
 
@@ -192,10 +200,10 @@ namespace Belle2 {
       return angularDistr(t0 / t) / m_angularNorm * t0 / pow(t, 2);
     }
 
-    inline double DeltaRayPDF::getPDFValue(double time) const
+    inline double DeltaRayPDF::getPDFValue(double time, double dt0, double acc) const
     {
       double t = time - m_TOF;
-      double pdfDirect = smearedTimeDistr(t, m_dirT0);
+      double pdfDirect = smearedTimeDistr(t, m_dirT0 + dt0) * acc;
       double pdfReflec = smearedTimeDistr(t, m_reflT0);
       return m_dirFrac * pdfDirect + (1 - m_dirFrac) * pdfReflec;
     }

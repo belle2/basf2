@@ -74,6 +74,7 @@ namespace Belle2 {
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
       for (size_t i = 0; i < m_pixels.size(); i++) {
         int pixelID = i + 1;
+        m_pixels[i].ID = pixelID;
         int pmtID = mapper.getPmtID(pixelID);
         m_pixels[i].pmtType = TOPGeometryPar::Instance()->getPMTType(moduleID, pmtID);
       }

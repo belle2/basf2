@@ -116,13 +116,19 @@ namespace Belle2 {
 
       // selected photon hits mapped to pixel columns
 
-      unsigned numCols = TOPRecoManager::getYScanner(m_moduleID)->getPixelPositions().getNumPixelColumns();
+      const auto* yScanner = TOPRecoManager::getYScanner(m_moduleID);
+      if (not yScanner) {
+        B2ERROR("TOP::TOPTrack: YScanner for given module not found (must be a bug!)" << LogVar("slot", m_moduleID));
+        m_valid = false;
+        return;
+      }
+      unsigned numCols = yScanner->getPixelPositions().getNumPixelColumns();
       for (const auto& hit : m_selectedHits) {
         unsigned col = (hit.pixelID - 1) % numCols;
         m_columnHits.emplace(col, &hit);
       }
 
-      m_valid = effi > 0; // no sense to provide PID for this track if the module is fully inefficient
+      m_valid = effi > 0; // no sense to provide PID for this track since the module is fully inefficient
     }
 
 
@@ -248,8 +254,6 @@ namespace Belle2 {
       points.push_back(rotation * TVector3(prism.A / 2, 0, 0) + translation); // right-side surface
       normals.push_back(rotation * TVector3(1, 0, 0));
 
-      double slantedSlope = (prism.yDown + prism.B / 2) / (prism.zFlat - prism.zR);
-
       for (size_t i = 0; i < 2; i++) {
         if (positions[i].Z() < prism.zR) {
           double t = m_helix.getDistanceToPlane(points[i], normals[i]);
@@ -263,7 +267,7 @@ namespace Belle2 {
             for (int iter = 0; iter < 20; iter++) {
               t = (t1 + t2) / 2;
               r = m_helix.getPosition(t);
-              double ySlanted = prism.yDown + slantedSlope * (r.Z() - prism.zFlat);
+              double ySlanted = prism.yDown + prism.slope * (r.Z() - prism.zFlat);
               if (r.Y() < ySlanted) t2 = t;
               else t1 = t;
             }
@@ -276,7 +280,7 @@ namespace Belle2 {
             r = m_helix.getPosition(t);
             if (r.Z() < prism.zR) { // yes, it's on the prism side
               if (r.Y() > prism.yUp or r.Y() < prism.yDown) return false;
-              double ySlanted = prism.yDown + slantedSlope * (r.Z() - prism.zFlat);
+              double ySlanted = prism.yDown + prism.slope * (r.Z() - prism.zFlat);
               if (r.Y() < ySlanted) return false;
             } else { // no, it's on the prism entrance but outside the bar exit window -> find it using bisection
               double t1 = lengths[i];

@@ -33,7 +33,7 @@ namespace Belle2 {
       m_photonStates.push_back(photon);
 
       int nbars = m_bars.size();
-      if (photon.getKz() > 0) {
+      if (photon.getKz() > 0 and photon.getZ() > m_prism.zR) {
         for (int i = 0; i < nbars; i++) {
           const auto& bar = m_bars[i];
           const auto& lastState = m_photonStates.back();

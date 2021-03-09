@@ -107,6 +107,7 @@ namespace Belle2 {
         double zR = 0;    /**< maximal z, i.e position of prism-bar joint */
         double zFlat = 0; /**< z where flat continues to slanted surface */
         double zD = 0;    /**< detector (photo-cathode) position */
+        double slope = 0; /**< slope of slanted surface (dy/dz) */
         int k0 = 0; /**< index of true prism in the vector 'unfoldedWindows' */
         std::vector<TOPGeoPrism::UnfoldedWindow> unfoldedWindows; /**< unfolded prism exit windows */
 

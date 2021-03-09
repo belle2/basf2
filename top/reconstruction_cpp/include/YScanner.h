@@ -317,10 +317,16 @@ namespace Belle2 {
       double getTrackLengthInQuartz() const {return m_length;}
 
       /**
+       * Returns number of photons per Cerenkov azimuthal angle per track length
+       * @return number of photons per radian per centimeter
+       */
+      double getNumPhotonsPerLen() const {return m_numPhotons;}
+
+      /**
        * Returns number of photons per Cerenkov azimuthal angle
        * @return number of photons per radian
        */
-      double getNumPhotons() const {return m_numPhotons;}
+      double getNumPhotons() const {return m_numPhotons * m_length;}
 
       /**
        * Returns mean photon energy
@@ -458,7 +464,7 @@ namespace Belle2 {
       mutable double m_momentum = 0; /**< particle momentum magnitude */
       mutable double m_beta = 0; /**< particle beta */
       mutable double m_length = 0; /**< length of particle trajectory inside quartz */
-      mutable double m_numPhotons = 0; /**< number of photons per Cerenkov azimuthal angle */
+      mutable double m_numPhotons = 0; /**< number of photons per Cerenkov azimuthal angle per track length */
       mutable double m_meanE = 0; /**< mean photon energy */
       mutable double m_rmsE = 0; /**< r.m.s of photon energy */
       mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */

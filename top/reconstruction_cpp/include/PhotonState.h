@@ -203,12 +203,10 @@ namespace Belle2 {
        * Returns total internal reflection status.
        * @param cosTotal cosine of total reflection angle
        * @return true if totally reflected
-       *
-       * TODO: check also slanted prism surface
        */
       bool getTotalReflStatus(double cosTotal) const
       {
-        return ((m_nx == 0 or abs(m_kx) < cosTotal) and (m_ny == 0 or abs(m_ky) < cosTotal));
+        return ((m_nx == 0 or m_cosx < cosTotal) and (m_ny == 0 or m_cosy < cosTotal));
       }
 
       /**
@@ -278,6 +276,8 @@ namespace Belle2 {
       double m_propLen = 0; /**< propagation length since initial position */
       int m_nx = 0; /**< signed number of reflections in x at last propagation step */
       int m_ny = 0; /**< signed number of reflections in y at last propagation step */
+      double m_cosx = 0; /**< maximal cosine of impact angle to surface in x */
+      double m_cosy = 0; /**< maximal cosine of impact angle to surface in y */
       double m_A = 0; /**< width of the quartz segment (dimension in x) for unfolding */
       double m_B = 0; /**< thickness of the quartz segment (dimension in y) for unfolding */
       double m_y0 = 0; /**< origin in y for unfolding */

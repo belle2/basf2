@@ -18,9 +18,15 @@ using namespace std;
 
 namespace Belle2 {
 
-  TOPGeoPrism::UnfoldedWindow::UnfoldedWindow(const TVector2& orig, const TVector2& dir):
-    y0(orig.X()), z0(orig.Y()), sy(dir.X()), sz(dir.Y())
-  {}
+  TOPGeoPrism::UnfoldedWindow::UnfoldedWindow(const TVector2& orig, const TVector2& dir,
+                                              const TVector2& norm, const TVector2& slanted):
+    y0(orig.X()), z0(orig.Y()), sy(dir.X()), sz(dir.Y()), ny(norm.X()), nz(norm.Y())
+  {
+    nsy[0] = sy;
+    nsz[0] = sz;
+    nsy[1] = slanted.X();
+    nsz[1] = slanted.Y();
+  }
 
 
   bool TOPGeoPrism::isConsistent() const
@@ -127,33 +133,40 @@ namespace Belle2 {
     TVector2 normals[2] = {TVector2(1, 0), TVector2(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
 
     TVector2 orig(0, z); // window origin
-    TVector2 surf(1, 0); // window surface direction
+    TVector2 surf(1, 0); // window surface direction (= upper surface normal)
+    TVector2 norm(0, -1); // window normal
+    auto slanted = normals[1]; // slanted surface normal
 
     std::vector<UnfoldedWindow> tmp;
-    reflect(points, normals, orig, surf, 1, tmp); // unfolding down
+    reflect(points, normals, orig, surf, norm, slanted, 1, tmp); // unfolding down
     while (not tmp.empty()) {
       m_unfoldedWindows.push_back(tmp.back());
       tmp.pop_back();
     }
-    m_unfoldedWindows.push_back(UnfoldedWindow(orig, surf)); // true window
+    m_unfoldedWindows.push_back(UnfoldedWindow(orig, surf, norm, slanted)); // true window
     m_k0 = m_unfoldedWindows.size() - 1;
-    reflect(points, normals, orig, surf, 0, m_unfoldedWindows); // unfolding up
+    reflect(points, normals, orig, surf, norm, slanted, 0, m_unfoldedWindows); // unfolding up
   }
 
 
   void TOPGeoPrism::reflect(const TVector2* points, const TVector2* normals,
-                            const TVector2& orig, const TVector2& surf, int k,
+                            const TVector2& orig, const TVector2& surf, const TVector2& norm,
+                            const TVector2& slanted, int k,
                             std::vector<UnfoldedWindow>& result) const
   {
     TVector2 rp[2] = {points[0], points[1]};
     TVector2 n[2] = {normals[0], normals[1]};
     auto r = orig;
     auto s = surf;
+    auto q = norm;
+    auto sl = slanted;
 
     while (rp[k].Y() < 0) {
       r -= 2 * ((r - rp[k]) * n[k]) * n[k]; // reflect window origin
       s -= 2 * (s * n[k]) * n[k];           // reflect window surface direction
-      result.push_back(UnfoldedWindow(r, s));
+      q -= 2 * (q * n[k]) * n[k];           // reflect window normal
+      sl -= 2 * (sl * n[k]) * n[k];         // reflect slanted normal
+      result.push_back(UnfoldedWindow(r, s, q, sl));
       if (result.size() > 100) {
         B2ERROR("TOPGeoPrism::reflect: too many reflections -> must be a bug");
         return;

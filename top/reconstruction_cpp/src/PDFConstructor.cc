@@ -42,7 +42,8 @@ namespace Belle2 {
         return;
       }
 
-      m_yScanner->prepare(track.getMomentumMag(), track.getBeta(hypothesis), track.getLengthInQuartz());
+      m_beta = track.getBeta(hypothesis);
+      m_yScanner->prepare(track.getMomentumMag(), m_beta, track.getLengthInQuartz());
 
       m_tof = track.getTOF(hypothesis);
       m_groupIndex = TOPGeometryPar::Instance()->getGroupIndex(m_yScanner->getMeanEnergy());
@@ -51,7 +52,7 @@ namespace Belle2 {
       m_minTime = TOPRecoManager::getMinTime();
       m_maxTime = TOPRecoManager::getMaxTime();
 
-      // prepare memory for storing signal PDF parametrization
+      // prepare the memory for storing signal PDF
 
       const auto& pixelPositions = m_yScanner->getPixelPositions();
       int numPixels = pixelPositions.getNumPixels();
@@ -79,8 +80,14 @@ namespace Belle2 {
     {
       // construct PDF analytically
 
-      setSignalPDF_direct();
-      setSignalPDF_reflected();
+      const auto& prism = m_inverseRaytracer->getPrism();
+
+      if (m_track.getEmissionPoint(m_track.getLengthInQuartz() / 2).position.Z() > prism.zR) {
+        setSignalPDF_direct();
+        setSignalPDF_reflected();
+      } else {
+        setSignalPDF_prism();
+      }
 
       // count expected number of signal photons
 
@@ -95,6 +102,8 @@ namespace Belle2 {
         signalPDF.normalize(m_signalPhotons);
       }
     }
+
+    // signal PDF construction for track crossing bar segments -------------------------------------------
 
     void PDFConstructor::setSignalPDF_direct()
     {
@@ -217,7 +226,7 @@ namespace Belle2 {
 
     bool PDFConstructor::doRaytracingCorrections(const InverseRaytracer::Solution& sol, double dFic_dx, double xD)
     {
-      const double precision = 0.01; //[cm]
+      const double precision = 0.01; // [cm]
 
       double x1 = 0;                    // x is dFic
       double y1 = deltaXD(x1, sol, xD); // y is the difference in xD
@@ -279,23 +288,23 @@ namespace Belle2 {
       m_ncallsExpandPDF[type]++;
 
       double Len = m_fastRaytracer->getPropagationLen();
-      double avSpeedOfLight = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
+      double speedOfLightQuartz = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
 
       // difference of propagation times of true and fliped prism
-      double dTime = m_fastRaytracer->getPropagationLenDelta() / avSpeedOfLight;
+      double dTime = m_fastRaytracer->getPropagationLenDelta() / speedOfLightQuartz;
 
       // derivatives: dt/de, dt/dx, dt/dL
-      double dt_de = (D.dLen_de + Len * m_groupIndexDerivative / m_groupIndex) / avSpeedOfLight; // for chromatic
-      double dt_dx =  D.dLen_dx / avSpeedOfLight; // for channel x-size
-      double dt_dL = (D.dLen_dL + 1 / m_yScanner->getBeta() / m_groupIndex) / avSpeedOfLight; // for parallax
+      double dt_de = (D.dLen_de + Len * m_groupIndexDerivative / m_groupIndex) / speedOfLightQuartz;
+      double dt_dx = D.dLen_dx / speedOfLightQuartz;
+      double dt_dL = D.dLen_dL / speedOfLightQuartz + 1 / m_beta / Const::speedOfLight;
 
       // contribution of multiple scattering in quartz
-      double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / avSpeedOfLight;
+      double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / speedOfLightQuartz;
 
       const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
-      double L = m_yScanner->getTrackLengthInQuartz();
+      double L = m_track.getLengthInQuartz();
 
-      // sigma squared: channel x-size, parallax, propagation time difference, multiple scattering
+      // sigma squared: pixel size, parallax, propagation time difference, multiple scattering
       double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2);
       // sigma squared: adding chromatic contribution
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
@@ -308,7 +317,7 @@ namespace Belle2 {
 
       bool doScan = (m_PDFOption == c_Fine);
       if (m_PDFOption == c_Optimal) {
-        double time = m_tof + Len / avSpeedOfLight;
+        double time = m_tof + Len / speedOfLightQuartz;
         doScan = m_track.isScanRequired(col, time, wid);
       }
 
@@ -445,7 +454,7 @@ namespace Belle2 {
         if (cosFic[i] < cosLimit) xmima[i] = x0 + dxdz[i] * dz;
       }
 
-      // just to make sure xmima are within the limits given by maximal propagation length
+      // just to make sure xmi/xma are within the limits given by maximal propagation length
       xmi = std::max(xmima[0], x0 - maxLen);
       xma = std::min(xmima[1], x0 + maxLen);
 
@@ -512,6 +521,205 @@ namespace Belle2 {
       double x = (x1 + x2) / 2;
 
       return x * mirror.R + mirror.xc;
+    }
+
+    // signal PDF construction for track crossing prism --------------------------------------------------
+
+    void PDFConstructor::setSignalPDF_prism()
+    {
+      const auto& pixelPositions = m_yScanner->getPixelPositions();
+      const auto& prism = m_inverseRaytracer->getPrism();
+      double speedOfLightQuartz = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
+
+      double xE = m_track.getEmissionPoint().position.X();
+      int nxmi = (xE > 0) ? 0 : -1;
+      int nxma = (xE > 0) ? 1 : 0;
+
+      for (const auto& pixel : pixelPositions.getPixels()) {
+        if (not m_yScanner->getPixelMasks().isActive(pixel.ID)) continue;
+        double RQE = m_yScanner->getPixelEfficiencies().get(pixel.ID);
+        if (RQE == 0) continue;
+        auto& signalPDF = m_signalPDFs[pixel.ID - 1];
+        for (int Nxe = nxmi; Nxe <= nxma; Nxe++) {
+          for (size_t k = 0; k < prism.unfoldedWindows.size(); k++) {
+            const auto sol = prismSolution(pixel, k, Nxe);
+            if (sol.len == 0 or abs(sol.L) > m_track.getLengthInQuartz() / 2) continue;
+
+            bool ok = prismRaytrace(sol);
+            if (not ok) continue;
+            int Nye = k - prism.k0;
+            if (Nye != m_fastRaytracer->getNy() or Nxe != m_fastRaytracer->getNx()) continue;
+            if (not m_fastRaytracer->getTotalReflStatus(m_cosTotal)) continue;
+            const auto firstState = m_fastRaytracer->getPhotonStates().front();  // a copy of
+            const auto lastState = m_fastRaytracer->getPhotonStates().back();  // a copy of
+
+            double slope = lastState.getKy() / lastState.getKz();
+            double dz = prism.zD - prism.zFlat;
+            double y2 = std::min(pixel.yc + pixel.Dy / 2, prism.yUp + slope * dz);
+            double y1 = std::max(pixel.yc - pixel.Dy / 2, prism.yDown + slope * dz);
+            double Dy = y2 - y1;
+            if (Dy < 0) continue;
+
+            double dL = 0.1; // cm
+            for (int i = 0; i < 4; i++) {
+              ok = prismRaytrace(sol, dL);
+              ok = ok and Nye == m_fastRaytracer->getNy() and Nxe == m_fastRaytracer->getNx();
+              if (ok) break;
+              dL = - dL / 2;
+            }
+            if (not ok) continue;
+            const auto lastState_dL = m_fastRaytracer->getPhotonStates().back();  // a copy of
+
+            double dFic = 0.01; // rad
+            for (int i = 0; i < 4; i++) {
+              ok = prismRaytrace(sol, 0, dFic);
+              ok = ok and Nye == m_fastRaytracer->getNy() and Nxe == m_fastRaytracer->getNx();
+              if (ok) break;
+              dFic = - dFic / 2;
+            }
+            if (not ok) continue;
+            const auto lastState_dFic = m_fastRaytracer->getPhotonStates().back();  // a copy of
+
+            double de = 0.1; // eV
+            for (int i = 0; i < 4; i++) {
+              ok = prismRaytrace(sol, 0, 0, de);
+              ok = ok and Nye == m_fastRaytracer->getNy() and Nxe == m_fastRaytracer->getNx();
+              if (ok) break;
+              de = - de / 2;
+            }
+            if (not ok) continue;
+            const auto lastState_de = m_fastRaytracer->getPhotonStates().back();  // a copy of
+
+            double dx_dL = (lastState_dL.getX() - lastState.getX()) / dL;
+            double dy_dL = (lastState_dL.getY() - lastState.getY()) / dL;
+            double dx_dFic = (lastState_dFic.getX() - lastState.getX()) / dFic;
+            double dy_dFic = (lastState_dFic.getY() - lastState.getY()) / dFic;
+            double Jacobi = dx_dL * dy_dFic - dy_dL * dx_dFic;
+            double numPhotons = m_yScanner->getNumPhotonsPerLen() * pixel.Dx * Dy / abs(Jacobi) * RQE;
+
+            double dLen_de = (lastState_de.getPropagationLen() - lastState.getPropagationLen()) / de;
+            double dLen_dL = (lastState_dL.getPropagationLen() - lastState.getPropagationLen()) / dL;
+            double dLen_dFic = (lastState_dFic.getPropagationLen() - lastState.getPropagationLen()) / dFic;
+
+            double dt_de = (dLen_de + sol.len * m_groupIndexDerivative / m_groupIndex) / speedOfLightQuartz;
+            double dt_dL = dLen_dL / speedOfLightQuartz;
+            double dt_dFic = dLen_dFic / speedOfLightQuartz;
+
+            double chromatic = pow(dt_de * m_yScanner->getRMSEnergy(), 2);
+
+            double DL = (dy_dFic * pixel.Dx - dx_dFic * pixel.Dy) / Jacobi;
+            double DFic = (dx_dL * pixel.Dy - dy_dL * pixel.Dx) / Jacobi;
+            double paralax = (pow(dt_dL * DL, 2) + pow(dt_dFic * DFic, 2)) / 12;
+
+            double scattering = pow(dLen_de * m_yScanner->getSigmaScattering() / speedOfLightQuartz, 2);
+
+            SignalPDF::PDFPeak peak;
+            peak.t0 = m_tof + sol.L / m_beta / Const::speedOfLight + sol.len / speedOfLightQuartz;
+            peak.wid = chromatic + paralax + scattering;
+            peak.nph = 1 - exp(-numPhotons); // because photons that pile-up are counted as one
+            peak.fic = atan2(sol.sinFic, sol.cosFic);
+            signalPDF.append(peak);
+
+            if (m_storeOption == c_Reduced) continue;
+
+            SignalPDF::PDFExtra extra;
+            extra.thc = acos(getCosCerenkovAngle(m_yScanner->getMeanEnergy()));
+            extra.e = m_yScanner->getMeanEnergy();
+            extra.sige = m_yScanner->getRMSEnergy();
+            extra.Nxe = Nxe;
+            extra.Nye = Nye;
+            extra.xD = lastState.getXD();
+            extra.yD = lastState.getYD();
+            extra.zD = lastState.getZD();
+            extra.kxE = firstState.getKx();
+            extra.kyE = firstState.getKy();
+            extra.kzE = firstState.getKz();
+            extra.kxD = lastState.getKx();
+            extra.kyD = lastState.getKy();
+            extra.kzD = lastState.getKz();
+            extra.type = SignalPDF::c_Direct;
+            signalPDF.append(extra);
+
+          } // reflections in y (unfolded prism windows)
+        } // reflections in x
+      } // pixels
+
+    }
+
+
+    bool PDFConstructor::prismRaytrace(const PrismSolution& sol, double dL, double dFic, double de)
+    {
+      const auto& emi = m_track.getEmissionPoint(sol.L + dL);
+      const auto& trk = emi.trackAngles;
+      const auto& cer = cerenkovAngle(de);
+
+      double cosDFic = 1;
+      double sinDFic = 0;
+      if (dFic != 0) {
+        cosDFic = cos(dFic);
+        sinDFic = sin(dFic);
+      }
+      double cosFic = sol.cosFic * cosDFic - sol.sinFic * sinDFic;
+      double sinFic = sol.sinFic * cosDFic + sol.cosFic * sinDFic;
+      double a = trk.cosTh * cer.sinThc * cosFic + trk.sinTh * cer.cosThc;
+      double b = cer.sinThc * sinFic;
+      double kx = a * trk.cosFi - b * trk.sinFi;
+      double ky = a * trk.sinFi + b * trk.cosFi;
+      double kz = trk.cosTh * cer.cosThc - trk.sinTh * cer.sinThc * cosFic;
+      PhotonState photon(emi.position, kx, ky, kz);
+      m_fastRaytracer->propagate(photon);
+
+      return m_fastRaytracer->getPropagationStatus();
+    }
+
+
+    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const PixelPositions::PixelData& pixel,
+                                                                unsigned k, int nx)
+    {
+      const auto& prism = m_inverseRaytracer->getPrism();
+      const auto& win = prism.unfoldedWindows[k];
+      double dz = abs(prism.zD - prism.zFlat);
+      TVector3 rD(func::unfold(pixel.xc, nx, prism.A),
+                  pixel.yc * win.sy + win.y0 + win.ny * dz,
+                  pixel.yc * win.sz + win.z0 + win.nz * dz);
+
+      double L = 0;
+      for (int iter = 0; iter < 100; iter++) {
+        auto sol = prismSolution(rD, L);
+        if (abs(sol.L) > m_track.getLengthInQuartz() / 2) return sol;
+        if (abs(sol.L - L) < 0.01) return sol;
+        L = sol.L;
+      }
+      B2WARNING("TOP::PDFConstructor::prismSolution: iterations not converging");
+      return PrismSolution();
+    }
+
+
+    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const TVector3& rD, double L)
+    {
+      const auto& emi = m_track.getEmissionPoint(L);
+
+      // transformation of detection position to system of particle
+
+      auto r = rD - emi.position;
+      const auto& trk = emi.trackAngles;
+      double xx = r.X() * trk.cosFi + r.Y() * trk.sinFi;
+      double y = -r.X() * trk.sinFi + r.Y() * trk.cosFi;
+      double x = xx * trk.cosTh - r.Z() * trk.sinTh;
+      double z = xx * trk.sinTh + r.Z() * trk.cosTh;
+
+      // solution
+
+      double rho = sqrt(x * x + y * y);
+      const auto& cer = cerenkovAngle();
+
+      PrismSolution sol;
+      sol.len = rho / cer.sinThc;
+      sol.L = L + z - sol.len * cer.cosThc;
+      sol.cosFic = x / rho;
+      sol.sinFic = y / rho;
+
+      return sol;
     }
 
     // log likelihood calculation ------------------------------------------------------------------------

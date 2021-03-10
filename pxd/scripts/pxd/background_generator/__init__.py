@@ -69,7 +69,7 @@ from secrets import randbelow
 from typing import Union
 
 import basf2
-from ROOT.Belle2 import DataStore, PyStoreArray
+from ROOT.Belle2 import DataStore, PyStoreArray, PyStoreObj
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 from ROOT.Belle2 import VxdID, PXDDigit
 
@@ -108,9 +108,6 @@ class Specs:
         which is used to download the model checkpoints automatically,
         defaults to 'PXDBackgroundGenerator'
     :type globaltag: str, optional
-    :param extension: Name extension of the background digit collection,
-        defaults to '_beamBG' - beam background
-    :type extension: str, optional
     """
 
     @staticmethod
@@ -142,7 +139,7 @@ class Specs:
             raise TypeError("expecting None or type int `seed`")
         if seed is None:
             return seed
-        if not -2 ** 63 <= seed < 2 ** 63:
+        if not -(2 ** 63) <= seed < 2 ** 63:
             raise ValueError(f"expecting -2^63 <= `seed` < 2^63 (got: {seed})")
         return seed
 
@@ -171,13 +168,6 @@ class Specs:
             raise TypeError("expecting type str `globaltag`")
         return globaltag
 
-    @staticmethod
-    def _validate_extension(extension: str) -> str:
-        """"""
-        if not isinstance(extension, str):
-            raise TypeError("expecting type str `extension`")
-        return extension
-
     def __init__(
         self,
         model: str = "convnet",
@@ -186,7 +176,6 @@ class Specs:
         nintra: int = 1,
         ninter: int = 1,
         globaltag: str = "PXDBackgroundGenerator",
-        extension: str = "_beamBG",
     ):
         """"""
         # process `model`
@@ -207,9 +196,6 @@ class Specs:
         # process `globaltag`
         self.globaltag = type(self)._validate_globaltag(globaltag)
 
-        # process `extension`
-        self.extension = extension
-
     def _instantiate(self):
         """"""
         try:
@@ -222,13 +208,13 @@ class Specs:
         if self.seed is None:
             obj = basf2.get_random_seed()
             func = hashlib.sha512()
-            func.update(bytes(str(obj), 'utf-8'))
+            func.update(bytes(str(obj), "utf-8"))
             digest = func.digest()[:8]
-            self.seed = int.from_bytes(digest, 'big', signed=True)
+            self.seed = int.from_bytes(digest, "big", signed=True)
 
         # load the checkpoint from the conditions database - if none given
         if self.checkpoint is None:
-            payload_name = f'PXDBackgroundGenerator_{self.model}'
+            payload_name = f"PXDBackgroundGenerator_{self.model}"
             accessor = DBAccessorBase(DBStoreEntry.c_RawFile, payload_name, True)
             self.checkpoint = accessor.getFilename()
 
@@ -287,10 +273,6 @@ class Specs:
     # Global tag in the conditions database which is used to
     # download the model checkpoints automatically
 
-    ##
-    # @var extension
-    # Name extension of the background digit collection
-
 
 class PXDBackgroundGenerator(basf2.Module):
     """Generates PXD background data on-the-fly.
@@ -312,9 +294,16 @@ class PXDBackgroundGenerator(basf2.Module):
 
     def initialize(self):
         """"""
-        # register the digit collection
+        # infer the name extension of the background digit colection
+        bkginfo = PyStoreObj("BackgroundInfo", DataStore.c_Persistent)
+        if not bkginfo.isValid():
+            # no background digit collection found
+            basf2.B2ERROR("path must contain the BGOverlayInput module")
+        extension = bkginfo.getExtensionName()
+
+        # register the background digit collection
         self.storearr = PyStoreArray("PXDDigits", DataStore.c_DontWriteOut)
-        self.storearr.registerInDataStore(f"PXDDigits{self.specs.extension}")
+        self.storearr.registerInDataStore(f"PXDDigits{extension}")
 
         # instantiate all distinct sensor identifier objects
         self.vxdids = tuple(VxdID(arg) for arg in VXDID_ARGS)

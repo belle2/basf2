@@ -50,6 +50,9 @@ namespace Belle2 {
       m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
 
+    /** destructor */
+    virtual ~PXDDAQDHEStatus() {};
+
     /** Return Usability of data
      * @return conclusion if data is useable
      */

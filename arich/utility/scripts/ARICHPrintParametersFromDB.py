@@ -26,12 +26,11 @@ if options.object == '':
 
 # set database tag
 if options.tag == 'local':
-    b2.use_local_database("localdb/database.txt", "localdb")
+    b2.conditions.testing_payloads = ["localdb/database.txt"]
 elif options.tag == '':
     print("Using default tag")
 else:
-    b2.use_central_database(options.tag)
-
+    b2.conditions.override_globaltags([options.tag])
 
 # EventInfoSetter is only needed to register EventMetaData...
 # (will try to get rid of this)
@@ -72,6 +71,8 @@ elif options.object == 'ARICHGlobalAlignment':
     dbImporter.printGlobalAlignment()
 elif options.object == 'ARICHMirrorAlignment':
     dbImporter.printMirrorAlignment()
+elif options.object == 'ARICHAeroTilesAlignment':
+    dbImporter.printAeroTilesAlignment()
 elif options.object == 'ARICHGeometryConfig':
     # print geometry parameters of ARICH detector from the database
     dbImporter.printGeometryConfig()

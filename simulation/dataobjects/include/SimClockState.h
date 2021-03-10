@@ -77,6 +77,15 @@ namespace Belle2 {
      */
     unsigned getSVDTriggerBin(unsigned offset = 2) const {return (m_revo9Count + offset) % 4;}
 
+    /**
+    * Returns CDC trigger bin.
+    * Default value for offset put as 0 for now.
+    * @param offset offset
+    * @return CDC trigger bin
+    */
+    unsigned getCDCTriggerBin(unsigned offset = 0) const {return (m_revo9Count + offset) % 4;}
+
+
 
   private:
 

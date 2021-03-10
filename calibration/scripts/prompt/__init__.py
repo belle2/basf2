@@ -1,7 +1,6 @@
 import basf2
 from collections import namedtuple
 import json
-import subprocess
 
 prompt_script_package = "prompt.calibrations."
 prompt_script_dir = "calibration/scripts/prompt/calibrations"

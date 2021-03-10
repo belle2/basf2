@@ -149,11 +149,11 @@ elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inpu
     isGlobalDAQ = True
     outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
 
-if interimRoot is "NoInterimRootFile":
+if interimRoot == "NoInterimRootFile":
     interimRoot = outputBase + "_gain_histo.root"
-if outputRoot is "NoOutputRootFile":
+if outputRoot == "NoOutputRootFile":
     outputRoot = outputBase + "_gain_" + pmtStr + ".root"
-if outputPDF is "NoOutputPDFFile":
+if outputPDF == "NoOutputPDFFile":
     outputPDF = outputBase + "_" + pmtStr
 
 if isGlobalDAQForced and (not isPocketDAQForced):

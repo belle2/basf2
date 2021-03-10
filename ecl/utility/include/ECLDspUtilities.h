@@ -20,6 +20,19 @@ namespace Belle2 {
   namespace ECL {
 
     /**
+     * This struct is returned by the `pedestalFit` method that fits the
+     * first 16 samples of the waveform (pedestal points) to find a peak
+     * there (that corresponds to background).
+     *
+     * Currently it only contains peak amplitude but potentially
+     * we can add more values here later.
+     */
+    typedef struct ECLPedestalFit {
+      /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
+      int amp;
+    } ECLPedestalFit;
+
+    /**
      * This class contains static methods to make them
      * accessible from pyROOT.
      */
@@ -29,6 +42,7 @@ namespace Belle2 {
        * @brief Convert ECLDspData from *.dat file to Root object.
        *
        * @param[in] raw_file Path to dsp??.dat file.
+       * @param[in] boardNumber Number of shaperDSP board, from 1 to 52*12
        * @return ECLDspData object
        */
       static ECLDspData* readEclDsp(const char* raw_file, int boardNumber);
@@ -59,7 +73,35 @@ namespace Belle2 {
       static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig,
                                      bool adjusted_timing = true);
 
+      /**
+       * Load DSP coefficients used in the pedestal fit function.
+       * If it is not done explicitly, pedestalFit will do it
+       * internally when it is called the first time.
+       *
+       * However, it is preferable to call it explicitly, in a
+       * thread-safe context.
+       */
+      static void initPedestalFit();
+
+      /**
+       * @brief Fit pedestal part of the signal waveform (first 16 samples)
+       * This method will fit the first 16 samples of the waveform
+       * and return the amplitude of the peak found in that region.
+       *
+       * @param[in] adc  vector of waveform samples (size >= 16)
+       *
+       * @return struct with fit results
+       */
+      static ECLPedestalFit pedestalFit(std::vector<int> adc);
+
     private:
+      /** Flag indicating whether arrays fg31,fg32 are filled */
+      static int pedestal_fit_initialized;
+      /** DSP coefficients used to determine amplitude in pedestalFit */
+      static float pedfit_fg31[768];
+      /** DSP coefficients used to determine time in pedestalFit */
+      static float pedfit_fg32[768];
+
       /**
        * Private constructor since class only contains static methods,
        * no need to create an instance.

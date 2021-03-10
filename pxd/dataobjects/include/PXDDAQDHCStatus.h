@@ -37,8 +37,11 @@ namespace Belle2 {
      * @param dhcid DHC id
      * @param mask error mask
      */
-    PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
+    explicit PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
       m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
+
+    /** destructor */
+    virtual ~PXDDAQDHCStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable

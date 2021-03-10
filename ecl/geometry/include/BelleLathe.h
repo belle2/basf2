@@ -97,6 +97,9 @@ namespace Belle2 {
 
       G4VSolid* Clone() const;
 
+      /** Two vectors define an axis-parallel bounding box for the shape */
+      void BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const;
+
       std::ostream& StreamInfo(std::ostream& os) const;
 
       // Visualisation functions
@@ -130,6 +133,7 @@ namespace Belle2 {
       zr_t normal(const zr_t&, double&) const ;
       void getvolarea();
       void Init(const std::vector<zr_t>&, double, double);
+
     private:
       std::vector<zr_t> fcontour;
       std::vector<cachezr_t> fcache;
@@ -138,7 +142,7 @@ namespace Belle2 {
       mutable std::vector<double> farea;
       mutable std::vector<triangle_t> ftlist;
 
-      double fphi, fdphi;
+      double fphi, fdphi; // starting angle and finishing angle
       double fs0, fc0, fs1, fc1;
       double fn0x, fn0y, fn1x, fn1y;
       double frmin, frmax, fzmin, fzmax;

@@ -57,9 +57,13 @@ def add_packers(path, components=None):
         path.add_module(klmpacker)
 
 
-def add_unpackers(path, components=None):
+def add_unpackers(path, components=None, writeKLMDigitRaws=False):
     """
     This function adds the raw data unpacker modules to a path.
+
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param writeKLMDigitRaws: flag for creating the KLMDigitRaw object and storing it in the datastore. The KLMDQM
+        module needs it for filling some histograms.
     """
 
     # Check components.
@@ -108,6 +112,7 @@ def add_unpackers(path, components=None):
     # KLM
     if components is None or 'KLM' in components:
         klmunpacker = b2.register_module('KLMUnpacker')
+        klmunpacker.param('WriteDigitRaws', writeKLMDigitRaws)
         path.add_module(klmunpacker)
 
     # TRG

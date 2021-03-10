@@ -210,8 +210,8 @@ class Cluster:
                     job.job_id = res.group(1)
                 else:
                     self.logger.error(
-                        f"Could not find job id! Will not be able to terminate"
-                        f" this job, even if necessary. "
+                        "Could not find job id! Will not be able to terminate"
+                        " this job, even if necessary. "
                     )
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
@@ -273,7 +273,7 @@ class Cluster:
             except subprocess.CalledProcessError:
                 job.status = 'failed'
                 self.logger.error(
-                    f"Probably wasn't able to cancel job. Here's the traceback:"
+                    "Probably wasn't able to cancel job. Here's the traceback:"
                 )
                 self.logger.error(traceback.format_exc())
             else:
@@ -291,5 +291,5 @@ class Cluster:
             self.logger.error(
                 "Termination of the job corresponding to steering file "
                 f"{job.path} has been requested, but no job id is available."
-                f" Can't do anything."
+                " Can't do anything."
             )

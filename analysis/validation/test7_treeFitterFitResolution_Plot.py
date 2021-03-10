@@ -12,11 +12,11 @@
 # Bto J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex
 # positions/E/P/pVal is plotted.
 
+import glob
+
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))  # noqa
-
-import glob
 
 workingFiles = glob.glob(str("../TreeFitted_B0ToJPsiKs.root"))
 

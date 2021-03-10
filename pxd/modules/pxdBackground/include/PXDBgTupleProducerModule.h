@@ -74,13 +74,13 @@ namespace Belle2 {
       /** Constructor */
       PXDBgTupleProducerModule();
 
-      /* Initialize module */
+      /** Initialize module */
       void initialize() override final;
-      /* Start-of-run initializations */
+      /** Start-of-run initializations */
       void beginRun() override final;
-      /* Event processing */
+      /** Event processing */
       void event() override final;
-      /* Final summary and cleanup */
+      /** Final summary and cleanup */
       void terminate() override final;
 
     private:

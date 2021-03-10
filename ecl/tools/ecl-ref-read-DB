@@ -1,0 +1,326 @@
+#! /usr/bin/env python3
+
+'''
+A tool to read information about reference runs and histograms from the database "ecl_references.db".
+
+The tool allows to:
+1. Get the last reference set by its type
+2. Get reference set by its ID
+3. Get reference runs by type and exp
+4. Get reference runs by type, exp and histogram name
+'''
+
+
+import sqlite3
+import re
+
+path_to_database = "/group/belle2/group/detector/ECL/ecl_references.db"
+
+
+#----------------- PRINT FUNCTIONS -----------------
+#find and print difference between two sets
+def print_diff(mset, prev_set):
+
+	last_hists = mset[1]
+	prev_hists = prev_set[1]
+
+	from_last = set(last_hists) - set(prev_hists)
+	from_prev = set(prev_hists) - set(last_hists)
+
+	print('\nDifference between sets '+str(mset[0][0])+' and '+str(prev_set[0][0])+':')
+
+	print('{:<32}{:<20}{:<20}'.format('Histogram name','Set ID '+str(mset[0][0])+' exp, run','Set ID '+str(prev_set[0][0])+' exp, run'))
+
+	for item_l in from_last:
+
+		if item_l[2] not in [item_p[2] for item_p in from_prev]:
+			print('{:<32}{:<20}{:<20}'.format(item_l[2], str(item_l[0]) + ', ' +str(item_l[1]), '---'))
+			continue
+
+		for item_p in from_prev:
+			if (item_p[2] == item_l[2]):
+				print('{:<32}{:<20}{:<20}'.format(item_l[2], str(item_l[0]) + ', ' +str(item_l[1]), str(item_p[0]) + ', ' +str(item_p[1])))
+				break
+
+	for item_p in from_prev:
+
+		if item_p[2] not in [item_l[2] for item_l in from_last]:
+			print('{:<32}{:<20}{:<20}'.format(item_p[2], '---', str(item_p[0]) + ', ' +str(item_p[1])))
+			continue
+
+#print info and histograms for one set
+def print_set_info(mset):
+	#set = (info, hists)
+	print('\nSet ID:', mset[0][0], '  Date:', mset[0][1], '  Type:', mset[0][2])
+	print('\nHistograms in the set:')
+	print('{:<35}{:<8}{:<8}'.format('Histogram name','exp','run'))
+	for hist in mset[1]:
+		print('{:<35}{:<8}{:<8}'.format(hist[2],hist[0],hist[1]))
+
+#print info about previous or next set
+def print_near_info(set_info, near_info, which):
+	if which=='prev':
+		print("\nPrevious set for set with ID " + str(set_info[0]) + ':')
+	if which=='next':
+		print("\nNext set for set with ID " + str(set_info[0]) + ':')
+	print('Set ID:', near_info[0], '  Date:', near_info[1], '  Type:', near_info[2])
+
+
+#print reference runs and histograms for them
+	
+def print_ref_runs(runs_hists):
+
+	u_runs = set([item[0] for item in runs_hists])
+	print('\nReference runs for exp ' + str(exp) + ', type ' + str(run_type) + ':')
+	print(u_runs)
+
+	answ = input("Show reference histograms for this runs? (y/n): ")
+	if answ.split()[0] == 'y':
+
+		print('\nHistograms:')
+
+		for run in u_runs:
+			print(run, ':')
+			for item in runs_hists:
+				if item[0] == run:
+					print(' -', item[1])
+	elif answ.split()[0] != 'n':
+		print("Incorrect: ", answ)
+		
+	return
+
+def print_ref_runs_for_hist(runs_hists):
+
+	u_runs = set([item[0] for item in runs_hists])
+	print('\nReference runs for exp ' + str(exp) + ', type ' + str(run_type) + ', histogram ' + runs_hists[0][1])
+	print(u_runs)
+
+	return
+
+#--------------------------------------------------
+
+#------------------- GET FUNCTIONS ----------------
+
+# type -> last ref set 
+def get_last_and_prev_set(run_type):
+
+	conn = sqlite3.connect('file:'+path_to_database+'?mode=ro', uri=True) #uri style for read-only connection
+	curs = conn.cursor()
+
+	curs.execute('''select id, creation_date, type from reference_sets 
+			where type like ?
+			order by creation_date desc limit 2''',
+			(run_type.split('_')[0]+'%',))
+
+	res = curs.fetchall()
+
+	if res is not None:
+		last_info = res[0]
+		if len(res) > 1:
+			prev_info = res[1]
+		else:
+			prev_info = None
+
+		#get histograms from the last set
+		if last_info is not None:
+			curs.execute("select exp, run, name from ref_histograms where set_id=?", (last_info[0], ))
+			last_hists = curs.fetchall()
+		else:
+			last_hists = None
+
+		#get histograms from the previous set
+		if prev_info is not None:
+			curs.execute("select exp, run, name from ref_histograms where set_id=?", (prev_info[0], ))
+			prev_hists = curs.fetchall()
+		else:
+			prev_hists = None
+
+	else:
+		last_hists = None
+		prev_hists = None
+
+	conn.close()
+
+	return (last_info, last_hists), (prev_info, prev_hists)
+
+
+# set ID -> ref set
+def get_set_and_prev_by_id(set_id):
+
+	conn = sqlite3.connect('file:'+path_to_database+'?mode=ro', uri=True) #uri style for read-only connection
+	curs = conn.cursor()
+
+	curs.execute('''select id, creation_date, type from reference_sets 
+			where id=?''',
+			(set_id,))
+	chosen_info = curs.fetchone()
+
+	if chosen_info is not None:
+
+		curs.execute('''select id, creation_date, type from reference_sets 
+				where type like ? and id > ?
+				order by creation_date asc limit 1''',
+				(chosen_info[2],chosen_info[0]))
+		next_info = curs.fetchone()
+
+		curs.execute('''select id, creation_date, type from reference_sets 
+				where type like ? and id < ?
+				order by creation_date desc limit 1''',
+				(chosen_info[2],chosen_info[0]))
+		prev_info = curs.fetchone()
+	else:
+		next_info = None
+		prev_info = None
+
+	if chosen_info is not None:
+		curs.execute("select exp, run, name from ref_histograms where set_id=?", (chosen_info[0], ))
+		chosen_hists = curs.fetchall()
+	else:
+		chosen_hists = None
+
+	if prev_info is not None:
+		curs.execute("select exp, run, name from ref_histograms where set_id=?", (prev_info[0], ))
+		prev_hists = curs.fetchall()
+	else:
+		prev_hists = None
+
+	if next_info is not None:
+		curs.execute("select exp, run, name from ref_histograms where set_id=?", (next_info[0], ))
+		next_hists = curs.fetchall()
+	else:
+		next_hists = None
+
+	conn.close()
+
+	return (next_info, next_hists), (chosen_info, chosen_hists), (prev_info, prev_hists)
+
+
+#get all reference runs and hists for the given run type and exp
+def get_ref_runs_hists(run_type, exp):
+	conn = sqlite3.connect('file:'+path_to_database+'?mode=ro', uri=True) #uri style for read-only connection
+	curs = conn.cursor()
+
+	curs.execute('''select distinct hists.run, hists.name 
+			from reference_sets as sets, ref_histograms as hists 
+			where hists.exp=? and sets.type=? and sets.id = hists.set_id''',
+			(exp,run_type))
+
+	runs_hists = curs.fetchall()
+
+	conn.close()
+
+	return runs_hists
+	
+#get all refecrence runs for the givet run type, exp and histogram name
+def get_ref_runs_for_hist(run_type, exp, hist_name):
+	conn = sqlite3.connect('file:'+path_to_database+'?mode=ro', uri=True) #uri style for read-only connection
+	curs = conn.cursor()
+
+	curs.execute('''select distinct hists.run, hists.name 
+			from reference_sets as sets, ref_histograms as hists 
+			where hists.exp=? and sets.type=? and sets.id = hists.set_id and hists.name=?''',
+			(exp,run_type, hist_name))
+
+	runs_hists = curs.fetchall()
+
+	conn.close()
+
+	return runs_hists
+
+#--------------------------------------------------
+
+print("Which information do you want to get?")
+print("1. Get last reference set by its type")
+print("2. Get reference set by its ID")
+print("3. Get reference runs by type and exp")
+print("4. Get reference runs by type, exp and histogram name")
+istr = input("\nEnter the number: ")
+
+if istr.strip() == '1':
+	run_type = input('\nEnter a run type (beam/cosmic): ')
+	if run_type.split()[0] in ['beam', 'cosmic']:
+
+		last_set, prev_set = get_last_and_prev_set(run_type.split()[0])
+
+		if last_set[1] is not None:
+			print_set_info(last_set)
+			if prev_set[1] is not None:
+				print_near_info(last_set[0], prev_set[0],'prev')
+				print_diff(last_set, prev_set)
+			else: 
+				print("\nNo previous set")
+		else:
+			print("\nNo such set")
+	else:
+		print("\nIncorrect type: ", run_type)
+
+elif istr.strip() == '2':
+	inp_id = input('\nEnter set ID: ')
+	if re.fullmatch(r'[0-9]+', inp_id.split()[0]):
+		next_set, chosen_set, prev_set = get_set_and_prev_by_id(int(inp_id.split()[0]))
+
+		if chosen_set[1] is not None:
+			print_set_info(chosen_set)
+
+			if prev_set[1] is not None:
+				print_near_info(chosen_set[0], prev_set[0], 'prev')
+				print_diff(chosen_set, prev_set)
+			else:
+				print("\nNo previous set")
+
+			if next_set[1] is not None:
+				print_near_info(chosen_set[0], next_set[0], 'next')
+				print_diff(chosen_set, next_set)
+			else:
+				print("\nNo next set")	
+		else:
+			print("\nNo set with ID", inp_id)
+	else:
+		print("\nIncorrect set ID: ", inp_id)
+
+elif istr.strip() == '3':
+	exp = input("Enter exp number: ")
+	if re.fullmatch(r'[0-9]+', exp.split()[0]):
+
+		run_type = input("Enter a run type (beam/cosmic): ")
+
+		if (run_type.split()[0] in ['beam', 'cosmic']):
+			runs_hists = get_ref_runs_hists(run_type.split()[0], int(exp.split()[0]))
+			if runs_hists is not None and len(runs_hists) != 0:
+				print_ref_runs(runs_hists)
+			else:
+				print("No such reference runs")
+		else:
+			print("Incorrect run type: ", run_type)
+	else:
+		print("Incorrect exp: ", exp)
+
+elif istr.strip() == '4':
+	exp = input("Enter exp number: ")
+	if re.fullmatch(r'[0-9]+', exp.split()[0]):
+
+		run_type = input("Enter a run type (beam/cosmic): ")
+
+		if (run_type.split()[0] in ['beam', 'cosmic']):
+
+			hist_name = input("Enter histogtram name ('ECL/hist_name'): ")
+
+			runs_hists = get_ref_runs_for_hist(run_type.split()[0], int(exp.split()[0]), hist_name.split()[0])
+			if runs_hists is not None and len(runs_hists) != 0:
+				print_ref_runs_for_hist(runs_hists)
+			else:
+				print("No such reference runs")
+		else:
+			print("Incorrect run type: ", run_type)
+	else:
+		print("Incorrect exp: ", exp)
+
+else:
+	print("\nIncorrect number: ", istr)
+
+
+
+
+
+
+

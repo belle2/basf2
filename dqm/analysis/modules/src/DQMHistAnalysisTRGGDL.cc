@@ -47,6 +47,9 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
 {
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisTRGGDLModule::initialize()
@@ -79,6 +82,19 @@ void DQMHistAnalysisTRGGDLModule::initialize()
     m_h_pure_eff->GetXaxis()->SetBinLabel(i + 1, c_pure_eff[i]);
   }
   m_c_pure_eff = new TCanvas("TRGGDL/hGDL_ana_pure_eff");
+
+
+
+#ifdef _BELLE2_EPICS
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  for (int i = 0; i < n_eff_shifter; i++) {
+    std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
+    // Read LO and HI limits from EPICS, seems this needs additional channels?
+    // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
 }
@@ -339,6 +355,15 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_c_pure_eff->Update();
 
 
+#ifdef _BELLE2_EPICS
+  for (auto i = 0; i < n_eff_shifter; i++) {
+    double data;
+    data = m_h_eff_shifter->GetBinContent(i + 1);
+    if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+
 }
 
 void DQMHistAnalysisTRGGDLModule::endRun()
@@ -348,7 +373,12 @@ void DQMHistAnalysisTRGGDLModule::endRun()
 
 void DQMHistAnalysisTRGGDLModule::terminate()
 {
-
+#ifdef _BELLE2_EPICS
+  for (auto i = 0; i < n_eff_shifter; i++) {
+    if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   B2DEBUG(20, "terminate called");
 }
 

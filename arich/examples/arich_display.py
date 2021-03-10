@@ -21,12 +21,6 @@ import os
 from optparse import OptionParser
 home = os.environ['BELLE2_LOCAL_DIR']
 
-
-# reset_database()
-# use_central_database("development")
-b2.use_database_chain()
-b2.use_central_database("data_reprocessing_prod5", b2.LogLevel.WARNING)
-
 # parameters
 parser = OptionParser()
 parser.add_option('-f', '--file', dest='filename', default='ARICHHits.root')

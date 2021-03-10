@@ -37,6 +37,9 @@ namespace Belle2 {
      */
     explicit PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
 
+    /** destructor */
+    virtual ~PXDDAQPacketStatus() {};
+
     /** Return Usability of data
      * @return conclusion if data is useable
      */

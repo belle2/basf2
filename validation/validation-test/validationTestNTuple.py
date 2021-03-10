@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# @cond SUPPRESS_DOXYGEN
+
 """
 <header>
 <output>validationTestNTuple.root</output>
@@ -76,3 +78,5 @@ if __name__ == "__main__":
     # Closing
 
     tfile.Close()
+
+# @endcond

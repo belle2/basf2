@@ -1046,9 +1046,9 @@ void Particle::setFlavorType()
 {
   m_flavorType = c_Flavored;
   if (m_pdgCode < 0) return;
-  if (m_pdgCode == 22) {m_flavorType = c_Unflavored; return;} // gamma
-  if (m_pdgCode == 310) {m_flavorType = c_Unflavored; return;} // K_s
-  if (m_pdgCode == 130) {m_flavorType = c_Unflavored; return;} // K_L
+  if (m_pdgCode == Const::photon.getPDGCode()) {m_flavorType = c_Unflavored; return;} // gamma
+  if (m_pdgCode == Const::Kshort.getPDGCode()) {m_flavorType = c_Unflavored; return;} // K_s
+  if (m_pdgCode == Const::Klong.getPDGCode()) {m_flavorType = c_Unflavored; return;} // K_L
   if (m_pdgCode == 43) {m_flavorType = c_Unflavored; return;} // Xu0
   int nnn = m_pdgCode / 10;
   int q3 = nnn % 10; nnn /= 10;

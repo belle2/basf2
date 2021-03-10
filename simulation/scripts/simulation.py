@@ -157,14 +157,18 @@ def add_simulation(
                     pxd_veto_emulator = b2.register_module('PXDInjectionVetoEmulator')
                     path.add_module(pxd_veto_emulator)
 
-    # PXD background generator module
+    # PXD background generation
     if pxd_background_generator is not None:
-        # check that PXD simulation is desired
+        # check that PXD simulation is enabled
         if components is None or 'PXD' in components:
-            # add the PXD background generator module to path
-            add_pxd_background_generator(path, pxd_background_generator)
+            # check that background overlay is enabled
+            if bkgOverlay and bkgfiles is not None:
+                # add the PXD background generator module to path
+                add_pxd_background_generator(path, pxd_background_generator)
+            else:
+                b2.B2ERROR('background overlay disabled - cannot run PXD background generation')
         else:
-            b2.B2WARNING('PXD simulation is not enabled - skipping PXD background generation')
+            b2.B2ERROR('PXD simulation disabled - cannot run PXD background generation')
 
     # geometry parameter database
     if 'Gearbox' not in path:

@@ -692,7 +692,24 @@ class CombinedSkim(BaseSkim):
     __category__ = "combined"
     __contact__ = None
 
-    def __init__(self, *skims, NoisyModules=None, CombinedSkimName="CombinedSkim"):
+    def __init__(
+            self,
+            *skims,
+            NoisyModules=None,
+            additionalDataDescription=None,
+            udstOutput=None,
+            CombinedSkimName="CombinedSkim",
+    ):
+        """Initialise the CombinedSkim class.
+
+        Parameters:
+            *skims (BaseSkim): One or more (instantiated) skim objects.
+            NoisyModules (list(str)): Additional modules to silence.
+            additionalDataDescription (dict): Overrides corresponding setting of all individual skims.
+            udstOutput (bool): Overrides corresponding setting of all individual skims.
+            CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
+        """
+
         if NoisyModules is None:
             NoisyModules = []
         # Check that we were passed only BaseSkim objects
@@ -706,6 +723,14 @@ class CombinedSkim(BaseSkim):
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
         self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
+        if additionalDataDescription is not None:
+            for skim in self:
+                skim.additionalDataDescription = additionalDataDescription
+
+        if udstOutput is not None:
+            for skim in self:
+                skim._udstOutput = udstOutput
+
         self.merge_data_structures()
 
     def __str__(self):
@@ -715,6 +740,9 @@ class CombinedSkim(BaseSkim):
         self.name
 
     def __call__(self, path):
+        for skim in self:
+            skim._MainPath = path
+
         self.set_skim_logging(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
@@ -789,7 +817,8 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self:
-            skim.output_udst(skim._ConditionalPath or path)
+            if skim._udstOutput:
+                skim.output_udst(skim._ConditionalPath or path)
 
     def apply_hlt_hadron_cut_if_required(self, path):
         """Run the `BaseSkim.apply_hlt_hadron_cut_if_required` function for each skim.

@@ -128,6 +128,9 @@ def add_simulation(
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
+    :param pxd_background_generator: Specifications to pass to the PXD background generator module,
+        defaults to None - disable the module
+    :type pxd_background_generator: :py:class:`pxd.background_generator.Specs`, optional
     """
 
     # Check compoments.

@@ -323,7 +323,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :class: toggle solution
 
      Running ``b2help-particles --min 3.0 --max 3.6`` shows that there are 7 particles in this particular mass range:
-     :math:`J/\Psi`, :math:`\Xi_{cc}^+`, :math:`\bar{\Xi}_{cc}^+` :math:`\chi_{c0}`, :math:`\chi_{c1}`,
+     :math:`J/\Psi`, :math:`\Xi_{cc}^+`, :math:`\bar{\Xi}_{cc}^-` :math:`\chi_{c0}`, :math:`\chi_{c1}`,
      :math:`\chi_{c2}` and :math:`h_c`.
 
 

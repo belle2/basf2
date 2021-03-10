@@ -26,7 +26,7 @@ namespace Belle2 {
        * Class constructor
        * @param moduleID slot ID
        */
-      BackgroundPDF(int moduleID);
+      explicit BackgroundPDF(int moduleID);
 
       /**
        * Returns slot ID

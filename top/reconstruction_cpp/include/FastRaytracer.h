@@ -31,7 +31,7 @@ namespace Belle2 {
        * @param geometry treatement of quartz geometry
        * @param optics treatement of spherical mirror optics
        */
-      FastRaytracer(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear):
+      explicit FastRaytracer(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear):
         RaytracerBase(moduleID, geometry, optics)
       {};
 

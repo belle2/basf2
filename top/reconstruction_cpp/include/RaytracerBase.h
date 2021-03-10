@@ -131,7 +131,7 @@ namespace Belle2 {
        * @param geometry treatement of quartz geometry
        * @param optics treatement of spherical mirror optics
        */
-      RaytracerBase(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear);
+      explicit RaytracerBase(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear);
 
       /**
        * Returns slot ID.

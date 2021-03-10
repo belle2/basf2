@@ -45,8 +45,8 @@ namespace Belle2 {
       double sz = 0; /**< window surface direction in z */
       double ny = 0; /**< normal to window surface, y component */
       double nz = 0; /**< normal to window surface, z component */
-      double nsy[2] = {0, 0}; /** normals to upper [0] and slanted [1] surfaces, y component */
-      double nsz[2] = {0, 0}; /** normals to upper [0] and slanted [1] surfaces, z component */
+      double nsy[2] = {0, 0}; /**< normals to upper [0] and slanted [1] surfaces, y component */
+      double nsz[2] = {0, 0}; /**< normals to upper [0] and slanted [1] surfaces, z component */
 
       /**
        * constructor

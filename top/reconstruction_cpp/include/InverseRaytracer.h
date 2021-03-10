@@ -54,7 +54,7 @@ namespace Belle2 {
          * Constructor from cosine of Cerenkov angle
          * @param cosTheta cosine of Cerenkov angle
          */
-        CerenkovAngle(double cosTheta);
+        explicit CerenkovAngle(double cosTheta);
       };
 
 
@@ -126,7 +126,7 @@ namespace Belle2 {
       /**
        * Class constructor
        * @param moduleID slot ID
-       * @param cosine of total reflection angle
+       * @param cosTotal cosine of total reflection angle
        */
       InverseRaytracer(int moduleID, double cosTotal): RaytracerBase(moduleID, c_Unified, c_SemiLinear),
         m_cosTotal(cosTotal)

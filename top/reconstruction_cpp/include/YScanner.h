@@ -209,7 +209,7 @@ namespace Belle2 {
          * Constructor with pixel ID
          * @param ID pixel ID (1-based)
          */
-        Result(int ID): pixelID(ID)
+        explicit Result(int ID): pixelID(ID)
         {}
 
         /**

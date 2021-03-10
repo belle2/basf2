@@ -169,9 +169,9 @@ namespace Belle2 {
       std::vector<GausXY> m_tableGaus; /**< table of normal (Gaussian) distribution */
 
       // variables set in prepare method (track/hypothesis dependent)
-      double m_xE;  /**< average photon emission position in x */
-      double m_yE;  /**< average photon emission position in y */
-      double m_zE;  /**< average photon emission position in z */
+      double m_xE = 0;  /**< average photon emission position in x */
+      double m_yE = 0;  /**< average photon emission position in y */
+      double m_zE = 0;  /**< average photon emission position in z */
       double m_dirFrac = 0; /**< fraction of direct photons */
       double m_dirT0 = 0;   /**< minimal propagation time of direct photons */
       double m_reflT0 = 0;  /**< minimal propagation time of reflected photons */

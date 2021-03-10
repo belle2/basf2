@@ -57,7 +57,7 @@ namespace Belle2 {
          * Constructor from direction vector
          * @param direction track direction at photon emission (must be unit vector)
          */
-        TrackAngles(const TVector3& direction);
+        explicit TrackAngles(const TVector3& direction);
 
         /**
          * Returns direction vector

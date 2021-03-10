@@ -79,8 +79,7 @@ namespace Belle2 {
       double dz = zD - emiPoint.Z();
 
       double dxdz = dx / dz;
-      bool ok = solve(dxdz, cer, trk);
-      if (not ok) return c_NoEquationSolution;
+      if (not solve(dxdz, cer, trk)) return c_NoEquationSolution;
 
       for (int i = 0; i < 2; i++) {
         auto& sol = m_solutions[i].back();
@@ -98,8 +97,7 @@ namespace Belle2 {
         if (not sol.getStatus()) m_ok[i] = false;
       }
 
-      bool atLeastOne = m_ok[0] or m_ok[1];
-      if (not atLeastOne) return c_NoPhysicsSolution;
+      if (not(m_ok[0] or m_ok[1])) return c_NoPhysicsSolution;
 
       return m_solutions[0].size() - 1;
     }
@@ -183,8 +181,7 @@ namespace Belle2 {
         if (not sol.getStatus()) m_ok[i] = false;
       }
 
-      bool atLeastOne = m_ok[0] or m_ok[1];
-      if (not atLeastOne) return c_NoPhysicsSolution;
+      if (not(m_ok[0] or m_ok[1])) return c_NoPhysicsSolution;
 
       return m_solutions[0].size() - 1;
     }
@@ -252,8 +249,7 @@ namespace Belle2 {
         m_ok[i] = sol.getStatus();
       }
 
-      bool atLeastOne = m_ok[0] or m_ok[1];
-      if (not atLeastOne) return c_NoPhysicsSolution;
+      if (not(m_ok[0] or m_ok[1])) return c_NoPhysicsSolution;
 
       return m_solutions[0].size() - 1;
     }
@@ -334,7 +330,6 @@ namespace Belle2 {
         double y = getDeltaXE(x, xe, ze, xd, zd);
         if (y * y1 < 0) {
           x2 = x;
-          y2 = y;
         } else {
           x1 = x;
           y1 = y;

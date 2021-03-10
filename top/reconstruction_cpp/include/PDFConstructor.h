@@ -57,11 +57,11 @@ namespace Belle2 {
         double expPhotons = 0; /**< expected number of photons */
         unsigned numPhotons = 0; /**< detected number of photons */
 
-        /*
+        /**
          * Constructor
          * @param phot expected number of photons
          */
-        LogL(double phot): logL(-phot), expPhotons(phot)
+        explicit LogL(double phot): logL(-phot), expPhotons(phot)
         {}
       };
 
@@ -77,13 +77,13 @@ namespace Belle2 {
         double phiCer = 0;  /**< azimuthal Cerenkov angle (signal) or 0 (background)*/
         double wt = 0;      /**< weight */
 
-        /*
+        /**
          * Constructor
          * @param pix pixel ID
          * @param t photon time
          * @param t0 PDF peak time
          * @param tts0 TTS gaussian peak time
-         * @param sigma peak overall sigma
+         * @param sig peak overall sigma
          * @param phi azimuthal Cerenkov angle
          * @param w weight
          */

@@ -11,8 +11,9 @@
 #include <top/dbobjects/TOPGeoPrism.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
+#include <cmath>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -137,12 +138,8 @@ namespace Belle2 {
     TVector2 norm(0, -1); // window normal
     auto slanted = normals[1]; // slanted surface normal
 
-    std::vector<UnfoldedWindow> tmp;
-    reflect(points, normals, orig, surf, norm, slanted, 1, tmp); // unfolding down
-    while (not tmp.empty()) {
-      m_unfoldedWindows.push_back(tmp.back());
-      tmp.pop_back();
-    }
+    reflect(points, normals, orig, surf, norm, slanted, 1, m_unfoldedWindows); // unfolding down
+    std::reverse(m_unfoldedWindows.begin(), m_unfoldedWindows.end());
     m_unfoldedWindows.push_back(UnfoldedWindow(orig, surf, norm, slanted)); // true window
     m_k0 = m_unfoldedWindows.size() - 1;
     reflect(points, normals, orig, surf, norm, slanted, 0, m_unfoldedWindows); // unfolding up

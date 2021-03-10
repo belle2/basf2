@@ -723,6 +723,9 @@ class CombinedSkim(BaseSkim):
         self._check_duplicate_list_names()
         self.output_udst(path)
 
+    def __iter__(self):
+        yield from self.Skims
+
     def load_standard_lists(self, path):
         """Add all required standard list loading to the path.
 
@@ -736,7 +739,7 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         ModulesAndParams = []
-        for skim in self.Skims:
+        for skim in self:
             DummyPath = b2.Path()
             skim.load_standard_lists(DummyPath)
 
@@ -767,7 +770,7 @@ class CombinedSkim(BaseSkim):
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        for skim in self.Skims:
+        for skim in self:
             skim.additional_setup(path)
 
     def build_lists(self, path):
@@ -776,7 +779,7 @@ class CombinedSkim(BaseSkim):
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        for skim in self.Skims:
+        for skim in self:
             skim.build_lists(skim._ConditionalPath or path)
 
     def output_udst(self, path):
@@ -785,7 +788,7 @@ class CombinedSkim(BaseSkim):
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        for skim in self.Skims:
+        for skim in self:
             skim.output_udst(skim._ConditionalPath or path)
 
     def apply_hlt_hadron_cut_if_required(self, path):
@@ -794,7 +797,7 @@ class CombinedSkim(BaseSkim):
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        for skim in self.Skims:
+        for skim in self:
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
 
     @property
@@ -830,7 +833,7 @@ class CombinedSkim(BaseSkim):
             RuntimeError: Raised if the individual skims in combined skim contain a mix
                 of True and False for this property.
         """
-        produce_on_tau = [skim.produce_on_tau_samples for skim in self.Skims]
+        produce_on_tau = [skim.produce_on_tau_samples for skim in self]
         if all(produce_on_tau):
             return True
         elif all(not TauBool for TauBool in produce_on_tau):
@@ -842,7 +845,7 @@ class CombinedSkim(BaseSkim):
                 "    It is unclear what should be done in this situation."
                 "Please reorganise the combined skims to address this.\n"
                 "    Skims included in the problematic combined skim: "
-                f"{', '.join(skim.name for skim in self.Skims)}"
+                f"{', '.join(skim.name for skim in self)}"
             )
 
     def merge_data_structures(self):
@@ -860,7 +863,7 @@ class CombinedSkim(BaseSkim):
         """
         for iSkim, skim in enumerate(self.Skims):
             for attribute, MergingFunction in skim.MergeDataStructures.items():
-                SkimsWithAttribute = [skim for skim in self.Skims if hasattr(skim, attribute)]
+                SkimsWithAttribute = [skim for skim in self if hasattr(skim, attribute)]
                 setattr(
                     self.Skims[iSkim],
                     attribute,
@@ -875,7 +878,7 @@ class CombinedSkim(BaseSkim):
             Skims cannot be relied on to define their particle list names in advance, so
             this function can only be run after `build_lists` is run.
         """
-        ParticleListLists = [skim.SkimLists for skim in self.Skims]
+        ParticleListLists = [skim.SkimLists for skim in self]
         ParticleLists = [lst for L in ParticleListLists for lst in L]
         DuplicatedParticleLists = {
             ParticleList

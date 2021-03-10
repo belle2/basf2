@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Hikaru Tanigawa                            *
+ * Contributors: Marko Staric, Hikaru Tanigawa, Ludovico Massaccesi       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -109,6 +109,19 @@ namespace Belle2 {
       virtual void normalize_rates(TreeStruct& rates);
 
       /**
+       * Normalize a TreeStruct that stores charge/energy, not hits.
+       * @param rates TreeStruct to be normalized.
+       *
+       * Assumes the TreeStruct contains the total accumulated cluster
+       * charge (in e-), and uses Const::ehEnergy and the mass of the
+       * sensors to convert to the average dose rate per event in
+       * mrad/s.
+       *
+       * Assumes the integration time is 155 ns (6 samples).
+       */
+      virtual void normalize_energy_rates(TreeStruct& rates);
+
+      /**
        * Return number of strips on a sensor.
        * @param layer layer number of the sensor (starting from 0)
        * @param isU true if the sensor is U side, false if V.
@@ -118,6 +131,14 @@ namespace Belle2 {
         if (!isU && layer > 0) return 512; // V side on Layer 4,5,6
         else return 768;
       }
+
+      /**
+       * Returns the (active) mass of the given sensor in Kg.
+       * @param layer tha layer number (starting from 0, not 3)
+       * @param ladder the ladder number (starting from 0, not 1)
+       * @param sensor the sensor number (starting from 0, not 1)
+       */
+      double massOfSensor(int layer, int ladder, int sensor);
 
     private:
 
@@ -130,11 +151,13 @@ namespace Belle2 {
       TreeStruct m_rates; /**< tree variables for fired strips */
       TreeStruct m_rates_highE; /**< tree variables for high-energy clusters */
       TreeStruct m_rates_lowE; /**< tree variables for low-energy clusters */
+      TreeStruct m_rates_energyU; /**< Tree variables for deposited energy (U-side) */
 
       // buffer
       std::map<unsigned, TreeStruct> m_buffer; /**< average strip occupancies in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_highE; /**< average cluster occupancies (high energy) in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_lowE; /**< average cluster occupancies (low energy) in time stamps */
+      std::map<unsigned, TreeStruct> m_buffer_energyU; /**< Average deposited energy (U-side) per event in time stamps */
 
       // collections
       StoreArray<SVDShaperDigit> m_digits;  /**< collection of digits */
@@ -156,6 +179,11 @@ namespace Belle2 {
       int m_l3LadderSensorActiveStrips[7][2] = {0}; /**< number of active strips in each sensor in Layer 3 */
       double m_thrCharge = 0; /**< cut on cluster energy in electrons */
 
+      double m_massKg = 0; /**< Active mass of the whole SVD in Kg. */
+      double m_layerMassKg[4] = {0}; /**< Active mass of each layer in Kg. */
+      double m_layerLadderMassKg[4][16] = {0}; /**< Active mass of each ladder of each layer, in Kg. */
+      double m_layerSensorMassKg[4][5] = {0}; /**< Active mass of each ladder/sensor position, in Kg. */
+      // No need for m_l3LadderSensorMassKg, massOfSensor() can be used.
     };
 
   } // Background namespace

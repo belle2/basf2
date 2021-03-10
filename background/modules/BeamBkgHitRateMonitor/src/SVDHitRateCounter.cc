@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Hikaru Tanigawa                            *
+ * Contributors: Marko Staric, Hikaru Tanigawa, Ludovico Massaccesi       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,8 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 
 using namespace std;
 
@@ -34,7 +36,8 @@ namespace Belle2 {
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
       tree->Branch("svd_lowE", &m_rates_lowE,
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
-
+      tree->Branch("svd_energyU", &m_rates_energyU,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
 
       // count active strips
       for (int layer = 0; layer < m_nLayers; layer++) {
@@ -70,6 +73,18 @@ namespace Belle2 {
         }
       }
 
+      // Compute active mass
+      for (layer = 0; layer < m_nLayers; layer++) {
+        for (int ladder = 0; ladder < m_nLadders[layer]; ladder++) {
+          for (int sensor = 0; sensor < m_nSensors[layer]; sensor++) {
+            double mass = massOfSensor(layer, ladder, sensor);
+            m_massKg += mass;
+            m_layerMassKg[layer] += mass;
+            m_layerLadderMassKg[layer][ladder] += mass;
+            m_layerSensorMassKg[layer][sensor] += mass;
+          }
+        }
+      }
     }
 
     void SVDHitRateCounter::clear()
@@ -121,10 +136,12 @@ namespace Belle2 {
         // get buffer element
         auto& rates_highE = m_buffer_highE[timeStamp];
         auto& rates_lowE = m_buffer_lowE[timeStamp];
+        auto& rates_energyU = m_buffer_energyU[timeStamp];
 
         // increment event counter
         rates_highE.numEvents++;
         rates_lowE.numEvents++;
+        rates_energyU.numEvents++;
 
         // accumulate clusters
         for (const auto& cluster : m_clusters) {
@@ -147,11 +164,20 @@ namespace Belle2 {
             if (layer == 0)
               rates_lowE.l3LadderSensorAverageRates[ladder][sensor] ++;
           }
+          if (cluster.isUCluster()) {
+            rates_energyU.layerAverageRates[layer] += cluster.getCharge();
+            rates_energyU.layerLadderAverageRates[layer][ladder] += cluster.getCharge();
+            rates_energyU.layerSensorAverageRates[layer][sensor] += cluster.getCharge();
+            rates_energyU.averageRate += cluster.getCharge();
+            if (layer == 0)
+              rates_energyU.l3LadderSensorAverageRates[ladder][sensor] += cluster.getCharge();
+          }
         }
 
         // set flag to true to indicate the rates are valid
         rates_highE.valid = true;
         rates_lowE.valid = true;
+        rates_energyU.valid = true;
       }
 
     }
@@ -163,10 +189,12 @@ namespace Belle2 {
       m_rates = m_buffer[timeStamp];
       m_rates_highE = m_buffer_highE[timeStamp];
       m_rates_lowE = m_buffer_lowE[timeStamp];
+      m_rates_energyU = m_buffer_energyU[timeStamp];
 
       SVDHitRateCounter::normalize_rates(m_rates);
       SVDHitRateCounter::normalize_rates(m_rates_highE);
       SVDHitRateCounter::normalize_rates(m_rates_lowE);
+      SVDHitRateCounter::normalize_energy_rates(m_rates_energyU);
     }
 
     void SVDHitRateCounter::normalize_rates(TreeStruct& rates)
@@ -194,6 +222,50 @@ namespace Belle2 {
         }
       }
     }
+
+    void SVDHitRateCounter::normalize_energy_rates(TreeStruct& rates)
+    {
+      static const double ehEnergyJoules = Const::ehEnergy / Unit::J;
+      static const double integrationTime = 155 * Unit::ns;
+      static const double integrationTimeSeconds = integrationTime / Unit::s;
+      // Convert charge to mrad/s by multiplying by this constant and dividing by the mass
+      static const double conv = ehEnergyJoules / integrationTimeSeconds * 100e3;
+
+      if (!rates.valid) return;
+
+      rates.normalize(); // Divide by nEvents
+      // Convert to dose rate [mrad/s]
+      rates.averageRate *= conv / m_massKg;
+      for (int layer = 0; layer < m_nLayers; layer++) {
+        rates.layerAverageRates[layer] *= conv / m_layerMassKg[layer];
+        for (int ladder = 0; ladder < m_nLadders[layer]; ladder++)
+          rates.layerLadderAverageRates[layer][ladder] *= conv / m_layerLadderMassKg[layer][ladder];
+        for (int sensor = 0; sensor < m_nSensors[layer]; sensor++)
+          rates.layerSensorAverageRates[layer][sensor] *= conv / m_layerSensorMassKg[layer][sensor];
+      }
+      int layer = 0;
+      for (int ladder = 0; ladder < m_nLadders[layer]; ladder++)
+        for (int sensor = 0; sensor < m_nSensors[layer]; sensor++)
+          rates.l3LadderSensorAverageRates[ladder][sensor] *= conv / massOfSensor(layer, ladder, sensor);
+    }
+
+    // layer is unused, but this may be changed in the future. Better keep it.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    double SVDHitRateCounter::massOfSensor(int layer, int ladder, int sensor)
+    {
+      static const double rho_Si = 2.329 * Unit::g_cm3;
+      static const double activeAreaHPKSmall = 122.9 * 38.55 * Unit::mm2;
+      static const double activeAreaHPKLarge = 122.9 * 57.72 * Unit::mm2;
+      static const double activeAreaMicron = 122.76 * (57.59 + 38.42) / 2 * Unit::mm2;
+      static const double thicknessHPK = 320 * Unit::um;
+      static const double thicknessMicron = 280 * Unit::um;
+      static const double massHPKSmallKg = activeAreaHPKSmall * thicknessHPK * rho_Si / 1e3;
+      static const double massHPKLargeKg = activeAreaHPKLarge * thicknessHPK * rho_Si / 1e3;
+      static const double massMicronKg = activeAreaMicron * thicknessMicron * rho_Si / 1e3;
+      return layer == 0 ? massHPKSmallKg : (sensor == 0 ? massMicronKg : massHPKLargeKg);
+    }
+#pragma GCC diagnostic pop
 
   } // background namespace
 } // Belle2 namespace

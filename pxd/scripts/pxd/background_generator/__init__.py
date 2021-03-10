@@ -282,7 +282,7 @@ class Specs:
     # Name extension of the background digit collection
 
 
-class BackgroundGenerator(basf2.Module):
+class PXDBackgroundGenerator(basf2.Module):
     """Generates PXD background data on-the-fly.
 
     .. warning::
@@ -377,7 +377,7 @@ def add_pxd_background_generator(path: basf2.Path, specs: Specs = None):
     if specs is not None:
         # add the module to the path
         basf2.B2INFO("Adding the PXD background generator module to path")
-        path.add_module(BackgroundGenerator(specs))
+        path.add_module(PXDBackgroundGenerator(specs))
 
         # enable the global tag that stores the model checkpoints
         basf2.conditions.append_globaltag(specs.globaltag)

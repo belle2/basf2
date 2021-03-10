@@ -28,8 +28,9 @@ RunNumber RunNumberTable::add(const std::string& node,
   } else if (node == "global") {
     if (runtype != "physics" && runtype != "cosmic" && runtype != "beam" &&
         runtype != "null" && runtype != "debug" && runtype != "hlttest") {
-      LogFile::fatal("wrong node name or runtype : node='%s' runtype='%s'!=physics/cosmic/beam/debug/test/null", node.c_str(),
+      LogFile::fatal("wrong node name or runtype : node='%s' runtype='%s'!=physics/cosmic/beam/debug/hlttest/null", node.c_str(),
                      runtype.c_str());
+      return RunNumber();
     }
   } else {
     LogFile::fatal("wrong node name : node='%s'!=global/pxd/svd/cdc/top/arich/ecl/klm/trg/b4test runtype='%s'", node.c_str(),

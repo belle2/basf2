@@ -53,8 +53,8 @@ static double s_UpperTimeBoundary = 0;
 /** Maximal propagation distance (strip length). */
 static double s_StripLength = 0;
 
-static bool compareEventNumber(std::pair<uint16_t, unsigned int>& pair1,
-                               std::pair<uint16_t, unsigned int>& pair2)
+static bool compareEventNumber(const std::pair<uint16_t, unsigned int>& pair1,
+                               const std::pair<uint16_t, unsigned int>& pair2)
 {
   return pair1.second < pair2.second;
 }
@@ -69,6 +69,7 @@ static double timeDensity(double x[2], double* par)
   return fabs(polynomial + gauss);
 }
 
+/* cppcheck-suppress constParameter */
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;
@@ -143,20 +144,21 @@ void KLMTimeAlgorithm::setupDatabase()
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
 {
   B2INFO("Read tree entries and seprate events by module id.");
+  Event event;
   std::shared_ptr<TTree> timeCalibrationData;
   timeCalibrationData = getObjectPtr<TTree>("time_calibration_data");
-  timeCalibrationData->SetBranchAddress("t0", &m_Event.t0);
-  timeCalibrationData->SetBranchAddress("flyTime", &m_Event.flyTime);
-  timeCalibrationData->SetBranchAddress("recTime", &m_Event.recTime);
-  timeCalibrationData->SetBranchAddress("dist", &m_Event.dist);
-  timeCalibrationData->SetBranchAddress("diffDistX", &m_Event.diffDistX);
-  timeCalibrationData->SetBranchAddress("diffDistY", &m_Event.diffDistY);
-  timeCalibrationData->SetBranchAddress("diffDistZ", &m_Event.diffDistZ);
-  timeCalibrationData->SetBranchAddress("eDep", &m_Event.eDep);
-  timeCalibrationData->SetBranchAddress("nPE", &m_Event.nPE);
-  timeCalibrationData->SetBranchAddress("channelId", &m_Event.channelId);
-  timeCalibrationData->SetBranchAddress("inRPC", &m_Event.inRPC);
-  timeCalibrationData->SetBranchAddress("isFlipped", &m_Event.isFlipped);
+  timeCalibrationData->SetBranchAddress("t0", &event.t0);
+  timeCalibrationData->SetBranchAddress("flyTime", &event.flyTime);
+  timeCalibrationData->SetBranchAddress("recTime", &event.recTime);
+  timeCalibrationData->SetBranchAddress("dist", &event.dist);
+  timeCalibrationData->SetBranchAddress("diffDistX", &event.diffDistX);
+  timeCalibrationData->SetBranchAddress("diffDistY", &event.diffDistY);
+  timeCalibrationData->SetBranchAddress("diffDistZ", &event.diffDistZ);
+  timeCalibrationData->SetBranchAddress("eDep", &event.eDep);
+  timeCalibrationData->SetBranchAddress("nPE", &event.nPE);
+  timeCalibrationData->SetBranchAddress("channelId", &event.channelId);
+  timeCalibrationData->SetBranchAddress("inRPC", &event.inRPC);
+  timeCalibrationData->SetBranchAddress("isFlipped", &event.isFlipped);
 
   B2INFO(LogVar("Total number of digits:", timeCalibrationData->GetEntries()));
   m_evts.clear();
@@ -166,7 +168,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::readCalibrationData()
     return CalibrationAlgorithm::c_NotEnoughData;
   for (int i = 0; i < n; ++i) {
     timeCalibrationData->GetEntry(i);
-    m_evts[m_Event.channelId].push_back(m_Event);
+    m_evts[event.channelId].push_back(event);
   }
   B2INFO("Events packing finish.");
   return CalibrationAlgorithm::c_OK;

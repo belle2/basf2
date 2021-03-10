@@ -45,40 +45,40 @@ namespace Belle2 {
     struct Event {
 
       /** EventT0 for the digit. */
-      double t0;
+      double t0 = 0;
 
       /** Particle flying time. */
-      double flyTime;
+      double flyTime = 0;
 
       /** Recosntruction time respected to the trigger time. */
-      double recTime;
+      double recTime = 0;
 
       /** Propagation distance from hit to FEE. */
-      double dist;
+      double dist = 0;
 
       /** Global position difference between klmHit2d and ExtHit (X). */
-      double diffDistX;
+      double diffDistX = 0;
 
       /** Global position difference between klmHit2d and ExtHit (Y). */
-      double diffDistY;
+      double diffDistY = 0;
 
       /** Global position difference between klmHit2d and ExtHit (Z). */
-      double diffDistZ;
+      double diffDistZ = 0;
 
       /** Collect energy eV. */
-      double eDep;
+      double eDep = 0;
 
       /** Number of photon electron. */
-      double nPE;
+      double nPE = 0;
 
       /** Unique channel id Barral and endcap merged. */
-      int channelId;
+      int channelId = 0;
 
       /** BKLM RPC flag, used for testing and not necessary. */
-      bool inRPC;
+      bool inRPC = 0;
 
       /** If phi and z plane flipped, used for testing and not necessary. */
-      bool isFlipped;
+      bool isFlipped = 0;
 
       /**
        * Get propagation time + cableDelay time.
@@ -241,9 +241,6 @@ namespace Belle2 {
       TProfile* profileEKLMScintillatorPlane1,
       TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms);
 
-    /** Collected event data. */
-    Event m_Event;
-
     /**
      * Container of hit information.
      * the global element number of the strip is used as the key.
@@ -321,10 +318,10 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** BKLM geometry data. */
-    const bklm::GeometryPar* m_BKLMGeometry;
+    const bklm::GeometryPar* m_BKLMGeometry = nullptr;
 
     /** EKLM geometry data. */
-    const EKLM::GeometryData* m_EKLMGeometry;
+    const EKLM::GeometryData* m_EKLMGeometry = nullptr;
 
     /** KLM ChannelIndex object. */
     KLMChannelIndex m_klmChannels;

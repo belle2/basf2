@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 import subprocess
 import json
+from pathlib import Path
 import re
 
 import yaml
@@ -13,9 +14,15 @@ from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 
 
-def _get_test_sample_info(sampleName):
-    """Read in the YAML file of test samples (``skim/scripts/TestFiles.yaml``) and
-    return the info for a sample as a dict.
+def get_test_file(sampleName):
+    """
+    Return the KEKCC location of files used specifically for skim testing
+
+    Args:
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+
+    Returns:
+        The path to the test file on KEKCC.
     """
 
     with open(b2.find_file("skim/scripts/TestFiles.yaml")) as f:
@@ -29,77 +36,39 @@ def _get_test_sample_info(sampleName):
         raise KeyError(msg)
 
 
-def get_test_file(sampleName):
+def get_file_metadata(filename):
     """
-    Returns the KEKCC location of files used specifically for skim testing
+    Retrieve the metadata for a file using ``b2file-metadata-show``.
 
-    Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Parameters:
+       metadata (str): File to get number of events from.
+
     Returns:
-        The path to the test file on KEKCC.
+        metadata: Metadata of file in dict format.
     """
-    sampleInfo = _get_test_sample_info(sampleName)
+    if not Path(filename).exists():
+        raise FileNotFoundError(f"Could not find file {filename}")
 
-    if "location" in sampleInfo and sampleInfo["location"] is not None:
-        return sampleInfo["location"]
-    else:
-        msg = f"No test file location listed for {sampleName} sample."
-        b2.B2ERROR(msg)
-        raise KeyError(msg)
+    proc = subprocess.run(
+        ["b2file-metadata-show", "--json", str(filename)],
+        stdout=subprocess.PIPE,
+        check=True,
+    )
+    metadata = json.loads(proc.stdout.decode("utf-8"))
+    return metadata
 
 
-def get_total_infiles(sampleName):
+def get_eventN(filename):
     """
-    Returns the total number of input MDST files for a given sample. This is useful for resource estimate.
+    Retrieve the number of events in a file using ``b2file-metadata-show``.
 
-    Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Parameters:
+       filename (str): File to get number of events from.
+
     Returns:
-        Total number of input files for sample.
+        nEvents: Number of events in the file.
     """
-    sampleInfo = _get_test_sample_info(sampleName)
-
-    if "total_input_files" in sampleInfo and sampleInfo["total_input_files"] is not None:
-        return sampleInfo["total_input_files"]
-    else:
-        msg = f"'total_input_files' not listed for {sampleName} sample."
-        raise KeyError(msg)
-
-
-def get_events_per_file(sampleName):
-    """
-    Returns an estimate for the average number of events in an input MDST file of the given sample type.
-
-    Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
-    Returns:
-        The average number of events in file of the given sample type.
-    """
-    sampleInfo = _get_test_sample_info(sampleName)
-
-    if "average_events_per_file" in sampleInfo and sampleInfo["average_events_per_file"] is not None:
-        return sampleInfo["average_events_per_file"]
-    else:
-        msg = f"'average_events_per_file' not listed for {sampleName} sample."
-        raise KeyError(msg)
-
-
-def get_eventN(fileName):
-    """
-    Returns the number of events in a specific file
-
-    Arguments:
-     filename: Name of the file as clearly indicated in the argument's name.
-    """
-
-    process = subprocess.Popen(['b2file-metadata-show', '--json', fileName], stdout=subprocess.PIPE)
-    out = process.communicate()[0]
-    if process.returncode == 0:
-        metadata = json.loads(out)
-        nevents = metadata['nEvents']
-        return nevents
-    else:
-        b2.B2ERROR("FILE INVALID OR NOT FOUND.")
+    return int(get_file_metadata(filename)["nEvents"])
 
 
 def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):

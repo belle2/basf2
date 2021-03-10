@@ -145,6 +145,78 @@ def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
     return skims, modules
 
 
+class InitialiseSkimFlag(b2.Module):
+    """
+    [Module for skim expert usage] Create the EventExtraInfo DataStore object, and set
+    all required flag variables to zero.
+
+    .. Note::
+
+        Add this module to the path before adding any skims, so that the skim flags are
+        defined in the datastore for all events.
+    """
+
+    def __init__(self, skims):
+        # Keep these imports here to avoid ROOT hijacking the argument parser
+        from variables import variables as vm  # noqa
+        from ROOT import Belle2
+
+        super().__init__()
+        if not isinstance(skims, (tuple, list, CombinedSkim)):
+            skims = [skims]
+        self.flags = [f"passes_{skim}" for skim in skims]
+        self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
+
+        # Create aliases for convenience
+        for flag in self.flags:
+            vm.addAlias(flag, f"eventExtraInfo({flag})")
+
+    def event(self):
+        """Initialise all flags to zero."""
+        self.EventExtraInfo.create()
+
+        for flag in self.flags:
+            self.EventExtraInfo.addExtraInfo(flag, 0)
+
+
+class UpdateSkimFlag(b2.Module):
+    """
+    [Module for skim expert usage] Update the skim flag to be 1 if there is at least one
+    candidate in any of the skim lists.
+
+    .. Note::
+
+        Add this module to the post-skim path of each skim in the combined skim, as the
+        skim lists are only guaranteed to exist on the conditional path (if a
+        conditional path was used).
+    """
+
+    def __init__(self, skim):
+        from ROOT import Belle2
+        super().__init__()
+        self.skim = skim
+        self.flag = f"passes_{skim}"
+        self.lists = skim.SkimLists
+        self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
+
+    def event(self):
+        from ROOT import Belle2
+
+        # NOTE: Assumes EventExtraInfo has already been registered by InitialiseSkimFlags,
+        #       and the skim lists have all been built (with all skim cuts applied)
+        ListObjects = [Belle2.PyStoreObj(lst) for lst in self.lists]
+        if any([not ListObj.isValid() for ListObj in ListObjects]):
+            b2.B2ERROR(
+                f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
+                "Did you add this module to the pre-skim path rather than the post-skim path?"
+            )
+        nCandidates = sum(ListObj.getListSize() for ListObj in ListObjects)
+
+        # Override ExtraInfo flag if at least one candidate from any list passed
+        if nCandidates > 0:
+            self.EventExtraInfo.setExtraInfo(self.flag, 1)
+
+
 def _sphinxify_decay(decay_string):
     """Format the given decay string by using LaTeX commands instead of plain-text.
     Output is formatted for use with Sphinx (ReStructured Text).
@@ -431,6 +503,7 @@ class BaseSkim(ABC):
         self._MainPath = path
 
         self.set_skim_logging(path)
+        self.initialise_skim_flag(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
         # At this point, BaseSkim.skim_event_cuts may have been run, so pass
@@ -439,7 +512,7 @@ class BaseSkim(ABC):
         self.build_lists(self._ConditionalPath or path)
         self.apply_hlt_hadron_cut_if_required(self._ConditionalPath or path)
 
-        self.create_skim_flag()
+        self.update_skim_flag(self._ConditionalPath or path)
 
         if self._udstOutput:
             self.output_udst(self._ConditionalPath or path)
@@ -523,45 +596,30 @@ class BaseSkim(ABC):
 
         return ConditionalPath
 
-    _flag = None
-
     @property
     def flag(self):
         """
-        Event-level flag indication whether an event passes the skim or not. This
-
-        raises:
-            RuntimeError: Raised if skim flag has not been defined yet.
+        Event-level variable indicating whether an event passes the skim or not. To use
+        the skim flag without writing uDST output, use the argument ``udstOutput=False``
+        when instantiating the skim class.
         """
-        if self._flag is None:
-            raise RuntimeError(
-                "Skim flag has not been defined yet. Have you added the skim to the path?"
-            )
-        else:
-            return self._flag
+        return f"passes_{self}"
 
-    def create_skim_flag(self):
+    def initialise_skim_flag(self, path):
         """
-        Create a variable which checks that at least one skim list is non-empty.
+        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
+        initialises flag for this skim to zero.
         """
-        # Keep this import here to avoid ROOT hijacking the argument parser
-        from variables import variables as vm  # noqa
+        path.add_module(InitialiseSkimFlag(self))
 
-        if not self.SkimLists:
-            b2.B2FATAL(
-                "Cannot create skim flag, because skim has not been added to the path."
-            )
-        # Create a variable which checks that at least one skim list is non-empty
-        flag = f"passes_{self}"
-        cut = " or ".join(
-            f"[ countInList({SkimList})>0 ]" for SkimList in self.SkimLists
-        )
-        vm.addAlias(flag, f"passesEventCut({cut})")
+    def update_skim_flag(self, path):
+        """
+        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
+        initialises flag for this skim to zero.
 
-        self._flag = flag
-        b2.B2INFO(
-            f"Created event-level flag '{flag}' which is non-zero for events which pass skim {self}."
-        )
+        If a conditional path has been created before this, then
+        """
+        path.add_module(UpdateSkimFlag(self))
 
     def get_skim_list_names(self):
         """
@@ -744,10 +802,12 @@ class CombinedSkim(BaseSkim):
             skim._MainPath = path
 
         self.set_skim_logging(path)
+        self.initialise_skim_flag(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
         self.apply_hlt_hadron_cut_if_required(path)
+        self.update_skim_flag(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
 
@@ -839,19 +899,17 @@ class CombinedSkim(BaseSkim):
         return NotImplemented
 
     @property
-    def flag(self):
+    def flags(self):
         """
-        Undefined property, since the skim flag is not guaranteed to work for a combined skim.
+        List of flags for each skim in combined skim.
         """
-        b2.B2ERROR("Skim flags are not defined for combined skims.")
-        return NotImplemented
+        return [skim.flag for skim in self]
 
-    def create_skim_flag(self):
-        """
-        Undefined method, since the skim flag is not guaranteed to work for a combined skim.
-        """
-        b2.B2ERROR("Skim flags are not defined for combined skims.")
-        return NotImplemented
+    flag = flags  # alias inherited method
+
+    def update_skim_flag(self, path):
+        for skim in self:
+            skim.postskim_path.add_module(UpdateSkimFlag(skim))
 
     @property
     def produce_on_tau_samples(self):

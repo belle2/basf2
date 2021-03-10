@@ -13,6 +13,7 @@
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 /* C++ headers. */
 #include <bitset>
@@ -54,7 +55,7 @@ namespace Belle2 {
     StoreArray<KLMMuidLikelihood> muids;
 
     // Test the non-default constructor
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     EXPECT_EQ(m_muid->getPDGCode(), pdg);

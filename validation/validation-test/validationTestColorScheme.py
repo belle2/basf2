@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# @cond SUPPRESS_DOXYGEN
+
 """
 <header>
 <output>validationTestColorScheme.root</output>
@@ -90,3 +92,5 @@ if __name__ == "__main__":
         generate_gaus("fail expert", mop_expert, distort=1)
 
     tfile.Close()
+
+# @endcond

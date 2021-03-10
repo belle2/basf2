@@ -28,9 +28,6 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = 10
     min_events_per_file = 1000
 
-    max_events_per_calibration = 10000000
-    max_events_per_file = 10000
-
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")

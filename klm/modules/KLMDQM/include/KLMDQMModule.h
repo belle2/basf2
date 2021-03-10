@@ -13,7 +13,6 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -23,6 +22,7 @@
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 /* ROOT headers. */
@@ -79,6 +79,23 @@ namespace Belle2 {
 
   private:
 
+    /** Bins for the trigger bits historgrams. */
+    enum TriggerBitsBin {
+
+      /** 0x8. */
+      c_0x8 = 1,
+
+      /** 0x4. */
+      c_0x4 = 2,
+
+      /** 0x2. */
+      c_0x2 = 3,
+
+      /** 0x1. */
+      c_0x1 = 4,
+
+    };
+
     /** Number of channel hit histograms per sector for BKLM. */
     const int m_ChannelHitHistogramsBKLM = 2;
 
@@ -87,12 +104,6 @@ namespace Belle2 {
 
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
-
-    /** Directory for EKLM DQM histograms in ROOT file. */
-    std::string m_HistogramDirectoryNameEKLM;
-
-    /** Directory for BKLM DQM histograms in ROOT file. */
-    std::string m_HistogramDirectoryNameBKLM;
 
     /** KLM DAQ inclusion. */
     TH1F* m_DAQInclusion;
@@ -123,14 +134,41 @@ namespace Belle2 {
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;
 
-    /** Axial position of muon hit. */
-    TH1F* m_bklmHit2dsZ;
+    /** Number of digits: whole KLM. */
+    TH1F* m_DigitsKLM;
 
-    /** Number of BKLM Digits. */
-    TH1F* m_BklmDigitsNumber;
+    /** Number of digits: BKLM RPCs. */
+    TH1F* m_DigitsRPC;
 
-    /** Number of KLM Digits. */
-    TH1F* m_KlmDigitsNumber;
+    /** Number of digits: BKLM scintillators. */
+    TH1F* m_DigitsScintillatorBKLM;
+
+    /** Number of digits: EKLM scintillators. */
+    TH1F* m_DigitsScintillatorEKLM;
+
+    /** Number of multi-strip digits: BKLM scintillators. */
+    TH1F* m_DigitsMultiStripBKLM;
+
+    /** Number of multi-strip digits: EKLM scintillators. */
+    TH1F* m_DigitsMultiStripEKLM;
+
+    /** Trigger bits: BKLM scintillators. */
+    TH1F* m_TriggerBitsBKLM;
+
+    /** Trigger bits: EKLM scintillators. */
+    TH1F* m_TriggerBitsEKLM;
+
+    /** Number of KLM Digits after LER injection. */
+    TH1F* m_KlmDigitsAfterLERInj;
+
+    /** Histogram to be used for normalization of occupancy after LER injection. */
+    TH1F* m_TriggersLERInj;
+
+    /** Number of KLM Digits after LER injection. */
+    TH1F* m_KlmDigitsAfterHERInj;
+
+    /** Histogram to be used for normalization of occupancy after HER injection. */
+    TH1F* m_TriggersHERInj;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
@@ -144,6 +182,9 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
 
+    /** Raw FTSW. */
+    StoreArray<RawFTSW> m_RawFtsws;
+
     /** Raw KLM. */
     StoreArray<RawKLM> m_RawKlms;
 
@@ -152,9 +193,6 @@ namespace Belle2 {
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_BklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_BklmHit2ds;
 
   };
 

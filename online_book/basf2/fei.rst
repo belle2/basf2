@@ -99,7 +99,7 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: -21
+        :lines: -20
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
 training of the FEI is released, so please check the recommended versions.
@@ -185,7 +185,7 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 36-39
+        :lines: 35-38
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -683,7 +683,7 @@ and explanations on the code structure.
     * FEI Purity and efficiency are controlled by a cut on ``extraInfo(SignalProbability)``
     * The B\ :sub:`tag` from the FEI can be used to construct a complete ϒ(4S) event.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

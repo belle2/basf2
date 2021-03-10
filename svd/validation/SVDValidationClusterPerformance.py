@@ -231,7 +231,7 @@ pu.ploter(
     nbins=121,
     xmin=-0.5,
     xmax=120.5,
-    x_label='Cluster charge (# of electrons)',
+    x_label='cluster SNR',
     y_label='counts',
     granules=pu.gD,
     tree=treeC,

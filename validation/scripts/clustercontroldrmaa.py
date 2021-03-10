@@ -115,8 +115,7 @@ class Cluster(ClusterBase):
         # installations which have no drmaa at all
         import drmaa
 
-        ss = drmaa.Session()
-        print(str(drmaa.Session))
+        print(str(drmaa.Session()))
 
         with drmaa.Session() as session:
             print("got session ")

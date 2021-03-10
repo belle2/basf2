@@ -112,7 +112,7 @@ logging.info("Starting channelmasking from HLT histograms")
 logging.info("Experiment: "+str(experiment))
 
 numFiles = len(fileNames)
-if numFiles is 0:
+if numFiles == 0:
     logging.error('No files found, exiting')
     sys.exit()
 

@@ -14,6 +14,7 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
 #include <memory>
@@ -51,6 +52,8 @@ namespace Belle2 {
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
       /// Store Object for reading the l1 result
       StoreObjPtr<TRGSummary> m_l1Result;
+      /// EventMetaData is used by processEvent()/processCore().
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
       /// TFile to store the debug TTree
       std::unique_ptr<TFile> m_debugOutputFile;
       /// TTree to store the debug output

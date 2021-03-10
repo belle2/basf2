@@ -6,7 +6,7 @@ import re
 import functools
 import numpy as np
 import collections
-from .plot import ValidationPlot
+from tracking.validation.plot import ValidationPlot
 
 import logging
 
@@ -361,7 +361,7 @@ def put_legend_outside(ax,
     if exclude_handles:
         select_handles = [handle for handle in select_handles if handle not in exclude_handles]
 
-    fig = ax.get_figure()
+    # fig = ax.get_figure()
     # trans = transforms.blended_transform_factory(fig.transFigure, ax.transAxes)
 
     if bottom:
@@ -480,7 +480,7 @@ def get_stats_from_th(th):
     th.GetStats(stats_values)
 
     sum_w = stats_values[0]
-    sum_w2 = stats_values[1]
+    # sum_w2 = stats_values[1]
     sum_wx = stats_values[2]
     sum_wx2 = stats_values[3]
     sum_wy = stats_values[4]  # Only for TH2 and TProfile
@@ -510,7 +510,6 @@ def compose_stats_label(title, additional_stats=None):
     """Render the summary statistics to a label string."""
     if additional_stats is None:
         additional_stats = {}
-    keys = list(additional_stats.keys())
     labeled_value_template = "{0:<9}: {1:.3g}"
     labeled_string_template = "{0:<9}: {1:>9s}"
     label_elements = []
@@ -787,8 +786,8 @@ def plot_th2_data_into(ax,
     # May set these from th2 properties
     log_scale = False
 
-    root_color_index = th2.GetLineColor()
-    linecolor = root_color_to_matplot_color(root_color_index)
+    # root_color_index = th2.GetLineColor()
+    # linecolor = root_color_to_matplot_color(root_color_index)
 
     if plot_3d:
         raise NotImplementedError("3D plotting of two dimensional histograms not implemented yet")

@@ -31,6 +31,8 @@
 
 namespace Belle2 {
 
+  class ECLDsp;
+
   namespace ECL {
     /** The ECL Occ after Injection DQM module.
      *
@@ -63,22 +65,28 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_storeHits;
       /** Input array for ECL burst suppresions. */
       StoreArray<ECLTrig> m_ECLTrigs;
+      /** Input array for ECL waveform data */
+      StoreArray<ECLDsp> m_ECLDsps;
 
       /** PSD waveform amplitude threshold. */
       DBObjPtr<ECLCrystalCalib> m_calibrationThrApsd;
 
       /** Global event number. */
       int m_iEvent{ -1};
+      /** Flag to select events triggered by delayed bhabha. */
+      bool m_DPHYTTYP{0};
+
+
 
       /** Vector to store psd wf amplitude threshold. */
       std::vector<int> v_totalthrApsd = {};
 
 
-      TH1F* hOccAfterInjLER{};          /**< Histogram Occupancy after LER injection */
-      TH1F* hOccAfterInjHER{};          /**< Histogram Occupancy after HER injection */
+      TH1F* hHitsAfterInjLER{};          /**< Histogram Hits after LER injection */
+      TH1F* hHitsAfterInjHER{};          /**< Histogram Hits after HER injection */
 
-      TH1F* hEOccAfterInjLER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      TH1F* hEOccAfterInjHER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+      TH1F* hEHitsAfterInjLER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1F* hEHitsAfterInjHER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
       TH1F* hBurstsAfterInjLER{};       /**< Histogram Bursts suppression after LER injection */
       TH1F* hBurstsAfterInjHER{};       /**< Histogram Bursts suppression after HER injection */
@@ -86,8 +94,23 @@ namespace Belle2 {
       TH1F* hEBurstsAfterInjLER{};      /**< Histogram Bursts suppression for normalization after LER injection */
       TH1F* hEBurstsAfterInjHER{};      /**< Histogram Bursts suppression for normalization after HER injection */
 
-      TH2F* hVetoAfterInjLER{};         /**< Histogram Veto tuning w/ ECL occupancy after LER injection */
-      TH2F* hVetoAfterInjHER{};         /**< Histogram Veto tuning w/ ECL occupancy after HER injection */
+      TH2F* hVetoAfterInjLER{};         /**< Histogram Veto tuning w/ ECL hits after LER injection */
+      TH2F* hVetoAfterInjHER{};         /**< Histogram Veto tuning w/ ECL hits after HER injection */
+
+      TH2F* hOccAfterInjLER{};         /**< Histogram Occupancy after LER injection */
+      TH2F* hOccAfterInjHER{};         /**< Histogram Occupancy after HER injection */
+
+      /**
+       * Injection time range (in ms) for h_ped_peak histograms
+       */
+      std::vector<float> m_ped_peak_range = {};
+      /**
+       * Distribution of pedestal peak (peak in first 16 waveform samples)
+       * after HER/LER injection, with separate histograms for forward endcap,
+       * barrel and backward, also separated by time range after the injection
+       * (m_ped_peak_range defines these time ranges)
+       */
+      std::vector<TH1F*> h_ped_peak = {};
 
       void initialize() override final; /**< initialize function */
 

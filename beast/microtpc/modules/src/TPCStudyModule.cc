@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Const.h>
 #include <boost/foreach.hpp>
 
 #include <iostream>
@@ -136,8 +137,8 @@ void TPCStudyModule::event()
       cout << " pdg " << pdg << " Energy deposited " << MicrotpcSimHit.getEnergyDep() << " zpos " << zpos << endl;
       h_tpc_xy[7]->Fill(xpos, ypos);
       if (pdg == 1000020040) h_tpc_xy[8]->Fill(xpos, ypos);
-      if (pdg == 2212) h_tpc_xy[9]->Fill(xpos, ypos);
-      if (pdg == 11) h_tpc_xy[10]->Fill(xpos, ypos);
+      if (pdg == Const::proton.getPDGCode()) h_tpc_xy[9]->Fill(xpos, ypos);
+      if (pdg == Const::electron.getPDGCode()) h_tpc_xy[10]->Fill(xpos, ypos);
     }
     if (old_trkID[detNb] != trkID && MicrotpcSimHit.gettkKEnergy() > 0 && MicrotpcSimHit.getEnergyDep() > 0) {
       old_trkID[detNb] = trkID;
@@ -202,7 +203,7 @@ void TPCStudyModule::event()
       h_tpc_xy[2]->Fill(xpos, ypos);
     }
 
-    if (pdg == 2212) {
+    if (pdg == Const::proton.getPDGCode()) {
       //atrk[detNb] = true;
       //cout << "He4 detNb " << detNb << " trID " << trkID << endl;
       //cout << "Direction x " << direction.X() << " y " << direction.Y() << " z " << direction.Z()  << endl;
@@ -221,20 +222,20 @@ void TPCStudyModule::event()
       h_tpc_xy[3]->Fill(xpos, ypos);
     }
 
-    if (pdg == 2112) {
+    if (pdg == Const::neutron.getPDGCode()) {
       aneu[detNb] = true;
       h_tpc_kin[4]->Fill(MicrotpcSimHit.gettkKEnergy());
       h_tpc_xy[4]->Fill(xpos, ypos);
       n_ctr[detNb] ++;
     }
 
-    if (pdg == 11) {
+    if (pdg == Const::electron.getPDGCode()) {
       aele[detNb] = true;
       h_tpc_kin[5]->Fill(MicrotpcSimHit.gettkKEnergy());
       h_tpc_xy[5]->Fill(xpos, ypos);
     }
 
-    if (pdg == -11) {
+    if (pdg == -Const::electron.getPDGCode()) {
       apos[detNb] = true;
       h_tpc_kin[6]->Fill(MicrotpcSimHit.gettkKEnergy());
       h_tpc_xy[6]->Fill(xpos, ypos);

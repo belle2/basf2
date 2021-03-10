@@ -35,6 +35,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/gearbox/Const.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -876,7 +877,7 @@ namespace Belle2 {
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughter->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > Const::photon.getPDGCode())
           nHadronicParticles++;
       }
 
@@ -916,7 +917,8 @@ namespace Belle2 {
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
         int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+        if (pdg == Const::electron.getPDGCode() or pdg == Const::muon.getPDGCode() or pdg == Const::pion.getPDGCode()
+            or pdg == Const::kaon.getPDGCode() or pdg == Const::proton.getPDGCode())
           par_tracks++;
       }
       return event_tracks - par_tracks;

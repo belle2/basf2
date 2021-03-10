@@ -13,6 +13,7 @@
 //Framework
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/Helix.h>
+#include <framework/gearbox/Const.h>
 
 //MDST
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -46,7 +47,7 @@ ECLTrackCalDigitMatchModule::ECLTrackCalDigitMatchModule() : Module()
   addParam("extRadius", m_extRadius, "radius to which tracks are extrapolated [cm]", 130.00);
   addParam("angleFWDGap", m_angleFWDGap, "FWD gap angle [deg]", 31.80);
   addParam("angleBWDGap", m_angleBWDGap, "BWD gap angle [deg]", 129.70);
-  addParam("trackHypothesis", m_trackHypothesis, "Track hypothesis (PDG code) used in extrapolation", 11);
+  addParam("trackHypothesis", m_trackHypothesis, "Track hypothesis (PDG code) used in extrapolation", Const::electron.getPDGCode());
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

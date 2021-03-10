@@ -72,6 +72,7 @@ namespace Belle2 {
           }
         }
       }
+      B2INFO("SVD active strips = " << m_activeStrips << " / 223744");
 
       // Compute active mass
       for (layer = 0; layer < m_nLayers; layer++) {
@@ -205,20 +206,20 @@ namespace Belle2 {
       rates.normalize();
 
       // convert to occupancy [%]
-      rates.averageRate /= m_activeStrips / 100;
+      rates.averageRate /= m_activeStrips / 100.0;
       for (int layer = 0; layer < m_nLayers; layer++) {
-        rates.layerAverageRates[layer] /= m_layerActiveStrips[layer] / 100;
+        rates.layerAverageRates[layer] /= m_layerActiveStrips[layer] / 100.0;
         for (int ladder = 0; ladder < m_nLadders[layer]; ladder++) {
-          rates.layerLadderAverageRates[layer][ladder] /= m_layerLadderActiveStrips[layer][ladder] / 100;
+          rates.layerLadderAverageRates[layer][ladder] /= m_layerLadderActiveStrips[layer][ladder] / 100.0;
         }
         for (int sensor = 0; sensor < m_nSensors[layer]; sensor++) {
-          rates.layerSensorAverageRates[layer][sensor] /= m_layerSensorActiveStrips[layer][sensor] / 100;
+          rates.layerSensorAverageRates[layer][sensor] /= m_layerSensorActiveStrips[layer][sensor] / 100.0;
         }
       }
       int layer = 0;
       for (int ladder = 0; ladder < m_nLadders[layer]; ladder++) {
         for (int sensor = 0; sensor < m_nSensors[layer]; sensor++) {
-          rates.l3LadderSensorAverageRates[ladder][sensor] /= m_l3LadderSensorActiveStrips[ladder][sensor] / 100;
+          rates.l3LadderSensorAverageRates[ladder][sensor] /= m_l3LadderSensorActiveStrips[ladder][sensor] / 100.0;
         }
       }
     }

@@ -67,9 +67,6 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_CoincidenceWindow(0),
   m_PromptTime(0),
   m_PromptWindow(0),
-  m_effC_eklm(0.5671 * Const::speedOfLight),
-  m_effC_bklm(0.5671 * Const::speedOfLight),
-  m_effC_RPC(0.5 * Const::speedOfLight),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
@@ -134,9 +131,12 @@ void KLMReconstructorModule::beginRun()
   m_PromptTime = m_TimeWindow->getPromptTime();
   m_PromptWindow = m_TimeWindow->getPromptWindow();
   if (m_TimeCableDelayCorrection) {
-    m_effC_eklm = m_TimeConstants->getEffLightSpeed(KLMTimeConstants::c_EKLM);
-    m_effC_bklm = m_TimeConstants->getEffLightSpeed(KLMTimeConstants::c_BKLM);
-    m_effC_RPC = m_TimeConstants->getEffLightSpeed(KLMTimeConstants::c_RPC);
+    m_DelayEKLMScintillators = m_TimeConstants->getDelay(
+                                 KLMTimeConstants::c_EKLM);
+    m_DelayBKLMScintillators = m_TimeConstants->getDelay(
+                                 KLMTimeConstants::c_BKLM);
+    m_DelayRPCPhi = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCPhi);
+    m_DelayRPCZ = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCZ);
   }
   /* EKLM. */
   if (!m_eklmRecPar.isValid())
@@ -267,9 +267,17 @@ void KLMReconstructorModule::reconstructBKLMHits()
       } else {
         propagationDist = m->getPropagationTimes(local);
       }
-      double effC = phiHit->inRPC() ? m_effC_RPC : m_effC_bklm;
-      double phiTime = phiHit->getTime() - propagationDist.y() / effC;
-      double zTime = zHit->getTime() - propagationDist.z() / effC;
+      double delayPhi, delayZ;
+      if (phiHit->inRPC())
+        delayPhi = m_DelayRPCPhi;
+      else
+        delayPhi = m_DelayBKLMScintillators;
+      if (zHit->inRPC())
+        delayZ = m_DelayRPCZ;
+      else
+        delayZ = m_DelayBKLMScintillators;
+      double phiTime = phiHit->getTime() - propagationDist.y() * delayPhi;
+      double zTime = zHit->getTime() - propagationDist.z() * delayZ;
       if (std::fabs(phiTime - zTime) > m_CoincidenceWindow)
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
@@ -390,8 +398,10 @@ void KLMReconstructorModule::reconstructEKLMHits()
         }
         for (it8 = it4; it8 != it5; ++it8) {
           for (it9 = it6; it9 != it7; ++it9) {
-            t1 = (*it8)->getTime() - d1 / m_effC_eklm + 0.5 * sd / Const::speedOfLight;
-            t2 = (*it9)->getTime() - d2 / m_effC_eklm - 0.5 * sd / Const::speedOfLight;
+            t1 = (*it8)->getTime() - d1 * m_DelayEKLMScintillators
+                 + 0.5 * sd / Const::speedOfLight;
+            t2 = (*it9)->getTime() - d2 * m_DelayEKLMScintillators
+                 - 0.5 * sd / Const::speedOfLight;
             if (m_TimeCableDelayCorrection) {
               correctCableDelay(t1, *it8);
               correctCableDelay(t2, *it9);

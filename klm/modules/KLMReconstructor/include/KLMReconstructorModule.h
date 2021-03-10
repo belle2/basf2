@@ -121,14 +121,17 @@ namespace Belle2 {
      */
     double m_PromptWindow;
 
-    /** Effective light speed in fiber for EKLM scintillators. */
-    double m_effC_eklm;
+    /** Delay (ns / cm) for EKLM scintillators. */
+    double m_DelayEKLMScintillators = 0.0;
 
-    /** Effective light speed in fiber for BKLM scintillators. */
-    double m_effC_bklm;
+    /** Delay (ns / cm) for BKLM scintillators. */
+    double m_DelayBKLMScintillators = 0.0;
 
-    /** Effective light speed in fiber for BKLM RPCs. */
-    double m_effC_RPC;
+    /** Delay (ns / cm) for RPC phi plane. */
+    double m_DelayRPCPhi = 0.0;
+
+    /** Delay (ns / cm) for RPC Z plane. */
+    double m_DelayRPCZ = 0.0;
 
     /** Perform cable delay time correction (true) or not (false). */
     bool m_TimeCableDelayCorrection;

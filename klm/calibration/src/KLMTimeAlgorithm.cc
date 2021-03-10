@@ -862,16 +862,16 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
   B2INFO("Effective light speed fitting.");
   m_ProfileRpcPhi->Fit("fcn_pol1", "EMQ");
-  double slope_rpc_phi = fcn_pol1->GetParameter(1);
+  double delayRPCPhi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
-  double effC_rpc_phi = 1.0 / slope_rpc_phi;
-  double e_effC_rpc_phi = e_slope_rpc_phi / (slope_rpc_phi * slope_rpc_phi);
+  double effC_rpc_phi = 1.0 / delayRPCPhi;
+  double e_effC_rpc_phi = e_slope_rpc_phi / (delayRPCPhi * delayRPCPhi);
 
   m_ProfileRpcZ->Fit("fcn_pol1", "EMQ");
-  double slope_rpc_z = fcn_pol1->GetParameter(1);
+  double delayRPCZ = fcn_pol1->GetParameter(1);
   double e_slope_rpc_z = fcn_pol1->GetParError(1);
-  double effC_rpc_z = 1.0 / slope_rpc_z;
-  double e_effC_rpc_z = e_slope_rpc_z / (slope_rpc_z * slope_rpc_z);
+  double effC_rpc_z = 1.0 / delayRPCZ;
+  double e_effC_rpc_z = e_slope_rpc_z / (delayRPCZ * delayRPCZ);
 
   m_ProfileBKLMScintillatorPhi->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
@@ -922,20 +922,19 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
          << LogVar("Fitted Value (2d fit) ", logStr_z.Data()));
 
   // Default Effective light speed in current Database
+  double delayEKLM = delay;
+  double delayBKLM = 0.5 * (slope_scint_phi + slope_scint_phi);
   effSpeed_end = effC_scint_end;
   effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
   effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
 
-  effSpeed_RPC = 0.50 * Const::speedOfLight;
-
-  m_timeConstants->setEffLightSpeed(effSpeed_end, KLMTimeConstants::c_EKLM);
+  m_timeConstants->setDelay(delayEKLM, KLMTimeConstants::c_EKLM);
+  m_timeConstants->setDelay(delayBKLM, KLMTimeConstants::c_BKLM);
+  m_timeConstants->setDelay(delayRPCPhi, KLMTimeConstants::c_RPCPhi);
+  m_timeConstants->setDelay(delayRPCZ, KLMTimeConstants::c_RPCZ);
   m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_EKLM);
-  m_timeConstants->setEffLightSpeed(effSpeed, KLMTimeConstants::c_BKLM);
   m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_BKLM);
-  m_timeConstants->setEffLightSpeed(effSpeed_RPC, KLMTimeConstants::c_RPC);
-  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_RPC);
-
-  effSpeed = 0.5671 * Const::speedOfLight;
+  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_RPCPhi);
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");

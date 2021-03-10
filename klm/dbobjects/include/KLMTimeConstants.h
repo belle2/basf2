@@ -33,40 +33,47 @@ namespace Belle2 {
       /** BKLM scintillator. */
       c_BKLM = 2,
 
-      /** RPC. */
-      c_RPC = 3,
+      /** RPC phi plane. */
+      c_RPCPhi = 3,
+
+      /** RPC z plane. */
+      c_RPCZ = 4,
 
     };
 
     /**
      * Constructor.
      */
-    KLMTimeConstants();
+    KLMTimeConstants()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~KLMTimeConstants();
+    ~KLMTimeConstants()
+    {
+    }
 
     /**
      * Get effective light speed of scintillators.
      * @param[in] cType Flag of channel type.
      */
-    double getEffLightSpeed(int cType) const;
+    float getDelay(int cType) const;
 
     /**
      * Set effective light speed of scintillators.
      * @param[in] lightSpeed Effective light speed.
      * @param[in] cType      Flag of channel type.
      */
-    void setEffLightSpeed(double lightSpeed, int cType);
+    void setDelay(float delay, int cType);
 
     /**
      * Get amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
      * @param[in] cType Flag of channel type.
      */
-    double getAmpTimeConstant(int cType) const;
+    float getAmpTimeConstant(int cType) const;
 
     /**
      * Set amplitude dependence time constant.
@@ -74,27 +81,30 @@ namespace Belle2 {
      * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
      * @param[in] cType                 Flag of channel type.
      */
-    void setAmpTimeConstant(double amplitudeTimeConstant, int cType);
+    void setAmpTimeConstant(float amplitudeTimeConstant, int cType);
 
   private:
 
-    /** Effective light speed of scintillators for EKLM. */
-    double m_effLightSpeed_end;
+    /** Delay (ns / cm) for EKLM scintillators. */
+    float m_DelayEKLMScintillators = 0.0;
 
-    /** Effective light speed of scintillators for BKLM. */
-    double m_effLightSpeed;
+    /** Delay (ns / cm) for BKLM scintillators. */
+    float m_DelayBKLMScintillators = 0.0;
 
-    /** Effective light speed of RPCs. */
-    double m_effLightSpeedRPC;
+    /** Delay (ns / cm) for RPC phi plane. */
+    float m_DelayRPCPhi = 0.0;
+
+    /** Delay (ns / cm) for RPC Z plane. */
+    float m_DelayRPCZ = 0.0;
 
     /** Amplitude dependence time constant of scintillators for EKLM. */
-    double m_ampTimeConstant_end;
+    float m_ampTimeConstant_end = 0.0;
 
     /** Amplitude dependence time constant of scintillators for BKLM. */
-    double m_ampTimeConstant;
+    float m_ampTimeConstant = 0.0;
 
     /** Amplitude dependence time constant of RPCs. */
-    double m_ampTimeConstantRPC;
+    float m_ampTimeConstantRPC = 0.0;
 
     /** Class version. */
     ClassDef(KLMTimeConstants, 1);

@@ -16,63 +16,55 @@
 
 using namespace Belle2;
 
-KLMTimeConstants::KLMTimeConstants() :
-  m_effLightSpeed_end(0.0),
-  m_effLightSpeed(0.0),
-  m_effLightSpeedRPC(0.0),
-  m_ampTimeConstant_end(0.0),
-  m_ampTimeConstant(0.0),
-  m_ampTimeConstantRPC(0.0)
-{
-}
-
-KLMTimeConstants::~KLMTimeConstants()
-{
-}
-
-double KLMTimeConstants::getEffLightSpeed(int cType) const
+float KLMTimeConstants::getDelay(int cType) const
 {
   switch (cType) {
     case c_EKLM:
-      return m_effLightSpeed_end;
+      return m_DelayEKLMScintillators;
     case c_BKLM:
-      return m_effLightSpeed;
-    case c_RPC:
-      return m_effLightSpeedRPC;
+      return m_DelayBKLMScintillators;
+    case c_RPCPhi:
+      return m_DelayRPCPhi;
+    case c_RPCZ:
+      return m_DelayRPCZ;
   }
   B2FATAL("Incorrect channel type: " << cType);
 }
 
-void KLMTimeConstants::setEffLightSpeed(double lightSpeed, int cType)
+void KLMTimeConstants::setDelay(float delay, int cType)
 {
   switch (cType) {
     case c_EKLM:
-      m_effLightSpeed_end = lightSpeed;
+      m_DelayEKLMScintillators = delay;
       return;
     case c_BKLM:
-      m_effLightSpeed = lightSpeed;
+      m_DelayBKLMScintillators = delay;
       return;
-    case c_RPC:
-      m_effLightSpeedRPC = lightSpeed;
+    case c_RPCPhi:
+      m_DelayRPCPhi = delay;
+      return;
+    case c_RPCZ:
+      m_DelayRPCZ = delay;
       return;
   }
   B2FATAL("Incorrect channel type: " << cType);
 }
 
-double KLMTimeConstants::getAmpTimeConstant(int cType) const
+float KLMTimeConstants::getAmpTimeConstant(int cType) const
 {
   switch (cType) {
     case c_EKLM:
       return m_ampTimeConstant_end;
     case c_BKLM:
       return m_ampTimeConstant;
-    case c_RPC:
+    case c_RPCPhi:
+    case c_RPCZ:
       return m_ampTimeConstantRPC;
   }
   B2FATAL("Incorrect channel type: " << cType);
 }
 
-void KLMTimeConstants::setAmpTimeConstant(double amplitudeTimeConstant, int cType)
+void KLMTimeConstants::setAmpTimeConstant(float amplitudeTimeConstant, int cType)
 {
   switch (cType) {
     case c_EKLM:
@@ -81,7 +73,8 @@ void KLMTimeConstants::setAmpTimeConstant(double amplitudeTimeConstant, int cTyp
     case c_BKLM:
       m_ampTimeConstant = amplitudeTimeConstant;
       return;
-    case c_RPC:
+    case c_RPCPhi:
+    case c_RPCZ:
       m_ampTimeConstantRPC = amplitudeTimeConstant;
       return;
   }

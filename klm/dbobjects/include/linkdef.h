@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::KLMScintillatorDigitizationParameters+; // checksum=0x569c2529, version=1
 #pragma link C++ class Belle2::KLMStripEfficiency+; // checksum=0xbe1e8e53, version=1
 #pragma link C++ class Belle2::KLMTimeCableDelay+; // checksum=0x9003bfcd, version=1
-#pragma link C++ class Belle2::KLMTimeConstants+; // checksum=0x5d862eb5, version=1
+#pragma link C++ class Belle2::KLMTimeConstants+; // checksum=0xca66f98, version=1
 #pragma link C++ class Belle2::KLMTimeConversion+; // checksum=0xf02e3022, version=1
 #pragma link C++ class Belle2::KLMTimeWindow+; // checksum=0x546af69b, version=1
 

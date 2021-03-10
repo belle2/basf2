@@ -219,7 +219,8 @@ class Specs:
 
         # load the checkpoint from the conditions database - if none given
         if self.checkpoint is None:
-            accessor = DBAccessorBase(DBStoreEntry.c_RawFile, self.model, True)
+            payload_name = f'PXDBackgroundGenerator_{self.model}'
+            accessor = DBAccessorBase(DBStoreEntry.c_RawFile, payload_name, True)
             self.checkpoint = accessor.getFilename()
 
         # set the number of inter-op CPU threads

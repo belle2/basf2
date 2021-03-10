@@ -61,6 +61,7 @@ using the PXD background generator module is
 provided in ``pxd/examples/background_generator.py``.
 
 """
+import hashlib
 import os.path
 import pathlib
 from itertools import product
@@ -93,9 +94,9 @@ class Specs:
     :param checkpoint: Path to the file with the pre-trained model weights,
         defaults to None - download the checkpoint automatically
     :type checkpoint: str, optional
-    :param seed: Integer number :math:`[0, 2^{63} - 1]`
+    :param seed: Integer number :math:`[-2^{63}, 2^{63} - 1]`
         used as the initial seed for the internal pseudo-random number generator,
-        defaults to None - select a seed automatically
+        defaults to None - derive a deterministic seed from the basf2 seed
     :type seed: int, optional
     :param nintra: Number of intra-op threads to be utilized for the generation,
         defaults to 1
@@ -135,12 +136,14 @@ class Specs:
         return checkpoint
 
     @staticmethod
-    def _validate_seed(seed: int) -> int:
+    def _validate_seed(seed: Union[None, int]) -> Union[None, int]:
         """"""
-        if not isinstance(seed, int):
-            raise TypeError("expecting type int `seed`")
-        elif not 0 <= seed < 2 ** 63:
-            raise ValueError(f"expecting 0 <= `seed` < 2^63 (got: {seed})")
+        if not isinstance(seed, (type(None), int)):
+            raise TypeError("expecting None or type int `seed`")
+        if seed is None:
+            return seed
+        if not -2 ** 63 <= seed < 2 ** 63:
+            raise ValueError(f"expecting -2^63 <= `seed` < 2^63 (got: {seed})")
         return seed
 
     @staticmethod
@@ -193,8 +196,6 @@ class Specs:
         self.checkpoint = type(self)._validate_checkpoint(checkpoint)
 
         # process `seed`
-        if seed is None:
-            seed = randbelow(2 ** 63)
         self.seed = type(self)._validate_seed(seed)
 
         # process `nintra`
@@ -216,6 +217,14 @@ class Specs:
         except ImportError as exc:
             exc.msg = "please install PyTorch: `pip3 install torch==1.4.0`"
             raise
+
+        # derive a deterministic seed from the basf2 seed - if none given
+        if self.seed is None:
+            obj = basf2.get_random_seed()
+            func = hashlib.sha512()
+            func.update(bytes(str(obj), 'utf-8'))
+            digest = func.digest()[:8]
+            self.seed = int.from_bytes(digest, 'big', signed=True)
 
         # load the checkpoint from the conditions database - if none given
         if self.checkpoint is None:

@@ -242,8 +242,8 @@ namespace Belle2 {
        * @param zD detection position in z
        * @param xmMin lower limit for search range in x
        * @param xmMax upper limit for search range in x
-       * &param xM reflection position in x [out]
-       * &param zM reflection position in z [out]
+       * @param xM reflection position in x [out]
+       * @param zM reflection position in z [out]
        * @param dxdz photon slope in x-z (dx/dz) before mirror [out]
        * @return true on success
        */

@@ -178,7 +178,7 @@ namespace Belle2 {
       double m_TOF = 0;     /**< time-of-flight of particle */
       double m_fraction = 0; /**< fraction of delta-ray photons within time window */
       double m_numPhotons = 0; /**< number of photons */
-      std::vector<double> m_pixelAcceptances; /** pixel angular acceptances for direct peak (index = pixelID - 1) */
+      std::vector<double> m_pixelAcceptances; /**< pixel angular acceptances for direct peak (index = pixelID - 1) */
 
     };
 

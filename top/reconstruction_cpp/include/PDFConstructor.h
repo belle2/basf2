@@ -109,6 +109,12 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
+       * Returns particle hypothesis
+       * @return particle hypothesis
+       */
+      const Const::ChargedStable& getHypothesis() const {return m_hypothesis;}
+
+      /**
        * Returns cosine of total reflection angle
        * @return cosine of total reflection angle at mean photon energy for beta = 1
        */

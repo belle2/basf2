@@ -144,7 +144,7 @@ class ClusterBase:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
-                    returncode = -666
+                    returncode = -654
 
             print(f"donefile found with return code {returncode}")
             donefile_exists = True

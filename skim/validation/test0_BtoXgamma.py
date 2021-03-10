@@ -16,7 +16,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from ROOT import Belle2
 
-b2.set_random_seed(666)
+b2.set_random_seed(665)
 
 
 # create path

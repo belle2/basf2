@@ -263,7 +263,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
 
   // Set error matrix.
   TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
-                              getECLClusterEHypothesisBit());
+                              getECLClusterEHypothesisBit(), m_momentumScale);
   storeErrorMatrix(clustercovmat);
 }
 

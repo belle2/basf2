@@ -60,27 +60,27 @@ namespace Belle2 {
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, float scale);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, float scale);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale);
 
     /**
      * Returns default IP position from beam parameters

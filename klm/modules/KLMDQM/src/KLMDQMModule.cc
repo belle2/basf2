@@ -58,12 +58,21 @@ KLMDQMModule::KLMDQMModule() :
 
 KLMDQMModule::~KLMDQMModule()
 {
-  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
     uint16_t sector = klmSector.getKLMSectorNumber();
     uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
     if (m_ChannelHits[sectorIndex] != nullptr)
       delete[] m_ChannelHits[sectorIndex];
+  }
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
+  for (KLMChannelIndex& klmSection : klmIndex) {
+    uint16_t subdetector = klmSection.getSubdetector();
+    if (subdetector == KLMElementNumbers::c_EKLM) {
+      uint16_t section = klmSection.getSection();
+      if (m_Spatial2DHitsEKLM[section - 1] != nullptr)
+        delete[] m_Spatial2DHitsEKLM[section - 1];
+    }
   }
 }
 
@@ -114,8 +123,8 @@ void KLMDQMModule::defineHisto()
     m_ChannelHitHistogramsEKLM;
   uint16_t* firstChannelNumbers = new uint16_t[nChannelHistograms + 1];
   int i = 0;
-  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
     KLMChannelIndex klmChannel(klmSector);
     klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
     uint16_t channel = klmChannel.getKLMChannelNumber();
@@ -140,7 +149,7 @@ void KLMDQMModule::defineHisto()
   }
   firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNElements();
   i = 0;
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = m_ChannelHitHistogramsBKLM;
@@ -171,7 +180,7 @@ void KLMDQMModule::defineHisto()
   uint16_t totalSectors = m_SectorArrayIndex->getNElements();
   m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
                                        totalSectors, -0.5, totalSectors - 0.5);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (KLMChannelIndex& klmSector : klmIndex) {
     std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
     uint16_t sector = klmSector.getKLMSectorNumber();
     uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
@@ -232,6 +241,30 @@ void KLMDQMModule::defineHisto()
   m_TriggersHERInj = new TH1F("KLMEOccInjHER", "KLMEOccInjHER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
                               4000, 0, 20000);
   m_TriggersHERInj->SetOption("LIVE");
+  /* Spatial distribution of EKLM 2d hits per layer. */
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
+  for (KLMChannelIndex& klmSection : klmIndex) {
+    uint16_t subdetector = klmSection.getSubdetector();
+    if (subdetector == KLMElementNumbers::c_EKLM) {
+      uint16_t section = klmSection.getSection();
+      int maximalLayerNumber = m_eklmElementNumbers->getMaximalDetectorLayerNumber(section);
+      m_Spatial2DHitsEKLM[section - 1] = new TH2F*[maximalLayerNumber];
+      std::string sectionName = (section == EKLMElementNumbers::c_ForwardSection) ? "Forward" : "Backward";
+      for (int j = 1; j <= maximalLayerNumber; ++j) {
+        std::string name = "spatial_2d_hits_subdetector_" + std::to_string(subdetector) +
+                           "_section_" + std::to_string(section) +
+                           "_layer_" + std::to_string(j);
+        std::string title = "Endcap " + sectionName + " , Layer " + std::to_string(j);
+        /* Use bins with a size of 10 cm per side. */
+        m_Spatial2DHitsEKLM[section - 1][j - 1] = new TH2F(name.c_str(), title.c_str(),
+                                                           340 * 2 / 10, -340, 340,
+                                                           340 * 2 / 10, -340, 340);
+        m_Spatial2DHitsEKLM[section - 1][j - 1]->GetXaxis()->SetTitle("X coordinate [cm]");
+        m_Spatial2DHitsEKLM[section - 1][j - 1]->GetYaxis()->SetTitle("Y coordinate [cm]");
+        m_Spatial2DHitsEKLM[section - 1][j - 1]->SetOption("LIVE");
+      }
+    }
+  }
   oldDirectory->cd();
 }
 
@@ -242,6 +275,7 @@ void KLMDQMModule::initialize()
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
+  m_EklmHit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -261,8 +295,8 @@ void KLMDQMModule::beginRun()
   m_PlaneBKLMPhi->Reset();
   m_PlaneBKLMZ->Reset();
   /* Channel hits. */
-  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = m_ChannelHitHistogramsBKLM;
@@ -288,6 +322,17 @@ void KLMDQMModule::beginRun()
   m_TriggersLERInj->Reset();
   m_KlmDigitsAfterHERInj->Reset();
   m_TriggersHERInj->Reset();
+  /* Spatial 2D hits distributions. */
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSection : klmIndex) {
+    uint16_t subdetector = klmSection.getSubdetector();
+    if (subdetector == KLMElementNumbers::c_EKLM) {
+      uint16_t section = klmSection.getSection();
+      int maximalLayerNumber = m_eklmElementNumbers->getMaximalDetectorLayerNumber(section);
+      for (int j = 1; j <= maximalLayerNumber; ++j)
+        m_Spatial2DHitsEKLM[section - 1][j - 1]->Reset();
+    }
+  }
 }
 
 void KLMDQMModule::event()
@@ -423,6 +468,12 @@ void KLMDQMModule::event()
      * If there are more, ignore the others.
      */
     break;
+  }
+  /* Spatial 2D hits distributions. */
+  for (const EKLMHit2d& hit2d : m_EklmHit2ds) {
+    int section = hit2d.getSection();
+    int layer = hit2d.getLayer();
+    m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());
   }
 }
 

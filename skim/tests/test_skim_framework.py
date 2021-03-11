@@ -204,21 +204,6 @@ class TestSkimFramework(unittest.TestCase):
                 ),
             )
 
-    def test_validation_samples(self):
-        """
-        Check that all ``validation_sample`` attributes of skims point to existing files.
-        """
-        for skim in Registry.names:
-            SkimObject = Registry.get_skim_function(skim)()
-            # Don't bother checking sample if no `validation_histograms` method is defined
-            if SkimObject._method_unchanged("validation_histograms"):
-                continue
-
-            try:
-                find_file(SkimObject.validation_sample, data_type="validation")
-            except FileNotFoundError:
-                self.fail(f"{skim}.validation_sample does not point to an existing validation file.")
-
 
 if __name__ == "__main__":
     unittest.main()

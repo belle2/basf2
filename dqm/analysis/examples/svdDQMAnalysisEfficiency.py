@@ -19,7 +19,6 @@ mypath.add_module('Geometry')
 
 dqm = b2.register_module('DQMHistAnalysisSVDEfficiency')
 dqm.set_log_level(b2.LogLevel.INFO)
-dqm.param("printCanvas", True)
 mypath.add_module(dqm)
 
 outroot = b2.register_module('DQMHistAnalysisOutputFile')

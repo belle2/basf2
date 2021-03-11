@@ -17,6 +17,7 @@ from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -167,6 +168,8 @@ class CharmoniumPsi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
+    validation_sample = _VALIDATION_SAMPLE
+
     def load_standard_lists(self, path):
         stdE('loosepid', path=path)
         stdMu('loosepid', path=path)
@@ -215,6 +218,33 @@ class CharmoniumPsi(BaseSkim):
                           'J/psi:eebrems', 'psi(2S):eebrems',
                           'J/psi:eebrems2', 'psi(2S):eebrems2',
                           'J/psi:mumu', 'psi(2S):mumu']
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
+        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid e-:loosepid', '', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
+
+        # Print histograms.
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='J/psi:ll',
+            variables_1d=[(
+                'InvM', 65, 2.7, 4.0,
+                'J/#psi mass',
+                __liaison__,
+                'J/psi mass',
+                'J/psi peak is seen.',
+                'M [GeV/c^{2}]', 'Events / (20 MeV/c^{2})',
+                'shifter'
+            )],
+            path=path
+        )
 
 
 @fancy_skim_header

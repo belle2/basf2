@@ -22,7 +22,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::PXD::PXDError;
-// using namespace Belle2::PXD::PXDError::PXDErrorFlags;
 
 using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
@@ -71,8 +70,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
 //            ));
 
   // this is not really a parameter, it should be fixed.
-  m_errorSkipPacketMask[ c_nrDHE_CRC];
-  m_errorSkipPacketMask[ c_nrFIX_SIZE];
+  m_errorSkipPacketMask[c_nrDHE_CRC] = true;
+  m_errorSkipPacketMask[c_nrFIX_SIZE] = true;
 }
 
 void PXDUnpackerModule::initialize()
@@ -657,16 +656,6 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
            << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
           );
   }*/
-};
-
-int PXDUnpackerModule::nr5bits(int i)
-{
-  /// too lazy to count the bits myself, thus using a small lookup table
-  const int lut[32] = {
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
-  };
-  return lut[i & 0x1F];
 }
 
 void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event,
@@ -1214,8 +1203,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
       /// TODO how to handle error flags set in in DHE_END?
       if (dhc.data_dhe_end_frame->getErrorInfo() != 0) {
-        if (!(m_suppressErrorMask[c_nrDHH_END_ERRORBITS])) B2ERROR("DHE END Error Info set to $" << hex <<
-                                                                     dhc.data_dhe_end_frame->getErrorInfo());
+        if (!(m_suppressErrorMask[c_nrDHH_END_ERRORBITS])) {
+          B2ERROR("DHE END Error Info set to $" << hex <<
+                  dhc.data_dhe_end_frame->getErrorInfo());
+        }
         m_errorMask[c_nrDHH_END_ERRORBITS] = true;
       }
       dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
@@ -1444,3 +1435,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
   B2DEBUG(29, "DHC/DHE $" << hex << countedBytesInDHC << ", $" << hex << countedBytesInDHE);
 }
+
+int PXDUnpackerModule::nr5bits(int i)
+{
+  /// too lazy to count the bits myself, thus using a small lookup table
+  const int lut[32] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
+  };
+  return lut[i & 0x1F];
+}
+

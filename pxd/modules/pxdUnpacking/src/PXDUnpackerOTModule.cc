@@ -22,7 +22,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::PXD::PXDError;
-// using namespace Belle2::PXD::PXDError::PXDErrorFlags;
 
 using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
@@ -71,8 +70,8 @@ PXDUnpackerOTModule::PXDUnpackerOTModule() :
 //            ));
 
   // this is not really a parameter, it should be fixed.
-  m_errorSkipPacketMask[ c_nrDHE_CRC];
-  m_errorSkipPacketMask[ c_nrFIX_SIZE];
+  m_errorSkipPacketMask[c_nrDHE_CRC] = true;
+  m_errorSkipPacketMask[c_nrFIX_SIZE] = true;
 }
 
 void PXDUnpackerOTModule::initialize()
@@ -312,7 +311,8 @@ void PXDUnpackerOTModule::unpack_dhp_raw(void* data, unsigned int frame_len, uns
   // Size: 64*768 + 8 bytes for a full frame readout
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask[c_nrFIX_SIZE])) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
-                                                          LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
+                                                          LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str())
+                                                          << LogVar("DHE", dhe_ID) << LogVar("DHP", dhe_DHPport));
     m_errorMask[c_nrFIX_SIZE] = true;
     return;
   }
@@ -455,7 +455,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
   int last_gate = -1; // workaround to recalc a relative frame number
 
   // cppcheck-suppress unreadVariable
-  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  unsigned int dhp_row = 0, dhp_col = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
   bool rowflag = false;
   bool pixelflag = true; // just for first row start
@@ -635,7 +635,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
             }
             m_errorMask[c_nrCOL_OVERFLOW] = true;
           }
-          dhp_adc = dhp_pix[i] & 0xFF;
+          auto dhp_adc = dhp_pix[i] & 0xFF;
           B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
                   << " CM $" << hex << dhp_cm);
 
@@ -663,16 +663,6 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
            << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
           );
   }*/
-};
-
-int PXDUnpackerOTModule::nr5bits(int i)
-{
-  /// too lazy to count the bits myself, thus using a small lookup table
-  const int lut[32] = {
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
-  };
-  return lut[i & 0x1F];
 }
 
 void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event,
@@ -809,7 +799,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
   }
 
   // TODO How do we handle Frames where Error Bit is set in header?
-  // Currently there is no documentation what it actually means... ony an error bit is set (below)
+  // Currently there is no documentation what it actually means... only an error bit is set (below)
   // the following errors must be "accepted", as all firmware sets it wrong from Ghost frames.
   if (hw->getErrorFlag()) {
     if (frame_type != EDHCFrameHeaderDataType::c_GHOST) {
@@ -1471,3 +1461,14 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
   }
   B2DEBUG(29, "DHC/DHE $" << hex << countedBytesInDHC << ", $" << hex << countedBytesInDHE);
 }
+
+int PXDUnpackerOTModule::nr5bits(int i)
+{
+  /// too lazy to count the bits myself, thus using a small lookup table
+  const int lut[32] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
+  };
+  return lut[i & 0x1F];
+}
+

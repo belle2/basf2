@@ -166,7 +166,7 @@ Skim flags can also be used in combined skims, with the individual flags being a
 
 .. tip::
 
-   Skim flags are guaranteed to work on the main path (the variable ``path`` in the above examples). However, any other modules attempting to access the skim lists should be added to the :py:func:`postskim_path <BaseSkim.postskim_path>`.
+   Skim flags are guaranteed to work on the main path (the variable ``path`` in the above examples). However, any other modules attempting to access the skim lists should be added to the :py:func:`postskim_path <skimExpertFunctions.BaseSkim.postskim_path>`.
 
 .. _skim-running:
 

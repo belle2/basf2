@@ -48,11 +48,11 @@ else:
 
 if myLocalDB is not None:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
     filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
     filenameCluster = "SVDClusterCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
 else:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
     filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"

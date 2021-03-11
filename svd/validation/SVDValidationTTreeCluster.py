@@ -214,11 +214,11 @@ class SVDValidationTTreeCluster(b2.Module):
                     if eventt0.hasEventT0():
                         self.data.eventt0_all = eventt0.getEventT0()
                     if eventt0.hasTemporaryEventT0(top):
-                        eventt0_top = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.TOP)[-1].eventT0
+                        self.data.eventt0_top = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.TOP)[-1].eventT0
                     if eventt0.hasTemporaryEventT0(cdc):
-                        eventt0_cdc = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.CDC)[-1].eventT0
+                        self.data.eventt0_cdc = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.CDC)[-1].eventT0
                     if eventt0.hasTemporaryEventT0(ecl):
-                        eventt0_ecl = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.ECL)[-1].eventT0
+                        self.data.eventt0_ecl = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.ECL)[-1].eventT0
                     # Fill tree
                     self.file.cd()
                     self.tree.Fill()

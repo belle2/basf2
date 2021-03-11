@@ -28,7 +28,7 @@ treeC = inputC.Get("tree")
 histsCP = R.TFile.Open("SVDClusterPerformance.root", "recreate")
 
 
-pu.ploter(
+pu.plotter(
     name='ClusterTime',
     title='Cluster time',
     nbins=200,
@@ -46,7 +46,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionResidual',
     title='Cluster position residual',
     nbins=100,
@@ -64,7 +64,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionResidual_size1',
     title='Cluster position residual for one strip',
     nbins=100,
@@ -82,7 +82,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionResidual_size2',
     title='Cluster position residual for two strips',
     nbins=100,
@@ -100,7 +100,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionResidual_size3plus',
     title='Cluster position residual for 3 or more strips',
     nbins=100,
@@ -118,7 +118,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionPull',
     title='Cluster position pull',
     nbins=100,
@@ -136,7 +136,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionPull_size1',
     title='Cluster position pull for one strip',
     nbins=100,
@@ -154,7 +154,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionPull_size2',
     title='Cluster position pull for two strip',
     nbins=100,
@@ -172,7 +172,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='PositionPull_size3plus',
     title='Cluster position pull for 3 or more strips',
     nbins=100,
@@ -190,7 +190,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='TimeResolution',
     title='Cluster time resolution',
     nbins=200,
@@ -208,7 +208,7 @@ pu.ploter(
     isShifter=False)
 
 
-pu.ploter(
+pu.plotter(
     name='ClusterCharge',
     title='Cluster charge',
     nbins=50,
@@ -225,7 +225,7 @@ pu.ploter(
     check='Distribution peaks around 20-40 ke.',
     isShifter=True)
 
-pu.ploter(
+pu.plotter(
     name='ClusterSN',
     title='Cluster Signal/Noise ratio',
     nbins=121,
@@ -241,7 +241,7 @@ pu.ploter(
     check='Distribution peaks around 20.',
     isShifter=True)
 
-pu.ploter(
+pu.plotter(
     name='InterstripPosition',
     title='Interstrip position',
     nbins=50,
@@ -258,7 +258,7 @@ pu.ploter(
     check='',
     isShifter=False)
 
-pu.ploter(
+pu.plotter(
     name='ClusterSize',
     title='Cluster size',
     nbins=9,

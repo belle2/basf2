@@ -23,7 +23,7 @@ treeSim = inputSim.Get("tree")
 
 histsOV = R.TFile.Open("SVDOtherValidations.root", "recreate")
 
-pu.ploter(
+pu.plotter(
     name='dEdxForSimhits',
     title='dE/dx for SimHits',
     nbins=100,

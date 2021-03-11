@@ -289,8 +289,8 @@ namespace Belle2 {
     bool SVDHitRateCounter::isStripActive(const VxdID& sensorID, const bool& isU,
                                           const unsigned short& strip)
     {
-      return ((m_ignoreHotStrips || !m_HotStripsCalib.isHot(sensorID, isU, strip))
-              && (m_ignoreMaskedStrips || !m_FADCMaskedStrips.isMasked(sensorID, isU, strip)));
+      return ((m_ignoreHotStripsPayload || !m_HotStripsCalib.isHot(sensorID, isU, strip))
+              && (m_ignoreMaskedStripsPayload || !m_FADCMaskedStrips.isMasked(sensorID, isU, strip)));
     }
 
   } // background namespace

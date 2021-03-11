@@ -74,13 +74,15 @@ namespace Belle2 {
        * Constructor
        * @param svdShaperDigitsName name of the input SVDShaperDigits collection
        * @param thrCharge cut on cluster energy in electrons
-       * @param ignoreHotStrips Count also hot strips as active
-       * @param ignoreMaskedStrips Count also FADC-masked strips as active
+       * @param ignoreHotStripsPayload Count also hot strips as active
+       * @param ignoreMaskedStripsPayload Count also FADC-masked strips as active
        */
       explicit SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge,
-                                 bool ignoreHotStrips = false, bool ignoreMaskedStrips = false):
+                                 bool ignoreHotStripsPayload = false,
+                                 bool ignoreMaskedStripsPayload = false):
         m_svdShaperDigitsName(svdShaperDigitsName), m_thrCharge(thrCharge),
-        m_ignoreHotStrips(ignoreHotStrips), m_ignoreMaskedStrips(ignoreMaskedStrips)
+        m_ignoreHotStripsPayload(ignoreHotStripsPayload),
+        m_ignoreMaskedStripsPayload(ignoreMaskedStripsPayload)
       {}
 
       /**
@@ -192,8 +194,8 @@ namespace Belle2 {
       int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */
       int m_l3LadderSensorActiveStrips[7][2] = {0}; /**< number of active strips in each sensor in Layer 3 */
       double m_thrCharge = 0; /**< cut on cluster energy in electrons */
-      bool m_ignoreHotStrips;
-      bool m_ignoreMaskedStrips;
+      bool m_ignoreHotStripsPayload; /**< count hot strips as active */
+      bool m_ignoreMaskedStripsPayload; /**< SVD: count FAD-masked strips as active */
 
       double m_massKg = 0; /**< Active mass of the whole SVD in Kg. */
       double m_layerMassKg[4] = {0}; /**< Active mass of each layer in Kg. */

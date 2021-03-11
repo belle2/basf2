@@ -149,6 +149,7 @@ void KLMDQMModule::defineHisto()
   }
   firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNElements();
   i = 0;
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
@@ -180,6 +181,7 @@ void KLMDQMModule::defineHisto()
   uint16_t totalSectors = m_SectorArrayIndex->getNElements();
   m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
                                        totalSectors, -0.5, totalSectors - 0.5);
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
     std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
     uint16_t sector = klmSector.getKLMSectorNumber();
@@ -323,7 +325,7 @@ void KLMDQMModule::beginRun()
   m_KlmDigitsAfterHERInj->Reset();
   m_TriggersHERInj->Reset();
   /* Spatial 2D hits distributions. */
-  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
   for (KLMChannelIndex& klmSection : klmIndex) {
     uint16_t subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {

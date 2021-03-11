@@ -79,6 +79,10 @@ namespace Belle2 {
              "SVDShaperDigits collection name", string(""));
     addParam("svdThrCharge", m_svdThrCharge,
              "Energy cur on SVD Cluster charge in electrons", 15000.);
+    addParam("svdIgnoreHotStrips", m_svdIgnoreHotStrips,
+             "If true SVD hot strips are counted as active", false);
+    addParam("svdIgnoreMaskedStrips", m_svdIgnoreMaskedStrips,
+             "If true SVD FADC-masked strips are counted as active", false);
     addParam("additionalDataDescription", m_additionalDataDescription,
              "Additional dictionary of "
              "name->value pairs to be added to the file metadata to describe the data",
@@ -125,7 +129,8 @@ namespace Belle2 {
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
     m_monitors.push_back(pxd);
-    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge);
+    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge,
+                                                  m_svdIgnoreHotStrips, m_svdIgnoreMaskedStrips);
     m_monitors.push_back(svd);
     auto* cdc = new Background::CDCHitRateCounter(m_cdcTimeWindowLowerEdgeSmallCell,  m_cdcTimeWindowUpperEdgeSmallCell,
                                                   m_cdcTimeWindowLowerEdgeNormalCell, m_cdcTimeWindowUpperEdgeNormalCell,

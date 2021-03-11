@@ -19,6 +19,8 @@
 
 using namespace std;
 
+#define LOGRATIO(x,y) (x) << " / " << (y) << " = " << ((x) * 100 / (y)) << "%"
+
 namespace Belle2 {
   namespace Background {
 
@@ -47,7 +49,7 @@ namespace Belle2 {
             for (bool isU : {true, false}) {
               int nStrips = nStripsOnLayerSide(layer, isU);
               for (int strip = 0; strip < nStrips; strip++) {
-                if (!m_HotStripsCalib.isHot(sensorID, isU, strip) && !m_FADCMaskedStrips.isMasked(sensorID, isU, strip)) {
+                if (isStripActive(sensorID, isU, strip)) {
                   m_activeStrips ++;
                   m_layerActiveStrips[layer] ++;
                   m_layerLadderActiveStrips[layer][ladder] ++;
@@ -65,14 +67,30 @@ namespace Belle2 {
           for (bool isU : {true, false}) {
             int nStrips = nStripsOnLayerSide(layer, isU);
             for (int strip = 0; strip < nStrips; strip++) {
-              if (!m_HotStripsCalib.isHot(sensorID, isU, strip) && !m_FADCMaskedStrips.isMasked(sensorID, isU, strip)) {
+              if (isStripActive(sensorID, isU, strip)) {
                 m_l3LadderSensorActiveStrips[ladder][sensor] ++;
               }
             }
           }
         }
       }
-      B2INFO("SVD active strips = " << m_activeStrips << " / 223744");
+      B2INFO("SVD active strips = " << LOGRATIO(m_activeStrips, 223744));
+      for (layer = 0; layer < m_nLayers; layer++)
+        B2INFO("  Active strips L" << layer + 3 << ".X.X = "
+               << LOGRATIO(m_layerActiveStrips[layer], m_nLadders[layer] * m_nSensors[layer] * (nStripsOnLayerSide(layer, false) + 768)));
+      for (layer = 0; layer < m_nLayers; layer++)
+        for (int ladder = 0; ladder < m_nLadders[layer]; ladder++)
+          B2INFO("  Active strips L" << layer + 3 << "." << ladder + 1 << ".X = "
+                 << LOGRATIO(m_layerLadderActiveStrips[layer][ladder], m_nSensors[layer] * (nStripsOnLayerSide(layer, false) + 768)));
+      for (layer = 0; layer < m_nLayers; layer++)
+        for (int sensor = 0; sensor < m_nSensors[layer]; sensor++)
+          B2INFO("  Active strips L" << layer + 3 << ".X." << sensor + 1 << " = "
+                 << LOGRATIO(m_layerSensorActiveStrips[layer][sensor], m_nLadders[layer] * (nStripsOnLayerSide(layer, false) + 768)));
+      layer = 0;
+      for (int ladder = 0; ladder < m_nLadders[layer]; ladder++)
+        for (int sensor = 0; sensor < m_nSensors[layer]; sensor++)
+          B2INFO("  Active strips L3." << ladder + 1 << "." << sensor + 1 << " = "
+                 << LOGRATIO(m_l3LadderSensorActiveStrips[ladder][sensor], 2 * 768));
 
       // Compute active mass
       for (layer = 0; layer < m_nLayers; layer++) {
@@ -267,6 +285,13 @@ namespace Belle2 {
       return layer == 0 ? massHPKSmallKg : (sensor == 0 ? massMicronKg : massHPKLargeKg);
     }
 #pragma GCC diagnostic pop
+
+    bool SVDHitRateCounter::isStripActive(const VxdID& sensorID, const bool& isU,
+                                          const unsigned short& strip)
+    {
+      return ((m_ignoreHotStrips || !m_HotStripsCalib.isHot(sensorID, isU, strip))
+              && (m_ignoreMaskedStrips || !m_FADCMaskedStrips.isMasked(sensorID, isU, strip)));
+    }
 
   } // background namespace
 } // Belle2 namespace

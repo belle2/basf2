@@ -74,9 +74,13 @@ namespace Belle2 {
        * Constructor
        * @param svdShaperDigitsName name of the input SVDShaperDigits collection
        * @param thrCharge cut on cluster energy in electrons
+       * @param ignoreHotStrips Count also hot strips as active
+       * @param ignoreMaskedStrips Count also FADC-masked strips as active
        */
-      explicit SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge):
-        m_svdShaperDigitsName(svdShaperDigitsName), m_thrCharge(thrCharge)
+      explicit SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge,
+                                 bool ignoreHotStrips = false, bool ignoreMaskedStrips = false):
+        m_svdShaperDigitsName(svdShaperDigitsName), m_thrCharge(thrCharge),
+        m_ignoreHotStrips(ignoreHotStrips), m_ignoreMaskedStrips(ignoreMaskedStrips)
       {}
 
       /**
@@ -140,6 +144,16 @@ namespace Belle2 {
        */
       double massOfSensor(int layer, int ladder, int sensor);
 
+      /**
+       * Returns wether a strips is active (neither hot nor masked),
+       * taking into account the ignoreHotStrips and ignoreMaskedStrips
+       * settings.
+       * @param sensorID The VxdID of the sensor
+       * @param isU The side of the sensor
+       * @param strip The strip index
+       */
+      bool isStripActive(const VxdID& sensorID, const bool& isU, const unsigned short& strip);
+
     private:
 
       // class parameters: to be set via constructor or setters
@@ -178,6 +192,8 @@ namespace Belle2 {
       int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */
       int m_l3LadderSensorActiveStrips[7][2] = {0}; /**< number of active strips in each sensor in Layer 3 */
       double m_thrCharge = 0; /**< cut on cluster energy in electrons */
+      bool m_ignoreHotStrips;
+      bool m_ignoreMaskedStrips;
 
       double m_massKg = 0; /**< Active mass of the whole SVD in Kg. */
       double m_layerMassKg[4] = {0}; /**< Active mass of each layer in Kg. */

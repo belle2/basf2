@@ -35,6 +35,8 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/utility/ECLChannelMapper.h>
 
+//TRG
+#include <mdst/dataobjects/TRGSummary.h>
 
 class TH1F;
 class TH2F;
@@ -82,6 +84,12 @@ namespace Belle2 {
     /** Use modified time determination algorithm in emulator, same as in ShaperDSP version >= 1.4.3 */
     bool m_adjusted_timing;
 
+    /**
+     * Skip events with specified type of timing source
+     * (see TRGSummary class, ETimingType enum)
+     */
+    std::vector<int> m_skipEvents = {};
+
     /** DBArray for payload 'ECLDSPPars0'. */
     DBArray<ECLDspData> m_ECLDspDataArray0;
     /** DBArray for payload 'ECLDSPPars1'. */
@@ -97,6 +105,9 @@ namespace Belle2 {
 
     /** ECL DSP data. */
     StoreArray<ECLDsp> m_ECLDsps;
+
+    /** StoreObjPtr TRGSummary  */
+    StoreObjPtr<TRGSummary> m_TRGSummary;
 
     /** Low amplitude threshold. */
     DBObjPtr<ECLCrystalCalib> m_calibrationThrA0;

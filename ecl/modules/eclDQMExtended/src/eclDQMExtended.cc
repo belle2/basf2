@@ -82,6 +82,14 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
            "failed fits.", false);
   addParam("AdjustedTiming", m_adjusted_timing, "Use improved procedure for "
            "time determination in ShaperDSP emulator", true);
+
+  std::vector<int> default_skip = {
+    // By default, skip delayed bhabha and random trigger events
+    TRGSummary::ETimingType::TTYP_DPHY,
+    TRGSummary::ETimingType::TTYP_RAND,
+  };
+  addParam("skipEvents", m_skipEvents, "Skip events that have listed timing "
+           "source (from TRGSummary)", default_skip);
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -488,6 +496,15 @@ void ECLDQMEXTENDEDModule::beginRun()
 
 void ECLDQMEXTENDEDModule::event()
 {
+  if (m_TRGSummary.isValid()) {
+    // Skip events for several types of timing sources
+    // to reduce CPU time usage on HLT (random trigger, delayed bhahba).
+    int timing_type = m_TRGSummary->getTimType();
+    for (auto& skipped_timing_type : m_skipEvents) {
+      if (timing_type == skipped_timing_type) return;
+    }
+  }
+
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 

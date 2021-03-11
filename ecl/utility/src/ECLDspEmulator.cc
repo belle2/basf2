@@ -26,7 +26,10 @@ namespace Belle2 {
     namespace ShapeFitter {
       bool amplitudeOverflow(long long amp)
       {
-        return amp > 262015;
+        // There are 18 bits reserved for the amplitude,
+        // in range [-128, 262015]
+        static const long long max_amp = 0x3FFFF - 128;
+        return amp > max_amp;
       }
     }
   }

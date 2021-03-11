@@ -30,7 +30,6 @@ skim(path)
 {%- if hints %}
 
 # The skim list names are contained in the Python list skim.SkimLists.
-# The attribute skim.flag is a variable indicating whether an event passed the skim.
 #
 # Add all subsequent modules to skim.postskim_path, but call b2.process on
 # the main path. For example...
@@ -40,6 +39,10 @@ skim(path)
 #         ["pt", "E"],
 #         path=skim.postskim_path
 #     )
+#
+# The one exception to this is the attribute skim.flag, which is a variable indicating
+# whether an event passed the skim. This can be written out to ntuples on the main path
+# (the variable `path` in this steering file).
 {%- endif %}
 
 b2.process(path)

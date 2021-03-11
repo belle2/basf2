@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-# from svd import add_svd_create_recodigits
+from svd import add_svd_create_recodigits
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
@@ -50,7 +50,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # SVD
         if components is None or 'SVD' in components:
             # reconstruct SVDRecoDigits first of all
-            # add_svd_create_recodigits(path)
+            add_svd_create_recodigits(path)
 
             # SVD DATA FORMAT
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')

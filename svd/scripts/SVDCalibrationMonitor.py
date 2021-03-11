@@ -35,10 +35,16 @@ RunList = args.run
 ExpList = args.exp
 
 
-b2.conditions.prepend_globaltag("online")
-b2.conditions.prepend_globaltag("svd_basic")
-b2.conditions.prepend_globaltag("svd_loadedOnFADC")
+# b2.conditions.prepend_globaltag("online")
+# b2.conditions.prepend_globaltag("svd_basic")
+# b2.conditions.prepend_globaltag("svd_loadedOnFADC")
 
+b2.conditions.override_globaltags()
+b2.conditions.globaltags = ["svd_offlineCalibrations",
+                            "svd_basic",
+                            "svd_loadedOnFADC",
+                            "data_reprocessing_prompt",
+                            "online"]
 myLocalDB = None
 
 if myLocalDB is not None:
@@ -48,13 +54,13 @@ else:
 
 if myLocalDB is not None:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(localDB_tag) + ".root"
     filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(localDB_tag) + ".root"
     filenameCluster = "SVDClusterCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(localDB_tag) + ".root"
 else:
-    filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+    filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + "_2.root"
     filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
     filenameCluster = "SVDClusterCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 

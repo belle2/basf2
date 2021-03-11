@@ -205,7 +205,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
         b2.set_module_parameters(path, 'SVDCoGTimeEstimator', CalibrationWithEventT0=False)
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
-    path.add_module("SVDShaperDigitsFromTracks", useWithRel5Reconstruction=True)
+    path.add_module("SVDShaperDigitsFromTracks")
     cog = b2.register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)

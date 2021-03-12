@@ -70,20 +70,14 @@ algo.debugFilenameBase = "eclBhabhaTAlgorithm"
 # algo.refCrysPerCrate = arr.array('i', [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 #                                        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 #                                        -1,-1,-1])   # 'i' is a signed integer
-# 'i' is a signed integer - old cid ref values.  some are not very good but also give a good reference
-# for which crystals to use for testing
-# algo.refCrysPerCrate = arr.array('i', [2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349,
-#                                        2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397,
-#                                        2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445,
-#                                        667, 583, 595, 607, 619, 631, 643, 655, 8256, 8172, 8184, 8196, 8208,
-#                                        8220, 8232, 8244])
+
+# Below is equivalent to the first payload version
 # algo.refCrysPerCrate = arr.array('i', [2306, 2309, 2313, 2317, 2321,
 # 2326, 2329, 2334, 2337, 2343, 2348, 2349, 2356, 2357, 2361, 2365, 2372,
 # 2373, 2377, 2381, 2388, 2391, 2393, 2399, 2401, 2407, 2409, 2413, 2417,
 # 2421, 2426, 2429, 2433, 2440, 2585, 2446, 671, 583, 595, 607, 619, 631,
-# 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244])   # 'i' is a
-# signed integer - matching first version defined as good.
-
+# 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244])
+# 'i' is a signed integer
 
 set_debug_level(35)
 set_log_level(LogLevel.INFO)   # LogLevel.INFO or LogLevel.DEBUG

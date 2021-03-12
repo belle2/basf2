@@ -10,7 +10,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Configuration.h>
 
 #include <TH2F.h>
 #include <TFile.h>
@@ -294,9 +293,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
      that should have a different set of payloads. */
   auto tsNew_MINUS_tsOlderRuns__cid = new TH1F("tsNew_MINUS_tsOlderRuns__cid", ";cell id; ts(new) - ts(older runs)  [ns]", 8736, 1,
                                                8736 + 1);
+
   auto tsNew_MINUS_tsOlderRuns = new TH1F("tsNew_MINUS_tsOlderRuns", ";ts(new) - ts(older runs)  [ns];Number of crystals", 201,
                                           -10.05, 10.05);
-
 
 
 
@@ -307,7 +306,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
     double clusterTime_mean = 0;
     double clusterTime_mean_unc = 0;
 
-    B2INFO("Crystal id = " << crys_id);
+    B2INFO("Crystal cell id = " << crys_id);
 
 
 
@@ -426,7 +425,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
         (fit_sigma < 0.1)          ||
         (fit_mean < time_fit_min)  ||
         (fit_mean > time_fit_max)) {
-      B2INFO("Crystal id = " << crys_id);
+      B2INFO("Crystal cell id = " << crys_id);
       B2INFO("fit mean, default mean = " << fit_mean << ", " << default_mean);
       B2INFO("fit mean unc, default mean unc = " << fit_mean_unc << ", " << default_mean_unc);
       B2INFO("fit sigma, default sigma = " << fit_sigma << ", " << default_sigma);
@@ -745,7 +744,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   B2INFO("-------- List of the (fitted) peak cluster times sorted by their absolute value ----------");
   B2INFO("------------------------------------------------------------------------------------------");
   B2INFO("------------------------------------------------------------------------------------------");
-  B2INFO("Quoted # of clusters is before the cutting off of the distribution tails, crysID=1..8736");
+  B2INFO("Quoted # of clusters is before the cutting off of the distribution tails, cellID=1..8736, crysID=0..8735");
 
   bool hasHitThresholdBadTimes = false ;
   for (int iSortedTimes = 0; iSortedTimes < 8736; iSortedTimes++) {
@@ -755,7 +754,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
       hasHitThresholdBadTimes = true;
     }
     //B2INFO("crystal ID = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << ", # clusters = " << numClusterPerCrys[cid] << ", fabs(t) = " << fitClusterTime__crystalIDBase0__pairs[iSortedTimes].first );
-    B2INFO("crysID = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << " ns, # clust = " <<
+    B2INFO("cid = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << " ns, # clust = " <<
            numClusterPerCrys[cid] << ", good fit = " << crysHasGoodFit[cid] << ", good fit & stats = " << crysHasGoodFitandStats[cid]);
   }
 
@@ -771,7 +770,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   for (int iSortedTimes = 0; iSortedTimes < 8736; iSortedTimes++) {
     int cid = fitClusterTime__crystalIDBase0__pairs[iSortedTimes].second ;
     if (fitClusterTime__crystalIDBase0__pairs[iSortedTimes].first > 2  && crysHasGoodFitandStats[cid]) {
-      B2INFO("WARNING: crysID = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << " ns, # clust = " <<
+      B2INFO("WARNING: cid = " << cid << ", peak clust t = " << t_offsets[cid] << " +- " << t_offsets_unc[cid] << " ns, # clust = " <<
              numClusterPerCrys[cid] << ", good fit = " << crysHasGoodFit[cid] << ", good fit & stats = " << crysHasGoodFitandStats[cid]);
     }
   }

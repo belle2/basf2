@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLBHABHATIMECALIBRATIONVALIDATIONMODULE_H
-#define ECLBHABHATIMECALIBRATIONVALIDATIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <ecl/utility/ECLChannelMapper.h>
@@ -129,6 +128,3 @@ namespace Belle2 {
 
   } ;
 }
-
-#endif /* ECLTIMECALIBRATIONVALIDATIONMODULE_H  */
-

@@ -168,7 +168,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";cell ID ;Electron ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
+                                  ";crystal ID ;Electron ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
@@ -202,7 +202,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 {
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
 
   /* Use ECLChannelMapper to get other detector indices for the crystals */
@@ -212,14 +212,14 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
 
-  B2DEBUG(35, "Finished checking if previous crystal time payload has changed");
+  B2DEBUG(29, "Finished checking if previous crystal time payload has changed");
 
   if (m_CrateTimeDB.hasChanged()) {
     m_CrateTime = m_CrateTimeDB->getCalibVector();
     m_CrateTimeUnc = m_CrateTimeDB->getCalibUncVector();
   }
 
-  B2DEBUG(29, "eclBhabhaTimeCalibrationValidationCollector:: loaded ECLCrateTimeOffset from the database"
+  B2DEBUG(25, "eclBhabhaTimeCalibrationValidationCollector:: loaded ECLCrateTimeOffset from the database"
           << LogVar("IoV", m_CrateTimeDB.getIoV())
           << LogVar("Revision", m_CrateTimeDB.getRevision()));
 
@@ -266,7 +266,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
       evt_t0 = m_eventT0->getEventT0() ;
       evt_t0_unc = m_eventT0->getEventT0Uncertainty() ;
     }
-    B2DEBUG(30, "Found event t0") ;
+    B2DEBUG(26, "Found event t0") ;
   }
 
 
@@ -291,9 +291,9 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
      We will select events with only 2 tight tracks and no additional loose tracks.
      Tight tracks are a subset of looses tracks. */
   for (int iTrk = 0 ; iTrk < nTrkAll ; iTrk++) {
-
-    // Get track and assume it is a pion for now ... because it is the only particle we can assume?
-    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResult(Const::ChargedStable(211)) ;
+    // Get track biasing towards the particle being a pion based on what particle types
+    // are used for reconstruction at this stage.
+    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResultWithClosestMass(Const::pion);
     if (not tempTrackFit) {continue ;}
 
     // Collect track info to be used for categorizing
@@ -356,7 +356,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // There are exactly two tight tracks
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
 
 
   if (nTrkLoose != 2) {
@@ -365,7 +365,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // There are exactly two loose tracks as well, i.e. no additional loose tracks
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: No additional loose tracks: index = " << cutIndexPassed) ;
+  B2DEBUG(22, "Cutflow: No additional loose tracks: index = " << cutIndexPassed) ;
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
      and [1] fo the positively charged track.  If both are filled then both a negatively charged
@@ -377,7 +377,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // The two tracks have the opposite electric charges.
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
 
 
 
@@ -403,7 +403,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   for (int icharge = 0; icharge < 2; icharge++) {
     if (maxiTrk[icharge] > -1) {
-      B2DEBUG(10, "looping over the 2 max pt tracks");
+      B2DEBUG(22, "looping over the 2 max pt tracks");
 
       const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
@@ -418,7 +418,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
       auto eclClusterRelationsFromTracks = tracks[maxiTrk[icharge]]->getRelationsTo<ECLCluster>();
       for (unsigned int clusterIdx = 0; clusterIdx < eclClusterRelationsFromTracks.size(); clusterIdx++) {
 
-        B2DEBUG(10, "Looking at clusters.  index = " << clusterIdx);
+        B2DEBUG(22, "Looking at clusters.  index = " << clusterIdx);
         auto cluster = eclClusterRelationsFromTracks[clusterIdx];
 
         if (cluster->hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
@@ -451,7 +451,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   /* At the end of this section the 3-momenta magnitudes and the cluster energies are known
      for the two saved track indices for both the lab and COM frames.
      The crystal with the maximum energy, one associated to each track, is recorded*/
-  B2DEBUG(30, "Extracted time information and E/p for the tracks") ;
+  B2DEBUG(26, "Extracted time information and E/p for the tracks") ;
 
 
 
@@ -469,8 +469,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // There is exactly two ECL clusters connected to tracks in the event
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: Exactly " << numGoodElectronClusters_cut << " good clusters connected to tracks: index = " << cutIndexPassed)
-  ;
+  B2DEBUG(22, "Cutflow: Exactly " << numGoodElectronClusters_cut
+          << " good clusters connected to tracks: index = " << cutIndexPassed);
 
 
   // Check both electrons to see if their cluster energy / track momentum is good.
@@ -487,7 +487,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // E/p sufficiently large
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
 
 
 
@@ -502,11 +502,11 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // Invariable mass of the two tracks are above the minimum
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
+  B2DEBUG(22, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
           " : index = " << cutIndexPassed);
 
 
-  B2DEBUG(10, "Event passed all cuts");
+  B2DEBUG(22, "Event passed all cuts");
 
 
   // Fill the histogram for the event level variables
@@ -541,7 +541,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
     }
   }
-  B2DEBUG(30, "Filled cluster tree") ;
+  B2DEBUG(26, "Filled cluster tree") ;
 
 
   if (m_saveTree) {
@@ -572,6 +572,6 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     }
   }
 
-  B2DEBUG(30, "Filled event tree") ;
+  B2DEBUG(26, "Filled event tree") ;
 
 }

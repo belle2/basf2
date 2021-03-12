@@ -107,25 +107,25 @@ void eclTimeShiftsPlottingCollectorModule::collect()
       m_CrateTime = m_CrateTimeDB->getCalibVector();
       m_CrateTimeUnc = m_CrateTimeDB->getCalibUncVector();
     }
-    B2DEBUG(35, "Finished checking if previous crate time payload has changed");
-    B2DEBUG(35, "m_CrateTime size = " << m_CrateTime.size());
-    B2DEBUG(29, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
-    B2DEBUG(29, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
+    B2DEBUG(29, "Finished checking if previous crate time payload has changed");
+    B2DEBUG(29, "m_CrateTime size = " << m_CrateTime.size());
+    B2DEBUG(25, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
+    B2DEBUG(25, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
 
-    B2DEBUG(35, "Finished checking if previous crate time payload has changed");
+    B2DEBUG(29, "Finished checking if previous crate time payload has changed");
     if (m_RefCrystalsCalibDB.hasChanged()) {
       m_RefCrystalsCalib = m_RefCrystalsCalibDB->getReferenceCrystals();
     }
-    B2DEBUG(35, "Finished checking if reference crystal ids payload has changed");
+    B2DEBUG(29, "Finished checking if reference crystal ids payload has changed");
 
 
-    B2DEBUG(29, "eclTimeShiftsPlottingCollector:: loaded ECLCrystalTimeOffset from the database"
+    B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLCrystalTimeOffset from the database"
             << LogVar("IoV", m_CrystalTimeDB.getIoV())
             << LogVar("Revision", m_CrystalTimeDB.getRevision()));
-    B2DEBUG(29, "eclTimeShiftsPlottingCollector:: loaded ECLCrateTimeOffset from the database"
+    B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLCrateTimeOffset from the database"
             << LogVar("IoV", m_CrateTimeDB.getIoV())
             << LogVar("Revision", m_CrateTimeDB.getRevision()));
-    B2DEBUG(29, "eclTimeShiftsPlottingCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
+    B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
             << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
             << LogVar("Revision", m_RefCrystalsCalibDB.getRevision()));
 

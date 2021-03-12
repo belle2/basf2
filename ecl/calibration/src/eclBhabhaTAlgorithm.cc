@@ -13,11 +13,9 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Configuration.h>
 
 #include "TH2F.h"
 #include "TFile.h"
@@ -83,18 +81,31 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   auto cutflow = getObjectPtr<TH1F>("cutflow");
 
 
-
   // Define new plots to make
-
   // New ts values minus ts values from previous iteration plotted as a function of the crystal or crate id
-  auto tsNew_MINUS_tsOld__cid = new TH1F("TsNew_MINUS_TsOld__cid", ";cell id; ts(new) - ts(old)  [ns]", 8736, 1, 8736 + 1);
-  auto tcrateNew_MINUS_tcrateOld__crateID = new TH1F("tcrateNew_MINUS_tcrateOld__crateID", ";crate id; ts(new) - ts(old)  [ns]", 52,
-                                                     1, 52 + 1);
+  unique_ptr<TH1F> tsNew_MINUS_tsOld__cid(new TH1F("TsNew_MINUS_TsOld__cid", ";cell id; ts(new) - ts(old)  [ns]", 8736, 1, 8736 + 1));
+  unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld__crateID(new TH1F("tcrateNew_MINUS_tcrateOld__crateID",
+                                                      ";crate id; ts(new) - ts(old)  [ns]", 52,
+                                                      1, 52 + 1));
 
   // Histogram of the new time constant values minus values from previous iteration
-  auto tsNew_MINUS_tsOld = new TH1F("TsNew_MINUS_TsOld", ";ts(new) - ts(old)  [ns];Number of crystals", 201, -10.05, 10.05);
-  auto tcrateNew_MINUS_tcrateOld = new TH1F("tcrateNew_MINUS_tcrateOld", ";tcrate(new) - tcrate(old)  [ns];Number of crates", 201,
-                                            -10.05, 10.05);
+  unique_ptr<TH1F> tsNew_MINUS_tsOld(new TH1F("TsNew_MINUS_TsOld", ";ts(new) - ts(old)  [ns];Number of crystals", 201, -10.05,
+                                              10.05));
+  unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld(new TH1F("tcrateNew_MINUS_tcrateOld",
+                                                      ";tcrate(new) - tcrate(old)  [ns];Number of crates", 201,
+                                                      -10.05, 10.05));
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   if (!TimevsCrysNoCalibrations) return c_Failure;
@@ -197,10 +208,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("Dumping payload");
 
   //..Get vectors of values from the payloads
-  std::vector<float> currentValuesCrys = crystalTimeObject->getCalibVector();
-  std::vector<float> currentUncCrys = crystalTimeObject->getCalibUncVector();
-  std::vector<float> currentValuesCrate = crateTimeObject->getCalibVector();
-  std::vector<float> currentUncCrate = crateTimeObject->getCalibUncVector();
+  vector<float> currentValuesCrys = crystalTimeObject->getCalibVector();
+  vector<float> currentUncCrys = crystalTimeObject->getCalibUncVector();
+  vector<float> currentValuesCrate = crateTimeObject->getCalibVector();
+  vector<float> currentUncCrate = crateTimeObject->getCalibUncVector();
 
   //..Print out a few values for quality control
   B2INFO("Values read from database.  Write out for their values for comparison against those from tcol");
@@ -261,6 +272,12 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     crateIDsNumRefCrystalsUntested[crate_id_from_crystal - 1]++;
     crystalIDReferenceForZeroTs[crate_id_from_crystal - 1] = crys_id;
   }
+  B2INFO("crystalIDReferenceForZeroTs = {");
+  for (int crateTest = 0; crateTest < 52 - 1; crateTest++) {
+    B2INFO(crystalIDReferenceForZeroTs[crateTest] << ",");
+  }
+  B2INFO(crystalIDReferenceForZeroTs[52 - 1] << "}");
+
 
   // Make sure that there is only one reference crystal per crate as defined by the payload/database
   for (int crateTest = 0; crateTest < 52; crateTest++) {
@@ -403,10 +420,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     /* Determining which bins to mask out for mean calculation
     */
 
-    TH1D* h_time = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionY((std::string("h_time_psi__") + std::to_string(crys_id)).c_str(),
+    TH1D* h_time = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionY((string("h_time_psi__") + to_string(crys_id)).c_str(),
                    crys_id, crys_id);
     TH1D* h_timeMask = (TH1D*)h_time->Clone();
-    TH1D* h_timeMasked = (TH1D*)h_time->Clone((std::string("h_time_psi_masked__") + std::to_string(crys_id)).c_str());
+    TH1D* h_timeMasked = (TH1D*)h_time->Clone((string("h_time_psi_masked__") + to_string(crys_id)).c_str());
     TH1D* h_timeRebin = (TH1D*)h_time->Clone();
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down
@@ -567,8 +584,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     t_offsets_unc[crys_id - 1] = database_mean_unc / TICKS_TO_NS;
 
 
-    histfile->WriteTObject(h_time, (std::string("h_time_psi") + std::to_string(crys_id)).c_str());
-    histfile->WriteTObject(h_timeMasked, (std::string("h_time_psi_masked") + std::to_string(crys_id)).c_str());
+    histfile->WriteTObject(h_time, (string("h_time_psi") + to_string(crys_id)).c_str());
+    histfile->WriteTObject(h_timeMasked, (string("h_time_psi_masked") + to_string(crys_id)).c_str());
 
     mean = database_mean;
     mean_unc = database_mean_unc;
@@ -622,8 +639,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
 
     // Save the histograms to the output root file
-    histfile->WriteTObject(tsNew_MINUS_tsOld__cid, "tsNew_MINUS_tsOld__cid");
-    histfile->WriteTObject(tsNew_MINUS_tsOld, "tsNew_MINUS_tsOld");
+    histfile->WriteTObject(tsNew_MINUS_tsOld__cid.get(), "tsNew_MINUS_tsOld__cid");
+    histfile->WriteTObject(tsNew_MINUS_tsOld.get(), "tsNew_MINUS_tsOld");
   }
 
 
@@ -637,11 +654,11 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   if (cellIDLo <= cellIDHi) {
     saveCalibration(BhabhaTCalib, "ECLCrystalTimeOffset");
     saveCalibration(BhabhaTCalib, "ECLCrystalTimeOffsetBhabha");
-    B2DEBUG(30, "crystal payload made");
+    B2DEBUG(22, "crystal payload made");
   }
 
 
-  B2DEBUG(30, "end of crystal start of crate corrections .....");
+  B2DEBUG(22, "end of crystal start of crate corrections .....");
 
 
   //==============================================================
@@ -650,14 +667,14 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   hist_tmin = TimevsCrateNoCrateCalibPrevCrystCalib->GetYaxis()->GetXmin();
   hist_tmax = TimevsCrateNoCrateCalibPrevCrystCalib->GetYaxis()->GetXmax();
 
-  B2DEBUG(30, "Found min/max of X axis of TimevsCrateNoCrateCalibPrevCrystCalib");
+  B2DEBUG(22, "Found min/max of X axis of TimevsCrateNoCrateCalibPrevCrystCalib");
 
   // Vector of time offsets to be saved in the database.
 
   auto TcrateDatabase = getObjectPtr<TH1F>("TcrateDatabase");
 
 
-  B2DEBUG(30, "Retrieved Ts and Tcrate histograms from tcol root file");
+  B2DEBUG(22, "Retrieved Ts and Tcrate histograms from tcol root file");
 
 
   vector<float> tcrate_mean_new(52, 0.0);
@@ -667,7 +684,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // vector<float> tcrate_sigma_prev(52, 0.0); // currently not used
   vector<bool> tcrate_new_was_set(52, false);
 
-  B2DEBUG(30, "crate vectors set");
+  B2DEBUG(22, "crate vectors set");
 
 
 
@@ -686,7 +703,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   for (int crate_id = crateIDLo; crate_id <= crateIDHi; crate_id++) {
 
-    B2DEBUG(30, "Start of crate id = " << crate_id);
+    B2DEBUG(22, "Start of crate id = " << crate_id);
 
     TH1D* h_time_crate = TimevsCrateNoCrateCalibPrevCrystCalib->ProjectionY("h_time_psi_crate", crate_id, crate_id);
     TH1D* h_time_crate_mask = (TH1D*)h_time_crate->Clone();
@@ -743,7 +760,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
 
-    B2DEBUG(30, "crate loop - projected h_time_psi_crate");
+    B2DEBUG(22, "crate loop - projected h_time_psi_crate");
 
 
     double default_mean_crate = h_time_crate_masked->GetMean();
@@ -772,7 +789,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     bool good_fit = false;
 
-    B2DEBUG(30, "Crate id = " << crate_id << " with crate mean = " << default_mean_crate << " +- " << fit_mean_crate_unc);
+    B2DEBUG(22, "Crate id = " << crate_id << " with crate mean = " << default_mean_crate << " +- " << fit_mean_crate_unc);
 
     if ((fabs(meanDiff) > 7)            ||
         (fabs(meanUncDiff) > 7)         ||
@@ -819,14 +836,14 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     tcrate_new_was_set[crate_id - 1] = true;
 
 
-    histfile->WriteTObject(h_time_crate, (std::string("h_time_psi_crate") + std::to_string(crate_id)).c_str());
-    histfile->WriteTObject(h_time_crate_masked, (std::string("h_time_psi_crate_masked") + std::to_string(crate_id)).c_str());
-    histfile->WriteTObject(h_time_crate_rebin, (std::string("h_time_psi_crate_rebinned") + std::to_string(crate_id)).c_str());
+    histfile->WriteTObject(h_time_crate, (string("h_time_psi_crate") + to_string(crate_id)).c_str());
+    histfile->WriteTObject(h_time_crate_masked, (string("h_time_psi_crate_masked") + to_string(crate_id)).c_str());
+    histfile->WriteTObject(h_time_crate_rebin, (string("h_time_psi_crate_rebinned") + to_string(crate_id)).c_str());
 
     delete gaus;
   }
 
-  B2DEBUG(30, "crate histograms made");
+  B2DEBUG(22, "crate histograms made");
 
 
   // Save database for crates
@@ -867,8 +884,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
 
     // Save the histograms to the output root file
-    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID, "tcrateNew_MINUS_tcrateOld__crateID");
-    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld, "tcrateNew_MINUS_tcrateOld");
+    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID.get(), "tcrateNew_MINUS_tcrateOld__crateID");
+    histfile->WriteTObject(tcrateNew_MINUS_tcrateOld.get(), "tcrateNew_MINUS_tcrateOld");
   }
 
 
@@ -880,7 +897,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   //    begin calibrated.
   if (crateIDLo <= crateIDHi) {
     saveCalibration(BhabhaTCrateCalib, "ECLCrateTimeOffset");
-    B2DEBUG(30, "crate payload made");
+    B2DEBUG(22, "crate payload made");
   }
 
 
@@ -918,7 +935,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
   }
 
-  B2DEBUG(30, "end of crate corrections .....");
+  B2DEBUG(22, "end of crate corrections .....");
 
   tree_crystal->Write();
   tree_crate->Write();

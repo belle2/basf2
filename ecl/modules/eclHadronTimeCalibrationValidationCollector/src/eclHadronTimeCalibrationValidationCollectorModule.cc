@@ -147,7 +147,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";cell ID ;Photon ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
+                                  ";crystal ID ;Photon ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
@@ -180,7 +180,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 {
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
 
   /* Use ECLChannelMapper to get other detector indices for the crystals */
@@ -215,7 +215,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
       evt_t0 = m_eventT0->getEventT0() ;
       evt_t0_unc = m_eventT0->getEventT0Uncertainty() ;
     }
-    B2DEBUG(30, "Found event t0") ;
+    B2DEBUG(26, "Found event t0") ;
   }
 
   //---------------------------------------------------------------------
@@ -232,8 +232,8 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
      Tight tracks are a subset of looses tracks. */
   for (int iTrk = 0 ; iTrk < nTrkAll ; iTrk++) {
 
-    // Get track and assume it is a pion for now ... because it is the only particle we can assume?
-    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResult(Const::ChargedStable(211)) ;
+    // Get track biasing towards the particle being a pion
+    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResultWithClosestMass(Const::pion) ;
     if (not tempTrackFit) {continue ;}
 
     // Collect track info to be used for categorizing
@@ -278,7 +278,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 
   }
   // After that last section the numbers of loose and tight tracks are known
-  B2DEBUG(30, "Found loose and tight tracks") ;
+  B2DEBUG(26, "Found loose and tight tracks") ;
 
 
   int numGoodTightTracks_minCut = 4 ;
@@ -288,7 +288,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // There are at least X tight tracks
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: At least " << numGoodTightTracks_minCut << " tight tracks: index = " << cutIndexPassed) ;
+  B2DEBUG(22, "Cutflow: At least " << numGoodTightTracks_minCut << " tight tracks: index = " << cutIndexPassed) ;
 
 
   int numGoodLooseTracks_minCut = numGoodTightTracks_minCut ;
@@ -298,7 +298,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // There are more loose tracks than tight tracks then veto the event.  If there are fewer loose tracks than tight tracks then veto the event, although this should be impossible
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: No additional loose tracks: index = " << cutIndexPassed) ;
+  B2DEBUG(22, "Cutflow: No additional loose tracks: index = " << cutIndexPassed) ;
 
 
   //------------------------------------------------------------------------
@@ -324,7 +324,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // There are at least 5 good EM clusters (photon = basically all clusters)
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: At least " << numGoodEMclusters_minCut << " ECL clusters: index = " << cutIndexPassed) ;
+  B2DEBUG(22, "Cutflow: At least " << numGoodEMclusters_minCut << " ECL clusters: index = " << cutIndexPassed) ;
 
 
   //------------------------------------------------------------------------
@@ -364,7 +364,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // There is at least one good photon in the event
   cutIndexPassed++ ;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed) ;
-  B2DEBUG(10, "Cutflow: At least " << numGoodPhotonclusters_minCut << " good photon: index = " << cutIndexPassed) ;
+  B2DEBUG(22, "Cutflow: At least " << numGoodPhotonclusters_minCut << " good photon: index = " << cutIndexPassed) ;
 
 
 
@@ -405,7 +405,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 
 
 
-  B2DEBUG(10, "Event passed all cuts");
+  B2DEBUG(22, "Event passed all cuts");
 
 
   // Fill the histogram for the event level variables
@@ -442,7 +442,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 
     }
   }
-  B2DEBUG(30, "Filled cluster tree") ;
+  B2DEBUG(26, "Filled cluster tree") ;
 
 
   if (m_saveTree) {
@@ -459,6 +459,6 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
     m_dbg_tree_event->Fill() ;
   }
 
-  B2DEBUG(30, "Filled event tree") ;
+  B2DEBUG(26, "Filled event tree") ;
 
 }

@@ -15,6 +15,7 @@
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
@@ -215,6 +216,7 @@ namespace Belle2 {
       double m_elNoiseV = 500; //e-
 
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
       //run-dependent MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/

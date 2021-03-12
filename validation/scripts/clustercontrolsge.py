@@ -242,7 +242,7 @@ class Cluster:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
-                    returncode = -666
+                    returncode = -654
 
             # Delete the *.done file
             os.remove(donefile_path)

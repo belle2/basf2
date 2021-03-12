@@ -77,19 +77,42 @@ namespace Belle2 {
        * Returns time window lower edge
        * @return time window lower edge
        */
-      static double getMinTime() {return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMin();}
+      static double getMinTime()
+      {
+        if (getInstance().m_minTime < getInstance().m_maxTime) {
+          return getInstance().m_minTime;
+        }
+        return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMin();
+      }
 
       /**
        * Returns time window upper edge
        * @return time window upper edge
        */
-      static double getMaxTime() {return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMax();}
+      static double getMaxTime()
+      {
+        if (getInstance().m_minTime < getInstance().m_maxTime) {
+          return getInstance().m_maxTime;
+        }
+        return TOPGeometryPar::Instance()->getGeometry()->getNominalTDC().getTimeMax();
+      }
 
       /**
        * Returns size of time window
        * @return size of time window
        */
       static double getTimeWindowSize() {return getMaxTime() - getMinTime();}
+
+      /**
+       * Sets time window
+       * @param minTime lower edge
+       * @param maxTime upper edge
+       */
+      static void setTimeWindow(double minTime, double maxTime)
+      {
+        getInstance().m_minTime = minTime;
+        getInstance().m_maxTime = maxTime;
+      }
 
       /**
        * Sets channel masks
@@ -162,6 +185,8 @@ namespace Belle2 {
       std::vector<FastRaytracer> m_fastRaytracers; /**< collection of fast raytracers */
       std::vector<YScanner> m_yScanners; /**< collection of y-scanners */
       std::vector<BackgroundPDF> m_backgroundPDFs; /**< collection of background PDF's */
+      double m_minTime = 0; /**< time window lower edge */
+      double m_maxTime = 0; /**< time window upper edge */
       bool m_redoBkg = false; /**< flag to signal whether backgroundPDF has to be redone */
 
     };

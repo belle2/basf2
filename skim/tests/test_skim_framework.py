@@ -12,14 +12,15 @@ from pathlib import Path
 import unittest
 
 from basf2 import find_file
+from b2test_utils import skip_test_if_light
 from skim.registry import Registry
 from skimExpertFunctions import BaseSkim
 
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
 
 
-class TestSkimFramework(unittest.TestCase):
-    """Test case for skim framework."""
+class TestSkimRegistry(unittest.TestCase):
+    """Test case for skim registry."""
 
     ExistentModulePaths = Path(find_file("skim/scripts/skim")).glob("*.py")
     ExistentModules = [
@@ -168,7 +169,9 @@ class TestSkimFramework(unittest.TestCase):
                     ),
                 )
 
-    def test_validation_scripts(self):
+
+class TestSkimValidation(unittest.TestCase):
+    def test_validation_scripts_exist(self):
         """
         Check that all skims with a ``validation_histograms`` method defined have a
         script in skim/validation/, and vice versa. This unit test exists to make sure
@@ -204,6 +207,22 @@ class TestSkimFramework(unittest.TestCase):
                 ),
             )
 
+    def test_validation_samples(self):
+        """
+        Check that all ``validation_sample`` attributes of skims point to existing files.
+        """
+        for skim in Registry.names:
+            SkimObject = Registry.get_skim_function(skim)()
+            # Don't bother checking sample if no `validation_histograms` method is defined
+            if SkimObject._method_unchanged("validation_histograms"):
+                continue
+
+            try:
+                find_file(SkimObject.validation_sample, data_type="validation")
+            except FileNotFoundError:
+                self.fail(f"{skim}.validation_sample does not point to an existing validation file.")
+
 
 if __name__ == "__main__":
+    skip_test_if_light(py_case=TestSkimValidation)
     unittest.main()

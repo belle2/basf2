@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .minimal import EmptyRun
+from tracking.run.minimal import EmptyRun
 import tracking.root_utils as root_utils
 
 import logging

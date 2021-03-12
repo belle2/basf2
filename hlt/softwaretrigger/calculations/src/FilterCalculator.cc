@@ -154,6 +154,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   if (m_l1Trigger.isValid()) {
     calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
     calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+    calculationResult["l1_trigger_poisson"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
 
     calculationResult["bha3d"] = m_l1Trigger->testPsnm("bha3d");
     calculationResult["bhapur"] = m_l1Trigger->testPsnm("bhapur");
@@ -161,6 +162,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   } else {
     calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
     calculationResult["l1_trigger_delayed_bhabha"] = 0;
+    calculationResult["l1_trigger_poisson"] = 0;
     calculationResult["bha3d"] = 0;
     calculationResult["bhapur"] = 0;
     calculationResult["bhapur_lml1"] = 0;

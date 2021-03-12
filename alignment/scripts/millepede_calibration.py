@@ -9,9 +9,9 @@ from caf import strategies
 import os
 
 import alignment.parameters as parameters  # noqa
-import alignment.constraints as constraints  # noqa
+import alignment.constraints  # noqa
 
-import alignment.collections as collections  # noqa
+import alignment.collections  # noqa
 from alignment.collections import make_collection  # noqa
 
 

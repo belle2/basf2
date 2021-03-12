@@ -74,8 +74,39 @@ With all of these steps followed, you will now be able to run your skim using th
 
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
-10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+10. Define validation histograms for your skim by overriding the method `BaseSkim.validation_histograms`, and running `b2skim-generate-validation<b2skim-generate-validation>` to auto-generate a steering file in the skim validation directory. The :py:func:`validation_histograms <skimExpertFunctions.BaseSkim.validation_histograms>` method should not be long: it should simply use the particle lists that have been created by :py:func:`build_lists <skimExpertFunctions.BaseSkim.build_lists>` to plot one or two key variables. If possible, *do not do any further reconstruction or particle list loading here*. Below is an example of what a typical method ought to contain.
 
+    .. code-block:: python
+
+        def validation_histograms(self, path):
+            # The validation package is not part of the light releases, so this import
+            # must be made inside this function rather than at the top of the file.
+            from validation_tools.metadata import create_validation_histograms
+
+            # Combine B+ particle lists for a single histogram (assuming self.SkimLists only
+            # has B+ particle lists). Not necessary if only one particle list is created.
+            ma.copyLists(f"B+:{self}_validation", self.SkimLists, path=path)
+        
+            create_validation_histograms(
+                rootfile=f"{self}_validation.root",
+                particlelist=f"B+:{self}_validation",
+                variables_1d=[
+                    ("deltaE", 20, -0.5, 0.5, "#Delta E", __liaison__,
+                     "$\\Delta E$ distribution of reconstructed $B^{+}$ candidates",
+                     "Peak around 0", "#Delta E [GeV]", "B^{+} candidates"),
+                    # Include "shifter" flag to have this plot shown to shifters
+                    ("Mbc", 20, 5.2, 5.3, "M_{bc}", __liaison__,
+                     "$M_{\\rm bc}$ distribution of reconstructed $B^{+}$ candidates",
+                     "Peak around 5.28", "M_{bc} [GeV]", "B^{+} candidates", "shifter")],
+            )
+
+    .. seealso::
+
+       Documentation of :py:func:`create_validation_histograms <validation_tools.metadata.create_validation_histograms>` for explanation of the expected arguments. Options to pay particular attention to:
+
+       * Passing the "shifter" flag in ``metaoptions``, which will allow the plot to be shown to shifters when they check `validation.belle2.org <https://validation.belle2.org>`_.
+
+       * Adding a contact email address with the ``contact`` option, preferably the contact email of your working group's skim liaison. If this is set, then the B2Bot will know where to send polite emails in case the validation comparison fails.
 
 .. _skim-steering-file:
 
@@ -196,6 +227,19 @@ In the skim package, there are command-line tools available for running skims, d
    :nodefaultconst:
    :nogroupsections:
 
+.. _b2skim-generate-validation:
+
+``b2skim-generate-validation``: Generate skim validation scripts
+................................................................
+
+.. argparse::
+   :filename: skim/tools/b2skim-generate-validation
+   :func: get_argument_parser
+   :prog: b2skim-generate-validation
+   :nodefaultconst:
+   :nogroupsections:
+
+
 Skim tutorial
 ~~~~~~~~~~~~~
 
@@ -280,12 +324,6 @@ This will read the output files of the test jobs, and produce tables of statisti
    :nodefaultconst:
    :nogroupsections:
 
-   .. note::
-      This tool uses the third-party package `tabulate <https://pypi.org/project/tabulate>`_, which
-      can be installed via ``pip``.
-
-      This will be included in a future version of the externals.
-
 
 .. _skim-expert-functions:
 
@@ -308,6 +346,19 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :filename: skim/tools/b2skim-prod
    :func: get_argument_parser
    :prog: b2skim-prod
+   :nodefaultconst:
+   :nogroupsections:
+
+
+.. _b2skim-stats-total:
+
+``b2skim-stats-total``: Produce summary statistics for skim package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/b2skim-stats-total
+   :func: get_argument_parser
+   :prog: b2skim-stats-total
    :nodefaultconst:
    :nogroupsections:
 

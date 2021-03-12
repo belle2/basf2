@@ -185,15 +185,15 @@ with the `passesCut` function.
    This is the first one:
 
    .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 33-36
-           :lineno-start: 33
+           :lines: 32-35
+           :lineno-start: 32
 
 .. admonition:: Solution
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 33-45
-           :lineno-start: 33
+           :lines: 32-44
+           :lineno-start: 32
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -218,8 +218,8 @@ one Bremsstrahlung photon was added to this particle.
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 47-48
-           :lineno-start: 47
+           :lines: 46-47
+           :lineno-start: 46
 
 .. admonition:: Question
    :class: exercise stacked
@@ -270,8 +270,8 @@ variable by the `isSignalAcceptBremsPhotons` one, or add the ``?addbrems``
 marker to the decay string:
 
 .. literalinclude:: steering_files/039_various_additions.py
-   :lines: 50-55
-   :lineno-start: 50
+   :lines: 49-54
+   :lineno-start: 49
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -307,8 +307,8 @@ Bremsstrahlung recovery?
     :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-      :lines: 113-115
-      :lineno-start: 113
+      :lines: 112-114
+      :lineno-start: 112
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -423,8 +423,8 @@ random seed.
    :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-       :lines: 74-76
-       :lineno-start: 74
+       :lines: 73-75
+       :lineno-start: 73
 
 .. warning::
 

@@ -129,7 +129,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   for (const std::string& trigger : m_param_l1Identifiers) {
     m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
-    m_l1Histograms[trigger]->SetXTitle(("HLT Result for L1: " + trigger).c_str());
+    m_l1Histograms[trigger]->SetXTitle("");
     m_l1Histograms[trigger]->SetOption("bar");
     m_l1Histograms[trigger]->SetFillStyle(0);
     m_l1Histograms[trigger]->SetStats(false);
@@ -310,6 +310,7 @@ void SoftwareTriggerHLTDQMModule::event()
 
       const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
       m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
+      m_l1Histograms[l1Trigger]->LabelsDeflate("X");
     }
   }
 

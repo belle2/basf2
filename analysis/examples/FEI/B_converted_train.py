@@ -37,6 +37,7 @@ if feistate.stage <= 0:
             False),
         applySkim=True,
         enableNisKsFinder=False,
+        enableLocalDB=False,
         path=path)
 else:
     ma.inputMdstList('Belle', [], path)

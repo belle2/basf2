@@ -16,6 +16,10 @@
 
 #include <mdst/dataobjects/TRGSummary.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+
 #include <string.h>
 
 
@@ -238,8 +242,6 @@ void TRGGDLSummaryModule::event()
     tt = TRGSummary::TTYP_NONE;
   }
 
-  GDLResult->setTimType(tt);
-
   StoreObjPtr<EventMetaData> bevt;
   unsigned _exp = bevt->getExperiment();
   unsigned _run = bevt->getRun();
@@ -266,5 +268,25 @@ void TRGGDLSummaryModule::event()
     }
     GDLResult->setTimQuality(timQuality);
   }
+
+  if (exprun > 16000271) {
+    if (tt == TRGSummary::TTYP_RAND) {
+      int i_poissonin = GDLResult->getInputBitNumber(std::string("poissonin"));
+      int j_poissonin = i_poissonin / TRGSummary::c_trgWordSize;
+      int k_poissonin = i_poissonin % TRGSummary::c_trgWordSize;
+      int i_veto      = GDLResult->getInputBitNumber(std::string("veto"));
+      int j_veto      = i_veto / TRGSummary::c_trgWordSize;
+      int k_veto      = i_veto % TRGSummary::c_trgWordSize;
+      for (int clk = 5; clk < n_clocks - 5; clk++) {
+        if ((1 << k_poissonin) & _data[ee_itd[j_poissonin]][clk]) {
+          tt = TRGSummary::TTYP_POIS;
+          if ((1 << k_veto) & _data[ee_itd[j_veto]][clk]) {
+            GDLResult->setPoissonInInjectionVeto();
+          }
+        }
+      }
+    }
+  }
+  GDLResult->setTimType(tt);
 
 }

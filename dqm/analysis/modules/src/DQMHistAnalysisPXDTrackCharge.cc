@@ -41,6 +41,8 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower border for fit", 20.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
+//   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
+//   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
@@ -294,34 +296,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         canvas->cd();
 
         // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-        if (abs(hist2->Integral()) > 0)
-          h->Scale(hh1->Integral() / hist2->Integral());
+        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
-        h->SetFillColor(kWhite);
         h->SetStats(kFALSE);
-        hh1->SetFillColor(kWhite);
-        if (h->GetMaximum() > hh1->GetMaximum())
-          hh1->SetMaximum(1.1 * h->GetMaximum());
-        hh1->Draw("hist");
-        h->Draw("same hist");
-
-        canvas->Pad()->SetFrameFillColor(10);
-        if (m_color) {
-          if (hh1->GetEntries() < 1000) {
-            // not enough Entries
-            canvas->Pad()->SetFillColor(kGray);
-          } else {
-            canvas->Pad()->SetFillColor(kGreen);
-          }
-        } else {
-          canvas->Pad()->SetFillColor(kWhite);// White
-        }
-
+        h->Draw("same,hist");
       }
+
+      // add coloring, cuts? based on fit, compare with ref?
+      canvas->Pad()->SetFrameFillColor(10);
+      if (m_color) {
+        if (hh1->GetEntries() < 100) {
+          // not enough Entries
+          canvas->Pad()->SetFillColor(kGray);
+        } else {
+          canvas->Pad()->SetFillColor(kGreen);
+        }
+      } else {
+        canvas->Pad()->SetFillColor(kWhite);// White
+      }
+
       canvas->Modified();
       canvas->Update();
 
+      // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
       if (hh1->GetEntries() >= 1000) enough = true;
     }
   }

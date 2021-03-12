@@ -121,7 +121,6 @@ def start_zmq_path(args, location):
     input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
     reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Start_ZMQ')
     return path, reco_path
 
 
@@ -137,6 +136,8 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+    path.add_module('StatisticsSummary').set_name('Sum_Wait')
+
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_HLT_COMPONENTS
     if reco_components is None:
@@ -156,7 +157,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Initialization')
 
     # Unpack the event content
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # Build one path for all accepted events...
@@ -326,4 +327,3 @@ def finalize_zmq_path(path, args, location):
         path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")
-    path.add_module('StatisticsSummary').set_name('Sum_Finalize_ZMQ')

@@ -59,6 +59,13 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   updateDBObjPtrs(1, expRun.second, expRun.first);
   fStartRun = expRun.second;
 
+  //checking existing payload pointer
+  if (!m_DBBadWires.isValid())
+    B2FATAL("There is no valid payload for CDCDedxBadWires");
+
+  if (!m_DBWireGains.isValid())
+    B2FATAL("There is no valid payload for CDCDedxWireGain");
+
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
   ttree->SetBranchAddress("wire", &wire);
@@ -152,10 +159,10 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     double truncMean = 1.0;
     int startfrom = 1, endat = 1;
 
-    if (htempPerWire->Integral() == 0) {
-      truncMean  = 0.0; //dead wire
-    } else if (htempPerWire->Integral() < 1000) {
-      truncMean  = 1.0; //partial dead or bad wire
+    if (htempPerWire->Integral() <= 50 || m_DBBadWires->getBadWireStatus(jwire)) {
+      truncMean  = 0.0; //dead or bad wire
+    } else if (htempPerWire->Integral() > 50 && htempPerWire->Integral() < 1000) {
+      truncMean  = 1.0; //partial dead wire
     } else {
       if (!isLTruc) {
         if (jwire < 160 * 8) {
@@ -289,14 +296,17 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     if (isMergePayload)hWGConstVar->SetTitle(Form("abs-const: %s", hWGConstVar->GetTitle()));
     else hWGConstVar->SetTitle(Form("rel-const: %s", hWGConstVar->GetTitle()));
 
-    std::ofstream fBadWG_New;
-    fBadWG_New.open(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun));
+    std::ofstream fBadWG;
+    fBadWG.open(Form("cdcdedx_wiregain_badwire_frun%d.txt", fStartRun));
 
-    std::ofstream fBadWG_Old;
-    fBadWG_Old.open(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun));
+    std::ofstream fDeadWG_New;
+    fDeadWG_New.open(Form("cdcdedx_wiregain_deadwire_frun%d_new.txt", fStartRun));
 
-    int toWire = 0;
-    int countwire = 0, allbadwire = 0, allbadwireold = 0;
+    std::ofstream fDeadWG_Old;
+    fDeadWG_Old.open(Form("cdcdedx_wiregain_deadwire_frun%d_old.txt", fStartRun));
+
+    int toWire = 0, countwire = 0;
+    int cnewdeadwires = 0, colddeadwires = 0, cbadwires = 0;
     for (int iLayer = 0; iLayer < 56; iLayer++) {
 
       int iSuperLayer = (iLayer - 2) / 6;
@@ -311,38 +321,50 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
       if (isMergePayload)hLayerConst->SetTitle(Form("abs-const: Layer = %d (start run: %d); wire numbers;<dedxhit>", iLayer, fStartRun));
       else hLayerConst->SetTitle(Form("rel-const: Layer = %d (start run: %d); wire numbers;<dedxhit>", iLayer, fStartRun));
 
-      int iwire = 0, layerbadwire = 0, layerbadwireold = 0;
+      int iwire = 0, cnewdeadLwires = 0, colddeadLwires = 0, cbadLwires = 0;
       for (int jwire = fromWire; jwire < toWire; jwire++) {
+
         countwire++;
         iwire++;
+
         hLayerConst->SetBinContent(iwire, dedxTruncmean.at(jwire));
-        hWGConstVar->Fill(dedxTruncmean.at(jwire));
         if (iLayer < 32 && (iwire % 10 == 0))hLayerConst->GetXaxis()->SetBinLabel(iwire, Form("w%d", jwire));
         else if (iLayer >= 32 && (iwire % 15 == 0))hLayerConst->GetXaxis()->SetBinLabel(iwire, Form("w%d", jwire));
+
+        hWGConstVar->Fill(dedxTruncmean.at(jwire));
         hWGConst->SetBinContent(countwire, dedxTruncmean.at(jwire));
 
         //see new dead wires
-        if (dedxTruncmean.at(jwire) == 0) {
-          allbadwire++;
-          layerbadwire++;
-          fBadWG_New << jwire << "\n";
+        if (m_DBBadWires->getBadWireStatus(jwire)) {
+          cbadwires++;
+          cbadLwires++;
+          fBadWG << jwire << "\n";
+        }
+
+        //see new dead wires
+        if (dedxTruncmean.at(jwire) == 0 && !m_DBBadWires->getBadWireStatus(jwire)) {
+          cnewdeadwires++;
+          cnewdeadLwires++;
+          fDeadWG_New << jwire << "\n";
         }
 
         //see old dead wires
-        if (m_DBWireGains->getWireGain(jwire) == 0) {
-          allbadwireold++;
-          layerbadwireold++;
-          fBadWG_Old << jwire << "\n";
+        if (m_DBWireGains->getWireGain(jwire) == 0 && !m_DBBadWires->getBadWireStatus(jwire)) {
+          colddeadwires++;
+          colddeadLwires++;
+          fDeadWG_Old << jwire << "\n";
         }
+
         if ((countwire) % 500 == 0)hWGConst->GetXaxis()->SetBinLabel(countwire, Form("w%d", countwire));
       }
 
       cLConst->cd(iLayer % 4 + 1);
       gStyle->SetOptStat("ne");
-      double fraclbad = (100.0 * layerbadwire) / nWireiLayer;
+      double fraclbad = (100.0 * (cnewdeadLwires + cbadLwires)) / nWireiLayer;
       if (isLayerScale)hLayerConst->SetTitle(Form("%s, avg = %0.04f, nDeadwires = %d->%d(%0.02f%%)", hLayerConst->GetTitle(),
-                                                    flayerAvg.at(iLayer) / layeravg, layerbadwireold, layerbadwire, fraclbad));
-      else hLayerConst->SetTitle(Form("%s, nDeadwires = %d->%d(%0.02f%%)", hLayerConst->GetTitle(), layerbadwireold, layerbadwire,
+                                                    flayerAvg.at(iLayer) / layeravg, colddeadLwires + cbadLwires, cnewdeadLwires + cbadLwires, fraclbad));
+      else hLayerConst->SetTitle(Form("%s, nDeadwires = %d->%d(%0.02f%%)", hLayerConst->GetTitle(), colddeadLwires + cbadLwires,
+                                        cnewdeadLwires + cbadLwires,
                                         fraclbad));
       if (iLayer < 8)hLayerConst->GetYaxis()->SetRangeUser(-0.1, 4.0);
       else hLayerConst->GetYaxis()->SetRangeUser(-0.1, 2.0);
@@ -371,10 +393,12 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     cConst->SetGridy(1);
     hWGConst->LabelsOption("u", "X");
     hWGConst->GetYaxis()->SetRangeUser(-0.1, hWGConst->GetMaximum() * 1.05);
-    double fracabad = (100.0 * allbadwire) / 14336.0;
-    if (isMergePayload)hWGConst->SetTitle(Form("merged %s, nDeadwires = %d->%d (%0.02f%%)", hWGConst->GetTitle(), allbadwireold,
-                                                 allbadwire, fracabad));
-    else hWGConst->SetTitle(Form("relative %s, nDeadwires = %d->%d (%0.02f%%)", hWGConst->GetTitle(), allbadwireold, allbadwire,
+    double fracabad = (100.0 * (cnewdeadwires + cbadwires)) / 14336.0;
+    if (isMergePayload)hWGConst->SetTitle(Form("merged %s, nDeadwires = %d->%d (%0.02f%%)", hWGConst->GetTitle(),
+                                                 colddeadwires + cbadwires,
+                                                 cnewdeadwires + cbadwires, fracabad));
+    else hWGConst->SetTitle(Form("relative %s, nDeadwires = %d->%d (%0.02f%%)", hWGConst->GetTitle(), colddeadwires + cbadwires,
+                                   cnewdeadwires + cbadwires,
                                    fracabad));
     // hWGConst->SetStats(0);
     hWGConst->LabelsDeflate();
@@ -384,10 +408,12 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
 
     TCanvas* cConstvar = new TCanvas("cConstvar", "cConstvar", 500, 400);
     cConstvar->cd();
-    if (isMergePayload)hWGConstVar->SetTitle(Form("merged %s, nDeadwires = %d->%d (%0.02f%%)", hWGConstVar->GetTitle(), allbadwireold,
-                                                    allbadwire,
+    if (isMergePayload)hWGConstVar->SetTitle(Form("merged %s, nDeadwires = %d->%d (%0.02f%%)", hWGConstVar->GetTitle(),
+                                                    colddeadwires + cbadwires,
+                                                    cnewdeadwires + cbadwires,
                                                     fracabad));
-    else hWGConstVar->SetTitle(Form("relative %s, bad wire = %d->%d (%0.02f)", hWGConstVar->GetTitle(), allbadwireold, allbadwire,
+    else hWGConstVar->SetTitle(Form("relative %s, bad wire = %d->%d (%0.02f)", hWGConstVar->GetTitle(), colddeadwires + cbadwires,
+                                      cnewdeadwires + cbadwires,
                                       fracabad));
     //hWGConst->SetStats(0);
     hWGConstVar->SetFillColorAlpha(kAzure, 0.10);
@@ -395,11 +421,12 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     cConstvar->SaveAs(Form("cdcdedx_wiregain_constantsvar_frun%d.pdf", fStartRun));
     delete cConstvar;
 
-    fBadWG_New.close();
-    fBadWG_Old.close();
+    fBadWG.close();
+    fDeadWG_New.close();
+    fDeadWG_Old.close();
 
     //create nice plots for bad wire status
-    plotBadWires(allbadwire, allbadwireold);
+    plotBadWires(cnewdeadwires, colddeadwires, cbadwires);
   }
 
   B2INFO("dE/dx Calibration done for " << dedxTruncmean.size() << " CDC wires");
@@ -469,8 +496,8 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
     flayerAvg.push_back(jLayerMeanAvg);
     hLayerAvg->SetBinContent(iLayer + 1, jLayerMeanAvg);
     if ((iLayer + 1) % 2 == 0)hLayerAvg->GetXaxis()->SetBinLabel(iLayer + 1, Form("L%d", iLayer));
-    std::cout << " \t --> sum = " << jLayerMeanSum << ", active wires = " << jLayerActWires << ", average = " << jLayerMeanAvg <<
-              std::endl;
+    std::cout << " \t --> sum = " << jLayerMeanSum << ", active wires = " << jLayerActWires
+              << ", average = " << jLayerMeanAvg << std::endl;
 
     if (iLayer >= 8 && jLayerMeanAvg > 0.0) {
       OutLayerMeanSum += jLayerMeanAvg;
@@ -504,7 +531,7 @@ double CDCDedxWireGainAlgorithm::getLayerAverage(std::vector<double> tempWire)
   return OutLayerMeanAvg;
 }
 
-void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
+void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oDeadwires, int Badwires)
 {
 
   TCanvas* cCDCWires = new TCanvas(Form("cCDCWires_frun%d", fStartRun), "CDC dE/dx bad wire status", 800, 800);
@@ -515,17 +542,28 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyOldBad = getHistoPattern(Form("cdcdedx_wiregain_badwireold_frun%d.txt", fStartRun), "olddead");
-  if (hxyOldBad) {
-    hxyOldBad->SetTitle("");
-    hxyOldBad->SetMarkerStyle(20);
-    hxyOldBad->SetMarkerSize(0.3);
-    hxyOldBad->SetMarkerColor(kBlack);
-    hxyOldBad->SetStats(0);
-    hxyOldBad->Draw("same");
+
+  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_wiregain_badwire_frun%d.txt", fStartRun), "badwire");
+  if (hxyBad) {
+    hxyBad->SetTitle("");
+    hxyBad->SetMarkerStyle(20);
+    hxyBad->SetMarkerSize(0.3);
+    hxyBad->SetMarkerColor(kBlue);
+    hxyBad->SetStats(0);
+    hxyBad->Draw("same");
   }
 
-  TH2F* hxyNewDead = getHistoPattern(Form("cdcdedx_wiregain_deadwirenew_frun%d.txt", fStartRun), "newdead");
+  TH2F* hxyOldDead = getHistoPattern(Form("cdcdedx_wiregain_deadwire_frun%d_old.txt", fStartRun), "olddead");
+  if (hxyOldDead) {
+    hxyOldDead->SetTitle("");
+    hxyOldDead->SetMarkerStyle(20);
+    hxyOldDead->SetMarkerSize(0.3);
+    hxyOldDead->SetMarkerColor(kBlack);
+    hxyOldDead->SetStats(0);
+    hxyOldDead->Draw("same");
+  }
+
+  TH2F* hxyNewDead = getHistoPattern(Form("cdcdedx_wiregain_deadwire_frun%d_new.txt", fStartRun), "newdead");
   if (hxyNewDead) {
     hxyNewDead->SetTitle("");
     hxyNewDead->SetMarkerStyle(20);
@@ -538,8 +576,9 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   auto legend = new TLegend(0.72, 0.80, 0.90, 0.92);
   legend->SetBorderSize(0);
   legend->SetLineWidth(3);
-  legend->SetHeader(Form("Total Dead: %d (~%0.02f%%)", nDeadwires, 100.*(nDeadwires) / 14336.0));
-  legend->AddEntry(hxyOldBad, Form("oldbad  %d" , oBadwires), "p");
+  legend->SetHeader(Form("Total Bad: %d (~%0.02f%%)", nDeadwires + Badwires, 100.*(nDeadwires + Badwires) / 14336.0));
+  legend->AddEntry(hxyBad, Form("badadc  %d" , Badwires), "p");
+  legend->AddEntry(hxyOldDead, Form("olddead  %d" , oDeadwires), "p");
   legend->AddEntry(hxyNewDead, Form("newdead  %d" , nDeadwires), "p");
   legend->Draw();
 

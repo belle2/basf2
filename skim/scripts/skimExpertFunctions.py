@@ -147,7 +147,7 @@ def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
 
 class InitialiseSkimFlag(b2.Module):
     """
-    [Module for skim expert usage] Create the EventExtraInfo DataStore object, and set
+    *[Module for skim expert usage]* Create the EventExtraInfo DataStore object, and set
     all required flag variables to zero.
 
     .. Note::
@@ -156,33 +156,39 @@ class InitialiseSkimFlag(b2.Module):
         defined in the datastore for all events.
     """
 
-    def __init__(self, skims):
-        # Keep these imports here to avoid ROOT hijacking the argument parser
-        from variables import variables as vm  # noqa
+    def __init__(self, *skims):
+        """
+        Initialise module.
+
+        Parameters:
+            skims (skimExpertFunctions.BaseSkim): Skim to initialise event flag for.
+        """
+
+        from variables import variables as vm
         from ROOT import Belle2
 
         super().__init__()
-        if not isinstance(skims, (tuple, list, CombinedSkim)):
-            skims = [skims]
-        self.flags = [f"passes_{skim}" for skim in skims]
+        self.skims = skims
         self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
         # Create aliases for convenience
-        for flag in self.flags:
-            vm.addAlias(flag, f"eventExtraInfo({flag})")
+        for skim in skims:
+            vm.addAlias(skim.flag, f"eventExtraInfo({skim.flag})")
 
     def event(self):
-        """Initialise all flags to zero."""
-        self.EventExtraInfo.create()
+        """
+        Initialise flags to zero.
+        """
 
-        for flag in self.flags:
-            self.EventExtraInfo.addExtraInfo(flag, 0)
+        self.EventExtraInfo.create()
+        for skim in self.skims:
+            self.EventExtraInfo.addExtraInfo(skim.flag, 0)
 
 
 class UpdateSkimFlag(b2.Module):
     """
-    [Module for skim expert usage] Update the skim flag to be 1 if there is at least one
-    candidate in any of the skim lists.
+    *[Module for skim expert usage]* Update the skim flag to be 1 if there is at least
+    one candidate in any of the skim lists.
 
     .. Note::
 
@@ -192,19 +198,30 @@ class UpdateSkimFlag(b2.Module):
     """
 
     def __init__(self, skim):
+        """
+        Initialise module.
+
+        Parameters:
+            skim (skimExpertFunctions.BaseSkim): Skim to update event flag for.
+        """
+
         from ROOT import Belle2
+
         super().__init__()
         self.skim = skim
-        self.flag = f"passes_{skim}"
-        self.lists = skim.SkimLists
         self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
     def event(self):
+        """
+        Check if at least one skim list is non-empty; if so, update the skim flag to 1.
+        """
+
         from ROOT import Belle2
 
-        # NOTE: Assumes EventExtraInfo has already been registered by InitialiseSkimFlags,
-        #       and the skim lists have all been built (with all skim cuts applied)
-        ListObjects = [Belle2.PyStoreObj(lst) for lst in self.lists]
+        # NOTE: Assumes EventExtraInfo has already been registered by
+        # InitialiseSkimFlags, and the skim lists have all been built (with all skim
+        # cuts applied)
+        ListObjects = [Belle2.PyStoreObj(lst) for lst in self.skim.SkimLists]
         if any([not ListObj.isValid() for ListObj in ListObjects]):
             b2.B2ERROR(
                 f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
@@ -214,7 +231,7 @@ class UpdateSkimFlag(b2.Module):
 
         # Override ExtraInfo flag if at least one candidate from any list passed
         if nCandidates > 0:
-            self.EventExtraInfo.setExtraInfo(self.flag, 1)
+            self.EventExtraInfo.setExtraInfo(self.skim.flag, 1)
 
 
 def _sphinxify_decay(decay_string):
@@ -617,7 +634,11 @@ class BaseSkim(ABC):
         Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
         initialises flag for this skim to zero.
 
-        If a conditional path has been created before this, then
+        .. Warning::
+
+            If a conditional path has been created before this, then this function
+            *must* run on the conditional path, since the skim lists are not guaranteed
+            to exist for all events on the main path.
         """
         path.add_module(UpdateSkimFlag(self))
 
@@ -907,7 +928,18 @@ class CombinedSkim(BaseSkim):
 
     flag = flags  # alias inherited method
 
+    def initialise_skim_flag(self, path):
+        """
+        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, to
+        initialise flags for each skim.
+        """
+        path.add_module(InitialiseSkimFlag(*self))
+
     def update_skim_flag(self, path):
+        """
+        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the conditional path
+        of each skims.
+        """
         for skim in self:
             skim.postskim_path.add_module(UpdateSkimFlag(skim))
 

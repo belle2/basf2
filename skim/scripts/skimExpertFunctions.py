@@ -431,6 +431,11 @@ class BaseSkim(ABC):
     def __contact__(self):
         pass
 
+    @property
+    def code(self):
+        """Eight-digit code assigned to this skim in the registry."""
+        return Registry.encode_skim_name(self.name)
+
     def __init__(self, *, OutputFileName=None, additionalDataDescription=None, udstOutput=True, validation=False):
         """Initialise the BaseSkim class.
 
@@ -443,7 +448,6 @@ class BaseSkim(ABC):
                 instead of writing uDSTs.
         """
         self.name = self.__class__.__name__
-        self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName
         self.additionalDataDescription = additionalDataDescription
         self._udstOutput = udstOutput

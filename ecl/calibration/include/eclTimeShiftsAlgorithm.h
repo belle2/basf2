@@ -29,7 +29,7 @@ namespace Belle2 {
       eclTimeShiftsAlgorithm();
 
       /**..Destructor */
-      virtual ~eclTimeShiftsAlgorithm() {}
+      ~eclTimeShiftsAlgorithm() {}
 
 
       /*** Parameters ***/
@@ -57,7 +57,7 @@ namespace Belle2 {
     protected:
 
       /**..Run algorithm */
-      virtual EResult calibrate() override;
+      EResult calibrate() override;
 
     private:
 

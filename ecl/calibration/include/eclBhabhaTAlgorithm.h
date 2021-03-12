@@ -23,7 +23,7 @@ namespace Belle2 {
       eclBhabhaTAlgorithm();
 
       /**..Destructor */
-      virtual ~eclBhabhaTAlgorithm() {}
+      ~eclBhabhaTAlgorithm() {}
 
       /*** Parameters ***/
 
@@ -44,7 +44,7 @@ namespace Belle2 {
     protected:
 
       /**..Run algorithm on events */
-      virtual EResult calibrate() override;
+      EResult calibrate() override;
 
 //    private:
 //      /** Number of processed runs */

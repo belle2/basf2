@@ -226,7 +226,7 @@ void ECLBhabhaTCollectorModule::prepare()
 
 
   auto TimevsCrysPrevCrateCalibPrevCrystCalib = new TH2F("TimevsCrysPrevCrateCalibPrevCrystCalib",
-                                                         "Time t psi - ts - tcrate (previous calibs) vs crystal ID;crystal ID;Time t_psi with previous calib (ns)",
+                                                         "Time t psi - ts - tcrate (previous calibs) vs crystal cell ID;crystal cell ID;Time t_psi with previous calib (ns)",
                                                          8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib", TimevsCrysPrevCrateCalibPrevCrystCalib);
 
@@ -236,7 +236,7 @@ void ECLBhabhaTCollectorModule::prepare()
   registerObject<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib", TimevsCratePrevCrateCalibPrevCrystCalib);
 
   auto TimevsCrysNoCalibrations = new TH2F("TimevsCrysNoCalibrations",
-                                           "Time tpsi vs crystal ID;crystal ID;Time t_psi (ns)", 8736, 1, 8736 + 1, nbins, min_t, max_t);
+                                           "Time tpsi vs crystal cell ID;crystal cell ID;Time t_psi (ns)", 8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysNoCalibrations", TimevsCrysNoCalibrations);
 
   auto TimevsCrateNoCalibrations = new TH2F("TimevsCrateNoCalibrations",
@@ -244,7 +244,7 @@ void ECLBhabhaTCollectorModule::prepare()
   registerObject<TH2F>("TimevsCrateNoCalibrations", TimevsCrateNoCalibrations);
 
   auto TimevsCrysPrevCrateCalibNoCrystCalib = new TH2F("TimevsCrysPrevCrateCalibNoCrystCalib",
-                                                       "Time tpsi - tcrate (previous calib) vs crystal ID;crystal ID;Time t_psi including previous crate calib (ns)",
+                                                       "Time tpsi - tcrate (previous calib) vs crystal cell ID;crystal cell ID;Time t_psi including previous crate calib (ns)",
                                                        8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib", TimevsCrysPrevCrateCalibNoCrystCalib);
 
@@ -310,7 +310,7 @@ void ECLBhabhaTCollectorModule::collect()
 {
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
 
   /* Use ECLChannelMapper to get other detector indices for the crystals */
@@ -339,39 +339,39 @@ void ECLBhabhaTCollectorModule::collect()
     m_PreviousCrystalTimeUnc = m_PreviousCrystalTimeDB->getCalibUncVector();
   }
 
-  B2DEBUG(35, "Finished checking if previous crystal time payload has changed");
+  B2DEBUG(29, "Finished checking if previous crystal time payload has changed");
   if (m_CrateTimeDB.hasChanged()) {
     m_CrateTime = m_CrateTimeDB->getCalibVector();
     m_CrateTimeUnc = m_CrateTimeDB->getCalibUncVector();
   }
-  B2DEBUG(35, "Finished checking if previous crate time payload has changed");
-  B2DEBUG(35, "m_CrateTime size = " << m_CrateTime.size());
-  B2DEBUG(29, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
-  B2DEBUG(29, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
+  B2DEBUG(29, "Finished checking if previous crate time payload has changed");
+  B2DEBUG(29, "m_CrateTime size = " << m_CrateTime.size());
+  B2DEBUG(25, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
+  B2DEBUG(25, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
 
-  B2DEBUG(35, "Finished checking if previous crate time payload has changed");
+  B2DEBUG(29, "Finished checking if previous crate time payload has changed");
   if (m_RefCrystalsCalibDB.hasChanged()) {
     m_RefCrystalsCalib = m_RefCrystalsCalibDB->getReferenceCrystals();
   }
-  B2DEBUG(35, "Finished checking if reference crystal ids payload has changed");
+  B2DEBUG(29, "Finished checking if reference crystal cell ids payload has changed");
 
 
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalTimeOffset from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalTimeOffset from the database"
           << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
           << LogVar("Revision", m_PreviousCrystalTimeDB.getRevision()));
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrateTimeOffset from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrateTimeOffset from the database"
           << LogVar("IoV", m_CrateTimeDB.getIoV())
           << LogVar("Revision", m_CrateTimeDB.getRevision()));
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalElectronics from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronics from the database"
           << LogVar("IoV", m_ElectronicsDB.getIoV())
           << LogVar("Revision", m_ElectronicsDB.getRevision()));
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalElectronicsTime from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronicsTime from the database"
           << LogVar("IoV", m_ElectronicsTimeDB.getIoV())
           << LogVar("Revision", m_ElectronicsTimeDB.getRevision()));
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalFlightTime from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalFlightTime from the database"
           << LogVar("IoV", m_FlightTimeDB.getIoV())
           << LogVar("Revision", m_FlightTimeDB.getRevision()));
-  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
           << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
           << LogVar("Revision", m_RefCrystalsCalibDB.getRevision()));
 
@@ -393,10 +393,7 @@ void ECLBhabhaTCollectorModule::collect()
 
 
 
-
-
-
-  /** Store the crystal id of those being used as the reference crystals for ts.
+  /** Store the crystal cell id of those being used as the reference crystals for ts.
       One crystal per crate is defined as having ts=0.  This histogram only keeps
       track of the crystal id, not the crate id.  The talg can figure out to which
       crate to associate the crystal.
@@ -404,8 +401,6 @@ void ECLBhabhaTCollectorModule::collect()
   for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
     getObjectPtr<TH1F>("refCrysIDzeroingCrate")->Fill(m_RefCrystalsCalib[crateID_temp - 1] + 0.001);
   }
-
-
 
 
   /** Record the input database constants */
@@ -462,7 +457,7 @@ void ECLBhabhaTCollectorModule::collect()
     // Event has a t0 from CDC
     cutIndexPassed++;
     getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-    B2DEBUG(10, "Cutflow: Event t0 exists: index = " << cutIndexPassed);
+    B2DEBUG(22, "Cutflow: Event t0 exists: index = " << cutIndexPassed);
 
 
     // Get event t0 from CDC.  We don't want event t0 from ECL as we are calibrating the ECL wrt the more accurately measured time measurements of the time.  Start with the CDC since it has an event t0 but in the future we may switch to the TOP detector.
@@ -492,18 +487,18 @@ void ECLBhabhaTCollectorModule::collect()
       }
 
       evt_t0_ECL_closestCDC = evt_t0_list_ECL[smallest_CDC_ECL_t0_diff_idx].eventT0;   // time value
-      B2DEBUG(30, "evt_t0_ECL_closestCDC = " << evt_t0_ECL_closestCDC);
+      B2DEBUG(26, "evt_t0_ECL_closestCDC = " << evt_t0_ECL_closestCDC);
 
 
 
       double smallest_ECL_t0_minChi2 = evt_t0_list_ECL[0].quality;
       int smallest_ECL_t0_minChi2_idx = 0;
 
-      B2DEBUG(30, "evt_t0_list_ECL[0].quality = " << evt_t0_list_ECL[0].quality
+      B2DEBUG(26, "evt_t0_list_ECL[0].quality = " << evt_t0_list_ECL[0].quality
               << ", with ECL event t0 = " << evt_t0_list_ECL[0].eventT0);
 
       for (long unsigned int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
-        B2DEBUG(30, "evt_t0_list_ECL[" << ECLi << "].quality = " << evt_t0_list_ECL[ECLi].quality
+        B2DEBUG(26, "evt_t0_list_ECL[" << ECLi << "].quality = " << evt_t0_list_ECL[ECLi].quality
                 << ", with ECL event t0 = " <<
                 evt_t0_list_ECL[ECLi].eventT0);
         if (evt_t0_list_ECL[ECLi].quality < smallest_ECL_t0_minChi2) {
@@ -514,8 +509,8 @@ void ECLBhabhaTCollectorModule::collect()
 
       evt_t0_ECL_minChi2 = evt_t0_list_ECL[smallest_ECL_t0_minChi2_idx].eventT0;   // time value
 
-      B2DEBUG(30, "evt_t0_ECL_minChi2 = " << evt_t0_ECL_minChi2);
-      B2DEBUG(30, "smallest_ECL_t0_minChi2_idx = " << smallest_ECL_t0_minChi2_idx);
+      B2DEBUG(26, "evt_t0_ECL_minChi2 = " << evt_t0_ECL_minChi2);
+      B2DEBUG(26, "smallest_ECL_t0_minChi2_idx = " << smallest_ECL_t0_minChi2_idx);
     }
   }
 
@@ -569,8 +564,9 @@ void ECLBhabhaTCollectorModule::collect()
      We will select events with only 2 tight tracks and no additional loose tracks.
      Tight tracks are a subset of looses tracks. */
   for (int iTrk = 0; iTrk < nTrkAll; iTrk++) {
-    // Get track and assume it is a pion for now ... because it is the only particle we can assume?
-    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResult(Const::ChargedStable(211));
+    // Get track biasing towards the particle being a pion based on what particle types
+    // are used for reconstruction at this stage.
+    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResultWithClosestMass(Const::pion);
     if (not tempTrackFit) {continue;}
 
     // Collect track info to be used for categorizing
@@ -649,7 +645,7 @@ void ECLBhabhaTCollectorModule::collect()
   // There are exactly two tight tracks
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
 
 
   if (nTrkLoose != 2) {
@@ -658,7 +654,7 @@ void ECLBhabhaTCollectorModule::collect()
   // There are exactly two loose tracks as well, i.e. no additional loose tracks
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: No additional loose tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: No additional loose tracks: index = " << cutIndexPassed);
 
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
@@ -671,7 +667,7 @@ void ECLBhabhaTCollectorModule::collect()
   // The two tracks have the opposite electric charges.
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
 
 
 
@@ -705,7 +701,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   for (int icharge = 0; icharge < 2; icharge++) {
     if (maxiTrk[icharge] > -1) {
-      B2DEBUG(10, "looping over the 2 max pt tracks");
+      B2DEBUG(22, "looping over the 2 max pt tracks");
 
       const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
@@ -720,7 +716,7 @@ void ECLBhabhaTCollectorModule::collect()
       auto eclClusterRelationsFromTracks = tracks[maxiTrk[icharge]]->getRelationsTo<ECLCluster>();
       for (unsigned int clusterIdx = 0; clusterIdx < eclClusterRelationsFromTracks.size(); clusterIdx++) {
 
-        B2DEBUG(10, "Looking at clusters.  index = " << clusterIdx);
+        B2DEBUG(22, "Looking at clusters.  index = " << clusterIdx);
         auto cluster = eclClusterRelationsFromTracks[clusterIdx];
         bool goodClusterType = false;
 
@@ -762,27 +758,7 @@ void ECLBhabhaTCollectorModule::collect()
             // If we drop the information about the second highest energy crystal we could use
             //    m_eclClusterArray[ic]->getMaxECellId()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            B2DEBUG(30,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
+            B2DEBUG(26,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
             time_ECLCaldigits_bothClusters.push_back(calDigit->getTime());
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
             E_ECLCaldigits_bothClusters.push_back(tempE);
@@ -846,7 +822,7 @@ void ECLBhabhaTCollectorModule::collect()
     //    The electronics calibration also accounts for crystals that have a dead pre-amp and thus half the normal amplitude.
     double energyTimeShift = m_ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
 
-    B2DEBUG(35, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
+    B2DEBUG(29, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
             ", t(E) shift = " << energyTimeShift << " ns");
     time -= energyTimeShift;
 
@@ -870,11 +846,11 @@ void ECLBhabhaTCollectorModule::collect()
     times_noPreviousCalibrations[iCharge] = time;
 
 
-    B2DEBUG(30, "iCharge = " << iCharge);
-    B2DEBUG(30, "crateIDs[iCharge] = " << crateIDs[iCharge]);
-    B2DEBUG(30, "times_noPreviousCalibrations[iCharge] = " << times_noPreviousCalibrations[iCharge]);
-    B2DEBUG(30, "tcrate_prevCalib[iCharge] = " << tcrate_prevCalib[iCharge]);
-    B2DEBUG(30, "ts_prevCalib[iCharge] = " << ts_prevCalib[iCharge]);
+    B2DEBUG(26, "iCharge = " << iCharge);
+    B2DEBUG(26, "crateIDs[iCharge] = " << crateIDs[iCharge]);
+    B2DEBUG(26, "times_noPreviousCalibrations[iCharge] = " << times_noPreviousCalibrations[iCharge]);
+    B2DEBUG(26, "tcrate_prevCalib[iCharge] = " << tcrate_prevCalib[iCharge]);
+    B2DEBUG(26, "ts_prevCalib[iCharge] = " << ts_prevCalib[iCharge]);
 
 
     crystalCutsPassed[iCharge] = true;
@@ -930,10 +906,7 @@ void ECLBhabhaTCollectorModule::collect()
   // E/p sufficiently large
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
-
-
-
+  B2DEBUG(22, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
 
 
 
@@ -958,21 +931,21 @@ void ECLBhabhaTCollectorModule::collect()
 
   int numTrackless = 0;
   for (int clustId = 0; clustId < 2; clustId++) {
-    B2DEBUG(30, "m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack() = " <<
+    B2DEBUG(26, "m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack() = " <<
             m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack());
     if (!m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack()) {
       numTrackless++;
     }
   }
   if (numTrackless != 0) {
-    B2DEBUG(20, "Number of trackless ECL clusters != 0");
+    B2DEBUG(23, "Number of trackless ECL clusters != 0");
   }
 
   // There are exactly three energy clusters
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: ECL cluster associated to photon does not have a track associated to it: index = " << cutIndexPassed);
-  B2DEBUG(10, "Cutflow: NEW CUT TO BHABHA CODE FROM eegamma code");
+  B2DEBUG(22, "Cutflow: ECL cluster associated to photon does not have a track associated to it: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: NEW CUT TO BHABHA CODE FROM eegamma code");
 
 
 
@@ -997,7 +970,7 @@ void ECLBhabhaTCollectorModule::collect()
   // Invariable mass of the two tracks are above the minimum
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
+  B2DEBUG(22, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
           " : index = " << cutIndexPassed);
 
 
@@ -1029,7 +1002,7 @@ void ECLBhabhaTCollectorModule::collect()
     // At least one ECL crystal time and quality cuts passed
     cutIndexPassed++;
     getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-    B2DEBUG(10, "Cutflow: At least one crystal time and quality cuts passed: index = " << cutIndexPassed);
+    B2DEBUG(22, "Cutflow: At least one crystal time and quality cuts passed: index = " << cutIndexPassed);
 
     getObjectPtr<TH1F>("numCrystalEntriesPerEvent")->Fill(numCrystalsPassingCuts);
   }
@@ -1087,10 +1060,10 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-  B2DEBUG(30, "m_tree_maxEcrystPosClust + evt_t0 = " << m_tree_maxEcrystPosClust + evt_t0);
-  B2DEBUG(30, "m_tree_maxEcrystNegClust + evt_t0 = " << m_tree_maxEcrystNegClust + evt_t0);
-  B2DEBUG(30, "CDC evt_t0 = " << evt_t0);
-  B2DEBUG(30, "ECL min chi2 even t0, m_tree_t0_ECL_minChi2 = " << m_tree_t0_ECL_minChi2);
+  B2DEBUG(26, "m_tree_maxEcrystPosClust + evt_t0 = " << m_tree_maxEcrystPosClust + evt_t0);
+  B2DEBUG(26, "m_tree_maxEcrystNegClust + evt_t0 = " << m_tree_maxEcrystNegClust + evt_t0);
+  B2DEBUG(26, "CDC evt_t0 = " << evt_t0);
+  B2DEBUG(26, "ECL min chi2 even t0, m_tree_t0_ECL_minChi2 = " << m_tree_t0_ECL_minChi2);
 
 
 
@@ -1117,7 +1090,7 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-  B2DEBUG(30, "This was for event number = " << m_tree_evtNum);
+  B2DEBUG(26, "This was for event number = " << m_tree_evtNum);
 
 }
 

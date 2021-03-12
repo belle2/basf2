@@ -172,7 +172,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
         B2INFO("m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
                m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
       } else {
-        B2DEBUG(10, "m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
+        B2DEBUG(22, "m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
                 m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
         //B2INFO("m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " << m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
       }

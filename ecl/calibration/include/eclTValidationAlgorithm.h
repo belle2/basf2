@@ -30,7 +30,7 @@ namespace Belle2 {
       explicit eclTValidationAlgorithm(std::string physicsProcessCollectorName);
 
       /**..Destructor */
-      virtual ~eclTValidationAlgorithm() {}
+      ~eclTValidationAlgorithm() {}
 
       /*** Parameters ***/
 
@@ -47,7 +47,7 @@ namespace Belle2 {
     protected:
 
       /**..Run algorithm on events */
-      virtual EResult calibrate() override;
+      EResult calibrate() override;
 
     };
   }  // namespace ECL

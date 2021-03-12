@@ -33,12 +33,12 @@ namespace Belle2 {
       eclMergingCrystalTimingAlgorithm();
 
       /**..Destructor */
-      virtual ~eclMergingCrystalTimingAlgorithm() {}
+      ~eclMergingCrystalTimingAlgorithm() {}
 
     protected:
 
       /**..Run algorithm */
-      virtual EResult calibrate() override;
+      EResult calibrate() override;
 
     private:
 
@@ -63,10 +63,10 @@ namespace Belle2 {
       DBObjPtr<ECLCrystalCalib> m_ECLCrateTimeOffset;
 
       /** Number of Crystals expected */
-      const int m_numCrystals = 8736;
+      static constexpr int m_numCrystals = 8736;
 
       /** Number of Crates expected */
-      const int m_numCrates = 52;
+      static constexpr int m_numCrates = 52;
     };
   }
 } // namespace Belle2

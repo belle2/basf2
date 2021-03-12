@@ -26,25 +26,25 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
-    input_data_filters={
-            "bhabha_all_calib": [
-                "bhabha_all_calib",
-                "4S",
-                "Continuum",
-                "Scan",
-                "Good",
-                "physics",
-                "On"],
-            "hadron_calib": [
-                "hadron_calib",
-                "4S",
-                "Continuum",
-                "Scan",
-                "Good",
-                "physics",
-                "On"]},
+    # input_data_filters={
+    #         "bhabha_all_calib": [
+    #             "bhabha_all_calib",
+    #             "4S",
+    #             "Continuum",
+    #             "Scan",
+    #             "Good",
+    #             "physics",
+    #             "On"],
+    #         "hadron_calib": [
+    #             "hadron_calib",
+    #             "4S",
+    #             "Continuum",
+    #             "Scan",
+    #             "Good",
+    #             "physics",
+    #             "On"]},
     depends_on=[],
-    expert_config={"numCrysCrateIterations": 1})
+    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": None})
 
 
 ##############################
@@ -80,6 +80,7 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.strategies import SimpleRunByRun
     from caf.strategies import SingleIOV
+    from caf.strategies import SequentialBoundaries
     import numpy as np
 
     # In this script we want to use one sources of input data.
@@ -128,6 +129,13 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     numCrysCrateIterations = expert_config["numCrysCrateIterations"]
     print("expert_config:  numCrysCrateIterations = ", numCrysCrateIterations)
+
+    # Determine the user defined calibration boundaries.  Most useful
+    # for when multiple experiments are processed at the same time.
+    # Useful for the crystal calibrations but not for the crate
+    # calibrations, which are done run-by-run.
+    payload_boundaries = expert_config["payload_boundaries"]
+    print("expert_config:  payload_boundaries = ", payload_boundaries)
 
     ###################################################
     from basf2 import register_module, create_path
@@ -251,7 +259,15 @@ def get_calibrations(input_data, **kwargs):
             cal_crystals_i.add_collection(name="bhabha", collection=eclTCol_crys)
             cal_crystals_i.algorithms = [eclTAlgCrystals]
             cal_crystals_i.save_payloads = False
-            cal_crystals_i.strategies = SingleIOV
+
+            # cal_crystals_i.strategies = SingleIOV
+
+            # If payload boundaries are set use SequentialBoundaries
+            # otherwise use SingleIOV
+            if payload_boundaries:
+                cal_crystals_i.strategies = SequentialBoundaries
+            else:
+                cal_crystals_i.strategies = SingleIOV
 
             ###################################################
             # Setup for merging crystals payloads
@@ -264,22 +280,74 @@ def get_calibrations(input_data, **kwargs):
             prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
             ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
 
-            if i == numCrysCrateIterations - 1:
-                # The final crystal payload is given the user's iov
-                # cal_ecl_merge_3 is the same as cal_ecl_merge_2 except for the iov.
-                for algorithm in cal_ecl_merge_i.algorithms:
-                    algorithm.params = {"apply_iov": output_iov}
-            else:
-                # Force the output iovs to be open
-                for algorithm in cal_crystals_i.algorithms:
-                    algorithm.params = {"apply_iov": intermediate_iov}
+
+#             if i == numCrysCrateIterations - 1:
+#                 # The final crystal payload is given the user's iov
+#                 for algorithm in cal_ecl_merge_i.algorithms:
+#                     algorithm.params = {"apply_iov": output_iov}
+#             else:
+#                 # Force the output iovs to be open
+#                 for algorithm in cal_crystals_i.algorithms:
+#                     algorithm.params = {"apply_iov": intermediate_iov}
+
+            # Modify the iov for each of the calibration algorithms
+            for algorithm in cal_crystals_i.algorithms:
+                # The payload of the final crystal calibration iteration
+                # is given the user's iov.
+                if i == numCrysCrateIterations - 1:
+                    # Set payload iov information for SequentialBoundaries
+                    # and SingleIOV strategies.
+                    if payload_boundaries:
+                        algorithm.params = {"iov_coverage": output_iov,
+                                            "payload_boundaries": payload_boundaries}
+
+                        print("Set iov for final crystals alg - SequentialBoundaries")
+                    else:
+                        algorithm.params = {"apply_iov": output_iov}
+                        print("Set iov for final crystals alg - SingleIOV ")
+                # Force the output iovs to be open for the intermediate
+                # step calibrations.
+                else:
+                    if payload_boundaries:
+                        algorithm.params = {"iov_coverage": intermediate_iov,
+                                            "payload_boundaries": payload_boundaries}
+                        print("Set iov for intermediate crystals alg - SequentialBoundaries")
+                    else:
+                        algorithm.params = {"apply_iov": intermediate_iov}
+                        print("Set iov for intermediate crystals alg - SingleIOV ")
+
+            # Modify the iov for each of the payload merging algorithms
+            for algorithm in cal_ecl_merge_i.algorithms:
+                # The payload of the final crystal calibration iteration
+                # is given the user's iov.
+                if i == numCrysCrateIterations - 1:
+                    # Set payload iov information for SequentialBoundaries
+                    # and SingleIOV strategies.
+                    if payload_boundaries:
+                        algorithm.params = {"iov_coverage": output_iov,
+                                            "payload_boundaries": payload_boundaries}
+
+                        print("Set iov for final merging alg - SequentialBoundaries")
+                    else:
+                        algorithm.params = {"apply_iov": output_iov}
+                        print("Set iov for final merging alg - SingleIOV ")
+                # Force the output iovs to be open for the intermediate
+                # step calibrations.
+                else:
+                    if payload_boundaries:
+                        algorithm.params = {"iov_coverage": intermediate_iov,
+                                            "payload_boundaries": payload_boundaries}
+                        print("Set iov for intermediate merging alg - SequentialBoundaries")
+                    else:
+                        algorithm.params = {"apply_iov": intermediate_iov}
+                        print("Set iov for intermediate merging alg - SingleIOV ")
 
             # Fill the calibs array with all the "calibrations" that will be run
             calibs = np.append(calibs, [cal_crates_i, cal_crystals_i, cal_ecl_merge_i])
 
         # Make sure that the final paylaods get saved.
-        calibs[len(calibs)-3].save_payloads = True   # crates
-        calibs[len(calibs)-1].save_payloads = True   # crystals
+        calibs[len(calibs) - 3].save_payloads = True   # crates
+        calibs[len(calibs) - 1].save_payloads = True   # crystals
 
         #############################################################
         #############################################################
@@ -420,14 +488,14 @@ def get_calibrations(input_data, **kwargs):
 
         # Make the crate and crytsal calibrations and the cerge crystal
         # process occur in the order loaded into the array.
-        for i in range(len(calibs)-1):
-            calibs[i+1].depends_on(calibs[i])
+        for i in range(len(calibs) - 1):
+            calibs[i + 1].depends_on(calibs[i])
 
         # The validations and plotting can run independently of each other
         # but rely on the last calibration step
-        valid_cal_bhabha.depends_on(calibs[len(calibs)-1])
-        valid_cal_hadron.depends_on(calibs[len(calibs)-1])
-        cal_ecl_timeShifts.depends_on(calibs[len(calibs)-1])
+        valid_cal_bhabha.depends_on(calibs[len(calibs) - 1])
+        valid_cal_hadron.depends_on(calibs[len(calibs) - 1])
+        cal_ecl_timeShifts.depends_on(calibs[len(calibs) - 1])
 
         ###################################################
         # Finalize all calibrations
@@ -463,7 +531,6 @@ def get_calibrations(input_data, **kwargs):
         cal_crates_1.save_payloads = False
 
         # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SimpleRunByRun
 
         # The SimpleRunByRun strategy executes your algorithm over runs
         # individually to give you payloads for each one (if successful)
@@ -492,13 +559,18 @@ def get_calibrations(input_data, **kwargs):
         cal_crystals_1.save_payloads = False
 
         # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
 
         # The default value is SingleIOV, you don't have to set this, it is done automatically.
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
         # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-        cal_crystals_1.strategies = SingleIOV
+        # cal_crystals_1.strategies = SingleIOV
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            cal_crystals_1.strategies = SequentialBoundaries
+        else:
+            cal_crystals_1.strategies = SingleIOV
 
         ###################################################
         # Calibration setup for crates iteration 2
@@ -533,10 +605,30 @@ def get_calibrations(input_data, **kwargs):
         intermediate_iov = IoV(0, 0, -1, -1)
         requested_iov = kwargs.get("requested_iov", None)
         output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+
+        # for algorithm in cal_crystals_1.algorithms:
+        #     algorithm.params = {"apply_iov": intermediate_iov}
+        # for algorithm in cal_ecl_merge.algorithms:
+        #     algorithm.params = {"apply_iov": output_iov}
+
+        # Modify the iov for each of the algorithms
         for algorithm in cal_crystals_1.algorithms:
-            algorithm.params = {"apply_iov": intermediate_iov}
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": intermediate_iov,
+                                    "payload_boundaries": payload_boundaries}
+                print("Set iov for crystals alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": intermediate_iov}
+                print("Set iov for crystals alg - SingleIOV")
+
         for algorithm in cal_ecl_merge.algorithms:
-            algorithm.params = {"apply_iov": output_iov}
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+                print("Set iov for crystals merge alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for crystals merge alg - SingleIOV")
 
         #############################################################
         #############################################################
@@ -582,7 +674,6 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha.save_payloads = False
 
         # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
 
         # The default value is SingleIOV, you don't have to set this, it is done automatically.
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
@@ -634,7 +725,6 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron.save_payloads = False
 
         # Here we set the AlgorithmStrategy for our algorithm
-        from caf.strategies import SingleIOV
 
         # The default value is SingleIOV, you don't have to set this, it is done automatically.
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.

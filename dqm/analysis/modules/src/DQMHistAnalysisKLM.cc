@@ -46,6 +46,13 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number of processed events required to print error messages", 10000.);
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
+  m_2DHitsLine.SetLineColor(kRed);
+  m_2DHitsLine.SetLineWidth(3);
+  m_2DHitsLine.SetLineStyle(2); // dashed
+  m_2DHitsText.SetTextAlign(22); // centerd, middle
+  m_2DHitsText.SetTextColor(kBlack);
+  m_2DHitsText.SetTextFont(42); // Helvetica regular
+  m_2DHitsText.SetTextSize(0.04); // 4% of TPad's full height
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -227,6 +234,25 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Modified();
 }
 
+void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
+  uint16_t section, TH2F* histogram, TCanvas* canvas)
+{
+  /* We currently process only the plots of forward endcap. */
+  if (section != EKLMElementNumbers::c_ForwardSection)
+    return;
+  canvas->Clear();
+  canvas->cd();
+  histogram->SetStats(false);
+  histogram->Draw();
+  m_2DHitsLine.DrawLine(-110, 80, -110, 190);
+  m_2DHitsLine.DrawLine(-110, 190, 110, 190);
+  m_2DHitsLine.DrawLine(110, 80, 110, 190);
+  m_2DHitsLine.DrawLine(-110, 80, 110, 80);
+  m_2DHitsText.DrawText(0, 55, "Region mostly affected");
+  m_2DHitsText.DrawText(0, 25, "by the beam background");
+  canvas->Modified();
+}
+
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   const std::string& histName)
 {
@@ -395,8 +421,8 @@ void DQMHistAnalysisKLMModule::event()
   TLatex latex;
   latex.SetTextColor(kRed);
   latex.SetTextAlign(11);
-  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -423,6 +449,32 @@ void DQMHistAnalysisKLMModule::event()
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
         klmSector.getSector(), histogram, canvas, latex);
+    }
+  }
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
+  for (KLMChannelIndex& klmSection : klmIndex) {
+    uint16_t subdetector = klmSection.getSubdetector();
+    if (subdetector == KLMElementNumbers::c_EKLM) {
+      uint16_t section = klmSection.getSection();
+      int maximalLayerNumber = m_EklmElementNumbers->getMaximalDetectorLayerNumber(section);
+      for (int j = 1; j <= maximalLayerNumber; ++j) {
+        str = "spatial_2d_hits_subdetector_" + std::to_string(subdetector) +
+              "_section_" + std::to_string(section) +
+              "_layer_" + std::to_string(j);
+        histogramName = "KLM/" + str;
+        canvasName = "KLM/c_" + str;
+        TH2F* histogram = static_cast<TH2F*>(findHist(histogramName));
+        if (histogram == nullptr) {
+          B2ERROR("KLM DQM histogram " << histogramName << " is not found.");
+          continue;
+        }
+        TCanvas* canvas = findCanvas(canvasName);
+        if (canvas == nullptr) {
+          B2ERROR("KLM DQM histogram canvas " << canvasName << " is not found.");
+          continue;
+        }
+        processSpatial2DHitEndcapHistogram(section, histogram, canvas);
+      }
     }
   }
   fillMaskedChannelsHistogram("masked_channels");

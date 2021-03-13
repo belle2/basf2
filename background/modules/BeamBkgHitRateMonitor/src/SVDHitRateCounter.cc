@@ -34,6 +34,10 @@ namespace Belle2 {
       // set branch address
       tree->Branch("svd", &m_rates,
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
+      tree->Branch("svdU", &m_ratesU,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
+      tree->Branch("svdV", &m_ratesV,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
       tree->Branch("svd_highE", &m_rates_highE,
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
       tree->Branch("svd_lowE", &m_rates_lowE,
@@ -54,6 +58,17 @@ namespace Belle2 {
                   m_layerActiveStrips[layer] ++;
                   m_layerLadderActiveStrips[layer][ladder] ++;
                   m_layerSensorActiveStrips[layer][sensor] ++;
+                  if (isU) {
+                    m_activeStripsU++;
+                    m_layerActiveStripsU[layer]++;
+                    m_layerLadderActiveStripsU[layer][ladder]++;
+                    m_layerSensorActiveStripsU[layer][sensor]++;
+                  } else {
+                    m_activeStripsV++;
+                    m_layerActiveStripsV[layer]++;
+                    m_layerLadderActiveStripsV[layer][ladder]++;
+                    m_layerSensorActiveStripsV[layer][sensor]++;
+                  }
                 }
               }
             }
@@ -69,6 +84,10 @@ namespace Belle2 {
             for (int strip = 0; strip < nStrips; strip++) {
               if (isStripActive(sensorID, isU, strip)) {
                 m_l3LadderSensorActiveStrips[ladder][sensor] ++;
+                if (isU)
+                  m_l3LadderSensorActiveStripsU[ladder][sensor]++;
+                else
+                  m_l3LadderSensorActiveStripsV[ladder][sensor]++;
               }
             }
           }
@@ -126,9 +145,13 @@ namespace Belle2 {
 
         // get buffer element
         auto& rates = m_buffer[timeStamp];
+        auto& ratesU = m_bufferU[timeStamp];
+        auto& ratesV = m_bufferV[timeStamp];
 
         // increment event counter
         rates.numEvents++;
+        ratesU.numEvents++;
+        ratesV.numEvents++;
 
         // accumulate hits
         for (const auto& digit : m_digits) {
@@ -143,10 +166,28 @@ namespace Belle2 {
           rates.averageRate ++;
           if (layer == 0)
             rates.l3LadderSensorAverageRates[ladder][sensor] ++;
+
+          if (digit.isUStrip()) {
+            ratesU.layerAverageRates[layer]++;
+            ratesU.layerLadderAverageRates[layer][ladder]++;
+            ratesU.layerSensorAverageRates[layer][sensor]++;
+            ratesU.averageRate++;
+            if (layer == 0)
+              ratesU.l3LadderSensorAverageRates[ladder][sensor]++;
+          } else {
+            ratesV.layerAverageRates[layer]++;
+            ratesV.layerLadderAverageRates[layer][ladder]++;
+            ratesV.layerSensorAverageRates[layer][sensor]++;
+            ratesV.averageRate++;
+            if (layer == 0)
+              ratesV.l3LadderSensorAverageRates[ladder][sensor]++;
+          }
         }
 
         // set flag to true to indicate the rates are valid
         rates.valid = true;
+        ratesU.valid = true;
+        ratesV.valid = true;
       }
 
       // check if data are available
@@ -206,38 +247,52 @@ namespace Belle2 {
       B2DEBUG(10, "SVDHitRateCounter: normalize()");
       // copy buffer element
       m_rates = m_buffer[timeStamp];
+      m_ratesU = m_bufferU[timeStamp];
+      m_ratesV = m_bufferV[timeStamp];
       m_rates_highE = m_buffer_highE[timeStamp];
       m_rates_lowE = m_buffer_lowE[timeStamp];
       m_rates_energyU = m_buffer_energyU[timeStamp];
 
       SVDHitRateCounter::normalize_rates(m_rates);
+      SVDHitRateCounter::normalize_rates(m_ratesU, true);
+      SVDHitRateCounter::normalize_rates(m_ratesV, false, true);
       SVDHitRateCounter::normalize_rates(m_rates_highE);
       SVDHitRateCounter::normalize_rates(m_rates_lowE);
       SVDHitRateCounter::normalize_energy_rates(m_rates_energyU);
     }
 
-    void SVDHitRateCounter::normalize_rates(TreeStruct& rates)
+    void SVDHitRateCounter::normalize_rates(TreeStruct& rates, bool isU, bool isV)
     {
       if (not rates.valid) return;
 
       // normalize -> nHits on each segment in single event
       rates.normalize();
 
+      // Take the correct active strips counter
+      const auto& activeStrips = isU ? m_activeStripsU : (isV ? m_activeStripsV : m_activeStrips);
+      const auto& layerActiveStrips = isU ? m_layerActiveStripsU : (isV ? m_layerActiveStripsV : m_layerActiveStrips);
+      const auto& layerLadderActiveStrips = isU ? m_layerLadderActiveStripsU
+                                            : (isV ? m_layerLadderActiveStripsV : m_layerLadderActiveStrips);
+      const auto& layerSensorActiveStrips = isU ? m_layerSensorActiveStripsU
+                                            : (isV ? m_layerSensorActiveStripsV : m_layerSensorActiveStrips);
+      const auto& l3LadderSensorActiveStrips = isU ? m_l3LadderSensorActiveStripsU
+                                               : (isV ? m_l3LadderSensorActiveStripsV : m_l3LadderSensorActiveStrips);
+
       // convert to occupancy [%]
-      rates.averageRate /= m_activeStrips / 100.0;
+      rates.averageRate /= activeStrips / 100.0;
       for (int layer = 0; layer < m_nLayers; layer++) {
-        rates.layerAverageRates[layer] /= m_layerActiveStrips[layer] / 100.0;
+        rates.layerAverageRates[layer] /= layerActiveStrips[layer] / 100.0;
         for (int ladder = 0; ladder < m_nLadders[layer]; ladder++) {
-          rates.layerLadderAverageRates[layer][ladder] /= m_layerLadderActiveStrips[layer][ladder] / 100.0;
+          rates.layerLadderAverageRates[layer][ladder] /= layerLadderActiveStrips[layer][ladder] / 100.0;
         }
         for (int sensor = 0; sensor < m_nSensors[layer]; sensor++) {
-          rates.layerSensorAverageRates[layer][sensor] /= m_layerSensorActiveStrips[layer][sensor] / 100.0;
+          rates.layerSensorAverageRates[layer][sensor] /= layerSensorActiveStrips[layer][sensor] / 100.0;
         }
       }
       int layer = 0;
       for (int ladder = 0; ladder < m_nLadders[layer]; ladder++) {
         for (int sensor = 0; sensor < m_nSensors[layer]; sensor++) {
-          rates.l3LadderSensorAverageRates[ladder][sensor] /= m_l3LadderSensorActiveStrips[ladder][sensor] / 100.0;
+          rates.l3LadderSensorAverageRates[ladder][sensor] /= l3LadderSensorActiveStrips[ladder][sensor] / 100.0;
         }
       }
     }

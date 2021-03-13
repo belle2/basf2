@@ -111,8 +111,10 @@ namespace Belle2 {
       /**
        * Normalize TreeStruct
        * @param rates TreeStruct to be normalized
+       * @param isU Whether the TreeStruct only contains U-side hits
+       * @param isV Whether the TreeStruct only contains V-side hits
        */
-      virtual void normalize_rates(TreeStruct& rates);
+      virtual void normalize_rates(TreeStruct& rates, bool isU = false, bool isV = false);
 
       /**
        * Normalize a TreeStruct that stores charge/energy, not hits.
@@ -165,12 +167,16 @@ namespace Belle2 {
 
       // tree structure
       TreeStruct m_rates; /**< tree variables for fired strips */
+      TreeStruct m_ratesU; /**< tree variables for fired U-strips */
+      TreeStruct m_ratesV; /**< tree variables for fired V-strips */
       TreeStruct m_rates_highE; /**< tree variables for high-energy clusters */
       TreeStruct m_rates_lowE; /**< tree variables for low-energy clusters */
       TreeStruct m_rates_energyU; /**< Tree variables for deposited energy (U-side) */
 
       // buffer
       std::map<unsigned, TreeStruct> m_buffer; /**< average strip occupancies in time stamps */
+      std::map<unsigned, TreeStruct> m_bufferU; /**< average U-strip occupancies in time stamps */
+      std::map<unsigned, TreeStruct> m_bufferV; /**< average V-strip occupancies in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_highE; /**< average cluster occupancies (high energy) in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_lowE; /**< average cluster occupancies (low energy) in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_energyU; /**< Average deposited energy (U-side) per event in time stamps */
@@ -188,11 +194,25 @@ namespace Belle2 {
 
       // other
       std::string m_svdShaperDigitsName; /**< name of the input SVDShaperDigits collection */
+
       int m_activeStrips = 0; /**< number of active strips */
       int m_layerActiveStrips[4] = {0}; /**< number of active strips in each layer */
       int m_layerLadderActiveStrips[4][16] = {0}; /**< number of active strips in each layer, ladder */
       int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */
       int m_l3LadderSensorActiveStrips[7][2] = {0}; /**< number of active strips in each sensor in Layer 3 */
+
+      int m_activeStripsU = 0; /**< number of active U-strips */
+      int m_layerActiveStripsU[4] = {0}; /**< number of active U-strips in each layer */
+      int m_layerLadderActiveStripsU[4][16] = {0}; /**< number of active U-strips in each layer, ladder */
+      int m_layerSensorActiveStripsU[4][5] = {0}; /**< number of active U-strips in each layer, sensor position */
+      int m_l3LadderSensorActiveStripsU[7][2] = {0}; /**< number of active U-strips in each sensor in Layer 3 */
+
+      int m_activeStripsV = 0; /**< number of active V-strips */
+      int m_layerActiveStripsV[4] = {0}; /**< number of active V-strips in each layer */
+      int m_layerLadderActiveStripsV[4][16] = {0}; /**< number of active V-strips in each layer, ladder */
+      int m_layerSensorActiveStripsV[4][5] = {0}; /**< number of active V-strips in each layer, sensor position */
+      int m_l3LadderSensorActiveStripsV[7][2] = {0}; /**< number of active V-strips in each sensor in Layer 3 */
+
       double m_thrCharge = 0; /**< cut on cluster energy in electrons */
       bool m_ignoreHotStripsPayload; /**< count hot strips as active */
       bool m_ignoreMaskedStripsPayload; /**< SVD: count FAD-masked strips as active */

@@ -156,9 +156,6 @@ namespace Belle2 {
     /** TLine for background region in 2d hits histograms. */
     TLine m_2DHitsLine;
 
-    /** TText for message in 2d hits histograms. */
-    TText m_2DHitsText;
-
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
 

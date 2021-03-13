@@ -49,10 +49,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   m_2DHitsLine.SetLineColor(kRed);
   m_2DHitsLine.SetLineWidth(3);
   m_2DHitsLine.SetLineStyle(2); // dashed
-  m_2DHitsText.SetTextAlign(22); // centerd, middle
-  m_2DHitsText.SetTextColor(kBlack);
-  m_2DHitsText.SetTextFont(42); // Helvetica regular
-  m_2DHitsText.SetTextSize(0.04); // 4% of TPad's full height
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -248,8 +244,6 @@ void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
   m_2DHitsLine.DrawLine(-110, 190, 110, 190);
   m_2DHitsLine.DrawLine(110, 80, 110, 190);
   m_2DHitsLine.DrawLine(-110, 80, 110, 80);
-  m_2DHitsText.DrawText(0, 55, "Region mostly affected");
-  m_2DHitsText.DrawText(0, 25, "by the beam background");
   canvas->Modified();
 }
 

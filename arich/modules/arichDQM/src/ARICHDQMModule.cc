@@ -104,13 +104,13 @@ namespace Belle2 {
 
     h_hitsPerEvent = new TH1D("hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, -0.5, 150 - 0.5);
     h_theta = new TH1D("theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6);
-    h_hitsPerTrack = new TH1D("hitsPerTrack", "Number of hit per track;Number of hits;Tracks", 41, -0.5, 40.5);
+    h_hitsPerTrack = new TH1D("hitsPerTrack", "Number of hit per track;Number of hits;Tracks", 150, -0.5, 150 - 0.5);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i] = new TH1D(Form("thetaSec%d", i + 1), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i + 1),
                                60, 0, M_PI / 6);
       h_secHitsPerTrack[i] = new TH1D(Form("hitsPerTrackSec%d", i + 1),
-                                      Form("Number of hit per track in sector %d;Number of hits;Tracks", i + 1), 40, 0, 40);
+                                      Form("Number of hit per track in sector %d;Number of hits;Tracks", i + 1), 150, -0.5, 150 - 0.5);
       h_secHapdHit[i] = new TH1D(Form("hapdHit%d", i + 1), Form("Number of hits in each HAPD in sector %d;HAPD serial;Hits", i + 1), 70,
                                  0.5, 71 - 0.5);
     }

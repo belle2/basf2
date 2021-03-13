@@ -171,7 +171,10 @@ namespace Belle2 {
       TreeStruct m_ratesV; /**< tree variables for fired V-strips */
       TreeStruct m_rates_highE; /**< tree variables for high-energy clusters */
       TreeStruct m_rates_lowE; /**< tree variables for low-energy clusters */
-      TreeStruct m_rates_energyU; /**< Tree variables for deposited energy (U-side) */
+      TreeStruct m_clustersU; /**< tree variables for U-side clusters */
+      TreeStruct m_clustersV; /**< tree variables for V-side clusters */
+      TreeStruct m_rates_energyU; /**< Tree variables for deposited energy, then converted to dose rate (U-side) */
+      TreeStruct m_rates_energyV; /**< Tree variables for deposited energy, then converted to dose rate (V-side) */
 
       // buffer
       std::map<unsigned, TreeStruct> m_buffer; /**< average strip occupancies in time stamps */
@@ -179,7 +182,10 @@ namespace Belle2 {
       std::map<unsigned, TreeStruct> m_bufferV; /**< average V-strip occupancies in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_highE; /**< average cluster occupancies (high energy) in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_lowE; /**< average cluster occupancies (low energy) in time stamps */
+      std::map<unsigned, TreeStruct> m_buffer_clustersU; /**< average cluster occupancies (U-side) in time stamps */
+      std::map<unsigned, TreeStruct> m_buffer_clustersV; /**< average cluster occupancies (V-side) in time stamps */
       std::map<unsigned, TreeStruct> m_buffer_energyU; /**< Average deposited energy (U-side) per event in time stamps */
+      std::map<unsigned, TreeStruct> m_buffer_energyV; /**< Average deposited energy (V-side) per event in time stamps */
 
       // collections
       StoreArray<SVDShaperDigit> m_digits;  /**< collection of digits */

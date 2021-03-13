@@ -42,7 +42,13 @@ namespace Belle2 {
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
       tree->Branch("svd_lowE", &m_rates_lowE,
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
+      tree->Branch("svd_clustersU", &m_clustersU,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
+      tree->Branch("svd_clustersV", &m_clustersV,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
       tree->Branch("svd_energyU", &m_rates_energyU,
+                   "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
+      tree->Branch("svd_energyV", &m_rates_energyV,
                    "layerAverageRates[4]/F:layerLadderAverageRates[4][16]/F:layerSensorAverageRates[4][5]:averageRate/F:l3LadderSensorAverageRates[7][2]/F:numEvents/I:valid/O");
 
       // count active strips
@@ -196,12 +202,18 @@ namespace Belle2 {
         // get buffer element
         auto& rates_highE = m_buffer_highE[timeStamp];
         auto& rates_lowE = m_buffer_lowE[timeStamp];
+        auto& clustersU = m_buffer_clustersU[timeStamp];
+        auto& clustersV = m_buffer_clustersV[timeStamp];
         auto& rates_energyU = m_buffer_energyU[timeStamp];
+        auto& rates_energyV = m_buffer_energyV[timeStamp];
 
         // increment event counter
         rates_highE.numEvents++;
         rates_lowE.numEvents++;
+        clustersU.numEvents++;
+        clustersV.numEvents++;
         rates_energyU.numEvents++;
+        rates_energyV.numEvents++;
 
         // accumulate clusters
         for (const auto& cluster : m_clusters) {
@@ -231,13 +243,35 @@ namespace Belle2 {
             rates_energyU.averageRate += cluster.getCharge();
             if (layer == 0)
               rates_energyU.l3LadderSensorAverageRates[ladder][sensor] += cluster.getCharge();
+            clustersU.layerAverageRates[layer]++;
+            clustersU.layerLadderAverageRates[layer][ladder]++;
+            clustersU.layerSensorAverageRates[layer][sensor]++;
+            clustersU.averageRate++;
+            if (layer == 0)
+              clustersU.l3LadderSensorAverageRates[ladder][sensor]++;
+          } else {
+            rates_energyV.layerAverageRates[layer] += cluster.getCharge();
+            rates_energyV.layerLadderAverageRates[layer][ladder] += cluster.getCharge();
+            rates_energyV.layerSensorAverageRates[layer][sensor] += cluster.getCharge();
+            rates_energyV.averageRate += cluster.getCharge();
+            if (layer == 0)
+              rates_energyV.l3LadderSensorAverageRates[ladder][sensor] += cluster.getCharge();
+            clustersV.layerAverageRates[layer]++;
+            clustersV.layerLadderAverageRates[layer][ladder]++;
+            clustersV.layerSensorAverageRates[layer][sensor]++;
+            clustersV.averageRate++;
+            if (layer == 0)
+              clustersV.l3LadderSensorAverageRates[ladder][sensor]++;
           }
         }
 
         // set flag to true to indicate the rates are valid
         rates_highE.valid = true;
         rates_lowE.valid = true;
+        clustersU.valid = true;
+        clustersV.valid = true;
         rates_energyU.valid = true;
+        rates_energyV.valid = true;
       }
 
     }
@@ -251,14 +285,20 @@ namespace Belle2 {
       m_ratesV = m_bufferV[timeStamp];
       m_rates_highE = m_buffer_highE[timeStamp];
       m_rates_lowE = m_buffer_lowE[timeStamp];
+      m_clustersU = m_buffer_clustersU[timeStamp];
+      m_clustersV = m_buffer_clustersV[timeStamp];
       m_rates_energyU = m_buffer_energyU[timeStamp];
+      m_rates_energyV = m_buffer_energyV[timeStamp];
 
       SVDHitRateCounter::normalize_rates(m_rates);
       SVDHitRateCounter::normalize_rates(m_ratesU, true);
       SVDHitRateCounter::normalize_rates(m_ratesV, false, true);
       SVDHitRateCounter::normalize_rates(m_rates_highE);
       SVDHitRateCounter::normalize_rates(m_rates_lowE);
+      SVDHitRateCounter::normalize_rates(m_clustersU, true);
+      SVDHitRateCounter::normalize_rates(m_clustersV, false, true);
       SVDHitRateCounter::normalize_energy_rates(m_rates_energyU);
+      SVDHitRateCounter::normalize_energy_rates(m_rates_energyV);
     }
 
     void SVDHitRateCounter::normalize_rates(TreeStruct& rates, bool isU, bool isV)

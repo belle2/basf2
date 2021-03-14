@@ -648,7 +648,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
 }
 
 void KLMTimeAlgorithm::timeDistance2dFit(
-  const std::vector< std::pair<uint16_t, unsigned int> > channels,
+  const std::vector< std::pair<uint16_t, unsigned int> >& channels,
   double& delay, double& delayError)
 {
   std::vector<struct Event>::iterator it;

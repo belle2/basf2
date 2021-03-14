@@ -248,7 +248,7 @@ namespace Belle2 {
      * @param[out] delayError Delay error.
      */
     void timeDistance2dFit(
-      const std::vector< std::pair<uint16_t, unsigned int> > channels,
+      const std::vector< std::pair<uint16_t, unsigned int> >& channels,
       double& delay, double& delayError);
 
     /**

@@ -242,6 +242,16 @@ namespace Belle2 {
       TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms);
 
     /**
+     * Two-dimensional fit for individual channels.
+     * @param[in]  channels   Channels.
+     * @param[out] delay      Delay (ns / cm).
+     * @param[out] delayError Delay error.
+     */
+    void timeDistance2dFit(
+      const std::vector< std::pair<uint16_t, unsigned int> > channels,
+      double& delay, double& delayError);
+
+    /**
      * Container of hit information.
      * the global element number of the strip is used as the key.
      */

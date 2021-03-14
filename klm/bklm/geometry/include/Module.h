@@ -197,6 +197,9 @@ namespace Belle2 {
         return m_ZScintPositions[scint];
       }
 
+      //! Get scintillator length.
+      double getStripLength(int plane, int strip) const;
+
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 

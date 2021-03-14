@@ -639,6 +639,89 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
   }
 }
 
+void KLMTimeAlgorithm::timeDistance2dFit(
+  const std::vector< std::pair<uint16_t, unsigned int> > channels,
+  double& delay, double& delayError)
+{
+  std::vector<struct Event>::iterator it;
+  std::vector<struct Event> eventsChannel;
+  int nFits = 1000;
+  int nConvergedFits = 0;
+  delay = 0;
+  delayError = 0;
+  if (nFits > (int)channels.size())
+    nFits = channels.size();
+  for (int i = 0; i < nFits; ++i) {
+    int subdetector, section, sector, layer, plane, strip;
+    m_ElementNumbers->channelNumberToElementNumbers(
+      channels[i].first, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
+    if (subdetector == KLMElementNumbers::c_BKLM) {
+      s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsBKLM;
+      s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsBKLM;
+      const bklm::Module* module =
+        m_BKLMGeometry->findModule(section, sector, layer);
+      s_StripLength = module->getStripLength(plane, strip);
+    } else {
+      s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
+      s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
+      s_StripLength = m_EKLMGeometry->getStripLength(strip) /
+                      CLHEP::cm * Unit::cm;
+    }
+    for (int j = 0; j < c_NBinsTime; ++j) {
+      for (int k = 0; k < c_NBinsDistance; ++k)
+        s_BinnedData[j][k] = 0;
+    }
+    eventsChannel = m_evts[channels[i].first];
+    double averageTime = 0;
+    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
+      double timeHit = it->time();
+      if (m_useEventT0)
+        timeHit = timeHit - it->t0;
+      averageTime = averageTime + timeHit;
+      int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
+                               (s_UpperTimeBoundary - s_LowerTimeBoundary));
+      if (timeBin < 0 || timeBin >= c_NBinsTime)
+        continue;
+      int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
+      if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
+        B2ERROR("The distance to SiPM is greater than the strip length.");
+        continue;
+      }
+      s_BinnedData[timeBin][distanceBin] += 1;
+    }
+    averageTime = averageTime / eventsChannel.size();
+    TMinuit minuit(5);
+    int minuitResult;
+    minuit.mnparm(0, "P0", 1, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(1, "N", 10, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(2, "T0", averageTime, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
+    minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
+    minuit.SetFCN(fcn);
+    minuit.mncomd("FIX 2 3 4 5", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 2", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 3", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 4", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    minuit.mncomd("RELEASE 5", minuitResult);
+    minuit.mncomd("MIGRAD 10000", minuitResult);
+    /* Require converged fit with accurate error matrix. */
+    if (minuit.fISW[1] != 3)
+      continue;
+    nConvergedFits++;
+    double channelDelay, channelDelayError;
+    minuit.GetParameter(4, channelDelay, channelDelayError);
+    delay = delay + channelDelay;
+    delayError = delayError + channelDelayError * channelDelayError;
+  }
+  delay = delay / nConvergedFits;
+  delayError = sqrt(delayError) / (nConvergedFits - 1);
+}
+
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 {
   int channelId;
@@ -681,7 +764,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_minimizerOptions.SetDefaultStrategy(2);
 
   /* Sort channels by number of events. */
-  std::vector< std::pair<uint16_t, unsigned int> > channels;
+  std::vector< std::pair<uint16_t, unsigned int> > channelsBKLM;
+  std::vector< std::pair<uint16_t, unsigned int> > channelsEKLM;
   KLMChannelIndex klmChannels;
   for (KLMChannelIndex& klmChannel : klmChannels) {
     uint16_t channel = klmChannel.getKLMChannelNumber();
@@ -696,77 +780,24 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       continue;
     }
     m_cFlag[channel] = ChannelCalibrationStatus::c_FailedFit;
-    if (klmChannel.getSubdetector() == KLMElementNumbers::c_EKLM)
-      channels.push_back(std::pair<uint16_t, unsigned int>(channel, nEvents));
+    if (klmChannel.getSubdetector() == KLMElementNumbers::c_BKLM &&
+        klmChannel.getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
+      channelsBKLM.push_back(
+        std::pair<uint16_t, unsigned int>(channel, nEvents));
+    }
+    if (klmChannel.getSubdetector() == KLMElementNumbers::c_EKLM) {
+      channelsEKLM.push_back(
+        std::pair<uint16_t, unsigned int>(channel, nEvents));
+    }
   }
-  std::sort(channels.begin(), channels.end(), compareEventNumber);
+  std::sort(channelsBKLM.begin(), channelsBKLM.end(), compareEventNumber);
+  std::sort(channelsEKLM.begin(), channelsEKLM.end(), compareEventNumber);
 
   /* Two-dimensional fit for the channel with the maximal number of events. */
-  int nFits = 1000;
-  int nConvergedFits = 0;
-  double delay = 0;
-  double delayError = 0;
-  if (nFits > (int)channels.size())
-    nFits = channels.size();
-  for (i = 0; i < nFits; ++i) {
-    int subdetector, section, sector, layer, plane, strip;
-    m_ElementNumbers->channelNumberToElementNumbers(
-      channels[i].first, &subdetector, &section, &sector, &layer, &plane, &strip);
-    s_LowerTimeBoundary = m_LowerTimeBoundaryScintilltorsEKLM;
-    s_UpperTimeBoundary = m_UpperTimeBoundaryScintilltorsEKLM;
-    s_StripLength = m_EKLMGeometry->getStripLength(strip) / CLHEP::cm * Unit::cm;
-    for (int j = 0; j < c_NBinsTime; ++j) {
-      for (int k = 0; k < c_NBinsDistance; ++k)
-        s_BinnedData[j][k] = 0;
-    }
-    eventsChannel = m_evts[channels[i].first];
-    double averageTime = 0;
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time();
-      if (m_useEventT0)
-        timeHit = timeHit - it->t0;
-      averageTime = averageTime + timeHit;
-      int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
-                               (s_UpperTimeBoundary - s_LowerTimeBoundary));
-      if (timeBin < 0 || timeBin >= c_NBinsTime)
-        continue;
-      int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
-      if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
-        B2ERROR("The distance to SiPM is greater than the strip length.");
-        continue;
-      }
-      s_BinnedData[timeBin][distanceBin] = s_BinnedData[timeBin][distanceBin] + 1;
-    }
-    averageTime = averageTime / eventsChannel.size();
-    TMinuit minuit(5);
-    int minuitResult;
-    minuit.mnparm(0, "P0", 1, 0.001, 0, 0, minuitResult);
-    minuit.mnparm(1, "N", 10, 0.001, 0, 0, minuitResult);
-    minuit.mnparm(2, "T0", averageTime, 0.001, 0, 0, minuitResult);
-    minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
-    minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
-    minuit.SetFCN(fcn);
-    minuit.mncomd("FIX 2 3 4 5", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 2", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 3", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 4", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 5", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    /* Require converged fit with accurate error matrix. */
-    if (minuit.fISW[1] != 3)
-      continue;
-    nConvergedFits++;
-    double channelDelay, channelDelayError;
-    minuit.GetParameter(4, channelDelay, channelDelayError);
-    delay = delay + channelDelay;
-    delayError = delayError + channelDelayError * channelDelayError;
-  }
-  delay = delay / nConvergedFits;
-  delayError = sqrt(delayError) / (nConvergedFits - 1);
+  double delayBKLM, delayBKLMError;
+  double delayEKLM, delayEKLMError;
+  timeDistance2dFit(channelsBKLM, delayBKLM, delayBKLMError);
+  timeDistance2dFit(channelsEKLM, delayEKLM, delayEKLMError);
 
   /**********************************
    * First loop
@@ -878,26 +909,18 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_ProfileBKLMScintillatorPhi->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
   double e_slope_scint_phi = fcn_pol1->GetParError(1);
-  double effC_scint_phi = 1.0 / slope_scint_phi;
-  double e_effC_scint_phi = e_slope_scint_phi / (slope_scint_phi * slope_scint_phi);
 
   m_ProfileBKLMScintillatorZ->Fit("fcn_pol1", "EMQ");
   double slope_scint_z = fcn_pol1->GetParameter(1);
   double e_slope_scint_z = fcn_pol1->GetParError(1);
-  double effC_scint_z = 1.0 / slope_scint_z;
-  double e_effC_scint_z = e_slope_scint_z / (slope_scint_z * slope_scint_z);
 
   m_ProfileEKLMScintillatorPlane1->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane1_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane1_end = fcn_pol1->GetParError(1);
-  double effC_scint_plane1_end = 1.0 / slope_scint_plane1_end;
-  double e_effC_scint_plane1_end = e_slope_scint_plane1_end / (slope_scint_plane1_end * slope_scint_plane1_end);
 
   m_ProfileEKLMScintillatorPlane2->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane2_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
-  double effC_scint_plane2_end = 1.0 / slope_scint_plane2_end;
-  double e_effC_scint_plane2_end = e_slope_scint_plane2_end / (slope_scint_plane2_end * slope_scint_plane2_end);
 
   TString logStr_phi, logStr_z;
   logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_rpc_phi, e_effC_rpc_phi);
@@ -905,29 +928,31 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   B2INFO("Estimation of effective light speed of RPCs: "
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_phi, e_effC_scint_phi);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_z, e_effC_scint_z);
-  B2INFO("Estimation of effective light speed of BKLM scintillators: "
+  logStr_phi = Form("%.4f +/- %.4f cm/ns", slope_scint_phi, e_slope_scint_phi);
+  logStr_z = Form("%.4f +/- %.4f cm/ns", slope_scint_z, e_slope_scint_z);
+  B2INFO("Delay in BKLM scintillators:"
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_scint_plane1_end, e_effC_scint_plane1_end);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_plane2_end, e_effC_scint_plane2_end);
-  B2INFO("Estimation of effective light speed of EKLM scintillators: "
+  logStr_phi = Form("%.4f +/- %.4f cm/ns", slope_scint_plane1_end,
+                    e_slope_scint_plane1_end);
+  logStr_z = Form("%.4f +/- %.4f cm/ns", slope_scint_plane2_end,
+                  e_slope_scint_plane2_end);
+  B2INFO("Delay in EKLM scintillators: "
          << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
-  double effC_scint_end = 1.0 / delay;
-  double e_effC_scint_end = delayError / (delay * delay);
-
-  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_scint_end, e_effC_scint_end);
-  B2INFO("Estimation of effective light speed of EKLM scintillators: "
+  logStr_z = Form("%.4f +/- %.4f ns/cm", delayBKLM, delayBKLMError);
+  B2INFO("Delay in BKLM scintillators:"
+         << LogVar("Fitted Value (2d fit) ", logStr_z.Data()));
+  logStr_z = Form("%.4f +/- %.4f ns/cm", delayEKLM, delayEKLMError);
+  B2INFO("Delay in EKLM scintillators:"
          << LogVar("Fitted Value (2d fit) ", logStr_z.Data()));
 
   // Default Effective light speed in current Database
-  double delayEKLM = delay;
-  double delayBKLM = 0.5 * (slope_scint_phi + slope_scint_phi);
-  effSpeed_end = effC_scint_end;
-  effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
+  //delayEKLM = 0.5 * (slope_scint_plane1_end + slope_scint_plane2_end);
+  //delayBKLM = 0.5 * (slope_scint_phi + slope_scint_z);
+  effSpeed_end = 1.0 / delayEKLM;
+  effSpeed = 1.0 / delayBKLM;
   effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
 
   m_timeConstants->setDelay(delayEKLM, KLMTimeConstants::c_EKLM);

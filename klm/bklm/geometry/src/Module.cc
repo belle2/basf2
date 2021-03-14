@@ -11,8 +11,12 @@
 /* Own header. */
 #include <klm/bklm/geometry/Module.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+
 /* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <iostream>
@@ -249,6 +253,16 @@ void Module::addZScint(int scint, double length, double offset, double position)
   m_ZScintLengths[scint] = length;
   m_ZScintOffsets[scint] = offset;
   m_ZScintPositions[scint] = position;
+}
+
+double Module::getStripLength(int plane, int strip) const
+{
+  if (plane == BKLMElementNumbers::c_ZPlane)
+    return m_ZScintLengths[strip];
+  else if (plane == BKLMElementNumbers::c_PhiPlane)
+    return m_PhiScintLengths[strip];
+  else
+    B2FATAL("Incorrect plane number.");
 }
 
 const CLHEP::Hep3Vector Module::getLocalPosition(double phiStripAve, double zStripAve) const

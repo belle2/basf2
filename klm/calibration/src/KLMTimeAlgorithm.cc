@@ -699,6 +699,7 @@ void KLMTimeAlgorithm::timeDistance2dFit(
     minuit.mnparm(3, "SIGMA", 10, 0.001, 0, 0, minuitResult);
     minuit.mnparm(4, "DELAY", 0.0, 0.001, 0, 0, minuitResult);
     minuit.SetFCN(fcn);
+    minuit.SetPrintLevel(-1);
     minuit.mncomd("FIX 2 3 4 5", minuitResult);
     minuit.mncomd("MIGRAD 10000", minuitResult);
     minuit.mncomd("RELEASE 2", minuitResult);

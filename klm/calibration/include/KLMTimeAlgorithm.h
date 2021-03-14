@@ -25,9 +25,9 @@
 #include <Math/MinimizerOptions.h>
 #include <TF1.h>
 #include <TGraphErrors.h>
-#include <TH1D.h>
+#include <TH1F.h>
 #include <TH1I.h>
-#include <TH2D.h>
+#include <TH2F.h>
 #include <TProfile.h>
 
 namespace Belle2 {
@@ -379,7 +379,7 @@ namespace Belle2 {
     TH1I* h_calibrated = nullptr;
 
     /** Distance between global and local position. */
-    TH1D* h_diff = nullptr;
+    TH1F* h_diff = nullptr;
 
     /* Monitor graphs of peak value of time distribution for each channel. */
 
@@ -449,35 +449,35 @@ namespace Belle2 {
      */
 
     /** BKLM RPC part. */
-    TH1D* h_time_rpc_tc = nullptr;
+    TH1F* h_time_rpc_tc = nullptr;
 
     /** BKLM scintillator part. */
-    TH1D* h_time_scint_tc = nullptr;
+    TH1F* h_time_scint_tc = nullptr;
 
     /** EKLM part. */
-    TH1D* h_time_scint_tc_end = nullptr;
+    TH1F* h_time_scint_tc_end = nullptr;
 
     /* Histograms of global time distribution before calibration. */
 
     /** BKLM RPC part. */
-    TH1D* h_time_rpc = nullptr;
+    TH1F* h_time_rpc = nullptr;
 
     /** BKLM scintillator part. */
-    TH1D* h_time_scint = nullptr;
+    TH1F* h_time_scint = nullptr;
 
     /** EKLM part. */
-    TH1D* h_time_scint_end = nullptr;
+    TH1F* h_time_scint_end = nullptr;
 
     /* Histograms of global time distribution after calibration. */
 
     /** BKLM RPC part. */
-    TH1D* hc_time_rpc = nullptr;
+    TH1F* hc_time_rpc = nullptr;
 
     /** BKLM scintillator part. */
-    TH1D* hc_time_scint = nullptr;
+    TH1F* hc_time_scint = nullptr;
 
     /** EKLM part. */
-    TH1D* hc_time_scint_end = nullptr;
+    TH1F* hc_time_scint_end = nullptr;
 
     /*
      * Histograms of time distribution for forward (backward)
@@ -485,13 +485,13 @@ namespace Belle2 {
      */
 
     /** BKLM RPC part. */
-    TH1D* h_timeF_rpc[2] = {nullptr};
+    TH1F* h_timeF_rpc[2] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH1D* h_timeF_scint[2] = {nullptr};
+    TH1F* h_timeF_scint[2] = {nullptr};
 
     /** EKLM part. */
-    TH1D* h_timeF_scint_end[2] = {nullptr};
+    TH1F* h_timeF_scint_end[2] = {nullptr};
 
     /*
      * Histograms of time distribution for forward (backward)
@@ -499,13 +499,13 @@ namespace Belle2 {
      */
 
     /** BKLM RPC part. */
-    TH1D* hc_timeF_rpc[2] = {nullptr};
+    TH1F* hc_timeF_rpc[2] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH1D* hc_timeF_scint[2] = {nullptr};
+    TH1F* hc_timeF_scint[2] = {nullptr};
 
     /** EKLM part. */
-    TH1D* hc_timeF_scint_end[2] = {nullptr};
+    TH1F* hc_timeF_scint_end[2] = {nullptr};
 
     /*
      * Histograms of time dependent on sector for forward (backward)
@@ -513,13 +513,13 @@ namespace Belle2 {
      */
 
     /** BKLM RPC part. */
-    TH2D* h2_timeF_rpc[2] = {nullptr};
+    TH2F* h2_timeF_rpc[2] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH2D* h2_timeF_scint[2] = {nullptr};
+    TH2F* h2_timeF_scint[2] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2_timeF_scint_end[2] = {nullptr};
+    TH2F* h2_timeF_scint_end[2] = {nullptr};
 
     /*
      * Histograms of time dependent on sector for forward (backward)
@@ -527,35 +527,35 @@ namespace Belle2 {
      */
 
     /** BKLM RPC part. */
-    TH2D* h2c_timeF_rpc[2] = {nullptr};
+    TH2F* h2c_timeF_rpc[2] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH2D* h2c_timeF_scint[2] = {nullptr};
+    TH2F* h2c_timeF_scint[2] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2c_timeF_scint_end[2] = {nullptr};
+    TH2F* h2c_timeF_scint_end[2] = {nullptr};
 
     /* Histograms of time distribution for sectors before calibration. */
 
     /** BKLM RPC part. */
-    TH1D* h_timeFS_rpc[2][8] = {nullptr};
+    TH1F* h_timeFS_rpc[2][8] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH1D* h_timeFS_scint[2][8] = {nullptr};
+    TH1F* h_timeFS_scint[2][8] = {nullptr};
 
     /** EKLM part. */
-    TH1D* h_timeFS_scint_end[2][4] = {nullptr};
+    TH1F* h_timeFS_scint_end[2][4] = {nullptr};
 
     /* Histograms of time distribution for sectors after calibration. */
 
     /** BKLM RPC part. */
-    TH1D* hc_timeFS_rpc[2][8] = {nullptr};
+    TH1F* hc_timeFS_rpc[2][8] = {nullptr};
 
     /** BKLM scintillator part. */
-    TH1D* hc_timeFS_scint[2][8] = {nullptr};
+    TH1F* hc_timeFS_scint[2][8] = {nullptr};
 
     /** EKLM part. */
-    TH1D* hc_timeFS_scint_end[2][4] = {nullptr};
+    TH1F* hc_timeFS_scint_end[2][4] = {nullptr};
 
     /*
      * Histograms of time distribution dependent on layer of sectors
@@ -563,10 +563,10 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2D* h2_timeFS[2][8] = {nullptr};
+    TH2F* h2_timeFS[2][8] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2_timeFS_end[2][4] = {nullptr};
+    TH2F* h2_timeFS_end[2][4] = {nullptr};
 
     /*
      * Histograms of time distribution dependent on layer of sectors
@@ -574,42 +574,42 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2D* h2c_timeFS[2][8] = {nullptr};
+    TH2F* h2c_timeFS[2][8] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2c_timeFS_end[2][4] = {nullptr};
+    TH2F* h2c_timeFS_end[2][4] = {nullptr};
 
     /* Histograms of time distribution of one layer before calibration. */
 
     /** BKLM part. */
-    TH1D* h_timeFSL[2][8][15] = {nullptr};
+    TH1F* h_timeFSL[2][8][15] = {nullptr};
 
     /** EKLM part. */
-    TH1D* h_timeFSL_end[2][4][14] = {nullptr};
+    TH1F* h_timeFSL_end[2][4][14] = {nullptr};
 
     /* Histograms of time distribution of one layer after calibration. */
 
     /** BKLM part. */
-    TH1D* hc_timeFSL[2][8][15] = {nullptr};
+    TH1F* hc_timeFSL[2][8][15] = {nullptr};
 
     /** EKLM part. */
-    TH1D* hc_timeFSL_end[2][4][14] = {nullptr};
+    TH1F* hc_timeFSL_end[2][4][14] = {nullptr};
 
     /* Histograms of time distribution of one plane before calibration. */
 
     /** BKLM part. */
-    TH1D* h_timeFSLP[2][8][15][2] = {nullptr};
+    TH1F* h_timeFSLP[2][8][15][2] = {nullptr};
 
     /** EKLM part. */
-    TH1D* h_timeFSLP_end[2][4][14][2] = {nullptr};
+    TH1F* h_timeFSLP_end[2][4][14][2] = {nullptr};
 
     /* Histograms of time distribution of one plane after calibration. */
 
     /** BKLM part. */
-    TH1D* hc_timeFSLP[2][8][15][2] = {nullptr};
+    TH1F* hc_timeFSLP[2][8][15][2] = {nullptr};
 
     /** EKLM part. */
-    TH1D* hc_timeFSLP_end[2][4][14][2] = {nullptr};
+    TH1F* hc_timeFSLP_end[2][4][14][2] = {nullptr};
 
     /*
      * Histograms of time distribution dependent on channels
@@ -617,10 +617,10 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2D* h2_timeFSLP[2][8][15][2] = {nullptr};
+    TH2F* h2_timeFSLP[2][8][15][2] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2_timeFSLP_end[2][4][14][2] = {nullptr};
+    TH2F* h2_timeFSLP_end[2][4][14][2] = {nullptr};
 
     /*
      * Histograms of time distribution dependent on channels
@@ -628,27 +628,27 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2D* h2c_timeFSLP[2][8][15][2] = {nullptr};
+    TH2F* h2c_timeFSLP[2][8][15][2] = {nullptr};
 
     /** EKLM part. */
-    TH2D* h2c_timeFSLP_end[2][4][14][2] = {nullptr};
+    TH2F* h2c_timeFSLP_end[2][4][14][2] = {nullptr};
 
     /* Histograms of time distribution of each channel before calibration. */
 
     /** BKLM part, used for effective light speed estimation. */
-    TH1D* h_timeFSLPC_tc[2][8][15][2][54] = {nullptr};
+    TH1F* h_timeFSLPC_tc[2][8][15][2][54] = {nullptr};
 
     /** BKLM part. */
-    TH1D* h_timeFSLPC[2][8][15][2][54] = {nullptr};
+    TH1F* h_timeFSLPC[2][8][15][2][54] = {nullptr};
 
     /** Two-dimensional distributions of time versus propagation length. */
     TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {nullptr};
 
     /** EKLM part, used for effective light speed estimation. */
-    TH1D* h_timeFSLPC_tc_end[2][4][14][2][75] = {nullptr};
+    TH1F* h_timeFSLPC_tc_end[2][4][14][2][75] = {nullptr};
 
     /** EKLM part. */
-    TH1D* h_timeFSLPC_end[2][4][14][2][75] = {nullptr};
+    TH1F* h_timeFSLPC_end[2][4][14][2][75] = {nullptr};
 
     /** Two-dimensional distributions of time versus propagation length. */
     TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {nullptr};
@@ -656,10 +656,10 @@ namespace Belle2 {
     /* Histograms of time distribution of each channel after calibration. */
 
     /** BKLM part. */
-    TH1D* hc_timeFSLPC[2][8][15][2][54] = {nullptr};
+    TH1F* hc_timeFSLPC[2][8][15][2][54] = {nullptr};
 
     /** EKLM part. */
-    TH1D* hc_timeFSLPC_end[2][4][14][2][75] = {nullptr};
+    TH1F* hc_timeFSLPC_end[2][4][14][2][75] = {nullptr};
 
     /* Formulas used for fitting. */
 

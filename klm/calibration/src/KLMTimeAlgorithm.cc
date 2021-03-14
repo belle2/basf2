@@ -725,7 +725,6 @@ void KLMTimeAlgorithm::timeDistance2dFit(
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 {
   int channelId;
-  double effSpeed_end, effSpeed, effSpeed_RPC;
   gROOT->SetBatch(kTRUE);
   setupDatabase();
   m_timeCableDelay = new KLMTimeCableDelay();
@@ -897,14 +896,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_ProfileRpcPhi->Fit("fcn_pol1", "EMQ");
   double delayRPCPhi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
-  double effC_rpc_phi = 1.0 / delayRPCPhi;
-  double e_effC_rpc_phi = e_slope_rpc_phi / (delayRPCPhi * delayRPCPhi);
 
   m_ProfileRpcZ->Fit("fcn_pol1", "EMQ");
   double delayRPCZ = fcn_pol1->GetParameter(1);
   double e_slope_rpc_z = fcn_pol1->GetParError(1);
-  double effC_rpc_z = 1.0 / delayRPCZ;
-  double e_effC_rpc_z = e_slope_rpc_z / (delayRPCZ * delayRPCZ);
 
   m_ProfileBKLMScintillatorPhi->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
@@ -923,21 +918,21 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
 
   TString logStr_phi, logStr_z;
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", effC_rpc_phi, e_effC_rpc_phi);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", effC_rpc_z, e_effC_rpc_z);
-  B2INFO("Estimation of effective light speed of RPCs: "
+  logStr_phi = Form("%.4f +/- %.4f ns/cm", delayRPCPhi, e_slope_rpc_phi);
+  logStr_z = Form("%.4f +/- %.4f ns/cm", delayRPCZ, e_slope_rpc_z);
+  B2INFO("Delay in RPCs:"
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", slope_scint_phi, e_slope_scint_phi);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", slope_scint_z, e_slope_scint_z);
+  logStr_phi = Form("%.4f +/- %.4f ns/cm", slope_scint_phi, e_slope_scint_phi);
+  logStr_z = Form("%.4f +/- %.4f ns/cm", slope_scint_z, e_slope_scint_z);
   B2INFO("Delay in BKLM scintillators:"
          << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
-  logStr_phi = Form("%.4f +/- %.4f cm/ns", slope_scint_plane1_end,
+  logStr_phi = Form("%.4f +/- %.4f ns/cm", slope_scint_plane1_end,
                     e_slope_scint_plane1_end);
-  logStr_z = Form("%.4f +/- %.4f cm/ns", slope_scint_plane2_end,
+  logStr_z = Form("%.4f +/- %.4f ns/cm", slope_scint_plane2_end,
                   e_slope_scint_plane2_end);
-  B2INFO("Delay in EKLM scintillators: "
+  B2INFO("Delay in EKLM scintillators:"
          << LogVar("Fitted Value (plane1 readout) ", logStr_phi.Data())
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
@@ -951,9 +946,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   // Default Effective light speed in current Database
   //delayEKLM = 0.5 * (slope_scint_plane1_end + slope_scint_plane2_end);
   //delayBKLM = 0.5 * (slope_scint_phi + slope_scint_z);
-  effSpeed_end = 1.0 / delayEKLM;
-  effSpeed = 1.0 / delayBKLM;
-  effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
 
   m_timeConstants->setDelay(delayEKLM, KLMTimeConstants::c_EKLM);
   m_timeConstants->setDelay(delayBKLM, KLMTimeConstants::c_BKLM);
@@ -984,7 +976,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane();
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
-          double propgationT = it->dist / effSpeed_RPC;
+          double propgationT;
+          if (iP == BKLMElementNumbers::c_ZPlane)
+            propgationT = it->dist * delayRPCZ;
+          else
+            propgationT = it->dist * delayRPCPhi;
           double time = timeHit - propgationT;
           h_time_rpc->Fill(time);
           h_timeF_rpc[iF]->Fill(time);
@@ -996,7 +992,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2_timeFS[iF][iS]->Fill(iL, time);
           h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
-          double propgationT = it->dist / effSpeed;
+          double propgationT = it->dist * delayBKLM;
           double time = timeHit - propgationT;
           h_time_scint->Fill(time);
           h_timeF_scint[iF]->Fill(time);
@@ -1014,7 +1010,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it->dist / effSpeed_end;
+        double propgationT = it->dist * delayEKLM;
         double time = timeHit - propgationT;
         h_time_scint_end->Fill(time);
         h_timeF_scint_end[iF]->Fill(time);
@@ -1176,7 +1172,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iP = klmChannel.getPlane();
         int iC = klmChannel.getStrip() - 1;
         if (iL > 1) {
-          double propgationT = it->dist / effSpeed_RPC;
+          double propgationT;
+          if (iP == BKLMElementNumbers::c_ZPlane)
+            propgationT = it->dist * delayRPCZ;
+          else
+            propgationT = it->dist * delayRPCPhi;
           double time = timeHit - propgationT - m_timeShift[channelId];
           hc_time_rpc->Fill(time);
           hc_timeF_rpc[iF]->Fill(time);
@@ -1188,7 +1188,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2c_timeFS[iF][iS]->Fill(iL, time);
           h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
-          double propgationT = it->dist / effSpeed;
+          double propgationT = it->dist * delayBKLM;
           double time = timeHit - propgationT - m_timeShift[channelId];
           hc_time_scint->Fill(time);
           hc_timeF_scint[iF]->Fill(time);
@@ -1206,7 +1206,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it->dist / effSpeed;
+        double propgationT = it->dist * delayEKLM;
         double time = timeHit - propgationT - m_timeShift[channelId];
         hc_time_scint_end->Fill(time);
         hc_timeF_scint_end[iF]->Fill(time);

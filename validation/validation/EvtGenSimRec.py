@@ -43,7 +43,7 @@ add_reconstruction(main)
 
 # reconstruct SVDRecoDigits not used in reconstruction
 # but interesting for validation purposes
-add_svd_create_recodigits(path)
+add_svd_create_recodigits(main)
 
 # memory profile
 main.add_module('Profile')

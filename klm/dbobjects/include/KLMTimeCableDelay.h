@@ -41,13 +41,13 @@ namespace Belle2 {
      * @param[in] channel   Channel number.
      * @param[in] timeDelay Time calibration constant.
      */
-    void setTimeDelay(uint16_t channel, double timeDelay);
+    void setTimeDelay(uint16_t channel, float timeDelay);
 
     /**
      * Get the time calibration constant.
      * @param[in] channel Channel number.
      */
-    double getTimeDelay(uint16_t channel) const;
+    float getTimeDelay(uint16_t channel) const;
 
     /**
      * Clear the time calibration constants.
@@ -57,7 +57,7 @@ namespace Belle2 {
   private:
 
     /** Map of the time calibration constants. */
-    std::map<uint16_t, double> m_timeDelay;
+    std::map<uint16_t, float> m_timeDelay;
 
     /** Class version. */
     ClassDef(KLMTimeCableDelay, 1);

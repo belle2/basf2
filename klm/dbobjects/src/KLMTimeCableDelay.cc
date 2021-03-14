@@ -24,22 +24,22 @@ KLMTimeCableDelay::~KLMTimeCableDelay()
 {
 }
 
-void KLMTimeCableDelay::setTimeDelay(uint16_t channel, double delay)
+void KLMTimeCableDelay::setTimeDelay(uint16_t channel, float delay)
 {
-  std::map<uint16_t, double>::iterator it;
+  std::map<uint16_t, float>::iterator it;
   it = m_timeDelay.find(channel);
   if (it == m_timeDelay.end())
-    m_timeDelay.insert(std::pair<uint16_t, double>(channel, delay));
+    m_timeDelay.insert(std::pair<uint16_t, float>(channel, delay));
   else
     it->second = delay;
 }
 
-double KLMTimeCableDelay::getTimeDelay(uint16_t channel) const
+float KLMTimeCableDelay::getTimeDelay(uint16_t channel) const
 {
-  std::map<uint16_t, double>::const_iterator it;
+  std::map<uint16_t, float>::const_iterator it;
   it = m_timeDelay.find(channel);
   if (it == m_timeDelay.end())
-    return std::numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<float>::quiet_NaN();
   return it->second;
 }
 

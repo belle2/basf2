@@ -63,8 +63,8 @@ namespace Belle2 {
 
     /**
      * Set effective light speed of scintillators.
-     * @param[in] lightSpeed Effective light speed.
-     * @param[in] cType      Flag of channel type.
+     * @param[in] delay Delay.
+     * @param[in] cType Flag of channel type.
      */
     void setDelay(float delay, int cType);
 

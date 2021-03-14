@@ -68,21 +68,6 @@ namespace Belle2 {
      */
     void setDelay(float delay, int cType);
 
-    /**
-     * Get amplitude dependence time constant.
-     * This item is not supported by the firmwire so far.
-     * @param[in] cType Flag of channel type.
-     */
-    float getAmpTimeConstant(int cType) const;
-
-    /**
-     * Set amplitude dependence time constant.
-     * This item is not supported by the firmwire so far.
-     * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
-     * @param[in] cType                 Flag of channel type.
-     */
-    void setAmpTimeConstant(float amplitudeTimeConstant, int cType);
-
   private:
 
     /** Delay (ns / cm) for EKLM scintillators. */
@@ -96,15 +81,6 @@ namespace Belle2 {
 
     /** Delay (ns / cm) for RPC Z plane. */
     float m_DelayRPCZ = 0.0;
-
-    /** Amplitude dependence time constant of scintillators for EKLM. */
-    float m_ampTimeConstant_end = 0.0;
-
-    /** Amplitude dependence time constant of scintillators for BKLM. */
-    float m_ampTimeConstant = 0.0;
-
-    /** Amplitude dependence time constant of RPCs. */
-    float m_ampTimeConstantRPC = 0.0;
 
     /** Class version. */
     ClassDef(KLMTimeConstants, 1);

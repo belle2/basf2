@@ -951,9 +951,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_timeConstants->setDelay(delayBKLM, KLMTimeConstants::c_BKLM);
   m_timeConstants->setDelay(delayRPCPhi, KLMTimeConstants::c_RPCPhi);
   m_timeConstants->setDelay(delayRPCZ, KLMTimeConstants::c_RPCZ);
-  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_EKLM);
-  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_BKLM);
-  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_RPCPhi);
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");

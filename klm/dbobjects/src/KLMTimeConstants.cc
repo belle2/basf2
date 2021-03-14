@@ -49,35 +49,3 @@ void KLMTimeConstants::setDelay(float delay, int cType)
   }
   B2FATAL("Incorrect channel type: " << cType);
 }
-
-float KLMTimeConstants::getAmpTimeConstant(int cType) const
-{
-  switch (cType) {
-    case c_EKLM:
-      return m_ampTimeConstant_end;
-    case c_BKLM:
-      return m_ampTimeConstant;
-    case c_RPCPhi:
-    case c_RPCZ:
-      return m_ampTimeConstantRPC;
-  }
-  B2FATAL("Incorrect channel type: " << cType);
-}
-
-void KLMTimeConstants::setAmpTimeConstant(float amplitudeTimeConstant, int cType)
-{
-  switch (cType) {
-    case c_EKLM:
-      m_ampTimeConstant_end = amplitudeTimeConstant;
-      return;
-    case c_BKLM:
-      m_ampTimeConstant = amplitudeTimeConstant;
-      return;
-    case c_RPCPhi:
-    case c_RPCZ:
-      m_ampTimeConstantRPC = amplitudeTimeConstant;
-      return;
-  }
-  B2FATAL("Incorrect channel type: " << cType);
-}
-

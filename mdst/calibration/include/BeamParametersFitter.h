@@ -15,6 +15,7 @@
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
 /* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
@@ -45,10 +46,26 @@ namespace Belle2 {
       m_IntervalOfValidity = iov;
     }
 
+    /**
+     * Perform the fit.
+     */
+    void fit();
+
   protected:
+
+    /**
+     * Setup database.
+     */
+    void setupDatabase();
 
     /** Interval of validity. */
     IntervalOfValidity m_IntervalOfValidity;
+
+    /** Collision boost vector. */
+    DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;
+
+    /** Collision invariant mass. */
+    DBObjPtr<CollisionInvariantMass> m_CollisionInvariantMass;
 
   };
 

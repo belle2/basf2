@@ -51,6 +51,38 @@ namespace Belle2 {
     }
 
     /**
+     * Set HER angle.
+     */
+    void setAngleHER(double angleHER)
+    {
+      m_AngleHER = angleHER;
+    }
+
+    /**
+     * Set LER angle.
+     */
+    void setAngleLER(double angleLER)
+    {
+      m_AngleLER = angleLER;
+    }
+
+    /**
+     * Set angle error.
+     */
+    void setAngleError(double angleError)
+    {
+      m_AngleError = angleError;
+    }
+
+    /**
+     * Set boost error.
+     */
+    void setBoostError(double boostError)
+    {
+      m_BoostError = boostError;
+    }
+
+    /**
      * Perform the fit.
      */
     void fit();
@@ -64,6 +96,18 @@ namespace Belle2 {
 
     /** Interval of validity. */
     IntervalOfValidity m_IntervalOfValidity;
+
+    /** HER angle. */
+    double m_AngleHER = 0;
+
+    /** LER angle. */
+    double m_AngleLER = 0;
+
+    /** Angle error. */
+    double m_AngleError = 0;
+
+    /** Boost error (use only if inverse error matrix is not available). */
+    double m_BoostError = 0.0001;
 
     /** Collision boost vector. */
     DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;

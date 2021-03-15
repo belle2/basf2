@@ -15,6 +15,7 @@
 #include <framework/database/Database.h>
 #include <framework/database/DBStore.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 /* ROOT headers. */
 #include <TLorentzVector.h>
@@ -35,6 +36,15 @@ static TVector3 s_BoostVector;
 /** Boost-vector covariance. */
 static TMatrixDSym s_BoostVectorInverseCovariance(3);
 
+/** HER direction. */
+static TVector3 s_DirectionHER;
+
+/** LER direction. */
+static TVector3 s_DirectionLER;
+
+/** Angle error. */
+static double s_AngleError;
+
 /* cppcheck-suppress constParameter */
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
@@ -52,8 +62,13 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   boostDifference[2] = beamBoost.Z() - s_BoostVector.Z();
   double boostChi2 = s_BoostVectorInverseCovariance.Similarity(boostDifference);
   double invariantMass = pBeam.M();
-  fval = pow((invariantMass - s_InvariantMass) / s_InvariantMassError, 2) +
-         boostChi2;
+  double massChi2 = pow((invariantMass - s_InvariantMass) /
+                        s_InvariantMassError, 2);
+  double angleHER = pHER.Vect().Angle(s_DirectionHER);
+  double angleLER = pLER.Vect().Angle(s_DirectionLER);
+  double angleChi2 = pow(angleHER / s_AngleError, 2) +
+                     pow(angleLER / s_AngleError, 2);
+  fval = boostChi2 + massChi2 + angleChi2;
 }
 
 void BeamParametersFitter::setupDatabase()
@@ -82,9 +97,32 @@ void BeamParametersFitter::fit()
   setupDatabase();
   s_BoostVector = m_CollisionBoostVector->getBoost();
   s_BoostVectorInverseCovariance = m_CollisionBoostVector->getBoostCovariance();
-  s_BoostVectorInverseCovariance.Invert();
+  if (s_BoostVectorInverseCovariance.Determinant() == 0) {
+    B2WARNING("Determinant of boost covariance matrix is 0, "
+              "using generic inverse covariance matrix for fit.");
+    s_BoostVectorInverseCovariance[0][0] = 1.0 / (m_BoostError * m_BoostError);
+    s_BoostVectorInverseCovariance[0][1] = 0;
+    s_BoostVectorInverseCovariance[0][2] = 0;
+    s_BoostVectorInverseCovariance[1][0] = 0;
+    s_BoostVectorInverseCovariance[1][1] = 1.0 / (m_BoostError * m_BoostError);
+    s_BoostVectorInverseCovariance[1][2] = 0;
+    s_BoostVectorInverseCovariance[2][0] = 0;
+    s_BoostVectorInverseCovariance[2][1] = 0;
+    s_BoostVectorInverseCovariance[2][2] = 1.0 / (m_BoostError * m_BoostError);
+  } else {
+    s_BoostVectorInverseCovariance.Invert();
+  }
   s_InvariantMass = m_CollisionInvariantMass->getMass();
   s_InvariantMassError = m_CollisionInvariantMass->getMassSpread();
+  s_DirectionHER.SetX(0);
+  s_DirectionHER.SetY(0);
+  s_DirectionHER.SetZ(1);
+  s_DirectionHER.RotateY(m_AngleHER);
+  s_DirectionLER.SetX(0);
+  s_DirectionLER.SetY(0);
+  s_DirectionLER.SetZ(1);
+  s_DirectionLER.RotateY(m_AngleLER + M_PI);
+  s_AngleError = m_AngleError;
   TMinuit minuit(6);
   minuit.mnparm(0, "PHER_X", 0, 0.01, 0, 0, minuitResult);
   minuit.mnparm(1, "PHER_Y", 0, 0.01, 0, 0, minuitResult);
@@ -94,5 +132,7 @@ void BeamParametersFitter::fit()
   minuit.mnparm(5, "PLER_Z", -4, 0.01, 0, 0, minuitResult);
   minuit.SetFCN(fcn);
   minuit.mncomd("FIX 1 2 4 5", minuitResult);
+  minuit.mncomd("MIGRAD 10000", minuitResult);
+  minuit.mncomd("RELEASE 1 2 4 5", minuitResult);
   minuit.mncomd("MIGRAD 10000", minuitResult);
 }

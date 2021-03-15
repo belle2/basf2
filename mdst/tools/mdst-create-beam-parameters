@@ -47,6 +47,9 @@ overlapping_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
 
 # Get beam parameters for each interval.
 fitter = BeamParametersFitter()
+fitter.setAngleHER(0.0415);
+fitter.setAngleLER(-0.0415);
+fitter.setAngleError(0.0001);
 for iov in overlapping_iovs:
     fitter.setIntervalOfValidity(iov)
     fitter.fit()

@@ -2,6 +2,6 @@ Import('env')
 
 env['LIBS'] = ['mdst_dbobjects',
                'framework',
-               '$ROOT_LIBS']
+               '$ROOT_LIBS', 'Minuit']
 
 Return('env')

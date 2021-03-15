@@ -20,6 +20,10 @@
 
 namespace Belle2 {
 
+  /**
+   * Fitter calculating BeamParameters from CollisionBoostVector and
+   * CollisionInvariantMass.
+   */
   class BeamParametersFitter {
 
   public:

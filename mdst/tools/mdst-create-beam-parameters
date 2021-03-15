@@ -12,6 +12,9 @@ parser.add_argument('--input-tag', required=True, default=None,
                     help="Input global tag.")
 arguments = parser.parse_args()
 
+# Setup database.
+basf2.conditions.override_globaltags()
+basf2.conditions.prepend_globaltag(arguments.input_tag)
 db = ConditionsDB()
 
 def get_iov_list(payload_name):
@@ -46,5 +49,4 @@ overlapping_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
 fitter = BeamParametersFitter()
 for iov in overlapping_iovs:
     fitter.setIntervalOfValidity(iov)
-    print(iov.getExperimentLow(), iov.getRunLow())
-    
+    fitter.fit()

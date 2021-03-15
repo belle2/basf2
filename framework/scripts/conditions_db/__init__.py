@@ -564,9 +564,15 @@ class ConditionsDB:
 
         return req.json()["payloadIovId"]
 
-    def get_iovs(self, globalTagName):
+    def get_iovs(self, globalTagName, payloadName=None):
         """Return existing iovs for a given tag name. It returns a dictionary
-        which maps (payloadId, first runId, final runId) to iovId"""
+        which maps (payloadId, first runId, final runId) to iovId
+
+        Parameters:
+          globalTagName(str): Global tag name.
+          payloadName(str):   Payload name (if None, selection by name is
+                              not performed.
+        """
 
         try:
             req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
@@ -578,6 +584,9 @@ class ConditionsDB:
         result = {}
         for payload in req.json():
             payloadId = payload["payloadId"]["payloadId"]
+            if payloadName is not None:
+                if payload["payloadId"]["basf2Module"]["name"] != payloadName:
+                    continue
             for iov in payload["payloadIovs"]:
                 iovId = iov["payloadIovId"]
                 firstExp, firstRun = iov["expStart"], iov["runStart"]

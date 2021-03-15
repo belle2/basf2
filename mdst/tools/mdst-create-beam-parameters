@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import basf2
+from conditions_db import ConditionsDB
+from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter
+
+# Arguments.
+parser = argparse.ArgumentParser()
+parser.add_argument('--input-tag', required=True, default=None,
+                    help="Input global tag.")
+arguments = parser.parse_args()
+
+db = ConditionsDB()
+
+def get_iov_list(payload_name):
+    iovs = db.get_iovs(arguments.input_tag, payload_name)
+    iovs2 = []
+    for (payloadId, firstExp, firstRun, finalExp, finalRun) in iovs:
+        iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun)
+        iovs2.append(iov)
+    for i in range(len(iovs2)):
+        j = i + 1
+        while j < len(iovs2):
+            if (iovs2[i].overlaps(iovs2[j])):
+                basf2.B2FATAL('Overlapping IOVs found.')
+            j = j + 1
+    return iovs2
+
+# Get intervals of validity for calibrated beam payloads.
+invariant_mass_iovs = get_iov_list('CollisionInvariantMass')
+boost_vector_iovs = get_iov_list('CollisionBoostVector')
+
+# Get list of overlapping intervals of validity.
+overlapping_iovs = []
+for iov1 in invariant_mass_iovs:
+    for iov2 in boost_vector_iovs:
+        overlap = iov1.overlap(iov2)
+        if overlap.empty():
+            continue
+        overlapping_iovs.append(overlap)
+overlapping_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
+
+# Get beam parameters for each interval.
+fitter = BeamParametersFitter()
+for iov in overlapping_iovs:
+    fitter.setIntervalOfValidity(iov)
+    print(iov.getExperimentLow(), iov.getRunLow())
+    

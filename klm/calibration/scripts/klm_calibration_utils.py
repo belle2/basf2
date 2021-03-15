@@ -6,6 +6,7 @@ import basf2
 
 from rawdata import add_unpackers
 from reconstruction import add_cosmics_reconstruction, add_reconstruction, prepare_cdst_analysis
+from softwaretrigger.constants import RAWDATA_OBJECTS
 import modularAnalysis as ma
 
 
@@ -39,8 +40,7 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     main = basf2.create_path()
     root_input = basf2.register_module(
         'RootInput',
-        branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
-                     'RawARICHs', 'RawECLs', 'RawKLMs', 'RawTRGs'])
+        branchNames=RAWDATA_OBJECTS + ['EventMetaData'])
     if entry_sequence:
         root_input.param('entrySequences', [entry_sequence])
     main.add_module(root_input)
@@ -78,8 +78,7 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     main = basf2.create_path()
     root_input = basf2.register_module(
         'RootInput',
-        branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
-                     'RawARICHs', 'RawECLs', 'RawKLMs', 'RawTRGs'])
+        branchNames=RAWDATA_OBJECTS + ['EventMetaData'])
     if entry_sequence:
         root_input.param('entrySequences', [entry_sequence])
     main.add_module(root_input)

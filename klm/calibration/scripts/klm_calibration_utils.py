@@ -37,9 +37,13 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
         basf2.Path:  A reconstruction path to run before the collector. Used for raw cosmic input files.
     """
     main = basf2.create_path()
+    root_input = basf2.register_module(
+        'RootInput',
+        branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
+                     'RawARICHs', 'RawECLs', 'RawKLMs', 'RawTRGs'])
     if entry_sequence:
-        main.add_module('RootInput',
-                        entrySequences=[entry_sequence])
+        root_input.param('entrySequences', [entry_sequence])
+    main.add_module(root_input)
 
     # Unpackers and reconstruction.
     add_unpackers(main)
@@ -72,9 +76,13 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
         basf2.Path:  A reconstruction path to run before the collector. Used for raw physics input files.
     """
     main = basf2.create_path()
+    root_input = basf2.register_module(
+        'RootInput',
+        branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
+                     'RawARICHs', 'RawECLs', 'RawKLMs', 'RawTRGs'])
     if entry_sequence:
-        main.add_module('RootInput',
-                        entrySequences=[entry_sequence])
+        root_input.param('entrySequences', [entry_sequence])
+    main.add_module(root_input)
 
     # Unpackers and reconstruction.
     add_unpackers(main)

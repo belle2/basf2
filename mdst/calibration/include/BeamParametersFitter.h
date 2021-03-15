@@ -83,6 +83,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set whether to use momentum components or energy and two angles.
+     */
+    void useMomentum(bool use)
+    {
+      m_UseMomentum = use;
+    }
+
+    /**
      * Perform the fit.
      */
     void fit();
@@ -108,6 +116,9 @@ namespace Belle2 {
 
     /** Boost error (use only if inverse error matrix is not available). */
     double m_BoostError = 0.0001;
+
+    /** Whether to use momentum components or energy and two angles. */
+    bool m_UseMomentum = false;
 
     /** Collision boost vector. */
     DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;

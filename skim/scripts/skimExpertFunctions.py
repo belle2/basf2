@@ -175,6 +175,13 @@ class InitialiseSkimFlag(b2.Module):
         for skim in skims:
             vm.addAlias(skim.flag, f"eventExtraInfo({skim.flag})")
 
+    def initialize(self):
+        """
+        Register EventExtraInfo in datastore if it has not been registered already.
+        """
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.registerInDataStore()
+
     def event(self):
         """
         Initialise flags to zero.
@@ -211,6 +218,13 @@ class UpdateSkimFlag(b2.Module):
         self.skim = skim
         self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
+    def initialize(self):
+        """
+        Check EventExtraInfo has been registered previously. This registration should be
+        done by InitialiseSkimFlag.
+        """
+        self.EventExtraInfo.isRequired()
+
     def event(self):
         """
         Check if at least one skim list is non-empty; if so, update the skim flag to 1.
@@ -218,15 +232,15 @@ class UpdateSkimFlag(b2.Module):
 
         from ROOT import Belle2
 
-        # NOTE: Assumes EventExtraInfo has already been registered by
-        # InitialiseSkimFlags, and the skim lists have all been built (with all skim
-        # cuts applied)
         ListObjects = [Belle2.PyStoreObj(lst) for lst in self.skim.SkimLists]
+
+        # Check required skim lists have been built on this path
         if any([not ListObj.isValid() for ListObj in ListObjects]):
-            b2.B2ERROR(
+            b2.B2FATAL(
                 f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
                 "Did you add this module to the pre-skim path rather than the post-skim path?"
             )
+
         nCandidates = sum(ListObj.getListSize() for ListObj in ListObjects)
 
         # Override ExtraInfo flag if at least one candidate from any list passed

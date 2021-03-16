@@ -111,12 +111,12 @@ namespace Belle2 {
     void IdentifyTauPair();
     double getEnergyTauRestFrame(const MCParticle* mc, const int ichg);
     int getRecursiveMotherCharge(const MCParticle* mc);
-    int TauBBBmode(std::string s, std::map<std::string, int> tau_map);
+    int TauBBBmode(std::string s);
     int getProngOfDecay(const MCParticle& mc);
 
   protected:
 
-    int m_printmode;
+    std::string m_printmode;
 
   };
 

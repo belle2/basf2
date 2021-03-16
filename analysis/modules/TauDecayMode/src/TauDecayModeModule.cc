@@ -66,8 +66,11 @@ std::vector<std::string> parseString(std::string str, std::string sep)
 std::map<string, int> make_map(std::string file)
 {
   std::string fileName;
-  if (file == "") {fileName = "map_tau_v4.txt";}
-  else {fileName = file;}
+  if (file == "") {
+    B2INFO("This is a log message" << LogVar("text",
+                                             "Missing input mapping file , use mp_file=basf2.find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt') TauDecayMode.param('file', mp_file)  for classify with the default mapping."));
+
+  } else {fileName = file;}
 
   ifstream f;
   f.open(fileName);
@@ -105,9 +108,10 @@ REG_MODULE(TauDecayMode)
 TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
 {
   // Set module properties
-  setDescription("");
+  setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
+                 "is by default numbered following the order of TauolaBBB");
   //Parameter definition
-  addParam("printmode",      m_printmode,      "Printout more information from each event", 0);
+  addParam("printmode",      m_printmode,      "Printout more information from each event", std::string("default"));
   addParam("file", m_file, "path for an alternative mapping", std::string(""));
   addParam("particle", m_particle , "Add a particle with his pdg for clasification", std::string(""));
 }
@@ -118,8 +122,8 @@ TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), 
 void TauDecayModeModule::initialize()
 {
   nop = 0 ;
-  taum_no = -1;
-  taup_no = -1;
+  taum_no = 0;
+  taup_no = 0;
   EventNumber = 1;
   mode_decay = make_map(m_file);
   m_tauDecay.registerInDataStore();
@@ -132,8 +136,7 @@ void TauDecayModeModule::initialize()
 }
 void TauDecayModeModule::event()
 {
-  //StoreArray<MCParticle> MCParticles;
-  //
+
   IdentifyTauPair();
   if (tauPair) {
     m_pprong = getProngOfDecay(*MCParticles[idOfTauPlus - 1]);
@@ -217,42 +220,7 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 9010221) vec_f0.push_back(i);
     if (m_particle != "" && p.getPDG() == pdg_extra) vec_extra.push_back(i);
   }
-  //
-  if (m_printmode < 0) {
-    B2INFO("TauDecayMode:: vec_nut.size()  = " << vec_nut.size());
-    B2INFO("TauDecayMode:: vec_anut.size() = " << vec_anut.size());
-    B2INFO("TauDecayMode:: vec_em.size()   = "  << vec_em.size());
-    B2INFO("TauDecayMode:: vec_ep.size()   = "  << vec_ep.size());
-    B2INFO("TauDecayMode:: vec_pim.size()  = " << vec_pim.size());
-    B2INFO("TauDecayMode:: vec_pip.size()  = " << vec_pip.size());
-    B2INFO("TauDecayMode:: vec_pi0.size()  = " << vec_pi0.size());
-    B2INFO("TauDecayMode:: vec_gam.size()  = " << vec_gam.size());
-    B2INFO("TauDecayMode:: vec_K0.size()  = " << vec_K0.size());
-    B2INFO("TauDecayMode:: vec_K0_br.size()  = " << vec_K0_br.size());
-    B2INFO("TauDecayMode:: vec_k0s.size()  = " << vec_k0s.size());
-    B2INFO("TauDecayMode:: vec_k0l.size()  = " << vec_k0l .size());
-    B2INFO("TauDecayMode:: vec_eta.size()  = " << vec_eta.size());
-    B2INFO("TauDecayMode:: vec_omega.size()  = " << vec_omega.size());
-    B2INFO("TauDecayMode:: vec_kstarm.size()  = " << vec_kstarm.size());
-    B2INFO("TauDecayMode:: vec_kstarp.size()  = " << vec_kstarp.size());
-    B2INFO("TauDecayMode:: vec_lambda.size()  = " << vec_lambda.size());
-    B2INFO("TauDecayMode:: vec_lmb_br.size()  = " << vec_lmb_br.size());
-    B2INFO("TauDecayMode:: vec_kstar.size()  = " << vec_kstar.size());
-    B2INFO("TauDecayMode:: vec_kstar_br.size()  = " << vec_kstar_br.size());
-    B2INFO("TauDecayMode:: vec_etapr.size()  = " << vec_etapr.size());
-    B2INFO("TauDecayMode:: vec_a0.size()  = " << vec_a0.size());
-    B2INFO("TauDecayMode:: vec_a0p.size()  = " << vec_a0p.size());
-    B2INFO("TauDecayMode:: vec_a0m.size()  = " << vec_a0m.size());
-    B2INFO("TauDecayMode:: vec_b1m.size()  = " << vec_b1m.size());
-    B2INFO("TauDecayMode:: vec_b1p.size()  = " << vec_b1p.size());
-    B2INFO("TauDecayMode:: vec_phi.size()  = " << vec_phi.size());
-    B2INFO("TauDecayMode:: vec_a1p.size()  = " << vec_a1p.size());
-    B2INFO("TauDecayMode:: vec_a1m.size()  = " << vec_a1m.size());
-    B2INFO("TauDecayMode:: vec_rhom.size()  = " << vec_rhom.size());
-    B2INFO("TauDecayMode:: vec_rhop.size()  = " << vec_rhop.size());
-    B2INFO("TauDecayMode:: vec_rho0.size()  = " << vec_rho0.size());
-    B2INFO("TauDecayMode:: vec_f0.size()  = " << vec_f0.size());
-  }
+
   //
   vec_dau_tauminus.clear();
   vec_dau_tauplus.clear();
@@ -611,7 +579,7 @@ void TauDecayModeModule::event()
     if (chg > 0) vec_dau_tauplus.push_back(ii);
   }
 
-  //
+  //make decay string for t-
   m_tauminusdecaymode = "";
   for (unsigned int i = 0; i < vec_dau_tauminus.size(); i++) {
     MCParticle* p = MCParticles[vec_dau_tauminus[i]];
@@ -620,20 +588,20 @@ void TauDecayModeModule::event()
     //
     if (m_particle != "" && pdg == pdg_extra) m_tauminusdecaymode.append("." + name);
     //
-    if (pdg ==  16)  m_tauminusdecaymode.append(".nut");
-    if (pdg == -16)  m_tauminusdecaymode.append(".anut");
+    if (pdg ==  16)  m_tauminusdecaymode.append(".nu_tau");
+    if (pdg == -16)  m_tauminusdecaymode.append(".anti-nu_tau");
     //
     if (pdg ==  11)  m_tauminusdecaymode.append(".e-");
     if (pdg == -11)  m_tauminusdecaymode.append(".e+");
 
-    if (pdg ==  12)  m_tauminusdecaymode.append(".nue");
-    if (pdg == -12)  m_tauminusdecaymode.append(".anue");
+    if (pdg ==  12)  m_tauminusdecaymode.append(".nu_e");
+    if (pdg == -12)  m_tauminusdecaymode.append(".anti-nu_e");
 
     if (pdg ==  13)  m_tauminusdecaymode.append(".mu-");
     if (pdg == -13)  m_tauminusdecaymode.append(".mu+");
 
-    if (pdg ==  14)  m_tauminusdecaymode.append(".numu");
-    if (pdg == -14)  m_tauminusdecaymode.append(".anumu");
+    if (pdg ==  14)  m_tauminusdecaymode.append(".nu_mu");
+    if (pdg == -14)  m_tauminusdecaymode.append(".anti-nu_mu");
     //
     if (pdg == -211) m_tauminusdecaymode.append(".pi-");
     if (pdg ==  211) m_tauminusdecaymode.append(".pi+");
@@ -642,61 +610,56 @@ void TauDecayModeModule::event()
     if (pdg ==  321) m_tauminusdecaymode.append(".K+");
     //
     if (pdg == 311) m_tauminusdecaymode.append(".K0");
-    if (pdg == -311) m_tauminusdecaymode.append(".K0bar");
+    if (pdg == -311) m_tauminusdecaymode.append(".anti-K0");
 
-    if (pdg == -2212)m_tauminusdecaymode.append(".apro-");
-    if (pdg ==  2212)m_tauminusdecaymode.append(".pro+");
+    if (pdg == -2212)m_tauminusdecaymode.append(".anti-p-");
+    if (pdg ==  2212)m_tauminusdecaymode.append(".p+");
 
     if (pdg == 111)  m_tauminusdecaymode.append(".pi0");
-    if (pdg == 310)  m_tauminusdecaymode.append(".K0S");
-    if (pdg == 130)  m_tauminusdecaymode.append(".K0L");
+    if (pdg == 310)  m_tauminusdecaymode.append(".K_S0");
+    if (pdg == 130)  m_tauminusdecaymode.append(".K_L0");
     if (pdg == 22)   m_tauminusdecaymode.append(".gamma");
     //
-    if (pdg == 3122) m_tauminusdecaymode.append(".lambda");
-    if (pdg == -3122) m_tauminusdecaymode.append(".lmbbar");
-    if (pdg == 10311) m_tauminusdecaymode.append(".kstar");
-    if (pdg == -10311) m_tauminusdecaymode.append(".kstarbr");
-    if (pdg == 331) m_tauminusdecaymode.append(".etapr");
+    if (pdg == 3122) m_tauminusdecaymode.append(".Lambda0");
+    if (pdg == -3122) m_tauminusdecaymode.append(".anti-Lambda0");
+    if (pdg == 10311) m_tauminusdecaymode.append(".K_0*0");
+    if (pdg == -10311) m_tauminusdecaymode.append(".anti-K_0*0");
+    if (pdg == 331) m_tauminusdecaymode.append(".eta'");
 
 
-    if (pdg == 221) m_tauminusdecaymode.append(".|eta|");
-    if (pdg == 223) m_tauminusdecaymode.append(".|omega|");
-    if (pdg == 323) m_tauminusdecaymode.append(".kstarp");
-    if (pdg == -323) m_tauminusdecaymode.append(".kstarm");
-    if (pdg == 9000111) m_tauminusdecaymode.append(".|a0|");
-    if (pdg == 9000211) m_tauminusdecaymode.append(".|a0p|");
-    if (pdg == -9000211) m_tauminusdecaymode.append(".|a0m|");
-    if (pdg == 10213) m_tauminusdecaymode.append(".|b1p|");
-    if (pdg == -10213) m_tauminusdecaymode.append(".|b1m|");
-    if (pdg == 333) m_tauminusdecaymode.append(".|phi|");
-    if (pdg == 20223) m_tauminusdecaymode.append(".|f1|");
-    if (pdg == 20213) m_tauminusdecaymode.append(".|a1p|");
-    if (pdg == -20213) m_tauminusdecaymode.append(".|a1m|");
-    if (pdg == 213) m_tauminusdecaymode.append(".|rhop|");
-    if (pdg == -213) m_tauminusdecaymode.append(".|rhom|");
+    if (pdg == 221) m_tauminusdecaymode.append(".eta");
+    if (pdg == 223) m_tauminusdecaymode.append(".omega");
+    if (pdg == 323) m_tauminusdecaymode.append(".K*+");
+    if (pdg == -323) m_tauminusdecaymode.append(".K*-");
+    if (pdg == 9000111) m_tauminusdecaymode.append(".a00");
+    if (pdg == 9000211) m_tauminusdecaymode.append(".a_0+");
+    if (pdg == -9000211) m_tauminusdecaymode.append(".a_0-");
+    if (pdg == 10213) m_tauminusdecaymode.append(".b_1+");
+    if (pdg == -10213) m_tauminusdecaymode.append(".b_1-");
+    if (pdg == 333) m_tauminusdecaymode.append(".phi");
+    if (pdg == 20223) m_tauminusdecaymode.append(".f_1");
+    if (pdg == 20213) m_tauminusdecaymode.append(".a_1+");
+    if (pdg == -20213) m_tauminusdecaymode.append(".a_1-");
+    if (pdg == 213) m_tauminusdecaymode.append(".rho+");
+    if (pdg == -213) m_tauminusdecaymode.append(".rho-");
     if (pdg == 113) m_tauminusdecaymode.append(".rho0");
-    if (pdg == 9010221) m_tauminusdecaymode.append(".|f0|");
+    if (pdg == 9010221) m_tauminusdecaymode.append(".f_0");
   }
-//
-  //if (m_printmode>1) B2INFO("TauDecayMode:: PDG inside vec_dau_tauminus = " << pdg << " tauminusdecaymode = " << m_tauminusdecaymode);
 
+  if (m_printmode == "missing") {
 
-
-  if (m_printmode == 5) {
-    if (TauBBBmode(m_tauminusdecaymode, mode_decay) == -1) {nop = nop + 1;}
-    if (TauBBBmode(m_tauminusdecaymode, mode_decay) == -1) {
-      //float per = nop*100/27400;
-      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode, mode_decay));
+    if (TauBBBmode(m_tauminusdecaymode) == -1) {
+      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
       B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " << m_tauminusdecaymode);
-      //B2INFO("No encontrado =" << nop <<" el porcentaje" << per <<"%");
+
     }
   }
 
-  if (m_printmode == 10) B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode, mode_decay));
-  //m_tauminusdecaymode=m_tauminusdecaymode.erase(0,1); // remove the leading dot
-  if (m_printmode == 10) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
-                                  m_tauminusdecaymode);
-  //}
+  if (m_printmode == "all") B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
+  if (m_printmode == "all") B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
+                                     m_tauminusdecaymode);
+
+
   m_tauplusdecaymode = "";
   for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {
     MCParticle* p = MCParticles[vec_dau_tauplus[i]];
@@ -704,94 +667,89 @@ void TauDecayModeModule::event()
     //
     if (m_particle != "" && pdg == pdg_extra) m_tauplusdecaymode.append("." + name);
     //
-    if (pdg ==  16)   m_tauplusdecaymode.append(".nut");
-    if (pdg == -16)   m_tauplusdecaymode.append(".anut");
+    if (pdg ==  16)  m_tauplusdecaymode.append(".nu_tau");
+    if (pdg == -16)  m_tauplusdecaymode.append(".anti-nu_tau");
     //
-    if (pdg ==  11)   m_tauplusdecaymode.append(".e-");
-    if (pdg == -11)   m_tauplusdecaymode.append(".e+");
+    if (pdg ==  11)  m_tauplusdecaymode.append(".e-");
+    if (pdg == -11)  m_tauplusdecaymode.append(".e+");
+
+    if (pdg ==  12)  m_tauplusdecaymode.append(".nu_e");
+    if (pdg == -12)  m_tauplusdecaymode.append(".anti-nu_e");
+
+    if (pdg ==  13)  m_tauplusdecaymode.append(".mu-");
+    if (pdg == -13)  m_tauplusdecaymode.append(".mu+");
+
+    if (pdg ==  14)  m_tauplusdecaymode.append(".nu_mu");
+    if (pdg == -14)  m_tauplusdecaymode.append(".anti-nu_mu");
     //
-    if (pdg ==  12)   m_tauplusdecaymode.append(".nue");
-    if (pdg == -12)   m_tauplusdecaymode.append(".anue");
+    if (pdg == -211) m_tauplusdecaymode.append(".pi-");
+    if (pdg ==  211) m_tauplusdecaymode.append(".pi+");
     //
-    if (pdg ==  13)   m_tauplusdecaymode.append(".mu-");
-    if (pdg == -13)   m_tauplusdecaymode.append(".mu+");
-    //
-    if (pdg ==  14)   m_tauplusdecaymode.append(".numu");
-    if (pdg == -14)   m_tauplusdecaymode.append(".anumu");
-    //
-    if (pdg == -211)  m_tauplusdecaymode.append(".pi-");
-    if (pdg ==  211)  m_tauplusdecaymode.append(".pi+");
-    //
-    if (pdg == -321)  m_tauplusdecaymode.append(".K-");
-    if (pdg ==  321)  m_tauplusdecaymode.append(".K+");
+    if (pdg == -321) m_tauplusdecaymode.append(".K-");
+    if (pdg ==  321) m_tauplusdecaymode.append(".K+");
     //
     if (pdg == 311) m_tauplusdecaymode.append(".K0");
-    if (pdg == -311) m_tauplusdecaymode.append(".K0bar");
-    //
-    if (pdg == -2212) m_tauplusdecaymode.append(".apro-");
-    if (pdg ==  2212) m_tauplusdecaymode.append(".pro+");
-    //
-    if (pdg == 111)   m_tauplusdecaymode.append(".pi0");
-    if (pdg == 310)   m_tauplusdecaymode.append(".K0S");
-    if (pdg == 130)   m_tauplusdecaymode.append(".K0L");
-    if (pdg == 22)    m_tauplusdecaymode.append(".gamma");
-    //
-    if (pdg == 3122) m_tauplusdecaymode.append(".lambda");
-    if (pdg == -3122) m_tauplusdecaymode.append(".lmbbar");
-    if (pdg == 10311) m_tauplusdecaymode.append(".kstar");
-    if (pdg == -10311) m_tauplusdecaymode.append(".kstarbr");
-    if (pdg == 331) m_tauplusdecaymode.append(".etapr");
+    if (pdg == -311) m_tauplusdecaymode.append(".anti-K0");
 
-    //test with resonances
-    if (pdg == 221) m_tauplusdecaymode.append(".|eta|");
-    if (pdg == 223) m_tauplusdecaymode.append(".|omega|");
-    if (pdg == 323) m_tauplusdecaymode.append(".|kstarp|");
-    if (pdg == -323) m_tauplusdecaymode.append(".|kstarm|");
-    if (pdg == 9000111) m_tauplusdecaymode.append(".|a0|");
-    if (pdg == 9000211) m_tauplusdecaymode.append(".|a0p|");
-    if (pdg == -9000211) m_tauplusdecaymode.append(".|a0m|");
-    if (pdg == 10213) m_tauplusdecaymode.append(".|b1p|");
-    if (pdg == -10213) m_tauplusdecaymode.append(".|b1m|");
-    if (pdg == 333) m_tauplusdecaymode.append(".|phi|");
-    if (pdg == 20223) m_tauplusdecaymode.append(".|f1|");
-    if (pdg == 20213) m_tauplusdecaymode.append(".|a1p|");
-    if (pdg == -20213) m_tauplusdecaymode.append(".|a1m|");
-    if (pdg == 213) m_tauplusdecaymode.append(".|rhop|");
-    if (pdg == -213) m_tauplusdecaymode.append(".|rhom|");
-    if (pdg == 113) m_tauplusdecaymode.append(".|rho0|");
-    if (pdg == 9010221) m_tauplusdecaymode.append(".|f0|");
+    if (pdg == -2212)m_tauplusdecaymode.append(".anti-p-");
+    if (pdg ==  2212)m_tauplusdecaymode.append(".p+");
+
+    if (pdg == 111)  m_tauplusdecaymode.append(".pi0");
+    if (pdg == 310)  m_tauplusdecaymode.append(".K_S0");
+    if (pdg == 130)  m_tauplusdecaymode.append(".K_L0");
+    if (pdg == 22)   m_tauplusdecaymode.append(".gamma");
     //
-    //if (m_printmode>1) B2INFO("TauDecayMode:: PDG inside vec_dau_tauplus = " << pdg << "  m_tauplusdecaymode = " <<  m_tauplusdecaymode);
+    if (pdg == 3122) m_tauplusdecaymode.append(".Lambda0");
+    if (pdg == -3122) m_tauplusdecaymode.append(".anti-Lambda0");
+    if (pdg == 10311) m_tauplusdecaymode.append(".K_0*0");
+    if (pdg == -10311) m_tauplusdecaymode.append(".anti-K_0*0");
+    if (pdg == 331) m_tauplusdecaymode.append(".eta'");
+
+
+    if (pdg == 221) m_tauplusdecaymode.append(".eta");
+    if (pdg == 223) m_tauplusdecaymode.append(".omega");
+    if (pdg == 323) m_tauplusdecaymode.append(".K*+");
+    if (pdg == -323) m_tauplusdecaymode.append(".K*-");
+    if (pdg == 9000111) m_tauplusdecaymode.append(".a00");
+    if (pdg == 9000211) m_tauplusdecaymode.append(".a_0+");
+    if (pdg == -9000211) m_tauplusdecaymode.append(".a_0-");
+    if (pdg == 10213) m_tauplusdecaymode.append(".b_1+");
+    if (pdg == -10213) m_tauplusdecaymode.append(".b_1-");
+    if (pdg == 333) m_tauplusdecaymode.append(".phi");
+    if (pdg == 20223) m_tauplusdecaymode.append(".f_1");
+    if (pdg == 20213) m_tauplusdecaymode.append(".a_1+");
+    if (pdg == -20213) m_tauplusdecaymode.append(".a_1-");
+    if (pdg == 213) m_tauplusdecaymode.append(".rho+");
+    if (pdg == -213) m_tauplusdecaymode.append(".rho-");
+    if (pdg == 113) m_tauplusdecaymode.append(".rho0");
+    if (pdg == 9010221) m_tauplusdecaymode.append(".f_0");
     //
-    //if(m_printmode==10) B2INFO("TauDecayMode:: Decay mode is ="<<TauBBBmode(m_tauplusdecaymode));
+
 
   }
-  if (m_printmode == 5) {
-    if (TauBBBmode(m_tauplusdecaymode, mode_decay) == -1) {
-      //float per = nop*100/27400;
-      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode, mode_decay));
-      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau+ -> " << m_tauminusdecaymode);
-      //B2INFO("No encontrado =" << nop <<" el porcentaje" << per <<"%");
+  if (m_printmode == "missing") {
+    if (TauBBBmode(m_tauplusdecaymode) == -1) {
+      B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
+      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau+ -> " << m_tauplusdecaymode);
     }
   }
-  //m_tauplusdecaymode = m_tauplusdecaymode.erase(0,1); // remove the leading dot
-  if (m_printmode == 10) B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode, mode_decay));
-  if (m_printmode == 10) B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
-                                  m_tauplusdecaymode);
+
+  if (m_printmode == "all") B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
+  if (m_printmode == "all") B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
+                                     m_tauplusdecaymode);
 
   //
 
-  m_mmode = TauBBBmode(m_tauminusdecaymode, mode_decay);
-  m_pmode = TauBBBmode(m_tauplusdecaymode, mode_decay);
+  m_mmode = TauBBBmode(m_tauminusdecaymode);
+  m_pmode = TauBBBmode(m_tauplusdecaymode);
   if (m_mmode == -1) {
     taum_no = taum_no - 1;
     m_mmode = taum_no;
   }
   if (m_pmode == -1) {
     taup_no = taup_no - 1;
-    m_mmode = taup_no;
+    m_pmode = taup_no;
   }
-
 
   m_tauDecay->addTauMinusIdMode(m_mmode);
   m_tauDecay->addTauPlusIdMode(m_pmode);
@@ -799,12 +757,10 @@ void TauDecayModeModule::event()
   m_tauDecay->addTauPlusMcProng(m_pprong);
   m_tauDecay->addTauMinusMcProng(m_mprong);
 
-
-
   EventNumber = EventNumber + 1;
   //
 }
-//
+
 void TauDecayModeModule::terminate()
 {
 }
@@ -841,8 +797,6 @@ double TauDecayModeModule::getEnergyTauRestFrame(const MCParticle* p, const int 
   }
   //
   TLorentzVector mom_4vecLAB(0.0, 0.0, 0.0, 0.0);
-  //
-  StoreArray<MCParticle> MCParticles;
   for (int i = 0; i < MCParticles.getEntries(); i++) {
     MCParticle* m = MCParticles[i];
     if (m->getStatus() == 1 && m->getPDG() == -15 * ichg) {
@@ -897,8 +851,8 @@ int TauDecayModeModule::getProngOfDecay(const MCParticle& p)
 }
 
 
-
-int TauDecayModeModule::TauBBBmode(string state, map<string, int> tau_map)
+//
+int TauDecayModeModule::TauBBBmode(string state)
 {
   string dem = ".";
   std::vector<std::string> x = parseString(state, dem);
@@ -909,29 +863,38 @@ int TauDecayModeModule::TauBBBmode(string state, map<string, int> tau_map)
     string mode = itr-> first;
     std::vector<std::string> y = parseString(itr -> first, dem);
     int b = y.size();
+    int j;
+    int val = 0;
+    for (j = 0; j != b; ++j) {
+      if (state.find(y[j]) == string::npos) {
+        val = val + 1;
+        break;
+      }
+    }
     std::set<std::string> const uniques(x.begin(), x.end());
     x.assign(uniques.begin(), uniques.end());
     int count = 0;
     int nein = 0;
-    for (i = 0 ; i != x.size(); ++i) {
+    for (i = 0 ; i != (int)x.size(); ++i) {
       int pos = 0;
       int index;
 
-      if ((index = mode.find(x[i], pos)) == string::npos) {
+      if ((index = mode.find(x[i], pos)) == (int)string::npos) {
         nein = nein + 1;
       } else {
-        while ((index = mode.find(x[i], pos)) != string::npos) {
+        while ((index = mode.find(x[i], pos)) != (int)string::npos) {
           if (x[i] != "") {count = count + 1;}
 
-          if ((index = mode.find(x[i], pos)) == string::npos) {
+          if ((index = mode.find(x[i], pos)) == (int)string::npos) {
             break;
           }
           pos = index + 1;
         }
       }
     }
-    if ((b == r) & (b - 1 == count) & (nein == 0)) {
-      return itr -> second;
+    if ((b == r) & (b - 1 == count) & (nein == 0) & (val == 0)) {
+      int tau_mode = itr-> second;
+      return tau_mode;
       break;
     }
 

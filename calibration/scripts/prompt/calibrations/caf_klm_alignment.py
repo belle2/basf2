@@ -23,16 +23,21 @@ from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
 # Expert configuration:
 # "required_events" : number of events in basf2 files selected for processing.
 # "millepede_entries" : minimal number of Millepede entries.
-settings = CalibrationSettings(name="KLM alignmnent",
-                               expert_username="chilikin",
-                               description=__doc__,
-                               input_data_formats=["raw"],
-                               input_data_names=["raw_physics", "raw_cosmic"],
-                               depends_on=[vxdcdc_alignment],
-                               expert_config={
-                                    "required_events": 5000000,
-                                    "millepede_entries": 500000
-                               })
+settings = CalibrationSettings(
+    name="KLM alignmnent",
+    expert_username="chilikin",
+    description=__doc__,
+    input_data_formats=["raw"],
+    input_data_names=["raw_physics", "raw_cosmic"],
+    input_data_filters={
+        'raw_physics': ['mumutight_calib', 'physics', 'Good']
+        'raw_cosmic': ['cosmic_calib', 'physics', 'Good']
+    },
+    depends_on=[vxdcdc_alignment],
+    expert_config={
+        "required_events": 5000000,
+        "millepede_entries": 500000
+    })
 
 
 ##############################

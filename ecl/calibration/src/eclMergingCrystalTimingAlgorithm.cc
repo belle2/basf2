@@ -26,7 +26,7 @@ eclMergingCrystalTimingAlgorithm::eclMergingCrystalTimingAlgorithm(): Calibratio
 CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 {
   //------------------------------------------------------------------------
-  // Get the input run list (should be only 1) for us to use to update the DBObjectPtrs
+  // Get the input run list to use to update the DBObjectPtrs
   auto runs = getRunList();
   /* Take the first run.  For the crystal cosmic calibrations, because of the crate
      calibrations, there is not a known correct run to use within the range. */

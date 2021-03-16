@@ -5,8 +5,7 @@
 
 from prompt import CalibrationSettings
 from reconstruction import prepare_cdst_analysis
-from caf.utils import IoV
-
+from caf.utils import IoV, ExpRun
 
 ##############################
 # REQUIRED VARIABLE #
@@ -78,9 +77,7 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     # Set up config options
 
-    from caf.strategies import SimpleRunByRun
-    from caf.strategies import SingleIOV
-    from caf.strategies import SequentialBoundaries
+    from caf.strategies import SimpleRunByRun, SingleIOV, SequentialBoundaries
     import numpy as np
 
     # In this script we want to use one sources of input data.
@@ -111,6 +108,10 @@ def get_calibrations(input_data, **kwargs):
     input_files_bhabha = list(reduced_file_to_iov_bhabha.keys())
     basf2.B2INFO(f"Total number of bhabha files actually used as input for crates = {len(input_files_bhabha)}")
 
+    reduced_file_to_iov_bhabha_1perRun = filter_by_max_files_per_run(file_to_iov_bhabha, 1)
+    input_files_bhabha_1perRun = list(reduced_file_to_iov_bhabha_1perRun.keys())
+    basf2.B2INFO(f"Total number of bhabha files actually used for dummy collectors = {len(input_files_bhabha_1perRun)}")
+
     input_files_bhabha_full = list(file_to_iov_bhabha.keys())
     basf2.B2INFO(f"Total number of bhabha files as input for crystals = {len(input_files_bhabha_full)}")
 
@@ -130,11 +131,20 @@ def get_calibrations(input_data, **kwargs):
     numCrysCrateIterations = expert_config["numCrysCrateIterations"]
     print("expert_config:  numCrysCrateIterations = ", numCrysCrateIterations)
 
+    # Interval of validity for the calibrations
+    intermediate_iov = IoV(0, 0, -1, -1)
+    requested_iov = kwargs.get("requested_iov", None)
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
+
     # Determine the user defined calibration boundaries.  Most useful
     # for when multiple experiments are processed at the same time.
     # Useful for the crystal calibrations but not for the crate
     # calibrations, which are done run-by-run.
-    payload_boundaries = expert_config["payload_boundaries"]
+    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+
+    # payload_boundaries = expert_config["payload_boundaries"] # guessed !!!
     print("expert_config:  payload_boundaries = ", payload_boundaries)
 
     ###################################################
@@ -227,12 +237,6 @@ def get_calibrations(input_data, **kwargs):
         calibs = []
 
         # --------------------------------------------------------------
-        # Interval of validity for the calibrations
-        intermediate_iov = IoV(0, 0, -1, -1)
-        requested_iov = kwargs.get("requested_iov", None)
-        output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-
-        # --------------------------------------------------------------
         # Loop over all the iterations to set up the crate and crystal
         # calibrations.
 
@@ -272,23 +276,21 @@ def get_calibrations(input_data, **kwargs):
             ###################################################
             # Setup for merging crystals payloads
             merging_alg_i = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
+
             cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector", algorithms=[merging_alg_i],
-                                          input_files=input_files_bhabha[:1])
+                                          input_files=input_files_bhabha_1perRun)
 
             cal_ecl_merge_i.save_payloads = False
             ecl_merge_pre_path_i = basf2.create_path()
             prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
             ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
 
-
-#             if i == numCrysCrateIterations - 1:
-#                 # The final crystal payload is given the user's iov
-#                 for algorithm in cal_ecl_merge_i.algorithms:
-#                     algorithm.params = {"apply_iov": output_iov}
-#             else:
-#                 # Force the output iovs to be open
-#                 for algorithm in cal_crystals_i.algorithms:
-#                     algorithm.params = {"apply_iov": intermediate_iov}
+            # If payload boundaries are set use SequentialBoundaries
+            # otherwise use SingleIOV
+            if payload_boundaries:
+                cal_ecl_merge_i.strategies = SequentialBoundaries
+            else:
+                cal_ecl_merge_i.strategies = SingleIOV
 
             # Modify the iov for each of the calibration algorithms
             for algorithm in cal_crystals_i.algorithms:
@@ -550,7 +552,7 @@ def get_calibrations(input_data, **kwargs):
         cal_crystals_1.add_collection(name="bhabha", collection=eclTCol_crys)
         cal_crystals_1.algorithms = [eclTAlgCrystals]
 
-        # Two payloads are created here:
+        # Two sets of payloads are created here:
         #    * ECLCrystalTimeOffset
         #    * ECLCrystalTimeOffsetBhabha
         # We technically want to save ECLCrystalTimeOffsetBhabha to the GT but because we don't want
@@ -564,7 +566,6 @@ def get_calibrations(input_data, **kwargs):
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
         # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-        # cal_crystals_1.strategies = SingleIOV
         # If payload boundaries are set use SequentialBoundaries
         # otherwise use SingleIOV
         if payload_boundaries:
@@ -589,8 +590,9 @@ def get_calibrations(input_data, **kwargs):
         # It doesn't matter which input file we choose as the output is never used.
 
         merging_alg = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
+
         cal_ecl_merge = Calibration(name="ecl_t_merge", collector="DummyCollector", algorithms=[merging_alg],
-                                    input_files=input_files_bhabha[:1])
+                                    input_files=input_files_bhabha_1perRun)
 
         # The important part is that we depend on all the calibrations we previously ran
         cal_ecl_merge.depends_on(cal_crystals_1)
@@ -600,16 +602,12 @@ def get_calibrations(input_data, **kwargs):
         prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
         ecl_merge_pre_path.pre_collector_path = ecl_merge_pre_path
 
-        # --------------------------------------------------------------
-        # ..Force the output iovs to be open
-        intermediate_iov = IoV(0, 0, -1, -1)
-        requested_iov = kwargs.get("requested_iov", None)
-        output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-
-        # for algorithm in cal_crystals_1.algorithms:
-        #     algorithm.params = {"apply_iov": intermediate_iov}
-        # for algorithm in cal_ecl_merge.algorithms:
-        #     algorithm.params = {"apply_iov": output_iov}
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            cal_ecl_merge.strategies = SequentialBoundaries
+        else:
+            cal_ecl_merge.strategies = SingleIOV
 
         # Modify the iov for each of the algorithms
         for algorithm in cal_crystals_1.algorithms:

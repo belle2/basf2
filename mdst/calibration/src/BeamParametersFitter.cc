@@ -235,7 +235,8 @@ void BeamParametersFitter::fit()
   s_AngleError = m_AngleError;
   s_UseMomentum = m_UseMomentum;
   TMinuit minuit(6);
-  //minuit.SetPrintLevel(-1);
+  if (!m_Verbose)
+    minuit.SetPrintLevel(-1);
   minuit.SetFCN(fcn);
   if (m_UseMomentum) {
     minuit.mnparm(0, "PHER_X", 0, 0.01, 0, 0, minuitResult);
@@ -284,8 +285,8 @@ void BeamParametersFitter::fit()
       pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
   cosThetaX = cos(lerThetaX);
   sinThetaX = sin(lerThetaX);
-  cosThetaY = cos(lerThetaY);
-  sinThetaY = sin(lerThetaY);
+  cosThetaY = cos(lerThetaY + M_PI);
+  sinThetaY = sin(lerThetaY + M_PI);
   double lerPartial =
     (pBeam.E() - pLER.E() / pLER.Vect().Mag() *
      (pBeam.Px() * cosThetaX * sinThetaY - pBeam.Py() * sinThetaX +

@@ -87,8 +87,6 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
 
   double sum_magnitude_mom = 0.;
   double thrust = 0.;
-  double trial_thrust;
-  double trial_mag;
 
   /*
     STEP 2: Parse momenta vector to compute magnitude Σ(||p_i||)
@@ -103,6 +101,9 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
   */
 
   for (auto const& mom : momenta) {
+    double trial_thrust;
+    double trial_mag;
+
     // By convention, thrust axis in same direction as Z axis
     trial_axis = (mom.z() >= 0.) ? TVector3(mom) : TVector3(-mom);
 

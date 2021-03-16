@@ -19,6 +19,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <memory>
 
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -175,10 +176,18 @@ void SoftwareTriggerResultPrinterModule::event()
     m_passedEventsPerTrigger["final_decision"][SoftwareTriggerCutResult::c_reject]++;
   }
 
-  const bool l1Accepted = m_l1Result->test();
-  if (l1Accepted) {
-    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_accept]++;
+  if (m_l1Result.isValid()) {
+    const bool l1Accepted = m_l1Result->test();
+    if (l1Accepted) {
+      m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_accept]++;
+    } else {
+      m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
+    }
   } else {
-    m_passedEventsPerTrigger["l1_decision"][SoftwareTriggerCutResult::c_reject]++;
+    if (m_eventMetaDataPtr)
+      B2WARNING("Uncaught exception encountered: Trying to access StoreObjPtr object 'TRGSummary' (durability: event), which was not created in exp/run/evt: "
+                << LogVar("exp", m_eventMetaDataPtr->getExperiment())
+                << LogVar("run", m_eventMetaDataPtr->getRun())
+                << LogVar("event", m_eventMetaDataPtr->getEvent()));
   }
 }

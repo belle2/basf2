@@ -25,6 +25,7 @@
 // KFit
 #include <analysis/VertexFitting/KFit/MassFitKFit.h>
 #include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
 #include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
@@ -85,6 +86,8 @@ namespace Belle2 {
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
+    std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
+    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine
@@ -131,6 +134,13 @@ namespace Belle2 {
     bool doKFourCFit(Particle* p);
 
     /**
+     * MassFourC fit using KFit
+     * @param p pointer to particle
+     * @return true for successful fit
+     */
+    bool doKMassFourCFit(Particle* p);
+
+    /**
      * Update mother particle after unconstrained vertex fit using KFit
      * @param kv reference to KFit VertexFit object
      * @param p pointer to particle
@@ -171,6 +181,14 @@ namespace Belle2 {
     bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
 
     /**
+     * Update mother particle after MassFourC fit using KFit
+     * @param kv reference to KFit MassFit object
+     * @param p pointer to particle
+     * @return true for successful construction of mother
+     */
+    bool makeMassKFourCMother(analysis::MassFourCFitKFit& kv, Particle* p);
+
+    /**
      * update the map of daughter and tracks, find out which tracks belong to each daughter.
      * @param l represent the tracks ID
      * @param pars map of all parameters
@@ -187,6 +205,14 @@ namespace Belle2 {
      * @param particle pointer to particle
      */
     bool addChildofParticletoKFit(analysis::FourCFitKFit& kv, const Particle* particle);
+
+    /**
+     * Adds given particle's child to the MassFourCFitKFit.
+     * @param kf reference to KFit FourCFit object
+     * @param particle pointer to particle
+     * @param particleId vector of daughters track id
+     */
+    bool addChildofParticletoMassKFit(analysis::MassFourCFitKFit& kf, const Particle* particle, std::vector<unsigned>& particleId);
 
     /**
      * Adds IPProfile constraint to the vertex fit using KFit.

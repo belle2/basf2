@@ -42,12 +42,12 @@ class SVDValidationTTreeStrip(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeStrip, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeStrip.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventDataStrip class
         self.data = EventDataStrip()
-        '''Instance of the EventDataStrip class'''
 
         # Declare tree branches
         for key in EventDataStrip.__dict__:

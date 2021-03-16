@@ -5,8 +5,6 @@
 Plot content of dbstore_CDCAlignment...root DB payload file
 """
 import sys
-import numpy as np
-import math
 
 import ROOT
 from ROOT import Belle2

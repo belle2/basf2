@@ -96,7 +96,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
         mc_pt = mc_particle.getMomentum().Pt()
         mc_theta = mc_particle.getMomentum().Theta()
 
-        reco_tracks = Belle2.PyStoreArray('RecoTracks')
+        # reco_tracks = Belle2.PyStoreArray('RecoTracks')
 
         this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRRecoTrack(mc_track)
         this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRRecoTrack(mc_track)

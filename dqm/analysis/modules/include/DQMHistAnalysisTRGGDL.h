@@ -13,8 +13,14 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
+
 
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>
@@ -178,6 +184,11 @@ namespace Belle2 {
     double m_limit_high_shifter[n_eff_shifter] = {
       0.9, 0.9, 0.9, 0.9, 1.0, 1.0, 0.2
     }; /**<upper limit value in each bin*/
+
+#ifdef _BELLE2_EPICS
+    chid mychid[n_eff_shifter];// hard limit max 10 parameters
+#endif
+
   };
 
 } // Belle2 namespace

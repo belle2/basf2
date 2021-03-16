@@ -30,7 +30,7 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-  class PXDDAQDHEStatus {
+  class PXDDAQDHEStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -49,6 +49,9 @@ namespace Belle2 {
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
       m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
+
+    /** destructor */
+    virtual ~PXDDAQDHEStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable

@@ -150,7 +150,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
 
         plt.plot(plot_dedx_data, self.dedx_estimator_function(plot_dedx_data), color="black", label="Fitted estimator")
         if self.use_sigma_for_result_fitting:
-            color = "black"
+            # color = "black"
             plt.errorbar(result_df.dedx_bin_center, result_df.mu, marker="o", ls="", label="Data Points", yerr=result_df.sigma)
 
         plt.ylim(0, 0.14)

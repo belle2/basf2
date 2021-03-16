@@ -415,7 +415,7 @@ void SVDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
+  if (m_currentHit->getPDGcode() == Const::photon.getPDGCode() || trackLength < 0.1 * Unit::um) {
     //Photons deposit energy at the end of their step
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::electron);
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::hole);
@@ -749,7 +749,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0));
+      storeShaperDigits.appendNew(sensorID, true, iStrip, rawSamples, 0);
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -830,7 +830,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0));
+      storeShaperDigits.appendNew(sensorID, false, iStrip, rawSamples, 0);
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {

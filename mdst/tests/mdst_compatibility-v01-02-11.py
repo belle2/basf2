@@ -18,6 +18,11 @@ CHANGES since release-01-02-11:
 - TrackFitResult:
   + ndf
   + chi2
+- TRGSummary:
+  + getTimQuality added
+  + isPoissonInInjectionVeto()
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity

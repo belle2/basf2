@@ -2,30 +2,24 @@
 # -*- coding: utf-8 -*-
 
 # illustrative run:
-# basf2 svdDQMAnalysisEfficiency.py dqm_e0014r000921.root 100
+# basf2 svdDQMAnalysisExample.py dqm_e0014r000921.root 1
 
-from basf2 import *
+import basf2 as b2
 import sys
 import re
-from basf2 import conditions as b2conditions
 
-mypath = Path()
+mypath = b2.Path()
 inputFile = sys.argv[1]
 exp_nr = int(re.findall(r'\d+', inputFile)[0])
 run_nr = int(re.findall(r'\d+', inputFile)[1])
 nevt = int(sys.argv[2])  # number of events
 
 # setup database
-b2conditions.reset()
-b2conditions.override_globaltags()
-b2conditions.globaltags = [
-    'klm_alignment_testing',
-    'data_reprocessing_proc11',
-    "data_reprocessing_prompt",
-    "online_proc11",
-    "Reco_master_patch_rel5"]
+b2.conditions.reset()
+b2.conditions.override_globaltags()
+b2.conditions.globaltags = ["online"]
 
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', inputFile)
 inroot.param('SelectHistograms', ['SVD*/*'])
 inroot.param('Experiment', exp_nr)
@@ -33,20 +27,10 @@ inroot.param('RunList', [run_nr])
 inroot.param('EventsList', [nevt])
 mypath.add_module(inroot)
 
-mypath.add_module('Gearbox')
-mypath.add_module('Geometry')
+dqmSVD = b2.register_module('DQMHistAnalysisSVDOnMiraBelle')
+mypath.add_module(dqmSVD)
 
-dqmEff = register_module('DQMHistAnalysisSVDEfficiency')
-dqmEff.set_log_level(LogLevel.INFO)
-dqmEff.param("printCanvas", True)
-mypath.add_module(dqmEff)
-
-dqmGen = register_module('DQMHistAnalysisSVDGeneral')
-dqmGen.set_log_level(LogLevel.INFO)
-dqmGen.param("printCanvas", True)
-mypath.add_module(dqmGen)
-
-outroot = register_module('DQMHistAnalysisOutputMonObj')
+outroot = b2.register_module('DQMHistAnalysisOutputMonObj')
 outroot.param('ProcID', 'online')  # set processing ID
 outroot.param('exp', exp_nr)
 outroot.param('run', run_nr)
@@ -54,8 +38,8 @@ outroot.param('nevt', nevt)
 mypath.add_module(outroot)
 
 # Process the events
-print_path(mypath)
-process(mypath)
+b2.print_path(mypath)
+b2.process(mypath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

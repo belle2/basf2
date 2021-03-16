@@ -8,7 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 ################
 import sys  # get argv
 import re
@@ -21,45 +21,45 @@ if argc == 2:
     f_in_root = argvs[1]
 
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-main = create_path()
+main = b2.create_path()
 
 # input
 if f_in_root[-6:] == ".sroot":
     rootfiletype = "sroot"
-    input = register_module('SeqRootInput')
-    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
-    basename = re.sub('\.sroot$', '', matchobj.group())
+    input = b2.register_module('SeqRootInput')
+    matchobj = re.search("([^\\/]+)\\.sroot", f_in_root)
+    basename = re.sub('\\.sroot$', '', matchobj.group())
 if f_in_root[-5:] == ".root":
     rootfiletype = "root"
-    input = register_module('RootInput')
-    matchobj = re.search("([^\/]+)\.root", f_in_root)
-    basename = re.sub('\.root$', '', matchobj.group())
+    input = b2.register_module('RootInput')
+    matchobj = re.search("([^\\/]+)\\.root", f_in_root)
+    basename = re.sub('\\.root$', '', matchobj.group())
 
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param("outputFileName", "trgsum/trgsum.%s.root" % basename)
 if not os.path.isdir('trgsum'):
     os.mkdir('trgsum')
 
 # Unpacker
-trggdlUnpacker = register_module("TRGGDLUnpacker")
+trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
 
 #
-trggdlsummary = register_module('TRGGDLSummary')
+trggdlsummary = b2.register_module('TRGGDLSummary')
 main.add_module(trggdlsummary)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 main.add_module(output, branchNames=["TRGSummary"])
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

@@ -20,12 +20,20 @@ from prompt.utils import events_in_basf2_file
 from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
 
 #: Tells the automated system some details of this script
+# Expert configuration:
+# "required_events" : number of events in basf2 files selected for processing.
+# "millepede_entries" : minimal number of Millepede entries.
 settings = CalibrationSettings(name="KLM alignmnent",
                                expert_username="chilikin",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],
-                               depends_on=[vxdcdc_alignment])
+                               depends_on=[vxdcdc_alignment],
+                               expert_config={
+                                    "required_events": 5000000,
+                                    "millepede_entries": 500000
+                               })
+
 
 ##############################
 
@@ -117,6 +125,9 @@ def get_calibrations(input_data, **kwargs):
     """
     # Set up config options
 
+    # Expert configuration.
+    expert_config = kwargs.get("expert_config")
+
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_physics = input_data["raw_physics"]
@@ -127,7 +138,7 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_cosmic = collections.OrderedDict()
     select_input_files(file_to_iov_physics, file_to_iov_cosmic,
                        reduced_file_to_iov_physics, reduced_file_to_iov_cosmic,
-                       5000000)
+                       expert_config["required_events"])
 
     input_files_physics = sorted(list(reduced_file_to_iov_physics.keys()))
     basf2.B2INFO(f"Total number of 'physics' files actually used as input = {len(input_files_physics)}")
@@ -190,7 +201,7 @@ def get_calibrations(input_data, **kwargs):
         index.increment()
 
     cal_klm = millepede.create('KLMAlignment', [])
-    millepede.algo.setMinEntries(500000)
+    millepede.algo.setMinEntries(expert_config["millepede_entries"])
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
 
@@ -222,7 +233,7 @@ def get_calibrations(input_data, **kwargs):
                                        input_files=input_files_cosmic,
                                        pre_collector_path=rec_path_cosmic)
 
-        cal_klm.add_collection(name="cosmic",  collection=collection_cosmic)
+        cal_klm.add_collection(name="cosmic", collection=collection_cosmic)
 
     #####
     # Algorithm step config
@@ -254,17 +265,17 @@ def get_collector(input_data_name):
 
     if input_data_name == "raw_physics":
         return basf2.register_module(
-                   'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment',
-                               'EKLMSegmentAlignment'],
-                   useGblTree=True,
-                   minPValue=1e-5)
+            'MillepedeCollector',
+            components=['BKLMAlignment', 'EKLMAlignment',
+                        'EKLMSegmentAlignment'],
+            useGblTree=True,
+            minPValue=1e-5)
     elif input_data_name == "raw_cosmic":
         return basf2.register_module(
-                   'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment',
-                               'EKLMSegmentAlignment'],
-                   useGblTree=True,
-                   minPValue=1e-5)
+            'MillepedeCollector',
+            components=['BKLMAlignment', 'EKLMAlignment',
+                        'EKLMSegmentAlignment'],
+            useGblTree=True,
+            minPValue=1e-5)
 
     raise Exception("Unknown input data name used when setting up collector")

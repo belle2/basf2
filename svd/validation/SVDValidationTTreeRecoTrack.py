@@ -44,12 +44,12 @@ class SVDValidationTTreeRecoTrack(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoTrack, self).__init__()
+        #: output root file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoTrack.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataRecoTrack()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoTrack.__dict__:

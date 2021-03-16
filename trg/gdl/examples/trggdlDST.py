@@ -8,7 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 ################
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -19,36 +19,36 @@ if argc == 2:
     f_in_root = argvs[1]
 
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-main = create_path()
+main = b2.create_path()
 
 # input
 if f_in_root[-6:] == ".sroot":
     rootfiletype = "sroot"
-    input = register_module('SeqRootInput')
+    input = b2.register_module('SeqRootInput')
 if f_in_root[-5:] == ".root":
     rootfiletype = "root"
-    input = register_module('RootInput')
+    input = b2.register_module('RootInput')
 
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
 # Unpacker
-trggdlUnpacker = register_module("TRGGDLUnpacker")
+trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
 
 # Fill DST
-trggdldst = register_module('TRGGDLDST')
+trggdldst = b2.register_module('TRGGDLDST')
 main.add_module(trggdldst)
 
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param("outputFileName", "gdldst.root")
 main.add_module(output, branchNames=["TRGGDLDST"])
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

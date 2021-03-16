@@ -16,7 +16,7 @@ import sys
 # read parameters
 
 argvs = sys.argv
-if len(argvs) is not 5:
+if len(argvs) != 5:
     print('usage: basf2', argvs[0],
           '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()

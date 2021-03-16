@@ -13,8 +13,10 @@
  to create summaries for a FEI training or application.
 """
 
-
-from generators import get_default_decayfile
+try:
+    from generators import get_default_decayfile
+except ModuleNotFoundError:
+    print("MonitoringBranchingFractions won't work.")
 from basf2_mva_evaluation import plotting
 import basf2_mva_util
 import pickle

@@ -13,10 +13,8 @@ b2.set_log_level(b2.LogLevel.ERROR)
 # globalTag = 'vxd_commissioning_20181030'
 globalTag = 'data_reprocessing_prompt'
 
-b2.reset_database()
-b2.use_database_chain()
-b2.use_central_database(globalTag, b2.LogLevel.WARNING)
-b2.use_local_database("localdb/database.txt", "localdb")
+b2.conditions.prepend_globaltag(globalTag)
+b2.conditions.prepend_testing_payloads("localdb/database.txt")
 
 
 gearbox = b2.register_module('Gearbox')

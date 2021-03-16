@@ -10,10 +10,11 @@ Plot (mis)alignment of PXD and SVD
 import numpy as np
 import pandas as pd
 import math
-from pylab import *
+from pylab import savefig, subplot
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import matplotlib as mpl
+import sys
 
 
 import ROOT

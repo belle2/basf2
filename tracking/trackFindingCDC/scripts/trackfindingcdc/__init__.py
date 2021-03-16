@@ -1,7 +1,7 @@
 # Loading some common libraries
-from ROOT import std
-from ROOT import Belle2  # make Belle2 namespace available
-import basf2
+from ROOT import std  # noqa
+from ROOT import Belle2  # make Belle2 namespace available # noqa
+import basf2  # noqa
 from ROOT import gSystem
 gSystem.Load('libcdc')
 gSystem.Load('libtracking')

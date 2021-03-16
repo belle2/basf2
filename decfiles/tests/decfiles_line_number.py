@@ -5,13 +5,12 @@
 # (including comments).
 
 import re
-
-from ROOT import Belle2
+import basf2
 from ROOT.Belle2 import EvtGenDatabasePDG
 
 database = EvtGenDatabasePDG.Instance()
 
-f = open(Belle2.FileSystem.findFile('decfiles/dec/DECAY_BELLE2.DEC'))
+f = open(basf2.find_file('decfiles/dec/DECAY_BELLE2.DEC'))
 decfile_lines = f.readlines()
 f.close()
 

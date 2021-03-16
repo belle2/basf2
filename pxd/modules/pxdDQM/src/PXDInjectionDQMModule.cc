@@ -134,6 +134,19 @@ void PXDInjectionDQMModule::defineHisto()
       }
     }
   }
+
+//   hTrigAfterInjLER = new TH2F("TrigAfterInjLER",
+//                               "Triggers for LER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+//                               5120 / 508.);
+//   hTrigAfterInjHER = new TH2F("TrigAfterInjHER",
+//                               "Triggers for HER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+//                               5120 / 508.);
+
+  hTriggersAfterTrigger = new TH1I("PXDTriggersAfterLast",
+                                   "PXD Trigger after Last Trigger;Time diff in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
+  hTriggersPerBunch = new TH1I("PXDTriggerBunch", "PXD Trigger per Bunch;Bunch/4;Triggers", 1280, 0, 1280);
+
+
   // cd back to root directory
   oldDir->cd();
 }
@@ -166,6 +179,10 @@ void PXDInjectionDQMModule::beginRun()
   for (auto& a : hMaxOccModAfterInjHER) if (a.second) a.second->Reset();
   for (auto& a : hOccModAfterInjLERGate) if (a.second) a.second->Reset();
   for (auto& a : hOccModAfterInjHERGate) if (a.second) a.second->Reset();
+//   hTrigAfterInjLER->Reset();
+//   hTrigAfterInjHER->Reset();
+  hTriggersAfterTrigger->Reset();
+  hTriggersPerBunch->Reset();
 }
 
 void PXDInjectionDQMModule::event()
@@ -177,6 +194,9 @@ void PXDInjectionDQMModule::event()
             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
     // get last injection time
+    hTriggersAfterTrigger->Fill(it.GetTimeSincePrevTrigger(0) / 127.);
+    hTriggersPerBunch->Fill(it.GetBunchNumber(0));
+
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
@@ -198,6 +218,7 @@ void PXDInjectionDQMModule::event()
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(diff2, all);
         hEOccAfterInjHER->Fill(diff2);
+//         hTrigAfterInjHER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
         if (m_createMaxHist) {
           auto bin = hMaxOccAfterInjHER->FindBin(diff2);
           auto value = hMaxOccAfterInjHER->GetBinContent(bin);
@@ -232,6 +253,7 @@ void PXDInjectionDQMModule::event()
       } else {
         hOccAfterInjLER->Fill(diff2, all);
         hEOccAfterInjLER->Fill(diff2);
+//         hTrigAfterInjLER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
         if (m_createMaxHist) {
           auto bin = hMaxOccAfterInjLER->FindBin(diff2);
           auto value = hMaxOccAfterInjLER->GetBinContent(bin);

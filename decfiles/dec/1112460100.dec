@@ -1,0 +1,39 @@
+# EventType: 1112460100
+# Descriptor: [B0 -> (KS0 -> pi+ pi-) (psi(2S) -> (J/psi -> mu+ mu-) pi+ pi-) ]
+# NickName: Bd_KsPsi2s_4pi+pi-Jpsi_mu+mu-
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: T. Czank
+# Email: thomas.czank@ipmu.jp
+# Cuts: None
+# Date: 20210224
+
+# Define aliases
+Alias psi2S_sig psi(2S)
+Alias K_S0sig K_S0
+Alias J/psi_sig J/psi
+
+
+Decay Upsilon(4S)
+1.0    B0sig anti-B0sig B0 anti-B0                 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+	1.000    psi2S_sig K_S0sig                         SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+Decay psi2S_sig
+ 1.000 J/psi_sig   pi+     pi-                             VVPIPI; 
+Enddecay
+
+Decay J/psi_sig
+1.000 mu+ mu-                                     PHOTOS   VLL; 
+
+Enddecay
+
+Decay K_S0sig
+1.000 pi+     pi-                                     PHSP; 
+Enddecay
+
+End

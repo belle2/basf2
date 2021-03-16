@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
 import sys
+import basf2 as b2
 import flavorTagger as ft
 from inputVariablesPlots import variablesPlotParamsDict
 
@@ -79,7 +80,7 @@ particleConditions = {'e+:inRoe': ['e', " mcPDG > 0 ", " mcPDG < 0 "], 'mu+:inRo
                       'h+:inRoe': ['h', " mcPDG < 0 ", " mcPDG > 0 "], 'Lambda0:inRoe': [r'\Lambda', " mcPDG < 0 ", " mcPDG > 0 "]}
 
 
-if not Belle2.FileSystem.findFile('./AsymmetriesInVariablesPlots', True):
+if not b2.find_file('AsymmetriesInVariablesPlots', silent=True):
     os.mkdir('./AsymmetriesInVariablesPlots')
 
 for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
@@ -87,7 +88,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     # if category != "KinLepton":
     #    continue
 
-    if not Belle2.FileSystem.findFile('./AsymmetriesInVariablesPlots/' + category, True):
+    if not b2.find_file('AsymmetriesInVariablesPlots/' + category, silent=True):
         os.mkdir('./AsymmetriesInVariablesPlots/' + category)
 
     if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
@@ -103,7 +104,6 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
 
     for iFile in workingFiles:
-        # if Belle2.FileSystem.findFile(workingFile):
         tree.AddFile(iFile)
 
     categoryInputVariables = []

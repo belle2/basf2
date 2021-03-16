@@ -487,7 +487,6 @@ def all_dependencies(dependencies, order=None):
 
 
 def past_from_future_dependencies(future_dependencies):
-    nodes = list(future_dependencies.keys())
     past_dependencies = defaultdict(list)
     for node, deps in future_dependencies.items():
         for dep in deps:
@@ -805,7 +804,7 @@ def find_int_dirs(dir_path):
         try:
             int(directory.name)
             paths.append(directory)
-        except ValueError as err:
+        except ValueError:
             pass
     return paths
 

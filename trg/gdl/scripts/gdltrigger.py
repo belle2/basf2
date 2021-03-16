@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-emptypath = create_path()
+import basf2 as b2
+emptypath = b2.create_path()
 
 
 def add_gdl_trigger(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2"):
@@ -17,7 +17,7 @@ def add_gdl_trigger(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase
                            will be discarded. Make sure you do need open filter before you
                            set the value to True
     """
-    trggdl = register_module('TRGGDL')
+    trggdl = b2.register_module('TRGGDL')
     trggdl.param('SimulationMode', SimulationMode)
     trggdl.param('Belle2Phase', Belle2Phase)
     if OpenFilter:

@@ -53,6 +53,8 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
   addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
            std::string("SVDShaperDigits"));
+  addParam("Clusters", m_storeSVDClustersName, "Cluster StoreArray name",
+           std::string("SVDClusters"));
   addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
@@ -598,7 +600,6 @@ void SVDDQMExpressRecoModule::initialize()
     StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
     StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
     StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-    m_storeSVDClustersName = storeSVDClusters.getName();
 
     storeSVDClusters.isOptional();
     storeSVDShaperDigits.isOptional();

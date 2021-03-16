@@ -38,6 +38,7 @@ namespace Belle2 {
      * @param clsSize Cluster size, number of fired strips that form the cluster.
      * @param clsSN Signal-to-noise ratio for the cluster
      * @param clsChi2 value for cluster fit
+     * @param firstFrame
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
@@ -129,8 +130,8 @@ namespace Belle2 {
      */
     float getClsTime() const { return m_clsTime; }
 
-    /** Get standard deviation of waveform maximum times of cluster strip signals.
-     * @return standard deviation of waveform maximum times.
+    /** Get the error of the reconstructed hit time.
+     * @return error of the reconstructed hit time.
      */
     float getClsTimeSigma() const { return m_clsTimeSigma; }
 

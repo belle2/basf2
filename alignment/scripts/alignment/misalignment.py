@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
-import sys
-from basf2 import *
+import basf2 as b2
 
 import ROOT
 from ROOT import Belle2
 
 import math
-import numpy
 
 
 class GlobalDeformation:
@@ -42,7 +39,6 @@ class GlobalDeformation:
 
     def _transform(self, r, phi, z):
         """ Fcn to be overriden by child classes, return vector (list of 3 numbers) of displacement """
-        pass
 
     def _xyz_to_rphiz(self, xyz):
         """ Convert (x,y,z) to (r,phi,z) """
@@ -126,7 +122,6 @@ class Clamshell(GlobalDeformation):
     def _transform(self, r, phi, z):
         """ the transformation """
         import math
-        import numpy
 
         return [0., self.scale * math.cos(phi), 0.]
 
@@ -179,7 +174,7 @@ class ZExpansion(GlobalDeformation):
         return [0., 0., self.scale * z]
 
 
-class CreateMisalignmentModule(Module):
+class CreateMisalignmentModule(b2.Module):
     """ Module to create misalignment (first reads real sensor positions, then applies misalignment and returns DB payload)
         TODO: random misalignment not finished...
     """
@@ -258,6 +253,5 @@ class CreateMisalignmentModule(Module):
 
         txt.close()
 
-        iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
         Belle2.Database.Instance().storeData('VXDAlignment', alignment, self.iov)
         txt.close()

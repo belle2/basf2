@@ -12,23 +12,25 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables as va
 import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts, stdLambdas
+from variables import variables as vm
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
+__liaison_leptonID__ = "Marcel Hohmann"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
-class Systematics(BaseSkim):
+class SystematicsDstar(BaseSkim):
     """
-    Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`, and
-    `PiKFromDstarList`.
+    Primarily used for hadron and lepton ID studies.
+    Lists in this skim are those defined in `PiKFromDstarList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib"]
     __description__ = ""
@@ -43,37 +45,11 @@ class Systematics(BaseSkim):
 
     def build_lists(self, path):
         lists = [
-            # self.JpsimumuTagProbe(path),
-            # self.JpsieeTagProbe(path),
             self.PiKFromDstarList(path),
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
-
-    def JpsimumuTagProbe(self, path):
-        """Build JpsimumuTagProbe lists for systematics skims."""
-        #   Cuts = "2.8 < M < 3.4"
-        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
-        Channel = "mu+:all mu-:loose"
-        jpsiList = []
-        chID = 0
-        ma.reconstructDecay("J/psi:mumutagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
-        jpsiList.append("J/psi:mumutagprobe" + str(chID))
-        ma.matchMCTruth("J/psi:mumutagprobe0", path=path)
-        return jpsiList
-
-    def JpsieeTagProbe(self, path):
-        """Build JpsieeTagProbe lists for systematics skims."""
-        #   Cuts = "2.7 < M < 3.4"
-        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
-        Channel = "e+:all e-:loose"
-        jpsiList = []
-        chID = 0
-        ma.reconstructDecay("J/psi:eetagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
-        jpsiList.append("J/psi:eetagprobe" + str(chID))
-        ma.matchMCTruth("J/psi:eetagprobe0", path=path)
-        return jpsiList
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
@@ -124,7 +100,7 @@ class SystematicsTracking(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
@@ -228,7 +204,7 @@ class Resonance(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def getDsList(self, path):
         """Build Ds list for systematics skims."""
@@ -543,10 +519,10 @@ class SystematicsLambda(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
-        va.variables.addAlias("pMom", "daughter(0,p)")
-        va.variables.addAlias("piMom", "daughter(1,p)")
-        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
+        vm.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
+        vm.addAlias("pMom", "daughter(0,p)")
+        vm.addAlias("piMom", "daughter(1,p)")
+        vm.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
         ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
@@ -574,15 +550,16 @@ class SystematicsPhiGamma(BaseSkim):
         ":math:`\\phi` decays into two charged tracks "
         "(:math:`K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
     )
-    __contact__ = __liaison__
+    __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
+
+    TestFiles = [get_test_file("phigamma_neutral")]
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
         stdKshorts(path=path)
-
-    TestFiles = [get_test_file("phigamma_neutral")]
 
     def build_lists(self, path):
         EventCuts = [
@@ -597,6 +574,33 @@ class SystematicsPhiGamma(BaseSkim):
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         self.SkimLists = ["gamma:PhiSystematics"]
+
+    def validation_histograms(self, path):
+        stdKshorts(path=path)
+        ma.fillParticleList('K+:all', "", writeOut=True, path=path)
+        ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
+
+        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
+
+        vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
+        vm.addAlias("gamma_E", "E")
+        vm.addAlias("K_S0_mass", "M")
+        vm.addAlias("phi_mass", "M")
+
+        histoRootFile = f'{self}_Validation.root'
+        variableshisto = [('gamma_E', 120, 2.5, 8.5),
+                          ('gamma_E_CMS', 100, 2.0, 7.0),
+                          ('nTracks', 15, 0, 15),
+                          ]
+        variableshistoKS = [('K_S0_mass', 200, 0.4, 0.6),
+                            ]
+        variableshistoPhi = [('phi_mass', 200, 0.8, 1.2),
+                             ]
+
+        ma.variablesToHistogram('gamma:sig', variableshisto, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('K_S0:merged', variableshistoKS, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('phi:KK', variableshistoPhi, filename=histoRootFile, path=path)
 
 
 @fancy_skim_header
@@ -641,3 +645,196 @@ class Random(BaseSkim):
         )
 
         self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]
+
+
+@fancy_skim_header
+class SystematicsFourLeptonFromHLTFlag(BaseSkim):
+    __authors__ = "Marcel Hohmann"
+    __contact__ = __liaison_leptonID__
+    __description__ = "Skim to select all events that pass the HLT Four Lepton skim for lepton ID studies"
+    __category__ = "systematics, leptonID"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        label = "FourLeptonHLT"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsFourLeptonHLT_randomRank", path=path)
+
+        path = self.skim_event_cuts(
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
+        )
+
+        self.SkimLists = [f"pi+:{label}"]
+
+
+@fancy_skim_header
+class SystematicsRadMuMuFromHLTFlag(BaseSkim):
+    __authors__ = "Marcel Hohmann"
+    __contact__ = __liaison_leptonID__
+    __description__ = "Skim to select all events that pass the HLT RadMuMu skim for lepton ID studies"
+    __category__ = "systematics, leptonID"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        label = "RadMuMuLeptonID"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuLeptonID_randomRank", path=path)
+
+        path = self.skim_event_cuts(
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
+        )
+        self.SkimLists = [f"pi+:{label}"]
+
+
+@fancy_skim_header
+class SystematicsJpsi(BaseSkim):
+    """
+    J/psi skim for lepton ID systematics studies. Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
+    """
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib", "Marcel Hohmann"]
+    __description__ = ""
+    __contact__ = __liaison_leptonID__
+    __category__ = "systematics, leptonID"
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+        stdE("all", path=path)
+        stdPhotons("all", path=path)
+
+    TestFiles = [get_test_file("MC13_ccbarBGx1")]
+    ApplyHLTHadronCut = True
+
+    def build_lists(self, path):
+        self.SkimLists = [
+            self.JpsimumuTagProbe(path),
+            self.JpsieeTagProbe(path),
+        ]
+
+    def JpsimumuTagProbe(self, path):
+        """Build JpsimumuTagProbe lists for systematics skims."""
+        Cuts = "2.7 < M < 3.4"
+        ma.reconstructDecay(
+            "J/psi:systematics_mumu -> mu+:all mu-:all",
+            f'{Cuts} and [daughter(0,muonID)>0.1 or daughter(1,muonID)>0.1]',
+            path=path)
+        return "J/psi:systematics_mumu"
+
+    def JpsieeTagProbe(self, path):
+        """Build JpsieeTagProbe lists for systematics skims."""
+
+        Cuts = "2.7 < M < 3.4"
+        ma.cutAndCopyList('gamma:brems', 'gamma:all', 'E<1', path=path)
+        ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
+        ma.reconstructDecay(
+            "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
+            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
+            path=path)
+        return "J/psi:systematics_ee"
+
+
+@fancy_skim_header
+class SystematicsKshort(BaseSkim):
+    """
+      K-short skim for hadron and lepton ID systematics studies.
+      As K-short candidates are abundant this skim has a high retention.
+      To meet the retention criteria a prescale is added. The prescale is given in standard trigger terms (reciprocal).
+      A prescale of 50 will keep 2% of events, etc.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Skim for K-short events for performance studies"
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+
+    ApplyHLTHadronCut = True
+
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the global prescale for this skim.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        self.prescale = prescale
+        super().__init__(**kwargs)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+
+        ma.reconstructDecay(
+            'K_S0:reco -> pi+:all pi-:all',
+            '[0.30 < M < 0.70]',
+            path=path)
+
+        vertex.treeFit('K_S0:reco', 0.0, path=path)
+        ma.applyCuts('K_S0:reco', '0.4 < M < 0.6', path=path)
+
+        ma.fillParticleList('K_S0:V0 -> pi+ pi-',
+                            '[0.30 < M < 0.70]',
+                            True,
+                            path=path)
+        vertex.treeFit('K_S0:V0', 0.0, path=path)
+        ma.applyCuts('K_S0:V0', '0.4 < M < 0.6', path=path)
+
+        ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0', 'K_S0:reco'],
+                                       variable='particleSource', preferLowest=True, path=path)
+
+        KS_cut = '[[cosAngleBetweenMomentumAndVertexVector>0.998] or '\
+            ' [formula(flightDistance/flightDistanceErr)>11] or '\
+            ' [flightTime>0.007]]'  # and '\
+        # '[useAlternativeDaughterHypothesis(M, 0:p+) > 1.13068 and useAlternativeDaughterHypothesis(M, 0:pi-, 1:p+) > 1.13068]'
+
+        ma.cutAndCopyList("K_S0:skim", "K_S0:merged", KS_cut, path=path)
+        path = self.skim_event_cuts(f'eventRandom < {(1/self.prescale):.6f}', path=path)
+        self.SkimLists = ['K_S0:skim']
+
+
+@fancy_skim_header
+class SystematicsBhabha(BaseSkim):
+    """
+    Skim for selecting Bhabha events for leptonID studies.
+    In case the retention exceeds 10% a prescale can be added.
+    The prescale is given in standard trigger terms (reciprocal).
+    """
+    __authors__ = ["Justin Skorupa"]
+    __description__ = "Skim for Bhabha events for lepton ID study"
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+
+    ApplyHLTHadronCut = False
+
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the global prescale for this skim.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        self.prescale = prescale
+        super().__init__(**kwargs)
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+        goodtrack = "abs(dz) < 5 and abs(dr) < 2"
+        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
+            " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
+        ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
+        ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
+
+        recoil = "m2Recoil < 10"
+        ma.reconstructDecay(
+            "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
+
+        event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"\
+                     f" and eventRandom < {(1/self.prescale):.6f}"
+
+        ma.applyCuts("vpho:bhabha", event_cuts, path=path)
+
+        self.SkimLists = ["vpho:bhabha"]

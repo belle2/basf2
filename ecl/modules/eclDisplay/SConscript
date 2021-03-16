@@ -4,9 +4,7 @@ Import('env')
 #               '$ROOT_LIBS', 'ecl_dataobjects', 'rawdata_dataobjects',
 #               'mdst_dataobjects', 'simulation_dataobjects', 'ecl',
 #               'framework']
-env['LIBS'] = ['Core', '$ROOT_LIBS', 'Gui', 'ecl_dataobjects', 'rawdata_dataobjects',
-               'mdst_dataobjects', 'simulation_dataobjects', 'ecl',
-               'framework']
+env['LIBS'] = ['Core', '$ROOT_LIBS', 'Gui', 'ecl_dataobjects', 'ecl', 'framework']
 #env['LIBS'] += env['TEVE_LIBS']
 
 Return('env')

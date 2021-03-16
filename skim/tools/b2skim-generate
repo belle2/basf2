@@ -86,7 +86,7 @@ def output(CodeString, *, OutputFilename, skims):
         if len(skims) == 1:
             OutputFilename = f"{SkimName}.py"
         else:
-            OutputFilename = f"CombinedSkim.py"
+            OutputFilename = "CombinedSkim.py"
 
         with open(OutputFilename, "w") as f:
             f.write(CodeString)

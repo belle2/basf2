@@ -67,8 +67,8 @@ namespace Belle2 {
       TTYP_TEST = 9,
       /** reserved (not defined yet) */
       TTYP_RSV4 = 11,
-      /** f also used for begin-run */
-      TTYP_RSV5 = 13,
+      /** poisson random trigger */
+      TTYP_POIS = 13,
       /** reserved (not defined yet) */
       TTYP_NONE = 15
     };
@@ -134,6 +134,21 @@ namespace Belle2 {
      * @return True if the bit is set
      */
     bool testPsnm(const std::string& name) const {return testPsnm(getOutputBitNumber(name));}
+
+    /*! check whether poisson random trigger is within injection veto
+     * @return True if poisson random trigger is within injection veto
+     */
+    bool isPoissonInInjectionVeto() const
+    {
+      return m_isPoissonInInjectionVeto;
+    }
+
+    /*! set true if poisson random trigger is within injection veto
+     */
+    void setPoissonInInjectionVeto()
+    {
+      m_isPoissonInInjectionVeto = true;
+    }
 
     /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
@@ -208,8 +223,6 @@ namespace Belle2 {
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const override;
 
-  private:
-
     /** get number of an input trigger bit
      * @param name input trigger bit name
      * @return     input trigger bit number
@@ -221,6 +234,8 @@ namespace Belle2 {
      * @return     output trigger bit number
     */
     unsigned int getOutputBitNumber(const std::string& name) const;
+
+  private:
 
     /** return the td part of an HTML table with green of the bit is > 0 */
     std::string outputBitWithColor(bool bit) const;
@@ -250,8 +265,11 @@ namespace Belle2 {
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
+    /** Poisson random trigger in injection veto or not */
+    bool m_isPoissonInInjectionVeto = false;
+
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDefOverride(TRGSummary, 6);
+    ClassDefOverride(TRGSummary, 7);
   };
 
 

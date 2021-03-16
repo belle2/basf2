@@ -684,7 +684,7 @@ class Box(Plotter):
             mask = numpy.ones(len(data)).astype('bool')
         x = data[column][mask]
         if weight_column is not None:
-            weight = data[weight_column][mask]
+            # weight = data[weight_column][mask]
             b2.B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
@@ -862,12 +862,14 @@ class Overtraining(Plotter):
         distribution.add(data, column, test_mask & signal_mask, weight_column)
         distribution.add(data, column, test_mask & bckgrd_mask, weight_column)
 
-        distribution.set_plot_options({'color': distribution.plots[0][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[0][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
-        distribution.set_plot_options({'color': distribution.plots[1][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[1][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
@@ -1222,8 +1224,6 @@ class CorrelationMatrix(Plotter):
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
         signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
-
-        bckgrd_heatmap = self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
 
         self.signal_axis.invert_yaxis()
         self.signal_axis.xaxis.tick_top()

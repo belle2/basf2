@@ -57,6 +57,8 @@ def get_calibrations(input_data, **kwargs):
 
     # Set up config options
     requested_iov = kwargs.get("requested_iov", None)
+    expert_config = kwargs.get("expert_config")
+    cal_kwargs = expert_config.get("kwargs", {})
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]
@@ -124,7 +126,8 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
                 cal_name="{}_PXDHotPixelMaskCalibration_BeamorPhysics".format(iCal + 1),
-                input_files=input_files)
+                input_files=input_files,
+                **cal_kwargs)
         cal.algorithms[0].params = {"iov_coverage": specific_iov}
         cal_list.append(cal)
         iCal += 1
@@ -150,7 +153,8 @@ def get_calibrations(input_data, **kwargs):
         cal = hot_pixel_mask_calibration(
                 cal_name="{}_PXDHotPixelMaskCalibration_Cosmic".format(iCal + 1),
                 input_files=input_files,
-                run_type='cosmic')
+                run_type='cosmic',
+                **cal_kwargs)
         cal.algorithms[0].params = {"iov_coverage": specific_iov}  # Not valid when using SimpleRunByRun strategy
         cal_list.append(cal)
         iCal += 1

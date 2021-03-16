@@ -45,10 +45,10 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("coreGaussWidth", m_coreGaussWidth, "sigma of core gaussian [ns]", 10.0);
-    addParam("tailGaussWidth", m_tailGaussWidth, "sigma of tail gaussian [ns]", 20.0);
+    addParam("coreGaussWidth", m_coreGaussWidth, "sigma of core gaussian [ns]", double(5.6));
+    addParam("tailGaussWidth", m_tailGaussWidth, "sigma of tail gaussian [ns]", double(14.5));
     addParam("tailGaussFraction", m_tailGaussFraction,
-             "fraction (by area) of tail gaussian", 0.0);
+             "fraction (by area) of tail gaussian", double(0.08));
     addParam("fixedT0",  m_fixedT0,
              "If set, a fixed event t0 is used instead of simulating the bunch timing.", m_fixedT0);
     addParam("maximumT0",  m_maximumT0,

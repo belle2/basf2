@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <TObject.h>
+
 namespace Belle2 {
   /** This class contains the measured average center-of-mass energy,
    * which is equal to the invariant mass of the colliding beams, and its uncertainty.

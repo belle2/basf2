@@ -99,12 +99,18 @@ void PXDDAQDQMModule::defineHisto()
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
 //   hDAQErrorEvent->SetStats(0);
+  hEODBAfterInjLER  = new TH1I("PXDEODBInjLER", "PXDEODBInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hEODBAfterInjHER  = new TH1I("PXDEODBInjHER", "PXDEODBInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hCM63AfterInjLER  = new TH1I("PXDCM63InjLER", "PXDCM63InjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hCM63AfterInjHER  = new TH1I("PXDCM63InjHER", "PXDCM63InjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjLER  = new TH1I("PXDTruncInjLER", "PXDTruncInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hTruncAfterInjHER  = new TH1I("PXDTruncInjHER", "PXDTruncInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hMissAfterInjLER  = new TH1I("PXDMissInjLER", "PXDMissInjLER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
   hMissAfterInjHER  = new TH1I("PXDMissInjHER", "PXDMissInjHER/Time;Time in #mus;Events/Time (5 #mus bins)", 4000, 0, 20000);
+  hEODBTrgDiff  = new TH1I("PXDEODBTrgDiff", "PXDEODBTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hCM63TrgDiff  = new TH1I("PXDCM63TrgDiff", "PXDCM63TrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hTruncTrgDiff  = new TH1I("PXDTruncTrgDiff", "PXDTruncTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
+  hMissTrgDiff  = new TH1I("PXDMissTrgDiff", "PXDMissTrgDiff/DiffTime;DiffTime in #mus;Events/Time (1 #mus bins)", 2000, 0, 2000);
 
   hDAQStat  = new TH1D("PXDDAQStat", "PXDDAQStat", 20, 0, 20);
   auto xa = hDAQStat->GetXaxis();
@@ -179,6 +185,8 @@ void PXDDAQDQMModule::event()
   /// Remark: for HLT event selection and/or events rejected by the event-
   /// of-doom-buster, we might count anyhow broken events as broken from PXD
 
+  bool eodbFlag = m_rawSVD.getEntries() == 0;
+
   bool truncFlag = false; // flag events which are DHE truncated
   bool nolinkFlag = false; // flag events which are DHE truncated
   bool missingFlag = false; // flag events where frame is missing
@@ -231,6 +239,9 @@ void PXDDAQDQMModule::event()
         for (int i = 0; i < 4; i++) {
           if ((dhe.getDHPFoundMask() & (1 << i)) == 0) hDAQDHPDataMissing->Fill(dhe.getDHEID() + i * 0.25);
         }
+        for (auto& dhp : dhe) {
+          truncFlag |= dhp.getTruncated(); // new firmware workaround flag
+        }
         unsigned int emask = dhe.getEndErrorInfo();
         // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {
@@ -268,12 +279,21 @@ void PXDDAQDQMModule::event()
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
 //             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
+    double lasttrig = it.GetTimeSincePrevTrigger(0) / 127.; //  127MHz clock ticks to us, inexact rounding
+    if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
+    if (cm63Flag && hCM63TrgDiff) hCM63TrgDiff->Fill(lasttrig);
+    if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);
+    if (missingFlag && hMissTrgDiff) hMissTrgDiff->Fill(lasttrig);
+
     // get last injection time
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
+        if (eodbFlag) {
+          if (hEODBAfterInjHER) hEODBAfterInjHER->Fill(diff2);
+        }
         if (cm63Flag) {
           hDAQStat->Fill(5); // sum CM63 after HER
           if (diff2 > 1000) hDAQStat->Fill(7); // sum CM63 after HER, but outside injections, 1ms
@@ -290,6 +310,9 @@ void PXDDAQDQMModule::event()
           if (hMissAfterInjHER) hMissAfterInjHER->Fill(diff2);
         }
       } else {
+        if (eodbFlag) {
+          if (hEODBAfterInjLER) hEODBAfterInjLER->Fill(diff2);
+        }
         if (cm63Flag) {
           hDAQStat->Fill(6); // sum CM63 after LER
           if (diff2 > 1000) hDAQStat->Fill(8); // sum CM63 after LER, but outside injections, 1ms
@@ -319,5 +342,5 @@ void PXDDAQDQMModule::event()
   if (mismatchFlag) hDAQStat->Fill(14);
 
   // Check Event-of-doom-busted or otherwise HLT rejected events
-  if (m_rawSVD.getEntries() == 0) hDAQStat->Fill(0);
+  if (eodbFlag) hDAQStat->Fill(0);
 }

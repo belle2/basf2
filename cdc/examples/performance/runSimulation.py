@@ -11,27 +11,22 @@ nevt: Number of events to be generated
 st: Stream ID
 """
 
-from basf2 import *
-from ROOT import Belle2
-import datetime
+import basf2 as b2
 from generators import add_cosmics_generator
-from simulation import add_simulation
 
-import os.path
-import sys
 from cdc.cr import getDataPeriod, getTriggerType, getMapperAngle
 from cdc.cr import add_cdc_cr_simulation
 from cdc.cr import add_GCR_Trigger_simulation
 
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Set database
-reset_database()
-use_database_chain()
+b2.reset_database()
+b2.use_database_chain()
 # For GCR, July and August 2017.
-use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
+b2.use_central_database("GT_gen_data_003.04_gcr2017-08", b2.LogLevel.WARNING)
 
 
 def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=False):
@@ -42,7 +37,7 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
     st : stream ID
     """
 
-    main_path = create_path()
+    main_path = b2.create_path()
 
     main_path.add_module('EventInfoSetter',
                          expList=[int(exp)],
@@ -85,14 +80,14 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
                                    backToBack=True if triggerType == 'b2b' else False,
                                    skipEcl=True)
     else:
-        B2INFO('skip tsim')
+        b2.B2INFO('skip tsim')
 
-    output = register_module('RootOutput',
-                             outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
+    output = b2.register_module('RootOutput',
+                                outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
     main_path.add_module(output)
-    print_path(main_path)
-    process(main_path)
-    print(statistics)
+    b2.print_path(main_path)
+    b2.process(main_path)
+    print(b2.statistics)
 
 
 if __name__ == "__main__":

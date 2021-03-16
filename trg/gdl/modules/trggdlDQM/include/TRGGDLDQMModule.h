@@ -139,7 +139,7 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra = 62;
+    static const int n_output_extra = 73;
     static const char* output_extra[n_output_extra];
     static const int n_output_overlap = 10;
     static const char* output_overlap[n_output_overlap];

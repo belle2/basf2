@@ -7,7 +7,7 @@
 #    usage : %> basf2 TrgEclUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
-from basf2 import *
+import basf2 as b2
 
 import sys
 
@@ -19,21 +19,21 @@ if argc == 3:
     f_out_root = argvs[2]
 
 if f_in_root[-6:] == ".sroot":
-    input = register_module('SeqRootInput')
+    input = b2.register_module('SeqRootInput')
 if f_in_root[-5:] == ".root":
-    input = register_module('RootInput')
+    input = b2.register_module('RootInput')
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
 # unpacker
-unpacker = register_module('TRGECLUnpacker')
+unpacker = b2.register_module('TRGECLUnpacker')
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -51,4 +51,4 @@ main.add_module(
         "TRGECLUnpackerSumStores"])
 
 # Process all events
-process(main)
+b2.process(main)

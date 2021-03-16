@@ -9,7 +9,7 @@
 ##########################################################################
 
 """
-ECL Crate Validation
+ECL Energy Validation
 """
 
 from prompt import ValidationSettings
@@ -21,7 +21,7 @@ import sys
 # Will be used to construct the validation in the automated system, as well as set up the submission web forms.
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='ECL Crate',
+settings = ValidationSettings(name='ECL_Energy',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config=None)

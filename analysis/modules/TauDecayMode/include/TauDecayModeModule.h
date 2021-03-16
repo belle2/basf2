@@ -44,8 +44,7 @@ namespace Belle2 {
 
     /** Method is called for each event. */
     virtual void event() override;
-    //! Terminate at the end of job
-    virtual void terminate();
+
 
   private:
 

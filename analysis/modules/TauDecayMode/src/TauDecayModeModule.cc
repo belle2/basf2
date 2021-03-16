@@ -63,7 +63,7 @@ std::vector<std::string> parseString(std::string str, std::string sep)
   return parsed;
 }
 
-std::map<string, int> make_map(std::string file)
+std::map<string, int> make_map(const std::string& file)
 {
   std::string fileName;
   if (file == "") {
@@ -105,7 +105,8 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 
-TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), m_pprong(0), m_mprong(0)
+TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1), nop(0) , taum_no(0), taup_no(0), m_pmode(-2), m_mmode(-2),
+  m_pprong(0), m_mprong(0), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1), idOfTauMinus(-1), pdg_extra(0)
 {
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
@@ -121,10 +122,10 @@ TauDecayModeModule::TauDecayModeModule() : Module() , m_pmode(-2), m_mmode(-2), 
 //
 void TauDecayModeModule::initialize()
 {
-  nop = 0 ;
-  taum_no = 0;
-  taup_no = 0;
-  EventNumber = 1;
+  // nop = 0 ;
+  // taum_no = 0;
+  // taup_no = 0;
+  // EventNumber = 1;
   mode_decay = make_map(m_file);
   m_tauDecay.registerInDataStore();
   if (m_particle != "") {
@@ -381,8 +382,6 @@ void TauDecayModeModule::event()
     int ii = vec_gamtmp_tauminus[i].first;
     MCParticle* p = MCParticles[ii];
     double Estar = getEnergyTauRestFrame(p, -1);
-    if (m_printmode < 0) cout << "vec_gamtmp_tauminus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
-                                Estar << endl;
     if (Estar > 0.00) { // tune ?
       vec_dau_tauminus.push_back(ii);
     }
@@ -393,8 +392,6 @@ void TauDecayModeModule::event()
     int ii = vec_gamtmp_tauplus[i].first;
     MCParticle* p = MCParticles[ii];
     double Estar = getEnergyTauRestFrame(p, +1);
-    if (m_printmode < 0) cout << "vec_gamtmp_tauplus: i = " << i << " ii = " << ii << " E = " << p->get4Vector().E() << " EStar = " <<
-                                Estar << endl;
     if (Estar > 0.00) { // tune ?
       vec_dau_tauplus.push_back(ii);
     }
@@ -655,9 +652,11 @@ void TauDecayModeModule::event()
     }
   }
 
-  if (m_printmode == "all") B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
-  if (m_printmode == "all") B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
-                                     m_tauminusdecaymode);
+  if (m_printmode == "all") {
+    B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
+    B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
+           m_tauminusdecaymode);
+  }
 
 
   m_tauplusdecaymode = "";
@@ -734,10 +733,11 @@ void TauDecayModeModule::event()
     }
   }
 
-  if (m_printmode == "all") B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
-  if (m_printmode == "all") B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
-                                     m_tauplusdecaymode);
-
+  if (m_printmode == "all") {
+    B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
+    B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
+           m_tauplusdecaymode);
+  }
   //
 
   m_mmode = TauBBBmode(m_tauminusdecaymode);
@@ -761,9 +761,6 @@ void TauDecayModeModule::event()
   //
 }
 
-void TauDecayModeModule::terminate()
-{
-}
 
 void TauDecayModeModule::IdentifyTauPair()
 {
@@ -858,7 +855,8 @@ int TauDecayModeModule::TauBBBmode(string state)
   std::vector<std::string> x = parseString(state, dem);
   int r = x.size();
   int i;
-  map<string, int>::iterator itr = mode_decay.begin();
+  //= mode_decay.begin()
+  map<string, int>::iterator itr ;
   for (itr =  mode_decay.begin(); itr !=  mode_decay.end(); ++itr) {
     string mode = itr-> first;
     std::vector<std::string> y = parseString(itr -> first, dem);
@@ -895,7 +893,6 @@ int TauDecayModeModule::TauBBBmode(string state)
     if ((b == r) & (b - 1 == count) & (nein == 0) & (val == 0)) {
       int tau_mode = itr-> second;
       return tau_mode;
-      break;
     }
 
   }

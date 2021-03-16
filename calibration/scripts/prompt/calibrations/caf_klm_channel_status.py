@@ -24,7 +24,7 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=['raw'],
     input_data_names=['raw_physics'],
-    input_data_filters={'raw_physics': ['hadron_calib', 'physics', 'Good']},
+    input_data_filters={'raw_physics': ['hlt_skim', 'physics', 'Good', 'NOT random_calib']},
     depends_on=[])
 
 ##############################

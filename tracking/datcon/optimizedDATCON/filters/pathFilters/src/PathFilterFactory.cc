@@ -32,7 +32,7 @@ std::string PathFilterFactory::getIdentifier() const
 
 std::string PathFilterFactory::getFilterPurpose() const
 {
-  return "Rejects SVD hit pairs. ";
+  return "Rejects SVD hit combination of different length. ";
 }
 
 std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDescriptions() const

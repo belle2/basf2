@@ -36,6 +36,7 @@ RawTrackCandCleaner::~RawTrackCandCleaner() = default;
 RawTrackCandCleaner::RawTrackCandCleaner() : Super()
 {
   Super::addProcessingSignalListener(&m_relationCreator);
+  Super::addProcessingSignalListener(&m_treeSearcher);
 
   initializeHists();
 }
@@ -44,6 +45,7 @@ void RawTrackCandCleaner::exposeParameters(ModuleParamList* moduleParamList, con
 {
   Super::exposeParameters(moduleParamList, prefix);
   m_relationCreator.exposeParameters(moduleParamList, prefix);
+  m_treeSearcher.exposeParameters(moduleParamList, prefix);
 }
 
 // void RawTrackCandCleaner::initialize()
@@ -62,11 +64,13 @@ void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCand
                                 std::vector<SpacePointTrackCand>& trackCandidates)
 {
   m_relations.reserve(8192);
+  m_results.reserve(32);
 
   uint totalRelationsPerEvent = 0;
   uint counter = 0;
   for (auto& rawTrackCand : rawTrackCandidates) {
     m_relations.clear();
+    m_results.clear();
     m_relationCreator.apply(rawTrackCand, m_relations);
 //     B2INFO("m_relations.size(): " << m_relations.size());
     totalRelationsPerEvent += m_relations.size();
@@ -74,6 +78,13 @@ void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCand
     m_nRelationsVsRawTrackCand->Fill(counter, m_relations.size());
     m_nRelationsVsRawTrackCandSize->Fill(rawTrackCand.size(), m_relations.size());
     counter++;
+
+//     m_treeSearcher.apply(rawTrackCand, m_relations, m_results);
+
+    for (auto& result : m_results) {
+      trackCandidates.emplace_back(result);
+    }
+
   }
   m_nRelationsPerEvent->Fill(totalRelationsPerEvent);
 

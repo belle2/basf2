@@ -69,12 +69,13 @@ namespace Belle2 {
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
 //     std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
+    std::vector<SpacePointTrackCand> m_results;
 
     std::vector<TrackFindingCDC::WeightedRelation<HitData>> m_relations;
 
     RelationCreator<HitData, ChooseableRelationFilter> m_relationCreator;
 
-    DATCONTreeSearcher<HitData, ChooseablePathFilter> m_treeSearcher;
+    DATCONTreeSearcher<HitData, ChooseablePathFilter, SpacePointTrackCand> m_treeSearcher;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.

@@ -18,6 +18,7 @@
 /* ROOT headers. */
 #include <TClass.h>
 #include <TROOT.h>
+#include <TStyle.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -233,17 +234,17 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
   uint16_t section, TH2F* histogram, TCanvas* canvas)
 {
-  /* We currently process only the plots of forward endcap. */
-  if (section != EKLMElementNumbers::c_ForwardSection)
-    return;
   canvas->Clear();
   canvas->cd();
   histogram->SetStats(false);
-  histogram->Draw();
-  m_2DHitsLine.DrawLine(-110, 80, -110, 190);
-  m_2DHitsLine.DrawLine(-110, 190, 110, 190);
-  m_2DHitsLine.DrawLine(110, 80, 110, 190);
-  m_2DHitsLine.DrawLine(-110, 80, 110, 80);
+  histogram->Draw("COLZ");
+  /* Draw the lines only for the backward layers. */
+  if (section == EKLMElementNumbers::c_ForwardSection) {
+    m_2DHitsLine.DrawLine(-110, 80, -110, 190);
+    m_2DHitsLine.DrawLine(-110, 190, 110, 190);
+    m_2DHitsLine.DrawLine(110, 80, 110, 190);
+    m_2DHitsLine.DrawLine(-110, 80, 110, 80);
+  }
   canvas->Modified();
 }
 
@@ -445,6 +446,8 @@ void DQMHistAnalysisKLMModule::event()
         klmSector.getSector(), histogram, canvas, latex);
     }
   }
+  /* Temporary change the color palette. */
+  gStyle->SetPalette(kLightTemperature);
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
   for (KLMChannelIndex& klmSection : klmIndex) {
     uint16_t subdetector = klmSection.getSubdetector();
@@ -471,6 +474,8 @@ void DQMHistAnalysisKLMModule::event()
       }
     }
   }
+  /* Reset the color palette to the default one. */
+  gStyle->SetPalette(kBird);
   fillMaskedChannelsHistogram("masked_channels");
   latex.SetTextColor(kBlue);
   processPlaneHistogram("plane_bklm_phi", latex);

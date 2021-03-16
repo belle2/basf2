@@ -99,6 +99,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set whether to be verbose (print Minuit output).
+     */
+    void setVerbose(bool verbose)
+    {
+      m_Verbose = verbose;
+    }
+
+    /**
      * Perform the fit.
      */
     void fit();
@@ -130,6 +138,9 @@ namespace Belle2 {
 
     /** Whether to use momentum components or energy and two angles. */
     bool m_UseMomentum = false;
+
+    /** Whether to be verbose (print Minuit output). */
+    bool m_Verbose = false;
 
     /** Collision boost vector. */
     DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;

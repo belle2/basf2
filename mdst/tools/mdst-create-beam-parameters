@@ -50,6 +50,7 @@ fitter = BeamParametersFitter()
 fitter.setAngleHER(0.0415);
 fitter.setAngleLER(-0.0415);
 fitter.setAngleError(0.0001);
+fitter.setVerbose(False)
 for iov in overlapping_iovs:
     fitter.setIntervalOfValidity(iov)
     fitter.fit()

@@ -4,12 +4,12 @@
 Airflow script for TOP post-tracking calibration:
    BS13d carrier shifts, module T0 and common T0
 
-Author: Marko Staric, Umberto Tamponi
+Author: Marko Staric, Umberto Tamponi, Shahab Kohani
 """
 
 from prompt import CalibrationSettings
-from caf.utils import IoV
-from caf.strategies import SequentialBoundaries
+from caf.utils import vector_from_runs, IoV, ExpRun
+from caf.strategies import SingleIOV, SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
@@ -20,7 +20,8 @@ settings = CalibrationSettings(name="TOP post-tracking calibration",
                                expert_username="skohani",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha"],
+                               input_data_names=["bhabha_all_calib"],
+                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib", "physics", "Good Or Recoverable"], }
                                depends_on=[],
                                expert_config={"payload_boundaries": None})
 
@@ -33,7 +34,7 @@ def get_calibrations(input_data, **kwargs):
     :**kwargs: Configuration options to be sent in.
     '''
 
-    file_to_iov = input_data["hlt_bhabha"]
+    file_to_iov = input_data["bhabha_all_calib"]  # changed to the new input name, is this correct?
     sample = 'bhabha'
     inputFiles = list(file_to_iov.keys())
     requested_iov = kwargs.get("requested_iov", None)

@@ -77,8 +77,8 @@ start right away!
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 78-79
-        :lineno-start: 78
+        :lines: 77-78
+        :lineno-start: 77
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -91,8 +91,8 @@ start right away!
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 106
-        :lineno-start: 106
+        :lines: 105
+        :lineno-start: 105
 
 .. admonition:: Exercise
     :class: stacked exercise

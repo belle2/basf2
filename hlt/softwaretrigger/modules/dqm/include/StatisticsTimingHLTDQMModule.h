@@ -78,6 +78,9 @@ namespace Belle2 {
       /// Memory used for processing distribution of events per unit
       std::map<unsigned int, TH1F*> m_processingMemoryPerUnitHistograms;
 
+      /// Number of processes per unit
+      TH1F* m_processesPerUnitHistogram;
+
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
 
@@ -115,7 +118,7 @@ namespace Belle2 {
       std::string m_param_histogramDirectoryName = "timing_statistics";
 
       /// Parameter: which modules should be shown in the overview list
-      std::vector<std::string> m_param_overviewModuleList = {"Sum_Start_ZMQ", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event", "Sum_Finalize_ZMQ"};
+      std::vector<std::string> m_param_overviewModuleList = {"Sum_Wait", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
 
       /// Summary modules of the actual processing
       std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
@@ -130,10 +133,10 @@ namespace Belle2 {
       const double m_fullTimeNBins = 250;
 
       /// Maximum for the histograms of processingTime
-      const double m_processingTimeMax = 5000;
+      const double m_processingTimeMax = 10000;
 
       /// Number of bins for the histograms of processingTime
-      const double m_processingTimeNBins = 125;
+      const double m_processingTimeNBins = 250;
 
       /// Minimum for the histograms of fullMemory
       const double m_fullMemoryMin = -100000;

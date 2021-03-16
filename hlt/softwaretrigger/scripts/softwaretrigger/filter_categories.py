@@ -77,6 +77,7 @@ LEVEL1 = [
     "filter L1 trigger",
     "filter passthrough l1 trigger delayed bhabha",
     "filter passthrough l1 trigger random",
+    "filter passthrough l1 trigger poisson",
     "filter L1 Bhabha veto",
     "filter L1 Bhabha select",
     "filter L1 trigger nn info",

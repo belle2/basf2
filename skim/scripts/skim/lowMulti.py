@@ -13,6 +13,9 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
+from variables import variables as vm
+
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -121,6 +124,7 @@ class LowMassTwoTrack(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     TestFiles = [get_test_file("MC13_mumuBGx1"), get_test_file("MC13_uubarBGx1")]
+    validation_sample = _VALIDATION_SAMPLE
 
     def build_lists(self, path):
         label = "LowMassTwoTrack"
@@ -166,6 +170,35 @@ class LowMassTwoTrack(BaseSkim):
         for dmID, (mode, decayString, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode + decayString, cut, dmID=dmID, path=path)
             self.SkimLists.append(mode)
+
+    def validation_histograms(self, path):
+        vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
+        vm.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
+        vm.addAlias('gamma_E_cms', 'daughter(2, useCMSFrame(E))')
+        vm.addAlias('pip_theta_lab', 'formula(daughter(0, theta)*180/3.1415927)')
+        vm.addAlias('pim_theta_lab', 'formula(daughter(1, theta)*180/3.1415927)')
+        vm.addAlias('gamma_theta_lab', 'formula(daughter(2, theta)*180/3.1415927)')
+        vm.addAlias('Mpipi', 'daughterInvM(0,1)')
+
+        ma.copyLists('vpho:LowMassTwoTrack', self.SkimLists, path=path)
+
+        variablesHist = [
+            ('pip_p_cms', 60, 0, 6),
+            ('pim_p_cms', 60, 0, 6),
+            ('gamma_E_cms', 60, 0, 6),
+            ('pip_theta_lab', 90, 0, 180),
+            ('pim_theta_lab', 90, 0, 180),
+            ('gamma_theta_lab', 90, 0, 180),
+            ('Mpipi', 80, 0., 4.),
+            ('M', 60, 6., 12.)
+        ]
+
+        # Output the variables to histograms
+        ma.variablesToHistogram(
+            'vpho:LowMassTwoTrack',
+            variablesHist,
+            filename=f'{self}_Validation.root',
+            path=path)
 
 
 @fancy_skim_header
@@ -220,11 +253,11 @@ class SingleTagPseudoScalar(BaseSkim):
 
         particles = [
             f"pi0:{label}_highE",
-            f"eta:gg",
-            f"eta:pipipi0",
-            f"eta:pipig",
-            f"eta':pipieta_gg",
-            f"eta':pipig"
+            "eta:gg",
+            "eta:pipipi0",
+            "eta:pipig",
+            "eta':pipieta_gg",
+            "eta':pipig"
         ]
         ModeSum = " + ".join(f"nParticlesInList({particle})" for particle in particles)
         presel = f"nParticlesInList(e+:{label}) == 1 and nParticlesInList(pi+:{label}) <= 2"

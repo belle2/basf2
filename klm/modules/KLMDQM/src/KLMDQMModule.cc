@@ -13,6 +13,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
 
 /* ROOT headers. */
 #include <TDirectory.h>
@@ -31,9 +32,14 @@ KLMDQMModule::KLMDQMModule() :
   m_PlaneBKLMZ{nullptr},
   m_PlaneEKLM{nullptr},
   m_MaskedChannelsPerSector{nullptr},
-  m_bklmHit2dsZ{nullptr},
-  m_BklmDigitsNumber{nullptr},
-  m_KlmDigitsNumber{nullptr},
+  m_DigitsKLM{nullptr},
+  m_DigitsRPC{nullptr},
+  m_DigitsScintillatorBKLM{nullptr},
+  m_DigitsScintillatorEKLM{nullptr},
+  m_DigitsMultiStripBKLM{nullptr},
+  m_DigitsMultiStripEKLM{nullptr},
+  m_TriggerBitsBKLM{nullptr},
+  m_TriggerBitsEKLM{nullptr},
   m_KlmDigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
   m_KlmDigitsAfterHERInj{nullptr},
@@ -48,12 +54,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLM"));
-  addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
-           "Directory for EKLM DQM histograms in ROOT file.",
-           std::string("EKLM"));
-  addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
-           "Directory for BKLM DQM histograms in ROOT file.",
-           std::string("BKLM"));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -179,19 +179,45 @@ void KLMDQMModule::defineHisto()
   }
   m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */
-  m_BklmDigitsNumber = new TH1F("bklm_digits", "Number of BKLM Digits",
-                                250.0, 0.0, 250.0);
-  m_BklmDigitsNumber->GetXaxis()->SetTitle("Number of BKLM Digits");
-  m_BklmDigitsNumber->SetOption("LIVE");
-  m_KlmDigitsNumber = new TH1F("klm_digits", "Number of KLM Digits",
-                               250.0, 0.0, 250.0);
-  m_KlmDigitsNumber->GetXaxis()->SetTitle("Number of KLM Digits");
-  m_KlmDigitsNumber->SetOption("LIVE");
-  /* BKLM 2d hits. */
-  m_bklmHit2dsZ = new TH1F("zBKLMHit2ds", "Axial position of muon hit",
-                           97, -172.22, 266.22);
-  m_bklmHit2dsZ->GetXaxis()->SetTitle("Axial position of muon hit");
-  m_bklmHit2dsZ->SetOption("LIVE");
+  m_DigitsKLM = new TH1F("digits_klm", "Number of KLM digits",
+                         250.0, 0.0, 250.0);
+  m_DigitsKLM->GetXaxis()->SetTitle("Number of digits");
+  m_DigitsKLM->SetOption("LIVE");
+  m_DigitsRPC = new TH1F("digits_rpc", "Number of RPC digits",
+                         250.0, 0.0, 250.0);
+  m_DigitsRPC->GetXaxis()->SetTitle("Number of digits");
+  m_DigitsRPC->SetOption("LIVE");
+  m_DigitsScintillatorBKLM = new TH1F("digits_scintillator_bklm", "Number of scintillator digits (BKLM)",
+                                      250.0, 0.0, 250.0);
+  m_DigitsScintillatorBKLM->GetXaxis()->SetTitle("Number of digits");
+  m_DigitsScintillatorBKLM->SetOption("LIVE");
+  m_DigitsScintillatorEKLM = new TH1F("digits_scintillator_eklm", "Number of scintillator digits (EKLM)",
+                                      250.0, 0.0, 250.0);
+  m_DigitsScintillatorEKLM->GetXaxis()->SetTitle("Number of digits");
+  m_DigitsScintillatorEKLM->SetOption("LIVE");
+  m_DigitsMultiStripBKLM = new TH1F("digits_multi_bklm", "Number of multi-strip digits (BKLM)",
+                                    50.0, 0.0, 50.0);
+  m_DigitsMultiStripBKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
+  m_DigitsMultiStripBKLM->SetOption("LIVE");
+  m_DigitsMultiStripEKLM = new TH1F("digits_multi_eklm", "Number of multi-strip digits (EKLM)",
+                                    50.0, 0.0, 50.0);
+  m_DigitsMultiStripEKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
+  m_DigitsMultiStripEKLM->SetOption("LIVE");
+  /* Trigger bits. */
+  m_TriggerBitsBKLM = new TH1F("trigger_bits_bklm", "Trigger bits of multi-strip digits (BKLM)",
+                               (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
+  m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+  m_TriggerBitsBKLM->SetOption("LIVE");
+  m_TriggerBitsEKLM = new TH1F("trigger_bits_eklm", "Trigger bits of multi-strip digits (EKLM)",
+                               (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
+  m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+  m_TriggerBitsEKLM->SetOption("LIVE");
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
   m_KlmDigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
@@ -216,7 +242,6 @@ void KLMDQMModule::initialize()
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
-  m_BklmHit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -249,10 +274,15 @@ void KLMDQMModule::beginRun()
       m_ChannelHits[sectorIndex][j]->Reset();
   }
   /* Digits. */
-  m_KlmDigitsNumber->Reset();
-  m_BklmDigitsNumber->Reset();
-  /* BKLM 2d hits. */
-  m_bklmHit2dsZ->Reset();
+  m_DigitsKLM->Reset();
+  m_DigitsRPC->Reset();
+  m_DigitsScintillatorBKLM->Reset();
+  m_DigitsScintillatorEKLM->Reset();
+  m_DigitsMultiStripBKLM->Reset();
+  m_DigitsMultiStripEKLM->Reset();
+  /* Trigger bits. */
+  m_TriggerBitsBKLM->Reset();
+  m_TriggerBitsEKLM->Reset();
   /* Injection information. */
   m_KlmDigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
@@ -262,91 +292,118 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
-  int i, nDigits, nEklmDigits = 0;
-  KLMDigit* eklmDigit;
-  nDigits = m_Digits.getEntries();
-  /* EKLM. */
-  for (i = 0; i < nDigits; i++) {
-    eklmDigit = m_Digits[i];
-    if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
-      continue;
+  int nDigits = m_Digits.getEntries();
+  int nDigitsRPC = 0, nDigitsScintillatorBKLM = 0, nDigitsScintillatorEKLM = 0;
+  int nDigitsMultiStripBKLM = 0, nDigitsMultiStripEKLM = 0;
+  for (const KLMDigit& digit : m_Digits) {
     /*
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
      */
-    if (!eklmDigit->isGood())
+    if (!digit.isGood())
       continue;
-    int section = eklmDigit->getSection();
-    int sector = eklmDigit->getSector();
-    int layer = eklmDigit->getLayer();
-    int plane = eklmDigit->getPlane();
-    int strip = eklmDigit->getStrip();
-    uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
-    uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-    uint16_t channel = m_ElementNumbers->channelNumberEKLM(
-                         section, sector, layer, plane, strip);
-    uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
-    for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
-      double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
-      double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
-      if ((xMin > channelIndex) || (xMax < channelIndex))
-        continue;
-      m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
-    }
-    int planeGlobal = m_eklmElementNumbers->planeNumber(
-                        section, layer, sector, plane);
-    m_PlaneEKLM->Fill(planeGlobal);
-    m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
-    nEklmDigits++;
+    if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
+      nDigitsScintillatorEKLM++;
+      int section = digit.getSection();
+      int sector = digit.getSector();
+      int layer = digit.getLayer();
+      int plane = digit.getPlane();
+      int strip = digit.getStrip();
+      if (not digit.isMultiStrip()) {
+        uint16_t klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
+        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        uint16_t channel = m_ElementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
+        uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
+        for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
+          double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
+          double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
+          if ((xMin > channelIndex) || (xMax < channelIndex))
+            continue;
+          m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
+        }
+      } else
+        nDigitsMultiStripEKLM++;
+      int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
+      m_PlaneEKLM->Fill(planeGlobal);
+      m_TimeScintillatorEKLM->Fill(digit.getTime());
+      if (digit.isMultiStrip()) {
+        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+        if (digitRaw) {
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x1) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x1);
+          if ((triggerBits & 0x2) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x2);
+          if ((triggerBits & 0x4) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x4);
+          if ((triggerBits & 0x8) != 0)
+            m_TriggerBitsEKLM->Fill(c_0x8);
+        }
+      }
+    } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
+      int section = digit.getSection();
+      int sector = digit.getSector();
+      int layer = digit.getLayer();
+      int plane = digit.getPlane();
+      int strip = digit.getStrip();
+      if (not digit.isMultiStrip()) {
+        uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        uint16_t channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
+        uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
+        for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
+          double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
+          double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
+          if ((xMin > channelIndex) || (xMax < channelIndex))
+            continue;
+          m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
+        }
+      } else
+        nDigitsMultiStripBKLM++;
+      if (digit.inRPC()) {
+        nDigitsRPC++;
+        m_TimeRPC->Fill(digit.getTime());
+      } else {
+        nDigitsScintillatorBKLM++;
+        m_TimeScintillatorBKLM->Fill(digit.getTime());
+      }
+      if (digit.isMultiStrip()) {
+        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+        if (digitRaw) {
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x1) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x1);
+          if ((triggerBits & 0x2) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x2);
+          if ((triggerBits & 0x4) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x4);
+          if ((triggerBits & 0x8) != 0)
+            m_TriggerBitsBKLM->Fill(c_0x8);
+        }
+      }
+    } else
+      B2FATAL("Not a BKLM or a EKLM digit, something went really wrong.");
   }
-  /* BKLM. */
-  m_BklmDigitsNumber->Fill((double)nDigits - nEklmDigits);
-  m_KlmDigitsNumber->Fill((double)nDigits);
-  for (i = 0; i < nDigits; i++) {
-    KLMDigit* digit = m_Digits[i];
-    if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
-      continue;
-    int section = digit->getSection();
-    int sector = digit->getSector();
-    int layer = digit->getLayer();
-    int plane = digit->getPlane();
-    int strip = digit->getStrip();
-    uint16_t klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-    uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-    uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         section, sector, layer, plane, strip);
-    uint16_t channelIndex = m_ChannelArrayIndex->getIndex(channel);
-    for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
-      double xMin = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmin();
-      double xMax = m_ChannelHits[klmSectorIndex][j]->GetXaxis()->GetXmax();
-      if ((xMin > channelIndex) || (xMax < channelIndex))
-        continue;
-      m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
-    }
-    if (digit->inRPC())
-      m_TimeRPC->Fill(digit->getTime());
-    else
-      m_TimeScintillatorBKLM->Fill(digit->getTime());
-  }
-  int nBklmHits2d = m_BklmHit2ds.getEntries();
-  for (i = 0; i < nBklmHits2d; i++) {
-    BKLMHit2d* hit2d = static_cast<BKLMHit2d*>(m_BklmHit2ds[i]);
-    TVector3 hitPosition = hit2d->getGlobalPosition();
-    m_bklmHit2dsZ->Fill(hitPosition.Z());
-  }
-  int nBklmHits1d = m_BklmHit1ds.getEntries();
-  for (i = 0; i < nBklmHits1d; i++) {
-    BKLMHit1d* hit1d = static_cast<BKLMHit1d*>(m_BklmHit1ds[i]);
-    int section = hit1d->getSection();
-    int sector = hit1d->getSector();
-    int layer = hit1d->getLayer();
+  for (const BKLMHit1d& hit1d : m_BklmHit1ds) {
+    int section = hit1d.getSection();
+    int sector = hit1d.getSector();
+    int layer = hit1d.getLayer();
     int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
                         section, sector, layer);
-    if (hit1d->isPhiReadout())
+    if (hit1d.isPhiReadout())
       m_PlaneBKLMPhi->Fill(layerGlobal);
     else
       m_PlaneBKLMZ->Fill(layerGlobal);
   }
+  /* Digits. */
+  m_DigitsKLM->Fill((double)nDigits);
+  m_DigitsRPC->Fill((double)nDigitsRPC);
+  m_DigitsScintillatorBKLM->Fill((double)nDigitsScintillatorBKLM);
+  m_DigitsScintillatorEKLM->Fill((double)nDigitsScintillatorEKLM);
+  if (nDigitsMultiStripBKLM > 0)
+    m_DigitsMultiStripBKLM->Fill((double)nDigitsMultiStripBKLM);
+  if (nDigitsMultiStripEKLM > 0)
+    m_DigitsMultiStripEKLM->Fill((double)nDigitsMultiStripEKLM);
   /* Injection information. */
   for (RawFTSW& rawFtsw : m_RawFtsws) {
     unsigned int difference = rawFtsw.GetTimeSinceLastInjection(0);
@@ -361,6 +418,11 @@ void KLMDQMModule::event()
         m_TriggersLERInj->Fill(differenceInUs);
       }
     }
+    /*
+     * Usually, only one RawFTSW object is stored per event.
+     * If there are more, ignore the others.
+     */
+    break;
   }
 }
 

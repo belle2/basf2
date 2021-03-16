@@ -204,21 +204,21 @@ class SVDValidationTTreeCluster(b2.Module):
                     self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
                     self.data.truehit_time = truehit.getGlobalTime()
                     #
-                    self.data.eventt0_all = -50
-                    self.data.eventt0_top = -50
-                    self.data.eventt0_cdc = -30
-                    self.data.eventt0_ecl = -60
+                    self.data.eventt0_all = -1
+                    self.data.eventt0_top = -1
+                    self.data.eventt0_cdc = -1
+                    self.data.eventt0_ecl = -1
                     top = Belle2.Const.DetectorSet(Belle2.Const.EDetector.TOP)
                     cdc = Belle2.Const.DetectorSet(Belle2.Const.EDetector.CDC)
                     ecl = Belle2.Const.DetectorSet(Belle2.Const.EDetector.ECL)
                     if eventt0.hasEventT0():
                         self.data.eventt0_all = eventt0.getEventT0()
                     if eventt0.hasTemporaryEventT0(top):
-                        eventt0_top = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.TOP)[-1].eventT0
+                        self.data.eventt0_top = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.TOP)[-1].eventT0
                     if eventt0.hasTemporaryEventT0(cdc):
-                        eventt0_cdc = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.CDC)[-1].eventT0
+                        self.data.eventt0_cdc = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.CDC)[-1].eventT0
                     if eventt0.hasTemporaryEventT0(ecl):
-                        eventt0_ecl = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.ECL)[-1].eventT0
+                        self.data.eventt0_ecl = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.ECL)[-1].eventT0
                     # Fill tree
                     self.file.cd()
                     self.tree.Fill()

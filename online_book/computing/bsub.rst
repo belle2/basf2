@@ -77,7 +77,7 @@ Different queues have different settings. For analysis you can use ``s``,
 you might want to use the queue ``l`` which gives jobs up to 24 hours of
 running time.
 More information about LSF queues can be found
-`here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
+`here <https://kekcc.kek.jp/service/kekcc/support/en/12/>`__.
 
 This command also displays the current "Fairshare" values. Fairshare
 defines the priorities of jobs that are dispatched.

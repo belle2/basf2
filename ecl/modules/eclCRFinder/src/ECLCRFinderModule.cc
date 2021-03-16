@@ -55,10 +55,10 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
 
   // Add module parameters.
   addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 10.0 * Belle2::Unit::MeV);
-  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 1.5 * Belle2::Unit::MeV);
+  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 10.0 * Belle2::Unit::MeV);
   addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.5 * Belle2::Unit::MeV);
   addParam("energyCutBkgd0", m_energyCutBkgd[0], "Seed energy cut (for high background).", 10.0 * Belle2::Unit::MeV);
-  addParam("energyCutBkgd1", m_energyCutBkgd[1], "Growth energy cut (for high background).", 1.5 * Belle2::Unit::MeV);
+  addParam("energyCutBkgd1", m_energyCutBkgd[1], "Growth energy cut (for high background).", 10.0 * Belle2::Unit::MeV);
   addParam("energyCutBkgd2", m_energyCutBkgd[2], "Digit energy cut (for high background).", 0.5 * Belle2::Unit::MeV);
   addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 99999.);
   addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 99999.);
@@ -126,9 +126,10 @@ void ECLCRFinderModule::initialize()
   }
 
   // Resize the vectors
+  m_cellIdToCheckVec.resize(8737); /**< cellid -> check digit: true if digit has been checked for neighbours. */
   m_cellIdToSeedVec.resize(8737); /**< cellid -> seed digit (type 1). */
-  m_cellIdToGrowthVec.resize(8737); /**< cellid -> growth digits. */
-  m_cellIdToDigitVec.resize(8737); /**< cellid -> above threshold digits (type 2). */
+  m_cellIdToGrowthVec.resize(8737); /**< cellid -> growth digits (type 2). */
+  m_cellIdToDigitVec.resize(8737); /**< cellid -> above threshold digits. */
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
   m_calDigitStoreArrPosition.resize(8737);
 
@@ -144,6 +145,7 @@ void ECLCRFinderModule::event()
   B2DEBUG(200, "ECLCRFinderModule::event()");
 
   // Reset the vector(s).
+  memset(&m_cellIdToCheckVec[0], 0, m_cellIdToCheckVec.size() * sizeof m_cellIdToCheckVec[0]);
   memset(&m_cellIdToSeedVec[0], 0, m_cellIdToSeedVec.size() * sizeof m_cellIdToSeedVec[0]);
   memset(&m_cellIdToGrowthVec[0], 0, m_cellIdToGrowthVec.size() * sizeof m_cellIdToGrowthVec[0]);
   memset(&m_cellIdToDigitVec[0], 0, m_cellIdToDigitVec.size() * sizeof m_cellIdToDigitVec[0]);
@@ -246,7 +248,8 @@ void ECLCRFinderModule::event()
   //-------------------------------------------------------
   // 'find" in a map is faster if the number of seeds is not too large, can be replaced easily once we know what seed cuts we want.
   for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
-    if (m_cellIdToSeedVec[pos] > 0) {
+    if (m_cellIdToSeedVec[pos] > 0 and m_cellIdToCheckVec[pos] == 0) {
+      m_cellIdToCheckVec[pos] = 1;
       checkNeighbours(pos, m_tempCRId, 0);
       ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
     }
@@ -324,16 +327,23 @@ void ECLCRFinderModule::checkNeighbours(const int cellid, const int tempcrid, co
       isAdded = 1;
     }
 
+    B2DEBUG(300, "  --> ECLCRFinderModule::checkNeighbours(): tempcrid=" << tempcrid);
     // Check if we have to grow further.
     if (m_cellIdToGrowthVec[neighbour] > 0) {
-
+      B2DEBUG(300, "  --> ECLCRFinderModule::checkNeighbours(): " << neighbour);
       if (isAdded < 1) {
+        B2DEBUG(300, "  --> ECLCRFinderModule::checkNeighbours(): isAdded=" << isAdded);
+
         updateCRs(neighbour, tempcrid); // it could be that this digit is not in the all digit list (eg. tight timing cuts for "all digits".
         isAdded = 1;
       }
 
-      if (m_cellIdToTempCRIdVec[neighbour] == 0) { //found
+      B2DEBUG(300, "  --> ECLCRFinderModule::checkNeighbours(): m_cellIdToTempCRIdVec[" << neighbour << "] " <<
+              m_cellIdToTempCRIdVec[neighbour]);
+      if (m_cellIdToCheckVec[neighbour] == 0) { // only check again if we have not looked at that digit before
+        m_cellIdToCheckVec[neighbour] = 1;
         checkNeighbours(neighbour, tempcrid, 1);
+
       }
     }
   }

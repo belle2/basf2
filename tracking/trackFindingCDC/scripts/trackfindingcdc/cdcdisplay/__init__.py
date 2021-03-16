@@ -3,13 +3,10 @@
 
 from .svgdrawing import attributemaps
 from . import svgdrawing
-import itertools
 from datetime import datetime
 import subprocess
-import math
 import os.path
 import os
-from ROOT import std
 from ROOT import Belle2  # make Belle2 namespace available
 import basf2
 
@@ -1033,9 +1030,9 @@ class CDCSVGDisplayModule(basf2.Module):
 
             # 'display' is part of the ImageMagic package commonly installed in linux
             if self.use_python:
-                procDisplay = subprocess.Popen(['eog', fileName])
+                subprocess.Popen(['eog', fileName])
             if self.use_cpp:
-                procDisplay = subprocess.Popen(['eog', cppfileName])
+                subprocess.Popen(['eog', cppfileName])
             # procDisplay = subprocess.Popen(['display','-background','white',
             # '-flatten',fileName])
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])

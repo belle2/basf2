@@ -78,6 +78,9 @@ namespace Belle2 {
       /// Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "softwaretrigger";
 
+      /// Location of the module in the path: before filter or after filter
+      std::string m_param_pathLocation = "after filter";
+
       /// HLT unit number of the machine used
       int m_hlt_unit = 0;
 

@@ -73,6 +73,9 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);
+
+  addParam("pathLocation", m_param_pathLocation,
+           "Location of the module in the path: before filter or after filter", m_param_pathLocation);
 }
 
 void SoftwareTriggerHLTDQMModule::defineHisto()
@@ -152,7 +155,8 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_hlt_unit_histograms) {
-    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number", "HLT Unit Number", HLTUnit::max_hlt_units, 0,
+    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
+                                                            ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units, 0,
                                                             HLTUnit::max_hlt_units + 1));
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {

@@ -92,6 +92,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
+            pathLocation="before filter",
         )
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
@@ -136,6 +137,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
+            pathLocation="after filter",
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(

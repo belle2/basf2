@@ -121,10 +121,86 @@ void BeamParametersFitter::setupDatabase()
   dbStore.updateEvent();
 }
 
+/*
+
+ In BeamParameters, the momenta are represented as (E, theta_x, theta_y).
+The cartesian coordinates of the momenta are given by
+
+ |p_x|   |cos(theta_y)  0 sin(theta_y)|   | 1 0            0             |
+ |p_y| = |0             1 0           | * | 0 cos(theta_x) -sin(theta_x) |
+ |p_x|   |-sin(theta_y) 0 cos(theta_y)|   | 0 sin(theta_x) cos(theta_x)  |
+
+           | 0 |
+         * | 0 | ,
+           | p |
+
+or, after, matrix multiplication,
+
+ p_x = p * cos(theta_x) * sin(theta_y) ,
+ p_y = - p * sin(theta_x) ,
+ p_z = p * cos(theta_x) * cos(theta_y) .
+
+ The block form of the full covariance matrix is
+
+    | V_HER | 0     |
+V = |-------|-------| ,
+    | 0     | V_LER |
+
+where V_HER and V_LER are the covariance matrices of high-energy and
+low-energy beam momenta. The directions are assumed to be known exactly,
+thus, the covariance matrix has only two non-zero elements:
+V_11 = sigma_{E_HER}^2 and V_44 = sigma_{E_LER}^2.
+
+ It is necessary to reproduce the measured variance (note that error represents
+energy spread rather than the uncertainty of the mean energy) of collision
+invariant mass. The corresponding 1x1 error matrix is given by
+
+               | \partial \sqrt{s} |       | \partial \sqrt{s} | ^ T
+V_{\sqrt{s}} = | ----------------- | * V * | ----------------- |     .
+               | \partial p_i      |       | \partial p_i      |
+
+Since there are only two non-zero elements, this formula reduces to
+
+                      | \partial \sqrt{s} | ^ 2
+\sigma^2_{\sqrt{s}} = | ----------------- |     * sigma_{E_HER}^2
+                      | \partial E_HER    |
+
+                        | \partial \sqrt{s} | ^ 2
+                      + | ----------------- |     * sigma_{E_LER}^2 .
+                        | \partial E_LER    |
+
+ The derivatives are given by
+
+\partial \sqrt{s}
+----------------- =
+ \partial E_HER
+
+      1                                                          E_HER
+= -------- [ E_beam - (p_beam)_x * cos(theta_x) * sin(theta_y) * -----
+  \sqrt{s}                                                       p_HER
+
+                                           E_HER
+             + (p_beam)_y * sin(theta_x) * -----
+                                           p_HER
+
+                                                          E_HER
+             - (p_beam)_z * cos(theta_x) * cos(theta_y) * ----- ],
+                                                          p_HER
+
+and by similar formula for E_LER.
+
+ Now it is necessary to make some assumption about the relation between
+sigma_{E_HER} and sigma_{E_LER}. It is assumed that sigma_{E_HER} = k E_HER
+and sigma_{E_LER} = k E_LER.
+
+*/
 void BeamParametersFitter::fit()
 {
   int minuitResult;
   setupDatabase();
+  /* Get p_HER and p_LER from a fit. */
+  double herMomentum, herThetaX, herThetaY;
+  double lerMomentum, lerThetaX, lerThetaY;
   s_BoostVector = m_CollisionBoostVector->getBoost();
   s_BoostVectorInverseCovariance = m_CollisionBoostVector->getBoostCovariance();
   if (s_BoostVectorInverseCovariance.Determinant() == 0) {
@@ -143,7 +219,11 @@ void BeamParametersFitter::fit()
     s_BoostVectorInverseCovariance.Invert();
   }
   s_InvariantMass = m_CollisionInvariantMass->getMass();
-  s_InvariantMassError = m_CollisionInvariantMass->getMassSpread();
+  s_InvariantMassError = m_CollisionInvariantMass->getMassError();
+  if (s_InvariantMassError == 0) {
+    B2WARNING("Invariant-mass errror is 0, using generic error for fit.");
+    s_InvariantMassError = m_InvariantMassError;
+  }
   s_DirectionHER.SetX(0);
   s_DirectionHER.SetY(0);
   s_DirectionHER.SetZ(1);
@@ -179,7 +259,59 @@ void BeamParametersFitter::fit()
     minuit.mncomd("MIGRAD 10000", minuitResult);
     minuit.mncomd("RELEASE 2 3 5 6", minuitResult);
     minuit.mncomd("MIGRAD 10000", minuitResult);
+    double error;
+    minuit.GetParameter(0, herMomentum, error);
+    minuit.GetParameter(1, herThetaX, error);
+    minuit.GetParameter(2, herThetaY, error);
+    minuit.GetParameter(3, lerMomentum, error);
+    minuit.GetParameter(4, lerThetaX, error);
+    minuit.GetParameter(5, lerThetaY, error);
   }
+  /* Calculate error. */
+  TLorentzVector pHER = getMomentum(herMomentum, herThetaX, herThetaY, false);
+  TLorentzVector pLER = getMomentum(lerMomentum, lerThetaX, lerThetaY, true);
+  TLorentzVector pBeam = pHER + pLER;
+  double fittedInvariantMass = pBeam.M();
+  B2RESULT("Initial invariant mass: " << s_InvariantMass <<
+           "; fitted invariant mass: " << fittedInvariantMass);
+  double cosThetaX = cos(herThetaX);
+  double sinThetaX = sin(herThetaX);
+  double cosThetaY = cos(herThetaY);
+  double sinThetaY = sin(herThetaY);
+  double herPartial =
+    (pBeam.E() - pHER.E() / pHER.Vect().Mag() *
+     (pBeam.Px() * cosThetaX * sinThetaY - pBeam.Py() * sinThetaX +
+      pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
+  cosThetaX = cos(lerThetaX);
+  sinThetaX = sin(lerThetaX);
+  cosThetaY = cos(lerThetaY);
+  sinThetaY = sin(lerThetaY);
+  double lerPartial =
+    (pBeam.E() - pLER.E() / pLER.Vect().Mag() *
+     (pBeam.Px() * cosThetaX * sinThetaY - pBeam.Py() * sinThetaX +
+      pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
+  double sigmaInvariantMass = m_CollisionInvariantMass->getMassSpread();
+  double k = sqrt(sigmaInvariantMass * sigmaInvariantMass /
+                  (pow(herPartial * pHER.E(), 2) +
+                   pow(lerPartial * pLER.E(), 2)));
+  double herSpread = k * pHER.E();
+  double lerSpread = k * pLER.E();
+  B2INFO("Invariant mass spread: " << sigmaInvariantMass);
+  B2RESULT("HER energy spread: " << herSpread <<
+           "; LER energy spread: " << lerSpread);
+  /* Import database object. */
   DBImportObjPtr<BeamParameters> beamParameters;
+  beamParameters.construct();
+  beamParameters->setHER(pHER);
+  beamParameters->setLER(pLER);
+  TMatrixDSym covariance(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j)
+      covariance[i][j] = 0;
+  }
+  covariance[0][0] = herSpread * herSpread;
+  beamParameters->setCovHER(covariance);
+  covariance[0][0] = lerSpread * lerSpread;
+  beamParameters->setCovLER(covariance);
   beamParameters.import(m_IntervalOfValidity);
 }

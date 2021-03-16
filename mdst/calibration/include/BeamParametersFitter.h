@@ -83,6 +83,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set invariant-mass error.
+     */
+    void setInvariantMassError(double invariantMassError)
+    {
+      m_InvariantMassError = invariantMassError;
+    }
+
+    /**
      * Set whether to use momentum components or energy and two angles.
      */
     void useMomentum(bool use)
@@ -116,6 +124,9 @@ namespace Belle2 {
 
     /** Boost error (use only if inverse error matrix is not available). */
     double m_BoostError = 0.0001;
+
+    /** Invariant-mass error (use only if error is 0). */
+    double m_InvariantMassError = 0.0001;
 
     /** Whether to use momentum components or energy and two angles. */
     bool m_UseMomentum = false;

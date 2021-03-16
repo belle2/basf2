@@ -29,7 +29,7 @@ class DumpDigits(b2.Module):
         """Find clusters with a truehit and print some stats."""
 
         digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
+        # nDigits = digits.getEntries()
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
         with open(self.dumpfile, 'a') as dumpfile:

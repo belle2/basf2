@@ -4,12 +4,12 @@
 import basf2
 import numpy as np
 import os
-import sys
 import glob
 from ROOT import gROOT, Belle2
-gROOT.ProcessLine("gErrorIgnoreLevel = 4000;")  # ignore endless root errors for background files...
 
 from cdctrigger import add_cdc_trigger
+
+gROOT.ProcessLine("gErrorIgnoreLevel = 4000;")  # ignore endless root errors for background files...
 
 """
 Example script for the CDC trigger.

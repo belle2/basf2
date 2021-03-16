@@ -15,6 +15,9 @@
 #include <TString.h>
 #include <TAxis.h>
 
+#include <TMath.h>
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 
@@ -43,7 +46,13 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("onlineOccLevel_Empty", m_onlineOccEmpty, "Maximum OnlineOccupancy (%) for which the sensor is considered empty",
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
-
+  addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
+  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
+           float(4)); // 4 ns
+  addParam("refMCTP", m_refMCTP, "Mean of Cluster Time from Physics reference run", float(-1.939)); // e14r826
+  addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
+  addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
+  addParam("refRCTC", m_refRCTC, "RMS of Cluster Time from Cosmic reference run", float(15.77)); // e14r1182
 }
 
 
@@ -189,6 +198,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   //  m_cOnlineOccupancyU->SetGrid(1);
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
   //  m_cOnlineOccupancyV->SetGrid(1);
+  m_cClusterOnTrackTime_L456V = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V");
 
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
@@ -222,14 +232,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOnlineOccupancyU->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOnlineOccupancyU->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
-  // add MonitoringObject and canvases
-  m_monObj = getMonitoringObject("svd");
-
-  m_c_avg_maxBin_UV = new TCanvas("svd_avg_maxBin_UV");
-
-  // add canvases to MonitoringObject
-  m_monObj->addCanvas(m_c_avg_maxBin_UV);
-
+  rtype = findHist("DQMInfo/rtype");
+  runtype = rtype ? rtype->GetTitle() : "";
 }
 
 
@@ -246,6 +250,7 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
     m_cStripOccupancyU[i]->Clear();
     m_cStripOccupancyV[i]->Clear();
   }
+  m_cClusterOnTrackTime_L456V->Clear();
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -295,7 +300,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   h->Draw("colztext");
   h->SetStats(0);
 
-
   m_cUnpacker->Modified();
   m_cUnpacker->Update();
 
@@ -321,6 +325,52 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_printCanvas)
     m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
+  // cluster time for clusters of track
+  TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  if (m_h != NULL) {
+    m_hClusterOnTrackTime_L456V.Clear();
+    m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
+    bool hasError = false;
+    if (nEvents > m_statThreshold) {
+      if (runtype == "physics") {
+        float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
+        if (difference_physics > m_timeThreshold) {
+          hasError = true;
+        }
+      } else if (runtype == "cosmic") {
+        float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
+        if (difference_cosmic > m_timeThreshold) {
+          hasError = true;
+        }
+      } else {
+        B2WARNING("Run type:" << runtype);
+      }
+    } else {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+    if (! hasError) {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    } else {
+      m_legError->Draw("same");
+      m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
+    }
+  } else {
+    B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
+    m_cClusterOnTrackTime_L456V->SetFillColor(kRed);
+  }
+
+  m_cClusterOnTrackTime_L456V->cd();
+  m_hClusterOnTrackTime_L456V.Draw();
+
+  m_cClusterOnTrackTime_L456V->Modified();
+  m_cClusterOnTrackTime_L456V->Update();
+
+  if (m_printCanvas)
+    m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
 
   //check MODULE OCCUPANCY online & offline
 
@@ -459,6 +509,10 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyV->SetBinContent(bin, onlineOccV);
 
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
       //test ERRORS
       /*
         if(bin == m_hOnlineOccupancyV->FindBin(3, findBinY(3, 1))){
@@ -493,6 +547,10 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyU->SetBinContent(bin, onlineOccU);
 
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
       //test ERRORS
       /*
         if(bin == m_hOnlineOccupancyU->FindBin(3, findBinY(3, 1))){
@@ -655,72 +713,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cOnlineOccupancyU->Print("c_SVDOnlineOccupancyU.pdf");
     m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
   }
+
 }
 
 void DQMHistAnalysisSVDGeneralModule::endRun()
 {
-  B2INFO("DQMHistAnalysisSVDGeneral:  endRun called");
-
-  // get existing histograms produced by DQM modules
-
-  // average maxBin
-  TH1F* h_maxBinU = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinUAll");
-  TH1F* h_maxBinV = (TH1F*)findHist("SVDClsTrk/SVDTRK_StripMaxBinVAll");
-
-  m_c_avg_maxBin_UV->Clear();
-  m_c_avg_maxBin_UV->Divide(2, 1);
-  m_c_avg_maxBin_UV->cd(1);
-  if (h_maxBinU) h_maxBinU->Draw();
-  m_c_avg_maxBin_UV->cd(2);
-  if (h_maxBinV) h_maxBinV->Draw();
-
-  if (h_maxBinU == NULL) {
-    B2INFO("Histogram needed for Average MaxBin on U side is not found");
-    m_monObj->setVariable("avgMaxBinU", -1);
-  } else {
-    double avgMaxBinU = 1.*h_maxBinU->GetMean();
-    m_monObj->setVariable("avgMaxBinU", avgMaxBinU);
-  }
-
-  if (h_maxBinV == NULL) {
-    B2INFO("Histogram needed for Average MaxBin on V side is not found");
-    m_monObj->setVariable("avgMaxBinV", -1);
-  } else {
-    double avgMaxBinV = 1.*h_maxBinV->GetMean();
-    m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
-  }
-
-
-  // offline occupancy - integrated number of ZS5 fired strips
-  TH1F* h_zs5countsU = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
-  TH1F* h_zs5countsV = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsV");
-  TH1F* h_events = (TH1F*)findHist("SVDExpReco/SVDDQM_nEvents");
-
-  // average occupancies for 3rd layer
-  int nEvents = h_events->GetEntries();
-  double avgOffOccL3U = 0.0;
-  double avgOffOccL3V = 0.0;
-  for (int bin = 1; bin < 14 + 1; bin++) {
-    avgOffOccL3U += h_zs5countsU->GetBinContent(bin) * 1.0 / 768 * 100; // 768 strips for u side
-    avgOffOccL3V += h_zs5countsV->GetBinContent(bin) * 1.0 / 768 * 100;
-  }
-  avgOffOccL3U /= (14 * nEvents); // 14 sensors in 3rd layer
-  avgOffOccL3V /= (14 * nEvents);
-
-  if (h_zs5countsU == NULL || h_events == NULL) {
-    B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
-    m_monObj->setVariable("avgOffOccL3U", -1);
-  } else {
-    m_monObj->setVariable("avgOffOccL3U", avgOffOccL3U);
-  }
-
-  if (h_zs5countsV == NULL || h_events == NULL) {
-    B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
-    m_monObj->setVariable("avgOffOccL3V", -1);
-  } else {
-    m_monObj->setVariable("avgOffOccL3V", avgOffOccL3V);
-  }
-
+  B2INFO("DQMHistAnalysisSVDGeneral: endRun called");
 }
 
 
@@ -763,12 +761,11 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cStripOccupancyU;
   delete m_cStripOccupancyV;
 
+  delete m_cClusterOnTrackTime_L456V;
 }
-
 
 Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
 {
-
   if (layer == 3)
     return sensor; //2
   if (layer == 4)
@@ -780,3 +777,4 @@ Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
   else
     return -1;
 }
+

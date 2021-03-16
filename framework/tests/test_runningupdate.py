@@ -446,8 +446,6 @@ class TestMergeStaging(unittest.TestCase):
     def test_doc_example_full(self):
         """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
         running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
-        # make a copy of the running payloads just to be able to compare later
-        result = running[:]
         db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
         updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FULL_REPLACEMENT)
         operations = updater.calculate_update()
@@ -468,8 +466,6 @@ class TestMergeStaging(unittest.TestCase):
     def test_doc_example_fixclosed(self):
         """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
         running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
-        # make a copy of the running payloads just to be able to compare later
-        result = running[:]
         db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
         updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FIX_CLOSED)
         operations = updater.calculate_update()

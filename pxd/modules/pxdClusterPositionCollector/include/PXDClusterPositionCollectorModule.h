@@ -28,7 +28,9 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     PXDClusterPositionCollectorModule();
+    /** Prepare */
     void prepare() override final;
+    /** Collect */
     void collect() override final;
 
   private:

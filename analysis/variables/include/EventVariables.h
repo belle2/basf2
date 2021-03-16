@@ -18,6 +18,11 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
+    /**
      * returns true if event doesn't contain an Y(4S)
      */
     double isContinuumEvent(const Particle*);

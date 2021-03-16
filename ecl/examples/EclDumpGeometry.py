@@ -7,21 +7,32 @@
 # from the payload ECLCrystalsPositionAndShape for the experiment and run of
 # the input file. Information from inputFile.root is not otherwise used.
 #
-# basf2 -n 1 [-i "inputFile.root"] EclDumpGeometry.py
+# basf2 -n 1 [-i "inputFile.root"] EclDumpGeometry.py [newGeom]
+#
+# newGeom = 1 will read it from global tag ecl_alignment
+# newGeom = 2 reads the payload from localdb;
+# If not specified, the payload will be taken from the global tag of "inputFile.root"
 #
 # (c) Christopher Hearty, 2020 (hearty@physics.ubc.ca)
 #
 ################################################################################
 
+import sys
 import basf2 as b2
 from modularAnalysis import inputMdst
 
 # ..path
 mypath = b2.create_path()
 
-# ..Read ecl geometry from localdb by adding a line such as:
-#  conditions.prepend_testing_payloads("localdb/database.txt")
-#  where localdb contains the ECLCrystalsPositionAndShape payload
+# ..override ECL geometry if requested
+newGeom = 0
+narg = len(sys.argv)
+if(narg == 2):
+    newGeom = int(sys.argv[1])
+if(newGeom == 1):
+    b2.conditions.globaltags = ['ecl_alignment']
+if(newGeom == 2):
+    b2.conditions.prepend_testing_payloads("localdb/database.txt")
 print(b2.conditions.globaltags)
 inputMdst(
     'default',
@@ -33,6 +44,6 @@ mypath.add_module('Gearbox')
 mypath.add_module('Geometry')
 mypath.add_module('ECLDumpGeometry')
 
-# Process the events
+# ..Process the events
 b2.process(mypath)
 print(b2.statistics)

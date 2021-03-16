@@ -8,7 +8,7 @@
 from jinja2 import Template
 import os
 from subprocess import check_output
-from ROOT import Belle2
+from basf2 import find_file
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
 
     print("Will now write your notebook config.")
 
-    jupyter_template_file = Belle2.FileSystem.findFile("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
+    jupyter_template_file = find_file("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
     with open(jupyter_template_file, 'r') as f:
         template = Template(f.read())
 

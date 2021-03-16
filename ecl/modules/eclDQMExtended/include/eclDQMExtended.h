@@ -79,7 +79,7 @@ namespace Belle2 {
     std::string m_RunName;
     /** Save detailed fit data for failed fits */
     bool m_SaveDetailedFitData;
-    /** */
+    /** Use modified time determination algorithm in emulator, same as in ShaperDSP version >= 1.4.3 */
     bool m_adjusted_timing;
 
     /** DBArray for payload 'ECLDSPPars0'. */

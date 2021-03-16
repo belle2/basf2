@@ -71,6 +71,14 @@
 #endif
 
 /**
+ * \def B2DEBUG_MODIFIABLE(level, streamText)
+ * Send a debug message for which the level may be adjusted with LogModRealm.
+ * For performance reasons normal B2DEBUG messages are ignored if the log level is not c_Debug, even if a LogModRealm is used. This optimization is not done for B2DEBUG_MODIFIABLE. So only use B2DEBUG_MODIFIABLE in conjuction with LogModRealm.
+ */
+#define B2DEBUG_MODIFIABLE(level, streamText) B2DEBUG(Belle2::LogConfig::c_Debug, level, streamText)
+
+
+/**
  * \def B2INFO(streamText)
  * Send an info message.
  */

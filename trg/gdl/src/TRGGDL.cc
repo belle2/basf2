@@ -244,6 +244,12 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB)  B2INFO("no database of gdl prescale");
+    int N_AlgsBits = db_algs->getnalgs();
+    if (!db_algs)  B2INFO("no global database of gdl ftd logics");
+    if (N_OutputBits > N_AlgsBits) {
+      B2DEBUG(20, "#Algs and #Ftdl is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
@@ -336,6 +342,12 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
+    int N_AlgsBits = db_algs->getnalgs();
+    if (!db_algs) B2INFO("no database of gdl ftdl bit logic");
+    if (N_OutputBits > N_AlgsBits) {
+      B2DEBUG(20, "#Algs and #FTDL is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     if (_debugLevel > 19)
       printf("TRGGDL:N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);

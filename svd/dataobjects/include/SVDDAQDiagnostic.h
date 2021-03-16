@@ -72,6 +72,13 @@ namespace Belle2 {
      * @param cmc2 Common Mode Correction performed after masking particle signals
      * @param apvError Error code as in the APV header
      * @param ftbError Errors field as in the FTB header
+     * @param fadcMatch true if FADC number matches
+     * @param apvMatch true if APV number matches
+     * @param badHeader
+     * @param missedHeader
+     * @param missedTrailer
+     * @param fadcNo FADC number
+     * @param apvNo apv number
      */
     SVDDAQDiagnostic(uint8_t triggerNumber, uint8_t triggerType, uint8_t pipelineAddress, uint8_t cmc1, uint8_t cmc2, uint8_t apvError,
                      uint8_t ftbError, bool fadcMatch, bool apvMatch, bool badHeader, bool missedHeader, bool missedTrailer, uint8_t fadcNo = uint8_t(0),

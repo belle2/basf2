@@ -10,7 +10,6 @@
 ##############################################################################
 
 import basf2 as b2
-import ROOT
 from ROOT import Belle2
 
 
@@ -18,10 +17,8 @@ class testSVDShaperDigitOrdering(b2.Module):
 
     """Module to check SVDShaperDigit ordering."""
 
-    def __init__(
+    def __init__(self):
         '''initialize'''
-        self,
-    ):
 
         super().__init__()
 

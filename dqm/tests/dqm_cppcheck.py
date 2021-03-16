@@ -15,4 +15,4 @@ if __name__ == "__main__":
     # but at least the test will correctly check if there are cppcheck warnings affecting this package.
     ignoreme = r"^((?!dqm\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "dqm",
-                     lambda x: re.findall(ignoreme, x) or x is "'", toolopts=['-D_BELLE2_EPICS'])
+                     lambda x: re.findall(ignoreme, x) or x == "'", toolopts=['-D_BELLE2_EPICS'])

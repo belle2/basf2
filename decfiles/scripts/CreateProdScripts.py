@@ -9,12 +9,10 @@
 #  warning: this script is under development
 
 from optparse import OptionParser, OptionValueError
-import mmap
 import glob
 import time
 import sys
 import logging
-import string
 import re
 import os
 version = 'v1'
@@ -1112,7 +1110,6 @@ def main():
                 options.force)
         except UserWarning:
             exit_status = 1
-            pass
     else:
         run_loop(options.remove, options.python, options.force)
 

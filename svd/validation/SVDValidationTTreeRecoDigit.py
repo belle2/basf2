@@ -27,6 +27,7 @@ gROOT.ProcessLine('struct EventDataRecoDigit {\
     int sensor;\
     int sensor_type;\
     int strip_dir;\
+    float recodigit_charge;\
     float recodigit_time;\
     float truehit_time;\
 };')
@@ -41,12 +42,12 @@ class SVDValidationTTreeRecoDigit(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoDigit, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoDigit.root', 'recreate')
-        '''Output ROOT file'''
+        #: ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of event data class
         self.data = EventDataRecoDigit()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoDigit.__dict__:
@@ -59,8 +60,10 @@ class SVDValidationTTreeRecoDigit(b2.Module):
     def event(self):
         """Take digits from SVDRecoDigits with a truehit and save needed information"""
         digits = Belle2.PyStoreArray('SVDRecoDigits')
+        shaperDigits = Belle2.PyStoreArray('SVDShaperDigits')
         for digit in digits:
-            digit_truehits = digit.getRelationsTo('SVDTrueHits')
+            # get the true hit from the related SVDShaperDigit
+            digit_truehits = shaperDigits[digit.getArrayIndex()].getRelationsTo('SVDTrueHits')
             # We want only digits with exactly one associated TrueHit
             if len(digit_truehits) != 1:
                 continue
@@ -86,6 +89,7 @@ class SVDValidationTTreeRecoDigit(b2.Module):
                     self.data.strip_dir = 0
                 else:
                     self.data.strip_dir = 1
+                self.data.recodigit_charge = digit.getCharge()
                 self.data.recodigit_time = digit.getTime()
                 self.data.truehit_time = truehit.getGlobalTime()
                 # Fill tree

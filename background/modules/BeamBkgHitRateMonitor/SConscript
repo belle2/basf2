@@ -1,12 +1,13 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'rawdata_dataobjects', 'mdst_dataobjects',
+env['LIBS'] = ['framework', 'framework_io', 'mdst_dataobjects',
                'pxd_dataobjects', 'pxd', 
-               'svd_dataobjects', 'svd',
-               'cdc_dataobjects',
+               'svd_dataobjects', 'svd_dbobjects', 'svd',
+               'vxd',
+               'cdc_dataobjects', 'cdc',
                'top_dataobjects', 'top', 
                'arich_dataobjects', 'arich',
-               'ecl_dataobjects', 'ecl', 'ecl_dbobjects', 'calibration', 'Geom',
+               'ecl_dataobjects', 'ecl', 'ecl_dbobjects', 'Geom',
                'klm_dataobjects', 'klm_dbobjects',
 	       'hlt',
 	       'tracking_trackFindingCDC',

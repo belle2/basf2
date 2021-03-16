@@ -781,8 +781,8 @@ Decay B0
 0.000000000   D(2S)-  mu+  nu_mu                           ISGW2;
 0.000000000   D*(2S)-  e+  nu_e                            ISGW2;
 0.000000000   D*(2S)-  mu+  nu_mu                          ISGW2;
-0.002140000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
-0.002140000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
+0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
+0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
 0.000094227   pi-  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
 0.000156755   rho-  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
@@ -2058,31 +2058,31 @@ Decay B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00985307    anti-cd_0  ud_0                              PYTHIA 23;
-0.01970623    anti-cd_1  ud_1                              PYTHIA 23;
+0.00987248    anti-cd_0  ud_0                              PYTHIA 23;
+0.01974506    anti-cd_1  ud_1                              PYTHIA 23;
 
 # Xi_c X      2.5%
-0.00268723    anti-cs_0  ud_0                              PYTHIA 23;
-0.00537444    anti-cs_1  ud_1                              PYTHIA 23;
+0.00269252    anti-cs_0  ud_0                              PYTHIA 23;
+0.00538503    anti-cs_1  ud_1                              PYTHIA 23;
 
-0.24171423    u  anti-d  anti-c  d                         PYTHIA 48;
-0.04120385    u  anti-d  anti-c  d                         PYTHIA 13;
-0.01881048    u  anti-s  anti-c  d                         PYTHIA 13;
-0.01612327    u  anti-c  anti-d  d                         PYTHIA 48;
-0.00080615    u  anti-c  anti-s  d                         PYTHIA 48;
+0.24219051    u  anti-d  anti-c  d                         PYTHIA 48;
+0.04128504    u  anti-d  anti-c  d                         PYTHIA 13;
+0.01884754    u  anti-s  anti-c  d                         PYTHIA 13;
+0.01615504    u  anti-c  anti-d  d                         PYTHIA 48;
+0.00080774    u  anti-c  anti-s  d                         PYTHIA 48;
 # Try to crank up the psi production (Lange).
-0.06628444    c  anti-s  anti-c  d                         PYTHIA 13;
-0.00537444    c  anti-d  anti-c  d                         PYTHIA 13;
-0.00268723    u  anti-d  anti-u  d                         PYTHIA 48;
-0.00358297    c  anti-s  anti-u  d                         PYTHIA 48;
+0.06641505    c  anti-s  anti-c  d                         PYTHIA 13;
+0.00538503    c  anti-d  anti-c  d                         PYTHIA 13;
+0.00269252    u  anti-d  anti-u  d                         PYTHIA 48;
+0.00359003    c  anti-s  anti-u  d                         PYTHIA 48;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183623    u  anti-u  anti-d  d                         PYTHIA 48;
-0.00006272    d  anti-d  anti-d  d                         PYTHIA 48;
-0.00008061    s  anti-s  anti-d  d                         PYTHIA 48;
-0.00197058    u  anti-u  anti-s  d                         PYTHIA 48;
-0.00161229    d  anti-d  anti-s  d                         PYTHIA 48;
-0.00134361    s  anti-s  anti-s  d                         PYTHIA 48;
-0.00447870    anti-s  d                                    PYTHIA 32;
+0.00183985    u  anti-u  anti-d  d                         PYTHIA 48;
+0.00006284    d  anti-d  anti-d  d                         PYTHIA 48;
+0.00008077    s  anti-s  anti-d  d                         PYTHIA 48;
+0.00197446    u  anti-u  anti-s  d                         PYTHIA 48;
+0.00161547    d  anti-d  anti-s  d                         PYTHIA 48;
+0.00134626    s  anti-s  anti-s  d                         PYTHIA 48;
+0.00448752    anti-s  d                                    PYTHIA 32;
 
 Enddecay
 
@@ -2157,7 +2157,7 @@ Decay anti-B0
 0.001300000   D_1+  tau-  anti-nu_tau                      LLSW 0.71 -1.6 -0.5 2.9;
 0.001300000   D_0*+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
 0.002000000   D'_1+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
-0.002000000   D_2*+  tau-  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
+0.002000000   D_2*+  tau-  anti-nu_tau                     LLSW 0.71 -1.6 -0.5 2.9;
 
 # B -> cc= s
 #
@@ -2539,8 +2539,8 @@ Decay anti-B0
 0.000000000   D(2S)+  mu-  anti-nu_mu                      ISGW2;
 0.000000000   D*(2S)+  mu-  anti-nu_mu                     ISGW2;
 0.000000000   D*(2S)+  e-  anti-nu_e                       ISGW2;
-0.002140000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
-0.002140000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
+0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
+0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
 0.000094227   pi+  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
 0.000156755   rho+  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
@@ -3816,31 +3816,31 @@ Decay anti-B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00985307    cd_0  anti-ud_0                              PYTHIA 23;
-0.01970623    cd_1  anti-ud_1                              PYTHIA 23;
+0.00987248    cd_0  anti-ud_0                              PYTHIA 23;
+0.01974506    cd_1  anti-ud_1                              PYTHIA 23;
 
 # Xi_c X      2.5%
-0.00268723    cs_0  anti-ud_0                              PYTHIA 23;
-0.00537444    cs_1  anti-ud_1                              PYTHIA 23;
+0.00269252    cs_0  anti-ud_0                              PYTHIA 23;
+0.00538503    cs_1  anti-ud_1                              PYTHIA 23;
 
-0.24171423    anti-u  d  c  anti-d                         PYTHIA 48;
-0.04120385    anti-u  d  c  anti-d                         PYTHIA 25;
-0.01881048    anti-u  s  c  anti-d                         PYTHIA 23;
-0.01612327    anti-u  c  d  anti-d                         PYTHIA 48;
-0.00080615    anti-u  c  s  anti-d                         PYTHIA 48;
+0.24219051    anti-u  d  c  anti-d                         PYTHIA 48;
+0.04128504    anti-u  d  c  anti-d                         PYTHIA 25;
+0.01884754    anti-u  s  c  anti-d                         PYTHIA 23;
+0.01615504    anti-u  c  d  anti-d                         PYTHIA 48;
+0.00080774    anti-u  c  s  anti-d                         PYTHIA 48;
 # Try to crank up the psi production (Lange).
-0.06628444    anti-c  s  c  anti-d                         PYTHIA 13;
-0.00537444    anti-c  d  c  anti-d                         PYTHIA 13;
-0.00268723    anti-u  d  u  anti-d                         PYTHIA 48;
-0.00358297    anti-c  s  u  anti-d                         PYTHIA 48;
+0.06641505    anti-c  s  c  anti-d                         PYTHIA 13;
+0.00538503    anti-c  d  c  anti-d                         PYTHIA 13;
+0.00269252    anti-u  d  u  anti-d                         PYTHIA 48;
+0.00359003    anti-c  s  u  anti-d                         PYTHIA 48;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183623    anti-u  u  d  anti-d                         PYTHIA 48;
-0.00006272    anti-d  d  d  anti-d                         PYTHIA 48;
-0.00008061    anti-s  s  d  anti-d                         PYTHIA 48;
-0.00197058    anti-u  u  s  anti-d                         PYTHIA 48;
-0.00161229    anti-d  d  s  anti-d                         PYTHIA 48;
-0.00134361    anti-s  s  s  anti-d                         PYTHIA 48;
-0.00447870    s  anti-d                                    PYTHIA 32;
+0.00183985    anti-u  u  d  anti-d                         PYTHIA 48;
+0.00006284    anti-d  d  d  anti-d                         PYTHIA 48;
+0.00008077    anti-s  s  d  anti-d                         PYTHIA 48;
+0.00197446    anti-u  u  s  anti-d                         PYTHIA 48;
+0.00161547    anti-d  d  s  anti-d                         PYTHIA 48;
+0.00134626    anti-s  s  s  anti-d                         PYTHIA 48;
+0.00448752    s  anti-d                                    PYTHIA 32;
 
 Enddecay
 
@@ -4220,8 +4220,8 @@ Decay B+
 0.000000000   anti-D(2S)0  mu+  nu_mu                      ISGW2;
 0.000000000   anti-D*(2S)0  e+  nu_e                       ISGW2;
 0.000000000   anti-D*(2S)0  mu+  nu_mu                     ISGW2;
-0.002140000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
-0.002140000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+0.001724000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+0.001724000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
 0.000050804   pi0  tau+  nu_tau                            ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
 0.000084530   rho0  tau+  nu_tau                           ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
@@ -4411,7 +4411,7 @@ Decay B+
 0.000026400   a_1+  pi0                                    SVS;  #[BF update - PG 09/2020]
 0.000006700   b_10  pi+                                    SVS;
 0.000010000   b_1+  pi0                                    SVS;
-0.000010000   rho+  f_0                                    SVS;
+0.000001900   rho+  f_0                                    SVS;  #Lower BF to be consistent with PDG UL. #[BF update - RM 12/2020]
 0.000010000   rho+  a_00                                   SVS;
 0.000002000   rho0  a_0+                                   SVS;
 0.000010000   f_0  pi+  pi0                                PHSP;
@@ -5340,27 +5340,27 @@ Decay B+
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02962009    anti-cd_1  uu_1                              PYTHIA 23;
+0.02968449    anti-cd_1  uu_1                              PYTHIA 23;
 
 # Xi_c X      2.4%
-0.00807825    anti-cs_1  uu_1                              PYTHIA 23;
+0.00809581    anti-cs_1  uu_1                              PYTHIA 23;
 
-0.20219415    u  anti-d  anti-c  u                         PYTHIA         48;
-0.03859591    u  anti-d  anti-c  u                         PYTHIA         13;
-0.02019552    u  anti-s  anti-c  u                         PYTHIA         13;
+0.20263378    u  anti-d  anti-c  u                         PYTHIA         48;
+0.03867983    u  anti-d  anti-c  u                         PYTHIA         13;
+0.02023943    u  anti-s  anti-c  u                         PYTHIA         13;
 # Try to crank up the psi production (Lange).
-0.06642087    c  anti-s  anti-c  u                         PYTHIA         13;
-0.00359029    c  anti-d  anti-c  u                         PYTHIA         13;
-0.00269271    u  anti-d  anti-u  u                         PYTHIA         48;
-0.00359029    c  anti-s  anti-u  u                         PYTHIA         48;
+0.06656528    c  anti-s  anti-c  u                         PYTHIA         13;
+0.00359810    c  anti-d  anti-c  u                         PYTHIA         13;
+0.00269857    u  anti-d  anti-u  u                         PYTHIA         48;
+0.00359810    c  anti-s  anti-u  u                         PYTHIA         48;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184004    u  anti-u  anti-d  u                         PYTHIA         48;
-0.00006286    d  anti-d  anti-d  u                         PYTHIA         48;
-0.00008080    s  anti-s  anti-d  u                         PYTHIA         48;
-0.00197471    u  anti-u  anti-s  u                         PYTHIA         48;
-0.00161566    d  anti-d  anti-s  u                         PYTHIA         48;
-0.00134641    s  anti-s  anti-s  u                         PYTHIA         48;
-0.00448787    anti-s  u                                    PYTHIA         32;
+0.00184404    u  anti-u  anti-d  u                         PYTHIA         48;
+0.00006300    d  anti-d  anti-d  u                         PYTHIA         48;
+0.00008097    s  anti-s  anti-d  u                         PYTHIA         48;
+0.00197900    u  anti-u  anti-s  u                         PYTHIA         48;
+0.00161917    d  anti-d  anti-s  u                         PYTHIA         48;
+0.00134934    s  anti-s  anti-s  u                         PYTHIA         48;
+0.00449762    anti-s  u                                    PYTHIA         32;
 
 Enddecay
 
@@ -5728,8 +5728,8 @@ Decay B-
 0.000000000   D(2S)0  mu-  anti-nu_mu                      ISGW2;
 0.000000000   D*(2S)0  e-  anti-nu_e                       ISGW2;
 0.000000000   D*(2S)0  mu-  anti-nu_mu                     ISGW2;
-0.002140000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
-0.002140000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+0.001724000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+0.001724000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
 0.000050804   pi0  tau-  anti-nu_tau                       ISGW2; #Assuming R_pi  = 0.641 (arXiv:1509.06938).    #[BF update - PG 09/2020]
 0.000084530   rho0  tau-  anti-nu_tau                      ISGW2; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020]
@@ -5919,7 +5919,7 @@ Decay B-
 0.000026400   a_1-  pi0                                    SVS;  #[BF update - PG 09/2020]
 0.000006700   b_10  pi-                                    SVS;
 0.000010000   b_1-  pi0                                    SVS;
-0.000010000   rho-  f_0                                    SVS;
+0.000001900   rho-  f_0                                    SVS;  #Lower BF to be consistent with PDG UL. #[BF update - RM 12/2020]
 0.000010000   rho-  a_00                                   SVS;
 0.000002000   rho0  a_0-                                   SVS;
 0.000010000   f_0  pi-  pi0                                PHSP;
@@ -6848,27 +6848,27 @@ Decay B-
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02962009    cd_1  anti-uu_1                              PYTHIA 23;
+0.02968449    cd_1  anti-uu_1                              PYTHIA 23;
 
 # Xi_c X      2.4%
-0.00807825    cs_1  anti-uu_1                              PYTHIA 23;
+0.00809581    cs_1  anti-uu_1                              PYTHIA 23;
 
-0.20219415    anti-u  d  c  anti-u                         PYTHIA         48;
-0.03859591    anti-u  d  c  anti-u                         PYTHIA         13;
-0.02019552    anti-u  s  c  anti-u                         PYTHIA         13;
+0.20263378    anti-u  d  c  anti-u                         PYTHIA         48;
+0.03867983    anti-u  d  c  anti-u                         PYTHIA         13;
+0.02023943    anti-u  s  c  anti-u                         PYTHIA         13;
 # Try to crank up the psi production (Lange).
-0.06642087    anti-c  s  c  anti-u                         PYTHIA         13;
-0.00359029    anti-c  d  c  anti-u                         PYTHIA         13;
-0.00269271    anti-u  d  u  anti-u                         PYTHIA         48;
-0.00359029    anti-c  s  u  anti-u                         PYTHIA         48;
+0.06656528    anti-c  s  c  anti-u                         PYTHIA         13;
+0.00359810    anti-c  d  c  anti-u                         PYTHIA         13;
+0.00269857    anti-u  d  u  anti-u                         PYTHIA         48;
+0.00359810    anti-c  s  u  anti-u                         PYTHIA         48;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184004    anti-u  u  d  anti-u                         PYTHIA         48;
-0.00006286    anti-d  d  d  anti-u                         PYTHIA         48;
-0.00008080    anti-s  s  d  anti-u                         PYTHIA         48;
-0.00197471    anti-u  u  s  anti-u                         PYTHIA         48;
-0.00161566    anti-d  d  s  anti-u                         PYTHIA         48;
-0.00134641    anti-s  s  s  anti-u                         PYTHIA         48;
-0.00448787    s  anti-u                                    PYTHIA         32;
+0.00184404    anti-u  u  d  anti-u                         PYTHIA         48;
+0.00006300    anti-d  d  d  anti-u                         PYTHIA         48;
+0.00008097    anti-s  s  d  anti-u                         PYTHIA         48;
+0.00197900    anti-u  u  s  anti-u                         PYTHIA         48;
+0.00161917    anti-d  d  s  anti-u                         PYTHIA         48;
+0.00134934    anti-s  s  s  anti-u                         PYTHIA         48;
+0.00449762    s  anti-u                                    PYTHIA         32;
 
 Enddecay
 

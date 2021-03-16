@@ -1,4 +1,0 @@
-SVD
-===
-
-.. include:: ../todo.rst

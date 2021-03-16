@@ -48,6 +48,9 @@ SVDShaperDigitsFromTracksModule::SVDShaperDigitsFromTracksModule() : Module()
            std::string("SVDShaperDigitsNotFromTracks"));
   addParam("InheritAllRelations", m_inheritance,
            "Set true if you want to inherit all relations between StoreArray, the default is false", bool(false));
+  addParam("useWithRel5Reconstruction", m_useWithRel5Reco,
+           "Set true if you are using this module with release-05 svd reconstruction (or older)", bool(false));
+
 }
 
 SVDShaperDigitsFromTracksModule::~SVDShaperDigitsFromTracksModule()
@@ -60,7 +63,8 @@ void SVDShaperDigitsFromTracksModule::initialize()
 {
 
   B2DEBUG(10, "SVDShaperDigits: " << m_svdshaper);
-  B2DEBUG(10, "SVDRecoDigits: " << m_svdreco);
+  if (m_useWithRel5Reco)
+    B2DEBUG(10, "SVDRecoDigits: " << m_svdreco);
   B2DEBUG(10, "SVDClusters: " << m_svdcluster);
   B2DEBUG(10, "Tracks: " << m_track);
   B2DEBUG(10, "RecoTracks: " << m_recotrack);
@@ -75,7 +79,8 @@ void SVDShaperDigitsFromTracksModule::initialize()
   StoreArray<Track> tracks(m_track);
   ShaperDigits.isRequired();
   Clusters.isRequired();
-  RecoDigits.isRequired();
+  if (m_useWithRel5Reco)
+    RecoDigits.isRequired();
   recoTracks.isRequired();
   tracks.isRequired();
   m_selectedShaperDigits.registerSubset(ShaperDigits, m_outputINArrayName);
@@ -101,12 +106,16 @@ void SVDShaperDigitsFromTracksModule::event()
 {
   StoreArray<SVDShaperDigit> ShaperDigits(m_svdshaper);
 
-  m_selectedShaperDigits.select([](const SVDShaperDigit * theSVDShaperDigit) {
+  m_selectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
+    if (m_useWithRel5Reco)
+      return isRelatedToTrackRel5(theSVDShaperDigit);
     return isRelatedToTrack(theSVDShaperDigit);
   });
 
 
-  m_notSelectedShaperDigits.select([](const SVDShaperDigit * theSVDShaperDigit) {
+  m_notSelectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
+    if (m_useWithRel5Reco)
+      return !isRelatedToTrackRel5(theSVDShaperDigit);
     return !isRelatedToTrack(theSVDShaperDigit);
   });
 }
@@ -120,6 +129,22 @@ void SVDShaperDigitsFromTracksModule::terminate()
 }
 
 bool SVDShaperDigitsFromTracksModule::isRelatedToTrack(const SVDShaperDigit* shaperdigit)
+{
+
+  RelationVector<SVDCluster> cluster_rel_shaper = shaperdigit->getRelationsFrom<SVDCluster>();
+  if (cluster_rel_shaper.size() == 0) {return false;}
+  else {
+    RelationVector<RecoTrack> recotrack_rel_cluster = cluster_rel_shaper[0]->getRelationsTo<RecoTrack>();
+    if (recotrack_rel_cluster.size() == 0) {return false;}
+    else {
+      RelationVector<Track> track_rel_recotrack = recotrack_rel_cluster[0]->getRelationsFrom<Track>();
+      if (track_rel_recotrack.size() == 0) {return false;}
+      else {return true;}
+    }
+  }
+}
+
+bool SVDShaperDigitsFromTracksModule::isRelatedToTrackRel5(const SVDShaperDigit* shaperdigit)
 {
   RelationVector<SVDRecoDigit> reco_rel_shape = shaperdigit->getRelationsFrom<SVDRecoDigit>();
   if (reco_rel_shape.size() == 0) {return false;}

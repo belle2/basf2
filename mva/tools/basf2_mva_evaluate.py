@@ -324,11 +324,11 @@ if __name__ == '__main__':
 
         if args.compile:
             B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")
-            o.save(f'latex.pdf', compile=True)
+            o.save('latex.tex', compile=True)
         else:
             B2INFO(f"Creating a .zip archive containing plots and a TeX file at {args.outputfile}."
                    f"Please unpack the archive and compile the latex.tex file with pdflatex.")
-            o.save(f'latex.tex', compile=False)
+            o.save('latex.tex', compile=False)
 
         os.chdir(old_cwd)
         if args.working_directory == '':
@@ -337,7 +337,7 @@ if __name__ == '__main__':
             working_directory = args.working_directory
 
         if args.compile:
-            shutil.copy(os.path.join(working_directory, f'latex.pdf'), args.outputfile)
+            shutil.copy(os.path.join(working_directory, 'latex.pdf'), args.outputfile)
         else:
             base_name = os.path.join(old_cwd, args.outputfile.rsplit('.', 1)[0])
             shutil.make_archive(base_name, 'zip', working_directory)

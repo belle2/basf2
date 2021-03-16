@@ -146,7 +146,7 @@ void SVDTimeCalibrationCollectorModule::collect()
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
 
-      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
+      float eventT0Sync = eventinfo->getTimeInSVDReference(eventT0, m_svdCls[cl]->getFirstFrame());
 
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);

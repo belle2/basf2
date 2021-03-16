@@ -71,20 +71,30 @@ namespace Belle2 {
       std::map<VxdID, TH1D*> hDAQCM2;/**< Common Mode per DHE to gate and DHP level */
       std::map<int, TH1D*> hDAQDHCReduction;/**< DHC data reduction  */
 
+      TH1I* hEODBAfterInjLER{};          /**< Histogram of EODB after LER injection */
+      TH1I* hEODBAfterInjHER{};          /**< Histogram of EODB after HER injection */
       TH1I* hCM63AfterInjLER{};          /**< Histogram of CM63 after LER injection */
       TH1I* hCM63AfterInjHER{};          /**< Histogram of CM63 after HER injection */
       TH1I* hTruncAfterInjLER{};          /**< Histogram Truncation after LER injection */
       TH1I* hTruncAfterInjHER{};          /**< Histogram Truncation after HER injection */
       TH1I* hMissAfterInjLER{};          /**< Histogram MissFrame after LER injection */
       TH1I* hMissAfterInjHER{};          /**< Histogram MissFrame after HER injection */
+      TH1I* hEODBTrgDiff{};          /**< Histogram of EODB after  last trigger */
+      TH1I* hCM63TrgDiff{};          /**< Histogram of CM63 after  last trigger */
+      TH1I* hTruncTrgDiff{};          /**< Histogram Truncation after  last trigger */
+      TH1I* hMissTrgDiff{};          /**< Histogram MissFrame after  last trigger */
       TH1D* hDAQStat{};                 /**< Histogram for Truncation etc Stats */
 
+      /** Initialize */
       void initialize() override final;
 
+      /** Begin run */
       void beginRun() override final;
 
+      /** Event */
       void event() override final;
 
+      /** Define histograms */
       void defineHisto() override final;
 
       /** vector of errors */

@@ -162,6 +162,8 @@ namespace Belle2 {
      * @param FADC is FADC number from the SVDRawCopper data.
      * @param APV25 is the APV25 number from the SVDRawCopper data.
      * @param channel is the APV25 channel number from the SVDRawCopper data.
+     * @param samples APV samples
+     * @param time strip time
      * @return a pointer to the new SVDShaperDigit owned by the caller whose
      * Position is 0
      * FIXME: There should be no such function in this mapping class, no dependence
@@ -181,7 +183,7 @@ namespace Belle2 {
     /** is the APV of the strips in the map? for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the layer number
      * @param ladder is the ladder number
-     * @param sensor is the sensor number
+     * @param dssd is the sensor number
      * @param side is true if U
      * @param strip is the strip number
      * @return true if the APV that reads the strip is in the map, false otherwise

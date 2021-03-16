@@ -185,7 +185,7 @@ void TRGGRLProjectsModule::initialize()
 void
 TRGGRLProjectsModule::beginRun()
 {
-  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
+  B2DEBUG(20, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -621,7 +621,7 @@ void TRGGRLProjectsModule::event()
   bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
 
   bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
-  bool cdcklm_1 = (trackKLMmatch.getEntries() == 2);
+  bool cdcklm_1 = (trackKLMmatch.getEntries() > 1);
   bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
   bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
 
@@ -671,6 +671,8 @@ void TRGGRLProjectsModule::event()
   bool nclst2_3 = (N_clst2 > 3);
 
   int N_ST = trgInfo->getNshorttrk();
+  int N_ST_fwd = trgInfo->getNshorttrk_fwd();
+  int N_ST_bwd = trgInfo->getNshorttrk_bwd();
   int s2s3 = trgInfo->gets2s3();
   int s2s5 = trgInfo->gets2s5();
   int s2so = trgInfo->gets2so();
@@ -683,10 +685,16 @@ void TRGGRLProjectsModule::event()
   int fwdnb  = trgInfo->getfwdnb();
   int brlfb  = trgInfo->getbrlfb();
   int brlnb  = trgInfo->getbrlnb();
+  int N_IT   = trgInfo->getNinnertrk();
+  int i2fo   = trgInfo->geti2fo();
+  int n_secl = trgInfo->getNsecl();
+  int n_iecl = trgInfo->getNiecl();
+  int n_seklm = trgInfo->getNsklm();
+  int n_ieklm = trgInfo->getNiklm();
 
   //---------------------------------------------------------------------
   //..Filling InputBits
-  //..Naming is based on trg/gdl/src/TrgBitData.cc
+  //..Naming is based on trg/gdl/dbobjects/log/
 
 
   if (!m_InputBitsDB)B2INFO("no database of gdl input bits");
@@ -709,6 +717,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ts_1") {bit = N_ST == 2;}
     else if (bitname == "ts_2") {bit = N_ST == 3;}
     else if (bitname == "ts_3") {bit = N_ST > 3;}
+    else if (bitname == "fwd_s") {bit = N_ST_fwd > 0;}
+    else if (bitname == "bwd_s") {bit = N_ST_bwd > 0;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}
@@ -729,6 +739,13 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "brlfb2") {bit = brlfb == 2;}
     else if (bitname == "brlnb1") {bit = brlnb == 1;}
     else if (bitname == "brlnb2") {bit = brlnb == 2;}
+    else if (bitname == "seklm_0") {bit = n_seklm == 0;}
+    else if (bitname == "seklm_1") {bit = n_seklm > 0;}
+    else if (bitname == "ieklm") {bit = n_ieklm > 0;}
+    else if (bitname == "secl") {bit = n_secl > 0;}
+    else if (bitname == "iecl") {bit = n_iecl > 0;}
+    else if (bitname == "ti") {bit = N_IT > 0;}
+    else if (bitname == "i2fo") {bit = i2fo > 0;}
     else if (bitname == "ehigh") {bit = ehigh;}
     else if (bitname == "elow") {bit = elow;}
     else if (bitname == "elum") {bit = elum;}
@@ -872,7 +889,14 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "nimin1") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
 
+    //other trigger bits
+    else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "f2f30") {bit = false;}
+    else if (bitname == "s2f30") {bit = false;}
+    else if (bitname == "s2s30") {bit = false;}
 
+    //DITTO: please don't change the WARNING message below.
+    //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
     else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
@@ -883,7 +907,7 @@ void TRGGRLProjectsModule::event()
 void
 TRGGRLProjectsModule::endRun()
 {
-  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
+  B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

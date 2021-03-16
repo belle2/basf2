@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # load the framework_io library because it contains helper functions to fill the
     # FileMetaData
     ROOT.gSystem.Load('libframework_io')
-    ROOT.gROOT.LoadMacro(ROOT.Belle2.FileSystem.findFile("include/framework/io/RootIOUtilities.h"))
+    ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
 
     parser = create_argumentparser()
     args = parser.parse_args()

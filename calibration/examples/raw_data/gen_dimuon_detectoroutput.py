@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+from generators import add_kkmc_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 from rawdata import add_packers, add_raw_seqoutput
-from ROOT import Belle2
 
 b2.set_random_seed(5433)
 
@@ -34,12 +34,7 @@ main.add_module(eventinfosetter)
 # set the BeamParameters for running at Y(4S)
 beamparameters = add_beamparameters(main, "Y4S")
 
-kkgeninput = b2.register_module('KKGenInput')
-kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
-kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-kkgeninput.param('taudecaytableFile', '')
-kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
-main.add_module(kkgeninput)
+add_kkmc_generator(main, 'mu-mu+')
 
 # Print out list of generated particles to check decay is correct
 # printMCParticles(path=main)

@@ -27,15 +27,17 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstar0_D0pi0_Kpipipi,
                                       loadStdDstarPlus_D0pi_Kpi,
                                       loadStdDstarPlus_D0pi_Kpipi0,
-                                      loadStdDstarPlus_D0pi_Kpipipi)
+                                      loadStdDstarPlus_D0pi_Kpipipi,
+                                      loadStdDstarPlus_Dpi0_Kpipi)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdK, stdPi
-from stdPi0s import stdPi0s
+from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -62,6 +64,7 @@ class BtoD0h_Kspi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -83,12 +86,15 @@ class BtoD0h_Kspi0(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K_S0:merged pi0:veryLooseFit', '1.84 < M < 1.89', path=path)
+        loadStdSkimPi0(path=path)
+        stdPi0s(listtype='eff50_Jan2020Fit', path=path)
+
+        ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_Jan2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
         ma.variablesToHistogram(
-            filename='BtoDh_Kspi0_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -123,6 +129,8 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -147,12 +155,18 @@ class BtoD0h_Kspipipi0(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
+        stdPi('all', path=path)
+        stdK('all', path=path)
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
+        stdPi0s(listtype='eff40_Jan2020Fit', path=path)
+
         ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_Jan2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
         ma.variablesToHistogram(
-            filename='BtoDh_Kspipipi0_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -222,6 +236,7 @@ class B0toDpi_Kspi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)
@@ -259,6 +274,7 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
@@ -293,6 +309,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         loadStdPi0ForBToHadrons(path=path)
@@ -385,6 +402,7 @@ class B0toDrho_Kspi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -429,6 +447,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -476,6 +495,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -536,6 +556,7 @@ class BtoD0h_hh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         loadPiForBtoHadrons(path=path)
@@ -557,13 +578,15 @@ class BtoD0h_hh(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K-:GoodTrack pi+:GoodTrack', '1.84 < M < 1.89', path=path)
-        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        stdPi('all', path=path)
+        stdK('all', path=path)
+
+        ma.reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-
         ma.variablesToHistogram(
-            filename='BtoDh_hh_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -717,6 +740,7 @@ class BtoD0h_Kshh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)
@@ -738,12 +762,16 @@ class BtoD0h_Kshh(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K_S0:merged pi+:GoodTrack pi-:GoodTrack', '1.84 < M < 1.89', path=path)
-        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        stdPi('all', path=path)
+        stdK('all', path=path)
+
+        ma.reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+
         ma.variablesToHistogram(
-            filename='BtoDh_Kshh_Validation.root',
+            filename=f'{self}_Validation.root',
             decayString='B-:ch3',
             variables=[
                 ('Mbc', 100, 5.2, 5.3),
@@ -873,3 +901,111 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
                          outputVariable="cosMdstIndex_rank", path=path)
 
         self.SkimLists = ["B+:BtoD0rho_merged"]
+
+
+@fancy_skim_header
+class B0toDD_Kpipi_Kspi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{+}(\\to K^- \\pi^+ \\pi^+) D^{-}(\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D^{+}(\\to K^- \\pi^+ \\pi^+) D^{-}(\\to K_{\\rm S}^0 \\pi^-)`
+    * :math:`B^{0}\\to D^{+}(\\to K_{\\rm S}^0 \\pi^-) D^{-}(\\to K_{\\rm S}^0 \\pi^-)`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+    * ``1.8 < M_D < 1.9``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi` and
+        `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^-`
+        channel is defined.
+    """
+
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdDplus_Kspi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        BsigChannels = [
+            "D+:Kpipi D-:Kpipi",
+            "D+:Kpipi D-:Kspi",
+            "D+:Kspi D-:Kspi"
+        ]
+
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B0:B0toDD" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B0:B0toDD" + str(chID))
+
+        self.SkimLists = BsigList
+
+
+@fancy_skim_header
+class B0toDstarD(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
+      (\\to K^+ \\pi^-, \\to K^+ \\pi^- \\pi^- \\pi^+, K^+ \\pi^- \\pi^0) \\pi^-) \\D^+(\\to K^- \\pi^+ \\pi^+)`
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to D^{-} \\pi^0) \\D^+(\\to K^- \\pi^+ \\pi^+)`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+    * ``DM_Dstar_D < 0.16``
+    * ``1.8 < M_D < 1.9``
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdD0_Kpipi0(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdDstarPlus_D0pi_Kpi(path=path)
+        loadStdDstarPlus_D0pi_Kpipipi(path=path)
+        loadStdDstarPlus_D0pi_Kpipi0(path=path)
+        loadStdDstarPlus_Dpi0_Kpipi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        BsigChannels = [
+            "D*+:D0_Kpi D-:Kpipi",
+            "D*+:D0_Kpipipi D-:Kpipi",
+            "D*+:D0_Kpipi0 D-:Kpipi",
+            "D*+:Dpi0_Kpipi D-:Kpipi"
+        ]
+
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B0:B0toDstarD" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B0:B0toDstarD" + str(chID))
+
+        self.SkimLists = BsigList

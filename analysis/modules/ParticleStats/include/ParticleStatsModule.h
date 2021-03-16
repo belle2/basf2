@@ -41,6 +41,8 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor;
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;
+    /** Name of output file */
+    std::string m_outputFile;
 
   public:
     /** Constructor */

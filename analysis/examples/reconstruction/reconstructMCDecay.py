@@ -10,14 +10,13 @@ An example script to find a specific decay chain at MC level.
 __authors__ = "Yo Sato"
 
 import basf2
-from ROOT import Belle2
 from modularAnalysis import fillParticleListFromMC, inputMdst, reconstructMCDecay, variablesToNtuple
 from variables import variables as vm  # shorthand for the variable manager instance
 
 basf2.set_log_level(basf2.LogLevel.DEBUG)
 
 mypath = basf2.create_path()
-testinput = Belle2.FileSystem.findFile('analysis/tests/mdst.root')
+testinput = basf2.find_file('analysis/tests/mdst.root')
 inputMdst("default", testinput, path=mypath)
 
 fillParticleListFromMC('K+:MC', 'mcPrimary', path=mypath)

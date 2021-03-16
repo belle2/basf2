@@ -54,12 +54,7 @@ import stat
 import shutil
 import pickle
 import json
-try:
-    import b2biiConversion
-    b2biifound = True
-except ModuleNotFoundError:
-    print("B2BII not found, can't use process_urls for training.")
-    b2biifound = False
+import b2biiConversion
 import fei
 
 
@@ -116,7 +111,7 @@ def setup(args):
 
     for x in args.data:
         for y in x:
-            if (y.startswith("http://") or y.startswith("https://")) and b2biifound:
+            if (y.startswith("http://") or y.startswith("https://")):
                 data_files += b2biiConversion.parse_process_url(y)
             else:
                 data_files += glob.glob(y)
@@ -136,7 +131,6 @@ def setup(args):
     shutil.rmtree('jobs', ignore_errors=True)
     os.mkdir('collection')
     os.mkdir('collection/localdb')
-    os.mkdir('collection/B2BII_MC_database')
     os.mkdir('jobs')
     if args.large_dir:
         if not os.path.isdir(args.large_dir):
@@ -155,7 +149,6 @@ def setup(args):
             os.symlink(data_input, f'jobs/{i}/input_{j}.root')
         # Symlink weight directory and basf2_path
         os.symlink(args.directory + '/collection/localdb', f'jobs/{i}/localdb')
-        os.symlink(args.directory + '/collection/B2BII_MC_database', f'jobs/{i}/B2BII_MC_database')
 
 
 def create_report(args):
@@ -374,7 +367,6 @@ if __name__ == '__main__':
             raise RuntimeError(f'Unknown skip parameter {args.skip}')
 
         if start == 7:
-            import sys
             create_report(args)
             sys.exit(0)
 

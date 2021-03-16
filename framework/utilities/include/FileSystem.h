@@ -68,6 +68,8 @@ namespace Belle2 {
     static bool isFile(const std::string& filename);
     /** Check if filename points to an existing directory */
     static bool isDir(const std::string& filename);
+    /** Check if filename points to an existing symbolic link */
+    static bool isSymLink(const std::string& filename);
 
     /** Calculate the MD5 checksum of a given file */
     static std::string calculateMD5(const std::string& filename);

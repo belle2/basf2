@@ -13,6 +13,8 @@ These files actually contain more information but fewer events.
 
 To get information about existing skim, ask the current skim group liaison.
 
+.. tip:: For an introductory lesson, take a look at :numref:`onlinebook_skim`.
+
 Systematics skims
 -----------------
 

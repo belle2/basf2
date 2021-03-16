@@ -12,8 +12,8 @@ b2.logging.set_info(b2.LogLevel.FATAL, b2.logging.get_info(b2.LogLevel.ERROR))
 main = b2.create_path()
 input = b2.register_module('B2BIIMdstInput')
 input.param('inputFileNames', [
-                               Belle2.FileSystem.findFile('b2bii/tests/chaintest_1.mdst'),
-                               Belle2.FileSystem.findFile('b2bii/tests/chaintest_2.mdst')
+                               b2.find_file('b2bii/tests/chaintest_1.mdst'),
+                               b2.find_file('b2bii/tests/chaintest_2.mdst')
                               ])
 main.add_module(input)
 processed_event_numbers = []
@@ -49,8 +49,8 @@ assert expected_event_numbers == processed_event_numbers
 main = b2.create_path()
 input = b2.register_module('B2BIIMdstInput')
 input.param('inputFileNames', [
-                               Belle2.FileSystem.findFile('b2bii/tests/chaintest_1.mdst'),
-                               Belle2.FileSystem.findFile('b2bii/tests/chaintest_2.mdst')
+                               b2.find_file('b2bii/tests/chaintest_1.mdst'),
+                               b2.find_file('b2bii/tests/chaintest_2.mdst')
                               ])
 input.param('entrySequences', ['1:2,4:6', '0,2:3,5:100'])
 main.add_module(input)
@@ -70,8 +70,8 @@ assert expected_event_numbers == processed_event_numbers
 main = b2.create_path()
 input = b2.register_module('B2BIIMdstInput')
 input.param('inputFileNames', [
-    Belle2.FileSystem.findFile('b2bii/tests/chaintest_1.mdst'),
-    Belle2.FileSystem.findFile('b2bii/tests/chaintest_2.mdst')
+    b2.find_file('b2bii/tests/chaintest_1.mdst'),
+    b2.find_file('b2bii/tests/chaintest_2.mdst')
 ])
 input.param('entrySequences', [':', '2:3,5:100'])
 main.add_module(input)
@@ -90,8 +90,8 @@ assert expected_event_numbers == processed_event_numbers
 main = b2.create_path()
 input = b2.register_module('B2BIIMdstInput')
 input.param('inputFileNames', [
-    Belle2.FileSystem.findFile('b2bii/tests/chaintest_1.mdst'),
-    Belle2.FileSystem.findFile('b2bii/tests/chaintest_2.mdst')
+    b2.find_file('b2bii/tests/chaintest_1.mdst'),
+    b2.find_file('b2bii/tests/chaintest_2.mdst')
 ])
 input.param('entrySequences', ['', '2:3,5:100'])
 main.add_module(input)

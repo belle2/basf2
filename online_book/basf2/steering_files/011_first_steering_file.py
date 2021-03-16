@@ -11,10 +11,9 @@ filenumber = sys.argv[1]
 main = b2.Path()
 
 # load input data from mdst/udst file
-filedirectory = "/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/"
 ma.inputMdstList(
     environmentType="default",
-    filelist=[f"{filedirectory}/1111540100_eph3_BGx0_{filenumber}.root"],
+    filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
 

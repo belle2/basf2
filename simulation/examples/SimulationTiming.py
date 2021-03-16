@@ -45,6 +45,7 @@ main.add_module("Geometry", assignRegions=True)
 main.add_module("FullSim")
 # including the timing module
 main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=b2.LogLevel.INFO)
+
 # and run it
 b2.process(main)
 
@@ -52,6 +53,7 @@ b2.process(main)
 def add_info(obj, title, text):
     """Add a description item to a TH object"""
     obj.GetListOfFunctions().Add(ROOT.TNamed(title, text))
+
 
 # now open the created root file and update some things
 root_file = ROOT.TFile("EvtGenTiming.root", "UPDATE")

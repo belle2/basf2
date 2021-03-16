@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
+from svd import add_svd_create_recodigits
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
 
-def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care"):
+def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
     """
     This function adds DQMs which are common for Cosmic runs and Collion runs
 
@@ -25,6 +26,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+    @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
+                                         Should be True only when running on the HLT servers
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
     # Check components.
@@ -46,6 +49,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
         # SVD
         if components is None or 'SVD' in components:
+            # reconstruct SVDRecoDigits first of all
+            add_svd_create_recodigits(path)
+
             # SVD DATA FORMAT
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
@@ -77,56 +83,75 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            createErrorFlagHistograms=True,
+            cutResultIdentifiers={},
+            histogramDirectoryName="softwaretrigger_before_filter",
+        )
+        path.add_module("StatisticsTimingHLTDQM",
+                        createHLTUnitHistograms=create_hlt_unit_histograms,
+                        )
+
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
-        hlt_trigger_lines_in_plot = [
-            "ge3_loose_tracks_inc_1_tight_not_ee2leg",
-            "selectmumu",
-            "ECLMuonPair",
-            "2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx",
-            "single_muon\\10",
-            "singleTagLowMass",
-        ]
+        hlt_trigger_lines_in_plot = []
+        hlt_skim_lines_in_plot = []
 
-        hlt_skim_lines_in_plot = [
-            "accept_hadron",
-            "accept_hadronb2",
-            "accept_bhabha_all",
-            "accept_bhabha",
-            "accept_gamma_gamma",
-            "accept_mumu_2trk",
-            "accept_mumutight",
-            "accept_radmumu",
-            "accept_offip",
-            "accept_tau_2trk",
-            "accept_tau_Ntrk",
+        hlt_trigger_lines_per_unit_in_plot = [
+            "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+            "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
+            "selectee",
+            "Estargt2_GeV_cluster",
         ]
+        cutResultIdentifiers = {}
+
+        from softwaretrigger import filter_categories, skim_categories
+
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
+        skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
+
+        def read_lines(category):
+            return [i.split(" ", 1)[1].replace(" ", "_") for i in category]
+
+        for i in filter_cat:
+            cutResultIdentifiers[i] = {"filter": read_lines(getattr(filter_categories, i))}
+            hlt_trigger_lines_in_plot += read_lines(getattr(filter_categories, i))
+
+        for i in skim_cat:
+            cutResultIdentifiers[i] = {"skim": read_lines(getattr(skim_categories, i))}
+            hlt_skim_lines_in_plot += read_lines(getattr(skim_categories, i))
+
+        cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
+        cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
 
         # Default plot
         path.add_module(
             "SoftwareTriggerHLTDQM",
-            cutResultIdentifiers={
-                "filter": hlt_trigger_lines_in_plot,
-                "skim": hlt_skim_lines_in_plot,
-            },
-            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"]
+            cutResultIdentifiers=cutResultIdentifiers,
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
-           "SoftwareTriggerHLTDQM",
-           cutResultIdentifiers={
-               "skim": hlt_skim_lines_in_plot,
-           },
-           cutResultIdentifiersIgnored={
-               "skim": [
-                   "accept_bhabha_all",
-                   ]
-           },
-           createTotalResultHistograms=False,
-           createExpRunEventHistograms=False,
-           histogramDirectoryName="softwaretrigger_skim_nobhabha",
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers={
+                "skim": {"skim": hlt_skim_lines_in_plot},
+            },
+            cutResultIdentifiersIgnored={
+                "skim": [
+                    "accept_bhabha_all",
+                ]
+            },
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            histogramDirectoryName="softwaretrigger_skim_nobhabha",
         )
-        path.add_module("StatisticsTimingHLTDQM")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
@@ -174,6 +199,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
+        # TRGTOP
+        trgtopdqm = b2.register_module('TRGTOPDQM')
+        trgtopdqm.param('skim', 0)
+        path.add_module(trgtopdqm)
         # TRGGRL
         trggrldqm = b2.register_module('TRGGRLDQM')
         path.add_module(trggrldqm)
@@ -208,6 +237,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
+        # TRGTOP
+        trgtopdqm_skim = b2.register_module('TRGTOPDQM')
+        trgtopdqm_skim.param('skim', 1)
+        path.add_module(trgtopdqm_skim)
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):

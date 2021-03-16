@@ -34,7 +34,7 @@ namespace Belle2 {
     static constexpr int T2DOutputWidth = T2D_TO_3D_WIDTH; // 747
     static constexpr unsigned lenTS = 21;   // ID (8 bit) + t (9 bit) + LR (2 bit) + priority (2 bit)
 
-    static constexpr int nMax2DTracksPerClock = 6;
+    static constexpr int nMax2DTracksPerClock = 4;
 
     // bit width of the clock counter
     static constexpr int clockCounterWidth = 9;
@@ -1228,8 +1228,8 @@ namespace Belle2 {
           }
           B2DEBUG(21, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
           if (p_nnenable.data == "1") {
-            std::vector<bool> foundoldtrack;
-            std::vector<bool> driftthreshold;
+            std::vector<bool> foundoldtrack{false};
+            std::vector<bool> driftthreshold{false};
             bool valstereobit;
             if (p_foundoldtrack.name != "None") {
               foundoldtrack = decodefoundoldtrack(p_foundoldtrack.data);

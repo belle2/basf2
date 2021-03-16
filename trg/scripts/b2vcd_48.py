@@ -15,7 +15,6 @@ import re
 from writer import VCDWriter
 from bitstring import BitArray
 import sys
-from operator import itemgetter
 import itertools
 import ast
 import operator as op

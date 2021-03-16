@@ -31,8 +31,8 @@ SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
-  addParam("svdClustersName", m_svdClustersName, "name of StoreArray with SVD cluster", std::string(""));
-  addParam("interceptsName", m_interceptsName, "name of StoreArray with SVDIntercepts", std::string(""));
+  addParam("Clusters", m_svdClustersName, "name of StoreArray with SVD cluster", std::string(""));
+  addParam("Intercepts", m_interceptsName, "name of StoreArray with SVDIntercepts", std::string(""));
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDEfficiency"));

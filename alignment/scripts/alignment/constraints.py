@@ -1,11 +1,10 @@
 '''
 @author: Claus Kleinwort (DESY), Tadeas Bilka
 '''
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import os
-import pickle
 import math
 
 
@@ -81,7 +80,6 @@ class Constraints():
         Can be overriden be child classes to pass additional configuration to the
         MillepedeCollector (activated by the use of the constraints)
         """
-        pass
 
 
 def generate_constraints(constraint_sets, timedep, global_tags, init_event):
@@ -107,7 +105,7 @@ def generate_constraints(constraint_sets, timedep, global_tags, init_event):
 
     from alignment.constraints_generator import save_config
     ccfn = save_config(constraint_sets, timedep, global_tags, init_event)
-    os.system('basf2 {} {}'.format(Belle2.FileSystem.findFile('alignment/scripts/alignment/constraints_generator.py'), ccfn))
+    os.system('basf2 {} {}'.format(b2.find_file('alignment/scripts/alignment/constraints_generator.py'), ccfn))
 
     return files
 
@@ -210,7 +208,6 @@ class CDCLayerConstraints(Constraints):
         self.r_scale = r_scale
         #: Constraint for z-scale
         self.z_scale = z_scale
-        pass
 
     def generate(self):
         """Generate constraints from CDC geometry
@@ -344,7 +341,6 @@ class CDCTimeZerosConstraint(Constraints):
           Can use different filename
         """
         super(CDCTimeZerosConstraint, self).__init__(filename)
-        pass
 
     def generate(self):
         """
@@ -402,7 +398,7 @@ class CDCWireConstraints(Constraints):
         super(CDCWireConstraints, self).__init__(filename)
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
-            layers = [l for l in range(0, 56)]
+            layers = [lst for lst in range(0, 56)]
         self.layers = layers
         #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
         #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.
@@ -415,12 +411,11 @@ class CDCWireConstraints(Constraints):
         #: 2 Constraints: Sum(dr)=0 for all wires in CDC at each end-plate -> "average CDC radius" kept same
         #  by this constraint (1 per CDC)
         self.cdc_radius = cdc_radius
-        pass
 
     def configure_collector(self, collector):
         """Enables wire-by-wire derivatives in collector
         """
-        B2WARNING("Adding CDC wire constraints -> enabling wire-by-wire alignment derivatives")
+        b2.B2WARNING("Adding CDC wire constraints -> enabling wire-by-wire alignment derivatives")
         collector.param('enableWireByWireAlignment', True)
 
     def get_label(self, layer, wire, parameter):

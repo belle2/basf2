@@ -7,24 +7,24 @@
 #
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Set your suitable DB
-reset_database()
-use_database_chain()
-use_central_database('data_reprocessing_prompt')
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database('data_reprocessing_prompt')
 
 # input file must be a data taken by Suppress mode of FE (Belle2 normal mode for physics run)
 # Input (ROOT file).
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 # Input (Seq. ROOT file).
 # input = register_module('SeqRootInput')
 
 # output
-unpacker = register_module('CDCUnpacker')
+unpacker = b2.register_module('CDCUnpacker')
 # FE channel <-> CDC cell ID map.
 # unpacker.param('xmlMapFileName', 'ch_map.dat')
 # Enable/Disable to store the RawCDC Object.
@@ -36,13 +36,13 @@ unpacker.param('enableStoreCDCRawHit', True)
 # unpacker.param('setRelationRaw2Hit', False)
 
 # dqm
-histo = register_module("HistoManager")  # Histogram Manager
-ex1 = register_module("cdcDQM7")
+histo = b2.register_module("HistoManager")  # Histogram Manager
+ex1 = b2.register_module("cdcDQM7")
 
 histo.param("histoFileName", "cdc_histo.root")  # File to save accumulated histograms
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -51,6 +51,6 @@ main.add_module(histo)   # Should be placed right after input module
 main.add_module(ex1)
 
 # Process all events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

@@ -14,26 +14,19 @@ import basf2_mva
 import inspect
 import modularAnalysis as ma
 from variables import utils
-from ROOT import Belle2
 import os
 import glob
-
-
-def setBelleOrBelle2(belleOrBelle2='Belle2'):
-    """
-    Sets belleOrBelle2Flag and the Revision of weight files according to the specified arguments.
-    """
-
-    global belleOrBelle2Flag
-
-    belleOrBelle2Flag = belleOrBelle2
+import b2bii
 
 
 def getBelleOrBelle2():
     """
     Gets the global ModeCode.
     """
-    return belleOrBelle2Flag
+    if b2bii.isB2BII():
+        return 'Belle'
+    else:
+        return 'Belle2'
 
 
 def setInteractionWithDatabase(downloadFromDatabaseIfNotFound=False, uploadToDatabaseAfterTraining=False):
@@ -634,7 +627,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = methodPrefixEventLevel
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
@@ -664,7 +657,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                 B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
                 if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
-                    methodPrefixEventLevelKaonPion = "FlavorTagger_" + belleOrBelle2Flag + \
+                    methodPrefixEventLevelKaonPion = "FlavorTagger_" + getBelleOrBelle2() + \
                         "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
@@ -722,14 +715,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
 
         if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
 
             if category == 'KaonPion':
-                methodPrefixEventLevelSlowPion = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                methodPrefixEventLevelSlowPion = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevelSlowPionFBDT'
                 identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
                 if not os.path.isfile(identifierEventLevelSlowPion):
                     B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
@@ -780,7 +773,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
@@ -831,7 +824,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
 
-    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     if mode == 'Sampler':
@@ -963,7 +956,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     B2INFO('COMBINER LEVEL TEACHER')
 
-    methodPrefixCombinerLevel = "FlavorTagger_" + belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixCombinerLevel + 'sampled*.root')
@@ -971,8 +964,8 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
         B2FATAL('FlavorTagger: combinerLevelTeacher did not find any ' +
                 methodPrefixCombinerLevel + 'sampled*.root file. Please run the flavorTagger in "Sampler" mode.')
 
-    ReadyTMVAfbdt = False
-    ReadyFANNmlp = False
+    # ReadyTMVAfbdt = False
+    # ReadyFANNmlp = False
 
     if TMVAfbdt:
 
@@ -1055,7 +1048,6 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    belleOrBelle2='Belle2',
     maskName='',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
@@ -1089,7 +1081,6 @@ def flavorTagger(
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
-      @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
       @param maskName                          Gets ROE particles from a specified ROE mask.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
@@ -1110,22 +1101,18 @@ def flavorTagger(
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
-    if not Belle2.FileSystem.findFile(workingDirectory, True):
-        B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
+    basf2.find_file(workingDirectory)
 
     global filesDirectory
     filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
     if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotFound):
-        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
+        if not basf2.find_file(workingDirectory + '/FlavorTagging', silent=True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
+        elif not basf2.find_file(workingDirectory + '/FlavorTagging/TrainedMethods', silent=True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
         filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
-
-    if not (belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle'):
-        B2FATAL('flavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
 
     if len(combinerMethods) < 1 or len(combinerMethods) > 2:
         B2FATAL('flavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
@@ -1155,7 +1142,6 @@ def flavorTagger(
     B2INFO('    Working directory is: ' + filesDirectory)
     B2INFO(' ')
 
-    setBelleOrBelle2(belleOrBelle2)
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
     set_FlavorTagger_pid_aliases()

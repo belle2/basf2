@@ -10,7 +10,7 @@ import sys
 import settings
 import os
 import time
-from colours import *
+from colours import mesg, query, fail, done, warning
 import descriptcheck
 
 mesg('Starting the decfile check')

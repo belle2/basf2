@@ -46,12 +46,10 @@
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDHitTimeSelectionFunction> +; // checksum=0xfe6bb093, version=-1
 #pragma link C++ class Belle2::SVDHitTimeSelectionFunction +; // checksum=0x996882b0, version=3
 
-
-
 #pragma link C++ class Belle2::SVDLocalConfigParameters +; // checksum=0x56a63232, version=1
-
-
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +; // , checksum=0x1694a3c, version=3
+
+#pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0x5da73de6, version=1
 
 #endif
 

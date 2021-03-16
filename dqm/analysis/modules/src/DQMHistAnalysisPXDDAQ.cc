@@ -69,26 +69,26 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   mychid.resize(20);
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HLTRej").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:Trunc").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_Trunc").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_Trunc").data(), NULL, NULL, 10, &mychid[3]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:CM63").data(), NULL, NULL, 10, &mychid[4]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_CM63").data(), NULL, NULL, 10, &mychid[5]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_CM63").data(), NULL, NULL, 10, &mychid[6]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_CM63_1ms").data(), NULL, NULL, 10, &mychid[7]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_CM63_1ms").data(), NULL, NULL, 10, &mychid[8]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[9]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[10]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:MissFrame").data(), NULL, NULL, 10, &mychid[11]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:Timeout").data(), NULL, NULL, 10, &mychid[12]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LinkDown").data(), NULL, NULL, 10, &mychid[13]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:Mismatch").data(), NULL, NULL, 10, &mychid[14]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_Miss").data(), NULL, NULL, 10, &mychid[15]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_Miss").data(), NULL, NULL, 10, &mychid[16]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:HER_Miss_1ms").data(), NULL, NULL, 10, &mychid[17]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:LER_Miss_1ms").data(), NULL, NULL, 10, &mychid[18]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status:unused").data(), NULL, NULL, 10, &mychid[19]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HLTRej").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Trunc").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Trunc").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Trunc").data(), NULL, NULL, 10, &mychid[3]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[4]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_CM63").data(), NULL, NULL, 10, &mychid[5]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_CM63").data(), NULL, NULL, 10, &mychid[6]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_CM63_1ms").data(), NULL, NULL, 10, &mychid[7]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_CM63_1ms").data(), NULL, NULL, 10, &mychid[8]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[9]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Trunc_1ms").data(), NULL, NULL, 10, &mychid[10]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "MissFrame").data(), NULL, NULL, 10, &mychid[11]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Timeout").data(), NULL, NULL, 10, &mychid[12]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LinkDown").data(), NULL, NULL, 10, &mychid[13]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Mismatch").data(), NULL, NULL, 10, &mychid[14]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Miss").data(), NULL, NULL, 10, &mychid[15]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Miss").data(), NULL, NULL, 10, &mychid[16]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "HER_Miss_1ms").data(), NULL, NULL, 10, &mychid[17]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "LER_Miss_1ms").data(), NULL, NULL, 10, &mychid[18]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "unused").data(), NULL, NULL, 10, &mychid[19]), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

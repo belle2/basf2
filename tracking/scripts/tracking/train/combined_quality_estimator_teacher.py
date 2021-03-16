@@ -380,7 +380,11 @@ class GenerateSimTask(Basf2PathTask):
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
-    bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    bkgfiles_dir = b2luigi.Parameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
     #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
@@ -551,7 +555,11 @@ class SplitNMergeSimTask(Basf2Task):
     # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
-    bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    bkgfiles_dir = b2luigi.Parameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
     #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'sx'
 
@@ -916,9 +924,17 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     #: RecoTrack option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
     # CDC-QI below 0.XY), useCDC (= uses trained CDC stored in datafiles/), useVXD (uses trained
     # VXD stored in datafiles/), noVXD (= doesn't use the VXD MVA at all)
-    recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
+    recotrack_option = b2luigi.Parameter(
+        #: \cond
+        default='deleteCDCQI080'
+        #: \endcond
+    )
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
     #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
     queue = 'l'
 
@@ -1153,14 +1169,30 @@ class TrackQETeacherBaseTask(Basf2Task):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(default="BBBAR")
+    process_type = b2luigi.Parameter(
+        #: \cond
+        default="BBBAR"
+        #: \endcond
+    )
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
-    training_target = b2luigi.Parameter(default="truth")
+    training_target = b2luigi.Parameter(
+        #: \cond
+        default="truth"
+        #: \endcond
+    )
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
-    exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
+    exclude_variables = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[]
+        #: \endcond
+    )
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
 
     @property
     def weightfile_identifier_basename(self):
@@ -1324,7 +1356,11 @@ class RecoTrackQETeacherTask(TrackQETeacherBaseTask):
     #: RecoTrack option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
     # CDC-QI below 0.XY), useCDC (= uses trained CDC stored in datafiles/), useVXD (uses trained
     # VXD stored in datafiles/), noVXD (= doesn't use the VXD MVA at all)
-    recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
+    recotrack_option = b2luigi.Parameter(
+        #: \cond
+        default='deleteCDCQI080'
+        #: \endcond
+    )
 
     #: Name of the weightfile that is created.
     weightfile_identifier_basename = "recotrack_mva_qe"
@@ -1378,12 +1414,24 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(default="BBBAR")
+    process_type = b2luigi.Parameter(
+        #: \cond
+        default="BBBAR"
+        #: \endcond
+    )
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
-    exclude_variables = b2luigi.ListParameter(hashed=True)
+    exclude_variables = b2luigi.ListParameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
     #: Name of the "harvested" ROOT output file with variables that can be used for validation.
     validation_output_file_name = "harvesting_validation.root"
     #: Name of the output of the RootOutput module with reconstructed events.
@@ -1702,7 +1750,11 @@ class TrackQEEvaluationBaseTask(Task):
     # ``Basf2Task``. For this task, I decided against inheriting from
     # ``Basf2Task`` because it already calls a subprocess and therefore does not
     # need a dispatchable ``process`` method.
-    git_hash = b2luigi.Parameter(default=get_basf2_git_hash())
+    git_hash = b2luigi.Parameter(
+        #: \cond
+        default=get_basf2_git_hash()
+        #: \endcond
+    )
     #: Number of events to generate for the test data set.
     n_events_testing = b2luigi.IntParameter()
     #: Number of events to generate for the training data set.
@@ -1712,14 +1764,30 @@ class TrackQEEvaluationBaseTask(Task):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(default="BBBAR")
+    process_type = b2luigi.Parameter(
+        #: \cond
+        default="BBBAR"
+        #: \endcond
+    )
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
-    training_target = b2luigi.Parameter(default="truth")
+    training_target = b2luigi.Parameter(
+        #: \cond
+        default="truth"
+        #: \endcond
+    )
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
-    exclude_variables = b2luigi.ListParameter(hashed=True)
+    exclude_variables = b2luigi.ListParameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
     #: Hyperparameter options for the FastBDT algorithm.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
 
     @property
     def teacher_task(self) -> TrackQETeacherBaseTask:
@@ -1950,14 +2018,30 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(default="BBBAR")
+    process_type = b2luigi.Parameter(
+        #: \cond
+        default="BBBAR"
+        #: \endcond
+    )
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
-    exclude_variables = b2luigi.ListParameter(hashed=True)
+    exclude_variables = b2luigi.ListParameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
     #: Whether to normalize the track finding efficiencies to primary particles only.
-    primaries_only = b2luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
+    primaries_only = b2luigi.BoolParameter(
+        #: \cond
+        default=True
+        #: \endcond
+    )  # normalize finding efficiencies to primary MC-tracks
 
     @property
     def harvesting_validation_task_instance(self) -> HarvestingValidationBaseTask:
@@ -2288,11 +2372,19 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(default="BBBAR")
+    process_type = b2luigi.Parameter(
+        #: \cond
+        default="BBBAR"
+        #: \endcond
+    )
     #: Feature/vaiable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
 
     def requires(self):
         """
@@ -2401,15 +2493,35 @@ class MasterTask(b2luigi.WrapperTask):
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
     # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
     # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.get_setting("process_type", default='BBBAR')
+    process_type = b2luigi.get_setting(
+        #: \cond
+        "process_type", default='BBBAR'
+        #: \endcond
+    )
     #: Number of events to generate for the training data set.
-    n_events_training = b2luigi.get_setting("n_events_training", default=20000)
+    n_events_training = b2luigi.get_setting(
+        #: \cond
+        "n_events_training", default=20000
+        #: \endcond
+    )
     #: Number of events to generate for the test data set.
-    n_events_testing = b2luigi.get_setting("n_events_testing", default=5000)
+    n_events_testing = b2luigi.get_setting(
+        #: \cond
+        "n_events_testing", default=5000
+        #: \endcond
+    )
     #: Number of events per task. Used to split up the simulation tasks.
-    n_events_per_task = b2luigi.get_setting("n_events_per_task", default=100)
+    n_events_per_task = b2luigi.get_setting(
+        #: \cond
+        "n_events_per_task", default=100
+        #: \endcond
+    )
     #: Number of basf2 processes to use in Basf2PathTasks
-    num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
+    num_processes = b2luigi.get_setting(
+        #: \cond
+        "basf2_processes_per_worker", default=0
+        #: \cond
+    )
     #: list of raw-datafiles to be used in the case of processing data.
     datafiles = b2luigi.get_setting("datafiles")
     #: Dictionary with experiment numbers as keys and background directory paths as values

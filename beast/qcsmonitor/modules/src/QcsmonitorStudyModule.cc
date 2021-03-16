@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 #include <cmath>
 
 #include <fstream>
@@ -164,8 +165,8 @@ void QcsmonitorStudyModule::event()
 
       h_qcss_hitrate0->Fill(detNB);
       h_qcss_Evtof1[detNB]->Fill(tof, Edep);
-      if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
-      else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
+      if (pdg == Const::photon.getPDGCode()) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
+      else if (fabs(pdg) == Const::electron.getPDGCode()) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
       else h_qcss_Evtof4[detNB]->Fill(tof, Edep);
       if (Edep > m_Ethres) {
         h_qcss_edep[detNB]->Fill(Edep);

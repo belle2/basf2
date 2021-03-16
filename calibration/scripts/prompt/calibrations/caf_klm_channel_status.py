@@ -25,9 +25,9 @@ settings = CalibrationSettings(
     input_data_formats=['raw'],
     input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],
     input_data_filters={
-        'raw_beam': ['beam', 'Good'],
-        'raw_cosmic': ['cosmic', 'Good'],
-        'raw_physics': ['hlt_skim', 'physics', 'Good', 'NOT random_calib']
+        'raw_beam': ['beam', 'Good Or Recoverable'],
+        'raw_cosmic': ['cosmic', 'Good Or Recoverable'],
+        'raw_physics': ['hlt_skim', 'physics', 'Good Or Recoverable', 'NOT random_calib']
     },
     depends_on=[])
 

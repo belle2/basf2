@@ -22,7 +22,7 @@ settings = CalibrationSettings(
     input_data_formats=['cdst'],
     input_data_names=['hlt_mumu'],
     input_data_filters={
-        'hlt_mumu': ['mumutight_calib', 'physics', 'Good']
+        'hlt_mumu': ['mumutight_calib', 'physics', 'Good Or Recoverable']
     },
     depends_on=[])
 

@@ -30,8 +30,8 @@ settings = CalibrationSettings(
     input_data_formats=["raw"],
     input_data_names=["raw_physics", "raw_cosmic"],
     input_data_filters={
-        'raw_physics': ['mumutight_calib', 'physics', 'Good'],
-        'raw_cosmic': ['cosmic_calib', 'physics', 'Good']
+        'raw_physics': ['mumutight_calib', 'physics', 'Good Or Recoverable'],
+        'raw_cosmic': ['cosmic_calib', 'physics', 'Good Or Recoverable']
     },
     depends_on=[vxdcdc_alignment],
     expert_config={

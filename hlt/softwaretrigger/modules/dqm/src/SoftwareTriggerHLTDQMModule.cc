@@ -156,12 +156,12 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   if (m_param_create_hlt_unit_histograms) {
     m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
-                                                            ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units, 0,
+                                                            ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                                             HLTUnit::max_hlt_units + 1));
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
       m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
-                                           ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units, 0,
+                                           ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                            HLTUnit::max_hlt_units + 1));
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("bar");

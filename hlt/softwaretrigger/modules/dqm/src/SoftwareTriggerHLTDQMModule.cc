@@ -115,9 +115,9 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
                                              numberOfFlags, 0,
                                              numberOfFlags));
     m_cutResultHistograms[title]->SetXTitle("");
-    m_cutResultHistograms[title]->SetOption("bar");
-    m_cutResultHistograms[title]->SetFillStyle(0);
+    m_cutResultHistograms[title]->SetOption("hist");
     m_cutResultHistograms[title]->SetStats(false);
+    m_cutResultHistograms[title]->SetMinimum(0);
   }
 
   // We add one for the total result
@@ -125,17 +125,17 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms.emplace("total_result",
                                   new TH1F("total_result", "Total Result of HLT (absolute numbers)", 1, 0, 0));
     m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
-    m_cutResultHistograms["total_result"]->SetOption("bar");
-    m_cutResultHistograms["total_result"]->SetFillStyle(0);
+    m_cutResultHistograms["total_result"]->SetOption("hist");
     m_cutResultHistograms["total_result"]->SetStats(false);
+    m_cutResultHistograms["total_result"]->SetMinimum(0);
   }
 
   for (const std::string& trigger : m_param_l1Identifiers) {
     m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
     m_l1Histograms[trigger]->SetXTitle("");
-    m_l1Histograms[trigger]->SetOption("bar");
-    m_l1Histograms[trigger]->SetFillStyle(0);
+    m_l1Histograms[trigger]->SetOption("hist");
     m_l1Histograms[trigger]->SetStats(false);
+    m_l1Histograms[trigger]->SetMinimum(0);
   }
 
   // And also one for the total numbers
@@ -143,9 +143,9 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_l1Histograms.emplace("l1_total_result",
                            new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
     m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
-    m_l1Histograms["l1_total_result"]->SetOption("bar");
-    m_l1Histograms["l1_total_result"]->SetFillStyle(0);
+    m_l1Histograms["l1_total_result"]->SetOption("hist");
     m_l1Histograms["l1_total_result"]->SetStats(false);
+    m_l1Histograms["l1_total_result"]->SetMinimum(0);
   }
 
   if (m_param_create_exp_run_event_histograms) {
@@ -158,23 +158,24 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
                                                             ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                                             HLTUnit::max_hlt_units + 1));
+    m_runInfoHistograms["hlt_unit_number"]->SetMinimum(0);
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
       m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
                                            ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                            HLTUnit::max_hlt_units + 1));
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
-      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("bar");
-      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetFillStyle(0);
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("histe");
+      m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetMinimum(0);
     }
 
   }
 
   if (m_param_create_error_flag_histograms) {
     m_runInfoHistograms.emplace("error_flag", new TH1F("error_flag", "Error Flag", 4, 0, 4));
-    m_runInfoHistograms["error_flag"]->SetOption("bar");
-    m_runInfoHistograms["error_flag"]->SetFillStyle(0);
     m_runInfoHistograms["error_flag"]->SetStats(false);
+    m_runInfoHistograms["error_flag"]->SetOption("hist");
+    m_runInfoHistograms["error_flag"]->SetMinimum(0);
   }
 
   if (oldDirectory) {

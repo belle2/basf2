@@ -5,7 +5,8 @@ import argparse
 import basf2
 from beamparameters import beamparameter_presets, calculate_beamspot
 from conditions_db import ConditionsDB
-from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter
+from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter, \
+                        MCInitialParticles
 
 # Arguments.
 parser = argparse.ArgumentParser()
@@ -92,6 +93,7 @@ beampos_spot, cov_spot = calculate_beamspot(
 )
 for iov in full_iovs:
     fitter.setIntervalOfValidity(iov[0])
+    beam_parameters[iov[1]].setGenerationFlags(MCInitialParticles.c_smearALL)
     fitter.setBeamParameters(beam_parameters[iov[1]])
     fitter.fillVertexData(cov_spot.item(0, 0), cov_spot.item(1, 1))
     fitter.importBeamParameters()

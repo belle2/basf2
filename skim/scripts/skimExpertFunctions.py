@@ -795,6 +795,8 @@ class CombinedSkim(BaseSkim):
             NoisyModules=None,
             additionalDataDescription=None,
             udstOutput=None,
+            mdstOutput=False,
+            mdst_kwargs=None,
             CombinedSkimName="CombinedSkim",
     ):
         """Initialise the CombinedSkim class.
@@ -804,6 +806,10 @@ class CombinedSkim(BaseSkim):
             NoisyModules (list(str)): Additional modules to silence.
             additionalDataDescription (dict): Overrides corresponding setting of all individual skims.
             udstOutput (bool): Overrides corresponding setting of all individual skims.
+            mdstOutput (bool): Write a single MDST output file containing events which
+                pass any of the skims in this combined skim.
+            mdst_kwargs (dict): kwargs to be passed to `mdst.add_mdst_output`. Only used
+                if ``mdstOutput`` is True.
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
         """
 
@@ -824,9 +830,13 @@ class CombinedSkim(BaseSkim):
             for skim in self:
                 skim.additionalDataDescription = additionalDataDescription
 
+        self._udstOutput = udstOutput
         if udstOutput is not None:
             for skim in self:
                 skim._udstOutput = udstOutput
+
+        self._mdstOutput = mdstOutput
+        self.mdst_kwargs = mdst_kwargs or {}
 
         self.merge_data_structures()
 
@@ -849,6 +859,7 @@ class CombinedSkim(BaseSkim):
         self.update_skim_flag(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
+        self.output_mdst_if_any_flag_passes(path=path, **self.mdst_kwargs)
 
     def __iter__(self):
         yield from self.Skims
@@ -918,6 +929,44 @@ class CombinedSkim(BaseSkim):
         for skim in self:
             if skim._udstOutput:
                 skim.output_udst(skim._ConditionalPath or path)
+
+    def output_mdst_if_any_flag_passes(self, *, path, **kwargs):
+        """
+        Add MDST output to the path if the event passes any of the skim flags.
+        EventExtraInfo is included in the MDST output so that the flags are available in
+        the output.
+
+        The ``CombinedSkimName`` parameter of `CombinedSkim.__init__` is used for the
+        output filename if ``filename`` is not included in kwargs.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+            **kwargs: Passed on to `mdst.add_mdst_output`.
+        """
+        from mdst import add_mdst_output
+
+        if not self._mdstOutput:
+            return
+
+        sum_flags = " + ".join(f"eventExtraInfo({f})" for f in self.flags)
+        variable = f"formula({sum_flags})"
+
+        passes_flag_path = b2.Path()
+        passes_flag = path.add_module("VariableToReturnValue", variable=variable)
+        passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
+
+        if "filename" not in kwargs:
+            filename = self.name
+            if not filename.endswith(".mdst.root"):
+                filename += ".mdst.root"
+            kwargs["filename"] = filename
+
+        try:
+            kwargs["additionalBranches"] += ["EventExtraInfo"]
+        except KeyError:
+            kwargs["additionalBranches"] = ["EventExtraInfo"]
+
+        add_mdst_output(path=passes_flag_path, **kwargs)
 
     def apply_hlt_hadron_cut_if_required(self, path):
         """Run the `BaseSkim.apply_hlt_hadron_cut_if_required` function for each skim.

@@ -147,6 +147,52 @@ namespace Belle2 {
       return trackTanLambdaError(daughter);
     }
 
+    double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID)
+    {
+      if (!particle)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      TVector3 v0Vertex = particle->getVertex();
+
+      const Particle* daug = particle->getDaughter(daughterID[0]);
+
+      const TrackFitResult* trackFit = daug->getTrackFitResult();
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(v0Vertex);
+
+      return helix.getD0();
+    }
+
+    double v0DaughterD0Diff(const Particle* particle)
+    {
+      return v0DaughterD0(particle, {0}) - v0DaughterD0(particle, {1});
+    }
+
+    double v0DaughterZ0(const Particle* particle, const std::vector<double>& daughterID)
+    {
+      if (!particle)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      TVector3 v0Vertex = particle->getVertex();
+
+      const Particle* daug = particle->getDaughter(daughterID[0]);
+
+      const TrackFitResult* trackFit = daug->getTrackFitResult();
+      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
+
+      UncertainHelix helix = trackFit->getUncertainHelix();
+      helix.passiveMoveBy(v0Vertex);
+
+      return helix.getZ0();
+    }
+
+    double v0DaughterZ0Diff(const Particle* particle)
+    {
+      return v0DaughterZ0(particle, {0}) - v0DaughterZ0(particle, {1});
+    }
+
     // helper function to get pull of the helix parameters of the V0 daughter tracks with the true vertex as the pivot.
     // Not registered in variable manager
     double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
@@ -375,6 +421,17 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterTanLambdaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaErr`,
                      so replace the current call with ``daughter(i, tanLambdaErr)``.)DOC");
+
+    /// V0 daughter helix parameters with V0 vertex as pivot
+    REGISTER_VARIABLE("V0d0(id)", v0DaughterD0,
+                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0Deltad0", v0DaughterD0Diff,
+                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0z0(id)", v0DaughterZ0,
+                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+    REGISTER_VARIABLE("V0Deltaz0", v0DaughterZ0Diff,
+                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+
     /// pull of helix parameters with the reco. vertex as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotD0Pull,
                       "d0 pull of the i-th daughter track with the true V0 vertex as the track pivot");

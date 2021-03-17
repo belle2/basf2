@@ -17,6 +17,7 @@
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 namespace Belle2 {
 
@@ -107,9 +108,35 @@ namespace Belle2 {
     }
 
     /**
+     * Get beam parameters.
+     */
+    BeamParameters getBeamParameters() const
+    {
+      return m_BeamParameters;
+    }
+
+    /**
+     * Set beam parameters.
+     */
+    void setBeamParameters(const BeamParameters* beamParameters)
+    {
+      m_BeamParameters = *beamParameters;
+    }
+
+    /**
      * Perform the fit.
      */
     void fit();
+
+    /**
+     * Fill beam spot (vertex) data.
+     */
+    void fillVertexData();
+
+    /**
+     * Import beam parameters.
+     */
+    void importBeamParameters();
 
   protected:
 
@@ -141,6 +168,9 @@ namespace Belle2 {
 
     /** Whether to be verbose (print Minuit output). */
     bool m_Verbose = false;
+
+    /** Beam parameters. */
+    BeamParameters m_BeamParameters;
 
     /** Collision boost vector. */
     DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;

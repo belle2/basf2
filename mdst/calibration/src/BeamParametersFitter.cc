@@ -15,7 +15,6 @@
 #include <framework/database/Database.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/dbobjects/BeamParameters.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -300,19 +299,27 @@ void BeamParametersFitter::fit()
   B2INFO("Invariant mass spread: " << sigmaInvariantMass);
   B2RESULT("HER energy spread: " << herSpread <<
            "; LER energy spread: " << lerSpread);
-  /* Import database object. */
-  DBImportObjPtr<BeamParameters> beamParameters;
-  beamParameters.construct();
-  beamParameters->setHER(pHER);
-  beamParameters->setLER(pLER);
+  /* Fill beam parameters. */
+  m_BeamParameters.setHER(pHER);
+  m_BeamParameters.setLER(pLER);
   TMatrixDSym covariance(3);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j)
       covariance[i][j] = 0;
   }
   covariance[0][0] = herSpread * herSpread;
-  beamParameters->setCovHER(covariance);
+  m_BeamParameters.setCovHER(covariance);
   covariance[0][0] = lerSpread * lerSpread;
-  beamParameters->setCovLER(covariance);
-  beamParameters.import(m_IntervalOfValidity);
+  m_BeamParameters.setCovLER(covariance);
+}
+
+void BeamParametersFitter::fillVertexData()
+{
+}
+
+void BeamParametersFitter::importBeamParameters()
+{
+  DBImportObjPtr<BeamParameters> beamParametersImport;
+  beamParametersImport.construct(m_BeamParameters);
+  beamParametersImport.import(m_IntervalOfValidity);
 }

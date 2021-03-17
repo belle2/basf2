@@ -34,23 +34,45 @@ def get_iov_list(payload_name):
 # Get intervals of validity for calibrated beam payloads.
 invariant_mass_iovs = get_iov_list('CollisionInvariantMass')
 boost_vector_iovs = get_iov_list('CollisionBoostVector')
+beam_spot_iovs = get_iov_list('BeamSpot')
 
-# Get list of overlapping intervals of validity.
-overlapping_iovs = []
+# Get list of intervals of validity for combination of
+# CollisionBoostVector and CollisionInvariantMass.
+collision_iovs = []
 for iov1 in invariant_mass_iovs:
     for iov2 in boost_vector_iovs:
         overlap = iov1.overlap(iov2)
         if overlap.empty():
             continue
-        overlapping_iovs.append(overlap)
-overlapping_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
+        collision_iovs.append(overlap)
+collision_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
 
 # Get beam parameters for each interval.
+beam_parameters = []
 fitter = BeamParametersFitter()
 fitter.setAngleHER(0.0415);
 fitter.setAngleLER(-0.0415);
 fitter.setAngleError(0.0001);
 fitter.setVerbose(False)
-for iov in overlapping_iovs:
+for iov in collision_iovs:
     fitter.setIntervalOfValidity(iov)
     fitter.fit()
+    beam_parameters.append(fitter.getBeamParameters())
+
+# Get list of validity intervals.
+full_iovs = []
+for i in range(len(collision_iovs)):
+    iov1 = collision_iovs[i]
+    for iov2 in beam_spot_iovs:
+        overlap = iov1.overlap(iov2)
+        if overlap.empty():
+            continue
+        full_iovs.append([overlap, i])
+full_iovs.sort(key = lambda x: (x[0].getExperimentLow(), x[0].getRunLow()))
+
+# Fill beam spot information.
+for iov in full_iovs:
+    fitter.setIntervalOfValidity(iov[0])
+    fitter.setBeamParameters(beam_parameters[iov[1]])
+    fitter.fillVertexData()
+    fitter.importBeamParameters()

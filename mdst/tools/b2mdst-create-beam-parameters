@@ -95,6 +95,16 @@ for iov in full_iovs:
     fitter.setIntervalOfValidity(iov[0])
     beam_parameters[iov[1]].setGenerationFlags(MCInitialParticles.c_smearALL)
     fitter.setBeamParameters(beam_parameters[iov[1]])
+    # FIXME: Remove this when a better estimate becomes available.
+    # The default size is too small, the calibrated size from BeamSpot
+    # is too large. For now, use beam size from mc_production_MC13b_proc11.
+    if iov[0].getExperimentLow() < 10 or \
+        (iov[0].getExperimentLow() == 10 and iov[0].getRunLow() < 5606):
+        cov_spot[0, 0] = 2.19039998228254e-06
+        cov_spot[1, 1] = 2.25000000853015e-08
+    else:
+        cov_spot[0, 0] = 1.4400000054593e-06
+        cov_spot[1, 1] = 9.00000018955183e-10
     fitter.fillVertexData(cov_spot.item(0, 0), cov_spot.item(1, 1))
     fitter.importBeamParameters()
     basf2.B2INFO(f'Imported IOV: {iov[0].getExperimentLow()} ' \

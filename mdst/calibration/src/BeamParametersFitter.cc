@@ -319,8 +319,15 @@ void BeamParametersFitter::fillVertexData(
   setupDatabase();
   m_BeamParameters.setVertex(m_BeamSpot->getIPPosition());
   TMatrixDSym beamSize = m_BeamSpot->getSizeCovMatrix();
-  double xScale = sqrt(covarianceXX / beamSize[0][0]);
-  double yScale = sqrt(covarianceYY / beamSize[1][1]);
+  double xScale, yScale;
+  if (covarianceXX < 0)
+    xScale = 1;
+  else
+    xScale = sqrt(covarianceXX / beamSize[0][0]);
+  if (covarianceYY < 0)
+    yScale = 1;
+  else
+    yScale = sqrt(covarianceYY / beamSize[1][1]);
   for (int i = 0; i < 3; ++i) {
     beamSize[0][i] *= xScale;
     beamSize[i][0] *= xScale;

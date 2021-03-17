@@ -131,7 +131,8 @@ namespace Belle2 {
 
     /**
      * Fill beam spot (vertex) data. The covariance matrix is rescaled
-     * to nominal XX and YY covariances.
+     * to nominal XX and YY covariances. If covariances are negative,
+     * then no rescaling is performed.
      * @param[in] covarianceXX Covariance-matrix XX element.
      * @param[in] covarianceYY Covariance-matrix YY element.
      */

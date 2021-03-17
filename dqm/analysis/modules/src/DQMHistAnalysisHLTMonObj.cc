@@ -62,6 +62,8 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_budget = findHist("timing_statistics/fullTimeHistogram");
   TH1* h_processing = findHist("timing_statistics/processingTimeHistogram");
   TH1* h_l1 = findHist("softwaretrigger_before_filter/hlt_unit_number");
+  TH1* h_hlt_triggers = findHist("softwaretrigger/filter");
+  TH1* h_l1_triggers = findHist("TRGGDL/hGDL_psn_all");
 
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
@@ -76,6 +78,25 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
       double nentr = (double)h_skim->GetBinContent(ibin);
       std::string bin_name(h_skim->GetXaxis()->GetBinLabel(ibin));
       m_monObj->setVariable(bin_name.replace(0, 6, "effCS"), nentr);
+    }
+  }
+
+  if (h_l1_triggers) {
+    // loop bins, add variable to monObj named as "effCS_l1_" + bin label"
+    for (int ibin = 1; ibin < h_l1_triggers->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_l1_triggers->GetBinContent(ibin);
+      std::string bin_name(h_l1_triggers->GetXaxis()->GetBinLabel(ibin));
+      if (bin_name == "") continue;
+      m_monObj->setVariable(bin_name.insert(0, "effCS_l1_"), nentr);
+    }
+  }
+
+  if (h_hlt_triggers) {
+    // loop bins, add variable to monObj named as "effCS_hlt_" + bin label"
+    for (int ibin = 1; ibin < h_hlt_triggers->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_hlt_triggers->GetBinContent(ibin);
+      std::string bin_name(h_hlt_triggers->GetXaxis()->GetBinLabel(ibin));
+      m_monObj->setVariable(bin_name.insert(0, "effCS_hlt_"), nentr);
     }
   }
 

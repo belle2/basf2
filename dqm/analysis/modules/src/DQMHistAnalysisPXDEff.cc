@@ -214,8 +214,10 @@ void DQMHistAnalysisPXDEffModule::beginRun()
       auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
 
       if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData.lower_alarm_limit)) m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-        if (!std::isnan(tPvData.lower_warning_limit)) m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+        if (!std::isnan(tPvData.lower_alarm_limit)
+            && tPvData.lower_alarm_limit > 0.0) m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+        if (!std::isnan(tPvData.lower_warning_limit)
+            && tPvData.lower_warning_limit > 0.0) m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
       } else {
         SEVCHK(r, "ca_get failure");
       }

@@ -3,6 +3,7 @@
 
 import argparse
 import basf2
+from beamparameters import beamparameter_presets, calculate_beamspot
 from conditions_db import ConditionsDB
 from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter
 
@@ -71,8 +72,17 @@ for i in range(len(collision_iovs)):
 full_iovs.sort(key = lambda x: (x[0].getExperimentLow(), x[0].getRunLow()))
 
 # Fill beam spot information.
+values = beamparameter_presets["SuperKEKB"][1]
+beampos_spot, cov_spot = calculate_beamspot(
+    [0, 0, 0], [0, 0, 0],
+    values["bunchHER"], values["bunchLER"],
+    values["angleHER"], values["angleLER"],
+)
 for iov in full_iovs:
     fitter.setIntervalOfValidity(iov[0])
     fitter.setBeamParameters(beam_parameters[iov[1]])
-    fitter.fillVertexData()
+    fitter.fillVertexData(cov_spot.item(0, 0), cov_spot.item(1, 1))
     fitter.importBeamParameters()
+    basf2.B2INFO(f'Imported IOV: {iov[0].getExperimentLow()} ' \
+                 f'{iov[0].getRunLow()} {iov[0].getExperimentHigh()} ' \
+                 f'{iov[0].getRunHigh()}')

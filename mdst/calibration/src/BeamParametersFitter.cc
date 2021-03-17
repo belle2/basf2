@@ -313,11 +313,20 @@ void BeamParametersFitter::fit()
   m_BeamParameters.setCovLER(covariance);
 }
 
-void BeamParametersFitter::fillVertexData()
+void BeamParametersFitter::fillVertexData(
+  double covarianceXX, double covarianceYY)
 {
   setupDatabase();
   m_BeamParameters.setVertex(m_BeamSpot->getIPPosition());
   TMatrixDSym beamSize = m_BeamSpot->getSizeCovMatrix();
+  double xScale = sqrt(covarianceXX / beamSize[0][0]);
+  double yScale = sqrt(covarianceYY / beamSize[1][1]);
+  for (int i = 0; i < 3; ++i) {
+    beamSize[0][i] *= xScale;
+    beamSize[i][0] *= xScale;
+    beamSize[1][i] *= yScale;
+    beamSize[i][1] *= yScale;
+  }
   m_BeamParameters.setCovVertex(beamSize);
 }
 

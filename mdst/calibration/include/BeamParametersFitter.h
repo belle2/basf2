@@ -130,9 +130,12 @@ namespace Belle2 {
     void fit();
 
     /**
-     * Fill beam spot (vertex) data.
+     * Fill beam spot (vertex) data. The covariance matrix is rescaled
+     * to nominal XX and YY covariances.
+     * @param[in] covarianceXX Covariance-matrix XX element.
+     * @param[in] covarianceYY Covariance-matrix YY element.
      */
-    void fillVertexData();
+    void fillVertexData(double covarianceXX, double covarianceYY);
 
     /**
      * Import beam parameters.

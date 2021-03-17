@@ -211,10 +211,14 @@ void DQMHistAnalysisPXDEffModule::beginRun()
       // get warn and error limit
       // as the same array as above, we assume chid exists
       struct dbr_ctrl_double tPvData;
-      SEVCHK(ca_get(DBR_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData), "ca_get failure");
+      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
 
-      m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-      m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+      if (r == ECA_NORMAL) {
+        m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+        m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+      } else {
+        SEVCHK(r, "ca_get failure");
+      }
 
 //         printf("alarm status: %d\n \talarm severity: %d\n \tvalue: %f\n\talarm limits: [%f-%f]\n \twarning limits: [%f-%f]\n",
 //                                 tPvData.status, tPvData.severity, tPvData.value,

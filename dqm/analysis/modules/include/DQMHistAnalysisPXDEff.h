@@ -17,7 +17,6 @@
 
 #include <TEfficiency.h>
 #include <TCanvas.h>
-#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
@@ -84,9 +83,9 @@ namespace Belle2 {
 
 
     /** TLine object for warning limit */
-    TLine* m_line_warn{};
+    TH1F* m_hWarnLine{};
     /** TLine object for error error */
-    TLine* m_line_error{};
+    TH1F* m_hErrorLine{};
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

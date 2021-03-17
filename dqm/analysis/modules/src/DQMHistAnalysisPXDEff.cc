@@ -117,6 +117,19 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
+  m_hErrorLine = new TH1F("Errorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hWarnLine = new TH1F("Warnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  for (int i = 0; i < (int)m_PXDModules.size(); i++) {
+    m_hErrorLine->SetBinContent(i + 1, m_errorlevel);
+    m_hWarnLine->SetBinContent(i + 1, m_warnlevel);
+  }
+  m_hWarnLine->SetLineColor(kOrange - 3);
+  m_hWarnLine->SetLineWidth(3);
+  m_hWarnLine->SetLineStyle(4);
+  m_hErrorLine->SetLineColor(kRed + 3);
+  m_hErrorLine->SetLineWidth(3);
+  m_hErrorLine->SetLineStyle(7);
+
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
@@ -161,18 +174,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
-  //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
-  m_line_warn = new TLine(0, m_warnlevel, m_PXDModules.size(), m_warnlevel);
-  m_line_error = new TLine(0, m_errorlevel, m_PXDModules.size(), m_errorlevel);
-  m_line_warn->SetHorizontal(true);
-  m_line_warn->SetLineColor(kOrange - 3);
-  m_line_warn->SetLineWidth(3);
-  m_line_warn->SetLineStyle(4);
-  m_line_error->SetHorizontal(true);
-  m_line_error->SetLineColor(kRed + 3);
-  m_line_error->SetLineWidth(3);
-  m_line_error->SetLineStyle(7);
-
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
@@ -204,6 +205,25 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_hEffAll->SetTotalEvents(j, 0);
     m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
     m_hEffAllUpdate->SetTotalEvents(j, 0);
+
+#ifdef _BELLE2_EPICS
+    if (m_useEpics) {
+      // get warn and error limit
+      // as the same array as above, we assume chid exists
+      struct dbr_ctrl_double tPvData;
+      SEVCHK(ca_get(DBR_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData), "ca_get failure");
+
+      m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+      m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+
+//         printf("alarm status: %d\n \talarm severity: %d\n \tvalue: %f\n\talarm limits: [%f-%f]\n \twarning limits: [%f-%f]\n",
+//                                 tPvData.status, tPvData.severity, tPvData.value,
+//                                 tPvData.lower_alarm_limit, tPvData.upper_alarm_limit,
+//                                 tPvData.lower_warning_limit, tPvData.upper_warning_limit);
+
+    }
+#endif
+
   }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
@@ -396,8 +416,8 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
       m_cEffAll->Pad()->Modified();
       m_cEffAll->Pad()->Update();
-      m_line_warn->Draw();
-      m_line_error->Draw();
+      m_hWarnLine->Draw("same,hist");
+      m_hErrorLine->Draw("same,hist");
     }
 
     m_cEffAll->Modified();
@@ -495,8 +515,8 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
     m_cEffAllUpdate->Pad()->Modified();
     m_cEffAllUpdate->Pad()->Update();
-    m_line_warn->Draw();
-    m_line_error->Draw();
+    m_hWarnLine->Draw("same,hist");
+    m_hErrorLine->Draw("same,hist");
   }
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();

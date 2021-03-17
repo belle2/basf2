@@ -21,11 +21,11 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Findlet for applying filters for creating hit-hit and hit-seed relations
-  template<class AState, class ARelationFilter>
-  class RelationCreator : public TrackFindingCDC::Findlet<AState*, TrackFindingCDC::WeightedRelation<AState>> {
+  template<class AHit, class ARelationFilter>
+  class RelationCreator : public TrackFindingCDC::Findlet<AHit*, TrackFindingCDC::WeightedRelation<AHit>> {
   public:
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<AState*, TrackFindingCDC::WeightedRelation<AState>>;
+    using Super = TrackFindingCDC::Findlet<AHit*, TrackFindingCDC::WeightedRelation<AHit>>;
 
     /// Construct this findlet and add the subfindlet as listener
     RelationCreator()
@@ -42,11 +42,11 @@ namespace Belle2 {
     };
 
     /// Apply both filters for creating state-hit and hit-hit relations
-    void apply(std::vector<AState*>& states,
-               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override
+    void apply(std::vector<AHit*>& hits,
+               std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations) override
     {
-      // relations += states -> states
-      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, states, states, relations, 100000);
+      // relations += hits -> hits
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
     };
 
   private:

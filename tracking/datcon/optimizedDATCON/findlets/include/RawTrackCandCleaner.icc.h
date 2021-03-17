@@ -7,12 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
+// #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
+
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <tracking/datcon/optimizedDATCON/filters/relations/LayerRelationFilter.icc.h>
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.icc.h>
@@ -30,10 +32,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template<class AHit>
+RawTrackCandCleaner<AHit>::~RawTrackCandCleaner() = default;
 
-RawTrackCandCleaner::~RawTrackCandCleaner() = default;
-
-RawTrackCandCleaner::RawTrackCandCleaner() : Super()
+template<class AHit>
+RawTrackCandCleaner<AHit>::RawTrackCandCleaner() : Super()
 {
   Super::addProcessingSignalListener(&m_relationCreator);
   Super::addProcessingSignalListener(&m_treeSearcher);
@@ -41,30 +44,34 @@ RawTrackCandCleaner::RawTrackCandCleaner() : Super()
   initializeHists();
 }
 
-void RawTrackCandCleaner::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+template<class AHit>
+void RawTrackCandCleaner<AHit>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
   m_relationCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearcher.exposeParameters(moduleParamList, prefix);
 }
 
-// void RawTrackCandCleaner::initialize()
-// {
-//   Super::initialize();
-// }
+template<class AHit>
+void RawTrackCandCleaner<AHit>::initialize()
+{
+  Super::initialize();
+}
 
-// void RawTrackCandCleaner::beginEvent()
+// template<class AHit>
+// void RawTrackCandCleaner<AHit>::beginEvent()
 // {
 //      Super::beginEvent();
 // //   m_prunedTrackCandidates.clear();
 // //   m_relations.clear();
 // }
 
-void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCandidates,
-                                std::vector<SpacePointTrackCand>& trackCandidates)
+template<class AHit>
+void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackCandidates,
+                                      std::vector<SpacePointTrackCand>& trackCandidates)
 {
   m_relations.reserve(8192);
-  m_results.reserve(32);
+  m_results.reserve(64);
 
   uint totalRelationsPerEvent = 0;
   uint counter = 0;
@@ -79,10 +86,15 @@ void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCand
     m_nRelationsVsRawTrackCandSize->Fill(rawTrackCand.size(), m_relations.size());
     counter++;
 
-//     m_treeSearcher.apply(rawTrackCand, m_relations, m_results);
+    m_treeSearcher.apply(rawTrackCand, m_relations, m_results);
 
-    for (auto& result : m_results) {
-      trackCandidates.emplace_back(result);
+    for (const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& result : m_results) {
+      std::vector<const SpacePoint*> spacePointsInResult;
+      spacePointsInResult.reserve(result.size());
+      for (const TrackFindingCDC::WithWeight<const AHit*>& hit : result) {
+        spacePointsInResult.emplace_back(hit->getHit());
+      }
+      trackCandidates.emplace_back(spacePointsInResult);
     }
 
   }
@@ -92,7 +104,8 @@ void RawTrackCandCleaner::apply(std::vector<std::vector<HitData*>>& rawTrackCand
 }
 
 
-void RawTrackCandCleaner::initializeHists()
+template<class AHit>
+void RawTrackCandCleaner<AHit>::initializeHists()
 {
   m_rootFile = new TFile("relationStats.root", "RECREATE");
   m_rootFile->cd();
@@ -105,7 +118,8 @@ void RawTrackCandCleaner::initializeHists()
 }
 
 
-void RawTrackCandCleaner::endRun()
+template<class AHit>
+void RawTrackCandCleaner<AHit>::endRun()
 {
   if (m_rootFile) {
     m_rootFile->Write();

@@ -13,9 +13,10 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
-#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
+// #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -78,7 +79,7 @@ namespace Belle2 {
     FastInterceptFinder2D m_interceptFinder;
 
     /// Raw track candidate cleaner
-    RawTrackCandCleaner m_rawTCCleaner;
+    RawTrackCandCleaner<HitData> m_rawTCCleaner;
 
     // container to share data between findlets
 

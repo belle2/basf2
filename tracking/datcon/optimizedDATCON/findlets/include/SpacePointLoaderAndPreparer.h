@@ -9,8 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/ModuleParamList.h>
+
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -21,8 +24,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class ModuleParamList;
-
   /**
    * Findlet for loading SVDClusters that were created by the DATCONSVDSimpleClusterizerModule and prepare them
    * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
@@ -34,13 +35,25 @@ namespace Belle2 {
 
   public:
     /// Load clusters and prepare them for intercept finding
-    SpacePointLoaderAndPreparer();
+    SpacePointLoaderAndPreparer() {};
 
     /// Expose the parameters of the sub findlets.
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+    {
+      Super::exposeParameters(moduleParamList, prefix);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"),
+                                    m_param_SVDSpacePointStoreArrayName,
+                                    "Name of the SVDSpacePoints Store Array.",
+                                    m_param_SVDSpacePointStoreArrayName);
+    };
 
     /// Create the store arrays
-    void initialize() override;
+    void initialize() override
+    {
+      Super::initialize();
+      m_storeSpacePoints.isRequired(m_param_SVDSpacePointStoreArrayName);
+    };
 
     /// Load the SVD SpacePoints and create a HitData object for each hit
     void apply(std::vector<HitData>& hits) override
@@ -48,20 +61,16 @@ namespace Belle2 {
       if (m_storeSpacePoints.getEntries() == 0) return;
 
       hits.reserve(m_storeSpacePoints.getEntries());
-
       for (auto& spacePoint : m_storeSpacePoints) {
         hits.emplace_back(HitData(&spacePoint));
       }
     };
 
   private:
-    // Parameters
     /// StoreArray name of the input Track Store Array
     std::string m_param_SVDSpacePointStoreArrayName = "SVDSpacePoints";
 
-    // Store Arrays
     /// Input SpacePoints Store Array
     StoreArray<SpacePoint> m_storeSpacePoints;
-
   };
 }

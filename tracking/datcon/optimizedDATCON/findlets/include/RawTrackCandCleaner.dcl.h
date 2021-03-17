@@ -28,17 +28,18 @@
 
 
 namespace Belle2 {
-  class HitData;
-  class SpacePoint;
   class SpacePointTrackCand;
   class VxdID;
 
   class ModuleParamList;
 
   /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-  class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<HitData*>, SpacePointTrackCand> {
+  template<class AHit>
+  class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand> {
     /// Parent class
-    using Super =  TrackFindingCDC::Findlet<std::vector<HitData*>, SpacePointTrackCand>;
+    using Super =  TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
+
+    using AResult = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -51,7 +52,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Create the store arrays
-//     void initialize() override;
+    void initialize() override;
 
     /// Begin the event and reset containers
 //     void beginEvent() override;
@@ -60,7 +61,7 @@ namespace Belle2 {
     void endRun() override;
 
     /// Reject bad SpacePointTrackCands and bad hits inside the remaining
-    void apply(std::vector<std::vector<HitData*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
+    void apply(std::vector<std::vector<AHit*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
 
   private:
 
@@ -68,14 +69,13 @@ namespace Belle2 {
 //     std::vector<const SpacePoint*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-//     std::vector<SpacePointTrackCand> m_prunedTrackCandidates;
-    std::vector<SpacePointTrackCand> m_results;
+    std::vector<AResult> m_results;
 
-    std::vector<TrackFindingCDC::WeightedRelation<HitData>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
 
-    RelationCreator<HitData, ChooseableRelationFilter> m_relationCreator;
+    RelationCreator<AHit, ChooseableRelationFilter> m_relationCreator;
 
-    DATCONTreeSearcher<HitData, ChooseablePathFilter, SpacePointTrackCand> m_treeSearcher;
+    DATCONTreeSearcher<AHit, ChooseablePathFilter, AResult> m_treeSearcher;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.

@@ -33,10 +33,10 @@ namespace Belle2 {
    */
   template <class AHit, class APathFilter, class AResult>
   class DATCONTreeSearcher : public
-    TrackFindingCDC::Findlet<const AHit, AHit, const TrackFindingCDC::WeightedRelation<AHit>, AResult> {
+    TrackFindingCDC::Findlet<AHit*, const TrackFindingCDC::WeightedRelation<AHit>, AResult> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AHit, AHit, const TrackFindingCDC::WeightedRelation<AHit>, AResult>;
+    using Super = TrackFindingCDC::Findlet<AHit*, const TrackFindingCDC::WeightedRelation<AHit>, AResult>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -51,8 +51,7 @@ namespace Belle2 {
      * ATTENTION: As described above, the states themselves can be altered during the tree
      * traversal.
      */
-    void apply(const std::vector<AHit>& seededStates,
-               std::vector<AHit>& hitStates,
+    void apply(std::vector<AHit*>& hits,
                const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
                std::vector<AResult>& results) final;
 

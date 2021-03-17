@@ -22,6 +22,7 @@ namespace Belle2 {
   // Guard to prevent repeated instantiations
   extern template class PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData,
                                                  TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+
                                                  /// Alias to apply the () operator to all items filtered by CKF SVD layer states
                                                  using ChooseablePathFilter = PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData,
                                                      TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;

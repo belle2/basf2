@@ -8,9 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONFindlet.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
+
+// #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
 #include <framework/core/ModuleParamList.h>
 

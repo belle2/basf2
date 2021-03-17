@@ -14,6 +14,7 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -27,6 +28,7 @@
 
 /* ROOT headers. */
 #include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -170,6 +172,9 @@ namespace Belle2 {
     /** Histogram to be used for normalization of occupancy after HER injection. */
     TH1F* m_TriggersHERInj;
 
+    /** Spatial distribution of EKLM 2d hits per layer. */
+    TH2F** m_Spatial2DHitsEKLM[EKLMElementNumbers::getMaximalSectionNumber()] = {nullptr};
+
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
@@ -193,6 +198,9 @@ namespace Belle2 {
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_BklmHit1ds;
+
+    /** EKLM 2d hits. */
+    StoreArray<EKLMHit2d> m_EklmHit2ds;
 
   };
 

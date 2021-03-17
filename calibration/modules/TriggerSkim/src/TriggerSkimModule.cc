@@ -54,7 +54,7 @@ lines were accepted after their own prescale.
            "or a counter (False) for applying the prescale. In the latter case, the module will retain exactly "
            "one event every N processed, where N (the counter value) is set for each line via the "
            "``triggerLines`` option. By default, random numbers are used.", m_useRandomNumbersForPreScale);
-  addParam("resultOnMissing", m_resultOnMissing, "Value to return if hlt trigger result or a particular line is not available. "
+  addParam("resultOnMissing", m_resultOnMissing, "Value to return if hlt trigger result is not available or incomplete. "
            "If this is set to None a FATAL error will be raised if the results are missing. Otherwise the value "
            "given will be set as return value of the module", m_resultOnMissing);
 }
@@ -114,7 +114,8 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
       available_lines += line + "(" + std::to_string((int)result) + ") ";
     }
     if(m_resultOnMissing) {
-      B2WARNING("software trigger line not found" << LogVar("requested", name) << LogVar("available", available_lines)
+      B2WARNING("Software trigger line not found" << LogVar("requested", name)
+                                                  << LogVar("available", available_lines)
                                                   << LogVar("errorFlag", m_eventMetaDataPtr->getErrorFlag())
                                                   << LogVar("experiment", m_eventMetaDataPtr->getExperiment())
                                                   << LogVar("run", m_eventMetaDataPtr->getRun())
@@ -122,12 +123,13 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
       return *m_resultOnMissing;
     }
     else {
-      B2FATAL("software trigger line not found" << LogVar("requested", name) << LogVar("available", available_lines)
+      B2FATAL("Software trigger line not found (if this is expected, please use the `resultOnMissing` parameter)"
+                                                << LogVar("requested", name)
+                                                << LogVar("available", available_lines)
                                                 << LogVar("errorFlag", m_eventMetaDataPtr->getErrorFlag())
                                                 << LogVar("experiment", m_eventMetaDataPtr->getExperiment())
                                                 << LogVar("run", m_eventMetaDataPtr->getRun())
-                                                << LogVar("event", m_eventMetaDataPtr->getEvent())
-                                                << "(if this is expected,please use the `resultOnMissing` parameter)");
+                                                << LogVar("event", m_eventMetaDataPtr->getEvent()));
       return false;
     }
   }

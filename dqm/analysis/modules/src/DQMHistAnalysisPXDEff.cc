@@ -42,6 +42,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
+  addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", false);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
@@ -206,6 +207,9 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
     m_hEffAllUpdate->SetTotalEvents(j, 0);
 
+    m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
+    m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
+
 #ifdef _BELLE2_EPICS
     if (m_useEpics) {
       // get warn and error limit
@@ -213,11 +217,18 @@ void DQMHistAnalysisPXDEffModule::beginRun()
       struct dbr_ctrl_double tPvData;
       auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
 
+
       if (r == ECA_NORMAL) {
         if (!std::isnan(tPvData.lower_alarm_limit)
-            && tPvData.lower_alarm_limit > 0.0) m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+            && tPvData.lower_alarm_limit > 0.0) {
+          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
+        }
         if (!std::isnan(tPvData.lower_warning_limit)
-            && tPvData.lower_warning_limit > 0.0) m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+            && tPvData.lower_warning_limit > 0.0) {
+          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
+        }
       } else {
         SEVCHK(r, "ca_get failure");
       }
@@ -344,9 +355,11 @@ void DQMHistAnalysisPXDEffModule::event()
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
       error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_errorlevel); // error if upper error value is below limit
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                        m_errorlevelmod[aModule]); // error if upper error value is below limit
       warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_warnlevel); // (and not only the actual eff value)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                       m_warnlevelmod[aModule]); // (and not only the actual eff value)
     }
   }
 

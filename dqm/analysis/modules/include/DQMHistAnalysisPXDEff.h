@@ -59,6 +59,8 @@ namespace Belle2 {
     double m_errorlevel;
     /** Update entry intervall */
     int m_minEntries = 1000;
+    /** use alarm level per module */
+    bool m_perModuleAlarm;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -86,6 +88,10 @@ namespace Belle2 {
     TH1F* m_hWarnLine{};
     /** TLine object for error error */
     TH1F* m_hErrorLine{};
+    //! warn level for alarm per module
+    std::map<VxdID, double> m_warnlevelmod;
+    //! error level for alarm per module
+    std::map<VxdID, double> m_errorlevelmod;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

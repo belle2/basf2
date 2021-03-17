@@ -1,3 +1,6 @@
+##
+# @package pxd.background_generator
+# Generate PXD background samples on-the-fly with a pre-trained generator model.
 """
 ========================
 PXD Background Generator
@@ -84,35 +87,50 @@ VXDID_ARGS = tuple(
 )
 
 
+##
+# Class for container objects with specifications for
+# invoking the PXD background generator module.
 class Specs:
-    """Create a container for the generator specifications
-    that is to be passed to the PXD background generator module.
+    """Create a container object with specifications for
+    invoking the PXD background generator module.
 
-    :param model: Name of the generator model - either 'convnet' or 'resnet',
-        defaults to 'convnet'
+    :param model: Name of the generator model - either "convnet" or "resnet",
+        defaults to "convnet"
     :type model: str, optional
-    :param checkpoint: Path to the file with the pre-trained model weights,
-        defaults to None - download the checkpoint automatically
+
+    :param checkpoint: Path to the checkpoint file containing the model weights,
+        defaults to None - download the checkpoint from the conditions database
     :type checkpoint: str, optional
-    :param seed: Integer number :math:`[-2^{63}, 2^{63} - 1]`
-        used as the initial seed for the internal pseudo-random number generator,
-        defaults to None - derive a deterministic seed from the basf2 seed
+
+    :param seed: Integer number in the range of :math:`[-2^{63}, 2^{63} - 1]`
+        used as the initial seed for the generator,
+        defaults to None - derive deterministically from the
+        value returned by :py:func:`basf2.get_random_seed`
     :type seed: int, optional
+
     :param nintra: Number of intra-op threads to be utilized for the generation,
         defaults to 1
     :type nintra: int, optional
+
     :param ninter: Number of inter-op threads to be utilized for the generation,
         defaults to 1
     :type ninter: int, optional
+
     :param globaltag: Global tag in the conditions database
-        which is used to download the model checkpoints automatically,
-        defaults to 'PXDBackgroundGenerator'
+        providing the payloads with checkpoint files,
+        defaults to "PXDBackgroundGenerator"
     :type globaltag: str, optional
     """
 
+    ##
+    # Static method used to verify that `model`:
+    #     * is a string,
+    #     * is a valid name for a model that is available for selection.
+    #
+    # The value of `model` is returned if the conditions are met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_model(model: str) -> str:
-        """"""
         if not isinstance(model, str):
             raise TypeError("expecting type str `model`")
         elif model not in MODELS:
@@ -120,9 +138,15 @@ class Specs:
             raise ValueError(f"invalid `model`: {model!r} (options: {options}")
         return model
 
+    ##
+    # Static method used to verify that `checkpoint`:
+    #     * is either None, a string, or a `pathlib.Path` object,
+    #     * is a valid path to an existing file - if not None.
+    #
+    # The value of `checkpoint` is returned if the conditions are met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_checkpoint(checkpoint: Union[None, str, pathlib.Path]) -> str:
-        """"""
         if not isinstance(checkpoint, (type(None), str, pathlib.Path)):
             raise TypeError("expecting None or type str `checkpoint`")
         if checkpoint is None:
@@ -132,9 +156,15 @@ class Specs:
             raise ValueError(f"invalid `checkpoint`: {checkpoint!r}")
         return checkpoint
 
+    ##
+    # Static method used to verify that `seed`:
+    #     * is either None or an integer,
+    #     * is in the interval \f$ [-2^{63}, 2^{63} - 1] \f$ - if not None.
+    #
+    # The value of `seed` is returned if the conditions are met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_seed(seed: Union[None, int]) -> Union[None, int]:
-        """"""
         if not isinstance(seed, (type(None), int)):
             raise TypeError("expecting None or type int `seed`")
         if seed is None:
@@ -143,31 +173,72 @@ class Specs:
             raise ValueError(f"expecting -2^63 <= `seed` < 2^63 (got: {seed})")
         return seed
 
+    ##
+    # Static method used to verify that `nintra`:
+    #     * is an integer,
+    #     * is larger than zero.
+    #
+    # The value of `nintra` is returned if the conditions are met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_nintra(nintra: int) -> int:
-        """"""
         if not isinstance(nintra, int):
             raise TypeError("expecting type int `nintra`")
         elif not nintra > 0:
             raise ValueError(f"expecting `nintra` > 0 (got: {nintra}")
         return nintra
 
+    ##
+    # Static method used to verify that `ninter`:
+    #     * is an integer,
+    #     * is larger than zero.
+    #
+    # The value of `ninter` is returned if the conditions are met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_ninter(ninter: int) -> int:
-        """"""
         if not isinstance(ninter, int):
             raise TypeError("expecting type int `ninter`")
         elif not ninter > 0:
             raise ValueError(f"expecting `ninter` > 0 (got: {ninter}")
         return ninter
 
+    ##
+    # Static method used to verify that `globaltag`:
+    #     * is a string.
+    #
+    # The value of `globaltag` is returned if the condition is met.
+    # An exception is raised otherwise.
     @staticmethod
     def _validate_globaltag(globaltag: str) -> str:
-        """"""
         if not isinstance(globaltag, str):
             raise TypeError("expecting type str `globaltag`")
         return globaltag
 
+    ##
+    # Create a container objects with specifications for
+    # invoking the PXD background generator module.
+    #
+    # @param model: Name of the generator model - either "convnet" or "resnet",
+    #     defaults to "convnet"
+    #
+    # @param checkpoint: Path to the checkpoint file containing the model weights,
+    #     defaults to None - download the checkpoint from the conditions database
+    #
+    # @param seed: Integer number in the range of \f$ [-2^{63}, 2^{63} - 1] \f$
+    #     used as the initial seed for the generator,
+    #     defaults to None - derive deterministically from the
+    #     value returned by `basf2.get_random_seed()`
+    #
+    # @param nintra: Number of intra-op threads to be utilized for the generation,
+    #     defaults to 1
+    #
+    # @param ninter: Number of inter-op threads to be utilized for the generation,
+    #     defaults to 1
+    #
+    # @param globaltag: Global tag in the conditions database
+    #     providing the payloads with checkpoint files,
+    #     defaults to "PXDBackgroundGenerator"
     def __init__(
         self,
         model: str = "convnet",
@@ -177,7 +248,6 @@ class Specs:
         ninter: int = 1,
         globaltag: str = "PXDBackgroundGenerator",
     ):
-        """"""
         # process `model`
         self.model = type(self)._validate_model(model)
 
@@ -196,8 +266,10 @@ class Specs:
         # process `globaltag`
         self.globaltag = type(self)._validate_globaltag(globaltag)
 
+    ##
+    # Method that returns the initialized generator model instance
+    # and the corresponding generation function.
     def _instantiate(self):
-        """"""
         try:
             import torch
         except ImportError as exc:
@@ -253,12 +325,11 @@ class Specs:
 
     ##
     # @var checkpoint
-    # Path to the file with the pre-trained model weights
+    # Path to the checkpoint file containing the model weights
 
     ##
     # @var seed
-    # Integer number used as the initial seed for the
-    # internal pseudo-random number generator
+    # Integer number used as the initial seed for the generator
 
     ##
     # @var nintra
@@ -270,21 +341,27 @@ class Specs:
 
     ##
     # @var globaltag
-    # Global tag in the conditions database which is used to
-    # download the model checkpoints automatically
+    # Global tag in the conditions database
+    # providing the payloads with checkpoint files
 
 
+##
+# Class for the PXD background generator module.
 class PXDBackgroundGenerator(basf2.Module):
-    """Generates PXD background data on-the-fly.
+    """Generates PXD background samples on-the-fly.
 
     .. warning::
-        PXD digits added to the background collection in the DataStore
-        prior to the execution of this module are deleted.
+        PXD digits added to the background collection by a
+        preceding module in the execution path are deleted.
 
-    :param specs: Generator specifications container
+    :param specs: Container object with the specifications
     :type specs: :py:class:`Specs`
     """
 
+    ##
+    # Constructor for the PXD background generator module.
+    #
+    # @param specs: Container object of type 'Specs' with the specifications
     def __init__(self, specs: Specs):
         """"""
         super().__init__()
@@ -292,6 +369,12 @@ class PXDBackgroundGenerator(basf2.Module):
             raise TypeError(f"expecting type {Specs.__module__}.Specs `specs`")
         self.specs = specs
 
+    ##
+    # Method called before event processing.
+    #
+    # This method infers the name extension of the background digit collection,
+    # instantiates the VxdID identifier objects required to create digits,
+    # and instantiates and initializes the selected generator model.
     def initialize(self):
         """"""
         # infer the name extension of the background digit colection
@@ -311,6 +394,13 @@ class PXDBackgroundGenerator(basf2.Module):
         # initialize the generator and the generation function per the specifications
         self.generator, self.generate_func = self.specs._instantiate()
 
+    ##
+    # Method called when processing an event.
+    #
+    # This method first clears the background digit collection
+    # then proceeds to generate a batch of forty background images,
+    # locates pixel hits in images, transcodes the pixel hits into digits,
+    # and stores the digits into the background digit collection.
     def event(self):
         """"""
         # cache variable references
@@ -339,6 +429,10 @@ class PXDBackgroundGenerator(basf2.Module):
         # delete variable references
         del x, nonzero, args, vals
 
+    ##
+    # Method called after all events are processed.
+    #
+    # This method deletes the attribute reference to the generator instance.
     def terminate(self):
         """"""
         # delete the reference to the generator instance
@@ -346,15 +440,16 @@ class PXDBackgroundGenerator(basf2.Module):
 
     ##
     # @var specs
-    # Generator specifications container
+    # Container object with the specifications
 
     ##
     # @var storearr
-    # Digit collection
+    # PXD background digit collection
 
     ##
     # @var vxdids
-    # VxdID objects describing all distinct PXD sensors
+    # Sequence of VxdID objects that
+    # collectively specify all distinct PXD sensors
 
     ##
     # @var generator
@@ -362,19 +457,34 @@ class PXDBackgroundGenerator(basf2.Module):
 
     ##
     # @var generate_func
-    # Generation function
+    # Generation function applied on the model instance to
+    # return an output that is transcoded into digits
 
 
+##
+# Helper function that instantiates the PXD background generator module
+# and adds the instantiated module to the execution path.
+#
+# @param path: Module executing path to add the PXD generator module to
+# @param specs: Specifications for the PXD background generator module
 def add_pxd_background_generator(path: basf2.Path, specs: Specs = None):
-    """Add the PXD background generator module to the execution path.
+    """Instantiate the PXD background generator module
+    and add the instantiated module to the execution path.
+
+    .. note::
+        This function is intended to be invoked inside the
+        function :py:func:`simulation.add_simulation`.
+
+    If the argument ``specs`` is None, the function does nothing.
 
     :param path: Module execution path
     :type path: :py:class:`basf2.Path`
+
     :param specs: Generator specifications, defaults to None
     :type specs: :py:class:`Specs`, optional
     """
     if specs is not None:
-        # add the module to the path
+        # instantiate the module and add it to the execution path
         basf2.B2INFO("Adding the PXD background generator module to path")
         path.add_module(PXDBackgroundGenerator(specs))
 

@@ -147,39 +147,9 @@ namespace Belle2 {
       return trackTanLambdaError(daughter);
     }
 
-    double v0DaughterHelixWithTrueVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto daughter = part->getDaughter(daughterID[0]);
-      return getHelixD0Pull(daughter);
-    }
-
-    double v0DaughterHelixWithTrueVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto daughter = part->getDaughter(daughterID[0]);
-      return getHelixPhi0Pull(daughter);
-    }
-
-    double v0DaughterHelixWithTrueVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto daughter = part->getDaughter(daughterID[0]);
-      return getHelixOmegaPull(daughter);
-    }
-
-    double v0DaughterHelixWithTrueVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto daughter = part->getDaughter(daughterID[0]);
-      return getHelixZ0Pull(daughter);
-    }
-
-    double v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto daughter = part->getDaughter(daughterID[0]);
-      return getHelixTanLambdaPull(daughter);
-    }
-
-    // helper function to get pull of the helix parameters of the V0 daughter tracks with the origin as the pivot.
+    // helper function to get pull of the helix parameters of the V0 daughter tracks with the true vertex as the pivot.
     // Not registered in variable manager
-    double getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(const Particle* particle, const double daughterID,
+    double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex)
     {
       if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
@@ -195,22 +165,23 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getDaughter(dID)->getMCParticle();
       if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const TrackFitResult* trackFit = particle->getDaughter(daughterID)->getTrackFitResult();
+      const TrackFitResult* trackFit = particle->getDaughter(dID)->getTrackFitResult();
       if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
 
       // MC information
       const TVector3 mcProdVertex   = mcparticle->getVertex();
       const TVector3 mcMomentum     = mcparticle->getMomentum();
       const double mcParticleCharge = mcparticle->getCharge();
-      const double BzAtOrigin = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
-
-      Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtOrigin);
+      const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      mcHelix.passiveMoveBy(mcProdVertex);
       const std::vector<double> mcHelixPars = { mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(),
                                                 mcHelix.getZ0(), mcHelix.getTanLambda()
                                               };
 
       // measured information (from the reconstructed particle)
       UncertainHelix measHelix = trackFit->getUncertainHelix();
+      measHelix.passiveMoveBy(mcProdVertex);
       const TMatrixDSym measCovariance = measHelix.getCovariance();
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(),
                                                  measHelix.getZ0(), measHelix.getTanLambda()
@@ -225,29 +196,59 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double v0DaughterHelixWithTrueVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID)
+    {
+      return getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(part, daughterID[0], 0);
+    }
+
+    double v0DaughterHelixWithTrueVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID)
+    {
+      return getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(part, daughterID[0], 1);
+    }
+
+    double v0DaughterHelixWithTrueVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID)
+    {
+      return getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(part, daughterID[0], 2);
+    }
+
+    double v0DaughterHelixWithTrueVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID)
+    {
+      return getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(part, daughterID[0], 3);
+    }
+
+    double v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID)
+    {
+      return getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(part, daughterID[0], 4);
+    }
+
     double v0DaughterHelixWithOriginAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID)
     {
-      return getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(part, daughterID[0], 0);
+      auto daughter = part->getDaughter(daughterID[0]);
+      return getHelixD0Pull(daughter);
     }
 
     double v0DaughterHelixWithOriginAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID)
     {
-      return getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(part, daughterID[0], 1);
+      auto daughter = part->getDaughter(daughterID[0]);
+      return getHelixPhi0Pull(daughter);
     }
 
     double v0DaughterHelixWithOriginAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID)
     {
-      return getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(part, daughterID[0], 2);
+      auto daughter = part->getDaughter(daughterID[0]);
+      return getHelixOmegaPull(daughter);
     }
 
     double v0DaughterHelixWithOriginAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID)
     {
-      return getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(part, daughterID[0], 3);
+      auto daughter = part->getDaughter(daughterID[0]);
+      return getHelixZ0Pull(daughter);
     }
 
     double v0DaughterHelixWithOriginAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID)
     {
-      return getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(part, daughterID[0], 4);
+      auto daughter = part->getDaughter(daughterID[0]);
+      return getHelixTanLambdaPull(daughter);
     }
 
     double v0DaughterTrackParam5AtIPPerigee(const Particle* part, const std::vector<double>& params)
@@ -292,125 +293,125 @@ namespace Belle2 {
     VARIABLE_GROUP("V0Daughter");
 
     REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits, "Number of CDC hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNCDCHits(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNCDCHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nCDCHits`,
                      so replace the current call with ``daughter(i, nCDCHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNSVDHits(i)", v0DaughterTrackNSVDHits, "Number of SVD hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNSVDHits(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNSVDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nSVDHits`,
                      so replace the current call with ``daughter(i, nSVDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNPXDHits(i)", v0DaughterTrackNPXDHits, "Number of PXD hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNPXDHits(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNPXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nPXDHits`,
                      so replace the current call with ``daughter(i, nPXDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNVXDHits(i)", v0DaughterTrackNVXDHits, "Number of PXD+SVD hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nVXDHits`,
                      so replace the current call with ``daughter(i, nVXDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstSVDLayer(i)", v0DaughterTrackFirstSVDLayer,
                       "First activated SVD layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstSVDLayer`,
                      so replace the current call with ``daughter(i, firstSVDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstPXDLayer(i)", v0DaughterTrackFirstPXDLayer,
                       "First activated PXD layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstPXDLayer(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstPXDLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstPXDLayer`,
                      so replace the current call with ``daughter(i, firstPXDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstCDCLayer(i)", v0DaughterTrackFirstCDCLayer,
                       "First activated CDC layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstCDCLayer(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstCDCLayer`,
                      so replace the current call with ``daughter(i, firstCDCLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterLastCDCLayer(i)",  v0DaughterTrackLastCDCLayer,
                       "Last CDC layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `lastCDCLayer`,
                      so replace the current call with ``daughter(i, lastCDCLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPValue(i)",        v0DaughterTrackPValue,
                       "chi2 probalility of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `pValue`,
                      so replace the current call with ``daughter(i, pValue)``.)DOC");
     /// helix parameters
     REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterD0(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterD0(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0`,
                      so replace the current call with ``daughter(i, d0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPhi0(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPhi0(i)", false, "light-2104-poseidon", R"DOC(
                  The same value can be calculated with the more generic variable `phi0`,
                  so replace the current call with ``daughter(i, phi0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterOmega(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterOmega(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omega`,
                      so replace the current call with ``daughter(i, omega)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterZ0(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterZ0(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0`,
                      so replace the current call with ``daughter(i, z0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambda(i)", v0DaughterTrackTanLambda, "tan(lambda) of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterTanLambda(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterTanLambda(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
     REGISTER_VARIABLE("v0DaughterD0Error(i)",        v0DaughterTrackD0Error,        "d0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0Error(i)",      v0DaughterTrackPhi0Error,      "phi0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaError(i)",     v0DaughterTrackOmegaError,     "omega error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0Error(i)",        v0DaughterTrackZ0Error,        "z0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaError(i)", v0DaughterTrackTanLambdaError, "tan(lambda) error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterTanLambdaError(i)", false, "light-2104-oceanos", R"DOC(
+    MAKE_DEPRECATED("v0DaughterTanLambdaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaErr`,
                      so replace the current call with ``daughter(i, tanLambdaErr)``.)DOC");
     /// pull of helix parameters with the reco. vertex as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotD0Pull,
                       "d0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
-    MAKE_DEPRECATED("v0DaughterD0PullWithTrueVertexAsPivot(i)", false, "light-2104-oceanos", R"DOC(
-                     The same value can be calculated with the more generic variable `d0Pull`,
-                     so replace the current call with ``daughter(i, d0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0PullWithTrueVertexAsPivot(i)",     v0DaughterHelixWithTrueVertexAsPivotPhi0Pull,
                       "phi0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
-    MAKE_DEPRECATED("v0DaughterPhi0PullWithTrueVertexAsPivot(i)", false, "light-2104-oceanos", R"DOC(
-                     The same value can be calculated with the more generic variable `phi0Pull`,
-                     so replace the current call with ``daughter(i, phi0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaPullWithTrueVertexAsPivot(i)",    v0DaughterHelixWithTrueVertexAsPivotOmegaPull,
                       "omega pull of the i-th daughter track with the true V0 vertex as the track pivot");
-    MAKE_DEPRECATED("v0DaughterOmegaPullWithTrueVertexAsPivot(i)", false, "light-2104-oceanos", R"DOC(
-                     The same value can be calculated with the more generic variable `omegaPull`,
-                     so replace the current call with ``daughter(i, omegaPull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotZ0Pull,
                       "z0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
-    MAKE_DEPRECATED("v0DaughterZ0PullWithTrueVertexAsPivot(i)", false, "light-2104-oceanos", R"DOC(
-                     The same value can be calculated with the more generic variable `z0Pull`,
-                     so replace the current call with ``daughter(i, z0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaPullWithTrueVertexAsPivot(i)", v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull,
                       "tan(lambda) pull of the i-th daughter track with the true V0 vertex as the track pivot");
-    MAKE_DEPRECATED("v0DaughterTanLambdaPullWithTrueVertexAsPivot(i)", false, "light-2104-oceanos", R"DOC(
-                     The same value can be calculated with the more generic variable `tanLambdaPull`,
-                     so replace the current call with ``daughter(i, tanLambdaPull)``.)DOC");
     /// pull of helix parameters with the origin as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotD0Pull,
                       "d0 pull of the i-th daughter track with the origin as the track pivot");
+    MAKE_DEPRECATED("v0DaughterD0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+                     The same value can be calculated with the more generic variable `d0Pull`,
+                     so replace the current call with ``daughter(i, d0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0PullWithOriginAsPivot(i)",     v0DaughterHelixWithOriginAsPivotPhi0Pull,
                       "phi0 pull of the i-th daughter track with the origin as the track pivot");
+    MAKE_DEPRECATED("v0DaughterPhi0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+                     The same value can be calculated with the more generic variable `phi0Pull`,
+                     so replace the current call with ``daughter(i, phi0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaPullWithOriginAsPivot(i)",    v0DaughterHelixWithOriginAsPivotOmegaPull,
                       "omega pull of the i-th daughter track with the origin as the track pivot");
+    MAKE_DEPRECATED("v0DaughterOmegaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+                     The same value can be calculated with the more generic variable `omegaPull`,
+                     so replace the current call with ``daughter(i, omegaPull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotZ0Pull,
                       "z0 pull of the i-th daughter track with the origin as the track pivot");
+    MAKE_DEPRECATED("v0DaughterZ0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+                     The same value can be calculated with the more generic variable `z0Pull`,
+                     so replace the current call with ``daughter(i, z0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaPullWithOriginAsPivot(i)", v0DaughterHelixWithOriginAsPivotTanLambdaPull,
                       "tan(lambda) pull of the i-th daughter track with the origin as the track pivot");
+    MAKE_DEPRECATED("v0DaughterTanLambdaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+                     The same value can be calculated with the more generic variable `tanLambdaPull`,
+                     so replace the current call with ``daughter(i, tanLambdaPull)``.)DOC");
     /// helix parameters and covariance matrix elements
     REGISTER_VARIABLE("v0DaughterTau(i,j)",        v0DaughterTrackParam5AtIPPerigee,
                       "j-th track parameter (at IP perigee) of the i-th daughter track. "

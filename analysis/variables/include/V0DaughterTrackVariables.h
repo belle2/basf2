@@ -180,8 +180,8 @@ namespace Belle2 {
      */
     double getV0DaughterTrackDetNHits(const Particle* particle, const double daughterID, const Const::EDetector& det);
 
-    /** helper function to get pull of the helix parameters of the V0 daughter tracks with the origin as the pivot */
-    double getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(const Particle* particle, const double daughterID,
+    /** helper function to get pull of the helix parameters of the V0 daughter tracks with the true V0 vertex as the pivot */
+    double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex);
 
   }

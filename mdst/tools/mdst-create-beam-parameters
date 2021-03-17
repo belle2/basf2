@@ -10,8 +10,17 @@ from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter
 # Arguments.
 parser = argparse.ArgumentParser()
 parser.add_argument('--input-tag', required=True, default=None,
-                    help="Input global tag.")
+                    help='Input global tag.')
+parser.add_argument(
+    '--iov', default='0,0,-1,-1',
+    help='Interval of validity (4 comma-separated integers: ' \
+         'first experiment, first run, last experiment, last run).')
 arguments = parser.parse_args()
+
+# Get interval of validity.
+iov_values = arguments.iov.split(',')
+import_iov = IntervalOfValidity(int(iov_values[0]), int(iov_values[1]),
+                                int(iov_values[2]), int(iov_values[3]))
 
 # Setup database.
 basf2.conditions.override_globaltags()
@@ -41,6 +50,9 @@ beam_spot_iovs = get_iov_list('BeamSpot')
 # CollisionBoostVector and CollisionInvariantMass.
 collision_iovs = []
 for iov1 in invariant_mass_iovs:
+    iov1 = iov1.overlap(import_iov)
+    if iov1.empty():
+        continue
     for iov2 in boost_vector_iovs:
         overlap = iov1.overlap(iov2)
         if overlap.empty():

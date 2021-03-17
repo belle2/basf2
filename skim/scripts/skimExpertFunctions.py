@@ -936,8 +936,8 @@ class CombinedSkim(BaseSkim):
         EventExtraInfo is included in the MDST output so that the flags are available in
         the output.
 
-        The ``CombinedSkimName`` parameter of `CombinedSkim.__init__` is used for the
-        output filename if ``filename`` is not included in kwargs.
+        The ``CombinedSkimName`` parameter in the `CombinedSkim` initialisation is used
+        for the output filename if ``filename`` is not included in kwargs.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.

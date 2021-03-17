@@ -11,6 +11,7 @@
 #pragma once
 
 /* MDST headers. */
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -171,6 +172,9 @@ namespace Belle2 {
 
     /** Beam parameters. */
     BeamParameters m_BeamParameters;
+
+    /** Beam spot. */
+    DBObjPtr<BeamSpot> m_BeamSpot;
 
     /** Collision boost vector. */
     DBObjPtr<CollisionBoostVector> m_CollisionBoostVector;

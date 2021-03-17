@@ -315,6 +315,10 @@ void BeamParametersFitter::fit()
 
 void BeamParametersFitter::fillVertexData()
 {
+  setupDatabase();
+  m_BeamParameters.setVertex(m_BeamSpot->getIPPosition());
+  TMatrixDSym beamSize = m_BeamSpot->getSizeCovMatrix();
+  m_BeamParameters.setCovVertex(beamSize);
 }
 
 void BeamParametersFitter::importBeamParameters()

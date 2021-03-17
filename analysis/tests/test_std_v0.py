@@ -14,6 +14,7 @@ class TestStdV0(unittest.TestCase):
             std_function=stdV0s.stdKshorts,
             expected_modules=[
                 "ParticleLoader",
+                "ParticleListManipulator",
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleLoader",
@@ -21,7 +22,7 @@ class TestStdV0(unittest.TestCase):
                 "TreeFitter",
                 "ParticleSelector",
                 "ParticleListManipulator"],
-            expected_lists=['V0', 'all', 'RD', 'merged']):
+            expected_lists=['V0', 'V0_MassWindow', 'all', 'RD', 'merged']):
         """check that a given function works"""
         testpath = create_path()
         std_function(path=testpath)
@@ -37,8 +38,8 @@ class TestStdV0(unittest.TestCase):
         for module in testpath.modules():
             loaded_modules.append(module.type())
             for param in module.available_params():
-                if module.type() == 'ParticleLoader' and param.name == 'decayStringsWithCuts':
-                    name = param.values[0][0].split(':')[1].split(' -> ')[0]
+                if module.type() == 'ParticleLoader' and param.name == 'decayStrings':
+                    name = param.values[0].split(':')[1].split(' -> ')[0]
                     built_lists.append(name)
                 if module.type() == 'ParticleListManipulator' and param.name == 'outputListName':
                     name = str(param.values).split(':')[1].split(' -> ')[0]
@@ -62,6 +63,8 @@ class TestStdV0(unittest.TestCase):
     def test_belle_list(self):
         """check that the builder function works with the legacy Belle Kshorts list"""
         expected_modules = ["ParticleLoader",
+                            "ParticleListManipulator",
+                            "ParticleSelector",
                             "ParticleVertexFitter",
                             "ParticleSelector"]
         self._check_list(std_function=stdV0s.goodBelleKshort, expected_modules=expected_modules, expected_lists=["legacyGoodKS"])
@@ -69,6 +72,7 @@ class TestStdV0(unittest.TestCase):
     def test_stdlambdas_list(self):
         """check that the builder function works with the stdLambdas list"""
         expected_modules = ["ParticleLoader",
+                            "ParticleListManipulator",
                             "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
@@ -81,7 +85,7 @@ class TestStdV0(unittest.TestCase):
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleListManipulator"]
-        expected_lists = ['V0', 'all', 'all', 'RD', 'merged']
+        expected_lists = ['V0', 'V0_MassWindow', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
 

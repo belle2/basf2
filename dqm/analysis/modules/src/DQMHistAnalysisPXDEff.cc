@@ -42,7 +42,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
-  addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", false);
+  addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }

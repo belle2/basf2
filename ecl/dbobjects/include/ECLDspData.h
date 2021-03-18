@@ -64,19 +64,19 @@ namespace Belle2 {
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
     short int m_adcAlwThresh;
     /** See documentation for method 'getF31' */
-    std::vector<short int> m_fg31;
+    std::vector<short int> m_fg31 = {};
     /** See documentation for method 'getF32' */
-    std::vector<short int> m_fg32;
+    std::vector<short int> m_fg32 = {};
     /** See documentation for method 'getF33' */
-    std::vector<short int> m_fg33;
+    std::vector<short int> m_fg33 = {};
     /** See documentation for method 'getF41' */
-    std::vector<short int> m_fg41;
+    std::vector<short int> m_fg41 = {};
     /** See documentation for method 'getF43' */
-    std::vector<short int> m_fg43;
+    std::vector<short int> m_fg43 = {};
     /** See documentation for method 'getF' */
-    std::vector<short int> m_f;
+    std::vector<short int> m_f = {};
     /** See documentation for method 'getF1' */
-    std::vector<short int> m_f1;
+    std::vector<short int> m_f1 = {};
     /**
      * This vector contains all parameters that didn't exist in the initial
      * version of ECL DSP file format.
@@ -114,14 +114,7 @@ namespace Belle2 {
       m_hitThresh(0),
       m_lowAmpThresh(0),
       m_skipThresh(0),
-      m_adcAlwThresh(0),
-      m_fg31(49152),
-      m_fg32(49152),
-      m_fg33(49152),
-      m_fg41(6144),
-      m_fg43(6144),
-      m_f(49152),
-      m_f1(49152)
+      m_adcAlwThresh(0)
     {}
     /** */
     ~ECLDspData() {};

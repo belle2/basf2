@@ -224,7 +224,7 @@ namespace Belle2 {
     /** Read calibration values for thresholds from DBObject. */
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>&, std::vector<short int>&);
     /** Read DSP coeffs and auxiliary constants from DBObject. */
-    void callbackCalibration(ECLDspData*, std::map<std::string, std::vector<short int>>&, std::map<std::string, short int>&);
+    void callbackCalibration(const ECLDspData*, std::map<std::string, std::vector<short int>>&, std::map<std::string, short int>&);
     /** Get DSP coeffs and auxiliary constants from DB. */
     void initDspfromDB();
     /** Get DSP coeffs and auxiliary constants from Files. */

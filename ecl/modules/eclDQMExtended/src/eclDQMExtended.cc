@@ -305,7 +305,7 @@ void ECLDQMEXTENDEDModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, s
 }
 
 
-void ECLDQMEXTENDEDModule::callbackCalibration(ECLDspData* dspdata, std::map<std::string, std::vector<short int>>& map1,
+void ECLDQMEXTENDEDModule::callbackCalibration(const ECLDspData* dspdata, std::map<std::string, std::vector<short int>>& map1,
                                                std::map<std::string, short int>& map2)
 {
 
@@ -354,8 +354,7 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
     iShaper++;
     map_vec.clear();
     map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
+    callbackCalibration(&dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;
   }
@@ -364,8 +363,7 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
     iShaper++;
     map_vec.clear();
     map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
+    callbackCalibration(&dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;
   }
@@ -379,8 +377,7 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
     }
     map_vec.clear();
     map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
+    callbackCalibration(&dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;
   }

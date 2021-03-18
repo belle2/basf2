@@ -119,10 +119,6 @@ namespace Belle2 {
     /** ECL channel mapper. */
     ECL::ECLChannelMapper mapper;
 
-    /** Map to store DSP coeffs. for one shaper */
-    std::map<std::string, std::vector<short int>> map_vec;
-    /** Map to store auxiliary constants for one shaper. */
-    std::map<std::string, short int> map_coef;
     /** Map to store DSP coeffs. for all shapers. */
     std::map<int, std::map<std::string, std::vector<short int>>> map_container_vec;
     /** Map to store auxiliary constants for all shapers. */

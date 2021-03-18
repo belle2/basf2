@@ -305,7 +305,8 @@ void ECLDQMEXTENDEDModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, s
 }
 
 
-void ECLDQMEXTENDEDModule::callbackCalibration(const ECLDspData* dspdata, std::map<std::string, std::vector<short int>>& map1,
+void ECLDQMEXTENDEDModule::callbackCalibration(const ECLDspData* dspdata,
+                                               std::map<std::string, std::vector<short int>>& map1,
                                                std::map<std::string, short int>& map2)
 {
 
@@ -352,20 +353,14 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
 
   for (const auto& dspdata : m_ECLDspDataArray0) { //iCrate = 1, ..., 18
     iShaper++;
-    map_vec.clear();
-    map_coef.clear();
-    callbackCalibration(&dspdata, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 
   for (const auto& dspdata : m_ECLDspDataArray1) { //iCrate = 19, ..., 36
     iShaper++;
-    map_vec.clear();
-    map_coef.clear();
-    callbackCalibration(&dspdata, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 
   for (const auto& dspdata : m_ECLDspDataArray2) { //iCrate = 37, ..., 52
@@ -375,11 +370,8 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
     } else {
       if (iShaper - (iShaper - 1) / 12 * 12 > 8) continue;
     }
-    map_vec.clear();
-    map_coef.clear();
-    callbackCalibration(&dspdata, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 }
 
@@ -401,9 +393,8 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
       if (iShaperPosition > 8) continue;
     }
     ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
-    callbackCalibration(dspdata, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
     callbackCalibration(m_calibrationThrA0, v_totalthrA0);
     callbackCalibration(m_calibrationThrAhard, v_totalthrAhard);
     callbackCalibration(m_calibrationThrAskip, v_totalthrAskip);
@@ -412,14 +403,13 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
 
 void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<int> adc_data)
 {
-
   int iShaper = conversion(cellID);
   int iChannelPosition = mapper.getShaperChannel(cellID);
   short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
   int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
   int A0, Ahard, Askip;
 
-  map_vec = map_container_vec[iShaper];
+  auto& map_vec = map_container_vec[iShaper];
   f    = vectorsplit(map_vec["F"], iChannelPosition);
   f1   = vectorsplit(map_vec["F1"], iChannelPosition);
   fg31 = vectorsplit(map_vec["F31"], iChannelPosition);
@@ -428,7 +418,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   fg41 = vectorsplit(map_vec["F41"], iChannelPosition);
   fg43 = vectorsplit(map_vec["F43"], iChannelPosition);
 
-  map_coef = map_container_coef[iShaper];
+  auto& map_coef = map_container_coef[iShaper];
   k_a = map_coef["k_a"];
   k_b = map_coef["k_b"];
   k_c = map_coef["k_c"];

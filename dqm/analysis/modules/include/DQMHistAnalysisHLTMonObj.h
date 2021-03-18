@@ -59,12 +59,12 @@ namespace Belle2 {
 
   protected:
 
-    TCanvas* m_c_filter = NULL; /**<Canvas with histograms related to HLT filter*/
-    TCanvas* m_c_skim = NULL; /**<Canvas with histograms related to HLT skims*/
-    TCanvas* m_c_hardware = NULL; /**<Canvas with histograms related to HLT hardware*/
-    TCanvas* m_c_l1 = NULL; /**<Canvas with histograms related to L1*/
+    TCanvas* m_c_filter = nullptr; /**<Canvas with histograms related to HLT filter*/
+    TCanvas* m_c_skim = nullptr; /**<Canvas with histograms related to HLT skims*/
+    TCanvas* m_c_hardware = nullptr; /**<Canvas with histograms related to HLT hardware*/
+    TCanvas* m_c_l1 = nullptr; /**<Canvas with histograms related to L1*/
 
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
+    MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
   };
 

@@ -41,6 +41,18 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   // if monitoring object already exists this will return pointer to it
   m_monObj = getMonitoringObject("hlt");
 
+  // make canvases to be added to MonitoringObject
+  m_c_filter = new TCanvas("Filter");
+  m_c_skim = new TCanvas("Skim");
+  m_c_hardware = new TCanvas("Hardware");
+  m_c_l1 = new TCanvas("L1");
+
+  // add canvases to MonitoringObject
+  m_monObj->addCanvas(m_c_filter);
+  m_monObj->addCanvas(m_c_skim);
+  m_monObj->addCanvas(m_c_hardware);
+  m_monObj->addCanvas(m_c_l1);
+
 }
 
 void DQMHistAnalysisHLTMonObjModule::beginRun()
@@ -61,9 +73,43 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_skim = findHist("softwaretrigger/skim");
   TH1* h_budget = findHist("timing_statistics/fullTimeHistogram");
   TH1* h_processing = findHist("timing_statistics/processingTimeHistogram");
+  TH1* h_budg_unit = findHist("timing_statistics/fullTimeMeanPerUnitHistogram");
+  TH1* h_proc_unit = findHist("timing_statistics/processingTimeMeanPerUnitHistogram");
   TH1* h_l1 = findHist("softwaretrigger_before_filter/hlt_unit_number");
   TH1* h_hlt_triggers = findHist("softwaretrigger/filter");
   TH1* h_l1_triggers = findHist("TRGGDL/hGDL_psn_all");
+
+  // set the content of filter canvas
+  m_c_filter->Clear(); // clear existing content
+  m_c_filter->Divide(2, 1);
+  m_c_filter->cd(1);
+  if (h_hlt) h_hlt->Draw();
+  m_c_filter->cd(2);
+  if (h_hlt_triggers) h_hlt_triggers->Draw();
+
+  // set the content of skim canvas
+  m_c_skim->Clear(); // clear existing content
+  m_c_skim->cd();
+  if (h_skim) h_skim->Draw();
+
+  // set the content of hardware canvas
+  m_c_hardware->Clear(); // clear existing content
+  m_c_hardware->Divide(3, 2);
+  m_c_hardware->cd(1);
+  if (h_l1) h_l1->Draw();
+  m_c_hardware->cd(2);
+  if (h_budget) h_budget->Draw();
+  m_c_hardware->cd(3);
+  if (h_processing) h_processing->Draw();
+  m_c_hardware->cd(4);
+  if (h_budg_unit) h_budg_unit->Draw();
+  m_c_hardware->cd(5);
+  if (h_proc_unit) h_proc_unit->Draw();
+
+  // set the content of L1 canvas
+  m_c_l1->Clear(); // clear existing content
+  m_c_l1->cd();
+  if (h_l1_triggers) h_l1_triggers->Draw();
 
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));

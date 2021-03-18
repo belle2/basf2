@@ -335,7 +335,7 @@ int ECLDQMEXTENDEDModule::conversion(int cellID)
   return (iCrate - 1) * 12 + iShaperPosition;
 
 }
-short int* ECLDQMEXTENDEDModule::vectorsplit(std::vector<short int>& vectorFrom, int iChannel)
+const short int* ECLDQMEXTENDEDModule::vectorsplit(const std::vector<short int>& vectorFrom, int iChannel)
 {
   size_t size = vectorFrom.size();
   if (size % 16) B2ERROR("ECL DQM logic test error: Split is impossible!" << LogVar("Vector size", size));
@@ -405,31 +405,28 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 {
   int iShaper = conversion(cellID);
   int iChannelPosition = mapper.getShaperChannel(cellID);
-  short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
-  int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
-  int A0, Ahard, Askip;
 
-  auto& map_vec = map_container_vec[iShaper];
-  f    = vectorsplit(map_vec["F"], iChannelPosition);
-  f1   = vectorsplit(map_vec["F1"], iChannelPosition);
-  fg31 = vectorsplit(map_vec["F31"], iChannelPosition);
-  fg32 = vectorsplit(map_vec["F32"], iChannelPosition);
-  fg33 = vectorsplit(map_vec["F33"], iChannelPosition);
-  fg41 = vectorsplit(map_vec["F41"], iChannelPosition);
-  fg43 = vectorsplit(map_vec["F43"], iChannelPosition);
+  const auto& map_vec = map_container_vec[iShaper];
+  const short int* f    = vectorsplit(map_vec.at("F"),   iChannelPosition);
+  const short int* f1   = vectorsplit(map_vec.at("F1"),  iChannelPosition);
+  const short int* fg31 = vectorsplit(map_vec.at("F31"), iChannelPosition);
+  const short int* fg32 = vectorsplit(map_vec.at("F32"), iChannelPosition);
+  const short int* fg33 = vectorsplit(map_vec.at("F33"), iChannelPosition);
+  const short int* fg41 = vectorsplit(map_vec.at("F41"), iChannelPosition);
+  const short int* fg43 = vectorsplit(map_vec.at("F43"), iChannelPosition);
 
-  auto& map_coef = map_container_coef[iShaper];
-  k_a = map_coef["k_a"];
-  k_b = map_coef["k_b"];
-  k_c = map_coef["k_c"];
-  k_1 = map_coef["k_1"];
-  k_2 = map_coef["k_2"];
-  k_16 = map_coef["k_16"];
-  chi_thres = map_coef["chi_thres"];
+  const auto& map_coef = map_container_coef[iShaper];
+  int k_a = map_coef.at("k_a");
+  int k_b = map_coef.at("k_b");
+  int k_c = map_coef.at("k_c");
+  int k_1 = map_coef.at("k_1");
+  int k_2 = map_coef.at("k_2");
+  int k_16 = map_coef.at("k_16");
+  int chi_thres = map_coef.at("chi_thres");
 
-  A0 = (int)v_totalthrA0[cellID - 1];
-  Ahard = (int)v_totalthrAhard[cellID - 1];
-  Askip = (int)v_totalthrAskip[cellID - 1];
+  int A0 = (int)v_totalthrA0[cellID - 1];
+  int Ahard = (int)v_totalthrAhard[cellID - 1];
+  int Askip = (int)v_totalthrAskip[cellID - 1];
 
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);

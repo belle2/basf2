@@ -216,7 +216,7 @@ namespace Belle2 {
     /** Convert a CellID number to the global Shaper number. */
     int conversion(int);
     /** Select from vector of DSP coeffs a subvector corresponding to accurate channel number. */
-    short int* vectorsplit(std::vector<short int>&, int);
+    const short int* vectorsplit(const std::vector<short int>&, int);
     /** Read calibration values for thresholds from DBObject. */
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>&, std::vector<short int>&);
     /** Read DSP coeffs and auxiliary constants from DBObject. */

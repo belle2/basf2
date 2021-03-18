@@ -61,6 +61,8 @@ namespace Belle2 {
     int m_minEntries = 1000;
     /** use alarm level per module */
     bool m_perModuleAlarm;
+    /** generate alarm from adhoc values */
+    bool m_alarmAdhoc;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

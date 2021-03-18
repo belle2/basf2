@@ -43,6 +43,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
+  addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
@@ -327,7 +328,7 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
       /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += ihit;
+      all += nhit;
       m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
@@ -354,12 +355,18 @@ void DQMHistAnalysisPXDEffModule::event()
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
-      error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
-                        m_errorlevelmod[aModule]); // error if upper error value is below limit
-      warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
-                       m_warnlevelmod[aModule]); // (and not only the actual eff value)
+      if (nhit > 10) {
+        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                       m_errorlevelmod[aModule]); // error if upper error value is below limit
+        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                      m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        if (m_alarmAdhoc) {
+          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                         m_errorlevelmod[aModule]); // error if upper error value is below limit
+          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        }
+      }
     }
   }
 

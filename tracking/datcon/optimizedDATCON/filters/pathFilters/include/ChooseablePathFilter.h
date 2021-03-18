@@ -16,15 +16,13 @@
 
 namespace Belle2 {
   class HitData;
-  /// A chooseable filter for picking out the relations between states
-//   using ChooseablePathFilter = TrackFindingCDC::ChooseableFilter<PathFilterFactory>;
 
   // Guard to prevent repeated instantiations
-  extern template class PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData,
-                                                 TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+  extern template class
+  PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
 
-                                                 /// Alias to apply the () operator to all items filtered by CKF SVD layer states
-                                                 using ChooseablePathFilter = PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData,
-                                                     TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+                           /// Alias to apply the () operator to all items filtered by CKF SVD layer states
+                           using ChooseablePathFilter =
+                           PathLengthToggledApplier<HitData, LimitedOnHitApplier<HitData, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
 
 }

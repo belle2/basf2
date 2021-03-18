@@ -41,6 +41,13 @@ namespace Belle2 {
     B2ASSERT("Expected relation to be sorted",
              std::is_sorted(relations.begin(), relations.end()));
 
+//     // FIXME: quick fix for development, abort if number of relations too high.
+//     // High number of relations might be OK when filters implemented properly
+//     if (relations.size() > 5000) {
+//       B2WARNING("Aborting because number of relations is above 5000 (exact number: " << relations.size() << ")");
+//       return;
+//     }
+
 //     // TODO: May be better to just do this for each seed separately
 //     const std::vector<AHit*>& hitPointers = TrackFindingCDC::as_pointers<AHit>(hits);
     // TODO: Maybe const-cast as above, which was done by Nils for the CKF, where he
@@ -49,11 +56,19 @@ namespace Belle2 {
 //     m_automaton.applyTo(hitPointers, relations);
     m_automaton.applyTo(hits, relations);
 
-    std::vector<TrackFindingCDC::WithWeight<const AHit*>> path;
+    std::vector<const AHit*> seedHits;
     for (const AHit* hit : hits) {
+      if (hit->getDataCache().layer >= 5) {
+        seedHits.emplace_back(hit);
+      }
+    }
+//     B2INFO("hits size (= rawTC size): " << hits.size() << " relations size: " << relations.size() << " seedHits size: " << seedHits.size());
+
+    std::vector<TrackFindingCDC::WithWeight<const AHit*>> path;
+    for (const AHit* seedHit : seedHits) {
       B2DEBUG(29, "Starting with new seed...");
 
-      path.emplace_back(hit, 0);
+      path.emplace_back(seedHit, 0);
       traverseTree(path, relations, results);
       path.pop_back();
       B2ASSERT("Something went wrong during the path traversal", path.empty());
@@ -75,17 +90,18 @@ namespace Belle2 {
 
     std::vector<TrackFindingCDC::WithWeight<AHit*>> childHits;
     for (const TrackFindingCDC::WeightedRelation<AHit>& continuation : continuations) {
-      AHit* childState = continuation.getTo();
+      AHit* childHit = continuation.getTo();
       TrackFindingCDC::Weight weight = continuation.getWeight();
       // the state may still include information from an other round of processing, so lets set it back
 
-      if (std::count(path.begin(), path.end(), childState)) {
+      if (std::count(path.begin(), path.end(), childHit)) {
+//       if (TrackFindingCDC::is_in(childHit, path)) {
         // Cycle detected -- is this the best handling?
         // Other options: Raise an exception and bail out of this seed
         B2FATAL("Cycle detected!");
       }
 
-      childHits.emplace_back(childState, weight);
+      childHits.emplace_back(childHit, weight);
     }
 
     // Apply three-hit-filters, so the path has to contain at least to hits to form >= triplet with the child states
@@ -95,9 +111,11 @@ namespace Belle2 {
       m_pathFilter.apply(constPath, childHits);
     }
 
-    if (childHits.empty() and path.size() >= 3) {
+    if (childHits.empty()) {
       B2DEBUG(29, "Terminating this route, as there are no possible child states.");
-      results.emplace_back(path);
+      if (path.size() >= 3) {
+        results.emplace_back(path);
+      }
       return;
     }
 
@@ -108,8 +126,10 @@ namespace Belle2 {
     std::sort(childHits.begin(), childHits.end(), stateLess);
 
     B2DEBUG(29, "Having found " << childHits.size() << " child states.");
-    for (const TrackFindingCDC::WithWeight<AHit*>& childState : childHits) {
-      path.emplace_back(childState, childState.getWeight());
+//     if (childHits.size() > 10)
+//       B2INFO("Having found " << childHits.size() << " child states.");
+    for (const TrackFindingCDC::WithWeight<AHit*>& childHit : childHits) {
+      path.emplace_back(childHit, childHit.getWeight());
       traverseTree(path, relations, results);
       path.pop_back();
     }

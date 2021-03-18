@@ -39,7 +39,7 @@ namespace Belle2 {
     /// Parent class
     using Super =  TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
 
-    using AResult = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
+    using Result = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -65,17 +65,17 @@ namespace Belle2 {
 
   private:
 
+    RelationCreator<AHit, ChooseableRelationFilter> m_relationCreator;
+
+    DATCONTreeSearcher<AHit, ChooseablePathFilter, Result> m_treeSearcher;
+
     /// the current track candidate
 //     std::vector<const SpacePoint*> m_currentTrackCandidate;
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<AResult> m_results;
+    std::vector<Result> m_results;
 
     std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
-
-    RelationCreator<AHit, ChooseableRelationFilter> m_relationCreator;
-
-    DATCONTreeSearcher<AHit, ChooseablePathFilter, AResult> m_treeSearcher;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
@@ -88,6 +88,8 @@ namespace Belle2 {
     TH2D* m_nRelationsVsRawTrackCandSize;
 
     void initializeHists();
+
+    int m_nEvent = 0;
 
   };
 }

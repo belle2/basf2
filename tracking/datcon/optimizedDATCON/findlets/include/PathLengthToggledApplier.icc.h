@@ -31,7 +31,7 @@ namespace Belle2 {
   {
     m_threeHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "threeHit"));
     m_fourHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fourHit"));
-    m_pathFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "path"));
+    m_pathFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "shortPath"));
   }
 
   /// The weight is calculated using the subfilter based on the geometrical layer of the state.

@@ -86,6 +86,11 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
     m_nRelationsVsRawTrackCandSize->Fill(rawTrackCand.size(), m_relations.size());
     counter++;
 
+    if (m_relations.size() > 2000) {
+      B2WARNING("Aborting because number of relations is above 2000 (exact number: " << m_relations.size() << ") in event: " << m_nEvent);
+      continue;
+    }
+
     m_treeSearcher.apply(rawTrackCand, m_relations, m_results);
 
     for (const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& result : m_results) {
@@ -99,7 +104,9 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
 
   }
   m_nRelationsPerEvent->Fill(totalRelationsPerEvent);
+  m_nEvent++;
 
+//   B2INFO("Event number: " << ++m_nEvent << " with nTrackCands: " << rawTrackCandidates.size() << " and total number of relations: " << totalRelationsPerEvent);
 
 }
 

@@ -29,7 +29,7 @@ RelationFilterFactory::~RelationFilterFactory() = default;
 
 std::string RelationFilterFactory::getIdentifier() const
 {
-  return "SVD Hit Pair";
+  return "SVD Hit Pair Relation Filter";
 }
 
 std::string RelationFilterFactory::getFilterPurpose() const

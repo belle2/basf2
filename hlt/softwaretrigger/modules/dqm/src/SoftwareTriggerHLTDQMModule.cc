@@ -104,16 +104,30 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     const std::string& baseIdentifier = mapVal.first;
     const int numberOfFlags = mapVal.second.size();
 
-    if (title == baseIdentifier)
-      m_cutResultHistograms.emplace(title,
-                                    new TH1F(title.c_str(), ("Events triggered in HLT " + baseIdentifier).c_str(),
-                                             numberOfFlags, 0,
-                                             numberOfFlags));
-    else
-      m_cutResultHistograms.emplace(title,
-                                    new TH1F((baseIdentifier + "_" + title).c_str(), ("Events triggered in HLT " + baseIdentifier + " : " + title).c_str(),
-                                             numberOfFlags, 0,
-                                             numberOfFlags));
+    if (m_param_histogramDirectoryName == "softwaretrigger_skim_nobhabha") {
+      if (title == baseIdentifier)
+        m_cutResultHistograms.emplace(title,
+                                      new TH1F((title + "_nobhabha").c_str(), ("Events triggered in HLT " + baseIdentifier).c_str(),
+                                               numberOfFlags, 0,
+                                               numberOfFlags));
+      else
+        m_cutResultHistograms.emplace(title,
+                                      new TH1F((baseIdentifier + "_" + title + "_nobhabha").c_str(),
+                                               ("Events triggered in HLT " + baseIdentifier + " : " + title).c_str(),
+                                               numberOfFlags, 0,
+                                               numberOfFlags));
+    } else {
+      if (title == baseIdentifier)
+        m_cutResultHistograms.emplace(title,
+                                      new TH1F(title.c_str(), ("Events triggered in HLT " + baseIdentifier).c_str(),
+                                               numberOfFlags, 0,
+                                               numberOfFlags));
+      else
+        m_cutResultHistograms.emplace(title,
+                                      new TH1F((baseIdentifier + "_" + title).c_str(), ("Events triggered in HLT " + baseIdentifier + " : " + title).c_str(),
+                                               numberOfFlags, 0,
+                                               numberOfFlags));
+    }
     m_cutResultHistograms[title]->SetXTitle("");
     m_cutResultHistograms[title]->SetOption("hist");
     m_cutResultHistograms[title]->SetStats(false);
@@ -155,9 +169,15 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_hlt_unit_histograms) {
-    m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
-                                                            ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
-                                                            HLTUnit::max_hlt_units + 1));
+    if (m_param_histogramDirectoryName != "softwaretrigger_before_filter") {
+      m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number_after_filter",
+                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
+                                                              HLTUnit::max_hlt_units + 1));
+    } else {
+      m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
+                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
+                                                              HLTUnit::max_hlt_units + 1));
+    }
     m_runInfoHistograms["hlt_unit_number"]->SetMinimum(0);
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {

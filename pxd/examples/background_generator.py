@@ -3,8 +3,9 @@
 
 #############################################################
 # This steering file generates, simulates, and reconstructs
-# a sample of 10 BBbar events. It uses the PXD background
-# generator module.
+# a sample of 10 BBbar events. The PXD background generator
+# module is used to generate background samples for
+# background overlay on the fly.
 #
 # Usage: basf2 background_generator.py
 #
@@ -12,7 +13,7 @@
 # Output: output.root, mdst.root
 #
 # Example steering file - 2021 Belle II Collaboration
-# Based on reconstruction/examples/example.py
+# Based on `reconstruction/examples/example.py`
 #############################################################
 
 import basf2 as b2
@@ -35,9 +36,13 @@ main.add_module('EventInfoPrinter')
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# list of background overlay files that are available on the system
 files = get_background_files()
-specs = Specs(model='convnet', seed=0)
+
+# specifications for the PXD background generator module
+specs = Specs(model='resnet')
+
+# detector simulation with background overlay
 add_simulation(main, bkgfiles=files, pxd_background_generator=specs)
 
 # trigger simulation

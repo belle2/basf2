@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/PathFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ShortPathFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -27,7 +30,7 @@ PathFilterFactory::~PathFilterFactory() = default;
 
 std::string PathFilterFactory::getIdentifier() const
 {
-  return "SVD Hit Pair";
+  return "SVD Hit Path Filter";
 }
 
 std::string PathFilterFactory::getFilterPurpose() const
@@ -40,6 +43,9 @@ std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDesc
   return {
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
+    {"threeHit", "filter three hits (path of length 2 plus next hit)"},
+    {"fourHit", "filter four hits (path of length 3 plus next hit)"},
+    {"shortPath", "filter a path longer than 4 hits"},
   };
 }
 
@@ -49,9 +55,17 @@ PathFilterFactory::create(const std::string& filterName) const
   if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BasePathFilter>>();
   }
-
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BasePathFilter>>();
+  }
+  if (filterName == "threeHit") {
+    return std::make_unique<ThreeHitFilter>();
+  }
+  if (filterName == "fourHit") {
+    return std::make_unique<FourHitFilter>();
+  }
+  if (filterName == "shortPath") {
+    return std::make_unique<ShortPathFilter>();
   }
 
   return Super::create(filterName);

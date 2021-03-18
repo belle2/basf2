@@ -111,6 +111,7 @@ void ECLDQMModule::defineHisto()
 
   h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Flag number");
+  h_trigtag1->SetDrawOption("hist");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 

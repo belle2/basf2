@@ -313,10 +313,8 @@ void ECLDQMModule::event()
       h_evtot->Fill(0);
       for (const auto& id : m_WaveformOption) {
         if (id == "logic" && m_iEvent % 1000 == 999) h_evtot_logic->Fill(0);
-        if (id == "rand" && m_l1Trigger.isValid() &&
-            m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
-        if (id == "dphy" && m_l1Trigger.isValid() &&
-            bhatrig) h_evtot_dphy->Fill(0);
+        if (id == "rand" && isRandomTrigger()) h_evtot_rand->Fill(0);
+        if (id == "dphy" && bhatrig) h_evtot_dphy->Fill(0);
       }
     }
   }
@@ -329,8 +327,8 @@ void ECLDQMModule::event()
     for (const auto& id : m_WaveformOption) {
       if (id != "psd") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  bhatrig) ||
+                               isRandomTrigger() ||
+                               bhatrig ||
                                aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
@@ -418,18 +416,12 @@ void ECLDQMModule::event()
     for (const auto& id : m_WaveformOption) {
       auto index = std::distance(m_WaveformOption.begin(), std::find(m_WaveformOption.begin(), m_WaveformOption.end(), id));
       if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
-      else if (id == "psd" && (m_iEvent % 1000 == 999 ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  bhatrig) ||
+      else if (id == "psd" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
                                !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       else if (id == "logic" && m_iEvent % 1000 != 999) continue;
-      else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
-      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                !bhatrig)) continue;
-      else if (id == "other" && (m_iEvent % 1000 == 999 ||
-                                 (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                                 (m_l1Trigger.isValid() &&  bhatrig) ||
+      else if (id == "rand" && (m_iEvent % 1000 == 999 || !isRandomTrigger())) continue;
+      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !bhatrig)) continue;
+      else if (id == "other" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
                                  (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
       if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());
@@ -447,3 +439,11 @@ void ECLDQMModule::endRun()
 void ECLDQMModule::terminate()
 {
 }
+
+bool ECLDQMModule::isRandomTrigger()
+{
+  if (!m_l1Trigger.isValid()) return false;
+  return m_l1Trigger.getTimType() == TRGSummary::ETimingType::TTYP_RAND ||
+         m_l1Trigger.getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+}
+

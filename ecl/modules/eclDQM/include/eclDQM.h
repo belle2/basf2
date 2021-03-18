@@ -74,6 +74,12 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    /**
+     * @return true if the current event is a random trigger event,
+     *         false otherwise.
+     */
+    bool isRandomTrigger();
+
     /** Geometry */
     ECL::ECLGeometryPar* m_geom{nullptr};
     /** StoreObjPtr EventMetaData */

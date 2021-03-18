@@ -60,7 +60,7 @@ of the physics program.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\, \textrm
+    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^{35}\, \textrm
     {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
     a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.

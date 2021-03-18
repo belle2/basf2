@@ -32,7 +32,7 @@ skim(path)
 # The skim list names are contained in the Python list skim.SkimLists.
 #
 # Add all subsequent modules to skim.postskim_path, but call b2.process on
-# the main path. For example...
+# the main path. For example:
 #
 #     ma.variablesToNtuple(
 #         skim.SkimLists[0],
@@ -40,9 +40,11 @@ skim(path)
 #         path=skim.postskim_path
 #     )
 #
-# The one exception to this is the attribute skim.flag, which is a variable indicating
-# whether an event passed the skim. This can be written out to ntuples on the main path
-# (the variable `path` in this steering file).
+# The one exception to this is the attribute skim.flag, which is an event-level variable
+# indicating whether an event passed the skim. This variable is available for all events
+# on the main path (`path` in this steering file). For example:
+#
+#     ma.variablesToNtuple("", {% if skims|length == 1 %}[skim.flag]{% else %}skim.flags{% endif %}, path=path)
 {%- endif %}
 
 b2.process(path)

@@ -443,7 +443,7 @@ void ECLDQMModule::terminate()
 bool ECLDQMModule::isRandomTrigger()
 {
   if (!m_l1Trigger.isValid()) return false;
-  return m_l1Trigger.getTimType() == TRGSummary::ETimingType::TTYP_RAND ||
-         m_l1Trigger.getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+  return m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND ||
+         m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
 }
 

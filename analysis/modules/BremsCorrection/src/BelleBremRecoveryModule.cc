@@ -47,10 +47,10 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription(R"DOC(
-                   Takes the charged particle from the given charged particle list(``inputListName``) and
-                   copies them to the output list(``outputListName``) and adds the 4-vector of nearest(all) photon(s)
-                   from ``gammaListName`` (considered as radiative) to the charged particle, if the given
-                   criteria for maximum angle(``angleThreshold``) and minimum energy(``minimumEnergy``) are fulfilled.
+                   Takes the charged particle from the given charged particle list (``inputListName``) and
+                   copies it to the output list (``outputListName``). The 4-vector of the nearest (all) photon(s)
+                   from ``gammaListName`` (considered as radiative) is added to the charged particle, if it is
+                   found inside the cone around the charged particle with the given maximum angle (``angleThreshold``).
                    )DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -63,7 +63,7 @@ namespace Belle2 {
              "The maximum angle in radians between the charged particle  and the (radiative) gamma to be accepted.", 0.05);
     addParam("multiplePhotons", m_isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
     addParam("writeOut", m_writeOut,
-             "Set to false if you want to add only the nearest photon, otherwise all eligible photons will be added", false);
+             "Set to true if you want to write out the output list to a root file", false);
 
   }
 

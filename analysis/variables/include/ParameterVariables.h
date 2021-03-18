@@ -78,25 +78,5 @@ namespace Belle2 {
      */
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters);
 
-    /**
-     * return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track
-     */
-    double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID);
-
-    /**
-     * return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track
-     */
-    double v0DaughterD0Diff(const Particle* particle);
-
-    /**
-     * return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track
-     */
-    double v0DaughterZ0(const Particle* particle, const std::vector<double>& daughterID);
-
-    /**
-     * return the difference between Z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track
-     */
-    double v0DaughterZ0Diff(const Particle* particle);
-
   }
 }

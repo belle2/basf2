@@ -242,6 +242,8 @@ void SoftwareTriggerHLTDQMModule::event()
   }
 
   if (m_triggerResult.isValid()) {
+    const auto results = m_triggerResult->getResults();
+
     for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
       const std::string& title = cutIdentifier.first;
       const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
@@ -256,10 +258,9 @@ void SoftwareTriggerHLTDQMModule::event()
         const std::string& cutNameIgnored = cutTitleIgnored.substr(0, cutTitleIgnored.find("\\"));
         const std::string& fullCutIdentifierIgnored = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutNameIgnored);
 
-        const auto resultsIgnored = m_triggerResult->getResults();
-        auto const cutEntryIgnored = resultsIgnored.find(fullCutIdentifierIgnored);
+        auto const cutEntryIgnored = results.find(fullCutIdentifierIgnored);
 
-        if (cutEntryIgnored != resultsIgnored.end()) {
+        if (cutEntryIgnored != results.end()) {
           if (cutEntryIgnored->second > 0) skip = true;
         }
       }
@@ -271,7 +272,6 @@ void SoftwareTriggerHLTDQMModule::event()
         // check if the cutResult is in the list, be graceful when not available
         // Create results object instead of calling .find() on a temporary object. This will cause undefined behaviour
         // when checking again the .end() pointer, when the .end() pointer is also created from a temporary object.
-        const auto results = m_triggerResult->getResults();
         auto const cutEntry = results.find(fullCutIdentifier);
 
         if (cutEntry != results.end()) {
@@ -294,48 +294,65 @@ void SoftwareTriggerHLTDQMModule::event()
       const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
       m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
     }
-  }
 
-  if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid() and m_triggerResult.isValid()) {
-    for (const std::string& l1Trigger : m_param_l1Identifiers) {
-      const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
-      if (triggerBit < 0) {
-        B2WARNING("Can not find L1 trigger with name " << l1Trigger);
-        continue;
-      }
-      const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
-      if (m_param_create_total_result_histograms) {
-        m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
-      }
+    if (m_param_create_hlt_unit_histograms) {
+      for (const std::string& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
+        const std::string& cutName = cutIdentifierPerUnit.substr(0, cutIdentifierPerUnit.find("\\"));
+        const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName("filter", cutName);
 
-      if (not triggerResult) {
-        continue;
-      }
+        // check if the cutResult is in the list, be graceful when not available
+        auto const cutEntry = results.find(fullCutIdentifier);
 
-      for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
-        const std::string& title = cutIdentifier.first;
-        const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
-        const std::string& baseIdentifier = mapVal.first;
-        const auto& cuts = mapVal.second;
-
-        for (const std::string& cutTitle : cuts) {
-          const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
-          const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
-
-          // check if the cutResult is in the list, be graceful when not available
-          const auto results = m_triggerResult->getResults();
-          auto const cutEntry = results.find(fullCutIdentifier);
-
-          if (cutEntry != results.end()) {
-            const int cutResult = cutEntry->second;
-            m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
-          }
+        if (cutEntry != results.end()) {
+          const int cutResult = cutEntry->second;
+          m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit, cutResult > 0);
         }
       }
+    }
 
-      const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-      m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
-      m_l1Histograms[l1Trigger]->LabelsDeflate("X");
+    if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid()) {
+      for (const std::string& l1Trigger : m_param_l1Identifiers) {
+        const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
+        if (triggerBit < 0) {
+          B2WARNING("Could not find"
+                    << LogVar("L1 trigger line", l1Trigger));
+          continue;
+        }
+        const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+        if (m_param_create_total_result_histograms) {
+          m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
+        }
+
+        if (not triggerResult) {
+          continue;
+        }
+
+        for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
+          const std::string& title = cutIdentifier.first;
+          const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
+          const std::string& baseIdentifier = mapVal.first;
+          const auto& cuts = mapVal.second;
+
+          if (title == baseIdentifier) {
+            for (const std::string& cutTitle : cuts) {
+              const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
+              const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
+
+              // check if the cutResult is in the list, be graceful when not available
+              auto const cutEntry = results.find(fullCutIdentifier);
+
+              if (cutEntry != results.end()) {
+                const int cutResult = cutEntry->second;
+                m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
+              }
+            }
+          }
+        }
+
+        const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
+        m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
+        m_l1Histograms[l1Trigger]->LabelsDeflate("X");
+      }
     }
   }
 
@@ -358,22 +375,6 @@ void SoftwareTriggerHLTDQMModule::event()
 
   if (m_param_create_hlt_unit_histograms) {
     m_runInfoHistograms["hlt_unit_number"]->Fill(m_hlt_unit);
-
-    if (m_triggerResult.isValid()) {
-      for (const std::string& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
-        const std::string& cutName = cutIdentifierPerUnit.substr(0, cutIdentifierPerUnit.find("\\"));
-        const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName("filter", cutName);
-
-        // check if the cutResult is in the list, be graceful when not available
-        const auto results = m_triggerResult->getResults();
-        auto const cutEntry = results.find(fullCutIdentifier);
-
-        if (cutEntry != results.end()) {
-          const int cutResult = cutEntry->second;
-          m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit, cutResult > 0);
-        }
-      }
-    }
   }
 }
 

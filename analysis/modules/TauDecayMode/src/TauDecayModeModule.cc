@@ -105,7 +105,7 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 
-TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1), nop(0) , taum_no(0), taup_no(0), m_pmode(-2), m_mmode(-2),
+TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1) , taum_no(0), taup_no(0), m_pmode(-2), m_mmode(-2),
   m_pprong(0), m_mprong(0), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1), idOfTauMinus(-1), pdg_extra(0)
 {
   // Set module properties
@@ -122,7 +122,7 @@ TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1), nop(0) , t
 //
 void TauDecayModeModule::initialize()
 {
-  // nop = 0 ;
+
   // taum_no = 0;
   // taup_no = 0;
   // EventNumber = 1;

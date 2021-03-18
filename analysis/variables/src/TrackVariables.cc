@@ -96,7 +96,7 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
       // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
       // Then, we have to take the detour via the related track to access the real pattern and get the first SVD layer if available.
-      if (trackFit->getHitPatternVXD().getNSVDHits() < 1) {
+      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
         trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
       }
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
@@ -108,7 +108,7 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
       // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
       // Then, we have to take the detour via the related track to access the real pattern and get the first PXD layer if available.
-      if (trackFit->getHitPatternVXD().getNPXDHits() < 1) {
+      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
         trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
       }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
@@ -120,7 +120,7 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
       // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
       // Then, we have to take the detour via the related track to access the real pattern and get the first CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() < 1) {
+      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
         trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
       }
       return trackFit->getHitPatternCDC().getFirstLayer();
@@ -132,7 +132,7 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
       // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
       // Then, we have to take the detour via the related track to access the real pattern and get the last CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() < 1) {
+      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
         trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
       }
       return trackFit->getHitPatternCDC().getLastLayer();

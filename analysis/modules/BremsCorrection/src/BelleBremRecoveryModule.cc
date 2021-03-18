@@ -61,7 +61,6 @@ namespace Belle2 {
     addParam("gammaListName", m_gammaListName, "The gammas list containing possibly radiative gammas, should already exist.");
     addParam("angleThreshold", m_angleThres,
              "The maximum angle in radians between the charged particle  and the (radiative) gamma to be accepted.", 0.05);
-    addParam("minimumEnergy", m_minimumEnergy, "The minimum energy in GeV of the (radiative) gamma to be accepted.", 0.05);
     addParam("multiplePhotons", m_isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
     addParam("writeOut", m_writeOut,
              "Set to false if you want to add only the nearest photon, otherwise all eligible photons will be added", false);
@@ -128,8 +127,6 @@ namespace Belle2 {
       // look for all possible (radiative) gamma
       for (unsigned j = 0; j < nGam; j++) {
         Particle* gamma = m_gammaList->getParticle(j);
-        // check if gamma energy is within allowed energy range
-        if (gamma->getEnergy() < m_minimumEnergy) continue;
         // get angle (in lab system)
         TVector3 pi = lepton->getMomentum();
         TVector3 pj = gamma->getMomentum();

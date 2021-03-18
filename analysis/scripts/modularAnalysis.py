@@ -486,7 +486,6 @@ def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
                       multiplePhotons=True,
-                      minimumEnergy=0.05,
                       angleThreshold=0.05,
                       writeOut=False,
                       path=None):
@@ -503,7 +502,6 @@ def correctBremsBelle(outputListName,
              add all the photons within the cone -> True
        angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
-       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
        path (basf2.Path): modules are added to this path
     """
@@ -515,7 +513,6 @@ def correctBremsBelle(outputListName,
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 

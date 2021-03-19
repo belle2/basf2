@@ -4,18 +4,6 @@
 # selected to generate digits in the PXD background generator module.
 """
 This package encapsulates different PXD background generator models.
-
-To implement your own generator model, first create a new Python
-module named after your model. Define a class named `Model`
-inheriting from the `torch.nn.Module` base class and
-place it your Python module. Next, define a function
-named `generate` which acts on an instance of your model and
-produces a `torch.Tensor` output of type `torch.uint8`,
-shape `(40, 250, 768)`, and containing values in :math:`[0, 255]`.
-The output of this function is transcoded into pixel hits and digits.
-Finally, add the name of your Python module
-to the tuple :py:const:`MODELS`.
-
 """
 
 from importlib import import_module

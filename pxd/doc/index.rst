@@ -2,7 +2,7 @@
 PXD Background Generator
 ========================
 
-The package :py:mod:`.pxd.background_generator` provides a generator of PXD background samples for background overlay on the fly.
+The package :py:mod:`!pxd.background_generator` provides a generator of PXD background samples for background overlay on the fly.
 Background generation on the fly is motivated to reduce the data volume in background overlay files currently distributed.
 
 The proof-of-concept generator is implemented as a stand-alone :py:class:`.PXDBackgroundGenerator` module designed to build on the existing background overlay setup.
@@ -24,8 +24,7 @@ By default, background overlay uses data sampled from the background overlay fil
 
 To enable the module and use the generated PXD digits instead,
 create a container object with the specifications for invoking the module and
-pass the object to the :py:func:`.add_simulation` function as the keyword argument ``pxd_background_generator``,
-as follows:
+pass the object to the :py:func:`simulation.add_simulation` function as the keyword argument ``pxd_background_generator``:
 
 
 .. code-block:: python
@@ -75,10 +74,19 @@ are the same. This approximation will not be made in
 in future models, specifically, models which will
 allow class-conditional image generation.
 
+.. rubric:: Implementing a new model
+
+Choose a unique model name to add into the :py:const:`!pxd.background_generator.models.MODELS` collection,
+create a Python module with the same name in the :py:mod:`!pxd.background_generator.models` package.
+
+The module shall include a model class and a generation function named ``Model`` and ``generate``, respectively.
+The model class must inherit from the ``torch.nn.Module`` base class.
+The generation function must act on a model instance and return a ``torch.Tensor`` with shape ``(40, 250, 768)`` and values of type ``torch.uint8`` in the range :math:`[0, 255]`. 
+
 
 Reference
 =========
 
-.. automodule:: pxd.background_generator
-    :members:
-    :show-inheritance:
+.. autoclass:: pxd.background_generator.PXDBackgroundGenerator
+
+.. autoclass:: pxd.background_generator.Specs

@@ -2,12 +2,53 @@
 PXD Background Generator
 ========================
 
-Generate PXD background samples for background overlay on the fly.
+The package :py:mod:`.pxd.background_generator` provides a generator of PXD background samples for background overlay on the fly.
+Background generation on the fly is motivated to reduce the data volume in background overlay files currently distributed.
 
-The package provides a PXD background generator :py:class:`basf2.Module` module
-that can be added to the module execution path to generate PXD digits on-the-fly
-and store them into a background digit collection. The module is designed to
-replace the collection stored by the :any:`!BGOverlayInput` module.
+The proof-of-concept generator is implemented as a stand-alone :py:class:`.PXDBackgroundGenerator` module designed to build on the existing background overlay setup.
+The module uses one of the generator models available for selection to generate PXD digits on the fly and store the generated digits into the background collection.
+The generated digits replace the existing digits in the background digit collection previously samlped from the background overlay files.
+
+
+Usage
+=====
+
+The module is integrated into the detector simulation with background overlay.
+By default, background overlay uses data sampled from the background overlay files for all detectors.
+
+
+.. note::
+
+    Invoking the module requires a Python environment with PyTorch.
+
+
+To enable the module and use the generated PXD digits instead,
+create a container object with the specifications for invoking the module and
+pass the object to the :py:func:`.add_simulation` function as the keyword argument ``pxd_background_generator``,
+as follows:
+
+
+.. code-block:: python
+
+    from background import get_background_files
+    from pxd.background_generator import Specs
+    from simulation import add_simulation
+
+    files = get_background_files()
+    specs = Specs(model='resnet')
+
+    add_simulation(path, bkgfiles=files, pxd_background_generator=specs)
+
+
+The module can use different generator models.
+The model can be selected with the keyword argument ``model`` in the :py:class:`.Specs` instance used to invoke the module.
+
+.. seealso::
+    An example steering file is available at ``pxd/examples/background_generator.py``.
+
+
+Models
+======
 
 Two proof-of-concept generator models are currently implemented and
 can be used to generate PXD background data. They are based on the
@@ -33,38 +74,6 @@ in other words, it is assumed that all PXD sensors
 are the same. This approximation will not be made in
 in future models, specifically, models which will
 allow class-conditional image generation.
-
-
-Usage
-=====
-
-Invoking the PXD background generator module
-requires the PyTorch Python package. PyTorch
-version 1.4.0 is included in the basf2 externals
-v01-09-01, thus, no installation is necessary.
-
-The PXD background generator module can be used
-in simulation by first creating a :py:class:`.Specs` container object
-with the generator specifications. This object is then passed
-as an argument to the function :py:func:`simulation.add_simulation`
-which will automatically add the PXD background generator module
-to the execution path:
-
-.. code-block:: python
-
-    from background import get_background_files
-    from pxd.background_generator import Specs
-    from simulation import add_simulation
-
-    files = get_background_files()
-    specs = Specs(model='resnet')
-
-    add_simulation(path, bkgfiles=files, pxd_background_generator=specs)
-
-An example steering file for generating, simulating,
-and reconstructing :math:`B\bar{B}` events
-using the PXD background generator module is
-provided in ``pxd/examples/background_generator.py``.
 
 
 Reference

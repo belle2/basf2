@@ -48,6 +48,18 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_badHitsMean = new TCanvas("TOP/c_bad_hits_mean");
   m_c_badHitsRMS = new TCanvas("TOP/c_bad_hits_rms");
 
+  //using c2_Name to avoid an overlap on default c_Name
+  TCanvas* m_c_good_hits_xy_[16] = {};
+  TCanvas* m_c_bad_hits_xy_[16] = {};
+  TCanvas* m_c_good_hits_asics_[16] = {};
+  TCanvas* m_c_bad_hits_asics_[16] = {};
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_xy_[i] = new TCanvas(Form("TOP/c2_good_hits_xy_%d", i));
+    m_c_bad_hits_xy_[i] = new TCanvas(Form("TOP/c2_bad_hits_xy_%d", i));
+    m_c_good_hits_ascis_[i] = new TCanvas(Form("TOP/c2_good_hits_ascis_%d", i));
+    m_c_bad_hits_ascis_[i] = new TCanvas(Form("TOP/c2_bad_hits_ascis_%d", i));
+  }
+
   m_h_goodHitsMean = new TH1F("TOP/good_hits_mean", "Mean of good hits per event", 16, 0.5, 16.5);
   m_h_goodHitsRMS = new TH1F("TOP/good_hits_rms", "RMS of good hits per event", 16, 0.5, 16.5);
   m_h_badHitsMean = new TH1F("TOP/bad_hits_mean", "Mean of bad hits per event", 16, 0.5, 16.5);
@@ -227,6 +239,84 @@ void DQMHistAnalysisTOPModule::event()
     if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);
     m_text2->Draw();
+  }
+
+  //obtaining the total yield for 16 2D-plots
+  double Ntotal_good_hits_xy(0.0);
+  double Ntotal_bad_hits_xy(0.0);
+  double Ntotal_good_hits_asics(0.0);
+  double Ntotal_good_hits_asics(0.0);
+  for (int module = 1; module <= 16; module++) {
+    TH2F* h2Dtmp = 0;
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", module));
+    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
+      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
+        Ntotal_good_hits_xy += h2Dtmp->GetBinContent(i, j);
+      }
+    }
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", module));
+    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
+      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
+        Ntotal_bad_hits_xy += h2Dtmp->GetBinContent(i, j);
+      }
+    }
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", module));
+    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
+      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
+        Ntotal_good_hits_asics += h2Dtmp->GetBinContent(i, j);
+      }
+    }
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", module));
+    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
+      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
+        Ntotal_bad_hits_asics += h2Dtmp->GetBinContent(i, j);
+      }
+    }
+  }
+
+  //scaling the 2D plots
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_xy_[i]->Clear();
+    m_c_good_hits_xy_[i]->cd();
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
+    double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries() ;
+    h2Dscale_xy->Scale(scale_xy);
+    h2Dscale_xy->Draw();
+    m_c_good_hits_xy_[i]->Modified();
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_bad_hits_xy_[i]->Clear();
+    m_c_bad_hits_xy_[i]->cd();
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
+    double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries() ;
+    h2Dscale_xy->Scale(scale_xy);
+    h2Dscale_xy->Draw();
+    m_c_bad_hits_xy_[i]->Modified();
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_asics_[i]->Clear();
+    m_c_good_hits_asics_[i]->cd();
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
+    double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries() ;
+    h2Dscale_asics->Scale(scale_asics);
+    h2Dscale_asics->Draw();
+    m_c_good_hits_asics_[i]->Modified();
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_bad_hits_asics_[i]->Clear();
+    m_c_bad_hits_asics_[i]->cd();
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
+    double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries() ;
+    h2Dscale_asics->Scale(scale_asics);
+    h2Dscale_asics->Draw();
+    m_c_bad_hits_asics_[i]->Modified();
   }
 
   m_c_goodHitsMean->Clear();

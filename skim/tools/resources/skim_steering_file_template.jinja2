@@ -15,13 +15,18 @@ from skimExpertFunctions import CombinedSkim
     from {{ module }} import {{ ", ".join(ModuleSkims) }}
 {% endfor %}
 path = b2.Path()
-{% if skims|length == 1 -%}
+{% if skims|length == 1 and not mdstOutput -%}
     skim = {{ skims[0] }}(){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
         {{ skim|indent(4, True) }}(),
     {% endfor -%}
+    {%- if mdstOutput -%}
+    {{ "    " }}udstOutput=False,
+    mdstOutput=True,
+    mdst_kwargs=dict(),
+    {% endif -%}
     )
 {% endif %}
 ma.inputMdstList("default", skim.TestFiles, path=path)
@@ -51,4 +56,3 @@ b2.process(path)
 {%- if stats %}
 print(b2.statistics)
 {%- endif %}
-

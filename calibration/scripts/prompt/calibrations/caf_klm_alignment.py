@@ -24,7 +24,7 @@ from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
 # "required_events" : number of events in basf2 files selected for processing.
 # "millepede_entries" : minimal number of Millepede entries.
 settings = CalibrationSettings(name="KLM alignmnent",
-                               expert_username="chilikin",
+                               expert_username="oskin",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],

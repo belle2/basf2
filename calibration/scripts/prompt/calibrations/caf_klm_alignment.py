@@ -128,7 +128,7 @@ def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
             for exp in experiment_numbers:
                 if collected_events_experiment[exp] >= \
                         required_events_experiment:
-                    select_events_experiment[exp] = True
+                    select_events_experiment[exp] = False
                 else:
                     all_experiments_selected = False
             if all_experiments_selected:

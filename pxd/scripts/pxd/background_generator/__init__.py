@@ -20,7 +20,9 @@ from .models import MODELS
 from .models import _get_model_cls, _get_generate_func
 
 ##
-# VxdID arguments describing all distinct PXD sensors; format: (layer, ladder, sensor)
+# Sequence of forty arguments represented as
+# tuples with elements `(layer, ladder, sensor)` used to
+# instantiate `VxdID` objects that collectively specify all distinct PXD sensors.
 VXDID_ARGS = tuple(
     tuple(product([1], [ladder + 1 for ladder in range(8)], [1, 2]))
     + tuple(product([2], [ladder + 1 for ladder in range(12)], [1, 2]))
@@ -301,7 +303,7 @@ class PXDBackgroundGenerator(basf2.Module):
     ##
     # Constructor for the PXD background generator module.
     #
-    # @param specs: Container object of type 'Specs' with the specifications
+    # @param specs: Container object of type `Specs` with the specifications
     def __init__(self, specs: Specs):
         """"""
         super().__init__()
@@ -388,7 +390,7 @@ class PXDBackgroundGenerator(basf2.Module):
 
     ##
     # @var vxdids
-    # Sequence of VxdID objects that
+    # Sequence of `VxdID` objects that
     # collectively specify all distinct PXD sensors
 
     ##
@@ -403,25 +405,25 @@ class PXDBackgroundGenerator(basf2.Module):
 
 ##
 # Helper function that instantiates the PXD background generator module
-# and adds the instantiated module to the execution path.
+# and adds the module instance to the execution path.
 #
-# @param path: Module executing path to add the PXD generator module to
-# @param specs: Specifications for the PXD background generator module
+# @param path: Execution path to add the module instance to
+# @param specs: Specifications for invoking the module
 def add_pxd_background_generator(path: basf2.Path, specs: Specs = None):
     """Instantiate the PXD background generator module
-    and add the instantiated module to the execution path.
+    and add the module instance to the execution path.
 
     .. note::
         This function is intended to be invoked inside the
-        function :py:func:`simulation.add_simulation`.
+        function :py:func:`.add_simulation`.
 
-    If the argument ``specs`` is None, the function does nothing.
-
-    :param path: Module execution path
+    :param path: Execution path
     :type path: :py:class:`basf2.Path`
 
-    :param specs: Generator specifications, defaults to None
+    :param specs: Specifications for invoking the module, defaults to None
     :type specs: :py:class:`Specs`, optional
+
+    This function does not do anything if the ``specs`` argument is None.
     """
     if specs is not None:
         # instantiate the module and add it to the execution path

@@ -40,9 +40,9 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsMultiStripEKLM{nullptr},
   m_TriggerBitsBKLM{nullptr},
   m_TriggerBitsEKLM{nullptr},
-  m_KlmDigitsAfterLERInj{nullptr},
+  m_DigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
-  m_KlmDigitsAfterHERInj{nullptr},
+  m_DigitsAfterHERInj{nullptr},
   m_TriggersHERInj{nullptr},
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
@@ -231,16 +231,16 @@ void KLMDQMModule::defineHisto()
   m_TriggerBitsEKLM->SetOption("LIVE");
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
-  m_KlmDigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
-                                    4000, 0, 20000);
-  m_KlmDigitsAfterLERInj->SetOption("LIVE");
-  m_TriggersLERInj = new TH1F("KLMOEccInjLER", "KLMEOccInjLER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+  m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+                                 4000, 0, 20000);
+  m_DigitsAfterLERInj->SetOption("LIVE");
+  m_TriggersLERInj = new TH1F("KLMTrigInjLER", "TrigInjLER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
                               4000, 0, 20000);
   m_TriggersLERInj->SetOption("LIVE");
-  m_KlmDigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLMOccInjHER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
-                                    4000, 0, 20000);
-  m_KlmDigitsAfterHERInj->SetOption("LIVE");
-  m_TriggersHERInj = new TH1F("KLMEOccInjHER", "KLMEOccInjHER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+  m_DigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLMOccInjHER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+                                 4000, 0, 20000);
+  m_DigitsAfterHERInj->SetOption("LIVE");
+  m_TriggersHERInj = new TH1F("KLMTrigInjHER", "TrigInjHER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
                               4000, 0, 20000);
   m_TriggersHERInj->SetOption("LIVE");
   /* Spatial distribution of EKLM 2d hits per layer. */
@@ -320,9 +320,9 @@ void KLMDQMModule::beginRun()
   m_TriggerBitsBKLM->Reset();
   m_TriggerBitsEKLM->Reset();
   /* Injection information. */
-  m_KlmDigitsAfterLERInj->Reset();
+  m_DigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
-  m_KlmDigitsAfterHERInj->Reset();
+  m_DigitsAfterHERInj->Reset();
   m_TriggersHERInj->Reset();
   /* Spatial 2D hits distributions. */
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
@@ -458,10 +458,10 @@ void KLMDQMModule::event()
       /* 127 MHz clock ticks to us, inexact rounding. */
       float differenceInUs = difference / 127.;
       if (rawFtsw.GetIsHER(0)) {
-        m_KlmDigitsAfterHERInj->Fill(differenceInUs, nDigits);
+        m_DigitsAfterHERInj->Fill(differenceInUs, nDigits);
         m_TriggersHERInj->Fill(differenceInUs);
       } else {
-        m_KlmDigitsAfterLERInj->Fill(differenceInUs, nDigits);
+        m_DigitsAfterLERInj->Fill(differenceInUs, nDigits);
         m_TriggersLERInj->Fill(differenceInUs);
       }
     }

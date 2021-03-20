@@ -231,16 +231,16 @@ void KLMDQMModule::defineHisto()
   m_TriggerBitsEKLM->SetOption("LIVE");
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
-  m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLMOccInjLER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+  m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLM digits after LER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
                                  4000, 0, 20000);
   m_DigitsAfterLERInj->SetOption("LIVE");
-  m_TriggersLERInj = new TH1F("KLMTrigInjLER", "TrigInjLER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+  m_TriggersLERInj = new TH1F("KLMTrigInjLER", "Triggers after KER injection / Time;Time [#mus];Number of triggers / (5 #mus)",
                               4000, 0, 20000);
   m_TriggersLERInj->SetOption("LIVE");
-  m_DigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLMOccInjHER / Time;Time in #mus;KLM Digits / Time (5 #mus bins)",
+  m_DigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLM digits after HER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
                                  4000, 0, 20000);
   m_DigitsAfterHERInj->SetOption("LIVE");
-  m_TriggersHERInj = new TH1F("KLMTrigInjHER", "TrigInjHER / Time;Time in #mus;Triggers / Time (5 #mus bins)",
+  m_TriggersHERInj = new TH1F("KLMTrigInjHER", "Triggers after HER injection / Time;Time [#mus];Number of triggers / (5 #mus)",
                               4000, 0, 20000);
   m_TriggersHERInj->SetOption("LIVE");
   /* Spatial distribution of EKLM 2d hits per layer. */

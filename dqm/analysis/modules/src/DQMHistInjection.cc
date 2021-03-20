@@ -79,7 +79,8 @@ void DQMHistInjectionModule::initialize()
                                 20000);
   m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
-  m_hInjectionLERKLM = new TH1F("HitInjectionLERKLM", "KLM occupancy after LER Injection;Time in #mus;Mean digits / event", 4000, 0 ,
+  m_hInjectionLERKLM = new TH1F("HitInjectionLERKLM",
+                                "KLM occupancy after LER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
                                 20000);
 
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
@@ -95,7 +96,8 @@ void DQMHistInjectionModule::initialize()
                                 20000);
   m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
-  m_hInjectionHERKLM = new TH1F("HitInjectionHERKLM", "KLM occupancy after HER Injection;Time in #mus;Mean digits / event", 4000, 0 ,
+  m_hInjectionHERKLM = new TH1F("HitInjectionHERKLM",
+                                "KLM occupancy after HER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
                                 20000);
 
 #ifdef _BELLE2_EPICS

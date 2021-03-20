@@ -849,7 +849,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
       See the definitions of the individual skims for the details.
     """
     __authors__ = ["Marcel Hohmann"]
-    __description__ = "Combined Skim of the systematic hadronic skims: Kshort, Jpsi, Dstar, Lambda."
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, TauThrust."
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"

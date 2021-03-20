@@ -19,6 +19,8 @@
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+
 #include <framework/logging/Logger.h>
 
 #include <vector>
@@ -81,6 +83,8 @@ namespace Belle2 {
                   m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
                   m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
+                } else if (std::is_base_of<AObject, HitData>::value) {
+                  B2INFO("Aborting processing DATCON track candidate, not setting AbortionFlag.");
                 } else {
                   B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
                 }

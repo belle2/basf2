@@ -19,9 +19,11 @@ using namespace TrackFindingCDC;
 TrackFindingCDC::Weight
 ShortPathFilter::operator()(const BasePathFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const HitData*>>& previousHits = pair.first;
-  HitData* currentHit = pair.second;
+//   const std::vector<TrackFindingCDC::WithWeight<const HitData*>>& previousHits = pair.first;
+//   HitData* currentHit = pair.second;
 
+//   return 1.0;
+//   return 0.0;
   return NAN;
 }
 

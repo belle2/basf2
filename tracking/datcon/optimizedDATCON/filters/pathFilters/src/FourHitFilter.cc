@@ -32,9 +32,25 @@ FourHitFilter::operator()(const BasePathFilter::Object& pair)
   const B2Vector3D& thirdHitPos   = previousHits.at(2)->getHit()->getPosition();
   const B2Vector3D& currentHitPos = pair.second->getHit()->getPosition();
 
-  return NAN;
+  FourHitVariables fourHitVariables(firstHitPos, secondHitPos, thirdHitPos, currentHitPos);
+
+  if (fourHitVariables.getCircleRadiusDifference() > m_param_CircleRadiusDifferenceCut) {
+    return NAN;
+  }
+  if (fourHitVariables.getCircleCenterPositionDifference() > m_param_CircleCenterPositionDifferenceCut) {
+    return NAN;
+  }
+
+  return 1.0 / fourHitVariables.getCircleRadiusDifference();
 }
 
 void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_param_CircleRadiusDifferenceCut,
+                                "TODO: Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
+                                m_param_CircleRadiusDifferenceCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
+                                m_param_CircleCenterPositionDifferenceCut,
+                                "TODO: Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
+                                m_param_CircleCenterPositionDifferenceCut);
 }

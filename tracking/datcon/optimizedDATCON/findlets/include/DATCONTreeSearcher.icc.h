@@ -13,8 +13,9 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -40,13 +41,6 @@ namespace Belle2 {
   {
     B2ASSERT("Expected relation to be sorted",
              std::is_sorted(relations.begin(), relations.end()));
-
-//     // FIXME: quick fix for development, abort if number of relations too high.
-//     // High number of relations might be OK when filters implemented properly
-//     if (relations.size() > 5000) {
-//       B2WARNING("Aborting because number of relations is above 5000 (exact number: " << relations.size() << ")");
-//       return;
-//     }
 
 //     // TODO: May be better to just do this for each seed separately
 //     const std::vector<AHit*>& hitPointers = TrackFindingCDC::as_pointers<AHit>(hits);
@@ -119,11 +113,18 @@ namespace Belle2 {
       return;
     }
 
+// //     // Traverse the tree from each new state on
+// //     const auto stateLess = [](const auto & lhs, const auto & rhs) {
+// //       return lhs->getAutomatonCell().getCellState() < rhs->getAutomatonCell().getCellState();
+// //     };
+// //     std::sort(childHits.begin(), childHits.end(), stateLess);
+//     // Traverse the tree from each new state on
+//     const auto stateGreater = [](const auto & lhs, const auto & rhs) {
+//       return lhs->getAutomatonCell().getCellState() > rhs->getAutomatonCell().getCellState();
+//     };
+//     std::sort(childHits.begin(), childHits.end(), stateGreater);
     // Traverse the tree from each new state on
-    const auto stateLess = [](const auto & lhs, const auto & rhs) {
-      return lhs->getAutomatonCell().getCellState() < rhs->getAutomatonCell().getCellState();
-    };
-    std::sort(childHits.begin(), childHits.end(), stateLess);
+    std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::GreaterOf<TrackFindingCDC::GetWeight>());
 
     B2DEBUG(29, "Having found " << childHits.size() << " child states.");
 //     if (childHits.size() > 10)

@@ -39,6 +39,10 @@ namespace Belle2 {
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
       m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("twoHitRelation", prefix));
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
+      "Maximum number of relations to be created.",
+      m_maxRelations);
     };
 
     /// Apply both filters for creating state-hit and hit-hit relations
@@ -46,11 +50,13 @@ namespace Belle2 {
                std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations) override
     {
       // relations += hits -> hits
-      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, m_maxRelations);
     };
 
   private:
     /// Subfindlet for the relation checking between seed and hits
     ARelationFilter m_relationFilter;
+
+    uint m_maxRelations = 10000;
   };
 }

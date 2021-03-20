@@ -33,11 +33,17 @@ ThreeHitFilter::operator()(const BasePathFilter::Object& pair)
 
   ThreeHitVariables threeHitVariables(firstHitPos, secondHitPos, currentHitPos);
 
-  if (fabs(threeHitVariables.getAngleRZSimple()) > m_cosRZCut) {
+  if (threeHitVariables.getCosAngleRZSimple() < m_cosRZCut) {
     return NAN;
   }
 
-  return NAN;
+  const double circleDistanceIP = threeHitVariables.getCircleDistanceIP();
+
+  if (circleDistanceIP > m_circleIPDistanceCut) {
+    return NAN;
+  }
+
+  return 1.0 / circleDistanceIP;
 }
 
 void ThreeHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -45,4 +51,7 @@ void ThreeHitFilter::exposeParameters(ModuleParamList* moduleParamList, const st
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_cosRZCut,
                                 "Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
                                 m_cosRZCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
+                                "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
+                                m_circleIPDistanceCut);
 }

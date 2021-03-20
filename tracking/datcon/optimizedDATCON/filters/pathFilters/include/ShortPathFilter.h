@@ -23,11 +23,11 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
-    /// Cut on relations in theta for overlay region on same layer but different ladder
-    double m_param_SimpleThetaCutDeltaL0 = 0.05;
-    /// Filter relations in theta between hit states where the layer difference is +-1
-    double m_param_SimpleThetaCutDeltaL1 = 0.1;
-    /// Filter relations in theta between hit states where the layer difference is +-2
-    double m_param_SimpleThetaCutDeltaL2 = 0.2;
+//     /// Cut on relations in theta for overlay region on same layer but different ladder
+//     double m_param_SimpleThetaCutDeltaL0 = 0.05;
+//     /// Filter relations in theta between hit states where the layer difference is +-1
+//     double m_param_SimpleThetaCutDeltaL1 = 0.1;
+//     /// Filter relations in theta between hit states where the layer difference is +-2
+//     double m_param_SimpleThetaCutDeltaL2 = 0.2;
   };
 }

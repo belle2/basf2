@@ -31,7 +31,6 @@ namespace Belle2 {
     };
 
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: cm */
-    /** TODO: a straight line exception is thrown and not catched (at least here) in calcCircleCenter */
     double getCircleRadiusDifference()
     {
 //       B2Vector3D outerCircleCenter = getCircleCenterXY(m_oHit, m_ocHit, m_icHit);

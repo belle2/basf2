@@ -28,7 +28,7 @@ DATCONFindlet::DATCONFindlet()
   addProcessingSignalListener(&m_interceptFinder);
   addProcessingSignalListener(&m_rawTCCleaner);
 
-  initializeHists();
+//   initializeHists();
 
 }
 
@@ -66,7 +66,7 @@ void DATCONFindlet::apply()
 
   m_interceptFinder.apply(m_hits, m_rawTrackCandidates);
   B2DEBUG(29, "m_rawTrackCandidates.size: " << m_rawTrackCandidates.size());
-  analyseSPTCs();
+//   analyseSPTCs();
 
   m_rawTCCleaner.apply(m_rawTrackCandidates, m_trackCandidates);
 }

@@ -77,6 +77,8 @@ namespace Belle2 {
 
     std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
 
+    uint m_maxRelations = 200;
+
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name
@@ -84,8 +86,14 @@ namespace Belle2 {
 
     TH1D* m_nRelationsPerRawTrackCand;
     TH1D* m_nRelationsPerEvent;
+    TH1D* m_nResultsPerRawTrackCand;
+    TH1D* m_nResultsPerEvent;
+    TH1D* m_nResultSize;
+
     TH2D* m_nRelationsVsRawTrackCand;
     TH2D* m_nRelationsVsRawTrackCandSize;
+    TH2D* m_nResultsPerRawTCvsnRelationsPerRawTC;
+    TH2D* m_nResultsPerRawTCvsRawTCSize;
 
     void initializeHists();
 

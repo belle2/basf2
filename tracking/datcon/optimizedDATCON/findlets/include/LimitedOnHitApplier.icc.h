@@ -31,7 +31,8 @@ namespace Belle2 {
     Super::apply(currentPath, childHits);
 
     if (m_param_useNHits > 0 and childHits.size() > static_cast<unsigned int>(m_param_useNHits)) {
-      std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::LessOf<TrackFindingCDC::GetWeight>());
+//       std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::LessOf<TrackFindingCDC::GetWeight>());
+      std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::GreaterOf<TrackFindingCDC::GetWeight>());
       childHits.erase(childHits.begin() + m_param_useNHits, childHits.end());
     }
   };

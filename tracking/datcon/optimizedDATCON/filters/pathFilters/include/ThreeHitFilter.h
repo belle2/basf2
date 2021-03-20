@@ -28,6 +28,9 @@ namespace Belle2 {
 
   private:
     /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
-    double m_cosRZCut = 0.2;
+    double m_cosRZCut = 0.8;
+    /// cut on the difference between circle radius and circle center position in the x-y plane
+    /// to check if the track is compatible with passing through the IP
+    double m_circleIPDistanceCut = 2.0;
   };
 }

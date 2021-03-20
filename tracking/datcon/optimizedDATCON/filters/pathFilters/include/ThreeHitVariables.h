@@ -30,7 +30,7 @@ namespace Belle2 {
       m_innerDifferenceVector = cHit - iHit;
     };
 
-    /** helper function with calculates the average distance in XY from the given center */
+    /** helper function which calculates the average distance in XY from the given center */
     double calcAvgDistanceXY(const B2Vector3D& circleCenter)
     {
       return (sqrt(std::pow(circleCenter.X() - m_oHit.X(), 2) + std::pow(circleCenter.Y() - m_oHit.Y(), 2)) +
@@ -70,8 +70,8 @@ namespace Belle2 {
     } // return unit: rad (0 - pi)
 
 
-    /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead) */
-    double getAngleRZSimple()
+    /** calculates the cosine of the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead) */
+    double getCosAngleRZSimple()
     {
       B2Vector3D rzVecAB(m_outerDifferenceVector.Perp(), m_outerDifferenceVector.Z(), 0.);
       B2Vector3D rzVecBC(m_innerDifferenceVector.Perp(), m_innerDifferenceVector.Z(), 0.);

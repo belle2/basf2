@@ -161,13 +161,13 @@ namespace Belle2 {
     TH1F* m_TriggerBitsEKLM;
 
     /** Number of KLM Digits after LER injection. */
-    TH1F* m_KlmDigitsAfterLERInj;
+    TH1F* m_DigitsAfterLERInj;
 
     /** Histogram to be used for normalization of occupancy after LER injection. */
     TH1F* m_TriggersLERInj;
 
     /** Number of KLM Digits after LER injection. */
-    TH1F* m_KlmDigitsAfterHERInj;
+    TH1F* m_DigitsAfterHERInj;
 
     /** Histogram to be used for normalization of occupancy after HER injection. */
     TH1F* m_TriggersHERInj;

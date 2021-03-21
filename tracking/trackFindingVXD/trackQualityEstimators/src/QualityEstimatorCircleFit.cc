@@ -107,8 +107,25 @@ double QualityEstimatorCircleFit::estimateQuality(std::vector<SpacePoint const*>
   }
   double radius = 1. / curvature;
   double absRadius = fabs(radius);
+  double pt = calcPt(absRadius);
+  m_results.pt = pt;
+  m_results.pocaD = pocaD;
 
-  m_results.pt = calcPt(absRadius);
+  // Estimating theta of the track with the theta of the innermost hit.
+  // Otherwise the track is solely a circle without theta information.
+  double innermostHitTheta = 0.;
+  double innermostHitRadiusSpared = 100000000;
+  for (const SpacePoint* hit : measurements) {
+    if (hit->getPosition().Perp2() < innermostHitRadiusSpared) {
+      innermostHitRadiusSpared = hit->getPosition().Perp2();
+      innermostHitTheta = hit->getPosition().Theta();
+    }
+  }
+  // Account for precision when checking equality of innermostHitTheta with 0
+  double pz = (innermostHitTheta <= 1e-6 ? 0 : pt / tan(innermostHitTheta));
+  // Both p and pmag are only rough estimates based and by far not accutate!
+  m_results.p = B2Vector3D(pt * cosPhi, pt * sinPhi, pz);
+  m_results.pmag = sqrt(pt * pt + pz * pz);
 
   double chi2 = sumWeights * (1. + curvature * pocaD) * (1. + curvature * pocaD)
                 * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);

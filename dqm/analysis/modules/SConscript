@@ -4,7 +4,8 @@ Import('env')
 
 env['LIBS'] = ['framework', 'daq', 'boost_regex',
                'arich', 'cdc', 'dqm_dataobjects',
-               'klm_dbobjects', 'svd_dataobjects',
+	       'klm_dataobjects', 'klm_dbobjects', 
+	       'svd_dataobjects',
                'RooFit', 'RooFitCore', 'ca', 'Com']
 
 # this check is not completely save if new options are added with clang

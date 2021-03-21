@@ -8,6 +8,7 @@
 
 
 #include <dqm/analysis/modules/DQMHistInjection.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <TROOT.h>
 
 using namespace std;
@@ -465,7 +466,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
-    m_hInjectionLERKLM->Divide(Hits, Triggers);
+    m_hInjectionLERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
   }
 
   m_cInjectionLERKLM->Clear();
@@ -484,7 +485,7 @@ void DQMHistInjectionModule::event()
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
-    m_hInjectionHERKLM->Divide(Hits, Triggers);
+    m_hInjectionHERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
   }
 
   m_cInjectionHERKLM->Clear();

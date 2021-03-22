@@ -98,12 +98,9 @@ namespace Belle2 {
       childHits.emplace_back(childHit, weight);
     }
 
-    // Apply three-hit-filters, so the path has to contain at least to hits to form >= triplet with the child states
-    if (path.size() >= 2) {
-      // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
-      const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
-      m_pathFilter.apply(constPath, childHits);
-    }
+    // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
+    const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
+    m_pathFilter.apply(constPath, childHits);
 
     if (childHits.empty()) {
       B2DEBUG(29, "Terminating this route, as there are no possible child states.");

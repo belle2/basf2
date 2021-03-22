@@ -19,6 +19,7 @@ namespace Belle2 {
   template <class AHit, class AFindlet>
   PathLengthToggledApplier<AHit, AFindlet>::PathLengthToggledApplier() : Super()
   {
+    Super::addProcessingSignalListener(&m_twoHitFilterFindlet);
     Super::addProcessingSignalListener(&m_threeHitFilterFindlet);
     Super::addProcessingSignalListener(&m_fourHitFilterFindlet);
     Super::addProcessingSignalListener(&m_pathFilterFindlet);
@@ -29,6 +30,7 @@ namespace Belle2 {
   void PathLengthToggledApplier<AHit, AFindlet>::exposeParameters(ModuleParamList* moduleParamList,
       const std::string& prefix)
   {
+    m_twoHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "twoHit"));
     m_threeHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "threeHit"));
     m_fourHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fourHit"));
     m_pathFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "shortPath"));
@@ -39,10 +41,13 @@ namespace Belle2 {
   void PathLengthToggledApplier<AHit, AFindlet>::apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
                                                        std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits)
   {
+    // if currentPath.size() == 1, including the single child hits makes the total path length 2, so use the twoHitFilter
     // if currentPath.size() == 2, including the single child hits makes the total path length 3, so use the threeHitFilter
     // if currentPath.size() == 3, including the single child hits makes the total path length 4, so use the fourHitFilter
     // if currentPath.size() > 3, including the single child hits makes the total path length > 4, so use the pathFilter
-    if (currentPath.size() == 2) {
+    if (currentPath.size() == 1) {
+      m_twoHitFilterFindlet.apply(currentPath, childHits);
+    } else if (currentPath.size() == 2) {
       m_threeHitFilterFindlet.apply(currentPath, childHits);
     } else if (currentPath.size() == 3) {
       m_fourHitFilterFindlet.apply(currentPath, childHits);

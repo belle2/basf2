@@ -34,6 +34,8 @@ namespace Belle2 {
                std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
 
   private:
+    /// Findlet used for currentPath.size() == 1
+    AFindlet m_twoHitFilterFindlet;
     /// Findlet used for currentPath.size() == 2
     AFindlet m_threeHitFilterFindlet;
     /// Findlet used for currentPath.size() == 3

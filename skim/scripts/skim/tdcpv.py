@@ -65,7 +65,7 @@ class TDCPV_qqs(BaseSkim):
     * ``phi:SkimHighEff``
     * ``eta':SkimHighEff``
     * ``eta:SkimHighEff``
-    * ``pi0:eff40_Jan2020``
+    * ``pi0:eff40_May2020``
     * ``pi0:skim``
     * ``rho0:SkimHighEff``
     * ``omega:SkimHighEff``
@@ -105,7 +105,7 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)
@@ -265,7 +265,7 @@ class TDCPV_ccs(BaseSkim):
 
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
 
         loadStdJpsiToee(path=path)

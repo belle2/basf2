@@ -88,29 +88,29 @@ class TestStdPhotons(unittest.TestCase):
         """check that the builder function works with the tight list"""
         self._check_list("tight", expected_lists=["cdc", "cdc", "loose", "tight"])
 
-    def test_pi0eff60_Jan2020_list(self):
-        """check that the builder function works with the pi0eff60_Jan2020 list"""
-        self._check_list("pi0eff60_Jan2020", expected_lists=["pi0eff60_Jan2020"])
+    def test_pi0eff60_May2020_list(self):
+        """check that the builder function works with the pi0eff60_May2020 list"""
+        self._check_list("pi0eff60_May2020", expected_lists=["pi0eff60_May2020"])
 
-    def test_pi0eff50_Jan2020_list(self):
-        """check that the builder function works with the pi0eff50_Jan2020 list"""
-        self._check_list("pi0eff50_Jan2020", expected_lists=["pi0eff50_Jan2020"])
+    def test_pi0eff50_May2020_list(self):
+        """check that the builder function works with the pi0eff50_May2020 list"""
+        self._check_list("pi0eff50_May2020", expected_lists=["pi0eff50_May2020"])
 
-    def test_pi0eff40_Jan2020_list(self):
-        """check that the builder function works with the pi0eff40_Jan2020 list"""
-        self._check_list("pi0eff40_Jan2020", expected_lists=["pi0eff40_Jan2020"])
+    def test_pi0eff40_May2020_list(self):
+        """check that the builder function works with the pi0eff40_May2020 list"""
+        self._check_list("pi0eff40_May2020", expected_lists=["pi0eff40_May2020"])
 
-    def test_pi0eff30_Jan2020_list(self):
-        """check that the builder function works with the pi0eff30_Jan2020 list"""
-        self._check_list("pi0eff30_Jan2020", expected_lists=["pi0eff30_Jan2020"])
+    def test_pi0eff30_May2020_list(self):
+        """check that the builder function works with the pi0eff30_May2020 list"""
+        self._check_list("pi0eff30_May2020", expected_lists=["pi0eff30_May2020"])
 
-    def test_pi0eff20_Jan2020_list(self):
-        """check that the builder function works with the pi0eff20_Jan2020 list"""
-        self._check_list("pi0eff20_Jan2020", expected_lists=["pi0eff20_Jan2020"])
+    def test_pi0eff20_May2020_list(self):
+        """check that the builder function works with the pi0eff20_May2020 list"""
+        self._check_list("pi0eff20_May2020", expected_lists=["pi0eff20_May2020"])
 
-    def test_pi0eff10_Jan2020_list(self):
-        """check that the builder function works with the pi0eff10_Jan2020 list"""
-        self._check_list("pi0eff10_Jan2020", expected_lists=["pi0eff10_Jan2020"])
+    def test_pi0eff10_May2020_list(self):
+        """check that the builder function works with the pi0eff10_May2020 list"""
+        self._check_list("pi0eff10_May2020", expected_lists=["pi0eff10_May2020"])
 
     def test_skim(self):
         """check that the builder function works with the skim list"""

@@ -91,7 +91,7 @@ class SystematicsTracking(BaseSkim):
     def load_standard_lists(self, path):
         stdK("loose", path=path)
         stdPi("loose", path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -109,7 +109,7 @@ class SystematicsTracking(BaseSkim):
         B0Cuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         # D0
-        D0Channel = ["K+:loose pi-:loose", "K+:loose pi-:loose pi-:loose pi+:loose", "K+:loose pi-:loose pi0:eff40_Jan2020"]
+        D0Channel = ["K+:loose pi-:loose", "K+:loose pi-:loose pi-:loose pi+:loose", "K+:loose pi-:loose pi0:eff40_May2020"]
 
         D0List = []
         for chID, channel in enumerate(D0Channel):
@@ -191,7 +191,7 @@ class Resonance(BaseSkim):
         stdMu("loose", path=path)
         stdPi("loose", path=path)
         stdPr("loose", path=path)
-        stdPi0s("eff40_Jan2020Fit", path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -238,7 +238,7 @@ class Resonance(BaseSkim):
 
         DstarChannel = []
         for channel in DplusList:
-            DstarChannel.append(channel + " pi0:eff40_Jan2020")
+            DstarChannel.append(channel + " pi0:eff40_May2020")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):

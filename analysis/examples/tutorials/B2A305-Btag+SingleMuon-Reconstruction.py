@@ -65,8 +65,8 @@ stdc.stdK(listtype='loose', path=my_path)
 # creates "mu+:loose" ParticleList (and c.c.)
 stdc.stdMu(listtype='loose', path=my_path)
 
-# creates "pi0:eff40_Jan2020Fit" ParticleList
-stdPi0s(listtype='eff40_Jan2020Fit',
+# creates "pi0:eff40_May2020Fit" ParticleList
+stdPi0s(listtype='eff40_May2020Fit',
         path=my_path)
 
 # 1. reconstruct D0 in multiple decay modes
@@ -74,7 +74,7 @@ ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     cut='1.8 < M < 1.9',
                     dmID=1,
                     path=my_path)
-ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_Jan2020Fit',
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_May2020Fit',
                     cut='1.8 < M < 1.9',
                     dmID=2,
                     path=my_path)

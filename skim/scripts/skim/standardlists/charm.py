@@ -296,13 +296,13 @@ def loadStdDstar0(path):
     """
     Create a list of 'D*0:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
 
-      - 'D0:all pi0:eff40_Jan2020'
+      - 'D0:all pi0:eff40_May2020'
       - 'D0:all gamma:loose'
 
     @param path     modules are added to this path
     """
     Dstar0Cuts = 'massDifference(0) < 0.16'
-    D_Channels = ['D0:all pi0:eff40_Jan2020',
+    D_Channels = ['D0:all pi0:eff40_May2020',
                   'D0:all gamma:loose']
 
     DList = []
@@ -380,13 +380,13 @@ def loadStdDstarPlus(path):
     """
     Create a list of 'D*++:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
       - 'D0:all pi+:GoodTrack'
-      - 'D+:all pi0:eff40_Jan2020'
+      - 'D+:all pi0:eff40_May2020'
 
     @param path     modules are added to this path
     """
     DstarPlusCuts = 'massDifference(0) < 0.16'
     D_Channels = ['D0:all pi+:GoodTrack',
-                  'D+:all pi0:eff40_Jan2020']
+                  'D+:all pi0:eff40_May2020']
 
     DList = []
     for chID, channel in enumerate(D_Channels):

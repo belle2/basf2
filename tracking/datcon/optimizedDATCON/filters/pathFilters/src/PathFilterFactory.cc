@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/PathFilterFactory.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/TwoHitVirtualIPFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ShortPathFilter.h>
@@ -43,6 +44,7 @@ std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDesc
   return {
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
+    {"twoHitVirtualIP", "filter using two hits and a virtual IP at the origin"},
     {"threeHit", "filter three hits (path of length 2 plus next hit)"},
     {"fourHit", "filter four hits (path of length 3 plus next hit)"},
     {"shortPath", "filter a path longer than 4 hits"},
@@ -57,6 +59,9 @@ PathFilterFactory::create(const std::string& filterName) const
   }
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BasePathFilter>>();
+  }
+  if (filterName == "twoHitVirtualIP") {
+    return std::make_unique<TwoHitVirtualIPFilter>();
   }
   if (filterName == "threeHit") {
     return std::make_unique<ThreeHitFilter>();

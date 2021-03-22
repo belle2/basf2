@@ -245,37 +245,54 @@ void DQMHistAnalysisTOPModule::event()
   double Ntotal_good_hits_xy(0.0);
   double Ntotal_bad_hits_xy(0.0);
   double Ntotal_good_hits_asics(0.0);
-  double Ntotal_good_hits_asics(0.0);
+  double Ntotal_bad_hits_asics(0.0);
   for (int module = 1; module <= 16; module++) {
     TH2F* h2Dtmp = 0;
 
     h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", module));
-    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
-      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
-        Ntotal_good_hits_xy += h2Dtmp->GetBinContent(i, j);
-      }
-    }
+    Ntotal_good_hits_xy += h2Dtmp->Integrate();
 
     h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", module));
-    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
-      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
-        Ntotal_bad_hits_xy += h2Dtmp->GetBinContent(i, j);
-      }
-    }
+    Ntotal_bad_hits_xy += h2Dtmp->Integrate();
 
     h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", module));
-    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
-      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
-        Ntotal_good_hits_asics += h2Dtmp->GetBinContent(i, j);
-      }
-    }
+    Ntotal_good_hits_asics += h2Dtmp->Integrate();
 
     h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", module));
-    for (int i = 1; i <= h2Dtmp->GetNbinsX(); i++) {
-      for (int j = 1; j <= h2Dtmp->GetNbinsY(); j++) {
-        Ntotal_bad_hits_asics += h2Dtmp->GetBinContent(i, j);
-      }
-    }
+    Ntotal_bad_hits_asics += h2Dtmp->Integrate();
+  }
+
+  //obtain the maximum of 16 plots to set same z-axis
+  double good_hits_xy_Ymax(0);
+  double bad_hits_xy_Ymax(0);
+  double good_hits_asics_Ymax(0);
+  double bad_hits_asics_Ymax(0);
+  for (int i = 1; i <= 16; i++) {
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
+    double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries();
+    double max_xy = h2Dscale_xy->GetMaximum() * scale_xy;
+    good_hits_xy_Ymax = max_xy > good_hits_xy_Ymax ? max_xy : good_hits_xy_Ymax;
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
+    double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries();
+    double max_xy = h2Dscale_xy->GetMaximum() * scale_xy;
+    bad_hits_xy_Ymax = max_xy > bad_hits_xy_Ymax ? max_xy : bad_hits_xy_Ymax;
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
+    double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries();
+    double max_asics = h2Dscale_asics->GetMaximum() * scale_asics;
+    good_hits_asics_Ymax = max_asics > good_hits_asics_Ymax ? max_asics : good_hits_asics_Ymax;
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
+    double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries();
+    double max_asics = h2Dscale_asics->GetMaximum() * scale_asics;
+    bad_hits_asics_Ymax = max_asics > bad_hits_asics_Ymax ? max_asics : bad_hits_asics_Ymax;
   }
 
   //scaling the 2D plots
@@ -285,9 +302,11 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
     double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries() ;
     h2Dscale_xy->Scale(scale_xy);
+    h2Dscale_xy->GetZaxis()->SetRangeUser(0, good_hits_xy_Ymax);
     h2Dscale_xy->Draw();
     m_c_good_hits_xy_[i]->Modified();
   }
+
 
   for (int i = 1; i <= 16; i++) {
     m_c_bad_hits_xy_[i]->Clear();
@@ -295,6 +314,7 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
     double scale_xy = Ntotal_bad_hits_xy / 16.0 / h2Dscale_xy->GetEntries() ;
     h2Dscale_xy->Scale(scale_xy);
+    h2Dscale_xy->GetZaxis()->SetRangeUser(0, bad_hits_xy_Ymax);
     h2Dscale_xy->Draw();
     m_c_bad_hits_xy_[i]->Modified();
   }
@@ -305,6 +325,7 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
     double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries() ;
     h2Dscale_asics->Scale(scale_asics);
+    h2Dscale_asics->GetZaxis()->SetRangeUser(0, good_hits_asics_Ymax);
     h2Dscale_asics->Draw();
     m_c_good_hits_asics_[i]->Modified();
   }
@@ -315,6 +336,7 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
     double scale_asics = Ntotal_bad_hits_asics / 16.0 / h2Dscale_asics->GetEntries() ;
     h2Dscale_asics->Scale(scale_asics);
+    h2Dscale_asics->GetZaxis()->SetRangeUser(0, bad_hits_asics_Ymax);
     h2Dscale_asics->Draw();
     m_c_bad_hits_asics_[i]->Modified();
   }

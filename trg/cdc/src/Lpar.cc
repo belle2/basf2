@@ -246,6 +246,7 @@ namespace Belle2 {
   }
 
   /// intersection
+  // cppcheck-suppress constParameter
   int intersect(const TRGCDCLpar& lp1, const TRGCDCLpar& lp2, CLHEP::HepVector& v1, CLHEP::HepVector& v2)
   {
     CLHEP::HepVector cen1(lp1.center());

@@ -369,8 +369,7 @@ void KLMUnpackerModule::event()
           else if (channelReadoutBoard >= 16 && channelReadoutBoard < 32)
             subdetector = KLMElementNumbers::c_EKLM;
           else
-            B2FATAL("The PCIe40 channel is invalid."
-                    << LogVar("Channel", channelReadoutBoard));
+            continue;
           convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
         } else {
           B2FATAL("The maximum number of channels per readout board is invalid."
@@ -381,8 +380,8 @@ void KLMUnpackerModule::event()
         klmDigitEventInfo->setPreviousEventTriggerCTime(
           m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
-        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, hslb);
-        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, hslb);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, channelReadoutBoard);
+        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, channelReadoutBoard);
         int numHits = numDetNwords / hitLength;
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."

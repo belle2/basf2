@@ -7,25 +7,24 @@
 <contact>Hiroki Kanda, kanda@m.tains.tohoku.ac.jp</contact>
 </header>
 """
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from beamparameters import add_beamparameters
-import glob
 
-set_random_seed(12345)
+b2.set_random_seed(12345)
 
-main = create_path()
+main = b2.create_path()
 add_beamparameters(main, "Y4S")
 
 # specify number of events to be generated.
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # generate BBbar events
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation
@@ -36,11 +35,11 @@ bg = None
 add_simulation(main, components=['CDC'], bkgfiles=bg)
 
 # Root output
-simpleoutput = register_module('RootOutput')
+simpleoutput = b2.register_module('RootOutput')
 simpleoutput.param('outputFileName', '../CDCOutputGen.root')
 main.add_module(simpleoutput)
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

@@ -43,7 +43,7 @@ add_reconstruction(main)
 output = b2.register_module('RootOutput')
 output.param('outputFileName', '../EvtGenSimRec_B2Kpi.root')
 output.param('branchNames', ['MCParticles', 'Tracks', 'TrackFitResults',
-                             'TOPLikelihoods', 'TOPBarHits', 'ExtHits'])
+                             'TOPLikelihoods', 'TOPBarHits', 'ExtHits', 'TOPRecBunch'])
 main.add_module(output)
 
 b2.process(main)

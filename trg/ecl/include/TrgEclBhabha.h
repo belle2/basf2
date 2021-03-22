@@ -38,6 +38,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclBhabha();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclBhabha(TrgEclBhabha&) = delete;
+
+    /** Assignement operator, deleted. */
+    TrgEclBhabha& operator=(TrgEclBhabha&) = delete;
+
   public:
     //!  Belle 2D Bhabha veto method
     bool GetBhabha00(std::vector<double>);
@@ -176,6 +182,7 @@ namespace Belle2 {
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap = nullptr;
     /** Object of Trigger ECL DataBase */
+    // cppcheck-suppress unsafeClassCanLeak
     TrgEclDataBase* _database = nullptr;
 
     /** Bhabha Combination*/

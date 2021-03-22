@@ -225,8 +225,8 @@ def combVCD(clocks, atlas, writer):
             if atlas[j][0] == atlas[i][0]:
                 signal.append(atlas[j])
         signal = sorted(signal, key=itemgetter(1), reverse=True)
-        for l in signal[1:]:
-            signal[0].extend(l)
+        for k in signal[1:]:
+            signal[0].extend(k)
         comAtlas.append(signal[0])
     vars = [writer.register_var(
         'm', sig[0] + '[{}:{}]'.format(sig[1], sig[-3]), 'wire',

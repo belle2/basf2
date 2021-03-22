@@ -101,7 +101,7 @@ namespace Belle2 {
     Belle2::VxdID::baseType getVxdID() { return m_vxdID; };
 
     /** setter for the VxdID:
-     * @param anID: new vxdid
+     * @param anId: new vxdid
     */
     void setVxdID(Belle2::VxdID::baseType anId) { m_vxdID = anId; };
 

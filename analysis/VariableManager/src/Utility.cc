@@ -18,6 +18,7 @@ namespace Belle2 {
       if (variableName == "expNum") return true;
       else if (variableName == "runNum") return true;
       else if (variableName == "evtNum") return true;
+      else if (variableName == "productionIdentifier") return true;
       return false;
     }
   }

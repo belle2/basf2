@@ -47,8 +47,7 @@ namespace Belle2 {
 
     /** This is the method for getting the occupancy, or the deviation from the average, still to be decided.
      * Input:
-     * @param sensor ID: identitiy of the sensor for which the
-     * calibration is required
+     * @param sensorID: identitiy of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *

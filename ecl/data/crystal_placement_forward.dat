@@ -73,13 +73,12 @@
  1 1.9952935024  0.337536057108 0.970877253846 1266.22217073 1.45820888213 0.370747867913
 # zshift = 1 closest point of the crystal to nominal z plane d[4]= 0.89, d[63]= 0.41, d[70]= 0.29, d[64]= 0.079, d[1]= 0.057, d[7]= 0.001, d[27]= 0.001, d[18]= 0.001, d[35]= 0.001, d[65]= 0.001, d[25]= 0.001, d[28]= 0.001, d[24]= 0.001, d[3]= 0.001, d[53]= 0.001, d[52]= 0.001, d[59]= 0.001, d[57]= 0.001, d[66]= 0.001, d[5]= 0.001, d[23]= 0.001, d[21]= 0.001, d[6]= 0.001, d[8]= 0.00099, d[56]= 0.00099, d[61]= 0.00099, d[46]= 0.00099, d[9]= 0.00099, d[10]= 0.00099, d[62]= 0.00099, d[17]= 0.00099, d[2]= 0.00099, d[22]= 0.00099, d[13]= 0.00099, d[55]= 0.00099, d[11]= 0.00098, d[48]= 0.00098, d[54]= 0.00098, d[71]= 0.00098, d[12]= 0.00097, d[29]= 0.00097, d[34]= 0.00097, d[16]= 0.00096, d[50]= 0.00096, d[15]= 0.00096, d[49]= 0.00096, d[14]= 0.00095, d[19]= 0.00094, d[69]= 0.00094, d[44]= 0.00093, d[31]= 0.00093, d[67]= 0.00093, d[58]= 0.00092, d[37]= 0.00092, d[68]= 0.00091, d[51]= 0.00091, d[42]= 0.00091, d[43]= 0.00091, d[41]= 0.0009, d[36]= 0.0009, d[26]= 0.0009, d[20]= 0.00089, d[60]= 0.00088, d[0]= 0.00088, d[39]= 0.00087, d[38]= 0.00087, d[45]= 0.00084, d[40]= 0.00082, d[47]= 0.00077, d[33]= 0.00076, d[30]= 0.0007, d[32]= 0.00056,
 
-#transformation of the whole forward part
-# test exaggerated transformation to show that the entire forward part behave as a solid
-#1000 1.57079632679489661923 1.57079632679489661923 1.57079632679489661923 4000 0 0
+# transformation of the whole endcap with the supporting structures as a solid body
+# forward part placement as in drawings; used for ECLCrystalsShapesAndPositions Rev 3 for Phase 2
+# 1000 0 0 0 1960 0 0
 
-# forward part placement as in drawings
-#1000 0 0 0 1960 0 0
+# forward part displaced by 5 mm; used for ECLCrystalsShapesAndPositions Rev 9 and earlier
+#1000 0 0 0 1965 0 0
 
-# forward part displaced by 5 mm
-1000 0 0 0 1965 0 0
-
+# alignment documented in BELLE2-NOTE-TE-2020-031 ECLCrystalsShapesAndPositions Rev 15
+1000 0.003667  1.539175  3.083347  1965.377866  0.001912 -1.866857

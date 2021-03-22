@@ -35,6 +35,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/gearbox/Const.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -876,7 +877,7 @@ namespace Belle2 {
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughter->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > Const::photon.getPDGCode())
           nHadronicParticles++;
       }
 
@@ -916,7 +917,8 @@ namespace Belle2 {
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
         int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+        if (pdg == Const::electron.getPDGCode() or pdg == Const::muon.getPDGCode() or pdg == Const::pion.getPDGCode()
+            or pdg == Const::kaon.getPDGCode() or pdg == Const::proton.getPDGCode())
           par_tracks++;
       }
       return event_tracks - par_tracks;
@@ -1098,9 +1100,14 @@ Note that this is context-dependent variable and can take different values depen
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
-                      "called connected - region(CR) track match");
+    REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
+
+                      * -1 particle has no ECL cluster
+                      *  0 particle has no associated track
+                      *  1 there is a matched track called connected - region(CR) track match
+                      )DOC");
+    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"

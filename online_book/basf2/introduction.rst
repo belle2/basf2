@@ -544,9 +544,9 @@ To find information about a basf2 module, try:
 
 .. code-block:: bash
 
-    basf2 -m # this lists all of them
-    basf2 -m | grep "Particle"
-    basf2 -m ParticleCombiner
+    b2help-modules # this lists all of them
+    b2help-modules | grep "Particle"
+    b2help-modules ParticleCombiner
 
 Listing the basf2 variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -561,8 +561,8 @@ To check the list of basf2 variables known to the :ref:`analysis_variablemanager
 
 .. code-block:: bash
 
-    basf2 variables.py
-    basf2 variables.py | grep "invariant"
+    b2help-variables
+    b2help-variables | grep "invariant"
 
 There is a :ref:`analysis_variables` section in this documentation which you might find
 more helpful than the big dump.
@@ -965,7 +965,7 @@ Good luck.
     `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

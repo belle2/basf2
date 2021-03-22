@@ -21,7 +21,6 @@
 #include <TTree.h>
 
 namespace Belle2 {
-
   /**The module studies VXD hits from overlapping sensors of a same VXD layer.
    * In particular, it computes residuals differences sensitive to possible detector misalignments.
    *
@@ -177,64 +176,131 @@ namespace Belle2 {
                  extLadder_PXD = 0, /**< tree t_PXD branch extLadder_PXD/i */
                  extSensor_PXD = 0; /**< tree t_PXD branch extSensor_PXD/i */
     /* Branches of SVD u-clusters tree */
-    float deltaRes_SVD_U = 0, /**< U difference between external and internal residual */
-          intRes_SVD_U = 0,   /**< U internal residual computed by genfit */
-          intClPos_SVD_U = 0,      /**< U internal cluster position */
-          intClPosErr_SVD_U = 0,      /**< U internal cluster position error */
-          intTruePos_SVD_U = -99,      /**< U internal true position */
-          intClPhi_SVD_U = 0,   /**< U internal cluster global phi */
-          intClZ_SVD_U = 0,     /**< U internal cluster global Z */
-          intTrkPos_SVD_U = 0, /**< U internal track position*/
-          intTrkPosErr_SVD_U = 0, /**< U internal track position error*/
-          intTrkQoP_SVD_U = 0, /**< U internal track q/p*/
-          intTrkPrime_SVD_U = 0,     /**< U internal tan of incident angle projected on u,w*/
-          extRes_SVD_U = 0,   /**< U external residual computed by genfit */
-          extClPos_SVD_U = 0,      /**< U external cluster position */
-          extClPosErr_SVD_U = 0,      /**< U external cluster position error */
-          extTruePos_SVD_U = -99,      /**< U external true position */
-          extClPhi_SVD_U = 0,   /**< U external cluster global phi */
-          extClZ_SVD_U = 0,     /**< U external cluster global Z */
-          extTrkPos_SVD_U = 0, /**< U external track position*/
-          extTrkPosErr_SVD_U = 0, /**< U external track position error*/
-          extTrkQoP_SVD_U = 0, /**< U external track q/p*/
-          extTrkPrime_SVD_U = 0;     /**< U external tan of incident angle projected on u,w*/
-    unsigned int intLayer_SVD_U = 0,  /**< U internal layer */
-                 intLadder_SVD_U = 0, /**< U internal ladder */
-                 intSensor_SVD_U = 0, /**< U internal sensor */
-                 intSize_SVD_U = 0, /**< U internal size */
-                 extLayer_SVD_U = 0,  /**< U external layer */
-                 extLadder_SVD_U = 0, /**< U external ladder */
-                 extSensor_SVD_U = 0, /**< U external sensor */
-                 extSize_SVD_U = 0; /**< U external size */
+    float svdDeltaRes_U = 0,          /**< U difference between external and internal residual */
+          svdClCharge_U_int = 0,      /**< U internal cluster charge */
+          svdClSNR_U_int = 0,         /**< U internal cluster SNR */
+          svdClTime_U_int = 0,        /**< U internal cluster time */
+          svdRes_U_int = 0,           /**< U internal residual computed by genfit */
+          svdClIntStrPos_U_int = 0,   /**< U internal cluster interstrip position */
+          svdClPos_U_int = 0,         /**< U internal cluster position */
+          svdClPosErr_U_int = 0,      /**< U internal cluster position error */
+          svdTruePos_U_int = -99,     /**< U internal true position */
+          svdClPhi_U_int = 0,         /**< U internal cluster global phi */
+          svdClZ_U_int = 0,           /**< U internal cluster global Z */
+          svdTrkd0 = 0,         /**< d0 of the track */
+          svdTrkz0 = 0,         /**< z0 of the track */
+          svdTrkpT = 0,         /**< pT of the track */
+          svdTrkpCM = 0,        /**< pCM of the track */
+          svdTrkTraversedLength_U_int = 0,   /**< U internal traversed length of the track in the sensor */
+          svdTrkPos_U_int = 0,        /**< U internal track position */
+          svdTrkPosOS_U_int = 0,      /**< U internal track position on the other side */
+          svdTrkPosErr_U_int = 0,     /**< U internal track position error */
+          svdTrkPosErrOS_U_int = 0,   /**< U internal track position error on the other side */
+          svdTrkQoP_U_int = 0,        /**< U internal track q/p */
+          svdTrkPrime_U_int = 0,      /**< U internal tan of incident angle projected on u,w */
+          svdTrkPrimeOS_U_int = 0,    /**< U internal tan of incident angle projected on v/u,w (other side) */
+          svdTrkPosUnbiased_U_int = 0,   /**< U internal unbiased track position */
+          svdTrkPosErrUnbiased_U_int = 0,   /**< U internal unbiased track position error */
+          svdTrkQoPUnbiased_U_int = 0,   /**< U internal unbiased track q/p */
+          svdTrkPrimeUnbiased_U_int = 0,   /**< U internal unbiased tan of incident angle projected on u,w */
+          svdClCharge_U_ext = 0,      /**< U external cluster charge */
+          svdClSNR_U_ext = 0,         /**< U external cluster SNR */
+          svdClTime_U_ext = 0,        /**< U external cluster time */
+          svdRes_U_ext = 0,           /**< U external residual computed by genfit */
+          svdClIntStrPos_U_ext = 0,   /**< U external cluster interstrip position */
+          svdClPos_U_ext = 0,         /**< U external cluster position */
+          svdClPosErr_U_ext = 0,      /**< U external cluster position error */
+          svdTruePos_U_ext = -99,     /**< U external true position */
+          svdClPhi_U_ext = 0,         /**< U external cluster global phi */
+          svdClZ_U_ext = 0,           /**< U external cluster global Z */
+          svdTrkTraversedLength_U_ext = 0,   /**< U external traversed length of the track in the sensor */
+          svdTrkPos_U_ext = 0,        /**< U external track position */
+          svdTrkPosOS_U_ext = 0,      /**< U external track position on the other side */
+          svdTrkPosErr_U_ext = 0,     /**< U external track position error */
+          svdTrkPosErrOS_U_ext = 0,   /**< U external track position error on the other side */
+          svdTrkQoP_U_ext = 0,        /**< U external track q/p */
+          svdTrkPrime_U_ext = 0,      /**< U external tan of incident angle projected on u,w */
+          svdTrkPrimeOS_U_ext = 0,    /**< U external tan of incident angle projected on v/u,w (other side) */
+          svdTrkPosUnbiased_U_ext = 0,   /**< U external unbiased track position */
+          svdTrkPosErrUnbiased_U_ext = 0,   /**< U external unbiased track position error */
+          svdTrkQoPUnbiased_U_ext = 0,   /**< U external unbiased track q/p */
+          svdTrkPrimeUnbiased_U_ext = 0;   /**< U external unbiased tan of incident angle projected on u,w */
+    int svdTrkPXDHits = 0,   /**< number of PXD hits on the track*/
+        svdTrkSVDHits = 0,   /**< number of PXD hits on the track*/
+        svdTrkCDCHits = 0;   /**< number of PXD hits on the track*/
+    unsigned int svdLayer_U_int = 0,    /**< U internal layer */
+                 svdLadder_U_int = 0,   /**< U internal ladder */
+                 svdSensor_U_int = 0,   /**< U internal sensor */
+                 svdSize_U_int = 0,     /**< U internal size */
+                 svdLayer_U_ext = 0,    /**< U external layer */
+                 svdLadder_U_ext = 0,   /**< U external ladder */
+                 svdSensor_U_ext = 0,   /**< U external sensor */
+                 svdSize_U_ext = 0;     /**< U external size */
+    std::vector<float> svdStripCharge_U_int,     /**< U internal charge of the strips of the cluster*/
+        svdStripTime_U_int,       /**< U internal time of the strips of the cluster*/
+        svdStripPosition_U_int,   /**< U internal position of the strips of the cluster*/
+        svdStripCharge_U_ext,     /**< U external charge of the strips of the cluster*/
+        svdStripTime_U_ext,       /**< U external time of the strips of the cluster*/
+        svdStripPosition_U_ext;   /**< U external position of the strips of the cluster*/
     /* Branches of SVD v-clusters tree */
-    float deltaRes_SVD_V = 0, /**< V difference between external and internal residual */
-          intRes_SVD_V = 0,   /**< V internal residual computed by genfit */
-          intClPos_SVD_V = 0,      /**< V internal cluster position */
-          intClPosErr_SVD_V = 0,      /**< V internal cluster position error */
-          intTruePos_SVD_V = -99,      /**< V internal true position */
-          intClPhi_SVD_V = 0,   /**< V internal cluster global phi */
-          intClZ_SVD_V = 0,     /**< V internal cluster global Z */
-          intTrkPos_SVD_V = 0, /**< V internal track position*/
-          intTrkPosErr_SVD_V = 0, /**< V internal track position error*/
-          intTrkQoP_SVD_V = 0, /**< V internal track q/p*/
-          intTrkPrime_SVD_V = 0,     /**< V internal tan of incident angle projected on u,w*/
-          extRes_SVD_V = 0,   /**< V external residual computed by genfit */
-          extClPos_SVD_V = 0,      /**< V external cluster position */
-          extClPosErr_SVD_V = 0,      /**< V external cluster position error */
-          extTruePos_SVD_V = -99,      /**< V external true position */
-          extClPhi_SVD_V = 0,   /**< V external cluster global phi */
-          extClZ_SVD_V = 0,     /**< V external cluster global Z */
-          extTrkPos_SVD_V = 0, /**< V external track position*/
-          extTrkPosErr_SVD_V = 0, /**< V external track position error*/
-          extTrkQoP_SVD_V = 0, /**< V external track q/p*/
-          extTrkPrime_SVD_V = 0;     /**< V external tan of incident angle projected on u,w*/
-    unsigned int intLayer_SVD_V = 0,  /**< V internal layer */
-                 intLadder_SVD_V = 0, /**< V internal ladder */
-                 intSensor_SVD_V = 0, /**< V internal sensor */
-                 intSize_SVD_V = 0, /**< V internal size */
-                 extLayer_SVD_V = 0,  /**< V external layer */
-                 extLadder_SVD_V = 0, /**< V external ladder */
-                 extSensor_SVD_V = 0, /**< V external sensor */
-                 extSize_SVD_V = 0; /**< V external size */
+    float svdDeltaRes_V = 0,          /**< V difference between external and internal residual */
+          svdClCharge_V_int = 0,      /**< V internal cluster charge */
+          svdClSNR_V_int = 0,         /**< V internal cluster SNR */
+          svdClTime_V_int = 0,        /**< V internal cluster time */
+          svdRes_V_int = 0,           /**< V internal residual computed by genfit */
+          svdClIntStrPos_V_int = 0,   /**< V internal cluster interstrip position */
+          svdClPos_V_int = 0,         /**< V internal cluster position */
+          svdClPosErr_V_int = 0,      /**< V internal cluster position error */
+          svdTruePos_V_int = -99,     /**< V internal true position */
+          svdClPhi_V_int = 0,         /**< V internal cluster global phi */
+          svdClZ_V_int = 0,           /**< V internal cluster global Z */
+          svdTrkTraversedLength_V_int = 0,   /**< V internal traversed length of the track in the sensor */
+          svdTrkPos_V_int = 0,        /**< V internal track position */
+          svdTrkPosOS_V_int = 0,      /**< V internal track position on the other side */
+          svdTrkPosErr_V_int = 0,     /**< V internal track position error */
+          svdTrkPosErrOS_V_int = 0,   /**< V internal track position error on the other side */
+          svdTrkQoP_V_int = 0,        /**< V internal track q/p */
+          svdTrkPrime_V_int = 0,      /**< V internal tan of incident angle projected on u,w */
+          svdTrkPrimeOS_V_int = 0,    /**< V internal tan of incident angle projected on v/u,w (other side) */
+          svdTrkPosUnbiased_V_int = 0,   /**< V internal unbiased track position */
+          svdTrkPosErrUnbiased_V_int = 0,   /**< V internal unbiased track position error */
+          svdTrkQoPUnbiased_V_int = 0,   /**< V internal unbiased track q/p */
+          svdTrkPrimeUnbiased_V_int = 0,   /**< V internal unbiased tan of incident angle projected on u,w */
+          svdClCharge_V_ext = 0,      /**< V external cluster charge */
+          svdClSNR_V_ext = 0,         /**< V external cluster SNR */
+          svdClTime_V_ext = 0,        /**< V external cluster time */
+          svdRes_V_ext = 0,           /**< V external residual computed by genfit */
+          svdClIntStrPos_V_ext = 0,   /**< V external cluster interstrip position */
+          svdClPos_V_ext = 0,         /**< V external cluster position */
+          svdClPosErr_V_ext = 0,      /**< V external cluster position error */
+          svdTruePos_V_ext = -99,     /**< V external true position */
+          svdClPhi_V_ext = 0,         /**< V external cluster global phi */
+          svdClZ_V_ext = 0,           /**< V external cluster global Z */
+          svdTrkTraversedLength_V_ext = 0,   /**< V external traversed length of the track in the sensor */
+          svdTrkPos_V_ext = 0,        /**< V external track position */
+          svdTrkPosOS_V_ext = 0,      /**< V external track position on the other side */
+          svdTrkPosErr_V_ext = 0,     /**< V external track position error */
+          svdTrkPosErrOS_V_ext = 0,   /**< V external track position error on the other side */
+          svdTrkQoP_V_ext = 0,        /**< V external track q/p */
+          svdTrkPrime_V_ext = 0,      /**< V external tan of incident angle projected on u,w */
+          svdTrkPrimeOS_V_ext = 0,    /**< V external tan of incident angle projected on v/u,w (other side) */
+          svdTrkPosUnbiased_V_ext = 0,   /**< V external unbiased track position */
+          svdTrkPosErrUnbiased_V_ext = 0,   /**< V external unbiased track position error */
+          svdTrkQoPUnbiased_V_ext = 0,   /**< V external unbiased track q/p */
+          svdTrkPrimeUnbiased_V_ext = 0;   /**< V external unbiased tan of incident angle projected on u,w */
+    unsigned int svdLayer_V_int = 0,    /**< V internal layer */
+                 svdLadder_V_int = 0,   /**< V internal ladder */
+                 svdSensor_V_int = 0,   /**< V internal sensor */
+                 svdSize_V_int = 0,     /**< V internal size */
+                 svdLayer_V_ext = 0,    /**< V external layer */
+                 svdLadder_V_ext = 0,   /**< V external ladder */
+                 svdSensor_V_ext = 0,   /**< V external sensor */
+                 svdSize_V_ext = 0;     /**< V external size */
+    std::vector<float> svdStripCharge_V_int,     /**< V internal charge of the strips of the cluster*/
+        svdStripTime_V_int,       /**< V internal time of the strips of the cluster*/
+        svdStripPosition_V_int,   /**< V internal position of the strips of the cluster*/
+        svdStripCharge_V_ext,     /**< V external charge of the strips of the cluster*/
+        svdStripTime_V_ext,       /**< V external time of the strips of the cluster*/
+        svdStripPosition_V_ext;   /**< V external position of the strips of the cluster*/
   };
 }

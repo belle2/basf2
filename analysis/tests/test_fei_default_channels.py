@@ -10,6 +10,8 @@ import shutil
 
 import fei.default_channels
 
+import b2bii
+
 # @cond
 
 
@@ -17,21 +19,23 @@ class TestGetDefaultChannels(unittest.TestCase):
     def test_get_default(self):
         particles = fei.default_channels.get_default_channels()
         self.assertEqual([p.identifier for p in particles],
-                         ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
-                          'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
-                          'D_s*+:generic', 'B0:generic', 'B+:generic',
+                         ['pi+:generic', 'K+:generic', 'p+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic',
+                          'pi0:generic', 'K_S0:generic', 'Lambda0:generic', 'Sigma+:generic', 'J/psi:generic',
+                          'D0:generic', 'D+:generic', 'D_s+:generic', 'Lambda_c+:generic',
+                          'D*0:generic', 'D*+:generic', 'D_s*+:generic',
+                          'B0:generic', 'B+:generic',
                           'D0:semileptonic', 'D+:semileptonic', 'D*0:semileptonic', 'D*+:semileptonic',
                           'B0:semileptonic', 'B+:semileptonic'])
 
     def test_get_hadronic(self):
-        particles = fei.default_channels.get_default_channels(hadronic=True, semileptonic=False, KLong=False)
+        particles = fei.default_channels.get_default_channels(hadronic=True, semileptonic=False, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
                           'D_s*+:generic', 'B0:generic', 'B+:generic'])
 
     def test_get_semileptonic(self):
-        particles = fei.default_channels.get_default_channels(hadronic=False, semileptonic=True, KLong=False)
+        particles = fei.default_channels.get_default_channels(hadronic=False, semileptonic=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -39,7 +43,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'B0:semileptonic', 'B+:semileptonic'])
 
     def test_get_charged(self):
-        particles = fei.default_channels.get_default_channels(chargedB=True, neutralB=False)
+        particles = fei.default_channels.get_default_channels(chargedB=True, neutralB=False, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -47,7 +51,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'D*+:semileptonic', 'B+:semileptonic'])
 
     def test_get_neutral(self):
-        particles = fei.default_channels.get_default_channels(chargedB=False, neutralB=True)
+        particles = fei.default_channels.get_default_channels(chargedB=False, neutralB=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -55,7 +59,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'D*+:semileptonic', 'B0:semileptonic'])
 
     def test_get_klong(self):
-        particles = fei.default_channels.get_default_channels(hadronic=False, semileptonic=False, KLong=True)
+        particles = fei.default_channels.get_default_channels(hadronic=False, semileptonic=False, KLong=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -63,7 +67,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'B0:KL', 'B+:KL'])
 
     def test_B_extra_cut(self):
-        particles = fei.default_channels.get_default_channels(B_extra_cut='nRemainingTracksInROE == 0', KLong=True)
+        particles = fei.default_channels.get_default_channels(B_extra_cut='nRemainingTracksInROE == 0', KLong=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -80,7 +84,7 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[30].preCutConfig.userCut, 'nRemainingTracksInROE == 0')
 
     def test_get_specific(self):
-        particles = fei.default_channels.get_default_channels(specific=True, KLong=True)
+        particles = fei.default_channels.get_default_channels(specific=True, KLong=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -99,7 +103,8 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
 
     def test_get_specific_converted(self):
-        particles = fei.default_channels.get_default_channels(specific=True, KLong=True, convertedFromBelle=True)
+        b2bii.setB2BII()
+        particles = fei.default_channels.get_default_channels(specific=True, KLong=True, baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -116,9 +121,11 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < InvM < 0.18 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
+        b2bii.unsetB2BII()
 
     def test_get_converted(self):
-        particles = fei.default_channels.get_default_channels(convertedFromBelle=True)
+        b2bii.setB2BII()
+        particles = fei.default_channels.get_default_channels(baryonic=False)
         self.assertEqual([p.identifier for p in particles],
                          ['pi+:generic', 'K+:generic', 'mu+:generic', 'e+:generic', 'gamma:generic', 'pi0:generic', 'K_S0:generic',
                           'J/psi:generic', 'D0:generic', 'D+:generic', 'D_s+:generic', 'D*0:generic', 'D*+:generic',
@@ -150,6 +157,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                                                             'cosAngleBetweenMomentumAndVertexVector',
                                                             'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
                                                             'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'])
+        b2bii.unsetB2BII()
 
 
 class TestGetFRChannels(unittest.TestCase):

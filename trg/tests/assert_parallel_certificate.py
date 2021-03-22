@@ -1,10 +1,10 @@
 # Test for the parallel certified flag in all modules in the standard L1 trigger simulation.
 
-from basf2 import *
+import basf2 as b2
 from L1trigger import add_tsim
 
 # Create an empty path
-path = create_path()
+path = b2.create_path()
 
 # Add only tsim
 add_tsim(path)
@@ -13,4 +13,4 @@ add_tsim(path)
 modules = path.modules()
 for m in modules:
     assert m.has_properties(
-        ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)

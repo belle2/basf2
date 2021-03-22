@@ -3,4 +3,4 @@
 from hlt.hlt_execution import main
 
 if __name__ == '__main__':
-    exit(main("beam_reco.py"))
+    exit(main("beam_reco_sel.py"))

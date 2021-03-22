@@ -18,10 +18,9 @@
 
 
 import basf2 as b2
-from ROOT import Belle2, TFile, TFitResultPtr, TH1F, TH2D
+from ROOT import Belle2, TFile, TH1F, TH2D
 from ROOT import TF1, gDirectory, gROOT
 # import numpy
-import math
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 
 
@@ -84,7 +83,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
-            tZero_err = 5.1
+            # tZero_err = 5.1
             tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
@@ -368,18 +367,18 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
         """
         Function that allows to cicle on the events
         """
-        timeClusterU = 0
-        timeClusterV = 0
-        sideIndex = 0
-        TBIndexU = 0
-        TBIndexV = 0
+        # timeClusterU = 0
+        # timeClusterV = 0
+        # sideIndex = 0
+        # TBIndexU = 0
+        # TBIndexV = 0
         #: counts the number of events
         self.Evt = self.Evt + 1
 
         #: registers PyStoreObj EventT0
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
-        svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
+        # svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
 
         for svdCluster in svdCluster_list:
             svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
@@ -397,7 +396,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
 
         timeCal = SVDCoGCalibrationFunction()
         par = [0, 1, 0, 0]
-        TCOGMEAN = 0
+        # TCOGMEAN = 0
         T0MEAN = 0
 
         '''
@@ -433,7 +432,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
                     for side in range(2):
                         # Resolution distribution Histograms with Gaussian Fit
                         res = self.resList[li][ldi][si][side]
-                        fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
+                        # fitResult = int(TFitResultPtr(res.Fit(self.gaus, "R")))
 
                         res.Write()
                         # COG Distribution Histograms
@@ -444,11 +443,11 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
                         cdc.Write()
                         # SNR Distribution Histograms
                         snr = self.snrList[li][ldi][si][side]
-                        snrMean = snr.GetMean()
+                        # snrMean = snr.GetMean()
                         snr.Write()
                         # ScatterPlot Histograms with Linear Fit
                         sp = self.spList[li][ldi][si][side]
-                        covscalebias = sp.GetCovariance()
+                        # covscalebias = sp.GetCovariance()
                         pfxsp = sp.ProfileX()
                         self.pol.SetParameters(-50, 1.5, 0.001, 0.00001)
                         pfxsp.Fit(self.pol, "R")
@@ -458,19 +457,6 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
                         par[3] = self.pol.GetParameter(3)
                         sp.Write()
                         pfxsp.Write()
-
-                        if sp.GetRMS() != 0:
-                            m = sp.GetCovariance() / pow(sp.GetRMS(1), 2)
-                            # m = sp.GetCovariance()/cog.GetRMS()
-                            m_err = 2 / pow(sp.GetRMS(), 3) * sp.GetRMSError() * sp.GetCovariance()
-                            q = sp.GetMean(2) - m * sp.GetMean(1)
-                            q_err = math.sqrt(pow(sp.GetMeanError(2), 2) +
-                                              pow(m * sp.GetMeanError(1), 2) + pow(m_err * sp.GetMean(1), 2))
-                        else:
-                            m = 1
-                            m_err = 0
-                            q = 0
-                            q_err = 0
 
                         # T0MEAN = self.EventT0Hist.GetMean()
                         T0MEAN = cdc.GetMean()

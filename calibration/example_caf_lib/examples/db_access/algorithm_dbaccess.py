@@ -38,23 +38,15 @@ inputFileNames = [pathlib.Path(args.input_data, "CollectorOutput.root").absolute
 algo.setInputFileNames(inputFileNames)
 
 if not args.reset:
-    b2.reset_database()
-    b2.use_database_chain()
     # The local db that we will both write to and read from
-    b2.use_local_database("localdb/database.txt",
-                          directory="localdb",
-                          readonly=False)
+    b2.conditions.prepend_testing_payloads("localdb/database.txt")
 
 # We iterate over some runs and execute separately.
 # This means that we repeatedly access the DB interface after committing
 for i in range(1, 5):
     if args.reset:
         # We're doing this here to test what happens when resetting in a single Python process
-        b2.reset_database()
-        b2.use_database_chain()
         # The local db that we will both write to and read from
-        b2.use_local_database("localdb/database.txt",
-                              directory="localdb",
-                              readonly=False)
+        b2.conditions.prepend_testing_payloads("localdb/database.txt")
     print("Result of calibration =", algo.execute([(0, i)], args.iteration))
     algo.commit()

@@ -3,7 +3,7 @@ from ROOT import Belle2
 
 def cdc_layers(layers=None):
     if layers is None:
-        layers = [l for l in range(0, 56)]
+        layers = [lyr for lyr in range(0, 56)]
 
     result = []
 

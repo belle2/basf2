@@ -27,6 +27,11 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
+     * return MVA output that uses shower shape variables to distinguish between true photon and beam background clusters
+     */
+    double beamBackgroundProbabilityMVA(const Particle* particle);
+
+    /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */
@@ -169,7 +174,7 @@ namespace Belle2 {
     /**
      * return absolute value of Zernike Moment 51
      */
-    double eclClusterAbsZernikeMoment40(const Particle* particle);
+    double eclClusterAbsZernikeMoment51(const Particle* particle);
 
     /**
      * return result of MVA using zernike moments
@@ -235,11 +240,6 @@ namespace Belle2 {
     double eclClusterHasPulseShapeDiscrimination(const Particle* particle);
 
     /**
-     * return 1.0 if cluster matched to a trigger cluster
-     */
-    double eclClusterTrigger(const Particle* particle);
-
-    /**
      * return theta of extrapolated track
      */
     double eclExtTheta(const Particle* particle);
@@ -253,26 +253,6 @@ namespace Belle2 {
      * return phi id of extrapolated track
      */
     double eclExtPhiId(const Particle* particle);
-
-    /**
-     * return three digit energy sum FWD barrel
-     */
-    double eclEnergy3FWDBarrel(const Particle* particle);
-
-    /**
-     * return three digit energy sum FWD endcap
-     */
-    double eclEnergy3FWDEndcap(const Particle* particle);
-
-    /**
-     * return three digit energy sum BWD barrel
-     */
-    double eclEnergy3BWDBarrel(const Particle* particle);
-
-    /**
-     * return three digit energy sum BWD endcap
-     */
-    double eclEnergy3BWDEndcap(const Particle* particle);
 
     /**
      * Returns the ECL weighted average time of the daughters of the provided particle
@@ -335,86 +315,6 @@ namespace Belle2 {
      * Used for ECL-based dark sector physics and debugging track-cluster matching.
      */
     double eclClusterOnlyInvariantMass(const Particle* part);
-
-    /**
-     * return the number of TCs above threshold
-     */
-    double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC energy
-     */
-    double getEnergyTC(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC energy based on ECLCalDigits
-     */
-    double getEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC timing
-     */
-    double getTimingTC(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC event timing
-     */
-    double getEvtTimingTC(const Particle*);
-
-    /**
-     * return the  TC Id with maximum FADC
-     */
-    double getMaximumTCId(const Particle*);
-
-    /**
-     * returns the TC hit window
-     */
-    double eclHitWindowTC(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC timing based on ECLCalDigits
-     */
-    double getTimingTCECLCalDigit(const Particle*, const std::vector<double>& vars);
-
-    /**
-    * return the TC energy sum
-    */
-    double eclEnergySumTC(const Particle*, const std::vector<double>& vars);
-
-    /**
-    * return the TC energy sum based on ECLCalDigits
-    */
-    double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars);
-
-    /**
-     * return the TC energy sum based on ECLCalDigits that are in ECLClusters above threshold
-     */
-    double eclEnergySumTCECLCalDigitInECLCluster(const Particle*);
-
-    /**
-     * return the energy sum based on ECLCalDigits that are in ECLClusters above threshold
-     */
-    double eclEnergySumECLCalDigitInECLCluster(const Particle*);
-
-    /**
-    * return the threshold TC energy sum based on ECLCalDigits that are in ECLClusters
-    */
-    double eclEnergySumTCECLCalDigitInECLClusterThreshold(const Particle*);
-
-    /**
-     * Returns the number of TCs above threshold
-     */
-    double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars);
-
-    /**
-     * Returns the FADC sum above threshold for given hit windows
-     */
-    double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars);
-
-    /**
-     * Returns true if cluster is related to maximum TC
-     */
-    double eclTCIsMaximumForCluster(const Particle* particle);
 
     /**
      * Returns cluster mdst array index

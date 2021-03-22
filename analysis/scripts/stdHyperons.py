@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from basf2 import B2ERROR, B2WARNING
+from b2bii import isB2BII
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
 
@@ -9,7 +10,7 @@ from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
 
 
-def stdXi(fitter='TreeFit', b2bii=False, path=None):
+def stdXi(fitter='TreeFit', path=None):
     r"""
     Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std``.
 
@@ -17,11 +18,10 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
-        b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
-    if not b2bii:
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -33,7 +33,7 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
             [ daughter(0,protonID) > 0.01 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
-    elif b2bii:
+    else:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
@@ -70,7 +70,7 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', b2bii=False, path=None):
+def stdXi0(gammatype='eff40', path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -80,11 +80,10 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
                          to select the signal efficiency of the photons used in the pi0 reconstruction
                          (default ``eff40``)
-        b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
-    if not b2bii:
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
         cutAndCopyList(
@@ -102,7 +101,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
                          'abs( dM ) < 0.0406',
                          True, path=path)
 
-    elif b2bii:
+    else:
         # Rough pi0/Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         cutAndCopyList(
             'pi0:reco',
@@ -131,7 +130,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         path=path)
     treeFit('Xi0:prelim', conf_level=0.0, massConstraint=[3122], ipConstraint=True, updateAllDaughters=True, path=path)
     # Selecting ~4*sigma around the pi0 nominal mass
-    # pi0 mass range is invariant for b2bii=True, tighter selection is required by user
+    # pi0 mass range is invariant for B2BII, tighter selection is required by user
     applyCuts('Xi0:prelim', '[ abs( daughter(1,dM) ) < 0.0232 ]', path=path)
     treeFit('Xi0:prelim', conf_level=0.0, massConstraint=[111, 3122], ipConstraint=True, updateAllDaughters=False, path=path)
 
@@ -147,7 +146,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         path=path)
 
 
-def stdOmega(fitter='TreeFit', b2bii=False, path=None):
+def stdOmega(fitter='TreeFit', path=None):
     r"""
     Reconstruct the standard :math:`\Omega^-` ``ParticleList`` named ``Omega-:std``.
 
@@ -155,11 +154,10 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
-        b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
 
-    if not b2bii:
+    if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
@@ -171,7 +169,7 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
             [ daughter(0,protonID) > 0.01 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
-    elif b2bii:
+    else:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
@@ -198,7 +196,7 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
     else:
         B2ERROR(f"stdOmega: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
-    if not b2bii:
+    if not isB2BII():
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',
@@ -210,7 +208,7 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
             True,
             path=path)
 
-    elif b2bii:
+    else:
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',

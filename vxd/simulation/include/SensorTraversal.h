@@ -22,10 +22,11 @@ namespace Belle2 {
    */
   struct StepInformation {
     /** Construct a new instance
-     * @param pos step position
-     * @param mom step momentum
-     * @param electrons number of created electrons
-     * @param time global time the step occured
+     * @param stepPosition step position
+     * @param stepMomentum step momentum
+     * @param stepElectrons number of created electrons
+     * @param stepTime global time the step occured
+     * @param stepLength step length
      */
     StepInformation(const G4ThreeVector& stepPosition, const G4ThreeVector& stepMomentum, double stepElectrons, double stepTime,
                     double stepLength):
@@ -59,6 +60,8 @@ namespace Belle2 {
      * @param position position of the step
      * @param momentum momentum of the step
      * @param electrons number of deposited electrons during step
+     * @param time of the step
+     * @param length of the step
      */
     void add(const G4ThreeVector& position, const G4ThreeVector& momentum, double electrons, double time, double length)
     {

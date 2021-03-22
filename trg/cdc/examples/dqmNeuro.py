@@ -1,5 +1,4 @@
 import basf2
-from ROOT import Belle2
 import neurotrigger
 import reconstruction
 import sys

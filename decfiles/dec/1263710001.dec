@@ -1,0 +1,26 @@
+# EventType: 1263710001
+# Descriptor:  [B- -> D*(2S)0 l- nu] cc
+# NickName: Bu_Dst2Slnu
+# Documentation: b->c l nu process, D*2S mode (FLATQ2 model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+
+Decay Upsilon(4S)
+0.500 B+sig B-  VSS;
+0.500 B+ B-sig  VSS;
+Enddecay
+
+Decay B-sig
+0.5  D*(2S)0  e- anti-nu_e   PHOTOS FLATQ2;
+0.5  D*(2S)0  mu- anti-nu_mu   PHOTOS FLATQ2;
+Enddecay
+CDecay B+sig
+
+
+End

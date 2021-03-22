@@ -14,7 +14,6 @@ from L1trigger import add_tsim
 from softwaretrigger import constants
 from softwaretrigger.constants import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 from ROOT import Belle2
-find_file = Belle2.FileSystem.findFile
 
 
 class CheckForCorrectHLTResults(basf2.Module):
@@ -99,9 +98,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
 
-    # There us no packer for these objects :-(
+    # There is no packer for the following objects :(
     branch_names.remove("RawTRGs")
-    branch_names.remove("RawFTSWs")
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
@@ -177,7 +175,7 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False):
                         output_file_name=output_file_name, exp_number=exp_number,
                         passthrough=passthrough)
 
-    script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
+    script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True

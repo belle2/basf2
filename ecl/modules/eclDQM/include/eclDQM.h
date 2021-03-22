@@ -74,6 +74,12 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    /**
+     * @return true if the current event is a random trigger event,
+     *         false otherwise.
+     */
+    bool isRandomTrigger();
+
     /** Geometry */
     ECL::ECLGeometryPar* m_geom{nullptr};
     /** StoreObjPtr EventMetaData */
@@ -99,6 +105,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
+    /** Flag to select events triggered by delayed bhabha. */
+    bool m_DPHYTTYP{0};
 
     /** Parameters for hit occ. histograms. */
     std::vector<double> m_HitThresholds = {};

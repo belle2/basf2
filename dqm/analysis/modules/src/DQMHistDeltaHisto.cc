@@ -12,8 +12,6 @@
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -69,10 +67,10 @@ TCanvas* DQMHistDeltaHistoModule::find_canvas(TString canvas_name)
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
 
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvas_name)
-        return (TCanvas*)obj;
+        return dynamic_cast<TCanvas*>(obj);
     }
   }
   return nullptr;
@@ -126,11 +124,6 @@ void DQMHistDeltaHistoModule::event()
         }
       }
     }
-
-    TH1* h_diff = hq.back()->diff_histo;
-    h_diff->SetName((string(h_diff->GetName()) + "_diff").c_str());
-    if (h_diff->Integral() != 0) h_diff->Scale(hh->Integral() / h_diff->Integral());
-
     TString a = histoname;
     StringList s = StringUtil::split(a.Data(), '/');
     std::string dirname = s[0];
@@ -138,6 +131,9 @@ void DQMHistDeltaHistoModule::event()
     std::string canvas_name = dirname + "/c_" + hname;
     TCanvas* c = find_canvas(canvas_name);
     if (c == nullptr) continue;
+    TH1* h_diff = hq.back()->diff_histo;
+    h_diff->SetName((a + "_diff").Data());
+    if (h_diff->Integral() != 0) h_diff->Scale(hh->Integral() / h_diff->Integral());
     c->cd();
     h_diff->SetLineColor(kRed);
     h_diff->SetLineStyle(kDotted);

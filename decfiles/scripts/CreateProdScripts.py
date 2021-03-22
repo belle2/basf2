@@ -8,6 +8,13 @@
 #  create an mc production file from a decay file
 #  warning: this script is under development
 
+from optparse import OptionParser, OptionValueError
+import glob
+import time
+import sys
+import logging
+import re
+import os
 version = 'v1'
 
 bkk_first = True
@@ -17,16 +24,6 @@ eventid_insql = []
 list_of_obsoletes = []
 exit_status = 0
 list_of_wg = ['SL', 'EWP', 'TCPV', 'HAD', 'CHARM', 'ONIA', 'TAU']
-
-import os
-import re
-import string
-import logging
-import sys
-import time
-import glob
-import mmap
-from optparse import OptionParser, OptionValueError
 
 
 class GenericOptionFile(object):
@@ -84,21 +81,22 @@ class GenericOptionFile(object):
         Write the lines in the file.
         """
 
-        self.f.writelines([l + '\n' for l in lines])
+        self.f.writelines([line + '\n' for line in lines])
 
     def WriteHeader(self, eventtype, descriptor):
         """
         Write header of .dec file.
         """
+        timeString = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
         lines = [
-            '{0} file {1} generated: {2}'.format(self.comment, self.filename,
-                                                 time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())),
-            '{0}'.format(self.comment),
-            '{0} Event Type: {1}'.format(self.comment, eventtype),
-            '{0}'.format(self.comment),
-            '{0} ASCII decay Descriptor: {1}'.format(self.comment, descriptor),
-            '{0}'.format(self.comment),
+            f"{self.comment} file {self.filename} generated: {timeString}",
+            self.comment,
+            f"{self.comment} Event Type: {eventtype}",
+            self.comment,
+            f"{self.comment} ASCII decay Descriptor: {descriptor}",
+            self.comment
         ]
+
         self.Write(lines)
 
     def AddExtraOptions(self, eventtype):
@@ -354,17 +352,21 @@ class EventType:
 
         # check if the nickname is correct
         if self.NickName() != self.DecayName():
-            logging.error('In %s, the nickname %s is not equal to the name of the file %s.',
-                          self.DecayFileName,
-                          self.KeywordDictionary['NickName'], self.DecayName())
+            logging.error(
+                'In %s, the nickname %s is not equal to the name of the file %s.',
+                self.DecayFileName,
+                self.KeywordDictionary['NickName'],
+                self.DecayName())
             raise UserWarning
 
         # check if the date format is correct
         try:
             thetime = time.strptime(self.Date(), '%Y%m%d')
         except ValueError:
-            logging.error('In %s, the date format is not correct, it should be YYYYMMDD instead of %s.',
-                          self.DecayFileName, self.Date())
+            logging.error(
+                'In %s, the date format is not correct, it should be YYYYMMDD instead of %s.',
+                self.DecayFileName,
+                self.Date())
             raise UserWarning
 
         # check physics wg name
@@ -388,16 +390,22 @@ class EventType:
 
         # check if the event is obsolete
         if self.EventTypeNumber() in obsoletes:
-            logging.error('The EventType %s is in use in the obsolete list, please change it.', self.EventTypeNumber())
+            logging.error(
+                'The EventType %s is in use in the obsolete list, please change it.',
+                self.EventTypeNumber())
             raise UserWarning
 
         # check Tested is equal to Yes or No
-        self.KeywordDictionary['Tested'] = self.KeywordDictionary['Tested'].lower()
+        self.KeywordDictionary['Tested'] = self.KeywordDictionary['Tested'].lower(
+        )
         if self.KeywordDictionary['Tested'] != 'yes' and self.KeywordDictionary['Tested'] != 'no':
-            logging.error('In %s, Tested should be equal to Yes or No', self.DecayName())
+            logging.error(
+                'In %s, Tested should be equal to Yes or No',
+                self.DecayName())
             raise UserWarning
 
-        # check that the file has been tested (check can be disabled with --force option)
+        # check that the file has been tested (check can be disabled with
+        # --force option)
         if self.KeywordDictionary['Tested'] == 'no':
             logging.error('The decay file %s has not been tested',
                           self.DecayName())
@@ -487,7 +495,8 @@ class EventType:
             self.OptionFile = PythonOptionFile()
 
         if not filename:
-            filename = '{0}/prod/{1}'.format(os.environ['DECFILESROOT'], self.EventTypeNumber())
+            filename = '{0}/prod/{1}'.format(
+                os.environ['DECFILESROOT'], self.EventTypeNumber())
 
         self.OptionFile.SetFileName(filename)
         if os.path.exists(self.OptionFile.OptionFileName()):
@@ -496,8 +505,8 @@ class EventType:
             else:
                 logging.warning('The file %s already exists.',
                                 self.OptionFile.OptionFileName())
-                logging.warning('To overwrite it, you should remove it first or run with the --remove option.'
-                                )
+                logging.warning(
+                    'To overwrite it, you should remove it first or run with the --remove option.')
                 raise UserWarning
         self.OptionFile.Open()
 
@@ -736,7 +745,8 @@ def writeSQLTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = 'EVTTYPEID = {0}, DESCRIPTION = "{1}", PRIMARY = "{2}"\n'.format(evttypeid, nick, desc)
+            line = 'EVTTYPEID = {0}, DESCRIPTION = "{1}", PRIMARY = "{2}"\n'.format(
+                evttypeid, nick, desc)
             f.write(line)
 
 
@@ -962,7 +972,8 @@ def CheckFile(option, opt_str, value, parser):
     WHITE,
 ) = list(range(8))
 
-# The background is set with 40 plus the number of the color, and the foreground with 30
+# The background is set with 40 plus the number of the color, and the
+# foreground with 30
 
 # These are the sequences need to get colored ouput
 RESET_SEQ = "\033[0m"
@@ -1003,7 +1014,13 @@ class ColoredFormatter(logging.Formatter):
         levelname = record.levelname
         color = COLOR_SEQ % (30 + COLORS[levelname])
         message = logging.Formatter.format(self, record)
-        message = message.replace('$RESET', RESET_SEQ).replace('$BOLD', BOLD_SEQ).replace('$COLOR', color)
+        message = message.replace(
+            '$RESET',
+            RESET_SEQ).replace(
+            '$BOLD',
+            BOLD_SEQ).replace(
+            '$COLOR',
+            color)
         return message + RESET_SEQ
 
 
@@ -1016,7 +1033,10 @@ def main():
     #: logging.basicConfig(level=logging.DEBUG)
     mylog = logging.StreamHandler()
     logging.getLogger().setLevel(logging.DEBUG)
-    mylog.setFormatter(ColoredFormatter('$COLOR$BOLD[%(levelname)-10s]$RESET$COLOR  %(message)s', True))
+    mylog.setFormatter(
+        ColoredFormatter(
+            '$COLOR$BOLD[%(levelname)-10s]$RESET$COLOR  %(message)s',
+            True))
     logging.getLogger().addHandler(mylog)
     usage = 'usage: %prog [options]'
     parser = OptionParser(usage=usage, version=version)
@@ -1048,10 +1068,13 @@ def main():
                       action='store_false',
                       help='create text option files instead of python options'
                       )
-    parser.add_option('--force', dest='force', default=False,
-                      action='store_true',
-                      help='force create of option file even when the decay file '
-                      'syntax is not correct')
+    parser.add_option(
+        '--force',
+        dest='force',
+        default=False,
+        action='store_true',
+        help='force create of option file even when the decay file '
+        'syntax is not correct')
 
     # Check that the environment variable DECFILESROOT exist otherwise
     # set it to ../dec
@@ -1059,8 +1082,8 @@ def main():
         logging.warning('')
         logging.warning('The variable DECFILESROOT is not defined.')
         logging.warning('Use ../ instead.')
-        logging.warning('Run the setup script of the package to set the correct value.'
-                        )
+        logging.warning(
+            'Run the setup script of the package to set the correct value.')
         logging.warning('')
         os.environ['DECFILESROOT'] = '../'
     else:
@@ -1078,12 +1101,15 @@ def main():
 
     if options.NickName:
         try:
-            run_create('{0}/dec/{1}.dec'.format(os.environ['DECFILESROOT'],
-                                                options.NickName), options.remove, options.python,
-                       options.force)
+            run_create(
+                '{0}/dec/{1}.dec'.format(
+                    os.environ['DECFILESROOT'],
+                    options.NickName),
+                options.remove,
+                options.python,
+                options.force)
         except UserWarning:
             exit_status = 1
-            pass
     else:
         run_loop(options.remove, options.python, options.force)
 

@@ -361,28 +361,28 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
   hADCMean->SetMaximum(300);
-  hADCMean->Draw();
+  hADCMean->DrawCopy();
 
   m_cMain->cd(2);
   hTDCEdge->SetMinimum(4800);
   hTDCEdge->SetMaximum(5000);
-  hTDCEdge->Draw();
+  hTDCEdge->DrawCopy();
 
   m_cMain->cd(3);
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
-  hTDCSlope->Draw();
+  hTDCSlope->DrawCopy();
   m_cMain->cd(4);
-  hBadChannel->Draw("col");
+  hBadChannel->DrawCopy("col");
 
   m_cMain->cd(5);
-  hBadChannelBC->Draw("col");
+  hBadChannelBC->DrawCopy("col");
   m_cMain->cd(9);
-  hHitPerLayer->Draw();
+  hHitPerLayer->DrawCopy();
   m_cMain->cd(7);
-  hADC1000->Draw();
+  hADC1000->DrawCopy();
   m_cMain->cd(8);
-  hADC0->Draw();
+  hADC0->DrawCopy();
 
   m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {
@@ -415,7 +415,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   m_cMain->cd(6);
-  h2p->Draw("col");
+  h2p->DrawCopy("col");
   float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
                            79.39, 90.31, 101.23, 112.05
                           };

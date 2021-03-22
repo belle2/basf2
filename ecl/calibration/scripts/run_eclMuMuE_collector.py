@@ -22,13 +22,11 @@
 # run_eclMuMuE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
 # them to an output file.
 
-import os
 import sys
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 
-main = create_path()
+main = b2.create_path()
 DR2 = '/ghi/fs01/belle2/bdata/users/karim/MC/DR2/release-00-09-02/mdst_calib/*.root'
 main.add_module('RootInput', inputFileNames=[DR2])
 
@@ -39,12 +37,12 @@ if(narg >= 2):
 main.add_module("HistoManager", histoFileName=outputName)
 
 # Genfit and track extrapolation
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 main.add_module("SetupGenfitExtrapolation")
-ext = register_module('Ext')
+ext = b2.register_module('Ext')
 
 # extrapolate using muon hypothesis only
 pdgcodes = [13]
@@ -52,7 +50,7 @@ ext.param('pdgCodes', pdgcodes)
 
 main.add_module(ext)
 
-eclMuMuE = register_module('eclMuMuECollector')
+eclMuMuE = b2.register_module('eclMuMuECollector')
 eclMuMuE.param('minPairMass', 9.0)
 eclMuMuE.param('minTrackLength', 30.)
 eclMuMuE.param('MaxNeighbourE', 0.010)
@@ -65,15 +63,15 @@ main.add_module(eclMuMuE)
 
 main.add_module('Progress')
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # It is possible to force the job to use the specified global tag.
 # Default localdb is the subdirectory of current working directory, but can be overwritten
-reset_database()
-use_database_chain()
-use_central_database("development")
-use_local_database("localdb/database.txt")
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("development")
+b2.use_local_database("localdb/database.txt")
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

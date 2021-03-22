@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .plot import ValidationPlot, compose_axis_label, get_unit
+from tracking.validation.plot import ValidationPlot, compose_axis_label, get_unit
 
 # get error function as a np.ufunc vectorised for numpy array
 from tracking.root_utils import root_save_name
@@ -10,7 +10,7 @@ import collections
 
 import numpy as np
 
-from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 
@@ -123,7 +123,7 @@ class ResolutionAnalysis(object):
 
         quantity_name = self.quantity_name
 
-        axis_label = compose_axis_label(quantity_name, self.unit)
+        # axis_label = compose_axis_label(quantity_name, self.unit)
 
         plot_name_prefix = self.plot_name_prefix
         outlier_z_score = self.outlier_z_score
@@ -191,7 +191,7 @@ class ResolutionAnalysis(object):
                     params = fit_res.GetParams()
                     errs = fit_res.Errors()
 
-                    gaus_mean = params[1]
+                    # gaus_mean = params[1]
                     gaus_sigma = params[2]
                     gaus_sigma_err = errs[2]
 

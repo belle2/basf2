@@ -179,7 +179,7 @@ def events_in_basf2_file(file_path):
     Returns:
         int: Number of entries in tree.
     """
-    f = ROOT.TFile(file_path, "READ")
+    f = ROOT.TFile.Open(file_path, "READ")
     events = f.tree.GetEntries()
     f.Close()
     return events

@@ -136,14 +136,18 @@ global_env = Environment(
     ],
     # scripts and python modules that have to be installed before we can run b2code-classversion-check
     REQUIRED_TOOLS=[os.path.join('$BINDIR', 'b2code-classversion-check'),
+        os.path.join('$BINDIR', 'b2code-classversion-update'),
         os.path.join('$LIBDIR', 'b2test_utils', 'classversion.py'),
         os.path.join('$LIBDIR', 'pybasf2.so'),
         os.path.join('$DATADIR', 'framework', 'particledb', 'evt.pdl')]
 )
 
-for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
-    if entry.endswith('.py'):
-        global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
+if analysis:
+    global_env['REQUIRED_TOOLS'] = []
+else:
+    for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
+        if entry.endswith('.py'):
+            global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
 
 if global_env.GetOption('doxygen'):
     global_env['MODULE_IO'] = True
@@ -170,8 +174,9 @@ if GetOption('extralibpath'):
 if GetOption('extraccflags'):
     global_env.Append(CCFLAGS=GetOption('extraccflags').split())
 
-# check for debug flag
+# check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
+print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
@@ -307,6 +312,12 @@ if analysis:
 else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
+    if (os.path.exists('.excluded_directories')):
+        f = open('.excluded_directories', 'r')
+        for line in f.readlines():
+            exclude_dirs.add(line.rstrip('\n'))
+        f.close()
+        print(f'Excluded directories: {exclude_dirs}')
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:

@@ -25,8 +25,8 @@ namespace Belle2 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
     CDCTriggerTrack(double phi0, double omega, double chi2,
-                    std::vector<bool>& foundoldtrack,
-                    std::vector<bool>& driftthreshold,
+                    const std::vector<bool>& foundoldtrack,
+                    const std::vector<bool>& driftthreshold,
                     bool valstereobit = false,
                     int expert = -1,
                     short time = 0,
@@ -66,11 +66,11 @@ namespace Belle2 {
      */
     CDCTriggerTrack(double phi0, double omega, double chi2D,
                     double z0, double cotTheta, double chi3D,
-                    std::vector<bool> foundoldtrack = std::vector<bool>(6, false),
-                    std::vector<bool> driftthreshold = std::vector<bool>(9, false),
+                    const std::vector<bool>& foundoldtrack = std::vector<bool>(6, false),
+                    const std::vector<bool>& driftthreshold = std::vector<bool>(9, false),
                     bool valstereobit = false,
                     int expert = -1,
-                    std::vector<bool> tsvector = std::vector<bool>(9, false),
+                    const std::vector<bool>& tsvector = std::vector<bool>(9, false),
                     short time = 0, short quadrant = -1,
                     unsigned qualityvector = 0):
       Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),

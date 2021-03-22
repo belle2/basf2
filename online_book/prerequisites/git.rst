@@ -111,6 +111,17 @@ more information and help in case of problems.
 Exercises
 =========
 
+.. seealso::
+
+  While we'd encourage you to work through this section by yourself, we've also
+  prepared a video to help. Please stop it at every exercise to think and try to
+  do all steps by yourself as well.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/fb969" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 Let's test what you learned so far!
 
 .. admonition:: Exercise
@@ -175,6 +186,17 @@ For this concept you need to complete the next section.
 
 Branches (intermediate)
 =======================
+
+.. seealso::
+
+  While we'd encourage you to work through this section by yourself, we've also
+  prepared a video to help. Please stop it at every exercise to think and try to
+  do all steps by yourself as well.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/94f3hik" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 By now you should have a good feeling about why git is needed and start to feel
 a bit more comfortable with basic ``git`` commands.
@@ -295,7 +317,7 @@ to continue your training even after the StarterKit. It will not be time wasted!
   helps you and you still feel uncomfortable in the command line, you might
   want to try them out!
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

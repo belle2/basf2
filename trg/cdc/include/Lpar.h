@@ -42,7 +42,7 @@ namespace Belle2 {
     virtual ~TRGCDCLpar();
 
     /// assignment operator(s)
-    inline const TRGCDCLpar& operator=(const TRGCDCLpar&);
+    inline TRGCDCLpar& operator=(const TRGCDCLpar&);
 
     /// member functions
     inline void neg();
@@ -205,7 +205,7 @@ namespace Belle2 {
     m_kappa = l.m_kappa;
   }
 
-  inline const TRGCDCLpar& TRGCDCLpar::operator=(const TRGCDCLpar& l)
+  inline TRGCDCLpar& TRGCDCLpar::operator=(const TRGCDCLpar& l)
   {
     if (this != &l) {
       m_alpha = l.m_alpha;

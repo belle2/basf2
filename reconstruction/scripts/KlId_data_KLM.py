@@ -55,7 +55,7 @@ mypath = b2.Path()
 dec_file = None
 final_state = 'mixed'
 ma.setupEventInfo(noEvents, mypath)
-# , signaldecfile=Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+
 add_evtgen_generator(mypath, finalstate=final_state, signaldecfile=dec_file)
 
 add_simulation(mypath, bkgfiles=glob.glob('/sw/belle2/bkg/*.root'))

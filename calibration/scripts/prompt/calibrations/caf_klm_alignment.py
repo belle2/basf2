@@ -20,34 +20,57 @@ from prompt.utils import events_in_basf2_file
 from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
 
 #: Tells the automated system some details of this script
+# Expert configuration:
+# "required_events" : number of events in basf2 files selected for processing.
+# "required_events_experiment" : required number of events per experiment.
+# "events_per_file" : number of events per file.
+# "millepede_entries" : minimal number of Millepede entries.
+# Test with experiment 12 physics data:
+# ~350000 events correspond to ~1300000 Millepede entries.
 settings = CalibrationSettings(name="KLM alignmnent",
-                               expert_username="chilikin",
+                               expert_username="oskin",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],
-                               depends_on=[vxdcdc_alignment])
+                               depends_on=[vxdcdc_alignment],
+                               expert_config={
+                                    "required_events": 5000000,
+                                    "required_events_experiment": 500000,
+                                    "events_per_file": 1000,
+                                    "millepede_entries": 1000000
+                               })
+
 
 ##############################
 
 
 def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
                        reduced_file_to_iov_physics, reduced_file_to_iov_cosmic,
-                       required_events):
+                       required_events, required_events_experiment,
+                       events_per_file):
     """
     Parameters:
         files_to_iov_physics (dict): Dictionary {run : IOV} for physics data.
         files_to_iov_cosmic (dict): Dictionary {run : IOV} for cosmic data.
         reduced_file_to_iov_physics (dict): Selected physics data.
         reduced_file_to_iov_cosmic (dict): Selected cosmic data.
+        required_events (int): Required total number of events.
+        required_events_experiment (int): Required number of events
+                                          per experiment.
+        events_per_file (int): Number of events per file. If non-positive, then
+                               the number is not limited.
     """
+    experiment_numbers = set()
     run_to_files_physics = collections.defaultdict(list)
     for input_file, file_iov in file_to_iov_physics.items():
         run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
         run_to_files_physics[run].append(input_file)
+        experiment_numbers.add(file_iov.exp_low)
     run_to_files_cosmic = collections.defaultdict(list)
     for input_file, file_iov in file_to_iov_cosmic.items():
         run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
         run_to_files_cosmic[run].append(input_file)
+        experiment_numbers.add(file_iov.exp_low)
     max_files_per_run = 0
     for files in run_to_files_physics.values():
         files_per_run = len(files)
@@ -59,8 +82,15 @@ def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
             max_files_per_run = files_per_run
     files_per_run = 0
     collected_events = 0
+    collected_events_experiment = collections.defaultdict(int)
+    select_events_experiment = collections.defaultdict(bool)
+    for exp in experiment_numbers:
+        collected_events_experiment[exp] = 0
+        select_events_experiment[exp] = True
     while files_per_run < max_files_per_run:
         for run, files in run_to_files_physics.items():
+            if not select_events_experiment[run.exp]:
+                continue
             if files_per_run >= len(files):
                 continue
             input_file = files[files_per_run]
@@ -68,10 +98,16 @@ def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
             # Reject files without events.
             if events == 0:
                 continue
+            if events_per_file > 0 and events > events_per_file:
+                events = events_per_file
             collected_events = collected_events + events
+            collected_events_experiment[run.exp] = \
+                collected_events_experiment[run.exp] + events
             reduced_file_to_iov_physics[input_file] = IoV(*run, *run)
             basf2.B2INFO(f'File {input_file} with {events} events is selected.')
         for run, files in run_to_files_cosmic.items():
+            if not select_events_experiment[run.exp]:
+                continue
             if files_per_run >= len(files):
                 continue
             input_file = files[files_per_run]
@@ -79,12 +115,24 @@ def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
             # Reject files without events.
             if events == 0:
                 continue
+            if events_per_file > 0 and events > events_per_file:
+                events = events_per_file
             collected_events = collected_events + events
+            collected_events_experiment[run.exp] = \
+                collected_events_experiment[run.exp] + events
             reduced_file_to_iov_cosmic[input_file] = IoV(*run, *run)
             basf2.B2INFO(f'File {input_file} with {events} events is selected.')
         files_per_run = files_per_run + 1
         if collected_events >= required_events:
-            break
+            all_experiments_selected = True
+            for exp in experiment_numbers:
+                if collected_events_experiment[exp] >= \
+                        required_events_experiment:
+                    select_events_experiment[exp] = False
+                else:
+                    all_experiments_selected = False
+            if all_experiments_selected:
+                break
     basf2.B2INFO(f'The total number of collected events is {collected_events}.')
 
 ##############################
@@ -117,6 +165,9 @@ def get_calibrations(input_data, **kwargs):
     """
     # Set up config options
 
+    # Expert configuration.
+    expert_config = kwargs.get("expert_config")
+
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     file_to_iov_physics = input_data["raw_physics"]
@@ -127,7 +178,9 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_cosmic = collections.OrderedDict()
     select_input_files(file_to_iov_physics, file_to_iov_cosmic,
                        reduced_file_to_iov_physics, reduced_file_to_iov_cosmic,
-                       5000000)
+                       expert_config["required_events"],
+                       expert_config["required_events_experiment"],
+                       expert_config["events_per_file"])
 
     input_files_physics = sorted(list(reduced_file_to_iov_physics.keys()))
     basf2.B2INFO(f"Total number of 'physics' files actually used as input = {len(input_files_physics)}")
@@ -190,7 +243,7 @@ def get_calibrations(input_data, **kwargs):
         index.increment()
 
     cal_klm = millepede.create('KLMAlignment', [])
-    millepede.algo.setMinEntries(500000)
+    millepede.algo.setMinEntries(expert_config["millepede_entries"])
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
 
@@ -204,9 +257,14 @@ def get_calibrations(input_data, **kwargs):
 
     from klm_calibration_utils import get_alignment_pre_collector_path_physics, get_alignment_pre_collector_path_cosmic
 
+    entries = ''
+    if expert_config["events_per_file"] > 0:
+        last_entry = expert_config["events_per_file"]
+        entries = f'0:{last_entry}'
+
     if input_files_physics:
         coll_physics = get_collector("raw_physics")
-        rec_path_physics = get_alignment_pre_collector_path_physics(entry_sequence="0:1000")
+        rec_path_physics = get_alignment_pre_collector_path_physics(entry_sequence=entries)
 
         collection_physics = Collection(collector=coll_physics,
                                         input_files=input_files_physics,
@@ -216,13 +274,13 @@ def get_calibrations(input_data, **kwargs):
 
     if input_files_cosmic:
         coll_cosmic = get_collector("raw_cosmic")
-        rec_path_cosmic = get_alignment_pre_collector_path_cosmic(entry_sequence="0:1000")
+        rec_path_cosmic = get_alignment_pre_collector_path_cosmic(entry_sequence=entries)
 
         collection_cosmic = Collection(collector=coll_cosmic,
                                        input_files=input_files_cosmic,
                                        pre_collector_path=rec_path_cosmic)
 
-        cal_klm.add_collection(name="cosmic",  collection=collection_cosmic)
+        cal_klm.add_collection(name="cosmic", collection=collection_cosmic)
 
     #####
     # Algorithm step config
@@ -230,6 +288,11 @@ def get_calibrations(input_data, **kwargs):
     from caf.strategies import SequentialRunByRun
 
     cal_klm.algorithms = [millepede.algo]
+
+    # Bugfix for Condor:
+    from alignment.prompt_utils import fix_mille_paths_for_algo
+    for algorithm in cal_klm.algorithms:
+        fix_mille_paths_for_algo(algorithm)
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = SequentialRunByRun
@@ -249,17 +312,17 @@ def get_collector(input_data_name):
 
     if input_data_name == "raw_physics":
         return basf2.register_module(
-                   'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment',
-                               'EKLMSegmentAlignment'],
-                   useGblTree=True,
-                   minPValue=1e-5)
+            'MillepedeCollector',
+            components=['BKLMAlignment', 'EKLMAlignment',
+                        'EKLMSegmentAlignment'],
+            useGblTree=True,
+            minPValue=1e-5)
     elif input_data_name == "raw_cosmic":
         return basf2.register_module(
-                   'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment',
-                               'EKLMSegmentAlignment'],
-                   useGblTree=True,
-                   minPValue=1e-5)
+            'MillepedeCollector',
+            components=['BKLMAlignment', 'EKLMAlignment',
+                        'EKLMSegmentAlignment'],
+            useGblTree=True,
+            minPValue=1e-5)
 
     raise Exception("Unknown input data name used when setting up collector")

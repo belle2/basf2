@@ -14,7 +14,7 @@ from tabulate import tabulate
 _RegisteredSkims = [
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
-    ("10600100", "systematics", "Systematics"),
+    ("10600100", "systematics", "SystematicsDstar"),
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
     ("10600500", "systematics", "SystematicsRadMuMu"),
@@ -22,10 +22,17 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
+    ("10600800", "systematics", "SystematicsFourLeptonFromHLTFlag"),
+    ("10600900", "systematics", "SystematicsRadMuMuFromHLTFlag"),
+    ("10611000", "systematics", "SystematicsJpsi"),
+    ("10611100", "systematics", "SystematicsKshort"),
+    ("10601200", "systematics", "SystematicsBhabha"),
+
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
+    ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
@@ -41,7 +48,8 @@ _RegisteredSkims = [
     ("12160400", "ewp", "inclusiveBplusToKplusNuNu"),
 
     # --- WG3: Time-dependent CP violation ---
-    ("13160100", "tcpv", "TCPV"),
+    ("13160200", "tdcpv", "TDCPV_ccs"),
+    ("13160300", "tdcpv", "TDCPV_qqs"),
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),
@@ -66,6 +74,8 @@ _RegisteredSkims = [
     ("14140200", "btocharm", "BtoD0h_Kshh"),
     ("14141000", "btocharm", "BtoD0rho_Kpi"),
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
+    ("14141002", "btocharm", "B0toDD_Kpipi_Kspi"),
+    ("14141003", "btocharm", "B0toDstarD"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -106,6 +116,7 @@ _RegisteredSkims = [
     ("18020300", "dark", "ALP3Gamma"),
     ("18020400", "dark", "EGammaControlDark"),
     ("18000000", "dark", "InelasticDarkMatter"),
+    ("18000001", "dark", "RadBhabhaV0Control"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
@@ -118,8 +129,10 @@ _RegisteredSkims = [
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
 
     # --- WG9: Charmless B decays ---
-    ("19130100", "btocharmless", "CharmlessHad2Body"),
-    ("19130200", "btocharmless", "CharmlessHad3Body"),
+    ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130201", "btocharmless", "BtoHadTracks"),
+    ("19130300", "btocharmless", "BtoHad1Pi0"),
+    ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

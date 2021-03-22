@@ -131,7 +131,7 @@ def add_time_extraction(path, components=None):
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False):
+                                   merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 

@@ -23,7 +23,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/Environment.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
@@ -251,7 +250,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -869,9 +868,42 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
-    double isMC(const Particle*)
+    double isBBCrossfeed(const Particle* particle)
     {
-      return Environment::Instance().isMC();
+      if (particle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      int pdg = particle->getPDGCode();
+      if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
+      int nDaughters = daughters.size();
+      if (nDaughters <= 1)
+        return 0;
+      std::vector<int> mother_ids;
+
+      for (int j = 0; j < nDaughters; ++j) {
+        const MCParticle* curMCParticle = daughters[j]->getMCParticle();
+        while (curMCParticle != nullptr) {
+          pdg = curMCParticle->getPDG();
+          if (abs(pdg) == 511 || abs(pdg) == 521 || abs(pdg) == 531) {
+            mother_ids.emplace_back(curMCParticle->getArrayIndex());
+            break;
+          }
+          const MCParticle* curMCMother = curMCParticle->getMother();
+          curMCParticle = curMCMother;
+        }
+        if (curMCParticle == nullptr) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      }
+
+      std::set<int> distinctIDs = std::set(mother_ids.begin(), mother_ids.end());
+      if (distinctIDs.size() == 1)
+        return 0;
+      else
+        return 1;
     }
 
     VARIABLE_GROUP("MC matching and MC truth");
@@ -898,7 +930,8 @@ namespace Belle2 {
     // genMotherPDG and genMotherID are overloaded (each are two C++ functions
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
-
+    REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
+                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1043,8 +1076,6 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
-    REGISTER_VARIABLE("isMC", isMC,
-                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
 
   }
 }

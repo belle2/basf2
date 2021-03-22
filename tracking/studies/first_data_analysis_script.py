@@ -21,8 +21,7 @@ def get_output_file_name(file_name):
 
 
 if __name__ == "__main__":
-    basf2.reset_database()
-    basf2.use_central_database(os.environ["BASF2_GDT"])
+    basf2.conditions.override_globaltags([os.environ["BASF2_GDT"]])
 
     path = basf2.create_path()
 

@@ -11,11 +11,11 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics, \
-    set_nprocesses
+from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
+from svd import add_svd_create_recodigits
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
 
@@ -40,6 +40,10 @@ add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)
+
+# reconstruct SVDRecoDigits not used in reconstruction
+# but interesting for validation purposes
+add_svd_create_recodigits(main)
 
 # memory profile
 main.add_module('Profile')

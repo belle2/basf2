@@ -559,6 +559,7 @@ void CDCTriggerUnpackerModule::initialize()
     m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
+    m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHitsAll);
     m_NNInput2DFinderTracks.registerRelationTo(m_NeuroTracks);
     m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
     m_NeuroTracks.registerRelationTo(m_NeuroInputs);

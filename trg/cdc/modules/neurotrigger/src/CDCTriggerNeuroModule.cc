@@ -185,7 +185,7 @@ CDCTriggerNeuroModule::event()
       driftthreshold.push_back(!tsvector[k] || static_cast<bool>((puredriftth & (1 << k)) >> k));
     }
     int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
-    short quadrant;
+    short quadrant = 0;
     double tphi = m_tracks2D[itrack]->getPhi0();
     if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
     else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }

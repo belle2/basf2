@@ -99,7 +99,7 @@ Semileptonic skims
 Time-dependent CP-violation (TDCPV) analysis skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.tcpv
+.. automodule:: skim.tdcpv
     :members:
     :undoc-members:
 

@@ -47,6 +47,9 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
 {
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisTRGGDLModule::initialize()
@@ -80,6 +83,19 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   }
   m_c_pure_eff = new TCanvas("TRGGDL/hGDL_ana_pure_eff");
 
+
+
+#ifdef _BELLE2_EPICS
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  for (int i = 0; i < n_eff_shifter; i++) {
+    std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
+    // Read LO and HI limits from EPICS, seems this needs additional channels?
+    // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
 }
 
@@ -105,11 +121,11 @@ void DQMHistAnalysisTRGGDLModule::event()
     //fill efficiency values
     if (m_h_psn_extra[iskim]->GetBinContent(0 + 1) == 0)continue;
     if (m_h_psn_extra[iskim]->GetBinContent(5 + 1) == 0)continue;
-    m_h_eff[iskim]->SetBinContent(1,  m_h_psn_extra[iskim]->GetBinContent(1 + 1) / m_h_psn_extra[iskim]->GetBinContent(
+    m_h_eff[iskim]->SetBinContent(1,  m_h_psn_extra[iskim]->GetBinContent(1 + 1)  / m_h_psn_extra[iskim]->GetBinContent(
                                     5 + 1)); //fff with c4|hie
-    m_h_eff[iskim]->SetBinContent(2,  m_h_psn_extra[iskim]->GetBinContent(2 + 1) / m_h_psn_extra[iskim]->GetBinContent(
+    m_h_eff[iskim]->SetBinContent(2,  m_h_psn_extra[iskim]->GetBinContent(2 + 1)  / m_h_psn_extra[iskim]->GetBinContent(
                                     5 + 1)); //ffo with c4|hie
-    m_h_eff[iskim]->SetBinContent(3,  m_h_psn_extra[iskim]->GetBinContent(3 + 1) / m_h_psn_extra[iskim]->GetBinContent(
+    m_h_eff[iskim]->SetBinContent(3,  m_h_psn_extra[iskim]->GetBinContent(3 + 1)  / m_h_psn_extra[iskim]->GetBinContent(
                                     5 + 1)); //ffb with c4|hie
     m_h_eff[iskim]->SetBinContent(4,  m_h_psn_extra[iskim]->GetBinContent(19 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     5 + 1)); //ffy with c4|hie
@@ -117,6 +133,18 @@ void DQMHistAnalysisTRGGDLModule::event()
                                     5 + 1)); //fyo with c4|hie
     m_h_eff[iskim]->SetBinContent(6,  m_h_psn_extra[iskim]->GetBinContent(21 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     5 + 1)); //fyb with c4|hie
+    m_h_eff[iskim]->SetBinError(1,  sqrt(m_h_psn_extra[iskim]->GetBinContent(1 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //fff with c4|hie
+    m_h_eff[iskim]->SetBinError(2,  sqrt(m_h_psn_extra[iskim]->GetBinContent(2 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //ffo with c4|hie
+    m_h_eff[iskim]->SetBinError(3,  sqrt(m_h_psn_extra[iskim]->GetBinContent(3 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //ffb with c4|hie
+    m_h_eff[iskim]->SetBinError(4,  sqrt(m_h_psn_extra[iskim]->GetBinContent(19 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //ffy with c4|hie
+    m_h_eff[iskim]->SetBinError(5,  sqrt(m_h_psn_extra[iskim]->GetBinContent(20 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //fyo with c4|hie
+    m_h_eff[iskim]->SetBinError(6,  sqrt(m_h_psn_extra[iskim]->GetBinContent(21 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  5 + 1)); //fyb with c4|hie
 
     if (m_h_psn_extra[iskim]->GetBinContent(6 + 1) == 0)continue;
     m_h_eff[iskim]->SetBinContent(7,  m_h_psn_extra[iskim]->GetBinContent(27 + 1) / m_h_psn_extra[iskim]->GetBinContent(
@@ -149,10 +177,45 @@ void DQMHistAnalysisTRGGDLModule::event()
                                     6 + 1)); //lml12 with fff|ffo|ffb
     m_h_eff[iskim]->SetBinContent(21, m_h_psn_extra[iskim]->GetBinContent(40 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     6 + 1)); //lml13 with fff|ffo|ffb
-    m_h_eff[iskim]->SetBinContent(22, m_h_psn_extra[iskim]->GetBinContent(9 + 1) / m_h_psn_extra[iskim]->GetBinContent(
+    m_h_eff[iskim]->SetBinContent(22, m_h_psn_extra[iskim]->GetBinContent(9 + 1) /  m_h_psn_extra[iskim]->GetBinContent(
                                     0 + 1)); //bha3d with all
     m_h_eff[iskim]->SetBinContent(23, m_h_psn_extra[iskim]->GetBinContent(42 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     6 + 1)); //mu_b2b with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(7,  sqrt(m_h_psn_extra[iskim]->GetBinContent(27 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //hie with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(8,  sqrt(m_h_psn_extra[iskim]->GetBinContent(26 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //c4 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(9,  sqrt(m_h_psn_extra[iskim]->GetBinContent(28 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml0 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(10, sqrt(m_h_psn_extra[iskim]->GetBinContent(29 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml1 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(11, sqrt(m_h_psn_extra[iskim]->GetBinContent(30 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml2 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(12, sqrt(m_h_psn_extra[iskim]->GetBinContent(31 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml3 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(13, sqrt(m_h_psn_extra[iskim]->GetBinContent(32 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml4 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(14, sqrt(m_h_psn_extra[iskim]->GetBinContent(33 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml5 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(15, sqrt(m_h_psn_extra[iskim]->GetBinContent(34 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml6 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(16, sqrt(m_h_psn_extra[iskim]->GetBinContent(35 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml7 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(17, sqrt(m_h_psn_extra[iskim]->GetBinContent(36 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml8 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(18, sqrt(m_h_psn_extra[iskim]->GetBinContent(37 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml9 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(19, sqrt(m_h_psn_extra[iskim]->GetBinContent(38 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml10 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(20, sqrt(m_h_psn_extra[iskim]->GetBinContent(39 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml12 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(21, sqrt(m_h_psn_extra[iskim]->GetBinContent(40 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //lml13 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(22, sqrt(m_h_psn_extra[iskim]->GetBinContent(9 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  0 + 1));  //bha3d with all
+    m_h_eff[iskim]->SetBinError(23, sqrt(m_h_psn_extra[iskim]->GetBinContent(42 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //mu_b2b with fff|ffo|ffb
+
     if (m_h_psn_extra[iskim]->GetBinContent(14 + 1) == 0)continue;
     m_h_eff[iskim]->SetBinContent(24, m_h_psn_extra[iskim]->GetBinContent(48 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     14 + 1)); //mu_b2b with lml|eclmumu
@@ -178,7 +241,30 @@ void DQMHistAnalysisTRGGDLModule::event()
                                     14 + 1)); //fyo with lml|eclmumu
     m_h_eff[iskim]->SetBinContent(35, m_h_psn_extra[iskim]->GetBinContent(25 + 1) / m_h_psn_extra[iskim]->GetBinContent(
                                     14 + 1)); //fyb with lml|eclmumu
-
+    m_h_eff[iskim]->SetBinError(24, sqrt(m_h_psn_extra[iskim]->GetBinContent(48 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //mu_b2b with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(25, sqrt(m_h_psn_extra[iskim]->GetBinContent(49 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //mu_eb2b with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(26, sqrt(m_h_psn_extra[iskim]->GetBinContent(44 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //cdcklm1 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(27, sqrt(m_h_psn_extra[iskim]->GetBinContent(45 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  6 + 1)); //cdcklm2 with fff|ffo|ffb
+    m_h_eff[iskim]->SetBinError(28, sqrt(m_h_psn_extra[iskim]->GetBinContent(15 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //fff with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(29, sqrt(m_h_psn_extra[iskim]->GetBinContent(16 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //ffo with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(30, sqrt(m_h_psn_extra[iskim]->GetBinContent(17 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //ffb with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(31, sqrt(m_h_psn_extra[iskim]->GetBinContent(11 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //ff with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(32, sqrt(m_h_psn_extra[iskim]->GetBinContent(13 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //f with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(33, sqrt(m_h_psn_extra[iskim]->GetBinContent(23 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //ffy with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(34, sqrt(m_h_psn_extra[iskim]->GetBinContent(24 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //fyo with lml|eclmumu
+    m_h_eff[iskim]->SetBinError(35, sqrt(m_h_psn_extra[iskim]->GetBinContent(25 + 1)) / m_h_psn_extra[iskim]->GetBinContent(
+                                  14 + 1)); //fyb with lml|eclmumu
   }
   //fill efficiency for shifter
   m_h_eff_shifter->SetBinContent(1,  m_h_eff[1]->GetBinContent(0 + 1));  //fff with c4|hie
@@ -188,6 +274,14 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_h_eff_shifter->SetBinContent(5,  m_h_eff[1]->GetBinContent(6 + 1));  //hie with fff|ffo|ffb
   m_h_eff_shifter->SetBinContent(6,  m_h_eff[1]->GetBinContent(7 + 1));  //c4 with fff|ffo|ffb
   m_h_eff_shifter->SetBinContent(7,  m_h_eff[4]->GetBinContent(22 + 1)); //mu_b2b with lml|eclmumu
+  m_h_eff_shifter->SetBinError(1,  m_h_eff[1]->GetBinError(0 + 1));  //fff with c4|hie
+  m_h_eff_shifter->SetBinError(2,  m_h_eff[1]->GetBinError(1 + 1));  //ffo with c4|hie
+  m_h_eff_shifter->SetBinError(3,  m_h_eff[1]->GetBinError(3 + 1));  //ffy with c4|hie
+  m_h_eff_shifter->SetBinError(4,  m_h_eff[1]->GetBinError(4 + 1));  //fyo with c4|hie
+  m_h_eff_shifter->SetBinError(5,  m_h_eff[1]->GetBinError(6 + 1));  //hie with fff|ffo|ffb
+  m_h_eff_shifter->SetBinError(6,  m_h_eff[1]->GetBinError(7 + 1));  //c4 with fff|ffo|ffb
+  m_h_eff_shifter->SetBinError(7,  m_h_eff[4]->GetBinError(22 + 1)); //mu_b2b with lml|eclmumu
+
 
   //fill efficiency with offline selection
   m_h_psn_pure_extra = (TH1D*)findHist("TRGGDL/hGDL_psn_pure_extra_all");/**psn bits*/
@@ -230,15 +324,26 @@ void DQMHistAnalysisTRGGDLModule::event()
 
   m_c_eff_shifter->Clear();
   m_c_eff_shifter->cd();
+  m_c_eff_shifter->SetFillColor(0);
   m_h_eff_shifter->SetMaximum(1.1);
   m_h_eff_shifter->SetMinimum(0);
+  m_h_eff_shifter->SetLineWidth(2);
+  for (int i = 0; i < n_eff_shifter; i++) {
+    double eff = m_h_eff_shifter->GetBinContent(i + 1);
+    double err = m_h_eff_shifter->GetBinError(i + 1);
+    double eff_err_min = eff - 2 * err;
+    double eff_err_max = eff + 2 * err;
+    if ((eff_err_max < m_limit_low_shifter[i]) || (eff_err_min > m_limit_high_shifter[i])) m_c_eff_shifter->SetFillColor(2);
+  }
   m_h_eff_shifter->Draw();
   for (int i = 0; i < n_eff_shifter; i++) {
-    m_line_limit_low_shifter[i]-> SetLineColor(2);
+    m_line_limit_low_shifter[i]-> SetLineColor(1);
     m_line_limit_low_shifter[i]-> SetLineStyle(2);
+    m_line_limit_low_shifter[i]-> SetLineWidth(2);
     m_line_limit_low_shifter[i]-> Draw("same");
-    m_line_limit_high_shifter[i]->SetLineColor(2);
+    m_line_limit_high_shifter[i]->SetLineColor(1);
     m_line_limit_high_shifter[i]->SetLineStyle(2);
+    m_line_limit_high_shifter[i]-> SetLineWidth(2);
     m_line_limit_high_shifter[i]->Draw("same");
   }
   m_c_eff_shifter->Update();
@@ -250,6 +355,15 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_c_pure_eff->Update();
 
 
+#ifdef _BELLE2_EPICS
+  for (auto i = 0; i < n_eff_shifter; i++) {
+    double data;
+    data = m_h_eff_shifter->GetBinContent(i + 1);
+    if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+
 }
 
 void DQMHistAnalysisTRGGDLModule::endRun()
@@ -259,7 +373,12 @@ void DQMHistAnalysisTRGGDLModule::endRun()
 
 void DQMHistAnalysisTRGGDLModule::terminate()
 {
-
+#ifdef _BELLE2_EPICS
+  for (auto i = 0; i < n_eff_shifter; i++) {
+    if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   B2DEBUG(20, "terminate called");
 }
 

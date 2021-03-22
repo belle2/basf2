@@ -1,5 +1,4 @@
 import basf2 as b2
-b2.set_log_level(b2.LogLevel.INFO)
 
 import sys
 import datetime
@@ -12,6 +11,8 @@ from caf import strategies
 from caf.utils import IoV
 
 import svd as svd
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 now = datetime.datetime.now()
 

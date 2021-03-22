@@ -1,14 +1,13 @@
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
-    unpacker = register_module('CDCTriggerUnpacker')
+    unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
-        unpacker.logging.log_level = LogLevel.DEBUG
+        unpacker.logging.log_level = b2.LogLevel.DEBUG
         # increase this value to get debug mesages in more detail
         unpacker.logging.debug_level = debug_level
-        unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
@@ -33,11 +32,11 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
     path.add_module(unpacker)
 
 
-set_log_level(LogLevel.ERROR)
-use_database_chain()
-use_central_database("data_reprocessing_prod6")
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.use_database_chain()
+b2.use_central_database("data_reprocessing_prod6")
 
-main = create_path()
+main = b2.create_path()
 dstfiles = ['/hsm/belle2/bdata/Data/\
 release-02-01-00/DB00000438/prod00000006/e0003/4S/\
 r05613/all/dst/sub00/dst.physics.0003.05613.HLT2.f00000.root']
@@ -50,5 +49,5 @@ main.add_module('HistoManager',
 main.add_module('CDCTriggerDQM')
 main.add_module('Progress')
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

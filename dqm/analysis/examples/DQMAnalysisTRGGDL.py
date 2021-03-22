@@ -1,31 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import sys
+import basf2 as b2
 
 # Set log level.
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Create main path.
-main = create_path()
+main = b2.create_path()
 
 # Modules
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', '/group/belle2/phase3/dqm/dqmsrv1/e0014/dqmhisto/hltdqm_e0014r000822.root')
 main.add_module(inroot)
 
-trggdl_analysis = register_module('DQMHistAnalysisTRGGDL')
+trggdl_analysis = b2.register_module('DQMHistAnalysisTRGGDL')
 main.add_module(trggdl_analysis)
 
-output = register_module('DQMHistAnalysisOutputFile')
+output = b2.register_module('DQMHistAnalysisOutputFile')
 output.param('histogramDirectoryName', 'analysismodule')
 output.param('SaveHistos', False)
 output.param('SaveCanvases', True)
 main.add_module(output)
 
 # Process mian path.
-process(main)
+b2.process(main)
 
 # Statistics.
-print(statistics)
+print(b2.statistics)

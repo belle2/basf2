@@ -70,6 +70,11 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 {
   static DBObjPtr<TRGGDLDBInputBits> inputBits;
 
+  if (not inputBits) {
+    B2ERROR("The mapping of input trigger names does not exist in the given globaltags");
+    return c_trgWordSize * c_ntrgWords;
+  }
+
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
     if (std::string(inputBits->getinbitname((int)bit)) == name) {
       return bit;
@@ -83,6 +88,10 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
 {
   static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+  if (not ftdlBits) {
+    B2ERROR("The mapping of output trigger names does not exist in the given globaltags");
+    return c_trgWordSize * c_ntrgWords;
+  }
 
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
     if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {

@@ -86,7 +86,7 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
 
     # Get the expert configurations if you have something you might configure from them. It should always be available
-    expert_config = kwargs.get("expert_config")
+    # expert_config = kwargs.get("expert_config")
 
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.

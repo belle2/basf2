@@ -21,17 +21,13 @@ from basf2.pickle_path import serialize_path
 
 from ROOT.Belle2 import CalibrationAlgorithm
 
-from .utils import create_directories
-from .utils import method_dispatch
-from .utils import iov_from_runs
-from .utils import IoV_Result
-from .utils import get_iov_from_file
-from .utils import find_absolute_file_paths
-from .backends import Job
-from .backends import LSF
-from .backends import PBS
-from .backends import Local
-from .runners import AlgorithmsRunner
+from caf.utils import create_directories
+from caf.utils import method_dispatch
+from caf.utils import iov_from_runs
+from caf.utils import IoV_Result
+from caf.utils import get_iov_from_file
+from caf.backends import Job
+from caf.runners import AlgorithmsRunner
 
 
 class State():
@@ -310,11 +306,12 @@ class Machine():
         Runs the transition logic. Callbacks are evaluated in the order:
         conditions -> before -> <new state set here> -> after.
         """
-        source, dest, conditions, before_callbacks, after_callbacks = (transition_dict["source"],
-                                                                       transition_dict["dest"],
-                                                                       transition_dict["conditions"],
-                                                                       transition_dict["before"],
-                                                                       transition_dict["after"])
+        dest, conditions, before_callbacks, after_callbacks = (
+            transition_dict["dest"],
+            transition_dict["conditions"],
+            transition_dict["before"],
+            transition_dict["after"]
+        )
         # Returns True only if every condition returns True when called
         if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
             for before_func in before_callbacks:
@@ -523,12 +520,7 @@ class CalibrationMachine(Machine):
     def _resolve_file_paths(self):
         """
         """
-        if isinstance(self.collector_backend, Local) or \
-           isinstance(self.collector_backend, PBS) or \
-           isinstance(self.collector_backend, LSF):
-            B2INFO(f"Resolving absolute paths of input files for calibration: {self.calibration.name}.")
-            for collection in self.calibration.collections.values():
-                collection.input_files = [Path(p) for p in find_absolute_file_paths(collection.input_files)]
+        pass
 
     def _build_iov_dicts(self):
         """

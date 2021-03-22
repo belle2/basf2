@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from math import pi, tan
 import os
 import socket
 from subprocess import call
@@ -77,13 +75,13 @@ if not environment.getNumberEventsOverride():
     environment.setNumberEventsOverride(evtnum)
 
 # set random seed
-basf2.set_random_seed(seed)
+b2.set_random_seed(seed)
 # suppress messages and warnings during processing:
-# basf2.set_log_level(basf2.LogLevel.ERROR)
+# b2.set_log_level(b2.LogLevel.ERROR)
 
-main = basf2.create_path()
+main = b2.create_path()
 
-empty_path = basf2.create_path()
+empty_path = b2.create_path()
 
 # The root file is on KEKCC
 if read_data:
@@ -97,7 +95,7 @@ if not read_data:
     main.add_module('Geometry', components=['BeamPipe',
                                             'PXD', 'SVD', 'CDC',
                                             'MagneticFieldConstant4LimitedRCDC'])
-    particlegun = basf2.register_module('ParticleGun')
+    particlegun = b2.register_module('ParticleGun')
     particlegun.param(particlegun_params)
     main.add_module(particlegun)
 
@@ -117,26 +115,26 @@ if fast_tsf:
                     InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
                     OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
 
-firmtsf = register_module('CDCTriggerTSFFirmware')
+firmtsf = b2.register_module('CDCTriggerTSFFirmware')
 firmtsf.param('mergerOnly', merger_only)
-firmtsf.logging.log_level = basf2.LogLevel.DEBUG
+firmtsf.logging.log_level = b2.LogLevel.DEBUG
 firmtsf.logging.debug_level = 10
-firmtsf.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+firmtsf.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 main.add_module(firmtsf)
 
 # 2D finder
 
 # firm2d = register_module('CDCTrigger2DFinderFirmware')
-# firm2d.logging.log_level = basf2.LogLevel.DEBUG
+# firm2d.logging.log_level = b2.LogLevel.DEBUG
 # firm2d.logging.debug_level = 20
-# firm2d.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+# firm2d.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 # main.add_module(firm2d)
 
 if save_outout:
     main.add_module('RootOutput', outputFileName='tsfout.root')
 
 # Process events
-basf2.process(main)
+b2.process(main)
 
 # Print call statistics
-print(basf2.statistics)
+print(b2.statistics)

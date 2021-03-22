@@ -13,11 +13,13 @@ Execute script with:
 """
 
 import basf2
-from modularAnalysis import printDataStore
+import modularAnalysis as ma
 
 path = basf2.Path()
-path.add_module('RootInput')
-printDataStore(path=path)
+ma.inputMdst(environmentType='default',
+             filename=basf2.find_file('mdst14.root', 'validation', False),
+             path=path)
+ma.printDataStore(path=path)
 basf2.process(path)
 
 # @endcond

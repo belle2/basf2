@@ -1,15 +1,11 @@
-from basf2 import *
+import basf2 as b2
 
-import os
-import sys
 
-import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 data_dir = '/gpfs/fs02/belle2/users/dvthanh/201702_unpacked/'
 runs = []
 with open('runlist') as runlist:
@@ -22,7 +18,7 @@ input_files_test = [data_dir + f for f in runs]
 def main():
 
     def cdc_pre_algorithm(algorithm, iteration):
-        B2INFO("Running pre_algorithm function")
+        b2.B2INFO("Running pre_algorithm function")
         #        evtinfo = register_module('EventInfoSetter', evtNumList=[1], runList=[1630], expList=[1])
         #        gear = register_module('Gearbox')
         #        geom = register_module('Geometry', components=['CDC'])
@@ -32,7 +28,7 @@ def main():
 
     calibrations = []
     for i in range(1):
-        col_test = register_module('CDCCrudeT0Collector')
+        col_test = b2.register_module('CDCCrudeT0Collector')
         col_test.set_name('CDCCrudeT0{}'.format(i))  # Sets the prefix of the collected data in the datastore
         col_test.param('granularity', 'all')  # Allows us to execute algorithm over all data, in one big IoV
 

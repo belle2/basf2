@@ -57,6 +57,9 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
   addParam("usePriorityTiming", m_usePriorityTiming,
            "Use priority timing instead of fastest timing.",
            true);
+  addParam("useHighPassTimingList", m_useHighPassTimingList,
+           "Use associated fastest timings track-by-track",
+           true);
   addParam("t0CalcMethod", m_t0CalcMethod,
            "0: Nth fastest fastest time."
            "1: median of all timings."
@@ -65,9 +68,9 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
   addParam("arrivalOrder", m_arrivalOrder,
            "When t0CalcMethod == 0: Nth fastest ft is used as T0. (i.e. 0 is fastest)",
            (unsigned)(0));
-  addParam("timeWindowStart", m_timeWindowStart,
+  addParam("timeWindowBegin", m_timeWindowBegin,
            "When t0CalcMethod == 2: start time of time window relative to median. (in ns)",
-           (short)(-64));
+           (short)(40));
   addParam("timeWindowEnd", m_timeWindowEnd,
            "When t0CalcMethod == 2: end time of time window relative to median. (in ns)",
            (short)(0));
@@ -95,6 +98,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
            "Shift the Hough plane by 1/4 cell size in 1/r to avoid "
            "curvature 0 tracks (<0: shift in negative direction, "
            "0: no shift, >0: shift in positive direction).", 0);
+
   addParam("minHits", m_minHits,
            "Minimum hits from different super layers required in a peak cell.",
            (unsigned)(4));
@@ -117,9 +121,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
            "Switch to skip second priority hits.", false);
   addParam("usePriorityPosition", m_usePriority,
            "If true, use wire position of priority cell in track segment, "
-           "otherwise use wire position of center cell."
-           "Note that the real houghETF firmware will not receive the information of priority position.",
-           false);
+           "otherwise use wire position of center cell.", true);
   addParam("requireSL0", m_requireSL0,
            "Switch to check separately for a hit in the innermost superlayer.", false);
   addParam("storeHoughPlane", m_storePlane,
@@ -178,6 +180,10 @@ CDCTriggerHoughETFModule::initialize()
     layerId += (iSL > 0 ? 6 : 7);
   }
 
+  for (int sl = 1; sl < 9; sl++) {
+    NSecOffset[sl] = NSEC[sl - 1] + NSecOffset[sl - 1];
+  }
+
   if (m_testFilename != "") {
     testFile.open(m_testFilename);
   }
@@ -218,7 +224,7 @@ CDCTriggerHoughETFModule::event()
       testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
                << m_segmentHits[iHit]->getPriorityPosition() << endl;
     }
-    if (iSL % 2) continue; //ysue
+    if (iSL % 2) continue;
     if (m_ignore2nd && m_segmentHits[iHit]->getPriorityPosition() < 3) continue;
     double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
     if (m_usePriority) {

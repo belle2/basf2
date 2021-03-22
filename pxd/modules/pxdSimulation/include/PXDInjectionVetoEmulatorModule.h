@@ -31,10 +31,10 @@ namespace Belle2 {
 
   private:
 
-    /**  */
+    /** Initialize */
     void initialize() override final;
 
-    /**  */
+    /**  Event */
     void event() override final;
 
     /** The name of the StoreObjPtr of PXDInjectionBGTiming to be generated */

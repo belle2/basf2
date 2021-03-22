@@ -10,14 +10,12 @@ import basf2
 import modularAnalysis as mA
 import stdPi0s
 
-from ROOT import Belle2
-
 
 main_path = basf2.create_path()
 
 mA.inputMdstList(
     environmentType="default",
-    filelist=[Belle2.FileSystem.findFile("analysis/tests/mdst.root")],
+    filelist=[basf2.find_file("analysis/tests/mdst.root")],
     path=main_path,
 )
 

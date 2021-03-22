@@ -195,13 +195,13 @@ CDCTriggerRecoMatcherModule::event()
     auto range_recoTrackIds = recoTrackId_by_hitId.equal_range(hitId);
 
     // Assign the hits to the total vector
-    for (const pair<HitId, TrackId>& hitId_and_trgTrackId :
+    for (const pair<HitId, TrackId> hitId_and_trgTrackId :
          as_range(range_trgTrackIds)) {
       TrackId trgTrackId = hitId_and_trgTrackId.second;
       totalHits_by_trgTrackId(trgTrackId) += 1;
       B2DEBUG(200, " trgTrackId for total count: " << trgTrackId);
     }
-    for (const pair<HitId, TrackId>& hitId_and_recoTrackId :
+    for (const pair<HitId, TrackId> hitId_and_recoTrackId :
          as_range(range_recoTrackIds)) {
       TrackId recoTrackId = hitId_and_recoTrackId.second;
       totalHits_by_recoTrackId(recoTrackId) += 1;
@@ -209,9 +209,9 @@ CDCTriggerRecoMatcherModule::event()
     }
 
     // Count matrix entries for all combinations
-    for (const pair<HitId, TrackId>& hitId_and_recoTrackId :
+    for (const pair<HitId, TrackId> hitId_and_recoTrackId :
          as_range(range_recoTrackIds)) {
-      for (const pair<HitId, TrackId>& hitId_and_trgTrackId :
+      for (const pair<HitId, TrackId> hitId_and_trgTrackId :
            as_range(range_trgTrackIds)) {
         TrackId recoTrackId = hitId_and_recoTrackId.second;
         TrackId trgTrackId = hitId_and_trgTrackId.second;

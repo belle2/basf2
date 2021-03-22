@@ -53,7 +53,7 @@ def process(path, max_event=0):
 
 for name, x in original_basf2.__dict__.items():
     # We record function and fake Boost.Python.function objects
-    if inspect.isfunction(x) or isinstance(x, type(original_basf2.use_central_database)):
+    if inspect.isfunction(x) or isinstance(x, type(original_basf2.find_file)):
         mock_x = mock.Mock(x, side_effect=x)
         manager.attach_mock(mock_x, name)
         setattr(basf2_state_recorder, name, mock_x)

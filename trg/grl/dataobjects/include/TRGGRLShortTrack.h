@@ -49,7 +49,7 @@ namespace Belle2 {
 
   private:
 
-    /**Energy of the cluster*/
+    /**TSF ID used for the short track*/
     std::vector<int> m_TS_ID = std::vector<int>(0, 0);
 
     /**! The Class title*/

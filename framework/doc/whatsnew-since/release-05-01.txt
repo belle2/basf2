@@ -1,0 +1,31 @@
+Changes in the framework package since release-05-01
+----------------------------------------------------
+
+* Added ``b2help-modules`` which behaves identical to ``basf2 -m`` but more
+  in-keeping with the ``b2help-<something>`` theme.
+
+
+Conditions Database
++++++++++++++++++++
+
+* ``b2conditionsdb-tag-merge`` has been added to merge a number of globaltags into a single globaltag
+  in the order they are given. The result is equivalent to having multiple globaltags setup in the 
+  conditions access for basf2.
+* ``b2conditionsdb-tag-runningupdate`` has been added to calculate and apply the necessary updates to 
+  a running globaltag with a given staging globaltag.
+* ``b2conditionsdb-download`` has learned a new argument to clean all payload files not mentioned in
+  the database file from the download area.
+
+
+Tools
++++++
+
+* Added ``b2rundb-query`` to perform simple rundb queries from the command line.
+
+
+Python Interface
+++++++++++++++++
+
+* The `ANSIColors <terminal_utils.ANSIColors>` class has been added to the module `terminal_utils` to
+  very easily add color output to the terminal.
+* Added a `RunDB <rundb.RunDB>` class which makes writing scripts using the rundb more straightforward.

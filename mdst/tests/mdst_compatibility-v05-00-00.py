@@ -12,7 +12,12 @@ CHANGES since release-05-00-00:
   + ndf
   + chi2
 - TRGSummary:
-  * getTimQuality added
+  + getTimQuality added
+  + isPoissonInInjectionVeto()
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
+  + getInputBitNumber added
+  + getOutputBitNumber added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

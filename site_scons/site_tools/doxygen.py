@@ -38,12 +38,12 @@ def module_io(target, source, env):
         try:
             subprocess.run(['basf2', '--module-io', module],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=dir, timeout=60)
-        except:
+        except Exception:
             continue
         try:
             subprocess.run(['dot', module + '.dot', '-Tpng', '-o', module + '.png'],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=dir, timeout=60)
-        except:
+        except Exception:
             pass
 
     return None
@@ -75,7 +75,7 @@ def doxygen_groups(target, source, env):
 
 /** @defgroup {package}_dataobjects {package} data objects
  *  @ingroup {package}
- *  @ingroup Dataobjects
+ *  @ingroup DataObjects
  */
 
 /** @defgroup {package}_modules {package} modules
@@ -101,7 +101,7 @@ moduleio = Builder(action=module_io, emitter=module_io_emitter)
 moduleio.action.cmdstr = '${MODULEIOCOMSTR}'
 
 # define builder for doxygen
-doxygen = Builder(action=f'doxygen $SOURCE 2>&1 > build/doxygen.log | sed "s;^{os.environ["BELLE2_LOCAL_DIR"]}/;;g" 1>&2',
+doxygen = Builder(action=f'doxygen $SOURCE 2>&1 > build/doxygen.log | sed "s;^{os.environ.get("BELLE2_LOCAL_DIR", "")}/;;g" 1>&2',
                   emitter=lambda target, source, env: (['build/doxygen/html/index.html'], source))
 
 

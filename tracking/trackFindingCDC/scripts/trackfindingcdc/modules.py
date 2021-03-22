@@ -1,9 +1,6 @@
 import basf2
 import numpy as np
 
-import ROOT
-
-
 from ROOT import Belle2
 
 
@@ -102,7 +99,7 @@ class HitCleaner(basf2.Module):
         for track in tracks:
             # Store all Hit IDs and reset the track
             hitIDs = track.getHitIDs(Belle2.Const.CDC)
-            hits = [cdc_hits[i] for i in hitIDs]
+            # hits = [cdc_hits[i] for i in hitIDs]
             good_hits = []
 
             relation_track_particle = [0] * mc_particles.getEntries()
@@ -117,7 +114,7 @@ class HitCleaner(basf2.Module):
 
             deleted_hits = sum(relation_track_particle) - relation_track_particle[should_belong_to_track]
 
-            plane_IDs_of_good_hits = []
+            # plane_IDs_of_good_hits = []
             for i, hitID in enumerate(hitIDs):
                 current_mc_track = cdc_hit_lookup.getMCTrackId(cdc_hits[hitID])
                 if current_mc_track == should_belong_to_track:
@@ -138,11 +135,12 @@ class HitCleaner(basf2.Module):
                 zStartingPosition = mc_trajectory.getTrajectorySZ().mapSToZ(sStartingPosition)
                 mc_trajectory.setLocalOrigin(Belle2.TrackFindingCDC.Vector3D(startingPosition.xy(), zStartingPosition))
 
-                pos = ROOT.TVector3(mc_trajectory.getSupport().x(), mc_trajectory.getSupport().y(), mc_trajectory.getSupport().z())
-                mom = ROOT.TVector3(
-                    mc_trajectory.getMom3DAtSupport().x(),
-                    mc_trajectory.getMom3DAtSupport().y(),
-                    mc_trajectory.getMom3DAtSupport().z())
+                # pos = ROOT.TVector3(
+                #     mc_trajectory.getSupport().x(), mc_trajectory.getSupport().y(), mc_trajectory.getSupport().z())
+                # mom = ROOT.TVector3(
+                #     mc_trajectory.getMom3DAtSupport().x(),
+                #     mc_trajectory.getMom3DAtSupport().y(),
+                #     mc_trajectory.getMom3DAtSupport().z())
 
                 # track.setPosMomSeedAndPdgCode(pos, mom , int(mc_track.getChargeSeed() * 211))
                 track.setPdgCode(int(track.getChargeSeed() * 211))

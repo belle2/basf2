@@ -742,6 +742,7 @@ C HV IS DEFINED FOR TAU-    WITH GAMMA=B+HV*POL
         DO  I=1,3
          HV(I)=0.0
         ENDDO
+        HV(4)=1.0
         AMPLIT= GFERMI**2       
 
       ELSEIF (IME.EQ.1) THEN ! flat phase space
@@ -749,6 +750,7 @@ C        FLAT PHASE SPACE ONLY;
         DO  I=1,3
          HV(I)=0.0
         ENDDO
+        HV(4)=1.0
         AMPLIT=GFERMI**2 
         RETURN
       ELSE
@@ -1350,7 +1352,7 @@ C ----------------------------------------------------------------------
       COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
-
+      REAL*4  RR1(1)    ! RANMAR generates floats
       REAL  HV(4),PN(4),PAA(4),PIM1(4),PIM2(4),PIPL(4),PNPI(4,9)
 C --- MASSES OF THE DECAY PRODUCTS
        AMP1=DCDMAS(IDFFIN(1,JNPI),0)
@@ -1371,6 +1373,16 @@ C MATRIX ELEMENT NUMBER:
          PNPI(I,2)=PIM2(I)
          PNPI(I,3)=PIPL(I)
       ENDDO
+      IF (MNUM.EQ.21) THEN ! symmetrize 
+         CALL KKMC_RANMAR(RR1,1)
+         IF (RR1(1).GT.0.5) THEN
+            DO I=1,4
+               PNPI(I,1)=PIPL(I)
+               PNPI(I,2)=PIM2(I)
+               PNPI(I,3)=PIM1(I)
+            ENDDO    
+         ENDIF
+      ENDIF
       END
 
 
@@ -1681,6 +1693,17 @@ C PARTIAL WIDTH CONSISTS OF PHASE SPACE AND AMPLITUDE
 !      if (mnum.gt.7) write(*,*) 'mnumy=',mnum
 
       DGAMT=1/(2.*AMTAUD)*AMPLIT*PHSPAC
+!      IF(DGAMT.LT.0.0) write(*,*) 'AMPLIT PHSPAC= ',AMPLIT,' ',PHSPAC
+!      If(amplit.lt.0.0) then
+!         write(*,77) 'PTR: ', PTR(1),   PTR(2),  PTR(3),  PTR(4)
+!         write(*,77) 'PNT: ', PNR(1),   PNR(2),  PNR(3),  PNR(4)
+!         write(*,77) 'PIM1R: ',PIM1R(1),PIM1R(2),PIM1R(3),PIM1R(4)
+!         write(*,77) 'PIM2R: ',PIM2R(1),PIM2R(2),PIM2R(3),PIM2R(4)
+!         write(*,77) 'PIPLR: ',PIPLR(1),PIPLR(2),PIPLR(3),PIPLR(4)
+!         write(*,*) '====================== '
+!      endif
+!      ENDIF
+! 77   format(A,'     ',4(' ',F12.9))
       END
  
       SUBROUTINE TAUGETSIGN(SIGN)
@@ -1933,11 +1956,17 @@ C for 4pi phase space, need lots more trials at initialization,
 C or use the WTMAX determined with many trials for default model:
         NTRIALS = 5000
 C cleo knew nothing about channels recently introduced
-        IF (JNPI.LE.4) THEN
+        IF (JNPI.LE.2) THEN
 C         11.Oct.11: fix for BINP and KARLSRUHE currents added
           WTMAX(JNPI) = PKORB(3,37+JNPI)
           NTRIALS = 20000
         END IF
+        IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
+          NTRIALS = 50000
+        ENDIF
+        IF (JNPI.GE.NM4+NM5+NM6+47.AND.JNPI.LE.NM4+NM5+NM6+48) THEN
+           NTRIALS = 50000
+        ENDIF          
 !       write(*,*) 'jnpi=',jnpi, ntrials, a
         DO  I=1,NTRIALS
 
@@ -2151,7 +2180,7 @@ C
      &      +(GV**2-GA**2)*AMTAU*AMF0*AMF1**2
         DO 40 I=1,3
 40      HV(I)=2*GA*GV*AMTAU*(2*PKK(I)*QXN-PNU(I)*AMF1**2)/BRAK
-        HV(4)=1
+        HV(4)=1.0
 
 C WARNING: 2-BODY PHASE SPACE FACTOR IS INCLUDED !
 
@@ -2178,6 +2207,7 @@ C CALL ALTERN1(INUM,PNU,PKK,GAMM,HV)
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
         ENDIF
 
        ELSEIF (IME.EQ.4) THEN
@@ -2188,18 +2218,26 @@ C CALL ALTERN1(INUM,PNU,PKK,GAMM,HV)
      $             -4*AMF1**2*AMF0**2           )/AMTAU**2
        ENDIF
        ELSEIF (IME.EQ.5) THEN       
-         CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
+          CALL DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,BRAK,HV)
+C we introduce ad hoc normalization factor (GFERMI**2*AMTAU**4),
+C to have couplings relative to W   boson mediated ones
+          GAMM=(GFERMI**2*AMTAU**4)/(16.*PI)*AMTAU**3*
+     $        (BRAK/AMTAU**4)*
+     $        SQRT((AMTAU**2-AMF1**2-AMF0**2)**2
+     $             -4*AMF1**2*AMF0**2           )/AMTAU**2
          RETURN
        ELSEIF (IME.EQ.0) THEN    ! not initialized
          GAMM=GFERMI**2
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
        ELSE    ! any other; flat phase space
          GAMM=GFERMI**2
          DO  I=1,3
           HV(I)=0.0
          ENDDO
+         HV(4)=1.0
        ENDIF
 
       END
@@ -2253,8 +2291,9 @@ C
       REAL*8 RR1,RR2,RR3,RR4,RR5,PREZ
       REAL*8 X,Y,Z,XLAM,PI
       REAL*8 PRC2, AMKUBA, GKUBA  ! locally defined presampling resonance 
-      REAL*8 PRFIR,PRSEC ! probabilities of first and second channel in the mass of 3
-
+      REAL*8 PRFIR,PRSEC        ! probabilities of first and second channel in the mass of 3
+      REAL*8  AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
 C --- Variables below are arguments of this or other routines
       REAL*4 HV(4),PNR(4),PAAR(4),PMULT(4,9)
       REAL*4 PIZR(4),PIM1R(4),PIM2R(4),PIPLR(4),PT(4)
@@ -2269,7 +2308,10 @@ C --- Variables below are arguments of this or other routines
       PRC2=0.0d0     ! Probability for two scalars resonance presampler
       AMKUBA=0.001d0 ! Its mass
       GKUBA=0.001d0  ! and width
-      
+      IF (AMDARK.GT.1.0D-6) THEN
+         AMKUBA = AMDARK
+         GKUBA  = GMDARK
+      ENDIF         
       PRFIR=0.5d0
       PRSEC=0.5d0
 C --- Correction to generation channels for decays of different 1st and 2nd particle
@@ -2290,6 +2332,7 @@ C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       AMP4=DCDMAS(IDFFIN(4,JNPI),0)    ! mass for  PIZ
 
       IF (AMP3+AMP4.LE.0.002d0) PRC2=0.8d0 ! only for electron pair in final state
+      IF (AMDARK.GT.1.0D-6)     PRC2=0.8d0 ! also for dark photons in final state
  
       CALL CHOICE4(JNPI,PROB1,PROB2,AMROP,GAMROP,AMRX,GAMRX)
 
@@ -4111,8 +4154,49 @@ C            4- default ME wrapped curr., 5- wrapped ME
       END
 
 
-      SUBROUTINE DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,GAMM,HV)
+      SUBROUTINE DAM1PI_wrap(INUM,PNU,AMF0,PKK,AMF1,OMEGA,HV)
       REAL  PKK(4),PNU(4),HV(4)
+C
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+C
+      REAL    AMINVI            ! mass
+      INTEGER ISPNVI            ! spin
+      REAL    VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      COMMON /AMINVI/ AMINVI,ISPNVI,VCINVI,ACINVI
+C
+      REAL  QN
+C
+      IF (INUM.NE.70.AND.INUM.NE.71) RETURN
+C
+      QN = PKK(4) * PNU(4)
+     $   - PKK(1) * PNU(1) - PKK(2) * PNU(2)- PKK(3) * PNU(3)
+
+!     Following is written for covariant vectors HV(k) (namely h_i, likewise 3.25 Comp. Phys. Commun. 64 (1991) 275).
+!     It is assumed that HV(4) corresponds to h_0
+
+      IF (ISPNVI.EQ.0) THEN     ! scalar case
+         OMEGA = 2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
+     $         + 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU
+         DO K=1,3
+            HV(K)= 4 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
+         ENDDO
+         HV(4)=1
+      ELSEIF (ISPNVI.EQ.1) THEN ! vector case
+         OMEGA = 2 * (2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
+     $              - 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU )
+         DO K=1,3
+            HV(K)= 8 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
+         ENDDO
+         HV(4)=1
+      ENDIF
       RETURN
       END
 
@@ -4138,28 +4222,47 @@ C            4- default ME wrapped curr., 5- wrapped ME
       RETURN
       END
 
-      SUBROUTINE DAM3PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,AMPLIT1,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4), FPI, FPIc, VUD, CE
-      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
-     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
-     *                 ,AMK,AMKZ,AMKST,GAMKST
-C
-      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
-     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
-     *                 ,AMK,AMKZ,AMKST,GAMKST
+      SUBROUTINE DAM3PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
+      IMPLICIT NONE
+      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4),FPI,FPIc,VUD,CE,AMPLIT
+      REAL*8 PTD(4),PND(4),PIM1D(4),PIM2D(4),PIM3D(4),AMPLITD,HVD(4)
+      INTEGER MNUM, I, IFLAG
+      COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD             
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D                
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD                           
+C                                                                       
+      REAL*8            AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD             
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D                
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD                           
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      EXTERNAL eepi, mumupi
-      DATA  FPIc /93.3E-3/ 
+      REAL*8          AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
+      EXTERNAL eepi
+      DATA  FPIc /93.3E-3/
+      DO I = 1,4
+         PTD(I) = PT(I)
+         PND(I) = PN(I)
+         PIM1D(I)=PIM1(I)
+         PIM2D(I)=PIM2(I)
+         PIM3D(I)=PIM3(I)
+      ENDDO
+      IFLAG = 0
       IF (MNUM.EQ.47) THEN
-         CALL eepi(AMEL,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
+         CALL eepi(AMDARK,GMDARK,AMELD,AMPID,PTD,PND,PIM1D,PIM2D,PIM3D,AMPLITD,HVD,IFLAG)
       ELSE IF (MNUM.EQ.48) THEN
-         CALL mumupi(AMMU,PT,PN,PIM1,PIM2,PIM3,AMPLIT,HV)
+         CALL eepi(AMDARK,GMDARK,AMMUD,AMPID,PTD,PND,PIM1D,PIM2D,PIM3D,AMPLITD,HVD,IFLAG)
       ENDIF
       FPI = FPIc
       VUD = CCABIB 
-      CE = 16.*GFERMI * GFERMI * AMTAU * AMTAU * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
-      AMPLIT1 = AMPLIT * CE
+      CE = 16.*GFERMI * GFERMI * AMTAUD * AMTAUD * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
+      AMPLIT = AMPLITD * CE
+      IF (AMDARK.GT.1.0D-6) THEN
+         AMPLIT = AMPLIT*EPDARK**2*16.
+      ENDIF
+      DO I = 1,4
+         HV(I) = HVD(I)
+      ENDDO
       RETURN
       END
 
@@ -4169,21 +4272,40 @@ C
       RETURN
       END
 
-      SUBROUTINE DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT1,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4),PIM4(4)
-      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
-     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
-     *                 ,AMK,AMKZ,AMKST,GAMKST
-C
-      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
-     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
-     *                 ,AMK,AMKZ,AMKST,GAMKST
+      SUBROUTINE DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
+      IMPLICIT NONE
+      INTEGER MNUM,I
+      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4),PIM3(4),PIM4(4),AMPLIT
+      REAL*8  PTD(4),PND(4),PIM1D(4),PIM2D(4),PIM3D(4),PIM4D(4),AMPLITD,HVD(4)
+      COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD             
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D                
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD                           
+C                                                                       
+      REAL*8            AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD             
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D                
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD                           
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*8          AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
       EXTERNAL eemu
       IF (MNUM.GE.3.AND.MNUM.LE.6) THEN
-         CALL eemu(AMTAU,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
-         AMPLIT1=AMPLIT* 32.*(GFERMI * GFERMI / 2.0)*4.*(16.*ACOS(-1.) * ACOS(-1.) / 137. / 137.);
+         DO I=1,4
+            PTD(I)=PT(I)
+            PND(I)=PN(I)
+            PIM1D(I)=PIM1(I)
+            PIM2D(I)=PIM2(I)
+            PIM3D(I)=PIM3(I)
+            PIM4D(I)=PIM4(I)
+         ENDDO
+         CALL eemu(AMDARK,GMDARK,AMTAUD,PTD,PND,PIM1D,PIM2D,PIM3D,PIM4D,AMPLITD,HVD)
+         AMPLIT=AMPLITD* 32.*(GFERMI * GFERMI / 2.0)*4.*(16.*ACOS(-1.) * ACOS(-1.) / 137. / 137.)
+         IF (AMDARK.GT.1.0D-6) THEN
+            AMPLIT = AMPLIT*EPDARK**2*16.
+         ENDIF
+         DO I=1,4
+            HV(I)=HVD(I)
+         ENDDO
       ENDIF
       RETURN
       END

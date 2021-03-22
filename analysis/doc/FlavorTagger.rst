@@ -10,6 +10,12 @@ flavor of the not reconstructed :math:`B^0` meson in events with a neutral
 :math:`B` meson pair. It can be used also in addition to continuum suppression in events
 with a charged :math:`B` meson pair.
 
+.. tip:: For an introductory hands-on lesson, take a look at :numref:`onlinebook_flavor_tagging`.
+
+.. seealso:: For a more detailed introduction, take a look at
+
+  * `First flavor tagging calibration using 2019 Belle II data (2008.02707) <https://arxiv.org/abs/2008.02707>`_
+  * `BELLE2-NOTE-PH-2020-013 <https://docs.belle2.org/record/1905>`_
 
 Flavor Tagging Principle
 ------------------------
@@ -20,12 +26,12 @@ the flavor of the latter at the time of its decay. The different signatures of
 flavor specific decay channels can be grouped into categories. Up to now we
 have developed 13 categories for the following signatures:
 
- 
+
 
 Electron:
       In the decay :math:`b \to X e^- (b \to c e^- \bar\nu)` the charge of the electron tags unambiguously the flavor of the B Meson.
 IntermediateElectron:
-      In the decay :math:`b \to X_c X \to X e^+ (b \to c \to s e^+ \nu)` the charge of the secondary electron (se) tags the B flavor. 
+      In the decay :math:`b \to X_c X \to X e^+ (b \to c \to s e^+ \nu)` the charge of the secondary electron (se) tags the B flavor.
 Muon:
       In the decay :math:`b \to X \mu- (b \to c \mu^- \bar\nu)` the charge of the muon tags the flavor.
 IntermediateMuon:
@@ -39,7 +45,7 @@ IntermediateKinLepton:
 Kaon:
       In the decay :math:`b \to X K^- (b \to c \to s)` the charge of the Kaon is the searched flavour signature.
 FastHadron:
-      In the decay :math:`b \to X^+ \pi^- (K^-)`  the charge of the pion (Kaon) tags the flavor of the B Meson.  
+      In the decay :math:`b \to X^+ \pi^- (K^-)`  the charge of the pion (Kaon) tags the flavor of the B Meson.
 SlowPion:
       In the decay :math:`b \to X D^{*+} \to X D^0 \pi^+ (b \to c )` the charge of the slow pion tags the flavor.
 MaximumP*:
@@ -50,17 +56,17 @@ KaonPion:
       In the decay :math:`b \to X D^{*+} \to X \pi^+ D^0 \to X K^- \pi^+ (b \to c \to s)` the
       charges of the Kaon and the slow pion provide a combined flavour signature.
 FastSlowCorrelated (FSC):
-      Slow pions from :math:`D^{*\pm}` and high momentum primary particles, e.g. :math:`\overline{B^0} \to D^{*+} e^- \bar\nu \to X \pi^+ e^-` , 
+      Slow pions from :math:`D^{*\pm}` and high momentum primary particles, e.g. :math:`\overline{B^0} \to D^{*+} e^- \bar\nu \to X \pi^+ e^-` ,
       provide a combined flavour signature.
 Lambda:
-      In the decay :math:`b \to \Lambda_c^* X \to \Lambda X \to X p \pi^- (b \to c \to s)` 
+      In the decay :math:`b \to \Lambda_c^* X \to \Lambda X \to X p \pi^- (b \to c \to s)`
       the flavor of the Lambda tags the flavor of the B. For this, a proton and a
       pion are reconstructed to a Lambda.
 
 In the following the particles providing the flavor tag information, i.e. the
 flavor signatures, are denoted as target.
 
-Below: Simple draft (no physical magnitudes) to illustrate the different decays providing the 
+Below: Simple draft (no physical magnitudes) to illustrate the different decays providing the
 signatures belonging to the different categories.
 
 
@@ -74,13 +80,13 @@ signatures belonging to the different categories.
 .. note::
    Decays with intermediate resonances that provide flavor information are
    correctly considered as signal. E.g., :math:`\bar{B_0} \to D_1^+ \to D^{*+} \to D^+ \to K_{10} \to K^{0*} \to K^-`.
-   
+
    The Kaon and the Intermediate Lepton categories consider mesonic and baryonic
-   decays via :math:`b \to c \to s` transitions. E.g., 
+   decays via :math:`b \to c \to s` transitions. E.g.,
    :math:`b \to \Sigma_{\bar{c}} \to \Lambda_{\bar{c}}^+ \to K^- p \pi^+ (\Lambda \ell^+ p \nu_{\ell})`.
-   
+
    The FastHadron category considers also intermediate resonances and single tau
-   daughters (kinematically similar). E.g., 
+   daughters (kinematically similar). E.g.,
    :math:`b \to \tau^- (\to \rho^-) \to \pi^-, b \to \tau^- (\to K^{*-}) \to K^-`.
 
 Flavor Tagger Algorithm
@@ -143,7 +149,7 @@ FlavorTagInfo data object, all flavor tagger extraInfos are then deleted. The
 user can decide which information is saved in the Ntuples. If specified, also
 the inputs of the combiner are saved.
 
-For more information see 
+For more information see
 `BELLE2-PTHESIS-2018-003 <https://docs.belle2.org/record/1215/files/BELLE2-PTHESIS-2018-003.pdf>`_.
 
 
@@ -157,24 +163,24 @@ analysis/examples/tutorials/B2A801-FlavorTagger.py
 At the beginning of your steering file you have to import:
 
 ::
-  
+
   import flavorTagger as ft
 
 Do not forget to buildRestOfEvent for your ``B0`` recoParticle before calling the flavor tagger.
 
 If you just want to use the flavor tagger as standard user you need only:
 
-:: 
+::
 
   ft.flavorTagger( particleLists=['B0:yourSignalBlist'], weightFiles='B2nunubarBGx1')
 
 and to add the ``flavor_tagging`` variables to your nTuple as explained below. BGx1 stays for MC generated
 with machine Background. Only BGx1 files are provided centrally.
- 
-The current flavor tagger is trained with MC samples for the signal channel 
+
+The current flavor tagger is trained with MC samples for the signal channel
 :math:`B^0 \to \overline{\nu}\nu` which has
 no built-in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
-on the tag side. 
+on the tag side.
 
 The full interface of :func:`flavorTagger` function has 10 possible arguments and it is described below.
 
@@ -182,8 +188,8 @@ The full interface of :func:`flavorTagger` function has 10 possible arguments an
 Saving to nTuples
 -----------------
 
-The flavor tagger provides the output of the two combiners and the outputs 
-of the 13 categories. It provides also the MC information relevant for the categories. 
+The flavor tagger provides the output of the two combiners and the outputs
+of the 13 categories. It provides also the MC information relevant for the categories.
 To save this information you just have to add the predefined list
 ``ft.flavor_tagging``
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
@@ -207,7 +213,7 @@ is saved is `isRelatedRestOfEventB0Flavor`.
 The goal of this variable is to return the value +1(-1) for a :math:`B^0 (\overline{B}^0)` on the tag side checking the MC.
 But technically this is not trivial at all. The variable calculation performs the following steps:
 
-1. Check the MC matching of :math:`B^0_{\rm sig}`. It means MC :math:`B^0_{\rm sig}` corresponds to RECO :math:`B^0_{\rm sig}`. 
+1. Check the MC matching of :math:`B^0_{\rm sig}`. It means MC :math:`B^0_{\rm sig}` corresponds to RECO :math:`B^0_{\rm sig}`.
    If correctly matched then:
 2. Loop over all tracks in the ROE and get for each one the related mc particle.
 3. Check all mothers (grand-, grandgrandmother, and so on) of each one of
@@ -219,13 +225,13 @@ But technically this is not trivial at all. The variable calculation performs th
 
 The variable has several output values. The meaning  are the following:
 
-  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`: 
+  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
     *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
   * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC :math:`B^0_{\rm sig}`:
     *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
-  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side. 
+  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
     It means, either there are no tracks in ROE, or among the MC particles
     (and also their ancestors) that are related to the
     ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
@@ -238,9 +244,9 @@ The variable has several output values. The meaning  are the following:
     not work well at all and one could think for an instant that the flavor tagger
     is under or overestimating the dilution.
 
-The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the 
-accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched 
-:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the
+accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched
+:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional information about individual categories are saved using the aliases
@@ -279,7 +285,7 @@ or not (with exceptions for kaons).
 Efficiency Calculation and Validation Plots
 -------------------------------------------
 
-If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script 
+If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script
 analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving your file and the ntuple tree name as arguments:
 
 ::
@@ -295,13 +301,13 @@ An example tutorial for normal use can be found under:
 
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
-Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_ 
+Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_
 at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
 
-As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged. 
+As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
 You find them under:
 
 ::
@@ -311,7 +317,7 @@ You find them under:
 You can train and test the flavor tagger, and evaluate its performance by yourself running:
 
 ::
-  
+
   sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1 yourPathForWeightFiles yourPathForAnalyzedMdst
 
 Note:
@@ -319,7 +325,7 @@ Note:
 The convention is BGx0 for no machine background and BGx1 for MC with machine background. The process is defined in:
 
 ::
- 
+
   flavorTaggerVertexingValidation.py
 
 

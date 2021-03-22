@@ -4,7 +4,7 @@
 import unittest
 from basf2 import create_path
 from stdHyperons import stdXi, stdXi0, stdOmega, goodXi, goodXi0, goodOmega
-from itertools import product
+from b2bii import setB2BII, unsetB2BII
 
 
 class TestStdHyperons(unittest.TestCase):
@@ -48,14 +48,13 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi(self):
         """Check stdXi"""
-        for fitter, b2bii in product(['KFit', 'TreeFit'], [True, False]):
-            self.assertTrue(self._check_list(lambda path: stdXi(fitter=fitter, b2bii=b2bii, path=path), expected_lists=['Xi-:std']))
+        for fitter in ['KFit', 'TreeFit']:
+            self.assertTrue(self._check_list(lambda path: stdXi(fitter=fitter, path=path), expected_lists=['Xi-:std']))
         # Also serves as a test for _check_list
         self.assertFalse(
             self._check_list(
                 lambda path: stdXi(
                     fitter='TreeFit',
-                    b2bii=False,
                     path=path),
                 expected_lists=['Xi-:good']))
         # Allow spaces in particle list
@@ -63,31 +62,59 @@ class TestStdHyperons(unittest.TestCase):
             self._check_list(
                 lambda path: stdXi(
                     fitter='TreeFit',
-                    b2bii=False,
                     path=path),
                 expected_lists=['Xi-  : std']))
 
+    def test_stdXi_b2bii(self):
+        """Check stdXi for B2BII settings"""
+        setB2BII()
+        for fitter in ['KFit', 'TreeFit']:
+            self.assertTrue(self._check_list(lambda path: stdXi(fitter=fitter, path=path), expected_lists=['Xi-:std']))
+        unsetB2BII()
+
     def test_stdXi0(self):
         """Check stdXi0"""
-        for gamma_efficiency, b2bii in product(['eff20', 'eff30', 'eff40', 'eff50', 'eff60'], [True, False]):
+        for gamma_efficiency in ['eff20', 'eff30', 'eff40', 'eff50', 'eff60']:
             self.assertTrue(
                 self._check_list(
                     lambda path: stdXi0(
                         gammatype=gamma_efficiency,
-                        b2bii=b2bii,
                         path=path),
                     expected_lists=['Xi0:std']))
 
+    def test_stdXi0_b2bii(self):
+        """Check stdXi0 for B2BII settings"""
+        setB2BII()
+        for gamma_efficiency in ['eff20', 'eff30', 'eff40', 'eff50', 'eff60']:
+            self.assertTrue(
+                self._check_list(
+                    lambda path: stdXi0(
+                        gammatype=gamma_efficiency,
+                        path=path),
+                    expected_lists=['Xi0:std']))
+        unsetB2BII()
+
     def test_stdOmega(self):
-        """Check stdXi"""
-        for fitter, b2bii in product(['KFit', 'TreeFit'], [True, False]):
+        """Check stdOmega"""
+        for fitter in ['KFit', 'TreeFit']:
             self.assertTrue(
                 self._check_list(
                     lambda path: stdOmega(
                         fitter=fitter,
-                        b2bii=b2bii,
                         path=path),
                     expected_lists=['Omega-:std']))
+
+    def test_stdOmega_b2bii(self):
+        """Check stdOmega for B2BII settings"""
+        setB2BII()
+        for fitter in ['KFit', 'TreeFit']:
+            self.assertTrue(
+                self._check_list(
+                    lambda path: stdOmega(
+                        fitter=fitter,
+                        path=path),
+                    expected_lists=['Omega-:std']))
+        unsetB2BII()
 
     def test_goodXi(self):
         """Check goodXi lists: veryloose, loose, tight"""

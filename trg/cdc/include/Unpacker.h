@@ -34,7 +34,7 @@ namespace Belle2 {
     static constexpr int T2DOutputWidth = T2D_TO_3D_WIDTH; // 747
     static constexpr unsigned lenTS = 21;   // ID (8 bit) + t (9 bit) + LR (2 bit) + priority (2 bit)
 
-    static constexpr int nMax2DTracksPerClock = 6;
+    static constexpr int nMax2DTracksPerClock = 4;
 
     // bit width of the clock counter
     static constexpr int clockCounterWidth = 9;
@@ -1228,8 +1228,8 @@ namespace Belle2 {
           }
           B2DEBUG(21, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
           if (p_nnenable.data == "1") {
-            std::vector<bool> foundoldtrack;
-            std::vector<bool> driftthreshold;
+            std::vector<bool> foundoldtrack{false};
+            std::vector<bool> driftthreshold{false};
             bool valstereobit;
             if (p_foundoldtrack.name != "None") {
               foundoldtrack = decodefoundoldtrack(p_foundoldtrack.data);
@@ -1267,7 +1267,7 @@ namespace Belle2 {
               const auto& ts = trk2D.ts[iAx];
               if (ts[3] > 0) {
                 CDCTriggerSegmentHit* hit =
-                  addTSHit(ts, 2 * iAx, iTracker, tsHits, iclock);
+                  addTSHit(ts, 2 * iAx, iTracker, tsHitsAll, iclock);
                 unsigned iTS = TSIDInSL(ts[0], iAx * 2, iTracker);
                 tsstr += "(SL" + std::to_string(iAx * 2) + ", " + std::to_string(iTS) + ", " + std::to_string(ts[1]) + ", " + std::to_string(
                            ts[2]) + ", " + std::to_string(ts[3]) + "),";
@@ -1375,11 +1375,13 @@ namespace Belle2 {
                   // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
                     hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
-                    // if (sim13dt) {
                     //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
                     // }
                   }
                   trackNN->addRelationTo(hit);
+                  if (iSL % 2 == 0) {
+                    track2D->addRelationTo(hit);
+                  }
                 }
               }
             }

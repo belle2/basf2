@@ -36,6 +36,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclTiming();/// Destructor
 
+    /** Copy constructor, deleted */
+    TrgEclTiming(TrgEclTiming&) = delete;
+
+    /** Assignment operator, deleted */
+    TrgEclTiming& operator=(TrgEclTiming&) = delete;
+
   public:
     //! SetUp
     void Setup(const std::vector<int>&, const std::vector<double>&, const std::vector<double>&);

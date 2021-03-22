@@ -33,6 +33,7 @@ namespace Belle2 {
     /// Constructor
     TRGPoint2D(double, double);
     /// Constructor
+    // cppcheck-suppress noExplicitConstructor
     TRGPoint2D(const HepGeom::Point3D<double>&);
     /// Constructor
     explicit TRGPoint2D(const Vector3D&);

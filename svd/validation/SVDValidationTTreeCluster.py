@@ -49,6 +49,10 @@ gROOT.ProcessLine('struct EventDataCluster {\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
     float truehit_time;\
+    float eventt0_all;\
+    float eventt0_top;\
+    float eventt0_cdc;\
+    float eventt0_ecl;\
 };')
 
 
@@ -62,12 +66,13 @@ class SVDValidationTTreeCluster(b2.Module):
         """Initialize the module"""
 
         super(SVDValidationTTreeCluster, self).__init__()
+
+        #: Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeCluster.root', 'recreate')
-        '''Output ROOT file'''
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataCluster()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataCluster.__dict__:
@@ -80,6 +85,7 @@ class SVDValidationTTreeCluster(b2.Module):
     def event(self):
         """ Find clusters with a truehit and save needed information """
         clusters = Belle2.PyStoreArray('SVDClusters')
+        eventt0 = Belle2.PyStoreObj('EventT0')
         for cluster in clusters:
             cluster_truehits = cluster.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
             cluster_TrueHit_Length = len(cluster_truehits)
@@ -197,6 +203,22 @@ class SVDValidationTTreeCluster(b2.Module):
                     self.data.truehit_deposEnergy = truehit.getEnergyDep()
                     self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
                     self.data.truehit_time = truehit.getGlobalTime()
+                    #
+                    self.data.eventt0_all = -1
+                    self.data.eventt0_top = -1
+                    self.data.eventt0_cdc = -1
+                    self.data.eventt0_ecl = -1
+                    top = Belle2.Const.DetectorSet(Belle2.Const.EDetector.TOP)
+                    cdc = Belle2.Const.DetectorSet(Belle2.Const.EDetector.CDC)
+                    ecl = Belle2.Const.DetectorSet(Belle2.Const.EDetector.ECL)
+                    if eventt0.hasEventT0():
+                        self.data.eventt0_all = eventt0.getEventT0()
+                    if eventt0.hasTemporaryEventT0(top):
+                        self.data.eventt0_top = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.TOP)[-1].eventT0
+                    if eventt0.hasTemporaryEventT0(cdc):
+                        self.data.eventt0_cdc = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.CDC)[-1].eventT0
+                    if eventt0.hasTemporaryEventT0(ecl):
+                        self.data.eventt0_ecl = eventt0.getTemporaryEventT0s(Belle2.Const.EDetector.ECL)[-1].eventT0
                     # Fill tree
                     self.file.cd()
                     self.tree.Fill()

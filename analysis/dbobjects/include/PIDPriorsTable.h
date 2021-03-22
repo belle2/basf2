@@ -171,10 +171,10 @@ namespace Belle2 {
 
 
     /**
-     * Checks is a values is withing the range of an array
+     * Checks if a value is within the range of an array
      * @param text text to display in the warning message
      * @param val the value
-     * @param array the std::vector the val has to be found
+     * @param edges the vector of bin edge values the val has to be found in
      * @returns the position of the last edge below the input value
      */
     bool checkRange(const std::string& text, float val, const std::vector<float>& edges) const;
@@ -202,7 +202,7 @@ namespace Belle2 {
 
     /**
      * This function returns the position of a number in a sorted array of bin edges,
-     * assuming that the atter are equally spaced.
+     * assuming that the latter are equally spaced.
      * @param val the value
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value

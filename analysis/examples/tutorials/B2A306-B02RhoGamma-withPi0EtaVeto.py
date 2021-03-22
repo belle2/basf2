@@ -42,7 +42,7 @@ from stdCharged import stdK, stdPi
 my_path = b2.create_path()
 
 # writePi0EtaVeto uses a payload in analysis global tag.
-b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',

@@ -88,13 +88,7 @@ namespace Belle2 {
   private:
 
 
-    static const int m_nSides = 2;
-
-
-    //list of functions to create histograms:
-    //    TH1F* createHistogram1D(const char* name, const char* title,
-    //                            Int_t nbins, Double_t min, Double_t max,
-    //                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
+    static const int m_nSides = 2; /**< number of sides*/
 
   };
 

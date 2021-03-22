@@ -8,10 +8,10 @@ performed before in the same process.
 
 import os
 import tempfile
-from ROOT import Belle2
+import basf2
 
-evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen_no_mc.py_noexec')
-reco_steering = Belle2.FileSystem.findFile('reconstruction/tests/reco.py_noexec')
+evtgen_steering = basf2.find_file('reconstruction/tests/evtgen_no_mc.py_noexec')
+reco_steering = basf2.find_file('reconstruction/tests/reco.py_noexec')
 
 # create and move to temporary directory
 with tempfile.TemporaryDirectory() as tempdir:

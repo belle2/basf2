@@ -412,6 +412,8 @@ void CDCSVGPlotter::drawWrongRLHitsInTracks(const std::string& tracksStoreObjNam
   this->drawWrongRLHits<CDCTrack>(tracksStoreObjName);
 }
 
+// doxygen really doesn't like these templated functions so shut it down
+// @cond doxygen_ignore
 template<class ACDCHitCollection>
 void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjName)
 {
@@ -466,6 +468,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
     m_eventdataPlotter.endGroup();
   }
 }
+// @endcond
 
 void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjName,
                                             const std::string& stroke,
@@ -627,6 +630,8 @@ std::string CDCSVGPlotter::saveFile(const std::string& fileName)
   return (m_eventdataPlotter.save(fileName));
 }
 
+// doxygen really doesn't like these templated functions so shut it down
+// @cond doxygen_ignore
 template <class AItem, bool a_drawTrajectories>
 void CDCSVGPlotter::drawStoreArray(const std::string& storeArrayName,
                                    Styling<AItem>& styling)
@@ -696,3 +701,5 @@ void CDCSVGPlotter::draw(const AObject& object, const AttributeMap& attributeMap
                                                               object,
                                                               attributeMap);
 }
+// @endcond
+

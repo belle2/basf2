@@ -14,7 +14,7 @@
 #pragma link C++ class Belle2::PXDRawAdc+; // checksum=0x5127f0f4, version=3
 #pragma link C++ class Belle2::PXDInjectionBGTiming+; // checksum=0x3a01879a, version=1
 
-#pragma link C++ class Belle2::PXDDAQDHPStatus+; // checksum=0xb381bf7a, version=1
+#pragma link C++ class Belle2::PXDDAQDHPStatus+; // checksum=0xe9b4cd4c, version=2
 #pragma link C++ class Belle2::PXDDAQDHEStatus+; // checksum=0x29fc2203, version=7
 #pragma link C++ class Belle2::PXDDAQDHCStatus+; // checksum=0x24e6063e, version=4
 #pragma link C++ class Belle2::PXDDAQPacketStatus+; // checksum=0x946311e, version=2

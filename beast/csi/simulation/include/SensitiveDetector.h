@@ -26,13 +26,15 @@ namespace Belle2 {
 
 
       /** Save ECLSimHits of the event  into datastore
-       * @param cellID the channel identifier
+       * @param cellId the channel identifier
        * @param trackID the track identifier
        * @param pid the pdg code of the particle
        * @param tof the time of flight of the particle
        * @param edep the energy deposited in the crystal by the particle
        * @param mom the momentum of the particle
-       * @param WightedPos the weighted position.
+       * @param pos TO BE COMPLETED
+       * @param PosCell TO BE COMPLETED
+       * @param VecCell TO BE COMPLETED
        *
        * @return int the number of hits saved in this event
        */

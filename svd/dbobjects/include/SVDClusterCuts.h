@@ -40,7 +40,7 @@ namespace Belle2 {
     float scaleError_clSize3;
 
     /** returns the corrected cluster position error */
-    float getCorrectedValue(float raw_error, int size)
+    float getCorrectedValue(float raw_error, int size) const
     {
 
       if (size == 1)

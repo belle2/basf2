@@ -11,10 +11,12 @@ import random
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVDTimeValidationAlgorithm
 
 import basf2 as b2
 
 import rawdata as raw
+from softwaretrigger.constants import HLT_INPUT_OBJECTS
 from tracking import add_tracking_reconstruction
 
 from caf.framework import Calibration
@@ -28,7 +30,6 @@ b2.set_log_level(b2.LogLevel.INFO)
 random.seed(42)
 
 now = datetime.datetime.now()
-isMC = False
 
 settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
@@ -38,6 +39,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[],
                                expert_config={
                                    "max_events_per_run": 10000,
+                                   "isMC": False,
                                })
 
 ##################################################################
@@ -80,6 +82,30 @@ def create_collector(name="SVDTimeCalibrationCollector",
     return collector
 
 
+def create_validation_collector(name="SVDTimeValidationCollector",
+                                clusters="SVDClusters",
+                                clusters_onTracks="SVDClustersOnTracks",
+                                event_info="SVDEventInfo",
+                                event_t0="EventT0",
+                                granularity="run"):
+    """
+    Simply creates a SVDTimeCalibrationCollector module with some options.
+
+    Returns:
+        pybasf2.Module
+    """
+
+    collector = b2.register_module("SVDTimeValidationCollector")
+    collector.set_name(name)
+    collector.param("SVDClustersName", clusters)
+    collector.param("SVDClustersOnTracksName", clusters_onTracks)
+    collector.param("SVDEventInfoName", event_info)
+    collector.param("EventT0Name", event_t0)
+    collector.param("granularity", granularity)
+
+    return collector
+
+
 def create_algorithm(unique_id, prefix="", min_entries=10000):
     """
     Simply creates a SVDCoGTimeCalibrationAlgorithm class with some options.
@@ -95,16 +121,32 @@ def create_algorithm(unique_id, prefix="", min_entries=10000):
         algorithm = SVD3SampleELSTimeCalibrationAlgorithm(unique_id)
     if prefix:
         algorithm.setPrefix(prefix)
-    algorithm.setMinEntries(10000)
+    algorithm.setMinEntries(min_entries)
+
+    return algorithm
+
+
+def create_validation_algorithm(prefix="", min_entries=10000):
+    """
+    Simply creates a SVDCoGTimeValidationAlgorithm class with some options.
+
+    Returns:
+        ROOT.Belle2.SVDCoGTimeValidationAlgorithm
+    """
+    algorithm = SVDTimeValidationAlgorithm()
+    if prefix:
+        algorithm.setPrefix(prefix)
+    algorithm.setMinEntries(min_entries)
 
     return algorithm
 
 
 def create_svd_clusterizer(name="ClusterReconstruction",
                            clusters="SVDClustersFromTracks",
-                           reco_digits=NEW_RECO_DIGITS_NAME,
-                           shaper_digits=NEW_SHAPER_DIGITS_NAME,
-                           time_algorithm=0):
+                           reco_digits=None,
+                           shaper_digits=None,
+                           time_algorithm=0,
+                           get_3sample_raw_time=False):
     """
     Simply creates a SVDSimpleClusterizer module with some options.
 
@@ -115,13 +157,17 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster = b2.register_module("SVDSimpleClusterizer")
     cluster.set_name(name)
     cluster.param("Clusters", clusters)
-    cluster.param("RecoDigits", reco_digits)
-    cluster.param("ShaperDigits", shaper_digits)
+    if reco_digits is not None:
+        cluster.param("RecoDigits", reco_digits)
+    if shaper_digits is not None:
+        cluster.param("ShaperDigits", shaper_digits)
     cluster.param("timeAlgorithm", time_algorithm)
+    if get_3sample_raw_time:
+        cluster.param("Calibrate3SampleWithEventT0", False)
     return cluster
 
 
-def create_pre_collector_path(clusterizers):
+def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.
@@ -135,6 +181,9 @@ def create_pre_collector_path(clusterizers):
     """
     # Set-up re-processing path
     path = b2.create_path()
+
+    # Read from file only what is needed
+    path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
 
     # unpack raw data to do the tracking
     if not isMC:
@@ -152,24 +201,23 @@ def create_pre_collector_path(clusterizers):
     # run tracking reconstruction
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
-    b2.set_module_parameters(path, 'SVDCoGTimeEstimator', CalibrationWithEventT0=False)
-    path.add_module("SVDShaperDigitsFromTracks")
+    if not is_validation:
+        b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
+    path.add_module("SVDShaperDigitsFromTracks")
+
     cog = b2.register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)
-
-    # Debugging misconfigured Datastore names
-    #    path.add_module("PrintCollections")
+    b2.set_module_parameters(path, 'CoGReconstruction',
+                             ShaperDigits=NEW_SHAPER_DIGITS_NAME,
+                             RecoDigits=NEW_RECO_DIGITS_NAME,
+                             CalibrationWithEventT0=is_validation)
 
     for cluster in clusterizers:
         path.add_module(cluster)
 
-    b2.set_module_parameters(path, 'CoGReconstruction',
-                             ShaperDigits=NEW_SHAPER_DIGITS_NAME,
-                             RecoDigits=NEW_RECO_DIGITS_NAME,
-                             CalibrationWithEventT0=False)
     path = remove_module(path, "SVDMissingAPVsClusterCreator")
 
     return path
@@ -180,6 +228,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["hlt_hadron"]
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
+    isMC = expert_config["isMC"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
                                                                max_events_per_run, random_select=True)
@@ -229,21 +278,24 @@ def get_calibrations(input_data, **kwargs):
         clusters=f"SVDClustersFromTracks{cog6_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=0)
+        time_algorithm=0,
+        get_3sample_raw_time=True)
 
     cog3 = create_svd_clusterizer(
         name=f"ClusterReconstruction{cog3_suffix}",
         clusters=f"SVDClustersFromTracks{cog3_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=1)
+        time_algorithm=1,
+        get_3sample_raw_time=True)
 
     els3 = create_svd_clusterizer(
         name=f"ClusterReconstruction{els3_suffix}",
         clusters=f"SVDClustersFromTracks{els3_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=2)
+        time_algorithm=2,
+        get_3sample_raw_time=True)
 
     ####
     # Build the Collectors and Algorithms with the different (but matching) options
@@ -291,7 +343,8 @@ def get_calibrations(input_data, **kwargs):
     ####
 
     pre_collector_path = create_pre_collector_path(
-        clusterizers=[cog6, cog3, els3])
+        clusterizers=[cog6, cog3, els3],
+        isMC=isMC)
     pre_collector_path.add_module(coll_cog6)
     pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF
@@ -303,11 +356,104 @@ def get_calibrations(input_data, **kwargs):
                               input_files=good_input_files,
                               pre_collector_path=pre_collector_path)
 
-    # calibration.strategies = strategies.SequentialRunByRun
-    # calibration.strategies = strategies.SingleIOV
     calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
-    return [calibration]
+    #########################################################
+    # Add new fake calibration to run validation collectors #
+    #########################################################
+
+    val_cog6 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog6_suffix}",
+        clusters=f"SVDClusters{cog6_suffix}",
+        time_algorithm=0)
+
+    val_cog6_onTracks = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog6_suffix}_onTracks",
+        clusters=f"SVDClusters{cog6_suffix}_onTracks",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=0)
+
+    val_cog3 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog3_suffix}",
+        clusters=f"SVDClusters{cog3_suffix}",
+        time_algorithm=1)
+
+    val_cog3_onTracks = create_svd_clusterizer(
+        name=f"ClusterReconstruction{cog3_suffix}_onTracks",
+        clusters=f"SVDClusters{cog3_suffix}_onTracks",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=1)
+
+    val_els3 = create_svd_clusterizer(
+        name=f"ClusterReconstruction{els3_suffix}",
+        clusters=f"SVDClusters{els3_suffix}",
+        time_algorithm=2)
+
+    val_els3_onTracks = create_svd_clusterizer(
+        name=f"ClusterReconstruction{els3_suffix}_onTracks",
+        clusters=f"SVDClusters{els3_suffix}_onTracks",
+        reco_digits=NEW_RECO_DIGITS_NAME,
+        shaper_digits=NEW_SHAPER_DIGITS_NAME,
+        time_algorithm=2)
+
+    val_coll_cog6 = create_validation_collector(
+        name=f"SVDTimeValidationCollector{cog6_suffix}",
+        clusters=f"SVDClusters{cog6_suffix}",
+        clusters_onTracks=f"SVDClusters{cog6_suffix}_onTracks",
+        event_info=eventInfo,
+        event_t0="EventT0")
+
+    val_algo_cog6 = create_validation_algorithm(
+        prefix=val_coll_cog6.name(),
+        min_entries=10000)
+
+    val_coll_cog3 = create_validation_collector(
+        name=f"SVDTimeValidationCollector{cog3_suffix}",
+        clusters=f"SVDClusters{cog3_suffix}",
+        clusters_onTracks=f"SVDClusters{cog3_suffix}_onTracks",
+        event_info=eventInfo,
+        event_t0="EventT0")
+
+    val_algo_cog3 = create_validation_algorithm(
+        prefix=val_coll_cog3.name(),
+        min_entries=10000)
+
+    val_coll_els3 = create_validation_collector(
+        name=f"SVDTimeValidationCollector{els3_suffix}",
+        clusters=f"SVDClusters{els3_suffix}",
+        clusters_onTracks=f"SVDClusters{els3_suffix}_onTracks",
+        event_info=eventInfo,
+        event_t0="EventT0")
+
+    val_algo_els3 = create_validation_algorithm(
+        prefix=val_coll_els3.name(),
+        min_entries=10000)
+
+    val_pre_collector_path = create_pre_collector_path(
+        clusterizers=[val_cog6, val_cog6_onTracks,
+                      val_cog3, val_cog3_onTracks,
+                      val_els3, val_els3_onTracks],
+        isMC=isMC, is_validation=True)
+    val_pre_collector_path.add_module(val_coll_cog6)
+    val_pre_collector_path.add_module(val_coll_cog3)
+
+    val_calibration = Calibration("SVDTimeValidation",
+                                  collector=val_coll_els3,
+                                  algorithms=[val_algo_cog6, val_algo_cog3,
+                                              val_algo_els3],
+                                  input_files=good_input_files,
+                                  pre_collector_path=val_pre_collector_path)
+
+    val_calibration.strategies = strategies.SequentialRunByRun
+
+    for algorithm in val_calibration.algorithms:
+        algorithm.params = {"iov_coverage": output_iov}
+
+    val_calibration.depends_on(calibration)
+
+    return [calibration, val_calibration]

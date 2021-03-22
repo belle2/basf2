@@ -47,7 +47,7 @@ def set_axis_label_range(ax, new_start, new_end, n_labels=5, axis=1, to_flat=Non
         new_labels[-1] = to_flat.max
         new_labels[0] = to_flat.min
 
-    if axis is 1:
+    if axis == 1:
         ax.set_xticks(label_position)
         ax.set_xticklabels(["%.2f" % i for i in new_labels])
     else:
@@ -165,7 +165,7 @@ class ProfilePlot():
         for last_x, next_x in zip(self.x_axis[:-1], self.x_axis[1:]):
             bin_range = (x > last_x) & (x < next_x)
             n_y_in_bin = len(y[bin_range])
-            if n_y_in_bin is 0:
+            if n_y_in_bin == 0:
                 self.mean.append(0)
                 self.err.append(0)
             else:
@@ -206,7 +206,7 @@ def draw_flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=N
                 ax.set_yticklabels([])
                 set_axis_label_range(ax, df.ix[:, i].min(), df.ix[:, i].max(), n_labels=3)
             else:
-                im = draw_flat_correlation(df.ix[:, i], df.ix[:, j], ax=ax, draw_label=False)
+                draw_flat_correlation(df.ix[:, i], df.ix[:, j], ax=ax, draw_label=False)
 
             if i is n_vars - 1 and j is not n_vars - 1:
                 plt.setp(ax.get_xticklabels(), visible=False)

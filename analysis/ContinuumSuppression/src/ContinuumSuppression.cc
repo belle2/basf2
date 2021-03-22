@@ -98,8 +98,9 @@ namespace Belle2 {
     if (roe) {
 
       if (!roe->isBuiltWithMostLikely()) {
-        B2ERROR("The ROE was not created with most-likely particle lists."
-                "The continuum suppression will not work properly.");
+        B2ERROR("The ROE was not created with the most-likely particle lists."
+                "Did you use your own input particle lists?"
+                "The continuum suppression builder does not work with this setting.");
       }
 
       // Charged tracks

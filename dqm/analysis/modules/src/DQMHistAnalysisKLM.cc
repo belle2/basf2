@@ -18,6 +18,7 @@
 /* ROOT headers. */
 #include <TClass.h>
 #include <TROOT.h>
+#include <TStyle.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -28,7 +29,11 @@ REG_MODULE(DQMHistAnalysisKLM)
 
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
-    m_eklmStripLayer{nullptr}
+    m_ProcessedEvents{0},
+    m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
+    m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
+    m_ElementNumbers{&(KLMElementNumbers::Instance())},
+    m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("Module used to analyze KLM DQM histograms.");
   addParam("ThresholdForMasked", m_ThresholdForMasked,
@@ -42,11 +47,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number of processed events required to print error messages", 10000.);
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
-  m_ProcessedEvents = 0.;
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
-  m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
+  m_2DHitsLine.SetLineColor(kRed);
+  m_2DHitsLine.SetLineWidth(3);
+  m_2DHitsLine.SetLineStyle(2); // dashed
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -228,6 +231,23 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->Modified();
 }
 
+void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
+  uint16_t section, TH2F* histogram, TCanvas* canvas)
+{
+  canvas->Clear();
+  canvas->cd();
+  histogram->SetStats(false);
+  histogram->Draw("COLZ");
+  /* Draw the lines only for the backward layers. */
+  if (section == EKLMElementNumbers::c_ForwardSection) {
+    m_2DHitsLine.DrawLine(-110, 80, -110, 190);
+    m_2DHitsLine.DrawLine(-110, 190, 110, 190);
+    m_2DHitsLine.DrawLine(110, 80, 110, 190);
+    m_2DHitsLine.DrawLine(-110, 80, 110, 80);
+  }
+  canvas->Modified();
+}
+
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   const std::string& histName)
 {
@@ -333,7 +353,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       if (layerGlobal < maximalLayer)
         m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
       int section, layer;
-      m_eklmElementNumbers->layerNumberToElementNumbers(
+      m_EklmElementNumbers->layerNumberToElementNumbers(
         layerGlobal, &section, &layer);
       if (section == EKLMElementNumbers::c_BackwardSection)
         name = "B";
@@ -368,10 +388,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
-  while ((obj = static_cast<TObject*>(nextkey()))) {
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvasName)
-        return static_cast<TCanvas*>(obj);
+        return dynamic_cast<TCanvas*>(obj);
     }
   }
   return nullptr;
@@ -380,6 +400,13 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
+  /* If KLM is not included, stop here and return. */
+  TH1* daqInclusion = findHist("KLM/daq_inclusion");
+  if (not(daqInclusion == nullptr)) {
+    int isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
+    if (isKlmIncluded == 0)
+      return;
+  }
   /* Make sure that the vectors are cleared at each DQM refresh. */
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
@@ -389,8 +416,8 @@ void DQMHistAnalysisKLMModule::event()
   TLatex latex;
   latex.SetTextColor(kRed);
   latex.SetTextAlign(11);
-  KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -419,6 +446,36 @@ void DQMHistAnalysisKLMModule::event()
         klmSector.getSector(), histogram, canvas, latex);
     }
   }
+  /* Temporary change the color palette. */
+  gStyle->SetPalette(kLightTemperature);
+  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
+  for (KLMChannelIndex& klmSection : klmIndex) {
+    uint16_t subdetector = klmSection.getSubdetector();
+    if (subdetector == KLMElementNumbers::c_EKLM) {
+      uint16_t section = klmSection.getSection();
+      int maximalLayerNumber = m_EklmElementNumbers->getMaximalDetectorLayerNumber(section);
+      for (int j = 1; j <= maximalLayerNumber; ++j) {
+        str = "spatial_2d_hits_subdetector_" + std::to_string(subdetector) +
+              "_section_" + std::to_string(section) +
+              "_layer_" + std::to_string(j);
+        histogramName = "KLM/" + str;
+        canvasName = "KLM/c_" + str;
+        TH2F* histogram = static_cast<TH2F*>(findHist(histogramName));
+        if (histogram == nullptr) {
+          B2ERROR("KLM DQM histogram " << histogramName << " is not found.");
+          continue;
+        }
+        TCanvas* canvas = findCanvas(canvasName);
+        if (canvas == nullptr) {
+          B2ERROR("KLM DQM histogram canvas " << canvasName << " is not found.");
+          continue;
+        }
+        processSpatial2DHitEndcapHistogram(section, histogram, canvas);
+      }
+    }
+  }
+  /* Reset the color palette to the default one. */
+  gStyle->SetPalette(kBird);
   fillMaskedChannelsHistogram("masked_channels");
   latex.SetTextColor(kBlue);
   processPlaneHistogram("plane_bklm_phi", latex);

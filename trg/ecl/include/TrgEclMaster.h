@@ -45,6 +45,12 @@ namespace Belle2 {
     //! TrgEclMaster Destructor
     virtual ~TrgEclMaster();
 
+    //! Copy constructor, deleted
+    TrgEclMaster(TrgEclMaster&) = delete;
+
+    //! Assignment operator, deleted
+    TrgEclMaster& operator=(TrgEclMaster&) = delete;
+
   public:
 
     /** initialize */

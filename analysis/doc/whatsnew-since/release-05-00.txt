@@ -31,7 +31,14 @@ Variables
  * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
    :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
  * Added new variables :b2:var:`ndf` and :b2:var:`chi2` to return track NDF and Chi2
- * Exclude SVD from definition of standard global and binary PID variables (like ``electronID``, ``pionID`` etc.). This change is introduced because physical SVD PDFs are available only for some particle hypotheses, but not for others yet.
+ * Added the variable `particleSource`, which returns the mdst source, i.e. whether the particle was created from a track, an ECL
+   cluster, or a KLM cluster, is a V0 object, an MC particle, or a composite particle.
+ * Exclude SVD from definition of standard global and binary PID variables (like ``electronID``, ``pionID`` etc.). This change is
+   introduced because physical SVD PDFs are available only for some particle hypotheses, but not for others yet.
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
+
 
 Modules
 +++++++

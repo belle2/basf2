@@ -95,12 +95,12 @@ namespace Belle2 {
     SpacePointTrackCand() = default;
 
     /** Constructor from a vector<SpacePoint*> and some additional information.
-     *
-     *  @param pdgCode    Mass hypothesis to be used.
-     *  @param charge     Charge hypthesis for the tracked particle.
-     *  @param mcTrackID  ???
-     *  sortingParameters are generated from the order of the SpacePoints!
-     *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
+     *  @param spacePoints list of pointers to the SpacePoint for this track candidate
+     *  @param pdgCode     Mass hypothesis to be used.
+     *  @param charge      Charge hypthesis for the tracked particle.
+     *  @param mcTrackID   ???
+     *    sortingParameters are generated from the order of the SpacePoints!
+     *    Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
     explicit SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
                                  int mcTrackID = -1);

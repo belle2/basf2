@@ -5,6 +5,9 @@ import json
 prompt_script_package = "prompt.calibrations."
 prompt_script_dir = "calibration/scripts/prompt/calibrations"
 
+prompt_validation_script_package = "prompt.validations."
+prompt_validation_script_dir = "calibration/scripts/prompt/validations"
+
 
 class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username", "description",
                                                         "input_data_formats", "input_data_names", "depends_on", "expert_config"])):
@@ -111,5 +114,69 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
         output_str += f"  description='{self.description}'\n"
+        output_str += f"  expert_config={self.expert_config}"
+        return output_str
+
+
+class ValidationSettings(namedtuple('ValSet_Factory', ["name", "description", "download_files", "expert_config"])):
+    """
+    Simple class to hold and display required information for a validation calibration script (process).
+
+    Parameters:
+        name (str): The unique name that must match the corresponding calibration, not longer than 64 characters.
+
+        description (str): Long form description of the validation and what it does. Feel free to make this as long as you need.
+
+        download_files (list): The names of the files you want downloaded, e.g. mycalibration_stdout. If multiple files of
+        the same name are found, all files are downloaded and appended with the folder they were in.
+
+        expert_config (dict): Default expert configuration for this validation script. This is an optional dictionary
+            (which must be JSON compliant) of configuration options for validation script.
+            This is supposed to be used as a catch-all place to send in options for your calibration setup. For example,
+            you may want to have an optional list of IoV boundaries so that your validation script knows that it should split the
+            input data between different IoV ranges. Or you might want to send if options like the maximum events per
+            input file to process. The value in your settings object will be the *default*, but you can override the value via
+            the caf_config.json sent into ``b2caf-prompt-run``.
+    """
+
+    def __new__(cls, name, description, download_files=None, expert_config=None):
+        """
+        The special method to create the tuple instance. Returning the instance
+        calls the __init__ method
+        """
+        if len(name) > 64:
+            raise ValueError("name cannot be longer than 64 characters!")
+
+        if expert_config:
+            # Check that it's a dictionary and not some other valid JSON object
+            if not isinstance(expert_config, dict):
+                raise TypeError("expert_config must be a dictionary")
+            # Check if it is JSONable since people might put objects in there by mistake
+            try:
+                json.dumps(expert_config)
+            except TypeError as e:
+                basf2.B2ERROR("expert_config could not be serialised to JSON. "
+                              "Most likely you used a non-supported type e.g. datetime.")
+                raise e
+        else:
+            expert_config = {}
+
+        return super().__new__(cls, name, description, download_files, expert_config)
+
+    def json_dumps(self):
+        """
+        Returns:
+             str: A valid JSON format string of the attributes.
+        """
+        return json.dumps({"name": self.name,
+                           "description": self.description,
+                           "download_files": self.download_files,
+                           "expert_config": self.expert_config
+                           })
+
+    def __str__(self):
+        output_str = str(self.__class__.__name__) + f"(name='{self.name}'):\n"
+        output_str += f"  description='{self.description}'\n"
+        output_str += f"  download_files='{self.download_files}'\n"
         output_str += f"  expert_config={self.expert_config}"
         return output_str

@@ -56,6 +56,15 @@ def get_argument_parser():
     )
 
     parser.add_argument(
+        "--skimmed-mdst-output",
+        action="store_true",
+        help=(
+            "If flag passed, save a single MDST containing events which pass at "
+            "least one of the skims."
+        ),
+    )
+
+    parser.add_argument(
         "--no-user-hints",
         action="store_true",
         help=(
@@ -115,6 +124,7 @@ def main():
         modules=modules,
         stats=(not args.no_stats),
         hints=(not args.no_user_hints),
+        mdstOutput=args.skimmed_mdst_output,
     )
 
     output(CodeString, OutputFilename=args.OutputFilename, skims=skims)

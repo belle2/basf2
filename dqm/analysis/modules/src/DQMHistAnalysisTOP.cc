@@ -49,10 +49,6 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_badHitsRMS = new TCanvas("TOP/c_bad_hits_rms");
 
   //using c2_Name to avoid an overlap on default c_Name
-  TCanvas* m_c_good_hits_xy_[17] = {};
-  TCanvas* m_c_bad_hits_xy_[17] = {};
-  TCanvas* m_c_good_hits_asics_[17] = {};
-  TCanvas* m_c_bad_hits_asics_[17] = {};
   for (int i = 1; i <= 16; i++) {
     m_c_good_hits_xy_[i] = new TCanvas(Form("TOP/c2_good_hits_xy_%d", i));
     m_c_bad_hits_xy_[i] = new TCanvas(Form("TOP/c2_bad_hits_xy_%d", i));

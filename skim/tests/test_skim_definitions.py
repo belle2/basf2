@@ -13,7 +13,11 @@ from skim.registry import Registry
 
 
 class TestSkimRules(unittest.TestCase):
-    def test_ast(self):
+    def test_applyEventCuts_not_used(self):
+        """
+        Check that no skims use ma.applyEventCuts anywhere. BaseSkim.skim_event_cuts is
+        preferred, since ma.applyEventCuts is incompatible with CombinedSkim.
+        """
         SkimsWithApplyEventCuts = set()
 
         for skim in Registry.names:

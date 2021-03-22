@@ -18,6 +18,10 @@ Standard Particles
         * `stdV0s.stdKshorts`
         * `stdV0s.stdLambdas`
 
+        However, please check
+        `this Neutrals Performance confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+        for the latest updates.
+
 The ultimate goal is that these standard particle lists will provide recommended selection
 criteria for final-state particles, and in some cases, for composite particles.
 The recommended selections will be provided by the performance group(s).
@@ -28,8 +32,8 @@ There are also some skimming, development and legacy lists available.
 These are specifically for use in skims, for study, or for comparison with Belle and old simulations.
 If you don't know that you specifically need these legacy/skim lists, then avoid them.
 
-Recommended final-state particle list builder functions
--------------------------------------------------------
+Default final-state particle list builder functions
+---------------------------------------------------
 
 .. autofunction:: stdPi0s.stdPi0s
 

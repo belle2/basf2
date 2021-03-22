@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  class ShortPathFilter : public BasePathFilter {
+  class FiveHitFilter : public BasePathFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;

@@ -40,7 +40,7 @@ namespace Belle2 {
     AFindlet m_threeHitFilterFindlet;
     /// Findlet used for currentPath.size() == 3
     AFindlet m_fourHitFilterFindlet;
-    /// Findlet used for currentPath.size() > 3
-    AFindlet m_pathFilterFindlet;
+    /// Findlet used for currentPath.size() == 4
+    AFindlet m_fiveHitFilterFindlet;
   };
 }

@@ -44,7 +44,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIP");
   moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("threeHit");
   moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("fourHit");
-  moduleParamList->getParameter<std::string>("shortPathFilter").setDefaultValue("shortPath");
+  moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("fiveHit");
 }
 
 void DATCONFindlet::beginEvent()

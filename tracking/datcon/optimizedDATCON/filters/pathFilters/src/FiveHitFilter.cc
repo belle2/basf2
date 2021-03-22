@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ShortPathFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/FiveHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
@@ -17,16 +17,16 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 TrackFindingCDC::Weight
-ShortPathFilter::operator()(const BasePathFilter::Object& pair)
+FiveHitFilter::operator()(const BasePathFilter::Object& pair)
 {
 //   const std::vector<TrackFindingCDC::WithWeight<const HitData*>>& previousHits = pair.first;
 //   HitData* currentHit = pair.second;
 
-//   return 1.0;
+  return 1.0;
 //   return 0.0;
-  return NAN;
+//   return NAN;
 }
 
-void ShortPathFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
 }

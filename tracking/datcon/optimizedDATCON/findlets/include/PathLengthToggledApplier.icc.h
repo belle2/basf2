@@ -22,7 +22,7 @@ namespace Belle2 {
     Super::addProcessingSignalListener(&m_twoHitFilterFindlet);
     Super::addProcessingSignalListener(&m_threeHitFilterFindlet);
     Super::addProcessingSignalListener(&m_fourHitFilterFindlet);
-    Super::addProcessingSignalListener(&m_pathFilterFindlet);
+    Super::addProcessingSignalListener(&m_fiveHitFilterFindlet);
   }
 
   /// Expose parameters of the subfilters and the layer to change.
@@ -33,7 +33,7 @@ namespace Belle2 {
     m_twoHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "twoHit"));
     m_threeHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "threeHit"));
     m_fourHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fourHit"));
-    m_pathFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "shortPath"));
+    m_fiveHitFilterFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fiveHit"));
   }
 
   /// The weight is calculated using the subfilter based on the geometrical layer of the state.
@@ -44,15 +44,15 @@ namespace Belle2 {
     // if currentPath.size() == 1, including the single child hits makes the total path length 2, so use the twoHitFilter
     // if currentPath.size() == 2, including the single child hits makes the total path length 3, so use the threeHitFilter
     // if currentPath.size() == 3, including the single child hits makes the total path length 4, so use the fourHitFilter
-    // if currentPath.size() > 3, including the single child hits makes the total path length > 4, so use the pathFilter
+    // if currentPath.size() == 4, including the single child hits makes the total path length 5, so use the fiveHitFilter
     if (currentPath.size() == 1) {
       m_twoHitFilterFindlet.apply(currentPath, childHits);
     } else if (currentPath.size() == 2) {
       m_threeHitFilterFindlet.apply(currentPath, childHits);
     } else if (currentPath.size() == 3) {
       m_fourHitFilterFindlet.apply(currentPath, childHits);
-    } else if (currentPath.size() > 3) {
-      m_pathFilterFindlet.apply(currentPath, childHits);
+    } else if (currentPath.size() == 4) {
+      m_fiveHitFilterFindlet.apply(currentPath, childHits);
     }
   }
 }

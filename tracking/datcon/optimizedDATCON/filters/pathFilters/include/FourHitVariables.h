@@ -20,9 +20,11 @@ namespace Belle2 {
 
   class FourHitVariables {
   public:
+    /// basic constructor
     FourHitVariables() : m_oHit(0., 0., 0.), m_ocHit(0., 0., 0.), m_icHit(0., 0., 0.), m_iHit(0., 0., 0.)
     {};
 
+    /// actual useful constructor
     FourHitVariables(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit) :
       m_oHit(oHit), m_ocHit(ocHit), m_icHit(icHit), m_iHit(iHit)
     {
@@ -105,15 +107,24 @@ namespace Belle2 {
       return fabs(0.00299792458 * m_BFieldZ * (outerCircleRadius - innerCircleRadius));
     } // return unit: GeV/c
 
+    /// Set the B-Field value used for pT calculations
+    /// @param bfieldZ B-Field value to be used
     void setBFieldZ(const double bfieldZ = 1.5) { m_BFieldZ = bfieldZ; }
 
   private:
+    /// BField along z to estimate pT
     double m_BFieldZ = 1.5;
+    /// outermost hit position
     B2Vector3D m_oHit;
+    /// second-to-outer hit position
     B2Vector3D m_ocHit;
+    /// second-to-inner hit position
     B2Vector3D m_icHit;
+    /// innermost hit position
     B2Vector3D m_iHit;
+    /// ThreeHitVariables getter for the outer three hits
     ThreeHitVariables m_outerThreeHitVariables;
+    /// ThreeHitVariables getter for the inner three hits
     ThreeHitVariables m_innerThreeHitVariables;
 
   };

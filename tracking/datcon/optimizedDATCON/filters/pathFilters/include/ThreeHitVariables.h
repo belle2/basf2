@@ -19,10 +19,12 @@ namespace Belle2 {
 
   class ThreeHitVariables {
   public:
+    /// basic constructor
     ThreeHitVariables() : m_oHit(0., 0., 0.), m_cHit(0., 0., 0.), m_iHit(0., 0., 0.),
       m_outerDifferenceVector(0., 0., 0.), m_innerDifferenceVector(0., 0., 0.)
     {};
 
+    /// actual useful constructor
     ThreeHitVariables(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit) :
       m_oHit(oHit), m_cHit(cHit), m_iHit(iHit)
     {
@@ -30,7 +32,8 @@ namespace Belle2 {
       m_innerDifferenceVector = cHit - iHit;
     };
 
-    /** helper function which calculates the average distance in XY from the given center */
+    /// helper function which calculates the average distance in XY from the given center
+    /// @param circleCenter center of the cirlce for which the average distance is calculated
     double calcAvgDistanceXY(const B2Vector3D& circleCenter)
     {
       return (sqrt(std::pow(circleCenter.X() - m_oHit.X(), 2) + std::pow(circleCenter.Y() - m_oHit.Y(), 2)) +
@@ -39,7 +42,7 @@ namespace Belle2 {
     } // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
 
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: angle in radian */
+    /// calculates the angle between the hits/vectors (3D), returning unit: angle in radian
     double getAngle3D()
     {
       double result = acos(m_outerDifferenceVector.Dot(m_innerDifferenceVector) /
@@ -48,17 +51,17 @@ namespace Belle2 {
     }
 
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use Angle3DFull instead) */
+    /// calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use Angle3DFull instead)
     double getAngle3DSimple()
     {
       // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag()), but here time-consuming parts have been neglected
-      double result = m_outerDifferenceVector.Dot(m_innerDifferenceVector) / (m_outerDifferenceVector.Mag2() *
-                      m_innerDifferenceVector.Mag2());
+      double result = m_outerDifferenceVector.Dot(m_innerDifferenceVector) /
+                      (m_outerDifferenceVector.Mag2() * m_innerDifferenceVector.Mag2());
       return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     }
 
 
-    /** calculates the angle between the hits/vectors (RZ), returning unit: angle in radian */
+    /// calculates the angle between the hits/vectors (RZ), returning unit: angle in radian
     double getAngleRZ()
     {
       B2Vector3D rzVecAB(m_outerDifferenceVector.Perp(), m_outerDifferenceVector.Z(), 0.);
@@ -70,7 +73,7 @@ namespace Belle2 {
     } // return unit: rad (0 - pi)
 
 
-    /** calculates the cosine of the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead) */
+    /// calculates the cosine of the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead)
     double getCosAngleRZSimple()
     {
       B2Vector3D rzVecAB(m_outerDifferenceVector.Perp(), m_outerDifferenceVector.Z(), 0.);
@@ -80,7 +83,7 @@ namespace Belle2 {
       return twoHitVariables.getCosXY();
     }
 
-    /** return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead) */
+    /// return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead)
     double getAngleXY()
     {
       TwoHitVariables twoHitVariables(m_outerDifferenceVector, m_innerDifferenceVector);
@@ -89,7 +92,7 @@ namespace Belle2 {
     } // return unit: rad (0 - pi)
 
 
-    /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
+    /// calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3.
     B2Vector3D getCircleCenterXY()
     {
       // calculates the intersection point using Cramer's rule.
@@ -99,7 +102,7 @@ namespace Belle2 {
       double outX = m_oHit.X() - m_cHit.X(); // x value of the normal vector of the outer segment (m_oHit-m_cHit)
       double outY = m_oHit.Y() - m_cHit.Y(); // y value of the normal vector of the outer segment (m_oHit-m_cHit)
 
-      //searching solution for Ax = b, aij are the matrix elements of A, bi are elements of b
+      // searching solution for Ax = b, aij are the matrix elements of A, bi are elements of b
       double a11 = inY;
       double a12 = -inX;
       double a21 = -outY;
@@ -107,17 +110,19 @@ namespace Belle2 {
       double b1 = m_cHit.X() + outX * 0.5 - (m_iHit.X() + inX * 0.5);
       double b2 = m_cHit.Y() + outY * 0.5 - (m_iHit.Y() + inY * 0.5);
 
+      // protect against the determinant being zero
       if (a11 * a22 == a12 * a21) {
         return B2Vector3D(1e30, 1e30, 1e30);
       }
 
-      double s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero if the three hits are on a line in (x,y).
+      // the determinant is zero if the three hits are on a line in (x,y), which is checked above.
+      double s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21);
 
       return B2Vector3D(m_iHit.X() + inX * 0.5 + s * inY, m_iHit.Y() + inY * 0.5 - s * inX, 0.);
     }
 
 
-    /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
+    /// calculates the distance of the point of closest approach of circle to the IP, returning unit: cm
     double getCircleDistanceIP()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -132,7 +137,7 @@ namespace Belle2 {
     } // return unit: cm
 
 
-    /** calculates the estimation of the circle radius of the 3-hit-tracklet, returning unit: cm. */
+    /// calculates the estimation of the circle radius of the 3-hit-tracklet, returning unit: cm.
     double getCircleRadius()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -143,19 +148,19 @@ namespace Belle2 {
     } // return unit: cm
 
 
-    /** calculates the angle between the hits/vectors (XY),
-    * returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead) */
+    /// calculates the angle between the hits/vectors (XY),
+    /// returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead)
     double getCosAngleXY()
     {
-      double result = (m_outerDifferenceVector.X() * m_innerDifferenceVector.X() + m_outerDifferenceVector.Y() *
-                       m_innerDifferenceVector.Y()) /
+      double result = (m_outerDifferenceVector.X() * m_innerDifferenceVector.X() +
+                       m_outerDifferenceVector.Y() * m_innerDifferenceVector.Y()) /
                       (m_outerDifferenceVector.Perp() * m_innerDifferenceVector.Perp());
 
       return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead)
 
 
-    /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
+    /// calculates deviations in the slope of the inner segment and the outer segment, returning unit: none
     double getDeltaSlopeRZ()
     {
       TwoHitVariables outerTwoHitVariables(m_oHit, m_cHit);
@@ -167,7 +172,7 @@ namespace Belle2 {
     } // return unit: none
 
 
-    /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
+    /// compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane.
     double getDeltaSlopeZoverS()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -194,8 +199,7 @@ namespace Belle2 {
     }
 
 
-    /** calculates the helixparameter describing the deviation in arc length per unit in z.
-    * returning unit: radians*cm  */
+    /// calculates the helixparameter describing the deviation in arc length per unit in z. returning unit: radians*cm
     double getDeltaSoverZ()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -216,14 +220,7 @@ namespace Belle2 {
     } // return unit: radians*cm
 
 
-    // //     /** return the time difference (ns) among the V and U side clusters of th ecenter space point */
-    // //     double getDeltaTimeVU(const SpacePoint&, const SpacePoint& m_cHit, const SpacePoint&)
-    // //     {
-    // //       return m_cHit.TimeV() - m_cHit.TimeU();
-    // //     }
-
-
-    /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
+    /// calculates the helixparameter describing the deviation in z per unit angle, returning unit: none
     double performHelixParamterFit()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -247,7 +244,7 @@ namespace Belle2 {
     } // return unit: none
 
 
-    /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
+    /// calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c
     double getSimplePTEstimate()
     {
       B2Vector3D circleCenter = getCircleCenterXY();
@@ -260,11 +257,9 @@ namespace Belle2 {
     } // return unit: GeV/c
 
 
-    /** calculates calculates the sign of the curvature of given 3-hit-tracklet.
-    * a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
-    * 0 means that it is exactly straight or that two hits are identical.
-    * first vector should be outer hit, second = center hit, third is inner hit.
-    */
+    /// calculates calculates the sign of the curvature of given 3-hit-tracklet.
+    /// A positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
+    /// 0 means that it is exactly straight or that two hits are identical.
     int getCurvatureSign()
     {
       using boost::math::sign;
@@ -273,14 +268,23 @@ namespace Belle2 {
       return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
     }
 
+    /// Set the B-Field value used for pT calculations
+    /// @param bfieldZ B-Field value to be used
     void setBFieldZ(const double bfieldZ = 1.5) { m_BFieldZ = bfieldZ; }
 
   private:
+    /// BField along z to estimate pT
     double m_BFieldZ = 1.5;
+    /// outermost hit position
     B2Vector3D m_oHit;
+    /// center hit position
     B2Vector3D m_cHit;
+    /// innermost hit position
     B2Vector3D m_iHit;
+    /// The following two differences are used very often, so calculate once on construction
+    /// vector containing the difference m_oHit - m_cHit
     B2Vector3D m_outerDifferenceVector;
+    /// vector containing the difference m_cHit - m_iHit
     B2Vector3D m_innerDifferenceVector;
 
   };

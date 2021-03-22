@@ -7,16 +7,15 @@ env.Dictionary()['SUBLIB'] = True
 
 # Additional libraries
 env['LIBS'] = [
-    #'tracking',
+    'tracking',
     'tracking_trackFindingCDC',
-    #'tracking_dataobjects',
-    #'framework',
-    #'genfit2',
-    #'cdc', 'cdc_dataobjects',
-    #'pxd', 'pxd_dataobjects',
-    #'svd', 'svd_dataobjects',
-    #'vxd', 'vxd_dataobjects',
-    #'mdst_dataobjects',
+    'tracking_dataobjects',
+    'framework',
+    'svd',
+    'svd_dataobjects',
+    'svd_dbobjects',
+    'vxd',
+    'vxd_dataobjects',
     '$ROOT_LIBS',
     ]
 

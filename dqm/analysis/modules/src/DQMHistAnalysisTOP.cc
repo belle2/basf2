@@ -56,8 +56,8 @@ void DQMHistAnalysisTOPModule::initialize()
   for (int i = 1; i <= 16; i++) {
     m_c_good_hits_xy_[i] = new TCanvas(Form("TOP/c2_good_hits_xy_%d", i));
     m_c_bad_hits_xy_[i] = new TCanvas(Form("TOP/c2_bad_hits_xy_%d", i));
-    m_c_good_hits_ascis_[i] = new TCanvas(Form("TOP/c2_good_hits_ascis_%d", i));
-    m_c_bad_hits_ascis_[i] = new TCanvas(Form("TOP/c2_bad_hits_ascis_%d", i));
+    m_c_good_hits_asics_[i] = new TCanvas(Form("TOP/c2_good_hits_asics_%d", i));
+    m_c_bad_hits_asics_[i] = new TCanvas(Form("TOP/c2_bad_hits_asics_%d", i));
   }
 
   m_h_goodHitsMean = new TH1F("TOP/good_hits_mean", "Mean of good hits per event", 16, 0.5, 16.5);

@@ -812,7 +812,8 @@ class CombinedSkim(BaseSkim):
             mdst_kwargs (dict): kwargs to be passed to `mdst.add_mdst_output`. Only used
                 if ``mdstOutput`` is True.
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
-            OutputFileName (str): Sets name of output file for the single mdstOutput set to True.
+            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
+                If mdstOutput=False, this option does nothing.
         """
 
         if NoisyModules is None:

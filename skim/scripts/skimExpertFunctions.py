@@ -814,8 +814,6 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
             OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
                 If mdstOutput=False, this option does nothing.
-            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
-                If mdstOutput=False, this option does nothing.
         """
 
         if NoisyModules is None:

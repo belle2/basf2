@@ -41,8 +41,11 @@ namespace Belle2 {
      * @param sensorID: identitiy of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
-     * @param couplingName: coupling name, specify which coupling (C0, C1, ...) to return
-     *
+     * @param couplingName: coupling name, specify which coupling to return. Possible values are:
+     * "C0"  |  Coupling from readout implant to its readout channel
+     * "C1"  |  Coupling from first neighbour implant (floating) to readout channel
+     * "C2"  |  Coupling from second neighbour implant (readout) to readout channel
+     * "C3"  |  Coupling from third neighbour implant (floating) to readout channel
      * Output: float corresponding to a given coupling constant.
      */
     inline float getCouplingConstant(const VxdID& sensorID, const bool& isU, const unsigned short& strip,

@@ -829,11 +829,18 @@ class SystematicsCombinedHadronic(CombinedSkim):
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedHadronic"
 
-    def __init__(self, prescale_kshort=1, **kwargs):
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            prescale_kshort (Optional[int]): offline prescale factor for KS skim.
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
         """
-        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+
         skims_list = [SystematicsKshort(prescale=prescale_kshort), SystematicsDstar(), SystematicsLambda(), SystematicsJpsi()]
-        super().__init__(*skims_list, CombinedSkimName=self.__name__, mdstOutput=True, **kwargs)
+        super().__init__(*skims_list, **kwargs)
 
 
 @fancy_skim_header
@@ -854,9 +861,15 @@ class SystematicsCombinedLowMulti(CombinedSkim):
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
 
-    def __init__(self, **kwargs):
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
         """
-        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+
         from skim.taupair import TauThrust
         skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
-        super().__init__(*skims_list, CombinedSkimName=self.__name__, mdstOutput=True, **kwargs)
+        super().__init__(*skims_list, **kwargs)

@@ -797,8 +797,7 @@ class CombinedSkim(BaseSkim):
             udstOutput=None,
             mdstOutput=False,
             mdst_kwargs=None,
-            CombinedSkimName="CombinedSkim",
-            OutputFileName=None,
+            CombinedSkimName="CombinedSkim"
     ):
         """Initialise the CombinedSkim class.
 
@@ -812,8 +811,6 @@ class CombinedSkim(BaseSkim):
             mdst_kwargs (dict): kwargs to be passed to `mdst.add_mdst_output`. Only used
                 if ``mdstOutput`` is True.
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
-            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
-                If mdstOutput=False, this option does nothing.
         """
 
         if NoisyModules is None:
@@ -958,26 +955,12 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        # TODO - fix this mess
-        if "OutputFileName" in kwargs and "filename" in kwargs:
-            raise KeyError("Both 'filename' and 'OutputFileName' given. This is unsupported.")
-        if "OutputFileName" in kwargs and "filename" not in kwargs:
-            filename = kwargs["OutputFileName"]
-        if "OutputFileName" not in kwargs and "filename" in kwargs:
-            filename = kwargs["filename"]
-        if "OutputFileName" not in kwargs and "filename" not in kwargs:
-            filename = None
-
-        if filename is None:
-            filename = self.name
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"
 
         kwargs["filename"] = filename
-
-        if "OutputFileName" in kwargs:
-            del kwargs["OutputFileName"]
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]

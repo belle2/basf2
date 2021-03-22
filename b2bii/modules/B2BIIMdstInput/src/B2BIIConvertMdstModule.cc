@@ -1254,16 +1254,32 @@ void B2BIIConvertMdstModule::convertRecTrgTable()
     m_evtInfo.create();
   }
 
-  // Pull rectrg_summary3 from manager
-  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+  StoreObjPtr<EventMetaData> event;
 
-  std::string name = "rectrg_summary3_m_final";
-  // Only one entry in each event
-  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+  // Pull rectrg_summary from namager
+  Belle::Rectrg_summary_Manager& RecTrgSummaryMgr = Belle::Rectrg_summary_Manager::get_manager();
+  std::vector<Belle::Rectrg_summary>::iterator eflagIterator = RecTrgSummaryMgr.begin();
+  std::string name_summary = "rectrg_summary_m_final";
 
-  // Converting m_final(3)
-  for (int index = 0; index < 3; ++index) {
-    std::string iVar = name + std::to_string(index);
+  if (event->getExperiment() > 27) {
+    // Pull rectrg_summary3 from manager
+    Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+
+    std::string name_summary3 = "rectrg_summary3_m_final";
+    // Only one entry in each event
+    std::vector<Belle::Rectrg_summary3>::iterator eflagIterator3 = RecTrgSummary3Mgr.begin();
+
+    // Converting m_final(3)
+    for (int index = 0; index < 3; ++index) {
+      std::string iVar = name_summary3 + std::to_string(index);
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator3).final(index));
+      B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    }
+  }
+
+  // Converting m_final(2) from rectrg_summary
+  for (int index = 0; index < 2; ++index) {
+    std::string iVar = name_summary + std::to_string(index);
     m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
     B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }

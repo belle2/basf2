@@ -797,7 +797,8 @@ class CombinedSkim(BaseSkim):
             udstOutput=None,
             mdstOutput=False,
             mdst_kwargs=None,
-            CombinedSkimName="CombinedSkim"
+            CombinedSkimName="CombinedSkim",
+            OutputFileName=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -811,6 +812,10 @@ class CombinedSkim(BaseSkim):
             mdst_kwargs (dict): kwargs to be passed to `mdst.add_mdst_output`. Only used
                 if ``mdstOutput`` is True.
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
+            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
+                If mdstOutput=False, this option does nothing.
+            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
+                If mdstOutput=False, this option does nothing.
         """
 
         if NoisyModules is None:
@@ -837,6 +842,7 @@ class CombinedSkim(BaseSkim):
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}
+        self.mdst_kwargs.update(OutputFileName=OutputFileName)
 
         self.merge_data_structures()
 
@@ -957,10 +963,16 @@ class CombinedSkim(BaseSkim):
 
         filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
 
+        if filename is None:
+            filename = self.name
+
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"
 
         kwargs["filename"] = filename
+
+        if "OutputFileName" in kwargs.keys():
+            del kwargs["OutputFileName"]
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]

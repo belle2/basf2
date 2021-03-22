@@ -45,6 +45,7 @@
 //STL
 #include <iostream>
 #include <iterator>
+#include <cmath>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -118,6 +119,11 @@ void ECLDQMModule::defineHisto()
   h_adc_hits = new TH1F("adc_hits", "Fraction of high-energy hits (E > 50 MeV)", 1001, 0, 1.001);
   h_adc_hits->GetXaxis()->SetTitle("Fraction");
   h_adc_hits->SetOption("LIVE");
+
+  h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large", "Entries with ECL crate timing  > 100 ns (E > 1 GeV)", 52, 1,
+                                        53);
+  h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID");
+  h_time_crate_Thr1GeV_large->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {
     std::string h_name, h_title;
@@ -280,6 +286,7 @@ void ECLDQMModule::beginRun()
   h_bad_quality->Reset();
   h_trigtag1->Reset();
   h_adc_hits->Reset();
+  h_time_crate_Thr1GeV_large->Reset();
   h_cell_psd_norm->Reset();
   std::for_each(h_cids.begin(), h_cids.end(), [](auto & it) {it->Reset();});
   std::for_each(h_edeps.begin(), h_edeps.end(), [](auto & it) {it->Reset();});
@@ -382,7 +389,8 @@ void ECLDQMModule::event()
       }
     }
 
-    if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
   }
 
   for (auto& h : h_edeps) {

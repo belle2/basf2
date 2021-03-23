@@ -41,8 +41,7 @@ namespace Belle2 {
       m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("twoHitRelation", prefix));
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
-      "Maximum number of relations to be created.",
-      m_maxRelations);
+      "Maximum number of relations to be created.",  m_maxRelations);
     };
 
     /// Apply both filters for creating state-hit and hit-hit relations
@@ -57,6 +56,7 @@ namespace Belle2 {
     /// Subfindlet for the relation checking between seed and hits
     ARelationFilter m_relationFilter;
 
+    /// maximum number of relations that can be created per track candidate
     uint m_maxRelations = 10000;
   };
 }

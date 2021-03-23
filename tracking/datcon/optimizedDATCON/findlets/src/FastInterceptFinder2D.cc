@@ -140,18 +140,18 @@ void FastInterceptFinder2D::apply(std::vector<HitData>& hits, std::vector<std::v
 
     FindHoughSpaceCluster();
 
-//     if (m_breakFlag) {
-//       gnuplotoutput(m_currentSensorsHitList);
-//       uint count = 0;
-//       for (auto& hit : hits) {
-//         double X = hit.getDataCache().x;
-//         double Y = hit.getDataCache().y;
-//         double Z = hit.getDataCache().z;
-//         B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.getDataCache().sensorID);
-//         count++;
-//       }
-//       B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
-//     }
+    if (m_breakFlag) {
+      gnuplotoutput(m_currentSensorsHitList);
+      uint count = 0;
+      for (auto& hit : hits) {
+        double X = hit.getDataCache().x;
+        double Y = hit.getDataCache().y;
+        double Z = hit.getDataCache().z;
+        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.getDataCache().sensorID);
+        count++;
+      }
+      B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
+    }
   }
 
   for (auto& trackCand : m_trackCandidates) {

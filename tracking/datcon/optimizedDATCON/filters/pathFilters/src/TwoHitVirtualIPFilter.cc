@@ -63,7 +63,8 @@ TwoHitVirtualIPFilter::operator()(const BasePathFilter::Object& pair)
     return NAN;
   }
 
-  return 1.0 / chi2VirtIP;
+//   return 1.0 / chi2VirtIP;
+  return estimatorResultVirtIP.qualityIndicator;
 }
 
 void TwoHitVirtualIPFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

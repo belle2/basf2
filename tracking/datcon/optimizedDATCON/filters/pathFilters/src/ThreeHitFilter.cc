@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -27,11 +28,15 @@ ThreeHitFilter::operator()(const BasePathFilter::Object& pair)
     return NAN;
   }
 
+  const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+  helixFitEstimator.setMagneticFieldStrength(bFieldZ);
+
   const B2Vector3D& firstHitPos   = previousHits.at(0)->getHit()->getPosition();
   const B2Vector3D& secondHitPos  = previousHits.at(1)->getHit()->getPosition();
   const B2Vector3D& currentHitPos = pair.second->getHit()->getPosition();
 
   ThreeHitVariables threeHitVariables(firstHitPos, secondHitPos, currentHitPos);
+  threeHitVariables.setBFieldZ(bFieldZ);
 
   if (threeHitVariables.getCosAngleRZSimple() < m_cosRZCut) {
     return NAN;
@@ -43,7 +48,40 @@ ThreeHitFilter::operator()(const BasePathFilter::Object& pair)
     return NAN;
   }
 
-  return 1.0 / circleDistanceIP;
+  std::vector<const SpacePoint*> spacePoints;
+  spacePoints.reserve(previousHits.size() + 1);
+  spacePoints.emplace_back(previousHits.at(0)->getHit());
+  spacePoints.emplace_back(previousHits.at(1)->getHit());
+  spacePoints.emplace_back(pair.second->getHit());
+  const auto& estimatorResult = helixFitEstimator.estimateQualityAndProperties(spacePoints);
+
+  const double absHelixPocaD = (estimatorResult.pocaD) ? fabs(*estimatorResult.pocaD) : 1e-6;
+  const double chi2 = (estimatorResult.chiSquared) ? *estimatorResult.chiSquared : 1e6;
+
+//   B2INFO("PocaD: " << absHelixPocaD << " chi2: " << chi2);
+
+  if (absHelixPocaD > m_helixFitPocaDCut) {
+    return NAN;
+  }
+
+//   std::vector<const SpacePoint*> spacePointsVirtIP;
+//   spacePointsVirtIP.reserve(previousHits.size() + 2);
+//   SpacePoint virtualIPSpacePoint = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
+//   spacePointsVirtIP.emplace_back(&virtualIPSpacePoint);
+//   spacePointsVirtIP.emplace_back(previousHits.at(0)->getHit());
+//   spacePointsVirtIP.emplace_back(previousHits.at(1)->getHit());
+//   spacePointsVirtIP.emplace_back(pair.second->getHit());
+//   const auto& estimatorResultVirtIP = helixFitEstimator.estimateQualityAndProperties(spacePointsVirtIP);
+//
+//   const double absHelixPocaDVirtIP = (estimatorResultVirtIP.pocaD) ? fabs(*estimatorResultVirtIP.pocaD) : 1e-6;
+//   const double chi2VirtIP = (estimatorResultVirtIP.chiSquared) ? *estimatorResultVirtIP.chiSquared : 1e6;
+//
+//   B2INFO("Virtual IP: absHelixPocaDVirtIP: " << absHelixPocaDVirtIP << " chi2VirtIP: " << chi2VirtIP);
+
+//   return 1.0 / circleDistanceIP;
+//   return 1.0 / absHelixPocaD;
+//   return 1.0 / chi2;
+  return estimatorResult.qualityIndicator;
 }
 
 void ThreeHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -54,4 +92,7 @@ void ThreeHitFilter::exposeParameters(ModuleParamList* moduleParamList, const st
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
                                 "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
                                 m_circleIPDistanceCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_helixFitPocaDCut,
+                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit (tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
+                                m_helixFitPocaDCut);
 }

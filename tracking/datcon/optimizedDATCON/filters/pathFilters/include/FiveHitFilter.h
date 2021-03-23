@@ -11,6 +11,10 @@
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <math.h>
 
 namespace Belle2 {
@@ -29,5 +33,15 @@ namespace Belle2 {
 //     double m_param_SimpleThetaCutDeltaL1 = 0.1;
 //     /// Filter relations in theta between hit states where the layer difference is +-2
 //     double m_param_SimpleThetaCutDeltaL2 = 0.2;
+
+    /// cut on the POCA distance in xy obtained from the helixFitEstimator
+    double m_helixFitPocaDCut = 1.0;
+
+    /// Get track quality estimate from a circle fit
+    QualityEstimatorCircleFit circleFitEstimator;
+    /// Get track quality estimate from a helix fit
+    QualityEstimatorRiemannHelixFit helixFitEstimator;
+    /// Get track quality estimate from a triplet fit
+    QualityEstimatorTripletFit tripletFitEstimator;
   };
 }

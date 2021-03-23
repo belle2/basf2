@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -27,21 +28,44 @@ FourHitFilter::operator()(const BasePathFilter::Object& pair)
     return NAN;
   }
 
-  const B2Vector3D& firstHitPos   = previousHits.at(0)->getHit()->getPosition();
-  const B2Vector3D& secondHitPos  = previousHits.at(1)->getHit()->getPosition();
-  const B2Vector3D& thirdHitPos   = previousHits.at(2)->getHit()->getPosition();
-  const B2Vector3D& currentHitPos = pair.second->getHit()->getPosition();
+//   const B2Vector3D& firstHitPos   = previousHits.at(0)->getHit()->getPosition();
+//   const B2Vector3D& secondHitPos  = previousHits.at(1)->getHit()->getPosition();
+//   const B2Vector3D& thirdHitPos   = previousHits.at(2)->getHit()->getPosition();
+//   const B2Vector3D& currentHitPos = pair.second->getHit()->getPosition();
+//
+//   FourHitVariables fourHitVariables(firstHitPos, secondHitPos, thirdHitPos, currentHitPos);
+//   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+//   fourHitVariables.setBFieldZ(bFieldZ);
+//
+//   if (fourHitVariables.getCircleRadiusDifference() > m_param_CircleRadiusDifferenceCut) {
+//     return NAN;
+//   }
+//   if (fourHitVariables.getCircleCenterPositionDifference() > m_param_CircleCenterPositionDifferenceCut) {
+//     return NAN;
+//   }
+//
+//   return 1.0 / fourHitVariables.getCircleRadiusDifference();
 
-  FourHitVariables fourHitVariables(firstHitPos, secondHitPos, thirdHitPos, currentHitPos);
+  std::vector<const SpacePoint*> spacePoints;
+  spacePoints.reserve(previousHits.size() + 1);
+  spacePoints.emplace_back(previousHits.at(0)->getHit());
+  spacePoints.emplace_back(previousHits.at(1)->getHit());
+  spacePoints.emplace_back(previousHits.at(2)->getHit());
+  spacePoints.emplace_back(pair.second->getHit());
+  const auto& estimatorResult = helixFitEstimator.estimateQualityAndProperties(spacePoints);
 
-  if (fourHitVariables.getCircleRadiusDifference() > m_param_CircleRadiusDifferenceCut) {
+  const double absHelixPocaD = (estimatorResult.pocaD) ? fabs(*estimatorResult.pocaD) : 1e-6;
+  const double chi2 = (estimatorResult.chiSquared) ? *estimatorResult.chiSquared : 1e6;
+
+//   B2INFO("PocaD: " << absHelixPocaD << " chi2: " << chi2);
+
+  if (absHelixPocaD > m_helixFitPocaDCut) {
     return NAN;
   }
-  if (fourHitVariables.getCircleCenterPositionDifference() > m_param_CircleCenterPositionDifferenceCut) {
-    return NAN;
-  }
 
-  return 1.0 / fourHitVariables.getCircleRadiusDifference();
+//   return 1.0 / chi2;
+  return estimatorResult.qualityIndicator;
+
 }
 
 void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -53,4 +77,8 @@ void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_CircleCenterPositionDifferenceCut,
                                 "TODO: Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
                                 m_param_CircleCenterPositionDifferenceCut);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_helixFitPocaDCut,
+                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit (tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
+                                m_helixFitPocaDCut);
 }

@@ -140,7 +140,8 @@ void BestCandidateSelectionModule::event()
       if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
 
-    p->addExtraInfo(m_outputVariableName, rank);
+    if (!p->hasExtraInfo(m_outputVariableName))
+      p->addExtraInfo(m_outputVariableName, rank);
     m_inputList->addParticle(p);
 
     previous_val = candidate.first;

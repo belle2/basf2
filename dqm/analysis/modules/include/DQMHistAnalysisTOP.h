@@ -64,6 +64,11 @@ namespace Belle2 {
     /** Canvas for the RMS of the bad hits. */
     TCanvas* m_c_badHitsRMS = nullptr;
 
+    TCanvas* m_c_good_hits_xy_[17] = {};
+    TCanvas* m_c_bad_hits_xy_[17] = {};
+    TCanvas* m_c_good_hits_asics_[17] = {};
+    TCanvas* m_c_bad_hits_asics_[17] = {};
+
     /** Histogram for the mean of the good hits. */
     TH1F* m_h_goodHitsMean = nullptr;
     /** Histogram for the RMS of the good hits. */

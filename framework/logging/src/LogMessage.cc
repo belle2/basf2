@@ -18,11 +18,8 @@
 #include <framework/core/ProcessStatistics.h>
 
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/asio/ip/host_name.hpp>
 #include <ostream>
 #include <utility>
-#include <sys/types.h>
-#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;
@@ -124,8 +121,6 @@ std::string LogMessage::toJSON(bool complete) const
       buffer << ",\"nevents\":" << int(stats.getCalls());
     }
     buffer << ",\"initialize\":" << ((DataStore::Instance().getInitializeActive()) ? "true" : "false");
-    buffer << ",\"hostname\":\"" << boost::asio::ip::host_name() << '"';
-    buffer << ",\"pid\":" << int(getpid());
   }
   buffer << "}\n";
   return buffer.str();

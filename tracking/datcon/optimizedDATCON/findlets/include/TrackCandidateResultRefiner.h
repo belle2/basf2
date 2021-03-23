@@ -1,0 +1,67 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Wessel                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+
+#include <string>
+#include <vector>
+
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TFile.h>
+
+
+namespace Belle2 {
+  class SpacePointTrackCand;
+  class ModuleParamList;
+
+  /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
+  class TrackCandidateResultRefiner : public TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand> {
+    /// Parent class
+    using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand>;
+
+  public:
+    /// Find intercepts in the 2D Hough space
+    TrackCandidateResultRefiner();
+
+    /// Default destructor
+    ~TrackCandidateResultRefiner();
+
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+    /// Create the store arrays
+    void initialize() override;
+
+    /// End run and write Root file
+    void beginRun() override;
+
+    /// Reject bad SpacePointTrackCands and bad hits inside the remaining
+    void apply(std::vector<SpacePointTrackCand>& unprunedResults, std::vector<SpacePointTrackCand>& prunedResults) override;
+
+  private:
+    /// Identifier which estimation method to use. Valid identifiers are:
+    /// mcInfo, circleFit, tripletFit, helixFit
+    std::string m_EstimationMethod = "tripletFit";
+
+    /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
+    std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
+    /// Only required for MCInfo method
+    bool m_MCStrictQualityEstimator = true;
+    /** pointer to the selected QualityEstimator */
+    std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+  };
+}

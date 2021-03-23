@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['CLHEP', 'framework', 'belle_legacy', 'mdst_dataobjects', 'b2bii', 'b2bii_dataobjects', 'analysis_dataobjects', 'analysis_VertexFitting']
+env['LIBS'] = ['CLHEP', 'framework', 'belle_legacy', 'mdst_dataobjects', 'b2bii', 'b2bii_dataobjects', 'analysis_dataobjects', 'analysis_VertexFitting', 'mdst_dbobjects']
 
 Return('env')

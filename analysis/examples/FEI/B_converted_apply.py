@@ -29,16 +29,17 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
     # Actually, the KS finder should be set to True.
     # However, here it's set to False because the necessary library is only present on kekcc and not on the build server.
     enableNisKsFinder=False,
+    enableLocalDB=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
 # Get FEI default channels for a converted training
 # Utilise the arguments to toggle on and off certain channels
-particles = fei.get_default_channels(convertedFromBelle=True)
+particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
 configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
-                                            b2bii=True, training=False, monitor=False, cache=0)
+                                            training=False, monitor=False, cache=0)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

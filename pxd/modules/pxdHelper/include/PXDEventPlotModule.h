@@ -40,8 +40,10 @@ namespace Belle2 {
       PXDEventPlotModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Event */
       void event() override final;
 
     private:

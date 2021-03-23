@@ -56,6 +56,7 @@ import basf2
 from basf2 import B2INFO, B2WARNING
 import pybasf2
 import modularAnalysis as ma
+import b2bii
 
 import basf2_mva
 
@@ -74,7 +75,6 @@ import re
 import functools
 import subprocess
 import multiprocessing
-import pickle
 
 # Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
@@ -175,7 +175,7 @@ class FSPLoader(object):
         """
         path = basf2.create_path()
 
-        if self.config.b2bii:
+        if b2bii.isB2BII():
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('p+:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
@@ -356,7 +356,7 @@ class PreReconstruction(object):
                 elif self.config.training:
                     ma.matchMCTruth(channel.name, path=path)
 
-                if self.config.b2bii and particle.name in ['K_S0', 'Lambda0']:
+                if b2bii.isB2BII() and particle.name in ['K_S0', 'Lambda0']:
                     pvfit = basf2.register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
                     pvfit.param('listName', channel.name)
@@ -742,7 +742,7 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     @param config config.FeiConfiguration object
     @param cache current cache level
     """
-    configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
+    configuration = config.FeiConfiguration(configuration.prefix, cache,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
     # Backup existing Summary.pickle files

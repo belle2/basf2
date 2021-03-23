@@ -99,7 +99,7 @@ if __name__ == "__main__":
         test_ordering.add_module("Geometry", components=["SVD"])
         test_ordering.add_module(CreateDigits(sig_digits))
         test_ordering.add_module("SVDShaperDigitSorter")
-        add_svd_reconstruction(test_ordering, useCoG=True)
+        add_svd_reconstruction(test_ordering)
         test_ordering.add_module(PrintDigitsAndClusters())
         test_ordering.add_module(CheckOrderingOfDigits())
 

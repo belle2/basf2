@@ -178,8 +178,8 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
 
           g0b->SetParLimits(0, 0, m_hBiased[il][lr][al][th]->GetEntries() * 5);
           g0u->SetParLimits(0, 0, m_hUnbiased[il][lr][al][th]->GetEntries() * 5);
-          g0b->SetParLimits(1, -0.1, 0.1);
-          g0u->SetParLimits(1, -0.1, 0.1);
+          g0b->SetParLimits(1, -0.01, 0.004);
+          g0u->SetParLimits(1, -0.01, 0.004);
           g0b->SetParLimits(2, 0.0, proYb->GetRMS() * 5);
           g0u->SetParLimits(2, 0.0, proYu->GetRMS() * 5);
 

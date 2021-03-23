@@ -1,0 +1,39 @@
+# EventType: 1296700004
+# Descriptor:  [B- -> D_0*0 l- nu, D_0*0 -> D* pi pi ] cc 
+# NickName: Bu_Dzerostlnu_Dstpipi
+# Documentation: b->c l nu process, D_0* mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+ 
+Alias D_0*0sig D_0*0
+Alias anti-D_0*0sig anti-D_0*0
+ChargeConj D_0*0sig anti-D_0*0sig
+ 
+Decay Upsilon(4S)
+0.500 B+sig B-  VSS;
+0.500 B-sig B+  VSS;
+Enddecay
+ 
+ 
+Decay B-sig
+0.500 D_0*0sig  e-  anti-nu_e  PHOTOS LLSW 0.68 -0.2 0.3;
+0.500 D_0*0sig  mu- anti-nu_mu PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+ 
+Decay  D_0*0sig
+0.1719    D*0 pi+ pi-                     PHOTOS PHSP;
+0.1145    D*0 pi0 pi0                     PHSP;
+0.1145    D*+ pi- pi0                     PHOTOS PHSP;
+Enddecay
+CDecay  anti-D_0*0sig
+ 
+End
+
+

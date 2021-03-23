@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """ Compare ROOT objects and perform e.g. chi2 tests.
 A small command line interface for testing/debugging purposes is included.
@@ -663,7 +662,7 @@ class AndersonDarlingTest(PvalueTest):
 # ==============================================================================
 
 
-class TablePrinter(object):
+class TablePrinter:
     """ A tiny class to print columns of fixed width numbers. """
 
     def __init__(self, ncols, width=None):
@@ -706,7 +705,7 @@ class TablePrinter(object):
         for icol, col in enumerate(cols):
             width = self.widths[icol]
             if isinstance(col, int):
-                form = "{{:{}d}}".format(width)
+                form = f"{{:{width}d}}"
                 out.append(form.format(col))
             elif isinstance(col, float):
                 form = "{{:{}.{}f}}".format(width, width // 2)

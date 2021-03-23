@@ -127,7 +127,6 @@ def efficiencyCalculator(mc, data, method):
     mc_wvalueB0bar = array('f', [0] * r_size)
     mc_wvalueDiff = array('f', [0] * r_size)
     mc_wvalueDiffUncertainty = array('f', [0] * r_size)
-    mc_entries = array('f', [0] * r_size)
     mc_iEffEfficiency = array('f', [0] * r_size)
     mc_iEffEfficiencyUncertainty = array('f', [0] * r_size)
     mc_iEffEfficiencyB0Uncertainty = array('f', [0] * r_size)
@@ -625,15 +624,12 @@ def plotWithResiduals(rooFitFrame, rooRealVar, dots, modelCurve, units, nameOfPl
     rooFitFrame.GetYaxis().SetTitleOffset(0.98)
     rooFitFrame.GetYaxis().SetLabelSize(0.055)
 
-    yLabelBin = 0
-    yLabelBin = '{:0.0f}'.format(float(dots.GetErrorXlow(1) + dots.GetErrorXhigh(1)))
-
     pointsHist = ROOT.RooHist()
 
     iBin = 0
 
-    xValModel = ROOT.Double(-1.E30)
-    yValModel = ROOT.Double(-1.E30)
+    # xValModel = ROOT.Double(-1.E30)
+    # yValModel = ROOT.Double(-1.E30)
     xValDot = ROOT.Double(-1.E30)
     yValDot = ROOT.Double(-1.E30)
 

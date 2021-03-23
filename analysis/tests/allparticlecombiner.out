@@ -5,8 +5,9 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is release-05-01-03
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+:fromPV (pi-:fromPV)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : dr < 2 and abs(dz) < 5
 [INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : abs(dzFromMedianDz) < 0.05

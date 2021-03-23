@@ -21,7 +21,7 @@ def get_greeting(name):
                  "Honorable", "To the esteemed", "Magnificent", "Glorious", "Howdy"]
     closing = ["Bye", "Cheers", "Best Regards", "Best Wishes", "Yours sincerely",
                "Yours truly", "Thank you", "Seeya", "Toodle-loo", "Ciao", "Hochachtungsvoll"]
-    return {"greeting": "%s %s" % (random.choice(greetings), name), "closing": random.choice(closing)}
+    return {"greeting": "{} {}".format(random.choice(greetings), name), "closing": random.choice(closing)}
 
 
 def markdown_to_plaintext(text):

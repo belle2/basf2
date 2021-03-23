@@ -6,17 +6,14 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is release-05-01-03
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: mu- (mu+)
+[INFO]  o) creating (anti-)ParticleList with name: mu-:all (mu+:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
+[INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
 [INFO]    -> MDST source: Tracks
-[INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
-[INFO]    -> MDST source: ECLClusters
-[INFO]    -> With cuts  : 
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleVertexFitter: Performing vertex fit on J/psi using KFit
 [INFO] TagVertexModule : magnetic field = 1.45279
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -24,7 +21,7 @@
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : J/psi (0+1)
-[INFO]  - 37 = 443[0]
+[INFO]  - 41 = 443[0]
 [INFO]      o) daughter indices = 9 6
 [INFO]      o) DeltaT = -0.541025
 [INFO]      o) DeltaTErr = 0.298963

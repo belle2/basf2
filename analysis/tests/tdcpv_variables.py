@@ -19,15 +19,12 @@ fsps = ['mu-', 'pi-', 'gamma']
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 for fsp in fsps:
-    # There is an annoying warning in ParticleLoader about zero charged tracks
-    # If it will be removed in the future releases, the test log should be
-    # updated respectively.
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
+    testpath.add_module('ParticleLoader', decayStrings=[fsp])
 
 ###############################################################################
 signal_list = 'J/psi'
 # Find J/psi
-testpath.add_module('ParticleCombiner', decayString=f'{signal_list} -> mu+ mu-',
+testpath.add_module('ParticleCombiner', decayString=f'{signal_list} -> mu+:all mu-:all',
                     cut='daughter(0, isSignal) > 0 and daughter(1, isSignal) > 0 '
                     ' and daughter(0, genMotherID) == daughter(1, genMotherID)')
 # Signal vertex fit using kFit
@@ -37,7 +34,7 @@ testpath.add_module('ParticleVertexFitter', listName=signal_list,
 testpath.add_module('ParticlePrinter', listName=signal_list, fullPrint=False)
 # Build ROE
 testpath.add_module('RestOfEventBuilder', particleList=signal_list,
-                    particleListsInput=['pi+', 'gamma'])
+                    particleListsInput=['pi+:all', 'gamma:all'])
 # Tag vertex fit
 testpath.add_module('TagVertex', listName=signal_list)
 # Define ROE variables for testing

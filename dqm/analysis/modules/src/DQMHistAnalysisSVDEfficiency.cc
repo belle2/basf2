@@ -36,7 +36,7 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
   addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
-  addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
+  addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
@@ -118,19 +118,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrU = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrU");
   m_cEfficiencyErrV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV");
 
-
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
-
-  // add MonitoringObject and canvases
-  m_monObj = getMonitoringObject("svd");
-
-  m_c_found_tracks_UV = new TCanvas("svd_found_tracks_UV");
-  m_c_matched_clusters_UV = new TCanvas("svd_matched_clusters_UV");
-
-  // add canvases to MonitoringObject
-  m_monObj->addCanvas(m_c_found_tracks_UV);
-  m_monObj->addCanvas(m_c_matched_clusters_UV);
 
 }
 
@@ -152,10 +141,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //  gStyle->SetTitleY(.97);
 
   //check MODULE EFFICIENCY
-  m_effUstatus = 0;
+  m_effUstatus = 0; // 0: good; 1: low stat; 2: warning; 3: error;
   m_effVstatus = 0;
-  m_effUErrstatus = 0;
-  m_effVErrstatus = 0;
 
   //set dedicate gStyle
   //  const Int_t colNum = 4;
@@ -201,13 +188,13 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
-      if (effU <= m_effEmpty) {
-        if (m_effUstatus < 1) m_effUstatus = 1;
-      } else if (effU < m_effWarning) {
-        if (effU > m_effError) {
-          if (m_effUstatus < 2) m_effUstatus = 2;
+      if (effU <= m_effEmpty || denU < m_statThreshold) {
+        if (m_effUstatus < 1) m_effUstatus = 1; // low statistics
+      } else if (effU + erreffU < m_effWarning) {
+        if (effU > m_effError || effU + erreffU > m_effError) {
+          if (m_effUstatus < 2) m_effUstatus = 2; // warning
         } else {
-          if (m_effUstatus < 3) m_effUstatus = 3;
+          if (m_effUstatus < 3) m_effUstatus = 3; // error
         }
       }
     }
@@ -242,10 +229,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
-      if (effV <= m_effEmpty) {
+      if (effV <= m_effEmpty || denV < m_statThreshold) {
         if (m_effVstatus < 1) m_effVstatus = 1;
-      } else if (effV < m_effWarning) {
-        if (effV > m_effError) {
+      } else if (effV + erreffV < m_effWarning) {
+        if (effV > m_effError || effV + erreffV > m_effError) {
           if (m_effVstatus < 2) m_effVstatus = 2;
         } else {
           if (m_effVstatus < 3) m_effVstatus = 3;
@@ -254,12 +241,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
-
   //update summary
   m_cEfficiencyU->cd();
-
-
-
   m_hEfficiency->getHistogram(1)->Draw("text");
 
   if (m_effUstatus == 0) {
@@ -333,60 +316,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::endRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency:  endRun called");
-  if (m_printCanvas) {
-    m_cEfficiencyU->Print("c_SVDEfficiencyU.pdf");
-    m_cEfficiencyV->Print("c_SVDEfficiencyV.pdf");
-    m_cEfficiencyErrU->Print("c_SVDEfficiencyErrU.pdf");
-    m_cEfficiencyErrV->Print("c_SVDEfficiencyErrV.pdf");
-  }
-
-  // get existing histograms produced by DQM modules
-  // Efficiency for the U side
-  TH2F* h_found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
-  TH2F* h_matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
-
-  //Efficiency for the V side
-  TH2F* h_found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
-  TH2F* h_matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
-
-  m_c_found_tracks_UV->Clear();
-  m_c_found_tracks_UV->Divide(2, 1);
-  m_c_found_tracks_UV->cd(1);
-  if (h_found_tracksU) h_found_tracksU->Draw("colz");
-  m_c_found_tracks_UV->cd(2);
-  if (h_found_tracksV) h_found_tracksV->Draw("colz");
-
-  m_c_matched_clusters_UV->Clear();
-  m_c_matched_clusters_UV->Divide(2, 1);
-  m_c_matched_clusters_UV->cd(1);
-  if (h_matched_clusU) h_matched_clusU->Draw("colz");
-  m_c_matched_clusters_UV->cd(2);
-  if (h_matched_clusV) h_matched_clusV->Draw("colz");
-
-  // add variables for run dependent monitoring
-
-  if (h_matched_clusU == NULL || h_found_tracksU == NULL) {
-    B2INFO("Histograms needed for Average Efficiency on U side are not found");
-    m_monObj->setVariable("avgEffU", -1);
-  } else {
-    double avgEffU = 1.*h_matched_clusU->GetEntries() / h_found_tracksU->GetEntries();
-    m_monObj->setVariable("avgEffU", avgEffU);
-  }
-
-  if (h_matched_clusV == NULL || h_found_tracksV == NULL) {
-    B2INFO("Histograms needed for Average Efficiency on V side are not found");
-    m_monObj->setVariable("avgEffV", -1);
-  } else {
-    double avgEffV = 1.*h_matched_clusV->GetEntries() / h_found_tracksV->GetEntries();
-    m_monObj->setVariable("avgEffV", avgEffV);
-  }
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
@@ -406,17 +340,18 @@ void DQMHistAnalysisSVDEfficiencyModule::terminate()
   delete m_cEfficiencyErrV;
 }
 
+// return y coordinate in TH2F histogram for specified sensor
 Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
 {
-
   if (layer == 3)
-    return sensor; //2
+    return sensor; //2 -> 1,2
   if (layer == 4)
-    return 2 + 1 + sensor; //6
+    return 2 + 1 + sensor; //6 -> 4,5,6
   if (layer == 5)
-    return 6 + 1 + sensor; // 11
+    return 6 + 1 + sensor; // 11 -> 8, 9, 10, 11
   if (layer == 6)
-    return 11 + 1 + sensor; // 17
+    return 11 + 1 + sensor; // 17 -> 13, 14, 15, 16, 17
   else
     return -1;
 }
+

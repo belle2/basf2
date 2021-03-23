@@ -123,6 +123,13 @@ namespace Belle2 {
     */
     static void setStreamingObjects(const boost::python::list& streamingObjects);
 
+    /**
+     * Function to set the execution realm
+     *
+     * @param realm basf2 execution realm
+    */
+    static void setRealm(const std::string& realm);
+
 
     /** Find a file. This is a wrapper around FileSystem::findFile() to be able
      * to call it nicely from python and create a `FileNotFoundError` if the

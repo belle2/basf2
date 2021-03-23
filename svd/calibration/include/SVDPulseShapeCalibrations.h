@@ -130,9 +130,9 @@ namespace Belle2 {
     inline float getPeakTime(const VxdID& sensorID, const bool& isU,
                              const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                                     sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
-                                     strip).peakTime;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                              sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
+                                              strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -154,8 +154,8 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                              m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
     }
 
@@ -180,8 +180,8 @@ namespace Belle2 {
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
+      return m_calAmp_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                              m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
 
     }
 
@@ -190,4 +190,3 @@ namespace Belle2 {
 
   };
 }
-

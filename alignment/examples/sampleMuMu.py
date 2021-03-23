@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-from ROOT import Belle2
 
-from beamparameters import add_beamparameters
+# from beamparameters import add_beamparameters
 from generators import add_kkmc_generator
 from simulation import add_simulation
 from L1trigger import add_tsim

@@ -20,6 +20,7 @@
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
 """
 
+import b2bii
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 from basf2 import B2FATAL, B2INFO
 
@@ -32,7 +33,6 @@ def get_default_channels(
         baryonic=True,
         chargedB=True,
         neutralB=True,
-        convertedFromBelle=False,
         specific=False,
         removeSLD=False,
         strangeB=False):
@@ -47,7 +47,6 @@ def get_default_channels(
     @param baryonic whether to include baryons into the training (default is True)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
-    @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
     @param strangeB if True, reconstruct B_s mesons in Upsilon5S decays (default is False)
@@ -61,6 +60,8 @@ def get_default_channels(
         if KLong is False:
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
+
+    convertedFromBelle = b2bii.isB2BII()
 
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID

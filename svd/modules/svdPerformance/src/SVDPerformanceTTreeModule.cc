@@ -170,7 +170,7 @@ void SVDPerformanceTTreeModule::event()
     if (! trk.wasFitSuccessful()) {
       continue;
     }
-    int pionCode = 211;
+
 
     RelationVector<Track> theTK = DataStore::getRelationsWithObj<Track>(&trk);
 
@@ -179,7 +179,8 @@ void SVDPerformanceTTreeModule::event()
     }
 
 
-    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::ChargedStable(pionCode));
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::pion);
+
     if (tfr) {
       m_svdTrkd0 = tfr->getD0();
       m_svdTrkz0 = tfr->getZ0();
@@ -277,6 +278,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
           m_svdStripPosition.clear();
+
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
@@ -291,6 +293,8 @@ void SVDPerformanceTTreeModule::event()
               //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
               m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
+
+
 
           m_t_U->Fill();
 
@@ -341,7 +345,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
           m_svdStripPosition.clear();
-
 
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);

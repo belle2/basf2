@@ -36,10 +36,13 @@ namespace Belle2 {
 
   private:
 
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
+    /** Define histograms */
     void defineHisto() override final;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */

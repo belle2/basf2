@@ -11,16 +11,16 @@ Algorithm overview
 Physics
 *******
 
-Measurements of decays including neutrinos, in particular rare decays, suffer from missing kinematic information. The FEI recovers this information partially and infers strong constraints on the signal candidates by automatically reconstructing the rest of the event in thousands of exclusive decay channels. The Full Event Interpretation (FEI) is an essential component in a wide range of important analyses, including: the measurement of the CKM element :math:`|V_{ub}|` through the semileptonic decay :math:`b \rightarrow u \nu`; the search for a charged-Higgs effect in :math:`B \rightarrow D \tau \nu`; and the precise measurement of the branching fraction of :math:`B \rightarrow \tau \nu`, which is sensitive to new physics effects. 
+Measurements of decays including neutrinos, in particular rare decays, suffer from missing kinematic information. The FEI recovers this information partially and infers strong constraints on the signal candidates by automatically reconstructing the rest of the event in thousands of exclusive decay channels. The Full Event Interpretation (FEI) is an essential component in a wide range of important analyses, including: the measurement of the CKM element :math:`|V_{ub}|` through the semileptonic decay :math:`b \rightarrow u \nu`; the search for a charged-Higgs effect in :math:`B \rightarrow D \tau \nu`; and the precise measurement of the branching fraction of :math:`B \rightarrow \tau \nu`, which is sensitive to new physics effects.
 
 .. _example_decay:
 
 .. figure:: figs/example_decay.png
   :width: 40em
   :align: left
-  
+
   :math:`\Upsilon(4S)\rightarrow (B^{+} \rightarrow l^{+} \nu_{l} \gamma) (B^{-} \rightarrow (D^{0} \rightarrow K^{-} \pi^{+}) \pi^{-})` decay topology. Here the decay :math:`B^{-} \rightarrow (D^{0} \rightarrow K^{-} \pi^{+}) \pi^{-}` can be reconstructed as the tag-side allowing additional information about the signal-side :math:`B^{+} \rightarrow l^{+} \nu_{l} \gamma` to be deduced.
- 
+
 As an analysis technique unique to B factories, the Full Event Interpretation will play an important role in the measurement of rare decays. This technique reconstructs one of the B mesons and infers strong constraints for the remaining B meson in the event using the precisely known initial state of the :math:`\Upsilon(4S)`. The actual analysis is then performed on the second B meson. The two mesons are called tag-side :math:`B_{\text{tag}}` and signal-side :math:`B_{\text{sig}}`, respectively. In effect the FEI allows one to reconstruct the initial :math:`\Upsilon(4S)` resonance, and thereby recovering the kinematic and flavour information of :math:`B_{\text{sig}}`. Furthermore, the background can be drastically reduced by discarding :math:`\Upsilon(4S)` candidates with remaining tracks or energy clusters in the rest of event.
 
 Belle already employed a similar technique called Full Reconstruction (FR) with great success. As a further development the Full Event Interpretation is more inclusive, provides more automation and analysis-specific optimisations. Both techniques heavily rely on multivariate classifiers (MVC). MVCs have to be trained on a Monte Carlo (MC) simulated data sample. However, the analysis-specific signal-side selection strongly influences the background distributions on the tag-side. Yet this influence had to be neglected by the FR, because the training of the MVCs was done independently from the signal-side analysis. In contrast, the FEI can be trained for each analysis separately and can thereby take the signal-side selection into account. The analysis-specific training is possible due to the deployment of speed-optimized training algorithms, full automation and the extensive usage of parallelization on all levels. The total training duration for a typical analysis is in the order of days instead of weeks. In consequence, it is also feasible to retrain the FEI if better MC data or optimized MVCs become available.
@@ -61,7 +61,7 @@ The basic idea of the Full Event Interpretation is to reconstruct the particles 
 .. figure:: figs/hierarchy.png
   :width: 40em
   :align: center
-  
+
   Hierarchical reconstruction applied by the FEI, which starting from tracks and EM clusters reconstructs initial state particles, intermediate particles in several stages and finally candidate :math:`B` tags.
 
 For instance, the FEI currently reconstructs 15 decay channels of the :math:`D^{0}` . Afterwards, the generated D0 candidates are used to reconstruct :math:`D^{*0}` in 2 decay channels. All information about the specific D0 decay channel of the candidate is encoded in its
@@ -121,7 +121,8 @@ In order to find the latest, recommended FEI training, you can use the `b2condit
 ``b2conditionsdb-recommend input_file.mdst.root``
 
 This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
-Analysis tags are named ``analysis_tools_XXXX``.
+Analysis tags are named ``analysis_tools_XXXX``, and the latest and recommended one can be retrieved using
+the tool `b2conditionsdb-recommend` or the function `modularAnalysis.getAnalysisGlobaltag`.
 You will need to prepend this tag to your global tags list.
 This is done inside the FEI steering script.
 
@@ -318,7 +319,7 @@ You can find up to date examples in ``analysis/examples/FEI``.
 In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
-* a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring, or if you use b2bii)
+* a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
 * a feistate object, which contains the BASF2 path for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
@@ -418,4 +419,4 @@ Resources, Publications etc.
 *    `The Full Event Interpretation for Belle II <http://ekp-invenio.physik.uni-karlsruhe.de/record/48602>`_
       Thomas's master thesis. Describes the proof-of-concept implementation of the FEI in Belle II, this twiki page is in large parts copied from here.
 *    `Machine learning algorithms for the Belle II experiment and their validation on Belle data <https://publikationen.bibliothek.kit.edu/1000078149>`_
-      Thomas's PhD thesis. 
+      Thomas's PhD thesis.

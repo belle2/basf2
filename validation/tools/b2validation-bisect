@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Utility script to be used in conjunction with the git bisect functionality
@@ -68,7 +67,7 @@ def get_error_count_from_json(file_name):
     """
     Get the number of failed comparisons for the json file
     """
-    with open(file_name, 'r') as fp:
+    with open(file_name) as fp:
         jdata = json.load(fp)
         packages = jdata["packages"]
         error_count = packages[0]["comparison_error"]
@@ -341,7 +340,7 @@ if __name__ == "__main__":
             )
             ecount = get_error_count_from_json(result_file_name)
 
-            print("This revision has {} failed comparisons".format(ecount))
+            print(f"This revision has {ecount} failed comparisons")
 
             # one comparison error found, tell git
             if ecount > argsVar["max_failed_comparison"]:
@@ -381,9 +380,9 @@ if __name__ == "__main__":
         print("Retrieved value " + str(valValue))
 
         compareResult = None
-        if c[2] is ">":
+        if c[2] == ">":
             compareResult = float(valValue) > float(c[3])
-        elif c[2] is "<":
+        elif c[2] == "<":
             compareResult = float(valValue) < float(c[3])
         else:
             print("Compare operation " + c[2] + " not supported")

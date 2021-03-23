@@ -153,7 +153,7 @@ class AlgorithmStrategy(ABC):
                 failed_results.append(result)
         if failed_results:
             B2WARNING("Failed results found.")
-            for result in results:
+            for result in failed_results:
                 if result.result == AlgResult.failure.value:
                     B2ERROR(f"c_Failure returned for {result.iov}.")
                 elif result.result == AlgResult.not_enough_data.value:
@@ -636,13 +636,25 @@ class SequentialBoundaries(AlgorithmStrategy):
     Runs the algorithm over the input data contained within the requested IoV of the boundaries,
     starting with the first boundary data only.
     If the algorithm returns 'not enough data' on the current boundary IoV, it won't commit the payloads,
-    but instead adds the next run's data and tries again. Basically the same logic as `SequentialRunByRun`
+    but instead adds the next boundarie's data and tries again. Basically the same logic as `SequentialRunByRun`
     but using run boundaries instead of runs directly.
-"""
+    Notice that boundaries cannot span multiple experiments.
+
+    By default the algorithm will get the payload boundaries directly from the algorithm that need to
+    have inplemented the function ``isBoundaryRequired``. If the desired boundaries are already known it
+    is possible to pass them directly setting the algorithm parameter ``payload_boundaries`` and avoid
+    the need to define the  ``isBoundaryRequired`` function.
+
+    ``payload_boundaries`` is a list ``[(exp1, run1), (exp2, run2), ...]``. A boundary at the beginning of each
+    experiment will be added if not already present. An empty list will thus produce a single payload for each
+    experiment. A ``payload_boundaries`` set to ``None`` is equivalent to not passing it and restores the default
+    behaviour where the boundaries are computed in the ``isBoundaryRequired`` function of the algorithm.
+    """
     #: The params that you could set on the Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.
     usable_params = {
         "iov_coverage": IoV,
+        "payload_boundaries": []  # [(exp1, run1), (exp2, run2), ...]
     }
 
     #: Granularity of collector that can be run by this algorithm properly
@@ -705,6 +717,11 @@ class SequentialBoundaries(AlgorithmStrategy):
             B2INFO(f"Detected that you have set iov_coverage to {self.algorithm.params['iov_coverage']}.")
             iov_coverage = self.algorithm.params["iov_coverage"]
 
+        payload_boundaries = None
+        if "payload_boundaries" in self.algorithm.params:
+            B2INFO(f"Detected that you have set payload_boundaries to {self.algorithm.params['payload_boundaries']}.")
+            payload_boundaries = self.algorithm.params["payload_boundaries"]
+
         number_of_experiments = len(runs_to_execute)
         B2INFO(f"We are iterating over {number_of_experiments} experiments.")
 
@@ -739,18 +756,34 @@ class SequentialBoundaries(AlgorithmStrategy):
 
             # Find the boundaries for this experiment's runs
             vec_run_list = vector_from_runs(run_list)
-            B2INFO("Attempting to find payload boundaries.")
-            vec_boundaries = self.algorithm.algorithm.findPayloadBoundaries(vec_run_list)
-            # If this vector is empty then that's bad. Maybe the isBoundaryRequired function
-            # wasn't implemented? Either way we should stop.
-            if vec_boundaries.empty():
-                B2ERROR("No boundaries found but we are in a strategy that requires them! Failing...")
-                # Tell the Runner that we have failed
-                self.send_final_state(self.FAILED)
-                break
+            if payload_boundaries is None:
+                # Find the boundaries using the findPayloadBoundaries implemented in the algorithm
+                B2INFO("Attempting to find payload boundaries.")
+                vec_boundaries = self.algorithm.algorithm.findPayloadBoundaries(vec_run_list)
+                # If this vector is empty then that's bad. Maybe the isBoundaryRequired function
+                # wasn't implemented? Either way we should stop.
+                if vec_boundaries.empty():
+                    B2ERROR("No boundaries found but we are in a strategy that requires them! Failing...")
+                    # Tell the Runner that we have failed
+                    self.send_final_state(self.FAILED)
+                    break
+                vec_boundaries = runs_from_vector(vec_boundaries)
+            else:
+                # Using boundaries set by user
+                B2INFO(f"Using as payload boundaries {payload_boundaries}.")
+                vec_boundaries = [ExpRun(exp, run) for exp, run in payload_boundaries]
+                # No need to check that vec_boundaries is not empty. In case it is we will anyway add
+                # a boundary at the first run of each experiment.
             # Remove any boundaries not from the current experiment (only likely if they were set manually)
             # We sort just to make everything easier later and just in case something mad happened.
-            run_boundaries = sorted([er for er in runs_from_vector(vec_boundaries) if er.exp == current_experiment])
+            run_boundaries = sorted([er for er in vec_boundaries if er.exp == current_experiment])
+            # In this strategy we consider separately each experiment. We then now check that the
+            # boundary (exp, 0) is present and if not we add it. It is indeed possible to miss it
+            # if the boundaries were given manually
+            first_exprun = ExpRun(current_experiment, 0)
+            if first_exprun not in run_boundaries:
+                B2WARNING(f"No boundary found at ({current_experiment}, 0), adding it.")
+                run_boundaries[0:0] = [first_exprun]
             B2INFO((f"Found {len(run_boundaries)} boundaries for this experiment. "
                     "Checking if we have some data for all boundary IoVs..."))
             # First figure out the run lists to use for each execution (potentially different from the applied IoVs)

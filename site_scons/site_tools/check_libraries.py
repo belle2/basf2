@@ -59,8 +59,8 @@ def get_package(env, node):
 
 def print_libs(title, text, pkg, lib, libs):
     """Print information on extra/missing libraries"""
-    for l in sorted(libs):
-        print("%s:%s:%s -> %s (%s)" % (title, pkg, lib, l, text))
+    for library in sorted(libs):
+        print("%s:%s:%s -> %s (%s)" % (title, pkg, lib, library, text))
 
 
 def check_libraries(target, source, env):
@@ -130,8 +130,9 @@ def check_libraries(target, source, env):
         # But for now we just restrict ourselves to libraries in $LIBDIR
         # because we know they don't have so-versions. So reduce the
         # lists to libraries which we can actually find in $LIBDIR
-        given_internal = set("lib%s.so" % l for l in given if os.path.exists(os.path.join(libdir, "lib%s.so" % l)))
-        needed_internal = set(l for l in needed if os.path.exists(os.path.join(libdir, l)))
+        given_internal = set("lib%s.so" % library for library in given if os.path.exists(os.path.join(libdir,
+                                                                                         "lib%s.so" % library)))
+        needed_internal = set(library for library in needed if os.path.exists(os.path.join(libdir, library)))
 
         # now check for extra or missing direct dependencies using
         # simple set operations

@@ -4,7 +4,6 @@
 """
 <header>
     <input>SVDValidationTTreeRecoDigit.root</input>
-    <input>SVDValidationTTreeStrip.root</input>
     <output>SVDRecoDigitPerformance.root</output>
     <description>
     Validation plots related to RecoDigit performance.
@@ -20,14 +19,12 @@ import ROOT as R
 import plotUtils as pu
 
 inputRD = R.TFile.Open("../SVDValidationTTreeRecoDigit.root")
-inputS = R.TFile.Open("../SVDValidationTTreeStrip.root")
 
 treeRD = inputRD.Get("tree")
-treeS = inputS.Get("tree")
 
 histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
-pu.ploter(
+pu.plotter(
     name='TimeResolution',
     title='Resolution of the reconstructed time of a single strip',
     nbins=200,
@@ -44,7 +41,7 @@ pu.ploter(
     check='Distribution between -40 and 20 ns.',
     isShifter=True)
 
-pu.ploter(
+pu.plotter(
     name='StripCharge',
     title='Charge of the strip',
     nbins=50,
@@ -53,9 +50,9 @@ pu.ploter(
     x_label='Strip charge (# of electrons)',
     y_label='counts',
     granules=pu.gD,
-    tree=treeS,
-    expr='strip_charge',
+    tree=treeRD,
+    expr='recodigit_charge',
     cut='',
-    descr='Strip charge as the highest charge among its digits. For all RecoDigit related to one TrueHit.',
+    descr='Strip charge for all RecoDigits related to one TrueHit.',
     check='Distribution peak around 15-30 ke.',
     isShifter=False)

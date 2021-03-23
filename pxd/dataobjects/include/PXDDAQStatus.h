@@ -41,6 +41,9 @@ namespace Belle2 {
     explicit PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
       m_unfiltered(false) {}
 
+    /** destructor */
+    virtual ~PXDDAQStatus() {};
+
     /** Return pointer to PXDDAQDHEStatus for the DHE connected to sensor with VxdID id
      *  If id not found, it returns nullptr!
      * @param id VxdID for required DHE

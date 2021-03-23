@@ -15,4 +15,4 @@ if __name__ == "__main__":
     # but at least the test will correctly check if there are cppcheck warnings affecting this package.
     ignoreme = r"^((?!mva\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "mva",
-                     lambda x: re.findall(ignoreme, x) or x is "'")
+                     lambda x: re.findall(ignoreme, x) or x == "'")

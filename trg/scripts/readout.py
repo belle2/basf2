@@ -5,6 +5,16 @@
 # steering file - 2017 Belle II Collaboration
 ######################################################
 
+import basf2 as b2
+
+from ROOT import Belle2
+import numpy as np
+import sys
+# from testpkg.bitstring import BitArray
+from bitstring import BitArray
+import pickle
+import re
+
 
 # we need to modify this to get data from different coppers
 
@@ -22,17 +32,6 @@ hslb = (('11000001', 'b'),
 
 
 integrity_check = False
-
-from basf2 import *
-import interactive
-
-from ROOT import Belle2
-import numpy as np
-import sys
-# from testpkg.bitstring import BitArray
-from bitstring import BitArray
-import pickle
-import re
 
 [steering, srootFile] = sys.argv[:2]
 if len(sys.argv) >= 3:
@@ -62,7 +61,7 @@ data = []
 meta = []
 
 
-class MinModule(Module):
+class MinModule(b2.Module):
 
     """
     Example module to drop into ipython and create some objects to look at.
@@ -130,19 +129,19 @@ class MinModule(Module):
 
 # Set the log level to show only error and fatal messages
 # set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # input
 if srootFile[-5:] == 'sroot':
-    root_input = register_module('SeqRootInput')
+    root_input = b2.register_module('SeqRootInput')
 else:
-    root_input = register_module('RootInput')
+    root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', srootFile)
 
-prog = register_module('Progress')
+prog = b2.register_module('Progress')
 
 # Add modules to main path
 main.add_module(root_input)
@@ -151,7 +150,7 @@ main.add_module(prog)
 readout = MinModule()
 main.add_module(readout)
 
-emptypath = create_path()
+emptypath = b2.create_path()
 readout.if_false(emptypath)
 
 # check signal file before processing
@@ -160,11 +159,11 @@ if not pickleIt:
     vcdFile = sys.argv[3] if len(sys.argv) >= 4 else re.sub(r'.+/', '', re.sub(r'sroot', 'vcd', srootFile))
     with open(pickleSigFile) as fin:
         evtsize = [int(width) for width in fin.readline().split()]
-        B2INFO('Interpreting B2L data format with dimension ' + str(evtsize))
+        b2.B2INFO('Interpreting B2L data format with dimension ' + str(evtsize))
         atlas = b2vcd_48.makeAtlas(fin.read(), evtsize)
 
 # Process all events
-process(main)
+b2.process(main)
 
 if pickleIt:
     pica = pickleSigFile if isPickleFile else re.sub(r'.+/', 'ana/', re.sub(r'sroot', 'p', srootFile))
@@ -173,9 +172,9 @@ if pickleIt:
     pickle.dump(meta, wfp, protocol=2)
     wfp.close()
 
-print(statistics)
+print(b2.statistics)
 
 if pickleIt:
-    B2INFO('Output pickle file ' + pica + ' saved.')
+    b2.B2INFO('Output pickle file ' + pica + ' saved.')
 else:
     b2vcd_48.writeVCD(meta, data, atlas, vcdFile, evtsize)

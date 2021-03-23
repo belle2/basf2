@@ -60,7 +60,11 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class WrongRLInfoCounter(HarvestingModule):
@@ -121,7 +125,11 @@ class WrongRLInfoCounter(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SegmentFakeRatesModule(HarvestingModule):
@@ -251,7 +259,11 @@ class SegmentFakeRatesModule(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SegmentFinderParameterExtractorModule(HarvestingModule):
@@ -289,33 +301,33 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         related_mc_track_cand = mc_track_matcher.getRelatedMCRecoTrack(local_track_cand)
 
         track_momentum = np.NaN
-        track_position = np.NaN
+        # track_position = np.NaN
         track_pt = np.NaN
         track_phi = np.NaN
 
         segment_momentum = np.NaN
-        segment_position = np.NaN
+        # segment_position = np.NaN
         segment_pt = np.NaN
         segment_phi = np.NaN
 
         if is_matched:
             track_momentum = related_mc_track_cand.getPosSeed()
-            track_position = related_mc_track_cand.getPosSeed()
+            # track_position = related_mc_track_cand.getPosSeed()
             track_pt = track_momentum.Pt()
             track_phi = track_momentum.Phi()
-            trajectory_track = \
-                Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
-                                                       Belle2.TrackFindingCDC.Vector3D(track_momentum),
-                                                       related_mc_track_cand.getChargeSeed())
+            # trajectory_track = \
+            #     Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
+            #                                            Belle2.TrackFindingCDC.Vector3D(track_momentum),
+            #                                            related_mc_track_cand.getChargeSeed())
 
             segment_momentum = local_track_cand.getMomSeed()
-            segment_position = local_track_cand.getPosSeed()
+            # segment_position = local_track_cand.getPosSeed()
             segment_pt = segment_momentum.Pt()
             segment_phi = segment_momentum.Phi()
-            trajectory_segment = \
-                Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
-                                                       Belle2.TrackFindingCDC.Vector3D(segment_momentum),
-                                                       local_track_cand.getChargeSeed())
+            # trajectory_segment = \
+            #     Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
+            #                                            Belle2.TrackFindingCDC.Vector3D(segment_momentum),
+            #                                            local_track_cand.getChargeSeed())
 
         return dict(is_matched=is_matched,
                     is_background=is_background,
@@ -329,7 +341,11 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
 
     #: Refiners to be executed at the end of the harvesting / termination of the module
     #: Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="tree")
+    save_tree = refiners.save_tree(
+        #: \cond
+        folder_name="tree"
+        #: \endcond
+    )
 
 
 class SeedsAnalyser(HarvestingModule):

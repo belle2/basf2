@@ -116,53 +116,7 @@ class skim6SampleEventsPyModule(b2.Module):
             self.return_value(0)
 
 
-"""
-class skimSVDBurstEventsDataSizeModule(b2.Module):
-
-    returns True if the event is a Burst event (svd data size above limit))
-    use set_MaxDataSize(maxDataSize) to set the max data sieze of a non-burst event, default is maxDataSize=50kB
-
-
-    def __init__(self):
-
-        super().__init__()
-        self.maxDataSize = 50000
-
-    def set_maxDataSize(self,user_maxDataSize):
-        "set the max strips, otherwise 5000"
-
-        self.maxDataSize = user_maxDataSize
-
-    def event(self):
-
-        raw = Belle2.PyStoreArray('RawSVDs')
-
-        if not raw.isValid():
-            b2.B2WARNING('No RawSVDs - event ignored')
-            self.return_value(0)
-
-            return
-
-        StoreArray<RawSVD> rawsvd;
-        int nsvd = rawsvd.getEntries();
-        int svdsize = 0;
-        for (int i = 0; i < nsvd; i++) { // Loop over COPPERs
-        int nbytes = rawsvd[i]->GetBlockNwords(0) * sizeof(unsigned int);
-        svdsize += nbytes;
-        }
-
-        svdSize = 0
-
-        for aRaw in raw:
-            svdSize+=aRaw.GetBlockNWords(0)*sizeof(unsigned int)
-        if raw.getEntries() > self.maxDataSize:
-            self.return_value(1)
-        else:
-            self.return_value(0)
-"""
-
-
-class skimSVDTriggerBinEventsModule(b2.Module):
+class skimSVDTriggerBinEventsPyModule(b2.Module):
     """
     returns True if TriggerBin of the event is the selected one
     use set_tb(tb) to set the value of the selected TriggerBin (0,1,2,3)
@@ -196,6 +150,70 @@ class skimSVDTriggerBinEventsModule(b2.Module):
             return
 
         if ord(eventInfo.getModeByte().getTriggerBin()) == int(self.tb):
+            self.return_value(1)
+        else:
+            self.return_value(0)
+
+
+class skimFineTRGEventsPyModule(b2.Module):
+    """
+    returns True if the event has a fine trigger from TRGSummary
+    """
+
+    def __init__(self):
+        """constructor"""
+
+        super().__init__()
+
+    def event(self):
+        '''event'''
+
+        trgQuality = Belle2.PyStoreObj('TRGSummary')
+
+        if not trgQuality.isValid():
+            b2.B2WARNING('No TRGSummary - event ignored')
+            self.return_value(0)
+
+            return
+
+        # check trigger quality
+        if trgQuality.getTimQuality() == 2:
+            self.return_value(1)
+        else:
+            self.return_value(0)
+
+
+class skimLowEventT0EventsPyModule(b2.Module):
+    """
+    returns True if |EventT0| is smaller than a selected value
+    that can be set with set_maxEventT0(evtT0)
+    """
+
+    def __init__(self):
+        """constructor"""
+
+        super().__init__()
+
+        #: maximum value of EventT0 allowed
+        self.maxEvtT0 = 10  # ns
+
+    def set_maxEventT0(self, user_maxEvtT0):
+        '''set the maximum EventT0, otherwise 10 ns'''
+
+        self.maxEvtT0 = user_maxEvtT0
+
+    def event(self):
+        '''event'''
+
+        eventT0 = Belle2.PyStoreObj('EventT0')
+
+        if not eventT0.isValid():
+            b2.B2ERROR('No EventT0 - event ignored')
+            self.return_value(0)
+
+            return
+
+        if abs(eventT0.getEventT0()) < self.maxEvtT0:
             self.return_value(1)
         else:
             self.return_value(0)

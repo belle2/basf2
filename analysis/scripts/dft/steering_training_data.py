@@ -33,7 +33,7 @@ def create_train_data(
         **kwargs):
     main = b2.create_path()
 
-    if not os.path.exists(working_dir) and working_dir is not '':
+    if not os.path.exists(working_dir) and working_dir != '':
         os.makedirs(working_dir)
 
     ma.inputMdstList(environmentType, filelist=file_names, path=main)

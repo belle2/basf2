@@ -10,12 +10,11 @@ from b2pandas_utils import VariablesToHDF5
 inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
-path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
-path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma', 'clusterE > 2.5')])
+path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2hdf5_e = VariablesToHDF5(
-    "e+", ['electronID', 'p', 'isSignal'], "particleDF.hdf5")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5")
 path.add_module(v2hdf5_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
@@ -31,7 +30,7 @@ with b2test_utils.clean_working_directory():
 
     # Testing
     assert os.path.isfile('particleDF.hdf5'), "particleDF.hdf5 wasn't created"
-    df1 = pandas.read_hdf('particleDF.hdf5', 'e+')
+    df1 = pandas.read_hdf('particleDF.hdf5', 'e+:all')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"

@@ -13,9 +13,11 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/RelationCreator.h>
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.dcl.h>
+#include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateResultRefiner.h>
 
 #include <tracking/datcon/optimizedDATCON/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ChooseablePathFilter.h>
+
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
@@ -65,18 +67,28 @@ namespace Belle2 {
 
   private:
 
+    /// create relations between the hits in each raw track candidate
     RelationCreator<AHit, ChooseableRelationFilter> m_relationCreator;
 
+    /// perform a tree search using a cellular automaton for all the hits and relations of each raw track candidate
     DATCONTreeSearcher<AHit, ChooseablePathFilter, Result> m_treeSearcher;
 
-    /// the current track candidate
-//     std::vector<const SpacePoint*> m_currentTrackCandidate;
+    /// sort and refine the results for each raw track cand, performing a fit and a basic overlap check
+    TrackCandidateResultRefiner m_resultRefiner;
 
-    /// vector containing track candidates, consisting of the found intersection values in the Hough Space
-    std::vector<Result> m_results;
-
+    /// vector containing the relations between the hits in the raw track candidate
     std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
 
+    /// vector containing track candidates after tree search
+    std::vector<Result> m_results;
+    /// vector containing unfiltered results, i.e. SpacePointTrackCands containing only the SpacePoins
+    /// of the hits in m_results
+    std::vector<SpacePointTrackCand> m_unfilteredResults;
+    /// vector containing the filtered and pruned results
+    /// the filtered results of each raw track candidate will be collected and given back to the caller
+    std::vector<SpacePointTrackCand> m_filteredResults;
+
+    /// maximum number of relations that can be created per track candidate
     uint m_maxRelations = 200;
 
 
@@ -84,6 +96,7 @@ namespace Belle2 {
     /// ROOT file name
     TFile* m_rootFile;
 
+    TH1D* m_nRawTrackCandsPerEvent;
     TH1D* m_nRelationsPerRawTrackCand;
     TH1D* m_nRelationsPerEvent;
     TH1D* m_nResultsPerRawTrackCand;

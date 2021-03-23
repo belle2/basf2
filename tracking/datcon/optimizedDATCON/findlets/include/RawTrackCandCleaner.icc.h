@@ -81,9 +81,13 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
   uint totalRelationsPerEvent = 0;
   uint totalResultsPerEvent = 0;
   uint counter = 0;
+  m_nRawTrackCandsPerEvent->Fill(rawTrackCandidates.size());
   for (auto& rawTrackCand : rawTrackCandidates) {
     m_relations.clear();
     m_results.clear();
+    m_unfilteredResults.clear();
+    m_filteredResults.clear();
+
     m_relationCreator.apply(rawTrackCand, m_relations);
 //     B2INFO("m_relations.size(): " << m_relations.size());
     totalRelationsPerEvent += m_relations.size();
@@ -112,7 +116,20 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
       for (const TrackFindingCDC::WithWeight<const AHit*>& hit : result) {
         spacePointsInResult.emplace_back(hit->getHit());
       }
-      trackCandidates.emplace_back(spacePointsInResult);
+      std::sort(spacePointsInResult.begin(), spacePointsInResult.end(), [](const SpacePoint * a, const SpacePoint * b) {
+        return
+          (a->getVxdID().getLayerNumber() < b->getVxdID().getLayerNumber()) or
+          (a->getVxdID().getLayerNumber() == b->getVxdID().getLayerNumber()
+           and a->getPosition().Perp() < b->getPosition().Perp());
+      });
+
+      m_unfilteredResults.emplace_back(spacePointsInResult);
+    }
+
+    m_resultRefiner.apply(m_unfilteredResults, m_filteredResults);
+
+    for (const SpacePointTrackCand& trackCand : m_filteredResults) {
+      trackCandidates.emplace_back(trackCand);
     }
 
   }
@@ -131,6 +148,7 @@ void RawTrackCandCleaner<AHit>::initializeHists()
 //   m_rootFile = new TFile("relationStats.root", "RECREATE");
   m_rootFile = new TFile("trackCandAnalysis.root", "RECREATE");
   m_rootFile->cd();
+  m_nRawTrackCandsPerEvent = new TH1D("nRawTrackCandsPerEvent", "Number of RawTCs per Event;Number of RawTCs;count", 200, 0, 200);
   m_nRelationsPerRawTrackCand = new TH1D("nRelationsPerRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 1000, 0, 1000);
   m_nRelationsPerEvent = new TH1D("nRelationsPerEvent", "Relations per event;Relations per event;count", 2000, 0, 20000);
   m_nResultsPerRawTrackCand = new TH1D("nResultsPerRawTrackCand", "Results per RawTC;Results per RawTC;count", 2000, 0, 2000);

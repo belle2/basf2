@@ -120,9 +120,9 @@ void ECLDQMModule::defineHisto()
   h_adc_hits->GetXaxis()->SetTitle("Fraction");
   h_adc_hits->SetOption("LIVE");
 
-  h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large", "Entries with ECL crate timing  > 100 ns (E > 1 GeV)", 52, 1,
+  h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large", "Entries with ECL crate timing > #pm 100 ns (E > 1 GeV)", 52, 1,
                                         53);
-  h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID");
+  h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_time_crate_Thr1GeV_large->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {

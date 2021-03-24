@@ -42,8 +42,8 @@ namespace Belle2 {
 
 
   protected:
-    //* Parameter passed by the user to indicated the informationt to be printed */
-    std::string m_printmode;
+
+    std::string m_printmode; /**< Parameter passed by the user to indicated the informationt to be printed */
 
   private:
 
@@ -94,23 +94,51 @@ namespace Belle2 {
     /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
     const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
 
-    std::vector<int> vec_em, vec_ep, vec_nue,
-        vec_anue; /**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_mum, vec_mup, vec_numu,
-        vec_anumu;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_nut, vec_anut;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_pim, vec_pip, vec_km, vec_kp, vec_apro,
-        vec_pro;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_pi0, vec_k0s, vec_k0l,
-        vec_gam;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_eta, vec_omega, vec_kstarp,
-        vec_kstarm;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_lambda, vec_lmb_br, vec_kstar, vec_kstar_br,
-        vec_etapr;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_a0, vec_a0p, vec_a0m, vec_b1m, vec_b1p, vec_phi, vec_f1, vec_a1m, vec_a1p, vec_rhom,
-        vec_rhop ;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<int> vec_K0, vec_K0_br,  vec_rho0,
-        vec_f0;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_em;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_ep;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_nue; /**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int>vec_anue; /**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_mum;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_mup;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_numu;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_anumu;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_nut;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_anut;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_pim;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_pip;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_km;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_kp;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_apro;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_pro;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_pi0;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_k0s;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_k0l;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_gam;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_eta;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_omega;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_kstarp;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_kstarm;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_lambda;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_lmb_br;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_kstar; /**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int>vec_kstar_br; /**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int>vec_etapr;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_a0;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_a0p;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_a0m;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_b1m;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_b1p; /**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int>vec_phi;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_f1;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_a1m;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_a1p;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_rhom;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_rhop;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_K0;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_K0_br;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int>  vec_rho0;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_f0;/**< Variable name of the vector where particles identified in the event are stored */
+
     std::vector<int> vec_dau_tauminus;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauplus;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_extra;/**< Variable name of the vector where particles identified in the event are stored */

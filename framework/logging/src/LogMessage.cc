@@ -13,6 +13,9 @@
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/ProcessStatistics.h>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <ostream>
@@ -31,7 +34,8 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
   m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
-  m_logInfo(0)
+  m_logInfo(0),
+  m_count(0)
 {
 }
 
@@ -45,7 +49,8 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messag
   m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
-  m_logInfo(0)
+  m_logInfo(0),
+  m_count(0)
 {
   messageStream.adjustLogLevel(m_logLevel);
 }
@@ -101,7 +106,23 @@ std::string LogMessage::toJSON(bool complete) const
     buffer << ",\"timestamp\":" << std::fixed << std::setprecision(3) << time;
   if (ProcHandler::EvtProcID() != -1 or complete)
     buffer << ",\"proc\":" << ProcHandler::EvtProcID();
-  //variables ...
+  if (complete) {
+    buffer << ",\"count\":" << m_count;
+    StoreObjPtr<EventMetaData> eventMetaData;
+    if (eventMetaData.isValid()) {
+      buffer << ",\"experiment\":" << eventMetaData->getExperiment();
+      buffer << ",\"run\":" << eventMetaData->getRun();
+      buffer << ",\"subrun\":" << eventMetaData->getSubrun();
+      buffer << ",\"event\":" << eventMetaData->getEvent();
+    }
+    StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+    if (processStatistics.isValid()) {
+      const auto& stats = processStatistics->getGlobal();
+      buffer << ",\"nruns\":" << int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_BeginRun));
+      buffer << ",\"nevents\":" << int(stats.getCalls());
+    }
+    buffer << ",\"initialize\":" << ((DataStore::Instance().getInitializeActive()) ? "true" : "false");
+  }
   buffer << "}\n";
   return buffer.str();
 }

@@ -10,8 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/datcon/optimizedDATCON/findlets/HitSelector.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include <vector>

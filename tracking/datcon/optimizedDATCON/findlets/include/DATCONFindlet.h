@@ -13,6 +13,7 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2DSimple.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
@@ -77,6 +78,8 @@ namespace Belle2 {
 
     /// Hough Space intercept finder
     FastInterceptFinder2D m_interceptFinder;
+    /// Simple Hough Space intercept finder
+    FastInterceptFinder2DSimple m_interceptFinderSimple;
 
     /// Raw track candidate cleaner
     RawTrackCandCleaner<HitData> m_rawTCCleaner;
@@ -120,5 +123,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_storeMCParticles;
     /// StoreArrays needed for analysing and debugging during development
     StoreArray<SpacePoint> m_storeSVDSpacePoints;
+
+    bool m_useSubHoughSpaces = true;
   };
 }

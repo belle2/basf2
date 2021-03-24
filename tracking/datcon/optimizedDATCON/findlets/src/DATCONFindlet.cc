@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
 
-// #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
@@ -26,6 +24,7 @@ DATCONFindlet::DATCONFindlet()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
   addProcessingSignalListener(&m_interceptFinder);
+  addProcessingSignalListener(&m_interceptFinderSimple);
   addProcessingSignalListener(&m_rawTCCleaner);
 
 //   initializeHists();
@@ -38,6 +37,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
+  m_interceptFinderSimple.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("twoHitRelationFilter").setDefaultValue("angleAndTime");
@@ -45,6 +45,10 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("qualityIndicator");
   moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("qualityIndicator");
   moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useSubHoughSpaces"), m_useSubHoughSpaces,
+                                "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
+                                m_useSubHoughSpaces);
 }
 
 void DATCONFindlet::beginEvent()
@@ -65,7 +69,11 @@ void DATCONFindlet::apply()
   m_spacePointLoaderAndPreparer.apply(m_hits);
   B2DEBUG(29, "m_hits.size(): " << m_hits.size());
 
-  m_interceptFinder.apply(m_hits, m_rawTrackCandidates);
+  if (m_useSubHoughSpaces) {
+    m_interceptFinder.apply(m_hits, m_rawTrackCandidates);
+  } else {
+    m_interceptFinderSimple.apply(m_hits, m_rawTrackCandidates);
+  }
   B2DEBUG(29, "m_rawTrackCandidates.size: " << m_rawTrackCandidates.size());
 //   analyseSPTCs();
 

@@ -333,6 +333,12 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
     m_clockFreq4TDC = tmp;
   }
+  double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
+  if (m_clockFreq4TDC != officialClockFreq4TDC) {
+    B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
+              officialClockFreq4TDC << " (GHz)!");
+    m_clockFreq4TDC = officialClockFreq4TDC;
+  }
   B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
   B2DEBUG(100, "CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");

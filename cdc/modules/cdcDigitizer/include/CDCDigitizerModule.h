@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <simulation/dataobjects/SimClockState.h>
+
 //cdc package headers
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -199,7 +201,7 @@ namespace Belle2 {
     float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
     float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
-    unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
+    unsigned short m_widthOfTimeWindowInCount  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
     bool m_useDB4RunGain;               /**< Fetch run gain from DB */
@@ -212,8 +214,18 @@ namespace Belle2 {
     bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
     bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
     bool m_includeEarlyXTalks; /**< Flag to switch on/off xtalks earlier than the hit */
+    int  m_debugLevel      ;   /**< Debug level */
     int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+
+    StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
+    bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */
+    bool m_randomization = true; /**< Flag to switch on/off timing randmization */
+    int m_tSimMode = 0; /**< Timing simulation mode */
+    int m_offsetForTriggerBin = 1; /**< Input to getCDCTriggerBin(offset) */
+    int m_trgTimingOffsetInCount   = 4; /**< Trigger timing offset in unit of count */
+    int m_shiftOfTimeWindowIn32Count = 153; /**< Shift of time window for synchronization in 32count */
+    unsigned short m_trgDelayInCount[nBoards] = {0}; /**< Trigger delay in frontend electronics in count */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

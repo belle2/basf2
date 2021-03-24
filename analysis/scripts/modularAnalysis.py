@@ -2010,7 +2010,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
@@ -2805,7 +2805,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
                 applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
@@ -2928,18 +2928,30 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None):
+def labelTauPairMC(printDecayInfo=False, path=None, marker='old', mapping='default'):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
+    @param marker: if old, TauDecayMarker is set. If new, TauDecayMode is set.
+    @param mapping: if default, the map is the default one, else the path for the map is given by the user.
     """
-    tauDecayMarker = register_module('TauDecayMarker')
-    tauDecayMarker.set_name('TauDecayMarker_')
+    from basf2 import find_file
+    if(marker == 'old'):
+        tauDecayMarker = register_module('TauDecayMarker')
+        tauDecayMarker.set_name('TauDecayMarker_')
 
-    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
+        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
+    elif(marker == 'new'):
+        TauDecayMode = register_module('TauDecayMode')
+        if (mapping == 'default'):
+            mp_file = find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt')
+            TauDecayMode.param('file', mp_file)
+            path.add_module('TauDecayMode', file=mp_file)
+        else:
+            path.add_module('TauDecayMode', file=mapping)
 
 
 def tagCurlTracks(particleLists,

@@ -16,16 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/Utility.h>
-#include <TVector3.h>
-#include "TFile.h"
-#include "TBox.h"
-#include "TDirectory.h"
-#include <iostream>
-#include <set>
-#include <vector>
-#include <algorithm>
-#include <map>
 #include <fstream>
 #include <string>
 #include <analysis/dataobjects/TauPairDecay.h>
@@ -51,14 +41,18 @@ namespace Belle2 {
     virtual void event() override;
 
 
+  protected:
+    //* Parameter passed by the user to indicated the informationt to be printed */
+    std::string m_printmode;
+
   private:
 
     /** pointer to tau pair decay objects */
     StoreObjPtr<TauPairDecay> m_tauDecay;
 
     int EventNumber; /**< event number */
-    int taum_no;     /**< number of tau- unclassified events */
-    int taup_no;     /**< number of tau+ unclassified events */
+    int m_taum_no;     /**< number of tau- unclassified events */
+    int m_taup_no;     /**< number of tau+ unclassified events */
 
     /** StoreArray of MCParticles */
     StoreArray<MCParticle> MCParticles;
@@ -93,9 +87,9 @@ namespace Belle2 {
     /** Extra particle  */
     std::string m_particle;
     /** Variable name for an extra pdg number in the classification */
-    int pdg_extra;
+    int m_pdg_extra;
     /** Variable name for an extra particle in the classification */
-    std::string name;
+    std::string m_name;
 
     /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
     const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
@@ -132,9 +126,7 @@ namespace Belle2 {
     /** Identifies the number of charged final state particles in the decay*/
     int getProngOfDecay(const MCParticle& mc);
 
-  protected:
-    //* Parameter passed by the user to indicated the informationt to be printed */
-    std::string m_printmode;
+
 
   };
 

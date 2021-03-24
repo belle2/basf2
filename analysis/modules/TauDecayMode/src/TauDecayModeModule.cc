@@ -105,8 +105,8 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 
-TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1) , taum_no(0), taup_no(0), m_pmode(-2), m_mmode(-2),
-  m_pprong(0), m_mprong(0), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1), idOfTauMinus(-1), pdg_extra(0)
+TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1) , m_taum_no(0), m_taup_no(0), m_pmode(-2), m_mmode(-2),
+  m_pprong(0), m_mprong(0), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1), idOfTauMinus(-1), m_pdg_extra(0)
 {
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
@@ -130,8 +130,8 @@ void TauDecayModeModule::initialize()
   m_tauDecay.registerInDataStore();
   if (m_particle != "") {
     std::vector<std::string> extra = parseString(m_particle, "=");
-    pdg_extra = atoi(extra[0].c_str());
-    name = extra[1];
+    m_pdg_extra = atoi(extra[0].c_str());
+    m_name = extra[1];
   }
 
 }
@@ -219,7 +219,7 @@ void TauDecayModeModule::event()
     if (p.getPDG() == 213) vec_rhop.push_back(i);
     if (p.getPDG() == 113) vec_rho0.push_back(i);
     if (p.getPDG() == 9010221) vec_f0.push_back(i);
-    if (m_particle != "" && p.getPDG() == pdg_extra) vec_extra.push_back(i);
+    if (m_particle != "" && p.getPDG() == m_pdg_extra) vec_extra.push_back(i);
   }
 
   //
@@ -583,7 +583,7 @@ void TauDecayModeModule::event()
 
     int pdg = p->getPDG();
     //
-    if (m_particle != "" && pdg == pdg_extra) m_tauminusdecaymode.append("." + name);
+    if (m_particle != "" && pdg == m_pdg_extra) m_tauminusdecaymode.append("." + m_name);
     //
     if (pdg ==  16)  m_tauminusdecaymode.append(".nu_tau");
     if (pdg == -16)  m_tauminusdecaymode.append(".anti-nu_tau");
@@ -664,7 +664,7 @@ void TauDecayModeModule::event()
     MCParticle* p = MCParticles[vec_dau_tauplus[i]];
     int pdg = p->getPDG();
     //
-    if (m_particle != "" && pdg == pdg_extra) m_tauplusdecaymode.append("." + name);
+    if (m_particle != "" && pdg == m_pdg_extra) m_tauplusdecaymode.append("." + m_name);
     //
     if (pdg ==  16)  m_tauplusdecaymode.append(".nu_tau");
     if (pdg == -16)  m_tauplusdecaymode.append(".anti-nu_tau");
@@ -743,12 +743,12 @@ void TauDecayModeModule::event()
   m_mmode = TauBBBmode(m_tauminusdecaymode);
   m_pmode = TauBBBmode(m_tauplusdecaymode);
   if (m_mmode == -1) {
-    taum_no = taum_no - 1;
-    m_mmode = taum_no;
+    m_taum_no = m_taum_no - 1;
+    m_mmode = m_taum_no;
   }
   if (m_pmode == -1) {
-    taup_no = taup_no - 1;
-    m_pmode = taup_no;
+    m_taup_no = m_taup_no - 1;
+    m_pmode = m_taup_no;
   }
 
   m_tauDecay->addTauMinusIdMode(m_mmode);

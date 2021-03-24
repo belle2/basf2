@@ -12,13 +12,14 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <math.h>
 
 namespace Belle2 {
-  /// Base filter for CKF PXD states
+  /// TODO: Base filter for five hits.
+  /// Basic working principle: use ThreeHitVariables and provide three B2Vector3D to each variable.
+  /// These are oHit (outer hit), cHit (middle hit), and iHit (inner hit) and then calculate
+  /// the variables specified in ThreeHitVariables for the three positions, often using the difference
+  /// (oHit - cHit) and (cHit - iHit).
   class FiveHitFilter : public BasePathFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
@@ -26,22 +27,11 @@ namespace Belle2 {
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-  private:
-//     /// Cut on relations in theta for overlay region on same layer but different ladder
-//     double m_param_SimpleThetaCutDeltaL0 = 0.05;
-//     /// Filter relations in theta between hit states where the layer difference is +-1
-//     double m_param_SimpleThetaCutDeltaL1 = 0.1;
-//     /// Filter relations in theta between hit states where the layer difference is +-2
-//     double m_param_SimpleThetaCutDeltaL2 = 0.2;
+    /// set BField value for estimator
+    void beginRun() override;
 
+  private:
     /// cut on the POCA distance in xy obtained from the helixFitEstimator
     double m_helixFitPocaDCut = 1.0;
-
-    /// Get track quality estimate from a circle fit
-    QualityEstimatorCircleFit circleFitEstimator;
-    /// Get track quality estimate from a helix fit
-    QualityEstimatorRiemannHelixFit helixFitEstimator;
-    /// Get track quality estimate from a triplet fit
-    QualityEstimatorTripletFit tripletFitEstimator;
   };
 }

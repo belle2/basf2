@@ -26,6 +26,12 @@ namespace Belle2 {
     TwoHitVariables(const B2Vector3D& oHit, const B2Vector3D& iHit) : m_oHit(oHit), m_iHit(iHit)
     {};
 
+    void setHits(const B2Vector3D& oHit, const B2Vector3D& iHit)
+    {
+      m_oHit = oHit;
+      m_iHit = iHit;
+    }
+
     /// calculate the cosine of the angle between two vectors in x-y
     double getCosXY()
     {

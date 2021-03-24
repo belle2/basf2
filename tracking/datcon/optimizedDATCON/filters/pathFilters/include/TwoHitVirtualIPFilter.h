@@ -10,12 +10,16 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitVariables.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+
 #include <math.h>
 
 namespace Belle2 {
-  /// Base filter for CKF PXD states
+  /// Filter for two hits plus a virtual IP.
+  /// Basic working principle: use ThreeHitVariables and provide three B2Vector3D to each variable.
+  /// These are oHit (outer hit), cHit (middle hit), and iHit (inner hit), which is the virtual IP, and then calculate
+  /// the variables specified in ThreeHitVariables using the three positions.
   class TwoHitVirtualIPFilter : public BasePathFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
@@ -23,9 +27,19 @@ namespace Belle2 {
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
+    /// set BField value for estimator
+    void beginRun() override;
+
   private:
-    QualityEstimatorRiemannHelixFit helixFitEstimator;
-    /// cut on the POCA distance in xy obtained from the helixFitEstimator
-    double m_helixFitPocaVirtIPDCut = 1.0;
+    /// virtual IP vector
+    const B2Vector3D m_virtualIPPosition;
+    /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
+    double m_cosRZCut = 0.95;
+    /// cut on the difference between circle radius and circle center position in the x-y plane
+    /// to check if the track is compatible with passing through the IP
+    double m_circleIPDistanceCut = 2.0;
+
+    /// Construct empty ThreeHitVariables instance
+    ThreeHitVariables m_threeHitVariables;
   };
 }

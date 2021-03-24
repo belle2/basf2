@@ -9,9 +9,13 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/PathFilterFactory.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/TwoHitVirtualIPFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/TwoHitVirtualIPQIFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitQIFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitQIFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/FiveHitFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/FiveHitQIFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -45,9 +49,13 @@ std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDesc
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
     {"twoHitVirtualIP", "filter using two hits and a virtual IP at the origin"},
+    {"twoHitVirtualIPQI", "filter using two hits and a virtual IP at the origin based on a fit quality indicator"},
     {"threeHit", "filter three hits (path of length 2 plus next hit)"},
+    {"threeHitQI", "filter three hits (path of length 2 plus next hit) based on a fit quality indicator"},
     {"fourHit", "filter four hits (path of length 3 plus next hit)"},
+    {"fourHitQI", "filter four hits (path of length 3 plus next hit) based on a fit quality indicator"},
     {"fiveHit", "filter five hits (path of length 4 plus next hit)"},
+    {"fiveHitQI", "filter five hits (path of length 4 plus next hit) based on a fit quality indicator"},
   };
 }
 
@@ -63,14 +71,26 @@ PathFilterFactory::create(const std::string& filterName) const
   if (filterName == "twoHitVirtualIP") {
     return std::make_unique<TwoHitVirtualIPFilter>();
   }
+  if (filterName == "twoHitVirtualIPQI") {
+    return std::make_unique<TwoHitVirtualIPQIFilter>();
+  }
   if (filterName == "threeHit") {
     return std::make_unique<ThreeHitFilter>();
+  }
+  if (filterName == "threeHitQI") {
+    return std::make_unique<ThreeHitQIFilter>();
   }
   if (filterName == "fourHit") {
     return std::make_unique<FourHitFilter>();
   }
+  if (filterName == "fourHitQI") {
+    return std::make_unique<FourHitQIFilter>();
+  }
   if (filterName == "fiveHit") {
     return std::make_unique<FiveHitFilter>();
+  }
+  if (filterName == "fiveHitQI") {
+    return std::make_unique<FiveHitQIFilter>();
   }
 
   return Super::create(filterName);

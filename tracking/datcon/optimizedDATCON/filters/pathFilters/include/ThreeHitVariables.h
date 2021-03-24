@@ -32,6 +32,15 @@ namespace Belle2 {
       m_innerDifferenceVector = cHit - iHit;
     };
 
+    void setHits(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
+    {
+      m_oHit = oHit;
+      m_oHit = oHit;
+      m_iHit = iHit;
+      m_outerDifferenceVector = oHit - cHit;
+      m_innerDifferenceVector = cHit - iHit;
+    }
+
     /// helper function which calculates the average distance in XY from the given center
     /// @param circleCenter center of the cirlce for which the average distance is calculated
     double calcAvgDistanceXY(const B2Vector3D& circleCenter)

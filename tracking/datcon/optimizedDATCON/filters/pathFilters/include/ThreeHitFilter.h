@@ -10,20 +10,16 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitVariables.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-// #include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 
 #include <math.h>
 
 namespace Belle2 {
-  /// Base filter for three hits.
+  /// Filter for three hits.
   /// Basic working principle: use ThreeHitVariables and provide three B2Vector3D to each variable.
   /// These are oHit (outer hit), cHit (middle hit), and iHit (inner hit) and then calculate
-  /// the variables specified in ThreeHitVariables for the three positions, often using the difference
+  /// the variables specified in ThreeHitVariables using the three positions, often using the difference
   /// (oHit - cHit) and (cHit - iHit).
   class ThreeHitFilter : public BasePathFilter {
 
@@ -32,6 +28,9 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+    /// set BField value for estimator
+    void beginRun() override;
 
   private:
     /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
@@ -42,11 +41,7 @@ namespace Belle2 {
     /// cut on the POCA distance in xy obtained from the helixFitEstimator
     double m_helixFitPocaDCut = 2.0;
 
-    /// Get track quality estimate from a circle fit
-    QualityEstimatorCircleFit circleFitEstimator;
-    /// Get track quality estimate from a helix fit
-    QualityEstimatorRiemannHelixFit helixFitEstimator;
-    /// Get track quality estimate from a triplet fit
-    QualityEstimatorTripletFit tripletFitEstimator;
+    /// Construct empty ThreeHitVariables instance
+    ThreeHitVariables m_threeHitVariables;
   };
 }

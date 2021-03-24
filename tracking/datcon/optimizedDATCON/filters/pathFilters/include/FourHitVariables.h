@@ -32,6 +32,16 @@ namespace Belle2 {
       m_innerThreeHitVariables = ThreeHitVariables(ocHit, icHit, iHit);
     };
 
+    void setHits(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit)
+    {
+      m_oHit = oHit;
+      m_ocHit = ocHit;
+      m_icHit = icHit;
+      m_iHit = iHit;
+      m_outerThreeHitVariables = ThreeHitVariables(oHit, ocHit, icHit);
+      m_innerThreeHitVariables = ThreeHitVariables(ocHit, icHit, iHit);
+    }
+
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: cm */
     double getCircleRadiusDifference()
     {

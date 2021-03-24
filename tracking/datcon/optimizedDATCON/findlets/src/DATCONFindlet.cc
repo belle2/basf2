@@ -41,10 +41,10 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("twoHitRelationFilter").setDefaultValue("angleAndTime");
-  moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIP");
-  moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("threeHit");
-  moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("fourHit");
-  moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("fiveHit");
+  moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIPQI");
+  moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("threeHitQI");
+  moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("fourHitQI");
+  moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("fiveHitQI");
 }
 
 void DATCONFindlet::beginEvent()

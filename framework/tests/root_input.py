@@ -71,6 +71,10 @@ with clean_working_directory():
         """
 
         def __init__(self, expected):
+            """
+            Initialize this nice class with the list of expected event
+            numbers to see in the correct order
+            """
             super().__init__()
             #: event metadata
             self.emd = Belle2.PyStoreObj('EventMetaData')
@@ -132,6 +136,11 @@ with clean_working_directory():
         """
 
         def __init__(self, accepted):
+            """
+            Initialize this nice class with the list/set of accepted event
+            numbers to see. Order not important. All other events will be flagged
+            as discarded.
+            """
             super().__init__()
             #: event metadata
             self.emd = Belle2.PyStoreObj('EventMetaData')
@@ -139,6 +148,7 @@ with clean_working_directory():
             self._accepted = accepted
 
         def event(self):
+            """Set error flag if required"""
             if self.emd.getEvent() not in self._accepted:
                 self.emd.addErrorFlag(Belle2.EventMetaData.c_HLTDiscard)
 

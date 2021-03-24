@@ -304,3 +304,40 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
  ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+ ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Added file brokenevents.root
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 1  { module: RootInput }
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 2  { module: RootInput }
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 4  { module: RootInput }
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 7  { module: RootInput }
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 9  { module: RootInput }
+[WARNING] Discarding corrupted event
+	errorFlag = 16
+	experiment = 0
+	run = 0
+	event = 10  { module: RootInput }
+ ... message repeated 1 times

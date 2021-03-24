@@ -219,7 +219,7 @@ class PythonLogJSON(unittest.TestCase):
         logobject = self.getLogMessage("message")
         self.assertSetEqual(set(logobject.keys()), {"level", "message", "variables", "module", "package",
                                                     "function", "file", "line", "timestamp", "proc",
-                                                    "initialize", "count", "hostname", "pid"})
+                                                    "initialize", "count"})
 
 
 if __name__ == "__main__":

@@ -60,8 +60,10 @@ namespace Belle2 {
     std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
     /// Only required for MCInfo method
     bool m_MCStrictQualityEstimator = true;
-    /** pointer to the selected QualityEstimator */
+    /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
+    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    double m_cutOnQualitiyIndicator = 0.5;
   };
 }

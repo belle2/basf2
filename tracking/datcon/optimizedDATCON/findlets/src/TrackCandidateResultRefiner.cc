@@ -38,18 +38,6 @@ TrackCandidateResultRefiner::~TrackCandidateResultRefiner() = default;
 
 TrackCandidateResultRefiner::TrackCandidateResultRefiner() : Super()
 {
-  // create pointer to chosen estimator
-  // get SegFault if I do this in initialize, Why, I don't know. Likely a bug in the parent class
-  if (m_EstimationMethod == "mcInfo") {
-    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
-  } else if (m_EstimationMethod == "tripletFit") {
-    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
-  } else if (m_EstimationMethod == "circleFit") {
-    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
-  } else if (m_EstimationMethod == "helixFit") {
-    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
-  }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
 void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -65,11 +53,27 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
                                 m_MCStrictQualityEstimator);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cutOnQualitiyIndicator"), m_cutOnQualitiyIndicator,
+                                "Cut on quality indicator value. Only accept SpacePointTrackCands with QI above this value.",
+                                m_cutOnQualitiyIndicator);
 }
 
 void TrackCandidateResultRefiner::initialize()
 {
   Super::initialize();
+
+  // create pointer to chosen estimator
+  if (m_EstimationMethod == "mcInfo") {
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  } else if (m_EstimationMethod == "tripletFit") {
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  } else if (m_EstimationMethod == "circleFit") {
+    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
+  } else if (m_EstimationMethod == "helixFit") {
+    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
+  }
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
 void TrackCandidateResultRefiner::beginRun()
@@ -104,12 +108,25 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
   for (SpacePointTrackCand& aTrackCandidate : unprunedResults) {
     double qi = m_estimator->estimateQuality(aTrackCandidate.getSortedHits());
     aTrackCandidate.setQualityIndicator(qi);
+
+    if (qi >= m_cutOnQualitiyIndicator) {
+      prunedResults.emplace_back(aTrackCandidate);
+    }
   }
 
-  std::sort(unprunedResults.begin(), unprunedResults.end(),
+//   std::sort(unprunedResults.begin(), unprunedResults.end(),
+//   [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
+//     return ((a.getNHits() > b.getNHits()) or
+//             (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()) );
+//   });
+
+// //   std::swap(unprunedResults, prunedResults);
+
+  std::sort(prunedResults.begin(), prunedResults.end(),
   [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
-    return a.getQualityIndicator() < b.getQualityIndicator();
+    return ((a.getNHits() > b.getNHits()) or
+            (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()));
   });
 
-  std::swap(unprunedResults, prunedResults);
+
 }

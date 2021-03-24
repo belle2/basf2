@@ -105,14 +105,14 @@ public:
           break;
               } else
         */
-        if (usage < 0.9) {
+        if (usage < 0.7) {
           if (flag != 1) {
             available = true;
             std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
             break;
           }
           std::cout << "[DEBUG] disk : " << m_diskid << " is with full_flag" << std::endl;
-        } else {
+        } else if (usage > 0.9) {
           std::ofstream fout(filename);
           fout << 1;
           fout.close();

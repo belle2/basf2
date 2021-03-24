@@ -101,9 +101,6 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
   */
 
   for (auto const& mom : momenta) {
-    double trial_thrust;
-    double trial_mag;
-
     // By convention, thrust axis in same direction as Z axis
     trial_axis = (mom.z() >= 0.) ? TVector3(mom) : TVector3(-mom);
 
@@ -141,7 +138,7 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
       */
     }
 
-    trial_mag = trial_axis.Mag(); // pre-compute
+    double trial_mag(trial_axis.Mag()); // pre-compute
     // trial_axis *= (1. / trial_axis.Mag());
 
     /*
@@ -150,7 +147,7 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
                   thrust = max(       ÷           )
                                 Σ(||p_i||) * ||n||
     */
-    trial_thrust = 0.;
+    double trial_thrust(0.);
     for (auto const& momentum : momenta)
       trial_thrust += std::fabs(momentum.Dot(trial_axis));
 

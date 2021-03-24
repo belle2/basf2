@@ -11,13 +11,13 @@
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+
 #include <math.h>
 
 namespace Belle2 {
-  /// Filter for four hits using QualityEstimators
-  class FourHitQIFilter : public BasePathFilter {
+  /// Filter for three hits using QualityEstimators.
+  class QualityIndicatorFilter : public BasePathFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
@@ -30,13 +30,12 @@ namespace Belle2 {
     void beginRun() override;
 
   private:
-    /// cut on the POCA distance in xy obtained from the helixFitEstimator
-    double m_helixFitPocaDCut = 1.0;
-
     /// Identifier which estimation method to use. Valid identifiers are:
     /// mcInfo, circleFit, tripletFit, helixFit
     std::string m_EstimationMethod = "helixFit";
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
+    /// cut on quality indicator
+    double m_QIcut = 0.0;
   };
 }

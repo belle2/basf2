@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitQIFilter.h>
+#include <tracking/datcon/optimizedDATCON/filters/pathFilters/QualityIndicatorFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
@@ -22,13 +22,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void FourHitQIFilter::beginRun()
+void QualityIndicatorFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 
-void FourHitQIFilter::initialize()
+void QualityIndicatorFilter::initialize()
 {
   // create pointer to chosen estimator
 //  if (m_EstimationMethod == "mcInfo") {
@@ -45,38 +45,33 @@ void FourHitQIFilter::initialize()
 }
 
 TrackFindingCDC::Weight
-FourHitQIFilter::operator()(const BasePathFilter::Object& pair)
+QualityIndicatorFilter::operator()(const BasePathFilter::Object& pair)
 {
   const std::vector<TrackFindingCDC::WithWeight<const HitData*>>& previousHits = pair.first;
 
-  // Do nothing if path is too short or too long
-  if (previousHits.size() != 3) {
-    return NAN;
-  }
-
   std::vector<const SpacePoint*> spacePoints;
   spacePoints.reserve(previousHits.size() + 1);
-  spacePoints.emplace_back(previousHits.at(0)->getHit());
-  spacePoints.emplace_back(previousHits.at(1)->getHit());
-  spacePoints.emplace_back(previousHits.at(2)->getHit());
+  for (auto& hit : previousHits) {
+    spacePoints.emplace_back(hit->getHit());
+  }
   spacePoints.emplace_back(pair.second->getHit());
   const auto& estimatorResult = m_estimator->estimateQualityAndProperties(spacePoints);
 
 //   const double absHelixPocaD = (estimatorResult.pocaD) ? fabs(*estimatorResult.pocaD) : 1e-6;
+//   const double chi2 = (estimatorResult.chiSquared) ? *estimatorResult.chiSquared : 1e6;
 //
 //   if (absHelixPocaD > m_helixFitPocaDCut) {
 //     return NAN;
 //   }
+  if (estimatorResult.qualityIndicator < m_QIcut) {
+    return NAN;
+  }
 
   return estimatorResult.qualityIndicator;
 }
 
-void FourHitQIFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void QualityIndicatorFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_helixFitPocaDCut,
-                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit (tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
-                                m_helixFitPocaDCut);
-
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
                                 m_EstimationMethod);
@@ -86,4 +81,8 @@ void FourHitQIFilter::exposeParameters(ModuleParamList* moduleParamList, const s
 //  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
 //                                "Only required for MCInfo method. If false combining several MCTracks is allowed.",
 //                                m_MCStrictQualityEstimator);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "QICut"), m_QIcut,
+                                "Cut on the quality indicator. Only process QI values larger than this.",
+                                m_QIcut);
+
 }

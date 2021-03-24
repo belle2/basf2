@@ -42,9 +42,9 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
 
   moduleParamList->getParameter<std::string>("twoHitRelationFilter").setDefaultValue("angleAndTime");
   moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIPQI");
-  moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("threeHitQI");
-  moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("fourHitQI");
-  moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("fiveHitQI");
+  moduleParamList->getParameter<std::string>("threeHitFilter").setDefaultValue("qualityIndicator");
+  moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("qualityIndicator");
+  moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
 }
 
 void DATCONFindlet::beginEvent()

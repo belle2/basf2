@@ -65,7 +65,8 @@ namespace Belle2 {
     addParam("phi", m_phi, "first rotation angle (around z) [deg]", 0.0);
     addParam("theta", m_theta, "second rotation angle (around x) [deg]", 0.0);
     addParam("psi", m_psi, "third rotation angle (around z) [deg]", 0.0);
-    addParam("startTime", m_startTime, "start time [ns]", 0.0);
+    addParam("startTime", m_startTime,
+             "start time [ns]. If TOPCalPulseGenerator is in path this is relative to the first cal pulse", 0.0);
     addParam("pulseWidth", m_pulseWidth, "pulse duration (Gaussian sigma) [ns]", 0.0);
     addParam("numPhotons", m_numPhotons,
              "average number of photons per pulse, if positive, otherwise exactly one",

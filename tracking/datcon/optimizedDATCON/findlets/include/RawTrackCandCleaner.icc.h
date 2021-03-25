@@ -112,6 +112,7 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
     m_nResultsPerRawTCvsnRelationsPerRawTC->Fill(m_relations.size(), m_results.size());
     m_nResultsPerRawTCvsRawTCSize->Fill(rawTrackCand.size(), m_results.size());
 
+    m_unfilteredResults.reserve(m_results.size());
     for (const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& result : m_results) {
       m_nResultSize->Fill(result.size());
       std::vector<const SpacePoint*> spacePointsInResult;
@@ -194,7 +195,7 @@ void RawTrackCandCleaner<AHit>::initializeHists()
   m_nPrunedResultsPerRawTrackCand = new TH1D("PrunedResultsPerRawTrackCand",
                                              "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
   m_nPrunedResultsPerEvent = new TH1D("PrunedResultsPerEvent", "Number of pruned results per event;Results per event;count", 2000, 0,
-                                      20000);
+                                      2000);
   m_nPrunedResultSize = new TH1D("PrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
 
   m_nPrunedResultsPerRawTCvsRawTCSize = new TH2D("PrunedResultsPerRawTCvsRawTCSize",

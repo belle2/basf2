@@ -17,8 +17,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class SpacePoint;
-  class SpacePointTrackCand;
   class VxdID;
   class HitData;
 

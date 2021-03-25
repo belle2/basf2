@@ -1004,7 +1004,12 @@ class CombinedSkim(BaseSkim):
         """
         return [skim.flag for skim in self]
 
-    flag = flags  # alias inherited method
+    @property
+    def flag(self):
+        """
+        Event-level variable indicating whether an event passes the combinedSkim or not.
+        """
+        return f"passes_{self}"
 
     def initialise_skim_flag(self, path):
         """

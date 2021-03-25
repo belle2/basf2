@@ -24,13 +24,25 @@ from random import seed
 gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
-settings = CalibrationSettings(name="CDC dedx",
-                               expert_username="jikumar",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["bhabha_all_calib"],
-                               expert_config={"payload_boundaries": None, "adjustment": 1.01},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="CDC dedx",
+    expert_username="jikumar",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib"],
+    expert_config={
+        "payload_boundaries": None,
+        "adjustment": 1.01},
+    input_data_filters={
+        "bhabha_all_calib": [
+            "bhabha_all_calib",
+            "Good",
+            "On",
+            "4S",
+            "physics",
+            "Continuum",
+            "Scan"]},
+    depends_on=[])
 
 # REQUIRED FUNCTION used b2caf-prompt-run tool #
 
@@ -84,8 +96,6 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Precollector path
     Calibrate_RGTrial = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RGTrial)
-    add_filter_software_trigger(path=Calibrate_RGTrial)
-    add_skim_software_trigger(path=Calibrate_RGTrial)
     trg_bhabhaskim = Calibrate_RGTrial.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
@@ -123,8 +133,6 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Precollector path
     Calibrate_RGPre = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RGPre)
-    add_filter_software_trigger(path=Calibrate_RGPre)
-    add_skim_software_trigger(path=Calibrate_RGPre)
     trg_bhabhaskim = Calibrate_RGPre.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_RGPre.add_module(
@@ -139,7 +147,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Rungain Collector setup
     Collector_RGPre = basf2.register_module('CDCDedxElectronCollector')
-    CollParamPre = {'cleanupCuts': True, 'IsRun': True, 'granularity': 'run', }
+    CollParamPre = {'cleanupCuts': True, 'IsRun': True, 'granularity': 'run'}
     Collector_RGPre.param(CollParamPre)
 
     # Rungain Algorithm setup
@@ -162,8 +170,6 @@ def get_calibrations(input_data, **kwargs):
     # Cosine Precollector path
     Calibrate_CC = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_CC)
-    add_filter_software_trigger(path=Calibrate_CC)
-    add_skim_software_trigger(path=Calibrate_CC)
     trg_bhabhaskim = Calibrate_CC.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_CC.add_module(
@@ -177,7 +183,7 @@ def get_calibrations(input_data, **kwargs):
         oneDCell=True)
     # Cosine Collector setup
     Collector_CC = basf2.register_module('CDCDedxElectronCollector')
-    CollParam_CC = {'cleanupCuts': True, 'IsCharge': True, 'IsCosth': True,  'granularity': 'all', }
+    CollParam_CC = {'cleanupCuts': True, 'IsCharge': True, 'IsCosth': True, 'granularity': 'all'}
     Collector_CC.param(CollParam_CC)
     if expert_config["payload_boundaries"] is not None:
         Collector_CC.param("granularity", "run")
@@ -205,8 +211,6 @@ def get_calibrations(input_data, **kwargs):
     # WireGain Precollector path
     Calibrate_WG = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_WG)
-    add_filter_software_trigger(path=Calibrate_WG)
-    add_skim_software_trigger(path=Calibrate_WG)
     trg_bhabhaskim = Calibrate_WG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_WG.add_module(
@@ -221,7 +225,7 @@ def get_calibrations(input_data, **kwargs):
 
     # WireGain Collector setup
     Collector_WG = basf2.register_module('CDCDedxElectronCollector')
-    CollParam_WG = {'cleanupCuts': True, 'IsWire': True, 'Isdedxhit': True, 'granularity': 'all', }
+    CollParam_WG = {'cleanupCuts': True, 'IsWire': True, 'Isdedxhit': True, 'granularity': 'all'}
     Collector_WG.param(CollParam_WG)
     if expert_config["payload_boundaries"] is not None:
         Collector_WG.param("granularity", "run")
@@ -250,8 +254,6 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Precollector path
     Calibrate_RG = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RG)
-    add_filter_software_trigger(path=Calibrate_RG)
-    add_skim_software_trigger(path=Calibrate_RG)
     trg_bhabhaskim = Calibrate_RG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_RG.add_module(

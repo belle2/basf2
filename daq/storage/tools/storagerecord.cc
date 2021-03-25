@@ -112,7 +112,7 @@ public:
             break;
           }
           std::cout << "[DEBUG] disk : " << m_diskid << " is with full_flag" << std::endl;
-        } else if (usage > 0.9) {
+        } else {
           std::ofstream fout(filename);
           fout << 1;
           fout.close();

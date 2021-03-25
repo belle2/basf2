@@ -14,8 +14,8 @@ secret = getpass.getpass("JWT Secret: ")
 payload = {
     "sub": "testuser",
     "name": "Dr. Test User",
-    "admin": [f"user_{username}_.*", "staging_online", "online"],
-    "create_iov": ["test_creation.*"],
+    "b2cdb:admin": [f"user_{username}_.*", "staging_online", "online"],
+    "b2cdb:create_iov": ["test_creation.*"],
     "exp": datetime.utcnow() + validity
 }
 

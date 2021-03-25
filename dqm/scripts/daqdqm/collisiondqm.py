@@ -44,7 +44,7 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
 
     # the following makes only sense in collisions
-    if dqm_environment == "expressreco":
+    if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         if components is None or ('CDC' in components and 'SVD' in components):
             add_IP_dqm(path)
 

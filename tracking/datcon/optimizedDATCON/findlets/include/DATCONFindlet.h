@@ -15,6 +15,7 @@
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2DSimple.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
+#include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
 // #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
@@ -84,10 +85,16 @@ namespace Belle2 {
     /// Raw track candidate cleaner
     RawTrackCandCleaner<HitData> m_rawTCCleaner;
 
+    /// Store tracks as RecoTracks
+    RecoTrackStorer m_recoTrackStorer;
+
     // container to share data between findlets
 
+    /// Pointers to the (const) SpacePoints as a vector
+    std::vector<const SpacePoint*> m_spacePointVector;
+
     /// Vector containing the cached hit information
-    std::vector<HitData> m_hits;
+    std::vector<HitData> m_hitDataVector;
 
     /// Vector containint raw track candidates
     std::vector<std::vector<HitData*>> m_rawTrackCandidates;

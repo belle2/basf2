@@ -29,9 +29,9 @@ namespace Belle2 {
    * for usage in the FastInterceptFinder2D by calculating the conformal transformed x,y coordinates and the creating pairs
    * of coordinates for finding track candidates in r-phi and r-z.
    */
-  class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<HitData> {
+  class SpacePointLoaderAndPreparer : public TrackFindingCDC::Findlet<const SpacePoint*, HitData> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<HitData>;
+    using Super = TrackFindingCDC::Findlet<const SpacePoint*, HitData>;
 
   public:
     /// Load clusters and prepare them for intercept finding
@@ -56,13 +56,15 @@ namespace Belle2 {
     };
 
     /// Load the SVD SpacePoints and create a HitData object for each hit
-    void apply(std::vector<HitData>& hits) override
+    void apply(std::vector<const SpacePoint*>& spacePoints, std::vector<HitData>& hits) override
     {
       if (m_storeSpacePoints.getEntries() == 0) return;
 
       hits.reserve(m_storeSpacePoints.getEntries());
+      spacePoints.reserve(m_storeSpacePoints.getEntries());
       for (auto& spacePoint : m_storeSpacePoints) {
         hits.emplace_back(HitData(&spacePoint));
+        spacePoints.emplace_back(&spacePoint);
       }
     };
 

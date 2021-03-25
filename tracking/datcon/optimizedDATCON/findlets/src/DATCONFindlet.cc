@@ -26,6 +26,7 @@ DATCONFindlet::DATCONFindlet()
   addProcessingSignalListener(&m_interceptFinder);
   addProcessingSignalListener(&m_interceptFinderSimple);
   addProcessingSignalListener(&m_rawTCCleaner);
+  addProcessingSignalListener(&m_recoTrackStorer);
 
 //   initializeHists();
 
@@ -39,6 +40,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
   m_interceptFinderSimple.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
+  m_recoTrackStorer.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("twoHitRelationFilter").setDefaultValue("angleAndTime");
   moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIPQI");
@@ -55,7 +57,8 @@ void DATCONFindlet::beginEvent()
 {
   Super::beginEvent();
 
-  m_hits.clear();
+  m_spacePointVector.clear();
+  m_hitDataVector.clear();
   m_rawTrackCandidates.clear();
   m_trackCandidates.clear();
 
@@ -66,18 +69,20 @@ void DATCONFindlet::apply()
   m_storeMCParticles.isOptional();
   m_storeSVDSpacePoints.isOptional("SVDSpacePoints");
 
-  m_spacePointLoaderAndPreparer.apply(m_hits);
-  B2DEBUG(29, "m_hits.size(): " << m_hits.size());
+  m_spacePointLoaderAndPreparer.apply(m_spacePointVector, m_hitDataVector);
+  B2DEBUG(29, "m_hitDataVector.size(): " << m_hitDataVector.size());
 
   if (m_useSubHoughSpaces) {
-    m_interceptFinder.apply(m_hits, m_rawTrackCandidates);
+    m_interceptFinder.apply(m_hitDataVector, m_rawTrackCandidates);
   } else {
-    m_interceptFinderSimple.apply(m_hits, m_rawTrackCandidates);
+    m_interceptFinderSimple.apply(m_hitDataVector, m_rawTrackCandidates);
   }
   B2DEBUG(29, "m_rawTrackCandidates.size: " << m_rawTrackCandidates.size());
 //   analyseSPTCs();
 
   m_rawTCCleaner.apply(m_rawTrackCandidates, m_trackCandidates);
+
+  m_recoTrackStorer.apply(m_trackCandidates, m_spacePointVector);
 }
 
 void DATCONFindlet::initializeHists()

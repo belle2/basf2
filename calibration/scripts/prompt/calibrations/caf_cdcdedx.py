@@ -32,6 +32,7 @@ settings = CalibrationSettings(
     input_data_names=["bhabha_all_calib"],
     expert_config={
         "payload_boundaries": None,
+        "calib_mode": False,
         "adjustment": 1.01},
     input_data_filters={
         "bhabha_all_calib": [
@@ -52,7 +53,8 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     file_to_iov_physics = input_data["bhabha_all_calib"]
 
-    fulldataMode = False
+    expert_config = kwargs.get("expert_config")
+    fulldataMode = expert_config["calib_mode"]
 
     if fulldataMode:
         input_files_rungain = list(file_to_iov_physics.keys())
@@ -85,7 +87,6 @@ def get_calibrations(input_data, **kwargs):
     from caf.utils import ExpRun, IoV
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    expert_config = kwargs.get("expert_config")
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")

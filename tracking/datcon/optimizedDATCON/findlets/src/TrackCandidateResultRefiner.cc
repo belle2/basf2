@@ -104,29 +104,64 @@ void TrackCandidateResultRefiner::beginRun()
 void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprunedResults,
                                         std::vector<SpacePointTrackCand>& prunedResults)
 {
+  std::vector<SpacePointTrackCand> selectedResults;
+  selectedResults.reserve(unprunedResults.size());
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTrackCandidate : unprunedResults) {
     double qi = m_estimator->estimateQuality(aTrackCandidate.getSortedHits());
     aTrackCandidate.setQualityIndicator(qi);
 
     if (qi >= m_cutOnQualitiyIndicator) {
-      prunedResults.emplace_back(aTrackCandidate);
+//       prunedResults.emplace_back(aTrackCandidate);
+      selectedResults.emplace_back(aTrackCandidate);
     }
   }
 
-//   std::sort(unprunedResults.begin(), unprunedResults.end(),
-//   [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
-//     return ((a.getNHits() > b.getNHits()) or
-//             (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()) );
-//   });
+  // return if nothing to do
+  if (selectedResults.size() <= 1) {
+    std::swap(selectedResults, prunedResults);
+    return;
+  }
 
-// //   std::swap(unprunedResults, prunedResults);
-
-  std::sort(prunedResults.begin(), prunedResults.end(),
+  // sort by number of hits in the track candidate and by the QI
+  std::sort(selectedResults.begin(), selectedResults.end(),
   [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
     return ((a.getNHits() > b.getNHits()) or
             (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()));
   });
 
+//   prunedResults.reserve(selectedResults.size());
+//   for (uint i = 0; i < selectedResults.size() - 1; i++) {
+//     auto& currentSPTC = selectedResults.at(i);
+//
+//     if (std::find(prunedResults.begin(), prunedResults.end(), currentSPTC) == prunedResults.end()) {
+//       prunedResults.emplace_back(currentSPTC);
+//     }
+//
+//     for (uint j = i+1; j < selectedResults.size(); j++) {
+//       auto& checkedSPTC = selectedResults.at(j);
+// //       if (checkedSPTC.getNHits() == currentSPTC.getNHits()) {
+// //         prunedResults.emplace_back(checkedSPTC);
+// //         continue;
+// //       }
+//       uint hitsInBothSPTCs = 0;
+//       for (auto& checkedHit : checkedSPTC) {
+//         hitsInBothSPTCs += TrackFindingCDC::is_in(checkedHit, currentSPTC);
+//       }
+//       if (hitsInBothSPTCs < checkedSPTC.size()) {
+//         prunedResults.emplace_back(checkedSPTC);
+//       }
+//     }
+//   }
+
+  std::bitset<8> numberOfHitsInCheckedSPTCs;
+  prunedResults.reserve(selectedResults.size());
+  for (uint i = 0; i < selectedResults.size(); i++) {
+    auto& currentSPTC = selectedResults.at(i);
+    if (not numberOfHitsInCheckedSPTCs[currentSPTC.size()]) {
+      numberOfHitsInCheckedSPTCs[currentSPTC.size()] = true;
+      prunedResults.emplace_back(currentSPTC);
+    }
+  }
 
 }

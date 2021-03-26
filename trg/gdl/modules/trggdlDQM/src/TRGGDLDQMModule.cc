@@ -92,7 +92,7 @@ void TRGGDLDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = gDirectory;
-  oldDir->mkdir("TRGGDL");
+  if (!oldDir->Get("TRGGDL"))oldDir->mkdir("TRGGDL");
   dirDQM->cd("TRGGDL");
 
   for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
@@ -180,17 +180,10 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_pure_extra; i++) {
       h_psn_pure_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_pure_extra[i]);
     }
-    // efficiency
-    h_eff[iskim]       = new TH1D(Form("hGDL_eff_%s", skim_smap[iskim].c_str()), "efficiency", n_eff, 0, n_eff);
-    for (int i = 0; i < n_eff; i++) {
-      h_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_eff[i]);
-    }
-    h_pure_eff[iskim]  = new TH1D(Form("hGDL_pure_eff_%s", skim_smap[iskim].c_str()), "efficiency wrt. offline", n_pure_eff, 0,
-                                  n_pure_eff);
-    for (int i = 0; i < n_pure_eff; i++) {
-      h_pure_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_pure_eff[i]);
-      h_pure_eff[iskim]->GetXaxis()->SetLabelSize(0.05);
-    }
+
+    h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(-1 + 0.5), "all");
+    h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(-1 + 0.5), "all");
+    h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(-1 + 0.5), "all");
     for (unsigned i = 0; i < n_inbit; i++) {
       if (m_bitNameOnBinLabel) {
         h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
@@ -212,14 +205,12 @@ void TRGGDLDQMModule::defineHisto()
       h_itd_fall[i][iskim]->SetLineColor(kGreen);
     }
     for (unsigned i = 0; i < n_outbit; i++) {
-      h_ftd[iskim]->GetXaxis()->SetBinLabel(h_ftd[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
       h_ftd_rise[i][iskim] = new TH1I(Form("hGDL_ftd_%s_rise_%s", outbitname[i], skim_smap[iskim].c_str()),
                                       Form("ftd%d(%s) rising", i, outbitname[i]), 48, 0, 48);
       h_ftd_rise[i][iskim]->SetLineColor(kRed);
       h_ftd_fall[i][iskim] = new TH1I(Form("hGDL_ftd_%s_fall_%s", outbitname[i], skim_smap[iskim].c_str()),
                                       Form("ftd%d(%s) falling", i, outbitname[i]), 48, 0, 48);
       h_ftd_fall[i][iskim]->SetLineColor(kGreen);
-      h_psn[iskim]->GetXaxis()->SetBinLabel(h_psn[iskim]->GetXaxis()->FindBin(i + 0.5), outbitname[i]);
       h_psn_rise[i][iskim] = new TH1I(Form("hGDL_psn_%s_rise_%s", outbitname[i], skim_smap[iskim].c_str()),
                                       Form("psn%d(%s) rising", i, outbitname[i]), 48, 0, 48);
       h_psn_rise[i][iskim]->SetLineColor(kRed);
@@ -229,15 +220,6 @@ void TRGGDLDQMModule::defineHisto()
     }
   }
 
-  if (m_skim != 0) {
-    h_eff_shifter    = new TH1D(Form("hGDL_eff_shifter"), "efficiency", n_eff_shifter, 0, n_eff_shifter);
-    for (int i = 0; i < n_eff_shifter; i++) {
-      h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
-    }
-    h_eff_shifter->SetMaximum(1.2);
-    h_eff_shifter->SetMinimum(0);
-    h_eff_shifter->GetXaxis()->SetLabelSize(0.05);
-  }
   oldDir->cd();
 }
 
@@ -267,12 +249,7 @@ void TRGGDLDQMModule::beginRun()
     h_psn[iskim]->Reset();
     h_psn_extra[iskim]->Reset();
     h_psn_pure_extra[iskim]->Reset();
-    h_eff[iskim]->Reset();
-    h_pure_eff[iskim]->Reset();
     h_timtype[iskim]->Reset();
-  }
-  if (m_skim != 0) {
-    h_eff_shifter->Reset();
   }
 
   oldDir->cd();
@@ -1383,97 +1360,6 @@ TRGGDLDQMModule::fillOutputExtra(void)
     }
   }
 
-
-
-  for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-    //fill efficiency values
-    h_eff[skim[ifill]]->SetBinContent(1,  h_psn_extra[skim[ifill]]->GetBinContent(1 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //fff with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(2,  h_psn_extra[skim[ifill]]->GetBinContent(2 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //ffo with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(3,  h_psn_extra[skim[ifill]]->GetBinContent(3 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //ffb with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(4,  h_psn_extra[skim[ifill]]->GetBinContent(19 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //ffy with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(5,  h_psn_extra[skim[ifill]]->GetBinContent(20 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //fyo with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(6,  h_psn_extra[skim[ifill]]->GetBinContent(21 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        5 + 1)); //fyb with c4|hie
-    h_eff[skim[ifill]]->SetBinContent(7,  h_psn_extra[skim[ifill]]->GetBinContent(27 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //hie with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(8,  h_psn_extra[skim[ifill]]->GetBinContent(26 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //c4 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(9,  h_psn_extra[skim[ifill]]->GetBinContent(28 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml0 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(10, h_psn_extra[skim[ifill]]->GetBinContent(29 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml1 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(11, h_psn_extra[skim[ifill]]->GetBinContent(30 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml2 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(12, h_psn_extra[skim[ifill]]->GetBinContent(31 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml3 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(13, h_psn_extra[skim[ifill]]->GetBinContent(32 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml4 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(14, h_psn_extra[skim[ifill]]->GetBinContent(33 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml5 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(15, h_psn_extra[skim[ifill]]->GetBinContent(34 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml6 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(16, h_psn_extra[skim[ifill]]->GetBinContent(35 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml7 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(17, h_psn_extra[skim[ifill]]->GetBinContent(36 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml8 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(18, h_psn_extra[skim[ifill]]->GetBinContent(37 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml9 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(19, h_psn_extra[skim[ifill]]->GetBinContent(38 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml10 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(20, h_psn_extra[skim[ifill]]->GetBinContent(39 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml12 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(21, h_psn_extra[skim[ifill]]->GetBinContent(40 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //lml13 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(22, h_psn_extra[skim[ifill]]->GetBinContent(9 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        0 + 1)); //bha3d with all
-    h_eff[skim[ifill]]->SetBinContent(23, h_psn_extra[skim[ifill]]->GetBinContent(42 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //mu_b2b with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(24, h_psn_extra[skim[ifill]]->GetBinContent(48 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //mu_b2b with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(25, h_psn_extra[skim[ifill]]->GetBinContent(49 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //mu_eb2b with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(26, h_psn_extra[skim[ifill]]->GetBinContent(44 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //cdcklm1 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(27, h_psn_extra[skim[ifill]]->GetBinContent(45 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        6 + 1)); //cdcklm2 with fff|ffo|ffb
-    h_eff[skim[ifill]]->SetBinContent(28, h_psn_extra[skim[ifill]]->GetBinContent(15 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //fff with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(29, h_psn_extra[skim[ifill]]->GetBinContent(16 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //ffo with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(30, h_psn_extra[skim[ifill]]->GetBinContent(17 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //ffb with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(31, h_psn_extra[skim[ifill]]->GetBinContent(11 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //ff with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(32, h_psn_extra[skim[ifill]]->GetBinContent(13 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //f with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(33, h_psn_extra[skim[ifill]]->GetBinContent(23 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //ffy with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(34, h_psn_extra[skim[ifill]]->GetBinContent(24 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //fyo with lml|eclmumu
-    h_eff[skim[ifill]]->SetBinContent(35, h_psn_extra[skim[ifill]]->GetBinContent(25 + 1) / h_psn_extra[skim[ifill]]->GetBinContent(
-                                        14 + 1)); //fyb with lml|eclmumu
-  }
-
-  if (m_skim != 0) {
-    h_eff_shifter->SetBinContent(1,  h_psn_extra[1]->GetBinContent(1 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fff with c4|hie
-    h_eff_shifter->SetBinContent(2,  h_psn_extra[1]->GetBinContent(2 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffo with c4|hie
-    h_eff_shifter->SetBinContent(3,  h_psn_extra[1]->GetBinContent(19 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffy with c4|hie
-    h_eff_shifter->SetBinContent(4,  h_psn_extra[1]->GetBinContent(20 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fyo with c4|hie
-    h_eff_shifter->SetBinContent(5,  h_psn_extra[1]->GetBinContent(27 + 1) / h_psn_extra[1]->GetBinContent(
-                                   6 + 1)); //hie with fff|ffo|ffb
-    h_eff_shifter->SetBinContent(6,  h_psn_extra[1]->GetBinContent(26 + 1) / h_psn_extra[1]->GetBinContent(
-                                   6 + 1)); //c4 with fff|ffo|ffb
-    h_eff_shifter->SetBinContent(7,  h_psn_extra[4]->GetBinContent(48 + 1) / h_psn_extra[4]->GetBinContent(
-                                   14 + 1) * 10); //mu_b2b with lml|eclmumu
-    h_eff_shifter->SetBinContent(8,  h_psn_extra[4]->GetBinContent(49 + 1) / h_psn_extra[4]->GetBinContent(
-                                   14 + 1) * 50); //mu_eb2b with lml|eclmumu
-  }
-
 }
 
 const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
@@ -1489,55 +1375,6 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {
   "all", "cdc", "c4", "hie", "klm", "short", "ff30", "lml", "bha3D", "other"
-};
-
-const char* TRGGDLDQMModule::c_eff_shifter[n_eff_shifter] = {
-  "CDC fff",
-  "CDC ffo",
-  "CDC ffy",
-  "CDC fyo",
-  "ECL hie",
-  "ECL c4",
-  "KLM b2b,x10",
-  "EKLM eb2b,x50"
-};
-
-const char* TRGGDLDQMModule::c_eff[n_eff] = {
-  "fff with c4|hie",
-  "ffo with c4|hie",
-  "ffb with c4|hie",
-  "ffy with c4|hie",
-  "fyo with c4|hie",
-  "fyb with c4|hie",
-  "hie with fff|ffo|ffb",
-  "c4 with fff|ffo|ffb",
-  "lml0 with fff|ffo|ffb",
-  "lml1 with fff|ffo|ffb",
-  "lml2 with fff|ffo|ffb",
-  "lml3 with fff|ffo|ffb",
-  "lml4 with fff|ffo|ffb",
-  "lml5 with fff|ffo|ffb",
-  "lml6 with fff|ffo|ffb",
-  "lml7 with fff|ffo|ffb",
-  "lml8 with fff|ffo|ffb",
-  "lml9 with fff|ffo|ffb",
-  "lml10 with fff|ffo|ffb",
-  "lml12 with fff|ffo|ffb",
-  "lml13 with fff|ffo|ffb",
-  "bha3d with all",
-  "mu_b2b with fff|ffo|ffb",
-  "mu_b2b with lml|eclmumu",
-  "mu_eb2b with lml|eclmumu",
-  "cdcklm1 with fff|ffo|ffb",
-  "cdcklm2 with fff|ffo|ffb",
-  "fff with lml|eclmumu",
-  "ffo with lml|eclmumu",
-  "ffb with lml|eclmumu",
-  "ff with lml|eclmumu",
-  "f with lml|eclmumu",
-  "ffy with lml|eclmumu",
-  "fyo with lml|eclmumu",
-  "fyb with lml|eclmumu"
 };
 
 
@@ -1719,23 +1556,6 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
     }
   }
 
-  h_pure_eff[0]->SetBinContent(1,  h_psn_pure_extra[0]->GetBinContent(1 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 0 + 1)); //fff with c4|hie
-  h_pure_eff[0]->SetBinContent(2,  h_psn_pure_extra[0]->GetBinContent(4 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 3 + 1)); //ffo with c4|hie
-  h_pure_eff[0]->SetBinContent(3,  h_psn_pure_extra[0]->GetBinContent(7 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 6 + 1)); //ffb with c4|hie
-  h_pure_eff[0]->SetBinContent(4,  h_psn_pure_extra[0]->GetBinContent(2 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 0 + 1)); //ffy with c4|hie
-  h_pure_eff[0]->SetBinContent(5,  h_psn_pure_extra[0]->GetBinContent(5 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 3 + 1)); //fyo with c4|hie
-  h_pure_eff[0]->SetBinContent(6,  h_psn_pure_extra[0]->GetBinContent(8 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 6 + 1)); //fyb with c4|hie
-  h_pure_eff[0]->SetBinContent(7,  h_psn_pure_extra[0]->GetBinContent(10 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 9 + 1)); //hie with fff|ffo|ffb
-  h_pure_eff[0]->SetBinContent(8,  h_psn_pure_extra[0]->GetBinContent(12 + 1) / h_psn_pure_extra[0]->GetBinContent(
-                                 11 + 1)); //hie with fff|ffo|ffb
-
 }
 
 const char* TRGGDLDQMModule::output_pure_extra[n_output_pure_extra] = {
@@ -1744,18 +1564,6 @@ const char* TRGGDLDQMModule::output_pure_extra[n_output_pure_extra] = {
   "c4|hie offline_ffb", "ffb&(c4|hie) offline_ffb", "fyb&(c4|hie) offline_ffb",
   "fff|ffb|ffo offline_hie", "hie&(fff|ffb|ffo) offline_hie",
   "fff|ffb|ffo offline_c4", "c4&(fff|ffb|ffo) offline_c4"
-};
-
-
-const char* TRGGDLDQMModule::c_pure_eff[n_pure_eff] = {
-  "fff with c4|hie",
-  "ffo with c4|hie",
-  "ffb with c4|hie",
-  "ffy with c4|hie",
-  "fyo with c4|hie",
-  "fyb with c4|hie",
-  "hie with fff|ffo|ffb",
-  "c4 with fff|ffo|ffb"
 };
 
 

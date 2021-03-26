@@ -446,7 +446,7 @@ namespace Belle2 {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      int modeTau = -99;
+      int modeTau = -1;
 
       for (const auto& iMCParticle : MC_Particle_list) {
         if (iMCParticle.getPDG() != -15) continue;
@@ -474,7 +474,7 @@ namespace Belle2 {
         B2WARNING("GenMCTagTool::eval - missing MCParticles array");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      int modeTau = -99;
+      int modeTau = -1;
 
       for (const auto& iMCParticle : MC_Particle_list) {
         if (iMCParticle.getPDG() != 15) continue;

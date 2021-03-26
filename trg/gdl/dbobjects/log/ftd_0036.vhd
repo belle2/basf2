@@ -62,7 +62,7 @@ end FTD;
 
 architecture RTL of FTD is
 
-  constant ftd_version : std_logic_vector(9 downto 0) := "0000100011"; -- 0.35
+  constant ftd_version : std_logic_vector(9 downto 0) := "0000100100"; -- 0.36
 
   --...................................
   --   Other signals
@@ -390,10 +390,10 @@ architecture RTL of FTD is
   signal sttv       : std_logic := '0'; --
   signal stteclv    : std_logic := '0'; --
   signal nima01     : std_logic := '0'; --[170]
-  signal oup171     : std_logic := '0'; --
-  signal oup172     : std_logic := '0'; --
-  signal oup173     : std_logic := '0'; --
-  signal oup174     : std_logic := '0'; --
+  signal yioiecl1   : std_logic := '0'; --[171]
+  signal ffyo       : std_logic := '0'; --[172]
+  signal eedy       : std_logic := '0'; --
+  signal yed        : std_logic := '0'; --
   signal oup175     : std_logic := '0'; --
   signal oup176     : std_logic := '0'; --
   signal oup177     : std_logic := '0'; --
@@ -588,7 +588,7 @@ begin
   --.......................................
 
   fff <= '1' when (t2(2)='1' or t2(3)='1')                                                                                  and veto='0' else '0';
-  fffo  <= '1' when (t2(2)='1' or t2(3)='1')              and cdc_open90='1' and veto='0' else '0';
+  fffo <= '1' when (t2(2)='1' or t2(3)='1')              and cdc_open90='1' and veto='0' else '0';
   ffs <= '1' when (t2(1)='1' or t2(2)='1' or t2(3)='1')              and (ts(0)='1' or ts(1)='1' or ts(2)='1' or ts(3)='1') and veto='0' else '0';
   fss <= '1' when (t2(0)='1' or t2(1)='1' or t2(2)='1' or t2(3)='1') and (ts(1)='1' or ts(2)='1' or ts(3)='1')              and veto='0' else '0';
   sss <= '1' when (ts(2)='1' or ts(3)='1')                                                                                  and veto='0' else '0';
@@ -768,7 +768,11 @@ begin
   sttv     <= '1' when typ='1'               and bha_veto='0' else '0';
   stteclv  <= '1' when typ='1'  and cdcecl>0 and bha_veto='0' else '0';
 
-  nima01 <= '1' when nimin0='1' and nimin1='1' and veto='0' else '0';
+  nima01   <= '1' when nimin0='1' and nimin1='1' and veto='0' else '0';
+  yioiecl1 <= '1' when ty>0 and ti='1' and i2fo='1' and iecl_0='1' and bha_veto='0' and veto='0' else '0';
+  ffyo     <= '1' when (t2(2)='1' or t2(3)='1') and ty>0 and cdc_open90='1' and veto='0' else '0';
+  eedy     <= '1' when t2(1)='1' and cdcecl(1)='1' and d5='1' and (ty(0)='1' or ty(1)='1') and bha_veto='0' and veto='0' else '0';
+  yed      <= '1' when t2(0)='1' and cdcecl(0)='1' and d5='1' and ty(0)='1' and bha_veto='0' and veto='0' else '0';
 
 
 
@@ -963,6 +967,10 @@ begin
       sig_ftdout(oname004'pos(b_stteclv)) <= stteclv;
 
       sig_ftdout(oname004'pos(b_nima01)) <= nima01;
+      sig_ftdout(oname004'pos(b_yioiecl1)) <= yioiecl1;
+      sig_ftdout(oname004'pos(b_ffyo)) <= ffyo;
+      sig_ftdout(oname004'pos(b_eedy)) <= eedy;
+      sig_ftdout(oname004'pos(b_yed))  <= yed;
 
 
     end if;

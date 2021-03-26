@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="AWESOME">
+  <!-- The geometry of this detector component should be created by the
+       Creator called AWESOMECreator. Since it is defined in the awesome
+       package we have to make sure the libawesome.so is loaded --> 
+  <Creator library="awesome">AWESOMECreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="mm">1,2,3; 4
+      5 6 7
+    </bar>
+    <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
+    <Active>
+      <Material>AWESOME-Material</Material>
+      <z unit="mm">10.000</z>
+      <width  unit="um">1024</width>
+      <length unit="um">1024</length>
+      <height unit="um"> 400</height>
+    </Active>
+    <Active>
+      <Material>AWESOME-Material</Material>
+      <z unit="mm">20.000</z>
+      <width  unit="um">2048</width>
+      <length unit="um">2048</length>
+      <height unit="um"> 400</height>
+    </Active>
+    <Active>
+      <Material>AWESOME-Material</Material>
+      <z unit="mm">30.000</z>
+      <width  unit="um">4096</width>
+      <length unit="um">4096</length>
+      <height unit="um"> 400</height>
+    </Active>
+  </Content>
+</DetectorComponent>

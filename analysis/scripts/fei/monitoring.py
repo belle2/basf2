@@ -161,8 +161,7 @@ class MonitoringHist(object):
         if not self.valid:
             return
 
-        f = ROOT.TFile(filename)
-        print(dirname)
+        f = ROOT.TFile.Open(filename, 'read')
         d = f.Get(Belle2.makeROOTCompatible(dirname))
 
         for key in d.GetListOfKeys():
@@ -252,7 +251,7 @@ class MonitoringNTuple(object):
         if not self.valid:
             return
         #: Reference to the ROOT file, so it isn't closed
-        self.f = ROOT.TFile(filename)
+        self.f = ROOT.TFile.Open(filename, 'read')
         #: Reference to the tree named variables inside the ROOT file
         self.tree = self.f.Get(f'{treenameprefix} variables')
         #: Filename so we can use it later
@@ -270,7 +269,7 @@ class MonitoringModuleStatistics(object):
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
         @param particle the particle for which the statistics are read
         """
-        root_file = ROOT.TFile('Monitor_ModuleStatistics.root')
+        root_file = ROOT.TFile.Open('Monitor_ModuleStatistics.root', 'read')
         persistentTree = root_file.Get('persistent')
         persistentTree.GetEntry(0)
         # Clone() needed so we actually own the object (original dies when tfile is deleted)
@@ -391,7 +390,7 @@ def MonitoringMCCount(particle):
     @param particle the particle for which the MC counts are read
     @return dictionary with 'sum', 'std', 'avg', 'max', and 'min'
     """
-    root_file = ROOT.TFile('mcParticlesCount.root')
+    root_file = ROOT.TFile.Open('mcParticlesCount.root', 'read')
 
     key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'
     Belle2.Variable.Manager

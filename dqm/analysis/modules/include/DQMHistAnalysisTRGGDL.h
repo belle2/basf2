@@ -110,7 +110,7 @@ namespace Belle2 {
     TH1D* m_h_psn_pure_extra = nullptr;   /**<DQM Histogram for PSN bits with offline selection*/
     TCanvas* m_c_eff[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
     TH1D* m_h_eff[nskim_gdldqm] = {};   /**<Histogram for TRGGDL efficiency in each HLT skim*/
-    static const int n_eff = 35;        /**<number of bins for the efficiency histogram*/
+    static const int n_eff = 40;        /**<number of bins for the efficiency histogram*/
     /**label of bins for the efficiency histogram*/
     const char* c_eff[n_eff] = {
       "fff with c4|hie",
@@ -147,11 +147,17 @@ namespace Belle2 {
       "f with lml|eclmumu",
       "ffy with lml|eclmumu",
       "fyo with lml|eclmumu",
-      "fyb with lml|eclmumu"
+      "fyb with lml|eclmumu",
+      "cdcecl2 with fff|ffo|ffb",
+      "ecleklm with lml|eclmumu",
+      "syo with c4|hie",
+      "yioiecl1 with c4|hie",
+      "stt with c4|hie"
     };
+
     TCanvas* m_c_eff_shifter = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
     TH1D* m_h_eff_shifter = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
-    static const int n_eff_shifter = 7;                 /**<number of bins for the simplified efficiency histogram*/
+    static const int n_eff_shifter = 14;                /**<number of bins for the simplified efficiency histogram*/
     const char* c_eff_shifter[n_eff_shifter] = {
       "CDC fff",
       "CDC ffo",
@@ -159,7 +165,14 @@ namespace Belle2 {
       "CDC fyo",
       "ECL hie",
       "ECL c4",
-      "KLM b2b"
+      "BKLM b2b",
+      "EKLM b2b",
+      "CDC-BKLM>1",
+      "CDC-ECL>1",
+      "ECL-EKLM>0",
+      "CDC syo",
+      "CDC yio",
+      "CDC stt"
     }; /**<label of bins for the simplified efficiency histogram*/
     TCanvas* m_c_pure_eff = nullptr;              /**<Canvas for TRGGDL efficiency with offline selection*/
     TH1D* m_h_pure_eff = nullptr;                 /**<Histogram for TRGGDL efficiency with offline selection*/
@@ -179,10 +192,10 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     double m_limit_low_shifter[n_eff_shifter] = {
-      0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 0.1
+      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.30, 0.05, 0.30, 0.80, 0.00, 0.00, 0.00, 0.00
     }; /**<lower limit value in each bin*/
     double m_limit_high_shifter[n_eff_shifter] = {
-      0.9, 0.9, 0.9, 0.9, 1.0, 1.0, 0.2
+      0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.40, 0.20, 0.50, 1.00, 1.00, 1.00, 1.00, 1.00
     }; /**<upper limit value in each bin*/
 
 #ifdef _BELLE2_EPICS

@@ -19,84 +19,84 @@ namespace Belle2 {
     /**
      * returns identifier of generated B+ mode
      */
-    int BplusMode(const Particle*);
+    double BplusMode(const Particle*);
 
     /**
      * returns identifier of generated B- mode
      */
-    int BminusMode(const Particle*);
+    double BminusMode(const Particle*);
 
     /**
      * returns identifier of generated B0 mode
      */
-    int B0Mode(const Particle*);
+    double B0Mode(const Particle*);
 
     /**
      * returns identifier of generated B0bar mode
      */
-    int Bbar0Mode(const Particle*);
+    double Bbar0Mode(const Particle*);
 
     /**
      * returns identifier of generated Bs0 mode
      */
-    int Bs0Mode(const Particle*);
+    double Bs0Mode(const Particle*);
 
     /**
      * returns identifier of generated Bs0bar mode
      */
-    int Bsbar0Mode(const Particle*);
+    double Bsbar0Mode(const Particle*);
 
     // D modes
     /**
      * returns identifier of generated D*+ mode
      */
-    int DstplusMode(const Particle*);
+    double DstplusMode(const Particle*);
 
     /**
      * returns identifier of generated D*- mode
      */
-    int DstminusMode(const Particle*);
+    double DstminusMode(const Particle*);
 
     /**
      * returns identifier of generated Ds+ mode
      */
-    int DsplusMode(const Particle*);
+    double DsplusMode(const Particle*);
 
     /**
      * returns identifier of generated Ds- mode
      */
-    int DsminusMode(const Particle*);
+    double DsminusMode(const Particle*);
 
     /**
      * returns identifier of generated D+ mode
      */
-    int DplusMode(const Particle*);
+    double DplusMode(const Particle*);
 
     /**
      * returns identifier of generated D- mode
      */
-    int DminusMode(const Particle*);
+    double DminusMode(const Particle*);
 
     /**
      * returns identifier of generated D0 mode
      */
-    int D0Mode(const Particle*);
+    double D0Mode(const Particle*);
 
     /**
      * returns identifier of generated D0bar mode
      */
-    int Dbar0Mode(const Particle*);
+    double Dbar0Mode(const Particle*);
 
     // Tau Modes
     /**
      * returns identifier of generated tau+ mode
      */
-    int TauplusMode(const Particle*);
+    double TauplusMode(const Particle*);
 
     /**
      * returns identifier of generated tau- mode
      */
-    int TauminusMode(const Particle*);
+    double TauminusMode(const Particle*);
   }
 
 } // namepspace Belle2

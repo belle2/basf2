@@ -453,7 +453,11 @@ namespace Belle2 {
 
         std::vector<int> DauPDG;
         for (auto const& mcDaughter : iMCParticle.getDaughters()) {
-          DauPDG.push_back(mcDaughter->getPDG());
+          if (mcDaughter->getPDG() == 24) {
+            for (auto const& WDaughter : mcDaughter->getDaughters()) {
+              DauPDG.push_back(WDaughter->getPDG());
+            }
+          } else DauPDG.push_back(mcDaughter->getPDG());
         }
         modeTau = gTKtag.Mode_tau_plus(DauPDG);
         break;
@@ -477,7 +481,11 @@ namespace Belle2 {
 
         std::vector<int> DauPDG;
         for (auto const& mcDaughter : iMCParticle.getDaughters()) {
-          DauPDG.push_back(mcDaughter->getPDG());
+          if (mcDaughter->getPDG() == -24) {
+            for (auto const& WDaughter : mcDaughter->getDaughters()) {
+              DauPDG.push_back(WDaughter->getPDG());
+            }
+          } else DauPDG.push_back(mcDaughter->getPDG());
         }
         modeTau = gTKtag.Mode_tau_minus(DauPDG);
         break;

@@ -829,6 +829,9 @@ class CombinedSkim(BaseSkim):
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
         self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
+        # empty but needed for functions inherited from baseSkim to work
+        self.SkimLists = []
+
         if additionalDataDescription is not None:
             for skim in self:
                 skim.additionalDataDescription = additionalDataDescription
@@ -987,15 +990,6 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self:
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
-
-    @property
-    def postskim_path(self):
-        """
-        Undefined property, since no subsequent modules can be added to the path after a
-        combined skim.
-        """
-        b2.B2ERROR("Post-skim path not defined for combined skims.")
-        return NotImplemented
 
     @property
     def flags(self):

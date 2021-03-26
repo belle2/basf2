@@ -312,6 +312,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_Ds_plus(DauPDG);
+        break;
       }
 
       return modeD;
@@ -335,6 +336,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_Ds_minus(DauPDG);
+        break;
       }
 
       return modeD;
@@ -358,6 +360,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_D_plus(DauPDG);
+        break;
       }
 
       return modeD;
@@ -381,6 +384,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_D_minus(DauPDG);
+        break;
       }
 
       return modeD;
@@ -404,6 +408,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_D0(DauPDG);
+        break;
       }
 
       return modeD;
@@ -427,6 +432,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeD = gDtag.Mode_anti_D0(DauPDG);
+        break;
       }
 
       return modeD;
@@ -450,6 +456,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeTau = gTKtag.Mode_tau_plus(DauPDG);
+        break;
       }
 
       return modeTau;
@@ -473,6 +480,7 @@ namespace Belle2 {
           DauPDG.push_back(mcDaughter->getPDG());
         }
         modeTau = gTKtag.Mode_tau_minus(DauPDG);
+        break;
       }
 
       return modeTau;

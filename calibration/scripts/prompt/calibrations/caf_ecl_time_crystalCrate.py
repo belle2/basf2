@@ -6,6 +6,7 @@
 from prompt import CalibrationSettings
 from reconstruction import prepare_cdst_analysis
 from caf.utils import IoV, ExpRun
+import copy
 
 ##############################
 # REQUIRED VARIABLE #
@@ -87,12 +88,13 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_bhabha = input_data["bhabha_all_calib"]
     file_to_iov_hadron = input_data["hadron_calib"]
 
-    # Could remove this limit on the number of files per run but will just
-    # set to a large number in case we want to introduce it later.
+    # Set the maximum limits on the number of files/events per run.
+    # If I decided to remove the limit on the number of files per run, it is just easier
+    # to set it to a large number in case we want to introduce it later.
     # Also, keeping it allows the crystal calibrations code to look like the
-    # crates calibration code.
+    # crates calibration code even though they don't use the same list of input files.
     max_files_per_run_calibration = 26
-    max_files_per_run_validation = 2
+    max_files_per_run_validation = 4
     max_events_per_run_plotting = 1
 
     # We filter addition files if there are more than [max_files_per_run] files per run.
@@ -208,13 +210,26 @@ def get_calibrations(input_data, **kwargs):
 
     # Define the CAF algorithm arguments
     # Set the crateIDLo to be larger than crateIDHi so that no crate
-    #    calibrations will be performed.
+    #    calibrations will be performed.  More variables set later in code....
     eclTAlgCrystals.crateIDLo = 3
     eclTAlgCrystals.crateIDHi = 2
     eclTAlgCrystals.debugOutput = True
     eclTAlgCrystals.meanCleanRebinFactor = 3
     eclTAlgCrystals.meanCleanCutMinFactor = 0.3
     eclTAlgCrystals.debugFilenameBase = "eclBhabhaTAlgorithm"
+
+    # Make two versions of these algorithms that differ only in whether
+    #    or not the previous bucket's payload information is saved
+    #    to a temporary payload for comparison purposes at each
+    #    iteration.
+    eclTAlgCrystals_saveNotReadPrevPayload = copy.deepcopy(eclTAlgCrystals)
+    eclTAlgCrystals_readNotSavePrevPayload = copy.deepcopy(eclTAlgCrystals)
+
+    eclTAlgCrystals_saveNotReadPrevPayload.savePrevCrysPayload = True
+    eclTAlgCrystals_saveNotReadPrevPayload.readPrevCrysPayload = False
+
+    eclTAlgCrystals_readNotSavePrevPayload.savePrevCrysPayload = False
+    eclTAlgCrystals_readNotSavePrevPayload.readPrevCrysPayload = True
 
     ####################################################
     # Introduce the number of crate+crystal iterations
@@ -259,12 +274,34 @@ def get_calibrations(input_data, **kwargs):
 
             ###################################################
             # Calibration setup for crystals iteration
+
             cal_crystals_i = Calibration(crysCalibName)
             cal_crystals_i.add_collection(name="bhabha", collection=eclTCol_crys)
-            cal_crystals_i.algorithms = [eclTAlgCrystals]
-            cal_crystals_i.save_payloads = False
 
-            # cal_crystals_i.strategies = SingleIOV
+            # If this is the first iteration then save the previous crystal payload
+            # values to a temporary storage payload.  If this is not the first iteration
+            # then read in the previous stored payload and plot the change in the crystal
+            if i == 0 and numCrysCrateIterations > 1:
+                cal_crystals_i.algorithms = [eclTAlgCrystals_saveNotReadPrevPayload]
+                print("crystal algorithm: save previous payload for comparison purposes but do not read it")
+                print("eclTAlgCrystals_saveNotReadPrevPayload.savePrevCrysPayload = ",
+                      eclTAlgCrystals_saveNotReadPrevPayload.savePrevCrysPayload)
+                print("eclTAlgCrystals_saveNotReadPrevPayload.readPrevCrysPayload = ",
+                      eclTAlgCrystals_saveNotReadPrevPayload.readPrevCrysPayload)
+            elif i == 0 and numCrysCrateIterations == 1:
+                cal_crystals_i.algorithms = [eclTAlgCrystals]
+                print("crystal algorithm: do not save or read any previous payloads for comparison purposes")
+                print("eclTAlgCrystals.savePrevCrysPayload = ", eclTAlgCrystals.savePrevCrysPayload)
+                print("eclTAlgCrystals.readPrevCrysPayload = ", eclTAlgCrystals.readPrevCrysPayload)
+            else:
+                cal_crystals_i.algorithms = [eclTAlgCrystals_readNotSavePrevPayload]
+                print("crystal algorithm: do not save previous payload but do read it in for comparison purposes")
+                print("eclTAlgCrystals_readNotSavePrevPayload.savePrevCrysPayload = ",
+                      eclTAlgCrystals_readNotSavePrevPayload.savePrevCrysPayload)
+                print("eclTAlgCrystals_readNotSavePrevPayload.readPrevCrysPayload = ",
+                      eclTAlgCrystals_readNotSavePrevPayload.readPrevCrysPayload)
+
+            cal_crystals_i.save_payloads = False
 
             # If payload boundaries are set use SequentialBoundaries
             # otherwise use SingleIOV
@@ -393,7 +430,27 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
         valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
         valid_cal_bhabha.save_payloads = False
-        valid_cal_bhabha.strategies = SingleIOV
+        eclValTAlgBhabha.readPrevCrysPayload = True
+        print("eclValTAlgBhabha.readPrevCrysPayload = ", eclValTAlgBhabha.readPrevCrysPayload)
+
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            valid_cal_bhabha.strategies = SequentialBoundaries
+        else:
+            valid_cal_bhabha.strategies = SingleIOV
+
+        for algorithm in valid_cal_bhabha.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for bhabha validation alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for bhabha validation alg - SingleIOV")
 
         #############################################################
         #############################################################
@@ -437,7 +494,27 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
         valid_cal_hadron.algorithms = [eclValTAlgHadronic]
         valid_cal_hadron.save_payloads = False
-        valid_cal_hadron.strategies = SingleIOV
+        eclValTAlgHadronic.readPrevCrysPayload = True
+        print("eclValTAlgHadronic.readPrevCrysPayload = ", eclValTAlgHadronic.readPrevCrysPayload)
+
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            valid_cal_hadron.strategies = SequentialBoundaries
+        else:
+            valid_cal_hadron.strategies = SingleIOV
+
+        for algorithm in valid_cal_hadron.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for hadron validation alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for hadron validation alg - SingleIOV")
 
         #######################################################################
         #######################################################################
@@ -481,6 +558,25 @@ def get_calibrations(input_data, **kwargs):
         cal_ecl_timeShifts.add_collection(name="bhabha", collection=eclTCol)
 
         cal_ecl_timeShifts.save_payloads = False
+
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            cal_ecl_timeShifts.strategies = SequentialBoundaries
+        else:
+            cal_ecl_timeShifts.strategies = SingleIOV
+
+        for algorithm in cal_ecl_timeShifts.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for crate time plotting alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for crate time plotting alg - SingleIOV")
 
         ##################################################
         # Set the dependencies to determine the order in
@@ -670,6 +766,8 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
         valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
         valid_cal_bhabha.save_payloads = False
+        eclValTAlgBhabha.readPrevCrysPayload = True
+        print("eclValTAlgBhabha.readPrevCrysPayload = ", eclValTAlgBhabha.readPrevCrysPayload)
 
         # Here we set the AlgorithmStrategy for our algorithm
 
@@ -677,7 +775,24 @@ def get_calibrations(input_data, **kwargs):
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
         # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-        valid_cal_bhabha.strategies = SingleIOV
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            valid_cal_bhabha.strategies = SequentialBoundaries
+        else:
+            valid_cal_bhabha.strategies = SingleIOV
+
+        for algorithm in valid_cal_bhabha.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for bhabha validation alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for bhabha validation alg - SingleIOV")
 
         #############################################################
         #############################################################
@@ -721,6 +836,8 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
         valid_cal_hadron.algorithms = [eclValTAlgHadronic]
         valid_cal_hadron.save_payloads = False
+        eclValTAlgHadronic.readPrevCrysPayload = True
+        print("eclValTAlgHadronic.readPrevCrysPayload = ", eclValTAlgHadronic.readPrevCrysPayload)
 
         # Here we set the AlgorithmStrategy for our algorithm
 
@@ -728,7 +845,24 @@ def get_calibrations(input_data, **kwargs):
         # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
         # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-        valid_cal_hadron.strategies = SingleIOV
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            valid_cal_hadron.strategies = SequentialBoundaries
+        else:
+            valid_cal_hadron.strategies = SingleIOV
+
+        for algorithm in valid_cal_hadron.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for hadron validation alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for hadron validation alg - SingleIOV")
 
         #######################################################################
         #######################################################################
@@ -772,6 +906,25 @@ def get_calibrations(input_data, **kwargs):
         cal_ecl_timeShifts.add_collection(name="bhabha", collection=eclTCol)
 
         cal_ecl_timeShifts.save_payloads = False
+
+        # If payload boundaries are set use SequentialBoundaries
+        # otherwise use SingleIOV
+        if payload_boundaries:
+            cal_ecl_timeShifts.strategies = SequentialBoundaries
+        else:
+            cal_ecl_timeShifts.strategies = SingleIOV
+
+        for algorithm in cal_ecl_timeShifts.algorithms:
+            # Set payload iov information for SequentialBoundaries
+            # and SingleIOV strategies.
+            if payload_boundaries:
+                algorithm.params = {"iov_coverage": output_iov,
+                                    "payload_boundaries": payload_boundaries}
+
+                print("Set iov for crate time plotting alg - SequentialBoundaries")
+            else:
+                algorithm.params = {"apply_iov": output_iov}
+                print("Set iov for crate time plotting alg - SingleIOV")
 
         #######################################################################
         #######################################################################

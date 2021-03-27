@@ -35,6 +35,8 @@ namespace Belle2 {
                                           Expand mask and apply to non-rebinned histogram. */
       int crateIDLo;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
       int crateIDHi;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
+      bool savePrevCrysPayload; /**< Save the previous crystal payload values for comparison */
+      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
       std::string debugFilenameBase;

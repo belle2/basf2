@@ -38,7 +38,7 @@ namespace Belle2::AWESOME {
      * @param step The G4Step with the current step information.
      * @return true if a hit was created, false otherwise.
      */
-    bool step(G4Step* step, G4TouchableHistory*);
+    bool step(G4Step* step, G4TouchableHistory*) override;
 
   private:
 

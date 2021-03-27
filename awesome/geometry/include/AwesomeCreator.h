@@ -20,12 +20,39 @@ namespace Belle2::AWESOME {
 
   /** The creator for the AWESOME geometry. */
   class AwesomeCreator : public geometry::CreatorBase {
+
   public:
+
+    /**
+     * Default constructor.
+     */
     AwesomeCreator();
+
+    /**
+     * Copy constructor, deleted.
+     */
+    AwesomeCreator(AwesomeCreator&) = delete;
+
+    /**
+     * Assignment operator, deleted.
+     */
+    AwesomeCreator& operator=(AwesomeCreator&) = delete;
+
+    /**
+     * Default destructor.
+     */
     virtual ~AwesomeCreator();
-    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-  protected:
+
+    /**
+     * Write something useful here.
+     */
+    void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+  private:
+
+    /** The AWESOME sensitive detector. */
     AWESOMESensitiveDetector* m_sensitiveDetector;
+
   };
 
 }

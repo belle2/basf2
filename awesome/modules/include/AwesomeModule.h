@@ -25,25 +25,38 @@ namespace Belle2::AWESOME {
 
   public:
 
-    /** Constructor */
+    /**
+     * Default constructor.
+     */
     AwesomeModule();
 
-    /** Init the module */
-    virtual void initialize();
+    /**
+     * Initialize the module.
+     */
+    void initialize() override;
 
-    /** Called for every begin run */
-    virtual void beginRun();
+    /**
+     * Called for each begin of run.
+     */
+    void beginRun() override;
 
-    /** Called for every end run */
-    virtual void event();
+    /**
+     * Called for each event.
+     */
+    void event() override;
 
-    /** Called for every end run */
-    virtual void endRun();
+    /**
+     * Called for each end of run.
+     */
+    void endRun() override;
 
-    /** Called on termination */
-    virtual void terminate();
+    /**
+     * Called on termination.
+     */
+    void terminate() override;
 
-  protected:
+  private:
+
     /** Useless variable showing how to create integer parameters */
     int m_intParameter;
 
@@ -55,6 +68,7 @@ namespace Belle2::AWESOME {
 
     /** Useless variable showing how to create array parameters */
     std::vector<double> m_doubleListParameter;
+
   };
 
 }

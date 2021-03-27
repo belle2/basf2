@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef AwesomeSIMHIT_H
-#define AwesomeSIMHIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -119,6 +118,4 @@ namespace Belle2 {
 
   };
 
-} // end namespace Belle2
-
-#endif
+}

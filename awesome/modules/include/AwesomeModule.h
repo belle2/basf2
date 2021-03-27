@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef AwesomeModule_H
-#define AwesomeModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -60,7 +59,5 @@ namespace Belle2 {
       std::vector<double> m_doubleListParameter;
     };
 
-  } // awesome namespace
-} // end namespace Belle2
-
-#endif // AwesomeModule_H
+  }
+}

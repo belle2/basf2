@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef AWESOME_SENSITIVEDETECTOR_H
-#define AWESOME_SENSITIVEDETECTOR_H
+
+#pragma once
 
 /* AWESOME headers. */
 #include <awesome/dataobjects/AwesomeSimHit.h>
@@ -55,7 +55,5 @@ namespace Belle2 {
 
     };
 
-  } //awesome namespace
-} //Belle2 namespace
-
-#endif
+  }
+}

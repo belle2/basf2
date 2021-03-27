@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef AWESOMECREATOR_H_
-#define AWESOMECREATOR_H_
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -31,5 +30,3 @@ namespace Belle2 {
 
   }
 }
-
-#endif /* AWESOMECREATOR_H_ */

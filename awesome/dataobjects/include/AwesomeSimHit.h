@@ -11,35 +11,112 @@
 #ifndef AwesomeSIMHIT_H
 #define AwesomeSIMHIT_H
 
-// ROOT
+/* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
   /**
-    * ClassAwesomeSimHit - Geant4 simulated hit for the Awesome detector.
-    *
-    * This class holds particle hit data from geant4 simulation. As the simulated
-    * hit classes are used to generate detector response, they contain _local_
-    * information.
-    */
+   * AwesomeSimHit - Geant4 simulated hit for the Awesome detector.
+   *
+   * This class holds particle hit data from Geant4 simulation.
+   * As the simulated hit classes are used to generate detector response,
+   * they should contain _local_ information.
+   */
   class AwesomeSimHit : public RelationsObject {
+
   public:
-    /** default constructor for ROOT */
-    AwesomeSimHit(): m_energyDep(0) {}
 
-    /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+    /**
+     * Default constructor.
      */
-    AwesomeSimHit(float energyDep): m_energyDep(energyDep) {}
+    AwesomeSimHit() :
+      m_energyDep{0},
+      m_position{0., 0., 0.},
+      m_time{0}
+    {}
 
-    /** Return the energy deposition in electrons */
-    float getEnergyDep()        const { return m_energyDep; }
+    /**
+     * Standard constructor.
+     * @param energyDep Deposited energy in MeV.
+     * @param position  Vector for position in cm.
+     * @param time      Time in ns.
+     */
+    AwesomeSimHit(float energyDep, B2Vector3<float> position, float time) :
+      m_energyDep{energyDep},
+      m_position{position},
+      m_time{time}
+    {}
+
+    /**
+     * Get the deposited energy.
+     * @return deposited energy in MeV.
+     */
+    float getEnergyDep() const
+    {
+      return m_energyDep;
+    }
+
+    /**
+     * Set the deposited energy.
+     * @param energy Deposited energy in MeV.
+     */
+    void setEnergyDep(float energyDep)
+    {
+      m_energyDep = energyDep;
+    }
+
+    /**
+     * Get the vector for position.
+     * @return vector for position in cm.
+     */
+    B2Vector3<float> getPosition() const
+    {
+      return m_position;
+    }
+
+    /**
+     * Set the vector for position.
+     * @param position Vector for position in cm.
+     */
+    void setPosition(B2Vector3<float> position)
+    {
+      m_position = position;
+    }
+
+    /**
+     * Get the time.
+     * @return time in ns.
+     */
+    float getTime() const
+    {
+      return m_time;
+    }
+
+    /**
+     * Set the time.
+     * @param time Time in ns.
+     */
+    void setTime(float time)
+    {
+      m_time = time;
+    }
+
   private:
-    /** Deposited energy in electrons */
+
+    /** Deposited energy in MeV. */
     float m_energyDep;
 
+    /** Vector for position in cm. */
+    B2Vector3<float> m_position;
+
+    /** Time in ns. */
+    float m_time;
+
+    /** Class versions, required by the ROOT streamer. */
     ClassDef(AwesomeSimHit, 1)
+
   };
 
 } // end namespace Belle2

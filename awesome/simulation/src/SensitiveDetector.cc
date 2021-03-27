@@ -8,66 +8,70 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <awesome/simulation/SensitiveDetector.h>
-#include <awesome/dataobjects/AwesomeSimHit.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
+/* Belle2 headers. */
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 
+/* Geant4 headers. */
+#include <G4StepPoint.hh>
 #include <G4Track.hh>
-#include <G4Step.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <CLHEP/Vector/ThreeVector.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the AWESOME detector */
   namespace awesome {
 
-    SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("AwesomeSensitiveDetector", Const::EDetector::TEST)
+    SensitiveDetector::SensitiveDetector() :
+      Simulation::SensitiveDetectorBase{"AwesomeSensitiveDetector", Const::EDetector::TEST}
     {
-      //Make sure all collections are registered
-      StoreArray<MCParticle>   mcParticles;
-      StoreArray<AwesomeSimHit>  simHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
-
-      //Register all collections we want to modify and require those we want to use
-      //      mcParticles.registerAsPersistent();
-      //      simHits.registerAsPersistent();
-      //      relMCSimHit.registerAsPersistent();
-
-      //Register the Relation so that the TrackIDs get replaced by the actual
-      //MCParticle indices after simulating the events. This is needed as
-      //secondary particles might not be stored so everything relating to those
-      //particles will be attributed to the last saved mother particle
-      registerMCParticleRelation(relMCSimHit);
+      /* MCParticles must be optional, not required. */
+      m_MCParticles.isOptional();
+      /* Register the simulted hits and all the necessary relations in the datastore. */
+      m_SimHits.registerInDataStore();
+      m_MCParticles.registerRelationTo(m_SimHits);
+      /*
+       * Register the Relation so that the Geant4 TrackIDs get replaced by the actual
+       * MCParticle indices after simulating the events. This is needed as
+       * secondary particles might not be stored so everything relating to those
+       * particles will be attributed to the last saved mother particle.
+      */
+      registerMCParticleRelation(m_MCParticlesToSimHits);
     }
 
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
     {
-      //Get Track information
-      const G4Track& track    = *step->GetTrack();
-      const int trackID       = track.GetTrackID();
-      const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
-
-      //Ignore everything below 1eV
-      if (depEnergy < Unit::eV) return false;
-
-      //Get the datastore arrays
-      StoreArray<MCParticle>  mcParticles;
-      StoreArray<AwesomeSimHit> simHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
-
-      //Add SimHit
-      simHits.appendNew(depEnergy);
-
-      //const int hitIndex = simHits.GetLast() + 1 ;
-      //new(simHits.AddrAt(hitIndex)) AwesomeSimHit(depEnergy);
-
-      //Add Relation between SimHit and MCParticle with a weight of 1. Since
-      //the MCParticle index is not yet defined we use the trackID from Geant4
-      //relMCSimHit.add(trackID, hitIndex, 1.0);
-
+      /* Get some basic information from Geant4. */
+      const G4Track& track   = *step->GetTrack();
+      const int trackID      = track.GetTrackID();
+      const double energyDep = step->GetTotalEnergyDeposit() * Unit::MeV;
+      G4StepPoint* preStep   = step->GetPreStepPoint();
+      G4StepPoint* postStep  = step->GetPostStepPoint();
+      /* Ignore everything below 1 eV. */
+      if (energyDep < Unit::eV)
+        return false;
+      /*
+       * Compute other useful quantities to be stored.
+       * We must be sure that the quantities are stored using the proper Belle2 units:
+       * positions in cm, time in ns, etc.
+       */
+      const CLHEP::Hep3Vector position = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // Now in cm
+      const double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime()); // Already in ns
+      /* Store the simulated hit. */
+      AwesomeSimHit* simHit = m_SimHits.appendNew();
+      simHit->setEnergyDep(energyDep);
+      simHit->setPosition(B2Vector3{position.x(), position.y(), position.z()});
+      simHit->setTime(time);
+      /*
+       * Add a relation between the current MCParticle and the simulated hit.
+       * Since the MCParticle index is not yet defined we use the trackID from Geant4.
+       */
+      m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
       return true;
     }
 

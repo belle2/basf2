@@ -23,37 +23,34 @@
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
 
-namespace Belle2 {
-  /** Namespace to encapsulate code needed for the AWESOME detector */
-  namespace awesome {
+namespace Belle2::AWESOME {
 
-    /** Sensitive Detector implementation of the AWESOME detector */
-    class SensitiveDetector : public Simulation::SensitiveDetectorBase {
+  /** Sensitive Detector implementation of the AWESOME detector */
+  class AWESOMESensitiveDetector : public Simulation::SensitiveDetectorBase {
 
-    public:
+  public:
 
-      /** Constructor */
-      SensitiveDetector();
+    /** Constructor */
+    AWESOMESensitiveDetector();
 
-      /**
-       * Step processing method.
-       * @param step The G4Step with the current step information.
-       * @return true if a hit was created, false otherwise.
-       */
-      bool step(G4Step* step, G4TouchableHistory*);
+    /**
+     * Step processing method.
+     * @param step The G4Step with the current step information.
+     * @return true if a hit was created, false otherwise.
+     */
+    bool step(G4Step* step, G4TouchableHistory*);
 
-    private:
+  private:
 
-      /** MC particles. */
-      StoreArray<MCParticle> m_MCParticles;
+    /** MC particles. */
+    StoreArray<MCParticle> m_MCParticles;
 
-      /** AWESOME simulated hits. */
-      StoreArray<AwesomeSimHit> m_SimHits;
+    /** AWESOME simulated hits. */
+    StoreArray<AwesomeSimHit> m_SimHits;
 
-      /** Relation array between MCParticles and AwesomeSimHits. */
-      RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
+    /** Relation array between MCParticles and AwesomeSimHits. */
+    RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
 
-    };
+  };
 
-  }
 }

@@ -10,23 +10,22 @@
 
 #pragma once
 
+/* AWESOME headers. */
+#include <awesome/simulation/AWESOMESensitiveDetector.h>
+
+/* Belle2 headers. */
 #include <geometry/CreatorBase.h>
 
-namespace Belle2 {
-  /** Namespace to encapsulate code needed for the AWESOME detector */
-  namespace awesome {
+namespace Belle2::AWESOME {
 
-    class SensitiveDetector;
+  /** The creator for the AWESOME geometry. */
+  class AwesomeCreator : public geometry::CreatorBase {
+  public:
+    AwesomeCreator();
+    virtual ~AwesomeCreator();
+    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+  protected:
+    AWESOMESensitiveDetector* m_sensitiveDetector;
+  };
 
-    /** The creator for the AWESOME geometry. */
-    class AwesomeCreator : public geometry::CreatorBase {
-    public:
-      AwesomeCreator();
-      virtual ~AwesomeCreator();
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-    protected:
-      SensitiveDetector* m_sensitive;
-    };
-
-  }
 }

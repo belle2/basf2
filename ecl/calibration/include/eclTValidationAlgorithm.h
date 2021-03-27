@@ -36,6 +36,7 @@ namespace Belle2 {
 
       int cellIDLo;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
       int cellIDHi;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
       double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
       double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
                                           less than meanCleanCutMinFactor times the maximum bin value.

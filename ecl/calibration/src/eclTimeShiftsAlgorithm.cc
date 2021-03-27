@@ -34,7 +34,7 @@ eclTimeShiftsAlgorithm::eclTimeShiftsAlgorithm():
   m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib")//,
 {
   setDescription(
-    "Perform time calibration of ecl crystals by combining previous values from the DB for different calibrations."
+    "Plots the ecl crystal and crate time calibations."
   );
 }
 
@@ -174,7 +174,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       } else {
         B2DEBUG(22, "m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
                 m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
-        //B2INFO("m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " << m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
       }
 
     }
@@ -545,8 +544,11 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   TFile* tcratefile = 0;
 
   B2INFO("Debug output rootfile: " << debugFilenameBase);
-  TString fname = debugFilenameBase;
-  fname += ".root";
+  string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") +
+                         to_string(maxExpNum) + "_" + to_string(maxRunNum);
+  string debugFilename = debugFilenameBase + runNumsString + string(".root");
+  TString fname = debugFilename;
+
   tcratefile = new TFile(fname, "recreate");
   tcratefile->cd();
   B2INFO("Debugging histograms written to " << fname);
@@ -572,7 +574,10 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
     string tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                           string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
-    string tgraph_name_short = "crateTimeVSrunNum_crate" ;
+
+    string tgraph_name_short = "crateTimeVSrunNum_" ;
+    tgraph_name_short = tgraph_name_short + runNumsString + "_crate";
+
     tgraph_title = tgraph_title + string("_crate") + paddedCrateID ;
     tgraph_name_short = tgraph_name_short + paddedCrateID ;
     tgraph_title = tgraph_title + string(" (") + to_string(m_tcrate_min_cut) + string(" < tcrate < ") +
@@ -596,9 +601,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     Leg1->SetTextFont(42);
     Leg1->SetTextSize(0.035);
     Leg1->SetTextColor(1);
-    //string crateLabel = "Phase 2, all runs, Crate " ;
-    //crateLabel += paddedCrateID ;
-    //Leg1->DrawLatex( 0.18, 0.96, paddedCrateID.c_str() ) ;
     Leg1->AppendPad();
 
     g_tcrate_vs_runNum->Write() ;
@@ -614,7 +616,10 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
     tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                    string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
-    tgraph_name_short = "crystalCrateTimeVSrunNum_crate" ;
+
+    tgraph_name_short = "crystalCrateTimeVSrunNum_" ;
+    tgraph_name_short = tgraph_name_short + runNumsString + "_crate";
+
     tgraph_title = tgraph_title + string("_crate") + paddedCrateID ;
     tgraph_name_short = tgraph_name_short + paddedCrateID ;
     tgraph_title = tgraph_title + string(" (") + to_string(m_tcrate_min_cut) + string(" < tcrate < ") +
@@ -685,13 +690,17 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       TGraphErrors* g_crateCrystalTime_vs_runCounter ;
 
       // NULL for run number errors = 0 for all
-      //g_crateCrystalTime_vs_runCounter = new TGraphErrors(numRunsWithCrateTimes, counterVec,
       g_crateCrystalTime_vs_runCounter = new TGraphErrors(numRunsWithCrateTimes, &counterVec[0],
                                                           single_crate_crystalCrate_times, NULL, single_crate_crystalCrate_times_unc) ;
 
       tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                      string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
-      tgraph_name_short = "crystalCrateTimeVSrunCounter_crate" ;
+
+
+      tgraph_name_short = "crystalCrateTimeVSrunCounter_" ;
+      tgraph_name_short = tgraph_name_short + runNumsString + "_crate";
+
+
       tgraph_title = tgraph_title + string("_crate") + paddedCrateID ;
       tgraph_name_short = tgraph_name_short + paddedCrateID ;
       tgraph_title = tgraph_title + string(" (") + to_string(m_tcrate_min_cut) + string(" < tcrate < ") +

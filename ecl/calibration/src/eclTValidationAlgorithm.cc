@@ -34,6 +34,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm():
   CalibrationAlgorithm("eclHadronTimeCalibrationValidationCollector"),
   cellIDLo(1),
   cellIDHi(8736),
+  readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
   debugFilenameBase("eclTValidationAlgorithm")
@@ -53,6 +54,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm(string physicsProcessCollectorN
   CalibrationAlgorithm(physicsProcessCollectorName.c_str()),
   cellIDLo(1),
   cellIDHi(8736),
+  readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
   debugFilenameBase("eclTValidationAlgorithm")
@@ -73,6 +75,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   B2INFO("eclTValidationAlgorithm parameters:");
   B2INFO("cellIDLo = " << cellIDLo);
   B2INFO("cellIDHi = " << cellIDHi);
+  B2INFO("readPrevCrysPayload = " << readPrevCrysPayload);
   B2INFO("meanCleanRebinFactor = " << meanCleanRebinFactor);
   B2INFO("meanCleanCutMinFactor = " << meanCleanCutMinFactor);
 
@@ -155,8 +158,8 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   }
 
   B2INFO("debugFilenameBase = " << debugFilenameBase);
-  string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") + to_string(
-                           maxExpNum) + "_" + to_string(maxRunNum);
+  string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") +
+                         to_string(maxExpNum) + "_" + to_string(maxRunNum);
   string debugFilename = debugFilenameBase + runNumsString + string(".root");
 
 
@@ -165,54 +168,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   // * ECLChannelMapper (to map crystal to crates)
   // * crystal payload updating for iterating crystal and crate fits
   int eventNumberForCrates = 1;
-
-  //-------------------------------------------------------------------
-  /* Uploading ts payload for the older set of runs,
-     hopefully a previous "bucket" worth of runs. */
-  int olderBucketRunNum = 0;
-  int olderBucketExpNum = 0;
-  if (minRunNum > 0) {
-    olderBucketRunNum = minRunNum - 1 ;
-    olderBucketExpNum = minExpNum ;
-  } else if (minExpNum > 0) {
-    olderBucketExpNum = minExpNum - 1 ;
-    olderBucketRunNum = 99999;
-  }
-
-
-  StoreObjPtr<EventMetaData> evtPtrOlderRuns;
-  // simulate the initialize() phase where we can register objects in the DataStore
-  DataStore::Instance().setInitializeActive(true);
-  evtPtrOlderRuns.registerInDataStore();
-  DataStore::Instance().setInitializeActive(false);
-  // now construct the event metadata
-  evtPtrOlderRuns.construct(eventNumberForCrates, olderBucketRunNum, olderBucketExpNum);
-  // and update the database contents
-  DBStore& dbstoreOlderRuns = DBStore::Instance();
-  dbstoreOlderRuns.update();
-  // this is only needed it the payload might be intra-run dependent,
-  // that is if it might change during one run as well
-  dbstoreOlderRuns.updateEvent();
-
-
-  B2INFO("For previous bucket comparisons, uploading payload for exp " << olderBucketExpNum << ", run " << olderBucketRunNum <<
-         ", event " << eventNumberForCrates);
-  updateDBObjPtrs(eventNumberForCrates, olderBucketRunNum, olderBucketExpNum);
-
-  //------------------------------------------------------------------------
-  //..Read payloads from database
-  DBObjPtr<Belle2::ECLCrystalCalib> crystalTimeOlderRunsObject("ECLCrystalTimeOffset");
-  B2INFO("Dumping payload");
-
-  //..Get vectors of values from the payloads
-  std::vector<float> olderRunsCrys = crystalTimeOlderRunsObject->getCalibVector();
-  std::vector<float> olderRunsUncCrys = crystalTimeOlderRunsObject->getCalibUncVector();
-
-  //..Print out a few values for quality control
-  B2INFO("Values read from database for the older runs.");
-  for (int ic = 0; ic < 8736; ic += 500) {
-    B2INFO("ts: cellID " << ic + 1 << " " << olderRunsCrys[ic] << " +/- " << olderRunsUncCrys[ic]);
-  }
 
 
   //-------------------------------------------------------------------
@@ -255,6 +210,23 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   }
 
 
+  //..Read in the previous crystal payload values
+  DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
+  vector<float> prevValuesCrys(8736);
+  vector<float> prevUncCrys(8736);
+  if (readPrevCrysPayload) {
+    //..Get vectors of values from the payloads
+    prevValuesCrys = customPrevCrystalTimeObject->getCalibVector();
+    prevUncCrys = customPrevCrystalTimeObject->getCalibUncVector();
+
+    //..Print out a few values for quality control
+    B2INFO("Previous values read from database.  Write out for their values for comparison against those from tcol");
+    for (int ic = 0; ic < 8736; ic += 500) {
+      B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic] << " +/- " << prevUncCrys[ic]);
+    }
+  }
+
+
   //------------------------------------------------------------------------
   //..Start looking at timing information
 
@@ -272,31 +244,34 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   cutflow->Write();
 
 
-  double hist_tmin = clusterTime_cid->GetYaxis()->GetXmin();
-  double hist_tmax = clusterTime_cid->GetYaxis()->GetXmax();
-  int hist_nTbins  = clusterTime_cid->GetNbinsX();
-
-  double time_fit_min = hist_tmax;   // Set min value to largest possible value so that it gets reset
-  double time_fit_max = hist_tmin;   // Set max value to smallest possible value so that it gets reset
+  double hist_tmin = clusterTime->GetXaxis()->GetXmin();
+  double hist_tmax = clusterTime->GetXaxis()->GetXmax();
+  int hist_nTbins  = clusterTime->GetNbinsX();
 
   B2INFO("hist_tmin = " << hist_tmin);
   B2INFO("hist_tmax = " << hist_tmax);
+  B2INFO("hist_nTbins = " << hist_nTbins);
+
+  double time_fit_min = hist_tmax;   // Set min value to largest possible value so that it gets reset
+  double time_fit_max = hist_tmin;   // Set max value to smallest possible value so that it gets reset
 
 
   // define histogram for keeping track of the peak of the cluster times per crystal
   auto peakClusterTime_cid = new TH1F("peakClusterTime_cid", ";cell id;Peak cluster time [ns]", 8736, 1, 8736 + 1);
   auto peakClusterTimes = new TH1F("peakClusterTimes",
-                                   "-For crystals with at least one hit-;Peak cluster time [ns];Number of crystals", hist_nTbins, hist_tmin, hist_tmax);
+                                   "-For crystals with at least one hit-;Peak cluster time [ns];Number of crystals",
+                                   hist_nTbins, hist_tmin, hist_tmax);
+  auto peakClusterTimesGoodFit = new TH1F("peakClusterTimesGoodFit",
+                                          "-For crystals with a good fit to distribution of hits-;Peak cluster time [ns];Number of crystals",
+                                          hist_nTbins, hist_tmin, hist_tmax);
 
 
-  /* The new crystal calibration contant minus the values from a previous set of runs,
-     that should have a different set of payloads. */
-  auto tsNew_MINUS_tsOlderRuns__cid = new TH1F("tsNew_MINUS_tsOlderRuns__cid", ";cell id; ts(new) - ts(older runs)  [ns]", 8736, 1,
-                                               8736 + 1);
+  // define histograms to keep track of the difference in the new crystal times vs the old ones
+  auto tsNew_MINUS_tsCustomPrev__cid = new TH1F("TsNew_MINUS_TsCustomPrev__cid", ";cell id; ts(new) - ts(old = 'pre-calib')  [ns]",
+                                                8736, 1, 8736 + 1);
 
-  auto tsNew_MINUS_tsOlderRuns = new TH1F("tsNew_MINUS_tsOlderRuns", ";ts(new) - ts(older runs)  [ns];Number of crystals", 201,
-                                          -10.05, 10.05);
-
+  auto tsNew_MINUS_tsCustomPrev = new TH1F("TsNew_MINUS_TsCustomPrev", ";ts(new) - ts(old = 'pre-calib')  [ns];Number of crystals",
+                                           285, -69.5801, 69.5801);
 
 
   /* CRYSTAL BY CRYSTAL VALIDATION */
@@ -484,6 +459,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
       peakClusterTimes->Fill(t_offsets[crys_id - 1]);
       numCrysWithNonZeroEntries++ ;
     }
+    if (good_fit) {
+      peakClusterTimesGoodFit->Fill(t_offsets[crys_id - 1]);
+    }
 
 
     delete gaus;
@@ -493,6 +471,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   histfile->WriteTObject(peakClusterTime_cid, "peakClusterTime_cid");
   histfile->WriteTObject(peakClusterTimes, "peakClusterTimes");
+  histfile->WriteTObject(peakClusterTimesGoodFit, "peakClusterTimesGoodFit");
 
 
 
@@ -776,8 +755,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   }
 
 
-
-
   B2INFO("~~~~~~~~");
   B2INFO("Number of crystals with non-zero number of hits = " << numCrysWithNonZeroEntries);
   B2INFO("Number of crystals with good quality fits = " << numCrysWithGoodFit);
@@ -790,32 +767,26 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   histfile->WriteTObject(clusterTimePeakWidth_ClusterEnergy_varBin, "clusterTimePeakWidth_ClusterEnergy_varBin");
 
 
-  /* Make plots of how much the crystal calibration constants changed
-     beteen the current values and those of a previous run. */
 
+  /* Fill histograms with the difference in the ts values from this iteration
+     and the previous values read in from the payload. */
+  B2INFO("Filling histograms for difference in crystal payload values and the pre-calibration values.  These older values may be from a previous bucket or older reprocessing of the data.");
   for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+    double tsDiffCustomOld_ns = -999;
+    if (readPrevCrysPayload) {
+      tsDiffCustomOld_ns = (t_offsets[crys_id - 1] - prevValuesCrys[crys_id - 1]) * TICKS_TO_NS;
+      B2INFO("Crystal " << crys_id << ": ts new - 'pre-calibration' = " << tsDiffCustomOld_ns << " ns");
+    }
+    tsNew_MINUS_tsCustomPrev__cid->SetBinContent(crys_id, tsDiffCustomOld_ns);
+    tsNew_MINUS_tsCustomPrev__cid->SetBinError(crys_id, 0);
+    tsNew_MINUS_tsCustomPrev__cid->ResetStats();
 
-    /* Fill histograms with the difference in the ts values between this
-       calibration of tho ts values of some previous runs. */
-    double tsDiffPreRuns_ns = (currentValuesCrys[crys_id - 1] - olderRunsCrys[crys_id - 1]) * TICKS_TO_NS;
-    B2INFO("Crystal " << crys_id << ": ts new - older runs = " << tsDiffPreRuns_ns << " ns");
-    tsNew_MINUS_tsOlderRuns__cid->SetBinContent(crys_id, tsDiffPreRuns_ns);
-    tsNew_MINUS_tsOlderRuns__cid->SetBinError(crys_id, 0);
-
-    tsNew_MINUS_tsOlderRuns->Fill(tsDiffPreRuns_ns);
+    tsNew_MINUS_tsCustomPrev->Fill(tsDiffCustomOld_ns);
+    tsNew_MINUS_tsCustomPrev->ResetStats();
   }
-  tsNew_MINUS_tsOlderRuns__cid->ResetStats();
-  tsNew_MINUS_tsOlderRuns->ResetStats();
 
-
-  string expRunDiff = "__e" + to_string(minExpNum) +
-                      "r" + to_string(minRunNum) + "-"
-                      "e" + to_string(olderBucketExpNum) +
-                      "r" + to_string(olderBucketRunNum) ;
-
-  // Save the histograms to the output root file
-  histfile->WriteTObject(tsNew_MINUS_tsOlderRuns__cid, (std::string("tsNew_MINUS_tsOlderRuns__cid") + expRunDiff).c_str());
-  histfile->WriteTObject(tsNew_MINUS_tsOlderRuns, (std::string("tsNew_MINUS_tsOlderRuns") + expRunDiff).c_str());
+  histfile->WriteTObject(tsNew_MINUS_tsCustomPrev__cid, "tsNew_MINUS_tsCustomPrev__cid");
+  histfile->WriteTObject(tsNew_MINUS_tsCustomPrev, "tsNew_MINUS_tsCustomPrev");
 
 
   histfile->Close();

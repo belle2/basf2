@@ -428,10 +428,23 @@ def get_calibrations(input_data, **kwargs):
 
         valid_cal_bhabha = Calibration("ECLcrystalTimeCalValidation_bhabhaPhysics")
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
-        valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
         valid_cal_bhabha.save_payloads = False
-        eclValTAlgBhabha.readPrevCrysPayload = True
-        print("eclValTAlgBhabha.readPrevCrysPayload = ", eclValTAlgBhabha.readPrevCrysPayload)
+
+        # Make a second version of this algorithm that differs only in
+        #    that it is instructed to read the previous crystal payload
+        eclValTAlgBhabha_readPrevPayload = copy.deepcopy(eclValTAlgBhabha)
+        eclValTAlgBhabha_readPrevPayload.readPrevCrysPayload = True
+
+        # If there is just one iteration then don't read a non-existant payload
+        if numCrysCrateIterations > 1:
+            valid_cal_bhabha.algorithms = [eclValTAlgBhabha_readPrevPayload]
+            print("bhabha validation: read previous payload for comparison purposes")
+            print("eclValTAlgBhabha_readPrevPayload.readPrevCrysPayload = ",
+                  eclValTAlgBhabha_readPrevPayload.readPrevCrysPayload)
+        else:
+            valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
+            print("bhabha validation: do not read previous payload for comparison purposes")
+            print("eclValTAlgBhabha.readPrevCrysPayload = ", eclValTAlgBhabha.readPrevCrysPayload)
 
         # If payload boundaries are set use SequentialBoundaries
         # otherwise use SingleIOV
@@ -492,10 +505,23 @@ def get_calibrations(input_data, **kwargs):
 
         valid_cal_hadron = Calibration("ECLcrystalTimeCalValidation_hadronPhysics")
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
-        valid_cal_hadron.algorithms = [eclValTAlgHadronic]
         valid_cal_hadron.save_payloads = False
-        eclValTAlgHadronic.readPrevCrysPayload = True
-        print("eclValTAlgHadronic.readPrevCrysPayload = ", eclValTAlgHadronic.readPrevCrysPayload)
+
+        # Make a second version of this algorithm that differs only in
+        #    that it is instructed to read the previous crystal payload
+        eclValTAlgHadron_readPrevPayload = copy.deepcopy(eclValTAlgHadronic)
+        eclValTAlgHadron_readPrevPayload.readPrevCrysPayload = True
+
+        # If there is just one iteration then don't read a non-existant payload
+        if numCrysCrateIterations > 1:
+            valid_cal_hadron.algorithms = [eclValTAlgHadron_readPrevPayload]
+            print("hadron validation: read previous payload for comparison purposes")
+            print("eclValTAlgHadron_readPrevPayload.readPrevCrysPayload = ",
+                  eclValTAlgHadron_readPrevPayload.readPrevCrysPayload)
+        else:
+            valid_cal_hadron.algorithms = [eclValTAlgHadronic]
+            print("hadron validation: do not read previous payload for comparison purposes")
+            print("eclValTAlgHadronic.readPrevCrysPayload = ", eclValTAlgHadronic.readPrevCrysPayload)
 
         # If payload boundaries are set use SequentialBoundaries
         # otherwise use SingleIOV
@@ -535,8 +561,7 @@ def get_calibrations(input_data, **kwargs):
         col_bhabha_plotting = register_module('eclTimeShiftsPlottingCollector')
         eclTCol = Collection(collector=col_bhabha_plotting,
                              input_files=input_files_plotting,
-                             pre_collector_path=rec_path_bhabha_plotting,
-                             )
+                             pre_collector_path=rec_path_bhabha_plotting)
 
         # Set up the plotting.  Use the two files with the collector to
         # determine the run range to plot.  The plotting is done in the

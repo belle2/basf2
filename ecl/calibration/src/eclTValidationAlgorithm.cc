@@ -213,16 +213,14 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   //..Read in the previous crystal payload values
   DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
   vector<float> prevValuesCrys(8736);
-  vector<float> prevUncCrys(8736);
   if (readPrevCrysPayload) {
     //..Get vectors of values from the payloads
     prevValuesCrys = customPrevCrystalTimeObject->getCalibVector();
-    prevUncCrys = customPrevCrystalTimeObject->getCalibUncVector();
 
     //..Print out a few values for quality control
     B2INFO("Previous values read from database.  Write out for their values for comparison against those from tcol");
     for (int ic = 0; ic < 8736; ic += 500) {
-      B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic] << " +/- " << prevUncCrys[ic]);
+      B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
     }
   }
 

@@ -212,7 +212,6 @@ class BtoXll(BaseSkim):
         stdK(listtype='good', path=path)
         stdMu(listtype='good', path=path)
         ma.reconstructDecay("B+:signal -> K+:good mu+:good mu-:good", "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
-        ma.matchMCTruth('B+:signal', path=path)
 
         create_validation_histograms(
             rootfile=histogram_filename,

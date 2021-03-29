@@ -23,9 +23,6 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
-// #include <vxd/dataobjects/VxdID.h>
-// #include <vxd/geometry/GeoCache.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
@@ -121,6 +118,7 @@ void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResu
                             const std::vector<const SpacePoint*>& spacePoints)
 {
   for (auto& thisSPTC : finishedResults) {
+    if (!thisSPTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) continue;
 
     const auto& estimatorResult = m_estimator->estimateQualityAndProperties(thisSPTC.getHits());
 

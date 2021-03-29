@@ -13,20 +13,14 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 
-// #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <iostream>
 
@@ -38,11 +32,14 @@ TrackCandidateResultRefiner::~TrackCandidateResultRefiner() = default;
 
 TrackCandidateResultRefiner::TrackCandidateResultRefiner() : Super()
 {
+  addProcessingSignalListener(&m_overlapResolver);
 }
 
 void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
+
+  m_overlapResolver.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
@@ -64,10 +61,10 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
                                 "Cut on quality indicator value for track candidates of size 5. Only accept SpacePointTrackCands with QI above this value.",
                                 m_param_minQualitiyIndicatorSize5);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfHitsForEachLength"),
-                                m_param_maxNumberOfHitsForEachLength,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfHitsForEachPathLength"),
+                                m_param_maxNumberOfHitsForEachPathLength,
                                 "Maximum number of SpacePointTrackCands with a length of 3, 4, 5, or 6 each.",
-                                m_param_maxNumberOfHitsForEachLength);
+                                m_param_maxNumberOfHitsForEachPathLength);
 }
 
 void TrackCandidateResultRefiner::initialize()
@@ -126,12 +123,11 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
         (aTrackCandidate.getNHits() == 4 and qi >= m_param_minQualitiyIndicatorSize4) or
         (aTrackCandidate.getNHits() == 5 and qi >= m_param_minQualitiyIndicatorSize5) or
         (aTrackCandidate.getNHits() >= 6))  {
-//       prunedResults.emplace_back(aTrackCandidate);
       selectedResults.emplace_back(aTrackCandidate);
     }
   }
 
-  // return if nothing to do
+  // return early if nothing to do
   if (selectedResults.size() <= 1) {
     std::swap(selectedResults, prunedResults);
     return;
@@ -144,38 +140,16 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
             (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()));
   });
 
-//   prunedResults.reserve(selectedResults.size());
-//   for (uint i = 0; i < selectedResults.size() - 1; i++) {
-//     auto& currentSPTC = selectedResults.at(i);
-//
-//     if (std::find(prunedResults.begin(), prunedResults.end(), currentSPTC) == prunedResults.end()) {
-//       prunedResults.emplace_back(currentSPTC);
-//     }
-//
-//     for (uint j = i+1; j < selectedResults.size(); j++) {
-//       auto& checkedSPTC = selectedResults.at(j);
-// //       if (checkedSPTC.getNHits() == currentSPTC.getNHits()) {
-// //         prunedResults.emplace_back(checkedSPTC);
-// //         continue;
-// //       }
-//       uint hitsInBothSPTCs = 0;
-//       for (auto& checkedHit : checkedSPTC) {
-//         hitsInBothSPTCs += TrackFindingCDC::is_in(checkedHit, currentSPTC);
-//       }
-//       if (hitsInBothSPTCs < checkedSPTC.size()) {
-//         prunedResults.emplace_back(checkedSPTC);
-//       }
-//     }
-//   }
-
   std::array<uint, 8> numberOfHitsInCheckedSPTCs{{0, 0, 0, 0, 0, 0, 0, 0}};
   prunedResults.reserve(selectedResults.size());
   for (uint i = 0; i < selectedResults.size(); i++) {
     auto& currentSPTC = selectedResults.at(i);
-    if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfHitsForEachLength) {
+    if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfHitsForEachPathLength) {
       numberOfHitsInCheckedSPTCs[currentSPTC.size()] += 1;
       prunedResults.emplace_back(currentSPTC);
     }
   }
+
+  m_overlapResolver.apply(prunedResults);
 
 }

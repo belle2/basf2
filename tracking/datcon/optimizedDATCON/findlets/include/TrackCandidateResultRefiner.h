@@ -12,16 +12,12 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <string>
 #include <vector>
-
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TFile.h>
-
 
 namespace Belle2 {
   class SpacePointTrackCand;
@@ -62,14 +58,17 @@ namespace Belle2 {
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
-    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    /// Resolve hit overlaps in track candidates
+    TrackCandidateOverlapResolver m_overlapResolver;
+
+    /// Cut on the quality estimator and only further propagate SPTCs with three hits that are above this value
     double m_param_minQualitiyIndicatorSize3 = 0.9;
-    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    /// Cut on the quality estimator and only further propagate SPTCs with four hits that are above this value
     double m_param_minQualitiyIndicatorSize4 = 0.5;
-    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    /// Cut on the quality estimator and only further propagate SPTCs with five hits that are above this value
     double m_param_minQualitiyIndicatorSize5 = 0.5;
 
     /// Accept nHits for each size at maximum
-    double m_param_maxNumberOfHitsForEachLength = 5;
+    uint m_param_maxNumberOfHitsForEachPathLength = 10;
   };
 }

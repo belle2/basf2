@@ -200,7 +200,6 @@ class TDCPV_qqs(BaseSkim):
         ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
         ma.reconstructDecay("B0:Kspipig -> " + Kres + ":all gamma:E15",
                             "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
-        ma.matchMCTruth('B0:Kspipig', path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         filename = f'{self}_Validation.root'

@@ -116,7 +116,6 @@ class SystematicsTracking(BaseSkim):
             resonanceName = "anti-D0:loose" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, D0Cuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0, path=path)
-            ma.matchMCTruth(resonanceName, path=path)
         ma.copyLists("anti-D0:loose", ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
         D0List.append("anti-D0:loose")
 
@@ -131,7 +130,6 @@ class SystematicsTracking(BaseSkim):
             ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0)
             DstarList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         # B0
         B0Channel = []
@@ -144,7 +142,6 @@ class SystematicsTracking(BaseSkim):
             ma.reconstructDecay(resonanceName + " -> " + channel, B0Cuts, chID, path=path)
             B0List.append(resonanceName)
             # vertex.raveFit(resonanceName, 0.0)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return B0List
 
@@ -170,7 +167,6 @@ class SystematicsTracking(BaseSkim):
             resonanceName = "D*0:loose" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             DstarList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return DstarList
 
@@ -218,7 +214,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(DsChannel):
             particlename = "D_s+:Resonance%d" % (chID)
             ma.reconstructDecay(particlename + " -> " + channel, DsCuts, chID, path=path)
-            ma.matchMCTruth(particlename, path)
             DsList.append(particlename)
 
         return DsList
@@ -244,7 +239,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(DstarChannel):
             ma.reconstructDecay("D*+:resonance" + str(chID) + " -> " + channel, DstarCuts, chID, path=path)
             DstarList.append("D*+:resonance" + str(chID))
-            ma.matchMCTruth("D*+:resonance0", path=path)
 
         return DstarList
 
@@ -269,7 +263,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(SigmacPlusChannel):
             ma.reconstructDecay("Sigma_c++:resonance" + str(chID) + " -> " + channel, SigmacCuts, chID, path=path)
             SigmacList.append("Sigma_c++:resonance" + str(chID))
-            ma.matchMCTruth("Sigma_c++:resonance0", path=path)
 
         # Sigma_c0
         Sigmac0Channel = []
@@ -280,7 +273,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(Sigmac0Channel):
             ma.reconstructDecay("Sigma_c0:resonance" + str(chID) + " -> " + channel, SigmacCuts, chID, path=path)
             Sigmac0List.append("Sigma_c0:resonance" + str(chID))
-            ma.matchMCTruth("Sigma_c0:resonance0", path=path)
 
         return SigmacList
 
@@ -293,7 +285,6 @@ class Resonance(BaseSkim):
             resonanceName = "vpho:resonance" + str(chID)
             ma.reconstructDecay("vpho:resonance" + str(chID) + " -> " + channel, vphocuts, chID, path=path)
             ma.applyCuts(resonanceName, "nTracks == 2 and M < formula(Ecms*0.9877)", path=path)
-            ma.matchMCTruth(resonanceName, path=path)
             vertex.raveFit(resonanceName, 0.0, path=path)
             ma.applyCuts(resonanceName, "M < formula(Ecms*0.9877)", path=path)
             vphoList.append(resonanceName)
@@ -310,7 +301,6 @@ class Resonance(BaseSkim):
             resonanceName = "B0:resonance" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, BZeroCuts, chID, path=path)
             BZeroList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return BZeroList
 
@@ -335,7 +325,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(BPlusChannel):
             ma.reconstructDecay("B+:resonance" + str(chID) + " -> " + channel, BPlusCuts, chID, path=path)
             BPlusList.append("B+:resonance" + str(chID))
-            ma.matchMCTruth("B+:resonance" + str(chID), path=path)
 
         return BPlusList
 

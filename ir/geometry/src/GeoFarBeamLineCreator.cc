@@ -35,9 +35,6 @@
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 
-#include <fstream>
-#include <regex>
-
 using namespace std;
 using namespace boost;
 

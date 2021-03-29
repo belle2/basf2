@@ -27,6 +27,13 @@ This removal does not imply any functionality loss, since the users can use the 
 Fixed the issue where PHOTOS photons were not correctly flagged in continuum events, e.g., charm decays (:issue:`BII-5934`).
 This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
+.. rubric:: Unification of B2BII settings
+
+A single switch between Belle and Belle II settings has been implemented, which is automatically set when reading in a Belle type mdst.
+No individual options have to be set in modular analysis functions. 
+
+.. include:: analysis/doc/whatsnew-since/release-05-02.txt
+
 .. include:: analysis/doc/whatsnew-since/release-05-01.txt
 
 .. include:: analysis/doc/whatsnew-since/release-05-00.txt

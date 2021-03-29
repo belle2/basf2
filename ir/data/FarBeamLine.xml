@@ -1633,65 +1633,36 @@
       </ConcreteShieldL>
 
       <!-- Collimators -->
-      <!-- see G4Trd documentation for parameters description -->
-      <!-- for horizontal c. dy1=dy2, for vertical dx1=dx2 -->
+      <!-- Approximated as trapezoids -->
 
       <Collimator type="horizontal" name="D01H5">
          <sec name="d1" unit="cm">-0.944</sec>
          <sec name="d2" unit="cm">0.954</sec>
-         <sec name="h" unit="cm">0.5</sec>
-         <sec name="dx1" unit="cm">19.31</sec>
-         <sec name="dx2" unit="cm">2.85</sec>
-         <sec name="dy1" unit="cm">0.6</sec>
-         <sec name="dy2" unit="cm">0.6</sec>
-         <sec name="dz" unit="cm">1.75</sec>
+         <sec name="fullH" unit="cm">4.0</sec>
+         <sec name="headH" unit="cm">0.5</sec>
+         <sec name="minW" unit="cm">1.0</sec>
+	 <sec name="maxW" unit="cm">38.62</sec>
+         <sec name="th" unit="cm">1.2</sec>
          <sec name="Z" unit="m">5.719</sec>
          <MotherVolume>LHL2</MotherVolume>
          <Material>Cu</Material>
+         <HeadMaterial>W</HeadMaterial>
          <Desc>Horizontal collimator D01H5</Desc>
-      </Collimator>
-
-      <Collimator type="horizontal" name="D01H5head">
-         <sec name="d1" unit="cm">-0.944</sec>
-         <sec name="d2" unit="cm">0.954</sec>
-         <sec name="dx1" unit="cm">2.85</sec>
-         <sec name="dx2" unit="cm">0.5</sec>
-         <sec name="dy1" unit="cm">0.6</sec>
-         <sec name="dy2" unit="cm">0.6</sec>
-         <sec name="dz" unit="cm">0.25</sec>
-         <sec name="Z" unit="m">5.719</sec>
-         <MotherVolume>LHL2</MotherVolume>
-         <Material>W</Material>
-         <Desc>Horizontal collimator D01H5 tungsten head</Desc>
       </Collimator>
 
       <Collimator type="horizontal" name="D02H4">
          <sec name="d1" unit="cm">-0.862</sec>
          <sec name="d2" unit="cm">0.935</sec>
-         <sec name="h" unit="cm">0.5</sec>
-         <sec name="dx1" unit="cm">19.31</sec>
-         <sec name="dx2" unit="cm">2.85</sec>
-         <sec name="dy1" unit="cm">0.6</sec>
-         <sec name="dy2" unit="cm">0.6</sec>
-         <sec name="dz" unit="cm">1.75</sec>
+         <sec name="fullH" unit="cm">4.0</sec>
+         <sec name="headH" unit="cm">0.5</sec>
+         <sec name="minW" unit="cm">1.0</sec>
+	 <sec name="maxW" unit="cm">38.62</sec>
+         <sec name="th" unit="cm">1.2</sec>
          <sec name="Z" unit="m">5.381</sec>
          <MotherVolume>LLR4</MotherVolume>
          <Material>Cu</Material>
+         <HeadMaterial>W</HeadMaterial>
          <Desc>Horizontal collimator D02H4</Desc>
-      </Collimator>
-
-      <Collimator type="horizontal" name="D02H4head">
-         <sec name="d1" unit="cm">-0.862</sec>
-         <sec name="d2" unit="cm">0.935</sec>
-         <sec name="dx1" unit="cm">2.85</sec>
-         <sec name="dx2" unit="cm">0.5</sec>
-         <sec name="dy1" unit="cm">0.6</sec>
-         <sec name="dy2" unit="cm">0.6</sec>
-	 <sec name="dz" unit="cm">0.25</sec>
-         <sec name="Z" unit="m">5.381</sec>
-         <MotherVolume>LLR4</MotherVolume>
-         <Material>W</Material>
-         <Desc>Horizontal collimator D02H4 tungsten head</Desc>
       </Collimator>
 
       <!-- Collimator Shields -->

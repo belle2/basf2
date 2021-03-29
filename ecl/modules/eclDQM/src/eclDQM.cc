@@ -389,8 +389,8 @@ void ECLDQMModule::event()
       }
     }
 
-    if (energy > 1.000 && abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
-    if (energy > 1.000 && abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
+    if (energy > 1.000 && std::abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
   }
 
   for (auto& h : h_edeps) {

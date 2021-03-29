@@ -54,13 +54,9 @@ namespace Belle2 {
                const std::vector<const SpacePoint*>& spacePoints) override;
 
   private:
-//     /// StoreArray name of the input Track Store Array
-//     std::string m_param_SVDSpacePointStoreArrayName = "SVDSpacePoints";
     /// StoreArray name of the input Track Store Array
     std::string m_param_RecoTracksStoreArrayName = "DATCONRecoTracks";
 
-//     /// Input SpacePoints Store Array
-//     StoreArray<SpacePoint> m_storeSpacePoints;
     /// Output RecoTracks Store Array
     StoreArray<RecoTrack> m_storeRecoTracks;
 
@@ -72,11 +68,11 @@ namespace Belle2 {
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
     /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
-    std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
+    std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
     /// Only required for MCInfo method
-    bool m_MCStrictQualityEstimator = true;
+    bool m_param_MCStrictQualityEstimator = true;
     /// Identifier which estimation method to use. Valid identifiers are:
     /// mcInfo, circleFit, tripletFit, helixFit
-    std::string m_EstimationMethod = "helixFit";
+    std::string m_param_EstimationMethod = "helixFit";
   };
 }

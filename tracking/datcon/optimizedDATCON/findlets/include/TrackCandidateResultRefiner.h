@@ -54,16 +54,22 @@ namespace Belle2 {
   private:
     /// Identifier which estimation method to use. Valid identifiers are:
     /// mcInfo, circleFit, tripletFit, helixFit
-    std::string m_EstimationMethod = "tripletFit";
-
+    std::string m_param_EstimationMethod = "tripletFit";
     /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
-    std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
+    std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
     /// Only required for MCInfo method
-    bool m_MCStrictQualityEstimator = true;
+    bool m_param_MCStrictQualityEstimator = true;
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /// Cut on the quality estimator and only further propagate SPTCs above the cut
-    double m_cutOnQualitiyIndicator = 0.5;
+    double m_param_minQualitiyIndicatorSize3 = 0.9;
+    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    double m_param_minQualitiyIndicatorSize4 = 0.5;
+    /// Cut on the quality estimator and only further propagate SPTCs above the cut
+    double m_param_minQualitiyIndicatorSize5 = 0.5;
+
+    /// Accept nHits for each size at maximum
+    double m_param_maxNumberOfHitsForEachLength = 5;
   };
 }

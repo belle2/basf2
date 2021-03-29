@@ -44,19 +44,30 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_EstimationMethod,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
-                                m_EstimationMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_MCRecoTracksStoreArrayName,
+                                m_param_EstimationMethod);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
-                                m_MCRecoTracksStoreArrayName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_MCStrictQualityEstimator,
+                                m_param_MCRecoTracksStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
-                                m_MCStrictQualityEstimator);
+                                m_param_MCStrictQualityEstimator);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cutOnQualitiyIndicator"), m_cutOnQualitiyIndicator,
-                                "Cut on quality indicator value. Only accept SpacePointTrackCands with QI above this value.",
-                                m_cutOnQualitiyIndicator);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize3"), m_param_minQualitiyIndicatorSize3,
+                                "Cut on quality indicator value for track candidates of size 3. Only accept SpacePointTrackCands with QI above this value.",
+                                m_param_minQualitiyIndicatorSize3);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize4"), m_param_minQualitiyIndicatorSize4,
+                                "Cut on quality indicator value for track candidates of size 4. Only accept SpacePointTrackCands with QI above this value.",
+                                m_param_minQualitiyIndicatorSize4);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minQualitiyIndicatorSize5"), m_param_minQualitiyIndicatorSize5,
+                                "Cut on quality indicator value for track candidates of size 5. Only accept SpacePointTrackCands with QI above this value.",
+                                m_param_minQualitiyIndicatorSize5);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfHitsForEachLength"),
+                                m_param_maxNumberOfHitsForEachLength,
+                                "Maximum number of SpacePointTrackCands with a length of 3, 4, 5, or 6 each.",
+                                m_param_maxNumberOfHitsForEachLength);
 }
 
 void TrackCandidateResultRefiner::initialize()
@@ -64,16 +75,16 @@ void TrackCandidateResultRefiner::initialize()
   Super::initialize();
 
   // create pointer to chosen estimator
-  if (m_EstimationMethod == "mcInfo") {
-    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
-  } else if (m_EstimationMethod == "tripletFit") {
+  if (m_param_EstimationMethod == "mcInfo") {
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_param_MCRecoTracksStoreArrayName, m_param_MCStrictQualityEstimator);
+  } else if (m_param_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
-  } else if (m_EstimationMethod == "circleFit") {
+  } else if (m_param_EstimationMethod == "circleFit") {
     m_estimator = std::make_unique<QualityEstimatorCircleFit>();
-  } else if (m_EstimationMethod == "helixFit") {
+  } else if (m_param_EstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod, m_estimator);
 }
 
 void TrackCandidateResultRefiner::beginRun()
@@ -84,9 +95,9 @@ void TrackCandidateResultRefiner::beginRun()
   double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
-  if (m_EstimationMethod == "mcInfo") {
+  if (m_param_EstimationMethod == "mcInfo") {
     StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
+    mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
     std::string svdClustersName = ""; std::string pxdClustersName = "";
 
     if (mcRecoTracks.getEntries() > 0) {
@@ -111,7 +122,10 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
     double qi = m_estimator->estimateQuality(aTrackCandidate.getSortedHits());
     aTrackCandidate.setQualityIndicator(qi);
 
-    if (qi >= m_cutOnQualitiyIndicator) {
+    if ((aTrackCandidate.getNHits() == 3 and qi >= m_param_minQualitiyIndicatorSize3) or
+        (aTrackCandidate.getNHits() == 4 and qi >= m_param_minQualitiyIndicatorSize4) or
+        (aTrackCandidate.getNHits() == 5 and qi >= m_param_minQualitiyIndicatorSize5) or
+        (aTrackCandidate.getNHits() >= 6))  {
 //       prunedResults.emplace_back(aTrackCandidate);
       selectedResults.emplace_back(aTrackCandidate);
     }
@@ -154,12 +168,12 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
 //     }
 //   }
 
-  std::bitset<8> numberOfHitsInCheckedSPTCs;
+  std::array<uint, 8> numberOfHitsInCheckedSPTCs{{0, 0, 0, 0, 0, 0, 0, 0}};
   prunedResults.reserve(selectedResults.size());
   for (uint i = 0; i < selectedResults.size(); i++) {
     auto& currentSPTC = selectedResults.at(i);
-    if (not numberOfHitsInCheckedSPTCs[currentSPTC.size()]) {
-      numberOfHitsInCheckedSPTCs[currentSPTC.size()] = true;
+    if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfHitsForEachLength) {
+      numberOfHitsInCheckedSPTCs[currentSPTC.size()] += 1;
       prunedResults.emplace_back(currentSPTC);
     }
   }

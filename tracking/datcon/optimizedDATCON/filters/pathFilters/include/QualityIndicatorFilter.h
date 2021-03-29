@@ -32,9 +32,14 @@ namespace Belle2 {
   private:
     /// Identifier which estimation method to use. Valid identifiers are:
     /// mcInfo, circleFit, tripletFit, helixFit
-    std::string m_EstimationMethod = "helixFit";
+    std::string m_param_EstimationMethod = "tripletFit";
+    /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
+    std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
+    /// Only required for MCInfo method
+    bool m_param_MCStrictQualityEstimator = true;
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
+
     /// cut on quality indicator
     double m_QIcut = 0.0;
   };

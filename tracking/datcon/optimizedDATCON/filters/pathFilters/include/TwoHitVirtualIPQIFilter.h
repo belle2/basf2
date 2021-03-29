@@ -34,11 +34,15 @@ namespace Belle2 {
     const SpacePoint m_virtualIPSpacePoint = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false},
                                                         VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     /// cut on the POCA distance in xy obtained from the helixFitEstimator
-    double m_helixFitPocaVirtIPDCut = 1.0;
+    double m_param_helixFitPocaVirtIPDCut = 1.0;
 
     /// Identifier which estimation methsod to use. Valid identifiers are:
     /// mcInfo, tripletFit, helixFit
-    std::string m_EstimationMethod = "helixFit";
+    std::string m_param_EstimationMethod = "helixFit";
+    /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
+    std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
+    /// Only required for MCInfo method
+    bool m_param_MCStrictQualityEstimator = true;
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
   };

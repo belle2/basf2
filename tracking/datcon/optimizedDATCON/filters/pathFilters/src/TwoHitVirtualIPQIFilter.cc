@@ -68,9 +68,12 @@ TwoHitVirtualIPQIFilter::operator()(const BasePathFilter::Object& pair)
 
   std::vector<const SpacePoint*> spacePointsVirtIP;
   spacePointsVirtIP.reserve(previousHits.size() + 2);
+  // Note that the path is always created outside-in.
+  // The tripletFit only works with hits being ordered inside-out, so add the hits in that direction.
+  // First the virtual IP, then the hit that is currently checked, and last the single hit in the path.
   spacePointsVirtIP.emplace_back(&m_virtualIPSpacePoint);
-  spacePointsVirtIP.emplace_back(previousHits.at(0)->getHit());
   spacePointsVirtIP.emplace_back(pair.second->getHit());
+  spacePointsVirtIP.emplace_back(previousHits.at(0)->getHit());
   const auto& estimatorResultVirtIP = m_estimator->estimateQualityAndProperties(spacePointsVirtIP);
 
 //   const double absHelixPocaDVirtIP = (estimatorResultVirtIP.pocaD) ? fabs(*estimatorResultVirtIP.pocaD) : 1e-6;

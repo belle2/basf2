@@ -70,6 +70,11 @@ QualityIndicatorFilter::operator()(const BasePathFilter::Object& pair)
     spacePoints.emplace_back(hit->getHit());
   }
   spacePoints.emplace_back(pair.second->getHit());
+
+  // The path is outwards-in, and thus the SPs are added outwards-in, too.
+  // The tripletFit only works with hits inside-out, so reverse the SP vector
+  std::reverse(spacePoints.begin(), spacePoints.end());
+
   const auto& estimatorResult = m_estimator->estimateQualityAndProperties(spacePoints);
 
 //   const double absHelixPocaD = (estimatorResult.pocaD) ? fabs(*estimatorResult.pocaD) : 1e-6;

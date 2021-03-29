@@ -9,7 +9,15 @@
 
 #pragma once
 
+/* AWESOME headers. */
+#include <awesome/dataobjects/AWESOMESimHit.h>
+
+/* Belle2 headers. */
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -19,7 +27,7 @@ namespace Belle2::AWESOME {
    * The AWESOME basic module.
    *
    * This is an almost empty module which just illustrates how to define
-   * parameters and use the datastore
+   * parameters and use the datastore.
    */
   class AWESOMEBasicModule : public Module {
 
@@ -57,17 +65,23 @@ namespace Belle2::AWESOME {
 
   private:
 
-    /** Useless variable showing how to create integer parameters */
+    /** Useless variable showing how to create integer parameters. */
     int m_intParameter;
 
-    /** Useless variable showing how to create double parameters */
+    /** Useless variable showing how to create double parameters. */
     double m_doubleParameter;
 
-    /** Useless variable showing how to create string parameters */
+    /** Useless variable showing how to create string parameters. */
     std::string m_stringParameter;
 
-    /** Useless variable showing how to create array parameters */
+    /** Useless variable showing how to create array parameters. */
     std::vector<double> m_doubleListParameter;
+
+    /** MC particles. */
+    StoreArray<MCParticle> m_MCParticles;
+
+    /** AWESOME simulated hits. */
+    StoreArray<AWESOMESimHit> m_SimHits;
 
   };
 

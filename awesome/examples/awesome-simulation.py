@@ -11,8 +11,6 @@
 #
 # ------------------------------------------------------------
 
-
-import os
 import basf2 as b2
 
 # Don't show all the messages :)
@@ -61,7 +59,8 @@ main.add_module('ParticleGun',
 main.add_module('FullSim')
 
 # do something with the awesome data
-main.add_module('Awesome')
+main.add_module('AWESOMEBasic',
+                logLevel=b2.LogLevel.INFO)
 
 # save the awesome results
 main.add_module('RootOutput', outputFileName='awesome-simulation.root')

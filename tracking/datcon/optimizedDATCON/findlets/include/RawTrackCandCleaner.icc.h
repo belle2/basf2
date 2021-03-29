@@ -20,7 +20,6 @@
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
@@ -83,7 +82,7 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
   uint totalRelationsPerEvent = 0;
   uint totalResultsPerEvent = 0;
   uint nPrunedResultsPerEvent = 0;
-  uint counter = 0;
+  uint family = 0; // family of the SpacePointTrackCands,
   m_nRawTrackCandsPerEvent->Fill(rawTrackCandidates.size());
   for (auto& rawTrackCand : rawTrackCandidates) {
     m_relations.clear();
@@ -95,9 +94,8 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
 //     B2INFO("m_relations.size(): " << m_relations.size());
     totalRelationsPerEvent += m_relations.size();
     m_nRelationsPerRawTrackCand->Fill(m_relations.size());
-    m_nRelationsVsRawTrackCand->Fill(counter, m_relations.size());
+    m_nRelationsVsRawTrackCand->Fill(family, m_relations.size());
     m_nRelationsVsRawTrackCandSize->Fill(rawTrackCand.size(), m_relations.size());
-    counter++;
 
     if (m_relations.size() > m_maxRelations) {
 //       B2WARNING("Aborting because number of relations is above " << m_maxRelations << " (exact number: " << m_relations.size() << ") in event: " << m_nEvent);
@@ -130,6 +128,10 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
       m_unfilteredResults.emplace_back(spacePointsInResult);
     }
 
+    for (auto aTC : m_unfilteredResults) {
+      aTC.setFamily(family);
+    }
+
     m_resultRefiner.apply(m_unfilteredResults, m_filteredResults);
 
 
@@ -150,6 +152,7 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
       trackCandidates.emplace_back(trackCand);
     }
 
+    family++;
   }
   m_nRelationsPerEvent->Fill(totalRelationsPerEvent);
   m_nResultsPerEvent->Fill(totalResultsPerEvent);

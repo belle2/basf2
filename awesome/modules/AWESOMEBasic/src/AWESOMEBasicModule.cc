@@ -7,8 +7,8 @@
  *                                                                        *
  **************************************************************************/
 
-#include <awesome/modules/AwesomeModule.h>
-#include <awesome/dataobjects/AwesomeSimHit.h>
+#include <awesome/modules/AWESOMEBasic/AWESOMEBasicModule.h>
+#include <awesome/dataobjects/AWESOMESimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,9 +25,9 @@ using namespace Belle2::AWESOME;
 //We have to register the module to the Framework. The "Module" part of the
 //class name will be appended automatically so every module hast to be named
 //XxxModule
-REG_MODULE(Awesome)
+REG_MODULE(AWESOMEBasic)
 
-AwesomeModule::AwesomeModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_stringParameter("")
+AWESOMEBasicModule::AWESOMEBasicModule() : Module(), m_intParameter(0), m_doubleParameter(0), m_stringParameter("")
 {
   setDescription("Here you can enter a description of the module which can be displayed during runtime");
 
@@ -46,9 +46,9 @@ AwesomeModule::AwesomeModule() : Module(), m_intParameter(0), m_doubleParameter(
   //Valid parameter types are int, double, string, bool and vectors of any of those
 }
 
-void AwesomeModule::initialize()
+void AWESOMEBasicModule::initialize()
 {
-  B2INFO("Awesome: Initialize");
+  B2INFO("AWESOME: Initialize");
   //Here you can do some stuff before processing starts. If you want to
   //write to some collections of the DataStore you have to register these
   //here by using StoreArray<T>::registerPersistent() for collections which
@@ -57,7 +57,7 @@ void AwesomeModule::initialize()
   //saved by default. If one just wants to access collections one should
   //check if they were registered by using the isRequired member
   StoreArray<MCParticle>   mcParticles;
-  StoreArray<AwesomeSimHit>  simHits;
+  StoreArray<AWESOMESimHit>  simHits;
   RelationArray relMCSimHit(mcParticles, simHits);
   if (!(mcParticles.isRequired() && simHits.isRequired() && relMCSimHit.isRequired())) {
     //Fatal is not neccessary here as the storeArrays should just look
@@ -66,35 +66,35 @@ void AwesomeModule::initialize()
   }
 }
 
-void AwesomeModule::beginRun()
+void AWESOMEBasicModule::beginRun()
 {
-  B2INFO("Awesome: Begin of new run");
+  B2INFO("AWESOME: Begin of new run");
   //Here comes the initialisation specific to each run
 }
 
-void AwesomeModule::event()
+void AWESOMEBasicModule::event()
 {
-  B2INFO("Awesome: Event is being processed");
+  B2INFO("AWESOME: Event is being processed");
   //Here comes the actual event processing
 
   StoreArray<MCParticle>   mcParticles;
-  StoreArray<AwesomeSimHit>  simHits;
+  StoreArray<AWESOMESimHit>  simHits;
 
   //RelationIndex is a readonly, bidirectional index for a Relation so that one
   //can easily use the RelationArray without looping over it manually.
-  RelationIndex<MCParticle, AwesomeSimHit> relMCSimHit(mcParticles, simHits);
+  RelationIndex<MCParticle, AWESOMESimHit> relMCSimHit(mcParticles, simHits);
 
-  //Lets loop over all created AwesomeSimHits:
+  //Lets loop over all created AWESOMESimHits:
   int nSimHits = simHits.getEntries();
   /*
   for (int i = 0; i < nSimHits; ++i) {
-    AwesomeSimHit& hit = *simHits[i];
+    AWESOMESimHit& hit = *simHits[i];
     //Find all MCParticles which point to that SimHit and the corresponding weight
-    RelationIndex<MCParticle, AwesomeSimHit>::range_to range = relMCSimHit.getElementsTo(hit);
+    RelationIndex<MCParticle, AWESOMESimHit>::range_to range = relMCSimHit.getElementsTo(hit);
     for (; range.first != range.second; ++range.first) {
       //And Print something about the relation
-      const RelationIndex<MCParticle, AwesomeSimHit>::Element& relation = *range.first;
-      B2INFO("AwesomeSimHit #" << i << " has an energy deposition of " << hit.getEnergyDep()
+      const RelationIndex<MCParticle, AWESOMESimHit>::Element& relation = *range.first;
+      B2INFO("AWESOMESimHit #" << i << " has an energy deposition of " << hit.getEnergyDep()
              << " and is related to MCParticle #" << relation.indexFrom
              << " which has an PDG code of " << relation.from->getPDG());
     }
@@ -105,9 +105,9 @@ void AwesomeModule::event()
   int nMCParticles = mcParticles.getEntries();
   for (int i = 0; i < nMCParticles; ++i) {
     MCParticle& mcp = *mcParticles[i];
-    //Find all AwesomeSimHits which point from that MCParticle using a typedef and BOOST_FOREACH
+    //Find all AWESOMESimHits which point from that MCParticle using a typedef and BOOST_FOREACH
     //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
-    typedef RelationIndex<MCParticle, AwesomeSimHit>::Element relMCSimHit_Element;
+    typedef RelationIndex<MCParticle, AWESOMESimHit>::Element relMCSimHit_Element;
     BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
       B2INFO("MCParticle #" << i << " created the AwesomSimHit #" << relation.indexTo
              << " which has an energy deposition of " << relation.to->getEnergyDep());
@@ -115,15 +115,15 @@ void AwesomeModule::event()
   }
 }
 
-void AwesomeModule::endRun()
+void AWESOMEBasicModule::endRun()
 {
-  B2INFO("Awesome: End of run");
+  B2INFO("AWESOME: End of run");
   //Here cleanup after each run
 }
 
 
-void AwesomeModule::terminate()
+void AWESOMEBasicModule::terminate()
 {
-  B2INFO("Awesome: Terminate");
+  B2INFO("AWESOME: Terminate");
   //Here final cleanup
 }

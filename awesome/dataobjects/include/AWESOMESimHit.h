@@ -14,23 +14,28 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/geometry/B2Vector3.h>
 
+/**
+ * Nota bene: the dataobjects must be declared under the Belle2 namespace only,
+ * and the specific subdetector namespace, if any, can not be added.
+ */
 namespace Belle2 {
 
   /**
-   * AwesomeSimHit - Geant4 simulated hit for the Awesome detector.
+   * A Geant4 simulated hit for the AWESOME detector.
    *
-   * This class holds particle hit data from Geant4 simulation.
-   * As the simulated hit classes are used to generate detector response,
+   * This class holds particle hit data from Geant4 simulation and it is
+   * filled by the AWESOMESensitiveDetector class.
+   * As the simulated hit classes are used to generate the detector response,
    * they should contain _local_ information.
    */
-  class AwesomeSimHit : public RelationsObject {
+  class AWESOMESimHit : public RelationsObject {
 
   public:
 
     /**
      * Default constructor.
      */
-    AwesomeSimHit() :
+    AWESOMESimHit() :
       m_energyDep{0},
       m_position{0., 0., 0.},
       m_time{0}
@@ -42,7 +47,7 @@ namespace Belle2 {
      * @param position  Vector for position in cm.
      * @param time      Time in ns.
      */
-    AwesomeSimHit(float energyDep, B2Vector3<float> position, float time) :
+    AWESOMESimHit(float energyDep, B2Vector3<float> position, float time) :
       m_energyDep{energyDep},
       m_position{position},
       m_time{time}
@@ -114,7 +119,7 @@ namespace Belle2 {
     float m_time;
 
     /** Class versions, required by the ROOT streamer. */
-    ClassDef(AwesomeSimHit, 1)
+    ClassDef(AWESOMESimHit, 1)
 
   };
 

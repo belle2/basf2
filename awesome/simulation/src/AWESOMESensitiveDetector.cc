@@ -62,7 +62,7 @@ bool AWESOMESensitiveDetector::step(G4Step* step, G4TouchableHistory*)
   const CLHEP::Hep3Vector position = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // Now in cm
   const double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime()); // Already in ns
   /* Store the simulated hit. */
-  AwesomeSimHit* simHit = m_SimHits.appendNew();
+  AWESOMESimHit* simHit = m_SimHits.appendNew();
   simHit->setEnergyDep(energyDep);
   simHit->setPosition(B2Vector3{position.x(), position.y(), position.z()});
   simHit->setTime(time);

@@ -11,7 +11,7 @@
 #pragma once
 
 /* AWESOME headers. */
-#include <awesome/dataobjects/AwesomeSimHit.h>
+#include <awesome/dataobjects/AWESOMESimHit.h>
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -46,9 +46,9 @@ namespace Belle2::AWESOME {
     StoreArray<MCParticle> m_MCParticles;
 
     /** AWESOME simulated hits. */
-    StoreArray<AwesomeSimHit> m_SimHits;
+    StoreArray<AWESOMESimHit> m_SimHits;
 
-    /** Relation array between MCParticles and AwesomeSimHits. */
+    /** Relation array between MCParticles and AWESOMESimHits. */
     RelationArray m_MCParticlesToSimHits{m_MCParticles, m_SimHits};
 
   };

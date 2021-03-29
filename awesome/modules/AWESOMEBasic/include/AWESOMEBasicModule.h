@@ -16,19 +16,19 @@
 namespace Belle2::AWESOME {
 
   /**
-   * The Awesome module.
+   * The AWESOME basic module.
    *
    * This is an almost empty module which just illustrates how to define
    * parameters and use the datastore
    */
-  class AwesomeModule : public Module {
+  class AWESOMEBasicModule : public Module {
 
   public:
 
     /**
      * Default constructor.
      */
-    AwesomeModule();
+    AWESOMEBasicModule();
 
     /**
      * Initialize the module.

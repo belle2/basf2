@@ -14,37 +14,46 @@
 #include <awesome/simulation/AWESOMESensitiveDetector.h>
 
 /* Belle2 headers. */
+#include <framework/gearbox/GearDir.h>
 #include <geometry/CreatorBase.h>
+
+/* Geant4 headers. */
+#include <G4LogicalVolume.hh>
 
 namespace Belle2::AWESOME {
 
-  /** The creator for the AWESOME geometry. */
-  class AwesomeCreator : public geometry::CreatorBase {
+  /**
+   * The creator for the AWESOME detector geometry.
+   */
+  class AWESOMEGeometryCreator : public geometry::CreatorBase {
 
   public:
 
     /**
      * Default constructor.
      */
-    AwesomeCreator();
+    AWESOMEGeometryCreator();
 
     /**
      * Copy constructor, deleted.
      */
-    AwesomeCreator(AwesomeCreator&) = delete;
+    AWESOMEGeometryCreator(AWESOMEGeometryCreator&) = delete;
 
     /**
      * Assignment operator, deleted.
      */
-    AwesomeCreator& operator=(AwesomeCreator&) = delete;
+    AWESOMEGeometryCreator& operator=(AWESOMEGeometryCreator&) = delete;
 
     /**
      * Default destructor.
      */
-    virtual ~AwesomeCreator();
+    virtual ~AWESOMEGeometryCreator();
 
     /**
-     * Write something useful here.
+     * Create the AWESOME detector geometry in the world volume.
+     * @param content Gearbox path to the detector geometry.
+     * @param topVolume Geant4 world volume.
+     * @param type Geometry type.
      */
     void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 

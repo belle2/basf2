@@ -626,7 +626,7 @@ namespace Belle2 {
       std::vector<std::string> collimators;
       boost::split(collimators, m_config.getParameterStr("Collimator"), boost::is_any_of(" "));
       for (const auto& name : collimators) {
-        //-   Collamators consist of two independent jaws (trapezoids), identical in shape, positioned opposite to each other
+        //-   Collimators consist of two independent jaws (trapezoids), identical in shape, positioned opposite to each other
         //-   Each jaw consists of copper body and high Z head
 
         prep = name + ".";
@@ -862,7 +862,7 @@ namespace Belle2 {
       std::vector<std::string> collimatorShields;
       boost::split(collimatorShields, m_config.getParameterStr("CollimatorShield"), boost::is_any_of(" "));
       for (const auto& name : collimatorShields) {
-        //-   Collamator shield made as box with subtracted inner space
+        //-   Collimator shield made as box with subtracted inner space
 
         prep = name + ".";
 

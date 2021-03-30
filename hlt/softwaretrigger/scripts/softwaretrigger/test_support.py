@@ -82,6 +82,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
                 self.results = Belle2.PyStoreObj(Belle2.SoftwareTriggerResult.Class(), "SoftwareTriggerResult")
                 self.results.registerInDataStore()
 
+                self.EventMetaData = Belle2.PyStoreObj("EventMetaData")
+
             def event(self):
                 self.results.create()
                 # First event: Add all the results that are used on express reco just to test all paths

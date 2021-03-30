@@ -364,7 +364,7 @@ def MonitorROCPlot(particle, filename):
                                   ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
-    p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1), label='Unique')
+    # p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1), label='Unique')
     p.finish()
     p.save(filename + '.png')
 
@@ -589,7 +589,7 @@ class MonitoringParticle(object):
             self.before_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
             hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking.root', f'{channel.label}')
             self.after_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_MatchParticleList_AfterVertex.root', f'{channel.label}')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterVertex.root', f'{channel.label}')
             self.after_vertex[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
             hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA.root', f'{channel.label}')
             self.after_classifier[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)

@@ -135,16 +135,13 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     B2INFO("Getting values for 'expert_config' from the prompt script.")
     expert_config = validation_module.settings.expert_config   # set to be the default from the script
     # If we have values in the validation_config we merge/overwrite with the default
-    if "expert_config" in validation_config:
-        # Overwrite/merge the default Validation Settings with JSON
-        if isinstance(validation_config["expert_config"], dict):
-            B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
-            expert_config = {**expert_config, **validation_config["expert_config"]}
-        else:
-            B2ERROR("Expert config must be a dictionary! E.g. {'my_var': 42}")
-            exit() 
-    
-
+    try:
+        B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
+        expert_config = {**expert_config, **validation_config["expert_config"]}
+    except:
+        B2ERROR("Expert config must be a dictionary! E.g. {'my_var': 42}")
+        exit() 
+        
     if "requested_iov" in validation_config:
         # Overwrite/merge the default Validation Settings with JSON
         if isinstance(validation_config["requested_iov"], list):

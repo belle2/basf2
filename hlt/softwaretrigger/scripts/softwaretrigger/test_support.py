@@ -54,7 +54,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
 
     if run_type == constants.RunTypes.beam:
         generators.add_continuum_generator(path, finalstate="uubar")
-        generators.add_evtgen_generator(path, finalstate="charged")
     elif run_type == constants.RunTypes.cosmic:
         # add something which looks a tiny bit like a cosmic generator. We
         # cannot use the normal cosmic generator as that needs a bigger

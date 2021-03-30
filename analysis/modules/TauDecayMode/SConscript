@@ -1,13 +1,7 @@
 Import('env')
-# This file specifies the dependencies of your Analyis code to parts of the
-# Belle 2 Software. It should be fine for most analysis but if you need to link
-# against additional libraries pleas put them here.
 env['LIBS'] = [
     'mdst_dataobjects',
     'analysis_dataobjects',
-    'analysis',
-    'analysis_utility',
-    'analysis_DecayDescriptor',
     'framework',
     '$ROOT_LIBS',
 ]

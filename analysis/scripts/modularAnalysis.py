@@ -2928,30 +2928,31 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None, marker='old', mapping='default'):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping='None'):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
-    @param marker: if old, TauDecayMarker is set. If new, TauDecayMode is set.
-    @param mapping: if default, the map is the default one, else the path for the map is given by the user.
+    @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
+    @param mapping: if None, the map is the default one, else the path for the map is given by the user.
     """
     from basf2 import find_file
-    if(marker == 'old'):
-        tauDecayMarker = register_module('TauDecayMarker')
-        tauDecayMarker.set_name('TauDecayMarker_')
-
-        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
-    elif(marker == 'new'):
+    if(TauolaBelle):
         TauDecayMode = register_module('TauDecayMode')
-        if (mapping == 'default'):
+        if (mapping == 'None'):
             mp_file = find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt')
             TauDecayMode.param('file', mp_file)
             path.add_module('TauDecayMode', file=mp_file)
         else:
             path.add_module('TauDecayMode', file=mapping)
+
+    else:
+        tauDecayMarker = register_module('TauDecayMarker')
+        tauDecayMarker.set_name('TauDecayMarker_')
+
+        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,

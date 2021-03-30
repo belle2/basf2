@@ -16,7 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <fstream>
 #include <string>
 #include <analysis/dataobjects/TauPairDecay.h>
 namespace Belle2 {
@@ -50,7 +49,7 @@ namespace Belle2 {
     /** pointer to tau pair decay objects */
     StoreObjPtr<TauPairDecay> m_tauDecay;
 
-    int EventNumber; /**< event number */
+    StoreObjPtr<EventMetaData> m_event_metadata; /**< event number */
     int m_taum_no;     /**< number of tau- unclassified events */
     int m_taup_no;     /**< number of tau+ unclassified events */
 

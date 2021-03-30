@@ -16,9 +16,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <utility>
+// #include <analysis/utility/PCmsLabTransform.h>
+// #include <analysis/utility/ReferenceFrame.h>
+// #include <utility>
 
 #include <framework/logging/Logger.h>
 #include <TLorentzVector.h>
@@ -105,7 +105,7 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 
-TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1) , m_taum_no(0), m_taup_no(0), m_pmode(-2), m_mmode(-2),
+TauDecayModeModule::TauDecayModeModule() : Module() , m_taum_no(0), m_taup_no(0), m_pmode(-2), m_mmode(-2),
   m_pprong(0), m_mprong(0), tauPair(false), numOfTauPlus(0), numOfTauMinus(0), idOfTauPlus(-1), idOfTauMinus(-1), m_pdg_extra(0)
 {
   // Set module properties
@@ -122,12 +122,9 @@ TauDecayModeModule::TauDecayModeModule() : Module() , EventNumber(1) , m_taum_no
 //
 void TauDecayModeModule::initialize()
 {
-
-  // taum_no = 0;
-  // taup_no = 0;
-  // EventNumber = 1;
   mode_decay = make_map(m_file);
   m_tauDecay.registerInDataStore();
+  m_event_metadata.isRequired();
   if (m_particle != "") {
     std::vector<std::string> extra = parseString(m_particle, "=");
     m_pdg_extra = atoi(extra[0].c_str());
@@ -647,14 +644,14 @@ void TauDecayModeModule::event()
 
     if (TauBBBmode(m_tauminusdecaymode) == -1) {
       B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
-      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " << m_tauminusdecaymode);
+      B2INFO("TauDecayMode:: EventNumber = " << m_event_metadata->getEvent() << " TauMinusDecayMode: tau- -> " << m_tauminusdecaymode);
 
     }
   }
 
   if (m_printmode == "all") {
     B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauminusdecaymode));
-    B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau- -> " <<
+    B2INFO("TauDecayMode:: EventNumber = " << m_event_metadata->getEvent() << " TauMinusDecayMode: tau- -> " <<
            m_tauminusdecaymode);
   }
 
@@ -729,13 +726,13 @@ void TauDecayModeModule::event()
   if (m_printmode == "missing") {
     if (TauBBBmode(m_tauplusdecaymode) == -1) {
       B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
-      B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauMinusDecayMode: tau+ -> " << m_tauplusdecaymode);
+      B2INFO("TauDecayMode:: EventNumber = " << m_event_metadata->getEvent() << " TauMinusDecayMode: tau+ -> " << m_tauplusdecaymode);
     }
   }
 
   if (m_printmode == "all") {
     B2INFO("TauDecayMode:: Decay mode is =" << TauBBBmode(m_tauplusdecaymode));
-    B2INFO("TauDecayMode:: EventNumber = " << EventNumber << " TauPlusDecayMode: tau+ -> " <<
+    B2INFO("TauDecayMode:: EventNumber = " << m_event_metadata->getEvent() << " TauPlusDecayMode: tau+ -> " <<
            m_tauplusdecaymode);
   }
   //
@@ -757,8 +754,7 @@ void TauDecayModeModule::event()
   m_tauDecay->addTauPlusMcProng(m_pprong);
   m_tauDecay->addTauMinusMcProng(m_mprong);
 
-  EventNumber = EventNumber + 1;
-  //
+
 }
 
 

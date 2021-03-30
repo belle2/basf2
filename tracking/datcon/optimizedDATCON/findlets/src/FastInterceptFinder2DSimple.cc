@@ -217,8 +217,9 @@ void FastInterceptFinder2DSimple::fastInterceptFinder2d(const std::vector<HitDat
         const double yCenter = m * cosCenter + a * sinCenter;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-        if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
-            (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate /*&& derivativeyCenter >= 0*/)) {
+        if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
+            (yCenter <= localUpperCoordinate and yLeft >= localLowerCoordinate and yRight >= localLowerCoordinate) or
+            (yCenter >= localLowerCoordinate and yLeft <= localUpperCoordinate and yRight <= localUpperCoordinate)) {
           layerHits[hitData.layer] = true;
           containedHits.emplace_back(hit);
         }

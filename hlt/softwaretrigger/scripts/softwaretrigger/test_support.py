@@ -87,17 +87,17 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
             def event(self):
                 self.results.create()
                 # First event: Add all the results that are used on express reco just to test all paths
-                if (self.EventMetaData.event == 1):
+                if (self.EventMetaData.obj().getEvent() == 1):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
                 # Second event: No skim lines to replicate a HLT discared event with filter ON
-                elif (self.EventMetaData.event == 2):
+                elif (self.EventMetaData.obj().getEvent() == 2):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
                     self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
                 # Third event: Does not pass through L1 passthrough
-                elif (self.EventMetaData.event == 3):
+                elif (self.EventMetaData.obj().getEvent() == 3):
                     self.results.addResult("software_trigger_cut&all&total_result", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
                     self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)

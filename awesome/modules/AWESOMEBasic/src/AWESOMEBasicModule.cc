@@ -13,6 +13,13 @@
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
 
+/* --------- WARNING ------------------------------------------------------
+ * If you have more complex parameter types in your class then simple int,
+ * double or std::vector of those you might need to uncomment the following
+ * include directive to avoid an undefined reference on compilation.
+ * --------------------------------------------------------------------- */
+// #include <framework/core/ModuleParam.templateDetails.h>
+
 using namespace Belle2;
 using namespace Belle2::AWESOME;
 

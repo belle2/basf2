@@ -70,118 +70,116 @@ class TestStdPi0s(unittest.TestCase):
         """check that the builder function works with the all list"""
         self._check_list("all", expected_lists=["all", "all"])
 
-    def test_eff10_Jan2020_list(self):
-        """check that the builder function works with the eff10_Jan2020 list"""
-        self._check_list("eff10_Jan2020", expected_lists=["pi0eff10_Jan2020", "pi0eff10_Jan2020", "eff10_Jan2020"])
+    def test_eff10_May2020_list(self):
+        """check that the builder function works with the eff10_May2020 list"""
+        self._check_list("eff10_May2020", expected_lists=["pi0eff10_May2020", "pi0eff10_May2020", "eff10_May2020"])
 
-    def test_eff20_Jan2020_list(self):
-        """check that the builder function works with the eff20_Jan2020 list"""
-        self._check_list("eff20_Jan2020", expected_lists=["pi0eff20_Jan2020", "pi0eff20_Jan2020", "eff20_Jan2020"])
+    def test_eff20_May2020_list(self):
+        """check that the builder function works with the eff20_May2020 list"""
+        self._check_list("eff20_May2020", expected_lists=["pi0eff20_May2020", "pi0eff20_May2020", "eff20_May2020"])
 
-    def test_eff30_Jan2020_list(self):
-        """check that the builder function works with the eff30_Jan2020 list"""
-        self._check_list("eff30_Jan2020", expected_lists=["pi0eff30_Jan2020", "pi0eff30_Jan2020", "eff30_Jan2020"])
+    def test_eff30_May2020_list(self):
+        """check that the builder function works with the eff30_May2020 list"""
+        self._check_list("eff30_May2020", expected_lists=["pi0eff30_May2020", "pi0eff30_May2020", "eff30_May2020"])
 
-    def test_eff40_Jan2020_list(self):
-        """check that the builder function works with the eff40_Jan2020 list"""
-        self._check_list("eff40_Jan2020", expected_lists=["pi0eff40_Jan2020", "pi0eff40_Jan2020", "eff40_Jan2020"])
+    def test_eff40_May2020_list(self):
+        """check that the builder function works with the eff40_May2020 list"""
+        self._check_list("eff40_May2020", expected_lists=["pi0eff40_May2020", "pi0eff40_May2020", "eff40_May2020"])
 
-    def test_eff50_Jan2020_nomcmatch_list(self):
-        """check that the builder function works with the eff50_Jan2020_nomcmatch list"""
+    def test_eff50_May2020_nomcmatch_list(self):
+        """check that the builder function works with the eff50_May2020_nomcmatch list"""
+        self._check_list("eff50_May2020_nomcmatch",
+                         expected_lists=["pi0eff50_May2020",
+                                         "pi0eff50_May2020",
+                                         "eff50_May2020_nomcmatch"])
+
+    def test_eff50_May2020_list(self):
+        """check that the builder function works with the eff50_May2020 list"""
         self._check_list(
-            "eff50_Jan2020_nomcmatch",
+            "eff50_May2020",
             expected_lists=[
-                "pi0eff50_Jan2020",
-                "pi0eff50_Jan2020",
-                "eff50_Jan2020_nomcmatch"])
+                "pi0eff50_May2020",
+                "pi0eff50_May2020",
+                "eff50_May2020_nomcmatch",
+                "eff50_May2020"])
 
-    def test_eff50_Jan2020_list(self):
-        """check that the builder function works with the eff50_Jan2020 list"""
-        self._check_list(
-            "eff50_Jan2020",
-            expected_lists=[
-                "pi0eff50_Jan2020",
-                "pi0eff50_Jan2020",
-                "eff50_Jan2020_nomcmatch",
-                "eff50_Jan2020"])
-
-    def test_eff60_Jan2020_list(self):
-        """check that the builder function works with the eff60_Jan2020 list"""
-        self._check_list("eff60_Jan2020", expected_lists=["pi0eff60_Jan2020", "pi0eff60_Jan2020", "eff60_Jan2020"])
+    def test_eff60_May2020_list(self):
+        """check that the builder function works with the eff60_May2020 list"""
+        self._check_list("eff60_May2020", expected_lists=["pi0eff60_May2020", "pi0eff60_May2020", "eff60_May2020"])
 
     def test_allfit_list(self):
         """check that the builder function works with the allFit list"""
         self._check_list("allFit", expected_lists=["all", "all", "allFit"])
 
-    def test_eff10_Jan2020fit_list(self):
-        """check that the builder function works with the eff10_Jan2020Fit list"""
+    def test_eff10_May2020fit_list(self):
+        """check that the builder function works with the eff10_May2020Fit list"""
         self._check_list(
-            "eff10_Jan2020Fit",
+            "eff10_May2020Fit",
             expected_lists=[
-                "pi0eff10_Jan2020",
-                "pi0eff10_Jan2020",
-                "eff10_Jan2020",
-                "eff10_Jan2020Fit"])
+                "pi0eff10_May2020",
+                "pi0eff10_May2020",
+                "eff10_May2020",
+                "eff10_May2020Fit"])
 
-    def test_eff20_Jan2020fit_list(self):
-        """check that the builder function works with the eff20_Jan2020Fit list"""
+    def test_eff20_May2020fit_list(self):
+        """check that the builder function works with the eff20_May2020Fit list"""
         self._check_list(
-            "eff20_Jan2020Fit",
+            "eff20_May2020Fit",
             expected_lists=[
-                "pi0eff20_Jan2020",
-                "pi0eff20_Jan2020",
-                "eff20_Jan2020",
-                "eff20_Jan2020Fit"])
+                "pi0eff20_May2020",
+                "pi0eff20_May2020",
+                "eff20_May2020",
+                "eff20_May2020Fit"])
 
-    def test_eff30_Jan2020fit_list(self):
-        """check that the builder function works with the eff30_Jan2020Fit list"""
+    def test_eff30_May2020fit_list(self):
+        """check that the builder function works with the eff30_May2020Fit list"""
         self._check_list(
-            "eff30_Jan2020Fit",
+            "eff30_May2020Fit",
             expected_lists=[
-                "pi0eff30_Jan2020",
-                "pi0eff30_Jan2020",
-                "eff30_Jan2020",
-                "eff30_Jan2020Fit"])
+                "pi0eff30_May2020",
+                "pi0eff30_May2020",
+                "eff30_May2020",
+                "eff30_May2020Fit"])
 
-    def test_eff40_Jan2020fit_list(self):
-        """check that the builder function works with the eff40_Jan2020Fit list"""
+    def test_eff40_May2020fit_list(self):
+        """check that the builder function works with the eff40_May2020Fit list"""
         self._check_list(
-            "eff40_Jan2020Fit",
+            "eff40_May2020Fit",
             expected_lists=[
-                "pi0eff40_Jan2020",
-                "pi0eff40_Jan2020",
-                "eff40_Jan2020",
-                "eff40_Jan2020Fit"])
+                "pi0eff40_May2020",
+                "pi0eff40_May2020",
+                "eff40_May2020",
+                "eff40_May2020Fit"])
 
-    def test_eff50_Jan2020fit_list(self):
-        """check that the builder function works with the eff50_Jan2020Fit list"""
+    def test_eff50_May2020fit_list(self):
+        """check that the builder function works with the eff50_May2020Fit list"""
         self._check_list(
-            "eff50_Jan2020Fit",
+            "eff50_May2020Fit",
             expected_lists=[
-                "pi0eff50_Jan2020",
-                "pi0eff50_Jan2020",
-                'eff50_Jan2020_nomcmatch',
-                "eff50_Jan2020",
-                "eff50_Jan2020Fit"])
+                "pi0eff50_May2020",
+                "pi0eff50_May2020",
+                'eff50_May2020_nomcmatch',
+                "eff50_May2020",
+                "eff50_May2020Fit"])
 
-    def test_eff60_Jan2020fit_list(self):
-        """check that the builder function works with the eff60_Jan2020Fit list"""
+    def test_eff60_May2020fit_list(self):
+        """check that the builder function works with the eff60_May2020Fit list"""
         self._check_list(
-            "eff60_Jan2020Fit",
+            "eff60_May2020Fit",
             expected_lists=[
-                "pi0eff60_Jan2020",
-                "pi0eff60_Jan2020",
-                "eff60_Jan2020",
-                "eff60_Jan2020Fit"])
+                "pi0eff60_May2020",
+                "pi0eff60_May2020",
+                "eff60_May2020",
+                "eff60_May2020Fit"])
 
     def test_skim(self):
         """check that the builder function works with the skim list"""
         self._check_list(
             std_function=stdPi0s.loadStdSkimPi0,
             expected_lists=[
-                "pi0eff50_Jan2020",
-                "pi0eff50_Jan2020",
-                "eff50_Jan2020_nomcmatch",
+                "pi0eff50_May2020",
+                "pi0eff50_May2020",
+                "eff50_May2020_nomcmatch",
                 "skim"])
 
 

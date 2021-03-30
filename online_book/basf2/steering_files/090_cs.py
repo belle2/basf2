@@ -17,7 +17,7 @@ ma.inputMdstList(
     path=main,
 )
 
-stdPi0s.stdPi0s(path=main, listtype="eff60_Jan2020")
+stdPi0s.stdPi0s(path=main, listtype="eff60_May2020")
 ma.fillParticleList(
     decayString="pi+:good", cut="chiProb > 0.001 and pionID > 0.5", path=main
 )
@@ -27,7 +27,7 @@ ma.reconstructDecay(
 )
 
 ma.reconstructDecay(
-    decayString="B0  -> K_S0 pi0:eff60_Jan2020",
+    decayString="B0  -> K_S0 pi0:eff60_May2020",
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
 )

@@ -24,7 +24,12 @@ namespace {
 
   double getValue(const std::string& name, TH1* histogram)
   {
-    B2ASSERT("This histogram does not have this value!", hasValue(name, histogram));
+    if (not hasValue(name, histogram)) {
+      B2ERROR("This histogram does not have this value! (fallback value = -1)"
+              << LogVar("histogram", histogram)
+              << LogVar("value", name));
+      return -1;
+    }
     auto binNumber = histogram->GetXaxis()->FindFixBin(name.c_str());
     return histogram->GetBinContent(binNumber);
   }

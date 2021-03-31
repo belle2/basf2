@@ -26,7 +26,7 @@ namespace {
   {
     if (not hasValue(name, histogram)) {
       B2ERROR("This histogram does not have this value! (fallback value = -1)"
-              << LogVar("histogram", histogram)
+              << LogVar("histogram", histogram->GetName())
               << LogVar("value", name));
       return -1;
     }

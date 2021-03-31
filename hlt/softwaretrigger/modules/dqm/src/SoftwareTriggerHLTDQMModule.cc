@@ -102,7 +102,8 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     const std::string& title = cutIdentifier.first;
     const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
     const std::string& baseIdentifier = mapVal.first;
-    const int numberOfFlags = mapVal.second.size();
+    const auto& cuts = mapVal.second;
+    const int numberOfFlags = cuts.size();
 
     if (m_param_histogramDirectoryName == "softwaretrigger_skim_nobhabha") {
       if (title == baseIdentifier)
@@ -132,6 +133,13 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms[title]->SetOption("hist");
     m_cutResultHistograms[title]->SetStats(false);
     m_cutResultHistograms[title]->SetMinimum(0);
+
+    // Set bin labels
+    int index = 0;
+    for (const std::string& cutTitle : cuts) {
+      index++;
+      m_cutResultHistograms[title]->GetXaxis()->SetBinLabel(index, cutTitle.c_str());
+    }
   }
 
   // We add one for the total result
@@ -265,7 +273,9 @@ void SoftwareTriggerHLTDQMModule::event()
         }
       }
 
+      float index = 0;
       for (const std::string& cutTitle : cuts) {
+        index++;
         const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
@@ -276,7 +286,9 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != results.end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[title]->Fill(cutTitle.c_str(), cutResult > 0 and not skip);
+          if (cutResult > 0 and not skip) {
+            m_cutResultHistograms[title]->Fill(index - 0.5);
+          }
         }
       }
 
@@ -305,7 +317,9 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != results.end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit, cutResult > 0);
+          if (cutResult > 0) {
+            m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->Fill(m_hlt_unit);
+          }
         }
       }
     }

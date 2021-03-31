@@ -47,49 +47,101 @@ namespace Belle2 {
         // and add / subtract {5, 7.5, 10} mm for L3, L4, L5 to account for a straight line not perfectly representing the boarders,
         // slight misalignment, boost, etc so that there is some overlap
         if (hitLayer < 6) {
+//           switch (sensorInLayerSixLadder) {
+//             case 1:
+//               if (hitLayer == 3 && hitZPosition > 6.56) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 4 && hitZPosition > 13.74) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 5 && hitZPosition > 17.84) {
+//                 selectedHits.emplace_back(&hit);
+//               }
+//               break;
+//             case 2:
+//               if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 4 && hitZPosition > 6.33 && hitZPosition < 15.24) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 5 && hitZPosition > 8.21 && hitZPosition < 19.84) {
+//                 selectedHits.emplace_back(&hit);
+//               }
+//               break;
+//             case 3:
+//               if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 4 && hitZPosition > -1.08 && hitZPosition < 7.83) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 5 && hitZPosition > -1.42 && hitZPosition < 10.21) {
+//                 selectedHits.emplace_back(&hit);
+//               }
+//               break;
+//             case 4:
+//               if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 4 && hitZPosition > -8.48 && hitZPosition < 0.42) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 5 && hitZPosition > -11.05 && hitZPosition < 0.58) {
+//                 selectedHits.emplace_back(&hit);
+//               }
+//               break;
+//             case 5:
+//               if (hitLayer == 3  && hitZPosition < -3.27) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 4  && hitZPosition < -6.98) {
+//                 selectedHits.emplace_back(&hit);
+//               } else if (hitLayer == 5 && hitZPosition < -9.05) {
+//                 selectedHits.emplace_back(&hit);
+//               }
+//               break;
+//           }
+
           switch (sensorInLayerSixLadder) {
             case 1:
-              if (hitLayer == 3 && hitZPosition > 6.56) {
+              if (hitLayer == 3 && hitZPosition > 6.06) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > 13.74) {
+//               } else if (hitLayer == 4 && hitZPosition > 13.74) {
+              } else if (hitLayer == 4 && hitZPosition > 11.90) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > 17.84) {
+//               } else if (hitLayer == 5 && hitZPosition > 17.84) {
+              } else if (hitLayer == 5 && hitZPosition > 17.00) {
                 selectedHits.emplace_back(&hit);
               }
               break;
             case 2:
-              if (hitLayer == 3 && hitZPosition > 2.95 && hitZPosition < 7.56) {
+              if (hitLayer == 3 && hitZPosition > 2.45 && hitZPosition < 8.06) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > 6.33 && hitZPosition < 15.24) {
+//               } else if (hitLayer == 4 && hitZPosition > 6.33 && hitZPosition < 15.24) {
+              } else if (hitLayer == 4 && hitZPosition > 6.08 && hitZPosition < 13.90) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > 8.21 && hitZPosition < 19.84) {
+//               } else if (hitLayer == 5 && hitZPosition > 8.21 && hitZPosition < 19.84) {
+              } else if (hitLayer == 5 && hitZPosition > 7.96 && hitZPosition < 19.50) {
                 selectedHits.emplace_back(&hit);
               }
               break;
             case 3:
-              if (hitLayer == 3 && hitZPosition > -0.66 && hitZPosition < 3.95) {
+              if (hitLayer == 3 && hitZPosition > -1.16 && hitZPosition < 4.45) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > -1.08 && hitZPosition < 7.83) {
+              } else if (hitLayer == 4 && hitZPosition > -1.33 && hitZPosition < 8.08) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > -1.42 && hitZPosition < 10.21) {
+              } else if (hitLayer == 5 && hitZPosition > -1.67 && hitZPosition < 10.46) {
                 selectedHits.emplace_back(&hit);
               }
               break;
             case 4:
-              if (hitLayer == 3 && hitZPosition > -4.27 && hitZPosition < 0.34) {
+              if (hitLayer == 3 && hitZPosition > -4.77 && hitZPosition < 0.84) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 4 && hitZPosition > -8.48 && hitZPosition < 0.42) {
+              } else if (hitLayer == 4 && hitZPosition > -8.73 && hitZPosition < 0.67) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition > -11.05 && hitZPosition < 0.58) {
+              } else if (hitLayer == 5 && hitZPosition > -11.30 && hitZPosition < 0.83) {
                 selectedHits.emplace_back(&hit);
               }
               break;
             case 5:
-              if (hitLayer == 3  && hitZPosition < -3.27) {
+              if (hitLayer == 3  && hitZPosition < -2.77) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 4  && hitZPosition < -6.98) {
+              } else if (hitLayer == 4  && hitZPosition < -6.73) {
                 selectedHits.emplace_back(&hit);
-              } else if (hitLayer == 5 && hitZPosition < -9.05) {
+              } else if (hitLayer == 5 && hitZPosition < -8.80) {
                 selectedHits.emplace_back(&hit);
               }
               break;

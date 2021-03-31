@@ -108,6 +108,11 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->Draw();
   }
 
+  m_hMeanTime = {
+    new TCanvas("HLT/MeanTime"),
+    new TH1F("MeanTime", "Mean processing time", 1, 0, 0)
+  };
+
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -120,7 +125,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
@@ -142,6 +147,8 @@ void DQMHistAnalysisHLTModule::event()
   auto* skimHistogram = findHist("softwaretrigger/skim");
   auto* totalResultHistogram = findHist("softwaretrigger/total_result");
   auto* hltUnitNumberHistogram = findHist("softwaretrigger_before_filter/hlt_unit_number");
+  auto* processesPerUnitHistogram = findHist("timing_statistics/processesPerUnitHistogram");
+  auto* meanTimeHistogram = findHist("timing_statistics/meanTimeHistogram");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -159,16 +166,26 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the HLT unit number histogram!");
     return;
   }
+  if (not processesPerUnitHistogram) {
+    B2ERROR("Can not find the processes per unit histogram!");
+    return;
+  }
+  if (not meanTimeHistogram) {
+    B2ERROR("Can not find the mean processing time histogram!");
+    return;
+  }
 
   m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();
   m_hCrossSection.second->Reset();
   m_hRatios.second->Reset();
+  m_hMeanTime.second->Reset();
 
   double instLuminosity = 0;
   double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
   double numberOfAllEvents = hltUnitNumberHistogram->GetEntries();
+  double numberOfProcesses = processesPerUnitHistogram->GetEntries();
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -281,7 +298,10 @@ void DQMHistAnalysisHLTModule::event()
     }
   }
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  m_hMeanTime.second = (TH1F*) processesPerUnitHistogram->Clone("MeanTime");
+  m_hMeanTime.second->Scale(1 / numberOfProcesses);
+
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 

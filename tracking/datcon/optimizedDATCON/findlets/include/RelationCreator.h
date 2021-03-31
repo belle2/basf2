@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-      m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("twoHitRelation", prefix));
+      m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("relation", prefix));
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
       "Maximum number of relations to be created.",  m_maxRelations);

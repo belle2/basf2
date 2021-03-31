@@ -120,6 +120,16 @@ namespace Belle2 {
     TH1D* m_prunedResultQualityEstimator;
     TH2D* m_prunedResultQualityEstimatorvsResultSize;
 
+
+    TH1D* m_nActivePrunedResultsPerRawTrackCand;
+    TH1D* m_nActivePrunedResultsPerEvent;
+    TH1D* m_nActivePrunedResultSize;
+
+    TH2D* m_nActivePrunedResultsPerRawTCvsRawTCSize;
+
+    TH1D* m_ActivePrunedResultQualityEstimator;
+    TH2D* m_ActivePrunedResultQualityEstimatorvsResultSize;
+
     void initializeHists();
 
     int m_nEvent = 0;

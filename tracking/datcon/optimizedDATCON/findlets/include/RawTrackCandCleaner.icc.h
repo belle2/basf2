@@ -82,6 +82,7 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
   uint totalRelationsPerEvent = 0;
   uint totalResultsPerEvent = 0;
   uint nPrunedResultsPerEvent = 0;
+  uint nActivePrunedResultsPerEvent = 0;
   uint family = 0; // family of the SpacePointTrackCands,
   m_nRawTrackCandsPerEvent->Fill(rawTrackCandidates.size());
   for (auto& rawTrackCand : rawTrackCandidates) {
@@ -144,19 +145,32 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
       m_resultQualityEstimatorvsResultSize->Fill(trackCand.getQualityIndicator(), trackCand.getNHits());
     }
 
+    uint countActive = 0;
     for (const SpacePointTrackCand& trackCand : m_filteredResults) {
       m_prunedResultQualityEstimator->Fill(trackCand.getQualityIndicator());
       m_prunedResultQualityEstimatorvsResultSize->Fill(trackCand.getQualityIndicator(), trackCand.getNHits());
       m_nPrunedResultSize->Fill(trackCand.getNHits());
 
+      if (trackCand.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
+        m_ActivePrunedResultQualityEstimator->Fill(trackCand.getQualityIndicator());
+        m_ActivePrunedResultQualityEstimatorvsResultSize->Fill(trackCand.getQualityIndicator(), trackCand.getNHits());
+        m_nActivePrunedResultSize->Fill(trackCand.getNHits());
+        countActive++;
+      }
+
       trackCandidates.emplace_back(trackCand);
     }
+
+    nActivePrunedResultsPerEvent += countActive;
+    m_nActivePrunedResultsPerRawTrackCand->Fill(countActive);
+    m_nActivePrunedResultsPerRawTCvsRawTCSize->Fill(rawTrackCand.size(), countActive);
 
     family++;
   }
   m_nRelationsPerEvent->Fill(totalRelationsPerEvent);
   m_nResultsPerEvent->Fill(totalResultsPerEvent);
   m_nPrunedResultsPerEvent->Fill(nPrunedResultsPerEvent);
+  m_nActivePrunedResultsPerEvent->Fill(nActivePrunedResultsPerEvent);
   m_nEvent++;
 
 //   B2INFO("Event number: " << ++m_nEvent << " with nTrackCands: " << rawTrackCandidates.size() << " and total number of relations: " << totalRelationsPerEvent);
@@ -210,6 +224,23 @@ void RawTrackCandCleaner<AHit>::initializeHists()
   m_prunedResultQualityEstimatorvsResultSize = new TH2D("prunedResultQualityEstimatorvsResultSize",
                                                         "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
                                                         1000, 0, 1, 5, 3, 8);
+
+  m_nActivePrunedResultsPerRawTrackCand = new TH1D("ActivePrunedResultsPerRawTrackCand",
+                                                   "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
+  m_nActivePrunedResultsPerEvent = new TH1D("ActivePrunedResultsPerEvent",
+                                            "Number of pruned results per event;Results per event;count", 2000, 0,
+                                            2000);
+  m_nActivePrunedResultSize = new TH1D("ActivePrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
+
+  m_nActivePrunedResultsPerRawTCvsRawTCSize = new TH2D("ActivePrunedResultsPerRawTCvsRawTCSize",
+                                                       "Number of Results vs RawTC size;RawTC size;Results per RawTC",
+                                                       200, 0, 200, 500, 0, 500);
+
+  m_ActivePrunedResultQualityEstimator = new TH1D("ActivePrunedResultQualityEstimator",
+                                                  "Quality estimator for the single pruned results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
+  m_ActivePrunedResultQualityEstimatorvsResultSize = new TH2D("ActivePrunedResultQualityEstimatorvsResultSize",
+                                                              "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
+                                                              1000, 0, 1, 5, 3, 8);
 }
 
 

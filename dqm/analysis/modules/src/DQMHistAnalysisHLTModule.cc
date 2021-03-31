@@ -58,7 +58,7 @@ void DQMHistAnalysisHLTModule::initialize()
   };
   m_hEfficiencyTotal = {
     new TCanvas("HLT/RatioTotal"),
-    new TH1F("Ratio", "Ratio of Tags to all events", 1, 0, 0)
+    new TH1F("RatioTotal", "Ratio of Tags to all events", 1, 0, 0)
   };
   m_hCrossSection = {
     new TCanvas("HLT/CrossSection"),

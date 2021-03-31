@@ -60,7 +60,8 @@ void RbTupleManager::init(int nprocess, const char* filename, const char* workdi
     DIR* dp;
     struct dirent* dirp;
     if ((dp = opendir(dir.c_str())) == nullptr) {
-      B2ERROR("Error to open directory" << dir);
+      B2ERROR("Error on opening the directory."
+              << LogVar("directory", dir));
       return;
     }
 
@@ -74,7 +75,7 @@ void RbTupleManager::init(int nprocess, const char* filename, const char* workdi
       }
     }
     closedir(dp);
-    cout << "HistoManager : old temporary histogram files deleted" << endl;
+    B2INFO("RbTupleManager: old temporary histogram files deleted.");
   }
 }
 
@@ -93,11 +94,13 @@ int RbTupleManager::begin(int procid)
     m_root = new TFile(fileNamePlusId.c_str(), "update");
     //    printf("RbTupleManager: histo file opened for process %d (pid=%d)\n",
     //           procid, getpid());
-    B2INFO("RbTupleManager : histo file opened for process " << procid << "(" << getpid() << ")");
+    B2INFO("RbTupleManager: histogram file opened."
+           << LogVar("process", procid)
+           << LogVar("pid", getpid());
   } else {
     m_root = new TFile(m_filename.c_str(), "recreate");
     //    printf("RbTupleManager: initialized for single-process\n");
-    B2INFO("RbTupleManager :  initialized for single process");
+    B2INFO("RbTupleManager: initialized for single process.");
   }
   if (m_root == nullptr) return -1;
   //  printf ( "RbTupleManager::TFile opened\n" );
@@ -140,12 +143,13 @@ int RbTupleManager::hadd(bool deleteflag)
     return 0;
   }
 
-  printf("RbTupleManager::hadd started\n");
+  B2INFO("RbTupleManager: hadd started.");
 
   // Set up merger with output file
   TFileMerger merger(false, false);
   if (!merger.OutputFile(m_filename.c_str())) {
-    B2ERROR("RbTupleManager:: error to open output file " << m_filename);
+    B2ERROR("RbTupleManager: error on opening the output file."
+            << LogVar("file name", m_filename));
     return -1;
   }
 
@@ -155,7 +159,8 @@ int RbTupleManager::hadd(bool deleteflag)
   DIR* dp;
   struct dirent* dirp;
   if ((dp = opendir(dir.c_str())) == nullptr) {
-    B2ERROR("Error to open directory" << dir);
+    B2ERROR("RbTubleManager: error on opening the directory."
+            << LogVar("directory", dir));
     return errno;
   }
 
@@ -163,7 +168,7 @@ int RbTupleManager::hadd(bool deleteflag)
   // Scan the directory and register all histogram files
   //  std::string compfile = dir + "/" + m_filename + ".";
   std::string compfile = m_filename + ".";
-  printf("compfile = %s\n", compfile.c_str());
+  B2INFO(LogVar("compfile", compfile));
   while ((dirp = readdir(dp)) != nullptr) {
     std::string curfile = std::string(dirp->d_name);
     //    printf("Checking %s with compfile%s\n", curfile.c_str(), compfile.c_str());
@@ -178,7 +183,7 @@ int RbTupleManager::hadd(bool deleteflag)
   // Do Merge
   if (!merger.Merge()) {
     //    printf ( "RbTupleManager:: error to merge files\n" );
-    B2ERROR("RbTupleManager:: error to merge files");
+    B2ERROR("RbTupleManager: error on merging files.");
     return -1;
   }
 
@@ -191,8 +196,7 @@ int RbTupleManager::hadd(bool deleteflag)
     }
   }
 
-  printf("RbTupleManager: histogram files are added\n");
-  //  B2INFO ( "RbTupleManager : histogram files are added" );
+  B2INFO("RbTupleManager: histogram files are added.");
 
   return 0;
 }

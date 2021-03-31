@@ -12,6 +12,7 @@
 #include <framework/core/HistoModule.h>
 
 #include <TH1F.h>
+#include <TH1D.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/TRGSummary.h>
@@ -98,7 +99,7 @@ namespace Belle2 {
       std::map<std::string, TH1F*> m_l1Histograms;
 
       /// histograms with the run information
-      std::map<std::string, TH1F*> m_runInfoHistograms;
+      std::map<std::string, TH1D*> m_runInfoHistograms;
 
       // Datastore members
       /// STM cut results

@@ -163,18 +163,18 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_exp_run_event_histograms) {
-    m_runInfoHistograms.emplace("run_number", new TH1F("run_number", "Run Number", 100, 0, 10000));
-    m_runInfoHistograms.emplace("event_number", new TH1F("event_number", "Event Number", 100, 0, 1'000'000));
-    m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
+    m_runInfoHistograms.emplace("run_number", new TH1D("run_number", "Run Number", 100, 0, 10000));
+    m_runInfoHistograms.emplace("event_number", new TH1D("event_number", "Event Number", 100, 0, 1'000'000));
+    m_runInfoHistograms.emplace("experiment_number", new TH1D("experiment_number", "Experiment Number", 50, 0, 50));
   }
 
   if (m_param_create_hlt_unit_histograms) {
     if (m_param_histogramDirectoryName != "softwaretrigger_before_filter") {
-      m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number_after_filter",
+      m_runInfoHistograms.emplace("hlt_unit_number", new TH1D("hlt_unit_number_after_filter",
                                                               ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                                               HLTUnit::max_hlt_units + 1));
     } else {
-      m_runInfoHistograms.emplace("hlt_unit_number", new TH1F("hlt_unit_number",
+      m_runInfoHistograms.emplace("hlt_unit_number", new TH1D("hlt_unit_number",
                                                               ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                                               HLTUnit::max_hlt_units + 1));
     }
@@ -192,7 +192,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   if (m_param_create_error_flag_histograms) {
-    m_runInfoHistograms.emplace("error_flag", new TH1F("error_flag", "Error Flag", 4, 0, 4));
+    m_runInfoHistograms.emplace("error_flag", new TH1D("error_flag", "Error Flag", 4, 0, 4));
     m_runInfoHistograms["error_flag"]->SetStats(false);
     m_runInfoHistograms["error_flag"]->SetOption("hist");
     m_runInfoHistograms["error_flag"]->SetMinimum(0);

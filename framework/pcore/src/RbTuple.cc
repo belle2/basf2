@@ -96,7 +96,7 @@ int RbTupleManager::begin(int procid)
     //           procid, getpid());
     B2INFO("RbTupleManager: histogram file opened."
            << LogVar("process", procid)
-           << LogVar("pid", getpid());
+           << LogVar("pid", getpid()));
   } else {
     m_root = new TFile(m_filename.c_str(), "recreate");
     //    printf("RbTupleManager: initialized for single-process\n");

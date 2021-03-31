@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -10,9 +9,9 @@ def check_execute(cmd, terminate_on_error=True):
     Executes a shell commands and check for =! 0 return codes
     """
 
-    print("Executing command '{}'".format(cmd))
+    print(f"Executing command '{cmd}'")
     res = os.system(cmd)
-    print("Command '{}' exited with code {}".format(cmd, res))
+    print(f"Command '{cmd}' exited with code {res}")
     if not res == 0:
         print("FATAL: Exit code is not 0")
         if terminate_on_error:
@@ -33,9 +32,9 @@ def check_path_exists(paths, terminate_on_error=True):
     """
 
     for p in paths:
-        print("Checking for existance of file {}".format(p))
+        print(f"Checking for existance of file {p}")
         if not os.path.exists(p):
-            print("Path {} does not exist".format(p))
+            print(f"Path {p} does not exist")
             if terminate_on_error:
                 sys.exit(1)
         print("Jep !")

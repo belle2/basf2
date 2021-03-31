@@ -17,7 +17,7 @@
 import basf2_mva
 import basf2_mva_util
 import skopt
-from skopt.space import Real, Integer
+from skopt.space import Integer
 from sklearn.externals.joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 

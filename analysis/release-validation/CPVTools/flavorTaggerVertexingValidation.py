@@ -30,7 +30,6 @@ import variables.collections as vc
 import variables.utils as vu
 from ROOT import Belle2
 import argparse
-import sys
 import os
 
 
@@ -71,11 +70,11 @@ def getCommandLineOptions():
 
     if args.belleData == "BelleDataConv":
         if args.belleOrBelle2Flag != "Belle":
-            B2FATAL("BelleDataConv only for Belle Data.")
+            b2.B2FATAL("BelleDataConv only for Belle Data.")
         if args.mode != "Expert":
-            B2FATAL("BelleDataConv only in Expert mode.")
+            b2.B2FATAL("BelleDataConv only in Expert mode.")
         if args.mcType != "BGx1":
-            B2FATAL("When using BelleDataConv, mcType must be set to BGx1.")
+            b2.B2FATAL("When using BelleDataConv, mcType must be set to BGx1.")
 
     return args
 
@@ -188,7 +187,6 @@ def applyCPVTools(mode='Expert'):
             mode=mode,
             weightFiles='B2' + decayChannelTrainedOn + mcType,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-            belleOrBelle2=belleOrBelle2Flag,
             useOnlyLocalWeightFiles=True,
             downloadFromDatabaseIfNotFound=False,
             workingDirectory=workingDirectory,
@@ -201,7 +199,6 @@ def applyCPVTools(mode='Expert'):
             particleLists=['B0:sig'],
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             weightFiles='B2' + decayChannelTrainedOn + mcType,
-            belleOrBelle2=belleOrBelle2Flag,
             useOnlyLocalWeightFiles=True,
             downloadFromDatabaseIfNotFound=False,
             workingDirectory=workingDirectory,
@@ -310,7 +307,6 @@ if __name__ == '__main__':
             mode='Teacher',
             weightFiles='B2' + decayChannelTrainedOn + mcType,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-            belleOrBelle2=belleOrBelle2Flag,
             useOnlyLocalWeightFiles=True,
             downloadFromDatabaseIfNotFound=False,
             uploadToDatabaseAfterTraining=True,

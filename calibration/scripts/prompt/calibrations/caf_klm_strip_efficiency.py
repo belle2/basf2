@@ -61,16 +61,15 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    # max_files_per_run = 2
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 1
+    # min_events_per_file = 1
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
 
     # For testing
     # reduced_file_to_iov_cdst = filter_by_max_files_per_run(file_to_iov_cdst, max_files_per_run, min_events_per_file)
@@ -92,7 +91,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 
     alg = KLMStripEfficiencyAlgorithm()

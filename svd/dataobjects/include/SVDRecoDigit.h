@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param fittedAmplitude amplitude estimate for the signal.
      * @param fittedAmplitudeError amplitude error estimate.
      * @param fittedTime fitted time-of-arrival estimate.
-     * @param fittedTimeEorror time error estimate.
+     * @param fittedTimeError time error estimate.
      * @param probabilities pdf for time estimate.
      * @param chi2 Standardized chi2 for the fit.
      */

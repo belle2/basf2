@@ -99,7 +99,6 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
 
     def log_error(self, *args):
         """Disable error logs"""
-        pass
 
     def do_GET(self):
         """Parse a get request"""
@@ -185,7 +184,6 @@ def run_redirect(pipe, redir_port):
 
         def log_error(self, *args):
             """Disable error logs"""
-            pass
 
     try:
         httpd = HTTPServer(("127.0.0.1", 12702), SimpleRedirectServer)
@@ -202,9 +200,7 @@ def run_redirect(pipe, redir_port):
 def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localtest"):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
-    # reset the database so that there is no chain
-    basf2.reset_database()
-    # now run the path in a child process inside of a clean working directory
+    # Run the path in a child process inside of a clean working directory
     with clean_working_directory():
         # make logging more reproducible by replacing some strings
         configure_logging_for_tests()

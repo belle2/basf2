@@ -103,7 +103,7 @@ namespace Belle2 {
      * */
     int getDstarOutputPDG(int pion_charge, int input_dstar_pdg);
 
-    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
     std::unique_ptr<Variable::Cut> m_cut_pion; /**< cut object which performs the cuts */
     std::unique_ptr<Variable::Cut> m_cut_dstar; /**< cut object which performs the cuts */

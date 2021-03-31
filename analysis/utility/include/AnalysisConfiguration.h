@@ -32,7 +32,7 @@ namespace Belle2 {
    * If object was not created before by AnalysisConfiguration module,
    * it is created on first call with default values by NTupleTool.
    *
-   * By now, this class cnofigures only style of variables in tuples
+   * By now, this class configures only style of variables in tuples
    * and thus has two specific functions:
    *
    * const string getTupleStyle() which returns chosen style
@@ -42,7 +42,7 @@ namespace Belle2 {
    * static AnalysisConfiguration *instance()
    * which returns pointer to previously created AnalysisClass object
    * or, if it is the first call, create object and return pointer to it.
-   * Constructor of class is prvate, so the only way to create object is
+   * Constructor of class is private, so the only way to create object is
    * through instance() function.
    *
    */
@@ -71,7 +71,7 @@ namespace Belle2 {
     }
 
     /**
-     * Determines wheter to use the legacy MCMatching algorithm (true) or not (false).
+     * Determines whether to use the legacy MCMatching algorithm (true) or not (false).
      */
     void useLegacyMCMatching(const bool flag)
     {

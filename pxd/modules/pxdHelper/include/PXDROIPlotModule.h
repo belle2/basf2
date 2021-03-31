@@ -32,8 +32,10 @@ namespace Belle2 {
       PXDROIPlotModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Event */
       void event() override final;
 
     private:

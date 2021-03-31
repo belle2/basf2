@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import register_module
-import inspect
 
 
 def fitKinematic4C(

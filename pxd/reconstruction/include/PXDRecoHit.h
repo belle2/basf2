@@ -60,6 +60,7 @@ namespace Belle2 {
      * assumed for both values by dividing the pixel size by sqrt(12).
      *
      * @param hit    PXDTrueHit to use as base
+     * @param trackCandHit    actually not used, should be removed?
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
@@ -84,6 +85,7 @@ namespace Belle2 {
      * perfect tracking results when using this constructor
      *
      * @param hit    PXDCluster to use as base
+     * @param trackCandHit    actually not used, should be removed?
      */
     explicit PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
@@ -123,6 +125,7 @@ namespace Belle2 {
     /** Get the likelyhood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
 
+    /** Construct the hessian matrix */
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
 
   private:

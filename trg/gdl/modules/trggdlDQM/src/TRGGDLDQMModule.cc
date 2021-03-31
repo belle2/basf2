@@ -162,6 +162,18 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_extra; i++) {
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
+    // output overlap
+    h_psn_overlap[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
+                                    n_output_overlap);
+    for (int i = 0; i < n_output_overlap; i++) {
+      h_psn_overlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+    }
+    // output no overlap
+    h_psn_nooverlap[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
+                                      n_output_overlap);
+    for (int i = 0; i < n_output_overlap; i++) {
+      h_psn_nooverlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+    }
     // output pure extra
     h_psn_pure_extra[iskim] = new TH1I(Form("hGDL_psn_pure_extra_%s", skim_smap[iskim].c_str()), "psn pure extra", n_output_pure_extra,
                                        0, n_output_pure_extra);
@@ -217,14 +229,15 @@ void TRGGDLDQMModule::defineHisto()
     }
   }
 
-  h_eff_shifter    = new TH1D(Form("hGDL_eff_shifter"), "efficiency", n_eff_shifter, 0, n_eff_shifter);
-  for (int i = 0; i < n_eff_shifter; i++) {
-    h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
+  if (m_skim != 0) {
+    h_eff_shifter    = new TH1D(Form("hGDL_eff_shifter"), "efficiency", n_eff_shifter, 0, n_eff_shifter);
+    for (int i = 0; i < n_eff_shifter; i++) {
+      h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
+    }
+    h_eff_shifter->SetMaximum(1.2);
+    h_eff_shifter->SetMinimum(0);
+    h_eff_shifter->GetXaxis()->SetLabelSize(0.05);
   }
-  h_eff_shifter->SetMaximum(1.2);
-  h_eff_shifter->SetMinimum(0);
-  h_eff_shifter->GetXaxis()->SetLabelSize(0.05);
-
   oldDir->cd();
 }
 
@@ -258,8 +271,9 @@ void TRGGDLDQMModule::beginRun()
     h_pure_eff[iskim]->Reset();
     h_timtype[iskim]->Reset();
   }
-  h_eff_shifter->Reset();
-
+  if (m_skim != 0) {
+    h_eff_shifter->Reset();
+  }
 
   oldDir->cd();
 }
@@ -457,7 +471,7 @@ void TRGGDLDQMModule::event()
   n_clocks = m_unpacker->getnClks();
   int nconf = m_unpacker->getconf();
   int nword_input  = m_unpacker->get_nword_input();
-  int nword_output = m_unpacker->get_nword_output();
+  const int nword_output = m_unpacker->get_nword_output();
   skim.clear();
 
   StoreArray<TRGGDLUnpackerStore> entAry;
@@ -552,9 +566,9 @@ void TRGGDLDQMModule::event()
     begin_run = false;
   }
 
-  int psn[5] = {0};
-  int ftd[5] = {0};
-  int itd[5] = {0};
+  int psn[10] = {0};
+  int ftd[10] = {0};
+  int itd[10] = {0};
   int timtype  = 0;
 
 
@@ -562,14 +576,14 @@ void TRGGDLDQMModule::event()
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
-    int psn_tmp[5] = {0};
-    int ftd_tmp[5] = {0};
-    int itd_tmp[5] = {0};
+    int psn_tmp[10] = {0};
+    int ftd_tmp[10] = {0};
+    int itd_tmp[10] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
-        if (itd_tmp[j] & (1 << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
+        if (itd_tmp[j] & (1u << i)) h_i->SetBinContent(clk, i + 1 +  j * 32, 1);
       }
     }
     if (nconf == 0) {
@@ -578,7 +592,7 @@ void TRGGDLDQMModule::event()
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[0] & (1 << i)) h_p->SetBinContent(clk, i + 1, 1);
+        if (psn_tmp[0] & (1u << i)) h_p->SetBinContent(clk, i + 1, 1);
         if (ftd_tmp[0] & (1 << i)) h_f->SetBinContent(clk, i + 1, 1);
       }
       psn_tmp[1] = h_0->GetBinContent(clk, 1 + ee_psn[2]) * (1 << 16) + h_0->GetBinContent(clk, 1 + ee_psn[1]);
@@ -586,7 +600,7 @@ void TRGGDLDQMModule::event()
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
       for (int i = 0; i < 32; i++) {
-        if (psn_tmp[1] & (1 << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
+        if (psn_tmp[1] & (1u << i)) h_p->SetBinContent(clk, i + 1 + 32, 1);
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
@@ -596,7 +610,7 @@ void TRGGDLDQMModule::event()
         psn[j] |= psn_tmp[j];
         ftd[j] |= ftd_tmp[j];
         for (int i = 0; i < 32; i++) {
-          if (psn_tmp[j] & (1 << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
+          if (psn_tmp[j] & (1u << i)) h_p->SetBinContent(clk, i + 1 +  j * 32, 1);
           if (ftd_tmp[j] & (1 << i)) h_f->SetBinContent(clk, i + 1 +  j * 32, 1);
         }
       }
@@ -610,6 +624,8 @@ void TRGGDLDQMModule::event()
   fillRiseFallTimings();
   // fill Output_extra for efficiency study
   fillOutputExtra();
+  // fill Output_overlap for trigger rate study
+  fillOutputOverlap();
   // fill Output for high purity efficiency study
   if (m_skim != 1) {
     fillOutputPureExtra();
@@ -750,6 +766,7 @@ bool TRGGDLDQMModule::anaBitCondition(void)
             B2DEBUG(20,
                     m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
                     << "(" << fired << ")");
+            // cppcheck-suppress knownConditionTrueFalse
             if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
               return true;
             }
@@ -786,7 +803,6 @@ bool TRGGDLDQMModule::anaBitCondition(void)
       // can be blank (white space) or any delimiter.
       if (reading_word) {
         // end of a word, 'xxxx '
-        reading_word = false;
         if (result_the_term) {
           // worth to try
           bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
@@ -954,6 +970,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_itd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -988,6 +1005,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_ftd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -1005,6 +1023,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           if (! rising_done) {
             h_psn_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
+            // cppcheck-suppress knownConditionTrueFalse
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
@@ -1019,6 +1038,74 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
   }
 }
 
+
+void
+TRGGDLDQMModule::fillOutputOverlap(void)
+{
+  for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
+    bool cdc_fired = isFired("FFF") || isFired("FFO") || isFired("FFB") ||  isFired("FFY") ||  isFired("FYO") ||  isFired("FYB");
+    bool c4_fired = isFired("C4");
+    bool hie_fired = isFired("HIE");
+    bool lml_fired = (isFired("LML0") || isFired("LML1") || isFired("LML2") || isFired("LML3") || isFired("LML4") || isFired("LML5")
+                      || isFired("LML6") || isFired("LML7") || isFired("LML8") || isFired("LML9") || isFired("LML10")  || isFired("LML11")
+                      || isFired("LML12") || isFired("LML13") || isFired("ECLMUMU"));
+    bool klm_fired = isFired("MU_B2B") || isFired("MU_EB2B") || isFired("BEKLM") || isFired("CDCKLM1") || isFired("CDCKLM2");
+    bool short_fired = isFired("FSO") || isFired("FSB") || isFired("YSO") ||  isFired("YSB");
+    bool ff30_fired = isFired("FF30") || isFired("FY30");
+    bool bha3d_fired = isFired("BHA3D");
+
+    if (1) {
+      h_psn_overlap[skim[ifill]]->Fill(0.5);
+    }
+    if (cdc_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(1.5);
+    } else if (c4_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(2.5);
+    } else if (hie_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(3.5);
+    } else if (klm_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(4.5);
+    } else if (short_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(5.5);
+    } else if (ff30_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(6.5);
+    } else if (lml_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(7.5);
+    } else if (bha3d_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(8.5);
+    } else {
+      h_psn_overlap[skim[ifill]]->Fill(9.5);
+    }
+
+    if (1) {
+      h_psn_nooverlap[skim[ifill]]->Fill(0.5);
+    }
+    if (cdc_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(1.5);
+    }
+    if (c4_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(2.5);
+    }
+    if (hie_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(3.5);
+    }
+    if (klm_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(4.5);
+    }
+    if (short_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(5.5);
+    }
+    if (ff30_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(6.5);
+    }
+    if (lml_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(7.5);
+    }
+    if (bha3d_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(8.5);
+    }
+  }
+}
 
 
 void
@@ -1037,8 +1124,8 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool ffy_fired = isFired("ffy");
     bool fyo_fired = isFired("fyo");
     bool fyb_fired = isFired("fyb");
-    bool bha2D_fired = isFired("BHA");
-    bool bha3D_fired = isFired("BHA3D");
+    bool bha2D_fired = isFired("bhabha");
+    bool bha3D_fired = isFired("bha3d");
     bool lml0_fired  = isFired("LML0");
     bool lml1_fired  = isFired("LML1");
     bool lml2_fired  = isFired("LML2");
@@ -1063,6 +1150,17 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool cdcecl2_fired = isFired("cdcecl2");
     bool cdcecl3_fired = isFired("cdcecl3");
     bool cdcecl4_fired = isFired("cdcecl4");
+    bool fso_fired = isFired("fso");
+    bool fsb_fired = isFired("fsb");
+    bool syo_fired = isFired("syo");
+    bool syb_fired = isFired("syb");
+    bool x_fired = isFired("x");
+    bool fioiecl1_fired = isFired("fioiecl1");
+    bool ecleklm1_fired = isFired("ecleklm1");
+    bool seklm1_fired = isFired("seklm1");
+    bool seklm2_fired = isFired("seklm2");
+    bool ieklm_fired = isFired("ieklm");
+    bool iecl_fired = isFired("iecl");
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
@@ -1250,7 +1348,42 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (cdcecl4_fired && lml_fired) {
       h_psn_extra[skim[ifill]]->Fill(61.5);
     }
+    if (fso_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(62.5);
+    }
+    if (fsb_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(63.5);
+    }
+    if (syo_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(64.5);
+    }
+    if (syb_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(65.5);
+    }
+    if (x_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(66.5);
+    }
+    if (fioiecl1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(67.5);
+    }
+    if (ecleklm1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(68.5);
+    }
+    if (seklm1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(69.5);
+    }
+    if (seklm2_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(70.5);
+    }
+    if (ieklm_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(71.5);
+    }
+    if (iecl_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(72.5);
+    }
   }
+
+
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
     //fill efficiency values
@@ -1350,7 +1483,12 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "lml2&(fff|ffo|ffb)", "lml3&(fff|ffo|ffb)", "lml4&(fff|ffo|ffb)", "lml5&(fff|ffo|ffb)", "lml6&(fff|ffo|ffb)", "lml7&(fff|ffo|ffb)", "lml8&(fff|ffo|ffb)", "lml9&(fff|ffo|ffb)", "lml10&(fff|ffo|ffb)", "lml12&(fff|ffo|ffb)",
   "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)", "mu_b2b&(fff|ffo|ffb)", "mu_eb2b&(fff|ffo|ffb)", "cdcklm1&(fff|ffo|ffb)", "cdcklm2&(fff|ffo|ffb)", "klm_hit&(fff|ffo|ffb)", "eklm_hit&(fff|ffo|ffb)", "mu_b2b&(lml|eclmumu)", "mu_eb2b&(lml|eclmumu)",
   "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
-  "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)"
+  "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)", "fso&(lml|eclmumu)", "fsb&(lml|eclmumu)", "syo&(lml|eclmumu)", "syb&(lml|eclmumu)", "x&(lml|eclmumu)", "fioiecl1&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "seklm1&(lml|eclmumu)",
+  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)"
+};
+
+const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {
+  "all", "cdc", "c4", "hie", "klm", "short", "ff30", "lml", "bha3D", "other"
 };
 
 const char* TRGGDLDQMModule::c_eff_shifter[n_eff_shifter] = {

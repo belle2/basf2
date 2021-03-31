@@ -3,7 +3,6 @@
 
 import sys
 import math
-import itertools
 import collections
 import array
 import numpy as np
@@ -14,7 +13,7 @@ import basf2
 
 from tracking.root_utils import root_cd, root_save_name
 
-from . import statistics
+from tracking.validation import statistics
 
 import logging
 
@@ -494,8 +493,6 @@ class ValidationPlot(object):
         # Introduce a dummy name for the temporary two dimensional histogram
         if quantiles is not None:
             name = "_" + self.name
-
-        is_expert = self.is_expert
 
         x_bins, y_bins = self.unpack_2d_param(bins)
         x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)
@@ -1118,7 +1115,7 @@ class ValidationPlot(object):
         x_taxis = tprofile.GetXaxis()
         n_bins = x_taxis.GetNbins()
 
-        bin_ids_with_underflow = list(range(n_bins + 1))
+        # bin_ids_with_underflow = list(range(n_bins + 1))
         bin_ids_without_underflow = list(range(1, n_bins + 1))
 
         bin_centers = np.array([x_taxis.GetBinCenter(i_bin) for i_bin in bin_ids_without_underflow])
@@ -1149,7 +1146,7 @@ class ValidationPlot(object):
         tprofile.GetStats(stats_values)
 
         sum_w = stats_values[0]
-        sum_w2 = stats_values[1]
+        # sum_w2 = stats_values[1]
         sum_wx = stats_values[2]
         sum_wx2 = stats_values[3]
         sum_wy = stats_values[4]
@@ -1915,7 +1912,7 @@ class ValidationPlot(object):
             n_bins = int(n_bins)
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % n_bins
                 raise ValueError(message)
 
         return n_bins, lower_bound, upper_bound
@@ -2180,7 +2177,7 @@ class ValidationPlot(object):
         combined_tf1.SetNDF(ndf)
 
         n_stats_parameters = additional_stats_tf1.GetNpar()
-        n_fit_parameters = fit_tf1.GetNpar()
+        # n_fit_parameters = fit_tf1.GetNpar()
         cls.copy_tf1_parameters(additional_stats_tf1, combined_tf1)
         cls.copy_tf1_parameters(fit_tf1, combined_tf1, offset=n_stats_parameters)
 
@@ -2211,8 +2208,8 @@ class ValidationPlot(object):
 
             # Workaround for a ROOT bug
             if i_target == -1:
-                for i_target in range(target_tf1.GetNpar()):
-                    if parameter_name == target_tf1.GetParName(i_target):
+                for i_target in range(tf1_target.GetNpar()):
+                    if parameter_name == tf1_target.GetParName(i_target):
                         break
                 else:
                     i_target = -1

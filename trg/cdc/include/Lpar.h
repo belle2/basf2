@@ -42,7 +42,7 @@ namespace Belle2 {
     virtual ~TRGCDCLpar();
 
     /// assignment operator(s)
-    inline const TRGCDCLpar& operator=(const TRGCDCLpar&);
+    inline TRGCDCLpar& operator=(const TRGCDCLpar&);
 
     /// member functions
     inline void neg();
@@ -77,7 +77,7 @@ namespace Belle2 {
     /// friend functions and classes
     friend class TRGCDCLpav;
     /// ostream operator
-    friend std::ostream& operator<<(std::ostream& o, TRGCDCLpar&);
+    friend std::ostream& operator<<(std::ostream& o, const TRGCDCLpar&);
     /// intersection
     friend int intersect(const TRGCDCLpar&, const TRGCDCLpar&, CLHEP::HepVector&, CLHEP::HepVector&);
 
@@ -205,7 +205,7 @@ namespace Belle2 {
     m_kappa = l.m_kappa;
   }
 
-  inline const TRGCDCLpar& TRGCDCLpar::operator=(const TRGCDCLpar& l)
+  inline TRGCDCLpar& TRGCDCLpar::operator=(const TRGCDCLpar& l)
   {
     if (this != &l) {
       m_alpha = l.m_alpha;

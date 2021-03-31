@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <fstream>
 #include <string>
@@ -165,8 +166,8 @@ void ClawsStudyModule::event()
       double tof = aHit->getTime(); //ns
 
       //h_clawss_Evtof1[detNB]->Fill(tof, Edep);
-      //if (pdg == 22) h_clawss_Evtof2[detNB]->Fill(tof, Edep);
-      //else if (fabs(pdg) == 11) h_clawss_Evtof3[detNB]->Fill(tof, Edep);
+      //if (pdg == Const::photon.getPDGCode()) h_clawss_Evtof2[detNB]->Fill(tof, Edep);
+      //else if (fabs(pdg) == Const::electron.getPDGCode()) h_clawss_Evtof3[detNB]->Fill(tof, Edep);
       //else h_clawss_Evtof4[detNB]->Fill(tof, Edep);
       if (Edep > m_Ethres) {
         //h_clawss_edep[detNB]->Fill(Edep);

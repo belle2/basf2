@@ -21,11 +21,8 @@
 # run_eclCosmicE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
 # them to an output file.
 
-import os
 import sys
-import glob
 import basf2 as b2
-from ROOT import Belle2
 from rawdata import add_unpackers
 
 

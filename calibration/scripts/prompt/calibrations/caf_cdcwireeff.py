@@ -2,9 +2,7 @@
 
 """CDC Wire Efficiency and BadWire creator. Creates layer-by-layer and wire-by-wire efficiencies and returns bad wire list"""
 
-import basf2
 from prompt import CalibrationSettings
-from prompt.utils import events_in_basf2_file
 from caf.framework import Calibration
 
 
@@ -29,9 +27,6 @@ def get_calibrations(input_data, **kwargs):
 
     max_files_per_run = 10
     min_events_per_file = 1000
-
-    max_events_per_calibration = 10000000
-    max_events_per_file = 10000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())

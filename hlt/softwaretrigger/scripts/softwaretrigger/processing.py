@@ -1,6 +1,5 @@
 import argparse
 import multiprocessing
-import sys
 
 import basf2
 import ROOT
@@ -10,7 +9,6 @@ from pxd import add_roi_payload_assembler, add_roi_finder
 
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from softwaretrigger import path_utils
-import reconstruction
 from geometry import check_components
 from rawdata import add_unpackers
 
@@ -56,7 +54,6 @@ def setup_basf2_and_db(zmq=False):
     args = parser.parse_args()
 
     # Local DB specification
-    basf2.reset_database()
     basf2.conditions.override_globaltags()
     if args.central_db_tag:
         for central_tag in args.central_db_tag:
@@ -134,10 +131,13 @@ def add_hlt_processing(path,
                        prune_output=True,
                        unpacker_components=None,
                        reco_components=None,
+                       create_hlt_unit_histograms=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """
+    path.add_module('StatisticsSummary').set_name('Sum_Wait')
+
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_HLT_COMPONENTS
     if reco_components is None:
@@ -154,21 +154,21 @@ def add_hlt_processing(path,
 
     # Add the geometry (if not already present)
     path_utils.add_geometry_if_not_present(path)
+    path.add_module('StatisticsSummary').set_name('Sum_Initialization')
 
     # Unpack the event content
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
+    path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
-    # Build up two paths: one for all accepted events...
+    # Build one path for all accepted events...
     accept_path = basf2.Path()
 
-    # ... and one for all dismissed events
-    discard_path = basf2.Path()
-
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, abort_path=discard_path, **kwargs)
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
 
     # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
+                           create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:
@@ -177,27 +177,30 @@ def add_hlt_processing(path,
 
         # There are two possibilities for the output of this module
         # (1) the event is dismissed -> only store the metadata
-        hlt_filter_module.if_value("==0", discard_path, basf2.AfterConditionPath.CONTINUE)
+        path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
+        accept_path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)
     else:
         basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
 
-    # For all dismissed events we set the HLTDiscard error flag and remove the data store content
-    discard_path.add_module("EventErrorFlag", errorFlag=ROOT.Belle2.EventMetaData.c_HLTDiscard)
-    path_utils.add_store_only_metadata_path(discard_path)
-
     # For accepted events we continue the reconstruction
     path_utils.add_post_filter_reconstruction(accept_path, run_type=run_type, components=reco_components)
 
     # Only create the ROIs for accepted events
     add_roi_finder(accept_path)
+    accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
-    path_utils.add_hlt_dqm(accept_path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.filtered)
+    path_utils.add_hlt_dqm(
+        accept_path,
+        run_type=run_type,
+        components=reco_components,
+        dqm_mode=constants.DQMModes.filtered,
+        create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
@@ -206,13 +209,16 @@ def add_hlt_processing(path,
     # However, if we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
+    path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events)
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
+                           create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if prune_output:
         # And in the end remove everything which should not be stored
         path_utils.add_store_only_rawdata_path(path)
+    path.add_module('StatisticsSummary').set_name('Sum_Close_Event')
 
 
 def add_expressreco_processing(path,

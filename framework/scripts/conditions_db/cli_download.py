@@ -14,7 +14,6 @@ import requests
 import shutil
 import fnmatch
 import re
-import sqlite3
 import functools
 import textwrap
 from urllib.parse import urljoin

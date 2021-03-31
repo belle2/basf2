@@ -134,16 +134,5 @@ namespace Belle2 {
     /** upper bound for truncated mean */
     double m_removeHighest;
 
-    /** saturation correction parameter: alpha */
-    double  m_alpha{ -1.};
-    /** saturation correction parameter: gamma */
-    double  m_gamma{ -1.};
-    /** saturation correction parameter: delta */
-    double  m_delta{ -1.};
-    /** saturation correction parameter: power on cos(theta) */
-    double  m_power{ -1.};
-    /** saturation correction parameter: ratio */
-    double  m_ratio{ -1.};
-
   };
 } // Belle2 namespace

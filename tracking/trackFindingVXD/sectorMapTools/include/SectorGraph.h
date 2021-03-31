@@ -209,7 +209,7 @@ namespace Belle2 {
 
       for (auto& subGraphEntry : m_subgraphs) {
         SubGraph<FilterType>& graph = subGraphEntry.second;
-        if (graph.getFound() <= absThreshold) {
+        if (int(graph.getFound()) <= absThreshold) {
           deadBranches.push_back(&graph);
         }
       }

@@ -14,7 +14,7 @@
 # (see python module)
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import sys
 
@@ -23,10 +23,10 @@ argvs = sys.argv
 if len(argvs) > 1:
     calChannel = int(argvs[1])
 
-B2RESULT('using calibration channel ' + str(calChannel))
+b2.B2RESULT('using calibration channel ' + str(calChannel))
 
 
-class SubtractCalSignal(Module):
+class SubtractCalSignal(b2.Module):
     ''' subtract time of the first calibration signal '''
 
     def event(self):
@@ -55,29 +55,29 @@ class SubtractCalSignal(Module):
             else:
                 digit.setHitQuality(0)
         if sum == 0:
-            B2ERROR("No calibration double pulses found in the event")
+            b2.B2ERROR("No calibration double pulses found in the event")
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Subtract time of the first calibration signal pulse
 main.add_module(SubtractCalSignal())
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 main.add_module(output)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

@@ -261,7 +261,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (!isDuplicate) {
         TLorentzVector p4CMS = T.rotateLabToCms() * part->get4Vector();
-        // it need to fill an std::vector of TVector3 to use the current FW rutines.
+        // it need to fill an std::vector of TVector3 to use the current FW routines.
         // It will hopefully change in release 3
         m_p4List.push_back(p4CMS);
         m_p3List.push_back(p4CMS.Vect());

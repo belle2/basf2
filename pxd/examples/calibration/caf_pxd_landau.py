@@ -38,32 +38,38 @@
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-
-import pickle
-import glob
-import os
+import argparse
+from caf.strategies import SequentialRunByRun
+from caf.utils import ExpRun, IoV
+from caf.backends import LSF
+from caf.framework import Calibration, CAF
+from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
+from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
+from ROOT.Belle2 import PXDGainCalibrationAlgorithm
 import ROOT
+import pickle
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
+
 ROOT.gROOT.SetBatch(True)
 
-from ROOT.Belle2 import PXDGainCalibrationAlgorithm
-from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
-from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
-from caf.framework import Calibration, CAF
-from caf import backends
-from caf.backends import LSF
-from caf.utils import ExpRun, IoV
-from caf.utils import get_iov_from_file
-from caf.utils import find_absolute_file_paths
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 
-import argparse
-parser = argparse.ArgumentParser(description="Compute gain correction maps for PXD from beam data")
-parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=20, type=int, help='Maximum number of subruns to use')
+parser = argparse.ArgumentParser(
+    description="Compute gain correction maps for PXD from beam data")
+parser.add_argument(
+    '--runLow',
+    default=0,
+    type=int,
+    help='Compute mask for specific IoV')
+parser.add_argument('--runHigh', default=-1, type=int,
+                    help='Compute mask for specific IoV')
+parser.add_argument(
+    '--expNo',
+    default=3,
+    type=int,
+    help='Compute mask for specific IoV')
+parser.add_argument('--maxSubRuns', default=20, type=int,
+                    help='Maximum number of subruns to use')
 args = parser.parse_args()
 
 
@@ -71,7 +77,11 @@ args = parser.parse_args()
 pxd_ignore_run_list = [ExpRun(3, 484), ExpRun(3, 485), ExpRun(3, 486), ExpRun(3, 524)]
 
 # Set the IoV range for this calibration
-iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
+iov_to_calibrate = IoV(
+    exp_low=args.expNo,
+    run_low=args.runLow,
+    exp_high=args.expNo,
+    run_high=args.runHigh)
 
 
 # Access files_to_iovs for beam runs
@@ -103,12 +113,13 @@ print('Number selected mc input files:  {}'.format(len(mc_input_files)))
 # HOTPIXEl CALIBRATION
 
 # Create and configure the collector and its pre collector path
-hotpixel_collector = register_module("PXDRawHotPixelMaskCollector")
+hotpixel_collector = b2.register_module("PXDRawHotPixelMaskCollector")
 hotpixel_collector.param("granularity", "run")
 
 # The pre collector path must contain geometry and unpacker
-pre_hotpixel_collector_path = create_path()
-pre_hotpixel_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
+pre_hotpixel_collector_path = b2.create_path()
+pre_hotpixel_collector_path.add_module(
+    "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_hotpixel_collector_path.add_module("Geometry", useDB=False)
 pre_hotpixel_collector_path.add_module('PXDUnpacker')
 pre_hotpixel_collector_path.add_module('PXDPostErrorChecker')
@@ -117,14 +128,23 @@ pre_hotpixel_collector_path.add_module('Progress')
 hotpixel_algo = PXDHotPixelMaskCalibrationAlgorithm()
 
 # We can play around with hotpixelkiller parameters
-hotpixel_algo.forceContinueMasking = False  # Continue masking even when few/no events were collected
-hotpixel_algo.minEvents = 10000             # Minimum number of collected events for masking
-hotpixel_algo.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
-hotpixel_algo.pixelMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
-hotpixel_algo.maskDrains = True             # Set True to allow masking of hot drain lines
-hotpixel_algo.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
-hotpixel_algo.maskRows = True               # Set True to allow masking of hot rows
-hotpixel_algo.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
+# Continue masking even when few/no events were collected
+hotpixel_algo.forceContinueMasking = False
+# Minimum number of collected events for masking
+hotpixel_algo.minEvents = 10000
+# Only consider dead pixel masking when median number of hits per pixel is
+# higher
+hotpixel_algo.minHits = 15
+# Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.pixelMultiplier = 7
+# Set True to allow masking of hot drain lines
+hotpixel_algo.maskDrains = True
+# Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.drainMultiplier = 7
+# Set True to allow masking of hot rows
+hotpixel_algo.maskRows = True
+# Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.rowMultiplier = 7
 
 # We want to use a specific collector collecting from raw hits
 hotpixel_algo.setPrefix("PXDRawHotPixelMaskCollector")
@@ -153,7 +173,7 @@ hotpixel_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
 
 
 # Create and configure the collector on beam data and its pre collector path
-charge_collector = register_module("PXDClusterChargeCollector")
+charge_collector = b2.register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
 charge_collector.param("minClusterCharge", 8)
 charge_collector.param("minClusterSize", 2)
@@ -163,8 +183,9 @@ charge_collector.param("nBinsV", 6)
 
 
 # The pre collector path on data
-pre_charge_collector_path = create_path()
-pre_charge_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
+pre_charge_collector_path = b2.create_path()
+pre_charge_collector_path.add_module(
+    "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_charge_collector_path.add_module("Geometry", useDB=False)
 pre_charge_collector_path.add_module("ActivatePXDPixelMasker")
 pre_charge_collector_path.add_module("PXDUnpacker")
@@ -176,9 +197,12 @@ pre_charge_collector_path.add_module("PXDClusterizer")
 landau_algo = PXDChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
-landau_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
-landau_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
-landau_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
+# Minimum number of collected clusters for estimating gains
+landau_algo.minClusters = 5000
+# Artificial noise sigma for smearing cluster charge
+landau_algo.noiseSigma = 0.6
+# Force continue algorithm instead of c_notEnoughData
+landau_algo.forceContinue = False
 landau_algo.strategy = 1	    # 0: medians, 1: landau fit
 # We want to use a specific collector
 landau_algo.setPrefix("PXDClusterChargeCollector")
@@ -207,7 +231,7 @@ charge_cal.use_central_database("Calibration_Offline_Development")
 
 # gain calibration on mc
 
-gain_collector = register_module("PXDClusterChargeCollector")
+gain_collector = b2.register_module("PXDClusterChargeCollector")
 gain_collector.param("granularity", "run")
 gain_collector.param("minClusterCharge", 8)
 gain_collector.param("minClusterSize", 2)
@@ -216,8 +240,9 @@ gain_collector.param("nBinsU", 4)
 gain_collector.param("nBinsV", 6)
 
 # The pre collector path on mc files
-pre_gain_collector_path = create_path()
-pre_gain_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
+pre_gain_collector_path = b2.create_path()
+pre_gain_collector_path.add_module(
+    "Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_gain_collector_path.add_module("Geometry", useDB=False)
 pre_gain_collector_path.add_module("PXDDigitizer")
 pre_gain_collector_path.add_module("PXDClusterizer")
@@ -227,9 +252,12 @@ pre_gain_collector_path.add_module("PXDClusterizer")
 gain_algo = PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
-gain_algo.minClusters = 3000      # Minimum number of collected clusters for estimating gains
-gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
-gain_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
+# Minimum number of collected clusters for estimating gains
+gain_algo.minClusters = 3000
+# Artificial noise sigma for smearing cluster charge
+gain_algo.noiseSigma = 0.6
+# Force continue algorithm instead of c_notEnoughData
+gain_algo.forceContinue = False
 gain_algo.strategy = 1		 # 0: median, 1: landau fit
 # We want to use a specific collector
 gain_algo.setPrefix("PXDClusterChargeCollector")
@@ -269,5 +297,6 @@ cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
 # cal_fw.backend = backends.Local(max_processes=20)
 cal_fw.backend = LSF()
-cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(args.runLow, args.runHigh, args.expNo)
+cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(
+    args.runLow, args.runHigh, args.expNo)
 cal_fw.run(iov=iov_to_calibrate)

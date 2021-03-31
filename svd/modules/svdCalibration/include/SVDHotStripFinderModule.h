@@ -66,9 +66,9 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data store array*/
     std::string m_rootFileName;   /**< root file name */
     std::string m_ShaperDigitName; /**< shaper digits name*/
-    float m_thr;
-    int m_base;
-    bool m_useHSFinderV1 = true;
+    float m_thr; /**< threshold */
+    int m_base; /**< base */
+    bool m_useHSFinderV1 = true; /**< use V1 finder */
     float m_absThr; /**< Absolute Occupancy Threshold cut for Hot strip finder*/
     float m_relOccPrec; /**< Relative precision on occupancy which is defined to be negligible for the hit background rate estimate. */
     bool m_verbose; /**< False by default, it allows to switch on the printing of all found HS.*/
@@ -81,13 +81,13 @@ namespace Belle2 {
     int m_firstExp; /**< first valid experiment */
     int m_firstRun; /**< first valid run */
     int m_lastExp; /**< last valid experiment */
-    int m_lastRun; /**<last valid run */
+    int m_lastRun; /**< last valid run */
 
 
-    static const int m_nLayers = 4;// to avoid empty layers we start from 0
-    static const int m_nLadders = 16;
-    static const int m_nSensors = 5;
-    static const int m_nSides = 2;
+    static const int m_nLayers = 4; /**< number of layers*/
+    static const int m_nLadders = 16; /**< max number of ladders*/
+    static const int m_nSensors = 5; /**< max number of sensors*/
+    static const int m_nSides = 2; /**< number of sides*/
 
     TList* m_histoList_occu = nullptr;/**< occupancy for low charge clusters */
 
@@ -98,9 +98,9 @@ namespace Belle2 {
     SVDHistograms<TH1F>* hm_occHot = nullptr; /**< occupancy distribution - hot strips*/
     SVDHistograms<TH1F>* hm_occAfter = nullptr; /**< occupancy distribution - not hot strips*/
 
-    SVDHistograms<TH1F>* hm_dist = nullptr;
-    SVDHistograms<TH1F>* hm_dist1 = nullptr;
-    SVDHistograms<TH2F>* hm_dist12 = nullptr;
+    SVDHistograms<TH1F>* hm_dist = nullptr; /**< occupancy histograms*/
+    SVDHistograms<TH1F>* hm_dist1 = nullptr; /**< true occupancy histograms*/
+    SVDHistograms<TH2F>* hm_dist12 = nullptr; /**< true occupancy VS sensor histograms*/
 
     SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */
 
@@ -112,21 +112,21 @@ namespace Belle2 {
     TH1F*  h_nevents = nullptr;  /**< number of events counting */
 
 
-    //list of functions to create histograms:
+    /** create 1D histograms */
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
-    //HSFinder algorithm (L&G)
+                            const char* xtitle, TList* histoList = nullptr);
 
-    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips);
-
+    /** create 2D histograms */
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = nullptr);  /**< thf */
 
-  protected:
-    //definition of input parameters
+    /** return true if the strip is hot */
+    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips);
+
+
 
   };
 }

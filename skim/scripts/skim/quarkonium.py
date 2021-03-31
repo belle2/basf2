@@ -11,12 +11,13 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu, stdPi
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -167,20 +168,83 @@ class CharmoniumPsi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
+    validation_sample = _VALIDATION_SAMPLE
+
     def load_standard_lists(self, path):
-        stdE("loosepid", path=path)
-        stdMu("loosepid", path=path)
+        stdE('loosepid', path=path)
+        stdMu('loosepid', path=path)
+        stdPhotons('all', path=path)
 
     def build_lists(self, path):
 
+        # Mass cuts.
+        jpsi_mass_cut = '2.85 < M < 3.3'
+        psi2s_mass_cut = '3.45 < M < 3.9'
+
+        # Electrons with bremsstrahlung correction.
+        # Use both correction algorithms as well as uncorrected electrons
+        # to allow for algorithm comparison in analysis.
+        # The recommeneded list for further reconstruction is J/psi:eebrems.
+        # The estimated ratio of efficiencies in B decays in release 5.1.5 is
+        # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid', 'gamma:all',
+                             minimumEnergy=0.001, angleThreshold=0.05,
+                             path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid', 'gamma:all', path=path)
+
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay("J/psi:ee -> e+:loosepid e-:loosepid",
-                            "2.7 < M < 4", path=path)
-        ma.reconstructDecay("J/psi:mumu -> mu+:loosepid mu-:loosepid",
-                            "2.7 < M < 4", path=path)
+        ma.reconstructDecay('J/psi:ee -> e+:loosepid e-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):ee -> e+:loosepid e-:loosepid',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems -> e+:brems e-:brems',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:eebrems2 -> e+:brems2 e-:brems2',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:mumu -> mu+:loosepid mu-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):mumu -> mu+:loosepid mu-:loosepid',
+                            psi2s_mass_cut, path=path)
 
         # Return the lists.
-        self.SkimLists = ["J/psi:ee", "J/psi:mumu"]
+        self.SkimLists = ['J/psi:ee', 'psi(2S):ee',
+                          'J/psi:eebrems', 'psi(2S):eebrems',
+                          'J/psi:eebrems2', 'psi(2S):eebrems2',
+                          'J/psi:mumu', 'psi(2S):mumu']
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
+        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid e-:loosepid', '', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
+
+        # Print histograms.
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='J/psi:ll',
+            variables_1d=[(
+                'InvM', 65, 2.7, 4.0,
+                'J/#psi mass',
+                __liaison__,
+                'J/psi mass',
+                'J/psi peak is seen.',
+                'M [GeV/c^{2}]', 'Events / (20 MeV/c^{2})',
+                'shifter'
+            )],
+            path=path
+        )
 
 
 @fancy_skim_header

@@ -8,7 +8,6 @@
 ########################################################
 
 from basf2 import *
-from ROOT import Belle2
 from beamparameters import add_beamparameters
 
 set_random_seed(12345)
@@ -27,11 +26,11 @@ beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
 kkgeninput = register_module('KKGenInput')
-kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/tauola_orig.input.dat'))
-kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-# kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat'))
+kkgeninput.param('tauinputFile', find_file('data/generators/kkmc/tauola_orig.input.dat'))
+kkgeninput.param('KKdefaultFile', find_file('data/generators/kkmc/KK2f_defaults.dat'))
+# kkgeninput.param('taudecaytableFile', find_file('data/generators/kkmc/tau_decaytable.dat'))
 # above line makes decay table to be read by Pythia; uncomment next line to make tau decay table to be read by Tauola
-kkgeninput.param('taudecaytableFile', ' ')
+kkgeninput.param('taudecaytableFile', '')
 kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau_orig.txt')
 
 # run

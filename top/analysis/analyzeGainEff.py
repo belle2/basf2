@@ -6,9 +6,8 @@
 # Usage: basf2 analyzeGainEff.py <input_file.sroot> --arg --slot (slotNum) --arg --PMT (PMTNum)
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 import sys
-import os
 import argparse
 import re
 
@@ -136,9 +135,9 @@ if HVHigherSetting and HVLowerSetting:
     sys.exit()
 
 # data base
-reset_database()
+b2.reset_database()
 path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855_AfterRelease01/localDB/"
-use_local_database(path_to_db + '/localDB.txt', path_to_db)
+b2.use_local_database(path_to_db + '/localDB.txt', path_to_db)
 
 inputBase = inputFiles[0] if not skipFirst else interimRoot
 dotPos = inputBase.rfind('.')
@@ -150,11 +149,11 @@ elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inpu
     isGlobalDAQ = True
     outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
 
-if interimRoot is "NoInterimRootFile":
+if interimRoot == "NoInterimRootFile":
     interimRoot = outputBase + "_gain_histo.root"
-if outputRoot is "NoOutputRootFile":
+if outputRoot == "NoOutputRootFile":
     outputRoot = outputBase + "_gain_" + pmtStr + ".root"
-if outputPDF is "NoOutputPDFFile":
+if outputPDF == "NoOutputPDFFile":
     outputPDF = outputBase + "_" + pmtStr
 
 if isGlobalDAQForced and (not isPocketDAQForced):
@@ -181,35 +180,35 @@ print("start process...")
 
 if not skipFirst:
     # Define a global tag
-    use_central_database('data_reprocessing_proc8')
+    b2.use_central_database('data_reprocessing_proc8')
 
     # Create path
-    first = create_path()
+    first = b2.create_path()
 
-    srootInput = register_module('SeqRootInput')
+    srootInput = b2.register_module('SeqRootInput')
     srootInput.param('inputFileNames', inputFiles)
     first.add_module(srootInput)
 
     # HistoManager
-    histoman = register_module('HistoManager')
+    histoman = b2.register_module('HistoManager')
     histoman.param('histoFileName', interimRoot)
     first.add_module(histoman)
 
     # conversion from RawCOPPER or RawDataBlock to RawDetector objects
     if not isGlobalDAQ:
-        converter = register_module('Convert2RawDet')
+        converter = b2.register_module('Convert2RawDet')
         first.add_module(converter)
 
     # geometry parameters
-    gearbox = register_module('Gearbox')
+    gearbox = b2.register_module('Gearbox')
     first.add_module(gearbox)
 
     # Geometry (only TOP needed)
-    geometry = register_module('Geometry')
+    geometry = b2.register_module('Geometry')
     first.add_module(geometry)
 
     # Unpacking
-    unpack = register_module('TOPUnpacker')
+    unpack = b2.register_module('TOPUnpacker')
     if isInterimFW:
         unpack.param('swapBytes', True)
         unpack.param('dataFormat', 0x0301)
@@ -217,11 +216,11 @@ if not skipFirst:
 
     # Add multiple hits by running feature extraction offline
     if not isOfflineFEDisabled:
-        featureExtractor = register_module('TOPWaveformFeatureExtractor')
+        featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
         first.add_module(featureExtractor)
 
     # Convert to TOPDigits
-    converter = register_module('TOPRawDigitConverter')
+    converter = b2.register_module('TOPRawDigitConverter')
     converter.param('useSampleTimeCalibration', False)
     converter.param('useChannelT0Calibration', False)
     converter.param('useModuleT0Calibration', False)
@@ -233,12 +232,12 @@ if not skipFirst:
     converter.param('calpulseWidthMax', 2.4)  # in [ns]
     first.add_module(converter)
 
-    flagSetter = register_module('TOPXTalkChargeShareSetter')
+    flagSetter = b2.register_module('TOPXTalkChargeShareSetter')
     flagSetter.param('sumChargeShare', sumChargeShare)
     flagSetter.param('timeCut', timeCut)  # in [nsec]
     first.add_module(flagSetter)
 
-    laserHitSelector = register_module('TOPLaserHitSelector')
+    laserHitSelector = b2.register_module('TOPLaserHitSelector')
     laserHitSelector.param('useDoublePulse', (not useSingleCalPulse))
     laserHitSelector.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
     laserHitSelector.param('minHeightSecondCalPulse', 100)  # in [ADC counts]
@@ -251,27 +250,27 @@ if not skipFirst:
     first.add_module(laserHitSelector)
 
     # Print progress
-    progress = register_module('Progress')
+    progress = b2.register_module('Progress')
     first.add_module(progress)
 
     # Process events
-    process(first)
+    b2.process(first)
 
 if not skipSecond:
     # second process
     print("start the second process...")
-    second = create_path()
+    second = b2.create_path()
 
-    eventinfosetter = register_module('EventInfoSetter')
+    eventinfosetter = b2.register_module('EventInfoSetter')
     eventinfosetter.param('evtNumList', [1])
     second.add_module(eventinfosetter)
 
     # HistoManager
-    histoman2 = register_module('HistoManager')
+    histoman2 = b2.register_module('HistoManager')
     histoman2.param('histoFileName', outputRoot)
     second.add_module(histoman2)
 
-    analysis = register_module('TOPGainEfficiencyCalculator')
+    analysis = b2.register_module('TOPGainEfficiencyCalculator')
     analysis.param('inputFile', interimRoot)
     analysis.param('outputPDFFile', outputPDF)
     analysis.param('targetSlotId', slotId)
@@ -281,7 +280,7 @@ if not skipSecond:
     analysis.param('fitoption', fitOption)
     second.add_module(analysis)
 
-    process(second)
+    b2.process(second)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

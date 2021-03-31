@@ -19,15 +19,11 @@
 ###########################################################################################
 
 
-from basf2 import B2INFO, B2FATAL
+from basf2 import B2FATAL
 import ROOT
-import numpy as np
-import pylab
 import sys
 import glob
 import math
-import random
-import array
 from operator import itemgetter
 
 if len(sys.argv) != 4:

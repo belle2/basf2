@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
+from basf2 import conditions as b2conditions
 
 numEvents = 2000
 
-main = create_path()
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-set_random_seed(1)
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+b2.set_random_seed(1)
+
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
@@ -20,11 +23,11 @@ main.add_module('EvtGenInput')
 main.add_module('Gearbox')
 
 # detector geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # event T0 jitter simulation
-eventt0 = register_module('EventT0Generator')
+eventt0 = b2.register_module('EventT0Generator')
 eventt0.param('coreGaussWidth', 10.0)  # 10 sigma of core gaussian [ns]
 # eventt0.param('fixedT0', nan)  If set, a fixed event t0 is used instead of simulating the bunch timing.
 eventt0.param('tailGaussFraction', 0.0)  # 0 fraction (by area) of tail gaussian
@@ -38,22 +41,22 @@ main.add_module('FullSim')
 # main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
 
 # SVD simulation
-svdevtinfoset = register_module("SVDEventInfoSetter")
+svdevtinfoset = b2.register_module("SVDEventInfoSetter")
 main.add_module(svdevtinfoset)
 
-digitizer = register_module('SVDDigitizer')
-digitizer.param('statisticsFilename', "digitizer_debug2020.root")
+digitizer = b2.register_module('SVDDigitizer')
+digitizer.param('statisticsFilename', "digitizer_test2021_1_hwclock.root")
 digitizer.param('storeWaveforms', True)
-digitizer.param('signalsList', "digitizer_debug2020.txt")
-digitizer.set_log_level(LogLevel.DEBUG)
+digitizer.param('signalsList', "digitizer_test2021_1_hwclock.txt")
+digitizer.set_log_level(b2.LogLevel.DEBUG)
 digitizer.set_debug_level(30)
 main.add_module(digitizer)
 
 main.add_module('RootOutput')
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

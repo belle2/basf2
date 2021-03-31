@@ -6,7 +6,7 @@
 # Usage: basf2 makeTOPDigitNtuple.py <input_file.sroot>
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 import sys
 import argparse
 import re
@@ -83,10 +83,10 @@ if calCh < 0 or calCh > 7:
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
     outputRoot = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+", inputFile):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics|hlttest)\.[0-9]+\.[0-9]+", inputFile):
     isGlobalDAQ = True
     outputRoot = re.search(
-        r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+",
+        r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics|hlttest)\.[0-9]+\.[0-9]+",
         inputFile).group() + "_ntuple.root"
 else:
     outputRoot = inputFile + "_ntuple.root"
@@ -112,30 +112,30 @@ print()
 print("start process...")
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 roinput.param('inputFileName', inputFile)
 main.add_module(roinput)
 
 # HistoManager
-histoman = register_module('HistoManager')
+histoman = b2.register_module('HistoManager')
 histoman.param('histoFileName', outputRoot)
 main.add_module(histoman)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
 if not isGlobalDAQ:
-    converter = register_module('Convert2RawDet')
+    converter = b2.register_module('Convert2RawDet')
     main.add_module(converter)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 if isInterimFE:  # need to be tested
     unpack.param('swapBytes', True)
     unpack.param('dataFormat', 0x0301)
@@ -143,13 +143,13 @@ main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
 if not isOfflineFEDisabled:
-    featureExtractor = register_module('TOPWaveformFeatureExtractor')
+    featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
     featureExtractor.param('threshold', heightThreshold)
     featureExtractor.param('hysteresis', TMath.CeilNint(heightThreshold * 0.4 - 0.00001))
     main.add_module(featureExtractor)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -164,10 +164,10 @@ converter.param('calpulseWidthMin', 1.2)  # in [ns]
 converter.param('calpulseWidthMax', 2.8)  # in [ns]
 main.add_module(converter)
 
-xtalk = register_module('TOPXTalkChargeShareSetter')
+xtalk = b2.register_module('TOPXTalkChargeShareSetter')
 main.add_module(xtalk)
 
-ntuple = register_module('TOPInterimFENtuple')
+ntuple = b2.register_module('TOPInterimFENtuple')
 ntuple.param('saveWaveform', (args.saveWaveform))
 if isInterimFE:
     ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
@@ -184,14 +184,14 @@ ntuple.param('timePerWin', 23.581939)  # in [ns]
 main.add_module(ntuple)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)
 
 if isInterimFE and not args.skipPlot:
     plotInterimFEDataNtupleSummary(outputRoot, 2, isOfflineFEDisabled)

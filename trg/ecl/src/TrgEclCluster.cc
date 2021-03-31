@@ -155,7 +155,7 @@ TrgEclCluster::getFwICNCluster(int ICNId, int location)
 //
 //
 void
-TrgEclCluster::setICN(std::vector<int> tcid)
+TrgEclCluster::setICN(const std::vector<int>& tcid)
 {
   TCId = tcid ;
   _Quadrant.clear();
@@ -174,9 +174,9 @@ TrgEclCluster::setICN(std::vector<int> tcid)
   return;
 }
 void
-TrgEclCluster::setICN(std::vector<int> tcid,
-                      std::vector<double> tcenergy,
-                      std::vector<double> tctiming)
+TrgEclCluster::setICN(const std::vector<int>& tcid,
+                      const std::vector<double>& tcenergy,
+                      const std::vector<double>& tctiming)
 {
   TCId = tcid ;
   Energy = tcenergy;
@@ -299,6 +299,7 @@ void TrgEclCluster::setBarrelICN(int Method)
     }
     if (iii > 11 && iii < 420) {
       tc_upper      = TCFire[iii - 12] ;
+      // cppcheck-suppress negativeContainerIndex
       tc_upper_right = TCFire[iii - 13] ;
       tc_right      = TCFire[iii - 1] ;
       tc_lower_right = TCFire[iii + 11] ;
@@ -324,6 +325,7 @@ void TrgEclCluster::setBarrelICN(int Method)
       tc_upper      = TCFire[iii - 12] ;
       tc_upper_right = TCFire[iii - 13] ;
       tc_right      = TCFire[iii - 1] ;
+      // cppcheck-suppress negativeContainerIndex
       tc_lower_right = TCFire[iii - 421] ;
       tc_lower      = TCFire[iii - 420] ;
       tc_lower_left = TCFire[iii  - 419];
@@ -400,6 +402,7 @@ void TrgEclCluster::setBarrelICN(int Method)
           if (maxTCid > 92 && maxTCid < 501) {
 
             TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
+            // cppcheck-suppress negativeContainerIndex
             TempCluster[2] = TCFire[maxTCid - 13 - 81] ;
             TempCluster[3] = TCFire[maxTCid - 1 - 81] ;
             TempCluster[4] = TCFire[maxTCid + 11 - 81] ;
@@ -427,6 +430,7 @@ void TrgEclCluster::setBarrelICN(int Method)
             TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
             TempCluster[2] = TCFire[maxTCid - 13 - 81] ;
             TempCluster[3] = TCFire[maxTCid - 1 - 81] ;
+            // cppcheck-suppress negativeContainerIndex
             TempCluster[4] = TCFire[maxTCid - 421 - 81] ;
             TempCluster[5] = TCFire[maxTCid - 420 - 81] ;
             TempCluster[6] = TCFire[maxTCid - 419 - 81] ;
@@ -1449,6 +1453,7 @@ TrgEclCluster::setBarrelICN()
     }
     if (iii > 11 && iii < 420) {
       tc_upper      = TCFire[iii - 12] ;
+      // cppcheck-suppress negativeContainerIndex
       tc_upper_right = TCFire[iii - 13] ;
       tc_right      = TCFire[iii - 1] ;
       tc_lower_right = TCFire[iii + 11] ;
@@ -1474,6 +1479,7 @@ TrgEclCluster::setBarrelICN()
       tc_upper      = TCFire[iii - 12] ;
       tc_upper_right = TCFire[iii - 13] ;
       tc_right      = TCFire[iii - 1] ;
+      // cppcheck-suppress negativeContainerIndex
       tc_lower_right = TCFire[iii - 421] ;
       tc_lower      = TCFire[iii - 420] ;
       tc_lower_left = TCFire[iii  - 419];

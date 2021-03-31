@@ -153,10 +153,10 @@ int RawCOPPERFormat::GetEventCRC16Value(int n, int finesse_num)
   return -1;
 }
 
-int* RawCOPPERFormat::PackDetectorBuf(int* packed_buf_nwords,
-                                      int* const(&detector_buf_ch)[MAX_PCIE40_CH],
-                                      int const(&nwords_ch)[MAX_PCIE40_CH],
-                                      RawCOPPERPackerInfo rawcpr_info)
+int* RawCOPPERFormat::PackDetectorBuf(int* /*packed_buf_nwords*/,
+                                      int* const(& /*detector_buf_ch*/)[MAX_PCIE40_CH],
+                                      int const(& /*nwords_ch*/)[MAX_PCIE40_CH],
+                                      RawCOPPERPackerInfo /*rawcpr_info*/)
 {
   char err_buf[500];
   sprintf(err_buf,
@@ -167,8 +167,8 @@ int* RawCOPPERFormat::PackDetectorBuf(int* packed_buf_nwords,
   return NULL;
 }
 
-void RawCOPPERFormat::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH],
-                                         std::vector<std::vector<unsigned int> >& result)
+void RawCOPPERFormat::CompareHeaderValue(int /*n*/, const unsigned int (& /*input_val*/)[MAX_PCIE40_CH],
+                                         std::vector<std::vector<unsigned int> >& /*result*/)
 {
   char err_buf[500];
   sprintf(err_buf,

@@ -15,6 +15,9 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/FitStatus.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/gearbox/Const.h>
 #include <root/TVector3.h>
 #include <limits>
 
@@ -27,6 +30,14 @@ namespace Belle2 {
     explicit RecoTrackExtractor(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
+      addVariable(prefix + "pdg_ID", variableSet);
+      addVariable(prefix + "pdg_ID_Mother", variableSet);
+      addVariable(prefix + "is_Vzero_Daughter", variableSet);
+      addVariable(prefix + "is_Primary", variableSet);
+
+      addVariable(prefix + "z0", variableSet);
+      addVariable(prefix + "d0", variableSet);
+
       addVariable(prefix + "seed_Charge", variableSet);
 
       addVariable(prefix + "seed_Pos_Pt", variableSet);
@@ -71,6 +82,39 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(const RecoTrack& recoTrack)
     {
+      float pdgID = 0;
+      float pdgIDMother = 0;
+      float isVzeroDaughter = -1;
+      float isPrimary = -1;
+      auto mcparticle = recoTrack.getRelated<MCParticle>();
+      if (mcparticle) {
+        pdgID = static_cast<float>(mcparticle->getPDG());
+        pdgIDMother = static_cast<float>(mcparticle->getMother()->getPDG());
+        isPrimary = static_cast<float>(mcparticle->isPrimaryParticle());
+        if (abs(pdgIDMother) == 310 || abs(pdgIDMother) == 3122) {
+          isVzeroDaughter = 1;
+        } else {
+          isVzeroDaughter = 0;
+        }
+      }
+      float z0 = -999;
+      float d0 = -999;
+      auto genfitTrack = recoTrack.getRelated<Track>("MDSTTracks");
+      if (genfitTrack) {
+        auto trackFitResult = genfitTrack->getTrackFitResultWithClosestMass(Const::pion);
+        if (trackFitResult) {
+          z0 = trackFitResult->getZ0();
+          d0 = trackFitResult->getD0();
+        }
+      }
+      m_variables.at(m_prefix + "pdg_ID") = pdgID;
+      m_variables.at(m_prefix + "pdg_ID_Mother") = pdgIDMother;
+      m_variables.at(m_prefix + "is_Vzero_Daughter") = isVzeroDaughter;
+      m_variables.at(m_prefix + "is_Primary") = isPrimary;
+
+      m_variables.at(m_prefix + "z0") = z0;
+      m_variables.at(m_prefix + "d0") = d0;
+
       m_variables.at(m_prefix + "seed_Charge") = recoTrack.getChargeSeed();
 
       m_variables.at(m_prefix + "seed_Pos_Pt") = recoTrack.getPositionSeed().Pt();

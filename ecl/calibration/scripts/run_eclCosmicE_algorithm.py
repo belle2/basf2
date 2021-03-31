@@ -11,11 +11,8 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-import os
 import sys
 import glob
-from basf2 import *
-import ROOT
 from ROOT import Belle2
 
 # Run algorithm part of the eclCosmicE calibration, which calibrates the single crystal

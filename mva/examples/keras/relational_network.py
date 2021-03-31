@@ -8,21 +8,14 @@
 # If you want to try out relational networks to your problem, feel free to import the two classes in your code.
 
 from basf2_mva_python_interface.contrib_keras import State
-import h5py
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
 
-from keras.layers import Input, Dense, Concatenate, Flatten, Dropout, GlobalAveragePooling1D
-from keras.layers.merge import Average
+from keras.layers import Dense, GlobalAveragePooling1D, Input
 from keras.layers.core import Reshape
-from keras.layers import activations
-from keras.models import Model, load_model
+from keras.models import Model
 from keras.optimizers import adam
-from keras.losses import binary_crossentropy, mean_squared_error
+from keras.losses import binary_crossentropy
 from keras.activations import sigmoid, tanh
-from keras.engine.topology import Layer
-from keras import backend as K
 from keras.callbacks import Callback, EarlyStopping
 import numpy as np
 
@@ -97,9 +90,7 @@ if __name__ == "__main__":
     from root_pandas import to_root
     import tempfile
     import json
-    import numpy as np
 
-    import basf2
     import basf2_mva
     import basf2_mva_util
     from basf2 import conditions

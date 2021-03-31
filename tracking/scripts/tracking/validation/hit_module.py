@@ -1,22 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import collections
 import numpy as np
 
-# Need for B2WARNING for some reason
-import inspect
-
-from .pull import PullAnalysis
-from .fom import (
+from tracking.validation.fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
 )
 
-from .module import (
+from tracking.validation.module import (
     AlwaysPassFilter,
-    getHelixFromMCParticle,
     TrackingValidationModule
 )
 
@@ -220,8 +214,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             # this is not very efficient...
             list_of_connected_mc_tracks = set()
             list_of_numbers_of_hits_for_connected_tracks = collections.deque()
-            number_of_connected_tracks = 0
-            number_of_wrong_hits = 0
+            # number_of_connected_tracks = 0
+            # number_of_wrong_hits = 0
 
             for mcTrackCand in mcTrackCands:
                 mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]

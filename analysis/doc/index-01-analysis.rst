@@ -8,6 +8,8 @@ The analysis package collects modules and tools for high-level analysis of Belle
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
 With these particle decay candidates, you can use high level tools such as :doc:`TreeFitter`, :doc:`FlavorTagger`, and the :doc:`FullEventInterpretation` (FEI).
 
+.. tip:: For a series of hands-on introductory lessons, take a look at :numref:`onlinebook_basf2`.
+
 The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
 Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
 
@@ -15,15 +17,17 @@ Examples of analysis steering files can be found in tutorial directory of analys
 
         ls $BELLE2_RELEASE_DIR/analysis/examples/tutorials
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
 
-.. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
+.. _Particle: https://software.belle2.org/|release|/classBelle2_1_1Particle.html
 
+
+.. _analysis_particles:
 
 Particles
 =========
 
-Particles in basf2 are created from mdst dataobjects: Tracks, tracking vertices (V0s) ECLClusters, and KLMClusters. 
+Particles in basf2 are created from reconstructed dataobjects: Tracks, tracking vertices (V0s), ECLClusters, and KLMClusters. 
 The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as phsical particles.
 All of the `Particle`_ s in an event that fall within certain criteria are collected into `ParticleList`_ s.
 
@@ -80,6 +84,14 @@ You can save information from analysis jobs directly from the ``VariableManager`
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
+
+(Advanced) user mDST files
+--------------------------
+
+You can also save events to your own mDST or user-defined dst (uDST) output files.
+These files are also created by the :ref:`skim` but the functional code is part of :ref:`analysis`.
+
+.. toctree:: UdstOutput
 
 Event-based analysis
 ====================

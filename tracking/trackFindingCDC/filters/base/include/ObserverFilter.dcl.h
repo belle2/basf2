@@ -38,9 +38,9 @@ namespace Belle2 {
        *  Function to evaluate the object.
        *  Base implementation rejects all objects.
        *
-       *  @param obj The object to be accepted or rejected.
-       *  @return    A finit float value if the object is accepted.
-       *             NAN if the object is rejected.
+       *  @param object The object to be accepted or rejected.
+       *  @return       A finit float value if the object is accepted.
+       *                NAN if the object is rejected.
        */
       Weight operator()(const Object& object) override;
 

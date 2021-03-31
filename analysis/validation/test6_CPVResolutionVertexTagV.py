@@ -80,7 +80,7 @@ for VXDReq in VXDReqs:
     B0_TruthTagVz = ROOT.RooRealVar("mcTagVz", "mcTagVz", 0., -100, 100, "cm")
 
     B0_Z = ROOT.RooRealVar("z", "z", 0., -100, 100, "cm")
-    B0_TruthZ = ROOT.RooRealVar("mcZ", "mcZ", 0., -100, 100, "cm")
+    B0_TruthZ = ROOT.RooRealVar("mcDecayVertexZ", "mcDecayVertexZ", 0., -100, 100, "cm")
 
     B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_nPXDHits", "Jpsi_mu_0_nPXDHits", 0., -10., 100.)
     B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_1_nPXDHits", "Jpsi_mu_1_nPXDHits", 0., -10., 100.)
@@ -119,7 +119,7 @@ for VXDReq in VXDReqs:
 
     tdat.Draw("DeltaT - mcDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
-    tdat.Draw("z - mcZ >> B0_DeltaZsig_" + VXDReq, cut)
+    tdat.Draw("z - mcDecayVertexZ >> B0_DeltaZsig_" + VXDReq, cut)
     tdat.Draw("TagVz - mcTagVz >> B0_DeltaZtag_" + VXDReq, cut)
 
     # Validation Plot 1
@@ -252,7 +252,7 @@ for VXDReq in VXDReqs:
             DT.setVal(tDT)
             fitDataDT.add(ROOT.RooArgSet(DT))
 
-        tDSigZ = row.getRealValue("z", 0, ROOT.kTRUE) - row.getRealValue("mcZ", 0, ROOT.kTRUE)
+        tDSigZ = row.getRealValue("z", 0, ROOT.kTRUE) - row.getRealValue("mcDecayVertexZ", 0, ROOT.kTRUE)
 
         if abs(tDSigZ) < limZSig:
             DSigZ.setVal(tDSigZ)

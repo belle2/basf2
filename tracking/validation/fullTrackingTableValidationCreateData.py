@@ -13,7 +13,7 @@ import basf2
 from ROOT import Belle2
 
 import tracking
-from tracking.harvest.peelers import peel_reco_track_hit_content, peel_mc_particle, peel_fit_status
+from tracking.harvest.peelers import peel_mc_particle, peel_reco_track_hit_content
 
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
@@ -46,7 +46,7 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         """
         this_best_track_cdc = self.mc_track_matcher_cdc.getMatchedPRRecoTrack(mc_track)
         this_best_track_vxd = self.mc_track_matcher_vxd.getMatchedPRRecoTrack(mc_track)
-        reco_track = self.mc_track_matcher.getMatchedPRRecoTrack(mc_track)
+        # reco_track = self.mc_track_matcher.getMatchedPRRecoTrack(mc_track)
 
         mc_particle = mc_track.getRelated("MCParticles")
 

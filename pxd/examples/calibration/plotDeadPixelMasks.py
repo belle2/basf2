@@ -15,9 +15,7 @@
 #
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
-import os
-import sys
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 from array import array
@@ -47,14 +45,14 @@ histofile.mkdir("maps")
 
 # Open file with extracted payloads
 rfile = ROOT.TFile("dead_payloads.root", "READ")
-conditions = rfile.Get("conditions")
+b2.conditions = rfile.Get("conditions")
 
 deadpixel_table = dict()
 for sensorID in sensor_list:
     deadpixel_table[sensorID.getID()] = list()
 run_list = list()
 
-for condition in conditions:
+for condition in b2.conditions:
     if condition.PXDDeadPixelPar_valid:
         print("Starting on run {}".format(condition.run))
         run_list.append(condition.run)

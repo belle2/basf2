@@ -9,13 +9,10 @@ The actual processing code is mostly in the `caf.state_machines` module.
 
 __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 
-import basf2
 import os
-import sys
 from threading import Thread
 from time import sleep
 from pathlib import Path
-import sqlite3
 import shutil
 from glob import glob
 
@@ -24,28 +21,23 @@ from basf2 import find_file
 from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
-import ROOT
 
-from .utils import B2INFO_MULTILINE
-from .utils import past_from_future_dependencies
-from .utils import topological_sort
-from .utils import all_dependencies
-from .utils import decode_json_string
-from .utils import method_dispatch
-from .utils import find_sources
-from .utils import AlgResult
-from .utils import temporary_workdir
-from .utils import IoV
-from .utils import IoV_Result
-from .utils import find_int_dirs
-from .utils import LocalDatabase
-from .utils import CentralDatabase
+import caf
+from caf.utils import B2INFO_MULTILINE
+from caf.utils import past_from_future_dependencies
+from caf.utils import topological_sort
+from caf.utils import all_dependencies
+from caf.utils import method_dispatch
+from caf.utils import temporary_workdir
+from caf.utils import find_int_dirs
+from caf.utils import LocalDatabase
+from caf.utils import CentralDatabase
+from caf.utils import parse_file_uri
 
-from caf import strategies
-from caf import runners
-import caf.backends
+import caf.strategies as strategies
+import caf.runners as runners
 from caf.backends import MaxSubjobsSplitter, MaxFilesSplitter
-from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from caf.state_machines import CalibrationMachine, ConditionError, MachineError
 from caf.database import CAFDB
 
 
@@ -200,6 +192,26 @@ This script will be copied into subjob directories as part of the input sandbox.
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
 
+    @staticmethod
+    def uri_list_from_input_file(input_file):
+        """
+        Parameters:
+            input_file (str): A local file/glob pattern or XROOTD URI
+
+        Returns:
+            list: A list of the URIs found from the initial string.
+        """
+        # By default we assume it is a local file path if no "scheme" is given
+        uri = parse_file_uri(input_file)
+        if uri.scheme == "file":
+            # For local files we also perform a glob just in case it is a wildcard pattern.
+            # That way we will have all the uris of files separately
+            uris = [parse_file_uri(f).geturl() for f in glob(input_file)]
+        else:
+            # Just let everything else through and hop the backend can figure it out
+            uris = [input_file]
+        return uris
+
     @property
     def input_files(self):
         return self._input_files
@@ -207,11 +219,13 @@ This script will be copied into subjob directories as part of the input sandbox.
     @input_files.setter
     def input_files(self, value):
         if isinstance(value, str):
-            self._input_files = glob(str(value))
+            # If it's a string, we convert to a list of URIs
+            self._input_files = self.uri_list_from_input_file(value)
         elif isinstance(value, list):
+            # If it's a list we loop and do the same thing
             total_files = []
             for pattern in value:
-                total_files.extend(glob(str(pattern)))
+                total_files.extend(self.uri_list_from_input_file(pattern))
             self._input_files = total_files
         else:
             raise TypeError("Input files must be a list or string")
@@ -335,7 +349,6 @@ class CalibrationBase(ABC, Thread):
         The most important method. Runs inside a new Thread and is called from `CalibrationBase.start`
         once the dependencies of this `CalibrationBase` have returned with state == end_state i.e. "completed".
         """
-        pass
 
     @abstractmethod
     def is_valid(self):
@@ -343,7 +356,6 @@ class CalibrationBase(ABC, Thread):
         A simple method you should implement that will return True or False depending on whether
         the Calibration has been set up correctly and can be run safely.
         """
-        pass
 
     def depends_on(self, calibration):
         """
@@ -1035,7 +1047,8 @@ class Calibration(CalibrationBase):
         The current major state of the calibration in the database file. The machine may have a different state.
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "state")
+            state = db.get_calibration_value(self.name, "state")
+        return state
 
     @state.setter
     def state(self, state):
@@ -1046,7 +1059,7 @@ class Calibration(CalibrationBase):
             db.update_calibration_value(self.name, "state", str(state))
             if state in self.checkpoint_states:
                 db.update_calibration_value(self.name, "checkpoint", str(state))
-        B2DEBUG(29, f"{self.name} set to {self.state}.")
+        B2DEBUG(29, f"{self.name} set to {state}.")
 
     @property
     def iteration(self):
@@ -1057,7 +1070,8 @@ class Calibration(CalibrationBase):
             int: The current iteration number
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "iteration")
+            iteration = db.get_calibration_value(self.name, "iteration")
+        return iteration
 
     @iteration.setter
     def iteration(self, iteration):
@@ -1328,7 +1342,9 @@ class CAF():
         self._make_database()
 
         # Enter the overall output dir during processing and opena  connection to the DB
-        with temporary_workdir(self.output_dir), CAFDB(self._db_path) as db:
+        with temporary_workdir(self.output_dir):
+            db = CAFDB(self._db_path)
+            db.open()
             db_initial_calibrations = db.query("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
@@ -1354,6 +1370,8 @@ class CAF():
                     calibration.iteration = cal_initial_iteration
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
+
+            db.close()
 
             # Is it possible to keep going?
             keep_running = True
@@ -1390,7 +1408,8 @@ class CAF():
                 sleep(self.heartbeat)
 
             B2INFO("Printing summary of final CAF status.")
-            print(db.output_calibration_table())
+            with CAFDB(self._db_path, read_only=True) as db:
+                print(db.output_calibration_table())
 
     @property
     def backend(self):
@@ -1436,5 +1455,5 @@ class CAF():
         if self._db_path.exists():
             B2INFO(f"Previous CAF database found {self._db_path}")
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path):
             pass

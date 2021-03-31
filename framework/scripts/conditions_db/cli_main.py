@@ -29,7 +29,6 @@ import argparse
 import textwrap
 import json
 import difflib
-from urllib.parse import urljoin
 import shutil
 import pprint
 import requests

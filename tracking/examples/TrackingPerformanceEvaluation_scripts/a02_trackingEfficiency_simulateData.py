@@ -16,12 +16,11 @@
 
 import sys
 import glob
-from ROOT import Belle2
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 
 
-set_random_seed(1509)
+b2.set_random_seed(1509)
 
 release = sys.argv[1]
 
@@ -61,14 +60,14 @@ output_filename = './' + release + '/TV_sim_' + bkg + '_' + roi + '_' + release 
 
 print(output_filename)
 
-path = create_path()
+path = b2.create_path()
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
-root_output = register_module('RootOutput')
+root_output = b2.register_module('RootOutput')
 root_output.param('outputFileName', output_filename)
 
-root_input = register_module('RootInput')
+root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', input_filename)
 
 path.add_module(root_input)
@@ -78,5 +77,5 @@ add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction)
 
 path.add_module(root_output)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

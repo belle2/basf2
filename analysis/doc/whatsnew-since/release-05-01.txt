@@ -1,0 +1,14 @@
+Changes in the analysis package since release-05-01
+---------------------------------------------------
+
+Variables
++++++++++
+
+ * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
+   theme.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+ * Background sampling for :math:`B^{0} \rightarrow J/\psi K_{S}^{0}` and :math:`B^{+} \rightarrow J/\psi K^{+}` are deactivated.
+ * The baryonic tagging modes are activated by default.

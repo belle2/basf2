@@ -16,7 +16,7 @@
 # Notes:
 #  1) No guarantee for collisions in the decayHash.
 #  2) Be careful with the removeRadiativeGammaFlag
-#     parameter. Bremsstrahlungsgammas are identified
+#     parameter. Bremsstrahlung gammas are identified
 #     as follows:
 #     If a decay has more than 2 daughters and pdg of
 #     that daughter is 22. I.e. in a decay like
@@ -40,7 +40,7 @@ hashmap2 = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples'
 # get one reconstructed J/psi
 candidate42 = data.iloc[42][["extraInfo__boDecayHash__bc", "extraInfo__boDecayHashExtended__bc"]].values
 
-# print the reconstruced decay
+# print the reconstructed decay
 print("Reconstructed Decay: ")
 rec = hashmap.get_reconstructed_decay(*candidate42)
 print(rec.to_string())
@@ -50,7 +50,7 @@ print("Monte Carlo Decay: ")
 org = hashmap.get_original_decay(*candidate42)
 print(org.to_string())
 
-# print the original decay as simulated in MC with removed Bremstrahlung gammas
+# print the original decay as simulated in MC with removed Bremsstrahlung gammas
 print("Monte Carlo Decay with removed Bremsstrahlung gammas: ")
 org2 = hashmap2.get_original_decay(*candidate42)
 print(org2.to_string())

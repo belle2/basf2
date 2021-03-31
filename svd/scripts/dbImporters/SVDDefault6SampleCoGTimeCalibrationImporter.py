@@ -6,21 +6,16 @@ SVD Default CoG Time Calibration importer.
 alfa = 1 and beta = 0 for all sensors and sides
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
 from basf2 import conditions as b2conditions
 import datetime
-import os
 
 now = datetime.datetime.now()
 
 
-class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
+class defaultCoGTimeCalibrationImporter_pol1TBdep(b2.Module):
     """1st order pol importer for CoG6 (TB dep)"""
 
     def beginRun(self):
@@ -40,7 +35,7 @@ class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
 
-class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
+class defaultCoGTimeCalibrationImporter_pol3TBindep(b2.Module):
     """3rd order pol importer for CoG6 (TB indep)"""
 
     def beginRun(self):
@@ -61,10 +56,10 @@ class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
 
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
@@ -75,8 +70,8 @@ main.add_module("Geometry")
 main.add_module(defaultCoGTimeCalibrationImporter_pol3TBindep())
 #
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

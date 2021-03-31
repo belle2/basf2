@@ -1,8 +1,7 @@
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import ROOT
-from tracking import add_cdc_cr_track_finding
-from tracking import add_cdc_track_finding
+from tracking.path_utils import add_cdc_cr_track_finding, add_cdc_track_finding
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -117,16 +116,16 @@ def add_cdc_cr_simulation(path,
     Add CDC CR simulation.
 
     """
-    empty_path = create_path()
+    empty_path = b2.create_path()
 
     # background mixing or overlay input before process forking
     if bkgfiles:
         if bkgOverlay:
-            bkginput = register_module('BGOverlayInput')
+            bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             path.add_module(bkginput)
         else:
-            bkgmixer = register_module('BeamBkgMixer')
+            bkgmixer = b2.register_module('BeamBkgMixer')
             bkgmixer.param('backgroundFiles', bkgfiles)
             if bkgcomponents:
                 bkgmixer.param('components', bkgcomponents)
@@ -138,33 +137,33 @@ def add_cdc_cr_simulation(path,
 
     # geometry parameter database
     if 'Gearbox' not in path:
-        gearbox = register_module('Gearbox')
+        gearbox = b2.register_module('Gearbox')
         path.add_module(gearbox)
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry', useDB=True)
+        geometry = b2.register_module('Geometry', useDB=True)
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
 
     # detector simulation
     if 'FullSim' not in path:
-        g4sim = register_module('FullSim',
-                                ProductionCut=1000000.)
+        g4sim = b2.register_module('FullSim',
+                                   ProductionCut=1000000.)
         path.add_module(g4sim)
 
     #    path.add_module(RandomizeTrackTimeModule(8.0))
 
     # CDC digitization
     if components is None or 'CDC' in components:
-        cdc_digitizer = register_module('CDCDigitizer')
+        cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # ECL digitization
     if components is None or 'ECL' in components:
-        ecl_digitizer = register_module('ECLDigitizer')
+        ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
@@ -342,8 +341,8 @@ def getDataPeriod(exp=0, run=0):
             break
 
     if period is None:
-        B2WARNING("No valid data period is specified.")
-        B2WARNING("Default configuration is loaded.")
+        b2.B2WARNING("No valid data period is specified.")
+        b2.B2WARNING("Default configuration is loaded.")
         period = 'normal'
     return period
 
@@ -388,7 +387,7 @@ def add_GCR_Trigger_simulation(path, backToBack=False, skipEcl=True):
     :param backToBack: if true back to back TSF2; if false single TSF2
     :param skipEcl: ignore ECL in trigger, just use CDC TSF2
     """
-    empty_path = create_path()
+    empty_path = b2.create_path()
     path.add_module('CDCTriggerTSF',
                     InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
                     OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"))

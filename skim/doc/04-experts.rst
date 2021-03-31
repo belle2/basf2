@@ -66,7 +66,7 @@ To write a new skim, please follow these steps:
 
        TestFiles = [get_test_file("MC13_ggBGx1")]
 
-8. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
+8. *[Mandatory]* Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
 With all of these steps followed, you will now be able to run your skim using the :ref:`skim command line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put into production, please also complete the following steps:
 
@@ -74,7 +74,44 @@ With all of these steps followed, you will now be able to run your skim using th
 
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
-10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+10. Define validation histograms for your skim by overriding the method `BaseSkim.validation_histograms`, and running `b2skim-generate-validation<b2skim-generate-validation>` to auto-generate a steering file in the skim validation directory. The :py:func:`validation_histograms <skimExpertFunctions.BaseSkim.validation_histograms>` method should not be long: it should simply use the particle lists that have been created by :py:func:`build_lists <skimExpertFunctions.BaseSkim.build_lists>` to plot one or two key variables. If possible, *do not do any further reconstruction or particle list loading here*. Below is an example of what a typical method ought to contain.
+
+    .. code-block:: python
+
+        def validation_histograms(self, path):
+            # The validation package is not part of the light releases, so this import
+            # must be made inside this function rather than at the top of the file.
+            from validation_tools.metadata import create_validation_histograms
+
+            # Combine B+ particle lists for a single histogram (assuming self.SkimLists only
+            # has B+ particle lists). Not necessary if only one particle list is created.
+            ma.copyLists(f"B+:{self}_validation", self.SkimLists, path=path)
+        
+            create_validation_histograms(
+                rootfile=f"{self}_validation.root",
+                particlelist=f"B+:{self}_validation",
+                variables_1d=[
+                    ("deltaE", 20, -0.5, 0.5, "#Delta E", __liaison__,
+                     "$\\Delta E$ distribution of reconstructed $B^{+}$ candidates",
+                     "Peak around 0", "#Delta E [GeV]", "B^{+} candidates"),
+                    # Include "shifter" flag to have this plot shown to shifters
+                    ("Mbc", 20, 5.2, 5.3, "M_{bc}", __liaison__,
+                     "$M_{\\rm bc}$ distribution of reconstructed $B^{+}$ candidates",
+                     "Peak around 5.28", "M_{bc} [GeV]", "B^{+} candidates", "shifter")],
+            )
+
+    .. seealso::
+
+       Documentation of :py:func:`create_validation_histograms <validation_tools.metadata.create_validation_histograms>` for explanation of the expected arguments. Options to pay particular attention to:
+
+       * Passing the "shifter" flag in ``metaoptions``, which will allow the plot to be shown to shifters when they check `validation.belle2.org <https://validation.belle2.org>`_.
+
+       * Adding a contact email address with the ``contact`` option, preferably the contact email of your working group's skim liaison. If this is set, then the B2Bot will know where to send polite emails in case the validation comparison fails.
+
+.. _skim-steering-file:
+
+Building skim lists in a steering file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -88,8 +125,79 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     ma.inputMdstList("default", [], path=path)
     skim = MySkim()
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
-    path.process()
+    b2.process(path)
 
+After ``skim(path)`` has been called, the skim list names are stored in the Python list ``skim.SkimLists``.
+
+.. warning:: There is a subtle but important technicality here: if ``BaseSkim.skim_event_cuts`` has been called, then the skim lists are not built for all events on the path, but they are built for all events on a conditional path. A side-effect of this is that no post-skim path can be safely defined for the `CombinedSkim` class (since a combined skim of five skims may have up to five conditional paths).
+
+After a skim has been added to the path, the attribute `BaseSkim.postskim_path` contains a safe path for adding subsequent modules to (*e.g.* performing further reconstruction using the skim candidates). However, the final call to `basf2.process` must be passed the original (main) path.
+
+.. code-block:: python
+
+    skim = MySkim()
+    skim(path)
+    # Add subsequent modules to skim.postskim_path
+    ma.variablesToNtuple(skim.SkimLists[0], ["pt", "E"], path=skim.postskim_path)
+    # Process full path
+    b2.process(path)
+
+The above code snippet will produce both uDST and ntuple output. To only build the skim lists without writing to uDST, pass the configuration parameter ``outputUdst=False`` during initialisation of the skim object:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+
+Disabling uDST output may be useful to you if you want to do any of the following:
+
+* print the statistics of the skim without producing any output files,
+
+* build the skim lists and perform further reconstruction or fitting on the skim candidates before writing the ROOT output,
+
+* go directly from unskimmed MDST to analysis ntuples in a single steering file (but please consider first using the centrally-produce skimmed uDSTs), or
+
+* use the :ref:`skim flag<skim-flags>` to build the skim lists and write an event-level ntuple with information about which events pass the skim.
+
+.. tip::
+
+    The tool :ref:`b2skim-generate<b2skim-generate>` can be used to generate simple skim steering files like the example above. The tool :ref:`b2skim-run<b2skim-run>` is a standalone tool for running skims. :ref:`b2skim-run<b2skim-run>` is preferable for quickly testing a skim during skim development. :ref:`b2skim-generate<b2skim-generate>` should be used as a starting point if you are doing anything more complicated than simply running a skim on an MDST file to produce a uDST file.
+
+
+.. _skim-flags:
+
+Skim flags
+..........
+
+When a skim is added to the path, an entry is added to the event extra info to indicate whether an event passes the skim or not. This flag is of the form ``eventExtraInfo(passes_<SKIMNAME>)`` (aliased to ``passes_<SKIMNAME>`` for convenience), and the flag name is stored in the property ``BaseSkim.flag``.
+
+In the example below, we build the skim lists, skip the uDST output, and write an ntuple containing the skim flag and other event-level variables:
+
+.. code-block:: python
+
+    skim = MySkim(udstOutput=False)
+    skim(path)
+    ma.variablesToNtuple("", [skim.flag, "nTracks"], path=path)
+    b2.process(path)
+
+
+Skim flags can also be used in combined skims, with the individual flags being available in the list `CombinedSkim.flags`. In the example below, we run three skims in a combined skim, disable the uDST output, and then save the three skim flags to an ntuple.
+
+.. code-block:: python
+
+    skim = CombinedSkim(
+        SkimA(),
+        SkimB(),
+        SkimC(),
+        udstOutput=False,
+    )
+    skim(path)
+    ma.variablesToNtuple("", skim.flags + ["nTracks"], path=path)
+    b2.process(path)
+
+.. tip::
+
+   Skim flags are guaranteed to work on the main path (the variable ``path`` in the above examples). However, any other modules attempting to access the skim lists should be added to the :py:func:`postskim_path <skimExpertFunctions.BaseSkim.postskim_path>`.
 
 .. _skim-running:
 
@@ -121,9 +229,10 @@ In the skim package, there are command-line tools available for running skims, d
 .................................................
 
 .. tip::
-   This tool is for special cases where this does not suffice (such as running on the grid). If you
-   just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. If you want to
-   test the performance of your skim, consider using the :ref:`b2skim-stats tools<testing-skims>`.
+   This tool is for cases where other tools does not suffice (such as running on the grid, or adding
+   additional modules to the path after adding a skim.). If you just want to run a skim on KEKCC,
+   consider using :ref:`b2skim-run<b2skim-run>`. If you want to test the performance of your skim,
+   consider using the :ref:`b2skim-stats tools<testing-skims>`.
 
 .. argparse::
    :filename: skim/tools/b2skim-generate
@@ -131,6 +240,19 @@ In the skim package, there are command-line tools available for running skims, d
    :prog: b2skim-generate
    :nodefaultconst:
    :nogroupsections:
+
+.. _b2skim-generate-validation:
+
+``b2skim-generate-validation``: Generate skim validation scripts
+................................................................
+
+.. argparse::
+   :filename: skim/tools/b2skim-generate-validation
+   :func: get_argument_parser
+   :prog: b2skim-generate-validation
+   :nodefaultconst:
+   :nogroupsections:
+
 
 Skim tutorial
 ~~~~~~~~~~~~~
@@ -216,12 +338,6 @@ This will read the output files of the test jobs, and produce tables of statisti
    :nodefaultconst:
    :nogroupsections:
 
-   .. note::
-      This tool uses the third-party package `tabulate <https://pypi.org/project/tabulate>`_, which
-      can be installed via ``pip``.
-
-      This will be included in a future version of the externals.
-
 
 .. _skim-expert-functions:
 
@@ -244,6 +360,19 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :filename: skim/tools/b2skim-prod
    :func: get_argument_parser
    :prog: b2skim-prod
+   :nodefaultconst:
+   :nogroupsections:
+
+
+.. _b2skim-stats-total:
+
+``b2skim-stats-total``: Produce summary statistics for skim package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/b2skim-stats-total
+   :func: get_argument_parser
+   :prog: b2skim-stats-total
    :nodefaultconst:
    :nogroupsections:
 

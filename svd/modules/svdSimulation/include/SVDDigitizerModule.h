@@ -14,9 +14,12 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
 
@@ -53,7 +56,7 @@ namespace Belle2 {
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon along the E/B fieldlines.
        * @param position start position of the charge
-       * @param electrons number of electrons and holes to drift
+       * @param carriers number of electrons and holes to drift
        * @param carrierType electrons or holes
        */
       void driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
@@ -120,7 +123,7 @@ namespace Belle2 {
       double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
-      /** Whether or not to apply poisson fluctuation of charge */
+      /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
       bool  m_applyNoise = false;
@@ -134,10 +137,12 @@ namespace Belle2 {
       double m_noiseFraction = 0.01;
 
       // 4. Timing
+      /** Hardware Clocks*/
+      DBObjPtr<HardwareClockSettings> m_hwClock;
       /** Shaping time of the APV25 shapers.*/
       double m_shapingTime = 250.0;
-      /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 16000. / 509.;
+      /** Interval between two waveform samples, by default taken from HardwareClockSettings */
+      double m_samplingTime = -1;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -209,6 +214,9 @@ namespace Belle2 {
       double m_elNoiseU = 500; //e-
       /** Electronic noise for v-strips. */
       double m_elNoiseV = 500; //e-
+
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
       //run-dependent MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/

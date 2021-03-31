@@ -11,6 +11,8 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <TROOT.h>
 
+#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -36,6 +38,8 @@ DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
   addParam("l1Histograms", m_l1Histograms, "Which l1 histograms to show", m_l1Histograms);
+  addParam("retentionPerUnit", m_retentionPerUnit, "Which HLT filter lines to use for calculation retention rate per unit",
+           m_retentionPerUnit);
 }
 
 void DQMHistAnalysisHLTModule::initialize()
@@ -68,6 +72,15 @@ void DQMHistAnalysisHLTModule::initialize()
                         ));
   }
 
+  for (const std::string& filterLine : m_retentionPerUnit) {
+    m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
+                                  new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
+                                  new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(),
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1, 0,
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1)
+                                ));
+  }
+
   for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* histogram = canvasAndHisto.second;
     histogram->SetDirectory(0);
@@ -84,6 +97,15 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->SetFillStyle(0);
     histogram->SetStats(false);
     histogram->Draw("hist");
+  }
+
+  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
+    auto* histogram = nameAndcanvasAndHisto.second.second;
+    histogram->SetDirectory(0);
+    histogram->SetOption("histe");
+    histogram->SetMinimum(0);
+    histogram->SetStats(false);
+    histogram->Draw();
   }
 
 #ifdef _BELLE2_EPICS
@@ -107,6 +129,11 @@ void DQMHistAnalysisHLTModule::beginRun()
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
+
+  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
+    auto* canvas = nameAndcanvasAndHisto.second.first;
+    canvas->Clear();
+  }
 }
 
 void DQMHistAnalysisHLTModule::event()
@@ -114,7 +141,7 @@ void DQMHistAnalysisHLTModule::event()
   auto* filterHistogram = findHist("softwaretrigger/filter");
   auto* skimHistogram = findHist("softwaretrigger/skim");
   auto* totalResultHistogram = findHist("softwaretrigger/total_result");
-  auto* eventNumberHistogram = findHist("softwaretrigger/event_number");
+  auto* hltUnitNumberHistogram = findHist("softwaretrigger_before_filter/hlt_unit_number");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -128,8 +155,8 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the total result histogram!");
     return;
   }
-  if (not eventNumberHistogram) {
-    B2ERROR("Can not find the event number histogram!");
+  if (not hltUnitNumberHistogram) {
+    B2ERROR("Can not find the HLT unit number histogram!");
     return;
   }
 
@@ -141,7 +168,7 @@ void DQMHistAnalysisHLTModule::event()
   double instLuminosity = 0;
   double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
-  double numberOfAllEvents = eventNumberHistogram->GetEntries();
+  double numberOfAllEvents = hltUnitNumberHistogram->GetEntries();
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -232,18 +259,51 @@ void DQMHistAnalysisHLTModule::event()
     histogram->Fill(to, hltValueInL1Bin / l1TotalResult);
   }
 
+  for (const std::string& filterLine : m_retentionPerUnit) {
+    auto* histogram = m_hRetentionPerUnit.at(filterLine).second;
+    histogram->Reset();
+
+    auto* filterLineHistogram = findHist("softwaretrigger/" + filterLine + "_per_unit");
+
+    if (not filterLineHistogram) {
+      B2ERROR("Can not find " << filterLineHistogram << "_per_event histograms from softwaretrigger!");
+      continue;
+    }
+
+    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units + 1; i++) {
+      double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
+      if (totalUnitValue == 0) {
+        histogram->Fill(i, 0);
+      } else {
+        double filterLineUnitValue = filterLineHistogram->GetBinContent(i);
+        histogram->SetBinContent(i, filterLineUnitValue / totalUnitValue);
+      }
+    }
+  }
 
   for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 
     canvas->cd();
+    histogram->LabelsDeflate("X");
     histogram->Draw("hist");
     canvas->Modified();
     canvas->Update();
   }
 
   for (auto& nameAndCanvasAndHisto : m_hl1Ratios) {
+    auto* canvas = nameAndCanvasAndHisto.second.first;
+    auto* histogram = nameAndCanvasAndHisto.second.second;
+
+    canvas->cd();
+    histogram->LabelsDeflate("X");
+    histogram->Draw("hist");
+    canvas->Modified();
+    canvas->Update();
+  }
+
+  for (auto& nameAndCanvasAndHisto : m_hRetentionPerUnit) {
     auto* canvas = nameAndCanvasAndHisto.second.first;
     auto* histogram = nameAndCanvasAndHisto.second.second;
 

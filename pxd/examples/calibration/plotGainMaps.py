@@ -15,12 +15,9 @@
 #
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
-import os
-import sys
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
-import numpy as np
 from array import array
 
 import argparse
@@ -48,14 +45,14 @@ histofile.mkdir("maps")
 
 # Open file with extracted payloads
 rfile = ROOT.TFile("gain_payloads.root", "READ")
-conditions = rfile.Get("conditions")
+b2.conditions = rfile.Get("conditions")
 
 gain_table = dict()
 for sensorID in sensor_list:
     gain_table[sensorID.getID()] = list()
 run_list = list()
 
-for condition in conditions:
+for condition in b2.conditions:
     if condition.PXDGainMapPar_valid:
         run_list.append(condition.run)
         for sensorID in sensor_list:

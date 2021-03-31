@@ -69,7 +69,7 @@ namespace Belle2 {
     /** Sets the date used for generation (the cosmic-ray distribution is adjusted to account for the eleven year, sunspot cycle).
      * @param date date used for generation (month-day-year).
      */
-    void setDate(std::string date) { m_date = date; }
+    void setDate(const std::string& date) { m_date = date; }
 
     /** Sets the maximum number of trials.
      * @param maxtrials maximum number of trials.

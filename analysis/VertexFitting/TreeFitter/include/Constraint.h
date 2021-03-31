@@ -17,7 +17,7 @@ namespace TreeFitter {
   class Projection ;
   class FitParams ;
 
-  /** class to manage the order of contraints and their filtering */
+  /** class to manage the order of constraints and their filtering */
   class Constraint {
   public:
     /**
@@ -63,7 +63,7 @@ namespace TreeFitter {
     /** is this a linear constraint */
     bool isLinear() const { return m_maxNIter <= 1; }
 
-    /**  get maximum number of iterations for non in contraint */
+    /**  get maximum number of iterations for non in constraint */
     unsigned int nIter() const { return m_maxNIter; }
 
     /** constructor  */
@@ -104,7 +104,7 @@ namespace TreeFitter {
     std::string name() const;
 
     /**
-     * used to be able to weigth the cosntraints
+     * used to be able to weight the constraints
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
@@ -119,7 +119,7 @@ namespace TreeFitter {
       m_weight(0),
       m_maxNIter(0) {}
 
-    /**   set dimension of cosntraint */
+    /**   set dimension of constraint */
     void setDim(unsigned int d) { m_dim = d; }
 
     /** set max number of iterations for non lin constraint  */

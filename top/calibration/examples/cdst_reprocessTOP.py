@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from reconstruction import add_top_modules, add_cdst_output
 
@@ -13,7 +13,7 @@ from reconstruction import add_top_modules, add_cdst_output
 # ---------------------------------------------------------------------------------------
 
 
-class ReplaceTOPLikelihoods(Module):
+class ReplaceTOPLikelihoods(b2.Module):
     ''' replacing TOP likelihoods in PIDLikelihoods with new values '''
 
     def event(self):
@@ -42,21 +42,21 @@ class ReplaceTOPLikelihoods(Module):
 # - payloads are searched for in the reverse order of DB's given below;
 #   therefore the new calibration, if provided, is taken from the local DB.
 # - one can even use several local DB's
-use_central_database('data_reprocessing_proc7')  # global tag used in production of cdst
-use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
+b2.use_central_database('data_reprocessing_proc7')  # global tag used in production of cdst
+b2.use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input: cdst file(s)
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
 # Time Recalibrator
-recalibrator = register_module('TOPTimeRecalibrator')
+recalibrator = b2.register_module('TOPTimeRecalibrator')
 recalibrator.param('subtractBunchTime', False)
 main.add_module(recalibrator)
 
@@ -73,11 +73,11 @@ main.add_module(ReplaceTOPLikelihoods())
 add_cdst_output(main)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

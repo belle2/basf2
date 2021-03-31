@@ -6,7 +6,6 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 
 import basf2
-import ROOT
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT import TH1F, TFile

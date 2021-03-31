@@ -93,7 +93,7 @@ void ECLHitDebugModule::event()
     double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
 
     int iECLCell = hitCellId;
-    if (hitCellId == iECLCell && hitTOF < 8000) {
+    if (hitTOF < 8000) {
       int TimeIndex = (int) hitTOF / interval;
       E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
       Tof_ave[iECLCell][TimeIndex]  += (6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + hitTOF) * hitE ;

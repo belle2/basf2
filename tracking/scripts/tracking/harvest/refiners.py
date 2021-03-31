@@ -293,7 +293,7 @@ class SaveHistogramsRefiner(Refiner):
                 try:
                     fit_method = getattr(histogram, fit_method_name)
                 except AttributeError:
-                    histogram.fit(str(fit), **kwds)
+                    histogram.fit(str(self.fit), **kwds)
                 else:
                     fit_method(**kwds)
 
@@ -470,7 +470,7 @@ class Plot2DRefiner(Refiner):
                         try:
                             fit_method = getattr(profile_plot, fit_method_name)
                         except BaseException:
-                            profile_plot.fit(str(fit), **kwds)
+                            profile_plot.fit(str(self.fit), **kwds)
                         else:
                             fit_method(**kwds)
 
@@ -1319,7 +1319,7 @@ def select_crop_parts(crops, select=None, exclude=None):
         return selected_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
+        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
 
 
 def filter_crops(crops, filter_function, part_name=None):
@@ -1340,7 +1340,7 @@ def filter_crops(crops, filter_function, part_name=None):
         return filtered_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
+        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
 
 
 def iter_items_sorted_for_key(crops):

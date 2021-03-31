@@ -40,12 +40,12 @@ namespace Belle2 {
 
       /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
        * @param id VXD ID of the sensor.
-       * @width Width of the sensor.
-       * @length Length of the sensor.
-       * @thickness Thickness of the senosr.
-       * @uCells Number of strips in u dirrection.
-       * @vCells Number of strips in v direction.
-       * @width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
+       * @param width Width of the sensor.
+       * @param length Length of the sensor.
+       * @param thickness Thickness of the senosr.
+       * @param uCells Number of strips in u dirrection.
+       * @param vCells Number of strips in v direction.
+       * @param width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
        */
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                  int uCells = 0, int vCells = 0, float width2 = 0):
@@ -91,9 +91,20 @@ namespace Belle2 {
        * @param stripEdgeV distance from end of strip to edge of active area.
        * @param depletionVoltage Depletion voltage of the sensor.
        * @param biasVoltage Bias voltage on the sensor.
-       * @param backplaneCapacitance Backplane capacitance wrt. the strips.
-       * @param interstripCapacitance Interstrip capacitance for the sensor.
-       * @param coupling capacitance Coupling capacitance for the strips.
+       * @param backplaneCapacitanceU Backplane capacitance wrt. the strips.
+       * @param interstripCapacitanceU Interstrip capacitance for the sensor.
+       * @param couplingCapacitanceU Coupling capacitance for the strips.
+       * @param backplaneCapacitanceV Backplane capacitance wrt. the strips.
+       * @param interstripCapacitanceV Interstrip capacitance for the sensor.
+       * @param couplingCapacitanceV Coupling capacitance for the strips.
+       * @param AduEquivalentU
+       * @param AduEquivalentV
+       * @param electronicNoiseU
+       * @param electronicNoiseV
+       * @param AduEquivalentSbwU
+       * @param AduEquivalentSbwV
+       * @param electronicNoiseSbwU
+       * @param electronicNoiseSbwV
        */
       void setSensorParams(double stripEdgeU, double stripEdgeV,
                            double depletionVoltage, double biasVoltage,
@@ -170,13 +181,13 @@ namespace Belle2 {
       double getElectronicNoiseV() const;
       /** Calculate electron mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-       * @param eField Electric field, V/cm
+       * @param E Electric field, V/cm
        * @return electron mobility, cm*2/V.ns
        */
       double getElectronMobility(double E) const;
       /** Calculate hole mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-       * @param eField Electric field, V/cm
+       * @param E Electric field, V/cm
        * @return hole mobility, cm*2/V.ns
        */
       double getHoleMobility(double E) const;

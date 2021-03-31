@@ -58,6 +58,7 @@ namespace Belle2 {
     std::string m_track; /**<Track store array*/
 
     bool m_inheritance = false; /**< if true all relations are inherited*/
+    bool m_useWithRel5Reco = false; /**<if true uses SVDRecoDigits relations*/
 
     std::string m_outputINArrayName;  /**< StoreArray with the selected output shaperdigits*/
     std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output shaperdigits */
@@ -66,6 +67,8 @@ namespace Belle2 {
     SelectSubset<SVDShaperDigit> m_notSelectedShaperDigits; /**< all shaperdigits from tracks */
 
     static bool isRelatedToTrack(const SVDShaperDigit* shaperdigit); /**< select the shaperdigits related to tracks **/
+    static bool isRelatedToTrackRel5(const SVDShaperDigit*
+                                     shaperdigit); /**< select the shaperdigits related to tracks using SVDRecoDigits**/
 
   };
 }

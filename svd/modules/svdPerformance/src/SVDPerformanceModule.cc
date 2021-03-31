@@ -461,9 +461,9 @@ void SVDPerformanceModule::event()
 
     const TrackFitResult* tfr = nullptr;
     if (m_is2017TBanalysis)
-      tfr = track.getTrackFitResult(Const::electron);
+      tfr = track.getTrackFitResultWithClosestMass(Const::electron);
     else
-      tfr = track.getTrackFitResult(Const::pion);
+      tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());

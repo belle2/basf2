@@ -9,13 +9,11 @@
 # ---------------------------------------------------------------------------------------
 
 import sys
-import time
 import numpy
 from array import array
-from basf2 import *
 from ROOT import gROOT
 gROOT.SetBatch(True)  # noqa
-from ROOT import TFile, TTree, TMath
+from ROOT import TFile, TTree
 
 
 def gainana_pixelToPmt(inputRoot, outputRoot, maxHitTiming=-8., nMinEntries=100):

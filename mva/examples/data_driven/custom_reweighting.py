@@ -31,8 +31,8 @@ if __name__ == "__main__":
     general_options.m_identifier = "boost.xml"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
-    # EventType is 0 for MC and 1 for Data
-    general_options.m_target_variable = "EventType"
+    # isMC is 1 for MC and 0 for Data
+    general_options.m_target_variable = "isMC"
     fastbdt_options = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general_options, fastbdt_options)
 

@@ -6,9 +6,7 @@ import basf2
 import b2test_utils
 import modularAnalysis as ma
 from variables import variables
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestParticleCombiner(unittest.TestCase):

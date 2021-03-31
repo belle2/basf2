@@ -97,6 +97,8 @@ namespace Belle2 {
     TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_overlap[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_nooverlap[nskim_gdldqm] = {nullptr};
     TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     TH1D* h_eff[nskim_gdldqm] = {nullptr};
     TH1D* h_pure_eff[nskim_gdldqm] = {nullptr};
@@ -123,6 +125,7 @@ namespace Belle2 {
     std::string m_postScriptName;
     void fillRiseFallTimings(void);
     void fillOutputExtra(void);
+    void fillOutputOverlap(void);
     void fillOutputPureExtra(void);
 
     void genVcd(void);
@@ -136,15 +139,17 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra = 62;
+    static const int n_output_extra = 73;
     static const char* output_extra[n_output_extra];
-    static const int n_output_pure_extra = 20;
+    static const int n_output_overlap = 10;
+    static const char* output_overlap[n_output_overlap];
+    static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];
     static const int n_eff = 35;
     static const char* c_eff[n_eff];
     static const int n_eff_shifter = 8;
     static const char* c_eff_shifter[n_eff_shifter];
-    static const int n_pure_eff = 10;
+    static const int n_pure_eff = 8;
     static const char* c_pure_eff[n_pure_eff];
 
     //condition database for unpacker
@@ -205,7 +210,7 @@ namespace Belle2 {
     };
 
     //ecltrg<->ecl mappint
-    TrgEclMapping* trgeclmap;
+    TrgEclMapping* trgeclmap = nullptr;
     StoreArray<ECLCalDigit> m_ECLCalDigitData;
     StoreArray<ECLDigit>    m_ECLDigitData;
 

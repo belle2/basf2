@@ -7,7 +7,6 @@ Utility functions for the ConditionsDB command line interface
 
 import re
 from basf2 import B2ERROR
-from . import PayloadInformation
 
 
 class ItemFilter:

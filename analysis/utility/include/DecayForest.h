@@ -34,17 +34,17 @@ namespace Belle2 {
     /**
      * Return nth tree (0 is the reconstructed tree)
      */
-    DecayTree& getTree(unsigned int n) { return forest[n]; }
+    const DecayTree& getTree(unsigned int n) const { return forest.at(n); }
 
     /**
      * Get reconstructed tree
      */
-    DecayTree& getReconstructedTree() { return forest[0]; }
+    const DecayTree& getReconstructedTree() const { return forest.at(0); }
 
     /**
      * Get first valid original tree
      */
-    DecayTree& getOriginalTree() { return forest[m_first_valid_original]; }
+    const DecayTree& getOriginalTree() const { return forest.at(m_first_valid_original); }
 
     /**
      * Convert DecayHashes outputted by ParticleMCDecayString module to an integer

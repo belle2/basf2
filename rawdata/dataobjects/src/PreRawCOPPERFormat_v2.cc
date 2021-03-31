@@ -399,15 +399,15 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
       } else {
         if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
             temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
+          char hostname[128];
+          GetNodeName(n, hostname, sizeof(hostname));
           if (err_flag == 0) {
             for (int j = 0; j < 4; j++) {
-              printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
+              printf("[DEBUG] %s ch=%d : FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
+                     hostname, -1,
                      j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
             }
           }
-
-          char hostname[128];
-          GetNodeName(n, hostname, sizeof(hostname));
           sprintf(err_buf,
                   "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting... FINESSE #=0 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=1 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=2 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=3 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n %s %s %d\n",
                   hostname, -1,

@@ -390,7 +390,7 @@ void ECLMatchingPerformanceExpertModule::addVariableToTree(const std::string& va
 void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
     int& matchedToNeighbours, const int& cell)
 {
-  auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
+  const auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
   for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
     const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
     [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > m_minCalDigitEnergy); }

@@ -244,6 +244,12 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB)  B2INFO("no database of gdl prescale");
+    int N_AlgsBits = db_algs->getnalgs();
+    if (!db_algs)  B2INFO("no global database of gdl ftd logics");
+    if (N_OutputBits > N_AlgsBits) {
+      B2DEBUG(20, "#Algs and #Ftdl is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
@@ -336,6 +342,12 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
+    int N_AlgsBits = db_algs->getnalgs();
+    if (!db_algs) B2INFO("no database of gdl ftdl bit logic");
+    if (N_OutputBits > N_AlgsBits) {
+      B2DEBUG(20, "#Algs and #FTDL is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     if (_debugLevel > 19)
       printf("TRGGDL:N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);
@@ -355,18 +367,12 @@ namespace Belle2 {
       }
 
       if (_algFromDB) {
-
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
-
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, db_algs->getalg(i));
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }
@@ -376,11 +382,11 @@ namespace Belle2 {
             if (_debugLevel == 971 && ftdl_fired) {
               int i_ehigh    = m_InputBitsDB->getinbitnum("ehigh");
               int i_bha_veto = m_InputBitsDB->getinbitnum("bha_veto");
-              printf("TRGGDL:hie:i=%d,evt=%d,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
+              printf("TRGGDL:hie:i=%d,evt=%u,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
                      i, _evt, m_PrescalesDB->getprescales(i),
                      _inpBits[i_ehigh] ? 1 : 0,
                      _inpBits[i_bha_veto] ? 1 : 0,
-                     ftdl_fired ? 1 : 0,
+                     ftdl_fired,
                      psnm_fired ? 1 : 0,
                      i_ehigh,
                      i_bha_veto,
@@ -390,9 +396,6 @@ namespace Belle2 {
         }
 
       } else {
-
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
         std::string str;
         std::vector<std::string> algs;
         std::ifstream isload(_algFilePath.c_str(), std::ios::in);
@@ -408,9 +411,7 @@ namespace Belle2 {
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }
@@ -467,6 +468,7 @@ namespace Belle2 {
               B2DEBUG(20,
                       alg.substr(begin_word, word_length).c_str()
                       << "(" << fired << ")");
+              // cppcheck-suppress knownConditionTrueFalse
               if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
                 return true;
               }
@@ -503,7 +505,6 @@ namespace Belle2 {
         // can be blank (white space) or any delimiter.
         if (reading_word) {
           // end of a word, 'xxxx '
-          reading_word = false;
           if (result_the_term) {
             // worth to try
             bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];

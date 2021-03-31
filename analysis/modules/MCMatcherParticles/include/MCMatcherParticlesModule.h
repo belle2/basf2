@@ -36,7 +36,7 @@ namespace Belle2 {
    * daughter particles while the normal algorithm finds the common mother of all daughters. In the case one of the
    * daughters has no generated mother (or mc association) the normal mc matching algorithm will tag such candidate
    * as background (no mc match), while the loose algorithm will find the common mother of remaining daughters. This
-   * is usefull for identifying for example self cross-feed candidates, where usually one of the photons is wrong,
+   * is useful for identifying for example self cross-feed candidates, where usually one of the photons is wrong,
    * but the rest of the decay chain is correctly reconstructed. The results of loose mc matching algorithm are
    * stored to the following extraInfo items:
    * - looseMCMotherPDG: PDG code of most common mother

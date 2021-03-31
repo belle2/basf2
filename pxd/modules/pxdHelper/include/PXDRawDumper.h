@@ -29,7 +29,9 @@ namespace Belle2 {
       bool unpack_dhc_frame(void* data, unsigned int& innerDHH, unsigned int& outerHLT);
 
     public:
+      /** Initialize */
       void initialize(void) override;
+      /** Event */
       void event(void) override;
     };
   }

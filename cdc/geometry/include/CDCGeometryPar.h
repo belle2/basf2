@@ -113,11 +113,11 @@ namespace Belle2 {
 
       /**
        * Read displacement or (mis)alignment params from text file.
-       * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
-       * @param[in] Pointer to DB CDCGeometry db object.
+       * @param[in] set Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
+       * @param[in] geom Pointer to DB CDCGeometry db object.
        */
       //      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
-      void readWirePositionParams(EWirePosition set, const CDCGeometry*);
+      void readWirePositionParams(EWirePosition set, const CDCGeometry* geom);
 
       /**
        * Set wire alignment params. from DB.
@@ -1006,25 +1006,21 @@ namespace Belle2 {
 
       /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
-       * @param alpha in rad.
        */
       void getClosestAlphaPoints(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
       /**
        * Returns the two closest alpha points for sigma for the input track incident angle (alpha). TODO: unify the two getClosestAlphaPoints().
-       * @param alpha in rad.
        */
       void getClosestAlphaPoints4Sgm(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
       /**
        * Returns the two closest theta points for the input track incident angle (theta).
-       * @param theta in rad.
        */
       void getClosestThetaPoints(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
        * Returns the two closest theta points for sigma for the input track incident angle (theta).
-       * @param theta in rad. TODO: unify the two getClosestThetaPoints().
        */
       void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import basf2
-import logging
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 import trackfindingcdc.cdcdisplay as cdcdisplay

@@ -89,7 +89,10 @@ C
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1                
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
 
-C initialization for 3 scalars
+      REAL*8  AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
+
+C     initialization for 3 scalars
       AMROP=1.1
       GAMROP=0.36
       AMOM=.782
@@ -197,6 +200,40 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=GAMKST
         AMRB(MNUM) =1.43
         GAMRB(MNUM)=0.9
+       ELSEIF (MNUM.EQ.47) THEN  ! piee, 0.0, 0.8, 0.16, 0.1, 0.7759, 0.1479, 0.001, 0.005
+        PROB1(MNUM)=0.0
+        PROB2(MNUM)=0.8
+        AMRX (MNUM)=0.16
+        GAMRX(MNUM)=0.1
+        AMRA(MNUM) =0.7759
+        GAMRA(MNUM)=0.1479
+        AMRB(MNUM) =0.001
+        GAMRB(MNUM)=0.005
+        IF (AMDARK.GT.1.0D-6) THEN
+           AMRX (MNUM) = 2*AMDARK
+           GAMRX(MNUM) = AMDARK
+           AMRA (MNUM) = AMDARK
+           GAMRA(MNUM) = GMDARK
+           AMRB (MNUM) = AMDARK
+           GAMRB(MNUM) = GMDARK
+        ENDIF
+      ELSEIF (MNUM.EQ.48) THEN  ! pimumu, 0.0, 0.8, 0.7, 0.4, 0.7759, 0.1479, 0.27, 0.2
+        PROB1(MNUM)=0.0
+        PROB2(MNUM)=0.8
+        AMRX (MNUM)=0.7
+        GAMRX(MNUM)=0.4
+        AMRA(MNUM) =0.7759
+        GAMRA(MNUM)=0.1479
+        AMRB(MNUM) =0.27
+        GAMRB(MNUM)=0.2
+        IF (AMDARK.GT.1.0D-6) THEN
+           AMRX (MNUM) = 2*AMDARK
+           GAMRX(MNUM) = AMDARK
+           AMRA (MNUM) = AMDARK
+           GAMRA(MNUM) = GMDARK
+           AMRB (MNUM) = AMDARK
+           GAMRB(MNUM) = GMDARK
+        ENDIF
        ELSE
         PROB1(MNUM)=0.0
         PROB2(MNUM)=0.0
@@ -223,8 +260,8 @@ C
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1                
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
 
-
-
+      REAL*8  AMDARK, GMDARK, EPDARK
+      COMMON /CMDARK/ AMDARK, GMDARK, EPDARK
 
 C initialization for 4 scalars
       DO INUM=1,NM4
@@ -244,7 +281,35 @@ C initialization for 4 scalars
         GAMRX(INUM)=.6
         AMRA(INUM) =AMOM
         GAMRA(INUM)=GAMOM
-       ELSEIF((INUM.GE.3.AND.INUM.LE.12).OR.(INUM.GE.28.AND.INUM.LE.31)) THEN
+       ELSE IF (INUM.EQ.3) THEN ! eee, 0.0, 0.8, 1.0, 0.9, 0.03, 0.07
+        PROB1(INUM)=0.0
+        PROB2(INUM)=0.8
+        AMRX(INUM) =1.0
+        GAMRX(INUM)=0.9
+        AMRA(INUM) =0.03
+        GAMRA(INUM)=0.07
+       ELSE IF (INUM.EQ.4) THEN ! mumumu, 0.0, 0.8, 1.0, 0.9, 0.15, 0.1
+        PROB1(INUM)=0.0
+        PROB2(INUM)=0.8
+        AMRX(INUM) =1.0
+        GAMRX(INUM)=0.9
+        AMRA(INUM) =0.15
+        GAMRA(INUM)=0.1
+       ELSE IF (INUM.EQ.5) THEN ! emumu, 0.0, 0.8, 1.0, 0.9, 0.15, 0.1
+        PROB1(INUM)=0.0
+        PROB2(INUM)=0.8
+        AMRX(INUM) =1.0
+        GAMRX(INUM)=0.9
+        AMRA(INUM) =0.15
+        GAMRA(INUM)=0.1
+       ELSE IF (INUM.EQ.6) THEN ! muee, 0.0, 0.8, 1.0, 0.9, 0.03, 0.07
+        PROB1(INUM)=0.0
+        PROB2(INUM)=0.8
+        AMRX(INUM) =1.0
+        GAMRX(INUM)=0.9
+        AMRA(INUM) =0.03
+        GAMRA(INUM)=0.07
+       ELSEIF((INUM.GT.6.AND.INUM.LE.12).OR.(INUM.GE.28.AND.INUM.LE.31)) THEN
         PROB1(INUM)=0.0
         PROB2(INUM)=0.0
         AMRX(INUM) =1.4
@@ -258,7 +323,13 @@ C initialization for 4 scalars
         GAMRX(INUM)=GAMA1
         AMRA(INUM) =AMRO
         GAMRA(INUM)=GAMRO
-       ENDIF
+      ENDIF
+      IF (INUM.GE.3.AND.INUM.LE.6) THEN
+         IF (AMDARK.GT.1.0D-6) THEN
+            AMRA(INUM) = AMDARK
+            GAMRA(INUM) = 2.0D0*GMDARK
+         ENDIF
+      ENDIF
       ENDDO
       END
 
@@ -389,8 +460,8 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 1, 1, 0,   0, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
-     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
+     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 5,
+     a                5, 0, 0, 0, 0,   0, 0, 0, 0, 0/
       DATA KEYstrt2 / 2, 2, 2, 2, 1,   1, 1, 1, 1, 1, 
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
@@ -409,9 +480,9 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 2, 2, 1,   1, 1, 1, 2, 2,
      a                2, 2, 2, 2, 2,   2, 2, 1, 1, 1,
      a                2, 2, 2, 2, 2,   2, 2, 2, 2, 2,
-     a                2, 2, 2, 2, 2,   2, 0, 0, 0, 0,
+     a                2, 2, 2, 2, 2,   2, 5, 5, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
-      DATA KEYstrt4 / 2, 2, 1, 1, 1,   1, 1, 1, 1, 1,
+      DATA KEYstrt4 / 2, 2, 5, 5, 5,   5, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 0, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
@@ -423,8 +494,8 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
 
       DATA NOPIK4 / -1,-1, 1, 2, 0, 0,3*0,     2, 2, 2,-1, 0, 0,3*0,                      ! 2
-     a              12,-11,-11,11, 0, 0,3*0,  14,-13,-13,13, 0, 0,3*0,   ! new (may 2004) ! 4
-     b              12,-11,-13,13, 0, 0,3*0,  14,-13,-11,11, 0, 0,3*0,   ! new (may 2004) ! 6
+     a              12,-11,11,-11,0,0,3*0,    14,-13,13,-13,0,0,3*0,     ! new (may 2004) ! 4
+     b              12,-11,13,-13,0,0,3*0,    14,-13,11,-11,0,0,3*0,     ! new (may 2004) ! 6
      c              -3, 2, 2, 2, 0, 0,3*0,     2, 2, 9,-3, 0, 0,3*0,     ! new (may 2004) ! 8
      d               2, 2, 4,-1, 0, 0,3*0,     2, 4, 9,-1, 0, 0,3*0,     ! new (may 2004) ! 10
      e               2,-1, 1,-3, 0, 0,3*0,     4,-1, 1,-1, 0, 0,3*0,     ! new (may 2004) ! 12
@@ -505,13 +576,13 @@ C AJWMOD fix sign bug, 2/22/99
      7              310, 9,-1, 0, 0, 0,3*0,   310, 9,-1, 0, 0, 0,3*0, ! new (may 2020) ! 42
      7              130, 9,-1, 0, 0, 0,3*0,   130, 9,-1, 0, 0, 0,3*0, ! new (may 2020) ! 44
      7              130, 9,-1, 0, 0, 0,3*0,   130, 9,-1, 0, 0, 0,3*0, ! new (may 2020) ! 46
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2, 2,   2, 0, 0, 0,3*0/ ! new (may 2020) ostatnie 3
+     7              -1,11,-11, 0, 0, 0,3*0,  -1, 13,-13, 0, 0, 0,3*0, ! new (may 2020) ! 48
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0/ ! new (may 2020) ostatnie 3
 
       DATA NOPIK2 /                            -1,  2,   0, 0, 0, 0,3*0, ! new (may 2004) !  1
      8             -1,   4,   0, 0, 0, 0,3*0,  -3,  2,   0, 0, 0, 0,3*0, ! new (may 2004) !  3
@@ -590,14 +661,14 @@ C AJWMOD fix sign bug, 2/22/99
      o                8,0,-11,   0,0,0,3*0,      8,0,-13,    0,0,0,3*0, ! new (may 2004) ! 4
      o                2,0,-11,   0,0,0,3*0,      2,0,-13,    0,0,0,3*0, ! new (may 2004) ! 6
      o                9,0,-11,   0,0,0,3*0,      9,0,-13,    0,0,0,3*0, ! new (may 2004) ! 8
-     o                4,0,-11,   0,0,0,3*0,      4,0,-13,    0,0,0,3*0, ! new (may 2004) !10
+     o              -11,0,130,   0,0,0,3*0,    -13,0,130,    0,0,0,3*0, ! new (may 2004) !10
      o              -11,0,  0, 223,0,0,3*0,    -13,0,  0,  223,0,0,3*0, ! new (may 2004) !12
      o              -11,0,  0, 333,0,0,3*0,    -13,0,  0,  333,0,0,3*0, ! new (may 2004) !14
      o              -11,0,  0, 113,0,0,3*0,    -13,0,  0,  113,0,0,3*0, ! new (may 2004) !16
      o          9000211,0,  0,   0,0,0,3*0,  10213,0,  0,    0,0,0,3*0, ! new (may 2004) !18
-     o              -11,0,  0, 311,0,0,3*0,    -13,0,  0,  311,0,0,3*0, ! new (may 2004) !20
+     o              -11,0,  0, 310,0,0,3*0,    -13,0,  0,  310,0,0,3*0, ! new (may 2004) !20
      o             2212,0,  0,  22,0,0,3*0,   2212,0,  0,  111,0,0,3*0, ! new (may 2004) !22
-     o             2212,0,  0, 221,0,0,3*0,   2212,0,  0,  311,0,0,3*0, ! new (may 2004) !24
+     o             2212,0,  0, 221,0,0,3*0,   2212,0,  0,    4,0,0,3*0, ! new (may 2004) !24
      o              -11,0,  0, 331,0,0,3*0,    -13,0,  0,  331,0,0,3*0, ! new (may 2004) !26
      o            -3122,0,211,   0,0,0,3*0,   3122,0,211,    0,0,0,3*0, ! new (may 2020) !28
      o            -3122,0,321,   0,0,0,3*0,   3122,0,321,    0,0,0,3*0, ! new (may 2020) !30
@@ -622,8 +693,8 @@ C AJWMOD fix sign bug, 2/22/99
      o          9000111,0,-11,   0,0,0,3*0, 9000111,0,-11,   0,0,0,3*0, ! new (may 2020) !65
      o          9000111,0,-13,   0,0,0,3*0, 9000111,0,-13,   0,0,0,3*0, ! new (may 2020) !67
      o          9000111,0,-13,   0,0,0,3*0, 9000111,0,-13,   0,0,0,3*0, ! new (may 2020) !69
-     o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !71
-     o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !73
+     o            94144,0,-11, 0, 0, 0,3*0,   94144,0,-13,   0,0,0,3*0, ! new (may 2020) !71
+     o            94144,0,-11, 0, 0, 0,3*0,   94144,0,-13,   0,0,0,3*0, ! new (may 2020) !73
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !75
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !77
      o               -3, 0, 0, 0, 0, 0,3*0,     - 3, 0, 0, 0, 0, 0,3*0, ! new (may 2020) !79
@@ -753,7 +824,7 @@ C=================================================
         IF(II.EQ. 6) NAMES(I-NLT)='  TAU-  --> 3PI- 2PI+ app08    ' ! TauDecayModeBBB = 68 ! explicitly included
         IF(II.EQ. 7) NAMES(I-NLT)='  TAU-  --> 2PI- 2PI+  K-      ' ! TauDecayModeBBB = 69 ! explicitly included
         IF(II.EQ. 8) NAMES(I-NLT)='  TAU-  --> 2PI- PI+ PI0 K0    ' ! TauDecayModeBBB = 70
-        IF(II.EQ. 9) NAMES(I-NLT)='  TAU-  --> PI- 4PI0           ' ! TauDecayModeBBB = 71
+        IF(II.EQ. 9) NAMES(I-NLT)='  TAU-  --> PI- 4PI0        old' ! TauDecayModeBBB = 71
         IF(II.EQ.10) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 72
         IF(II.EQ.11) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 73
         IF(II.EQ.12) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 74
@@ -874,8 +945,8 @@ C=================================================
         IF(II.EQ.44) NAMES(I-NLT)='  TAU-  --> PI-K0L ETA->P0P0P0 ' ! TauDecayModeBBB = 146 ! (ME=14) explicitly included
         IF(II.EQ.45) NAMES(I-NLT)='  TAU-  --> PI-K0L ETA->P+P-P0 ' ! TauDecayModeBBB = 147 ! (ME=14) explicitly included
         IF(II.EQ.46) NAMES(I-NLT)='  TAU-  --> PI-K0L ETA->P+P-Gam' ! TauDecayModeBBB = 148 ! (ME=14) explicitly included
-        IF(II.EQ.47) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 149
-        IF(II.EQ.48) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 150
+        IF(II.EQ.47) NAMES(I-NLT)='  TAU-  --> PI- E+ E-          ' ! TauDecayModeBBB = 149
+        IF(II.EQ.48) NAMES(I-NLT)='  TAU-  --> PI- MU+MU-         ' ! TauDecayModeBBB = 150
         IF(II.EQ.49) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 151
         IF(II.EQ.50) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 152
         IF(II.EQ.51) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 153
@@ -1078,18 +1149,18 @@ C=================================================
         IF(II.EQ. 6) NAMES(I-NLT)='  TAU-  --> PI0 mu-    !nu_tau ' ! TauDecayModeBBB = 308 
         IF(II.EQ. 7) NAMES(I-NLT)='  TAU-  --> eta e-     !nu_tau ' ! TauDecayModeBBB = 309 ! split into 350-353
         IF(II.EQ. 8) NAMES(I-NLT)='  TAU-  --> eta mu-    !nu_tau ' ! TauDecayModeBBB = 310 ! split into 354-357
-        IF(II.EQ. 9) NAMES(I-NLT)='  TAU-  --> e-  K0     !nu_tau ' ! TauDecayModeBBB = 311 
-        IF(II.EQ.10) NAMES(I-NLT)='  TAU-  --> mu- K0     !nu_tau ' ! TauDecayModeBBB = 312 
+        IF(II.EQ. 9) NAMES(I-NLT)='  TAU-  --> e-  K0L    !nu_tau ' ! TauDecayModeBBB = 311 
+        IF(II.EQ.10) NAMES(I-NLT)='  TAU-  --> mu- K0L    !nu_tau ' ! TauDecayModeBBB = 312 
         IF(II.EQ.11) NAMES(I-NLT)='  TAU-  --> e-  omega  !nu_tau ' ! TauDecayModeBBB = 313 ! split into 358-360
         IF(II.EQ.12) NAMES(I-NLT)='  TAU-  --> mu- omega  !nu_tau ' ! TauDecayModeBBB = 314 ! split into 361-363
         IF(II.EQ.13) NAMES(I-NLT)='  TAU-  --> e-  phi    !nu_tau ' ! TauDecayModeBBB = 315 
         IF(II.EQ.14) NAMES(I-NLT)='  TAU-  --> mu- phi    !nu_tau ' ! TauDecayModeBBB = 316 
-        IF(II.EQ.15) NAMES(I-NLT)='  TAU-  --> e- rho0    !nu_tau ' ! TauDecayModeBBB = 317 
+        IF(II.EQ.15) NAMES(I-NLT)='  TAU-  --> e-  rho0   !nu_tau ' ! TauDecayModeBBB = 317 
         IF(II.EQ.16) NAMES(I-NLT)='  TAU-  --> mu- rho0   !nu_tau ' ! TauDecayModeBBB = 318 
         IF(II.EQ.17) NAMES(I-NLT)='  TAU-  --> A0-                ' ! TauDecayModeBBB = 319 
         IF(II.EQ.18) NAMES(I-NLT)='  TAU-  --> B1-                ' ! TauDecayModeBBB = 320 
-        IF(II.EQ.19) NAMES(I-NLT)='  TAU-  --> e- K0      !nu_tau ' ! TauDecayModeBBB = 321 
-        IF(II.EQ.20) NAMES(I-NLT)='  TAU-  --> mu- K0     !nu_tau ' ! TauDecayModeBBB = 322 
+        IF(II.EQ.19) NAMES(I-NLT)='  TAU-  --> e-  K0S    !nu_tau ' ! TauDecayModeBBB = 321 
+        IF(II.EQ.20) NAMES(I-NLT)='  TAU-  --> mu- K0S    !nu_tau ' ! TauDecayModeBBB = 322 
         IF(II.EQ.21) NAMES(I-NLT)='  TAU-  --> p gamma    !nu_tau ' ! TauDecayModeBBB = 323 
         IF(II.EQ.22) NAMES(I-NLT)='  TAU-  --> p pi0      !nu_tau ' ! TauDecayModeBBB = 324 
         IF(II.EQ.23) NAMES(I-NLT)='  TAU-  --> p eta      !nu_tau ' ! TauDecayModeBBB = 325 
@@ -1139,8 +1210,8 @@ C=================================================
         IF(II.EQ.67) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 369 ! a0(980)->pi0eta(pi0pi0pi0) 
         IF(II.EQ.68) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 370 ! a0(980)->pi0eta(pi+pi-pi0) 
         IF(II.EQ.69) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 371 ! a0(980)->pi0eta(pi+pi-gamma) 
-        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 372
-        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 373
+        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  invi    !nu_tau' ! TauDecayModeBBB = 372
+        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- invi    !nu_tau' ! TauDecayModeBBB = 373
         IF(II.EQ.72) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 374
         IF(II.EQ.73) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 375
         IF(II.EQ.74) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 376
@@ -1341,7 +1412,7 @@ C      CALL INIOFC ! dummy for now anyway
             KSUM=KSUM+1
          ENDIF
       ENDDO
-      WRITE(6,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
+      WRITE(IOUT,'(''NCHAN, KSUM, SUM = '',2I4,1X,F10.7)') NCHAN, KSUM, SUM
 
       IF(IFEQUALBR.EQ.1) THEN   ! uniform  initialization useful for some tests only
          DO K=1,NCHAN
@@ -1359,7 +1430,7 @@ C      CALL INIOFC ! dummy for now anyway
                ENDIF
             ENDIF
          ENDDO
-         WRITE(6,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
       ENDIF
 
       IF(IFEQUALBR.EQ.2) THEN   ! uniform  initialization useful for some tests only
@@ -1373,49 +1444,49 @@ C      CALL INIOFC ! dummy for now anyway
                IF (KEY0(K).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K)
+                  WRITE (IOUT,*) '0 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,OLDNAMES(K)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4) THEN
                IF (KEY4(K-NLT).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '4 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '4 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5) THEN
                IF (KEY5(K-NLT-NM4).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '5 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '5 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6) THEN
                IF (KEY6(K-NLT-NM4-NM5).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '6 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '6 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3) THEN
                IF (KEY3(K-NLT-NM4-NM5-NM6).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '3 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '3 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3+NM2) THEN
                IF (KEY2(K-NLT-NM4-NM5-NM6-NM3).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '2 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '2 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ELSE IF (K.LE.NLT+NM4+NM5+NM6+NM3+NM2+NM1) THEN
                IF (KEY1(K-NLT-NM4-NM5-NM6-NM3-NM2).GT.0) THEN
                   KSUM=KSUM+1
                   ACTIVE(KSUM)=K
-                  PRINT*, '1 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
+                  WRITE(IOUT,*) '1 KSUM = ',KSUM, ' TauDecayModeBBB = ',K,NAMES(K-NLT)
                   GAMPRT(K)=1
                ENDIF
             ENDIF
@@ -1425,7 +1496,7 @@ C      CALL INIOFC ! dummy for now anyway
                GAMPRT(K) = 1.0D0/KSUM
             ENDIF
          ENDDO
-         WRITE(6,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
+         WRITE(IOUT,'(''IFEQUALBR, KSUM, GAMPRT = '',2I4,1X,F10.7)') IFEQUALBR, KSUM, GAMPRT(1)
       ENDIF
       
       WRITE(iout,bxope)

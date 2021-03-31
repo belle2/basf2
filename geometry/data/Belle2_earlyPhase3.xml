@@ -12,7 +12,7 @@
     <!-- half-width along x direction -->
     <width  unit="m">8.0</width>
     <!-- half-length along z direction -->
-    <length unit="m">8.0</length>
+    <length unit="m">40.0</length>
     <!-- half-height along y direction -->
     <height unit="m">8.0</height>
   </Global>

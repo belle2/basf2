@@ -6,6 +6,7 @@ import array
 import ROOT
 
 from tracking.root_utils import root_cd, root_save_name
+from tracking.validation.matplotting import get_logger
 
 
 class ValidationFiguresOfMerit(collections.MutableMapping):

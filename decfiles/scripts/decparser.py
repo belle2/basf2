@@ -10,7 +10,7 @@ import sys
 import settings
 import os
 import time
-from colours import *
+from colours import mesg, query, fail, done, warning
 import descriptcheck
 
 mesg('Starting the decfile check')
@@ -114,9 +114,9 @@ for line in file:
         if tmp:
             try:
                 eventtype = int(tmp)
-            except:
+            except BaseException:
                 fail(['Failed parsing eventtype on line ' + str(linecount),
-                     'Not a number.'])
+                      'Not a number.'])
             order += ['EventType']
             mesg('Eventtype found: ' + str(eventtype))
 
@@ -125,8 +125,8 @@ for line in file:
             descriptor = tmp
             order += ['descriptor']
             if '{,gamma}' in tmp:
-                warning('Please do not include radiative photons in the descriptor.'
-                        )
+                warning(
+                    'Please do not include radiative photons in the descriptor.')
 
         tmp = getfield(line, 'NickName')
         if tmp:
@@ -144,7 +144,12 @@ for line in file:
             order += ['cuts']
             test_cuts = ['None', 'DaughtersInBelleII']
             if cuts not in test_cuts:
-                warning('Unknown cuts <' + cuts + '> on line ' + str(linecount) + '. Please check.')
+                warning(
+                    'Unknown cuts <' +
+                    cuts +
+                    '> on line ' +
+                    str(linecount) +
+                    '. Please check.')
 
         tmp = getfield(line, 'FullEventCuts')
         if tmp:
@@ -207,7 +212,7 @@ for line in file:
                 if date - 100 * (date / 100) > 31:
                     warning('Cannot parse date. Please use YYYYMMDD for date field. DD parsed:' +
                             str(date - 100 * (date / 100)))
-            except:
+            except BaseException:
                 warning('Cannot parse date. Please use YYYYMMDD for date field.'
                         )
     elif not line == '' and not decay_started and not Ended:
@@ -254,7 +259,7 @@ for line in file:
                     dec = []
                     try:
                         bf = float(bf)
-                    except:
+                    except BaseException:
                         warning('Branching fraction not a number on line: ' +
                                 str(linecount) + '. Skipping.')
                         continue
@@ -263,7 +268,10 @@ for line in file:
                             # mesg("Terminator found, ending decay line.")
                             break
                         elif daug.endswith(';'):
-                            warning('A new terminator found: ' + daug.strip(';') + '. Adding to list')
+                            warning(
+                                'A new terminator found: ' +
+                                daug.strip(';') +
+                                '. Adding to list')
                             settings.terminators += [daug.strip(';')]
                             break
                         if daug in alias:
@@ -274,16 +282,26 @@ for line in file:
                             if daug in alias:
                                 daug = alias[daug]
                             else:
-                                warning("You defined a charge conjugation without either particle being an alias. "
-                                        "Are you sure you know what you're doing on line " + str(linecount) + '?')
+                                warning(
+                                    "You defined a charge conjugation without either particle being an alias. "
+                                    "Are you sure you know what you're doing on line " + str(linecount) + '?')
                         else:
                             for k in alias:
                                 if daug == alias[k]:
-                                    warning('You defined an alias to particle ' + daug + ' called ' + k + ' but on line ' +
-                                            str(linecount) + ' you use the original particle. Is this what you want?')
+                                    warning(
+                                        'You defined an alias to particle ' +
+                                        daug +
+                                        ' called ' +
+                                        k +
+                                        ' but on line ' +
+                                        str(linecount) +
+                                        ' you use the original particle. Is this what you want?')
                         dec += [daug]
                     if not line[-1].endswith(';'):
-                        warning('Line ' + str(linecount) + ' does not end with a ;')
+                        warning(
+                            'Line ' +
+                            str(linecount) +
+                            ' does not end with a ;')
                     current_decay += [(bf, dec)]
 
 mesg('File parsed successfully.')
@@ -376,14 +394,17 @@ elif general == 3:
     elif mother == 'K_S0':
         flag = 4
     else:
-        warning('General flag is 3 but mother particle is not recogniced - assuming minbias.'
-                )
+        warning(
+            'General flag is 3 but mother particle is not recogniced - assuming minbias.')
         flag = 0
 else:
     warning('Cannot determine selection flag. Please check manually.')
     flag = selection
 if not flag == selection:
-    warning('Selection flag is not compliant, should be ' + str(flag) + '. Please check.')
+    warning(
+        'Selection flag is not compliant, should be ' +
+        str(flag) +
+        '. Please check.')
 else:
     done()
 newevtype += str(flag)
@@ -404,8 +425,7 @@ for (bf2, dec2) in current_decay:
                 for (bf3, dau3) in decay[daug]:
                     norm += float(bf3)
                 newbf = bf * bf2 / norm
-                newdecay2 = newdecay[:] + dau2[:]
-                newdecay2.sort()
+                newdecay2 = sorted(newdecay[:] + dau2[:])
                 current_decay += [(newbf, newdecay2)]
             break
 
@@ -477,8 +497,7 @@ for (bf, dec) in current_decay:
             break
     else:
         if not final:
-            final = dec
-            final.sort()
+            final = sorted(dec)
         else:
             dec.sort()
             if final == dec:
@@ -590,7 +609,8 @@ for dec in main_decay:
             maxtracks = tracks
 
 if not trackflag == maxtracks:
-    fail(['Track flag not compliant. Should be: ' + str(maxtracks) + '. Please check.'])
+    fail(['Track flag not compliant. Should be: ' +
+          str(maxtracks) + '. Please check.'])
 else:
     done()
 newevtype += str(maxtracks)
@@ -656,16 +676,28 @@ if settings.use_url:
         settings.use_url = False
     else:
         for (k, v) in zippednos:
-            if filename.partition('=')[0] == v.partition('=')[0] and not eventtype / 10 == k / 10:
-                warning('The decfile: ' + v + ':' + str(k) + ' should contain the same decay, therefore the first 7 '
-                        'digits of the eventtype should match. Please check and use the same extra flag.')
+            if filename.partition('=')[0] == v.partition(
+                    '=')[0] and not eventtype / 10 == k / 10:
+                warning(
+                    'The decfile: ' +
+                    v +
+                    ':' +
+                    str(k) +
+                    ' should contain the same decay, therefore the first 7 '
+                    'digits of the eventtype should match. Please check and use the same extra flag.')
                 failed = True
             if k == eventtype:
                 warning('Error: ' + v + ' has this eventtype already.')
                 failed = True
-            if k / 10 == eventtype / 10 and not os.path.basename(filename).partition('=')[0] == v.partition('=')[0]:
-                warning('The decfile: ' + v + ':' + str(k) + ' uses this extra flag, but the decay seems different. '
-                        'Please check and use a unique extra flag.')
+            if k / 10 == eventtype / \
+                    10 and not os.path.basename(filename).partition('=')[0] == v.partition('=')[0]:
+                warning(
+                    'The decfile: ' +
+                    v +
+                    ':' +
+                    str(k) +
+                    ' uses this extra flag, but the decay seems different. '
+                    'Please check and use a unique extra flag.')
                 failed = True
 
     if settings.obs_url:
@@ -692,12 +724,17 @@ if not settings.use_url:
                     try:
                         newtype = int(line.partition('EventType: ')[2].strip())
                         break
-                    except:
+                    except BaseException:
                         break
             if filen.partition('=')[0] == filename.partition('='):
                 if not newtype / 10 == eventtype / 10:
-                    warning('The decfile: ' + filen + ':' + str(newtype) + ' should contain the same decay, therefore the first 7 '
-                            'digits of the eventtype should match. Please check and use the same extra flag.')
+                    warning(
+                        'The decfile: ' +
+                        filen +
+                        ':' +
+                        str(newtype) +
+                        ' should contain the same decay, therefore the first 7 '
+                        'digits of the eventtype should match. Please check and use the same extra flag.')
                     failed = True
 #            if newtype == eventtype and not os.path.basename(filename) == v:
             if newtype == eventtype:
@@ -708,16 +745,20 @@ if not settings.use_url:
         obsfile = open(settings.obsoletepath + '/table_obsolete.sql')
         if obsfile:
             for line in obsfile:
-                if int(line.partition('EVTTYPEID = ')[2].partition(', DESCRIPTION')[0]) == eventtype:
-                    warning('The eventtype is obsolete on the following line in: ' + settings.obsoletepath + '/table_obsolete.sql')
+                if int(line.partition('EVTTYPEID = ')[2].partition(
+                        ', DESCRIPTION')[0]) == eventtype:
+                    warning(
+                        'The eventtype is obsolete on the following line in: ' +
+                        settings.obsoletepath +
+                        '/table_obsolete.sql')
                     mesg(line)
                     failed = True
 
 extraflag = eventtype / 10
 extraflag = eventtype - extraflag * 10
 if 'DaughtersInBelleII' not in cuts and extraflag and cuts == 0:
-    warning('Your cuts are not empty, please set your userflag to greater or equal to 1.'
-            )
+    warning(
+        'Your cuts are not empty, please set your userflag to greater or equal to 1.')
     failed = True
 if cuts == ['None'] and extraflag != 0:
     warning("Your cuts are empty, your user flag should be 0 unless that's taken. Please check."
@@ -763,8 +804,8 @@ if len(nick[2].split(',')) < len(cuts.split(',')):
 
 query('Checking the Physics WG.')
 if physicswg not in settings.groups:
-    fail(['The group /' + physicswg + '/ is not known. Please use one of the following:',
-         settings.groups])
+    fail(['The group /' + physicswg +
+          '/ is not known. Please use one of the following:', settings.groups])
 else:
     done()
 
@@ -834,7 +875,7 @@ if mother:
         done()
     else:
         fail(['Descriptor not matched. Please check the old one:', descriptor,
-             '\nAnd the one built by the parser: ', descript])
+              '\nAnd the one built by the parser: ', descript])
         for mes in descriptcheck.mesgdict:
             warning(mes)
 

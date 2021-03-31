@@ -44,9 +44,9 @@ TrgEclTiming::~TrgEclTiming()
 //
 //
 void
-TrgEclTiming::Setup(std::vector<int> HitTCId,
-                    std::vector<double> HitTCEnergy,
-                    std::vector<double> HitTCTiming)
+TrgEclTiming::Setup(const std::vector<int>& HitTCId,
+                    const std::vector<double>& HitTCEnergy,
+                    const std::vector<double>& HitTCTiming)
 {
   TCId = HitTCId;
   TCEnergy = HitTCEnergy;

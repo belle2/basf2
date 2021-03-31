@@ -19,7 +19,6 @@ settings = CalibrationSettings(name="ecl_energy",
 
 def get_calibrations(input_data, **kwargs):
     import basf2
-    import ROOT
     from ROOT import Belle2
     from caf.utils import IoV
     from caf.framework import Calibration

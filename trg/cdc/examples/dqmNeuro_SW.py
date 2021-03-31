@@ -1,10 +1,7 @@
 import basf2
-from ROOT import Belle2
 import neurotrigger
-import reconstruction
 import sys
 import os
-import rawdata
 
 ################################################################################
 # Setting global tags in case Raw data is unpacked: ###

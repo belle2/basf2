@@ -23,7 +23,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/Environment.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
@@ -251,7 +250,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -869,22 +868,55 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
-    double isMC(const Particle*)
+    double isBBCrossfeed(const Particle* particle)
     {
-      return Environment::Instance().isMC();
+      if (particle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      int pdg = particle->getPDGCode();
+      if (abs(pdg) != 511 && abs(pdg) != 521 && abs(pdg) != 531)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      std::vector<const Particle*> daughters = particle->getFinalStateDaughters();
+      int nDaughters = daughters.size();
+      if (nDaughters <= 1)
+        return 0;
+      std::vector<int> mother_ids;
+
+      for (int j = 0; j < nDaughters; ++j) {
+        const MCParticle* curMCParticle = daughters[j]->getMCParticle();
+        while (curMCParticle != nullptr) {
+          pdg = curMCParticle->getPDG();
+          if (abs(pdg) == 511 || abs(pdg) == 521 || abs(pdg) == 531) {
+            mother_ids.emplace_back(curMCParticle->getArrayIndex());
+            break;
+          }
+          const MCParticle* curMCMother = curMCParticle->getMother();
+          curMCParticle = curMCMother;
+        }
+        if (curMCParticle == nullptr) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      }
+
+      std::set<int> distinctIDs = std::set(mother_ids.begin(), mother_ids.end());
+      if (distinctIDs.size() == 1)
+        return 0;
+      else
+        return 1;
     }
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
                       "It behaves according to DecayStringGrammar.");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
                       "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
+                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 if not, and NaN if no related MCParticle could be found");
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
@@ -898,7 +930,8 @@ namespace Belle2 {
     // genMotherPDG and genMotherID are overloaded (each are two C++ functions
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
-
+    REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
+                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -916,15 +949,15 @@ namespace Belle2 {
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "return 1 if the particle is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
+                      "return 1 if the particle is misidentified: at least one of the final state particles has the wrong PDG code assignment (including wrong charge), 0 if PDG code is fine, and NaN if no related MCParticle could be found.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
-                      "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
+                      "return 1 if the charge of the particle is wrongly assigned, 0 if it's the correct charge, and NaN if no related MCParticle could be found.");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
                       "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
     REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
                       "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
-                      "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The PDG code of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
@@ -1018,21 +1051,21 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
-                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
-                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
-                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
-                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInTOP", seenInTOP,
-                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInECL", seenInECL,
-                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInARICH", seenInARICH,
-                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
-                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
+                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
 
     VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
@@ -1043,8 +1076,6 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
-    REGISTER_VARIABLE("isMC", isMC,
-                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
 
   }
 }

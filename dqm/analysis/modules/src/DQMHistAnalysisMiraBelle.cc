@@ -175,7 +175,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float rms_dz0 = hist_dZ0->GetRMS();
   float rms_dpt = hist_dPtcms->GetRMS();
   int ntot = hist_nsvd->GetEntries();
-  float nevt_o_lum = ntot;
+  float neve_mumu = ntot;
   float goodmu_frac = hist_muid->GetBinContent(20) / (float)ntot;
   float goodmu_o_badmu = hist_muid->GetBinContent(20) / (float)hist_muid->GetBinContent(1);
   float pval_more95 = 0;
@@ -212,7 +212,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("rms_dd0", rms_dd0);
   mon_mumu->setVariable("rms_dz0", rms_dz0);
   mon_mumu->setVariable("rms_dpt", rms_dpt);
-  mon_mumu->setVariable("nevt_o_lum", nevt_o_lum);
+  mon_mumu->setVariable("neve_mumu", neve_mumu);
   mon_mumu->setVariable("goodmu_frac", goodmu_frac);
   mon_mumu->setVariable("goodmu_o_badmu", goodmu_o_badmu);
   mon_mumu->setVariable("pval_frac_0", pval_frac_0);
@@ -288,6 +288,17 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   f_pi0_InvM->SetParameters(hist_D0_pi0_InvM->GetMaximum(), 0.13, 5e-3, 0., 0.13, 0.);
   hist_D0_pi0_InvM->Fit(f_pi0_InvM, "", "", 0.09, 0.17);
   f_pi0_InvM->SetLineColor(kRed);
+
+  // D->KPi and D->KPiPi0 yields
+  TF1* f_gaus_InvM = new TF1("f_gaus_InvM", "gaus", 1.81, 1.95);
+  f_gaus_InvM->SetParameters(f_InvM->GetParameter(0), f_InvM->GetParameter(1), f_InvM->GetParameter(2));
+  float InvM_bin_width = hist_D0_InvM->GetXaxis()->GetBinWidth(1);
+  float neve_dst = f_gaus_InvM->Integral(1.81, 1.95) / InvM_bin_width;
+
+  TF1* f_gaus_pi0_InvM = new TF1("f_gaus_pi0_InvM", "gaus", 0.09, 0.17);
+  f_gaus_pi0_InvM->SetParameters(f_pi0_InvM->GetParameter(0), f_pi0_InvM->GetParameter(1), f_pi0_InvM->GetParameter(2));
+  float pi0_InvM_bin_width = hist_D0_pi0_InvM->GetXaxis()->GetBinWidth(1);
+  float neve_pi0 = f_gaus_pi0_InvM->Integral(0.09, 0.17) / pi0_InvM_bin_width;
 
   // Sumw2
   hist_D0_softpi_PID_ALL_pion->Sumw2();
@@ -440,6 +451,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float mean_D0_K_PID_KLM_kaon = hist_D0_K_PID_KLM_kaon->GetMean();
 
   // set values
+  mon_dst->setVariable("neve_dst", neve_dst);
+  mon_dst->setVariable("neve_pi0", neve_pi0);
   mon_dst->setVariable("mean_D0_InvM", mean_D0_InvM);
   mon_dst->setVariable("width_D0_InvM", width_D0_InvM);
   mon_dst->setVariable("mean_delta_m", mean_delta_m);

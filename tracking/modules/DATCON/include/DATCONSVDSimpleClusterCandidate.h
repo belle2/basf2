@@ -35,7 +35,7 @@ namespace Belle2 {
      * Add a Strip to the current cluster.
      * Update the cluster seed seed.
      * @param vxdID: VxdID of the strip that is to be added to the cluster
-     * @param isUSide: Is the strip a u-side strip?
+     * @param isUside: Is the strip a u-side strip?
      * @param index: Index of the strip inside the DATCONSVDDigit StoreArray
      * @param charge: Charge of the strip that is to be added
      * @param cellID: CellID of the strip that is to be added

@@ -67,9 +67,6 @@ namespace Belle2 {
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
 
-    /** SVDShaperDigits StoreArray name */
-    std::string m_ShaperDigitName;
-
     /** SVD diagnostics module name */
     std::string m_SVDDAQDiagnosticsName;
 

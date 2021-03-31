@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 
 from daqdqm.commondqm import add_common_dqm
 from IPDQM import add_IP_dqm
 from V0DQM import add_V0_dqm
 
 
-def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care"):
+def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
     """
     This function adds DQMs for collisions
 
@@ -27,11 +26,14 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
                             the hlt filter
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+    @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
+                                         Should be True only when running on the HLT servers
     """
 
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
 
-    add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+    add_common_dqm(path, components=components, dqm_environment=dqm_environment,
+                   dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)

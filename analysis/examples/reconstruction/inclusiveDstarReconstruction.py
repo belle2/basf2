@@ -10,14 +10,12 @@ import basf2
 import modularAnalysis as mA
 import stdPi0s
 
-from ROOT import Belle2
-
 
 main_path = basf2.create_path()
 
 mA.inputMdstList(
     environmentType="default",
-    filelist=[Belle2.FileSystem.findFile("analysis/tests/mdst.root")],
+    filelist=[basf2.find_file("analysis/tests/mdst.root")],
     path=main_path,
 )
 
@@ -68,18 +66,18 @@ mA.addInclusiveDstarReconstruction(
     path=main_path)
 mA.matchMCTruth("D*-:Dstcharged_slowPicharged_negative", path=main_path)
 
-stdPi0s.stdPi0s("eff60_Jan2020", path=main_path)
-mA.matchMCTruth("pi0:eff60_Jan2020", path=main_path)
+stdPi0s.stdPi0s("eff60_May2020", path=main_path)
+mA.matchMCTruth("pi0:eff60_May2020", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*+:Dstcharged_slowPizero -> pi0:eff60_Jan2020",
+    "D*+:Dstcharged_slowPizero -> pi0:eff60_May2020",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
 mA.matchMCTruth("D*+:Dstcharged_slowPizero", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*0:Dstzero_slowPizero -> pi0:eff60_Jan2020",
+    "D*0:Dstzero_slowPizero -> pi0:eff60_May2020",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)

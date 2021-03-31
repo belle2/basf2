@@ -89,7 +89,7 @@ namespace Belle2 {
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
-      double m_invMass;                  /**< Inviriant mass for Mass constraint */
+      double m_invMass;                  /**< Invariant mass for Mass constraint */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */
@@ -132,7 +132,7 @@ namespace Belle2 {
       bool fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren);
 
       /**
-       * Added four vectors and calcuated a covariance matrix for a combined particles
+       * Added four vectors and calculated a covariance matrix for a combined particles
        * @param mother pointer to particle
       */
       bool AddFour(Particle* mother);

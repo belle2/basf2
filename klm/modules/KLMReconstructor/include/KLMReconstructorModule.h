@@ -77,6 +77,8 @@ namespace Belle2 {
 
   private:
 
+    /* Functions. */
+
     /**
      * Reconstruct BKLMHit1d and BKLMHit2d.
      */
@@ -88,12 +90,11 @@ namespace Belle2 {
     void reconstructEKLMHits();
 
     /**
-     * Check if channel is normal or dead.
-     * Dead channels should not contain any signal; they are allowed for debugging.
+     * Check if channel is normal or dead. Dead channels should not
+     * contain any signal; they are allowed for debugging.
+     * @param[in] digit KLM digit.
      */
     bool isNormal(const KLMDigit* digit) const;
-
-    /* EKLM methods. */
 
     /**
      * Get 2d hit time corresponding to EKLM digit.
@@ -102,22 +103,42 @@ namespace Belle2 {
      */
     double getTime(KLMDigit* d, double dist);
 
-    /** Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits. */
+    /* Common member variables. */
+
+    /**
+     * Half-width of the time coincidence window used to create a 2D hit
+     * from 1D digits/hits.
+     */
     double m_CoincidenceWindow;
 
     /** Nominal time of prompt BKLMHit2ds. */
     double m_PromptTime;
 
-    /** Half-width of the time window relative to the prompt time for BKLMHit2ds. */
+    /**
+     * Half-width of the time window relative to the prompt time
+     * for BKLMHit2ds.
+     */
     double m_PromptWindow;
+
+    /**
+     * Use only normal and dead (for debugging) channels during 2d hit
+     * reconstruction.
+     */
+    bool m_IgnoreHotChannels;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** KLM time window. */
     DBObjPtr<KLMTimeWindow> m_TimeWindow;
 
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 
-    /* BKLM parameters. */
+    /* BKLM member variables. */
 
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
@@ -134,7 +155,7 @@ namespace Belle2 {
     /** BKLM 2d hits. */
     StoreArray<BKLMHit2d> m_bklmHit2ds;
 
-    /* EKLM parameters. */
+    /* EKLM member variables. */
 
     /**
      * Check if segments intersect. Normally should be true, but it may be
@@ -142,9 +163,8 @@ namespace Belle2 {
      */
     bool m_eklmCheckSegmentIntersection;
 
-    /** Element numbers. */
+    /** EKLM element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
-    const KLMElementNumbers* m_ElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
@@ -173,11 +193,6 @@ namespace Belle2 {
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
 
-    /** Channel status. */
-    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
-
-    /** Use only Normal and Dead (for debugging) channels during 2d hit reconstruction */
-    bool m_IgnoreHotChannels;
-
   };
-} // end namespace Belle2
+
+}

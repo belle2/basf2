@@ -53,7 +53,7 @@ namespace Belle2 {
      * @param cot         will contain the fitted cot(theta)
      * @param chi2        will contain the chi2 value for the fit
      */
-    void fitter(std::vector<int>& bestTSIndex, std::vector<double>& bestTSPhi,
+    void fitter(const std::vector<int>& bestTSIndex, std::vector<double>& bestTSPhi,
                 int charge, double rho, double phi,
                 double& z0, double& cot, double& chi2);
 

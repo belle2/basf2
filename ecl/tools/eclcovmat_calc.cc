@@ -92,8 +92,6 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   double Nsigcut;
   Nsigcut = 3.5;
   double delta = 0.;
-  int index;
-  index = 0;
   int icn, id;
 
 
@@ -171,7 +169,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
     fChain.GetEntry(i);
     if (i % 100 == 0) { cout << " nevent=" << i << endl; }
     for (icn = 0; icn < max; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
-      index = 1;
+      int index = 1;
       for (id = 0; id < 16; id++) {
         Y[id] = 0.; // was it, fixed 20151126.
       }

@@ -49,7 +49,7 @@ namespace Belle2 {
       std::string strline;
       //vector<const CDCTriggerTrack*> relin2dtracks;
       //vector<const CDCTriggerTrack*> relin2dtracks;
-      TSLine(const CDCTriggerSegmentHit& h)
+      explicit TSLine(const CDCTriggerSegmentHit& h)
       {
         hit = &h;
       }
@@ -117,7 +117,7 @@ namespace Belle2 {
       TSLines::iterator it = lines.begin();
       for (const CDCTriggerTrack& track : line.hit->getRelationsFrom<CDCTriggerTrack>(firstsortarray)) {
         if (!inserted) {
-          for (TSLines::iterator i = lines.begin(); i < lines.end(); i++) {
+          for (TSLines::iterator i = lines.begin(); i < lines.end(); ++i) {
             if (i->hit->getISuperLayer() % 2 != line.hit->getISuperLayer() % 2) {
               continue;
             }
@@ -133,12 +133,12 @@ namespace Belle2 {
         } else { break; }
       }
       if (related) {
-        if (!inserted) {it++; }
+        if (!inserted) {++it; }
         lines.insert(it, line);
       } else {
         for (const CDCTriggerTrack& track : line.hit->getRelationsFrom<CDCTriggerTrack>(secondsortarray)) {
           if (!inserted) {
-            for (TSLines::iterator i = it; i < lines.end(); i++) {
+            for (TSLines::iterator i = it; i < lines.end(); ++i) {
               if (i->hit->getISuperLayer() % 2 != line.hit->getISuperLayer() % 2) {
                 continue;
               }
@@ -154,7 +154,7 @@ namespace Belle2 {
           } else { break; }
         }
         if (related) {
-          if (!inserted) {it++; }
+          if (!inserted) {++it; }
           lines.insert(it, line);
         } else {
           lines.push_back(line);
@@ -409,8 +409,8 @@ namespace Belle2 {
 
 
     // hw 2D received TS
-    TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
-    TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
+    //TH1F* m_2DHWInTSID = nullptr;                      /**< ID of 2D incoming axial track segments */
+    //TH1F* m_2DHWInTSCount = nullptr;                   /**< number of 2D incoming TS per event */
     TH1F* m_2DHWInTSPrioT_Layer0 = nullptr;            /**< Priority time of 2D track segments in layer 0 */
     TH1F* m_2DHWInTSPrioT_Layer2 = nullptr;            /**< Priority time of 2D track segments in layer 2 */
     TH1F* m_2DHWInTSPrioT_Layer4 = nullptr;            /**< Priority time of 2D track segments in layer 4 */

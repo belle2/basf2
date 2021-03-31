@@ -19,14 +19,7 @@
 
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(TriggerSkim)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 TriggerSkimModule::TriggerSkimModule() : Module()
 {
@@ -61,7 +54,7 @@ lines were accepted after their own prescale.
            "or a counter (False) for applying the prescale. In the latter case, the module will retain exactly "
            "one event every N processed, where N (the counter value) is set for each line via the "
            "``triggerLines`` option. By default, random numbers are used.", m_useRandomNumbersForPreScale);
-  addParam("resultOnMissing", m_resultOnMissing, "Value to return if there's no hlt trigger result available. "
+  addParam("resultOnMissing", m_resultOnMissing, "Value to return if hlt trigger result is not available or incomplete. "
            "If this is set to None a FATAL error will be raised if the results are missing. Otherwise the value "
            "given will be set as return value of the module", m_resultOnMissing);
 }
@@ -73,7 +66,7 @@ void TriggerSkimModule::initialize()
   } else {
     m_trigResults.isOptional();
   }
-  if (m_logicMode != "and" && m_logicMode != "or") {
+  if (m_logicMode != "and" and m_logicMode != "or") {
     B2FATAL("You have entered an invalid parameter for logicMode. "
             "Valid strings are any of ['or', 'and']");
   }
@@ -83,7 +76,7 @@ void TriggerSkimModule::initialize()
 
   // check if and how many prescales we have
   int havePrescales{0};
-  for(const auto& line: m_triggerLines){
+  for(const auto& triggerLine: m_triggerLines){
     boost::apply_visitor(Utils::VisitOverload{
       [&havePrescales](const std::tuple<std::string, unsigned int>& line) {
         const auto& [name, prescale] = line;
@@ -98,10 +91,10 @@ void TriggerSkimModule::initialize()
         // nothing to do without prescales
         B2DEBUG(20, "No prescales to be applied to " << name);
       },
-    }, line);
+    }, triggerLine);
   }
   // and reserve counters if we need them
-  if(havePrescales>0 and not m_useRandomNumbersForPreScale) {
+  if(havePrescales > 0 and not m_useRandomNumbersForPreScale) {
     m_prescaleCounters.clear();
     m_prescaleCounters.assign(havePrescales, 0);
   }
@@ -110,18 +103,35 @@ void TriggerSkimModule::initialize()
 bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int prescale, uint32_t* counter) const {
   try {
     bool accepted = m_trigResults->getResult(name) == static_cast<SoftwareTriggerCutResult>(m_expectedResult);
-    if(accepted and prescale!=1) {
+    if(accepted and prescale != 1) {
       accepted &= SoftwareTrigger::makePreScale(prescale, counter);
     }
     return accepted;
   } catch(std::out_of_range &e) {
     // typo? change in lines? In any case we nope out of here but let's try to give a helpful message
     std::string available_lines = "";
-    for(auto&& [line, result]: m_trigResults->getResults()){
-            available_lines += line + "(" + std::to_string((int)result) + ") ";
+    for(auto&& [line, result]: m_trigResults->getResults()) {
+      available_lines += line + "(" + std::to_string((int)result) + ") ";
     }
-    B2FATAL("software trigger line not found" << LogVar("requested", name) << LogVar("available", available_lines));
-    return false;
+    if(m_resultOnMissing) {
+      B2WARNING("Software trigger line not found" << LogVar("requested", name)
+                                                  << LogVar("available", available_lines)
+                                                  << LogVar("errorFlag", m_eventMetaDataPtr->getErrorFlag())
+                                                  << LogVar("experiment", m_eventMetaDataPtr->getExperiment())
+                                                  << LogVar("run", m_eventMetaDataPtr->getRun())
+                                                  << LogVar("event", m_eventMetaDataPtr->getEvent()));
+      return *m_resultOnMissing;
+    }
+    else {
+      B2FATAL("Software trigger line not found (if this is expected, please use the `resultOnMissing` parameter)"
+                                                << LogVar("requested", name)
+                                                << LogVar("available", available_lines)
+                                                << LogVar("errorFlag", m_eventMetaDataPtr->getErrorFlag())
+                                                << LogVar("experiment", m_eventMetaDataPtr->getExperiment())
+                                                << LogVar("run", m_eventMetaDataPtr->getRun())
+                                                << LogVar("event", m_eventMetaDataPtr->getEvent()));
+      return false;
+    }
   }
 }
 
@@ -139,7 +149,7 @@ void TriggerSkimModule::event()
   size_t numAccepted(0);
   // Now check all lines, index is the prescale counter if needed
   size_t counterIndex{0};
-  for(const auto& line: m_triggerLines){
+  for(const auto& triggerLine: m_triggerLines) {
     const bool accept = boost::apply_visitor(Utils::VisitOverload{
       // check in prescale case
       [this, &counterIndex](const std::tuple<std::string, unsigned int>& line) {
@@ -151,8 +161,9 @@ void TriggerSkimModule::event()
       [this](const std::string& name) {
         return checkTrigger(name);
       },
-    }, line);
-    if(accept) ++numAccepted;
+    }, triggerLine);
+    if(accept) 
+      ++numAccepted;
   }
 
   // Apply our logic on the test results

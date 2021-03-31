@@ -3,7 +3,7 @@
 
 import os
 import basf2
-from ROOT import TFile, TTree
+from ROOT import TFile
 
 from b2test_utils import skip_test_if_light
 skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import  # noqa

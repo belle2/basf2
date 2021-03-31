@@ -1,11 +1,9 @@
 from tracking import modules
 from tracking.run.event_generation import StandardEventGenerationRun
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 import sys
 import logging
 from tracking.harvest import refiners
 from tracking.harvest.harvesting import HarvestingModule
-import basf2
 import ROOT
 from ROOT import Belle2
 
@@ -50,7 +48,7 @@ class FitValidationModule(HarvestingModule):
 
         cdc_hit_store_array = self.cdcHits
 
-        observations_variance = Belle2.TrackFindingCDC.CDCObservations2D()
+        # observations_variance = Belle2.TrackFindingCDC.CDCObservations2D()
         observations = Belle2.TrackFindingCDC.CDCObservations2D()
         hits = ROOT.std.vector("Belle2::TrackFindingCDC::TrackHit*")()
 

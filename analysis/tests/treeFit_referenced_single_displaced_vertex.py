@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import modularAnalysis as ma
 import b2test_utils
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestTreeFits(unittest.TestCase):
@@ -25,7 +22,7 @@ class TestTreeFits(unittest.TestCase):
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
         ma.inputMdst('default', inputfile, path=main)
 
-        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
 
         ma.reconstructDecay('K_S0:all -> pi+:a pi-:a', '', 0, path=main)
         ma.matchMCTruth('K_S0:all', path=main)

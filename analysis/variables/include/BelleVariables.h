@@ -46,6 +46,9 @@ namespace Belle2 {
     double BelleLastCDCHitY(const Particle* particle);
     /** Returns last_z from mdst_trk_fit */
     double BelleLastCDCHitZ(const Particle* particle);
+
+    /** Returns significance of invariant mass using daughters' covariance matrices */
+    double BellePi0InvariantMassSignificance(const Particle* particle);
   }
 }
 

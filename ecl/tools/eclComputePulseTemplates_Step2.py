@@ -1,14 +1,8 @@
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fftpack import fft, ifft
-from scipy import signal
 import ROOT
-from ROOT import TCanvas, TGraph, TFile
-import scipy
+from ROOT import TFile
 import sys
-import cppyy
-import libPyROOT as _backend
 from array import array
 #
 # See eclComputePulseTemplates_Step0.cc for README instructions.

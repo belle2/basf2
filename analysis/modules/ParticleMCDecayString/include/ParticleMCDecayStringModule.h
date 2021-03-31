@@ -95,7 +95,7 @@ namespace Belle2 {
 
     TFile* m_file; /**< ROOT file to store the hashes and strings */
 
-    StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containting the saved hashes and strings */
+    StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containing the saved hashes and strings */
 
     StoreObjPtr<SetMergeable<std::unordered_set<uint64_t>>> m_hashset; /**< Mergeable unordered set containing the encountered hashes */
 

@@ -166,9 +166,9 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
   vector<int> k161 = {2,  8, 9};      // (10) C5+C6+C7
   vector<int> k162 = {2,  9, 10};     // (10) C5+C6+C7
 
-  vector<int> k17 = {2, 14, 15};      // (11) C11+C12 +forward gap
+  //vector<int> k17 = {2, 14, 15};      // (11) C11+C12 +forward gap
 
-  vector<int> k18 = {1, 16};          // (11) B1 + forward gap
+  //vector<int> k18 = {1, 16};          // (11) B1 + forward gap
 
   vector<int> kLOM1 = {2,  2, 3 };    // (1)  F1+F2 + F3 + B1+B2
   vector<int> kLOM2 = {2, 16, 17};    // (1)  F1+F2 + F3 + B1+B2
@@ -310,8 +310,6 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
 //========================================================
 bool TrgEclBhabha::GetBhabha01()
 {
-  bool BtoBFlag = false;
-  bool BhabhaFlag = false;
   //
   // Read Cluster Table
   //
@@ -349,10 +347,10 @@ bool TrgEclBhabha::GetBhabha01()
 
   int cl_idx1 = -1;
   int cl_idx2 = -1;
-  BhabhaFlag = false;
+  bool BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
-      BtoBFlag = false;
+      bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
@@ -416,8 +414,6 @@ bool TrgEclBhabha::GetBhabha01()
 //========================================================
 bool TrgEclBhabha::GetBhabha02()
 {
-  bool BtoBFlag = false;
-  bool BhabhaFlag = false;
   //
   // Read Cluster Table
   //
@@ -451,10 +447,10 @@ bool TrgEclBhabha::GetBhabha02()
 
   int cl_idx1 = -1;
   int cl_idx2 = -1;
-  BhabhaFlag = false;
+  bool BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
-    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
-      BtoBFlag = false;
+    for (int jcluster = icluster + 1; jcluster < ncluster; ++jcluster) {
+      bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);

@@ -249,7 +249,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs, efficiencies, and fake rates for true pions
-    if (pidavail(pid, det) and abs(pdg) == 211) {
+    if (pidavail(pid, det) and abs(pdg) == Const::pion.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::pion, Const::kaon, det) > 0) ? true : false;
       m_piK_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -273,7 +273,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs, efficiencies, and fake rates for true kaons
-    if (pidavail(pid, det) and abs(pdg) == 321) {
+    if (pidavail(pid, det) and abs(pdg) == Const::kaon.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::kaon, Const::pion, det) > 0) ? true : false;
       m_Kpi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -294,7 +294,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs and efficiencies for true protons
-    if (pidavail(pid, det) and abs(pdg) == 2212) {
+    if (pidavail(pid, det) and abs(pdg) == Const::proton.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::proton, Const::pion, det) > 0) ? true : false;
       m_ppi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -306,7 +306,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill efficiencies for true deuterons
-    if (pidavail(pid, det) and abs(pdg) == 1000010020) {
+    if (pidavail(pid, det) and abs(pdg) == Const::deuteron.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::deuteron, Const::pion, det) > 0) ? true : false;
       m_dpi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
     }
@@ -334,7 +334,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs and efficiencies for true electrons
-    if (pidavail(pid, det) and abs(pdg) == 11) {
+    if (pidavail(pid, det) and abs(pdg) == Const::electron.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::electron, Const::pion, det) > 0) ? true : false;
       m_epi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -343,7 +343,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs and fake rates for true pions
-    if (pidavail(pid, det) and abs(pdg) == 211) {
+    if (pidavail(pid, det) and abs(pdg) == Const::pion.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::electron, Const::pion, det) > 0) ? true : false;
       m_epi_FakeRates[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -365,7 +365,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs and efficiencies for true muons
-    if (pidavail(pid, det) and abs(pdg) == 13) {
+    if (pidavail(pid, det) and abs(pdg) == Const::muon.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::muon, Const::pion, det) > 0) ? true : false;
       m_mpi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
 
@@ -374,7 +374,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     }
 
     // fill rocs and fake ratesfor true pions
-    if (pidavail(pid, det) and abs(pdg) == 211) {
+    if (pidavail(pid, det) and abs(pdg) == Const::pion.getPDGCode()) {
       pass = (pid->getDeltaLogL(Const::muon, Const::pion, det) > 0) ? true : false;
       m_mpi_FakeRates[i]->Fill(pass, trackFit->getMomentum().Mag());
 

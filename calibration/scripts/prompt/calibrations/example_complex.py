@@ -79,7 +79,6 @@ def get_calibrations(input_data, **kwargs):
     # Set up config options
     import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT.Belle2 import TestCalibrationAlgorithm, TestBoundarySettingAlgorithm
     from caf.framework import Calibration, Collection
     from caf.strategies import SequentialBoundaries

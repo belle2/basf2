@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 from basf2 import B2FATAL, B2RESULT, Path, process, conditions, register_module
 import b2test_utils
 import modularAnalysis as ma

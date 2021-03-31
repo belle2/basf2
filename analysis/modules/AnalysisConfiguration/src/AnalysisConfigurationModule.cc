@@ -22,7 +22,7 @@ REG_MODULE(AnalysisConfiguration)
 
 AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
 {
-  setDescription("This is a supplimentary module designed to configure other modules");
+  setDescription("This is a supplementary module designed to configure other modules");
   addParam("tupleStyle", m_tupleStyle, R"DOCSTRING(This parameter defines style of variables written by all other ntuples tools. \n
   Possible styles on example of PX variable of pi0 from D in decay B->(D->pi0 pi) pi0:\n
   'default': B_D_pi0_PX\n

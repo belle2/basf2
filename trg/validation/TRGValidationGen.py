@@ -9,20 +9,17 @@
 </header>
 """
 
-import os
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_tsim
-from modularAnalysis import *
 
-import glob
 
-main = create_path()
-eventinfosetter = register_module('EventInfoSetter')
+main = b2.create_path()
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [11, -11])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
@@ -42,7 +39,7 @@ add_simulation(main)
 add_tsim(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
-rootoutput = register_module('RootOutput')
+rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', "../TRGValidationGen.root")
 main.add_module(
     rootoutput,
@@ -54,6 +51,6 @@ main.add_module(
         "MCParticles"])
 
 # main
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)
 # ===<END>

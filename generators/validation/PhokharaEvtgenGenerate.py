@@ -10,7 +10,6 @@
 """
 
 from basf2 import *
-from ROOT import Belle2
 
 set_log_level(LogLevel.INFO)
 
@@ -48,7 +47,7 @@ phokhara.param('MinEnergyGamma', 0.01)
 
 # EvtGen
 evtgendecay = register_module('EvtGenDecay')
-evtgendecay.param('UserDecFile', Belle2.FileSystem.findFile('generators/examples/PhokharaEvtgenDoubleCharmonium.dec'))
+evtgendecay.param('UserDecFile', find_file('generators/examples/PhokharaEvtgenDoubleCharmonium.dec'))
 
 # Output
 output = register_module('RootOutput')

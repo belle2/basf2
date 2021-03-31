@@ -31,7 +31,11 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param detNb Detector number
+     * @param time time in seconds
+     * @param edep Deposited energy in electrons
+     * @param mip Particle mip
+     * @param pe Particle pe
      */
     ClawHit(int detNb, int time, float edep, float mip, float pe):
       m_detNb(detNb), m_time(time), m_edep(edep), m_mip(mip), m_pe(pe)

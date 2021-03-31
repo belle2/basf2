@@ -5,7 +5,6 @@ from string import Formatter
 from pathlib import Path
 import re
 import json
-from basf2 import B2ERROR
 
 
 def string(some_string):

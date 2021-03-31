@@ -7,11 +7,11 @@
 #   basf2 mdst/examples/printPIDLikelihoods.py -i <fileName.root>
 # --------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 
-class printPIDLikelihoods(Module):
+class printPIDLikelihoods(b2.Module):
 
     '''
     Prints PID log likelihoods + basic track info in a well formatted way.
@@ -54,26 +54,22 @@ class printPIDLikelihoods(Module):
             print()
 
         # wait for user respond
-        try:
-            q = 0
-            Q = 0
-            abc = input('Type <CR> to continue or Q to quit ')
+        response = input("Type Enter to continue or Q to quit.\n").lower().strip()
+        if response == "q":
             evtMetaData.obj().setEndOfData()
-        except BaseException:
-            abc = ''  # dummy line to terminate try-except
 
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Root input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # print array of log likelihoods
 main.add_module(printPIDLikelihoods())
 
 # Process events
-process(main)
+b2.process(main)

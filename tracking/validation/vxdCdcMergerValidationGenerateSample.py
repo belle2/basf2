@@ -12,12 +12,9 @@
 
 import basf2
 from ROOT import Belle2
-from simulation import add_simulation
 from tracking import add_tracking_reconstruction
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
-from tracking.validation import tracking_efficiency_helpers
-import numpy
 
 
 def run():
@@ -99,7 +96,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
         mc_pt = mc_particle.getMomentum().Pt()
         mc_theta = mc_particle.getMomentum().Theta()
 
-        reco_tracks = Belle2.PyStoreArray('RecoTracks')
+        # reco_tracks = Belle2.PyStoreArray('RecoTracks')
 
         this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRRecoTrack(mc_track)
         this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRRecoTrack(mc_track)

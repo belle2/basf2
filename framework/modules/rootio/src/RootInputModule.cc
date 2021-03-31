@@ -272,8 +272,8 @@ void RootInputModule::initialize()
     m_tree->SetEventList(elist);
   }
 
-  B2DEBUG(33, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntriesFast() << " entries.");
-  B2DEBUG(33, "Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntriesFast() << " entries.");
+  B2DEBUG(33, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "'" << LogVar("entries", m_persistent->GetEntriesFast()));
+  B2DEBUG(33, "Opened tree '" + c_treeNames[DataStore::c_Event] + "'" << LogVar("entries", m_tree->GetEntriesFast()));
 
   connectBranches(m_persistent, DataStore::c_Persistent, &m_persistentStoreEntries);
   readPersistentEntry(0);
@@ -365,6 +365,8 @@ void RootInputModule::event()
       if (errorFlag != 0) {
         B2WARNING("Discarding corrupted event" << LogVar("errorFlag", errorFlag) << LogVar("experiment", eventMetaData->getExperiment())
                   << LogVar("run", eventMetaData->getRun()) << LogVar("event", eventMetaData->getEvent()));
+        // make sure this event is not used if it's the last one in the file
+        eventMetaData->setEndOfData();
       }
     }
     if (errorFlag == 0) break;
@@ -374,7 +376,6 @@ void RootInputModule::event()
 
 void RootInputModule::terminate()
 {
-  B2DEBUG(200, "Term called");
   if (m_collectStatistics and m_tree) {
     //add stats for last file
     m_readStats.addFromFile(m_tree->GetFile());
@@ -430,7 +431,7 @@ void RootInputModule::readTree()
     B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " <<
             localEntryNumber << ")");
   }
-  B2DEBUG(200, "Reading file entry " << m_nextEntry);
+  B2DEBUG(39, "Reading file entry " << m_nextEntry);
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {
@@ -486,40 +487,41 @@ void RootInputModule::readTree()
 
 }
 
-
 bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries)
 {
-  B2DEBUG(100, "File changed, loading persistent data.");
+  B2DEBUG(30, "File changed, loading persistent data.");
   DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
-
   //Go over the branchlist and connect the branches with DataStore entries
-  const TObjArray* branches = tree->GetListOfBranches();
-  if (!branches) {
+  const TObjArray* branchesObjArray = tree->GetListOfBranches();
+  if (!branchesObjArray) {
     B2FATAL("Tree '" << tree->GetName() << "' doesn't contain any branches!");
   }
+  std::vector<TBranch*> branches;
   set<string> branchList;
-  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    auto* branch = static_cast<TBranch*>(branches->At(jj));
-    if (branch)
-      branchList.insert(branch->GetName());
+  for (int jj = 0; jj < branchesObjArray->GetEntriesFast(); jj++) {
+    auto* branch = static_cast<TBranch*>(branchesObjArray->At(jj));
+    if (!branch) continue;
+    branchList.insert(branch->GetName());
+    branches.emplace_back(branch);
+    // start with all branches disabled and only enable what we read
+    setBranchStatus(branch, false);
   }
   //skip branches the user doesn't want
   branchList = filterBranches(branchList, m_branchNames[durability], m_excludeBranchNames[durability], durability, true);
-  for (int jj = 0; jj < branches->GetEntriesFast(); jj++) {
-    auto* branch = static_cast<TBranch*>(branches->At(jj));
-    if (!branch) continue;
+  for (TBranch* branch : branches) {
     const std::string branchName = branch->GetName();
     //skip already connected branches
     if (m_connectedBranches[durability].find(branchName) != m_connectedBranches[durability].end())
       continue;
-    if (branchList.count(branchName) == 0) {
-      //make sure FileMetaData and EventMetaData of the main file are always loaded
-      if (((branchName != "FileMetaData") || (tree != m_persistent)) &&
-          ((branchName != "EventMetaData") || (tree != m_tree))) {
-        tree->SetBranchStatus(branchName.c_str(), false);
-        continue;
-      }
+
+    if ((branchList.count(branchName) == 0) and
+        ((branchName != "FileMetaData") || (tree != m_persistent)) and
+        ((branchName != "EventMetaData") || (tree != m_tree))) {
+      continue;
     }
+    auto found = setBranchStatus(branch, true);
+    B2DEBUG(32, "Enabling branch" << LogVar("branchName", branchName)
+            << LogVar("children found", found));
 
     //Get information about the object in the branch
     TObject* objectPtr = nullptr;
@@ -535,13 +537,12 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 
     //Create a DataStore entry and connect the branch address to it
     if (!DataStore::Instance().registerEntry(branchName, durability, objClass, array, DataStore::c_WriteOut)) {
-      tree->SetBranchStatus(branch->GetName(), false);
+      B2FATAL("Cannot connect branch to datastore" << LogVar("branchName", branchName));
       continue;
     }
     DataStore::StoreEntry& entry = (map.find(branchName))->second;
     tree->SetBranchAddress(branch->GetName(), &(entry.object));
     if (storeEntries) storeEntries->push_back(&entry);
-
 
     //Keep track of already connected branches
     m_connectedBranches[durability].insert(branchName);
@@ -623,7 +624,7 @@ bool RootInputModule::readParentTrees()
     TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
-      B2DEBUG(100, "Opening parent file" << LogVar("PFN", parentPfn));
+      B2DEBUG(30, "Opening parent file" << LogVar("PFN", parentPfn));
       TFile* file = TFile::Open(parentPfn.c_str(), "READ");
       dir->cd();
       if (!file || !file->IsOpen()) {

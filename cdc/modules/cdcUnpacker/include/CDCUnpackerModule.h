@@ -343,6 +343,11 @@ namespace Belle2 {
        */
       StoreArray<CDCHit> m_CDCHits;
 
+      /**
+       * Event number.
+       */
+      int m_eventNum;
+
     };//end class declaration
 
 

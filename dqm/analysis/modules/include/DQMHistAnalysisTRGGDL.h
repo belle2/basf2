@@ -200,6 +200,7 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters
+    chid mychid_entry[nskim_gdldqm];
 #endif
 
   };

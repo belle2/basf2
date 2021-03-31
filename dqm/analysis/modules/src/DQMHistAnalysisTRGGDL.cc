@@ -93,6 +93,10 @@ void DQMHistAnalysisTRGGDLModule::initialize()
     // Read LO and HI limits from EPICS, seems this needs additional channels?
     // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
   }
+  for (int i = 0; i < nskim_gdldqm; i++) {
+    std::string aa = "TRGAna:entry_" + std::to_string(i);
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid_entry[i]), "ca_create_channel failure");
+  }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
@@ -397,6 +401,11 @@ void DQMHistAnalysisTRGGDLModule::event()
     data = m_h_eff_shifter->GetBinContent(i + 1);
     if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
   }
+  for (auto i = 0; i < nskim_gdldqm; i++) {
+    double data = 0;
+    if (i == 0)data = m_h_psn_extra[i]->GetBinContent(0 + 1);
+    if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
+  }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
@@ -412,6 +421,9 @@ void DQMHistAnalysisTRGGDLModule::terminate()
 #ifdef _BELLE2_EPICS
   for (auto i = 0; i < n_eff_shifter; i++) {
     if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+  }
+  for (auto i = 0; i < nskim_gdldqm; i++) {
+    if (mychid_entry[i]) SEVCHK(ca_clear_channel(mychid_entry[i]), "ca_clear_channel failure");
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

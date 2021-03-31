@@ -303,7 +303,7 @@ void DQMHistAnalysisHLTModule::event()
     }
   }
 
-  m_hMeanTime.second = (TH1F*) processesPerUnitHistogram->Clone("MeanTime");
+  m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
   m_hMeanTime.second->Scale(1 / numberOfProcesses);
 
   for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime}) {

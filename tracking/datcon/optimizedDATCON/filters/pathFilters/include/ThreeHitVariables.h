@@ -277,6 +277,17 @@ namespace Belle2 {
       return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
     }
 
+    /// calculates calculates the sign of the curvature of 3-hit-tracklet given as arguments.
+    /// A positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
+    /// 0 means that it is exactly straight or that two hits are identical.
+    int getCurvatureSign(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
+    {
+      using boost::math::sign;
+      B2Vector3D ba(oHit.X() - cHit.X(), oHit.Y() - cHit.Y(), 0.0);
+      B2Vector3D bc(cHit.X() - iHit.X(), cHit.Y() - iHit.Y(), 0.0);
+      return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
+    }
+
     /// Set the B-Field value used for pT calculations
     /// @param bfieldZ B-Field value to be used
     void setBFieldZ(const double bfieldZ = 1.5) { m_BFieldZ = bfieldZ; }

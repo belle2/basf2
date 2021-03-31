@@ -59,8 +59,10 @@ namespace Belle2 {
     auto iterPos = sptc.begin();
     auto stopPos = sptc.end() - 2;
 
+    ThreeHitVariables threeHitVariables;
+
     for (; iterPos < stopPos; ++iterPos) {
-      int signVal = getCurvatureSign(**iterPos, **(iterPos + 1), **(iterPos + 2));
+      int signVal = threeHitVariables.getCurvatureSign(**iterPos, **(iterPos + 1), **(iterPos + 2));
       chargeSigns.push_back(signVal);
     }
 

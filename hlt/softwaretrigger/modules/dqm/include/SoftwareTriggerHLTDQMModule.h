@@ -61,6 +61,9 @@ namespace Belle2 {
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
 
+      /// Which additional L1 cuts should be added to the L1 total result plot?
+      std::vector<std::string> m_param_additionalL1Identifiers;
+
       /// Create total result histogram?
       bool m_param_create_total_result_histograms;
 

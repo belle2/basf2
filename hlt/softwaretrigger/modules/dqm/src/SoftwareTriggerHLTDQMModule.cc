@@ -55,6 +55,10 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
            "Which l1 identifiers to report?",
            m_param_l1Identifiers);
 
+  addParam("additionalL1Identifiers", m_param_additionalL1Identifiers,
+           "Which additional l1 identifiers to be added to the l1 total result plot?",
+           m_param_additionalL1Identifiers);
+
   addParam("createTotalResultHistograms", m_param_create_total_result_histograms,
            "Create total result histogram?",
            true);
@@ -168,6 +172,19 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_l1Histograms["l1_total_result"]->SetOption("hist");
     m_l1Histograms["l1_total_result"]->SetStats(false);
     m_l1Histograms["l1_total_result"]->SetMinimum(0);
+
+    const int numberOfL1Flags = m_param_l1Identifiers.size() + m_param_additionalL1Identifiers.size();
+    m_l1Histograms["l1_total_result"]->SetBins(numberOfL1Flags, 0, numberOfL1Flags);
+    // Set bin labels
+    int l1Index = 0;
+    for (const std::string& l1Trigger : m_param_l1Identifiers) {
+      l1Index++;
+      m_l1Histograms["l1_total_result"]->GetXaxis()->SetBinLabel(l1Index, l1Trigger.c_str());
+    }
+    for (const std::string& l1Trigger : m_param_additionalL1Identifiers) {
+      l1Index++;
+      m_l1Histograms["l1_total_result"]->GetXaxis()->SetBinLabel(l1Index, l1Trigger.c_str());
+    }
   }
 
   if (m_param_create_exp_run_event_histograms) {
@@ -325,7 +342,9 @@ void SoftwareTriggerHLTDQMModule::event()
     }
 
     if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid()) {
+      float l1Index = 0;
       for (const std::string& l1Trigger : m_param_l1Identifiers) {
+        l1Index++;
         const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
         if (triggerBit < 0) {
           B2WARNING("Could not find"
@@ -334,7 +353,9 @@ void SoftwareTriggerHLTDQMModule::event()
         }
         const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
         if (m_param_create_total_result_histograms) {
-          m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
+          if (triggerResult) {
+            m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);
+          }
         }
 
         if (not triggerResult) {
@@ -366,6 +387,21 @@ void SoftwareTriggerHLTDQMModule::event()
         const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
         m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
         m_l1Histograms[l1Trigger]->LabelsDeflate("X");
+      }
+      if (m_param_create_total_result_histograms) {
+        for (const std::string& l1Trigger : m_param_additionalL1Identifiers) {
+          l1Index++;
+          const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
+          if (triggerBit < 0) {
+            B2WARNING("Could not find"
+                      << LogVar("L1 trigger line", l1Trigger));
+            continue;
+          }
+          const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+          if (triggerResult) {
+            m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);
+          }
+        }
       }
     }
   }

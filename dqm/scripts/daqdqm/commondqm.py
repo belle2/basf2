@@ -131,11 +131,45 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
         cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
 
+        additionalL1Identifiers = [
+            'ffy',
+            'fyo',
+            'c4',
+            'hie',
+            'mu_b2b',
+            'mu_eb2b',
+            'beklm',
+            'eklm2',
+            'cdcklm1',
+            'seklm1',
+            'ieklm1',
+            'ecleklm1',
+            'fso',
+            'fioiecl1',
+            'ff30',
+            'stt',
+            'ioiecl1',
+            'ioiecl2',
+            'lml1',
+            'lml2',
+            'lml3',
+            'lml4',
+            'lml5',
+            'lml6',
+            'lml7',
+            'lml8',
+            'lml9',
+            'lml10',
+            'lml12',
+            'lml13',
+            'bhapur']
+
         # Default plot
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
             pathLocation="after filter",

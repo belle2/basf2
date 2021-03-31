@@ -351,6 +351,10 @@ void CDCUnpackerModule::event()
                 B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
                 B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
                 B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+              } else {
+                B2WARNING("CDCUnpacker : data length should be 4 or 5 words.");
+                B2WARNING("CDCUnpacker : length " << LogVar("data length", length) << " words.");
+                B2WARNING("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
               }
               it += length;
               break;

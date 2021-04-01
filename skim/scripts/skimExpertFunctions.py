@@ -975,6 +975,17 @@ class CombinedSkim(BaseSkim):
         if "OutputFileName" in kwargs.keys():
             del kwargs["OutputFileName"]
 
+        kwargs.setdefault("dataDescription", {})
+
+        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
+        # There is no requirement that a combinedSkim with single MDST output is
+        # registered so set the skimDecayMode to ``None`` if no code is defined.
+        try:
+            skim_code = self.code
+        except LookupError:
+            skim_code = None
+        kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
+
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]
         except KeyError:

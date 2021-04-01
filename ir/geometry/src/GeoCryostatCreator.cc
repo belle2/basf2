@@ -147,8 +147,8 @@ namespace Belle2 {
 
       const double unitFactor = Unit::cm / Unit::mm;
 
-      double crossingAngleHER = m_config.getParameter("CrossingAngle.HER");
-      double crossingAngleLER = m_config.getParameter("CrossingAngle.LER");
+      double crossingAngleHER = m_config.getParameter("CrossingAngle.HER", 0.0415);
+      double crossingAngleLER = m_config.getParameter("CrossingAngle.LER", -0.0415);
 
       G4Transform3D transform_HER = G4Translate3D(0., 0., 0.);
       transform_HER = transform_HER * G4RotateY3D(crossingAngleHER);

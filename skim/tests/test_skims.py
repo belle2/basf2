@@ -46,7 +46,6 @@ def get_skim_object(SkimName):
 
 def main():
     path = b2.Path()
-    b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
     mdst_files = glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
     mdst_files.sort(reverse=True)
     ma.inputMdstList("default", require_file(mdst_files[0]), path=path)

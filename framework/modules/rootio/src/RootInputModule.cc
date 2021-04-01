@@ -365,6 +365,8 @@ void RootInputModule::event()
       if (errorFlag != 0) {
         B2WARNING("Discarding corrupted event" << LogVar("errorFlag", errorFlag) << LogVar("experiment", eventMetaData->getExperiment())
                   << LogVar("run", eventMetaData->getRun()) << LogVar("event", eventMetaData->getEvent()));
+        // make sure this event is not used if it's the last one in the file
+        eventMetaData->setEndOfData();
       }
     }
     if (errorFlag == 0) break;

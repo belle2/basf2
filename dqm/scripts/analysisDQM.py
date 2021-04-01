@@ -86,9 +86,9 @@ def add_mirabelle_dqm(path):
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
     ma.fillParticleList('K+:MiraBelleDst2',  'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_Jan2020', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
     ma.reconstructDecay(
-        'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_Jan2020',
+        'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',
         path=MiraBelleDst2_path)
     ma.reconstructDecay('D*+:MiraBelleDst2_kpipi0 -> D0:MiraBelleDst2_kpipi0 pi+:MiraBelleDst2',

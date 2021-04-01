@@ -1,8 +1,6 @@
 from tracking.harvest.refiners import (
     save_tree,
     save_pull_analysis,
-    save_profiles,
-    save_scatters,
 )
 from tracking.harvest.harvesting import harvest
 import tracking

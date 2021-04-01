@@ -14,7 +14,7 @@ from tabulate import tabulate
 _RegisteredSkims = [
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
-    ("10600100", "systematics", "Systematics"),
+    ("10600100", "systematics", "SystematicsDstar"),
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
     ("10600500", "systematics", "SystematicsRadMuMu"),
@@ -22,6 +22,14 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
+    ("10600800", "systematics", "SystematicsFourLeptonFromHLTFlag"),
+    ("10600900", "systematics", "SystematicsRadMuMuFromHLTFlag"),
+    ("10611000", "systematics", "SystematicsJpsi"),
+    ("10611100", "systematics", "SystematicsKshort"),
+    ("10601200", "systematics", "SystematicsBhabha"),
+    ("10601300", "systematics", "SystematicsCombinedHadronic"),
+    ("10601400", "systematics", "SystematicsCombinedLowMulti"),
+
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),

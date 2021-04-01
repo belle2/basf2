@@ -39,23 +39,23 @@ bg = None
 num_events = 100
 # output filename, can be overriden with -o
 output_filename = "RootOutput.root"
-if (args.ExperimentType is 1):
+if (args.ExperimentType == 1):
     output_filename = "RootOutput_Phase2.root"
-if (args.ExperimentType is 2):
+if (args.ExperimentType == 2):
     output_filename = "RootOutput_Phase3Early.root"
-if (args.ExperimentType is 3):
+if (args.ExperimentType == 3):
     output_filename = "RootOutput_Phase3.root"
 
 # create path
 main = b2.create_path()
 
-if (args.ExperimentType is 1):
+if (args.ExperimentType == 1):
     # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
     main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
-if (args.ExperimentType is 2):
+if (args.ExperimentType == 2):
     # the experiment number for early phase3 MC has to be 1003, otherwise the wrong payloads for this faze are loaded
     main.add_module("EventInfoSetter", expList=1003, runList=1, evtNumList=num_events)
-if (args.ExperimentType is 3):
+if (args.ExperimentType == 3):
     # the experiment number for regular phase3 MC has no need to set, it is default
     main.add_module("EventInfoSetter", evtNumList=num_events)
 
@@ -102,11 +102,11 @@ add_reconstruction(main)
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)
 Histos_filename = "Histos_DQMVXD.root"
-if (args.ExperimentType is 1):
+if (args.ExperimentType == 1):
     Histos_filename = "Histos_DQMVXD_Phase2.root"
-if (args.ExperimentType is 2):
+if (args.ExperimentType == 2):
     Histos_filename = "Histos_DQMVXD_Phase3Early.root"
-if (args.ExperimentType is 3):
+if (args.ExperimentType == 3):
     Histos_filename = "Histos_DQMVXD_Phase3.root"
 main.add_module('HistoManager', histoFileName=Histos_filename)
 

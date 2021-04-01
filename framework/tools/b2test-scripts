@@ -161,10 +161,13 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = "Error while executing cell: {}".format(ce)
+        message = f"A CellExecutionError happened: {ce}. Please re-run the build if this failure happened on bamboo."
     except TimeoutError as te:
         result = False
-        message = f"{te}"
+        message = f"A TimeoutError happened: {te}. Please re-run the build if this failure happened on bamboo."
+    except RuntimeError as re:
+        result = False
+        message = f"A RuntimeError happened: {re}. Please re-run the build if this failure happened on bamboo."
 
     time = timeit.default_timer() - time_start
 

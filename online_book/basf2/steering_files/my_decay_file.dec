@@ -1,0 +1,20 @@
+# This is my signal decay file.
+
+Decay Upsilon(4S)
+1.0 B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay B0
+1.0 J/psi K_S0 PHSP;
+Enddecay
+CDecay anti-B0
+
+Decay J/psi
+1.0 mu+ mu- VLL;
+Enddecay
+
+Decay K_S0
+1.0 pi+ pi- PHSP;
+Enddecay
+
+End

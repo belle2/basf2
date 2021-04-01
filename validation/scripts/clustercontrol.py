@@ -210,8 +210,8 @@ class Cluster:
                     job.job_id = res.group(1)
                 else:
                     self.logger.error(
-                        f"Could not find job id! Will not be able to terminate"
-                        f" this job, even if necessary. "
+                        "Could not find job id! Will not be able to terminate"
+                        " this job, even if necessary. "
                     )
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
@@ -234,7 +234,7 @@ class Cluster:
 
         @param job: The job of which we want to know if it finished
         @return: (True if the job has finished, exit code). If we can't find the
-            exit code in the '.done'-file, the returncode will be -666.
+            exit code in the '.done'-file, the returncode will be -654.
             If the job is not finished, the exit code is returned as 0.
         """
 
@@ -247,7 +247,7 @@ class Cluster:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
-                    returncode = -666
+                    returncode = -654
 
             os.remove(donefile_path)
 
@@ -273,7 +273,7 @@ class Cluster:
             except subprocess.CalledProcessError:
                 job.status = 'failed'
                 self.logger.error(
-                    f"Probably wasn't able to cancel job. Here's the traceback:"
+                    "Probably wasn't able to cancel job. Here's the traceback:"
                 )
                 self.logger.error(traceback.format_exc())
             else:
@@ -291,5 +291,5 @@ class Cluster:
             self.logger.error(
                 "Termination of the job corresponding to steering file "
                 f"{job.path} has been requested, but no job id is available."
-                f" Can't do anything."
+                " Can't do anything."
             )

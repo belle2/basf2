@@ -10,8 +10,6 @@ import tempfile
 import numpy as np
 from B2Tools import b2latex, format
 
-import ROOT
-
 import os
 import shutil
 import collections

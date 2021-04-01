@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,7 +27,7 @@ ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
-  addParam("pdgCode", m_pdgCode, "PDG code for mass reference", 22);
+  addParam("pdgCode", m_pdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
 }
 
 void ParticleMassUpdaterModule::initialize()

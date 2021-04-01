@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import basf2 as b2
+from basf2 import conditions as b2conditions
 
 numEvents = 2000
+
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = b2.create_path()
 
@@ -42,9 +45,9 @@ svdevtinfoset = b2.register_module("SVDEventInfoSetter")
 main.add_module(svdevtinfoset)
 
 digitizer = b2.register_module('SVDDigitizer')
-digitizer.param('statisticsFilename', "digitizer_debug2020.root")
+digitizer.param('statisticsFilename', "digitizer_test2021_1_hwclock.root")
 digitizer.param('storeWaveforms', True)
-digitizer.param('signalsList', "digitizer_debug2020.txt")
+digitizer.param('signalsList', "digitizer_test2021_1_hwclock.txt")
 digitizer.set_log_level(b2.LogLevel.DEBUG)
 digitizer.set_debug_level(30)
 main.add_module(digitizer)

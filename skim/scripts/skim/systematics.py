@@ -13,7 +13,7 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 import vertex
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
@@ -827,3 +827,69 @@ class SystematicsBhabha(BaseSkim):
         ma.applyCuts("vpho:bhabha", event_cuts, path=path)
 
         self.SkimLists = ["vpho:bhabha"]
+
+
+@fancy_skim_header
+class SystematicsCombinedHadronic(CombinedSkim):
+    """
+      Combined systematics skim for the four hadronic channels:
+            SystematicsKshort,
+            SystematicsJpsi,
+            SystematicsDstar,
+            SystemmaticsLambda.
+
+      This is required for  technical (data production) reasons, as it keeps the number of files low.
+      See the definitions of the individual skims for the details.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Combined Skim of the systematic hadronic skims: Kshort, Jpsi, Dstar, Lambda."
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+    __name__ = "SystematicsCombinedHadronic"
+
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            prescale_kshort (Optional[int]): offline prescale factor for KS skim.
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
+        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
+
+        skims_list = [SystematicsKshort(prescale=prescale_kshort), SystematicsDstar(), SystematicsLambda(), SystematicsJpsi()]
+        super().__init__(*skims_list, **kwargs)
+
+
+@fancy_skim_header
+class SystematicsCombinedLowMulti(CombinedSkim):
+    """
+      Combined systematics skim for the four low multi channels:
+          SystematicsFourLeptonFromHLTFlag,
+          SystematicsRadmumuFromHLTFlag,
+          SystematicsBhabha,
+          ThauThrust.
+
+      This is required for  technical (data production) reasons, as it keeps the number of files low.
+      See the definitions of the individual skims for the details.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, TauThrust."
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+    __name__ = "SystematicsCombinedLowMulti"
+
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
+        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
+
+        from skim.taupair import TauThrust
+        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
+        super().__init__(*skims_list, **kwargs)

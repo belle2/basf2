@@ -298,6 +298,7 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMAlignment
         algorithm.params = {
+            "has_experiment_settings": True,
             "iov_coverage": output_iov,
             "millepede_entries": expert_config["millepede_entries"],
             "millepede_entries_exp7": expert_config["millepede_entries_exp7"]

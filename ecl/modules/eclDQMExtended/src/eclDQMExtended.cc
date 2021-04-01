@@ -87,6 +87,7 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
     // By default, skip delayed bhabha and random trigger events
     TRGSummary::ETimingType::TTYP_DPHY,
     TRGSummary::ETimingType::TTYP_RAND,
+    TRGSummary::ETimingType::TTYP_POIS,
   };
   addParam("skipEvents", m_skipEvents, "Skip events that have listed timing "
            "source (from TRGSummary)", default_skip);

@@ -1142,6 +1142,9 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool iecl_fired = isFired("iecl");
     bool yioiecl1_fired = isFired("yioiecl1");
     bool stt_fired = isFired("stt");
+    bool ffz_fired = isFired("ffz");
+    bool fzo_fired = isFired("fzo");
+    bool fzb_fired = isFired("fzb");
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
@@ -1374,6 +1377,60 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (stt_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(76.5);
     }
+    if (ffz_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(77.5);
+    }
+    if (fzo_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(78.5);
+    }
+    if (fzb_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(79.5);
+    }
+    if (ffy_fired && ffz_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(80.5);
+    }
+    if (fyo_fired && fzo_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(81.5);
+    }
+    if (fyb_fired && fzb_fired && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(82.5);
+    }
+    if ((ffy_fired || ffz_fired) && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(83.5);
+    }
+    if ((fyo_fired || fzo_fired) && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(84.5);
+    }
+    if ((fyb_fired || fzb_fired) && (ECL_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(85.5);
+    }
+    if (ffy_fired && ffz_fired) {
+      h_psn_extra[skim[ifill]]->Fill(86.5);
+    }
+    if (fyo_fired && fzo_fired) {
+      h_psn_extra[skim[ifill]]->Fill(87.5);
+    }
+    if (fyb_fired && fzb_fired) {
+      h_psn_extra[skim[ifill]]->Fill(88.5);
+    }
+    if (ffy_fired || ffz_fired) {
+      h_psn_extra[skim[ifill]]->Fill(89.5);
+    }
+    if (fyo_fired || fzo_fired) {
+      h_psn_extra[skim[ifill]]->Fill(90.5);
+    }
+    if (fyb_fired || fzb_fired) {
+      h_psn_extra[skim[ifill]]->Fill(91.5);
+    }
+    if (fff_fired) {
+      h_psn_extra[skim[ifill]]->Fill(92.5);
+    }
+    if (ffo_fired) {
+      h_psn_extra[skim[ifill]]->Fill(93.5);
+    }
+    if (ffb_fired) {
+      h_psn_extra[skim[ifill]]->Fill(94.5);
+    }
   }
 
 }
@@ -1386,7 +1443,9 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)", "mu_b2b&(fff|ffo|ffb)", "mu_eb2b&(fff|ffo|ffb)", "cdcklm1&(fff|ffo|ffb)", "cdcklm2&(fff|ffo|ffb)", "klm_hit&(fff|ffo|ffb)", "eklm_hit&(fff|ffo|ffb)", "mu_b2b&(lml|eclmumu)", "mu_eb2b&(lml|eclmumu)",
   "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
   "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)", "fso&(lml|eclmumu)", "fsb&(lml|eclmumu)", "syo&(lml|eclmumu)", "syb&(lml|eclmumu)", "x&(lml|eclmumu)", "fioiecl1&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "seklm1&(lml|eclmumu)",
-  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "syo&(c4|hie)", "yioiecl1&(c4|hie)", "stt&(c4|hie)"
+  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "syo&(c4|hie)", "yioiecl1&(c4|hie)", "stt&(c4|hie)", "ffz&(c4|hie)", "fzo&(c4|hie)", "fzb&(c4|hie)",
+  "ffy&ffz&(c4|hie)", "fyo&fzo&(c4|hie)", "fyb&fzb&(c4|hie)", "(ffy|ffz)&(c4|hie)", "(fyo|fzo)&(c4|hie)", "(fyb|fzb)&(c4|hie)", "ffy&ffz", "fyo&fzo", "fyb&fzb", "(ffy|ffz)",
+  "(fyo|fzo)", "(fyb|fzb)", "fff", "ffo", "ffb"
 };
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {

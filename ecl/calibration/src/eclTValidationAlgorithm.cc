@@ -263,6 +263,10 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
                                           "-For crystals with a good fit to distribution of hits-;Peak cluster time [ns];Number of crystals",
                                           hist_nTbins, hist_tmin, hist_tmax);
 
+  auto peakClusterTimesGoodFit__cid = new TH1F("peakClusterTimesGoodFit__cid",
+                                               "-For crystals with a good fit to distribution of hits-;cell id (only crystals with good fit);Peak cluster time [ns]",
+                                               8736, 1, 8736 + 1);
+
 
   // define histograms to keep track of the difference in the new crystal times vs the old ones
   auto tsNew_MINUS_tsCustomPrev__cid = new TH1F("TsNew_MINUS_TsCustomPrev__cid",
@@ -459,8 +463,10 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
       peakClusterTimes->Fill(t_offsets[crys_id - 1]);
       numCrysWithNonZeroEntries++ ;
     }
-    if (good_fit) {
+    if ((numEntries >= minNumEntries)  &&  good_fit) {
       peakClusterTimesGoodFit->Fill(t_offsets[crys_id - 1]);
+      peakClusterTimesGoodFit__cid->SetBinContent(crys_id, t_offsets[crys_id - 1]);
+      peakClusterTimesGoodFit__cid->SetBinError(crys_id, t_offsets_unc[crys_id - 1]);
     }
 
 
@@ -468,9 +474,11 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   }
 
   peakClusterTime_cid->ResetStats();
+  peakClusterTimesGoodFit__cid->ResetStats();
 
   histfile->WriteTObject(peakClusterTime_cid, "peakClusterTime_cid");
   histfile->WriteTObject(peakClusterTimes, "peakClusterTimes");
+  histfile->WriteTObject(peakClusterTimesGoodFit__cid, "peakClusterTimesGoodFit__cid");
   histfile->WriteTObject(peakClusterTimesGoodFit, "peakClusterTimesGoodFit");
 
 

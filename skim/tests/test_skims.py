@@ -50,7 +50,8 @@ def main():
     mdst_files.sort(reverse=True)
     ma.inputMdstList("default", require_file(mdst_files[0]), path=path)
 
-    skim = CombinedSkim(*[get_skim_object(skim) for skim in Registry.names if not isinstance(skim, CombinedSkim)])
+    SkimObjects = [get_skim_object(skim) for skim in Registry.names]
+    skim = CombinedSkim(*[skim for skim in SkimObjects if not isinstance(skim, CombinedSkim)])
     skim(path)
 
     b2.process(path, max_event=10)

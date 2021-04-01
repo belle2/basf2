@@ -123,6 +123,7 @@ void FastInterceptFinder2D::initialize()
           " unitY: " << m_unitY);
 
   initializeSectorFriendMap();
+
 }
 
 
@@ -172,38 +173,31 @@ void FastInterceptFinder2D::apply(std::vector<HitData>& hits, std::vector<std::v
 
 }
 
-
 void FastInterceptFinder2D::initializeSectorFriendMap()
 {
-  const std::vector<VxdID> friends6XX1 = {VxdID(3, 0, 1), VxdID(4, 0, 1), VxdID(5, 0, 1)};
-  const std::vector<VxdID> friends6XX2 = {VxdID(3, 0, 1), VxdID(4, 0, 1), VxdID(4, 0, 2), VxdID(5, 0, 1), VxdID(5, 0, 2)};
-  const std::vector<VxdID> friends6XX3 = {VxdID(3, 0, 1), VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(5, 0, 2), VxdID(5, 0, 3)};
-  const std::vector<VxdID> friends6XX4 = {VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 3), VxdID(5, 0, 4)};
-  const std::vector<VxdID> friends6XX5 = {VxdID(3, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 4)};
+  const std::vector<VxdID> friends6XX1 = {VxdID(3, 0, 1), VxdID(3, 0, 2), VxdID(4, 0, 1), VxdID(4, 0, 2), VxdID(5, 0, 1), VxdID(5, 0, 2), VxdID(5, 0, 3), VxdID(6, 0, 2), VxdID(6, 0, 3)};
+  const std::vector<VxdID> friends6XX5 = {VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 3), VxdID(5, 0, 4), VxdID(6, 0, 3), VxdID(6, 0, 4)};
 
   friendSensorMap thetaFriends;
   thetaFriends.insert(std::make_pair(VxdID(6, 0, 1), friends6XX1));
-  thetaFriends.insert(std::make_pair(VxdID(6, 0, 2), friends6XX2));
-  thetaFriends.insert(std::make_pair(VxdID(6, 0, 3), friends6XX3));
-  thetaFriends.insert(std::make_pair(VxdID(6, 0, 4), friends6XX4));
   thetaFriends.insert(std::make_pair(VxdID(6, 0, 5), friends6XX5));
 
-  const std::vector<VxdID> friends601X = {VxdID(3, 1, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 12, 0)};
-  const std::vector<VxdID> friends602X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 3, 0)};
-  const std::vector<VxdID> friends603X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 2, 0), VxdID(5, 3, 0)};
-  const std::vector<VxdID> friends604X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 3, 0), VxdID(5, 4, 0)};
-  const std::vector<VxdID> friends605X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(5, 5, 0)};
-  const std::vector<VxdID> friends606X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(5, 6, 0)};
-  const std::vector<VxdID> friends607X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 5, 0), VxdID(5, 6, 0)};
-  const std::vector<VxdID> friends608X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(5, 6, 0), VxdID(5, 7, 0)};
-  const std::vector<VxdID> friends609X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(5, 8, 0)};
-  const std::vector<VxdID> friends610X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(5, 9, 0)};
-  const std::vector<VxdID> friends611X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 8, 0), VxdID(5, 9, 0)};
-  const std::vector<VxdID> friends612X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 9, 0), VxdID(5, 10, 0)};
-  const std::vector<VxdID> friends613X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(5, 11, 0)};
-  const std::vector<VxdID> friends614X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0)};
-  const std::vector<VxdID> friends615X = {VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0)};
-  const std::vector<VxdID> friends616X = {VxdID(3, 1, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 12, 0)};
+  const std::vector<VxdID> friends601X = {VxdID(3, 1, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 12, 0), VxdID(6, 1, 0)};
+  const std::vector<VxdID> friends602X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 3, 0), VxdID(6, 2, 0)};
+  const std::vector<VxdID> friends603X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 2, 0), VxdID(5, 3, 0), VxdID(6, 3, 0)};
+  const std::vector<VxdID> friends604X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(6, 4, 0)};
+  const std::vector<VxdID> friends605X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(6, 5, 0)};
+  const std::vector<VxdID> friends606X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(5, 6, 0), VxdID(6, 6, 0)};
+  const std::vector<VxdID> friends607X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 5, 0), VxdID(5, 6, 0), VxdID(6, 7, 0)};
+  const std::vector<VxdID> friends608X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(6, 8, 0)};
+  const std::vector<VxdID> friends609X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(6, 9, 0)};
+  const std::vector<VxdID> friends610X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(5, 9, 0), VxdID(6, 10, 0)};
+  const std::vector<VxdID> friends611X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 8, 0), VxdID(5, 9, 0), VxdID(6, 11, 0)};
+  const std::vector<VxdID> friends612X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(6, 12, 0)};
+  const std::vector<VxdID> friends613X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(6, 13, 0)};
+  const std::vector<VxdID> friends614X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0), VxdID(6, 14, 0)};
+  const std::vector<VxdID> friends615X = {VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0), VxdID(6, 15, 0)};
+  const std::vector<VxdID> friends616X = {VxdID(3, 1, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 12, 0), VxdID(6, 16, 0)};
 
   friendSensorMap phiFriends;
   phiFriends.insert(std::make_pair(VxdID(6, 1, 0), friends601X));

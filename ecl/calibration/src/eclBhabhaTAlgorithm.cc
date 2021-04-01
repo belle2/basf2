@@ -87,23 +87,25 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // Define new plots to make
   // New calibration constant values minus older values from previous iteration plotted as a function of the crystal or crate id
-  unique_ptr<TH1F> tsNew_MINUS_tsOld__cid(new TH1F("TsNew_MINUS_TsOld__cid", ";cell id; ts(new) - ts(previous iteration)  [ns]", 8736,
+  unique_ptr<TH1F> tsNew_MINUS_tsOld__cid(new TH1F("TsNew_MINUS_TsOld__cid",
+                                                   ";cell id; ts(new|bhabha) - ts(previous iteration|merged)  [ns]", 8736,
                                                    1, 8736 + 1));
   unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld__crateID(new TH1F("tcrateNew_MINUS_tcrateOld__crateID",
-                                                      ";crate id; ts(new) - ts(previous iteration)  [ns]",
+                                                      ";crate id; ts(new | bhabha) - ts(previous iteration | merged)  [ns]",
                                                       52, 1, 52 + 1));
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev__cid(new TH1F("TsNew_MINUS_TsCustomPrev__cid",
-                                                          ";cell id; ts(new) - ts(old = 'pre-calib')  [ns]",
+                                                          ";cell id; ts(new|bhabha) - ts(old = 'before 1st iter'|merged)  [ns]",
                                                           8736, 1, 8736 + 1));
 
   // Histogram of the new time constant values minus values from previous iteration
-  unique_ptr<TH1F> tsNew_MINUS_tsOld(new TH1F("TsNew_MINUS_TsOld", ";ts(new) - ts(previous iteration)  [ns];Number of crystals",
+  unique_ptr<TH1F> tsNew_MINUS_tsOld(new TH1F("TsNew_MINUS_TsOld",
+                                              ";ts(new | bhabha) - ts(previous iteration | merged)  [ns];Number of crystals",
                                               201, -10.05, 10.05));
   unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld(new TH1F("tcrateNew_MINUS_tcrateOld",
                                                       ";tcrate(new) - tcrate(previous iteration)  [ns];Number of crates",
                                                       201, -10.05, 10.05));
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev(new TH1F("TsNew_MINUS_TsCustomPrev",
-                                                     ";ts(new) - ts(old = 'pre-calib')  [ns];Number of crystals",
+                                                     ";ts(new | bhabha) - ts(old = 'before 1st iter' | merged)  [ns];Number of crystals",
                                                      285, -69.5801, 69.5801));
 
 
@@ -400,8 +402,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     t_offsets.push_back(TsDatabase->GetBinContent(i) / numTimesFilled);
     t_offsets_prev.push_back(TsDatabase->GetBinContent(i) / numTimesFilled);
 
-    //B2INFO(" TsDatabase->GetBinContent(i) = " << TsDatabase->GetBinContent(i));
-    B2INFO("t_offsets_prev = " << t_offsets_prev[i - 1]);
+    B2INFO("t_offsets_prev (last iter) at crysID " << i << " = " << t_offsets_prev[i - 1]);
 
     t_offsets_unc.push_back(TsDatabaseUnc->GetBinContent(i) / numTimesFilled);
   }
@@ -473,7 +474,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
             } else {
               if (h_time->GetBinContent(nonRebinnedBinNumber) > 0) {
-                B2INFO("Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
+                B2DEBUG(22, "Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
                 maskedOutNonZeroBin = true;
               }
               h_timeMasked->SetBinContent(nonRebinnedBinNumber, 0);
@@ -641,7 +642,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
       // Fill histograms with the difference in the ts values between iterations
       double tsDiff_ns = (t_offsets[crys_id - 1] - t_offsets_prev[crys_id - 1]) * TICKS_TO_NS;
-      B2INFO("Crystal " << crys_id << ": ts new - old = " << tsDiff_ns << " ns");
+      B2INFO("Crystal " << crys_id << ": ts new bhabha - old merged = (" <<
+             t_offsets[crys_id - 1]  << " - " << t_offsets_prev[crys_id - 1]  <<
+             ") ticks * " << TICKS_TO_NS << " ns/tick = " << tsDiff_ns << " ns");
       tsNew_MINUS_tsOld__cid->SetBinContent(crys_id, tsDiff_ns);
       tsNew_MINUS_tsOld__cid->SetBinError(crys_id, 0);
       tsNew_MINUS_tsOld__cid->ResetStats();
@@ -655,7 +658,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       double tsDiffCustomOld_ns = -999;
       if (readPrevCrysPayload) {
         tsDiffCustomOld_ns = (t_offsets[crys_id - 1] - prevValuesCrys[crys_id - 1]) * TICKS_TO_NS;
-        B2INFO("Crystal " << crys_id << ": ts new - 'pre-calibration' = " << tsDiffCustomOld_ns << " ns");
+        B2INFO("Crystal " << crys_id << ": ts new bhabha - 'before 1st iter' merged = (" <<
+               t_offsets[crys_id - 1]  << " - " << prevValuesCrys[crys_id - 1]  <<
+               ") ticks * " << TICKS_TO_NS << " ns/tick = " << tsDiffCustomOld_ns << " ns");
       }
       tsNew_MINUS_tsCustomPrev__cid->SetBinContent(crys_id, tsDiffCustomOld_ns);
       tsNew_MINUS_tsCustomPrev__cid->SetBinError(crys_id, 0);
@@ -790,7 +795,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
               }
             } else {
               if (h_time_crate->GetBinContent(nonRebinnedBinNumber) > 0) {
-                B2INFO("Setting bin " << nonRebinnedBinNumber << " from " << h_time_crate_masked->GetBinContent(nonRebinnedBinNumber) << " to 0");
+                B2DEBUG(22, "Setting bin " << nonRebinnedBinNumber << " from " << h_time_crate_masked->GetBinContent(
+                          nonRebinnedBinNumber) << " to 0");
                 maskedOutNonZeroBin = true;
               }
               h_time_crate_masked->SetBinContent(nonRebinnedBinNumber, 0);

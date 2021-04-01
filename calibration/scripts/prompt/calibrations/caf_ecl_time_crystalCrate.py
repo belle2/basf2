@@ -44,7 +44,7 @@ settings = CalibrationSettings(
     #             "physics",
     #             "On"]},
     depends_on=[],
-    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": None})
+    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": []})
 
 
 ##############################
@@ -142,12 +142,10 @@ def get_calibrations(input_data, **kwargs):
     # for when multiple experiments are processed at the same time.
     # Useful for the crystal calibrations but not for the crate
     # calibrations, which are done run-by-run.
-    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    payload_boundaries = []  # Introduce empty list of payload boundaries.
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
-
-    # payload_boundaries = expert_config["payload_boundaries"] # guessed !!!
-    print("expert_config:  payload_boundaries = ", payload_boundaries)
+    print("payload_boundaries = ", payload_boundaries)
 
     ###################################################
     from basf2 import register_module, create_path

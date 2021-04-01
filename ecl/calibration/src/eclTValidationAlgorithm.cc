@@ -265,10 +265,12 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
 
   // define histograms to keep track of the difference in the new crystal times vs the old ones
-  auto tsNew_MINUS_tsCustomPrev__cid = new TH1F("TsNew_MINUS_TsCustomPrev__cid", ";cell id; ts(new) - ts(old = 'pre-calib')  [ns]",
+  auto tsNew_MINUS_tsCustomPrev__cid = new TH1F("TsNew_MINUS_TsCustomPrev__cid",
+                                                ";cell id; ts(new|merged) - ts(old = 'pre-calib'|merged)  [ns]",
                                                 8736, 1, 8736 + 1);
 
-  auto tsNew_MINUS_tsCustomPrev = new TH1F("TsNew_MINUS_TsCustomPrev", ";ts(new) - ts(old = 'pre-calib')  [ns];Number of crystals",
+  auto tsNew_MINUS_tsCustomPrev = new TH1F("TsNew_MINUS_TsCustomPrev",
+                                           ";ts(new | merged) - ts(old = 'pre-calib' | merged)  [ns];Number of crystals",
                                            285, -69.5801, 69.5801);
 
 
@@ -326,7 +328,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
             } else {
               if (h_time->GetBinContent(nonRebinnedBinNumber) > 0) {
-                B2INFO("Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
+                B2DEBUG(22, "Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
                 maskedOutNonZeroBin = true;
               }
               h_timeMasked->SetBinContent(nonRebinnedBinNumber, 0);
@@ -563,7 +565,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
             } else {
               if (h_time->GetBinContent(nonRebinnedBinNumber) > 0) {
-                B2INFO("Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
+                B2DEBUG(22, "Setting bin " << nonRebinnedBinNumber << " from " << h_timeMasked->GetBinContent(nonRebinnedBinNumber) << " to 0");
                 maskedOutNonZeroBin = true;
               }
               h_timeMasked->SetBinContent(nonRebinnedBinNumber, 0);
@@ -772,8 +774,11 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   for (int crys_id = 1; crys_id <= 8736; crys_id++) {
     double tsDiffCustomOld_ns = -999;
     if (readPrevCrysPayload) {
-      tsDiffCustomOld_ns = (t_offsets[crys_id - 1] - prevValuesCrys[crys_id - 1]) * TICKS_TO_NS;
-      B2INFO("Crystal " << crys_id << ": ts new - 'pre-calibration' = " << tsDiffCustomOld_ns << " ns");
+      tsDiffCustomOld_ns = (currentValuesCrys[crys_id - 1] - prevValuesCrys[crys_id - 1]) * TICKS_TO_NS;
+      B2INFO("Crystal " << crys_id << ": ts new merged - 'before 1st iter' merged = (" <<
+             currentValuesCrys[crys_id - 1]  << " - " << prevValuesCrys[crys_id - 1]  <<
+             ") ticks * " << TICKS_TO_NS << " ns/tick = " << tsDiffCustomOld_ns << " ns");
+
     }
     tsNew_MINUS_tsCustomPrev__cid->SetBinContent(crys_id, tsDiffCustomOld_ns);
     tsNew_MINUS_tsCustomPrev__cid->SetBinError(crys_id, 0);

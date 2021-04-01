@@ -14,7 +14,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables as va
 import vertex
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file, CombinedSkim
+from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
@@ -838,6 +838,7 @@ class SystematicsCombinedHadronic(CombinedSkim):
         """
 
         kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
 
         skims_list = [SystematicsKshort(prescale=prescale_kshort), SystematicsDstar(), SystematicsLambda(), SystematicsJpsi()]
         super().__init__(*skims_list, **kwargs)
@@ -869,6 +870,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
         """
 
         kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
 
         from skim.taupair import TauThrust
         skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]

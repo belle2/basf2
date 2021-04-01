@@ -32,7 +32,10 @@ settings = CalibrationSettings(
     input_data_names=["bhabha_all_calib"],
     expert_config={
         "payload_boundaries": None,
-        "calib_mode": False,
+        "calib_datamode": False,
+        "maxevt_rg": 75000,
+        "maxevt_cc": 18e6,
+        "maxevt_wg": 18e6,
         "adjustment": 1.01},
     input_data_filters={
         "bhabha_all_calib": [
@@ -54,7 +57,10 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["bhabha_all_calib"]
 
     expert_config = kwargs.get("expert_config")
-    fulldataMode = expert_config["calib_mode"]
+
+    # extracting parameters
+    fulldataMode = expert_config["calib_datamode"]
+    adjustment = expert_config["adjustment"]
 
     if fulldataMode:
         input_files_rungain = list(file_to_iov_physics.keys())
@@ -62,22 +68,31 @@ def get_calibrations(input_data, **kwargs):
         input_files_wiregain = list(file_to_iov_physics.keys())
     else:
         seed(271492)
+
+        maxevt_rg = expert_config["maxevt_rg"]
+        maxevt_cc = expert_config["maxevt_cc"]
+        maxevt_wg = expert_config["maxevt_wg"]
+
         from prompt.utils import filter_by_max_events_per_run, filter_by_select_max_events_from_files
         # collection for rungains
-        max_files_for_maxevents = 50000  # (around 5-6 random files per run) ~ 15% loss -> 80k tracks per run
+        max_files_for_maxevents = maxevt_rg  # allevents to accp bhabha event ratio = 0.60
         reduced_file_to_iov_rungain = filter_by_max_events_per_run(file_to_iov_physics, max_files_for_maxevents, True)
         input_files_rungain = list(reduced_file_to_iov_rungain.keys())
         basf2.B2INFO(f"Total number of files used for rungains = {len(input_files_rungain)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 15e6  # (~0.3 fb-) events from random files from dataset
-        input_files_coscorr = filter_by_select_max_events_from_files(list(file_to_iov_physics.keys()), max_events_per_dataset)
+        input_files_coscorr = filter_by_select_max_events_from_files(list(file_to_iov_physics.keys()), maxevt_cc)
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
         if not input_files_coscorr:
             raise ValueError(
-                f"Cosine: all requested ({max_events_per_dataset}) events not found")
+                f"Cosine: all requested ({maxevt_cc}) events not found")
 
-        input_files_wiregain = input_files_coscorr
+        # collection for wiregain
+        if maxevt_wg == maxevt_cc:
+            input_files_wiregain = input_files_coscorr
+        else:
+            input_files_wiregain = filter_by_select_max_events_from_files(list(file_to_iov_physics.keys()), maxevt_wg)
+
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
         if not input_files_wiregain:
             raise ValueError(
@@ -90,8 +105,6 @@ def get_calibrations(input_data, **kwargs):
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
     basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
-
-    adjustment = expert_config["adjustment"]
 
     # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
     # Rungain Precollector path

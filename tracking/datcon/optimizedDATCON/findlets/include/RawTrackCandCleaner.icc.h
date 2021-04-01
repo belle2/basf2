@@ -40,8 +40,6 @@ RawTrackCandCleaner<AHit>::RawTrackCandCleaner() : Super()
   Super::addProcessingSignalListener(&m_relationCreator);
   Super::addProcessingSignalListener(&m_treeSearcher);
   Super::addProcessingSignalListener(&m_resultRefiner);
-
-  initializeHists();
 }
 
 template<class AHit>
@@ -55,12 +53,18 @@ void RawTrackCandCleaner<AHit>::exposeParameters(ModuleParamList* moduleParamLis
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelationsCleaner"), m_maxRelations,
                                 "Maximum number of relations allowed for entering tree search.",
                                 m_maxRelations);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "rootFileName"), m_rootFileName,
+                                "Name of the root output file.",
+                                std::string(""));
 }
 
 template<class AHit>
 void RawTrackCandCleaner<AHit>::initialize()
 {
   Super::initialize();
+
+  initializeHists();
 }
 
 // template<class AHit>
@@ -75,8 +79,7 @@ template<class AHit>
 void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackCandidates,
                                       std::vector<SpacePointTrackCand>& trackCandidates)
 {
-//   m_relations.reserve(8192);
-  m_relations.reserve(m_maxRelations);
+  m_relations.reserve(8192);
   m_results.reserve(64);
 
   uint totalRelationsPerEvent = 0;
@@ -182,65 +185,67 @@ template<class AHit>
 void RawTrackCandCleaner<AHit>::initializeHists()
 {
 //   m_rootFile = new TFile("relationStats.root", "RECREATE");
-  m_rootFile = new TFile("trackCandAnalysis.root", "RECREATE");
-  m_rootFile->cd();
-  m_nRawTrackCandsPerEvent = new TH1D("RawTrackCandsPerEvent", "Number of RawTCs per Event;Number of RawTCs;count", 200, 0, 200);
-  m_nRelationsPerRawTrackCand = new TH1D("RelationsPerRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 1000, 0, 1000);
-  m_nRelationsPerEvent = new TH1D("RelationsPerEvent", "Relations per event;Relations per event;count", 2000, 0, 20000);
-  m_nResultsPerRawTrackCand = new TH1D("ResultsPerRawTrackCand", "Number of Results per RawTC;Results per RawTC;count", 2000, 0,
-                                       2000);
-  m_nResultsPerEvent = new TH1D("ResultsPerEvent", "Number of Results per event;Results per event;count", 2000, 0, 20000);
-  m_nResultSize = new TH1D("ResultSize", "Size of each result;Result size;count", 10, 0, 10);
+  if (!m_rootFileName.empty()) {
+    m_rootFile = new TFile(m_rootFileName.c_str(), "RECREATE");
+    m_rootFile->cd();
+    m_nRawTrackCandsPerEvent = new TH1D("RawTrackCandsPerEvent", "Number of RawTCs per Event;Number of RawTCs;count", 200, 0, 200);
+    m_nRelationsPerRawTrackCand = new TH1D("RelationsPerRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 1000, 0, 1000);
+    m_nRelationsPerEvent = new TH1D("RelationsPerEvent", "Relations per event;Relations per event;count", 2000, 0, 20000);
+    m_nResultsPerRawTrackCand = new TH1D("ResultsPerRawTrackCand", "Number of Results per RawTC;Results per RawTC;count", 2000, 0,
+                                         2000);
+    m_nResultsPerEvent = new TH1D("ResultsPerEvent", "Number of Results per event;Results per event;count", 2000, 0, 20000);
+    m_nResultSize = new TH1D("ResultSize", "Size of each result;Result size;count", 10, 0, 10);
 
-  m_nRelationsVsRawTrackCand = new TH2D("RelationsVsRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 100, 0, 100,
-                                        1000, 0, 1000);
-  m_nRelationsVsRawTrackCandSize = new TH2D("RelationsVsRawTrackCandSize", "Relations vs RawTC size;RawTC size;Relations per RawTC",
-                                            200, 0, 200, 1000, 0, 1000);
-  m_nResultsPerRawTCvsnRelationsPerRawTC = new TH2D("ResultsPerRawTCvsnRelationsPerRawTC",
-                                                    "Number of Results vs number of Relations per RawTC size;Relations size;Results per RawTC",
-                                                    200, 0, 200, 500, 0, 500);
-  m_nResultsPerRawTCvsRawTCSize = new TH2D("ResultsPerRawTCvsRawTCSize",
-                                           "Number of Results vs RawTC size;RawTC size;Results per RawTC",
-                                           200, 0, 200, 500, 0, 500);
+    m_nRelationsVsRawTrackCand = new TH2D("RelationsVsRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 100, 0, 100,
+                                          1000, 0, 1000);
+    m_nRelationsVsRawTrackCandSize = new TH2D("RelationsVsRawTrackCandSize", "Relations vs RawTC size;RawTC size;Relations per RawTC",
+                                              200, 0, 200, 1000, 0, 1000);
+    m_nResultsPerRawTCvsnRelationsPerRawTC = new TH2D("ResultsPerRawTCvsnRelationsPerRawTC",
+                                                      "Number of Results vs number of Relations per RawTC size;Relations size;Results per RawTC",
+                                                      200, 0, 200, 500, 0, 500);
+    m_nResultsPerRawTCvsRawTCSize = new TH2D("ResultsPerRawTCvsRawTCSize",
+                                             "Number of Results vs RawTC size;RawTC size;Results per RawTC",
+                                             200, 0, 200, 500, 0, 500);
 
-  m_resultQualityEstimator = new TH1D("resultQualityEstimator",
-                                      "Quality estimator for the single results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
-  m_resultQualityEstimatorvsResultSize = new TH2D("resultQualityEstimatorvsResultSize",
-                                                  "Quality estimator for the single results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits", 1000, 0,
-                                                  1, 5, 3, 8);
+    m_resultQualityEstimator = new TH1D("resultQualityEstimator",
+                                        "Quality estimator for the single results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
+    m_resultQualityEstimatorvsResultSize = new TH2D("resultQualityEstimatorvsResultSize",
+                                                    "Quality estimator for the single results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits", 1000, 0,
+                                                    1, 5, 3, 8);
 
-  m_nPrunedResultsPerRawTrackCand = new TH1D("PrunedResultsPerRawTrackCand",
-                                             "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
-  m_nPrunedResultsPerEvent = new TH1D("PrunedResultsPerEvent", "Number of pruned results per event;Results per event;count", 2000, 0,
-                                      2000);
-  m_nPrunedResultSize = new TH1D("PrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
+    m_nPrunedResultsPerRawTrackCand = new TH1D("PrunedResultsPerRawTrackCand",
+                                               "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
+    m_nPrunedResultsPerEvent = new TH1D("PrunedResultsPerEvent", "Number of pruned results per event;Results per event;count", 2000, 0,
+                                        2000);
+    m_nPrunedResultSize = new TH1D("PrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
 
-  m_nPrunedResultsPerRawTCvsRawTCSize = new TH2D("PrunedResultsPerRawTCvsRawTCSize",
-                                                 "Number of Results vs RawTC size;RawTC size;Results per RawTC",
-                                                 200, 0, 200, 500, 0, 500);
+    m_nPrunedResultsPerRawTCvsRawTCSize = new TH2D("PrunedResultsPerRawTCvsRawTCSize",
+                                                   "Number of Results vs RawTC size;RawTC size;Results per RawTC",
+                                                   200, 0, 200, 500, 0, 500);
 
-  m_prunedResultQualityEstimator = new TH1D("prunedResultQualityEstimator",
-                                            "Quality estimator for the single pruned results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
-  m_prunedResultQualityEstimatorvsResultSize = new TH2D("prunedResultQualityEstimatorvsResultSize",
-                                                        "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
-                                                        1000, 0, 1, 5, 3, 8);
+    m_prunedResultQualityEstimator = new TH1D("prunedResultQualityEstimator",
+                                              "Quality estimator for the single pruned results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
+    m_prunedResultQualityEstimatorvsResultSize = new TH2D("prunedResultQualityEstimatorvsResultSize",
+                                                          "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
+                                                          1000, 0, 1, 5, 3, 8);
 
-  m_nActivePrunedResultsPerRawTrackCand = new TH1D("ActivePrunedResultsPerRawTrackCand",
-                                                   "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
-  m_nActivePrunedResultsPerEvent = new TH1D("ActivePrunedResultsPerEvent",
-                                            "Number of pruned results per event;Results per event;count", 2000, 0,
-                                            2000);
-  m_nActivePrunedResultSize = new TH1D("ActivePrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
+    m_nActivePrunedResultsPerRawTrackCand = new TH1D("ActivePrunedResultsPerRawTrackCand",
+                                                     "Number of pruned results per RawTC;Results per RawTC;count", 2000, 0, 2000);
+    m_nActivePrunedResultsPerEvent = new TH1D("ActivePrunedResultsPerEvent",
+                                              "Number of pruned results per event;Results per event;count", 2000, 0,
+                                              2000);
+    m_nActivePrunedResultSize = new TH1D("ActivePrunedResultSize", "Size of each pruned result;Result size;count", 10, 0, 10);
 
-  m_nActivePrunedResultsPerRawTCvsRawTCSize = new TH2D("ActivePrunedResultsPerRawTCvsRawTCSize",
-                                                       "Number of Results vs RawTC size;RawTC size;Results per RawTC",
-                                                       200, 0, 200, 500, 0, 500);
+    m_nActivePrunedResultsPerRawTCvsRawTCSize = new TH2D("ActivePrunedResultsPerRawTCvsRawTCSize",
+                                                         "Number of Results vs RawTC size;RawTC size;Results per RawTC",
+                                                         200, 0, 200, 500, 0, 500);
 
-  m_ActivePrunedResultQualityEstimator = new TH1D("ActivePrunedResultQualityEstimator",
-                                                  "Quality estimator for the single pruned results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
-  m_ActivePrunedResultQualityEstimatorvsResultSize = new TH2D("ActivePrunedResultQualityEstimatorvsResultSize",
-                                                              "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
-                                                              1000, 0, 1, 5, 3, 8);
+    m_ActivePrunedResultQualityEstimator = new TH1D("ActivePrunedResultQualityEstimator",
+                                                    "Quality estimator for the single pruned results;Quality estimator (TMath::Prob(chi2, ndf));count", 1000, 0, 1);
+    m_ActivePrunedResultQualityEstimatorvsResultSize = new TH2D("ActivePrunedResultQualityEstimatorvsResultSize",
+                                                                "Quality estimator for the single pruned results vs size of the result (=nHits);Quality estimator (TMath::Prob(chi2, ndf));nHits",
+                                                                1000, 0, 1, 5, 3, 8);
+  }
 }
 
 

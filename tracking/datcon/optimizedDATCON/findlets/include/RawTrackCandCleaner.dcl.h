@@ -94,6 +94,8 @@ namespace Belle2 {
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name
+    std::string m_rootFileName;
+
     TFile* m_rootFile;
 
     TH1D* m_nRawTrackCandsPerEvent;

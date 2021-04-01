@@ -97,8 +97,8 @@ class LogAggregator():
         if self.forward_socket:
             try:
                 self.forward_socket.sendto(bytes(json.dumps(data), "utf-8"), (self.forward_host, self.forward_port))
-            except:
-                print(f'[ERROR] Failed to forward log message to {self.forward_host} port {self.forward_port}.')
+            except Exception as e:
+                print(f'[ERROR] Failed to forward log message to {self.forward_host} port {self.forward_port}: {e}')
         else:
             print(f'[{data["level"]}] {message}')
 

@@ -18,17 +18,49 @@ from optparse import OptionParser
 import sys
 import basf2
 
+
+def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
+
+    fillPatternBin = bin(int(theFillPatternHex, 16))
+    fillPatternBin = fillPatternBin.replace('0b', '')
+
+    for num, bucket in enumerate(fillPatternBin):
+        if(bucket == "1"):
+            bunches.setBucket(num)
+
+    print("Filling new payload. iov:", firstExp, firstRun, currentExp, currentRun)
+
+    iov = Belle2.IntervalOfValidity(firstExp, firstRun, currentExp, currentRun)
+
+    db = Belle2.Database.Instance()
+    db.storeData("BunchStructure", bunches, iov)
+
+
 # Argument parsing
 argvs = sys.argv
 
-if(len(argvs) < 6):
-    basf2.B2ERROR("Wrong arguments. Usage: basf2 ", argvs[0], " <username> <minexp> <minrun> <maxexp> <maxrun>")
+
+if len(argvs) == 1:
+    minexp = argvs[1]
+
+elif len(sys.argv) == 5:
+    minexp = argvs[1]
+    minrun = argvs[2]
+    maxexp = argvs[3]
+    maxrun = argvs[4]
+else:
+    basf2.B2ERROR("Wrong arguments. Options are:\n",
+                  "1 arguments usage: basf2 ", argvs[0], " <0> or <1003>\n"
+                  "4 arguments usage: basf2 ", argvs[0], " <minexp> <minrun> <maxexp> <maxrun>")
     sys.exit()
 
-minexp = argvs[2]
-minrun = argvs[3]
-maxexp = argvs[4]
-maxrun = argvs[5]
+# if(len(argvs) != 5):
+#     basf2.B2ERROR("Wrong arguments. Usage: basf2 ", argvs[0], " <minexp> <minrun> <maxexp> <maxrun>")
+
+# minexp = argvs[1]
+# minrun = argvs[2]
+# maxexp = argvs[3]
+# maxrun = argvs[4]
 
 if(minexp == "0"):
 
@@ -56,10 +88,10 @@ elif(minexp == "1003"):
     db.storeData("BunchStructure", bunches, iov)
 
 else:
+    username = input("Enter your username: ")
+    rundb = RunDB(username=username)
 
-    rundb = RunDB(username=sys.argv[1])
-
-    res = rundb.get_run_info(
+    runInfo = rundb.get_run_info(
         min_experiment=minexp,
         max_experiment=maxexp,
         min_run=minrun,
@@ -68,14 +100,23 @@ else:
     )
 
     theFillPatternHex = []
-
     newiov = True
 
-    for it in res:
+    currentRun = minexp
+    currentExp = minrun
+
+    for it in runInfo:
 
         bunches = Belle2.BunchStructure()
+        # print(i,"exp",it['experiment'],"run",it['run']) #del
 
         fillPatternHex = it['ler']['fill_pattern']
+
+        if(it['run_type'] != 'physics'):
+            continue
+
+        currentExp = it['experiment']
+        currentRun = it['run']
 
         if(fillPatternHex == theFillPatternHex or newiov):
             theFillPatternHex = fillPatternHex
@@ -85,22 +126,11 @@ else:
                 firstRun = int(it['run'])
                 newiov = False
 
-        if((it['run'] == int(maxrun) and it['experiment'] == int(maxexp)) or fillPatternHex != theFillPatternHex):
-            lastExp = int(it['experiment'])
-            lastRun = int(it['run'])
+        if(fillPatternHex != theFillPatternHex):
+            fill(theFillPatternHex, firstExp, firstRun, currentExp, currentRun)
+
             newiov = True
 
-            fillPatternBin = bin(int(theFillPatternHex, 16))
-
-            fillPatternBin = fillPatternBin.replace('0b', '')
-
-            for num, bucket in enumerate(fillPatternBin):
-                if(bucket == "1"):
-                    bunches.setBucket(num)
-
-            print("iov:", firstExp, firstRun, lastExp, lastRun)
-
-            iov = Belle2.IntervalOfValidity(firstExp, firstRun, lastExp, lastRun)
-
-            db = Belle2.Database.Instance()
-            db.storeData("BunchStructure", bunches, iov)
+    # in order to close the db with last run
+    if(fillPatternHex == theFillPatternHex):
+        fill(theFillPatternHex, firstExp, firstRun, currentExp, currentRun)

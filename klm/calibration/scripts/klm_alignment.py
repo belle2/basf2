@@ -15,11 +15,11 @@ class KLMAlignment(SequentialRunByRun):
     #: The params that you could set on the Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.
     usable_params = {
-        "has_experiment_settings": bool,
-        "iov_coverage": IoV,
+        "has_experiment_settings": bool,  # Used in SequentialRunByRun.
+        "iov_coverage": IoV,              # Used in SequentialRunByRun.
         "millepede_entries": int,
         "millepede_entries_exp7": int,
-        "step_size": int
+        "step_size": int                  # Used in SequentialRunByRun.
     }
 
     #: Granularity of collector that can be run by this algorithm properly
@@ -37,8 +37,6 @@ class KLMAlignment(SequentialRunByRun):
     def apply_experiment_settings(self, algorithm, experiment):
         """
         Apply experiment-dependent settings.
-        This is the default version, which does not do anything.
-        If necessary, it should be reimplemented by derived classes.
         """
         if "millepede_entries" in self.algorithm.params:
             self.millepede_entries = self.algorithm.params["millepede_entries"]

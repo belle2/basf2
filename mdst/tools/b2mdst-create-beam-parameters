@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+  This script generates BeamParameters for run-dependent MC generation
+  based on the information from the calibrated payloads
+  BeamSpot, CollisionBoostVector, and CollisionInvariantMass.
+"""
+
+
 import argparse
 import basf2
 from beamparameters import beamparameter_presets, calculate_beamspot
@@ -9,7 +16,7 @@ from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter, \
                         MCInitialParticles
 
 # Arguments.
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--input-tag', required=True, default=None,
                     help='Input global tag.')
 parser.add_argument(

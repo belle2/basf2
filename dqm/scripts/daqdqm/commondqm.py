@@ -26,10 +26,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+                     For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
+                            L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
                                          Should be True only when running on the HLT servers
     """
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
     # Check components.
     check_components(components)
 
@@ -62,8 +64,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
-            # SVD Occupancy after Injection
-            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
             # SVDDQMExpressReco General
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
@@ -82,6 +82,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
+
+    if dqm_environment == "expressreco" and (dqm_mode in ["l1_passthrough"]):
+        if components is None or 'SVD' in components:
+            # SVD Occupancy after Injection
+            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
         path.add_module(

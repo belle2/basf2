@@ -96,7 +96,7 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
         if not input_files_wiregain:
             raise ValueError(
-                f"WireGain: all requested ({max_events_per_dataset}) events not found")
+                f"WireGain: all requested ({maxevt_wg}) events not found")
 
     requested_iov = kwargs.get("requested_iov", None)
     from caf.utils import ExpRun, IoV

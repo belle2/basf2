@@ -40,10 +40,12 @@ settings = CalibrationSettings(
     depends_on=[])
 
 
-# This function return a list of Calibration
-# objects we assign to the CAF process
-# This is REQUIRED FUNCTION used b2caf-prompt-run tool
 def get_calibrations(input_data, **kwargs):
+
+    """ REQUIRED FUNCTION used by b2caf-prompt-run tool
+        This function return a list of Calibration
+        objects we assign to the CAF process
+    """
 
     import basf2
     file_to_iov_physics = input_data["bhabha_all_calib"]

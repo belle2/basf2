@@ -39,9 +39,10 @@ settings = CalibrationSettings(
         "adjustment": 1.01},
     depends_on=[])
 
-# REQUIRED FUNCTION used b2caf-prompt-run tool #
 
-
+# This function return a list of Calibration
+# objects we assign to the CAF process
+# This is REQUIRED FUNCTION used b2caf-prompt-run tool
 def get_calibrations(input_data, **kwargs):
 
     import basf2

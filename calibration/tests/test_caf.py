@@ -24,7 +24,7 @@ with b2test_utils.clean_working_directory():
         ],
         "raw_cosmic": [
             [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0008_r3121_cosmicSkim/", [8, 3121]],
-            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0010_r5095_hadronSkim/", [10, 5095]]
+            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0010_r5095_cosmicSkim/", [10, 5095]]
         ],
         "raw_beam": []
     }

@@ -2,10 +2,10 @@ import os
 import json
 import subprocess
 import validation_gt as vgt
-import b2test_utils as b2u
+import b2test_utils
 
 
-with b2u.clean_working_directory():
+with b2test_utils.clean_working_directory():
 
     # Prepare the configuration dictionary for CAF and dump it into a JSON file.
     config = {
@@ -31,5 +31,5 @@ with b2u.clean_working_directory():
     with open("input_files.json", "w") as input_files_json:
         json.dump(input_files, input_files_json)
 
-    # Now simply run the calibration locally.
+    # Now simply run the calibration locally (on our CI/CD servers we can not test different backends).
     subprocess.check_call(['b2caf-prompt-run', 'Local', 'config.json', 'input_files.json', '--heartbeat', '10'])

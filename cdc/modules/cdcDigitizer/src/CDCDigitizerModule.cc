@@ -125,7 +125,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            m_randomization);
   addParam("OffsetForGetTriggerBin", m_offsetForTriggerBin, "Input to getCDCTriggerBin(offset), either of 0,1,2 or 3",
            m_offsetForTriggerBin);
-  addParam("TrgTimingOffsetInCount", m_trgTimingOffsetInCount, "Trigger timing offset in count, [0,7]", m_trgTimingOffsetInCount);
+  addParam("TrgTimingOffsetInCount", m_trgTimingOffsetInCount,
+           "L1 trigger timing offset in count, [0,7] in a trigger bin. The defaut value is from exp14, while the value from exp12 is 2. This run dependence may be taken into account later if needed",
+           m_trgTimingOffsetInCount);
   addParam("ShiftOfTimeWindowIn32Count", m_shiftOfTimeWindowIn32Count,
            "Shift of time window in 32count for synchronization (L1 timing=0)", m_shiftOfTimeWindowIn32Count);
 
@@ -312,7 +314,7 @@ void CDCDigitizerModule::event()
     unsigned short offs = 8 * trigBin + m_trgTimingOffsetInCount;
     B2DEBUG(m_debugLevel, "tSimMode,trigBin,offs= " << m_tSimMode << " " << trigBin << " " << offs);
 
-    //TODO: simplify the following 7 lines by modifying setFEElectronics()
+    //TODO: simplify the following 7 lines and setFEElectronics()
     for (unsigned short bd = 1; bd < nBoards; ++bd) {
       const short tMaxInCount = 32 * (m_shiftOfTimeWindowIn32Count - m_trgDelayInCount[bd]) - offs;
       const short tMinInCount = tMaxInCount - 32 * m_widthOfTimeWindowInCount[bd];
@@ -490,6 +492,8 @@ void CDCDigitizerModule::event()
     }
 
     // Reject totally-dead wire; to be replaced by isDeadWire() in future
+    // N.B. The following lines for badwire must be after the above lines for trigger becuse badwires are different between trigger and tracking.
+    // Badwires for trigger are taken into account separately in the tsim module
     if (m_cdcgp->isBadWire(m_wireID)) {
       //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
       continue;

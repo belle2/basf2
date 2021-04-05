@@ -343,19 +343,20 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
             }
           }
 
-          sprintf(err_buf,
+          char err_buf_1[2500], err_buf_2[2500], err_buf_3[2500];
+          sprintf(err_buf_1,
                   "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting...",
                   hostname, -1);
-          sprintf(err_buf,
+          sprintf(err_buf_2,
                   "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
-                  err_buf,
+                  err_buf_1,
                   first_ch, GetFINESSENwords(n, first_ch), ctime_trgtype[ first_ch ], utime[ first_ch ], eve[ first_ch ], exprun[ first_ch ]);
-          sprintf(err_buf,
+          sprintf(err_buf_3,
                   "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
-                  err_buf,
+                  err_buf_2,
                   i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
           sprintf(err_buf, "%s\n %s %s %d\n",
-                  err_buf,
+                  err_buf_3,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 

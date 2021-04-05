@@ -370,6 +370,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
   char err_buf[2500];
+  int first_ch = 0;
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -396,6 +397,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
         temp_eve = eve[ i ];
         temp_exprun = exprun[ i ];
         flag = 1;
+        first_ch = i;
       } else {
         if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
             temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
@@ -409,17 +411,20 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
             }
           }
 
-          sprintf(err_buf,
+          char err_buf_1[2500], err_buf_2[2500], err_buf_3[2500];
+          sprintf(err_buf_1,
                   "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting...",
                   hostname, -1);
-          for (int j = 0; j < i + 1; j++) {
-            sprintf(err_buf,
-                    "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
-                    err_buf,
-                    j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
-          }
+          sprintf(err_buf_2,
+                  "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
+                  err_buf_1,
+                  first_ch, GetFINESSENwords(n, first_ch), ctime_trgtype[ first_ch ], utime[ first_ch ], eve[ first_ch ], exprun[ first_ch ]);
+          sprintf(err_buf_3,
+                  "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
+                  err_buf_2,
+                  i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
           sprintf(err_buf, "%s\n %s %s %d\n",
-                  err_buf,
+                  err_buf_3,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 

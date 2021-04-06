@@ -26,7 +26,7 @@ settings = CalibrationSettings(
             input_data_filters["Magnet"]["On"]],
         "mumutight_calib": [
             input_data_filters["Data Tag"]["mumutight_calib"],
-            input_data_filters["Data Quality Tag"]["Good or Recoverable"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
             input_data_filters["Magnet"]["On"]]},
     depends_on=[])
 

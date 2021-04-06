@@ -105,18 +105,21 @@ def checkFile(args):
             if args.expected_no_of_mcevents is not None:
                 checks_passed['mcevents_eq_expectation'] = mcevents == args.expected_no_of_mcevents
                 if not checks_passed['mcevents_eq_expectation']:
-                    print('expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
+                    print('Expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
 
         if args.expected_no_of_events is not None:
             checks_passed['entries_eq_expectation'] = nevents == args.expected_no_of_events
             if not checks_passed['entries_eq_expectation']:
-                print('expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
+                print('Expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
 
         if args.BRANCH:
             checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
 
-        if nevents == 0 and args.expected_event_size is None:
-            print('file contains zero events')
+        if nevents == 0:
+            print('File contains zero events')
+            stats['events_without_errorflag'] = 0
+            if args.expected_event_size is not None:
+                checks_passed['eventsize_eq_expectation'] = False
             return checks_passed, stats
 
         checks_passed['eventmetadata_readable'] = False
@@ -139,9 +142,10 @@ def checkFile(args):
 
         checks_passed['all_entries_readable'] = read_tree(tree) and read_tree(persistent)
 
-        # Get number of full events (excludes empty events which only have metadata stored and have the errorFlag set).
-        stats['full_events'] = tree.GetEntries("EventMetaData.m_errorFlag == 0")
-        stats['size_per_full_event_kib'] = size_kib / stats['full_events']
+        # Get number of events which do not have the errorFlag set.
+        stats['events_without_errorflag'] = tree.GetEntries("EventMetaData.m_errorFlag == 0")
+        if stats['events_without_errorflag'] != 0:
+            stats['size_per_event_without_errorflag_kib'] = size_kib / stats['events_without_errorflag']
 
     except BaseException:
         # at least one of the checks should have failed

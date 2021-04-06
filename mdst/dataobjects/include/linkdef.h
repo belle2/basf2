@@ -20,7 +20,7 @@
 #pragma link C++ class Belle2::MCParticle+; // checksum=0x3dc6fb35, version=5
 #pragma link C++ class vector<Belle2::MCParticle*>+; // checksum=0xd52f5001, version=6
 #pragma link C++ class Belle2::PIDLikelihood+; // checksum=0x22bf2bf, version=3
-#pragma link C++ class Belle2::ECLCluster+; // checksum=0x25fadb14, version=15
+#pragma link C++ class Belle2::ECLCluster+; // checksum=0x31d0dad4, version=15
 
 #pragma link C++ class Belle2::KLMCluster+; // checksum=0x9be09a36, version=2
 #pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
@@ -255,5 +255,6 @@
   code="{ if(onfile.m_hypothesisId == 5) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
         else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
         else m_hypotheses = 0;}"
+
 
 #endif

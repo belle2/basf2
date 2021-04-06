@@ -78,7 +78,7 @@ namespace Belle2 {
       m_sqrtcovmat_22(0.),
       m_deltaL(0.),
       m_minTrkDistance(0.),
-      m_minTrkDistanceID(0),
+      m_minTrkDistanceID(65535),
       m_absZernike40(0.),
       m_absZernike51(0.),
       m_zernikeMVA(0.),
@@ -412,7 +412,7 @@ namespace Belle2 {
     Double32_t  m_minTrkDistance;  //[0.0, 250., 10]
 
     /** Array index of the nearest track */
-    unsigned short  m_minTrkDistanceID;  //[0.0, 250., 10]
+    unsigned short m_minTrkDistanceID;
 
     /** Zernike 40. */
     Double32_t  m_absZernike40;  //[0.0, 1.7, 10]
@@ -473,6 +473,7 @@ namespace Belle2 {
 
     /** Class definition */
     ClassDef(ECLCluster, 15);
+    // 15: Added m_minTrkDistanceID
     // 14: Added m_maxECellId
     // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.

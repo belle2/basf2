@@ -318,7 +318,7 @@ void FastInterceptFinder2DSimple::DepthFirstSearch(uint lastIndexX, uint lastInd
 void FastInterceptFinder2DSimple::gnuplotoutput(const std::vector<HitData*>& hits)
 {
   std::ofstream outstream;
-  outstream.open("gnuplotlog.plt", std::ios::trunc);
+  outstream.open("gnuplotlogSimple.plt", std::ios::trunc);
   outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
   outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
   outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;

@@ -8,6 +8,34 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 prompt_validation_script_package = "prompt.validations."
 prompt_validation_script_dir = "calibration/scripts/prompt/validations"
 
+input_data_filters = {"Magnet": {"On": "On",
+                                 "Off": "Off",
+                                 "Either": "Either"},
+                      "Beam Energy": {"No Beam": "No Beam",
+                                      "4S": "4S",
+                                      "Continuum": "Continuum",
+                                      "Scan": "Scan"},
+                      "Run Type": {"beam": "beam",
+                                   "cosmic": "cosmic",
+                                   "debug": "debug", "null": "null",
+                                   "physics": "physics"},
+                      "Data Tag": {"bhabha_all_calib": "bhabha_all_calib",
+                                   "cosmic_calib": "cosmic_calib",
+                                   "gamma_gamma_calib": "gamma_gamma_calib",
+                                   "hadron_calib": "hadron_calib",
+                                   "mumutight_calib": "mumutight_calib",
+                                   "offip_calib": "offip_calib",
+                                   "radmumu_calib": "radmumu_calib",
+                                   "random_calib": "random_calib"},
+                      "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
+                                           "Bad For Alignment": "Bad For Alignment",
+                                           "Good": "Good",
+                                           "Good Shifter": "Good Shifter",
+                                           "Good For PXD": "Good For PXD",
+                                           "Good Or Recoverable": "Good Or Recoverable",
+                                           "Good Or Recoverable Shifter": "Good Or Recoverable Shifter"}
+                      }
+
 
 class CalibrationSettings(namedtuple('CalSet_Factory',
                                      ["name",
@@ -36,9 +64,17 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
 
         input_data_names (frozenset(str)): The names that you will use when accessing the input data given to the
             prompt calibration process i.e. Use these in the ``get_calibrations`` function to access the correct input
-            data files.
+            data files. e.g. input_data_names=["all_events", "offres_photon_events"]
 
-        input_data_filters (dict): The filters for the data input names, used for automated calibration
+        input_data_filters (dict): The data selection for the data input names, used for automated calibration.
+            The keys should correspond to one of the ``input_data_names`` with the values being a list of the various data
+            filters, e.g. Data Tag, Beam Energy, Run Type, Run Quality Tag and Magnet. All available filters can be found in the
+            input_data_filters dictionary e.g. from prompt import input_data_filters with details about data tags and run quality
+            tags found at: https://calibration.belle2.org/belle2/data_tags/list/.
+            To exclude specific filters, pre-append with *NOT* e.g.
+            {"all_events": ["mumutight_calib", "hadron_calib", "Good", "On"],
+            "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
+            Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
         depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of

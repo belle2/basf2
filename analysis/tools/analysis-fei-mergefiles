@@ -31,6 +31,11 @@ def is_statistics_file(tfile):
         return True
     return False
 
+def is_ntuple_file(tfile):
+    if 'training_input' in tfile.GetName() or 'Monitor_Final' in tfile.GetName():
+        return True
+    else:
+        return False
 
 def doMerge(outFile, inFiles):
     out = ROOT.TFile.Open(outFile, 'NEW')
@@ -62,6 +67,18 @@ def doMerge(outFile, inFiles):
     outTree.Write()
     out.Close()
 
+def doMergeNtuple(outFile, inFiles):
+    first_input = ROOT.TFile.Open(inFiles[0],'read')
+    tchains = [ROOT.TChain(k.GetName()) for k in first_input.GetListOfKeys()]
+
+    output = ROOT.TFile.Open(outFile,'recreate')
+
+    for t in tchains:
+        for f in inFiles:
+            t.Add(f)
+        t.Write(t.GetName(), ROOT.TObject.kOverwrite)
+
+    output.Close()
 
 if len(sys.argv) < 3:
     printUsage()
@@ -78,10 +95,16 @@ ROOT.gSystem.Load('libdataobjects')
 
 # pick first input file to check what we want to do
 filename = inFiles[0]
-tfile = ROOT.TFile(filename)
+tfile = ROOT.TFile.Open(filename)
+print(f'Preparing merging for {outFile}')
 if is_statistics_file(tfile):
+    print('Is a statistics file')
     doMerge(outFile, inFiles)
+elif is_ntuple_file(tfile):
+    print('Is an ntuple file')
+    doMergeNtuple(outFile, inFiles)
 else:
+    print('Is a histogram file')
     import subprocess
     ret = subprocess.call(['hadd', outFile] + inFiles)
     sys.exit(ret)

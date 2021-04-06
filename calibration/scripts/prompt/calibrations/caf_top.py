@@ -7,7 +7,7 @@ Airflow script for TOP post-tracking calibration:
 Author: Marko Staric, Umberto Tamponi, Shahab Kohani
 """
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
@@ -16,14 +16,20 @@ from top_calibration import commonT0_calibration_BF
 
 
 #: Required variable - tells the automated system some details of this script
-settings = CalibrationSettings(name="TOP post-tracking calibration",
-                               expert_username="skohani",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["bhabha_all_calib"],
-                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib", "physics", "Good Or Recoverable"], },
-                               depends_on=[],
-                               expert_config={"payload_boundaries": None})
+settings = CalibrationSettings(
+    name="TOP post-tracking calibration",
+    expert_username="skohani",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            input_data_filters["Data Tag"]["bhabha_all_calib"],
+            input_data_filters["Run Type"]["physics"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
+    depends_on=[],
+    expert_config={
+        "payload_boundaries": None})
 
 
 # Required function

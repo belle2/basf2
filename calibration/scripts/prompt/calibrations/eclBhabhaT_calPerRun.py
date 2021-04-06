@@ -2,7 +2,7 @@
 
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from reconstruction import prepare_cdst_analysis
 
 ##############################
@@ -20,14 +20,13 @@ settings = CalibrationSettings(name="ECL crate time calibrations",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["bhabha_all_calib"],
-                               input_data_filters={"bhabha_all_calib": [
-                                   "bhabha_all_calib",
-                                   "4S",
-                                   "Continuum",
-                                   "Scan",
-                                   "Good",
-                                   "physics",
-                                   "On"]},
+                               input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
+                                                                        input_data_filters["Beam Energy"]["4S"],
+                                                                        input_data_filters["Beam Energy"]["Continuum"],
+                                                                        input_data_filters["Beam Energy"]["Scan"],
+                                                                        input_data_filters["Data Quality Tag"]["Good"],
+                                                                        input_data_filters["Run Type"]["physics"],
+                                                                        input_data_filters["Magnet"]["On"]]},
                                depends_on=[])
 
 ##############################

@@ -6,7 +6,7 @@ import collections
 
 import basf2
 from caf.utils import ExpRun, IoV
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from prompt.utils import events_in_basf2_file
 
 ##############################
@@ -30,8 +30,12 @@ settings = CalibrationSettings(
     input_data_formats=["raw"],
     input_data_names=["raw_physics", "raw_cosmic"],
     input_data_filters={
-        'raw_physics': ['mumutight_calib', 'physics', 'Good Or Recoverable'],
-        'raw_cosmic': ['cosmic_calib', 'physics', 'Good Or Recoverable']
+        'raw_physics': [input_data_filters['Run Type']['physics'],
+                        input_data_filters['Data Tag']['mumutight_calib'],
+                        input_data_filters['Data Quality Tag']['Good Or Recoverable']],
+        'raw_cosmic': [input_data_filters['Run Type']['physics'],
+                       input_data_filters['Data Tag']['cosmic_calib'],
+                       input_data_filters['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[vxdcdc_alignment],
     expert_config={

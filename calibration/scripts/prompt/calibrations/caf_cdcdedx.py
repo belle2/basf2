@@ -18,7 +18,6 @@ from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SequentialBoundaries
 from prompt import CalibrationSettings
 import reconstruction as recon
-from softwaretrigger.path_utils import (add_filter_software_trigger, add_skim_software_trigger)
 from random import seed
 
 gSystem.Load('libreconstruction.so')
@@ -37,11 +36,19 @@ settings = CalibrationSettings(
         "maxevt_cc": 18e6,
         "maxevt_wg": 18e6,
         "adjustment": 1.01},
+    input_data_filters={
+        "bhabha_all_calib": [
+            "bhabha_all_calib",
+            "Good",
+            "On",
+            "4S",
+            "physics",
+            "Continuum",
+            "Scan"]},
     depends_on=[])
 
 
 def get_calibrations(input_data, **kwargs):
-
     """ REQUIRED FUNCTION used by b2caf-prompt-run tool
         This function return a list of Calibration
         objects we assign to the CAF process

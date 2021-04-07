@@ -136,12 +136,12 @@ def loadStdSkimHighEffRho0(persistent=True, path=None):
 
 def loadStdLooseRhoPlus(persistent=True, path=None):
     """
-    Create a list of 'rho+:loose' list from 'pi0:eff40_Jan2020 pi+:loose' with :math:`0.47 < M < 1.07~GeV`
+    Create a list of 'rho+:loose' list from 'pi0:eff40_May2020 pi+:loose' with :math:`0.47 < M < 1.07~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('rho+:loose -> pi+:loose pi0:eff40_Jan2020', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho+:loose -> pi+:loose pi0:eff40_May2020', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:loose'
 
 
@@ -298,25 +298,25 @@ def loadStdLooseF_0(persistent=True, path=None):
 
 def loadStdAllOmega(persistent=True, path=None):
     """
-    Create a list of 'omega:all' list from 'pi0:eff40_Jan2020 pi-:all pi+:all' with :math:`0.73 < M < 0.83~GeV`
+    Create a list of 'omega:all' list from 'pi0:eff40_May2020 pi-:all pi+:all' with :math:`0.73 < M < 0.83~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('omega:all -> pi0:eff40_Jan2020 pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
+    ma.reconstructDecay('omega:all -> pi0:eff40_May2020 pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:all'
 
 
 def loadStdSkimHighEffOmega(persistent=True, path=None):
     """
-    Create a list of 'omega:SkimHighEff' list from 'pi0:eff40_Jan2020 pi-:SkimHighEff pi+:SkimHighEff'
+    Create a list of 'omega:SkimHighEff' list from 'pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff'
     with :math:`0.73 < M < 0.83~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
     ma.reconstructDecay(
-        'omega:SkimHighEff -> pi0:eff40_Jan2020 pi-:SkimHighEff pi+:SkimHighEff',
+        'omega:SkimHighEff -> pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff',
         '0.73 < M < 0.83',
         1,
         persistent,
@@ -326,25 +326,25 @@ def loadStdSkimHighEffOmega(persistent=True, path=None):
 
 def loadStdLooseOmega(persistent=True, path=None):
     """
-    Create a list of 'omega:loose' list from 'pi0:eff40_Jan2020 pi-:loose pi+:loose' with :math:`0.73 < M < 0.83~GeV`
+    Create a list of 'omega:loose' list from 'pi0:eff40_May2020 pi-:loose pi+:loose' with :math:`0.73 < M < 0.83~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('omega:loose -> pi0:eff40_Jan2020 pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
+    ma.reconstructDecay('omega:loose -> pi0:eff40_May2020 pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:loose'
 
 
 def loadStdAllEta(persistent=True, path=None):
     """
-    Create a list of 'eta:all' list from 'gamma:all gamma:all' (dmID=1) and 'pi0:eff40_Jan2020 pi-:all pi+:all'
+    Create a list of 'eta:all' list from 'gamma:all gamma:all' (dmID=1) and 'pi0:eff40_May2020 pi-:all pi+:all'
     (dmID=2), with :math:`0.4< M < 0.6~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
     ma.reconstructDecay('eta:all1 -> gamma:all gamma:all', '0.4 < M < 0.6', 1, persistent, path)
-    ma.reconstructDecay('eta:all2 -> pi0:eff40_Jan2020 pi-:all pi+:all', '0.4 < M < 0.6', 2, persistent, path)
+    ma.reconstructDecay('eta:all2 -> pi0:eff40_May2020 pi-:all pi+:all', '0.4 < M < 0.6', 2, persistent, path)
     ma.copyLists('eta:all', ['eta:all1', 'eta:all2'], persistent, path)
     return 'eta:all'
 
@@ -352,7 +352,7 @@ def loadStdAllEta(persistent=True, path=None):
 def loadStdSkimHighEffEta(persistent=True, path=None):
     """
     Create a list of 'eta:SkimHighEff' list from 'gamma:all gamma:all' (dmID=1) and
-    'pi0:eff40_Jan2020 pi-:SkimHighEff pi+:SkimHighEff'
+    'pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff'
     (dmID=2), with :math:`0.4< M < 0.6~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
@@ -360,7 +360,7 @@ def loadStdSkimHighEffEta(persistent=True, path=None):
     """
     ma.reconstructDecay('eta:SkimHighEff1 -> gamma:all gamma:all', '0.4 < M < 0.6', 1, persistent, path)
     ma.reconstructDecay(
-        'eta:SkimHighEff2 -> pi0:eff40_Jan2020 pi-:SkimHighEff pi+:SkimHighEff',
+        'eta:SkimHighEff2 -> pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff',
         '0.4 < M < 0.6',
         2,
         persistent,
@@ -371,14 +371,14 @@ def loadStdSkimHighEffEta(persistent=True, path=None):
 
 def loadStdLooseEta(persistent=True, path=None):
     """
-    Create a list of 'eta:loose' list from 'gamma:loose gamma:loose' (dmID=1) and 'pi0:eff40_Jan2020 pi-:loose pi+:loose'
+    Create a list of 'eta:loose' list from 'gamma:loose gamma:loose' (dmID=1) and 'pi0:eff40_May2020 pi-:loose pi+:loose'
     (dmID=2), with :math:`0.4< M < 0.6~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
     ma.reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, persistent, path)
-    ma.reconstructDecay('eta:loose2 -> pi0:eff40_Jan2020 pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
+    ma.reconstructDecay('eta:loose2 -> pi0:eff40_May2020 pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
     ma.copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], persistent, path)
     return 'eta:loose'
 

@@ -190,7 +190,7 @@ class SLUntagged(BaseSkim):
         stdPi("all", path=path)
         stdPi("loose", path=path)
         stdPhotons("loose", path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
         stdKshorts(path=path)
         loadStdPi0ForBToHadrons(path=path)
         loadPiForBtoHadrons(path=path)

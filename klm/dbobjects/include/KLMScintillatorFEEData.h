@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017  Belle II Collaboration                              *
+ * Copyright(C) 2020  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Giacomo De Pietro                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,21 +18,21 @@ namespace Belle2 {
   /**
    * EKLM channel data.
    */
-  class EKLMChannelData : public TObject {
+  class KLMScintillatorFEEData : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMChannelData()
+    KLMScintillatorFEEData()
     {
     }
 
     /**
      * Destructor.
      */
-    ~EKLMChannelData()
+    ~KLMScintillatorFEEData()
     {
     }
 
@@ -150,9 +150,6 @@ namespace Belle2 {
 
   private:
 
-    /** True if channel is active. */
-    bool m_Active = false;
-
     /** Pedestal. */
     float m_Pedestal = 0;
 
@@ -175,7 +172,7 @@ namespace Belle2 {
     int m_LookbackWindowWidth = 0;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMChannelData, 4);
+    ClassDef(Belle2::KLMScintillatorFEEData, 1);
 
   };
 

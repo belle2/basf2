@@ -217,8 +217,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
       // as the same array as above, we assume chid exists
       struct dbr_ctrl_double tPvData;
       auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
-
-
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
       if (r == ECA_NORMAL) {
         if (!std::isnan(tPvData.lower_alarm_limit)
             && tPvData.lower_alarm_limit > 0.0) {
@@ -231,7 +230,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
           if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
         }
       } else {
-        SEVCHK(r, "ca_get failure");
+        SEVCHK(r, "ca_get or ca_pend_io failure");
       }
     }
 #endif

@@ -90,7 +90,8 @@ namespace Belle2 {
              true);
     addParam("minWidthXheight", m_minWidthXheight,
              "minimal product of width and height [ns * ADC counts]", 100.0);
-
+    addParam("lookBackWindows", m_lookBackWindows,
+             "number of look back windows, if positive override the number from database", 0);
   }
 
 
@@ -267,8 +268,9 @@ namespace Belle2 {
     TimeDigitizer::setStorageDepth(storageDepth);
 
     // from reference window and lookback determine first of the readout windows
-    int lookBackWindows = m_feSetting->getLookbackWindows() -
-                          m_feSetting->getExtraWindows();
+    int lookBackWindows = m_feSetting->getLookbackWindows();
+    if (m_lookBackWindows > 0) lookBackWindows = m_lookBackWindows;
+    lookBackWindows -= m_feSetting->getExtraWindows();
     int window = refWindow - lookBackWindows;
     if (window < 0) window += storageDepth;
     TimeDigitizer::setFirstWindow(window);

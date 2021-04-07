@@ -773,6 +773,7 @@ class CombinedSkim(BaseSkim):
             mdstOutput=False,
             mdst_kwargs=None,
             CombinedSkimName="CombinedSkim",
+            OutputFileName=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -786,6 +787,8 @@ class CombinedSkim(BaseSkim):
             mdst_kwargs (dict): kwargs to be passed to `mdst.add_mdst_output`. Only used
                 if ``mdstOutput`` is True.
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
+            OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
+                If mdstOutput=False, this option does nothing.
         """
 
         if NoisyModules is None:
@@ -801,6 +804,9 @@ class CombinedSkim(BaseSkim):
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
         self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
+        # empty but needed for functions inherited from baseSkim to work
+        self.SkimLists = []
+
         if additionalDataDescription is not None:
             for skim in self:
                 skim.additionalDataDescription = additionalDataDescription
@@ -812,6 +818,7 @@ class CombinedSkim(BaseSkim):
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}
+        self.mdst_kwargs.update(OutputFileName=OutputFileName)
 
         self.merge_data_structures()
 
@@ -819,7 +826,7 @@ class CombinedSkim(BaseSkim):
         return self.name
 
     def __name__(self):
-        self.name
+        return self.name
 
     def __call__(self, path):
         for skim in self:
@@ -930,11 +937,29 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        if "filename" not in kwargs:
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
+
+        if filename is None:
             filename = self.name
-            if not filename.endswith(".mdst.root"):
-                filename += ".mdst.root"
-            kwargs["filename"] = filename
+
+        if not filename.endswith(".mdst.root"):
+            filename += ".mdst.root"
+
+        kwargs["filename"] = filename
+
+        if "OutputFileName" in kwargs.keys():
+            del kwargs["OutputFileName"]
+
+        kwargs.setdefault("dataDescription", {})
+
+        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
+        # There is no requirement that a combinedSkim with single MDST output is
+        # registered so set the skimDecayMode to ``None`` if no code is defined.
+        try:
+            skim_code = self.code
+        except LookupError:
+            skim_code = None
+        kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]
@@ -953,22 +978,18 @@ class CombinedSkim(BaseSkim):
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
 
     @property
-    def postskim_path(self):
-        """
-        Undefined property, since no subsequent modules can be added to the path after a
-        combined skim.
-        """
-        b2.B2ERROR("Post-skim path not defined for combined skims.")
-        return NotImplemented
-
-    @property
     def flags(self):
         """
         List of flags for each skim in combined skim.
         """
         return [skim.flag for skim in self]
 
-    flag = flags  # alias inherited method
+    @property
+    def flag(self):
+        """
+        Event-level variable indicating whether an event passes the combinedSkim or not.
+        """
+        return f"passes_{self}"
 
     def initialise_skim_flag(self, path):
         """

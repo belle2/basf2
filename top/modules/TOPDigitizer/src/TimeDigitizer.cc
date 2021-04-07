@@ -260,7 +260,7 @@ namespace Belle2 {
       int offsetWindows = s_offsetWindows + m_windowShift;
       int winnum = s_window + offsetWindows;
       if (winnum < 0) winnum += s_storageDepth;
-      windowNumbers.push_back(winnum);
+      windowNumbers.push_back(winnum % s_storageDepth);
       for (unsigned i = 1; i < s_readoutWindows; i++) {
         windowNumbers.push_back((windowNumbers.back() + 1) % s_storageDepth);
       }

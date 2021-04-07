@@ -269,6 +269,7 @@ class SequentialRunByRun(AlgorithmStrategy):
     #: The params that you could set on the Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.
     usable_params = {
+        "has_experiment_settings": bool,
         "iov_coverage": IoV,
         "step_size": int
     }
@@ -286,6 +287,14 @@ class SequentialRunByRun(AlgorithmStrategy):
         if "step_size" not in self.algorithm.params:
             self.algorithm.params["step_size"] = 1
         self.first_execution = True
+
+    def apply_experiment_settings(self, algorithm, experiment):
+        """
+        Apply experiment-dependent settings.
+        This is the default version, which does not do anything.
+        If necessary, it should be reimplemented by derived classes.
+        """
+        return
 
     def run(self, iov, iteration, queue):
         """
@@ -338,6 +347,12 @@ class SequentialRunByRun(AlgorithmStrategy):
         number_of_experiments = len(runs_to_execute)
         # Iterate over experiment run lists
         for i_exp, run_list in enumerate(runs_to_execute, start=1):
+
+            # Apply experiment-dependent settings.
+            if "has_experiment_settings" in self.algorithm.params:
+                if self.algorithm.params["has_experiment_settings"]:
+                    self.apply_experiment_settings(self.machine.algorithm.algorithm, run_list[0].exp)
+
             # If 'iov_coverage' was set in the algorithm.params and it is larger (at both ends) than the
             # input data runs IoV, then we also have to set the first payload IoV to encompass the missing beginning
             # of the iov_coverage, and the last payload IoV must cover up to the end of iov_coverage.

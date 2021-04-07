@@ -75,7 +75,7 @@ public:
       sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
       statvfs(filename, &statfs);
       float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
-      if (usage < 0.9) {
+      if (usage < 0.7) {
         sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
         std::ifstream fin(filename);
         int flag = 0;

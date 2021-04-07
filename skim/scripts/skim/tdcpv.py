@@ -65,7 +65,7 @@ class TDCPV_qqs(BaseSkim):
     * ``phi:SkimHighEff``
     * ``eta':SkimHighEff``
     * ``eta:SkimHighEff``
-    * ``pi0:eff40_Jan2020``
+    * ``pi0:eff40_May2020``
     * ``pi0:skim``
     * ``rho0:SkimHighEff``
     * ``omega:SkimHighEff``
@@ -105,7 +105,7 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)
@@ -200,7 +200,6 @@ class TDCPV_qqs(BaseSkim):
         ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
         ma.reconstructDecay("B0:Kspipig -> " + Kres + ":all gamma:E15",
                             "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
-        ma.matchMCTruth('B0:Kspipig', path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         filename = f'{self}_Validation.root'
@@ -265,7 +264,7 @@ class TDCPV_ccs(BaseSkim):
 
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
 
         loadStdJpsiToee(path=path)

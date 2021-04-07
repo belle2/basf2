@@ -187,6 +187,7 @@ def get_calibrations(input_data, **kwargs):
     recon.prepare_cdst_analysis(path=Calibrate_CC)
     trg_bhabhaskim = Calibrate_CC.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
     Calibrate_CC.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -228,6 +229,7 @@ def get_calibrations(input_data, **kwargs):
     recon.prepare_cdst_analysis(path=Calibrate_WG)
     trg_bhabhaskim = Calibrate_WG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
     Calibrate_WG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -271,6 +273,7 @@ def get_calibrations(input_data, **kwargs):
     recon.prepare_cdst_analysis(path=Calibrate_RG)
     trg_bhabhaskim = Calibrate_RG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
     Calibrate_RG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,

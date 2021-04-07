@@ -68,12 +68,12 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # (-> for more details about V0s have a look at B2A203-LoadV0s.py)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(prioritiseV0=True, path=my_path)
-stdPi0s(listtype='eff10_Jan2020Fit', path=my_path)
-stdPi0s(listtype='eff20_Jan2020Fit', path=my_path)
-stdPi0s(listtype='eff30_Jan2020Fit', path=my_path)
-stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
-stdPi0s(listtype='eff50_Jan2020Fit', path=my_path)
-stdPi0s(listtype='eff60_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff10_May2020Fit', path=my_path)
+stdPi0s(listtype='eff20_May2020Fit', path=my_path)
+stdPi0s(listtype='eff30_May2020Fit', path=my_path)
+stdPi0s(listtype='eff40_May2020Fit', path=my_path)
+stdPi0s(listtype='eff50_May2020Fit', path=my_path)
+stdPi0s(listtype='eff60_May2020Fit', path=my_path)
 stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' is recommended at the moment
 
 # print contents of the DataStore after loading Particles
@@ -93,7 +93,7 @@ ma.printList('K-:good', False, path=my_path)
 ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:merged', False, path=my_path)
-ma.printList('pi0:eff40_Jan2020Fit', False, path=my_path)
+ma.printList('pi0:eff40_May2020Fit', False, path=my_path)
 ma.printList('K_L0:allklm', False, path=my_path)
 ma.printList('n0:all', False, path=my_path)
 
@@ -179,7 +179,7 @@ ma.variablesToNtuple(decayString='n0:all',
 # Note here, that since we want to get info about gammas from pi0,
 # we convert names of the variables from the gamma list in the way that they will
 # correspond to given gammas.
-ma.variablesToNtuple(decayString='pi0:eff40_Jan2020Fit',
+ma.variablesToNtuple(decayString='pi0:eff40_May2020Fit',
                      variables=pi0_variables + vu.create_aliases_for_selected(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                      filename=output_file,
                      treename='pi0',

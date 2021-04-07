@@ -76,7 +76,7 @@ void DQMHistAnalysisHLTModule::initialize()
     m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
                                   new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
                                   new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(),
-                                           SoftwareTrigger::HLTUnit::max_hlt_units, 1,
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1, 0,
                                            SoftwareTrigger::HLTUnit::max_hlt_units + 1)
                                 ));
   }
@@ -102,10 +102,10 @@ void DQMHistAnalysisHLTModule::initialize()
   for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
-    histogram->SetOption("bar");
-    histogram->SetFillStyle(0);
+    histogram->SetOption("histe");
+    histogram->SetMinimum(0);
     histogram->SetStats(false);
-    histogram->Draw("hist");
+    histogram->Draw();
   }
 
 #ifdef _BELLE2_EPICS
@@ -270,13 +270,13 @@ void DQMHistAnalysisHLTModule::event()
       continue;
     }
 
-    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units; i++) {
+    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units + 1; i++) {
       double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
       if (totalUnitValue == 0) {
         histogram->Fill(i, 0);
       } else {
         double filterLineUnitValue = filterLineHistogram->GetBinContent(i);
-        histogram->Fill(i, filterLineUnitValue / totalUnitValue);
+        histogram->SetBinContent(i, filterLineUnitValue / totalUnitValue);
       }
     }
   }

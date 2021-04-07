@@ -39,6 +39,9 @@ namespace Belle2 {
     /** Initialize. */
     void initialize() override final;
 
+    /** Begin run. */
+    void beginRun() override final;
+
     /** Event. */
     void event() override final;
 

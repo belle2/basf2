@@ -92,7 +92,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
-        )
+            pathLocation="before filter",
+        ).set_name("SoftwareTriggerHLTDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -136,6 +138,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
+            pathLocation="after filter",
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
@@ -151,7 +154,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createTotalResultHistograms=False,
             createExpRunEventHistograms=False,
             histogramDirectoryName="softwaretrigger_skim_nobhabha",
-        )
+        ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT

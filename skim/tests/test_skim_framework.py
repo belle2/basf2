@@ -8,11 +8,11 @@ Tests to ensure that the structure of the skim package is maintained.
 
 from importlib import import_module
 from inspect import getmembers, isclass
+import os
 from pathlib import Path
 import unittest
 
 from basf2 import find_file
-from b2test_utils import skip_test_if_light
 from skim.registry import Registry
 from skimExpertFunctions import BaseSkim
 
@@ -207,6 +207,10 @@ class TestSkimValidation(unittest.TestCase):
                 ),
             )
 
+    @unittest.skipIf(
+        not os.getenv("BELLE2_VALIDATION_DATA_DIR"),
+        "BELLE2_VALIDATION_DATA_DIR environment variable not set."
+    )
     def test_validation_samples(self):
         """
         Check that all ``validation_sample`` attributes of skims point to existing files.
@@ -224,5 +228,4 @@ class TestSkimValidation(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    skip_test_if_light(py_case=TestSkimValidation)
     unittest.main()

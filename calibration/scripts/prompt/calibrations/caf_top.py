@@ -29,7 +29,10 @@ settings = CalibrationSettings(
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[],
     expert_config={
-        "payload_boundaries": None})
+        "max_files_per_run": 10,
+        "payload_boundaries": None,
+        "request_memory": "4 GB"
+    })
 
 
 # Required function

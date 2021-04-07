@@ -82,6 +82,15 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
            "failed fits.", false);
   addParam("AdjustedTiming", m_adjusted_timing, "Use improved procedure for "
            "time determination in ShaperDSP emulator", true);
+
+  std::vector<int> default_skip = {
+    // By default, skip delayed bhabha and random trigger events
+    TRGSummary::ETimingType::TTYP_DPHY,
+    TRGSummary::ETimingType::TTYP_RAND,
+    TRGSummary::ETimingType::TTYP_POIS,
+  };
+  addParam("skipEvents", m_skipEvents, "Skip events that have listed timing "
+           "source (from TRGSummary)", default_skip);
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -143,13 +152,15 @@ void ECLDQMEXTENDEDModule::defineHisto()
   }
 
   h_ampfail_quality  = new TH1F("ampfail_quality", "Number of FPGA <-> C++ fitter #bf{amp} inconsistencies vs fit qual", 5, -1, 4);
-  h_ampfail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
   h_ampfail_quality->SetFillColor(kPink - 4);
+  h_ampfail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
+  h_ampfail_quality->SetDrawOption("hist");
   h_ampfail_quality->SetOption("LIVE");
 
   h_timefail_quality  = new TH1F("timefail_quality", "Number of FPGA <-> C++ fitter #bf{time} inconsistencies vs fit qual", 5, -1, 4);
   h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
+  h_ampfail_quality->SetDrawOption("hist");
   h_timefail_quality->SetOption("LIVE");
 
   h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", 8736, 1, 8737);
@@ -295,7 +306,8 @@ void ECLDQMEXTENDEDModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, s
 }
 
 
-void ECLDQMEXTENDEDModule::callbackCalibration(ECLDspData* dspdata, std::map<std::string, std::vector<short int>>& map1,
+void ECLDQMEXTENDEDModule::callbackCalibration(const ECLDspData* dspdata,
+                                               std::map<std::string, std::vector<short int>>& map1,
                                                std::map<std::string, short int>& map2)
 {
 
@@ -324,7 +336,7 @@ int ECLDQMEXTENDEDModule::conversion(int cellID)
   return (iCrate - 1) * 12 + iShaperPosition;
 
 }
-short int* ECLDQMEXTENDEDModule::vectorsplit(std::vector<short int>& vectorFrom, int iChannel)
+const short int* ECLDQMEXTENDEDModule::vectorsplit(const std::vector<short int>& vectorFrom, int iChannel)
 {
   size_t size = vectorFrom.size();
   if (size % 16) B2ERROR("ECL DQM logic test error: Split is impossible!" << LogVar("Vector size", size));
@@ -342,22 +354,14 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
 
   for (const auto& dspdata : m_ECLDspDataArray0) { //iCrate = 1, ..., 18
     iShaper++;
-    map_vec.clear();
-    map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 
   for (const auto& dspdata : m_ECLDspDataArray1) { //iCrate = 19, ..., 36
     iShaper++;
-    map_vec.clear();
-    map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 
   for (const auto& dspdata : m_ECLDspDataArray2) { //iCrate = 37, ..., 52
@@ -367,12 +371,8 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
     } else {
       if (iShaper - (iShaper - 1) / 12 * 12 > 8) continue;
     }
-    map_vec.clear();
-    map_coef.clear();
-    ECLDspData* dspointer = &(const_cast<ECLDspData&>(dspdata));
-    callbackCalibration(dspointer, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(&dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
   }
 }
 
@@ -394,9 +394,8 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
       if (iShaperPosition > 8) continue;
     }
     ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
-    callbackCalibration(dspdata, map_vec, map_coef);
-    map_container_vec[iShaper] = map_vec;
-    map_container_coef[iShaper] = map_coef;
+    callbackCalibration(dspdata, map_container_vec[iShaper],
+                        map_container_coef[iShaper]);
     callbackCalibration(m_calibrationThrA0, v_totalthrA0);
     callbackCalibration(m_calibrationThrAhard, v_totalthrAhard);
     callbackCalibration(m_calibrationThrAskip, v_totalthrAskip);
@@ -405,34 +404,30 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
 
 void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<int> adc_data)
 {
-
   int iShaper = conversion(cellID);
   int iChannelPosition = mapper.getShaperChannel(cellID);
-  short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
-  int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
-  int A0, Ahard, Askip;
 
-  map_vec = map_container_vec[iShaper];
-  f    = vectorsplit(map_vec["F"], iChannelPosition);
-  f1   = vectorsplit(map_vec["F1"], iChannelPosition);
-  fg31 = vectorsplit(map_vec["F31"], iChannelPosition);
-  fg32 = vectorsplit(map_vec["F32"], iChannelPosition);
-  fg33 = vectorsplit(map_vec["F33"], iChannelPosition);
-  fg41 = vectorsplit(map_vec["F41"], iChannelPosition);
-  fg43 = vectorsplit(map_vec["F43"], iChannelPosition);
+  const auto& map_vec = map_container_vec[iShaper];
+  const short int* f    = vectorsplit(map_vec.at("F"),   iChannelPosition);
+  const short int* f1   = vectorsplit(map_vec.at("F1"),  iChannelPosition);
+  const short int* fg31 = vectorsplit(map_vec.at("F31"), iChannelPosition);
+  const short int* fg32 = vectorsplit(map_vec.at("F32"), iChannelPosition);
+  const short int* fg33 = vectorsplit(map_vec.at("F33"), iChannelPosition);
+  const short int* fg41 = vectorsplit(map_vec.at("F41"), iChannelPosition);
+  const short int* fg43 = vectorsplit(map_vec.at("F43"), iChannelPosition);
 
-  map_coef = map_container_coef[iShaper];
-  k_a = map_coef["k_a"];
-  k_b = map_coef["k_b"];
-  k_c = map_coef["k_c"];
-  k_1 = map_coef["k_1"];
-  k_2 = map_coef["k_2"];
-  k_16 = map_coef["k_16"];
-  chi_thres = map_coef["chi_thres"];
+  const auto& map_coef = map_container_coef[iShaper];
+  int k_a = map_coef.at("k_a");
+  int k_b = map_coef.at("k_b");
+  int k_c = map_coef.at("k_c");
+  int k_1 = map_coef.at("k_1");
+  int k_2 = map_coef.at("k_2");
+  int k_16 = map_coef.at("k_16");
+  int chi_thres = map_coef.at("chi_thres");
 
-  A0 = (int)v_totalthrA0[cellID - 1];
-  Ahard = (int)v_totalthrAhard[cellID - 1];
-  Askip = (int)v_totalthrAskip[cellID - 1];
+  int A0 = (int)v_totalthrA0[cellID - 1];
+  int Ahard = (int)v_totalthrAhard[cellID - 1];
+  int Askip = (int)v_totalthrAskip[cellID - 1];
 
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
@@ -488,6 +483,15 @@ void ECLDQMEXTENDEDModule::beginRun()
 
 void ECLDQMEXTENDEDModule::event()
 {
+  if (m_TRGSummary.isValid()) {
+    // Skip events for several types of timing sources
+    // to reduce CPU time usage on HLT (random trigger, delayed bhahba).
+    int timing_type = m_TRGSummary->getTimType();
+    for (auto& skipped_timing_type : m_skipEvents) {
+      if (timing_type == skipped_timing_type) return;
+    }
+  }
+
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 

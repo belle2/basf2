@@ -784,7 +784,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
                                      The decay string determines the type of Particle
-                                     and determines the of the ParticleList.
+                                     and the name of the ParticleList.
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
@@ -804,14 +804,42 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [decayString for decayString, cut in decayStringsWithCuts])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
-    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
     for decayString, cut in decayStringsWithCuts:
-        if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-            getBeamBackgroundProbabilityMVA(decayString, path)
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
+        # need to check some logic to unpack possible scenarios
+        if decayDescriptor.getNDaughters() > 0:
+            # ... then we have an actual decay in the decay string which must be a V0
+            # the particle loader automatically calls this "V0" so we have to copy over
+            # the list to name/format that user wants
+            if decayDescriptor.getMother().getLabel() != 'V0':
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+        elif decayDescriptor.getMother().getLabel() != 'all':
+            # then we have a non-V0 particle which the particle loader automatically calls "all"
+            # as with the special V0 case we have to copy over the list to the name/format requested
+            copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
+
+        # optionally apply a cut
+        if cut != "":
+            applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
+
+        if decayString.startswith("gamma"):
+            # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
+            # but the user has to explicitly request them.
+            if not loadPhotonsFromKLM:
+                applyCuts(decayString, 'isFromECL', path)
+
+            # if the user asked for the beam background MVA to be added, then also provide this
+            # (populates the variable named beamBackgroundProbabilityMVA)
+            if loadPhotonBeamBackgroundMVA:
+                getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
@@ -876,13 +904,41 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
-    pload.param('loadPhotonsFromKLM', loadPhotonsFromKLM)
     path.add_module(pload)
-    if decayString.startswith("gamma") and loadPhotonBeamBackgroundMVA:
-        getBeamBackgroundProbabilityMVA(decayString, path)
+
+    # need to check some logic to unpack possible scenarios
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getNDaughters() > 0:
+        # ... then we have an actual decay in the decay string which must be a V0
+        # the particle loader automatically calls this "V0" so we have to copy over
+        # the list to name/format that user wants
+        if decayDescriptor.getMother().getLabel() != 'V0':
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+    elif decayDescriptor.getMother().getLabel() != 'all':
+        # then we have a non-V0 particle which the particle loader automatically calls "all"
+        # as with the special V0 case we have to copy over the list to the name/format requested
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
+
+    # optionally apply a cut
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
+
+    if decayString.startswith("gamma"):
+        # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
+        # but the user has to explicitly request them.
+        if not loadPhotonsFromKLM:
+            applyCuts(decayString, 'isFromECL', path)
+
+        # if the user asked for the beam background MVA to be added, then also provide this
+        # (populates the variable named beamBackgroundProbabilityMVA)
+        if loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -908,11 +964,24 @@ def fillParticleListWithTrackHypothesis(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'all':
+        # the particle loader automatically calls particle lists of charged FSPs "all"
+        # so we have to copy over the list to the name/format requested
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
@@ -927,7 +996,7 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
         fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
 
     Parameters:
-        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+        decayString (str): Must be gamma to an e+e- pair. You must specify the daughter ordering.
                            Will also determine the name of the particleList.
         cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):   whether RootOutput module should save the created ParticleList
@@ -936,10 +1005,23 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', True)
     pload.param('writeOut', writeOut)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'V0':
+        # the particle loader automatically calls converted photons "V0" so we have to copy over
+        # the list to name/format that user wants
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromROE(decayString,
@@ -970,13 +1052,26 @@ def fillParticleListFromROE(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param('roeMaskName', maskName)
     pload.param('useMissing', useMissing)
     pload.param('sourceParticleListName', sourceParticleListName)
     pload.param('useROEs', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'ROE':
+        # the particle loader automatically uses the label "ROE" for particles built from the ROE
+        # so we have to copy over the list to name/format that user wants
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':ROE', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromMC(decayString,
@@ -1002,12 +1097,25 @@ def fillParticleListFromMC(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'MC':
+        # the particle loader automatically uses the label "MC" for particles built from MCParticles
+        # so we have to copy over the list to name/format that user wants
+        copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillParticleListsFromMC(decayStringsWithCuts,
@@ -1036,12 +1144,26 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [decayString for decayString, cut in decayStringsWithCuts])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    for decayString, cut in decayStringsWithCuts:
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
+        if decayDescriptor.getMother().getLabel() != 'MC':
+            # the particle loader automatically uses the label "MC" for particles built from MCParticles
+            # so we have to copy over the list to name/format that user wants
+            copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
+
+        # apply a cut if a non-empty cut string is provided
+        if cut != "":
+            applyCuts(decayString, cut, path)
 
 
 def applyCuts(list_name, cut, path):
@@ -1912,18 +2034,18 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     """
     if inputParticlelists is None:
         inputParticlelists = []
-    fillParticleList('pi+:roe_default', '', path=path)
+    fillParticleList('pi+:all', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     import b2bii
     if not b2bii.isB2BII():
-        fillParticleList('gamma:roe_default', '', path=path)
+        fillParticleList('gamma:all', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+        inputParticlelists += ['pi+:all', 'gamma:all', 'K_L0:roe_default']
     else:
-        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
+        inputParticlelists += ['pi+:all', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -2682,7 +2804,7 @@ def getBeamBackgroundProbabilityMVA(
     @param path       modules are added to this path
     """
 
-    basf2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module(
         'MVAExpert',
         listNames=particleList,
@@ -2918,7 +3040,7 @@ def labelTauPairMC(printDecayInfo=False, path=None):
 def tagCurlTracks(particleLists,
                   mcTruth=False,
                   responseCut=0.324,
-                  selectorType='cUt',
+                  selectorType='cut',
                   ptCut=0.6,
                   train=False,
                   path=None):

@@ -74,6 +74,12 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    /**
+     * @return true if the current event is a random trigger event,
+     *         false otherwise.
+     */
+    bool isRandomTrigger();
+
     /** Geometry */
     ECL::ECLGeometryPar* m_geom{nullptr};
     /** StoreObjPtr EventMetaData */
@@ -145,6 +151,8 @@ namespace Belle2 {
     TH1F* h_trigtag1{nullptr};
     /** Histogram: Fraction of digits above ADC threshold. */
     TH1F* h_adc_hits{nullptr};
+    /** Histogram: Entries with crate time offsets > 100 ns (E > 1 GeV). */
+    TH1F* h_time_crate_Thr1GeV_large{nullptr};
 
     /** Histogram vector: Hit map. */
     std::vector<TH1F*> h_cids = {};

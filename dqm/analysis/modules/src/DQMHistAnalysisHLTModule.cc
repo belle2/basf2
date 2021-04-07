@@ -24,7 +24,12 @@ namespace {
 
   double getValue(const std::string& name, TH1* histogram)
   {
-    B2ASSERT("This histogram does not have this value!", hasValue(name, histogram));
+    if (not hasValue(name, histogram)) {
+      B2ERROR("This histogram does not have this value! (fallback value = -1)"
+              << LogVar("histogram", histogram->GetName())
+              << LogVar("value", name));
+      return -1;
+    }
     auto binNumber = histogram->GetXaxis()->FindFixBin(name.c_str());
     return histogram->GetBinContent(binNumber);
   }
@@ -53,7 +58,7 @@ void DQMHistAnalysisHLTModule::initialize()
   };
   m_hEfficiencyTotal = {
     new TCanvas("HLT/RatioTotal"),
-    new TH1F("Ratio", "Ratio of Tags to all events", 1, 0, 0)
+    new TH1F("RatioTotal", "Ratio of Tags to all events", 1, 0, 0)
   };
   m_hCrossSection = {
     new TCanvas("HLT/CrossSection"),
@@ -76,7 +81,7 @@ void DQMHistAnalysisHLTModule::initialize()
     m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
                                   new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
                                   new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(),
-                                           SoftwareTrigger::HLTUnit::max_hlt_units, 1,
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1, 0,
                                            SoftwareTrigger::HLTUnit::max_hlt_units + 1)
                                 ));
   }
@@ -102,11 +107,16 @@ void DQMHistAnalysisHLTModule::initialize()
   for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
-    histogram->SetOption("bar");
-    histogram->SetFillStyle(0);
+    histogram->SetOption("histe");
+    histogram->SetMinimum(0);
     histogram->SetStats(false);
-    histogram->Draw("hist");
+    histogram->Draw();
   }
+
+  m_hMeanTime = {
+    new TCanvas("HLT/MeanTime"),
+    new TH1F("MeanTime", "Mean processing time", 1, 0, 0)
+  };
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -120,7 +130,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
@@ -142,6 +152,8 @@ void DQMHistAnalysisHLTModule::event()
   auto* skimHistogram = findHist("softwaretrigger/skim");
   auto* totalResultHistogram = findHist("softwaretrigger/total_result");
   auto* hltUnitNumberHistogram = findHist("softwaretrigger_before_filter/hlt_unit_number");
+  auto* processesPerUnitHistogram = findHist("timing_statistics/processesPerUnitHistogram");
+  auto* meanTimeHistogram = findHist("timing_statistics/meanTimeHistogram");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -159,16 +171,26 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the HLT unit number histogram!");
     return;
   }
+  if (not processesPerUnitHistogram) {
+    B2ERROR("Can not find the processes per unit histogram!");
+    return;
+  }
+  if (not meanTimeHistogram) {
+    B2ERROR("Can not find the mean processing time histogram!");
+    return;
+  }
 
   m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();
   m_hCrossSection.second->Reset();
   m_hRatios.second->Reset();
+  m_hMeanTime.second->Reset();
 
   double instLuminosity = 0;
   double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
   double numberOfAllEvents = hltUnitNumberHistogram->GetEntries();
+  double numberOfProcesses = processesPerUnitHistogram->GetEntries();
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -270,18 +292,21 @@ void DQMHistAnalysisHLTModule::event()
       continue;
     }
 
-    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units; i++) {
+    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units + 1; i++) {
       double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
       if (totalUnitValue == 0) {
         histogram->Fill(i, 0);
       } else {
         double filterLineUnitValue = filterLineHistogram->GetBinContent(i);
-        histogram->Fill(i, filterLineUnitValue / totalUnitValue);
+        histogram->SetBinContent(i, filterLineUnitValue / totalUnitValue);
       }
     }
   }
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
+  m_hMeanTime.second->Scale(1 / numberOfProcesses);
+
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 

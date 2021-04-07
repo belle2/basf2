@@ -44,11 +44,11 @@ ma.printDataStore(path=my_path)
 # second argument are the selection criteria: '' means no cut, take all
 # the decay chain has to be specified (i.e. the two daughters, as well)
 # A vertex fit should also be performed
-# In this example a cut on the candidates mass is applied
-ma.fillParticleList(decayString='K_S0:V0 -> pi+ pi-', cut='0.3 < M < 0.7', path=my_path)
-vtx.treeFit(list_name='K_S0:V0', conf_level=0.0, path=my_path)
-ma.fillParticleList(decayString='Lambda0:V0 -> p+ pi-', cut='0.9 < M < 1.3', path=my_path)
-vtx.treeFit(list_name='Lambda0:V0', conf_level=0.0, path=my_path)
+# In this example a cut on the candidates' mass is applied
+ma.fillParticleList(decayString='K_S0:v0 -> pi+ pi-', cut='0.3 < M < 0.7', path=my_path)
+vtx.treeFit(list_name='K_S0:v0', conf_level=0.0, path=my_path)
+ma.fillParticleList(decayString='Lambda0:v0 -> p+ pi-', cut='0.9 < M < 1.3', path=my_path)
+vtx.treeFit(list_name='Lambda0:v0', conf_level=0.0, path=my_path)
 
 # alternatively, we can create a list of particles combined
 # using the analysis ParticleCombiner module
@@ -56,7 +56,7 @@ vtx.treeFit(list_name='Lambda0:V0', conf_level=0.0, path=my_path)
 # of the V0s' daughters (anti-particle lists are automatically
 # created, too)
 # A vertex fit should also be performed
-# In this example a cut on the candidates mass is applied
+# In this example a cut on the candidates' mass is applied
 ma.fillParticleList(decayString='pi-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='p+:all', cut='', path=my_path)
 
@@ -69,8 +69,8 @@ vtx.treeFit(list_name='Lambda0:RD', conf_level=0.0, path=my_path)
 ma.printDataStore(path=my_path)
 
 # print out the contents of each ParticleList
-ma.printList(list_name='K_S0:V0', full=False, path=my_path)
-ma.printList(list_name='Lambda0:V0', full=False, path=my_path)
+ma.printList(list_name='K_S0:v0', full=False, path=my_path)
+ma.printList(list_name='Lambda0:v0', full=False, path=my_path)
 
 ma.printList(list_name='K_S0:RD', full=False, path=my_path)
 ma.printList(list_name='Lambda0:RD', full=False, path=my_path)
@@ -96,7 +96,7 @@ rootOutputFile = 'B2A205-LoadV0s_expert.root'
 
 # K_S0 from V0s
 ma.variablesToNtuple(treename='kshort_v0',
-                     decayString='K_S0:V0',
+                     decayString='K_S0:v0',
                      variables=v0_vars,
                      filename=rootOutputFile,
                      path=my_path)
@@ -110,7 +110,7 @@ ma.variablesToNtuple(treename='kshort_rd',
 
 # Lambda0 from V0s
 ma.variablesToNtuple(treename='lambda_v0',
-                     decayString='Lambda0:V0',
+                     decayString='Lambda0:v0',
                      variables=v0_vars,
                      filename=rootOutputFile,
                      path=my_path)

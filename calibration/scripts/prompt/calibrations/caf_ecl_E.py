@@ -2,17 +2,33 @@
 
 """ECL single crystal energy calibration using three control samples."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
-    name="ecl_energy", expert_username="hearty", description=__doc__, input_data_formats=["cdst"], input_data_names=[
-        "bhabha_all_calib", "gamma_gamma_calib", "mumutight_calib"], input_data_filters={
-            "bhabha_all_calib": [
-                "bhabha_all_calib", "Good", "On"], "gamma_gamma_calib": [
-                    "gamma_gamma_calib", "Good", "On"], "mumutight_calib": [
-                        "mumutight_calib", "Good or Recoverable", "On"]}, depends_on=[])
+    name="ecl_energy",
+    expert_username="hearty",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=[
+        "bhabha_all_calib",
+        "gamma_gamma_calib",
+        "mumutight_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            input_data_filters["Data Tag"]["bhabha_all_calib"],
+            input_data_filters["Data Quality Tag"]["Good"],
+            input_data_filters["Magnet"]["On"]],
+        "gamma_gamma_calib": [
+            input_data_filters["Data Tag"]["gamma_gamma_calib"],
+            input_data_filters["Data Quality Tag"]["Good"],
+            input_data_filters["Magnet"]["On"]],
+        "mumutight_calib": [
+            input_data_filters["Data Tag"]["mumutight_calib"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]]},
+    depends_on=[])
 
 # --------------------------------------------------------------
 # ..The calibration functions

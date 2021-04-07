@@ -89,7 +89,7 @@ double EnergyLossEstimator::getMass(int pdgCode)
     const double electronMass = 0.511 * Unit::MeV;
     return electronMass;
   } else if (std::abs(pdgCode) == Const::muon.getPDGCode()) {
-    const double muonMass = 195.658 * Unit::MeV;
+    const double muonMass = 105.658 * Unit::MeV;
     return muonMass;
   } else if (std::abs(pdgCode) == Const::kaon.getPDGCode()) {
     const double kaonMass = 0.493677;

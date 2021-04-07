@@ -169,21 +169,35 @@ Disabling uDST output may be useful to you if you want to do any of the followin
 Skim flags
 ..........
 
-When a skim is added to the path, an event-level variable is created (via an alias), which indicates whether an event passes the skim or not. It is of the form ``passes_<SKIMNAME>``, and can be accessed through the property ``BaseSkim.flag``.
+When a skim is added to the path, an entry is added to the event extra info to indicate whether an event passes the skim or not. This flag is of the form ``eventExtraInfo(passes_<SKIMNAME>)`` (aliased to ``passes_<SKIMNAME>`` for convenience), and the flag name is stored in the property ``BaseSkim.flag``.
 
-The same caveat from the previous section regarding ``postskim_path`` applies here. The skim flag is not guaranteed to work if used on the main path, because the skim lists may not be built for all events.
-
-In the below code snippet, we build the skim lists, skip the uDST output, and write an ntuple containing the skim flag and other event-level variables:
+In the example below, we build the skim lists, skip the uDST output, and write an ntuple containing the skim flag and other event-level variables:
 
 .. code-block:: python
 
     skim = MySkim(udstOutput=False)
     skim(path)
-    # Add subsequent modules to skim.postskim_path, including anything that uses skim.flag
-    ma.variablesToNtuple("", [skim.flag, "nTracks"], path=skim.postskim_path)
-    # Process full path
+    ma.variablesToNtuple("", [skim.flag, "nTracks"], path=path)
     b2.process(path)
 
+
+Skim flags can also be used in combined skims, with the individual flags being available in the list `CombinedSkim.flags`. In the example below, we run three skims in a combined skim, disable the uDST output, and then save the three skim flags to an ntuple.
+
+.. code-block:: python
+
+    skim = CombinedSkim(
+        SkimA(),
+        SkimB(),
+        SkimC(),
+        udstOutput=False,
+    )
+    skim(path)
+    ma.variablesToNtuple("", skim.flags + ["nTracks"], path=path)
+    b2.process(path)
+
+.. tip::
+
+   Skim flags are guaranteed to work on the main path (the variable ``path`` in the above examples). However, any other modules attempting to access the skim lists should be added to the :py:func:`postskim_path <skimExpertFunctions.BaseSkim.postskim_path>`.
 
 .. _skim-running:
 

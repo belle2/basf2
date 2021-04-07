@@ -123,6 +123,7 @@ namespace Belle2 {
     bool m_simulateTTS; /**< if true, add TTS to simulated hits */
     bool m_allChannels; /**< if true, always make waveforms for all channels */
     double m_minWidthXheight;  /**< minimal width * height [ns * ADC counts] */
+    int m_lookBackWindows;     /**< number of "look back" windows */
 
     // datastore objects
     StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */

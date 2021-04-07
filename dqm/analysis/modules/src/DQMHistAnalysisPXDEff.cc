@@ -42,6 +42,8 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
+  addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
+  addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
@@ -117,6 +119,19 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
+  m_hErrorLine = new TH1F("Errorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hWarnLine = new TH1F("Warnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  for (int i = 0; i < (int)m_PXDModules.size(); i++) {
+    m_hErrorLine->SetBinContent(i + 1, m_errorlevel);
+    m_hWarnLine->SetBinContent(i + 1, m_warnlevel);
+  }
+  m_hWarnLine->SetLineColor(kOrange - 3);
+  m_hWarnLine->SetLineWidth(3);
+  m_hWarnLine->SetLineStyle(4);
+  m_hErrorLine->SetLineColor(kRed + 3);
+  m_hErrorLine->SetLineWidth(3);
+  m_hErrorLine->SetLineStyle(7);
+
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
@@ -161,18 +176,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
-  //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
-  m_line_warn = new TLine(0, m_warnlevel, m_PXDModules.size(), m_warnlevel);
-  m_line_error = new TLine(0, m_errorlevel, m_PXDModules.size(), m_errorlevel);
-  m_line_warn->SetHorizontal(true);
-  m_line_warn->SetLineColor(kOrange - 3);
-  m_line_warn->SetLineWidth(3);
-  m_line_warn->SetLineStyle(4);
-  m_line_error->SetHorizontal(true);
-  m_line_error->SetLineColor(kRed + 3);
-  m_line_error->SetLineWidth(3);
-  m_line_error->SetLineStyle(7);
-
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
@@ -204,6 +207,34 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_hEffAll->SetTotalEvents(j, 0);
     m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
     m_hEffAllUpdate->SetTotalEvents(j, 0);
+
+    m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
+    m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
+
+#ifdef _BELLE2_EPICS
+    if (m_useEpics) {
+      // get warn and error limit
+      // as the same array as above, we assume chid exists
+      struct dbr_ctrl_double tPvData;
+      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      if (r == ECA_NORMAL) {
+        if (!std::isnan(tPvData.lower_alarm_limit)
+            && tPvData.lower_alarm_limit > 0.0) {
+          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
+        }
+        if (!std::isnan(tPvData.lower_warning_limit)
+            && tPvData.lower_warning_limit > 0.0) {
+          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
+        }
+      } else {
+        SEVCHK(r, "ca_get or ca_pend_io failure");
+      }
+    }
+#endif
+
   }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
@@ -296,7 +327,7 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
       /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += ihit;
+      all += nhit;
       m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
@@ -323,10 +354,18 @@ void DQMHistAnalysisPXDEffModule::event()
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
-      error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_errorlevel); // error if upper error value is below limit
-      warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_warnlevel); // (and not only the actual eff value)
+      if (nhit > 10) {
+        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                       m_errorlevelmod[aModule]); // error if upper error value is below limit
+        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                      m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        if (m_alarmAdhoc) {
+          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                         m_errorlevelmod[aModule]); // error if upper error value is below limit
+          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        }
+      }
     }
   }
 
@@ -396,8 +435,8 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
       m_cEffAll->Pad()->Modified();
       m_cEffAll->Pad()->Update();
-      m_line_warn->Draw();
-      m_line_error->Draw();
+      m_hWarnLine->Draw("same,hist");
+      m_hErrorLine->Draw("same,hist");
     }
 
     m_cEffAll->Modified();
@@ -495,8 +534,8 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
     m_cEffAllUpdate->Pad()->Modified();
     m_cEffAllUpdate->Pad()->Update();
-    m_line_warn->Draw();
-    m_line_error->Draw();
+    m_hWarnLine->Draw("same,hist");
+    m_hErrorLine->Draw("same,hist");
   }
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();

@@ -143,7 +143,7 @@ class LowMassTwoTrack(BaseSkim):
         nHardISRPhotonCut = f"nCleanedECLClusters({ISRECut}) > 0"
 
         # Apply event based cuts
-        ma.applyEventCuts(f"{nTracksCut} and {nHardISRPhotonCut}", path=path)
+        path = self.skim_event_cuts(f"{nTracksCut} and {nHardISRPhotonCut}", path=path)
 
         # Reconstruct candidates
         ma.fillParticleList(f"pi+:{label}", pCut, path=path)

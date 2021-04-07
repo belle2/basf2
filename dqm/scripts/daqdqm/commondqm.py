@@ -26,10 +26,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+                     For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
+                            L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
                                          Should be True only when running on the HLT servers
     """
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
     # Check components.
     check_components(components)
 
@@ -62,8 +64,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
-            # SVD Occupancy after Injection
-            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
             # SVDDQMExpressReco General
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
@@ -83,6 +83,15 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
+    # Injection DQM modules that should run only on the L1 passthrough events on ExpressReco
+    if dqm_environment == "expressreco" and (dqm_mode in ["l1_passthrough"]):
+        if components is None or 'SVD' in components:
+            # SVD Occupancy after Injection
+            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+        if components is None or 'ECL' in components:
+            # ECL Injection DQM
+            path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
+
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
         path.add_module(
             "SoftwareTriggerHLTDQM",
@@ -92,7 +101,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
-        )
+            pathLocation="before filter",
+        ).set_name("SoftwareTriggerHLTDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -129,13 +140,48 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
         cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
 
+        additionalL1Identifiers = [
+            'ffy',
+            'fyo',
+            'c4',
+            'hie',
+            'mu_b2b',
+            'mu_eb2b',
+            'beklm',
+            'eklm2',
+            'cdcklm1',
+            'seklm1',
+            'ieklm1',
+            'ecleklm1',
+            'fso',
+            'fioiecl1',
+            'ff30',
+            'stt',
+            'ioiecl1',
+            'ioiecl2',
+            'lml1',
+            'lml2',
+            'lml3',
+            'lml4',
+            'lml5',
+            'lml6',
+            'lml7',
+            'lml8',
+            'lml9',
+            'lml10',
+            'lml12',
+            'lml13',
+            'bhapur']
+
         # Default plot
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
+            pathLocation="after filter",
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
@@ -151,7 +197,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createTotalResultHistograms=False,
             createExpRunEventHistograms=False,
             histogramDirectoryName="softwaretrigger_skim_nobhabha",
-        )
+        ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
@@ -178,9 +224,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(ecldqm)
         ecldqmext = b2.register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
-        # we dont want to create large histograms on HLT, thus ERECO only
-        if dqm_environment == "expressreco":
-            path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
+
     # TOP
     if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
         topdqm = b2.register_module('TOPDQM')

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                              *
+ * Copyright(C) 2020  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Giacomo De Pietro                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dbobjects/eklm/EKLMChannelData.h>
+#include <klm/dbobjects/KLMScintillatorFEEData.h>
 
 /* ROOT headers. */
 #include <TObject.h>
@@ -25,40 +25,40 @@ namespace Belle2 {
   /**
    * Class to store EKLM alignment data in the database.
    */
-  class EKLMChannels : public TObject {
+  class KLMScintillatorFEEParameters : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMChannels();
+    KLMScintillatorFEEParameters();
 
     /**
      * Destructor.
      */
-    ~EKLMChannels();
+    ~KLMScintillatorFEEParameters();
 
     /**
-     * Set channel data.
+     * Set scintillator FEE data.
      * @param[in] strip Strip (channel) number.
-     * @param[in] dat   Channels data.
+     * @param[in] data  Scintillator FEE data.
      */
-    void setChannelData(uint16_t strip, EKLMChannelData* dat);
+    void setFEEData(uint16_t strip, KLMScintillatorFEEData* data);
 
     /**
-     * Get channel data.
+     * Get scintillator FEE data.
      * @param[in] strip Strip (channel) number.
      */
-    const EKLMChannelData* getChannelData(uint16_t strip) const;
+    const KLMScintillatorFEEData* getFEEData(uint16_t strip) const;
 
   private:
 
-    /** Channel data. */
-    std::map<uint16_t, EKLMChannelData> m_Channels;
+    /** Scintillator FEE parameters. */
+    std::map<uint16_t, KLMScintillatorFEEData> m_FEEParameters;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMChannels, 1);
+    ClassDef(Belle2::KLMScintillatorFEEParameters, 1);
 
   };
 

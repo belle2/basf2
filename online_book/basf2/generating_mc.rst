@@ -157,7 +157,7 @@ number.
 
 .. tip::
 
-   You can also use `b2help-modules`_ to look at a module's parameters. For example, you can run on your shell
+   You can also use `b2help-modules` to look at a module's parameters. For example, you can run on your shell
    ``b2help-modules EventInfoSetter``.
 
 
@@ -260,7 +260,7 @@ Suppose that we want to study the :math:`B^0 \to J/\Psi K^0_S` decay, with :math
 :math:`K^0_S \to \pi^+ \pi^-`. A decay file that we can use is the following one (copy it into a file named
 ``my_decay_file.dec`` or something similar):
 
-.. literalinclude:: steering_files/my_deca_file.dec
+.. literalinclude:: steering_files/my_decay_file.dec
     :linenos:
 
 Looking at this simple decay file, it is not difficult to understand its structure:
@@ -317,7 +317,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Can you use :help:`b2help-particles` for this?
+     Can you use `b2help-particles` for this?
 
 .. admonition:: Solution
      :class: toggle solution

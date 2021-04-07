@@ -13,6 +13,7 @@ from caf.utils import ExpRun, IoV
 from itertools import groupby
 from itertools import chain
 from math import ceil, inf
+from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
@@ -36,7 +37,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
-                               depends_on=[])
+                               depends_on=[beamspot_calibration])
 
 
 def get_calibrations(input_data, **kwargs):

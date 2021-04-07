@@ -45,6 +45,7 @@
 //STL
 #include <iostream>
 #include <iterator>
+#include <cmath>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -111,12 +112,18 @@ void ECLDQMModule::defineHisto()
 
   h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Flag number");
+  h_trigtag1->SetDrawOption("hist");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 
   h_adc_hits = new TH1F("adc_hits", "Fraction of high-energy hits (E > 50 MeV)", 1001, 0, 1.001);
   h_adc_hits->GetXaxis()->SetTitle("Fraction");
   h_adc_hits->SetOption("LIVE");
+
+  h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large", "Entries with ECL crate timing > #pm 100 ns (E > 1 GeV)", 52, 1,
+                                        53);
+  h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
+  h_time_crate_Thr1GeV_large->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {
     std::string h_name, h_title;
@@ -279,6 +286,7 @@ void ECLDQMModule::beginRun()
   h_bad_quality->Reset();
   h_trigtag1->Reset();
   h_adc_hits->Reset();
+  h_time_crate_Thr1GeV_large->Reset();
   h_cell_psd_norm->Reset();
   std::for_each(h_cids.begin(), h_cids.end(), [](auto & it) {it->Reset();});
   std::for_each(h_edeps.begin(), h_edeps.end(), [](auto & it) {it->Reset();});
@@ -312,10 +320,8 @@ void ECLDQMModule::event()
       h_evtot->Fill(0);
       for (const auto& id : m_WaveformOption) {
         if (id == "logic" && m_iEvent % 1000 == 999) h_evtot_logic->Fill(0);
-        if (id == "rand" && m_l1Trigger.isValid() &&
-            m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
-        if (id == "dphy" && m_l1Trigger.isValid() &&
-            bhatrig) h_evtot_dphy->Fill(0);
+        if (id == "rand" && isRandomTrigger()) h_evtot_rand->Fill(0);
+        if (id == "dphy" && bhatrig) h_evtot_dphy->Fill(0);
       }
     }
   }
@@ -328,8 +334,8 @@ void ECLDQMModule::event()
     for (const auto& id : m_WaveformOption) {
       if (id != "psd") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  bhatrig) ||
+                               isRandomTrigger() ||
+                               bhatrig ||
                                aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
@@ -383,7 +389,8 @@ void ECLDQMModule::event()
       }
     }
 
-    if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
   }
 
   for (auto& h : h_edeps) {
@@ -417,18 +424,12 @@ void ECLDQMModule::event()
     for (const auto& id : m_WaveformOption) {
       auto index = std::distance(m_WaveformOption.begin(), std::find(m_WaveformOption.begin(), m_WaveformOption.end(), id));
       if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
-      else if (id == "psd" && (m_iEvent % 1000 == 999 ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  bhatrig) ||
+      else if (id == "psd" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
                                !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       else if (id == "logic" && m_iEvent % 1000 != 999) continue;
-      else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
-      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                !bhatrig)) continue;
-      else if (id == "other" && (m_iEvent % 1000 == 999 ||
-                                 (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                                 (m_l1Trigger.isValid() &&  bhatrig) ||
+      else if (id == "rand" && (m_iEvent % 1000 == 999 || !isRandomTrigger())) continue;
+      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !bhatrig)) continue;
+      else if (id == "other" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
                                  (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
       if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());
@@ -446,3 +447,11 @@ void ECLDQMModule::endRun()
 void ECLDQMModule::terminate()
 {
 }
+
+bool ECLDQMModule::isRandomTrigger()
+{
+  if (!m_l1Trigger.isValid()) return false;
+  return m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND ||
+         m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+}
+

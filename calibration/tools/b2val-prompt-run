@@ -160,7 +160,6 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     # Output directory, where the stdout and stderr will be sent.
     job.output_dir = validation_result_path
     # The command we want to run
-    module_name = prompt_validation_script_package + Path(script_name).stem
     job_path = validation_config.get('job_path', None)
     input_data_path=validation_config.get('input_data_path', None)
     job.cmd = ["basf2", f"{script_path}", f"{job_path} {input_data_path} {expert_config}"]

@@ -12,6 +12,7 @@ from ROOT.Belle2 import BKLMElementNumbers, KLMCalibrationChecker, KLMElementNum
 import sys
 import subprocess
 import math
+import os
 
 
 #: Tells the automated system some details of this script
@@ -122,9 +123,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
         chunks = math.ceil(len(run_list) / chunk_size)
         for chunk in range(chunks):
             file_name = f'strip_efficiency_exp{exp}_chunk{chunk}.root'
-            run_file_names = [
+            run_files = [
                 f'strip_efficiency_exp{exp}_run{run}.root' for run in run_list[chunk * chunk_size:(chunk + 1) * chunk_size]]
-            subprocess.run(['hadd', '-f', file_name] + run_file_names, check=True)
+            subprocess.run(['hadd', '-f', file_name] + run_files, check=True)
             input_file = ROOT.TFile(f'{file_name}')
             output_file = ROOT.TFile(f'histograms_{file_name}', 'recreate')
             output_file.cd()
@@ -138,6 +139,12 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
                 save_graph_to_pdf(canvas, output_file, graph_name, exp, chunk)
             input_file.Close()
             output_file.Close()
+            # Let's delete the files for single IoVs.
+            for run_file in run_files:
+                try:
+                    os.remove(run_file)
+                except OSError as e:
+                    basf2.B2ERROR(f'The file {run_file} can not be removed: {e.strerror}')
 
 
 if __name__ == "__main__":

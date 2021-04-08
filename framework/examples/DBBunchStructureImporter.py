@@ -101,8 +101,6 @@ else:
     for it in runInfo:
 
         bunches = Belle2.BunchStructure()
-        # print(i,"exp",it['experiment'],"run",it['run']) #del
-
         fillPatternHex = it['ler']['fill_pattern']
 
         if(it['run_type'] != 'physics'):

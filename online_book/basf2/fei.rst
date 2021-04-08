@@ -391,7 +391,7 @@ indicator for the quality of the B mesons we have reconstructed.
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
-the reconstructed B\ :sub:`tag` in you own analysis.
+the reconstructed B\ :sub:`tag` in your own analysis.
 
 
 Reconstructing the full ϒ(4S) event

@@ -124,7 +124,7 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     m_processesPerUnitHistogram = new TH1F("processesPerUnitHistogram", "Number of Processes Per Unit",
                                            HLTUnit::max_hlt_units + 1, 0,
                                            HLTUnit::max_hlt_units + 1);
-    m_processesPerUnitHistogram->SetStats(false);
+    m_processesPerUnitHistogram->SetXTitle("HLT unit number");
   }
 
   if (oldDirectory) {

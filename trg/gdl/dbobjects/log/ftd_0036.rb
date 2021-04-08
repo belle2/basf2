@@ -168,5 +168,9 @@
   "bha3dv" => "ecl_3dbha",
   "sttv" => "typ and !bha_veto",
   "stteclv" => "typ and cdcecl>0 and !bha_veto",
-  "nima01" => "nimin0 and nimin1 and !veto"
+  "nima01" => "nimin0 and nimin1 and !veto",
+  "yioiecl1" => "ty>0 and ti and i2fo and iecl_0 and !bha_veto and !veto",
+  "ffyo" => "(t2_2 or t2_3) and ty>0 and cdc_open90 and !veto",
+  "eedy" => "t2_1 and cdcecl_1 and d5 and (ty_0 or ty_1) and !bha_veto and !veto",
+  "yed" => "t2_0 and cdcecl_0 and d5 and ty_0 and !bha_veto and !veto"
 }

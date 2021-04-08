@@ -1,5 +1,5 @@
 # Physics skims
-PHYSICS = [
+Physics = [
     "skim accept dstar 1",
     "skim accept dstar 2",
     "skim accept dstar 3",
@@ -16,7 +16,7 @@ PHYSICS = [
 ]
 
 # Skims used for calibration
-CALIBRATION = [
+Calibration = [
     "skim accept bhabha all",
     "skim accept gamma gamma",
     "skim accept hadron",
@@ -26,7 +26,7 @@ CALIBRATION = [
 ]
 
 # Others
-OTHERS = [
+Others = [
     "skim accept 1 track1 cluster",
     "skim accept 2 tracks",
     "skim accept b2bcluster 3D",

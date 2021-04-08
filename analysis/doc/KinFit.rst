@@ -3,13 +3,14 @@
 Kinematic-fitting convenience functions
 =======================================
 
-The KinematicFitter is a global fitting tool to constrain the 4-momentum of the
-provided particle to be the same as the 4-momentum of the beam. 
+The `Orca kinematic fitter<https://github.com/tferber/OrcaKinfit>`_ is a global fitting tool.
+
+A typical use-case would be to to constrain the 4-momentum of all particles provided to the 4-momentum of the beam. 
+This is a "4C" fit (four constraints).
 
 .. note::
 
-        A ``4C`` constraint means that both the energy and the 3-D momentum are constrained to the beam.
-        In default settings, the 4-momentum of the beam is taken without uncertainties.
+        By default, the 4-momentum of the beam is taken without uncertainties.
 
 .. automodule:: kinfit
    :members:

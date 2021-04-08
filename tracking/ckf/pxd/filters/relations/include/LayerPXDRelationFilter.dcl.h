@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/CKFParameters.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
@@ -35,12 +37,26 @@ namespace Belle2 {
 
     TrackFindingCDC::Weight operator()(const CKFToPXDState& from, const CKFToPXDState& to) override;
 
+    void initialize() override;
+
+    void beginRun() override;
+
   private:
-    /// Parameter: Make it possible to jump over N layers.
+    /// Parameter: Make it possible to jump over N layers (if set to -1, read from DB).
     int m_param_hitJumping = 0;
+    /// This are values that are actually used ('m_param_hitJumping==-1' means parameter is read from DB).
+    int m_layerJumpLowPt = m_param_hitJumping;
+    /// This are values that are actually used ('m_param_hitJumping==-1' means parameter is read from DB).
+    int m_layerJumpHighPt = m_param_hitJumping;
+    /// This are values that are actually used ('m_param_hitJumping==-1' means parameter is read from DB).
+    double m_layerJumpPtThreshold = -1;
     /// Filter for rejecting the states
     AFilter m_filter;
     /// Loose pre-filter to reject possibleTos
     APrefilter m_prefilter;
+    /// Used to get correct payload
+    std::string m_prefix = "";
+    /// LayerJump parameter can be read from DB (use pointer as payload name contains 'prefix')
+    DBObjPtr<CKFParameters>* m_ckfParameters;
   };
 }

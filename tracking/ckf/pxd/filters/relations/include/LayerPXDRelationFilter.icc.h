@@ -29,6 +29,60 @@ namespace Belle2 {
   LayerPXDRelationFilter<AFilter, APrefilter>::~LayerPXDRelationFilter() = default;
 
   template <class AFilter, class APrefilter>
+  void LayerPXDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  {
+    // use value from DB if parameter is set to -1
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
+                                  "Make it possible to jump over N layers.", m_param_hitJumping);
+
+    m_filter.exposeParameters(moduleParamList, prefix);
+    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
+
+    m_prefix = prefix;
+  }
+
+  template <class AFilter, class APrefilter>
+  void LayerPXDRelationFilter<AFilter, APrefilter>::initialize()
+  {
+    Super::initialize();
+
+    if (m_prefix == "seed") {
+      m_ckfParameters = new OptionalDBObjPtr<CKFParameters>("PXDCKFSeedHitParameters");
+    } else if (m_prefix == "hit") {
+      m_ckfParameters = new OptionalDBObjPtr<CKFParameters>("PXDCKFHitHitParameters");
+    } else {
+      B2ERROR("Unknown prefix. Apparently, some non-trivial changes to code were done.");
+    }
+  }
+
+  template <class AFilter, class APrefilter>
+  void LayerPXDRelationFilter<AFilter, APrefilter>::beginRun()
+  {
+    Super::beginRun();
+
+    // use values from payload if parameter is set to -1
+    if (m_param_hitJumping == -1) {
+      if ((*m_ckfParameters).isValid()) {
+        m_layerJumpPtThreshold = (*m_ckfParameters)->getLayerJumpPtThreshold();
+        m_layerJumpLowPt = (*m_ckfParameters)->getLayerJumpLowPt();
+        m_layerJumpHighPt = (*m_ckfParameters)->getLayerJumpHighPt();
+        if (m_prefix == "hit" && m_layerJumpPtThreshold > 0.) {
+          // if we want to have this, some major restructure of the whole CKF code is necessary
+          // (CKF states from hits don't know anything about the seed track, i.e. you cannot access its momentum)
+          B2FATAL("pt dependence of layerJump parameter currently not implemented for hit->hit extrapolation.");
+        }
+      } else {
+        B2FATAL("Trying to read layerJump parameter from DB but payload '" << m_ckfParameters->getName() << "' not found.");
+      }
+      // we don't need all this if simple value from python config is to be used
+    } else {
+      m_layerJumpPtThreshold = -1;
+      m_layerJumpLowPt = m_param_hitJumping;
+      m_layerJumpHighPt = m_param_hitJumping;
+    }
+  }
+
+  template <class AFilter, class APrefilter>
   std::vector<CKFToPXDState*>
   LayerPXDRelationFilter<AFilter, APrefilter>::getPossibleTos(CKFToPXDState* currentState,
                                                               const std::vector<CKFToPXDState*>& states) const
@@ -37,7 +91,16 @@ namespace Belle2 {
 
     const CKFToPXDState::stateCache& currentStateCache = currentState->getStateCache();
     const unsigned int& currentLayer = currentStateCache.geoLayer;
-    const unsigned int& nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
+
+    // this is the parameter value set in the python config
+    int m_hitJump = m_param_hitJumping;
+    // if it is set to -1 we want to use the values in the payload
+    if (m_hitJump == -1) {
+      m_hitJump = currentStateCache.ptSeed < m_layerJumpPtThreshold ? m_layerJumpLowPt : m_layerJumpHighPt;
+    }
+    B2INFO(m_prefix << ": " << currentStateCache.ptSeed << "/" << m_layerJumpPtThreshold << "->" << m_hitJump);
+
+    const unsigned int& nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_hitJump, 0);
 
     // Patch for the PXD layer 2 overlap inefficiency fix
     // previous implementation of maximumLadderNumber was calculated using GeoCache gave incorrect value for exp1003
@@ -100,16 +163,6 @@ namespace Belle2 {
     }
 
     return possibleNextStates;
-  }
-
-  template <class AFilter, class APrefilter>
-  void LayerPXDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-  {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
-                                  "Make it possible to jump over N layers.", m_param_hitJumping);
-
-    m_filter.exposeParameters(moduleParamList, prefix);
-    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
   }
 
   template <class AFilter, class APrefilter>

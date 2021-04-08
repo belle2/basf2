@@ -25,6 +25,7 @@ CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(se
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
   m_stateCache.isHitState = false;
+  m_stateCache.ptSeed = fabs(this->getMeasuredStateOnPlane().getMom().Pt());
   m_stateCache.phi = this->getMeasuredStateOnPlane().getPos().Phi();
   m_stateCache.theta = this->getMeasuredStateOnPlane().getPos().Theta();
   m_stateCache.geoLayer = this->getGeometricalLayer();

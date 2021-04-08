@@ -40,7 +40,7 @@ def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
 argvs = sys.argv
 
 
-if len(argvs) == 1:
+if len(argvs) == 2:
     minexp = argvs[1]
 
 elif len(sys.argv) == 5:
@@ -54,13 +54,6 @@ else:
                   "4 arguments usage: basf2 ", argvs[0], " <minexp> <minrun> <maxexp> <maxrun>")
     sys.exit()
 
-# if(len(argvs) != 5):
-#     basf2.B2ERROR("Wrong arguments. Usage: basf2 ", argvs[0], " <minexp> <minrun> <maxexp> <maxrun>")
-
-# minexp = argvs[1]
-# minrun = argvs[2]
-# maxexp = argvs[3]
-# maxrun = argvs[4]
 
 if(minexp == "0"):
 

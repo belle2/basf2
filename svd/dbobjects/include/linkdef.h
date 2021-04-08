@@ -29,6 +29,10 @@
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +; // checksum=0xfff37002, version=-1
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
 
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<Belle2::SVDChargeSimCal>>+;
+#pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDChargeSimCal> +; // checksum=0xff2b9ec9, version=-1
+#pragma link C++ struct Belle2::SVDChargeSimCal +;
+
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsBitmap> +; // checksum=0x34de8474, version=2
 #pragma link C++ class Belle2::SVDCalibrationsBitmap +; // checksum=0xf2ee9bed, version=-1
 

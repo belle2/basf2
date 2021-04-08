@@ -16,6 +16,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDChargeSimulationCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
@@ -215,6 +216,7 @@ namespace Belle2 {
       /** Electronic noise for v-strips. */
       double m_elNoiseV = 500; //e-
 
+      SVDChargeSimulationCalibrations m_ChargeSimCal; /**<SVDChargeSimulationCalibrations calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 

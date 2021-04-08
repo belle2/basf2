@@ -24,8 +24,8 @@ namespace Belle2 {
   class SVDChargeSimulationCalibrations {
   public:
     static std::string name; /**< name of the SVDChargeSimulationCalibrations payload */
-    typedef SVDCalibrationsBase< SVDCalibrationsVector<SVDChargeSimCal>>
-        t_payload; /**< typedef of the SVDChargeSimulationCalibrations payload*/
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDChargeSimCal > >
+    t_payload; /**< typedef of the SVDChargeSimulationCalibrations payload*/
 
     /** Constructor, no input argument is required */
     SVDChargeSimulationCalibrations(): m_aDBObjPtr(name)

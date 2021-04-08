@@ -59,7 +59,6 @@ For vertex-fitter functions see the later section on :ref:`analysis_vertexfittin
 There are also some more specialised python wrapper functions for dealing with photons.
 
 .. toctree:: PhotonWrappers
-.. toctree:: KinFit
 
 
 .. _analysis_variables:
@@ -105,12 +104,12 @@ There are a number of vertex-fitting and kinematic fitter libraries interfaced a
 By default, `TreeFitter` is recommended even for simple single-vertex use-cases, however there are use cases where a better-performing or specialist tool is needed.
 
 .. toctree:: TreeFitter
-
 .. toctree:: OtherVertexFitters
 
 These fitters can be added to your basf2 path using a set of the convenient pre-defined python wrapper functions.
 
 .. toctree:: VertexWrappers
+.. toctree:: KinFit
 
 Event-based analysis
 ====================

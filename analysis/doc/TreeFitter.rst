@@ -31,7 +31,11 @@ So for example for :math:`J/\psi \rightarrow l^+ l^-` the calculation is the fol
 While for :math:`B \rightarrow D(K \pi \pi^0)\pi`:  
 :math:`r = 3\dot 5 (track) + 2 \cdot 3 (gamma) \\+ 3 \cdot 4 (kinematic) + 3 (D:geometric) \\- 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) \\- 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) \\- 2 \cdot 3 (gamma) = 5.`
 
+Citation
+########
 
+Krohn, J.-F. *et al*. *Nucl.Instrum.Meth.A* **976** (2020) 164269
+https://doi.org/10.1016/j.nima.2020.164269
 
 Usage
 #####
@@ -44,6 +48,13 @@ The vertex fitter has a convenience function: `vertex.treeFit`.
           if the option ``updateAllDaughters`` is turned on, also of the daughter particles.
           To store the quantities prior to the TreeFit and be able to write them out to a ntuple for further analysis
           it is recommended to run `variablesToExtraInfo` before the TreeFit.
+
+Troubleshooting and FAQ
+-----------------------
+
+- The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised, we haven't found a good general way to do it. If you see that the signal efficiency of you fit is below 95% this might be the problem. Feel free to report this. But keep in mind garbage in -> garbage out.  
+- Currently we are constraint by stack sizes to not extract more than 100 parameters per fit. If this is a problem report this and this can be extended (at the cost of speed of the fits).
+- Vertex fitting MC particles (ie. particle lists created with `modularAnalysis.fillParticleListsFromMC`) can lead to crashes. **MC particles do not need to be and should not be vertexed.** If you wish to study the vertex resolution please fit the reconstructed particles and compare the vertex variables with those of the truth matched MC values.   
 
 Parameters of the convenience function
 ######################################
@@ -78,15 +89,4 @@ To use the module add it to the path::
 
 There are more parameters which are based on optimisations we made. It is strongly recommended to not touch them.
 
-Citation
-########
 
-Krohn, J.-F. *et al*. *Nucl.Instrum.Meth.A* **976** (2020) 164269
-https://doi.org/10.1016/j.nima.2020.164269
-
-Troubleshooting and FAQ
------------------------
-
-- The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised, we haven't found a good general way to do it. If you see that the signal efficiency of you fit is below 95% this might be the problem. Feel free to report this. But keep in mind garbage in -> garbage out.  
-- Currently we are constraint by stack sizes to not extract more than 100 parameters per fit. If this is a problem report this and this can be extended (at the cost of speed of the fits).
-- Vertex fitting MC particles (ie. particle lists created with `modularAnalysis.fillParticleListsFromMC`) can lead to crashes. **MC particles do not need to be and should not be vertexed.** If you wish to study the vertex resolution please fit the reconstructed particles and compare the vertex variables with those of the truth matched MC values.   

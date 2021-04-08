@@ -101,7 +101,7 @@ Vertex (and kinematic) fitting
 
 There are a number of vertex-fitting and kinematic fitter libraries interfaced and available for use in basf2.
 
-By default, `TreeFitter` is recommended even for simple single-vertex use-cases, however there are use cases where a better-performing or specialist tool is needed.
+By default, :doc:`TreeFitter` is recommended even for simple single-vertex use-cases, however there are use cases where a better-performing or specialist tool is needed.
 
 .. toctree:: TreeFitter
 .. toctree:: OtherVertexFitters

@@ -185,7 +185,7 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', signalconfigfile='', kk2fdefaultsfile='', useTauolaBelle=False):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, kkmcdefaultsfile=''):
     """
     Add the default muon pair and tau pair generator KKMC.
     For tau decays, TauolaBelle and TauolaBelle2 are available.
@@ -196,9 +196,9 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', kk2fdefaultsfil
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu-mu+" or "tau-tau+"
         signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
-        kk2fdefaultsfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
         useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
+        kkmcdefaultsfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
     """
 
     #: kkmc input file
@@ -209,8 +209,8 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', kk2fdefaultsfil
 
     #: kkmc configuration file, should be fine as is
     kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
-    if not kk2fdefaultsfile == '':
-        kkmc_config = find_file(kk2fdefaultsfile)
+    if not kkmcdefaultsfile == '':
+        kkmc_config = find_file(kkmcdefaultsfile)
 
     #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBelle2)
     kkmc_tauconfigfile = ''

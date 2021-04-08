@@ -52,13 +52,14 @@ Modular analysis convenience functions
 
 The general idea of ``basf2`` modules is described in the section on :ref:`general_modpath`.
 The analysis package provides pre-defined python wrapper functions designed to simplify users python code.
+For vertex-fitter functions see the later section on :ref:`analysis_vertexfitting`.
 
 .. toctree:: MAWrappers
 
-There are also some more specialised python wrapper functions for vertex-fitting and for dealing with photons.
+There are also some more specialised python wrapper functions for dealing with photons.
 
-.. toctree:: Vertex
 .. toctree:: PhotonWrappers
+
 
 .. _analysis_variables:
 
@@ -93,6 +94,23 @@ These files are also created by the :ref:`skim` but the functional code is part 
 
 .. toctree:: UdstOutput
 
+.. _analysis_vertexfitting:
+
+Vertex (and kinematic) fitting
+==============================
+
+There are a number of vertex-fitting and kinematic fitter libraries interfaced and available for use in basf2.
+
+By default, `TreeFitter` is recommended even for simple single-vertex use-cases, however there are use cases where a better-performing or specialist tool is needed.
+
+.. toctree:: TreeFitter
+
+.. toctree:: OtherVertexFitters
+
+These fitters can be added to your basf2 path using a set of the convenient pre-defined python wrapper functions.
+
+.. toctree:: VertexWrappers
+
 Event-based analysis
 ====================
 
@@ -119,10 +137,6 @@ Advanced Topics
 .. toctree:: EventShape
 
 .. toctree:: ContinuumSuppression
-
-.. toctree:: TreeFitter
-
-.. .. toctree:: VertexFitter
 
 .. toctree:: MVA
 

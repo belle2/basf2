@@ -1,12 +1,5 @@
-Vertex Fitter
-=============
-
-This page summarises the development status for various vertex fitting algorithms and modules within basf2.
-
-Ongoing issues, development threads, and open projects can be found on `JIRA <https://agira.desy.de/>`_ under the `VertexFitting <https://agira.desy.de/browse/BII-3602?jql=labels%253DVertexFitting>`_ label.
-
-Interfaces to Vertex related functions and modules are in :doc:`Vertex`.
-
+Other vertex (and kinematic) fitters in basf2
+=============================================
 
 Use cases
 ---------
@@ -21,15 +14,10 @@ Use cases
 #. Kinematic fits of multiple particles with full or partial soft or hard (four momentum) constraints.
 #. Kinematic fits of multiple particles with full or partial soft or hard (four momentum) constraints with partially or completely missing particles.
 
-Available vertex fit libraries
-------------------------------
-
 RAVE
-~~~~
+----
 
 Rave is a Kalman-based vertex fitter implemented as an external library (CMS vertexing library)
-
-* **Developers/basf2 maintainer** None / Luigi Li Gioi
 
 * **Physics Use Case**
 
@@ -70,26 +58,10 @@ Rave is a Kalman-based vertex fitter implemented as an external library (CMS ver
   * rave is available at github `github <https://github.com/rave-package/rave/>`_
   * building/testing environment at `RAVE page <https://travis-ci.org/rave-package/rave>`_
 
-
-GFRave
-~~~~~~
-
-Implementation of RAVE in Genfit for V0 finding.
-
-* **Developers/basf2 maintainer** None / Luigi Li Gioi
-
-* **Physics Use Case** 
-  * V0 Fit
-
-* **basf2 implementation** 
-  * V0Finder
-
 KFit
-~~~~
+----
 
 Port of the Belle vertex fitter.
-
-* **Developers/basf2 maintainer** J. Tanaka / Luigi Li Gioi
 
 * **Physics Use Case**
 
@@ -105,33 +77,10 @@ Port of the Belle vertex fitter.
 
   * 4C constraint not completed
 
-TreeFitter
-~~~~~~~~~~
-
-(`Nuclear Instruments and Methods in Physics Research A 552 (2005) 566–575 <https://doi.org/10.1016/j.nima.2005.06.078>`_)
-(`Belle 2 Article <https://docs.belle2.org/record/841>`_)
-
-This is a progressive decay chain fitting tool from BaBar and LHCb, based on a
-Kalman Filter. More detail can be found in the page :doc:`TreeFitter`.
-
-* **Developers/basf2 maintainers** Francesco Tenchini, Jo-Frederik Krohn
-
-* **Physics Use Case**
-
-  * Fit of the entire decay tree
-  * Fit of neutral-rich decay chains
-  * Access to the full observable covariance matrix
-
-* **basf2 implementation**
-
-  * Now outperforming RAVE/KFit
-
 OrcaKinFit
-~~~~~~~~~~~~~~~~~~~~~~~
+----------
 
 Kinematic fitter implementation, based on a fork of MarlinKinFit with modifications (remove all ILC dependency).
-
-* **Developers/basf2 maintainer** Torben Ferber
 
 * **Physics Use Case**
 
@@ -140,12 +89,10 @@ Kinematic fitter implementation, based on a fork of MarlinKinFit with modificati
     <https://docs.belle2.org/record/483?ln=en>`_)
 
 TagV
-~~~~
+----
 
 Module to perform the Btag vertex geometric fit using the RAVE adaptive vertex fitting algorithm. It takes as input the tracks
 of the Rest Of Event. More info about interface in :b2:mod:`TagVertex`, `vertex.TagV`
-
-* **Developers/basf2 maintener** - / -
 
 * **Physics Use Case**
 

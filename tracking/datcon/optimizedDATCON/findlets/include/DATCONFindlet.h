@@ -15,6 +15,7 @@
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
 #include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2DSimple.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
+#include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
 // #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
@@ -84,6 +85,9 @@ namespace Belle2 {
 
     /// Raw track candidate cleaner
     RawTrackCandCleaner<HitData> m_rawTCCleaner;
+
+    /// Resolve hit overlaps in track candidates
+    TrackCandidateOverlapResolver m_overlapResolver;
 
     /// Store tracks as RecoTracks
     RecoTrackStorer m_recoTrackStorer;

@@ -26,6 +26,7 @@ DATCONFindlet::DATCONFindlet()
   addProcessingSignalListener(&m_interceptFinder);
   addProcessingSignalListener(&m_interceptFinderSimple);
   addProcessingSignalListener(&m_rawTCCleaner);
+  addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_recoTrackStorer);
 
 //   initializeHists();
@@ -40,6 +41,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   m_interceptFinder.exposeParameters(moduleParamList, prefix);
   m_interceptFinderSimple.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
+  m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "finalOverlapResolver"));
   m_recoTrackStorer.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("relationFilter").setDefaultValue("angleAndTime");
@@ -90,6 +92,8 @@ void DATCONFindlet::apply()
 //   });
 //   if (m_trackCandidates.size() > 30)
 //     m_trackCandidates.erase(m_trackCandidates.begin() + 30, m_trackCandidates.end());
+
+  m_overlapResolver.apply(m_trackCandidates);
 
   m_recoTrackStorer.apply(m_trackCandidates, m_spacePointVector);
 }

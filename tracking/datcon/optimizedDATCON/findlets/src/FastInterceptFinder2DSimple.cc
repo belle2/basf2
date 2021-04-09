@@ -265,7 +265,7 @@ void FastInterceptFinder2DSimple::FindHoughSpaceCluster()
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
-      if (m_currentTrackCandidate.size() > 200) {
+      if (m_currentTrackCandidate.size() > 20000) {
         gnuplotoutput(m_currentTrackCandidate);
       }
       m_currentTrackCandidate.clear();

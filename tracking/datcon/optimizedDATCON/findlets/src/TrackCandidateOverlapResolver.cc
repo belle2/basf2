@@ -68,9 +68,6 @@ void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spac
   //Create subset of active Candidates
   std::vector<SpacePointTrackCand*> activeCandidates;
   auto requiredSpace = spacePointTrackCandsToResolve.size();
-//   if (m_estimatedActiveCandidates < spacePointTrackCandsToResolve.size()) {
-//     requiredSpace = m_estimatedActiveCandidates;
-//   }
   activeCandidates.reserve(requiredSpace);
   for (SpacePointTrackCand& sptc : spacePointTrackCandsToResolve) {
     if (sptc.hasRefereeStatus(SpacePointTrackCand::c_isActive)) activeCandidates.push_back(&sptc);

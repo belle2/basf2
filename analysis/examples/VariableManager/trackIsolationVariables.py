@@ -4,7 +4,7 @@
 # @cond
 
 """
-Test track isolation variables.
+Example script to calculate track isolation variables.
 
 For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
@@ -26,6 +26,10 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
+    parser.add_argument("std_charged",
+                        type=str,
+                        choices=["e", "mu", "pi", "K", "p"],
+                        help="The base name of the standard charged particle list to consider.")
     parser.add_argument("--detectors",
                         type=str,
                         nargs="+",
@@ -63,16 +67,16 @@ if __name__ == "__main__":
 
     # Fill a particle list of charged stable particles (eg. pions).
     # Apply (optionally) some quality selection.
-    ma.fillParticleList("pi+:mypions", "", path=path)
-    ma.applyCuts("pi+:mypions", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+    ma.fillParticleList(f"{args.std_charged}+:my_std_charged", "", path=path)
+    ma.applyCuts(f"{args.std_charged}+:my_std_charged", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
     # 3D distance (default).
-    ma.calculateTrackIsolation("pi+:mypions",
+    ma.calculateTrackIsolation(f"{args.std_charged}+:my_std_charged",
                                path,
                                *args.detectors,
                                alias="dist3DToClosestTrkAtSurface")
     # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation("pi+:mypions",
+    ma.calculateTrackIsolation(f"{args.std_charged}+:my_std_charged",
                                path,
                                *args.detectors,
                                use2DRhoPhiDist=True,
@@ -89,7 +93,11 @@ if __name__ == "__main__":
                 m.set_debug_level(args.debug)
 
     # Dump isolation variables in a ntuple.
-    ma.variablesToNtuple("pi+:mypions", ntup_vars, treename="pi", filename="TrackIsolationVariables.root", path=path)
+    ma.variablesToNtuple(f"{args.std_charged}+:my_std_charged",
+                         ntup_vars,
+                         treename=args.std_charged,
+                         filename="TrackIsolationVariables.root",
+                         path=path)
 
     path.add_module("Progress")
 

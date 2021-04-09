@@ -12,7 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
-#include <svd/dbobjects/SVDCalibrationsVector.h>
+#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDChargeSimCal.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -24,7 +24,7 @@ namespace Belle2 {
   class SVDChargeSimulationCalibrations {
   public:
     static std::string name; /**< name of the SVDChargeSimulationCalibrations payload */
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDChargeSimCal > >
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDChargeSimCal > >
     t_payload; /**< typedef of the SVDChargeSimulationCalibrations payload*/
 
     /** Constructor, no input argument is required */

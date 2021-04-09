@@ -105,10 +105,13 @@ namespace Belle2 {
 
     Manager::FunctionPtr eclClusterIsolationVar(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2)
+      if (arguments.size() > 2 or arguments.size() == 0)
         B2FATAL("Wrong number of arguments (2 required) for meta variable minC2TDistVar");
-      std::string listName = arguments[0];
-      std::string variableName = arguments[1];
+      std::string listName = "pi-:all";
+      std::string variableName = arguments[0];
+      if (arguments.size() == 2)
+        listName = arguments[1];
+
 
       auto func = [listName, variableName](const Particle * particle) -> double {
         StoreObjPtr<ParticleList> particleList(listName);
@@ -126,7 +129,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < particleList->getListSize(); i++)
         {
           const Particle* listParticle = particleList->getParticle(i);
-          if (listParticle->getTrack()->getArrayIndex() == trackID) {
+          if (listParticle and listParticle->getTrack() and listParticle->getTrack()->getArrayIndex() == trackID) {
             result = var->function(listParticle);
             break;
           }
@@ -917,10 +920,9 @@ It is defined as the distance between this intersection and the track hit positi
     | Precision: :math:`10` bit
 )DOC");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, "Nearest track array index");
-    REGISTER_VARIABLE("minC2TDistVar(particleList,variable)", eclClusterIsolationVar, R"DOC(
-Returns variable value for the nearest track to the given ECL cluster. First argument is the
-particle list name which will be used to pick up the nearest track, e.g. pi-:all.
-Second argument is a variable name, e.g. nCDCHits.
+    REGISTER_VARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
+Returns variable value for the nearest track to the given ECL cluster. First argument is a variable name, e.g. nCDCHits. 
+The second argument is the particle list name which will be used to pick up the nearest track, default is pi-:all.
 )DOC");
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.

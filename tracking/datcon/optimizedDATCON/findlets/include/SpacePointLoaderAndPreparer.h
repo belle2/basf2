@@ -46,6 +46,22 @@ namespace Belle2 {
                                     m_param_SVDSpacePointStoreArrayName,
                                     "Name of the SVDSpacePoints Store Array.",
                                     m_param_SVDSpacePointStoreArrayName);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumUClusterTime"),
+                                    m_param_minimumUClusterTime,
+                                    "Minimum time of the u cluster (in ns).",
+                                    m_param_minimumUClusterTime);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumVClusterTime"),
+                                    m_param_minimumVClusterTime,
+                                    "Minimum time of the v cluster (in ns).",
+                                    m_param_minimumVClusterTime);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumUClusterTime"),
+                                    m_param_maximumUClusterTime,
+                                    "Maximum time of the u cluster (in ns).",
+                                    m_param_maximumUClusterTime);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumVClusterTime"),
+                                    m_param_maximumVClusterTime,
+                                    "Maximum time of the v cluster (in ns).",
+                                    m_param_maximumVClusterTime);
     };
 
     /// Create the store arrays
@@ -63,14 +79,28 @@ namespace Belle2 {
       hits.reserve(m_storeSpacePoints.getEntries());
       spacePoints.reserve(m_storeSpacePoints.getEntries());
       for (auto& spacePoint : m_storeSpacePoints) {
-        hits.emplace_back(HitData(&spacePoint));
-        spacePoints.emplace_back(&spacePoint);
+        if (spacePoint.TimeU() >= m_param_minimumUClusterTime and
+            spacePoint.TimeV() >= m_param_minimumVClusterTime and
+            spacePoint.TimeU() <= m_param_maximumUClusterTime and
+            spacePoint.TimeV() <= m_param_maximumVClusterTime) {
+          hits.emplace_back(HitData(&spacePoint));
+          spacePoints.emplace_back(&spacePoint);
+        }
       }
     };
 
   private:
     /// StoreArray name of the input Track Store Array
     std::string m_param_SVDSpacePointStoreArrayName = "SVDSpacePoints";
+
+    /// Minimum u cluster time
+    double m_param_minimumUClusterTime = -100;
+    /// Minimum v cluster time
+    double m_param_minimumVClusterTime = -100;
+    /// Maximum u cluster time
+    double m_param_maximumUClusterTime = 200;
+    /// Maximum v cluster time
+    double m_param_maximumVClusterTime = 200;
 
     /// Input SpacePoints Store Array
     StoreArray<SpacePoint> m_storeSpacePoints;

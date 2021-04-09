@@ -13,6 +13,7 @@
 #  ***************************************************************************/
 
 import modularAnalysis as ma
+from stdPi0s import stdPi0s
 
 
 def loadPiForBtoHadrons(path):
@@ -25,6 +26,26 @@ def loadPiForBtoHadrons(path):
     ma.fillParticleList("pi+:GoodTrack", "abs(dr) < 2 and abs(dz) < 5", path=path)
 
 
+def loadPiSkimHighEff(path):
+    """
+    Creates a ``pi+:SkimHighEff`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm} and pionID >= 0.01`.
+
+    Parameters
+        path (basf2.Path): Skim path to be processed.
+    """
+    ma.fillParticleList("pi+:SkimHighEff", "abs(dr) < 2 and abs(dz) < 5 and pionID >= 0.01", path=path)
+
+
+def loadSlowPi(path):
+    """
+    Creates a ``pi+:slowPi`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm} and useCMSFrame(p) < 0.4`.
+
+    Parameters
+        path (basf2.Path): Skim path to be processed.
+    """
+    ma.fillParticleList("pi+:slowPi", "abs(dr) < 2 and abs(dz) < 5 and useCMSFrame(p) < 0.4", path=path)
+
+
 def loadKForBtoHadrons(path):
     """
     Creates a ``K+:GoodTrack`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm}`.
@@ -33,6 +54,16 @@ def loadKForBtoHadrons(path):
         path (basf2.Path): Skim path to be processed.
     """
     ma.fillParticleList("K+:GoodTrack", "abs(dr) < 2 and abs(dz) < 5", path=path)
+
+
+def loadKSkimHighEff(path):
+    """
+    Creates a ``K+:SkimHighEff`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm} and kaonID >= 0.01`.
+
+    Parameters
+        path (basf2.Path): Skim path to be processed.
+    """
+    ma.fillParticleList("K+:SkimHighEff", "abs(dr) < 2 and abs(dz) < 5 and kaonID >= 0.01", path=path)
 
 
 def loadStdD0(path):
@@ -75,6 +106,19 @@ def loadStdD0_Kpi(path=None):
     return ['D0:Kpi']
 
 
+def loadSkimHighEffD0_Kpi(path=None):
+    """
+    Creates a 'D0:Kpi_skimhigheff' list, with an invariant mass in the range :math:`1.8 < M < 2.0~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      1. 'K-:SkimHighEff pi+:SkimHighEff',
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(decayString='D0:Kpi_skimhigheff -> K-:SkimHighEff pi+:SkimHighEff', cut='1.8 < M < 2.0', dmID=1, path=path)
+    return ['D0:Kpi_skimhigheff']
+
+
 def loadStdD0_Kpipipi(path=None):
     """
     Creates a 'D0:Kpipipi' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
@@ -89,6 +133,20 @@ def loadStdD0_Kpipipi(path=None):
     return ['D0:Kpipipi']
 
 
+def loadSkimHighEffD0_Kpipipi(path=None):
+    """
+    Creates a 'D0:Kpipipi_skimhigheff' list, with an invariant mass in the range :math:`1.8 < M < 2.0~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      2. 'K-:SkimHighEff pi+:SkimHighEff pi+:SkimHighEff pi-:SkimHighEff',
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(decayString='D0:Kpipipi_skimhigheff -> K-:SkimHighEff pi+:SkimHighEff pi+:SkimHighEff pi-:SkimHighEff',
+                        cut='1.8 < M < 2.0', dmID=2, path=path)
+    return ['D0:Kpipipi_skimhigheff']
+
+
 def loadStdD0_Kpipi0(path=None):
     """
     Creates a 'D0:Kpipi0' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
@@ -100,6 +158,23 @@ def loadStdD0_Kpipi0(path=None):
     """
     ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:GoodTrack pi+:GoodTrack pi0:bth_skim', cut='1.7 < M < 2.0', dmID=3, path=path)
     return ['D0:Kpipi0']
+
+
+def loadStdD0_eff20_Kpipi0(path=None):
+    """
+    Creates a 'D0:Kpipi0_eff20' list, with an invariant mass in the range :math:`1.8 < M < 2.0~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      3. 'K-:SkimHighEff pi+:SkimHighEff pi0:eff20_May2020',
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(
+        decayString='D0:Kpipi0_eff20 -> K-:SkimHighEff pi+:SkimHighEff pi0:eff20_May2020',
+        cut='1.8 < M < 2.0',
+        dmID=3,
+        path=path)
+    return ['D0:Kpipi0_eff20']
 
 
 def loadStdD0_Kspipi(path=None):
@@ -426,6 +501,18 @@ def loadStdDstarPlus_D0pi_Kpi(path=None):
     return ['D*+:D0_Kpi']
 
 
+def loadSkimHighEffDstarPlus_D0pi_Kpi(path=None):
+    """
+    Creates a 'D*+:D0_Kpi_skimhigheff' list combining the 'D0:Kpi_skimhigheff' and 'pi+:slowPi' lists by requiring the
+    mass difference between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(decayString='D*+:D0_Kpi_skimhigheff -> D0:Kpi_skimhigheff pi+:slowPi',
+                        cut='massDifference(0) < 0.16', dmID=1, path=path)
+    return ['D*+:D0_Kpi_skimhigheff']
+
+
 def loadStdDstarPlus_D0pi_Kpipipi(path=None):
     """
     Creates a 'D*+:D0_Kpipipi' list combining the 'D0:Kpipipi' and 'pi+:GoodTrack' lists by requiring the mass difference
@@ -437,6 +524,18 @@ def loadStdDstarPlus_D0pi_Kpipipi(path=None):
     return ['D*+:D0_Kpipipi']
 
 
+def loadSkimHighEffDstarPlus_D0pi_Kpipipi(path=None):
+    """
+    Creates a 'D*+:D0_Kpipipi_skimhigheff' list combining the 'D0:Kpipipi_skimhigheff' and 'pi+:slowPi' lists
+    by requiring the mass difference between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(decayString='D*+:D0_Kpipipi_skimhigheff -> D0:Kpipipi_skimhigheff pi+:slowPi',
+                        cut='massDifference(0) < 0.16', dmID=2, path=path)
+    return ['D*+:D0_Kpipipi_skimhigheff']
+
+
 def loadStdDstarPlus_D0pi_Kpipi0(path=None):
     """
     Creates a 'D*+:D0_Kpipi0' list combining the 'D0:Kpipi0' and 'pi+:GoodTrack' lists by requiring the mass difference
@@ -446,6 +545,18 @@ def loadStdDstarPlus_D0pi_Kpipi0(path=None):
     """
     ma.reconstructDecay(decayString='D*+:D0_Kpipi0 -> D0:Kpipi0 pi+:GoodTrack', cut='massDifference(0) < 0.16', dmID=3, path=path)
     return ['D*+:D0_Kpipi0']
+
+
+def loadStdDstarPlus_D0pi_Kpipi0_eff20(path=None):
+    """
+    Creates a 'D*+:D0_Kpipi0_eff20' list combining the 'D0:Kpipi0_eff20' and 'pi+:slowPi' lists by requiring the mass difference
+    between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(decayString='D*+:D0_Kpipi0_eff20 -> D0:Kpipi0_eff20 pi+:slowPi',
+                        cut='massDifference(0) < 0.16', dmID=3, path=path)
+    return ['D*+:D0_Kpipi0_eff20']
 
 
 def loadStdDstarPlus_D0pi_Kspipi(path=None):

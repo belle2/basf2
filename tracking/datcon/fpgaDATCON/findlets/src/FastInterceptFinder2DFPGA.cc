@@ -189,8 +189,8 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
     if (left == right) continue;
 
-    const double& localLeft   = m_HSXLUT[left];
-    const double& localRight  = m_HSXLUT[right];
+//     const double& localLeft   = m_HSXLUT[left];
+//     const double& localRight  = m_HSXLUT[right];
     const short&  sinLeft     = m_HSSinValuesLUT[left];
     const short&  cosLeft     = m_HSCosValuesLUT[left];
     const short&  sinRight    = m_HSSinValuesLUT[right];
@@ -198,8 +198,10 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const short   sinCenter   = convertToInt(sin((localLeft + localRight) / 2.), 3);
-    const short   cosCenter   = convertToInt(cos((localLeft + localRight) / 2.), 3);
+//     const short sinCenter   = convertToInt(sin((localLeft + localRight) / 2.), 3);
+//     const short cosCenter   = convertToInt(cos((localLeft + localRight) / 2.), 3);
+    const short&  sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
+    const short&  cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
 
     for (int j = 0; j < 2; ++j) {
 
@@ -227,10 +229,17 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
         long derivativeyRight  = m * -sinRight  + a * cosRight;
         long derivativeyCenter = m * -sinCenter + a * cosCenter;
 
+        // Only interested in the rising arm of the sinosoidal curves.
+        // Thus if derivative on both sides of the cell is negative, ignore and continue.
+        if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
+
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-        if (((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
-             (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate && derivativeyCenter >= 0)) &&
-            (derivativeyLeft >= 0 || derivativeyRight >= 0 || derivativeyCenter >= 0)) {
+//         if (((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
+//              (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate && derivativeyCenter >= 0)) &&
+//             (derivativeyLeft >= 0 || derivativeyRight >= 0 || derivativeyCenter >= 0)) {
+        if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
+            (yCenter <= localUpperCoordinate and yLeft >= localLowerCoordinate and yRight >= localLowerCoordinate) or
+            (yCenter >= localLowerCoordinate and yLeft <= localUpperCoordinate and yRight <= localUpperCoordinate)) {
           layerHits[sensor.getLayerNumber()] = true; /* layer filter */
           containedHits.emplace_back(hit);
         }

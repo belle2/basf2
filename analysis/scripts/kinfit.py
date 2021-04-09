@@ -60,7 +60,7 @@ def UnmeasuredfitKinematic1C(
     orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
-    orca.param('addUnmeasuredPhoton', False)
+    orca.param('addUnmeasuredPhoton', True)
     path.add_module(orca)
 
 

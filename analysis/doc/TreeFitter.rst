@@ -52,9 +52,13 @@ The vertex fitter has a convenience function: `vertex.treeFit`.
 Troubleshooting and FAQ
 -----------------------
 
-- The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised, we haven't found a good general way to do it. If you see that the signal efficiency of you fit is below 95% this might be the problem. Feel free to report this. But keep in mind garbage in -> garbage out.  
-- Currently we are constraint by stack sizes to not extract more than 100 parameters per fit. If this is a problem report this and this can be extended (at the cost of speed of the fits).
+- The TreeFitter is extremely sensitive to how the initial covariance matrix is initialised, we haven't found a good general way to do it. If you see that the signal efficiency of your fit is below 95% this might be the problem. Feel free to report this. But keep in mind garbage in -> garbage out.  
 - Vertex fitting MC particles (ie. particle lists created with `modularAnalysis.fillParticleListsFromMC`) can lead to crashes. **MC particles do not need to be and should not be vertexed.** If you wish to study the vertex resolution please fit the reconstructed particles and compare the vertex variables with those of the truth matched MC values.   
+ 
+.. seealso::
+
+        Ask for help with TreeFitter (or ask questions about it) at `questions.belle2.org <https://questions.belle2.org>`_.
+        Please `tag your questions <https://questions.belle2.org/questions/scope:all/tags:TreeFitter/>`_ with ``TreeFitter``.
 
 Parameters of the convenience function
 ######################################

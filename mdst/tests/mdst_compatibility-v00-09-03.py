@@ -25,6 +25,7 @@ CHANGES since release-00-09-03:
   * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
     The mapping is from the database and doesn't affect mdst content and is thus not tested here.
 - ECLCluster:
+  + getMinTrkDistanceID
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
   + getNumberOfHadronDigits

@@ -13,6 +13,7 @@ CHANGES since release-02-01-00:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 - ECLCluster:
+  + getMinTrkDistanceID
   + getPulseShapeDiscriminationMVA added
   + hasFailedFitTime
   + hasFailedTimeResolution

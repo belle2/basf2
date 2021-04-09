@@ -27,6 +27,8 @@ CHANGES since release-04-00-03:
 - TrackFitResult:
   + ndf
   + chi2
+- ECLCluster:
+  + getMinTrkDistanceID
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

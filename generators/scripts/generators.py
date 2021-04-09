@@ -207,7 +207,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
 
-    #: kkmc configuration file, should be fine as is [unless there is a non-empty kkmcdefaultsfile parameter]
+    #: kkmc configuration file, should be fine as is
     kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
 
     #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBelle2)

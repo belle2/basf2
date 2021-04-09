@@ -72,10 +72,10 @@ job state statistics.
    dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
 
 Different queues have different settings. For analysis you can use ``s``,
-``l``, or ``h``. For short jobs with running time under 3 hours, the queue
-``s`` is preferable. For jobs with execution time more than 3 hours,
-you might want to use the queue ``l`` which gives jobs up to 24 hours of
-running time.
+``l``, or ``h``. For short jobs with runtime under 6 hours, the queue
+``s`` is preferable. For jobs with execution time more than 6 hours,
+you might want to use the queue ``l`` which gives jobs up to 48 hours of
+runtime.
 More information about LSF queues can be found
 `here <https://kekcc.kek.jp/service/kekcc/support/en/12/>`__.
 

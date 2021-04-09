@@ -1,6 +1,4 @@
-.. Can link to this as `EventShape`. No need to define anker
-   here. Will confuse sphinx because document also has the same
-   filename
+.. _analysis_eventshape:
 
 EventShape
 ==========

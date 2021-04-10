@@ -84,14 +84,12 @@ void DATCONFindlet::apply()
 
   m_rawTCCleaner.apply(m_rawTrackCandidates, m_trackCandidates);
 
-//   // sort by number of hits in the track candidate and by the QI
-//   std::sort(m_trackCandidates.begin(), m_trackCandidates.end(),
-//   [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
-//     return ((a.getNHits() > b.getNHits()) or
-//             (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()));
-//   });
-//   if (m_trackCandidates.size() > 30)
-//     m_trackCandidates.erase(m_trackCandidates.begin() + 30, m_trackCandidates.end());
+  // sort by number of hits in the track candidate and by the QI
+  std::sort(m_trackCandidates.begin(), m_trackCandidates.end(),
+  [](const SpacePointTrackCand & a, const SpacePointTrackCand & b) {
+    return ((a.getNHits() > b.getNHits()) or
+            (a.getNHits() == b.getNHits() and a.getQualityIndicator() > b.getQualityIndicator()));
+  });
 
   m_overlapResolver.apply(m_trackCandidates);
 

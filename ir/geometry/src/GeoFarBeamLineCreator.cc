@@ -626,7 +626,8 @@ namespace Belle2 {
       std::vector<std::string> collimators;
       boost::split(collimators, m_config.getParameterStr("Collimator"), boost::is_any_of(" "));
       for (const auto& name : collimators) {
-        //-   Collamators consist of two independent jaws (trapezoids), identical in shape but differently positioned
+        //-   Collimators consist of two independent jaws (trapezoids), identical in shape, positioned opposite to each other
+        //-   Each jaw consists of copper body and high Z head
 
         prep = name + ".";
 
@@ -634,100 +635,226 @@ namespace Belle2 {
         string motherVolume = m_config.getParameterStr(prep + "MotherVolume");
         string motherVolumeVacuum = motherVolume + "Vac";
 
-        // If zz < 0 (positioned at negative z) collimator is flipped when rotated into Mother Volume system
+        // If zz < 0 (positioned at negative z) vertical collimator is flipped when rotated into Mother Volume system
         G4Scale3D scale;
         G4Rotate3D rotation;
         G4Translate3D translation;
         elements[motherVolumeVacuum].transform.getDecomposition(scale, rotation, translation);
         double zz = rotation.zz();
 
+        // d1, d2 are collimator jaws displacements from beam center, d1<0, d2>0
+        // Z is collimator position inside its Mother Volume
         double collimator_d1 = m_config.getParameter(prep + "d1") * unitFactor;
         double collimator_d2 = m_config.getParameter(prep + "d2") * unitFactor;
-        double collimator_dx1 = m_config.getParameter(prep + "dx1") * unitFactor;
-        double collimator_dx2 = m_config.getParameter(prep + "dx2") * unitFactor;
-        double collimator_dy1 = m_config.getParameter(prep + "dy1") * unitFactor;
-        double collimator_dy2 = m_config.getParameter(prep + "dy2") * unitFactor;
-        double collimator_dz = m_config.getParameter(prep + "dz") * unitFactor;
+        double collimator_fullH = m_config.getParameter(prep + "fullH") * unitFactor;
+        double collimator_headH = m_config.getParameter(prep + "headH") * unitFactor;
+        double collimator_minW = m_config.getParameter(prep + "minW") * unitFactor;
+        double collimator_maxW = m_config.getParameter(prep + "maxW") * unitFactor;
+        double collimator_th = m_config.getParameter(prep + "th") * unitFactor;
         double collimator_Z = m_config.getParameter(prep + "Z") * unitFactor;
 
+        B2WARNING("Collimator " << name << " displacement d1 is set to " << collimator_d1 << "mm (must be less than zero)");
+        B2WARNING("Collimator " << name << " displacement d2 is set to " << collimator_d2 << "mm (must be greater than zero)");
+
+
+        // Collimator heads
+
+        // dx1,2 dy1,2 dz are trapezoid dimensions
+        double head_dx1;
+        double head_dx2;
+        double head_dy1;
+        double head_dy2;
+        double head_dz = collimator_headH / 2.0;
+        if (type == "vertical") {
+          head_dx1 = collimator_th / 2.0;
+          head_dx2 = collimator_th / 2.0;
+          head_dy1 = ((collimator_maxW - collimator_minW) * collimator_headH / collimator_fullH + collimator_minW) / 2.0;
+          head_dy2 = collimator_minW / 2.0;
+        } else {
+          head_dx1 = ((collimator_maxW - collimator_minW) * collimator_headH / collimator_fullH + collimator_minW) / 2.0;
+          head_dx2 = collimator_minW / 2.0;
+          head_dy1 = collimator_th / 2.0;
+          head_dy2 = collimator_th / 2.0;
+        }
+
         // storable elements
-        FarBeamLineElement collimator_jaw1;
-        FarBeamLineElement collimator_jaw2;
+        FarBeamLineElement collimator_head1;
+        FarBeamLineElement collimator_head2;
 
-        // move collimator to its position on beam line
-        G4Transform3D place_collimator = G4Translate3D(0.0, 0.0, collimator_Z);
-
-        collimator_jaw1.transform = place_collimator;
-        collimator_jaw2.transform = place_collimator;
+        // move collimator to position on beam line
+        G4Transform3D transform_head1 = G4Translate3D(0.0, 0.0, collimator_Z);
+        G4Transform3D transform_head2 = G4Translate3D(0.0, 0.0, collimator_Z);
 
         // rotate and move collimator jaws to their relative positions
         if (type == "vertical") {
-          collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(0.0, -collimator_dz + collimator_d1, 0.0);
-          collimator_jaw1.transform = collimator_jaw1.transform * G4RotateX3D(-M_PI / 2 / Unit::rad);
+          transform_head1 = transform_head1 * G4Translate3D(0.0, -head_dz + collimator_d1, 0.0);
+          transform_head1 = transform_head1 * G4RotateX3D(-M_PI / 2 / Unit::rad);
 
-          collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(0.0, collimator_dz + collimator_d2, 0.0);
-          collimator_jaw2.transform = collimator_jaw2.transform * G4RotateX3D(M_PI / 2 / Unit::rad);
+          transform_head2 = transform_head2 * G4Translate3D(0.0, head_dz + collimator_d2, 0.0);
+          transform_head2 = transform_head2 * G4RotateX3D(M_PI / 2 / Unit::rad);
         } else {
           if (zz > 0) {
-            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz + collimator_d1, 0.0, 0.0);
-            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz + collimator_d2, 0.0, 0.0);
+            transform_head1 = transform_head1 * G4Translate3D(-head_dz + collimator_d1, 0.0, 0.0);
+            transform_head1 = transform_head1 * G4RotateY3D(M_PI / 2 / Unit::rad);
+
+            transform_head2 = transform_head2 * G4Translate3D(head_dz + collimator_d2, 0.0, 0.0);
+            transform_head2 = transform_head2 * G4RotateY3D(-M_PI / 2 / Unit::rad);
           } else {
-            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz - collimator_d2, 0.0, 0.0);
-            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz - collimator_d1, 0.0, 0.0);
+            transform_head1 = transform_head1 * G4Translate3D(head_dz - collimator_d1, 0.0, 0.0);
+            transform_head1 = transform_head1 * G4RotateY3D(-M_PI / 2 / Unit::rad);
+
+            transform_head2 = transform_head2 * G4Translate3D(-head_dz - collimator_d2, 0.0, 0.0);
+            transform_head2 = transform_head2 * G4RotateY3D(M_PI / 2 / Unit::rad);
           }
-          collimator_jaw1.transform = collimator_jaw1.transform * G4RotateY3D(M_PI / 2 / Unit::rad);
-          collimator_jaw2.transform = collimator_jaw2.transform * G4RotateY3D(-M_PI / 2 / Unit::rad);
+        }
+
+        collimator_head1.transform = transform_head1;
+        collimator_head2.transform = transform_head2;
+
+        // define geometry
+        string geo_headx_name = "geo_" + name + "_headx_name";
+
+        string geo_head1_name = "geo_" + name + "_head1_name";
+        string geo_head2_name = "geo_" + name + "_head2_name";
+
+        G4VSolid* geo_headx = new G4Trd(geo_headx_name, head_dx1, head_dx2, head_dy1, head_dy2, head_dz);
+
+        G4VSolid* geo_head1 = new G4IntersectionSolid(geo_head1_name, geo_headx, elements[motherVolumeVacuum].geo,
+                                                      collimator_head1.transform.inverse());
+        G4VSolid* geo_head2 = new G4IntersectionSolid(geo_head2_name, geo_headx, elements[motherVolumeVacuum].geo,
+                                                      collimator_head2.transform.inverse());
+
+        collimator_head1.geo = geo_head1;
+        collimator_head2.geo = geo_head2;
+
+        // define logical volume
+        string strMat_head = m_config.getParameterStr(prep + "HeadMaterial");
+        G4Material* mat_head = Materials::get(strMat_head);
+        string logi_head1_name = "logi_" + name + "_head1_name";
+        string logi_head2_name = "logi_" + name + "_head2_name";
+        G4LogicalVolume* logi_head1 = new G4LogicalVolume(geo_head1, mat_head, logi_head1_name);
+        G4LogicalVolume* logi_head2 = new G4LogicalVolume(geo_head2, mat_head, logi_head2_name);
+        setColor(*logi_head1, "#CC0000");
+        setColor(*logi_head2, "#CC0000");
+        setVisibility(*logi_head1, false);
+        setVisibility(*logi_head2, false);
+
+        // check if collimator is inside beam pipe
+        double volume_head1 = logi_head1->GetSolid()->GetCubicVolume();
+        double volume_head2 = logi_head2->GetSolid()->GetCubicVolume();
+
+        collimator_head1.logi = logi_head1;
+        collimator_head2.logi = logi_head2;
+
+        // put volume
+        string phys_head1_name = "phys_" + name + "_head1" + "_name";
+        string phys_head2_name = "phys_" + name + "_head2" + "_name";
+        if (volume_head1 != 0)
+          new G4PVPlacement(collimator_head1.transform, logi_head1, phys_head1_name, elements[motherVolumeVacuum].logi, false, 0);
+        if (volume_head2 != 0)
+          new G4PVPlacement(collimator_head2.transform, logi_head2, phys_head2_name, elements[motherVolumeVacuum].logi, false, 0);
+
+        // to use it later in "intersect" and "subtract"
+        collimator_head1.transform = collimator_head1.transform * elements[motherVolumeVacuum].transform;
+        collimator_head2.transform = collimator_head2.transform * elements[motherVolumeVacuum].transform;
+
+        string name_head1 = name + "_head1";
+        string name_head2 = name + "_head2";
+        elements[name_head1] = collimator_head1;
+        elements[name_head2] = collimator_head2;
+
+
+        // Collimator bodies
+
+        // dx1,2 dy1,2 dz are trapezoid dimensions
+        double body_dx1;
+        double body_dx2;
+        double body_dy1;
+        double body_dy2;
+        double body_dz = (collimator_fullH - collimator_headH) / 2.0;
+        if (type == "vertical") {
+          body_dx1 = collimator_th / 2.0;
+          body_dx2 = collimator_th / 2.0;
+          body_dy1 = collimator_maxW / 2.0;
+          body_dy2 = ((collimator_maxW - collimator_minW) * collimator_headH / collimator_fullH + collimator_minW) / 2.0;
+        } else {
+          body_dx1 = collimator_maxW / 2.0;
+          body_dx2 = ((collimator_maxW - collimator_minW) * collimator_headH / collimator_fullH + collimator_minW) / 2.0;
+          body_dy1 = collimator_th / 2.0;
+          body_dy2 = collimator_th / 2.0;
+        }
+
+        // storable elements
+        FarBeamLineElement collimator_body1;
+        FarBeamLineElement collimator_body2;
+
+        // reuse head transfomation with additional shift
+        if (type == "vertical") {
+          collimator_body1.transform = G4Translate3D(0.0, -head_dz - body_dz, 0.0) * transform_head1;
+          collimator_body2.transform = G4Translate3D(0.0, head_dz + body_dz, 0.0) * transform_head2;
+        } else {
+          if (zz > 0) {
+            collimator_body1.transform = G4Translate3D(-head_dz - body_dz, 0.0, 0.0) * transform_head1;
+            collimator_body2.transform = G4Translate3D(head_dz + body_dz, 0.0, 0.0) * transform_head2;
+          } else {
+            collimator_body1.transform = G4Translate3D(head_dz + body_dz, 0.0, 0.0) * transform_head1;
+            collimator_body2.transform = G4Translate3D(-head_dz - body_dz, 0.0, 0.0) * transform_head2;
+          }
         }
 
         // define geometry
-        string geo_collimatorx_name = "geo_" + name + "x_name";
+        string geo_bodyx_name = "geo_" + name + "_bodyx_name";
 
-        string geo_collimator_jaw1_name = "geo_" + name + "jaw1_name";
-        string geo_collimator_jaw2_name = "geo_" + name + "jaw2_name";
+        string geo_body1_name = "geo_" + name + "_body1_name";
+        string geo_body2_name = "geo_" + name + "_body2_name";
 
-        G4VSolid* geo_collimatorx = new G4Trd(geo_collimatorx_name, collimator_dx1, collimator_dx2, collimator_dy1, collimator_dy2,
-                                              collimator_dz);
+        G4VSolid* geo_bodyx = new G4Trd(geo_bodyx_name, body_dx1, body_dx2, body_dy1, body_dy2, body_dz);
 
-        G4VSolid* geo_collimator_jaw1 = new G4IntersectionSolid(geo_collimator_jaw1_name, geo_collimatorx, elements[motherVolumeVacuum].geo,
-                                                                collimator_jaw1.transform.inverse());
-        G4VSolid* geo_collimator_jaw2 = new G4IntersectionSolid(geo_collimator_jaw2_name, geo_collimatorx, elements[motherVolumeVacuum].geo,
-                                                                collimator_jaw2.transform.inverse());
+        G4VSolid* geo_body1 = new G4IntersectionSolid(geo_body1_name, geo_bodyx, elements[motherVolumeVacuum].geo,
+                                                      collimator_body1.transform.inverse());
+        G4VSolid* geo_body2 = new G4IntersectionSolid(geo_body2_name, geo_bodyx, elements[motherVolumeVacuum].geo,
+                                                      collimator_body2.transform.inverse());
 
-        collimator_jaw1.geo = geo_collimator_jaw1;
-        collimator_jaw2.geo = geo_collimator_jaw2;
+        collimator_body1.geo = geo_body1;
+        collimator_body2.geo = geo_body2;
 
         // define logical volume
-        string strMat_collimator = m_config.getParameterStr(prep + "Material");
-        G4Material* mat_collimator = Materials::get(strMat_collimator);
-        string logi_collimator_jaw1_name = "logi_" + name + "_jaw1_name";
-        string logi_collimator_jaw2_name = "logi_" + name + "_jaw2_name";
-        G4LogicalVolume* logi_collimator_jaw1 = new G4LogicalVolume(geo_collimator_jaw1, mat_collimator, logi_collimator_jaw1_name);
-        G4LogicalVolume* logi_collimator_jaw2 = new G4LogicalVolume(geo_collimator_jaw2, mat_collimator, logi_collimator_jaw2_name);
-        setColor(*logi_collimator_jaw1, "#CC0000");
-        setColor(*logi_collimator_jaw2, "#CC0000");
-        setVisibility(*logi_collimator_jaw1, false);
-        setVisibility(*logi_collimator_jaw2, false);
+        string strMat_body = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_body = Materials::get(strMat_body);
+        string logi_body1_name = "logi_" + name + "_body1_name";
+        string logi_body2_name = "logi_" + name + "_body2_name";
+        G4LogicalVolume* logi_body1 = new G4LogicalVolume(geo_body1, mat_body, logi_body1_name);
+        G4LogicalVolume* logi_body2 = new G4LogicalVolume(geo_body2, mat_body, logi_body2_name);
+        setColor(*logi_body1, "#CC0000");
+        setColor(*logi_body2, "#CC0000");
+        setVisibility(*logi_body1, false);
+        setVisibility(*logi_body2, false);
 
-        collimator_jaw1.logi = logi_collimator_jaw1;
-        collimator_jaw2.logi = logi_collimator_jaw2;
+        // check if collimator is inside beam pipe
+        double volume_body1 = logi_body1->GetSolid()->GetCubicVolume();
+        double volume_body2 = logi_body2->GetSolid()->GetCubicVolume();
+
+        collimator_body1.logi = logi_body1;
+        collimator_body2.logi = logi_body2;
 
         // put volume
-        string phys_collimator_jaw1_name = "phys_" + name + "_jaw1" + "_name";
-        string phys_collimator_jaw2_name = "phys_" + name + "_jaw2" + "_name";
-        new G4PVPlacement(collimator_jaw1.transform, logi_collimator_jaw1, phys_collimator_jaw1_name, elements[motherVolumeVacuum].logi,
-                          false, 0);
-        new G4PVPlacement(collimator_jaw2.transform, logi_collimator_jaw2, phys_collimator_jaw2_name, elements[motherVolumeVacuum].logi,
-                          false, 0);
+        string phys_body1_name = "phys_" + name + "_body1" + "_name";
+        string phys_body2_name = "phys_" + name + "_body2" + "_name";
+        if (volume_body1 != 0)
+          new G4PVPlacement(collimator_body1.transform, logi_body1, phys_body1_name, elements[motherVolumeVacuum].logi, false, 0);
+        if (volume_body2 != 0)
+          new G4PVPlacement(collimator_body2.transform, logi_body2, phys_body2_name, elements[motherVolumeVacuum].logi, false, 0);
 
-        //to use it later in "intersect" and "subtract"
-        collimator_jaw1.transform = collimator_jaw1.transform * elements[motherVolumeVacuum].transform;
-        collimator_jaw2.transform = collimator_jaw2.transform * elements[motherVolumeVacuum].transform;
+        // to use it later in "intersect" and "subtract"
+        collimator_body1.transform = collimator_body1.transform * elements[motherVolumeVacuum].transform;
+        collimator_body2.transform = collimator_body2.transform * elements[motherVolumeVacuum].transform;
 
-        string name_jaw1 = name + "_jaw1";
-        string name_jaw2 = name + "_jaw2";
-        elements[name_jaw1] = collimator_jaw1;
-        elements[name_jaw2] = collimator_jaw2;
+        string name_body1 = name + "_body1";
+        string name_body2 = name + "_body2";
+        elements[name_body1] = collimator_body1;
+        elements[name_body2] = collimator_body2;
       }
+
 
       //-----------------------
       //-   Collimator shields
@@ -735,7 +862,7 @@ namespace Belle2 {
       std::vector<std::string> collimatorShields;
       boost::split(collimatorShields, m_config.getParameterStr("CollimatorShield"), boost::is_any_of(" "));
       for (const auto& name : collimatorShields) {
-        //-   Collamator shield made as box with subtracted inner space
+        //-   Collimator shield made as box with subtracted inner space
 
         prep = name + ".";
 

@@ -2039,7 +2039,7 @@ class HTCondor(Batch):
             backend_status = job_info["JobStatus"]
             # if job is held (backend_status = 5) then report why then kill the job
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
+                hold_reason = job_info.get("HoldReason", None)
                 B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
                 subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
                 backend_status = 6

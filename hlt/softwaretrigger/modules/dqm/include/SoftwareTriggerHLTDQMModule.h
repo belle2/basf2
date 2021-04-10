@@ -12,6 +12,7 @@
 #include <framework/core/HistoModule.h>
 
 #include <TH1F.h>
+#include <TH1D.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/TRGSummary.h>
@@ -60,6 +61,9 @@ namespace Belle2 {
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
 
+      /// Which additional L1 cuts should be added to the L1 total result plot?
+      std::vector<std::string> m_param_additionalL1Identifiers;
+
       /// Create total result histogram?
       bool m_param_create_total_result_histograms;
 
@@ -98,7 +102,7 @@ namespace Belle2 {
       std::map<std::string, TH1F*> m_l1Histograms;
 
       /// histograms with the run information
-      std::map<std::string, TH1F*> m_runInfoHistograms;
+      std::map<std::string, TH1D*> m_runInfoHistograms;
 
       // Datastore members
       /// STM cut results

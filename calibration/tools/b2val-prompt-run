@@ -126,6 +126,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     validation_module = get_validation_module(args)       
     current_directory = Path().absolute()
     script_name = validation_config["validation_script"]
+    script_path = basf2.find_file(f'{prompt_validation_script_dir}/{script_name}')
 
     # Now we set the backend that will be used globally.
     backend_args = validation_config.get("backend_args", None)
@@ -178,8 +179,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     # Output directory, where the stdout and stderr will be sent.
     job.output_dir = validation_result_path
     # The command we want to run
-    module_name = prompt_validation_script_package + Path(script_name).stem
-    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f'{job_path} {input_data_path} {requested_iov} "{expert_config}"']
+    job.cmd = ["basf2", f"{script_path}", f'{job_path} {input_data_path} {requested_iov} "{expert_config}"']
     job.append_current_basf2_setup_cmds()
     return [job]
 

@@ -19,45 +19,45 @@ now = datetime.datetime.now()
 # ew = electronWeight
 
 # L3 u/V
-ew_L3_U = 1.1327
+ew_L3_U = 0.8828
 c0_L3_U = 0.9305
 c1_L3_U = 0.448
 c2_L3_U = 0.03
 c3_L3_U = 0
-ew_L3_V = 1.1853
+ew_L3_V = 0.8437
 c0_L3_V = 0.9782
 c1_L3_V = 0.3713
 c2_L3_V = 0.0065
 c3_L3_V = 0
 # forward U/V
-ew_fw_U = 1.0914
+ew_fw_U = 0.9163
 c0_fw_U = 0.964
 c1_fw_U = 0.4295
 c2_fw_U = 0.0139
 c3_fw_U = 0
-ew_fw_V = 1.0541
+ew_fw_V = 0.9486
 c0_fw_V = 0.9677
 c1_fw_V = 0.3552
 c2_fw_V = 0.0091
 c3_fw_V = 0
 # backward U/V
-ew_bk_U = 1.0943
+ew_bk_U = 0.9138
 c0_bk_U = 0.9665
 c1_bk_U = 0.4202
 c2_bk_U = 0.0125
 c3_bk_U = 0
-ew_bk_V = 1.0558
+ew_bk_V = 0.9472
 c0_bk_V = 0.9687
 c1_bk_V = 0.3615
 c2_bk_V = 0.0091
 c3_bk_V = 0
 # origami U/v
-ew_or_U = 1.0956
+ew_or_U = 0.9128
 c0_or_U = 0.9665
 c1_or_U = 0.4202
 c2_or_U = 0.0125
 c3_or_U = 0
-ew_or_V = 1.0543
+ew_or_V = 0.9485
 c0_or_V = 0.9687
 c1_or_V = 0.3615
 c2_or_V = 0.0091
@@ -148,7 +148,6 @@ class defaultChargeSimulationImporter(b2.Module):
                         chargeSimCal.couplingConstant['C2'] = c2
                         chargeSimCal.couplingConstant['C3'] = c3
                         chargeSimCal.electronWeight = ew
-                        print("insted?")
                         payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, chargeSimCal)
 
         Belle2.Database.Instance().storeData(Belle2.SVDChargeSimulationCalibrations.name, payload, iov)

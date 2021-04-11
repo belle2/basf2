@@ -13,12 +13,12 @@
 #include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   /// Findlet for applying filters for creating hit-hit and hit-seed relations
   template<class AHit, class ARelationFilter>

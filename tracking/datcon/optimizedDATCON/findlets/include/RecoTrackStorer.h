@@ -26,9 +26,9 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Store RecoTracks into StoreArray
-  class RecoTrackStorer : public TrackFindingCDC::Findlet<const SpacePointTrackCand, const SpacePoint* const> {
+  class RecoTrackStorer : public TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const SpacePointTrackCand, const SpacePoint* const>;
+    using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const>;
 
   public:
     /// Constructor
@@ -50,7 +50,7 @@ namespace Belle2 {
     void beginEvent() override;
 
     /// Store the finishey SpacePointTrackCands into RecoTracks and tag the SpacePoints
-    void apply(const std::vector<SpacePointTrackCand>& finishedResults,
+    void apply(std::vector<SpacePointTrackCand>& finishedResults,
                const std::vector<const SpacePoint*>& spacePoints) override;
 
   private:

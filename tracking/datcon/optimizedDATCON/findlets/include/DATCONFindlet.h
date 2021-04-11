@@ -39,7 +39,7 @@ namespace Belle2 {
   class HitData;
 
   /**
-   * Findlet for performing the DATCON ROI calculation.
+   * Main Findlet for DATCON.
    */
   class DATCONFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class

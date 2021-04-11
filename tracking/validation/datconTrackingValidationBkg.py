@@ -16,54 +16,59 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
+from datcon.datcon_functions import add_datcon
+
 VALIDATION_OUTPUT_FILE = 'DATCONTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
 
+rootFileName = 'trackCandAnalysisBkg.root'
+
 
 def setupFinderModule(path):
     tracking.add_hit_preparation_modules(path, components=["SVD"])
-    path.add_module('DATCON',
-                    minimumUClusterTime=-10,
-                    minimumVClusterTime=-10,
-                    maximumUClusterTime=60,
-                    maximumVClusterTime=60,
+    add_datcon(path, rootFileName=rootFileName, datcon_reco_tracks='RecoTracks')
+    # path.add_module('DATCON',
+    # minimumUClusterTime=-10,
+    # minimumVClusterTime=-10,
+    # maximumUClusterTime=60,
+    # maximumVClusterTime=60,
 
-                    useSubHoughSpaces=False,
+    # useSubHoughSpaces=False,
 
-                    simpleVerticalHoughSpaceSize=0.25,
-                    simpleNAngleSectors=256,
-                    simpleNVerticalSectors=256,
-                    simpleMinimumHSClusterSize=4,
-                    simpleMaximumHSClusterSize=200,
+    # simpleVerticalHoughSpaceSize=0.25,
+    # simpleNAngleSectors=256,
+    # simpleNVerticalSectors=256,
+    # simpleMinimumHSClusterSize=4,
+    # simpleMaximumHSClusterSize=200,
 
-                    maxRelations=1000000,
-                    relationFilter='angleAndTime',
-                    relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.03,
-                                              'AngleAndTimeThetaCutDeltaL1': 0.10,
-                                              'AngleAndTimeThetaCutDeltaL2': 0.15,
-                                              'AngleAndTimeDeltaUTime': 30.,
-                                              'AngleAndTimeDeltaVTime': 30., },
-                    rootFileName='trackCandAnalysisBkg.root',
-                    maxRelationsCleaner=2000,
-                    # twoHitFilter='twoHitVirtualIPQI',
-                    # twoHitUseNBestHits=100,
-                    twoHitFilter='all',
-                    twoHitUseNBestHits=0,
-                    threeHitUseNBestHits=20,
-                    fourHitUseNBestHits=10,
-                    fiveHitUseNBestHits=10,
+    # maxRelations=1000000,
+    # relationFilter='angleAndTime',
+    # relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.05,
+    # 'AngleAndTimeThetaCutDeltaL1': 0.10,
+    # 'AngleAndTimeThetaCutDeltaL2': 0.25,
+    # 'AngleAndTimeDeltaUTime': 50.,
+    # 'AngleAndTimeDeltaVTime': 50., },
+    # rootFileName=rootFileName,
+    # maxRelationsCleaner=1000,
+    # #  twoHitFilter='twoHitVirtualIPQI',
+    # #  twoHitUseNBestHits=100,
+    # twoHitFilter='all',
+    # twoHitUseNBestHits=0,
+    # threeHitUseNBestHits=50,
+    # fourHitUseNBestHits=30,
+    # fiveHitUseNBestHits=10,
 
-                    # trackQualityEstimationMethod='helixFit',
-                    minQualitiyIndicatorSize3=0.80,
-                    minQualitiyIndicatorSize4=0.02,
-                    minQualitiyIndicatorSize5=0.02,
-                    maxNumberOfHitsForEachPathLength=8,
+    # #  trackQualityEstimationMethod='helixFit',
+    # minQualitiyIndicatorSize3=0.50,
+    # minQualitiyIndicatorSize4=0.001,
+    # minQualitiyIndicatorSize5=0.001,
+    # maxNumberOfHitsForEachPathLength=50,
 
-                    RecoTracksStoreArrayName='RecoTracks',
-                    )
+    # RecoTracksStoreArrayName='RecoTracks',
+    # )
 
 
 class DATCONTrackingValidationBkg(TrackingValidationRun):

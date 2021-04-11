@@ -2137,13 +2137,15 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
+        # condor_q occassionally fails
         try:
             records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-            if records:
-                records = decode_json_string(records)
-            else:
-                records = []
         except BaseException:
+            records = None
+
+        if records is not None:
+            records = decode_json_string(records)
+        else:
             records = []
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
@@ -2200,11 +2202,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-        if records:
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
+        if records is not None:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info

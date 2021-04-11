@@ -114,22 +114,54 @@ void RecoTrackStorer::beginEvent()
   m_usedSpacePoints.clear();
 }
 
-void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResults,
+void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
                             const std::vector<const SpacePoint*>& spacePoints)
 {
   for (auto& thisSPTC : finishedResults) {
     if (!thisSPTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) continue;
 
-    const auto& estimatorResult = m_estimator->estimateQualityAndProperties(thisSPTC.getHits());
+    // const auto& estimatorResult = m_estimator->estimateQualityAndProperties(thisSPTC.getHits());
+    auto sortedHits = thisSPTC.getSortedHits();
+    const auto& estimatorResult = m_estimator->estimateQualityAndProperties(sortedHits);
 
-    const TVector3& trackPosition = TVector3(0., 0., 0.);
+    // const TVector3& trackPosition = TVector3(0., 0., 0.); // initial version, since there in principal is no better POCA estimate
+    const TVector3& trackPosition = TVector3(sortedHits.front()->X(), sortedHits.front()->Y(), sortedHits.front()->Z());
     const TVector3& trackMomentum = *estimatorResult.p;
-    const short& trackCharge = estimatorResult.curvatureSign ? -1 * (*(estimatorResult.curvatureSign)) : 0;
+    const short& trackChargeSeed = estimatorResult.curvatureSign ? -1 * (*(estimatorResult.curvatureSign)) : 0;
 
-    RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
+    RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackChargeSeed);
+
+
+    // TODO: the following lines are basically just a 1-to-1 copy from tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule
+    TVectorD stateSeed(6); //(x,y,z,px,py,pz)
+    TMatrixDSym covSeed(6);
+    // TODO: find out where these numbers come from!
+    covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
+    covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
+
+    stateSeed(0) = (sortedHits.front()->X());
+    stateSeed(1) = (sortedHits.front()->Y());
+    stateSeed(2) = (sortedHits.front()->Z());
+    if (estimatorResult.p) {
+      auto momentumSeed = *(estimatorResult.p);
+      stateSeed(3) = momentumSeed.X();
+      stateSeed(4) = momentumSeed.Y();
+      stateSeed(5) = momentumSeed.Z();
+    } else {
+      stateSeed(3) = 0;
+      stateSeed(4) = 0;
+      stateSeed(5) = 0;
+    }
+
+    thisSPTC.set6DSeed(stateSeed);
+    thisSPTC.setCovSeed(covSeed);
+    thisSPTC.setChargeSeed(trackChargeSeed);
+    // TODO: until here
+
 
     unsigned int sortingParameter = 0;
-    for (const SpacePoint* spacePoint : thisSPTC.getHits()) {
+    // for (const SpacePoint* spacePoint : thisSPTC.getHits()) {
+    for (const SpacePoint* spacePoint : sortedHits) {
       m_usedSpacePoints.insert(spacePoint);
 
       const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>();

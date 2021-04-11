@@ -135,6 +135,6 @@ namespace Belle2 {
     /// StoreArrays needed for analysing and debugging during development
     StoreArray<SpacePoint> m_storeSVDSpacePoints;
 
-    bool m_useSubHoughSpaces = true;
+    bool m_useSubHoughSpaces = false;
   };
 }

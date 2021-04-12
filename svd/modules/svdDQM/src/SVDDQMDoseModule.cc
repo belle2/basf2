@@ -9,6 +9,13 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMDoseModule.h>
+// Includes for the forward declarations
+#include <rawdata/dataobjects/RawFTSW.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <vxd/dataobjects/VxdID.h>
+// #include <svd/calibration/SVDFADCMaskedStrips.h>
+// Other includes
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 #include "TDirectory.h"

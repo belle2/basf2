@@ -13,11 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-// #include <svd/calibration/SVDFADCMaskedStrips.h>
-#include <mdst/dataobjects/TRGSummary.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <string>
@@ -25,6 +20,13 @@
 #include <functional>
 
 namespace Belle2 {
+  // Forward declarations to avoid the need of #includes here in the header
+  class RawFTSW;
+  class SVDShaperDigit;
+  class TRGSummary;
+  class VxdID;
+  // class SVDFADCMaskedStrips;
+
   namespace SVD {
     /** The SVD dose-monitoring DQM module.
      *

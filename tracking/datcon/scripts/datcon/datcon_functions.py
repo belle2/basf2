@@ -8,7 +8,7 @@ from svd import add_svd_reconstruction
 def add_datcon(path,
                rootFileName='trackCandAnalysis.root',
                datcon_reco_tracks='DATCONRecoTracks',
-               use_simple_roi_calculation=False,
+               use_simple_roi_calculation=True,
                use_advanced_roi_calculation=False,
                datcon_pxd_intercepts_name='DATCONPXDIntercepts',
                datcon_rois_name='DATCONROIs'):
@@ -73,6 +73,8 @@ def add_datcon(path,
                     maxNumberOfHitsForEachPathLength=50,
 
                     RecoTracksStoreArrayName=datcon_reco_tracks,
+
+                    calculateROI=use_simple_roi_calculation,
                     )
 
     if use_advanced_roi_calculation:

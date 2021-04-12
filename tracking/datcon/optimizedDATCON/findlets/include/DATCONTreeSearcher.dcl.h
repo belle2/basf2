@@ -67,5 +67,8 @@ namespace Belle2 {
 
     /// Findlet for adding a recursion cell state to the states
     TrackFindingCDC::CellularAutomaton<AHit> m_automaton;
+
+    /// TwoHitFilter activarion cut
+    uint m_param_applyTwoHitFilterIfMoreChildStates = 100;
   };
 }

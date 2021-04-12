@@ -32,6 +32,11 @@ namespace Belle2 {
       const std::string& prefix)
   {
     m_pathFilter.exposeParameters(moduleParamList, prefix);
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "twoHitFilterLimit"),
+                                  m_param_applyTwoHitFilterIfMoreChildStates,
+                                  "Use the TwoHitFilter (path length == 1) if thera are more child states than this value.",
+                                  m_param_applyTwoHitFilterIfMoreChildStates);
   }
 
   template <class AHit, class APathFilter, class AResult>
@@ -100,7 +105,9 @@ namespace Belle2 {
 
     // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
     const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
-    m_pathFilter.apply(constPath, childHits);
+    if (path.size() > 1 or childHits.size() > m_param_applyTwoHitFilterIfMoreChildStates) {
+      m_pathFilter.apply(constPath, childHits);
+    }
 
     if (childHits.empty()) {
       B2DEBUG(29, "Terminating this route, as there are no possible child states.");

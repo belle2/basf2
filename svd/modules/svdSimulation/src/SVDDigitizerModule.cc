@@ -365,12 +365,6 @@ void SVDDigitizerModule::event()
       m_sensorThickness = info.getThickness();
       m_depletionVoltage = info.getDepletionVoltage();
       m_biasVoltage = info.getBiasVoltage();
-      // m_backplaneCapacitanceU = info.getBackplaneCapacitanceU();
-      // m_interstripCapacitanceU = info.getInterstripCapacitanceU();
-      // m_couplingCapacitanceU = info.getCouplingCapacitanceU();
-      // m_backplaneCapacitanceV = info.getBackplaneCapacitanceV();
-      // m_interstripCapacitanceV = info.getInterstripCapacitanceV();
-      // m_couplingCapacitanceV = info.getCouplingCapacitanceV();
 
       m_currentSensor = &m_sensors[sensorID];
       B2DEBUG(20,
@@ -383,14 +377,6 @@ void SVDDigitizerModule::event()
               << " --> Thickness:      " << m_currentSensorInfo->getThickness() << endl
               << " --> Deplet. voltage:" << m_currentSensorInfo->getDepletionVoltage() << endl
               << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl
-              << " --> Backplane cap.U: " << m_currentSensorInfo->getBackplaneCapacitanceU() << endl
-              // << " --> Interstrip cap.U:" << m_currentSensorInfo->getInterstripCapacitanceU() << endl
-              // << " --> Coupling cap.U:  " << m_currentSensorInfo->getCouplingCapacitanceU() << endl
-              // << " --> Backplane cap.V: " << m_currentSensorInfo->getBackplaneCapacitanceV() << endl
-              // << " --> Interstrip cap.V:" << m_currentSensorInfo->getInterstripCapacitanceV() << endl
-              // << " --> Coupling cap.V:  " << m_currentSensorInfo->getCouplingCapacitanceV() << endl
-              //              << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
-              //              << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
              );
 
     }
@@ -552,12 +538,12 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 #undef NORMAL_CDF
 
   // Pad with zeros for smoothing
-  int npads = (strips.front() - floor(strips.front()) == 0) ? 8 : 7;
+  int npads = (strips.front() - floor(strips.front()) == 0) ? 5 : 4;
   for (int i = 0; i < npads; ++i) {
     strips.push_front(strips.front() - 0.5);
     stripCharges.push_front(0);
   }
-  npads = (strips.back() - floor(strips.back()) == 0) ? 8 : 7;
+  npads = (strips.back() - floor(strips.back()) == 0) ? 5 : 4;
   for (int i = 0; i < npads; ++i) {
     strips.push_back(strips.back() + 0.5);
     stripCharges.push_back(0);
@@ -566,15 +552,15 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(30, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
-  for (std::size_t index = 4; index <  strips.size() - 4; index += 2) {
+  for (std::size_t index = 3; index <  strips.size() - 3; index += 2) {
     B2DEBUG(30, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
     VxdID currentSensorID = m_currentHit->getSensorID();
 
-    double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, currentStrip, "C0");
-    double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, currentStrip, "C1");
-    double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, currentStrip, "C2");
-    double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, currentStrip, "C3");
+    double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C0");
+    double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C1");
+    double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C2");
+    double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C3");
 
     B2DEBUG(30, "  current strip = " << currentStrip);
     B2DEBUG(30, "     index-3 = " << index - 3 << ", strip = " << strips[index - 3] << ", stripCharge = " << stripCharges[index - 3]);
@@ -683,8 +669,6 @@ void SVDDigitizerModule::saveDigits()
 
   for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
-    const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
 
     // Cycle through signals and generate samples
@@ -698,10 +682,8 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
 
       double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, true, iStrip);
-      // FIXME: remove ugly electronWeight computation, it will be taken from DB
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, true, iStrip, 1);
-      double gainSim = 1 / info.getAduEquivalentU();
-      double electronWeight = gainSim / gain;
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, true, iStrip);
 
       double t = initTime;
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
@@ -765,10 +747,8 @@ void SVDDigitizerModule::saveDigits()
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
 
       double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, false, iStrip);
-      // FIXME: remove ugly electronWeight computation, it will be taken from DB
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, false, iStrip, 1);
-      double gainSim = 1 / info.getAduEquivalentV();
-      double electronWeight = gainSim / gain;
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false, iStrip);
 
       double t = initTime;
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {

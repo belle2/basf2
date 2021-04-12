@@ -51,8 +51,14 @@ namespace Belle2 {
     inline float getCouplingConstant(const VxdID& sensorID, const bool& isU, const unsigned short& strip,
                                      const std::string& couplingName) const
     {
-      return m_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                                       sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU), strip).couplingConstant.at(couplingName);
+      float coupling_constant = 0;
+      try {
+        coupling_constant = m_aDBObjPtr->getReference(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                                      sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU), strip).couplingConstant.at(couplingName);
+      } catch (const std::out_of_range& oor) {
+        B2ERROR("Cannot find coupling constant " << couplingName << " in database.");
+      }
+      return coupling_constant;
     }
 
     /** Return Geant4 electron weight.

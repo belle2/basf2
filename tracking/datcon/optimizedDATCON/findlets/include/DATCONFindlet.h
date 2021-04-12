@@ -17,9 +17,7 @@
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 #include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
-// #include <tracking/datcon/optimizedDATCON/findlets/ToPXDExtrapolator.h>
-// #include <tracking/datcon/optimizedDATCON/findlets/ROICalculator.h>
-// #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+#include <tracking/datcon/optimizedDATCON/findlets/ROIFinder.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -92,6 +90,9 @@ namespace Belle2 {
     /// Store tracks as RecoTracks
     RecoTrackStorer m_recoTrackStorer;
 
+    /// ROIFinder findlet, calculates PXD intercepts and ROIs
+    ROIFinder m_roiFinder;
+
     // container to share data between findlets
 
     /// Pointers to the (const) SpacePoints as a vector
@@ -106,6 +107,14 @@ namespace Belle2 {
     /// A track candidate is a vector of SpacePoint, and in each event multple track candidates
     /// will be created, which are stored in a vector themselves.
     std::vector<SpacePointTrackCand> m_trackCandidates;
+
+    /// Use the elaborate FastInterceptFinder2D with multiple Hough spaces (true)
+    /// or the simple one with just one Hough space (false)
+    bool m_param_useSubHoughSpaces = false;
+
+    /// Calculate ROI based on a simple circle extrapolation in r-phi
+    /// and a straight line extrapolation in z, theta?
+    bool m_param_calculateROI = true;
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name
@@ -134,7 +143,5 @@ namespace Belle2 {
     StoreArray<MCParticle> m_storeMCParticles;
     /// StoreArrays needed for analysing and debugging during development
     StoreArray<SpacePoint> m_storeSVDSpacePoints;
-
-    bool m_useSubHoughSpaces = false;
   };
 }

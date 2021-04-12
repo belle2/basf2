@@ -28,6 +28,7 @@ DATCONFindlet::DATCONFindlet()
   addProcessingSignalListener(&m_rawTCCleaner);
   addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_recoTrackStorer);
+  addProcessingSignalListener(&m_roiFinder);
 
 //   initializeHists();
 
@@ -43,6 +44,7 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "finalOverlapResolver"));
   m_recoTrackStorer.exposeParameters(moduleParamList, prefix);
+  m_roiFinder.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->getParameter<std::string>("relationFilter").setDefaultValue("angleAndTime");
   moduleParamList->getParameter<std::string>("twoHitFilter").setDefaultValue("twoHitVirtualIPQI");
@@ -50,9 +52,13 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("qualityIndicator");
   moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useSubHoughSpaces"), m_useSubHoughSpaces,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useSubHoughSpaces"), m_param_useSubHoughSpaces,
                                 "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
-                                m_useSubHoughSpaces);
+                                m_param_useSubHoughSpaces);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_param_calculateROI,
+                                "Calculate PXDIntercepts and ROIs based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
+                                m_param_calculateROI);
 }
 
 void DATCONFindlet::beginEvent()
@@ -74,7 +80,7 @@ void DATCONFindlet::apply()
   m_spacePointLoaderAndPreparer.apply(m_spacePointVector, m_hitDataVector);
   B2DEBUG(29, "m_hitDataVector.size(): " << m_hitDataVector.size());
 
-  if (m_useSubHoughSpaces) {
+  if (m_param_useSubHoughSpaces) {
     m_interceptFinder.apply(m_hitDataVector, m_rawTrackCandidates);
   } else {
     m_interceptFinderSimple.apply(m_hitDataVector, m_rawTrackCandidates);
@@ -94,6 +100,10 @@ void DATCONFindlet::apply()
   m_overlapResolver.apply(m_trackCandidates);
 
   m_recoTrackStorer.apply(m_trackCandidates, m_spacePointVector);
+
+  if (m_param_calculateROI) {
+    m_roiFinder.apply(m_trackCandidates);
+  }
 }
 
 void DATCONFindlet::initializeHists()

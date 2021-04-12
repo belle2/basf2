@@ -118,7 +118,10 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
                             const std::vector<const SpacePoint*>& spacePoints)
 {
   for (auto& thisSPTC : finishedResults) {
-    if (!thisSPTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) continue;
+    // do nothing if the SpacePointTrackCand is not active
+    if (!thisSPTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
+      continue;
+    }
 
     // const auto& estimatorResult = m_estimator->estimateQualityAndProperties(thisSPTC.getHits());
     auto sortedHits = thisSPTC.getSortedHits();
@@ -171,11 +174,11 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
         sortingParameter++;
       }
 
-//       RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
-//       for (const SVDCluster& cluster : relatedClusters) {
-//         newRecoTrack->addSVDHit(&cluster, sortingParameter);
-//         sortingParameter++;
-//       }
+      // RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
+      // for (const SVDCluster& cluster : relatedClusters) {
+      //   newRecoTrack->addSVDHit(&cluster, sortingParameter);
+      //   sortingParameter++;
+      // }
     }
   }
 

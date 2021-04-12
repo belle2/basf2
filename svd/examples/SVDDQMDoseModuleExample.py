@@ -51,7 +51,7 @@ main.add_module("HistoManager", histoFileName=args.out_file)
 # Necessary modules
 main.add_module('Gearbox')
 main.add_module('Geometry')
-add_unpackers(main, components=['SVD'])
+add_unpackers(main, components=['SVD', 'TRG'])
 main.add_module(
     "SVDZeroSuppressionEmulator", SNthreshold=5,
     ShaperDigits='SVDShaperDigits', ShaperDigitsIN='SVDShaperDigitsZS5',

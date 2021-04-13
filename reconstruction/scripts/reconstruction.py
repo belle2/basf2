@@ -46,7 +46,16 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
-    Consists of clustering, tracking and the PID modules,
+    Consists of clustering, tracking and the PID modules essentially in this structure:
+
+    :func:add_reconstruction()
+    ├── :func:add_prefilter_reconstruction()
+    │ ├── :func:add_pretracking_reconstruction()         <-- Clustering
+    │ ├── :func:add_prefilter_tracking_reconstruction()  <-- Tracking essential for HLT filter calculation
+    │ └── :func:add_posttracking_reconstruction()        <-- PID and clustering
+    └── :func:add_postfilter_reconstruction()
+      └── :func:add_postfilter_tracking_reconstruction() <-- Rest of the tracking
+
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.

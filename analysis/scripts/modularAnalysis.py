@@ -432,15 +432,21 @@ def correctBrems(outputList,
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
+        However, studies by the tau WG revealed that the cuts applied by the ``ECLTrackBremFinder`` module are too tight.
+        These will be loosened but this will only have effect with proc13 and MC15.
+        If your analysis is very sensitive to the Bremsstrahlung corrections, it is advised to use `correctBremsBelle`.
 
     Information:
+        A detailed description of how the weights are set can be found directly at the documentation of the
+        `BremsFinder` module.
+
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
+        The ``inputList`` should contain particles with associated tracks. Otherwise, the module will exit with an error.
 
-        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
+        The ``gammaList`` should contain photons. Otherwise, the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles
     @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
@@ -483,14 +489,19 @@ def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
                       multiplePhotons=True,
-                      minimumEnergy=0.05,
                       angleThreshold=0.05,
                       writeOut=False,
                       path=None):
     """
     Run the Belle - like brems finding on the ``inputListName`` of charged particles.
     Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
-    ``angleThreshold`` and above ``minimumEnergy``.
+    ``angleThreshold``.
+
+    Tip:
+        Studies by the tau WG show that using a rather wide opening angle (up to
+        0.2 rad) and rather low energetic photons results in good correction.
+        However, this should only serve as a starting point for your own studies
+        because the optimal criteria are likely mode-dependent
 
     Parameters:
        outputListName (str): The output charged particle list containing the corrected charged particles
@@ -500,7 +511,6 @@ def correctBremsBelle(outputListName,
              add all the photons within the cone -> True
        angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
-       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
        path (basf2.Path): modules are added to this path
     """
@@ -512,7 +522,6 @@ def correctBremsBelle(outputListName,
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 

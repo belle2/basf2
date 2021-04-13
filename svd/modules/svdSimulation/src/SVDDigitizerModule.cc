@@ -23,7 +23,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDModeByte.h>
+//#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <fstream>
 #include <sstream>
@@ -245,6 +245,10 @@ void SVDDigitizerModule::initialize()
     m_histDriftTime_h = new TH1D("h_holeDriftTime", "hole Drift Time",
                                  30, 0, 30);
     m_histDriftTime_h->GetXaxis()->SetTitle("Hole Drift Time");
+
+    m_histHitTime = new TH1D("h_startAPVTime", "start APV Time",
+                             200, -100, 100);
+    m_histHitTime->GetXaxis()->SetTitle("time (ns)");
 
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
@@ -627,7 +631,13 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
       histo->Fill(dist / Unit::um, readoutCharges[index]);
     }
   }
+  if (m_histHitTime)
+    m_histHitTime->Fill(m_currentTime);
+
   // Store
+  B2DEBUG(25, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
+          driftTime);
+
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
@@ -655,7 +665,8 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 void SVDDigitizerModule::saveDigits()
 {
   StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  //  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  //  B2DEBUG(25,"triggerBin = "<<modeByte.getTriggerBin());
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -664,12 +675,6 @@ void SVDDigitizerModule::saveDigits()
                                          m_relShaperDigitMCParticleName);
   RelationArray relShaperDigitTrueHit(storeShaperDigits, storeTrueHits,
                                       m_relShaperDigitTrueHitName);
-
-  //Get time of the first sample
-  const double bunchTimeSep = 2 * 1.96516; //in ns //not true! depends on the filling pattern!
-  int triggerBin = modeByte.getTriggerBin();
-  int bunchXingsSinceAPVstart  = 2 * triggerBin; //FIXME: this one  must be provided by SimClockState.
-  double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   //Get SVD config from SVDEventInfo
   //  int runType = (int) modeByte.getRunType();
@@ -704,7 +709,8 @@ void SVDDigitizerModule::saveDigits()
       double gainSim = 1 / info.getAduEquivalentU();
       double electronWeight = gainSim / gain;
 
-      double t = initTime;
+      double t = m_startSampling;
+      B2DEBUG(25, "start sampling at " << m_startSampling);
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
@@ -771,7 +777,7 @@ void SVDDigitizerModule::saveDigits()
       double gainSim = 1 / info.getAduEquivalentV();
       double electronWeight = gainSim / gain;
 
-      double t = initTime;
+      double t = m_startSampling;
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;

@@ -159,9 +159,9 @@ namespace Belle2 {
 
 
       /** Time window start.
-       * Starting from this time, signal samples are taken in samplingTime intervals.
+       * Starting from this time, signal samples are taken in samplingTime intervals. This is the parameter used to tune the latency wrt L1 trigger.
        */
-      double m_startSampling = -2.0;
+      double m_startSampling = -26.5;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
@@ -248,6 +248,8 @@ namespace Belle2 {
       TH1D*  m_histDriftTime_e = nullptr;
       /** Histogram showing the drift time of h. */
       TH1D*  m_histDriftTime_h = nullptr;
+      /** Histogram showing the hit time. */
+      TH1D*  m_histHitTime = nullptr;
 
       /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u = nullptr;

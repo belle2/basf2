@@ -43,17 +43,16 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
 
     int shift = -6;
 
-    std::vector<short> packed(size / values_packed);
+    std::vector<short> packed(size / values_packed, 0);
     int len = -1;
-    for (int i = 0; i < size; i++) {
-      if (i % values_packed == 0) packed[i / values_packed] = 0;
 
+    for (int i = 0; i < size; i++) {
       short val = dst[i] - shift;
       if (val >= 0 && val < value_max) {
         if (len < 0) len = i;
         packed[i / values_packed] |= val << (value_bits * (i % values_packed));
       } else {
-        if (len >= 0 && len < i) {
+        if (len >= 0) {
           dst[len++] = dst[i];
         }
         packed[i / values_packed] |= short(value_max) << (value_bits * (i % values_packed));
@@ -70,6 +69,7 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
       }
     }
     dst.push_back(packed_size);
+    dst.shrink_to_fit();
   }
 }
 void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst) const

@@ -11,8 +11,6 @@
 // Own include
 #include <background/modules/BGOverlayInput/BGOverlayInputModule.h>
 
-
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -22,14 +20,18 @@
 
 // MetaData
 #include <framework/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 // root
+#include <framework/io/RootFileInfo.h>
 #include <framework/io/RootIOUtilities.h>
 #include <TClonesArray.h>
 #include <TFile.h>
 #include <TRandom.h>
 
 #include <iostream>
+#include <set>
 
 using namespace std;
 
@@ -74,20 +76,35 @@ namespace Belle2 {
       B2FATAL("No valid files specified!");
     }
 
+    // get the experiment number from the EventMetaData
+    StoreObjPtr<EventMetaData> eventMetaData;
+    int experiment{eventMetaData->getExperiment()};
+
     // check files
-    TDirectory* dir = gDirectory;
     for (const string& fileName : m_inputFileNames) {
-      TFile* f = TFile::Open(fileName.c_str(), "READ");
-      if (!f or !f->IsOpen()) {
-        B2FATAL("Couldn't open input file " + fileName);
+      try {
+        RootFileInfo fileInfo = RootFileInfo{fileName};
+        const std::set<std::string>& branchNames = fileInfo.getBranchNames(true);
+        if (branchNames.count("BackgroundMetaData"))
+          B2FATAL("The BG sample used is aimed for BG mixing, not for BG mixing."
+                  << LogVar("File name", fileName));
+        const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
+        // we assume lowest experiment number is enough
+        if (experiment != fileMetaData.getExperimentLow())
+          B2FATAL("The BG sample used is aimed for a different experiment number. Please check what you are doing."
+                  << LogVar("File name", fileName)
+                  << LogVar("Experiment number of the basf2 process", experiment)
+                  << LogVar("Experiment number of the BG file", fileMetaData.getExperimentLow()));
+      } catch (const std::invalid_argument& e) {
+        B2FATAL("One of the BG files can not be opened."
+                << LogVar("File name", fileName));
+      } catch (const std::runtime_error& e) {
+        B2FATAL("Something went wrong with one of the BG files."
+                << LogVar("File name", fileName)
+                << LogVar("Issue", e.what()));
       }
-      auto* persistent = static_cast<TTree*>(f->Get("persistent"));
-      if (!persistent) B2ERROR("No 'persistent' tree found in " + fileName);
-      // check and issue error if file is for BG mixing
-      TBranch* branch = persistent->GetBranch("BackgroundMetaData");
-      if (branch) B2ERROR(fileName << ": wrong sample, this one is aimed for BG mixing");
-      delete f;
     }
+    TDirectory* dir = gDirectory;
     dir->cd();
 
     // get event TTree

@@ -15,6 +15,8 @@
 using namespace std;
 using namespace Belle2;
 
+REG_MODULE(DQMHistAnalysisSVDDose)
+
 DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 {
   setDescription("Monitoring of SVD Dose with events from Poisson trigger w/o inj. veto. See also SVDDQMDoseModule.");
@@ -58,7 +60,7 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   }
 
   // The legend need to be memory-leaked, so we make it once and use it evey time
-  m_legend = new TPaveText(0.73, 0.73, 0.88, 0.88, "brNDC");
+  m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
   m_legend->AddText("LER inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kRed);
   m_legend->AddText("HER inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kAzure);
   m_legend->AddText("No inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kBlack);
@@ -133,12 +135,13 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(0);
-      hHits->SetMaximum(1); // TODO is this the best limit to set?
+      hHits->SetMinimum(0.01);
+      hHits->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
       hHits->Draw("COLZ");
+      c->SetLogz();
     }
 
     c = m_c_occuHER[g];
@@ -149,12 +152,13 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(0);
-      hHits->SetMaximum(1); // TODO is this the best limit to set?
+      hHits->SetMinimum(0.01);
+      hHits->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
       hHits->Draw("COLZ");
+      c->SetLogz();
     }
   }
 }

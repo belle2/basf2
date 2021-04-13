@@ -339,7 +339,7 @@ namespace Belle2 {
     inline double TOPGeometryPar::getAbsorptionLength(double energy) const
     {
       double lambda = c_hc / energy;
-      return 15100 * pow(lambda / 405, 4); // Alan, 2013
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
     }
 
   } // end of namespace TOP

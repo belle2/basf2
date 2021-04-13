@@ -10,6 +10,10 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
+#include "cadef.h"
+#endif
+
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <TCanvas.h>
 #include <TString.h>
@@ -30,10 +34,20 @@ namespace Belle2 {
      * See Belle2::SVD::SVDDQMDoseModule::SensorGroup.
      */
     typedef struct SensorGroup {
-      TString nameSuffix;
-      TString titleSuffix;
-      int nStrips;
+      TString nameSuffix; ///< Suffix of the name of the histograms
+      TString titleSuffix; ///< Suffix for the title of the canvases
+      const char* pvSuffix; ///< Suffix for the PV. See also m_pvPrefix.
+      int nStrips; ///< Total number of strips in the sensor group.
     } SensorGroup;
+
+#ifdef _BELLE2_EPICS
+    /// A struct to keep EPICS PV-related data.
+    typedef struct MyPV {
+      chid mychid; ///< Channel id
+      double lastNHits = 0.0; ///< Hit count at last report. Needed for the delta.
+      double lastNEvts = 0.0; ///< Events count at last report. Needed for the delta.
+    } MyPV;
+#endif
 
     void initialize() override final;
     void event() override final;
@@ -55,7 +69,7 @@ namespace Belle2 {
      *  - `result_bin = scale * num_bin / den_bin`
      *  - `result_err = scale * num_err / den_bin`
      */
-    void divide(TH2F* num, TH2F* den, float scale = 1.0f);
+    static void divide(TH2F* num, TH2F* den, float scale = 1.0f);
 
     /// Carries the content of the overflow bin into the last bin
     static void carryOverflowOver(TH1F* h);
@@ -63,6 +77,7 @@ namespace Belle2 {
     // Steerable data members (parameters)
     std::string m_pvPrefix; ///< Prefix for EPICS PVs
     bool m_useEpics; ///< Whether to update EPICS PVs
+    double m_epicsUpdateSeconds; ///< Minimum interval between successive PV updates
 
     // Data members for outputs
     MonitoringObject* m_monObj = nullptr; ///< Monitoring object for MiraBelle
@@ -70,6 +85,11 @@ namespace Belle2 {
     std::vector<TCanvas*> m_c_occuLER; ///< Canvases for the occu. vs time after LER inj.
     std::vector<TCanvas*> m_c_occuHER; ///< Canvases for the occu. vs time after HER inj.
     TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
+
+#ifdef _BELLE2_EPICS
+    std::vector<MyPV> m_myPVs; ///< EPICS stuff for each sensor group / PV
+    double m_lastPVUpdate; ///< Time of the last PV update (seconds)
+#endif
 
     /** List of sensors groups. Must match Belle2::SVD::SVDDQMDoseModule::c_sensorGroups.
      * Defined in DQMHistAnalysisSVDDose.cc.

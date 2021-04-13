@@ -9,11 +9,15 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisSVDDose.h>
+#include <framework/utilities/Utils.h>
 #include <TROOT.h>
 #include <TText.h>
 
 using namespace std;
 using namespace Belle2;
+
+// Utility function
+inline double getClockSeconds() { return Utils::getClock() / 1e9; }
 
 REG_MODULE(DQMHistAnalysisSVDDose)
 
@@ -21,13 +25,17 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 {
   setDescription("Monitoring of SVD Dose with events from Poisson trigger w/o inj. veto. See also SVDDQMDoseModule.");
   // THIS MODULE CAN NOT BE RUN IN PARALLEL
-  addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("TODO!!!"));
+  addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("SVD:OccPois:"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", true);
+  addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
+           "Minimum interval between two successive PV updates (in seconds).", 300.0);
 }
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
 {
-  // TODO uninitialize EPICS
+#ifdef _BELLE2_EPICS
+  if (m_useEpics && ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisSVDDoseModule::initialize()
@@ -65,18 +73,64 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_legend->AddText("HER inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kAzure);
   m_legend->AddText("No inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kBlack);
 
-  // TODO initialize EPICS
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    if (!ca_current_context())
+      SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    m_myPVs.resize(c_sensorGroups.size());
+    for (unsigned int g = 0; g < c_sensorGroups.size(); g++)
+      SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvSuffix).data(),
+                               NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    m_lastPVUpdate = getClockSeconds();
+  }
+#endif
 }
 
 void DQMHistAnalysisSVDDoseModule::event()
 {
-  // TODO window averages and EPICS write
+  // Update PVs ("write" to EPICS)
+#ifdef _BELLE2_EPICS
+  if (m_useEpics && getClockSeconds() >= m_lastPVUpdate + m_epicsUpdateSeconds) {
+    for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
+      const auto& group = c_sensorGroups[g];
+      double nHits = 0.0, nEvts = 0.0;
+      for (TString dir : {"SVDDoseLERInj", "SVDDoseHERInj", "SVDDoseNoInj"}) {
+        auto hHits = findHistT<TH2F>(dir + "/SVDHitsVsTime_" + group.nameSuffix);
+        auto hEvts = findHistT<TH2F>(dir + "/SVDEvtsVsTime");
+        if (!hHits || !hEvts) {
+          B2WARNING("Histograms needed for Average Poisson Occupancy U-side not found.");
+          nEvts = 0.0;
+          break;
+        }
+        nHits += hHits->GetEntries();
+        nEvts += hEvts->GetEntries();
+      }
+
+      auto& pv = m_myPVs[g];
+      double delta_nHits = nHits - pv.lastNHits;
+      double delta_nEvts = nEvts - pv.lastNEvts;
+      double occ = delta_nEvts > 0.0 ? (delta_nHits / delta_nEvts * 100.0 / group.nStrips) : -1.0;
+      if (pv.mychid)
+        SEVCHK(ca_put(DBR_DOUBLE, pv.mychid, (void*)&occ), "ca_put");
+
+      pv.lastNEvts = nEvts;
+      pv.lastNHits = nHits;
+    }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    m_lastPVUpdate = getClockSeconds();
+  }
+#endif
 
   updateCanvases();
 }
 
 void DQMHistAnalysisSVDDoseModule::endRun()
 {
+  // EPICS: reset the counters used for the delta computation
+  for (auto& pv : m_myPVs)
+    pv.lastNEvts = pv.lastNHits = 0.0;
+
   // Write to MiraBelle
   for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
     const auto& group = c_sensorGroups[g];
@@ -181,10 +235,10 @@ void DQMHistAnalysisSVDDoseModule::carryOverflowOver(TH1F* h)
 }
 
 const vector<DQMHistAnalysisSVDDoseModule::SensorGroup> DQMHistAnalysisSVDDoseModule::c_sensorGroups = {
-  {"L31XU", "L3.1", 768 * 2},
-  {"L32XU", "L3.2", 768 * 2},
-  {"L3XXU", "L3 avg.", 768 * 14},
-  {"L4XXU", "L4 avg.", 768 * 30},
-  {"L5XXU", "L5 avg.", 768 * 48},
-  {"L6XXU", "L6 avg.", 768 * 80}
+  {"L31XU", "L3.1", "L3:1:X:U", 768 * 2},
+  {"L32XU", "L3.2", "L3:2:X:U", 768 * 2},
+  {"L3XXU", "L3 avg.", "L3:Avg", 768 * 14},
+  {"L4XXU", "L4 avg.", "L4:Avg", 768 * 30},
+  {"L5XXU", "L5 avg.", "L5:Avg", 768 * 48},
+  {"L6XXU", "L6 avg.", "L6:Avg", 768 * 80}
 };

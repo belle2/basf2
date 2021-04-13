@@ -1365,7 +1365,7 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (iecl_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(72.5);
     }
-    if (ecleklm1_fired && LML_fired) {
+    if (ecleklm1_fired && CDC_fired) {
       h_psn_extra[skim[ifill]]->Fill(73.5);
     }
     if (syo_fired && ECL_fired) {
@@ -1422,14 +1422,11 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (fyb_fired || fzb_fired) {
       h_psn_extra[skim[ifill]]->Fill(91.5);
     }
-    if (fff_fired) {
+    if (ffo_fired) {
       h_psn_extra[skim[ifill]]->Fill(92.5);
     }
-    if (ffo_fired) {
-      h_psn_extra[skim[ifill]]->Fill(93.5);
-    }
     if (ffb_fired) {
-      h_psn_extra[skim[ifill]]->Fill(94.5);
+      h_psn_extra[skim[ifill]]->Fill(93.5);
     }
   }
 
@@ -1443,9 +1440,9 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)", "mu_b2b&(fff|ffo|ffb)", "mu_eb2b&(fff|ffo|ffb)", "cdcklm1&(fff|ffo|ffb)", "cdcklm2&(fff|ffo|ffb)", "klm_hit&(fff|ffo|ffb)", "eklm_hit&(fff|ffo|ffb)", "mu_b2b&(lml|eclmumu)", "mu_eb2b&(lml|eclmumu)",
   "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
   "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)", "fso&(lml|eclmumu)", "fsb&(lml|eclmumu)", "syo&(lml|eclmumu)", "syb&(lml|eclmumu)", "x&(lml|eclmumu)", "fioiecl1&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "seklm1&(lml|eclmumu)",
-  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)", "ecleklm1&(lml|eclmumu)", "syo&(c4|hie)", "yioiecl1&(c4|hie)", "stt&(c4|hie)", "ffz&(c4|hie)", "fzo&(c4|hie)", "fzb&(c4|hie)",
+  "seklm2&(lml|eclmumu)", "ieklm&(lml|eclmumu)", "iecl&(lml|eclmumu)", "ecleklm1&(fff|ffo|ffb)", "syo&(c4|hie)", "yioiecl1&(c4|hie)", "stt&(c4|hie)", "ffz&(c4|hie)", "fzo&(c4|hie)", "fzb&(c4|hie)",
   "ffy&ffz&(c4|hie)", "fyo&fzo&(c4|hie)", "fyb&fzb&(c4|hie)", "(ffy|ffz)&(c4|hie)", "(fyo|fzo)&(c4|hie)", "(fyb|fzb)&(c4|hie)", "ffy&ffz", "fyo&fzo", "fyb&fzb", "(ffy|ffz)",
-  "(fyo|fzo)", "(fyb|fzb)", "fff", "ffo", "ffb"
+  "(fyo|fzo)", "(fyb|fzb)", "ffo", "ffb"
 };
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {

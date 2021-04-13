@@ -54,7 +54,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     │ ├── :func:add_prefilter_tracking_reconstruction()  <-- Tracking essential for HLT filter calculation
     │ └── :func:add_posttracking_reconstruction()        <-- PID and clustering
     └── :func:add_postfilter_reconstruction()
-      └── :func:add_postfilter_tracking_reconstruction() <-- Rest of the tracking
+    │ └── :func:add_postfilter_tracking_reconstruction() <-- Rest of the tracking
 
     plus the modules to calculate the software trigger cuts.
 

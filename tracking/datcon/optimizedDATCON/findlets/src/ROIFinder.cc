@@ -83,11 +83,14 @@ void ROIFinder::initialize()
   m_storePXDIntercepts.registerInDataStore(m_param_storePXDInterceptsName);
   m_storeROIs.registerInDataStore(m_param_storeROIsName);
 
-  if (m_param_overlapU < 0) {
-    B2ERROR("overlapU < 0 is not permitted, please choose a value >= 0.");
-  }
-  if (m_param_overlapV < 0) {
-    B2ERROR("overlapV < 0 is not permitted, please choose a value >= 0.");
+  if (m_param_minimumROISizeUL1 < 0 or m_param_minimumROISizeUL2 < 0 or
+      m_param_minimumROISizeVL1 < 0 or m_param_minimumROISizeVL2 < 0 or
+      m_param_multiplierUL1 < 0 or m_param_multiplierUL2 < 0 or
+      m_param_multiplierVL1 < 0 or m_param_multiplierVL2 < 0 or
+      m_param_overlapU < 0 or m_param_overlapV < 0) {
+    B2ERROR("Please check the ROI size parameters. "
+            "None of minimumROISizeUL1, minimumROISizeUL2, minimumROISizeVL1, minimumROISizeVL2, "
+            "multiplierUL1, multiplierUL2, multiplierVL1, multiplierVL2, overlapU, overlapV must be < 0!");
   }
 };
 
@@ -208,13 +211,13 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
     }
 
     const double omega = 1. / trackRadius;
-    // const double tanLambdaFactor = 1. + fabs(tan(trackLambda));
-    const double tanLambdaFactor = 1. + fabs(tanTrackLambda);
-    const double radiusFactor = omega * tanLambdaFactor;
-    unsigned short uSizeL1 = (unsigned short)(m_param_multiplierUL1 * radiusFactor + m_param_minimumROISizeUL1);
-    unsigned short uSizeL2 = (unsigned short)(m_param_multiplierUL2 * radiusFactor + m_param_minimumROISizeUL2);
-    unsigned short vSizeL1 = (unsigned short)(m_param_multiplierVL1 * radiusFactor + m_param_minimumROISizeVL1);
-    unsigned short vSizeL2 = (unsigned short)(m_param_multiplierVL2 * radiusFactor + m_param_minimumROISizeVL2);
+    const double tanLambdaFactorL1 = 1. + fabs(tanTrackLambda) * m_param_multiplierVL1;
+    const double tanLambdaFactorL2 = 1. + fabs(tanTrackLambda) * m_param_multiplierVL2;
+    // const double radiusFactor = omega * tanLambdaFactor;
+    unsigned short uSizeL1 = (unsigned short)(m_param_multiplierUL1 * omega + m_param_minimumROISizeUL1);
+    unsigned short uSizeL2 = (unsigned short)(m_param_multiplierUL2 * omega + m_param_minimumROISizeUL2);
+    unsigned short vSizeL1 = (unsigned short)((1. + fabs(tanTrackLambda) * m_param_multiplierVL1) * m_param_minimumROISizeVL1);
+    unsigned short vSizeL2 = (unsigned short)((1. + fabs(tanTrackLambda) * m_param_multiplierVL2) * m_param_minimumROISizeVL2);
     for (auto& intercept : thisTracksIntercepts) {
       const VxdID& interceptSensorID = intercept.getSensorID();
 

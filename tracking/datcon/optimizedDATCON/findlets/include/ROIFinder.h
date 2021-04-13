@@ -66,24 +66,24 @@ namespace Belle2 {
 
 
     /// Minimum size of ROI in u-direction on L1
-    unsigned short m_param_minimumROISizeUL1 = 40;
+    short m_param_minimumROISizeUL1 = 40;
     /// Minimum size of ROI in v-direction on L1
-    unsigned short m_param_minimumROISizeVL1 = 40;
+    short m_param_minimumROISizeVL1 = 40;
     /// Minimum size of ROI in u-direction on L2
-    unsigned short m_param_minimumROISizeUL2 = 40;
+    short m_param_minimumROISizeUL2 = 40;
     /// Minimum size of ROI in v-direction on L2
-    unsigned short m_param_minimumROISizeVL2 = 40;
+    short m_param_minimumROISizeVL2 = 40;
 
     /// Multiplier term in ROI size estimation
     /// size = multiplier * 1/R + minimumROISize
     /// Multiplier term for u-direction on L1
     double m_param_multiplierUL1 = 100;
-    /// Multiplier term for v-direction on L1
-    double m_param_multiplierVL1 = 100;
     /// Multiplier term for u-direction on L2
     double m_param_multiplierUL2 = 100;
+    /// Multiplier term for v-direction on L1
+    double m_param_multiplierVL1 = 0.5;
     /// Multiplier term for v-direction on L2
-    double m_param_multiplierVL2 = 100;
+    double m_param_multiplierVL2 = 0.5;
 
     /// allowed overlap (in cm) in u (=r-phi)
     double m_param_overlapU = 0.2;

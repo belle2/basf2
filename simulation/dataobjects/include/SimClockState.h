@@ -72,10 +72,9 @@ namespace Belle2 {
     /**
      * Returns SVD trigger bin.
      * Default value for offset determined on rawdata of run 7/1500 using SVDEventInfo and TOPRawDigits.
-     * @param offset offset
      * @return SVD trigger bin
      */
-    unsigned getSVDTriggerBin(unsigned offset = 2) const {return (m_revo9Count + offset) % 4;}
+    unsigned getSVDTriggerBin() const {return (m_revo9Count) % 4;}
 
     /**
     * Returns CDC trigger bin.

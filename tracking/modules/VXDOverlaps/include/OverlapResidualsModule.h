@@ -237,9 +237,11 @@ namespace Belle2 {
                  svdSensor_U_ext = 0,   /**< U external sensor */
                  svdSize_U_ext = 0;     /**< U external size */
     std::vector<float> svdStripCharge_U_int,     /**< U internal charge of the strips of the cluster*/
+        svdStrip6Samples_U_int,   /**< 6 samples of the strips of the cluster*/
         svdStripTime_U_int,       /**< U internal time of the strips of the cluster*/
         svdStripPosition_U_int,   /**< U internal position of the strips of the cluster*/
         svdStripCharge_U_ext,     /**< U external charge of the strips of the cluster*/
+        svdStrip6Samples_U_ext,   /**< 6 samples of the strips of the cluster*/
         svdStripTime_U_ext,       /**< U external time of the strips of the cluster*/
         svdStripPosition_U_ext;   /**< U external position of the strips of the cluster*/
     /* Branches of SVD v-clusters tree */
@@ -297,9 +299,11 @@ namespace Belle2 {
                  svdSensor_V_ext = 0,   /**< V external sensor */
                  svdSize_V_ext = 0;     /**< V external size */
     std::vector<float> svdStripCharge_V_int,     /**< V internal charge of the strips of the cluster*/
+        svdStrip6Samples_V_int,   /**< 6 samples of the strips of the cluster*/
         svdStripTime_V_int,       /**< V internal time of the strips of the cluster*/
         svdStripPosition_V_int,   /**< V internal position of the strips of the cluster*/
         svdStripCharge_V_ext,     /**< V external charge of the strips of the cluster*/
+        svdStrip6Samples_V_ext,   /**< 6 samples of the strips of the cluster*/
         svdStripTime_V_ext,       /**< V external time of the strips of the cluster*/
         svdStripPosition_V_ext;   /**< V external position of the strips of the cluster*/
   };

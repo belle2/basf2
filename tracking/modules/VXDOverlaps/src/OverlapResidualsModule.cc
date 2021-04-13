@@ -15,6 +15,7 @@
 #include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>

@@ -59,8 +59,11 @@ namespace Belle2 {
     addParam("inputFileNames", m_inputFileNames,
              "List of files with measured beam background ");
     addParam("extensionName", m_extensionName,
-             "name added to default branch names", string("_beamBG"));
-    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
+             "Name added to default branch names", string("_beamBG"));
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "Name of the BackgroundInfo StoreObjPtr", string(""));
+    addParam("skipExperimentCheck", m_skipExperimentCheck,
+             "If true, skip the check on the experiment number consistency between the basf2 process and the beam background files. By default, it is set to false, since the check should be skipped only by experts.",
+             false);
   }
 
   BGOverlayInputModule::~BGOverlayInputModule()
@@ -69,6 +72,14 @@ namespace Belle2 {
 
   void BGOverlayInputModule::initialize()
   {
+    if (m_skipExperimentCheck)
+      B2WARNING(R"RAW(The BGOverlayInput module will skip the check on the experiment number
+    consistency between the basf2 process and the beam background files.
+
+    This should be done only if you are extremely sure about what you are doing.
+
+    Be aware that you are not protected by the possible usage of beam background
+    files not suitabile for the experiment number you selected.)RAW");
 
     // expand possible wildcards
     m_inputFileNames = expandWordExpansions(m_inputFileNames);
@@ -88,13 +99,15 @@ namespace Belle2 {
         if (branchNames.count("BackgroundMetaData"))
           B2FATAL("The BG sample used is aimed for BG mixing, not for BG mixing."
                   << LogVar("File name", fileName));
-        const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
-        // we assume lowest experiment number is enough
-        if (experiment != fileMetaData.getExperimentLow())
-          B2FATAL("The BG sample used is aimed for a different experiment number. Please check what you are doing."
-                  << LogVar("File name", fileName)
-                  << LogVar("Experiment number of the basf2 process", experiment)
-                  << LogVar("Experiment number of the BG file", fileMetaData.getExperimentLow()));
+        if (not m_skipExperimentCheck) {
+          const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
+          // we assume lowest experiment number is enough
+          if (experiment != fileMetaData.getExperimentLow())
+            B2FATAL("The BG sample used is aimed for a different experiment number. Please check what you are doing."
+                    << LogVar("File name", fileName)
+                    << LogVar("Experiment number of the basf2 process", experiment)
+                    << LogVar("Experiment number of the BG file", fileMetaData.getExperimentLow()));
+        }
       } catch (const std::invalid_argument& e) {
         B2FATAL("One of the BG files can not be opened."
                 << LogVar("File name", fileName));

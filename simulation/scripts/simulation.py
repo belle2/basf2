@@ -120,12 +120,15 @@ def add_simulation(
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
-        usePXDGatedMode=False):
+        usePXDGatedMode=False,
+        skipExperimentCheckForBG):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
+    @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
+      process and the beam background files. Note that this check should be skipped only by experts.
     """
 
     # Check compoments.
@@ -136,6 +139,7 @@ def add_simulation(
         if bkgOverlay:
             bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
+            bkginput.param('skipExperimentCheck', skipExperimentCheckForBG)
             path.add_module(bkginput)
         else:
             bkgmixer = b2.register_module('BeamBkgMixer')

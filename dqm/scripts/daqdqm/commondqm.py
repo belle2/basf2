@@ -64,6 +64,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
+            # SVD Occupancy after Injection
+            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
             # SVDDQMExpressReco General
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
@@ -85,9 +87,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # Injection DQM modules that should run only on the L1 passthrough events on ExpressReco
     if dqm_environment == "expressreco" and (dqm_mode in ["l1_passthrough"]):
-        if components is None or 'SVD' in components:
-            # SVD Occupancy after Injection
-            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
         if components is None or 'ECL' in components:
             # ECL Injection DQM
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')

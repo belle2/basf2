@@ -121,7 +121,7 @@ def add_simulation(
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
         usePXDGatedMode=False,
-        skipExperimentCheckForBG):
+        skipExperimentCheckForBG=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'

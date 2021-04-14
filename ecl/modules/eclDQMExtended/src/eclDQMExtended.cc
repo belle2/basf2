@@ -160,8 +160,6 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_quality  = new TH1F("timefail_quality", "Number of FPGA <-> C++ fitter #bf{time} inconsistencies vs fit qual", 5, -1, 4);
   h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
-  h_ampfail_quality->SetDrawOption("hist");
-  h_timefail_quality->SetOption("LIVE");
 
   h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", 8736, 1, 8737);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");

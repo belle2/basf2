@@ -65,17 +65,22 @@ namespace Belle2 {
     StoreArray<ROIid> m_storeROIs;
 
 
+    /// Calculate ROI based on a simple circle extrapolation in r-phi
+    /// and a straight line extrapolation in z, theta?
+    bool m_param_calculateROI = true;
+
     /// Minimum size of ROI in u-direction on L1
-    short m_param_minimumROISizeUL1 = 40;
+    double m_param_minimumROISizeUL1 = 40;
     /// Minimum size of ROI in v-direction on L1
-    short m_param_minimumROISizeVL1 = 40;
+    double m_param_minimumROISizeVL1 = 40;
     /// Minimum size of ROI in u-direction on L2
-    short m_param_minimumROISizeUL2 = 40;
+    double m_param_minimumROISizeUL2 = 40;
     /// Minimum size of ROI in v-direction on L2
-    short m_param_minimumROISizeVL2 = 40;
+    double m_param_minimumROISizeVL2 = 40;
 
     /// Multiplier term in ROI size estimation
-    /// size = multiplier * 1/R + minimumROISize
+    /// For u: size = multiplier * 1/R + minimumROISize
+    /// For v: size = (1 + abs(tan(lambda)) * multiplier) + minimumROISize
     /// Multiplier term for u-direction on L1
     double m_param_multiplierUL1 = 100;
     /// Multiplier term for u-direction on L2
@@ -85,10 +90,15 @@ namespace Belle2 {
     /// Multiplier term for v-direction on L2
     double m_param_multiplierVL2 = 0.5;
 
-    /// allowed overlap (in cm) in u (=r-phi)
-    double m_param_overlapU = 0.2;
-    /// allowed overlap (in cm) in v (= z / theta)
-    double m_param_overlapV = 0.2;
+    /// allowed tolerance (in radians) phi to create intercepts per sensor
+    double m_param_tolerancePhi = 0.15;
+    /// allowed tolerance (in cm) in z to create intercepts per sensor
+    double m_param_toleranceZ = 0.5;
+
+    /// maximum ROI size in u
+    unsigned short m_param_maximumROISizeU = 120;
+    /// maximum ROI size in v
+    unsigned short m_param_maximumROISizeV = 120;
 
     // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
     /// Shift of the center of the active area of each sensor in a ladder of layer 1
@@ -108,6 +118,10 @@ namespace Belle2 {
     const double m_const_layerRadius[2] = {1.42854, 2.21218};
     /// Length of the active region for L1 and L2
     const double m_const_activeSensorLength[2] = {4.48, 6.144};
+    /// Phi values of the ladders of L1
+    const double m_const_ladderPhiL1[8] = {0., 0.25 * M_PI, M_PI_2, 0.75 * M_PI, M_PI, -0.75 * M_PI, -M_PI_2, -0.25 * M_PI};
+    /// Phi values of the ladders of L2
+    const double m_const_ladderPhiL2[12] = {0., 1. / 6. * M_PI, 1. / 3. * M_PI,  M_PI_2, 2. / 3. * M_PI, 5. / 6. * M_PI,  M_PI, -5. / 6. * M_PI, -2. / 3. * M_PI, -M_PI_2, -1. / 3. * M_PI, -1. / 6. * M_PI};
 
     /// BField in Tesla
     double m_bFieldZ = 1.5;

@@ -112,10 +112,6 @@ namespace Belle2 {
     /// or the simple one with just one Hough space (false)
     bool m_param_useSubHoughSpaces = false;
 
-    /// Calculate ROI based on a simple circle extrapolation in r-phi
-    /// and a straight line extrapolation in z, theta?
-    bool m_param_calculateROI = true;
-
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name
     TFile* m_rootFile;

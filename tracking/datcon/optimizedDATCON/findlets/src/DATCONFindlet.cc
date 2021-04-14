@@ -55,10 +55,6 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useSubHoughSpaces"), m_param_useSubHoughSpaces,
                                 "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
                                 m_param_useSubHoughSpaces);
-
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_param_calculateROI,
-                                "Calculate PXDIntercepts and ROIs based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
-                                m_param_calculateROI);
 }
 
 void DATCONFindlet::beginEvent()
@@ -101,9 +97,10 @@ void DATCONFindlet::apply()
 
   m_recoTrackStorer.apply(m_trackCandidates, m_spacePointVector);
 
-  if (m_param_calculateROI) {
-    m_roiFinder.apply(m_trackCandidates);
-  }
+  // A check if or if not ROIs shall be calculated is performed within the m_roiFinder findlet to
+  // avoid creation and registration of the ROIs and PXDIntercept StoreArrays
+  // such that StoreArrays with the same name can be registered elsewhere.
+  m_roiFinder.apply(m_trackCandidates);
 }
 
 void DATCONFindlet::initializeHists()

@@ -11,16 +11,17 @@ A test of the ECL variables using the latest mDST test file from the mdst packag
 
 import b2test_utils
 from glob import glob
-from basf2 import set_random_seed, create_path, process
+import basf2 as b2
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
-set_random_seed("1337")
-testinput = [b2test_utils.require_file(sorted(glob("mdst/tests/mdst-v0*.root"))[-1])]
+b2.set_random_seed("1337")
+
+testinput = [b2test_utils.require_file(sorted(glob(f"{b2.find_file('mdst/tests')}/mdst-v0*.root"))[-1])]
 
 fsps = ['gamma:all']
 
-testpath = create_path()
+testpath = b2.create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 #: Cluster-related variables
 ecl_vars = [
@@ -72,4 +73,4 @@ for fsp in fsps:
 
     testpath.add_module('ParticlePrinter', listName=fsp, fullPrint=False,
                         variables=ecl_vars)
-process(testpath, 1)
+b2.process(testpath, 1)

@@ -179,8 +179,8 @@ class SLUntagged(BaseSkim):
 
     __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
     __description__ = (
-        "Skim for semileptonic decays, :math:`B: decays "
-        "(:math:`B \\to D \\ell\\nu,` where :math:`\\ell=e,\\mu`)"
+        "Skim for semileptonic decays, :math:`B` decays "
+        "(:math:`B \\to D \\ell\\nu`, where :math:`\\ell=e,\\mu`)"
     )
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
@@ -271,6 +271,7 @@ class SLUntagged(BaseSkim):
 class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     """
     Cuts applied:
+
     * ``SkimHighEff tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND PID>=0.01``
     * ``slowPi tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
     * :math:`2.5 > p_{\\ell} > 1.1\\,\\text{GeV}`
@@ -278,9 +279,8 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     * ``1.8 < M_D0 < 2.0``
     * ``DM_Dstar_D < 0.16``
 
-
-
     Reconstructed decays:
+
     * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) e^+`,
     * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^0) e^+`,
     * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^- \\pi^+) e^+`,
@@ -289,19 +289,19 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^- \\pi^+) mu^+`,
 
     Note:
+
         This skim uses `skim.standardlists.charm.loadSkimHighEffD0_Kpi`,
         `skim.standardlists.charm.loadSkimHighEffD0_Kpipipi` and
         `skim.standardlists.charm.loadStdD0_eff20_Kpipi0`, where :math:`D^0`
         channel is defined.
         `skim.standardlists.charm.loadSkimHighEffDstarPlus_D0pi_Kpi`,
         `skim.standardlists.charm.loadSkimHighEffDstarPlus_D0pi_Kpipipi`,
-         `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipi0_eff20`,where the
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipi0_eff20`,where the
         :math:`D^{*-}` channel is defined.
 
         The pion and kaon lists used to define :math:`D^0` and :math:`D^{*-}` are:
         `skim.standardlists.charm.loadPiSkimHighEff`, `skim.standardlists.charm.loadKSkimHighEff` and
         `skim.standardlists.charm.loadSlowPi`
-
     """
     __authors__ = ["Bae Hanwook, Chiara La Licata"]
     __description__ = ""

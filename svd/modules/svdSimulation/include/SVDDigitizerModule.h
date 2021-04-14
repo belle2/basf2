@@ -161,7 +161,7 @@ namespace Belle2 {
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals. This is the parameter used to tune the latency wrt L1 trigger.
        */
-      double m_startSampling = -26.5;
+      double m_startSampling = -25;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */

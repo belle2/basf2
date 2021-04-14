@@ -357,15 +357,14 @@ class SequentialRunByRun(AlgorithmStrategy):
             # input data runs IoV, then we also have to set the first payload IoV to encompass the missing beginning
             # of the iov_coverage, and the last payload IoV must cover up to the end of iov_coverage.
             # This is only true for the lowest and highest experiments in our input data.
-            if iov_coverage and i_exp == 1:
-                lowest_exprun = ExpRun(iov_coverage.exp_low, iov_coverage.run_low)
-            else:
-                lowest_exprun = run_list[0]
+            # If we have multiple experiments the iov must be adjusted to avoid gaps at the iov boundaries
+            lowest_exprun = ExpRun(run_list[0].exp, 0)
+            highest_exprun = ExpRun(run_list[-1].exp, -1)
 
-            if iov_coverage and i_exp == number_of_experiments:
-                highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high)
-            else:
-                highest_exprun = run_list[-1]
+            if i_exp == 1:
+                lowest_exprun = ExpRun(iov_coverage.exp_low, iov_coverage.run_low) if iov_coverage else run_list[0]
+            if i_exp == number_of_experiments:
+                highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high) if iov_coverage else run_list[-1]
 
             self.execute_over_run_list(iteration, run_list, lowest_exprun, highest_exprun)
 

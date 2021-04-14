@@ -50,28 +50,15 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
 
 // -----------------------------------------------------------------------------
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo,
-    float scale)
+const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
-  return GetCovarianceMatrix4x4FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix(), hypo, scale);
+  return GetJacobiMatrix4x6FromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale)
+const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const TVector3& vertex,
+                                                           ECLCluster::EHypothesisBit hypo)
 {
-
-  // Get the covariance matrix (theta, phi, energy) from the ECL cluster.
-  TMatrixDSym covmatecl = cluster->getCovarianceMatrix3x3();
-
-  // Combine into the total covariance matrix from the ECL cluster (0..2) and the IP(3..5) as two 3x3 block matrices.
-  TMatrixDSym covmatcombined(6);
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j <= i ; j++) {
-      covmatcombined(i, j) = covmatcombined(j, i) = covmatecl(i, j);
-      covmatcombined(i + 3, j + 3) = covmatcombined(j + 3, i + 3) = covmatvertex(i, j);
-    }
-  }
 
   // Calculate the Jacobi matrix J =  dpx/dE dpx/dphi dpx/dtheta dpx/dx dpy/dy dpz/dz
   //                                  ...
@@ -79,7 +66,7 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   TMatrixD jacobian(4, 6);
 
   const double R      = cluster->getR();
-  const double energy = scale * cluster->getEnergy(hypo);
+  const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
 
@@ -139,26 +126,51 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   jacobian(3, 4) = 0.0; // dE/dvy
   jacobian(3, 5) = 0.0; // dE/dvz
 
-  TMatrixDSym covmatCart(4);
-  covmatCart = covmatcombined.Similarity(jacobian);
+  //jacobian.Print();
+  return jacobian;
 
+}
+
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+{
+
+  return GetCovarianceMatrix4x4FromCluster(cluster, GetIPPositionCovarianceMatrix(), hypo, jacobiMatrix);
+}
+
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster,
+    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, const TMatrixD& jacobiMatrix)
+{
+
+  // Get the covariance matrix (theta, phi, energy) from the ECL cluster.
+  TMatrixDSym covmatecl = cluster->getCovarianceMatrix3x3();
+
+  // Combine into the total covariance matrix from the ECL cluster (0..2) and the IP(3..5) as two 3x3 block matrices.
+  TMatrixDSym covmatcombined(6);
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j <= i ; j++) {
+      covmatcombined(i, j) = covmatcombined(j, i) = covmatecl(i, j);
+      covmatcombined(i + 3, j + 3) = covmatcombined(j + 3, i + 3) = covmatvertex(i, j);
+    }
+  }
+
+  TMatrixDSym covmatCart(4);
+  covmatCart = covmatcombined.Similarity(jacobiMatrix);
   return covmatCart;
 }
 
 // -----------------------------------------------------------------------------
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo,
-    float scale)
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
-  return GetCovarianceMatrix7x7FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix(), hypo, scale);
+  return GetCovarianceMatrix7x7FromCluster(cluster, GetIPPositionCovarianceMatrix(), hypo,
+                                           jacobiMatrix);
 }
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale)
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster,
+    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, const TMatrixD& jacobiMatrix)
 {
-
-  TMatrixDSym covmat4x4 = GetCovarianceMatrix4x4FromCluster(cluster, vertex, covmatvertex, hypo, scale);
+  TMatrixDSym covmat4x4 = GetCovarianceMatrix4x4FromCluster(cluster, covmatvertex, hypo, jacobiMatrix);
 
   TMatrixDSym covmatCart(7);
 

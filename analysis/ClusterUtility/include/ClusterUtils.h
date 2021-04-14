@@ -55,32 +55,46 @@ namespace Belle2 {
      * @return const four momentum vector
      */
     const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
+    /**
+     * Returns 4x6 Jacobi matrix (px, py, pz, E)
+     * @return const TMatrixDSym
+     */
+    const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+
+    /**
+     * Returns 4x6 Jacobi matrix (px, py, pz, E)
+     * @return const TMatrixDSym
+     */
+    const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const TVector3& vertex,
+                                                 ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, float scale);
+    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale);
+    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster,
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo,
+                                                        const TMatrixD& jacobiMatrix);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, float scale);
+    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo, float scale);
+    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster,
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo,
+                                                        const TMatrixD& jacobiMatrix);
 
     /**
      * Returns default IP position from beam parameters
@@ -94,6 +108,12 @@ namespace Belle2 {
      */
     const TMatrixDSym GetIPPositionCovarianceMatrix();
 
+    /**
+     * Returns Jacobian matrix
+     * @return const TMatrixDSym
+     */
+    //const TMatrixD GetJacobiMatrix();
+    const TMatrixD jacobiMatrix;
   private:
 
     DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */

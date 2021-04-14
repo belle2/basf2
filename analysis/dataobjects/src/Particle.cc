@@ -261,10 +261,15 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   // Get covariance matrix of IP distribution.
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
+  // Set Jacobi matrix.
+  TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(eclCluster, clustervertex,
+                                                    getECLClusterEHypothesisBit());
+  storeJacobiMatrix(jacobi);
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
-                              getECLClusterEHypothesisBit(), m_momentumScale);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertexcovmat,
+                              getECLClusterEHypothesisBit(), jacobi);
   storeErrorMatrix(clustercovmat);
+
 }
 
 
@@ -380,6 +385,20 @@ void Particle::setMomentumVertexErrorMatrix(const TMatrixFSym& m)
     return;
   }
   storeErrorMatrix(m);
+
+}
+
+
+void Particle::setJacobiMatrix(const TMatrixF& m)
+{
+  // check if provided Jacobi Matrix is of dimension 4x6
+  // if not, reset the error matrix and print warning
+  if (m.GetNrows() != 4 || m.GetNcols() != 6) {
+    resetJacobiMatrix();
+    B2WARNING("Jacobi Matrix is not 4x6 ");
+    return;
+  }
+  storeJacobiMatrix(m);
 }
 
 
@@ -1007,6 +1026,12 @@ void Particle::resetErrorMatrix()
     i = 0.0;
 }
 
+void Particle::resetJacobiMatrix()
+{
+  for (float& i : m_jacobiMatrix)
+    i = 0.0;
+}
+
 void Particle::storeErrorMatrix(const TMatrixFSym& m)
 {
   int element = 0;
@@ -1016,6 +1041,23 @@ void Particle::storeErrorMatrix(const TMatrixFSym& m)
       element++;
     }
   }
+}
+
+void Particle::storeJacobiMatrix(const TMatrixF& m)
+{
+  int element = 0;
+  for (int irow = 0; irow < 4; irow++) {
+    for (int icol = irow; icol < 6; icol++) {
+      if (icol != 0 && irow != 3) {
+        m_jacobiMatrix[element] = m(irow, icol);// * m_momentumScale;
+      } else {
+        m_jacobiMatrix[element] = m(irow, icol);
+      }
+      //m_jacobiMatrix[element] = m(irow, icol);
+      element++;
+    }
+  }
+
 }
 
 

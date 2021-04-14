@@ -43,6 +43,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
   std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*[3]*[3]*x - [2]*[3]*x*x + [2]*x*x*x/3", -10,
                                     80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
+  // apply parameter limits to be monotonic. upper limits are loose.
   pol3->SetParLimits(1, 0, 100);
   pol3->SetParLimits(2, 0, 0.1);
 
@@ -105,6 +106,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
+          // set initial value for d, which is quadratic in the formula.
           pol3->SetParameter(3, 40);
           TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
           double par[4];
@@ -113,7 +115,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           // double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
           // timeCal->set_current(2);
-          timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
+          timeCal->set_pol3parameters(par[0], par[1] + par[2]*par[3]*par[3], -par[2]*par[3], par[2] / 3);
           payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
           f->cd();
           hEventT0->Write();

@@ -86,7 +86,11 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "file cache size in Mbytes. If negative, use root default", 0);
 
   addParam("discardErrorEvents", m_discardErrorEvents,
-           "Discard events with an error flag != 0", true);
+           "Discard events with an error flag != 0", m_discardErrorEvents);
+  addParam("silentErrrorDiscardMask", m_discardErrorMask,
+           "Bitmask of error flags to silently discard without raising a WARNING. Should be a combination of the ErrorFlags defined "
+           "in the EventMetaData. No Warning will be issued when discarding an event if the error flag consists exclusively of flags "
+           "present in this mask", m_discardErrorMask);
 }
 
 RootInputModule::~RootInputModule() = default;
@@ -363,8 +367,10 @@ void RootInputModule::event()
       const StoreObjPtr<EventMetaData> eventMetaData;
       errorFlag = eventMetaData->getErrorFlag();
       if (errorFlag != 0) {
-        B2WARNING("Discarding corrupted event" << LogVar("errorFlag", errorFlag) << LogVar("experiment", eventMetaData->getExperiment())
-                  << LogVar("run", eventMetaData->getRun()) << LogVar("event", eventMetaData->getEvent()));
+        if (errorFlag & ~m_discardErrorMask) {
+          B2WARNING("Discarding corrupted event" << LogVar("errorFlag", errorFlag) << LogVar("experiment", eventMetaData->getExperiment())
+                    << LogVar("run", eventMetaData->getRun()) << LogVar("event", eventMetaData->getEvent()));
+        }
         // make sure this event is not used if it's the last one in the file
         eventMetaData->setEndOfData();
       }

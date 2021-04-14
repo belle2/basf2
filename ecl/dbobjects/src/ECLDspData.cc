@@ -52,7 +52,7 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
         if (len < 0) len = i;
         packed[i / values_packed] |= val << (value_bits * (i % values_packed));
       } else {
-        if (len >= 0) {
+        if (len >= 0 && len < i) {
           dst[len++] = dst[i];
         }
         packed[i / values_packed] |= short(value_max) << (value_bits * (i % values_packed));

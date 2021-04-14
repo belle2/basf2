@@ -351,6 +351,3 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
             B0_list.append("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID))
 
         self.SkimLists = B0_list
-
-    def validation_histograms(self, path):
-        pass

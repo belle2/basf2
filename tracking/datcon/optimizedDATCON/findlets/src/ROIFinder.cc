@@ -33,7 +33,7 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_param_calculateROI,
-                                "Calculate PXDIntercepts and ROIs based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
+                                "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
                                 m_param_calculateROI);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"),
@@ -52,6 +52,16 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toleranceZ"), m_param_toleranceZ,
                                 "Allowed tolerance in z (in cm) (for ROI calculation in v direction). If the intercept is within this range of the active region of a sensor, an intercept is created.",
                                 m_param_toleranceZ);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radusCorrectionFactor"), m_param_radusCorrectionFactor,
+                                "Correct charge-dependent bias of the extrapolated hit with radusCorrectionFactor * trackCharge / trackRadius.",
+                                m_param_radusCorrectionFactor);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sinPhiCorrectionFactor"), m_param_sinPhiCorrectionFactor,
+                                "Correct sin(trackPhi) dependent bias with sinPhiCorrectionFactor * sin(trackPhi).",
+                                m_param_sinPhiCorrectionFactor);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosPhiCorrectionFactor"), m_param_cosPhiCorrectionFactor,
+                                "Correct cos(trackPhi) dependent bias with cosPhiCorrectionFactor * cos(trackPhi).",
+                                m_param_cosPhiCorrectionFactor);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeUL1"), m_param_minimumROISizeUL1,
                                 "Minimum ROI size (in pixel) in u direction on L1.", m_param_minimumROISizeUL1);
@@ -179,11 +189,6 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         // coordinate system defined by the (rotated) line perpendicular
         // to the sensor (with length sensorPerpRadius)
         double relTrackCenterPhi = 0;
-//         if (trackCharge == +1) {
-//           relTrackCenterPhi = trackPhi - M_PI_2 - sensorPhi;
-//         } else if (trackCharge == -1) {
-//           relTrackCenterPhi = trackPhi + M_PI_2 - sensorPhi;
-//         }
         if (trackCharge == -1) {
           relTrackCenterPhi = trackPhi - M_PI_2 - sensorPhi;
         } else if (trackCharge == +1) {
@@ -197,8 +202,16 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         const double ytmp     = sqrt(trackRadius * trackRadius - (x - xCenter) * (x - xCenter));
         const double yplus    = yCenter + ytmp;
         const double yminus   = yCenter - ytmp;
-        const double localUPositionPlus   = yplus  - m_const_shiftY;
-        const double localUPositionMinus  = yminus - m_const_shiftY;
+//         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
+//         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
+// // //         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// // //         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// // //         const double correctionterm = 0.;//(m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// //         const double correctionterm = (trackCharge * sin(trackPhi) > 0) ? (-m_param_radusCorrectionFactor * fabs(trackCharge * sin(trackPhi)) / trackRadius) : 0.;
+        const double correctionterm = (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(
+                                        trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
+        const double localUPositionPlus   = yplus  - m_const_shiftY + correctionterm;
+        const double localUPositionMinus  = yminus - m_const_shiftY + correctionterm;
         const double toleranceRPhi = m_param_tolerancePhi * sensorPerpRadius;
 
         // if the hit for sure is out of reach of the current ladder, continue

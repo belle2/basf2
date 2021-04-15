@@ -54,6 +54,9 @@ namespace Belle2 {
     void beginEvent() override;
 
   private:
+    /// Calculate ROI in this findlet?
+    bool m_param_calculateROI = true;
+
     // StoreArrays
     /// Name of the PXDIntercepts StoreArray
     std::string m_param_storePXDInterceptsName = "DATCONPXDIntercepts";
@@ -65,10 +68,25 @@ namespace Belle2 {
     StoreArray<ROIid> m_storeROIs;
 
 
-    /// Calculate ROI based on a simple circle extrapolation in r-phi
-    /// and a straight line extrapolation in z, theta?
-    bool m_param_calculateROI = true;
+    //  Extrapolation parameters
+    /// Allowed tolerance (in radians) phi to create intercepts per sensor
+    double m_param_tolerancePhi = 0.15;
+    /// Allowed tolerance (in cm) in z to create intercepts per sensor
+    double m_param_toleranceZ = 0.5;
 
+    //  The etrapolation has two charge dependent biases:
+    //  a) the residuals show a ~1/R bias, that is larger for low pT = small track radii
+    //  b) the residuals show a larger sin(phi) and a smaller cos(phi modulation)
+    //  Both of these can be corrected for
+    /// Correction factor for radial bias: factor * charge / radius
+    double m_param_radusCorrectionFactor = 3.0;
+    /// Correction factor for the sin(phi) modulation
+    double m_param_sinPhiCorrectionFactor = 0.05;
+    /// Correction factor for the cos(phi) modulation
+    double m_param_cosPhiCorrectionFactor = 0.02;
+
+
+    //  ROI calculation parameters
     /// Minimum size of ROI in u-direction on L1
     double m_param_minimumROISizeUL1 = 40;
     /// Minimum size of ROI in v-direction on L1
@@ -90,16 +108,12 @@ namespace Belle2 {
     /// Multiplier term for v-direction on L2
     double m_param_multiplierVL2 = 0.5;
 
-    /// allowed tolerance (in radians) phi to create intercepts per sensor
-    double m_param_tolerancePhi = 0.15;
-    /// allowed tolerance (in cm) in z to create intercepts per sensor
-    double m_param_toleranceZ = 0.5;
-
     /// maximum ROI size in u
     unsigned short m_param_maximumROISizeU = 120;
     /// maximum ROI size in v
     unsigned short m_param_maximumROISizeV = 120;
 
+    //  Constants used during extrapolation to PXD and ROI calculation
     // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
     /// Shift of the center of the active area of each sensor in a ladder of layer 1
     /// For use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ

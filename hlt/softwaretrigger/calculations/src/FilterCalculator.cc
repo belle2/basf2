@@ -16,6 +16,7 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <numeric>
+#include <stdexcept>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

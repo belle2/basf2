@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-A test of the ECL variables using the latest mDST test file from the mdst package.
-
-.. note::
-   Please update the print out of this test when the new mDST test file is released.
-
+A test of the ECL variables using a recently produced mDST file.
+The mDST file contains 3 B0 -> [ J/psi -> mu+ mu- ] [ K_S0 -> pi+ pi- ] events, BGx0.
 """
 
 import b2test_utils
@@ -17,7 +14,7 @@ import basf2 as b2
 b2test_utils.configure_logging_for_tests()
 b2.set_random_seed("1337")
 
-testinput = [b2test_utils.require_file(sorted(glob(f"{b2.find_file('mdst/tests')}/mdst-v0*.root"))[-1])]
+testinput = [b2test_utils.require_file(f"{b2.find_file('analysis/tests')}/ecl-rec-mdst-test.root")]
 
 fsps = ['gamma:all']
 
@@ -70,7 +67,7 @@ testpath.add_module('ParticleLoader', decayStrings=['pi+:all'])
 
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStrings=[fsp])
-
+    testpath.add_module('ParticleSelector', decayString=fsp, cut='isFromKLM < 1')
     testpath.add_module('ParticlePrinter', listName=fsp, fullPrint=False,
                         variables=ecl_vars)
 b2.process(testpath, 1)

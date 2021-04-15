@@ -14,6 +14,8 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 namespace Belle2 {
   class VxdID;
@@ -81,6 +83,9 @@ namespace Belle2 {
     /// @param lastIndexY y-index of the last cell checked
     void DepthFirstSearch(uint lastIndexX, uint lastIndexY);
 
+    /// gnuplot output for debugging
+    void gnuplotoutput(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits);
+
     // Parameters
     /// Is this the intercept finder for the u-side hits (r-phi) or v-side (r-z)?
     bool m_param_isUFinder = true;
@@ -146,6 +151,23 @@ namespace Belle2 {
     uint m_clusterCount = 0;
     /// size of the current cluster
     uint m_clusterSize = 0;
+
+    /// use gnuplot output?
+    bool m_writeGnuplotOutput = false;
+    /// gnuplot HS output filename
+    std::string m_gnuplotHSOutputFileName = "HSFPGA.plt";
+    /// gnuplot HS sector output filename
+    std::string m_gnuplotHSRectOutputFileName = "HSFPGARect.plt";
+    /// gnuplot HS sector output filename
+    std::string m_gnuplotHSCoGOutputFileName = "HSFPGACoG.plt";
+    /// HS sector debug file
+    std::ofstream m_rectoutstream;
+    /// HS CoG debug file
+    std::ofstream m_cogoutstream;
+    /// color definition for the sector debug output
+    const std::string m_const_rectColor[8] = {"blue", "cyan", "green", "yellow", "orange", "violet", "skyblue", "pink"};
+    /// count HS debug rectangles
+    uint m_rectcounter = 1;
 
     /// start cell of the recursive cluster finding in the Hough Space
     std::pair<int, int> m_clusterInitialPosition = std::make_pair(0, 0);

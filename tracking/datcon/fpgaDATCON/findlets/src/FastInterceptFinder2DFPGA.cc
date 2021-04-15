@@ -14,7 +14,7 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <iostream>
+// #include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,6 +31,23 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
                                 m_param_isUFinder,
                                 "Intercept finder for u-side or v-side?",
                                 m_param_isUFinder);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeGnuplotOutput"),
+                                m_writeGnuplotOutput,
+                                "Write gnuplot debugging output to file?",
+                                m_writeGnuplotOutput);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSOutputFileName"),
+                                m_gnuplotHSOutputFileName,
+                                "Name of the gnuplot debug file.",
+                                m_gnuplotHSOutputFileName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSRectOutputFileName"),
+                                m_gnuplotHSRectOutputFileName,
+                                "Name of the gnuplot debug HS sectors file.",
+                                m_gnuplotHSRectOutputFileName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSCoGOutputFileName"),
+                                m_gnuplotHSCoGOutputFileName,
+                                "Name of the gnuplot debug cluster CoG file.",
+                                m_gnuplotHSCoGOutputFileName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
                                 m_maxRecursionLevel,
@@ -131,6 +148,13 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
   m_activeSectorArray.reserve(4096);
   m_trackCandidates.clear();
 
+  if (m_writeGnuplotOutput) {
+    m_rectcounter = 1;
+    m_rectoutstream.open(m_gnuplotHSRectOutputFileName.c_str(), std::ios::trunc);
+    m_cogoutstream.open(m_gnuplotHSCoGOutputFileName.c_str(), std::ios::trunc);
+    gnuplotoutput(hits);
+  }
+
   fastInterceptFinder2d(hits, 0, m_nAngleSectors, 0, m_nVerticalSectors, 0);
 //   for (uint y = 0; y < m_nVerticalSectors; y++) {
 //     for (uint x = 0; x < m_nAngleSectors; x++) {
@@ -167,6 +191,11 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
 
   B2DEBUG(29, "m_activeSectorArray.size: " << m_activeSectorArray.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
 
+  if (m_writeGnuplotOutput) {
+    m_rectoutstream.close();
+    m_cogoutstream.close();
+  }
+
 }
 
 void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
@@ -189,8 +218,8 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
     if (left == right) continue;
 
-//     const double& localLeft   = m_HSXLUT[left];
-//     const double& localRight  = m_HSXLUT[right];
+    const double& localLeft   = m_HSXLUT[left];
+    const double& localRight  = m_HSXLUT[right];
     const short&  sinLeft     = m_HSSinValuesLUT[left];
     const short&  cosLeft     = m_HSCosValuesLUT[left];
     const short&  sinRight    = m_HSSinValuesLUT[right];
@@ -248,6 +277,12 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
       if (layerFilter(layerHits) > 0) {
         // recursive call of fastInterceptFinder2d, until currentRecursion == m_maxRecursionLevel
         if (currentRecursion < m_maxRecursionLevel) {
+
+          m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
+                          " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
+                          m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
+          m_rectcounter++;
+
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
           m_SectorArray[localIndexY * m_nAngleSectors + localIndexX] = -layerFilter(layerHits);
@@ -298,11 +333,11 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
     DepthFirstSearch(currentCell.first, currentCell.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-      double CoGX = ((double)m_clusterCoG.first / (double)m_clusterSize + 1.0) * m_unitX + m_minimumX;
+      double CoGX = (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5) * m_unitX + m_minimumX;
       if (not m_param_isUFinder) {
-        CoGX = atan(tan(m_minimumX) + m_unitX * ((double)m_clusterCoG.first / (double)m_clusterSize) + 1.0);
+        CoGX = atan(tan(m_minimumX) + m_unitX * (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5));
       }
-      double CoGY = m_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 1.0) * m_unitY;
+      double CoGY = m_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 0.5) * m_unitY;
 
       if (m_param_isUFinder) {
         double trackPhi = CoGX + M_PI_2;
@@ -320,6 +355,10 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
       B2DEBUG(29, "m_clusterCoG.first: " << m_clusterCoG.first << " " << ((double)m_clusterCoG.first / (double)m_clusterSize) <<
               " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) << " CoGX: " << CoGX
               << " CoGY: " << CoGY);
+
+      if (m_writeGnuplotOutput) {
+        m_cogoutstream << CoGX << " " << CoGY << std::endl;
+      }
     }
     m_clusterCount++;
   }
@@ -355,4 +394,54 @@ void FastInterceptFinder2DFPGA::DepthFirstSearch(uint lastIndexX, uint lastIndex
       }
     }
   }
+}
+
+void FastInterceptFinder2DFPGA::gnuplotoutput(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits)
+{
+  std::ofstream hsoutstream;
+  hsoutstream.open(m_gnuplotHSOutputFileName.c_str(), std::ios::trunc);
+
+  hsoutstream << "set pointsize 1.5\nset style line 42 lc rgb '#0060ad' pt 7   # circle" << std::endl;
+
+  hsoutstream << "set style line 80 lt rgb \"#808080\"" << std::endl;
+  hsoutstream << "set style line 81 lt 0" << std::endl;
+  hsoutstream << "set style line 81 lt rgb \"#808080\"" << std::endl << std::endl;
+
+  hsoutstream << "set style line 1 lt rgb \"#A00000\" lw 1 pt 1" << std::endl;
+  hsoutstream << "set style line 2 lt rgb \"#00A000\" lw 1 pt 6" << std::endl;
+  hsoutstream << "set style line 3 lt rgb \"#000000\" lw 1 pt 6" << std::endl;
+
+  hsoutstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
+  hsoutstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
+  hsoutstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
+  hsoutstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
+
+  hsoutstream << "# Description position\nset key top right" << std::endl << std::endl;
+  hsoutstream << "# Grid and border style\nset grid back linestyle 81\nset border 3 back linestyle 80" << std::endl << std::endl;
+
+  hsoutstream << "# No mirrors\nset xtics nomirror\nset ytics nomirror" << std::endl << std::endl;
+  hsoutstream << "# Encoding\nset encoding utf8" << std::endl << std::endl;
+  hsoutstream << "set xlabel \"x\"\nset ylabel \"y\"" << std::endl << std::endl;
+
+  hsoutstream << "set xrange [-pi-0.5:pi+0.5]" << std::endl << std::endl;
+
+  hsoutstream << "load '" << m_gnuplotHSRectOutputFileName << "'" << std::endl << std::endl;
+
+  uint count = 0;
+  for (auto& hit : hits) {
+    const VxdID& id = hit.first;
+    int layer = id.getLayerNumber();
+    const long xc = 1000 * hit.second.first;
+    const long yc = 1000 * hit.second.second;
+
+    hsoutstream << "plot " << xc << " * -sin(x) + " << yc << " * cos(x) > 0 ? " << xc << " * cos(x) + " << yc <<
+                " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << std::endl;
+    if (count < hits.size() - 1) hsoutstream << "re";
+    count++;
+  }
+
+  hsoutstream << std::endl;
+  hsoutstream << "replot '" << m_gnuplotHSCoGOutputFileName << "' u 1:2 w p ls 42 notitle" << std::endl << std::endl;
+  hsoutstream << "pause -1" << std::endl;
+  hsoutstream.close();
 }

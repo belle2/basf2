@@ -104,17 +104,9 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           try {
             return trg->testPsnm(name);
-          } catch (const std::runtime_error&)
+          } catch (const std::exception&)
           {
-            // No valid trigger payload in the globaltags, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::invalid_argument&)
-          {
-            // The given trigger name does not exist, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::out_of_range&)
-          {
-            // Weird, the corresponding bit number is out of range, return NaN.
+            // Something went wrong, return NaN.
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -132,18 +124,10 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg) return std::numeric_limits<float>::quiet_NaN();
           try {
-            return trg->testPsnm(name);
-          } catch (const std::runtime_error&)
+            return trg->testFtdl(name);
+          } catch (const std::exception&)
           {
-            // No valid trigger payload in the globaltags, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::invalid_argument&)
-          {
-            // The given trigger name does not exist, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::out_of_range&)
-          {
-            // Weird, the corresponding bit number is out of range, return NaN.
+            // Something went wrong, return NaN.
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -161,18 +145,10 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg) return std::numeric_limits<float>::quiet_NaN();
           try {
-            return trg->testPsnm(name);
-          } catch (const std::runtime_error&)
+            return trg->testInput(name);
+          } catch (const std::exception&)
           {
-            // No valid trigger payload in the globaltags, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::invalid_argument&)
-          {
-            // The given trigger name does not exist, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
-          } catch (const std::out_of_range&)
-          {
-            // Weird, the corresponding bit number is out of range, return NaN.
+            // Something went wrong, return NaN.
             return std::numeric_limits<float>::quiet_NaN();
           }
         };

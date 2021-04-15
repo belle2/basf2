@@ -67,7 +67,7 @@ testpath.add_module('ParticleLoader', decayStrings=['pi+:all'])
 
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStrings=[fsp])
-    testpath.add_module('ParticleSelector', decayString=fsp, cut='isFromKLM < 1')
+    testpath.add_module('ParticleSelector', decayString=fsp, cut='isFromECL')
     testpath.add_module('ParticlePrinter', listName=fsp, fullPrint=False,
                         variables=ecl_vars)
 b2.process(testpath, 1)

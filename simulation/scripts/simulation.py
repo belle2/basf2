@@ -261,6 +261,9 @@ def add_simulation(
             roi_condition_module_Bkg.if_true(path_enableROI_Bkg, b2.AfterConditionPath.CONTINUE)
             roi_condition_module_Bkg.if_false(path_disableROI_Bkg, b2.AfterConditionPath.CONTINUE)
 
+    if components is None or 'SVD' in components:
+        path.add_module("SVDZeroSuppressionEmulator")
+
     # PXD data reduction - after background overlay executor
     if components is None or 'PXD' in components:
         if forceSetPXDDataReduction:

@@ -135,7 +135,7 @@ namespace Belle2 {
           pileup = digit->addBGDigit(&bgDigit) == DigitBase::c_DontAppend;
           if (pileup) break; // BG digit merged with simulated one
         }
-        if (!pileup) digits.appendNew(bgDigit); // BG digit not merged, therefore append
+        if (!pileup) digits.appendNew(bgDigit)->modifyBGDigit(); // BG digit not merged, therefore append and possibly modify
       }
 
       // debug printout

@@ -51,9 +51,10 @@ Variables
    theme.
  * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
    :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.
-   
  * New MCTruthVariable `isBBCrossfeed` checks for crossfeed in the reconstruction of the given B meson.
-
+ * Added a new variable :b2:var:`minC2TDistID` and a metavariable :b2:var:`minC2TDistVar(var)`, which allow to call
+   any variable for the nearest track to a given photon.
+   
 Modules
 +++++++
 

@@ -12,7 +12,7 @@
 [INFO]    -> With cuts  : isFromKLM < 1
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltag is master_2020-10-06
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : gamma:all (0+5)
 [INFO]  - 9 = 22[0]

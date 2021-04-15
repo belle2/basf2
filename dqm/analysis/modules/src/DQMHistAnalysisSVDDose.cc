@@ -41,6 +41,8 @@ DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
 
 void DQMHistAnalysisSVDDoseModule::initialize()
 {
+  B2DEBUG(18, "DQMHistAnalysisSVDDose: initialize");
+
   gROOT->cd(); // Don't know why I need this, but DQMHistAnalysisSVDOnMiraBelle uses it
 
   m_monObj = getMonitoringObject("svd"); // To write to MiraBelle
@@ -108,6 +110,10 @@ void DQMHistAnalysisSVDDoseModule::event()
         nEvts += hEvts->GetEntries();
       }
 
+      B2DEBUG(19, "DQMHistAnalysisSVDDose: PV write"
+              << LogVar("group", group.nameSuffix.Data())
+              << LogVar("nEvts", nEvts) << LogVar("nHits", nHits));
+
       auto& pv = m_myPVs[g];
       double delta_nHits = nHits - pv.lastNHits;
       double delta_nEvts = nEvts - pv.lastNEvts;
@@ -128,6 +134,8 @@ void DQMHistAnalysisSVDDoseModule::event()
 
 void DQMHistAnalysisSVDDoseModule::endRun()
 {
+  B2DEBUG(18, "DQMHistAnalysisSVDDose: endRun");
+
   // EPICS: reset the counters used for the delta computation
   for (auto& pv : m_myPVs)
     pv.lastNEvts = pv.lastNHits = 0.0;
@@ -148,6 +156,10 @@ void DQMHistAnalysisSVDDoseModule::endRun()
       nEvts += hEvts->GetEntries();
     }
 
+    B2DEBUG(19, "DQMHistAnalysisSVDDose: MonObj write"
+            << LogVar("group", group.nameSuffix.Data())
+            << LogVar("nEvts", nEvts) << LogVar("nHits", nHits));
+
     double occ = nEvts ? (nHits / nEvts * 100.0 / group.nStrips) : -1.0;
     // TODO is this the best name for the MonitoringObject variable?
     TString vName = group.nameSuffix + "OccPoisAvg"; // e.g. L3XXUOccPoisAvg
@@ -159,6 +171,8 @@ void DQMHistAnalysisSVDDoseModule::endRun()
 
 void DQMHistAnalysisSVDDoseModule::updateCanvases()
 {
+  B2DEBUG(18, "DQMHistAnalysisSVDDose: updating canvases");
+
   for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
     const auto& group = c_sensorGroups[g];
 

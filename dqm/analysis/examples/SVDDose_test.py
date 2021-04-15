@@ -14,14 +14,16 @@ parser.add_argument("-n", "--nevt", type=int, default=1, help="Events per file")
 args = parser.parse_args()
 
 main = b2.create_path()
-# Input histograms from file(s)
+# Input histograms from file(s). This is the module doing the scaling.
 main.add_module(
   'DQMHistAnalysisInputRootFile', SelectHistograms=['SVDDose*'],
   FileList=args.files, RunList=[args.run] * len(args.files),
-  EventList=[args.nevt] * len(args.files), Experiment=args.exp,
+  EventsList=[args.nevt] * len(args.files), Experiment=args.exp,
   EventInterval=1, NullHistogramMode=False, AutoCanvas=False)
 # Analysis module
-main.add_module('DQMHistAnalysisSVDDose')
+main.add_module(
+  'DQMHistAnalysisSVDDose', logLevel=b2.LogLevel.DEBUG, debugLevel=19,
+  epicsUpdateSeconds=2)
 # Output canvases to root file
 main.add_module(
   'DQMHistAnalysisOutputFile', SaveHistos=False, SaveCanvases=True,

@@ -28,38 +28,35 @@ namespace Belle2 {
     /**
      * default constructor
      */
-    TOPLikelihood(): m_flag(0), m_numPhot(0), m_estBkg(0)
-    {
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_logL[i] = 0;
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_estPhot[i] = 0;
-    }
+    TOPLikelihood()
+    {}
 
     /**
-     * full constructor
-     * @param flag reconstruction flag
-     * @param numPhot number of detected photons
-     * @param logL log likelihoods in the order of Const::ChargedStableSet
-     * @param estPhot estimated number of photons in the order of Const::ChargedStableSet
-     * @param estBkg estimated number of background photons
+     * Sets reconstruction flag
+     * @param reconstruction flag: 1 = OK, 0 = out of acceptance, -1 = error in reconstruction
      */
-    TOPLikelihood(int flag,
-                  int numPhot,
-                  const double* logL,
-                  const double* estPhot,
-                  double estBkg)
+    void setFlag(int flag) {m_flag = flag;}
+
+    /**
+     * Sets other data members for a given particle hypothesis
+     * @param part particle hypothesis
+     * @param numPhot number of measured photons
+     * @param logL log likelihood
+     * @param estPhot expected number of photons (including background)
+     * @param estBkg expected number of background hits
+     */
+    void set(const Const::ChargedStable& part, int numPhot, double logL, double estPhot, double estBkg)
     {
-      m_flag = flag;
+      auto i = part.getIndex();
       m_numPhot = numPhot;
+      m_logL[i] = logL;
+      m_estPhot[i] = estPhot;
       m_estBkg = estBkg;
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
-        m_logL[i] = logL[i];
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
-        m_estPhot[i] = estPhot[i];
     }
 
     /**
      * Return reconstruction flag
-     * @return reconstruction flag: 1=OK, 0=out of acceptance, -1=inside gap btw. bars
+     * @return reconstruction flag: 1 = OK, 0 = out of acceptance, -1 = error in reconstruction
      */
     int getFlag() const {return m_flag;}
 
@@ -156,11 +153,11 @@ namespace Belle2 {
     double getNphot_p() const {return m_estPhot[Const::proton.getIndex()];}
 
   private:
-    int m_flag;     /**< reconstruction flag */
-    int m_numPhot;  /**< number of photons */
-    float m_logL[Const::ChargedStable::c_SetSize];    /**< log likelihoods */
-    float m_estPhot[Const::ChargedStable::c_SetSize]; /**< estimated number of photons */
-    float m_estBkg; /**< estimated background */
+    int m_flag = 0;     /**< reconstruction flag */
+    int m_numPhot = 0;  /**< number of photons */
+    float m_logL[Const::ChargedStable::c_SetSize] = {0};    /**< log likelihoods */
+    float m_estPhot[Const::ChargedStable::c_SetSize] = {0}; /**< estimated number of photons */
+    float m_estBkg = 0; /**< estimated background */
 
     ClassDef(TOPLikelihood, 2); /**< ClassDef */
 

@@ -16,6 +16,7 @@
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 #include <map>
@@ -26,7 +27,6 @@ namespace Belle2 {
 
   class Track;
   class ExtHit;
-  class MCParticle;
   class TOPBarHit;
 
   namespace TOP {
@@ -204,6 +204,16 @@ namespace Belle2 {
        * @return MC particle or NULL pointer
        */
       const MCParticle* getMCParticle() const {return m_mcParticle;}
+
+      /**
+       * Returns PDG code of associated MCParticle (returns 0 if none)
+       * @return PDG code or 0
+       */
+      int getPDGCode() const
+      {
+        if (m_mcParticle) return m_mcParticle->getPDG();
+        return 0;
+      }
 
       /**
        * Returns bar hit of MC particle assigned to this track (if any)

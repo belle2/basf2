@@ -6,10 +6,10 @@ from SCons.Action import Action
 # Perform debug info splitting according to the GDB manual's guidelines
 # https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
 split_debug_action = Action(
-    'objcopy ${STRIP_EXTRA_ARGUMENTS} --only-keep-debug ${TARGET} ${TARGET.file}.debug && '
-    'objcopy --add-gnu-debuglink ${TARGET.file}.debug ${TARGET} && '
-    'mv ${TARGET.file}.debug {TARGET.dir}/.debug/${TARGET.file}.debug && '
-    'objcopy --strip-debug --strip-unneeded ${STRIP_EXTRA_ARGUMENTS} ${TARGET}',
+    'objcopy ${STRIP_EXTRA_ARGUMENTS} --only-keep-debug ${TARGET.file} ${TARGET.file}.debug && '
+    'objcopy --add-gnu-debuglink ${TARGET.file}.debug ${TARGET.file} && '
+    'mv ${TARGET.file}.debug .debug/${TARGET.file}.debug && '
+    'objcopy --strip-debug --strip-unneeded ${STRIP_EXTRA_ARGUMENTS} ${TARGET.file}',
     "${STRIPCOMSTR}", chdir=True)
 
 strip_debug_action = Action(

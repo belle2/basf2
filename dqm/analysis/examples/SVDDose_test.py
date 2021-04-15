@@ -3,8 +3,10 @@
 import argparse
 import basf2 as b2
 
-parser = argparse.ArgumentParser()
-# TODO capire come conviene usare questi argomenti per chiamare più volte event()
+parser = argparse.ArgumentParser(
+  epilog="About nevt: when asking N events per file, the histograms from that "
+         "file are sent multiple times to the analysis module. Each time, they "
+         "are scaled by i/N, where i is the iteration number.")
 parser.add_argument("files", nargs="+", help="Input root files with histograms")
 parser.add_argument("-e", "--exp", type=int, default=1, help="Experiment number")
 parser.add_argument("-r", "--run", type=int, default=1, help="Run number")

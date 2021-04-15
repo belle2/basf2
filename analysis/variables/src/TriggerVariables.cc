@@ -31,6 +31,9 @@
 // boost
 #include <boost/algorithm/string.hpp>
 
+// C++
+#include <stdexcept>
+
 namespace Belle2 {
   namespace {
     /**
@@ -97,8 +100,23 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
-          if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testPsnm(name);
+          if (!trg)
+            return std::numeric_limits<float>::quiet_NaN();
+          try {
+            return trg->testPsnm(name);
+          } catch (const std::runtime_error&)
+          {
+            // No valid trigger payload in the globaltags, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::invalid_argument&)
+          {
+            // The given trigger name does not exist, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::out_of_range&)
+          {
+            // Weird, the corresponding bit number is out of range, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          }
         };
         return func;
       } else {
@@ -113,7 +131,21 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testFtdl(name);
+          try {
+            return trg->testPsnm(name);
+          } catch (const std::runtime_error&)
+          {
+            // No valid trigger payload in the globaltags, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::invalid_argument&)
+          {
+            // The given trigger name does not exist, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::out_of_range&)
+          {
+            // Weird, the corresponding bit number is out of range, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          }
         };
         return func;
       } else {
@@ -128,7 +160,21 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testInput(name);
+          try {
+            return trg->testPsnm(name);
+          } catch (const std::runtime_error&)
+          {
+            // No valid trigger payload in the globaltags, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::invalid_argument&)
+          {
+            // The given trigger name does not exist, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          } catch (const std::out_of_range&)
+          {
+            // Weird, the corresponding bit number is out of range, return NaN.
+            return std::numeric_limits<float>::quiet_NaN();
+          }
         };
         return func;
       } else {

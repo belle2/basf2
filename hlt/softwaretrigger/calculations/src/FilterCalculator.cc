@@ -162,11 +162,17 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     } catch (const std::exception&) {
       bha3d = false;
     }
-    bool bhapur;
+    bool bhapurPsnm;
     try {
-      bhapur = m_l1Trigger->testPsnm("bhapur");
+      bhapurPsnm = m_l1Trigger->testPsnm("bhapur");
     } catch (const std::exception&) {
-      bhapur = false;
+      bhapurPsnm = false;
+    }
+    bool bhapurFtdl;
+    try {
+      bhapurFtdl = m_l1Trigger->testFtdl("bhapur");
+    } catch (const std::exception&) {
+      bhapurFtdl = false;
     }
     bool lml1;
     try {
@@ -175,8 +181,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       lml1 = false;
     }
     calculationResult["bha3d"] = bha3d;
-    calculationResult["bhapur"] = bhapur;
-    calculationResult["bhapur_lml1"] = lml1 and bhapur;
+    calculationResult["bhapur"] = bhapurPsnm;
+    calculationResult["bhapur_lml1"] = lml1 and bhapurFtdl;
   } else {
     calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
     calculationResult["l1_trigger_delayed_bhabha"] = 0;

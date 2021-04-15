@@ -117,9 +117,8 @@ void FastInterceptFinder2DSimple::initialize()
     m_HSYLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i;
     m_HSYCenterLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
-  B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize << " unitX: "
-          << m_unitX <<
-          " unitY: " << m_unitY);
+  B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize <<
+          " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
 
 

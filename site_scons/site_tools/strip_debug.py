@@ -5,12 +5,17 @@ from SCons.Action import Action
 
 # Perform debug info splitting according to the GDB manual's guidelines
 # https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
+#
+# Cannot use scons' chdir feature because it doesn't work in parallel builds
+# (working directory is a global variable that is shared by all threads)
+#
 split_debug_action = Action(
+    'cd ${TARGET.dir} && '
     'objcopy ${STRIP_EXTRA_ARGUMENTS} --only-keep-debug ${TARGET.file} ${TARGET.file}.debug && '
     'objcopy --add-gnu-debuglink ${TARGET.file}.debug ${TARGET.file} && '
     'mv ${TARGET.file}.debug .debug/${TARGET.file}.debug && '
     'objcopy --strip-debug --strip-unneeded ${STRIP_EXTRA_ARGUMENTS} ${TARGET.file}',
-    "${STRIPCOMSTR}", chdir=True)
+    "${STRIPCOMSTR}", chdir=False)
 
 strip_debug_action = Action(
     'objcopy --strip-debug --strip-unneeded ${STRIP_EXTRA_ARGUMENTS} ${TARGET}',

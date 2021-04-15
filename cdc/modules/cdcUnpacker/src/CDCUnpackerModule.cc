@@ -67,7 +67,7 @@ CDCUnpackerModule::~CDCUnpackerModule()
 
 void CDCUnpackerModule::initialize()
 {
-
+  m_eventNum = 0;
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
     //    B2INFO("Channel map is  valid");
@@ -347,9 +347,15 @@ void CDCUnpackerModule::event()
             }
 
             if (!((length == 4) || (length == 5))) {
-              B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
-              B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
-              B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+              if (m_eventNum % 10000 == 0) {
+                B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
+                B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
+                B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+              } else {
+                B2WARNING("CDCUnpacker : data length should be 4 or 5 words.");
+                B2WARNING("CDCUnpacker : length " << LogVar("data length", length) << " words.");
+                B2WARNING("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+              }
               it += length;
               break;
             }
@@ -446,6 +452,7 @@ void CDCUnpackerModule::event()
       hit.setTDCCount(static_cast<unsigned short>(tdc));
     }
   }
+  m_eventNum++;
 }
 
 void CDCUnpackerModule::endRun()

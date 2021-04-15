@@ -314,7 +314,7 @@ version to use.
     (we allow only ``[^a-zA-Z0-9+-_]``).
 
 
-Once located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input with
+Once you located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input
 with the flag ``-i``.
 
 .. note::

@@ -20,6 +20,7 @@
 #include <TSpline.h>
 #include <algorithm>
 #include <set>
+#include <cmath>
 
 using namespace std;
 
@@ -954,7 +955,36 @@ namespace Belle2 {
       return out;
     }
 
+    double TOPGeometryPar::refractiveIndex(double lambda) const
+    {
+      // parameters of SellMeier equation (Matsuoka-san, 24.11.2018)
+      // from the specs of Corning HPFS 7980
+      // https://www.corning.com/media/worldwide/csm/documents/5bf092438c5546dfa9b08e423348317b.pdf
+      double b[] = {0.683740494, 0.420323613, 0.585027480};
+      double c[] = {0.00460352869, 0.0133968856, 64.4932732};
 
+      double x = pow(lambda * 0.001, 2);
+      double y = 1;
+      for (int i = 0; i < 3; i++) {
+        y += b[i] * x / (x - c[i]);
+      }
+      return sqrt(y);
+    }
+
+    double TOPGeometryPar::getPhaseIndex(double energy) const
+    {
+      double lambda = c_hc / energy;
+      return refractiveIndex(lambda);
+    }
+
+    double TOPGeometryPar::getGroupIndex(double energy) const
+    {
+      double lambda = c_hc / energy;
+      double dl = 1.0; // [nm]
+      double n = refractiveIndex(lambda);
+      double dndl = (refractiveIndex(lambda + dl / 2) - refractiveIndex(lambda - dl / 2)) / dl;
+      return n / (1 + lambda / n * dndl);
+    }
 
   } // End namespace TOP
 } // End namespace Belle2

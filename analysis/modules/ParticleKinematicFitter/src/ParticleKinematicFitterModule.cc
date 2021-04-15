@@ -13,14 +13,12 @@
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
-#include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
 #include <analysis/OrcaKinFit/OPALFitterGSL.h>
 #include <analysis/OrcaKinFit/JetFitObject.h>
 #include <analysis/OrcaKinFit/NewtonFitterGSL.h>
 #include <analysis/OrcaKinFit/NewFitterGSL.h>
 #include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 
@@ -35,13 +33,8 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-// CLHEP
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/LorentzVector.h>
-
 using namespace CLHEP;
 using namespace std;
-//using namespace OrcaKinFit;
 
 namespace Belle2 {
   namespace OrcaKinFit {
@@ -107,7 +100,6 @@ namespace Belle2 {
       unsigned int n = m_plist->getListSize();
 
       for (unsigned i = 0; i < n; i++) {
-//       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
         Particle* particle = m_plist->getParticle(i);
 
         if (m_updateDaughters == true) {
@@ -190,7 +182,7 @@ namespace Belle2 {
       int debugfitter = 0;
       if (m_debugFitter) debugfitter = m_debugFitterLevel;
 
-      // choos eminimization
+      // choose minimization
       if (m_orcaFitterEngine == "OPALFitterGSL") {
         pfitter = new OPALFitterGSL(); // OPAL fitter has no debugger
       } else if (m_orcaFitterEngine == "NewtonFitterGSL") {
@@ -283,6 +275,7 @@ namespace Belle2 {
       }
 
       delete pfitter;
+      delete m_textTracer;
       return true;
     }
 
@@ -648,7 +641,7 @@ namespace Belle2 {
             } else {
               B2FATAL("ParticleKinematicFitterModule:   no fitObject could be used to update the daughter!");
             }
-            TVector3 pos          = allparticles[iDaug]->getVertex(); // we dont update the vertex yet
+            TVector3 pos          = allparticles[iDaug]->getVertex(); // we don't update the vertex yet
             TMatrixFSym errMatrix = allparticles[iDaug]->getMomentumVertexErrorMatrix();
             TMatrixFSym errMatrixMom = allparticles[iDaug]->getMomentumErrorMatrix();
             TMatrixFSym errMatrixVer = allparticles[iDaug]->getVertexErrorMatrix();
@@ -667,7 +660,7 @@ namespace Belle2 {
 
         return true;
       } else {
-        B2ERROR("updateOrcaKinFitDaughters: Cannot update daughters, mismatch betwen number of daughters and number of fitobjects!");
+        B2ERROR("updateOrcaKinFitDaughters: Cannot update daughters, mismatch between number of daughters and number of fitobjects!");
         return false;
       }
 

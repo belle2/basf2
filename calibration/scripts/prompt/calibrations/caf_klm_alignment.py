@@ -6,7 +6,7 @@ import collections
 
 import basf2
 from caf.utils import ExpRun, IoV
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from prompt.utils import events_in_basf2_file
 
 ##############################
@@ -32,12 +32,21 @@ settings = CalibrationSettings(name="KLM alignmnent",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],
+                               input_data_filters={
+                                   'raw_physics': [input_data_filters['Run Type']['physics'],
+                                                   input_data_filters['Data Tag']['mumutight_calib'],
+                                                   input_data_filters['Data Quality Tag']['Good Or Recoverable']],
+                                   'raw_cosmic': [input_data_filters['Run Type']['physics'],
+                                                  input_data_filters['Data Tag']['cosmic_calib'],
+                                                  input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+                               },
                                depends_on=[vxdcdc_alignment],
                                expert_config={
-                                    "required_events": 5000000,
-                                    "required_events_experiment": 500000,
-                                    "events_per_file": 1000,
-                                    "millepede_entries": 1000000
+                                   "required_events": 5000000,
+                                   "required_events_experiment": 500000,
+                                   "events_per_file": 1000,
+                                   "millepede_entries": 1000000,
+                                   "millepede_entries_exp7": 500000
                                })
 
 
@@ -243,7 +252,7 @@ def get_calibrations(input_data, **kwargs):
         index.increment()
 
     cal_klm = millepede.create('KLMAlignment', [])
-    millepede.algo.setMinEntries(expert_config["millepede_entries"])
+    # Number of entries is set in algorithm strategy now.
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
 
@@ -285,7 +294,7 @@ def get_calibrations(input_data, **kwargs):
     #####
     # Algorithm step config
 
-    from caf.strategies import SequentialRunByRun
+    from klm_alignment import KLMAlignment
 
     cal_klm.algorithms = [millepede.algo]
 
@@ -295,8 +304,13 @@ def get_calibrations(input_data, **kwargs):
         fix_mille_paths_for_algo(algorithm)
 
     for algorithm in cal_klm.algorithms:
-        algorithm.strategy = SequentialRunByRun
-        algorithm.params = {"iov_coverage": output_iov}
+        algorithm.strategy = KLMAlignment
+        algorithm.params = {
+            "has_experiment_settings": True,
+            "iov_coverage": output_iov,
+            "millepede_entries": expert_config["millepede_entries"],
+            "millepede_entries_exp7": expert_config["millepede_entries_exp7"]
+        }
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]

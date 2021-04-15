@@ -126,6 +126,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     validation_module = get_validation_module(args)       
     current_directory = Path().absolute()
     script_name = validation_config["validation_script"]
+    script_path = basf2.find_file(f'{prompt_validation_script_dir}/{script_name}')
 
     # Now we set the backend that will be used globally.
     backend_args = validation_config.get("backend_args", None)
@@ -135,13 +136,32 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     B2INFO("Getting values for 'expert_config' from the prompt script.")
     expert_config = validation_module.settings.expert_config   # set to be the default from the script
     # If we have values in the validation_config we merge/overwrite with the default
-    if "expert_config" in validation_config:
-        # Overwrite/merge the default Validation Settings with JSON
+    try:
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
         expert_config = {**expert_config, **validation_config["expert_config"]}
-
+    except:
+        B2ERROR("Expert config must be a dictionary! E.g. {'my_var': 42}")
+        exit() 
+        
+    if "requested_iov" in validation_config:
+        # Overwrite/merge the default Validation Settings with JSON
+        if isinstance(validation_config["requested_iov"], list):
+            if len(validation_config["requested_iov"]) != 4:
+                B2ERROR('request_iov list must have 4 elements! E.g. [10,0,10,300]')
+                exit() 
+            else:
+                requested_iov = validation_config.get("requested_iov")
+        else:
+            B2ERROR("requested_iov must be a list! E.g. [10,0,10,300]") 
+            exit() 
+    else:
+        requested_iov = None
+        
+    job_path = validation_config.get('job_path', None)
+    input_data_path=validation_config.get('input_data_path', None)
+    
     validation_result_path = Path(current_directory, 'validation_results', 'validations')
-
+    
     try:
         validation_result_path.mkdir(parents=True)
     except FileExistsError as e:
@@ -159,10 +179,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     # Output directory, where the stdout and stderr will be sent.
     job.output_dir = validation_result_path
     # The command we want to run
-    module_name = prompt_validation_script_package + Path(script_name).stem
-    job_path = validation_config.get('job_path', None)
-    input_data_path=validation_config.get('input_data_path', None)
-    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f"{job_path} {input_data_path} {expert_config}"]
+    job.cmd = ["basf2", f"{script_path}", f'{job_path} {input_data_path} {requested_iov} "{expert_config}"']
     job.append_current_basf2_setup_cmds()
     return [job]
 
@@ -187,7 +204,6 @@ def get_argparser():
                            )
 
         subparser.set_defaults(overwrite_workdir=False)
-        subparser.set_defaults(expert_config={})
 
     return parser
 

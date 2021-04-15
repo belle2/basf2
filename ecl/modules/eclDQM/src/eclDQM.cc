@@ -45,6 +45,7 @@
 //STL
 #include <iostream>
 #include <iterator>
+#include <cmath>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -97,6 +98,7 @@ void ECLDQMModule::defineHisto()
 
   h_quality = new TH1F("quality", "Fit quality flag. 0-good, 1-integer overflow, 2-low amplitude, 3-bad chi2", 4, 0, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
+  h_quality->GetYaxis()->SetTitle("ECL hits count");
   h_quality->SetFillColor(kPink - 4);
   h_quality->SetOption("LIVE");
 
@@ -107,17 +109,27 @@ void ECLDQMModule::defineHisto()
 
   h_bad_quality = new TH1F("bad_quality", "Fraction of hits with bad chi2 (qual=3) and E > 1 GeV vs Cell ID", 8736, 1, 8737);
   h_bad_quality->GetXaxis()->SetTitle("Cell ID");
+  h_bad_quality->GetYaxis()->SetTitle("ECL hits count");
   h_bad_quality->SetOption("LIVE");
 
   h_trigtag1 = new TH1F("trigtag1", "Consistency b/w global event number and trigger tag. 0-good, 1-DQM error", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Flag number");
+  h_trigtag1->GetYaxis()->SetTitle("Events count");
   h_trigtag1->SetDrawOption("hist");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 
   h_adc_hits = new TH1F("adc_hits", "Fraction of high-energy hits (E > 50 MeV)", 1001, 0, 1.001);
   h_adc_hits->GetXaxis()->SetTitle("Fraction");
+  h_adc_hits->GetYaxis()->SetTitle("Events count");
   h_adc_hits->SetOption("LIVE");
+
+  h_time_crate_Thr1GeV_large = new TH1F("time_crate_Thr1GeV_large",
+                                        "Number of hits with timing outside #pm 100 ns per Crate ID (E > 1 GeV)",
+                                        52, 1, 53);
+  h_time_crate_Thr1GeV_large->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
+  h_time_crate_Thr1GeV_large->GetYaxis()->SetTitle("ECL hits count");
+  h_time_crate_Thr1GeV_large->SetOption("LIVE");
 
   for (const auto& id : m_HitThresholds) {
     std::string h_name, h_title;
@@ -280,6 +292,7 @@ void ECLDQMModule::beginRun()
   h_bad_quality->Reset();
   h_trigtag1->Reset();
   h_adc_hits->Reset();
+  h_time_crate_Thr1GeV_large->Reset();
   h_cell_psd_norm->Reset();
   std::for_each(h_cids.begin(), h_cids.end(), [](auto & it) {it->Reset();});
   std::for_each(h_edeps.begin(), h_edeps.end(), [](auto & it) {it->Reset();});
@@ -382,7 +395,8 @@ void ECLDQMModule::event()
       }
     }
 
-    if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
   }
 
   for (auto& h : h_edeps) {

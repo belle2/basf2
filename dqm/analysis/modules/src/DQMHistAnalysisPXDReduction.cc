@@ -164,6 +164,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     m_hReduction->Draw("");
     if (status != 0) {
       m_line1->SetY1(value);
+      m_line1->SetY2(value); // aka SetHorizontal
       m_line1->Draw();
     }
 //     m_line2->Draw();

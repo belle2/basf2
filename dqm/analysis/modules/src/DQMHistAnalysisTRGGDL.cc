@@ -403,7 +403,18 @@ void DQMHistAnalysisTRGGDLModule::event()
   }
   for (auto i = 0; i < nskim_gdldqm; i++) {
     double data = 0;
-    if (i == 0)data = m_h_psn_extra[i]->GetBinContent(0 + 1);
+    if (m_h_psn_extra[i] == NULL) {
+      B2INFO("Histogram/canvas named hGDL_psn_extra is not found.");
+    } else if (m_h_psn_extra[6] == NULL) {
+      B2INFO("Histogram/canvas named hGDL_psn_extra is not found.");
+    } else {
+      if (i == 0 || i == 6) {
+        data = m_h_psn_extra[i]->GetBinContent(0 + 1);
+      } else if (m_h_psn_extra[6]->GetBinContent(0 + 1) != 0) {
+        data = m_h_psn_extra[i]->GetBinContent(0 + 1) / m_h_psn_extra[6]->GetBinContent(0 + 1);
+      }
+    }
+
     if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
   }
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

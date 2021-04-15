@@ -33,8 +33,10 @@ def add_module_name(path, module, name_suffix="", **kwargs):
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("files", metavar="FILE", nargs="+",
                     help="The input rootfile(s) with the RAW data.")
-parser.add_argument("--out-file", default="SVDDQM.root",
+parser.add_argument("-o", "--out-file", default="SVDDQM.root",
                     help='The output rootfile. Default "SVDDQM.root".')
+parser.add_argument("--no-trg-filter", action="store_true",
+                    help="Take all events instead of TTYP_POIS only.")
 args = parser.parse_args()
 
 conditions.override_globaltags()
@@ -51,19 +53,23 @@ main.add_module("HistoManager", histoFileName=args.out_file)
 # Necessary modules
 main.add_module('Gearbox')
 main.add_module('Geometry')
-add_unpackers(main, components=['SVD', 'TRG'])
+if args.no_trg_filter:
+    add_unpackers(main, components=['SVD'])
+else:
+    add_unpackers(main, components=['SVD', 'TRG'])
 main.add_module(
     "SVDZeroSuppressionEmulator", SNthreshold=5,
     ShaperDigits='SVDShaperDigits', ShaperDigitsIN='SVDShaperDigitsZS5',
     FADCmode=True)
 
 # SVDDQMDose module
+params = {'trgTypes': []} if args.no_trg_filter else {}
 add_module_name(main, 'SVDDQMDose', "HERInj",
-                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInj")
+                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInj", **params)
 add_module_name(main, 'SVDDQMDose', "LERInj",
-                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInj")
+                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInj", **params)
 add_module_name(main, 'SVDDQMDose', "NoInj",
-                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInj")
+                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInj", **params)
 
 # Necessary for impatient humans :)
 main.add_module("ProgressBar")

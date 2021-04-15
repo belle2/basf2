@@ -24,6 +24,23 @@
 #include <vector>
 
 namespace Belle2 {
+  /** The SVD dose-monitoring DQM analysis module.
+   *
+   * Takes the histograms from SVDDQMDoseModule and plots the
+   * instantaneous occupancy distributions and the occupancy vs time
+   * since last injection and time in beam revolution cycle.
+   *
+   * Sends the occupancies averaged over 5 minutes (TBD, can be
+   * configured with the `epicsUpdateSeconds` parameter) to EPICS PVs
+   * (the names of the PVs are like `pvPrefix + "L3" + pvSuffix` or
+   * `pvPrefix + "L3:1" + pvSuffix`; the default names are like
+   * `SVD:DQM:L3:OccPois:Avg`).
+   *
+   * Sends the occupancies averaged over the run to MiraBelle (via the
+   * `svd` MonitoringObject).
+   *
+   * @sa https://agira.desy.de/browse/BII-7853
+   */
   class DQMHistAnalysisSVDDoseModule : public DQMHistAnalysisModule {
   public:
     DQMHistAnalysisSVDDoseModule();
@@ -36,7 +53,7 @@ namespace Belle2 {
     typedef struct SensorGroup {
       TString nameSuffix; ///< Suffix of the name of the histograms
       TString titleSuffix; ///< Suffix for the title of the canvases
-      const char* pvSuffix; ///< Suffix for the PV. See also m_pvPrefix.
+      const char* pvMiddle; ///< Middle part of the PV name. See also m_pvPrefix and m_pvSuffix.
       int nStrips; ///< Total number of strips in the sensor group.
     } SensorGroup;
 
@@ -78,6 +95,7 @@ namespace Belle2 {
     std::string m_pvPrefix; ///< Prefix for EPICS PVs
     bool m_useEpics; ///< Whether to update EPICS PVs
     double m_epicsUpdateSeconds; ///< Minimum interval between successive PV updates
+    std::string m_pvSuffix; ///< Suffix for EPICS PVs
 
     // Data members for outputs
     MonitoringObject* m_monObj = nullptr; ///< Monitoring object for MiraBelle

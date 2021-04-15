@@ -30,10 +30,11 @@ namespace Belle2 {
   namespace SVD {
     /** The SVD dose-monitoring DQM module.
      *
-     * Fills histograms of the SVD's occupancy, occupancy vs time since
-     * last injection and time in beam cycle, occupancy by layer, by
-     * sensor type, by trigger type, by injection type, by presence of
-     * injection veto, by ... (TODO).
+     * Fills histograms of the SVD's instantaneous occupancy and of SVD
+     * occupancy vs time since last injection and time in beam
+     * revolution cycle. The primary purpose is to monitor the
+     * correlation coefficients between the dose rate in the diamonds
+     * and that in the layers of SVD.
      *
      * @sa https://agira.desy.de/browse/BII-7853
      */

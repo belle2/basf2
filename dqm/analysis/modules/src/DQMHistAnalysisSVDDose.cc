@@ -25,10 +25,11 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 {
   setDescription("Monitoring of SVD Dose with events from Poisson trigger w/o inj. veto. See also SVDDQMDoseModule.");
   // THIS MODULE CAN NOT BE RUN IN PARALLEL
-  addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("SVD:OccPois:"));
+  addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("SVD:DQM:"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", true);
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
            "Minimum interval between two successive PV updates (in seconds).", 300.0);
+  addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":OccPois:Avg"));
 }
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
@@ -79,7 +80,7 @@ void DQMHistAnalysisSVDDoseModule::initialize()
       SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     m_myPVs.resize(c_sensorGroups.size());
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++)
-      SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvSuffix).data(),
+      SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
                                NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
@@ -149,7 +150,7 @@ void DQMHistAnalysisSVDDoseModule::endRun()
 
     double occ = nEvts ? (nHits / nEvts * 100.0 / group.nStrips) : -1.0;
     // TODO is this the best name for the MonitoringObject variable?
-    TString vName = "avgPoisOcc" + group.nameSuffix; // e.g. avgPoisOccL3XXU
+    TString vName = group.nameSuffix + "OccPoisAvg"; // e.g. L3XXUOccPoisAvg
     m_monObj->setVariable(vName.Data(), occ);
   }
 
@@ -189,7 +190,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(0.01);
+      hHits->SetMinimum(1e-6);
       hHits->SetMaximum(10);
       c->Clear();
       c->cd(0);
@@ -206,7 +207,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(0.01);
+      hHits->SetMinimum(1e-6);
       hHits->SetMaximum(10);
       c->Clear();
       c->cd(0);
@@ -235,10 +236,10 @@ void DQMHistAnalysisSVDDoseModule::carryOverflowOver(TH1F* h)
 }
 
 const vector<DQMHistAnalysisSVDDoseModule::SensorGroup> DQMHistAnalysisSVDDoseModule::c_sensorGroups = {
-  {"L31XU", "L3.1", "L3:1:X:U", 768 * 2},
-  {"L32XU", "L3.2", "L3:2:X:U", 768 * 2},
-  {"L3XXU", "L3 avg.", "L3:Avg", 768 * 14},
-  {"L4XXU", "L4 avg.", "L4:Avg", 768 * 30},
-  {"L5XXU", "L5 avg.", "L5:Avg", 768 * 48},
-  {"L6XXU", "L6 avg.", "L6:Avg", 768 * 80}
+  {"L31XU", "L3.1", "L3:1", 768 * 2},
+  {"L32XU", "L3.2", "L3:2", 768 * 2},
+  {"L3XXU", "L3 avg.", "L3", 768 * 14},
+  {"L4XXU", "L4 avg.", "L4", 768 * 30},
+  {"L5XXU", "L5 avg.", "L5", 768 * 48},
+  {"L6XXU", "L6 avg.", "L6", 768 * 80}
 };

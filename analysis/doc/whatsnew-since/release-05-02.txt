@@ -94,6 +94,8 @@ Modules
    that case the momenta of all track-based daughter particles are scaled by the provided factor.
  * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
    and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
+ * Added a module :b2:mod:`TauDecayMode`, As an actualization of :b2:mod:`TauDecayMarker` for the new TauolaBelle decays, this module takes as input a txt file with a mapping between decay string and decay number from TauolaBelle then the module assign a decay number for each tau in the event, this decay number is stored in the variables  tauMinusMCMode and tauPlusMCMode. 
+ Give a different txt file for the mapping it's possible, passing the path for the file as a parameter for the module.  
 
 Full Event Interpretation
 +++++++++++++++++++++++++

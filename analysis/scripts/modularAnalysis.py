@@ -3023,7 +3023,7 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping='None'):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
@@ -3036,7 +3036,7 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping='
     from basf2 import find_file
     if(TauolaBelle):
         TauDecayMode = register_module('TauDecayMode')
-        if (mapping == 'None'):
+        if (mapping is None):
             mp_file = find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt')
             TauDecayMode.param('file', mp_file)
             path.add_module('TauDecayMode', file=mp_file)

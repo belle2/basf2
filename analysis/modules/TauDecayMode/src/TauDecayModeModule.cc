@@ -16,10 +16,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 
-// #include <analysis/utility/PCmsLabTransform.h>
-// #include <analysis/utility/ReferenceFrame.h>
-// #include <utility>
-
 #include <framework/logging/Logger.h>
 #include <TLorentzVector.h>
 #include <TMatrixFSymfwd.h>
@@ -28,9 +24,11 @@
 #include "TKey.h"
 #include "TObject.h"
 
+#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <TParticlePDG.h>
 #include <map>
 #include <fstream>
 #include <string>
@@ -156,6 +154,51 @@ void TauDecayModeModule::event()
   vec_K0.clear(), vec_K0_br.clear(), vec_rho0.clear(), vec_f0.clear();
   vec_extra.clear();
   //
+  map<int, std::vector<int>> map_vec;
+
+  map_vec[12] = vec_nue;
+  map_vec[-12] = vec_anue;
+  map_vec[13] = vec_mum;
+  map_vec[-13] = vec_mup;
+  map_vec[14] = vec_numu;
+  map_vec[-14] = vec_anumu;
+  map_vec[16] = vec_nut;
+  map_vec[-16] = vec_anut;
+  map_vec[-211] = vec_pim;
+  map_vec[211] = vec_pip;
+  map_vec[-321] = vec_km;
+  map_vec[321] = vec_kp;
+  map_vec[-2212] = vec_apro;
+  map_vec[2212] = vec_pro;
+  map_vec[111] = vec_pi0;
+  map_vec[310] = vec_k0s;
+  map_vec[130] = vec_k0l;
+  map_vec[311] = vec_K0;
+  map_vec[-311] = vec_K0_br;
+  map_vec[221] = vec_eta;
+  map_vec[223] = vec_omega;
+  map_vec[323] = vec_kstarp;
+  map_vec[-323] = vec_kstarm;
+  map_vec[3122] = vec_lambda;
+  map_vec[-3122] = vec_lmb_br;
+  map_vec[10311] = vec_kstar;
+  map_vec[-10311] = vec_kstar_br;
+  map_vec[331] = vec_etapr;
+  map_vec[9000111] = vec_a0;
+  map_vec[9000211] = vec_a0p;
+  map_vec[-9000211] = vec_a0m;
+  map_vec[-10213] = vec_b1m;
+  map_vec[10213] = vec_b1p;
+  map_vec[333] = vec_phi;
+  map_vec[20223] = vec_f1;
+  map_vec[20213] = vec_a1p;
+  map_vec[-20213] = vec_a1m;
+  map_vec[-213] = vec_rhom;
+  map_vec[213] = vec_rhop;
+  map_vec[113] = vec_rho0;
+  map_vec[9010221] = vec_f0;
+
+
 
   for (int i = 0; i < MCParticles.getEntries(); i++) {
 
@@ -164,58 +207,13 @@ void TauDecayModeModule::event()
     //
     if (p.getPDG() ==  11 && p.isInitial() == 0)  vec_em.push_back(i);
     if (p.getPDG() == -11 && p.isInitial() == 0)  vec_ep.push_back(i);
-    //
-    if (p.getPDG() ==  12)  vec_nue.push_back(i);
-    if (p.getPDG() == -12)  vec_anue.push_back(i);
-    //
-    if (p.getPDG() ==  13)  vec_mum.push_back(i);
-    if (p.getPDG() == -13)  vec_mup.push_back(i);
-    //
-    if (p.getPDG() ==  14)  vec_numu.push_back(i);
-    if (p.getPDG() == -14)  vec_anumu.push_back(i);
-    //
-    if (p.getPDG() ==  16)  vec_nut.push_back(i);
-    if (p.getPDG() == -16)  vec_anut.push_back(i);
-    //
-    if (p.getPDG() == -211) vec_pim.push_back(i);
-    if (p.getPDG() ==  211) vec_pip.push_back(i);
-    //
-    if (p.getPDG() == -321) vec_km.push_back(i);
-    if (p.getPDG() ==  321) vec_kp.push_back(i);
-    //
-    if (p.getPDG() == -2212)vec_apro.push_back(i);
-    if (p.getPDG() ==  2212)vec_pro.push_back(i);
-    //
-    if (p.getPDG() ==  111) vec_pi0.push_back(i);
-    if (p.getPDG() ==  310) vec_k0s.push_back(i);
-    if (p.getPDG() ==  130) vec_k0l.push_back(i);
     if (p.getPDG() ==  22)  vec_gam.push_back(i);
-    if (p.getPDG() ==  311) vec_K0.push_back(i);
-    if (p.getPDG() ==  -311) vec_K0_br.push_back(i);
     //
-    if (p.getPDG() ==  221) vec_eta.push_back(i);
-    if (p.getPDG() ==  223) vec_omega.push_back(i);
-    if (p.getPDG() ==  323) vec_kstarp.push_back(i);
-    if (p.getPDG() == -323) vec_kstarm.push_back(i);
-    // add particles
-    if (p.getPDG() == 3122) vec_lambda.push_back(i);
-    if (p.getPDG() == -3122) vec_lmb_br.push_back(i);
-    if (p.getPDG() == 10311) vec_kstar.push_back(i);
-    if (p.getPDG() == -10311) vec_kstar_br.push_back(i);
-    if (p.getPDG() == 331) vec_etapr.push_back(i);
-    if (p.getPDG() == 9000111) vec_a0.push_back(i);
-    if (p.getPDG() == 9000211) vec_a0p.push_back(i);
-    if (p.getPDG() == -9000211) vec_a0m.push_back(i);
-    if (p.getPDG() == -10213) vec_b1m.push_back(i);
-    if (p.getPDG() == 10213) vec_b1p.push_back(i);
-    if (p.getPDG() == 333) vec_phi.push_back(i);
-    if (p.getPDG() == 20223) vec_f1.push_back(i);
-    if (p.getPDG() == 20213) vec_a1p.push_back(i);
-    if (p.getPDG() == -20213) vec_a1m.push_back(i);
-    if (p.getPDG() == -213) vec_rhom.push_back(i);
-    if (p.getPDG() == 213) vec_rhop.push_back(i);
-    if (p.getPDG() == 113) vec_rho0.push_back(i);
-    if (p.getPDG() == 9010221) vec_f0.push_back(i);
+    map<int, std::vector<int>>::iterator ite ;
+    for (ite =  map_vec.begin(); ite !=  map_vec.end(); ++ite) {
+      if (p.getPDG() == ite-> first) ite-> second.push_back(i);
+    }
+
     if (m_particle != "" && p.getPDG() == m_pdg_extra) vec_extra.push_back(i);
   }
 
@@ -246,125 +244,16 @@ void TauDecayModeModule::event()
     if (chg > 0) vec_dau_tauplus.push_back(ii);
   }
   //
-  for (unsigned int i = 0; i < vec_nue.size(); i++) {
-    int ii = vec_nue[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
+  map<int, std::vector<int>>::iterator itr ;
+  for (itr =  map_vec.begin(); itr !=  map_vec.end(); ++itr) {
+    for (unsigned int i = 0; i < itr-> second.size(); i++) {
+      int ii = itr-> second[i];
+      int chg = getRecursiveMotherCharge(MCParticles[ii]);
+      if (chg < 0) vec_dau_tauminus.push_back(ii);
+      if (chg > 0) vec_dau_tauplus.push_back(ii);
+    }
   }
-  //
-  for (unsigned int i = 0; i < vec_anue.size(); i++) {
-    int ii = vec_anue[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_mum.size(); i++) {
-    int ii = vec_mum[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_mup.size(); i++) {
-    int ii = vec_mup[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_numu.size(); i++) {
-    int ii = vec_numu[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_anumu.size(); i++) {
-    int ii = vec_anumu[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_nut.size(); i++) {
-    int ii = vec_nut[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_anut.size(); i++) {
-    int ii = vec_anut[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_pim.size(); i++) {
-    int ii = vec_pim[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_pip.size(); i++) {
-    int ii = vec_pip[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_km.size(); i++) {
-    int ii = vec_km[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_kp.size(); i++) {
-    int ii = vec_kp[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_apro.size(); i++) {
-    int ii = vec_apro[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_pro.size(); i++) {
-    int ii = vec_pro[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_pi0.size(); i++) {
-    int ii = vec_pi0[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_k0s.size(); i++) {
-    int ii = vec_k0s[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_k0l.size(); i++) {
-    int ii = vec_k0l[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
+
   std::vector< std::pair<int, double> > vec_gamtmp_tauminus;
   std::vector< std::pair<int, double> > vec_gamtmp_tauplus;
   for (unsigned int i = 0; i < vec_gam.size(); i++) {
@@ -393,251 +282,21 @@ void TauDecayModeModule::event()
       vec_dau_tauplus.push_back(ii);
     }
   }
-  //
-  for (unsigned int i = 0; i < vec_eta.size(); i++) {
-    int ii = vec_eta[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_omega.size(); i++) {
-    int ii = vec_omega[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_kstarp.size(); i++) {
-    int ii = vec_kstarp[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_kstarm.size(); i++) {
-    int ii = vec_kstarm[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
 
-  //extra particles
-  for (unsigned int i = 0; i < vec_lambda.size(); i++) {
-    int ii = vec_lambda[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_lmb_br.size(); i++) {
-    int ii = vec_lmb_br[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_kstar.size(); i++) {
-    int ii = vec_kstar[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_kstar_br.size(); i++) {
-    int ii = vec_kstar_br[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_etapr.size(); i++) {
-    int ii = vec_etapr[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-
-  for (unsigned int i = 0; i < vec_a0.size(); i++) {
-    int ii = vec_a0[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_a0p.size(); i++) {
-    int ii = vec_a0p[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_a0m.size(); i++) {
-    int ii = vec_a0m[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_b1m.size(); i++) {
-    int ii = vec_b1m[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_b1p.size(); i++) {
-    int ii = vec_b1p[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_phi.size(); i++) {
-    int ii = vec_phi[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_f1.size(); i++) {
-    int ii = vec_f1[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_a1p.size(); i++) {
-    int ii = vec_a1p[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  //
-  for (unsigned int i = 0; i < vec_a1m.size(); i++) {
-    int ii = vec_a1m[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_rhom.size(); i++) {
-    int ii = vec_rhom[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  //
-  for (unsigned int i = 0; i < vec_rhop.size(); i++) {
-    int ii = vec_rhop[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  for (unsigned int i = 0; i < vec_K0.size(); i++) {
-    int ii = vec_K0[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  for (unsigned int i = 0; i < vec_K0_br.size(); i++) {
-    int ii = vec_K0_br[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
-  for (unsigned int i = 0; i < vec_rho0.size(); i++) {
-    int ii = vec_rho0[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-  for (unsigned int i = 0; i < vec_f0.size(); i++) {
-    int ii = vec_f0[i];
-    int chg = getRecursiveMotherCharge(MCParticles[ii]);
-    if (chg < 0) vec_dau_tauminus.push_back(ii);
-    if (chg > 0) vec_dau_tauplus.push_back(ii);
-  }
-
+  EvtGenDatabasePDG* databasePDG = EvtGenDatabasePDG::Instance();
   //make decay string for t-
   m_tauminusdecaymode = "";
   for (unsigned int i = 0; i < vec_dau_tauminus.size(); i++) {
     MCParticle* p = MCParticles[vec_dau_tauminus[i]];
 
     int pdg = p->getPDG();
+
     //
     if (m_particle != "" && pdg == m_pdg_extra) m_tauminusdecaymode.append("." + m_name);
     //
-    if (pdg ==  16)  m_tauminusdecaymode.append(".nu_tau");
-    if (pdg == -16)  m_tauminusdecaymode.append(".anti-nu_tau");
-    //
-    if (pdg ==  11)  m_tauminusdecaymode.append(".e-");
-    if (pdg == -11)  m_tauminusdecaymode.append(".e+");
+    m_tauminusdecaymode.append(".");
+    m_tauminusdecaymode.append(databasePDG->GetParticle(pdg)->GetName());
 
-    if (pdg ==  12)  m_tauminusdecaymode.append(".nu_e");
-    if (pdg == -12)  m_tauminusdecaymode.append(".anti-nu_e");
-
-    if (pdg ==  13)  m_tauminusdecaymode.append(".mu-");
-    if (pdg == -13)  m_tauminusdecaymode.append(".mu+");
-
-    if (pdg ==  14)  m_tauminusdecaymode.append(".nu_mu");
-    if (pdg == -14)  m_tauminusdecaymode.append(".anti-nu_mu");
-    //
-    if (pdg == -211) m_tauminusdecaymode.append(".pi-");
-    if (pdg ==  211) m_tauminusdecaymode.append(".pi+");
-    //
-    if (pdg == -321) m_tauminusdecaymode.append(".K-");
-    if (pdg ==  321) m_tauminusdecaymode.append(".K+");
-    //
-    if (pdg == 311) m_tauminusdecaymode.append(".K0");
-    if (pdg == -311) m_tauminusdecaymode.append(".anti-K0");
-
-    if (pdg == -2212)m_tauminusdecaymode.append(".anti-p-");
-    if (pdg ==  2212)m_tauminusdecaymode.append(".p+");
-
-    if (pdg == 111)  m_tauminusdecaymode.append(".pi0");
-    if (pdg == 310)  m_tauminusdecaymode.append(".K_S0");
-    if (pdg == 130)  m_tauminusdecaymode.append(".K_L0");
-    if (pdg == 22)   m_tauminusdecaymode.append(".gamma");
-    //
-    if (pdg == 3122) m_tauminusdecaymode.append(".Lambda0");
-    if (pdg == -3122) m_tauminusdecaymode.append(".anti-Lambda0");
-    if (pdg == 10311) m_tauminusdecaymode.append(".K_0*0");
-    if (pdg == -10311) m_tauminusdecaymode.append(".anti-K_0*0");
-    if (pdg == 331) m_tauminusdecaymode.append(".eta'");
-
-
-    if (pdg == 221) m_tauminusdecaymode.append(".eta");
-    if (pdg == 223) m_tauminusdecaymode.append(".omega");
-    if (pdg == 323) m_tauminusdecaymode.append(".K*+");
-    if (pdg == -323) m_tauminusdecaymode.append(".K*-");
-    if (pdg == 9000111) m_tauminusdecaymode.append(".a00");
-    if (pdg == 9000211) m_tauminusdecaymode.append(".a_0+");
-    if (pdg == -9000211) m_tauminusdecaymode.append(".a_0-");
-    if (pdg == 10213) m_tauminusdecaymode.append(".b_1+");
-    if (pdg == -10213) m_tauminusdecaymode.append(".b_1-");
-    if (pdg == 333) m_tauminusdecaymode.append(".phi");
-    if (pdg == 20223) m_tauminusdecaymode.append(".f_1");
-    if (pdg == 20213) m_tauminusdecaymode.append(".a_1+");
-    if (pdg == -20213) m_tauminusdecaymode.append(".a_1-");
-    if (pdg == 213) m_tauminusdecaymode.append(".rho+");
-    if (pdg == -213) m_tauminusdecaymode.append(".rho-");
-    if (pdg == 113) m_tauminusdecaymode.append(".rho0");
-    if (pdg == 9010221) m_tauminusdecaymode.append(".f_0");
   }
 
   if (m_printmode == "missing") {
@@ -662,64 +321,11 @@ void TauDecayModeModule::event()
     int pdg = p->getPDG();
     //
     if (m_particle != "" && pdg == m_pdg_extra) m_tauplusdecaymode.append("." + m_name);
-    //
-    if (pdg ==  16)  m_tauplusdecaymode.append(".nu_tau");
-    if (pdg == -16)  m_tauplusdecaymode.append(".anti-nu_tau");
-    //
-    if (pdg ==  11)  m_tauplusdecaymode.append(".e-");
-    if (pdg == -11)  m_tauplusdecaymode.append(".e+");
-
-    if (pdg ==  12)  m_tauplusdecaymode.append(".nu_e");
-    if (pdg == -12)  m_tauplusdecaymode.append(".anti-nu_e");
-
-    if (pdg ==  13)  m_tauplusdecaymode.append(".mu-");
-    if (pdg == -13)  m_tauplusdecaymode.append(".mu+");
-
-    if (pdg ==  14)  m_tauplusdecaymode.append(".nu_mu");
-    if (pdg == -14)  m_tauplusdecaymode.append(".anti-nu_mu");
-    //
-    if (pdg == -211) m_tauplusdecaymode.append(".pi-");
-    if (pdg ==  211) m_tauplusdecaymode.append(".pi+");
-    //
-    if (pdg == -321) m_tauplusdecaymode.append(".K-");
-    if (pdg ==  321) m_tauplusdecaymode.append(".K+");
-    //
-    if (pdg == 311) m_tauplusdecaymode.append(".K0");
-    if (pdg == -311) m_tauplusdecaymode.append(".anti-K0");
-
-    if (pdg == -2212)m_tauplusdecaymode.append(".anti-p-");
-    if (pdg ==  2212)m_tauplusdecaymode.append(".p+");
-
-    if (pdg == 111)  m_tauplusdecaymode.append(".pi0");
-    if (pdg == 310)  m_tauplusdecaymode.append(".K_S0");
-    if (pdg == 130)  m_tauplusdecaymode.append(".K_L0");
-    if (pdg == 22)   m_tauplusdecaymode.append(".gamma");
-    //
-    if (pdg == 3122) m_tauplusdecaymode.append(".Lambda0");
-    if (pdg == -3122) m_tauplusdecaymode.append(".anti-Lambda0");
-    if (pdg == 10311) m_tauplusdecaymode.append(".K_0*0");
-    if (pdg == -10311) m_tauplusdecaymode.append(".anti-K_0*0");
-    if (pdg == 331) m_tauplusdecaymode.append(".eta'");
 
 
-    if (pdg == 221) m_tauplusdecaymode.append(".eta");
-    if (pdg == 223) m_tauplusdecaymode.append(".omega");
-    if (pdg == 323) m_tauplusdecaymode.append(".K*+");
-    if (pdg == -323) m_tauplusdecaymode.append(".K*-");
-    if (pdg == 9000111) m_tauplusdecaymode.append(".a00");
-    if (pdg == 9000211) m_tauplusdecaymode.append(".a_0+");
-    if (pdg == -9000211) m_tauplusdecaymode.append(".a_0-");
-    if (pdg == 10213) m_tauplusdecaymode.append(".b_1+");
-    if (pdg == -10213) m_tauplusdecaymode.append(".b_1-");
-    if (pdg == 333) m_tauplusdecaymode.append(".phi");
-    if (pdg == 20223) m_tauplusdecaymode.append(".f_1");
-    if (pdg == 20213) m_tauplusdecaymode.append(".a_1+");
-    if (pdg == -20213) m_tauplusdecaymode.append(".a_1-");
-    if (pdg == 213) m_tauplusdecaymode.append(".rho+");
-    if (pdg == -213) m_tauplusdecaymode.append(".rho-");
-    if (pdg == 113) m_tauplusdecaymode.append(".rho0");
-    if (pdg == 9010221) m_tauplusdecaymode.append(".f_0");
-    //
+    m_tauplusdecaymode.append(".");
+    m_tauplusdecaymode.append(databasePDG->GetParticle(pdg)->GetName());
+
 
 
   }
@@ -851,7 +457,6 @@ int TauDecayModeModule::TauBBBmode(string state)
   std::vector<std::string> x = parseString(state, dem);
   int r = x.size();
   int i;
-  //= mode_decay.begin()
   map<string, int>::iterator itr ;
   for (itr =  mode_decay.begin(); itr !=  mode_decay.end(); ++itr) {
     string mode = itr-> first;

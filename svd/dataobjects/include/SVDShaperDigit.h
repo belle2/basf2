@@ -203,22 +203,45 @@ namespace Belle2 {
     {
       // Don't modify and don't append when bg points nowhere.
       if (!bg) return DigitBase::c_DontAppend;
+
       const auto& bgSamples = dynamic_cast<const SVDShaperDigit*>(bg)->getSamples();
+
       // Add background samples to the digit's and trim back to range
-      std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
-                     m_samples.begin(),
-                     [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
-      { return trimToSampleRange(x + y); }
-                    );
+      if (s_APVSampleMode == 3) {
+        std::transform(m_samples.begin(), m_samples.end() - 3, bgSamples.begin() + s_APVSampleBegin,
+                       m_samples.begin(),
+                       [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+        { return trimToSampleRange(x + y); }
+                      );
+      } else {
+        std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
+                       m_samples.begin(),
+                       [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+        { return trimToSampleRange(x + y); }
+                      );
+      }
+
       // FIXME: Reset FADC time flag in mode byte.
       return DigitBase::c_DontAppend;
     }
 
     /**
-    *
-    * @param
-    * @return append status
-    */
+     * Modify already appended BG digit if aquisition mode is 3 sample
+     */
+    void modifyBGDigit() override
+    {
+      if (s_APVSampleMode != 3) return;
+      if (s_APVSampleBegin > 0) {
+        for (size_t i = 0; i < 3; i++) m_samples[i] = m_samples[i + s_APVSampleBegin];
+      }
+      for (size_t i = 3; i < 6; i++) m_samples[i] = 0;
+    }
+
+    /**
+      *
+      * @param
+      * @return append status
+      */
     bool operator < (const SVDShaperDigit&   x)const
     {
       if (getSensorID() != x.getSensorID())
@@ -250,6 +273,12 @@ namespace Belle2 {
     }
 
 
+    static void setAPVMode(size_t mode, size_t firstSample)
+    {
+      s_APVSampleMode =  mode;
+      s_APVSampleBegin = firstSample;
+    }
+
 
   private:
 
@@ -258,6 +287,9 @@ namespace Belle2 {
     short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
     int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
+
+    static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
+    static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */
 
     ClassDefOverride(SVDShaperDigit, 5)
 

@@ -111,7 +111,12 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TimeFrameHigh", m_maxTimeFrame,
            "Right edge of event time randomization window, ns", m_maxTimeFrame);
 
-  // 5. Reporting
+  // 5. 3-mixed-6
+  addParam("3-mixed-6", m_mixedDAQ, "Set true to simulate 3-mixed-6 DAQ mode", m_mixedDAQ);
+  addParam("TRGSummaryName", m_objTrgSummaryName, "TRGSummary name", m_objTrgSummaryName);
+
+
+  // 6. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
            m_rootFilename);
@@ -292,10 +297,34 @@ void SVDDigitizerModule::beginRun()
   if (!m_map)
     B2WARNING("No valid channel mapping -> all APVs will be enabled");
 
+  if (!m_svdConfig.isValid())
+    B2WARNING("No valid SVDDetectorConfiguration for the requested IoV");
+  else if (m_svdConfig.isValid() && m_svdConfig.getNrFrames() == 9) {
+    m_mixedDAQ = true;
+    m_relativeShift = m_svdConfig.getRelativeTimeShift();
+  }
+
 }
 
 void SVDDigitizerModule::event()
 {
+
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  if (!m_svdConfig.isValid() || m_svdConfig.getNrFrames() != 9) {
+    m_relativeShift = storeSVDEvtInfo->getRelativeShift();
+  } else {
+    storeSVDEvtInfo->setRelativeShift(m_relativeShift);
+    modeByte.setDAQMode(3);
+  }
+  if (m_mixedDAQ) {
+    StoreObjPtr<TRGSummary> storeTRGSummary(m_objTrgSummaryName);
+    if (storeTRGSummary.isValid()) m_trgQuality = storeTRGSummary->getTimQuality();
+    else m_trgQuality = 1;
+    if (m_trgQuality == 2) m_startingSample = getFirstSample(modeByte);
+    else m_startingSample = 0;
+  }
+
   // Generate current event time
   if (m_randomizeEventTimes) {
     StoreObjPtr<EventMetaData> storeEvent;
@@ -324,8 +353,10 @@ void SVDDigitizerModule::event()
   RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
   unsigned int nSimHits = storeSimHits.getEntries();
-  if (nSimHits == 0)
+  if (nSimHits == 0) {
+    SVDShaperDigit::setAPVMode(storeSVDEvtInfo->getNSamples(), m_startingSample);
     return;
+  }
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
@@ -410,7 +441,16 @@ void SVDDigitizerModule::event()
   if (m_signalsList != "")
     saveSignals();
 
+
   saveDigits();
+
+  if (m_mixedDAQ) {
+    if (m_trgQuality == 2) {
+      storeSVDEvtInfo->setNSamples(3);
+    }
+  }
+
+  SVDShaperDigit::setAPVMode(storeSVDEvtInfo->getNSamples(), m_startingSample);
 }
 
 void SVDDigitizerModule::processHit()
@@ -744,6 +784,18 @@ void SVDDigitizerModule::saveDigits()
       // 2.c check if the APV is disabled
       if (!m_map->isAPVinMap(sensorID, true, iStrip)) continue;
 
+      // 2.d check DAQ mode and TRGQuality
+      if (m_mixedDAQ) {
+        if (m_trgQuality == 2) {
+          rawSamples[0] = rawSamples[m_startingSample];
+          rawSamples[1] = rawSamples[m_startingSample + 1];
+          rawSamples[2] = rawSamples[m_startingSample + 2];
+          rawSamples[3] = 0.;
+          rawSamples[4] = 0.;
+          rawSamples[5] = 0.;
+        }
+      }
+
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(sensorID, true, iStrip, rawSamples, 0);
@@ -809,6 +861,18 @@ void SVDDigitizerModule::saveDigits()
 
       // 2.c check if the APV is disabled
       if (!m_map->isAPVinMap(sensorID, false, iStrip)) continue;
+
+      // 2.d check DAQ mode and TRGQuality
+      if (m_mixedDAQ) {
+        if (m_trgQuality == 2) {
+          rawSamples[0] = rawSamples[m_startingSample];
+          rawSamples[1] = rawSamples[m_startingSample + 1];
+          rawSamples[2] = rawSamples[m_startingSample + 2];
+          rawSamples[3] = 0.;
+          rawSamples[4] = 0.;
+          rawSamples[5] = 0.;
+        }
+      }
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
@@ -922,4 +986,10 @@ void SVDDigitizerModule::terminate()
     m_rootFile->Write();
     m_rootFile->Close();
   }
+}
+
+int SVDDigitizerModule::getFirstSample(const SVDModeByte modeByte)
+{
+  int nTriggerClocks = modeByte.getTriggerBin() + m_relativeShift;
+  return floor(nTriggerClocks / 4);
 }

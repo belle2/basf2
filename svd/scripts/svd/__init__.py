@@ -201,7 +201,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
 
 def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
 
-    if daqMode != 2 and daqMode != 1:
+    if daqMode != 2 and daqMode != 1 and daqMode != 3:
         print("OOPS the acquisition mode that you want to simulate is not available.")
         print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
         sys.exit()
@@ -232,6 +232,7 @@ def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
 
         digitizer = b2.register_module('SVDDigitizer')
         digitizer.param("ShaperDigits", "SVDShaperDigitsOriginal")
+        digitizer.param("SVDEventInfo", "SVDEventInfoOriginal")
         path.add_module(digitizer)
 
         # emulate the 3-sample acquisition
@@ -260,7 +261,36 @@ def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
         zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
         path.add_module(zsonline)
 
-        # 3-mixed-6 sample mode not available
+        # 3-mixed-6 sample mode
+    if daqMode == 3:
+        if relativeShift == -1:
+            print("OOPS please set the relativeShift. Exiting now.")
+            sys.exit(1)
+        if relativeShift != -1 and latencyShift != -1:
+            print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
+            sys.exit(1)
+
+        svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+        svdevtinfoset.param("daqMode", daqMode)
+        svdevtinfoset.param("relativeShift", relativeShift)
+        path.add_module(svdevtinfoset)
+
+        # emulate trigger quality simulation for testing purpose
+        trgqualitygen = b2.register_module("SVDTriggerQualityGenerator")
+        trgqualitygen.param("TRGSummaryName", "TRGSummary")
+        path.add_module(trgqualitygen)
+
+        digitizer = b2.register_module('SVDDigitizer')
+        digitizer.param("ShaperDigits", "SVDShaperDigitsOriginal")
+        digitizer.param("3-mixed-6", True)
+        digitizer.param("TRGSummaryName", "TRGSummary")
+        path.add_module(digitizer)
+
+        # emulate online zero-suppression
+        zsonline = b2.register_module("SVDZeroSuppressionEmulator")
+        zsonline.param("ShaperDigits", "SVDShaperDigitsOriginal")
+        zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
+        path.add_module(zsonline)
 
 
 def add_svd_unpacker(path):

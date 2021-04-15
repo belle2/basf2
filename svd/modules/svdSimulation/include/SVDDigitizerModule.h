@@ -19,6 +19,9 @@
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/calibration/SVDDetectorConfiguration.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
@@ -171,6 +174,14 @@ namespace Belle2 {
       /** Name of the tab-delimited listing of signals */
       std::string m_signalsList = "";
 
+
+      // 6. 3-mixed-6
+      /** Parameter fot the 3-mixed-6 DAQ mode simulation */
+      bool m_mixedDAQ = false;
+      /** Name of the StoreObjectPrt TRGSummary */
+      std::string m_objTrgSummaryName = "TRGSummary";
+
+
       // Other data members:
 
       /** Structure containing signals in all existing sensors */
@@ -215,6 +226,16 @@ namespace Belle2 {
       /** Electronic noise for v-strips. */
       double m_elNoiseV = 500; //e-
 
+      /** relative shift in SVDEventInfo obj */
+      int m_relativeShift = 0;
+      /** Starting sample for the selection of 3 samples in 3-mixed-6 */
+      int m_startingSample = 0;
+      /**Trigger quality to choose if simulate 3 samples or 6 samples */
+      int m_trgQuality = 1;
+      /** return the starting sample */
+      int getFirstSample(const SVDModeByte modeByte);
+
+
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
@@ -223,6 +244,7 @@ namespace Belle2 {
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
       std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
+      SVDDetectorConfiguration m_svdConfig; /**< svd configuration parameters */
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */

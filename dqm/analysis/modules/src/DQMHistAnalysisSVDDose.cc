@@ -69,6 +69,8 @@ void DQMHistAnalysisSVDDoseModule::initialize()
     m_c_occuHER.push_back(c);
     m_monObj->addCanvas(c);
   }
+  m_h_occuLER.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuHER.resize(c_sensorGroups.size(), nullptr);
 
   // The legend need to be memory-leaked, so we make it once and use it evey time
   m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
@@ -200,16 +202,17 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     auto hHits = findHistT<TH2F>("SVDDoseLERInj/SVDHitsVsTime_" + group.nameSuffix);
     auto hEvts = findHistT<TH2F>("SVDDoseLERInj/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      divide(hHits, hEvts, 100.0f / group.nStrips);
-      hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
+      if (m_h_occuLER[g]) delete m_h_occuLER[g];
+      auto hOccu = m_h_occuLER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(1e-6);
-      hHits->SetMaximum(10);
+      hOccu->SetMinimum(1e-6);
+      hOccu->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
-      hHits->Draw("COLZ");
+      hOccu->Draw("COLZ");
       c->SetLogz();
     }
 
@@ -217,28 +220,32 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hHits = findHistT<TH2F>("SVDDoseHERInj/SVDHitsVsTime_" + group.nameSuffix);
     hEvts = findHistT<TH2F>("SVDDoseHERInj/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      divide(hHits, hEvts, 100.0f / group.nStrips);
-      hHits->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
+      if (m_h_occuHER[g]) delete m_h_occuHER[g];
+      auto hOccu = m_h_occuHER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hHits->SetMinimum(1e-6);
-      hHits->SetMaximum(10);
+      hOccu->SetMinimum(1e-6);
+      hOccu->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
-      hHits->Draw("COLZ");
+      hOccu->Draw("COLZ");
       c->SetLogz();
     }
   }
 }
 
-void DQMHistAnalysisSVDDoseModule::divide(TH2F* num, TH2F* den, float scale)
+TH2F* DQMHistAnalysisSVDDoseModule::divide(TH2F* num, TH2F* den, float scale)
 {
+  TString name = TString("occu_from_") + num->GetName();
+  TH2F* res = (TH2F*)num->Clone(name);
   for (int i = 0; i < num->GetNcells(); i++) {
     float n = num->GetBinContent(i), d = den->GetBinContent(i), e = num->GetBinError(i);
-    num->SetBinContent(i, d ? scale * n / d : 0.0f);
-    num->SetBinError(i, d ? scale * e / d : 0.0f);
+    res->SetBinContent(i, d ? scale * n / d : 0.0f);
+    res->SetBinError(i, d ? scale * e / d : 0.0f);
   }
+  return res;
 }
 
 void DQMHistAnalysisSVDDoseModule::carryOverflowOver(TH1F* h)

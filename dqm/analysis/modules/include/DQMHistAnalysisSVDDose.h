@@ -77,16 +77,16 @@ namespace Belle2 {
     inline T* findHistT(TString name) { return dynamic_cast<T*>(findHist(name.Data())); }
 
     /** Divide two histograms, ignoring errors on the second histogram.
-     * The result is stored in the numerator histogram.
      * @param num The numerator histogram. Will be overwritten with the result.
      * @param den The denominator histogram. Must have the same bins as num.
      * @param scale Optional rescaling factor.
+     * @return The result of the division, a new histogram owned by the caller.
      *
      * In short, for each bin we have
      *  - `result_bin = scale * num_bin / den_bin`
      *  - `result_err = scale * num_err / den_bin`
      */
-    static void divide(TH2F* num, TH2F* den, float scale = 1.0f);
+    static TH2F* divide(TH2F* num, TH2F* den, float scale = 1.0f);
 
     /// Carries the content of the overflow bin into the last bin
     static void carryOverflowOver(TH1F* h);
@@ -102,6 +102,8 @@ namespace Belle2 {
     std::vector<TCanvas*> m_c_instOccu; ///< Canvases for the instantaneous occupancy
     std::vector<TCanvas*> m_c_occuLER; ///< Canvases for the occu. vs time after LER inj.
     std::vector<TCanvas*> m_c_occuHER; ///< Canvases for the occu. vs time after HER inj.
+    std::vector<TH2F*> m_h_occuLER; ///< Histograms for the occu. vs time after LER inj.
+    std::vector<TH2F*> m_h_occuHER; ///< Histograms for the occu. vs time after HER inj.
     TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
 
 #ifdef _BELLE2_EPICS

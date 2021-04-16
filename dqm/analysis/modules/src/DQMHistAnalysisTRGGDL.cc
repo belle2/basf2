@@ -117,8 +117,8 @@ void DQMHistAnalysisTRGGDLModule::event()
     sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
     m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
 
-    if (m_h_psn_extra[iskim] == NULL) {
-      B2INFO("Histogram/canvas named hGDL_psn_extra is not found.");
+    if (m_h_psn_extra[iskim] == nullptr) {
+      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
       continue;
     }
 
@@ -325,8 +325,8 @@ void DQMHistAnalysisTRGGDLModule::event()
 
   //fill efficiency with offline selection
   m_h_psn_pure_extra = (TH1D*)findHist("TRGGDL/hGDL_psn_pure_extra_all");/**psn bits*/
-  if (m_h_psn_pure_extra == NULL) {
-    B2INFO("Histogram/canvas named hGDL_psn_pure_extra is not found.");
+  if (m_h_psn_pure_extra == nullptr) {
+    B2WARNING("Histogram/canvas named hGDL_psn_pure_extra is not found.");
   } else {
     if (m_h_psn_pure_extra->GetBinContent(0 + 1) != 0)
       m_h_pure_eff->SetBinContent(1,  m_h_psn_pure_extra->GetBinContent(1 + 1) / m_h_psn_pure_extra->GetBinContent(
@@ -403,10 +403,10 @@ void DQMHistAnalysisTRGGDLModule::event()
   }
   for (auto i = 0; i < nskim_gdldqm; i++) {
     double data = 0;
-    if (m_h_psn_extra[i] == NULL) {
-      B2INFO("Histogram/canvas named hGDL_psn_extra is not found.");
-    } else if (m_h_psn_extra[6] == NULL) {
-      B2INFO("Histogram/canvas named hGDL_psn_extra is not found.");
+    if (m_h_psn_extra[i] == nullptr) {
+      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
+    } else if (m_h_psn_extra[6] == nullptr) {
+      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
     } else {
       if (i == 0 || i == 6) {
         data = m_h_psn_extra[i]->GetBinContent(0 + 1);

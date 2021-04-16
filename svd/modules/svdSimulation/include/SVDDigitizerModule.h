@@ -16,6 +16,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDChargeSimulationCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
@@ -201,26 +202,6 @@ namespace Belle2 {
       double m_depletionVoltage = 40;
       /** The bias voltage on the sensor */
       double m_biasVoltage = 100;
-      /** The backplane capacitanceU wrt. the strips. */
-      double m_backplaneCapacitanceU = 0.1; //pF/cm
-      /** The interstrip capacitanceU for the sensor. */
-      double m_interstripCapacitanceU = 0.7; //pF/cm
-      /** The coupling capacitanceU for the sensor. */
-      double m_couplingCapacitanceU = 15; //pF/cm
-      /** The backplane capacitanceV wrt. the strips. */
-      double m_backplaneCapacitanceV = 0.4; //pF/cm
-      /** The interstrip capacitanceV for the sensor. */
-      double m_interstripCapacitanceV = 0.7; //pF/cm
-      /** The coupling capacitanceV for the sensor. */
-      double m_couplingCapacitanceV = 30; //pF/cm
-      /** ADU equivalent charge for u-strips. */
-      //      double m_aduEquivalentU;
-      /** ADU equivalent charge for v-strips. */
-      //      double m_aduEquivalentV;
-      /** Electronic noise for u-strips. */
-      double m_elNoiseU = 500; //e-
-      /** Electronic noise for v-strips. */
-      double m_elNoiseV = 500; //e-
 
       /** relative shift in SVDEventInfo obj */
       int m_relativeShift = 0;
@@ -240,6 +221,10 @@ namespace Belle2 {
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
       std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
       SVDDetectorConfiguration m_svdConfig; /**< svd configuration parameters */
+
+      SVDChargeSimulationCalibrations m_ChargeSimCal; /**<SVDChargeSimulationCalibrations calibrations db object*/
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */

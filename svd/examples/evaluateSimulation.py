@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import basf2 as b2
 from basf2 import conditions as b2conditions
+from svd import add_svd_trgsummary
 
 numEvents = 2000
 
@@ -40,8 +41,16 @@ main.add_module('FullSim')
 # including the timing module
 # main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
 
+add_svd_trgsummary(main)
+
 # SVD simulation
 svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+# svdevtinfoset.param("useDB",True)
+svdevtinfoset.param("daqMode", 3)
+svdevtinfoset.param("relativeShift", 9)
+svdevtinfoset.set_log_level(b2.LogLevel.DEBUG)
+svdevtinfoset.set_debug_level(25)
+
 main.add_module(svdevtinfoset)
 
 digitizer = b2.register_module('SVDDigitizer')

@@ -199,7 +199,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     add_svd_SPcreation(path, isROIsimulation)
 
 
-def add_new_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
+def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
 
     svdevtinfoset = b2.register_module("SVDEventInfoSetter")
     svdevtinfoset.param("useDB", useConfigFromDB)

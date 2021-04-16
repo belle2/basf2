@@ -16,7 +16,7 @@ from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
 from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SequentialBoundaries
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 import reconstruction as recon
 from random import seed
 
@@ -38,13 +38,13 @@ settings = CalibrationSettings(
         "adjustment": 1.01},
     input_data_filters={
         "bhabha_all_calib": [
-            "bhabha_all_calib",
-            "Good",
-            "On",
-            "4S",
-            "physics",
-            "Continuum",
-            "Scan"]},
+            input_data_filters['Run Type']['physics'],
+            input_data_filters['Data Tag']['bhabha_all_calib'],
+            input_data_filters['Data Quality Tag']['Good'],
+            input_data_filters['Magnet']['On'],
+            input_data_filters['Beam Energy']['4S'],
+            input_data_filters['Beam Energy']['Continuum'],
+            input_data_filters['Beam Energy']['Scan']]},
     depends_on=[])
 
 

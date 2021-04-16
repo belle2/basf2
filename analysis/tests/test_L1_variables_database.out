@@ -9,23 +9,23 @@
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -35,31 +35,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -69,31 +75,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -103,31 +115,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 0
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 0
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 0
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 0
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 0
 [INFO]      o) L1FTDLBit(0) = 0
@@ -137,31 +155,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -171,31 +195,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -205,31 +235,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 0
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 0
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 0
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 0
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 0
 [INFO]      o) L1FTDLBit(0) = 0
@@ -239,31 +275,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -273,31 +315,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -307,31 +355,37 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan
 [INFO]      o) L1PSNM(ffo) = 1
 [INFO]      o) L1FTDL(ffo) = 1
 [ERROR] The requested input trigger name does not exist
 	name = ffo
-[INFO]      o) L1Input(ffo) = 1
+[INFO]      o) L1Input(ffo) = nan
 [INFO]      o) L1Prescale(ffo) = 1
 [INFO]      o) L1PSNM(hie) = 1
 [INFO]      o) L1FTDL(hie) = 1
 [ERROR] The requested input trigger name does not exist
 	name = hie
-[INFO]      o) L1Input(hie) = 1
+[INFO]      o) L1Input(hie) = nan
 [INFO]      o) L1Prescale(hie) = 1
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1PSNM(INVALID_INPUT) = 1
+[INFO]      o) L1PSNM(INVALID_INPUT) = nan
 [ERROR] The requested output trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1FTDL(INVALID_INPUT) = 1
+[INFO]      o) L1FTDL(INVALID_INPUT) = nan
 [ERROR] The requested input trigger name does not exist
 	name = INVALID_INPUT
-[INFO]      o) L1Input(INVALID_INPUT) = 1
+[INFO]      o) L1Input(INVALID_INPUT) = nan
 [INFO]      o) L1Prescale(INVALID_INPUT) = nan
 [INFO]      o) L1PSNMBit(0) = 1
 [INFO]      o) L1FTDLBit(0) = 1
@@ -341,7 +395,13 @@
 [INFO]      o) L1FTDLBit(17) = 1
 [INFO]      o) L1InputBit(17) = 0
 [INFO]      o) L1PSNMBitPrescale(17) = 1
-[INFO]      o) L1PSNMBit(321) = 0
-[INFO]      o) L1FTDLBit(321) = 0
-[INFO]      o) L1InputBit(321) = 0
-[INFO]      o) L1PSNMBitPrescale(321) = 0
+[ERROR] Requested psnm trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1PSNMBit(321) = nan
+[ERROR] Requested ftdl trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1FTDLBit(321) = nan
+[ERROR] Requested input trigger bit number is out of range
+	bit = 321
+[INFO]      o) L1InputBit(321) = nan
+[INFO]      o) L1PSNMBitPrescale(321) = nan

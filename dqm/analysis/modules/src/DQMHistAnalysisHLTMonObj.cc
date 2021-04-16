@@ -78,17 +78,20 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_proc_unit = findHist("timing_statistics/processingTimeMeanPerUnitHistogram");
   TH1* h_procs = findHist("timing_statistics/processesPerUnitHistogram");
   TH1* h_l1 = findHist("softwaretrigger_before_filter/hlt_unit_number");
+  TH1* h_err_flag = findHist("softwaretrigger_before_filter/error_flag");
   TH1* h_hlt_triggers = findHist("softwaretrigger/filter");
   TH1* h_l1_triggers = findHist("TRGGDL/hGDL_psn_all");
   TH1* h_l1_triggers_filt = findHist("softwaretrigger/l1_total_result");
 
   // set the content of filter canvas
   m_c_filter->Clear(); // clear existing content
-  m_c_filter->Divide(2, 1);
+  m_c_filter->Divide(2, 2);
   m_c_filter->cd(1);
   if (h_hlt) h_hlt->Draw();
   m_c_filter->cd(2);
   if (h_hlt_triggers) h_hlt_triggers->Draw();
+  m_c_filter->cd(3);
+  if (h_err_flag) h_err_flag->Draw();
 
   // set the content of skim canvas
   m_c_skim->Clear(); // clear existing content
@@ -141,7 +144,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   }
 
   if (h_l1_triggers) {
-    // loop bins, add variable to monObj named as "effCS_l1_" + bin label"
+    // loop bins, add variable to monObj named as "effCS_l1_" + bin label
     for (int ibin = 1; ibin < h_l1_triggers->GetXaxis()->GetNbins() + 1; ibin++) {
       double nentr = (double)h_l1_triggers->GetBinContent(ibin);
       std::string bin_name(h_l1_triggers->GetXaxis()->GetBinLabel(ibin));
@@ -151,7 +154,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   }
 
   if (h_l1_triggers_filt) {
-    // loop bins, add variable to monObj named as "effCS_l1_fON_" + bin label"
+    // loop bins, add variable to monObj named as "effCS_l1_fON_" + bin label
     for (int ibin = 1; ibin < h_l1_triggers_filt->GetXaxis()->GetNbins() + 1; ibin++) {
       double nentr = (double)h_l1_triggers_filt->GetBinContent(ibin);
       std::string bin_name(h_l1_triggers_filt->GetXaxis()->GetBinLabel(ibin));
@@ -161,7 +164,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   }
 
   if (h_hlt_triggers) {
-    // loop bins, add variable to monObj named as "effCS_hlt_" + bin label"
+    // loop bins, add variable to monObj named as "effCS_hlt_" + bin label
     for (int ibin = 1; ibin < h_hlt_triggers->GetXaxis()->GetNbins() + 1; ibin++) {
       double nentr = (double)h_hlt_triggers->GetBinContent(ibin);
       std::string bin_name(h_hlt_triggers->GetXaxis()->GetBinLabel(ibin));
@@ -172,11 +175,20 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   }
 
   if (h_meantime) {
-    // loop bins, add variable to monObj named as "secTime_" + bin label"
+    // loop bins, add variable to monObj named as "secTime_" + bin label
     for (int ibin = 1; ibin < h_meantime->GetXaxis()->GetNbins() + 1; ibin++) {
       double nentr = (double)h_meantime->GetBinContent(ibin);
       std::string bin_name(h_meantime->GetXaxis()->GetBinLabel(ibin));
       m_monObj->setVariable(bin_name.insert(0, "secTime_"), nentr);
+    }
+  }
+
+  if (h_err_flag) {
+    // loop bins, add variable to monObj named as "errFlag_" + bin label
+    for (int ibin = 1; ibin < h_err_flag->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_err_flag->GetBinContent(ibin);
+      std::string bin_name(h_err_flag->GetXaxis()->GetBinLabel(ibin));
+      m_monObj->setVariable(bin_name.insert(0, "errFlag_"), nentr);
     }
   }
 

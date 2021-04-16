@@ -557,10 +557,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     int currentStrip = static_cast<int>(strips[index]);
     VxdID currentSensorID = m_currentHit->getSensorID();
 
-    double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C0");
-    double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C1");
-    double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C2");
-    double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, 0, "C3");
+    double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C0");
+    double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C1");
+    double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C2");
+    double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C3");
 
     B2DEBUG(30, "  current strip = " << currentStrip);
     B2DEBUG(30, "     index-3 = " << index - 3 << ", strip = " << strips[index - 3] << ", stripCharge = " << stripCharges[index - 3]);
@@ -683,7 +683,7 @@ void SVDDigitizerModule::saveDigits()
 
       double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, true, iStrip);
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, true, iStrip, 1);
-      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, true, iStrip);
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, true);
 
       double t = initTime;
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
@@ -748,7 +748,7 @@ void SVDDigitizerModule::saveDigits()
 
       double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, false, iStrip);
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, false, iStrip, 1);
-      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false, iStrip);
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false);
 
       double t = initTime;
       for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {

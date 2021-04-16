@@ -297,6 +297,9 @@ Variables will also work on generator-level particles:
 .. b2-variables::
    :group: MC particle seen in subdetectors
 
+.. b2-variables::
+   :group: Generated tau decay information
+   :noindex:
 
 Daughter info
 ~~~~~~~~~~~~~

@@ -50,6 +50,8 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_c_instOccu.reserve(c_sensorGroups.size());
   m_c_occuLER.reserve(c_sensorGroups.size());
   m_c_occuHER.reserve(c_sensorGroups.size());
+  m_c_occuLER1.reserve(c_sensorGroups.size());
+  m_c_occuHER1.reserve(c_sensorGroups.size());
   for (const auto& group : c_sensorGroups) {
     TCanvas* c = new TCanvas("svd_instOccupancy_" + group.nameSuffix,
                              "Instantaneous occupancy " + group.titleSuffix,
@@ -61,16 +63,30 @@ void DQMHistAnalysisSVDDoseModule::initialize()
                     "Occupancy vs time since LER inj. " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER.push_back(c);
-    m_monObj->addCanvas(c);
+    // m_monObj->addCanvas(c);
 
     c = new TCanvas("svd_occuHER_" + group.nameSuffix,
                     "Occupancy vs time since HER inj. " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER.push_back(c);
+    // m_monObj->addCanvas(c);
+
+    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix,
+                    "Occupancy vs time since LER inj. " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuLER1.push_back(c);
+    m_monObj->addCanvas(c);
+
+    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix,
+                    "Occupancy vs time since HER inj. " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuHER1.push_back(c);
     m_monObj->addCanvas(c);
   }
   m_h_occuLER.resize(c_sensorGroups.size(), nullptr);
   m_h_occuHER.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuLER1.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuHER1.resize(c_sensorGroups.size(), nullptr);
 
   // The legend need to be memory-leaked, so we make it once and use it evey time
   m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
@@ -214,6 +230,22 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       c->SetRightMargin(0.16); // For the colorbar
       hOccu->Draw("COLZ");
       c->SetLogz();
+
+      // 1D histo from projection of 2D histo
+      auto hpHits = hHits->ProjectionX(), hpEvts = hEvts->ProjectionX();
+      if (m_h_occuLER1[g]) delete m_h_occuLER1[g];
+      auto hpOccu = m_h_occuLER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
+                       ";Time since last injection [#mus];Occupancy [%]");
+      hpOccu->SetMinimum(1e-3);
+      hpOccu->SetMaximum(10);
+      c = m_c_occuLER1[g];
+      c->Clear();
+      c->cd(0);
+      hpOccu->Draw("E");
+      c->SetLogy();
+      delete hpHits;
+      delete hpEvts;
     }
 
     c = m_c_occuHER[g];
@@ -232,20 +264,24 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       c->SetRightMargin(0.16); // For the colorbar
       hOccu->Draw("COLZ");
       c->SetLogz();
+
+      // 1D histo from projection of 2D histo
+      auto hpHits = hHits->ProjectionX(), hpEvts = hEvts->ProjectionX();
+      if (m_h_occuHER1[g]) delete m_h_occuHER1[g];
+      auto hpOccu = m_h_occuHER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
+                       ";Time since last injection [#mus];Occupancy [%]");
+      hpOccu->SetMinimum(1e-3);
+      hpOccu->SetMaximum(10);
+      c = m_c_occuHER1[g];
+      c->Clear();
+      c->cd(0);
+      hpOccu->Draw("E");
+      c->SetLogy();
+      delete hpHits;
+      delete hpEvts;
     }
   }
-}
-
-TH2F* DQMHistAnalysisSVDDoseModule::divide(TH2F* num, TH2F* den, float scale)
-{
-  TString name = TString("occu_from_") + num->GetName();
-  TH2F* res = (TH2F*)num->Clone(name);
-  for (int i = 0; i < num->GetNcells(); i++) {
-    float n = num->GetBinContent(i), d = den->GetBinContent(i), e = num->GetBinError(i);
-    res->SetBinContent(i, d ? scale * n / d : 0.0f);
-    res->SetBinError(i, d ? scale * e / d : 0.0f);
-  }
-  return res;
 }
 
 void DQMHistAnalysisSVDDoseModule::carryOverflowOver(TH1F* h)

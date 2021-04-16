@@ -86,7 +86,18 @@ namespace Belle2 {
      *  - `result_bin = scale * num_bin / den_bin`
      *  - `result_err = scale * num_err / den_bin`
      */
-    static TH2F* divide(TH2F* num, TH2F* den, float scale = 1.0f);
+    template<typename T>
+    static T* divide(T* num, T* den, float scale = 1.0f)
+    {
+      TString name = TString("occu_from_") + num->GetName();
+      T* res = (T*)num->Clone(name);
+      for (int i = 0; i < num->GetNcells(); i++) {
+        float n = num->GetBinContent(i), d = den->GetBinContent(i), e = num->GetBinError(i);
+        res->SetBinContent(i, d ? scale * n / d : 0.0f);
+        res->SetBinError(i, d ? scale * e / d : 0.0f);
+      }
+      return res;
+    }
 
     /// Carries the content of the overflow bin into the last bin
     static void carryOverflowOver(TH1F* h);
@@ -102,8 +113,12 @@ namespace Belle2 {
     std::vector<TCanvas*> m_c_instOccu; ///< Canvases for the instantaneous occupancy
     std::vector<TCanvas*> m_c_occuLER; ///< Canvases for the occu. vs time after LER inj.
     std::vector<TCanvas*> m_c_occuHER; ///< Canvases for the occu. vs time after HER inj.
+    std::vector<TCanvas*> m_c_occuLER1; ///< Canvases for the 1D occu. vs time after LER inj.
+    std::vector<TCanvas*> m_c_occuHER1; ///< Canvases for the 1D occu. vs time after HER inj.
     std::vector<TH2F*> m_h_occuLER; ///< Histograms for the occu. vs time after LER inj.
     std::vector<TH2F*> m_h_occuHER; ///< Histograms for the occu. vs time after HER inj.
+    std::vector<TH1D*> m_h_occuLER1; ///< Histograms for the 1D occu. vs time after LER inj.
+    std::vector<TH1D*> m_h_occuHER1; ///< Histograms for the 1D occu. vs time after HER inj.
     TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
 
 #ifdef _BELLE2_EPICS

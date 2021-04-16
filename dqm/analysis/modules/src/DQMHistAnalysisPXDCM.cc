@@ -36,6 +36,8 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 1.0);
   addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 2.0);
+  addParam("warnOutside", m_warnOutside, "warn level for outside fraction", 1e-5);
+  addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -187,7 +189,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       // Attention, Integral uses the bin nr, not the value!
-      outside_full += hh1->Integral(16, 63);
+      outside_full += hh1->Integral(16 + 1, 63);
       // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
       // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside_full;
@@ -195,8 +197,8 @@ void DQMHistAnalysisPXDCMModule::event()
       double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current_full > 1) {
-        error_flag |= (outside_full / current_full > 1e-5); /// TODO level might need adjustment
-        warn_flag |= (outside_full / current_full > 1e-6); /// TODO level might need adjustment
+        error_flag |= (outside_full / current_full > m_errorOutside); /// TODO level might need adjustment
+        warn_flag |= (outside_full / current_full > m_warnOutside); /// TODO level might need adjustment
 //         error_flag |= (dhpc / current_full > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
 //         warn_flag |= (dhpc / current_full > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
       }

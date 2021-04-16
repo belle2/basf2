@@ -86,8 +86,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
            "Apply Poisson smearing on chargelets", m_applyPoisson);
-  addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
-           m_applyNoise);
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", m_SNAdjacent);
   addParam("FADCmode", m_roundZS,
@@ -160,39 +158,38 @@ void SVDDigitizerModule::initialize()
   m_minTimeFrame *= Unit::ns;
   m_maxTimeFrame *= Unit::ns;
 
-  B2DEBUG(1,
+  B2DEBUG(30,
           "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
-  B2DEBUG(1, " DATASTORE COLLECTIONS:");
-  B2DEBUG(1,
+  B2DEBUG(30, " DATASTORE COLLECTIONS:");
+  B2DEBUG(30,
           " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(1,
+  B2DEBUG(30,
           " -->  Digits:             " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
-  B2DEBUG(1,
+  B2DEBUG(30,
           " -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
-  B2DEBUG(1,
+  B2DEBUG(30,
           " -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  B2DEBUG(1, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(1, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(1, " PHYSICS: ");
-  B2DEBUG(1, " -->  SegmentLength:      " << m_segmentLength);
-  B2DEBUG(1, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
-  B2DEBUG(1, " NOISE: ");
-  B2DEBUG(1, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
-  B2DEBUG(1, " -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
-  B2DEBUG(1, " -->  Zero suppression cut" << m_SNAdjacent);
-  B2DEBUG(1, " -->  Round ZS cut:       " << (m_roundZS ? "true" : "false"));
-  B2DEBUG(1, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
-  B2DEBUG(1, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
-  B2DEBUG(1, " TIMING: ");
-  B2DEBUG(1, " -->  APV25 shaping time: " << m_shapingTime);
-  B2DEBUG(1, " -->  Sampling time:      " << m_samplingTime);
-  B2DEBUG(1, " -->  Start of int. wind.:" << m_startSampling);
-  B2DEBUG(1, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
-  B2DEBUG(1, " REPORTING: ");
-  B2DEBUG(1, " -->  statisticsFilename: " << m_rootFilename);
-  B2DEBUG(1,
+  B2DEBUG(30, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(30, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(30, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(30, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(30, " PHYSICS: ");
+  B2DEBUG(30, " -->  SegmentLength:      " << m_segmentLength);
+  B2DEBUG(30, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
+  B2DEBUG(30, " NOISE: ");
+  B2DEBUG(30, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(30, " -->  Zero suppression cut" << m_SNAdjacent);
+  B2DEBUG(30, " -->  Round ZS cut:       " << (m_roundZS ? "true" : "false"));
+  B2DEBUG(30, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
+  B2DEBUG(30, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
+  B2DEBUG(30, " TIMING: ");
+  B2DEBUG(30, " -->  APV25 shaping time: " << m_shapingTime);
+  B2DEBUG(30, " -->  Sampling time:      " << m_samplingTime);
+  B2DEBUG(30, " -->  Start of int. wind.:" << m_startSampling);
+  B2DEBUG(30, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
+  B2DEBUG(30, " REPORTING: ");
+  B2DEBUG(30, " -->  statisticsFilename: " << m_rootFilename);
+  B2DEBUG(30,
           " -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
 
   if (!m_rootFilename.empty()) {
@@ -384,11 +381,8 @@ void SVDDigitizerModule::event()
       const SensorInfo& info = *m_currentSensorInfo;
       // Publish some useful data
       m_sensorThickness = info.getThickness();
-      m_depletionVoltage = info.getDepletionVoltage();
-      m_biasVoltage = info.getBiasVoltage();
-
       m_currentSensor = &m_sensors[sensorID];
-      B2DEBUG(20,
+      B2DEBUG(30,
               "Sensor Parameters for Sensor " << sensorID << ": " << endl
               << " --> Width:          " << m_currentSensorInfo->getWidth() << endl
               << " --> Length:         " << m_currentSensorInfo->getLength() << endl
@@ -401,7 +395,7 @@ void SVDDigitizerModule::event()
              );
 
     }
-    B2DEBUG(10,
+    B2DEBUG(20,
             "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
     processHit();
   }

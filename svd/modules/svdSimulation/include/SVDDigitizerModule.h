@@ -128,8 +128,6 @@ namespace Belle2 {
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
-      /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
       double m_SNAdjacent = 3.0;
       /** Round ZS cut to nearest ADU */
@@ -175,7 +173,7 @@ namespace Belle2 {
       std::string m_signalsList = "";
 
 
-      // 6. 3-mixed-6 and 3-sample DAQM
+      // 6. 3-mixed-6 and 3-sample daqMode
       /** True if the event should be simulated with 3 sample */
       bool m_is3sampleEvent = false;
 
@@ -198,10 +196,6 @@ namespace Belle2 {
       double m_currentTime = 0;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness = 0.03;
-      /** The depletion voltage of the Silicon sensor */
-      double m_depletionVoltage = 40;
-      /** The bias voltage on the sensor */
-      double m_biasVoltage = 100;
 
       /** relative shift in SVDEventInfo obj */
       int m_relativeShift = 0;
@@ -211,11 +205,7 @@ namespace Belle2 {
       /** return the starting sample */
       int getFirstSample(const SVDModeByte modeByte);
 
-
-      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
-      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
-
-      //run-dependent MC payloads:
+      //MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/

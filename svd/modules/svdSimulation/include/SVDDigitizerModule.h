@@ -19,7 +19,6 @@
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
-#include <mdst/dataobjects/TRGSummary.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/calibration/SVDDetectorConfiguration.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
@@ -175,12 +174,9 @@ namespace Belle2 {
       std::string m_signalsList = "";
 
 
-      // 6. 3-mixed-6
-      /** Parameter fot the 3-mixed-6 DAQ mode simulation */
-      bool m_mixedDAQ = false;
-      /** Name of the StoreObjectPrt TRGSummary */
-      std::string m_objTrgSummaryName = "TRGSummary";
-
+      // 6. 3-mixed-6 and 3-sample DAQM
+      /** True if the event should be simulated with 3 sample */
+      bool m_is3sampleEvent = false;
 
       // Other data members:
 
@@ -230,8 +226,7 @@ namespace Belle2 {
       int m_relativeShift = 0;
       /** Starting sample for the selection of 3 samples in 3-mixed-6 */
       int m_startingSample = 0;
-      /**Trigger quality to choose if simulate 3 samples or 6 samples */
-      int m_trgQuality = 1;
+
       /** return the starting sample */
       int getFirstSample(const SVDModeByte modeByte);
 

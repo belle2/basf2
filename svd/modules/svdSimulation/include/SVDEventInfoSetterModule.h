@@ -18,6 +18,9 @@
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
 #include <simulation/dataobjects/SimClockState.h>
+#include <svd/calibration/SVDDetectorConfiguration.h>
+#include <mdst/dataobjects/TRGSummary.h>
+
 
 namespace Belle2 {
   /**
@@ -41,6 +44,11 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** Reads Detector Configuration from DB
+     *  daqMode and relativeShift
+     */
+    virtual void beginRun() override;
+
     /** Stores the SVD event info into the DataStore.
      *
      * Based on the parameters set by the user the current SVD event info
@@ -49,6 +57,11 @@ namespace Belle2 {
     virtual void event() override;
 
     std::string m_svdEventInfoName; /**< Name of the SVDEventInfo object */
+
+    /** Name of the StoreObjectPrt TRGSummary */
+    std::string m_objTrgSummaryName = "TRGSummary";
+
+    bool m_useDB; /**<if true reads the configuration from SVDDetectorConfiguration payload**/
 
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
@@ -70,6 +83,8 @@ namespace Belle2 {
     SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
 
     int m_relativeShift; /**< latency difference between the 3- and 6-sample acquired events*/
+
+    SVDDetectorConfiguration m_svdConfig; /**< svd configuration parameters */
   };
 }
 

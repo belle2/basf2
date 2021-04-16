@@ -280,11 +280,11 @@ A special case is the decay of generated tau lepton pairs. For their study, it i
 .. b2-variables::
         :variables: tauPlusMCMode,tauMinusMCMode,tauPlusMCProng,tauMinusMCProng
 
-Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay.
+Using MC information, `labelTauPairMC` identifies if the generated event is a tau pair decay.
 
-The variables ``tauPlusMCProng`` and ``tauMinusMCProng`` stores the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
+The variables `tauPlusMCProng` and `tauMinusMCProng` store the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
 
-The channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode`` (one for the positive and the other for the negative) according to the following table:
+The channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode` (one for the positive and the other for the negative) according to the following table:
 
 ============  ===============================================  ============  ==================================================
 MC mode       Decay channel                                    MC mode       Decay channel

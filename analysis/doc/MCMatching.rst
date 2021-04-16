@@ -278,7 +278,7 @@ A special case is the decay of generated tau lepton pairs. For their study, it i
         labelTauPairMC()
 
 .. b2-variables::
-        :variables: tauPlusMcMode,tauMinusMcMode,tauPlusMCProng,tauMinusMCProng
+        :variables: tauPlusMCMode,tauMinusMCMode,tauPlusMCProng,tauMinusMCProng
 
 Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay.
 

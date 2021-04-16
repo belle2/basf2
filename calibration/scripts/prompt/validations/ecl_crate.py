@@ -18,7 +18,7 @@ settings = ValidationSettings(name='ECL Crate',
                               expert_config=None)
 
 
-def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
+def run_validation(job_path, input_data_path, expert_config):
     # job_path will be replaced with path/to/calibration_results
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 
@@ -58,16 +58,16 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     EnVsCrysID = gg.Get("EnVsCrysID")
     ggEntries = EnVsCrysID.GetEntries()
     crossSection = 3990000.  # fb
-    lumi = ggEntries/crossSection
-    # nomUnc = 0.5  # percent
+    lumi = ggEntries / crossSection
+    nomUnc = 0.5  # percent
     nomLum = 2.36  # fb-1
-    estUnc = 0.5*np.sqrt(nomLum/lumi)
+    estUnc = 0.5 * np.sqrt(nomLum / lumi)
 
     print("%f entries in gg EnVsCrysID lumi = %.2f fb-1 est uncerta = %.2f \n" % (ggEntries, lumi, estUnc))
 
     # Summarize fit status
     hStatusgg = gg.Get("hStatus")
-    success = 100.*(hStatusgg.GetBinContent(22) + hStatusgg.GetBinContent(14))/8736.
+    success = 100. * (hStatusgg.GetBinContent(22) + hStatusgg.GetBinContent(14)) / 8736.
     print("\nSummary of Gamma Gamma fit status. %.1f good fits:\n" % (success))
     print("16 good fit:   %.4f \n" % (hStatusgg.GetBinContent(22)))
     print(" 8 iterations: %.4f \n" % (hStatusgg.GetBinContent(14)))
@@ -86,16 +86,16 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     minCellID = -1
     maxBarrelRatio = 0.
     maxCellID = -1
-    for cellID in range(1, 8736+1):
+    for cellID in range(1, 8736 + 1):
         status = StatusVsCrysIDgg.GetBinContent(cellID)
         if status > 0:
             inputCalib = AverageInitCalibgg.GetBinContent(cellID)
             outputCalib = CalibVsCrysIDgg.GetBinContent(cellID)
-            ratio = outputCalib/inputCalib
+            ratio = outputCalib / inputCalib
             ggRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
-                print("%.2f cellID %.4f %.3f %s\n" % (bigChange, cellID, ratio,  status))
+                print("%.2f cellID %.4f %.3f %s\n" % (bigChange, cellID, ratio, status))
 
             # Look for large deviations in the barrel excluding first and last
             if(cellID >= 1297 and cellID <= 7632):
@@ -133,18 +133,18 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     print("\nCompare Bhabha output calibration to input:\n")
     bigChange = 0
     eeCalibrated = 0
-    for cellID in range(1, 8736+1):
+    for cellID in range(1, 8736 + 1):
         inputCalib = AverageInitCalibee.GetBinContent(cellID)
         outputCalib = CalibVsCrysIDee.GetBinContent(cellID)
         if(outputCalib > 0):
             eeCalibrated += 1
-            ratio = outputCalib/inputCalib
+            ratio = outputCalib / inputCalib
             eeRatio.Fill(ratio)
             if(ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
                 print(" %2d cellID %.4f %5.3f\n" % (bigChange, cellID, ratio))
 
-    print("Total calibrated crystals = %.4f = %.1f \n\n" % (eeCalibrated, 100.*eeCalibrated/8736.))
+    print("Total calibrated crystals = %.4f = %.1f \n\n" % (eeCalibrated, 100. * eeCalibrated / 8736.))
     eeRatio.Fit("gaus")
     myC.Print("plots/eeRatio.pdf")
 
@@ -157,18 +157,18 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     # ------------------------------------------------------------------------
     # Bhabha/gg comparison
     print("\n---------------------------------------- \nBhabha to gamma comparison: \n\n")
-    xcellID = array('d', [0]*8736)
-    yratio = array('d', [0]*8736)
+    xcellID = array('d', [0] * 8736)
+    yratio = array('d', [0] * 8736)
     nPo = 0
-    for cellID in range(1, 8736+1):
+    for cellID in range(1, 8736 + 1):
         ggstatus = StatusVsCrysIDgg.GetBinContent(cellID)
         ggCalib = CalibVsCrysIDgg.GetBinContent(cellID)
         eeCalib = CalibVsCrysIDee.GetBinContent(cellID)
         if(ggstatus > 0. and eeCalib > 0.):
             if(cellID >= 1297 and cellID <= 7632):
-                eeggRatio.Fill(eeCalib/ggCalib)
+                eeggRatio.Fill(eeCalib / ggCalib)
                 xcellID[nPo] = cellID
-                yratio[nPo] = eeCalib/ggCalib
+                yratio[nPo] = eeCalib / ggCalib
                 nPo += 1
 
     # Fit ratio
@@ -203,8 +203,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
 
     # Summarize fit status
     hStatusmumu = mumu.Get("hStatus")
-    success = 100.*(hStatusmumu.GetBinContent(22) + hStatusmumu.GetBinContent(14))/8736.
-    print("\nSummary of muon pair fit status. %.1f good fits:\n" % success)
+    success = 100. * (hStatusmumu.GetBinContent(22) + hStatusmumu.GetBinContent(14)) / 8736.
+    print(r"\nSummary of muon pair fit status. \%.1f good fits:\n", success)
     print("16 good fit:   %.4f \n" % (hStatusmumu.GetBinContent(22)))
     print(" 8 iterations: %.4f \n" % (hStatusmumu.GetBinContent(14)))
     print(" 4 at limit:   %.4f \n" % (hStatusmumu.GetBinContent(10)))
@@ -220,16 +220,16 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     CalibVsCrysIDmumu = mumu.Get("CalibVsCrysID")
 
     nPo = 0
-    for cellID in range(1, 8736+1):
+    for cellID in range(1, 8736 + 1):
         ggstatus = StatusVsCrysIDgg.GetBinContent(cellID)
         ggCalib = CalibVsCrysIDgg.GetBinContent(cellID)
         mumustatus = StatusVsCrysIDmumu.GetBinContent(cellID)
         mumuCalib = CalibVsCrysIDmumu.GetBinContent(cellID)
         if(ggstatus > 7.5 and mumustatus > 7.5):
             if(cellID >= 1297 and cellID <= 7632):
-                mumuggRatio.Fill(mumuCalib/ggCalib)
+                mumuggRatio.Fill(mumuCalib / ggCalib)
                 xcellID[nPo] = cellID
-                yratio[nPo] = mumuCalib/ggCalib
+                yratio[nPo] = mumuCalib / ggCalib
                 nPo += 1
 
     mumuggRatio.Fit("gaus")
@@ -262,7 +262,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
 
     # Final calib should be equal to gamma gamma if available unchanged otherwise.
     nPo = 0
-    for cellID in range(1, 8736+1):
+    for cellID in range(1, 8736 + 1):
         ggstatus = StatusVsCrysIDgg.GetBinContent(cellID)
         newOldRatio = newPayload.GetBinContent(cellID) / existingPayload.GetBinContent(cellID)
         newggRatio = newPayload.GetBinContent(cellID) / CalibVsCrysIDgg.GetBinContent(cellID)

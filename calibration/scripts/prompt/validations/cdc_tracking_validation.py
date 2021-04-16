@@ -12,7 +12,11 @@ import os
 settings = ValidationSettings(name='CDC Tracking',
                               description=__doc__,
                               download_files=[],
-                              expert_config=None)
+                              expert_config={file_extension: 'png',
+                                             algo_tz: 'tz2'
+                                             algo_tw: 'tw0'
+                                             algo_sr: 'sr0'
+                                             algo_xt: 'xt0'})
 
 
 def findLastIteration(job_path, algorithm):
@@ -23,16 +27,17 @@ def findLastIteration(job_path, algorithm):
     return list_dirs[0]
 
 
-def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
+def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # job_path will be replaced with path/to/calibration_results
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 
     # will be included in the expert_config in the future
-    file_extension = 'png'
-    algo_tz = 'tz2'
-    algo_tw = 'tw0'
-    algo_sr = 'sr0'
-    algo_xt = 'xt0'
+    expert_config = json.loads(expert_config)
+    file_extension = expert_config['file_extension']
+    algo_tz = expert_config['algo_tz']
+    algo_tw = expert_config['algo_tw']
+    algo_sr = expert_config['algo_sr']
+    algo_xt = expert_config['algo_xt']
 
     import os
     import ROOT

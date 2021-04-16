@@ -161,7 +161,9 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
 //       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
 //       if (cellContent < -1) {
 //         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent >= 0 && cellContent < 10) {
+//       } else if (cellContent == 0) {
+//         std::cout << "   ";
+//       }  else if (cellContent > 0 && cellContent < 10) {
 //         std::cout << " " <<  cellContent << " ";
 //       } else if (cellContent >= 10) {
 //         std::cout << cellContent << " ";
@@ -175,7 +177,9 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
 //       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
 //       if (cellContent < -1) {
 //         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent >= 0 && cellContent < 10) {
+//       } else if (cellContent == 0) {
+//         std::cout << "   ";
+//       } else if (cellContent > 0 && cellContent < 10) {
 //         std::cout << " " <<  cellContent << " ";
 //       } else if (cellContent >= 10) {
 //         std::cout << cellContent << " ";
@@ -287,6 +291,13 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
         } else {
           m_SectorArray[localIndexY * m_nAngleSectors + localIndexX] = -layerFilter(layerHits);
           m_activeSectorArray.push_back(std::make_pair(localIndexX, localIndexY));
+
+
+          m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
+                          " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
+                          m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
+          m_rectcounter++;
+
 //           int nActiveSectors = std::count_if(m_SectorArray.begin(), m_SectorArray.end(), [](int c) {return c < 0;});
 //           B2DEBUG(29, "number of active sectors: " << nActiveSectors << " localIndexX: " << localIndexX << " localIndexY: " << localIndexY << " totalIndex: " << localIndexY * m_nAngleSectors + localIndexX);
         }
@@ -320,8 +331,12 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
     return ((int)b.second - (int)a.second) * 16384 < (int)b.first - (int)a.first;
   };
   std::sort(m_activeSectorArray.begin(), m_activeSectorArray.end(), sortSectors);
+//   for (const auto& currentCell : m_activeSectorArray) {
+//     B2INFO(currentCell.first << "\t" << currentCell.second);
+//   }
+//   B2INFO("    end this side");
 
-  for (auto& currentCell : m_activeSectorArray) {
+  for (const auto& currentCell : m_activeSectorArray) {
     const uint currentIndex = currentCell.second * m_nAngleSectors + currentCell.first;
     if (m_SectorArray[currentIndex] > -1) continue;
 

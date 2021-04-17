@@ -40,7 +40,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
   addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples or 3-mixed-6 samples", int(2));
-  addParam("fixedTriggerBin", m_triggerBin,
+  addParam("fixedTriggerBin", m_fixedTriggerBin,
            "Trigger bin 0/1/2/3 - useful for timing studies. The default is 3 if SimClockState is not valid.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
@@ -63,8 +63,9 @@ void SVDEventInfoSetterModule::initialize()
 
 void SVDEventInfoSetterModule::event()
 {
-  if (m_triggerBin >= 0 && m_triggerBin <= 3) {
+  if (m_fixedTriggerBin >= 0 && m_fixedTriggerBin <= 3) {
     B2DEBUG(25, "using fixed triggerBin");
+    m_triggerBin = m_fixedTriggerBin;
   } else {
     if (m_simClockState.isValid())
       m_triggerBin = m_simClockState->getSVDTriggerBin();
@@ -81,7 +82,7 @@ void SVDEventInfoSetterModule::event()
   m_SVDModeByte.setTriggerBin(m_triggerBin);
   m_SVDTriggerType.setType(m_triggerType);
 
-  B2DEBUG(25, " triggerBin = " << m_triggerBin << " from ModeByte = " << (int)m_SVDModeByte.getTriggerBin());
+  B2DEBUG(25, " triggerBin = " << m_triggerBin);
 
   m_svdEventInfoPtr.create();
   m_svdEventInfoPtr->setModeByte(m_SVDModeByte);

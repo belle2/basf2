@@ -3,10 +3,12 @@
 import basf2 as b2
 from basf2 import conditions as b2conditions
 from svd import add_svd_trgsummary
+from simulation import add_simulation
 
 numEvents = 2000
 
-b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+# SVD-ONLY SIMULATION
+# b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = b2.create_path()
 
@@ -20,6 +22,22 @@ main.add_module(eventinfosetter)
 main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
+# Belle2 Simulation
+add_simulation(main, simulateT0jitter=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+
+for m in main.modules():
+    if m.name() == "SVDEventInfoSetter":
+        m.param("useDB", True)
+        m.param("daqMode", 3)
+        m.param("relativeShift", 9)
+        m.set_log_level(b2.LogLevel.DEBUG)
+        m.set_debug_level(25)
+    if m.name() == "SVDDigitizer":
+        m.set_log_level(b2.LogLevel.INFO)
+        m.set_debug_level(25)
+
+'''
+# SVD_ONLY SIMULATION
 # gearbox
 main.add_module('Gearbox')
 
@@ -41,7 +59,7 @@ main.add_module('FullSim')
 # including the timing module
 # main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
 
-add_svd_trgsummary(main)
+# add_svd_trgsummary(main)
 
 # SVD simulation
 svdevtinfoset = b2.register_module("SVDEventInfoSetter")
@@ -60,7 +78,7 @@ digitizer.param('signalsList', "digitizer_test2021_1_hwclock.txt")
 digitizer.set_log_level(b2.LogLevel.DEBUG)
 digitizer.set_debug_level(30)
 main.add_module(digitizer)
-
+'''
 main.add_module('RootOutput')
 main.add_module('Progress')
 

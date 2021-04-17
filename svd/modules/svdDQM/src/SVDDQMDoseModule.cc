@@ -18,8 +18,9 @@
 // Other includes
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include "TDirectory.h"
-#include "TString.h"
+#include <TDirectory.h>
+#include <TString.h>
+#include <TMath.h>
 #include <cmath>
 
 using namespace std;
@@ -92,6 +93,23 @@ void SVDDQMDoseModule::defineHisto()
                500, 0, m_noInjectionTime, 100, 0, m_revolutionTime));
   }
 
+  // Nbins for 1D histos such that bin width = beam_revolution_time / 2
+  int nb1 = TMath::Nint(m_noInjectionTime * 2.0 / m_revolutionTime);
+  h_nEvtsVsTime1 = new TH1F(
+    "SVDEvtsVsTime1", "SVD Events;Time since last injection [#mus];Events / bin",
+    nb1, 0, m_noInjectionTime);
+
+  m_groupNHits1U.reserve(c_sensorGroups.size()); // Allocate memory only once
+  name = "SVDHitsVsTime1_";
+  title = "SVD Hits ";
+  axisTitle = ";Time since last injection [#mus];Hits / bin";
+  for (const SensorGroup& group : c_sensorGroups) {
+    m_groupNHits1U.push_back(
+      new TH1F(name + group.nameSuffix + "U",
+               title + group.titleSuffix + " U-side" + axisTitle,
+               nb1, 0, m_noInjectionTime));
+  }
+
   oldDir->cd();
 }
 
@@ -128,9 +146,12 @@ void SVDDQMDoseModule::initialize()
 void SVDDQMDoseModule::beginRun()
 {
   h_nEvtsVsTime->Reset();
+  h_nEvtsVsTime1->Reset();
   for (const auto& histPtr : m_groupOccupanciesU)
     histPtr->Reset();
   for (const auto& histPtr : m_groupNHitsU)
+    histPtr->Reset();
+  for (const auto& histPtr : m_groupNHits1U)
     histPtr->Reset();
 }
 
@@ -189,6 +210,7 @@ void SVDDQMDoseModule::event()
         if (c_sensorGroups[i].contains(sensorID)) {
           groupHitsU[i]++; // For instantaneous occupancy
           m_groupNHitsU[i]->Fill(timeSinceInj, timeInCycle);
+          m_groupNHits1U[i]->Fill(timeSinceInj);
         }
       }
     }
@@ -196,6 +218,7 @@ void SVDDQMDoseModule::event()
 
   // Count events
   h_nEvtsVsTime->Fill(timeSinceInj, timeInCycle);
+  h_nEvtsVsTime1->Fill(timeSinceInj);
 
   // Compute instantaneous occupancy
   for (unsigned int i = 0; i < c_sensorGroups.size(); i++)

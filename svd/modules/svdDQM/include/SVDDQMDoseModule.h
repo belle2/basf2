@@ -93,6 +93,10 @@ namespace Belle2 {
       std::vector<TH2F*> m_groupNHitsU;
       /** Hists of the instantaneous occupancy per sensor group (see c_sensorGroups), U-side. */
       std::vector<TH1F*> m_groupOccupanciesU;
+      /** Hist of the total evts in each time bin (1D, time since inj. only). */
+      TH1F* h_nEvtsVsTime1 = nullptr;
+      /// Hists of the number of hits in each time bin (1D) per sensor group, U-side.
+      std::vector<TH1F*> m_groupNHits1U;
 
       // Other stuff
       /** List of interesting groups of sensors to average over. Defined in SVDDQMDoseModule.cc . */

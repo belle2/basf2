@@ -223,29 +223,30 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hOccu->SetMinimum(1e-6);
+      hOccu->SetMinimum(1e-3);
       hOccu->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
       hOccu->Draw("COLZ");
       c->SetLogz();
+    }
 
-      // 1D histo from projection of 2D histo
-      auto hpHits = hHits->ProjectionX(), hpEvts = hEvts->ProjectionX();
+    c = m_c_occuLER1[g];
+    auto hpEvts = findHistT<TH1F>("SVDDoseLERInj/SVDEvtsVsTime1");
+    auto hpHits = findHistT<TH1F>("SVDDoseLERInj/SVDHitsVsTime1_" + group.nameSuffix);
+    if (hpHits && hpEvts) {
       if (m_h_occuLER1[g]) delete m_h_occuLER1[g];
       auto hpOccu = m_h_occuLER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
       hpOccu->SetMaximum(10);
-      c = m_c_occuLER1[g];
       c->Clear();
       c->cd(0);
-      hpOccu->Draw("E");
+      hpOccu->SetMarkerStyle(7);
+      hpOccu->Draw("hist P");
       c->SetLogy();
-      delete hpHits;
-      delete hpEvts;
     }
 
     c = m_c_occuHER[g];
@@ -257,29 +258,30 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
-      hOccu->SetMinimum(1e-6);
+      hOccu->SetMinimum(1e-3);
       hOccu->SetMaximum(10);
       c->Clear();
       c->cd(0);
       c->SetRightMargin(0.16); // For the colorbar
       hOccu->Draw("COLZ");
       c->SetLogz();
+    }
 
-      // 1D histo from projection of 2D histo
-      auto hpHits = hHits->ProjectionX(), hpEvts = hEvts->ProjectionX();
+    c = m_c_occuHER1[g];
+    hpEvts = findHistT<TH1F>("SVDDoseHERInj/SVDEvtsVsTime1");
+    hpHits = findHistT<TH1F>("SVDDoseHERInj/SVDHitsVsTime1_" + group.nameSuffix);
+    if (hpHits && hpEvts) {
       if (m_h_occuHER1[g]) delete m_h_occuHER1[g];
       auto hpOccu = m_h_occuHER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
       hpOccu->SetMaximum(10);
-      c = m_c_occuHER1[g];
       c->Clear();
       c->cd(0);
-      hpOccu->Draw("E");
+      hpOccu->SetMarkerStyle(7);
+      hpOccu->Draw("hist P");
       c->SetLogy();
-      delete hpHits;
-      delete hpEvts;
     }
   }
 }

@@ -40,7 +40,6 @@ pass the object to the :py:func:`simulation.add_simulation` function as the keyw
 
 
 The module can use different generator models.
-The model can be selected with the keyword argument ``model`` in the :py:class:`.Specs` instance used to invoke the module.
 
 .. seealso::
     An example steering file is available at ``pxd/examples/background_generator.py``.
@@ -89,4 +88,4 @@ Reference
 
 .. autoclass:: pxd.background_generator.PXDBackgroundGenerator
 
-.. autoclass:: pxd.background_generator.Specs
+.. autofunction:: pxd.background_generator.inject_simulation

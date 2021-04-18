@@ -4,7 +4,6 @@
 import basf2 as b2
 from geometry import check_components
 from pxd import add_pxd_simulation
-from pxd.background_generator import add_pxd_background_generator
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
@@ -121,16 +120,12 @@ def add_simulation(
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
-        usePXDGatedMode=False,
-        pxd_background_generator=None):
+        usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
-    :param pxd_background_generator: Specifications to pass to the PXD background generator module,
-        defaults to None - disable the module
-    :type pxd_background_generator: :py:class:`pxd.background_generator.Specs`, optional
     """
 
     # Check compoments.
@@ -156,19 +151,6 @@ def add_simulation(
                     # Emulate injection vetos for PXD
                     pxd_veto_emulator = b2.register_module('PXDInjectionVetoEmulator')
                     path.add_module(pxd_veto_emulator)
-
-    # PXD background generation
-    if pxd_background_generator is not None:
-        # check that PXD simulation is enabled
-        if components is None or 'PXD' in components:
-            # check that background overlay is enabled
-            if bkgOverlay and bkgfiles is not None:
-                # add the PXD background generator module to path
-                add_pxd_background_generator(path, pxd_background_generator)
-            else:
-                b2.B2ERROR('background overlay disabled - cannot run PXD background generation')
-        else:
-            b2.B2ERROR('PXD simulation disabled - cannot run PXD background generation')
 
     # geometry parameter database
     if 'Gearbox' not in path:

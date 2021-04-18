@@ -18,8 +18,7 @@
 
 import basf2 as b2
 from background import get_background_files
-from pxd.background_generator import Specs
-from simulation import add_simulation
+from pxd.background_generator import inject_simulation, PXDBackgroundGenerator
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
@@ -39,11 +38,14 @@ main.add_module('EvtGenInput')
 # list of background overlay files that are available on the system
 files = get_background_files()
 
-# specifications for the PXD background generator module
-specs = Specs(model='resnet')
+# instantiate the PXD background generator module
+generator_module = PXDBackgroundGenerator(model='resnet')
+
+# create a drop-in simulation function that incorporates the module
+add_simulation = inject_simulation(generator_module)
 
 # detector simulation with background overlay
-add_simulation(main, bkgfiles=files, pxd_background_generator=specs)
+add_simulation(main, bkgfiles=files)
 
 # trigger simulation
 add_tsim(main)

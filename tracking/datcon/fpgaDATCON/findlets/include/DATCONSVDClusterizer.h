@@ -77,6 +77,13 @@ namespace Belle2 {
     /// Is this the finldlet for u-side or for v-side?
     bool m_param_isU = true;
 
+    /// Save SVDCluster to DataStore for analysis?
+    bool m_param_saveClusterToDataStore = false;
+    /// SVDClusters StoreArray name
+    std::string m_param_storeSVDClustersName = "DATCONSVDClusters";
+    /// StoreArray to save the clusters to
+    StoreArray<SVDCluster> m_storeSVDClusters;
+
     /// maximum cluster size
     unsigned short m_param_maxiClusterSize = 20;
     /// Value above which u-strips are considered noisy, all other u-strips will get assigned a standard noise value of m_noiseCut

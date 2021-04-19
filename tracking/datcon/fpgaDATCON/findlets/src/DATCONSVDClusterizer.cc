@@ -35,40 +35,33 @@ void DATCONSVDClusterizer::exposeParameters(ModuleParamList* moduleParamList, co
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseMap"),
-                                m_param_noiseMapfileName,
-                                "Name of the text file containing strip noise information.",
-                                m_param_noiseMapfileName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseMap"), m_param_noiseMapfileName,
+                                "Name of the text file containing strip noise information.", m_param_noiseMapfileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeNoiseMapsToFile"),
-                                m_param_writeNoiseMapsToFile,
-                                "Write noise information to text file?",
-                                m_param_writeNoiseMapsToFile);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeNoiseMapsToFile"), m_param_writeNoiseMapsToFile,
+                                "Write noise information to text file?", m_param_writeNoiseMapsToFile);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumClusterSize"),
-                                m_param_maxiClusterSize,
-                                "Maximum cluster size.",
-                                m_param_maxiClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumClusterSize"), m_param_maxiClusterSize,
+                                "Maximum cluster size.", m_param_maxiClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseCut"),
-                                m_param_noiseCut,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseCut"), m_param_noiseCut,
                                 "Cut for using default noise (noise < this value), or actual noise (noise > this value).",
                                 m_param_noiseCut);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "requiredSNRstrip"),
-                                m_param_requiredSNRstrip,
-                                "Required SNR per strip.",
-                                m_param_requiredSNRstrip);
+                                m_param_requiredSNRstrip, "Required SNR per strip.", m_param_requiredSNRstrip);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "requiredSNRcluster"),
-                                m_param_requiredSNRcluster,
-                                "Required SNR for the cluster.",
-                                m_param_requiredSNRcluster);
+                                m_param_requiredSNRcluster, "Required SNR for the cluster.", m_param_requiredSNRcluster);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUClusterizer"),
-                                m_param_isU,
-                                "Is this u or v side?",
-                                m_param_isU);
+                                m_param_isU, "Is this u or v side?", m_param_isU);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "saveClusterToDataStore"),
+                                m_param_saveClusterToDataStore, "Save SVDClusters for analysis?", m_param_saveClusterToDataStore);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDClustersName"),
+                                m_param_storeSVDClustersName, "Name of the SVDClusters StoreArray", m_param_storeSVDClustersName);
 
 }
 
@@ -81,6 +74,11 @@ void DATCONSVDClusterizer::beginRun()
 void DATCONSVDClusterizer::initialize()
 {
   Super::initialize();
+
+  if (m_param_saveClusterToDataStore) {
+    m_storeSVDClusters.registerInDataStore(m_param_storeSVDClustersName);
+    m_param_storeSVDClustersName = m_storeSVDClusters.getName();
+  }
 }
 
 void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters)
@@ -155,6 +153,12 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
 
       clusters.emplace_back(SVDCluster(clusterCand.vxdID, m_param_isU, clusterCand.clusterPosition, clusterPositionError,
                                        0.0, 0.0, clusterCand.charge, clusterCand.seedCharge, clusterCand.strips.size(), 0.0, 0.0));
+    }
+  }
+
+  if (m_param_saveClusterToDataStore) {
+    for (const auto& cluster : clusters) {
+      m_storeSVDClusters.appendNew(cluster);
     }
   }
 

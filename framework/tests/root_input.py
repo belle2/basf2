@@ -150,7 +150,9 @@ with clean_working_directory():
         def event(self):
             """Set error flag if required"""
             if self.emd.getEvent() not in self._accepted:
-                self.emd.addErrorFlag(Belle2.EventMetaData.c_HLTDiscard)
+                error = Belle2.EventMetaData.c_HLTDiscard if self.emd.getEvent() % 2 == 0 else \
+                    Belle2.EventMetaData.c_HLTCrash
+                self.emd.addErrorFlag(error)
 
     main = basf2.Path()
     main.add_module("EventInfoSetter", evtNumList=10)

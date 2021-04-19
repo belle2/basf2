@@ -2039,7 +2039,7 @@ class HTCondor(Batch):
             backend_status = job_info["JobStatus"]
             # if job is held (backend_status = 5) then report why then kill the job
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
+                hold_reason = job_info.get("HoldReason", None)
                 B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
                 subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
                 backend_status = 6
@@ -2137,13 +2137,15 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
+        # condor_q occassionally fails
         try:
             records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-            if records:
-                records = decode_json_string(records)
-            else:
-                records = []
         except BaseException:
+            records = None
+
+        if records is not None:
+            records = decode_json_string(records)
+        else:
             records = []
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
@@ -2200,11 +2202,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-        if records:
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
+        if records is not None:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info

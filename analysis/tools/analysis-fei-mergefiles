@@ -31,8 +31,8 @@ def is_statistics_file(tfile):
         return True
     return False
 
-def is_ntuple_file(tfile):
-    if 'training_input' in tfile.GetName() or 'Monitor_Final' in tfile.GetName():
+def is_monitor_ntuple_file(tfile):
+    if 'Monitor_Final' in tfile.GetName():
         return True
     else:
         return False
@@ -100,11 +100,11 @@ print(f'Preparing merging for {outFile}')
 if is_statistics_file(tfile):
     print('Is a statistics file')
     doMerge(outFile, inFiles)
-elif is_ntuple_file(tfile):
-    print('Is an ntuple file')
+elif is_monitor_ntuple_file(tfile):
+    print('Is a monitor ntuple file')
     doMergeNtuple(outFile, inFiles)
 else:
-    print('Is a histogram file')
+    print('Is a histogram or a training ntuple file')
     import subprocess
     ret = subprocess.call(['hadd', outFile] + inFiles)
     sys.exit(ret)

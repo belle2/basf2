@@ -11,7 +11,10 @@
 
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -38,10 +41,10 @@ void ToPXDExtrapolator::exposeParameters(ModuleParamList* moduleParamList, const
                                 "Only extrapolate to PXD sensors within this value away from the track phi value, L2.",
                                 m_param_phiCutL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDIntercepts"),
-                                m_param_storePXDIntercepts,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "createPXDIntercepts"),
+                                m_param_createPXDIntercepts,
                                 "Store PXDIntercepts to StoreArray?",
-                                m_param_storePXDIntercepts);
+                                m_param_createPXDIntercepts);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"),
                                 m_param_PXDInterceptStoreArrayName,
@@ -54,7 +57,7 @@ void ToPXDExtrapolator::initialize()
 {
   Super::initialize();
 
-  if (m_param_storePXDIntercepts) {
+  if (m_param_createPXDIntercepts) {
     m_pxdIntercepts.registerInDataStore(m_param_PXDInterceptStoreArrayName);
     m_param_PXDInterceptStoreArrayName = m_pxdIntercepts.getName();
   }
@@ -78,14 +81,17 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
     uint layer = 1;
     long sensorPerpRadius = layerRadius[layer - 1];
     for (uint ladder = 1; ladder <= 8; ladder++) {
-      const double sensorPhi = M_PI / 4. * (ladder - 1);
+      double sensorPhi = M_PI / 4. * (ladder - 1);
+      if (sensorPhi > M_PI) {
+        sensorPhi -= 2. * M_PI;
+      }
 
       angleDiff = trackPhi - sensorPhi;
       if (angleDiff > M_PI) {
-        angleDiff -= 2 * M_PI;
+        angleDiff -= 2. * M_PI;
       }
       if (angleDiff < -M_PI) {
-        angleDiff += 2 * M_PI;
+        angleDiff += 2. * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL1) continue;
       B2DEBUG(29, "angleDiff: " << angleDiff);
@@ -94,10 +100,10 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
       B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
       B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
-      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius,
-                                3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff),
-               3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
+      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
       double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
 
       B2DEBUG(29, "y from extrapolation: " << y);
@@ -109,24 +115,10 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);
         uExtrapolations.emplace_back(sensorID, localUPosition);
-        if (m_param_storePXDIntercepts) {
-          PXDIntercept intercept;
-          intercept.setCoorU((double)localUPosition * Unit::nm);  // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<double>::max());
-          intercept.setVxdID(sensorID);
-          m_pxdIntercepts.appendNew(intercept);
-        }
 
         // store extrapolated hit for second sensor in ladder
         sensorID = VxdID(layer, ladder, 2);
         uExtrapolations.emplace_back(sensorID, localUPosition);
-        if (m_param_storePXDIntercepts) {
-          PXDIntercept intercept;
-          intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<double>::max());
-          intercept.setVxdID(sensorID);
-          m_pxdIntercepts.appendNew(intercept);
-        }
       }
     }
 
@@ -134,14 +126,17 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
     layer = 2;
     sensorPerpRadius = layerRadius[layer - 1];
     for (uint ladder = 1; ladder <= 12; ladder++) {
-      const double sensorPhi = M_PI / 6. * (ladder - 1);
+      double sensorPhi = M_PI / 6. * (ladder - 1);
+      if (sensorPhi > M_PI) {
+        sensorPhi -= 2. * M_PI;
+      }
 
       angleDiff = trackPhi - sensorPhi;
       if (angleDiff > M_PI) {
-        angleDiff -= 2 * M_PI;
+        angleDiff -= 2. * M_PI;
       }
       if (angleDiff < -M_PI) {
-        angleDiff += 2 * M_PI;
+        angleDiff += 2. * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL2) continue;
       B2DEBUG(29, "angleDiff: " << angleDiff);
@@ -150,10 +145,10 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
       B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
       B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
-      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius,
-                                3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff),
-               3);  // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
+      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
       double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
 
       B2DEBUG(29, "y from extrapolation: " << y);
@@ -165,33 +160,20 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);
         uExtrapolations.emplace_back(sensorID, localUPosition);
-        if (m_param_storePXDIntercepts) {
-          PXDIntercept intercept;
-          intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<double>::max());
-          intercept.setVxdID(sensorID);
-          m_pxdIntercepts.appendNew(intercept);
-        }
 
         // store extrapolated hit for second sensor in ladder
         sensorID = VxdID(layer, ladder, 2);
         uExtrapolations.emplace_back(sensorID, localUPosition);
-        if (m_param_storePXDIntercepts) {
-          PXDIntercept intercept;
-          intercept.setCoorU((double)localUPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-          intercept.setCoorV(-std::numeric_limits<double>::max());
-          intercept.setVxdID(sensorID);
-          m_pxdIntercepts.appendNew(intercept);
-        }
       }
     }
   }
 
   for (auto& vTrack : vTracks) {
+    const double& trackLambda = -vTrack.first;
+    const long tanLambda = convertToInt(tan(trackLambda), 3);
+
     // layer 1 extrapolation
     uint layer = 1;
-    const double& trackLambda = vTrack.first;
-    const long tanLambda = convertToInt(tan(trackLambda), 3);
     for (uint sensor = 1; sensor <= 2; sensor++) {
       const long& sensorPerpRadius = layerRadius[layer - 1];
       const long& lengthOfSensor = sensorLength[layer - 1];
@@ -200,19 +182,11 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
       const long globalz = sensorPerpRadius * tanLambda;
       // shift globalz into local coordinate system by subtracting the z-shift of this sensor
       const long localVPosition = globalz - shiftZ;
-      if (localVPosition >= -lengthOfSensor / 2 && localVPosition <= lengthOfSensor / 2) {
+      if (localVPosition >= -lengthOfSensor / 2. && localVPosition <= lengthOfSensor / 2.) {
 
         for (uint ladder = 1; ladder <= 8; ladder++) {
           sensorID = VxdID(layer, ladder, sensor);
-
           vExtrapolations.emplace_back(sensorID, localVPosition);
-          if (m_param_storePXDIntercepts) {
-            PXDIntercept intercept;
-            intercept.setCoorU(-std::numeric_limits<double>::max());
-            intercept.setCoorV((double)localVPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-            intercept.setVxdID(sensorID);
-            m_pxdIntercepts.appendNew(intercept);
-          }
         }
       }
     }
@@ -227,19 +201,35 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
 
       // shift globalz into local coordinate system by subtracting the z-shift of this sensor
       const long localVPosition = globalz - shiftZ;
-      if (localVPosition >= -lengthOfSensor / 2 && localVPosition <= lengthOfSensor / 2) {
+      if (localVPosition >= -lengthOfSensor / 2. && localVPosition <= lengthOfSensor / 2.) {
         for (uint ladder = 1; ladder <= 12; ladder++) {
           sensorID = VxdID(layer, ladder, sensor);
-
           vExtrapolations.emplace_back(sensorID, localVPosition);
-          if (m_param_storePXDIntercepts) {
-            PXDIntercept intercept;
-            intercept.setCoorU(-std::numeric_limits<double>::max());
-            intercept.setCoorV((double)localVPosition * Unit::nm); // convert the "nm" like values back to cm (basf2 std unit)
-            intercept.setVxdID(sensorID);
-            m_pxdIntercepts.appendNew(intercept);
-          }
         }
+      }
+    }
+  }
+
+  if (m_param_createPXDIntercepts) {
+    for (auto& uExtrapolatedHit : uExtrapolations) {
+      const VxdID& uHitSensorID = uExtrapolatedHit.first;
+
+      for (auto& vExtrapolatedHit : vExtrapolations) {
+        const VxdID& vHitSensorID = vExtrapolatedHit.first;
+
+        if (uHitSensorID != vHitSensorID) {
+          continue;
+        }
+
+        // convert back from nm to cm
+        double uCoordinateInCM = uExtrapolatedHit.second * Unit::nm;
+        double vCoordinateInCM = vExtrapolatedHit.second * Unit::nm;
+
+        PXDIntercept intercept;
+        intercept.setCoorU(uCoordinateInCM);
+        intercept.setCoorV(vCoordinateInCM);
+        intercept.setVxdID(uHitSensorID);
+        m_pxdIntercepts.appendNew(intercept);
       }
     }
   }

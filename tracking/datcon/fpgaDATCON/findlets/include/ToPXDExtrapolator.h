@@ -60,10 +60,10 @@ namespace Belle2 {
     /// Create ROIs in phi only if the absolute difference in phi between sensor and track is smaller than this value on L2.
     double m_param_phiCutL2 = M_PI / 4.;
 
-    /// store PXDIntercepts?
-    bool m_param_storePXDIntercepts = false;
+    /// Create PXDIntercepts?
+    bool m_param_createPXDIntercepts = false;
     /// name of the PXDIntercept StoreArray
-    std::string m_param_PXDInterceptStoreArrayName = "DATCONPXDIntercepts";
+    std::string m_param_PXDInterceptStoreArrayName = "DATCONFPGAPXDIntercepts";
     /// PXDIntercept StoreArray
     StoreArray<PXDIntercept> m_pxdIntercepts;
 
@@ -79,9 +79,9 @@ namespace Belle2 {
     /// length of the modules flr L1 and L2, in µm
     const long sensorLength[2] = {44800000, 61440000};
     /// minimum y coordinate for a ladder in the position of ladder 1 (perpendicular to the x-axis), in µm
-    const long sensorMinY  = convertToInt(-3.6, 6);
+    const long sensorMinY  = -3600000;
     /// maximum y coordinate for a ladder in the position of ladder 1 (perpendicular to the x-axis), in µm
-    const long sensorMaxY  = convertToInt(8.9, 6);
+    const long sensorMaxY  = 8900000;
     /// shift of the sensor center in r-phi
     const long shiftY      = (sensorMaxY + sensorMinY) / 2;
 

@@ -16,9 +16,12 @@
 ########################################################################
 """Uses the SVDDQMDose module and makes a rootfile with the histos."""
 import argparse
+import os
 import basf2 as b2
 from basf2 import conditions
 from rawdata import add_unpackers
+from svd import add_svd_reconstruction
+from svd.executionTime_utils import SVDExtraEventStatisticsModule
 
 
 def add_module_name(path, module, name_suffix="", **kwargs):
@@ -28,6 +31,11 @@ def add_module_name(path, module, name_suffix="", **kwargs):
     for k, v in kwargs.items():
         mod.param(k, v)
     path.add_module(mod)
+
+
+def prepend_to_filename(file_path, prefix):
+    dn, bn = os.path.dirname(file_path), os.path.basename(file_path)
+    return os.path.join(dn, f"{prefix}{bn}")
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -40,7 +48,8 @@ parser.add_argument("--no-trg-filter", action="store_true",
 args = parser.parse_args()
 
 conditions.override_globaltags()
-conditions.globaltags = ['svd_onlySVDinGeoConfiguration', 'online']
+conditions.globaltags = ['svd_onlySVDinGeoConfiguration', 'online',
+                         'Reco_master_patch_rel5']  # For HardwareClockSettings
 
 main = b2.create_path()
 
@@ -61,6 +70,7 @@ main.add_module(
     "SVDZeroSuppressionEmulator", SNthreshold=5,
     ShaperDigits='SVDShaperDigits', ShaperDigitsIN='SVDShaperDigitsZS5',
     FADCmode=True)
+add_svd_reconstruction(main)  # Required for the statistics
 
 # SVDDQMDose module
 params = {'trgTypes': []} if args.no_trg_filter else {}
@@ -70,6 +80,12 @@ add_module_name(main, 'SVDDQMDose', "LERInj",
                 eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInj", **params)
 add_module_name(main, 'SVDDQMDose', "NoInj",
                 eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInj", **params)
+
+# SVDDQMInjection for execution time comparison
+main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+
+# Execution time statistics
+main.add_module(SVDExtraEventStatisticsModule(prepend_to_filename(args.out_file, "stats_")))
 
 # Necessary for impatient humans :)
 main.add_module("ProgressBar")

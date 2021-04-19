@@ -159,12 +159,12 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   auto hTotalHitsLayer1 = getObjectPtr<TH2F>("hTotalHitsLayer1");
   auto hPassedHitsLayer2 = getObjectPtr<TH2F>("hPassedHitsLayer2");
   auto hTotalHitsLayer2 = getObjectPtr<TH2F>("hTotalHitsLayer2");
-  if (!cluster_counter) return c_Failure;
-  if (!point_counter) return c_Failure;
-  if (!hPassedHitsLayer1) return c_Failure;
-  if (!hTotalHitsLayer1) return c_Failure;
-  if (!hPassedHitsLayer2) return c_Failure;
-  if (!hTotalHitsLayer2) return c_Failure;
+  if (!cluster_counter) return c_NotEnoughData;
+  if (!point_counter) return c_NotEnoughData;
+  if (!hPassedHitsLayer1) return c_NotEnoughData;
+  if (!hTotalHitsLayer1) return c_NotEnoughData;
+  if (!hPassedHitsLayer2) return c_NotEnoughData;
+  if (!hTotalHitsLayer2) return c_NotEnoughData;
 
   // Save the current directory to change back later
   TDirectory* currentDir = gDirectory;
@@ -232,7 +232,7 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
 
   // Get resolution trees and create histograms
   auto tree_d0z0 = getObjectPtr<TTree>("tree_d0z0");
-  if (!tree_d0z0) return c_Failure;
+  if (!tree_d0z0) return c_NotEnoughData;
   float d0, z0;
   tree_d0z0->SetBranchAddress("d0", &d0);
   tree_d0z0->SetBranchAddress("z0", &z0);
@@ -250,8 +250,6 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_hD0->Fill(d0);
     m_hZ0->Fill(z0);
   }
-
-
 
 
   // Loop over all bins of input histo

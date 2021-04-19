@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from ROOT import Belle2
 import ROOT
 import numpy as np
+from root_numpy import array2hist
 from pxd.utils import get_sensor_graphs, get_sensor_maps, sensorID_list
 from pxd.utils import latex_r, nPixels, nVCells, nUCells
 
@@ -22,6 +23,7 @@ __checker_dict__ = {
     Belle2.PXDMaskedPixelPar: "PXDMaskedPixelsChecker",
     Belle2.PXDDeadPixelPar: "PXDDeadPixelsChecker",
     Belle2.PXDOccupancyInfoPar: "PXDOccupancyInfoChecker",
+    Belle2.PXDGainMapPar: "PXDGainMapChecker",
 }
 
 # plot categories and styles for PXDHotPixelMasking calibration
@@ -108,17 +110,18 @@ class ConditionCheckerBase(ABC):
         self.tfile.cd()
         self.graphs.update(get_sensor_graphs(ytitle))
 
-    def define_hists(self, name=None, title=None, ztitle=None):
+    def define_hists(self, name=None, title=None, ztitle=None, **kwargs):
         """
         Method to define TH2
         Parameters:
           name (str): name for TH2, to which sensor name will be attached
           title (str): title for TH2
           ztitle (str): title for z-axis (color bar)
+          kwargs: additional arguments
         """
         if self.rundir:
             self.tfile.cd(self.rundir)
-            self.hists.update(get_sensor_maps(name, title, ztitle, self.run))
+            self.hists.update(get_sensor_maps(name, title, ztitle, self.run, **kwargs))
 
     @abstractmethod
     def get_db_content(self):
@@ -228,9 +231,9 @@ class ConditionCheckerBase(ABC):
     def save_canvas(self, canvas, cname, with_logy=False):
         if cname:
             canvas.SetName(cname)
-        exp_run = f"e{self.expstart:05} r{self.runstart:04}-{self.runend:04}"
+        exp_run = f"e{self.expstart:05}_r{self.runstart:04}-{self.runend:04}"
         # Draw Belle II label
-        latex_r.DrawLatex(0.95, 0.92, "Belle II Experiment: " + exp_run)
+        latex_r.DrawLatex(0.95, 0.92, "Belle II Experiment: " + exp_run.replace("_", " "))
         # Print and write TCanvas
         canvas.SetLogy(0)
         canvas.Print(f"{exp_run}_{cname}_vs_run.png")
@@ -396,4 +399,43 @@ class PXDDeadPixelsChecker(ConditionCheckerBase):
                 h2.SetBinContent(int(uCell + 1), int(vCell + 1), 1)
 
     def draw_plots(self, canvas=None, cname="PXDDeadPixel", ymin=0., ymax=plot_type_dict["dead"]["max"]):
+        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
+
+
+class PXDGainMapChecker(ConditionCheckerBase):
+    """
+    Checker for PXDGainMapPar
+    """
+
+    def __init__(self, name, tfile, rundir="maps"):
+        """
+        """
+        super().__init__(name, Belle2.PXDGainMapPar, tfile, rundir)
+
+    def define_graphs(self):
+        super().define_graphs(ytitle="Gain / MC default")
+
+    def define_hists(self):
+        nU = self.dbObj.getBinsU()
+        nV = self.dbObj.getBinsV()
+        super().define_hists(name="GainMap", title="Gain / MC default", ztitle="Relative gain", nUCells=nU, nVCells=nV)
+
+    def get_db_content(self):
+        gainMap = self.dbObj.getCalibrationMap()
+        content_dic = {}
+        for sensorID in sensorID_list:
+            numID = sensorID.getID()
+            content_dic[numID] = np.array(list(gainMap[numID]))
+        return content_dic
+
+    def get_graph_value(self, sensor_db_content):
+        """
+        sensor_db_content (np.array): Array of gain factors of a module
+        """
+        return sensor_db_content.mean()
+
+    def set_hist_content(self, h2, sensor_db_content):
+        array2hist(sensor_db_content.reshape(h2.GetNbinsX(), h2.GetNbinsY()), h2)
+
+    def draw_plots(self, canvas=None, cname="PXDGain", ymin=0.5, ymax=2.5):
         super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)

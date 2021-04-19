@@ -194,9 +194,12 @@ def get_argument_parser():
 
 
 if __name__ == "__main__":
+    from conditions_db.testing_payloads import parse_testing_payloads_file
     # ROOT settings
     ROOT.gROOT.SetBatch(True)
     style()  # set plotting style for PXD
+    # selected runs indicated with a tuple (exp, run), e.g., [(7, 111), (8,1022)]
+    selected_runs = []
     # Arguments
     args = get_argument_parser().parse_args()
     # no need for log summary
@@ -213,9 +216,13 @@ if __name__ == "__main__":
             if tag.endswith('.txt'):
                 # basf2.use_local_database(tag, readonly=True, loglevel=basf2.LogLevel.DEBUG)
                 basf2.conditions.prepend_testing_payloads(tag)
+                # collect selected runs based on the first run of each iov
+                iov_entries = parse_testing_payloads_file(tag)
+                selected_runs += [(item.firstRun['exp'], item.firstRun['run']) for item in iov_entries]
+
             else:
                 # basf2.use_central_database(tag, basf2.LogLevel.DEBUG)
-                basf2.prepend_globaltag(tag)
+                basf2.conditions.prepend_globaltag(tag)
 
     # parse runs argument
     runs = []
@@ -225,11 +232,14 @@ if __name__ == "__main__":
             runs += list(range(int(firstrun), int(lastrun) + 1))
         else:
             runs.append(int(runentry))
-
-    runs = list(sorted(set(runs)))
+    if selected_runs:
+        runs = list(sorted(set(runs) & set(i for _, i in selected_runs)))
+    else:
+        runs = list(sorted(set(runs)))
 
     # run over the given run ranges and write the conditions to the TTree
     main = basf2.create_path()
     main.add_module('EventInfoSetter', expList=[args.exp] * len(runs), runList=runs, evtNumList=[1] * len(runs))
-    main.add_module(ConditionsTreeModule(args.exp, args.output, args.condition, [], args.only_hist, args.maps))
+    main.add_module(ConditionsTreeModule(
+        args.exp, args.output, args.condition, selected_runs, args.only_hist, args.maps))
     basf2.process(main)

@@ -113,7 +113,10 @@ def get_sensor_graphs(ytitle=""):
     return graphs
 
 
-def get_sensor_maps(name="MaskedPixels", title="Masked Pixels", ztitle="isMasked", run=0, sensorID_list=sensorID_list):
+def get_sensor_maps(
+    name="MaskedPixels", title="Masked Pixels", ztitle="isMasked", run=0,
+    nUCells=nUCells, nVCells=nVCells, sensorID_list=sensorID_list
+):
     """
     Create TH2F objects for saving pixel map
     Parameters:

@@ -300,12 +300,20 @@ void SVDDigitizerModule::beginRun()
 void SVDDigitizerModule::event()
 {
 
+  //get number of samples and relativeShift
   StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
   SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
   m_relativeShift = storeSVDEvtInfo->getRelativeShift();
+  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
+
+  //Compute time of the first sample, update latency
+  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
+  int triggerBin = modeByte.getTriggerBin();
+  B2DEBUG(25, "triggerBin = " << triggerBin);
+  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
 
   m_is3sampleEvent = false;
-  if (storeSVDEvtInfo->getNSamples() == 3)
+  if (m_nAPV25Samples == 3)
     m_is3sampleEvent = true;
 
   if (m_is3sampleEvent)
@@ -342,7 +350,7 @@ void SVDDigitizerModule::event()
 
   unsigned int nSimHits = storeSimHits.getEntries();
   if (nSimHits == 0) {
-    SVDShaperDigit::setAPVMode(storeSVDEvtInfo->getNSamples(), m_startingSample);
+    SVDShaperDigit::setAPVMode(m_nAPV25Samples, m_startingSample);
     return;
   }
 
@@ -412,20 +420,11 @@ void SVDDigitizerModule::event()
   if (m_signalsList != "")
     saveSignals();
 
-  //Compute time of the first sample and update latency
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
-  B2DEBUG(25, "triggerBin = " << (int)modeByte.getTriggerBin());
-  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
-  int triggerBin = modeByte.getTriggerBin();
-  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
-  //determine number fo samples
-  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   saveDigits();
 
 
-  SVDShaperDigit::setAPVMode(storeSVDEvtInfo->getNSamples(), m_startingSample);
+  SVDShaperDigit::setAPVMode(m_nAPV25Samples, m_startingSample);
 }
 
 void SVDDigitizerModule::processHit()

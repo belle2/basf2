@@ -30,6 +30,7 @@
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
+#include <root/TH2F.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -157,12 +158,19 @@ namespace Belle2 {
        * This is what gets randomized if m_randomizeEventTimes is true.
        */
       float m_currentEventTime = 0.0;
-
-
-      /** Time window start.
-       * Starting from this time, signal samples are taken in samplingTime intervals. This is the parameter used to tune the latency wrt L1 trigger.
+      /** number of digitized samples
+       * read from SVDEventInfo
        */
-      double m_startSampling = -25;
+      int m_nAPV25Samples = 6;
+
+      /** Time window start, excluding trigger bin effect.
+       * This is the parameter used to tune the latency wrt L1 trigger.
+       */
+      double m_startSampling = -2;
+      /** Time window start, including the triggerBin effect.
+       * Starting from this time, signal samples are taken in samplingTime intervals.
+       */
+      double m_initTime = 0;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
@@ -242,6 +250,8 @@ namespace Belle2 {
       TH1D*  m_histDriftTime_h = nullptr;
       /** Histogram showing the hit time. */
       TH1D*  m_histHitTime = nullptr;
+      /** Histogram showing the hit time vs TB. */
+      TH2F*  m_histHitTimeTB = nullptr;
 
       /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u = nullptr;

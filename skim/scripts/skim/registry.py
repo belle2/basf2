@@ -36,6 +36,7 @@ _RegisteredSkims = [
     ("11130300", "leptonic", "LeptonicUntagged"),
     ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
+    ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),

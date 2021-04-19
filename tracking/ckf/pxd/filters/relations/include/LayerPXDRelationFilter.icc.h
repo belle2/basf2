@@ -98,7 +98,6 @@ namespace Belle2 {
     if (m_hitJump == -1) {
       m_hitJump = currentStateCache.ptSeed < m_layerJumpPtThreshold ? m_layerJumpLowPt : m_layerJumpHighPt;
     }
-    B2INFO(m_prefix << ": " << currentStateCache.ptSeed << "/" << m_layerJumpPtThreshold << "->" << m_hitJump);
 
     const unsigned int& nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_hitJump, 0);
 

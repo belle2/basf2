@@ -12,11 +12,11 @@ import os
 settings = ValidationSettings(name='CDC Tracking',
                               description=__doc__,
                               download_files=[],
-                              expert_config={file_extension: 'png',
-                                             algo_tz: 'tz2'
-                                             algo_tw: 'tw0'
-                                             algo_sr: 'sr0'
-                                             algo_xt: 'xt0'})
+                              expert_config={'file_extension': 'png',
+                                             'algo_tz': 'tz2',
+                                             'algo_tw': 'tw0',
+                                             'algo_sr': 'sr0',
+                                             'algo_xt': 'xt0'})
 
 
 def findLastIteration(job_path, algorithm):

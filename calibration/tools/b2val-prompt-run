@@ -184,7 +184,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     # Output directory, where the stdout and stderr will be sent.
     job.output_dir = validation_result_path
     # The command we want to run
-    job.cmd = ["basf2", f"{script_path}", f"{job_path} {input_data_path} {requested_iov} '{json.dumps(expert_config)}'"]
+    job.cmd = ["basf2", f"{script_path}", f"{job_path} {input_data_path} '{requested_iov}' '{json.dumps(expert_config)}'"]
     job.append_current_basf2_setup_cmds()
     return [job]
 

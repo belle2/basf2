@@ -41,7 +41,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
   addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples or 3-mixed-6 samples", int(2));
   addParam("fixedTriggerBin", m_fixedTriggerBin,
-           "Trigger bin 0/1/2/3 - useful for timing studies. The default is 3 if SimClockState is not valid.", int(999));
+           "Trigger bin 0/1/2/3 - useful for timing studies. The default is random if SimClockState is not valid.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
   addParam("relativeShift", m_relativeShift, "Relative shift between 3- and 6-sample events, in units of APV clock / 4", int(0));
@@ -70,8 +70,9 @@ void SVDEventInfoSetterModule::event()
     if (m_simClockState.isValid())
       m_triggerBin = m_simClockState->getSVDTriggerBin();
     else {
-      m_triggerBin = 3;
-      B2DEBUG(25, "no SimClockState!");
+      const int triggerBinsInAPVclock = 4;
+      m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+      B2DEBUG(25, "no SimClockState -> random generation of trigger bin");
     }
   }
 

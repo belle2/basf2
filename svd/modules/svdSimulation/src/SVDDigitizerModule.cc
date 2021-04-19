@@ -124,6 +124,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
 
 void SVDDigitizerModule::initialize()
 {
+
   //Register all required collections
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
@@ -249,6 +250,10 @@ void SVDDigitizerModule::initialize()
     m_histHitTime = new TH1D("h_startAPVTime", "start APV Time",
                              200, -100, 100);
     m_histHitTime->GetXaxis()->SetTitle("time (ns)");
+    m_histHitTimeTB = new TH2F("h_startAPVTimeTB", "start APV Time vs TB",
+                               200, -100, 100, 4, -0.5, 3.5);
+    m_histHitTimeTB->GetXaxis()->SetTitle("time (ns)");
+    m_histHitTimeTB->GetYaxis()->SetTitle("TB");
 
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
@@ -395,6 +400,16 @@ void SVDDigitizerModule::event()
   }
   if (m_signalsList != "")
     saveSignals();
+
+  //Compute time of the first sample and update latency
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  B2DEBUG(25, "triggerBin = " << (int)modeByte.getTriggerBin());
+  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
+  int triggerBin = modeByte.getTriggerBin();
+  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
+  //determine number fo samples
+  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   saveDigits();
 }
@@ -616,8 +631,12 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
       histo->Fill(dist / Unit::um, readoutCharges[index]);
     }
   }
-  if (m_histHitTime)
+  if (m_histHitTime) {
     m_histHitTime->Fill(m_currentTime);
+    StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+    SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+    m_histHitTimeTB->Fill(m_currentTime, modeByte.getTriggerBin());
+  }
 
   // Store
   B2DEBUG(25, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
@@ -649,9 +668,6 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  //  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
-  //  B2DEBUG(25,"triggerBin = "<<modeByte.getTriggerBin());
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -665,7 +681,6 @@ void SVDDigitizerModule::saveDigits()
   //  int runType = (int) modeByte.getRunType();
   //  int eventType = (int) modeByte.getEventType();
 
-  int nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -690,13 +705,13 @@ void SVDDigitizerModule::saveDigits()
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, true, iStrip, 1);
       double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, true);
 
-      double t = m_startSampling;
-      B2DEBUG(25, "start sampling at " << m_startSampling);
-      for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
+      double t = m_initTime;
+      B2DEBUG(25, "start sampling at " << m_initTime);
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
         samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -756,12 +771,12 @@ void SVDDigitizerModule::saveDigits()
       double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, false, iStrip, 1);
       double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false);
 
-      double t = m_startSampling;
-      for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
+      double t = m_initTime;
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
         samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();

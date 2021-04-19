@@ -53,7 +53,7 @@ namespace Belle2 {
 //     }
 
     /// name of the PXDIntercept StoreArray
-    std::string m_param_ROIsStoreArrayName = "DATCONROIs";
+    std::string m_param_ROIsStoreArrayName = "DATCONFPGAROIs";
     /// PXDIntercept StoreArray
     StoreArray<ROIid> m_storeDATCONROIs;
 

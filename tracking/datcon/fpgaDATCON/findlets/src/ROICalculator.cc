@@ -104,15 +104,15 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
 
       /** Lower left corner */
       short uCellDownLeft = uCell - uROIsize / 2;
+      if (uCellDownLeft < 0) uCellDownLeft = 0;
       short vCellDownLeft = vCell - vROIsize / 2;
       if (vCellDownLeft < 0) vCellDownLeft = 0;
-      if (uCellDownLeft < 0) uCellDownLeft = 0;
 
       /** Upper right corner */
       short uCellUpRight = uCell + uROIsize / 2;
+      if (uCellUpRight >= uCells) uCellUpRight = uCells - 1;
       short vCellUpRight = vCell + vROIsize / 2;
       if (vCellUpRight >= vCells) vCellUpRight = vCells - 1;
-      if (uCellUpRight >= uCells) uCellUpRight = uCells - 1;
 
       m_storeDATCONROIs.appendNew(ROIid(uCellDownLeft, uCellUpRight, vCellDownLeft, vCellUpRight, uHitSensorID));
 //      if (storeDATCONROIids.getEntries() > 1000) {

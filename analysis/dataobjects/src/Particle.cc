@@ -258,20 +258,47 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   //TODO: gamma quality can be written here
   m_pValue = 1;
 
+}
+
+
+void Particle::updateJacobiMatrix()
+{
+  ClusterUtils C;
+
+  const ECLCluster* cluster = this->getECLCluster();
+
+  const TVector3 clustervertex = C.GetIPPosition();
+
+  // Get Jacobi matrix.
+  TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(cluster, clustervertex, getECLClusterEHypothesisBit());
+  storeJacobiMatrix(jacobi);
+
+  // Propagate the photon energy scaling to jacobian elements that were calculated using energy
+  TMatrixD scaledJacobi(4, 6);
+
+  int element = 0;
+
+  for (int irow = 0; irow < 4; irow++) {
+    for (int icol = 0; icol < 6; icol++) {
+      if (icol != 0 && irow != 3) {
+        scaledJacobi(irow, icol) = m_jacobiMatrix[element] * m_momentumScale;
+      } else {
+        scaledJacobi(irow, icol) = m_jacobiMatrix[element];
+      }
+      element++;
+    }
+  }
+
+  storeJacobiMatrix(scaledJacobi);
+
   // Get covariance matrix of IP distribution.
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
-  // Set Jacobi matrix.
-  TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(eclCluster, clustervertex,
-                                                    getECLClusterEHypothesisBit());
-  storeJacobiMatrix(jacobi);
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertexcovmat,
-                              getECLClusterEHypothesisBit(), jacobi);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(cluster, clustervertexcovmat, getECLClusterEHypothesisBit(),
+                              scaledJacobi);
   storeErrorMatrix(clustercovmat);
-
 }
-
 
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -1047,13 +1074,8 @@ void Particle::storeJacobiMatrix(const TMatrixF& m)
 {
   int element = 0;
   for (int irow = 0; irow < 4; irow++) {
-    for (int icol = irow; icol < 6; icol++) {
-      if (icol != 0 && irow != 3) {
-        m_jacobiMatrix[element] = m(irow, icol);// * m_momentumScale;
-      } else {
-        m_jacobiMatrix[element] = m(irow, icol);
-      }
-      //m_jacobiMatrix[element] = m(irow, icol);
+    for (int icol = 0; icol < 6; icol++) {
+      m_jacobiMatrix[element] = m(irow, icol);
       element++;
     }
   }

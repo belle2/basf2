@@ -63,7 +63,7 @@ namespace Belle2 {
 
     /**
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
-     * @return const TMatrixDSym
+     * @return const TMatrixD
      */
     const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const TVector3& vertex,
                                                  ECLCluster::EHypothesisBit hypo);
@@ -110,9 +110,8 @@ namespace Belle2 {
 
     /**
      * Returns Jacobian matrix
-     * @return const TMatrixDSym
+     * @return const TMatrixD
      */
-    //const TMatrixD GetJacobiMatrix();
     const TMatrixD jacobiMatrix;
   private:
 

@@ -925,6 +925,10 @@ namespace Belle2 {
     */
     const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
 
+    /**
+     * Propagate the photon energy scaling to jacobian elements that were calculated using energy
+     */
+    void updateJacobiMatrix();
 
   private:
 
@@ -992,7 +996,6 @@ namespace Belle2 {
      */
     void resetJacobiMatrix();
 
-
     /**
      * Stores 7x7 error matrix into private member m_errMatrix
      * @param errMatrix 7x7 error matrix
@@ -1039,13 +1042,14 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 13); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 14); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
+    // v14: added m_jacobiMatrix
 
     friend class ParticleSubset;
   };

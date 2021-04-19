@@ -109,6 +109,7 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
       particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
     particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
+    particle->updateJacobiMatrix();
   }
 }
 

@@ -57,7 +57,7 @@ namespace Belle2 {
     const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
     /**
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
-     * @return const TMatrixDSym
+     * @return const TMatrixD
      */
     const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 

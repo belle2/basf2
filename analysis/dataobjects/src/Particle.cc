@@ -258,6 +258,9 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   //TODO: gamma quality can be written here
   m_pValue = 1;
 
+  // get error matrix.
+  updateJacobiMatrix();
+
 }
 
 
@@ -273,7 +276,7 @@ void Particle::updateJacobiMatrix()
   TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(cluster, clustervertex, getECLClusterEHypothesisBit());
   storeJacobiMatrix(jacobi);
 
-  // Propagate the photon energy scaling to jacobian elements that were calculated using energy
+  // Propagate the photon energy scaling to jacobian elements that were calculated using energy.
   TMatrixD scaledJacobi(4, 6);
 
   int element = 0;
@@ -1079,7 +1082,6 @@ void Particle::storeJacobiMatrix(const TMatrixF& m)
       element++;
     }
   }
-
 }
 
 

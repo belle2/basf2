@@ -122,10 +122,10 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
 
     if loose_settings:
         module_parameters["seedHitJumping"] = 1  # we be set to -1 (read from payload) as soon as payload exists
-        module_parameters["hitHitJumping"] = 1
+        module_parameters["hitHitJumping"] = 0
     else:
         module_parameters["seedHitJumping"] = 0  # we be set to -1 (read from payload) as soon as payload exists
-        module_parameters["hitHitJumping"] = 1
+        module_parameters["hitHitJumping"] = 0
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},
@@ -329,7 +329,7 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
             useBestNInSeed=use_best_results,
 
             seedHitJumping=1,
-            hitHitJumping=1,
+            hitHitJumping=0,
         )
 
     path.add_module("ToPXDCKF",

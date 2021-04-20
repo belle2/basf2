@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdSimulation/SVDTriggerQualityGeneratorModule.h>
+#include <root/TRandom.h>
 
 using namespace Belle2;
 
@@ -52,8 +53,7 @@ void SVDTriggerQualityGeneratorModule::beginRun()
 void SVDTriggerQualityGeneratorModule::event()
 {
   m_triggerQRG.create();
-  int rndTRGQuality = rand() % 2;
-  if (rndTRGQuality == 0)
+  if (gRandom->Integer(2) == 0)
     m_triggerQRG->setTimQuality(TRGSummary::TTYQ_CORS);
   else
     m_triggerQRG->setTimQuality(TRGSummary::TTYQ_FINE);

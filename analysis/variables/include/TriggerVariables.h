@@ -17,6 +17,7 @@
 
 
 namespace Belle2 {
+
   class Particle;
 
   namespace Variable {
@@ -27,9 +28,19 @@ namespace Belle2 {
     double L1Trigger(const Particle*);
 
     /**
-     * returns true L1 time type
+     * returns L1 trigger time type
      */
     double getTimType(const Particle*);
+
+    /**
+     * returns L1 trigger time quality
+     */
+    double getTimQuality(const Particle*);
+
+    /**
+     * returns 1 if poisson random trigger is within injection veto window
+     */
+    double isPoissonInInjectionVeto(const Particle*);
 
     /**
      * returns 1 if the event passes a given software trigger identifier, NAN if

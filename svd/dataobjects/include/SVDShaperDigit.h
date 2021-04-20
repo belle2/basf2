@@ -228,7 +228,7 @@ namespace Belle2 {
     /**
      * Modify already appended BG digit if aquisition mode is 3 sample
      */
-    void modifyBGDigit() override
+    void adjustAppendedBGDigit() override
     {
       if (s_APVSampleMode != 3) return;
       if (s_APVSampleBegin > 0) {
@@ -272,7 +272,11 @@ namespace Belle2 {
       return false;
     }
 
-
+    /**
+     * set APV mode for the event
+     * @param mode = 3, 6 depending on the number of acquired samples
+     * @param first sample = first sample (of the 6) to be stored if mode = 3
+     */
     static void setAPVMode(size_t mode, size_t firstSample)
     {
       s_APVSampleMode =  mode;

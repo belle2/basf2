@@ -57,7 +57,7 @@ namespace Belle2 {
      * Virtual method for possible modification of BG digit
      * which is just appended to simulation store array
      */
-    virtual void modifyBGDigit() {}
+    virtual void adjustAppendedBGDigit() {}
 
   private:
     ClassDef(DigitBase, 2); /**< ClassDef */

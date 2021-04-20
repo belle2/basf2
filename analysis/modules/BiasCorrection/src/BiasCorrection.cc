@@ -1,3 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Copyright(C) 2021  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nataliia Kovalchuk and Savino Longo                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 // Own include
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
 #include <iostream>
@@ -8,6 +18,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 
 #include <map>
@@ -67,6 +78,12 @@ void EnergyBiasCorrectionModule::beginRun()
 
 void EnergyBiasCorrectionModule::event()
 {
+  //check if this module is used only for data
+  if (Environment::Instance().isMC()) {
+    B2ERROR("Attempting to run EnergyBiasCorrection on MC but this is only for data");
+    return;
+  }
+
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
@@ -82,6 +99,7 @@ void EnergyBiasCorrectionModule::event()
       setEnergyScalingFactor(particle);
     }
   }
+
 }
 
 void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)

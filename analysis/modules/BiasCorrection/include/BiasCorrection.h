@@ -1,3 +1,14 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Copyright(C) 2021  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nataliia Kovalchuk and Savino Longo                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+
 #pragma once
 
 #include <framework/core/Module.h>

@@ -20,6 +20,9 @@
 #include <framework/geometry/B2Vector3.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 #include <string>
 #include <vector>
 
@@ -71,6 +74,22 @@ namespace Belle2 {
       m_storeSpacePoints.isRequired(m_param_SVDSpacePointStoreArrayName);
     };
 
+    /// Retrieve the BeamSpot from DB
+    void beginRun() override
+    {
+      Super::beginRun();
+
+      if (m_BeamSpotDB.isValid()) {
+        m_BeamSpot = *m_BeamSpotDB;
+        const TVector3& BeamSpotPosition = m_BeamSpot.getIPPosition();
+        m_BeamSpotPosition.SetXYZ(BeamSpotPosition.X(), BeamSpotPosition.Y(), BeamSpotPosition.Z());
+      } else {
+        m_BeamSpotPosition.SetXYZ(0., 0., 0.);
+      }
+      B2INFO("DATCON uses following BeamSpot: " <<
+             m_BeamSpotPosition.X() << ", " << m_BeamSpotPosition.Y() << ", " << m_BeamSpotPosition.Z());
+    }
+
     /// Load the SVD SpacePoints and create a HitData object for each hit
     void apply(std::vector<const SpacePoint*>& spacePoints, std::vector<HitData>& hits) override
     {
@@ -83,7 +102,7 @@ namespace Belle2 {
             spacePoint.TimeV() >= m_param_minimumVClusterTime and
             spacePoint.TimeU() <= m_param_maximumUClusterTime and
             spacePoint.TimeV() <= m_param_maximumVClusterTime) {
-          hits.emplace_back(HitData(&spacePoint));
+          hits.emplace_back(HitData(&spacePoint, m_BeamSpotPosition));
           spacePoints.emplace_back(&spacePoint);
         }
       }
@@ -104,5 +123,12 @@ namespace Belle2 {
 
     /// Input SpacePoints Store Array
     StoreArray<SpacePoint> m_storeSpacePoints;
+
+    /// BeamSpot from DB
+    DBObjPtr<BeamSpot> m_BeamSpotDB;
+    /// Actual BeamSpot
+    BeamSpot m_BeamSpot;
+    /// B2Vector3D actually contining the BeamSpot position. This will be passed on to the HitData for the conformal transformation
+    B2Vector3D m_BeamSpotPosition;
   };
 }

@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -53,9 +54,9 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
                                 "Allowed tolerance in z (in cm) (for ROI calculation in v direction). If the intercept is within this range of the active region of a sensor, an intercept is created.",
                                 m_param_toleranceZ);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radusCorrectionFactor"), m_param_radusCorrectionFactor,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactor"), m_param_radiusCorrectionFactor,
                                 "Correct charge-dependent bias of the extrapolated hit with radusCorrectionFactor * trackCharge / trackRadius.",
-                                m_param_radusCorrectionFactor);
+                                m_param_radiusCorrectionFactor);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sinPhiCorrectionFactor"), m_param_sinPhiCorrectionFactor,
                                 "Correct sin(trackPhi) dependent bias with sinPhiCorrectionFactor * sin(trackPhi).",
                                 m_param_sinPhiCorrectionFactor);
@@ -125,6 +126,15 @@ void ROIFinder::beginRun()
   Super::beginRun();
 
   m_bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+
+  if (m_BeamSpotDB.isValid()) {
+    m_BeamSpot = *m_BeamSpotDB;
+    const TVector3& BeamSpotPosition = m_BeamSpot.getIPPosition();
+    m_BeamSpotPosition.SetXYZ(BeamSpotPosition.X(), BeamSpotPosition.Y(), BeamSpotPosition.Z());
+  } else {
+    m_BeamSpotPosition.SetXYZ(0., 0., 0.);
+  }
+//   B2INFO("DATCON uses following BeamSpot: " << m_BeamSpotPosition.X() << ", " << m_BeamSpotPosition.Y() << ", " << m_BeamSpotPosition.Z());
 }
 
 
@@ -202,13 +212,13 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         const double ytmp     = sqrt(trackRadius * trackRadius - (x - xCenter) * (x - xCenter));
         const double yplus    = yCenter + ytmp;
         const double yminus   = yCenter - ytmp;
-//         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
-//         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
-// // //         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
-// // //         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
-// // //         const double correctionterm = 0.;//(m_param_radusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
-// //         const double correctionterm = (trackCharge * sin(trackPhi) > 0) ? (-m_param_radusCorrectionFactor * fabs(trackCharge * sin(trackPhi)) / trackRadius) : 0.;
-        const double correctionterm = (m_param_radusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(
+//         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radiusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
+//         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radiusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
+// // //         const double localUPositionPlus   = yplus  - m_const_shiftY + (m_param_radiusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// // //         const double localUPositionMinus  = yminus - m_const_shiftY + (m_param_radiusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// // //         const double correctionterm = 0.;//(m_param_radiusCorrectionFactor * trackCharge * fabs(sin(trackPhi)) / trackRadius);
+// //         const double correctionterm = (trackCharge * sin(trackPhi) > 0) ? (-m_param_radiusCorrectionFactor * fabs(trackCharge * sin(trackPhi)) / trackRadius) : 0.;
+        const double correctionterm = (m_param_radiusCorrectionFactor * trackCharge / trackRadius) + m_param_sinPhiCorrectionFactor * sin(
                                         trackPhi) + m_param_cosPhiCorrectionFactor * cos(trackPhi);
         const double localUPositionPlus   = yplus  - m_const_shiftY + correctionterm;
         const double localUPositionMinus  = yminus - m_const_shiftY + correctionterm;
@@ -221,7 +231,7 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         }
 
         // estimate the z coordinate of the extrapolation on this layer
-        const double z = sensorPerpRadius * tanTrackLambda; // tan(trackLambda);
+        const double z = sensorPerpRadius * tanTrackLambda + m_BeamSpotPosition.Z(); // tan(trackLambda);
 
         /** Loop over both modules of a ladder */
         for (int sensor = 1; sensor <= 2; sensor++) {

@@ -41,6 +41,20 @@ void TwoHitVirtualIPQIFilter::beginRun()
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
     MCestimator->setClustersNames(svdClustersName, pxdClustersName);
   }
+
+
+  if (m_BeamSpotDB.isValid()) {
+    m_BeamSpot = *m_BeamSpotDB;
+    const B2Vector3D& BeamSpotPosition = m_BeamSpot.getIPPosition();
+    const TMatrixDSym posErr = m_BeamSpot.getIPPositionCovMatrix();
+    const B2Vector3D BeamSpotPositionError(sqrt(posErr[0][0]), sqrt(posErr[1][1]), sqrt(posErr[2][2]));
+    m_virtualIPSpacePoint = SpacePoint(BeamSpotPosition, BeamSpotPositionError, {0.5, 0.5}, {false, false}, VxdID(0),
+                                       Belle2::VXD::SensorInfoBase::VXD);
+  } else {
+    m_virtualIPSpacePoint = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false}, VxdID(0),
+                                       Belle2::VXD::SensorInfoBase::VXD);
+  }
+
 }
 
 void TwoHitVirtualIPQIFilter::initialize()

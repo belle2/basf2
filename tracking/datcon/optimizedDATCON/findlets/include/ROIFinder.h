@@ -16,6 +16,10 @@
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 #include <string>
 #include <vector>
@@ -79,7 +83,7 @@ namespace Belle2 {
     //  b) the residuals show a larger sin(phi) and a smaller cos(phi modulation)
     //  Both of these can be corrected for
     /// Correction factor for radial bias: factor * charge / radius
-    double m_param_radusCorrectionFactor = 3.0;
+    double m_param_radiusCorrectionFactor = 3.0;
     /// Correction factor for the sin(phi) modulation
     double m_param_sinPhiCorrectionFactor = 0.05;
     /// Correction factor for the cos(phi) modulation
@@ -139,6 +143,14 @@ namespace Belle2 {
 
     /// BField in Tesla
     double m_bFieldZ = 1.5;
+
+
+    /// BeamSpot from DB
+    DBObjPtr<BeamSpot> m_BeamSpotDB;
+    /// Actual BeamSpot
+    BeamSpot m_BeamSpot;
+    /// B2Vector3D actually contining the BeamSpot position. This will be used as the starting point of the extrapolation.
+    B2Vector3D m_BeamSpotPosition;
 
   };
 }

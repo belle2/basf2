@@ -12,6 +12,9 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <math.h>
 
@@ -31,8 +34,8 @@ namespace Belle2 {
 
   private:
     /// virtual IP SpacePoint
-    const SpacePoint m_virtualIPSpacePoint = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false},
-                                                        VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
+    SpacePoint m_virtualIPSpacePoint;/* = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false},
+                                                        VxdID(0), Belle2::VXD::SensorInfoBase::VXD);*/
     /// cut on the POCA distance in xy obtained from the helixFitEstimator
     double m_param_helixFitPocaVirtIPDCut = 1.0;
 
@@ -45,5 +48,10 @@ namespace Belle2 {
     bool m_param_MCStrictQualityEstimator = true;
     /// pointer to the selected QualityEstimator
     std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+    /// BeamSpot from DB
+    DBObjPtr<BeamSpot> m_BeamSpotDB;
+    /// Actual BeamSpot
+    BeamSpot m_BeamSpot;
   };
 }

@@ -34,7 +34,7 @@ namespace Belle2 {
     ~HitData() = default;
 
     /// Initialize the state as non-root with a related hit (and with a seed)
-    explicit HitData(const SpacePoint* hit) : m_hit(hit)
+    explicit HitData(const SpacePoint* hit, const B2Vector3D& BeamSpotPosition) : m_hit(hit)
     {
       m_dataCache.sensorID = hit->getVxdID();
       m_dataCache.layer = hit->getVxdID().getLayerNumber();
@@ -43,8 +43,10 @@ namespace Belle2 {
       m_dataCache.x = hit->X();
       m_dataCache.y = hit->Y();
       m_dataCache.z = hit->Z();
-      m_dataCache.xConformal = 2. * hit->X() / hit->getPosition().Perp2();
-      m_dataCache.yConformal = 2. * hit->Y() / hit->getPosition().Perp2();
+      const double conformalTransform = 2. / ((hit->X() - BeamSpotPosition.X()) * (hit->X() - BeamSpotPosition.X()) +
+                                              (hit->Y() - BeamSpotPosition.Y()) * (hit->Y() - BeamSpotPosition.Y()));
+      m_dataCache.xConformal = hit->X() * conformalTransform;
+      m_dataCache.yConformal = hit->Y() * conformalTransform;
       m_dataCache.localNormalizedu = hit->getNormalizedLocalU();
       m_dataCache.localNormalizedv = hit->getNormalizedLocalV();
       m_dataCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();

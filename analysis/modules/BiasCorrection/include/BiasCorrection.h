@@ -34,7 +34,7 @@ namespace Belle2 {
     EnergyBiasCorrectionModule();
     /**
     * Get LookUp information for the particle
-    * @param p particle
+    * @param particle
     * @return LookUp information (map: key - LookUp parameter; value - value of the parameter )
     */
     WeightInfo getInfo(const Particle* particle);

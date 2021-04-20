@@ -46,9 +46,9 @@ std::string HTML::getString(const TMatrixDBase& matrix, int precision, bool colo
         int r = 255;
         int g = 255;
         if (value > 0)
-          b = g = 255 - 180 * value / ((value > 0) ? max : min);
+          b = g = 255 - 180 * value / max;
         else
-          r = 255 - 200 * value / ((value > 0) ? max : min);
+          r = 255 - 200 * value / min;
 
         stream << " bgcolor=" << std::setfill('0') << std::hex;
         stream << std::setw(2) << r;

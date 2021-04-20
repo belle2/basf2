@@ -247,6 +247,8 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
       return size;
     } else {
       if (m_bufinfo->rptr >= size + 2) { // buffer full and wptr>rptr
+        // this should be dead code but I don't understand it well enough to delete it so let's suppress the cppcheck warning
+        // cppcheck-suppress knownConditionTrueFalse
         if (m_bufinfo->errtype != 0) {
           B2ERROR("insq: Error in errtype 1; current=" << m_bufinfo->errtype);
           return -1;
@@ -485,4 +487,3 @@ void RingBuffer::dumpInfo() const
   printf("ninsq = %d\n", m_bufinfo->ninsq);
   printf("nremq = %d\n", m_bufinfo->ninsq);
 }
-

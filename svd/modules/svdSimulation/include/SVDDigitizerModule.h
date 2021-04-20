@@ -21,7 +21,6 @@
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <svd/calibration/SVDDetectorConfiguration.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
@@ -145,6 +144,15 @@ namespace Belle2 {
       double m_shapingTime = 250.0;
       /** Interval between two waveform samples, by default taken from HardwareClockSettings */
       double m_samplingTime = -1;
+      /** Time window start, excluding trigger bin effect.
+       * This is the parameter used to tune the latency wrt L1 trigger.
+       */
+      double m_startSampling = -2;
+      /** Time window start, including the triggerBin effect.
+       * Starting from this time, signal samples are taken in samplingTime intervals.
+       */
+      double m_initTime = 0;
+
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -158,21 +166,14 @@ namespace Belle2 {
        * This is what gets randomized if m_randomizeEventTimes is true.
        */
       float m_currentEventTime = 0.0;
-      /** number of digitized samples
-       * read from SVDEventInfo
-       */
+
+      // 5. 3-mixed-6 and 3-sample daqMode
+      /** True if the event should be simulated with 3 sample */
+      bool m_is3sampleEvent = false;
+      /** number of digitized samples read from SVDEventInfo */
       int m_nAPV25Samples = 6;
 
-      /** Time window start, excluding trigger bin effect.
-       * This is the parameter used to tune the latency wrt L1 trigger.
-       */
-      double m_startSampling = -2;
-      /** Time window start, including the triggerBin effect.
-       * Starting from this time, signal samples are taken in samplingTime intervals.
-       */
-      double m_initTime = 0;
-
-      // 5. Reporting
+      // 6. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
@@ -180,10 +181,6 @@ namespace Belle2 {
       /** Name of the tab-delimited listing of signals */
       std::string m_signalsList = "";
 
-
-      // 6. 3-mixed-6 and 3-sample daqMode
-      /** True if the event should be simulated with 3 sample */
-      bool m_is3sampleEvent = false;
 
       // Other data members:
 
@@ -213,12 +210,11 @@ namespace Belle2 {
       /** return the starting sample */
       int getFirstSample(int triggerBin, int relativShift);
 
-      //MC payloads:
+      //payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
       std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
-      SVDDetectorConfiguration m_svdConfig; /**< svd configuration parameters */
 
       SVDChargeSimulationCalibrations m_ChargeSimCal; /**<SVDChargeSimulationCalibrations calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/

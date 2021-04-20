@@ -298,8 +298,7 @@ void Particle::updateJacobiMatrix()
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(cluster, clustervertexcovmat, getECLClusterEHypothesisBit(),
-                              scaledJacobi);
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(cluster, clustervertexcovmat, scaledJacobi);
   storeErrorMatrix(clustercovmat);
 }
 

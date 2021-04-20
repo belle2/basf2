@@ -292,16 +292,10 @@ void SVDPerformanceTTreeModule::event()
             for (unsigned int d = 0; d < m_svdSize; d++) {
 
               SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              array<float, 6> Samples = ShaperDigit->getSamples();
 
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[0]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[1]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[2]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[3]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[4]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[5]);
-
+              for (int k = 0; k < 6; k++) {m_svdStrip6Samples.push_back(Samples[k]);}
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID());
               //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -369,15 +363,9 @@ void SVDPerformanceTTreeModule::event()
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              array<float, 6> Samples = ShaperDigit->getSamples();
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[0]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[1]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[2]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[3]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[4]);
-              m_svdStrip6Samples.push_back(ShaperDigit->getSamples()[5]);
-
+              for (int k = 0; k < 6; k++) { m_svdStrip6Samples.push_back(Samples[k]);}
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID());
               //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)

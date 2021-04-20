@@ -50,7 +50,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
         clusterizer.param('timeAlgorithm6Samples', "CoG6")
-        clusterizer.param('timeAlgorithm3Samples', "CoG6")
+        clusterizer.param('timeAlgorithm3Samples', "CoG3")
         clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
         clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
         clusterizer.param('positionAlgorithm6Samples', "oldDefault")
@@ -89,56 +89,7 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
         path.add_module(recoDigitCreator)
 
 
-def add_rel5_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
-
-    if(useNN and useCoG):
-        print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
-        add_svd_reconstruction_CoG(path, isROIsimulation)
-    elif(useNN):
-        add_svd_reconstruction_nn(path, isROIsimulation)
-
-    elif(useCoG):
-        add_svd_reconstruction_CoG(path, isROIsimulation, applyMasking)
-
-
-def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
-
-    if direct:
-        if(isROIsimulation):
-            clusterizerName = '__ROISVDClusterizerDirect'
-            clusterName = '__ROIsvdClusters'
-        else:
-            clusterizerName = 'SVDClusterizerDirect'
-            clusterName = ""
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDClusterizerDirect')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-    else:
-        if(isROIsimulation):
-            fitterName = '__ROISVDNNShapeReconstructor'
-            clusterizerName = '__ROISVDNNClusterizer'
-            clusterName = '__ROIsvdClusters'
-        else:
-            fitterName = 'SVDNNShapeReconstructor'
-            clusterizerName = 'SVDNNClusterizer'
-            clusterName = ''
-
-        if fitterName not in [e.name() for e in path.modules()]:
-            fitter = b2.register_module('SVDNNShapeReconstructor')
-            fitter.set_name(fitterName)
-            path.add_module(fitter)
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDNNClusterizer')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-
-
-def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
+def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False):
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -217,14 +168,6 @@ def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
         # TODO add check of relative shift value
         svdevtinfoset.param("daqMode", daqMode)
         svdevtinfoset.param("relativeShift", relativeShift)
-
-
-def add_svd_trgsummary(path):
-
-    # emulate trigger quality simulation for testing purpose
-    trgqualitygen = b2.register_module("SVDTriggerQualityGenerator")
-    trgqualitygen.param("TRGSummaryName", "TRGSummary")
-    path.add_module(trgqualitygen)
 
 
 def add_svd_unpacker(path):

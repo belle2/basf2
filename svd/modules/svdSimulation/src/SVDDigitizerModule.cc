@@ -309,17 +309,17 @@ void SVDDigitizerModule::event()
   //Compute time of the first sample, update latency
   const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
   int triggerBin = modeByte.getTriggerBin();
-  B2DEBUG(25, "triggerBin = " << triggerBin);
+
   m_initTime = m_startSampling - systemClockPeriod * triggerBin;
 
   m_is3sampleEvent = false;
-  if (m_nAPV25Samples == 3)
+  if (m_nAPV25Samples == 3) {
     m_is3sampleEvent = true;
+    m_startingSample = getFirstSample(triggerBin, m_relativeShift);
+    B2DEBUG(25, "3-sample event, starting sample = " << m_startingSample);
+  } else m_startingSample = 0; //not used
 
-  if (m_is3sampleEvent)
-    m_startingSample = getFirstSample(modeByte);
-  else m_startingSample = 0; //not used
-
+  // set APV mode for background overlay
   SVDShaperDigit::setAPVMode(m_nAPV25Samples, m_startingSample);
 
   // Generate current event time
@@ -408,7 +408,7 @@ void SVDDigitizerModule::event()
              );
 
     }
-    B2DEBUG(20,
+    B2DEBUG(28,
             "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
     processHit();
   }
@@ -652,7 +652,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   }
 
   // Store
-  B2DEBUG(25, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
+  B2DEBUG(29, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
           driftTime);
 
   double recoveredCharge = 0;
@@ -720,12 +720,10 @@ void SVDDigitizerModule::saveDigits()
 
       double t = m_initTime;
       B2DEBUG(25, "start sampling at " << m_initTime);
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+      for (int iSample = 0; iSample < (int) SVDShaperDigit::c_nAPVSamples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
-        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -801,12 +799,10 @@ void SVDDigitizerModule::saveDigits()
       double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false);
 
       double t = m_initTime;
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+      for (int iSample = 0; iSample < (int)SVDShaperDigit::c_nAPVSamples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
-        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -846,7 +842,6 @@ void SVDDigitizerModule::saveDigits()
                                std::bind2nd(std::greater<double>(), rawThreshold)
                               );
         if (n_over < m_nSamplesOverZS) continue;
-
       }
 
       // 3. Save as a new digit
@@ -963,8 +958,8 @@ void SVDDigitizerModule::terminate()
   }
 }
 
-int SVDDigitizerModule::getFirstSample(const SVDModeByte modeByte)
+int SVDDigitizerModule::getFirstSample(int triggerBin, int relativeShift)
 {
-  int nTriggerClocks = modeByte.getTriggerBin() + m_relativeShift;
+  int nTriggerClocks = triggerBin + relativeShift;
   return floor(nTriggerClocks / 4);
 }

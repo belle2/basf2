@@ -211,7 +211,7 @@ namespace Belle2 {
       int m_startingSample = 0;
 
       /** return the starting sample */
-      int getFirstSample(const SVDModeByte modeByte);
+      int getFirstSample(int triggerBin, int relativShift);
 
       //MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/

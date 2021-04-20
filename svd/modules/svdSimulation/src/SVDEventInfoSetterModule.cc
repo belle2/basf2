@@ -129,5 +129,8 @@ void SVDEventInfoSetterModule::event()
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);
 
+  if (nAPVsamples == 3)
+    B2DEBUG(25, " relativeShift = " << m_relativeShift);
+
 }
 

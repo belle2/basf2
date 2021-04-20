@@ -110,8 +110,6 @@ void BGOverlayInputModule::initialize()
               << LogVar("Issue", e.what()));
     }
   }
-  TDirectory* dir = gDirectory;
-  dir->cd();
 
   // get event TTree
   m_tree = new TChain(RootIOUtilities::c_treeNames[DataStore::c_Event].c_str());
@@ -142,7 +140,6 @@ void BGOverlayInputModule::initialize()
   descr.numEvents = m_numEvents;
   m_index = bkgInfo->appendBackgroundDescr(descr);
   bkgInfo->setExtensionName(m_extensionName);
-
 }
 
 

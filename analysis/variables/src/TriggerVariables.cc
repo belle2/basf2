@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Sam Cunliffe  (sam.cunliffe@desy.de)                     *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,11 +28,13 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/Conversion.h>
 
 // boost
 #include <boost/algorithm/string.hpp>
 
 // C++
+#include <limits>
 #include <stdexcept>
 
 namespace Belle2 {
@@ -67,7 +70,8 @@ namespace Belle2 {
     {
       // get trigger result object
       StoreObjPtr<SoftwareTriggerResult> swtr;
-      if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+      if (!swtr)
+        return std::numeric_limits<double>::quiet_NaN();
 
       // check that the trigger ID provided by the user exists in the SWTR
       SoftwareTriggerCutResult swtcr;
@@ -91,7 +95,7 @@ namespace Belle2 {
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return trg->test();
     }
 
@@ -102,13 +106,13 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testPsnm(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -122,20 +126,20 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         int testBit;
         try {
-          testBit = std::stoi(arguments[0]);
+          testBit = Belle2::convertString<int>(arguments[0]);
         } catch (const std::invalid_argument&) {
           B2FATAL("Invalid argument for L1PSNMBit function. The argument must be an integer representing the PSNM trigger bit.");
         }
         auto func = [testBit](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testPsnm(testBit);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -151,13 +155,13 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testFtdl(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -171,20 +175,20 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         int testBit;
         try {
-          testBit = std::stoi(arguments[0]);
+          testBit = Belle2::convertString<int>(arguments[0]);
         } catch (const std::invalid_argument&) {
           B2FATAL("Invalid argument for L1FTDLBit function. The argument must be an integer representing the FTDL trigger bit.");
         }
         auto func = [testBit](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testFtdl(testBit);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -200,13 +204,13 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testInput(name);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -220,20 +224,20 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         int testBit;
         try {
-          testBit = std::stoi(arguments[0]);
+          testBit = Belle2::convertString<int>(arguments[0]);
         } catch (const std::invalid_argument&) {
           B2FATAL("Invalid argument for L1InputBit function. The argument must be an integer representing the input trigger bit.");
         }
         auto func = [testBit](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           try {
             return trg->testInput(testBit);
           } catch (const std::exception&)
           {
             // Something went wrong, return NaN.
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           }
         };
         return func;
@@ -249,16 +253,16 @@ namespace Belle2 {
         auto func = [name](const Particle*) -> double {
           static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
           if (!ftdlBits.isValid())
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           static DBObjPtr<TRGGDLDBPrescales> prescales;
           if (!prescales.isValid())
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           for (unsigned int bit = 0; bit < TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords; bit++)
           {
             if (std::string(ftdlBits->getoutbitname((int)bit)) == name)
               return prescales->getprescales(bit);
           }
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -271,16 +275,16 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         int testBit;
         try {
-          testBit = std::stoi(arguments[0]);
+          testBit = Belle2::convertString<int>(arguments[0]);
         } catch (const std::invalid_argument&) {
           B2FATAL("Invalid argument for L1PSNMBitPrescale function. The argument must be an integer representing the PSNM trigger bit.");
         }
         auto func = [testBit](const Particle*) -> double {
           if (testBit < 0 or testBit >= TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           static DBObjPtr<TRGGDLDBPrescales> prescales;
           if (!prescales.isValid())
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           return prescales->getprescales(testBit);
         };
         return func;
@@ -292,7 +296,8 @@ namespace Belle2 {
     double getTimType(const Particle*)
     {
       StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
       return trg->getTimType();
     }
 

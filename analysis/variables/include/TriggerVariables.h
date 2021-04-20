@@ -30,12 +30,12 @@ namespace Belle2 {
     /**
      * returns L1 trigger time type
      */
-    double getTimType(const Particle*);
+    double L1TimeType(const Particle*);
 
     /**
      * returns L1 trigger time quality
      */
-    double getTimQuality(const Particle*);
+    double L1TimeQuality(const Particle*);
 
     /**
      * returns 1 if poisson random trigger is within injection veto window

@@ -54,7 +54,7 @@ Variables
  * New MCTruthVariable `isBBCrossfeed` checks for crossfeed in the reconstruction of the given B meson.
  * Modified the ``L1 Trigger`` variables (:b2:var:`L1PSNM(name)`, :b2:var:`L1PSNMBit(i)`, etc.) to return ``NAN`` instead of ``0`` in case the requested
    trigger bit or number does not exist. These variables now return ``0`` only when the requested bit is not fired.
- * Added new variables :b2:var:`L1TimQuality` and :b2:var:`isPoissonTriggerInInjectionVeto` for returning the L1 trigger time quality and the injection veto flag.
+ * Added new variables :b2:var:`L1TimeQuality` and :b2:var:`isPoissonTriggerInInjectionVeto` for returning the L1 trigger time quality and the injection veto flag. Renamed the variable ``L1TimType`` into :b2:var:`L1TimeType`.
 
 Modules
 +++++++

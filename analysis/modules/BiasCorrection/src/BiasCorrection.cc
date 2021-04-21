@@ -12,17 +12,12 @@
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
 #include <iostream>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 
 #include <map>
-#include <TRandom.h>
 
 using namespace Belle2;
 
@@ -104,9 +99,9 @@ void EnergyBiasCorrectionModule::event()
 
 void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
 {
-  if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
-      particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
+  if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
     for (auto daughter : particle->getDaughters()) {
+      // if composite then apply scaling for daughters then recalculate (this particle) parent momentum
       setEnergyScalingFactor(daughter);
     }
     double px = 0;
@@ -129,5 +124,6 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
     particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
     particle->updateJacobiMatrix();
   }
+  B2DEBUG(10, "Called setMomentumScalingFactor for an unspecified, track-based or KLM cluster-based particle");
 }
 

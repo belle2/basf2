@@ -51,13 +51,12 @@ namespace Belle2 {
     * @param cellID Strip ID.
     * @param samples std::array of 6 APV raw samples.
     */
-    template<typename T>
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples]):
+                   APVFloatSampleType samples[c_nAPVSamples]):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                     [this](APVFloatSampleType x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
     }
 
@@ -67,12 +66,11 @@ namespace Belle2 {
     * @param cellID Strip ID.
     * @param samples std::array of 6 APV raw samples.
     */
-    template<typename T>
-    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples) :
+    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, APVFloatSamples samples) :
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [](typename T::value_type x)->APVRawSampleType
+                     [](typename APVFloatSamples::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }
@@ -81,7 +79,7 @@ namespace Belle2 {
     // cppcheck does not recognize initialization through other constructor
     // cppcheck-suppress uninitMemberVar
     DATCONSVDDigit() : DATCONSVDDigit(
-        0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
+        0, true, 0, APVFloatSamples( {{0, 0, 0, 0, 0, 0}})
     )
     {}
 

@@ -94,8 +94,8 @@ void DATCONFPGAFindlet::apply()
 
   m_ROICalculator.apply(m_uExtrapolations, m_vExtrapolations);
 
-  B2INFO("Event statistics: uDigits: " << m_uDigits.size() << " vDigits: " << m_vDigits.size() << " uClusters: " << m_uClusters.size()
-         << " vClusters: " << m_vClusters.size() << " uHits: " << m_uHits.size() << " vHits: " << m_vHits.size() << " uTracks: " <<
-         m_uTracks.size() << " vTracks: " << m_vTracks.size() << " uExtrapolations: " << m_uExtrapolations.size() << " vExtrapolations: " <<
-         m_vExtrapolations.size());
+  B2DEBUG(29, "Event statistics: uSVDDigits: " << m_uDigits.size() << " vSVDDigits: " << m_vDigits.size() << " uSVDClusters: " <<
+          m_uClusters.size() << " vSVDClusters: " << m_vClusters.size() << " uHits: " << m_uHits.size() << " vHits: " <<
+          m_vHits.size() << " uTracks: " <<  m_uTracks.size() << " vTracks: " << m_vTracks.size() <<
+          " uExtrapolations: " << m_uExtrapolations.size() << " vExtrapolations: " << m_vExtrapolations.size());
 }

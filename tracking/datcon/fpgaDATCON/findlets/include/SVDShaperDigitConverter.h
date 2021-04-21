@@ -18,9 +18,6 @@
 namespace Belle2 {
   class DATCONSVDDigit;
   class SVDShaperDigit;
-  class SVDTrueHit;
-  class MCParticle;
-
   class ModuleParamList;
 
   /**
@@ -53,7 +50,7 @@ namespace Belle2 {
     /// SVDShaperDigits StoreArray name
     std::string m_param_storeSVDShaperDigitsName = "SVDShaperDigits";
 
-
-    StoreArray<SVDShaperDigit> m_storeSVDShaperDigits;    /**< SVDShaperDigits StoreArray */
+    /// SVDShaperDigit StoreArray
+    StoreArray<SVDShaperDigit> m_storeSVDShaperDigits;
   };
 }

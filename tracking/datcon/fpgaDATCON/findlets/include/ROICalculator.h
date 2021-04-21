@@ -43,15 +43,6 @@ namespace Belle2 {
 
   private:
 
-//     /// convert float to long int for more similarity to the FPGA implementation
-//     /// @param value to be converted
-//     /// @param power multiply value by 10^power
-//     inline long convertToInt(double value, int power)
-//     {
-//       long factor = (long)pow(10, power);
-//       return round(factor * value);
-//     }
-
     /// name of the PXDIntercept StoreArray
     std::string m_param_ROIsStoreArrayName = "DATCONFPGAROIs";
     /// PXDIntercept StoreArray

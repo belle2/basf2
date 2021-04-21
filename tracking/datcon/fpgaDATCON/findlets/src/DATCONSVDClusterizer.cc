@@ -8,18 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
+#include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-
-#include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
-
-// #include <tracking/dataobjects/DATCONSVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>

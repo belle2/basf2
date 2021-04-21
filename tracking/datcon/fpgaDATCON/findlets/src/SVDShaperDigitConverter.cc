@@ -10,15 +10,10 @@
 #include <tracking/datcon/fpgaDATCON/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
-
-// #include <tracking/dataobjects/DATCONSVDDigit.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -51,10 +46,10 @@ void SVDShaperDigitConverter::apply(std::vector<DATCONSVDDigit>& svdUDigits, std
 {
   for (auto& shaperdigit : m_storeSVDShaperDigits) {
 
-    VxdID sensorid = shaperdigit.getSensorID();
+    const VxdID& sensorid = shaperdigit.getSensorID();
     bool isu = shaperdigit.isUStrip();
     short cellid = shaperdigit.getCellID();
-    DATCONSVDDigit::APVFloatSamples rawsamples = shaperdigit.getSamples();
+    const DATCONSVDDigit::APVFloatSamples& rawsamples = shaperdigit.getSamples();
 
     if (isu) {
       svdUDigits.emplace_back(DATCONSVDDigit(sensorid, isu, cellid, rawsamples));

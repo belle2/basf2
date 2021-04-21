@@ -30,29 +30,19 @@ void ROICalculator::exposeParameters(ModuleParamList* moduleParamList, const std
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIsStoreArrayName"),
-                                m_param_ROIsStoreArrayName,
-                                "Name of the ROIs StoreArray?",
-                                m_param_ROIsStoreArrayName);
+                                m_param_ROIsStoreArrayName, "Name of the ROIs StoreArray?", m_param_ROIsStoreArrayName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL1"),
-                                m_param_uROIsizeL1,
-                                "u direction ROI size on L1.",
-                                m_param_uROIsizeL1);
+                                m_param_uROIsizeL1, "u direction ROI size on L1.", m_param_uROIsizeL1);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL2"),
-                                m_param_uROIsizeL2,
-                                "u direction ROI size on L2.",
-                                m_param_uROIsizeL2);
+                                m_param_uROIsizeL2, "u direction ROI size on L2.", m_param_uROIsizeL2);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL1"),
-                                m_param_vROIsizeL1,
-                                "v direction ROI size on L1.",
-                                m_param_vROIsizeL1);
+                                m_param_vROIsizeL1, "v direction ROI size on L1.", m_param_vROIsizeL1);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL2"),
-                                m_param_vROIsizeL2,
-                                "v direction ROI size on L2.",
-                                m_param_vROIsizeL2);
+                                m_param_vROIsizeL2, "v direction ROI size on L2.", m_param_vROIsizeL2);
 
 }
 
@@ -69,7 +59,6 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
                           std::vector<std::pair<VxdID, long>>& vExtrapolations)
 {
   /** Reminder: 250 px in u-direction = r-phi, in total 768 (512+256) px in v-direction = z */
-//   double uCoordinate, vCoordinate;
   const unsigned short uCells = 250, vCells = 768;
 
   const PXD::SensorInfo* currentSensor;
@@ -83,14 +72,13 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
       if (uHitSensorID != vHitSensorID) {
         continue;
       }
-//       uCoordinate = datconumph.getLocalCoordinate().X(); // in nm
-//       vCoordinate = datconvmph.getLocalCoordinate().Y(); // in nm
 
-      // convert back from nm to cm
+      // Convert back from nm to cm.
+      // Before the all values were upscaled with "convertToInt" as the FPGA only works with integers.
+      // This conversion from nm to cm is hardcoded, if the powers of 10 are changed in the other modules, this conversion
+      // would not necessarily be right anymore, so maybe there is a better way of doing this - I didn't find any.
       double uCoordinateInCM = uExtrapolatedHit.second * Unit::nm;
       double vCoordinateInCM = vExtrapolatedHit.second * Unit::nm;
-
-//       B2INFO("uCoordinateInCM: " << uCoordinateInCM << " vCoordinateInCM: " << vCoordinateInCM);
 
       currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(uHitSensorID));
       const short uCell = currentSensor->getUCellID(uCoordinateInCM);
@@ -99,8 +87,9 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
       const unsigned short& uROIsize = (uHitSensorID.getLayerNumber() == 1 ? m_param_uROIsizeL1 : m_param_uROIsizeL2);
       const unsigned short& vROIsize = (uHitSensorID.getLayerNumber() == 1 ? m_param_vROIsizeL1 : m_param_vROIsizeL2);
 
-//       B2INFO("sensorID: " << uHitSensorID << ", localUCoordinate: " << uCoordinate << ", localVCoordinate: " << vCoordinate <<
-//              ", localUCell: " << uCell << ", localVCell: " << vCell << ", uROIsize : " << uROIsize << ", vROIsize: " << vROIsize);
+      B2DEBUG(29, "sensorID: " << uHitSensorID << ", localUCoordinate: " << uCoordinateInCM << ", localVCoordinate: " << vCoordinateInCM
+              <<
+              ", localUCell: " << uCell << ", localVCell: " << vCell << ", uROIsize : " << uROIsize << ", vROIsize: " << vROIsize);
 
       /** Lower left corner */
       short uCellDownLeft = uCell - uROIsize / 2;
@@ -115,14 +104,6 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
       if (vCellUpRight >= vCells) vCellUpRight = vCells - 1;
 
       m_storeDATCONROIs.appendNew(ROIid(uCellDownLeft, uCellUpRight, vCellDownLeft, vCellUpRight, uHitSensorID));
-//      if (storeDATCONROIids.getEntries() > 1000) {
-//        B2ERROR("Too many DATCON ROIs, aborting ROI creation.");
-//        break;
-//      }
     }
-//    if (storeDATCONROIids.getEntries() > 1000) {
-//      storeDATCONROIids.clear();
-//      break;
-//    }
   }
 }

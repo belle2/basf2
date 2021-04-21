@@ -33,71 +33,71 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
                                 m_param_isUFinder);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeGnuplotOutput"),
-                                m_writeGnuplotOutput,
+                                m_param_writeGnuplotOutput,
                                 "Write gnuplot debugging output to file?",
-                                m_writeGnuplotOutput);
+                                m_param_writeGnuplotOutput);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSOutputFileName"),
-                                m_gnuplotHSOutputFileName,
+                                m_param_gnuplotHSOutputFileName,
                                 "Name of the gnuplot debug file.",
-                                m_gnuplotHSOutputFileName);
+                                m_param_gnuplotHSOutputFileName);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSRectOutputFileName"),
-                                m_gnuplotHSRectOutputFileName,
+                                m_param_gnuplotHSRectOutputFileName,
                                 "Name of the gnuplot debug HS sectors file.",
-                                m_gnuplotHSRectOutputFileName);
+                                m_param_gnuplotHSRectOutputFileName);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSCoGOutputFileName"),
-                                m_gnuplotHSCoGOutputFileName,
+                                m_param_gnuplotHSCoGOutputFileName,
                                 "Name of the gnuplot debug cluster CoG file.",
-                                m_gnuplotHSCoGOutputFileName);
+                                m_param_gnuplotHSCoGOutputFileName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
-                                m_maxRecursionLevel,
+                                m_param_maxRecursionLevel,
                                 "Maximum recursion level for the fast Hough trafo algorithm.",
-                                m_maxRecursionLevel);
+                                m_param_maxRecursionLevel);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"),
-                                m_nAngleSectors,
+                                m_param_nAngleSectors,
                                 "Number of angle sectors (= x-axis) dividing the Hough space.",
-                                m_nAngleSectors);
+                                m_param_nAngleSectors);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"),
-                                m_nVerticalSectors,
+                                m_param_nVerticalSectors,
                                 "Number of vertical sectors (= y-axis) dividing the Hough space.",
-                                m_nVerticalSectors);
+                                m_param_nVerticalSectors);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"),
-                                m_verticalHoughSpaceSize,
+                                m_param_verticalHoughSpaceSize,
                                 "data type: long. Vertical size of the Hough space.",
-                                m_verticalHoughSpaceSize);
+                                m_param_verticalHoughSpaceSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"),
-                                m_minimumX,
+                                m_param_minimumX,
                                 "Minimum x value of the Hough space.",
-                                m_minimumX);
+                                m_param_minimumX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumX"),
-                                m_maximumX,
+                                m_param_maximumX,
                                 "Maximum x value of the Hough space.",
-                                m_maximumX);
+                                m_param_maximumX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"),
-                                m_MinimumHSClusterSize,
+                                m_param_MinimumHSClusterSize,
                                 "Maximum x value of the Hough space.",
-                                m_MinimumHSClusterSize);
+                                m_param_MinimumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"),
-                                m_MaximumHSClusterSize,
+                                m_param_MaximumHSClusterSize,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSize);
+                                m_param_MaximumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"),
-                                m_MaximumHSClusterSizeX,
+                                m_param_MaximumHSClusterSizeX,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSizeX);
+                                m_param_MaximumHSClusterSizeX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"),
-                                m_MaximumHSClusterSizeY,
+                                m_param_MaximumHSClusterSizeY,
                                 "Maximum x value of the Hough space.",
-                                m_MaximumHSClusterSizeY);
+                                m_param_MaximumHSClusterSizeY);
 
 }
 
@@ -105,19 +105,19 @@ void FastInterceptFinder2DFPGA::initialize()
 {
   Super::initialize();
 
-  m_maxRecursionLevel = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
-  B2ASSERT("The maximum number of currentRecursion in u must not be larger than 14, but it is " << m_maxRecursionLevel,
-           m_maxRecursionLevel <= 14);
-  m_unitX = (m_maximumX - m_minimumX) / m_nAngleSectors;
+  m_param_maxRecursionLevel = ceil(log2(std::max(m_param_nAngleSectors, m_param_nVerticalSectors))) - 1;
+  B2ASSERT("The maximum number of currentRecursion in u must not be larger than 14, but it is " << m_param_maxRecursionLevel,
+           m_param_maxRecursionLevel <= 14);
+  m_unitX = (m_param_maximumX - m_param_minimumX) / m_param_nAngleSectors;
   if (not m_param_isUFinder) {
-    m_unitX = (tan(m_maximumX) - tan(m_minimumX)) / m_nAngleSectors;
+    m_unitX = (tan(m_param_maximumX) - tan(m_param_minimumX)) / m_param_nAngleSectors;
   }
-  for (uint i = 0; i < m_nAngleSectors; i++) {
-    double x = m_minimumX + m_unitX * (double)i;
+  for (uint i = 0; i < m_param_nAngleSectors; i++) {
+    double x = m_param_minimumX + m_unitX * (double)i;
     double xc = x + 0.5 * m_unitX;
     if (not m_param_isUFinder) {
-      x = atan(tan(m_minimumX) + m_unitX * i);
-      xc = atan(tan(m_minimumX) + m_unitX * ((double)i + 0.5));
+      x = atan(tan(m_param_minimumX) + m_unitX * i);
+      xc = atan(tan(m_param_minimumX) + m_unitX * ((double)i + 0.5));
     }
 
     m_HSXLUT[i] = x;
@@ -127,67 +127,37 @@ void FastInterceptFinder2DFPGA::initialize()
     m_HSCenterCosValuesLUT[i] = convertToInt(cos(xc), 3);
     m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_nAngleSectors] = m_maximumX;
-  m_HSSinValuesLUT[m_nAngleSectors] = convertToInt(sin(m_maximumX), 3);
-  m_HSCosValuesLUT[m_nAngleSectors] = convertToInt(cos(m_maximumX), 3);
+  m_HSXLUT[m_param_nAngleSectors] = m_param_maximumX;
+  m_HSSinValuesLUT[m_param_nAngleSectors] = convertToInt(sin(m_param_maximumX), 3);
+  m_HSCosValuesLUT[m_param_nAngleSectors] = convertToInt(cos(m_param_maximumX), 3);
 
-  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (uint i = 0; i <= m_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
+  m_unitY = 2. * m_param_verticalHoughSpaceSize / m_param_nVerticalSectors;
+  for (uint i = 0; i <= m_param_nVerticalSectors; i++) {
+    m_HSYLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i;
+    m_HSYCenterLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
-  B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize << " unitX: " << m_unitX <<
-          " unitY: " << m_unitY);
+  B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize <<
+          " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
 
 void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
                                       std::vector<std::pair<double, double>>& tracks)
 {
-  m_SectorArray.assign(m_nAngleSectors * m_nVerticalSectors, 0);
+  m_SectorArray.assign(m_param_nAngleSectors * m_param_nVerticalSectors, 0);
   m_activeSectorArray.clear();
   m_activeSectorArray.reserve(4096);
   m_trackCandidates.clear();
 
-  if (m_writeGnuplotOutput) {
+  if (m_param_writeGnuplotOutput) {
     m_rectcounter = 1;
-    m_rectoutstream.open(m_gnuplotHSRectOutputFileName.c_str(), std::ios::trunc);
-    m_cogoutstream.open(m_gnuplotHSCoGOutputFileName.c_str(), std::ios::trunc);
+    m_rectoutstream.open(m_param_gnuplotHSRectOutputFileName.c_str(), std::ios::trunc);
+    m_cogoutstream.open(m_param_gnuplotHSCoGOutputFileName.c_str(), std::ios::trunc);
     gnuplotoutput(hits);
   }
 
-  fastInterceptFinder2d(hits, 0, m_nAngleSectors, 0, m_nVerticalSectors, 0);
-//   for (uint y = 0; y < m_nVerticalSectors; y++) {
-//     for (uint x = 0; x < m_nAngleSectors; x++) {
-//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
-//       if (cellContent < -1) {
-//         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent == 0) {
-//         std::cout << "   ";
-//       }  else if (cellContent > 0 && cellContent < 10) {
-//         std::cout << " " <<  cellContent << " ";
-//       } else if (cellContent >= 10) {
-//         std::cout << cellContent << " ";
-//       }
-//     }
-//     std::cout << std::endl;
-//   }
+  fastInterceptFinder2d(hits, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
+
   FindHoughSpaceCluster();
-//   for (uint y = 0; y < m_nVerticalSectors; y++) {
-//     for (uint x = 0; x < m_nAngleSectors; x++) {
-//       short cellContent = m_SectorArray[y * m_nAngleSectors + x];
-//       if (cellContent < -1) {
-//         std::cout << "-" << abs(cellContent) << " ";
-//       } else if (cellContent == 0) {
-//         std::cout << "   ";
-//       } else if (cellContent > 0 && cellContent < 10) {
-//         std::cout << " " <<  cellContent << " ";
-//       } else if (cellContent >= 10) {
-//         std::cout << cellContent << " ";
-//       }
-//     }
-//     std::cout << std::endl;
-//   }
-//   std::cout << std::endl;
 
   for (auto& trackCand : m_trackCandidates) {
     tracks.emplace_back(trackCand);
@@ -195,7 +165,7 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
 
   B2DEBUG(29, "m_activeSectorArray.size: " << m_activeSectorArray.size() << " m_trackCandidates.size: " << m_trackCandidates.size());
 
-  if (m_writeGnuplotOutput) {
+  if (m_param_writeGnuplotOutput) {
     m_rectoutstream.close();
     m_cogoutstream.close();
   }
@@ -207,7 +177,7 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 {
   std::vector<std::pair<VxdID, std::pair<long, long>>> containedHits;
 
-  if (currentRecursion == m_maxRecursionLevel + 1) return;
+  if (currentRecursion == m_param_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
   const uint centerx = xmin + (uint)((xmax - xmin) / 2);
@@ -231,8 +201,6 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-//     const short sinCenter   = convertToInt(sin((localLeft + localRight) / 2.), 3);
-//     const short cosCenter   = convertToInt(cos((localLeft + localRight) / 2.), 3);
     const short&  sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
     const short&  cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
 
@@ -267,9 +235,6 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
         if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-//         if (((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
-//              (yCenter <= localUpperCoordinate && yCenter >= localLowerCoordinate && derivativeyCenter >= 0)) &&
-//             (derivativeyLeft >= 0 || derivativeyRight >= 0 || derivativeyCenter >= 0)) {
         if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
             (yCenter <= localUpperCoordinate and yLeft >= localLowerCoordinate and yRight >= localLowerCoordinate) or
             (yCenter >= localLowerCoordinate and yLeft <= localUpperCoordinate and yRight <= localUpperCoordinate)) {
@@ -280,26 +245,26 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
 
       if (layerFilter(layerHits) > 0) {
         // recursive call of fastInterceptFinder2d, until currentRecursion == m_maxRecursionLevel
-        if (currentRecursion < m_maxRecursionLevel) {
+        if (currentRecursion < m_param_maxRecursionLevel) {
 
-          m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
-                          " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
-                          m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
-          m_rectcounter++;
+          if (m_param_writeGnuplotOutput) {
+            m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
+                            " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
+                            m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
+            m_rectcounter++;
+          }
 
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          m_SectorArray[localIndexY * m_nAngleSectors + localIndexX] = -layerFilter(layerHits);
+          m_SectorArray[localIndexY * m_param_nAngleSectors + localIndexX] = -layerFilter(layerHits);
           m_activeSectorArray.push_back(std::make_pair(localIndexX, localIndexY));
 
-
-          m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
-                          " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
-                          m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
-          m_rectcounter++;
-
-//           int nActiveSectors = std::count_if(m_SectorArray.begin(), m_SectorArray.end(), [](int c) {return c < 0;});
-//           B2DEBUG(29, "number of active sectors: " << nActiveSectors << " localIndexX: " << localIndexX << " localIndexY: " << localIndexY << " totalIndex: " << localIndexY * m_nAngleSectors + localIndexX);
+          if (m_param_writeGnuplotOutput) {
+            m_rectoutstream << "set object " << m_rectcounter << " rect from " << localLeft << ", " << localLowerCoordinate <<
+                            " to " << localRight << ", " << localUpperCoordinate << " fc rgb \"" <<
+                            m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
+            m_rectcounter++;
+          }
         }
       }
     }
@@ -337,7 +302,7 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
 //   B2INFO("    end this side");
 
   for (const auto& currentCell : m_activeSectorArray) {
-    const uint currentIndex = currentCell.second * m_nAngleSectors + currentCell.first;
+    const uint currentIndex = currentCell.second * m_param_nAngleSectors + currentCell.first;
     if (m_SectorArray[currentIndex] > -1) continue;
 
     m_clusterInitialPosition = currentCell;
@@ -347,12 +312,12 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
     // Check for HS sectors connected to each other which could form a cluster
     DepthFirstSearch(currentCell.first, currentCell.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
-    if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-      double CoGX = (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5) * m_unitX + m_minimumX;
+    if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
+      double CoGX = (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5) * m_unitX + m_param_minimumX;
       if (not m_param_isUFinder) {
-        CoGX = atan(tan(m_minimumX) + m_unitX * (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5));
+        CoGX = atan(tan(m_param_minimumX) + m_unitX * (((double)m_clusterCoG.first / (double)m_clusterSize) + 0.5));
       }
-      double CoGY = m_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 0.5) * m_unitY;
+      double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 0.5) * m_unitY;
 
       if (m_param_isUFinder) {
         double trackPhi = CoGX + M_PI_2;
@@ -368,10 +333,10 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
         m_trackCandidates.emplace_back(std::make_pair(CoGX, CoGY));
       }
       B2DEBUG(29, "m_clusterCoG.first: " << m_clusterCoG.first << " " << ((double)m_clusterCoG.first / (double)m_clusterSize) <<
-              " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) << " CoGX: " << CoGX
-              << " CoGY: " << CoGY);
+              " m_clusterCoG.second: " << m_clusterCoG.second << " " << ((double)m_clusterCoG.second / (double)m_clusterSize) <<
+              " CoGX: " << CoGX << " CoGY: " << CoGY);
 
-      if (m_writeGnuplotOutput) {
+      if (m_param_writeGnuplotOutput) {
         m_cogoutstream << CoGX << " " << CoGY << std::endl;
       }
     }
@@ -381,25 +346,25 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
 
 void FastInterceptFinder2DFPGA::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
-  if (m_clusterSize >= m_MaximumHSClusterSize) return;
+  if (m_clusterSize >= m_param_MaximumHSClusterSize) return;
 
   for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
-    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
-        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
+    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_param_MaximumHSClusterSizeY or
+        m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexY > m_param_nVerticalSectors) return;
     for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
-      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
-          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
+      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_param_MaximumHSClusterSizeX or
+          m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexX > m_param_nAngleSectors) return;
 
       // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
       if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;
 
       // first check bounds to avoid out-of-bound array access
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
-      if (currentIndexX < m_nAngleSectors and currentIndexY < m_nVerticalSectors) {
+      if (currentIndexX < m_param_nAngleSectors and currentIndexY < m_param_nVerticalSectors) {
 
-        if (m_SectorArray[currentIndexY * m_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
+        if (m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
           // Only continue searching if the current cluster is smaller than the maximum cluster size
-          m_SectorArray[currentIndexY * m_nAngleSectors + currentIndexX] = m_clusterCount;
+          m_SectorArray[currentIndexY * m_param_nAngleSectors + currentIndexX] = m_clusterCount;
           m_clusterCoG = std::make_pair(m_clusterCoG.first + currentIndexX, m_clusterCoG.second + currentIndexY);
           m_clusterSize++;
           // search in the next Hough Space cells...
@@ -414,7 +379,7 @@ void FastInterceptFinder2DFPGA::DepthFirstSearch(uint lastIndexX, uint lastIndex
 void FastInterceptFinder2DFPGA::gnuplotoutput(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits)
 {
   std::ofstream hsoutstream;
-  hsoutstream.open(m_gnuplotHSOutputFileName.c_str(), std::ios::trunc);
+  hsoutstream.open(m_param_gnuplotHSOutputFileName.c_str(), std::ios::trunc);
 
   hsoutstream << "set pointsize 1.5\nset style line 42 lc rgb '#0060ad' pt 7   # circle" << std::endl;
 
@@ -440,15 +405,19 @@ void FastInterceptFinder2DFPGA::gnuplotoutput(std::vector<std::pair<VxdID, std::
 
   hsoutstream << "set xrange [-pi-0.5:pi+0.5]" << std::endl << std::endl;
 
-  hsoutstream << "load '" << m_gnuplotHSRectOutputFileName << "'" << std::endl << std::endl;
+  hsoutstream << "load '" << m_param_gnuplotHSRectOutputFileName << "'" << std::endl << std::endl;
 
   uint count = 0;
   for (auto& hit : hits) {
     const VxdID& id = hit.first;
     int layer = id.getLayerNumber();
+    // Multiplication with 1000 is necessary, as in the actual intercept finding step, cos and sin are multiplied by 1000, too.
+    // To directly compare the information in the gnuplot HoughSpace, just multiply by 1000 here instead of adding another
+    // '1000 * ' when writing to the gnuplot debug file.
     const long xc = 1000 * hit.second.first;
     const long yc = 1000 * hit.second.second;
 
+    // only plot when derivative is positive
     hsoutstream << "plot " << xc << " * -sin(x) + " << yc << " * cos(x) > 0 ? " << xc << " * cos(x) + " << yc <<
                 " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << std::endl;
     if (count < hits.size() - 1) hsoutstream << "re";
@@ -456,7 +425,7 @@ void FastInterceptFinder2DFPGA::gnuplotoutput(std::vector<std::pair<VxdID, std::
   }
 
   hsoutstream << std::endl;
-  hsoutstream << "replot '" << m_gnuplotHSCoGOutputFileName << "' u 1:2 w p ls 42 notitle" << std::endl << std::endl;
+  hsoutstream << "replot '" << m_param_gnuplotHSCoGOutputFileName << "' u 1:2 w p ls 42 notitle" << std::endl << std::endl;
   hsoutstream << "pause -1" << std::endl;
   hsoutstream.close();
 }

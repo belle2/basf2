@@ -234,5 +234,5 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
     }
   }
 
-//   B2DEBUG(29, "uExtrapolations.size: " << uExtrapolations.size() << " vExtrapolations.size: " << vExtrapolations.size());
+  B2DEBUG(29, "uExtrapolations.size: " << uExtrapolations.size() << " vExtrapolations.size: " << vExtrapolations.size());
 }

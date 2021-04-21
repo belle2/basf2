@@ -91,21 +91,21 @@ namespace Belle2 {
     bool m_param_isUFinder = true;
 
     /// maximum number of recursive calls of fastInterceptFinder2d
-    uint m_maxRecursionLevel = 6;
+    uint m_param_maxRecursionLevel = 6;
 
     /// number of sectors of the Hough Space on the horizontal axis
-    uint m_nAngleSectors = 256;
+    uint m_param_nAngleSectors = 256;
 
     /// number of sectors of the Hough Space on the vertical axis
-    uint m_nVerticalSectors = 256;
+    uint m_param_nVerticalSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
-    long m_verticalHoughSpaceSize = convertToInt(64, 6);
+    long m_param_verticalHoughSpaceSize = convertToInt(64, 6);
 
     /// minimum x value of the Hough Space, defaults to the value for u-side
-    double m_minimumX = -3.168;
+    double m_param_minimumX = -3.168;
     /// maximum x value of the Hough Space, defaults to the value for u-side
-    double m_maximumX = 3.168;
+    double m_param_maximumX = 3.168;
 
     /// HS unit size in x
     double m_unitX = 0;
@@ -113,13 +113,13 @@ namespace Belle2 {
     double m_unitY = 0;
 
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_MinimumHSClusterSize = 3;
+    uint m_param_MinimumHSClusterSize = 3;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSize = 1000;
+    uint m_param_MaximumHSClusterSize = 1000;
     /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSizeX = 1000;
+    uint m_param_MaximumHSClusterSizeX = 1000;
     /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-    uint m_MaximumHSClusterSizeY = 1000;
+    uint m_param_MaximumHSClusterSizeY = 1000;
 
     /// Look-Up-Tables for values as cache to speed up calculation
     /// sine values of the Hough Space sector boarder coordinates
@@ -153,13 +153,13 @@ namespace Belle2 {
     uint m_clusterSize = 0;
 
     /// use gnuplot output?
-    bool m_writeGnuplotOutput = false;
+    bool m_param_writeGnuplotOutput = false;
     /// gnuplot HS output filename
-    std::string m_gnuplotHSOutputFileName = "HSFPGA.plt";
+    std::string m_param_gnuplotHSOutputFileName = "HSFPGA.plt";
     /// gnuplot HS sector output filename
-    std::string m_gnuplotHSRectOutputFileName = "HSFPGARect.plt";
+    std::string m_param_gnuplotHSRectOutputFileName = "HSFPGARect.plt";
     /// gnuplot HS sector output filename
-    std::string m_gnuplotHSCoGOutputFileName = "HSFPGACoG.plt";
+    std::string m_param_gnuplotHSCoGOutputFileName = "HSFPGACoG.plt";
     /// HS sector debug file
     std::ofstream m_rectoutstream;
     /// HS CoG debug file

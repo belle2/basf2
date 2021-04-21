@@ -21,7 +21,6 @@
 
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -29,6 +28,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
+  class VxdID;
 
   /**
    * Findlet for performing the DATCON ROI calculation close to the implementation

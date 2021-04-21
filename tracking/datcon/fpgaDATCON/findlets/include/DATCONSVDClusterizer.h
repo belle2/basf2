@@ -18,12 +18,11 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include<numeric>
+#include <numeric>
 
 namespace Belle2 {
   class DATCONSVDDigit;
   class SVDCluster;
-
   class ModuleParamList;
 
   /**

@@ -1,0 +1,28 @@
+# EventType: 1210034100
+# Descriptor: [B -> K K_S0 gamma]cc
+# NickName: B_KKS0gamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20210421
+#
+#
+
+Alias MyB B+
+Alias Myanti-B B-
+ChargeConj MyB Myanti-B
+
+Decay Upsilon(4S)
+0.5 MyB B- VSS;
+0.5 Myanti-B B+ VSS;
+Enddecay
+
+Decay MyB
+1.0 K+ K_S0 gamma		PHSP;
+Enddecay
+CDecay Myanti-B
+
+End

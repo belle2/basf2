@@ -110,6 +110,8 @@ namespace Belle2 {
 
     // Data members for outputs
     MonitoringObject* m_monObj = nullptr; ///< Monitoring object for MiraBelle
+    TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
+    // Canvases & output histos for Poisson trigger (TTYP_POIS) events
     std::vector<TCanvas*> m_c_instOccu; ///< Canvases for the instantaneous occupancy
     std::vector<TCanvas*> m_c_occuLER; ///< Canvases for the occu. vs time after LER inj.
     std::vector<TCanvas*> m_c_occuHER; ///< Canvases for the occu. vs time after HER inj.
@@ -119,7 +121,16 @@ namespace Belle2 {
     std::vector<TH2F*> m_h_occuHER; ///< Histograms for the occu. vs time after HER inj.
     std::vector<TH1F*> m_h_occuLER1; ///< Histograms for the 1D occu. vs time after LER inj.
     std::vector<TH1F*> m_h_occuHER1; ///< Histograms for the 1D occu. vs time after HER inj.
-    TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
+    // Canvases & output histos for all events
+    std::vector<TCanvas*> m_c_instOccuAll; ///< Canvases for the instantaneous occupancy
+    std::vector<TCanvas*> m_c_occuLERAll; ///< Canvases for the occu. vs time after LER inj.
+    std::vector<TCanvas*> m_c_occuHERAll; ///< Canvases for the occu. vs time after HER inj.
+    std::vector<TCanvas*> m_c_occuLER1All; ///< Canvases for the 1D occu. vs time after LER inj.
+    std::vector<TCanvas*> m_c_occuHER1All; ///< Canvases for the 1D occu. vs time after HER inj.
+    std::vector<TH2F*> m_h_occuLERAll; ///< Histograms for the occu. vs time after LER inj.
+    std::vector<TH2F*> m_h_occuHERAll; ///< Histograms for the occu. vs time after HER inj.
+    std::vector<TH1F*> m_h_occuLER1All; ///< Histograms for the 1D occu. vs time after LER inj.
+    std::vector<TH1F*> m_h_occuHER1All; ///< Histograms for the 1D occu. vs time after HER inj.
 
 #ifdef _BELLE2_EPICS
     std::vector<MyPV> m_myPVs; ///< EPICS stuff for each sensor group / PV

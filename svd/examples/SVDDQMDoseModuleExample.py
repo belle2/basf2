@@ -72,14 +72,22 @@ main.add_module(
     FADCmode=True)
 add_svd_reconstruction(main)  # Required for the statistics
 
-# SVDDQMDose module
+# SVDDQMDose module (Poisson trigger only)
 params = {'trgTypes': []} if args.no_trg_filter else {}
-add_module_name(main, 'SVDDQMDose', "HERInj",
-                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInj", **params)
-add_module_name(main, 'SVDDQMDose', "LERInj",
-                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInj", **params)
-add_module_name(main, 'SVDDQMDose', "NoInj",
-                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInj", **params)
+add_module_name(main, 'SVDDQMDose', "HERInjPois",
+                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInjPois", **params)
+add_module_name(main, 'SVDDQMDose', "LERInjPois",
+                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInjPois", **params)
+add_module_name(main, 'SVDDQMDose', "NoInjPois",
+                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInjPois", **params)
+# SVDDQMDose module (all events)
+params = {'trgTypes': []}
+add_module_name(main, 'SVDDQMDose', "HERInjAll",
+                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInjAll", **params)
+add_module_name(main, 'SVDDQMDose', "LERInjAll",
+                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInjAll", **params)
+add_module_name(main, 'SVDDQMDose', "NoInjAll",
+                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInjAll", **params)
 
 # SVDDQMInjection for execution time comparison
 main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')

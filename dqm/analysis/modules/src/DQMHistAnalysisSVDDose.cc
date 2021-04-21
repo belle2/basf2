@@ -52,41 +52,67 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_c_occuHER.reserve(c_sensorGroups.size());
   m_c_occuLER1.reserve(c_sensorGroups.size());
   m_c_occuHER1.reserve(c_sensorGroups.size());
+  m_c_instOccuAll.reserve(c_sensorGroups.size());
+  m_c_occuLERAll.reserve(c_sensorGroups.size());
+  m_c_occuHERAll.reserve(c_sensorGroups.size());
+  m_c_occuLER1All.reserve(c_sensorGroups.size());
+  m_c_occuHER1All.reserve(c_sensorGroups.size());
   for (const auto& group : c_sensorGroups) {
     TCanvas* c = new TCanvas("svd_instOccupancy_" + group.nameSuffix,
-                             "Instantaneous occupancy " + group.titleSuffix,
+                             "Instantaneous occupancy (Pois. trig.) " + group.titleSuffix,
                              0, 0, 800, 600);
     m_c_instOccu.push_back(c);
     m_monObj->addCanvas(c);
-
     c = new TCanvas("svd_occuLER_" + group.nameSuffix,
-                    "Occupancy vs time since LER inj. " + group.titleSuffix,
+                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER.push_back(c);
     // m_monObj->addCanvas(c);
-
     c = new TCanvas("svd_occuHER_" + group.nameSuffix,
-                    "Occupancy vs time since HER inj. " + group.titleSuffix,
+                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER.push_back(c);
     // m_monObj->addCanvas(c);
-
     c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix,
-                    "Occupancy vs time since LER inj. " + group.titleSuffix,
+                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER1.push_back(c);
     m_monObj->addCanvas(c);
-
     c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix,
-                    "Occupancy vs time since HER inj. " + group.titleSuffix,
+                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER1.push_back(c);
     m_monObj->addCanvas(c);
+
+    c = new TCanvas("svd_instOccupancy_" + group.nameSuffix,
+                    "Instantaneous occupancy (all events) " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_instOccuAll.push_back(c);
+    c = new TCanvas("svd_occuLER_" + group.nameSuffix,
+                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuLERAll.push_back(c);
+    c = new TCanvas("svd_occuHER_" + group.nameSuffix,
+                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuHERAll.push_back(c);
+    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix,
+                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuLER1All.push_back(c);
+    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix,
+                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
+                    0, 0, 800, 600);
+    m_c_occuHER1All.push_back(c);
   }
   m_h_occuLER.resize(c_sensorGroups.size(), nullptr);
   m_h_occuHER.resize(c_sensorGroups.size(), nullptr);
   m_h_occuLER1.resize(c_sensorGroups.size(), nullptr);
   m_h_occuHER1.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuLERAll.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuHERAll.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuLER1All.resize(c_sensorGroups.size(), nullptr);
+  m_h_occuHER1All.resize(c_sensorGroups.size(), nullptr);
 
   // The legend need to be memory-leaked, so we make it once and use it evey time
   m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
@@ -116,7 +142,7 @@ void DQMHistAnalysisSVDDoseModule::event()
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
       double nHits = 0.0, nEvts = 0.0;
-      for (TString dir : {"SVDDoseLERInj", "SVDDoseHERInj", "SVDDoseNoInj"}) {
+      for (TString dir : {"SVDDoseLERInjPois", "SVDDoseHERInjPois", "SVDDoseNoInjPois"}) {
         auto hHits = findHistT<TH2F>(dir + "/SVDHitsVsTime_" + group.nameSuffix);
         auto hEvts = findHistT<TH2F>(dir + "/SVDEvtsVsTime");
         if (!hHits || !hEvts) {
@@ -162,7 +188,7 @@ void DQMHistAnalysisSVDDoseModule::endRun()
   for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
     const auto& group = c_sensorGroups[g];
     double nHits = 0.0, nEvts = 0.0;
-    for (TString dir : {"SVDDoseLERInj", "SVDDoseHERInj", "SVDDoseNoInj"}) {
+    for (TString dir : {"SVDDoseLERInjPois", "SVDDoseHERInjPois", "SVDDoseNoInjPois"}) {
       auto hHits = findHistT<TH2F>(dir + "/SVDHitsVsTime_" + group.nameSuffix);
       auto hEvts = findHistT<TH2F>(dir + "/SVDEvtsVsTime");
       if (!hHits || !hEvts) {
@@ -195,9 +221,9 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     const auto& group = c_sensorGroups[g];
 
     auto c = m_c_instOccu[g];
-    auto hLER = findHistT<TH1F>("SVDDoseLERInj/SVDInstOccu_" + group.nameSuffix);
-    auto hHER = findHistT<TH1F>("SVDDoseHERInj/SVDInstOccu_" + group.nameSuffix);
-    auto hNo = findHistT<TH1F>("SVDDoseNoInj/SVDInstOccu_" + group.nameSuffix);
+    auto hLER = findHistT<TH1F>("SVDDoseLERInjPois/SVDInstOccu_" + group.nameSuffix);
+    auto hHER = findHistT<TH1F>("SVDDoseHERInjPois/SVDInstOccu_" + group.nameSuffix);
+    auto hNo = findHistT<TH1F>("SVDDoseNoInjPois/SVDInstOccu_" + group.nameSuffix);
     if (hLER && hHER && hNo) {
       hLER->SetLineColor(kRed);
       hHER->SetLineColor(kAzure);
@@ -207,6 +233,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
       carryOverflowOver(hNo);
       c->Clear();
       c->cd(0);
+      hNo->SetTitle("SVD instantaneous occu. " + group.titleSuffix + " U-side Pois. trig.");
       hNo->Draw("hist"); // hNo usually has the larger maximum by far
       hLER->Draw("hist same");
       hHER->Draw("hist same");
@@ -215,12 +242,12 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     }
 
     c = m_c_occuLER[g];
-    auto hHits = findHistT<TH2F>("SVDDoseLERInj/SVDHitsVsTime_" + group.nameSuffix);
-    auto hEvts = findHistT<TH2F>("SVDDoseLERInj/SVDEvtsVsTime");
+    auto hHits = findHistT<TH2F>("SVDDoseLERInjPois/SVDHitsVsTime_" + group.nameSuffix);
+    auto hEvts = findHistT<TH2F>("SVDDoseLERInjPois/SVDEvtsVsTime");
     if (hHits && hEvts) {
       if (m_h_occuLER[g]) delete m_h_occuLER[g];
       auto hOccu = m_h_occuLER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
-      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. Pois. trig."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
       hOccu->SetMinimum(1e-3);
@@ -233,12 +260,12 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     }
 
     c = m_c_occuLER1[g];
-    auto hpEvts = findHistT<TH1F>("SVDDoseLERInj/SVDEvtsVsTime1");
-    auto hpHits = findHistT<TH1F>("SVDDoseLERInj/SVDHitsVsTime1_" + group.nameSuffix);
+    auto hpEvts = findHistT<TH1F>("SVDDoseLERInjPois/SVDEvtsVsTime1");
+    auto hpHits = findHistT<TH1F>("SVDDoseLERInjPois/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
       if (m_h_occuLER1[g]) delete m_h_occuLER1[g];
       auto hpOccu = m_h_occuLER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
-      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj."
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. Pois. trig."
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
       hpOccu->SetMaximum(10);
@@ -250,12 +277,12 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     }
 
     c = m_c_occuHER[g];
-    hHits = findHistT<TH2F>("SVDDoseHERInj/SVDHitsVsTime_" + group.nameSuffix);
-    hEvts = findHistT<TH2F>("SVDDoseHERInj/SVDEvtsVsTime");
+    hHits = findHistT<TH2F>("SVDDoseHERInjPois/SVDHitsVsTime_" + group.nameSuffix);
+    hEvts = findHistT<TH2F>("SVDDoseHERInjPois/SVDEvtsVsTime");
     if (hHits && hEvts) {
       if (m_h_occuHER[g]) delete m_h_occuHER[g];
       auto hOccu = m_h_occuHER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
-      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. Pois. trig."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
       hOccu->SetMinimum(1e-3);
@@ -268,12 +295,104 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     }
 
     c = m_c_occuHER1[g];
-    hpEvts = findHistT<TH1F>("SVDDoseHERInj/SVDEvtsVsTime1");
-    hpHits = findHistT<TH1F>("SVDDoseHERInj/SVDHitsVsTime1_" + group.nameSuffix);
+    hpEvts = findHistT<TH1F>("SVDDoseHERInjPois/SVDEvtsVsTime1");
+    hpHits = findHistT<TH1F>("SVDDoseHERInjPois/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
       if (m_h_occuHER1[g]) delete m_h_occuHER1[g];
       auto hpOccu = m_h_occuHER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
-      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj."
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. Pois. trig."
+                       ";Time since last injection [#mus];Occupancy [%]");
+      hpOccu->SetMinimum(1e-3);
+      hpOccu->SetMaximum(10);
+      c->Clear();
+      c->cd(0);
+      hpOccu->SetMarkerStyle(7);
+      hpOccu->Draw("hist P");
+      c->SetLogy();
+    }
+
+    // ========== All events =============
+    c = m_c_instOccuAll[g];
+    hLER = findHistT<TH1F>("SVDDoseLERInjAll/SVDInstOccu_" + group.nameSuffix);
+    hHER = findHistT<TH1F>("SVDDoseHERInjAll/SVDInstOccu_" + group.nameSuffix);
+    hNo = findHistT<TH1F>("SVDDoseNoInjAll/SVDInstOccu_" + group.nameSuffix);
+    if (hLER && hHER && hNo) {
+      hLER->SetLineColor(kRed);
+      hHER->SetLineColor(kAzure);
+      hNo->SetLineColor(kBlack);
+      carryOverflowOver(hLER);
+      carryOverflowOver(hHER);
+      carryOverflowOver(hNo);
+      c->Clear();
+      c->cd(0);
+      hNo->SetTitle("SVD instantaneous occu. " + group.titleSuffix + " U-side all events");
+      hNo->Draw("hist"); // hNo usually has the larger maximum by far
+      hLER->Draw("hist same");
+      hHER->Draw("hist same");
+      c->SetLogy();
+      m_legend->Draw();
+    }
+
+    c = m_c_occuLERAll[g];
+    hHits = findHistT<TH2F>("SVDDoseLERInjAll/SVDHitsVsTime_" + group.nameSuffix);
+    hEvts = findHistT<TH2F>("SVDDoseLERInjAll/SVDEvtsVsTime");
+    if (hHits && hEvts) {
+      if (m_h_occuLERAll[g]) delete m_h_occuLERAll[g];
+      auto hOccu = m_h_occuLERAll[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. all events"
+                      ";Time since last injection [#mus];Time in beam cycle [#mus]"
+                      ";Occupancy [%]");
+      hOccu->SetMinimum(1e-3);
+      hOccu->SetMaximum(10);
+      c->Clear();
+      c->cd(0);
+      c->SetRightMargin(0.16); // For the colorbar
+      hOccu->Draw("COLZ");
+      c->SetLogz();
+    }
+
+    c = m_c_occuLER1All[g];
+    hpEvts = findHistT<TH1F>("SVDDoseLERInjAll/SVDEvtsVsTime1");
+    hpHits = findHistT<TH1F>("SVDDoseLERInjAll/SVDHitsVsTime1_" + group.nameSuffix);
+    if (hpHits && hpEvts) {
+      if (m_h_occuLER1All[g]) delete m_h_occuLER1All[g];
+      auto hpOccu = m_h_occuLER1All[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. all events"
+                       ";Time since last injection [#mus];Occupancy [%]");
+      hpOccu->SetMinimum(1e-3);
+      hpOccu->SetMaximum(10);
+      c->Clear();
+      c->cd(0);
+      hpOccu->SetMarkerStyle(7);
+      hpOccu->Draw("hist P");
+      c->SetLogy();
+    }
+
+    c = m_c_occuHERAll[g];
+    hHits = findHistT<TH2F>("SVDDoseHERInjAll/SVDHitsVsTime_" + group.nameSuffix);
+    hEvts = findHistT<TH2F>("SVDDoseHERInjAll/SVDEvtsVsTime");
+    if (hHits && hEvts) {
+      if (m_h_occuHERAll[g]) delete m_h_occuHERAll[g];
+      auto hOccu = m_h_occuHERAll[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. all events"
+                      ";Time since last injection [#mus];Time in beam cycle [#mus]"
+                      ";Occupancy [%]");
+      hOccu->SetMinimum(1e-3);
+      hOccu->SetMaximum(10);
+      c->Clear();
+      c->cd(0);
+      c->SetRightMargin(0.16); // For the colorbar
+      hOccu->Draw("COLZ");
+      c->SetLogz();
+    }
+
+    c = m_c_occuHER1All[g];
+    hpEvts = findHistT<TH1F>("SVDDoseHERInjAll/SVDEvtsVsTime1");
+    hpHits = findHistT<TH1F>("SVDDoseHERInjAll/SVDHitsVsTime1_" + group.nameSuffix);
+    if (hpHits && hpEvts) {
+      if (m_h_occuHER1All[g]) delete m_h_occuHER1All[g];
+      auto hpOccu = m_h_occuHER1All[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. all events"
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
       hpOccu->SetMaximum(10);

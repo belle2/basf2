@@ -58,49 +58,49 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_c_occuLER1All.reserve(c_sensorGroups.size());
   m_c_occuHER1All.reserve(c_sensorGroups.size());
   for (const auto& group : c_sensorGroups) {
-    TCanvas* c = new TCanvas("svd_instOccupancy_" + group.nameSuffix,
+    TCanvas* c = new TCanvas("svd_instOccupancy_" + group.nameSuffix + "_pois",
                              "Instantaneous occupancy (Pois. trig.) " + group.titleSuffix,
                              0, 0, 800, 600);
     m_c_instOccu.push_back(c);
     m_monObj->addCanvas(c);
-    c = new TCanvas("svd_occuLER_" + group.nameSuffix,
+    c = new TCanvas("svd_occuLER_" + group.nameSuffix + "_pois",
                     "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER.push_back(c);
     // m_monObj->addCanvas(c);
-    c = new TCanvas("svd_occuHER_" + group.nameSuffix,
+    c = new TCanvas("svd_occuHER_" + group.nameSuffix + "_pois",
                     "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER.push_back(c);
     // m_monObj->addCanvas(c);
-    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix,
+    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix + "_pois",
                     "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER1.push_back(c);
     m_monObj->addCanvas(c);
-    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix,
+    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix + "_pois",
                     "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER1.push_back(c);
     m_monObj->addCanvas(c);
 
-    c = new TCanvas("svd_instOccupancy_" + group.nameSuffix,
+    c = new TCanvas("svd_instOccupancy_" + group.nameSuffix + "_all",
                     "Instantaneous occupancy (all events) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_instOccuAll.push_back(c);
-    c = new TCanvas("svd_occuLER_" + group.nameSuffix,
+    c = new TCanvas("svd_occuLER_" + group.nameSuffix + "_all",
                     "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLERAll.push_back(c);
-    c = new TCanvas("svd_occuHER_" + group.nameSuffix,
+    c = new TCanvas("svd_occuHER_" + group.nameSuffix + "_all",
                     "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHERAll.push_back(c);
-    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix,
+    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix + "_all",
                     "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuLER1All.push_back(c);
-    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix,
+    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix + "_all",
                     "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
                     0, 0, 800, 600);
     m_c_occuHER1All.push_back(c);

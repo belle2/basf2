@@ -19,22 +19,14 @@
 #include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/ROIFinder.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <string>
 #include <vector>
-
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TFile.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class HitData;
+  class SpacePoint;
+  class SpacePointTrackCand;
 
   /**
    * Main Findlet for DATCON.
@@ -59,19 +51,9 @@ namespace Belle2 {
     /// Clear the object pools
     void beginEvent() override;
 
-    /// Write ROOT file and terminate.
-    /// Will be deleted when ROOT stuff is deleted.
-    void terminate() override;
-
   private:
-
-    /// Initialize ROOT histograms that are for debugging.
-    /// Will be deleted when ROOT stuff is deleted.
-    void initializeHists();
-    /// Analyze track candidates.
-    void analyseSPTCs();
-
     /// Findlets:
+
     /// Load SVDSpacePoints and prepare them for Hough-based tracking
     /// by calculating the conformal mapped x and y values of the 3D SpacePoint
     SpacePointLoaderAndPreparer m_spacePointLoaderAndPreparer;
@@ -93,7 +75,8 @@ namespace Belle2 {
     /// ROIFinder findlet, calculates PXD intercepts and ROIs
     ROIFinder m_roiFinder;
 
-    // container to share data between findlets
+
+    /// Container to share data between findlets
 
     /// Pointers to the (const) SpacePoints as a vector
     std::vector<const SpacePoint*> m_spacePointVector;
@@ -112,32 +95,5 @@ namespace Belle2 {
     /// or the simple one with just one Hough space (false)
     bool m_param_useSubHoughSpaces = false;
 
-    /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
-    /// ROOT file name
-    TFile* m_rootFile;
-    /// see histogram name for description
-    TH1D* m_nMCParticlesPerEvent;
-    /// see histogram name for description
-    TH1D* m_nSVDSPsPerEvent;
-    /// see histogram name for description
-    TH1D* m_trackCandsPerEvent;
-    /// see histogram name for description
-    TH1D* m_DiffTrackCandsMCParticlesPerEvent;
-    /// see histogram name for description
-    TH1D* m_hitsPerTrackCand;
-
-    /// see histogram name for description
-    TH2D* m_nTrackCandsvsnMCParticles2D;
-    /// see histogram name for description
-    TH2D* m_nTrackCandsvsnSVDSpacePoints2D;
-    /// see histogram name for description
-    TH2D* m_nDiffTrackCandsMCParticlesvsnSVDSpacePoints2D;
-    /// see histogram name for description
-    TH2D* m_trackCands2D;
-
-    /// StoreArrays needed for analysing and debugging during development
-    StoreArray<MCParticle> m_storeMCParticles;
-    /// StoreArrays needed for analysing and debugging during development
-    StoreArray<SpacePoint> m_storeSVDSpacePoints;
   };
 }

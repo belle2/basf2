@@ -56,9 +56,6 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// Begin the event and reset containers
-//     void beginEvent() override;
-
     /// End run and write Root file
     void endRun() override;
 
@@ -133,8 +130,5 @@ namespace Belle2 {
     TH2D* m_ActivePrunedResultQualityEstimatorvsResultSize;
 
     void initializeHists();
-
-    int m_nEvent = 0;
-
   };
 }

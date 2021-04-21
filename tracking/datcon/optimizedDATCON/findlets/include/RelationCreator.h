@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /// Findlet for applying filters for creating hit-hit and hit-seed relations
+  /// Findlet for applying filters for creating hit-hit relations in each track candidate
   template<class AHit, class ARelationFilter>
   class RelationCreator : public TrackFindingCDC::Findlet<AHit*, TrackFindingCDC::WeightedRelation<AHit>> {
   public:
@@ -39,24 +39,18 @@ namespace Belle2 {
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
       m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("relation", prefix));
-
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
-      "Maximum number of relations to be created.",  m_maxRelations);
     };
 
     /// Apply both filters for creating state-hit and hit-hit relations
     void apply(std::vector<AHit*>& hits,
                std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations) override
     {
-      // relations += hits -> hits
-      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, m_maxRelations);
+      // relations += hits -> hits in each track candidate
+      TrackFindingCDC::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
     };
 
   private:
     /// Subfindlet for the relation checking between seed and hits
     ARelationFilter m_relationFilter;
-
-    /// maximum number of relations that can be created per track candidate
-    uint m_maxRelations = 10000;
   };
 }

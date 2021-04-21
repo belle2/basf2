@@ -61,10 +61,10 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
                                 "Cut on quality indicator value for track candidates of size 5. Only accept SpacePointTrackCands with QI above this value.",
                                 m_param_minQualitiyIndicatorSize5);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfHitsForEachPathLength"),
-                                m_param_maxNumberOfHitsForEachPathLength,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfEachPathLength"),
+                                m_param_maxNumberOfEachPathLength,
                                 "Maximum number of SpacePointTrackCands with a length of 3, 4, 5, or 6 each.",
-                                m_param_maxNumberOfHitsForEachPathLength);
+                                m_param_maxNumberOfEachPathLength);
 }
 
 void TrackCandidateResultRefiner::initialize()
@@ -144,7 +144,7 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
   std::array<uint, 8> numberOfHitsInCheckedSPTCs{{0, 0, 0, 0, 0, 0, 0, 0}};
   prunedResults.reserve(selectedResults.size());
   for (auto& currentSPTC : selectedResults) {
-    if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfHitsForEachPathLength) {
+    if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfEachPathLength) {
       numberOfHitsInCheckedSPTCs[currentSPTC.size()] += 1;
       prunedResults.emplace_back(currentSPTC);
     }

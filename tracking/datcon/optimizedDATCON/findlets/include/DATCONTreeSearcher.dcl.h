@@ -23,12 +23,12 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
-   * Findlet for constructing result paths out of a list of states, which are connected
-   * with weighted relations. At each step, the states are again tested using a state rejector,
-   * which also knows the current path of states.
+   * Findlet for constructing result paths out of a list of hits, which are connected
+   * with weighted relations. At each step, the hits are again tested using a state rejector,
+   * which also knows the current path of hits.
    *
-   * This rejector is allowed to alter the states, so using a cellular automaton it is assured,
-   * that the states are traversed in the correct order without overriding each other.
+   * This rejector is allowed to alter the hits, so using a cellular automaton it is assured,
+   * that the hits are traversed in the correct order without overriding each other.
    * It is however crucial, that the relations do not create cycles in the graph!
    */
   template <class AHit, class APathFilter, class AResult>
@@ -46,9 +46,9 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     /**
-     * Main function of this findlet: traverse a tree starting from a given seed states.
+     * Main function of this findlet: traverse a tree starting from a given seed hits.
      *
-     * ATTENTION: As described above, the states themselves can be altered during the tree
+     * ATTENTION: As described above, the hits themselves can be altered during the tree
      * traversal.
      */
     void apply(std::vector<AHit*>& hits,
@@ -65,7 +65,7 @@ namespace Belle2 {
     /// State rejecter to decide which available continuations should be traversed next.
     APathFilter m_pathFilter;
 
-    /// Findlet for adding a recursion cell state to the states
+    /// Findlet for adding a recursion cell state to the hits
     TrackFindingCDC::CellularAutomaton<AHit> m_automaton;
 
     /// TwoHitFilter activarion cut

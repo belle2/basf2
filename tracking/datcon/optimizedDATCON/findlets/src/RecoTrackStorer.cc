@@ -138,7 +138,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     // TODO: the following lines are basically just a 1-to-1 copy from tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule
     TVectorD stateSeed(6); //(x,y,z,px,py,pz)
     TMatrixDSym covSeed(6);
-    // TODO: find out where these numbers come from!
+    // TODO: find out where these numbers come from! [This is copied from the VXDTF2 counterpart!]
     covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
     covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
 
@@ -159,11 +159,10 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     thisSPTC.set6DSeed(stateSeed);
     thisSPTC.setCovSeed(covSeed);
     thisSPTC.setChargeSeed(trackChargeSeed);
-    // TODO: until here
+    // until here
 
 
     unsigned int sortingParameter = 0;
-    // for (const SpacePoint* spacePoint : thisSPTC.getHits()) {
     for (const SpacePoint* spacePoint : sortedHits) {
       m_usedSpacePoints.insert(spacePoint);
 
@@ -173,12 +172,6 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
         newRecoTrack->addSVDHit(&relatedCluster, sortingParameter);
         sortingParameter++;
       }
-
-      // RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
-      // for (const SVDCluster& cluster : relatedClusters) {
-      //   newRecoTrack->addSVDHit(&cluster, sortingParameter);
-      //   sortingParameter++;
-      // }
     }
   }
 

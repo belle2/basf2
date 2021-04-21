@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-// #include <tracking/spacePointCreation/SpacePoint.h>
-// #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <framework/datastore/StoreArray.h>

@@ -69,6 +69,6 @@ namespace Belle2 {
     double m_param_minQualitiyIndicatorSize5 = 0.5;
 
     /// Accept nHits for each size at maximum
-    uint m_param_maxNumberOfHitsForEachPathLength = 10;
+    uint m_param_maxNumberOfEachPathLength = 10;
   };
 }

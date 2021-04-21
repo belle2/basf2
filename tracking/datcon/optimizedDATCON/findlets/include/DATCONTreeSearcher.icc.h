@@ -44,15 +44,8 @@ namespace Belle2 {
                                                              const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
                                                              std::vector<AResult>& results)
   {
-    B2ASSERT("Expected relation to be sorted",
-             std::is_sorted(relations.begin(), relations.end()));
+    B2ASSERT("Expected relation to be sorted", std::is_sorted(relations.begin(), relations.end()));
 
-//     // TODO: May be better to just do this for each seed separately
-//     const std::vector<AHit*>& hitPointers = TrackFindingCDC::as_pointers<AHit>(hits);
-    // TODO: Maybe const-cast as above, which was done by Nils for the CKF, where he
-    //       starts with a std::vector<AHit> instead of std::vector<AHit*> though...
-//     const std::vector<AHit*>& hitPointers = hits;
-//     m_automaton.applyTo(hitPointers, relations);
     m_automaton.applyTo(hits, relations);
 
     std::vector<const AHit*> seedHits;
@@ -61,7 +54,6 @@ namespace Belle2 {
         seedHits.emplace_back(hit);
       }
     }
-//     B2INFO("hits size (= rawTC size): " << hits.size() << " relations size: " << relations.size() << " seedHits size: " << seedHits.size());
 
     std::vector<TrackFindingCDC::WithWeight<const AHit*>> path;
     for (const AHit* seedHit : seedHits) {
@@ -94,7 +86,6 @@ namespace Belle2 {
       // the state may still include information from an other round of processing, so lets set it back
 
       if (std::count(path.begin(), path.end(), childHit)) {
-//       if (TrackFindingCDC::is_in(childHit, path)) {
         // Cycle detected -- is this the best handling?
         // Other options: Raise an exception and bail out of this seed
         B2FATAL("Cycle detected!");
@@ -117,22 +108,11 @@ namespace Belle2 {
       return;
     }
 
-// //     // Traverse the tree from each new state on
-// //     const auto stateLess = [](const auto & lhs, const auto & rhs) {
-// //       return lhs->getAutomatonCell().getCellState() < rhs->getAutomatonCell().getCellState();
-// //     };
-// //     std::sort(childHits.begin(), childHits.end(), stateLess);
-//     // Traverse the tree from each new state on
-//     const auto stateGreater = [](const auto & lhs, const auto & rhs) {
-//       return lhs->getAutomatonCell().getCellState() > rhs->getAutomatonCell().getCellState();
-//     };
-//     std::sort(childHits.begin(), childHits.end(), stateGreater);
     // Traverse the tree from each new state on
     std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::GreaterOf<TrackFindingCDC::GetWeight>());
 
     B2DEBUG(29, "Having found " << childHits.size() << " child states.");
-//     if (childHits.size() > 10)
-//       B2INFO("Having found " << childHits.size() << " child states.");
+
     for (const TrackFindingCDC::WithWeight<AHit*>& childHit : childHits) {
       path.emplace_back(childHit, childHit.getWeight());
       traverseTree(path, relations, results);

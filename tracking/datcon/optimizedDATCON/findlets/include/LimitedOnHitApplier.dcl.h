@@ -22,9 +22,9 @@ namespace Belle2 {
   /**
    * Specialisation of the OnHitApplier, which
    * (a) uses a filter for the () operator, which is configurable
-   * (b) does only allow for the best N candidates in the child states. All other states will be deleted.
+   * (b) does only allow for the best N candidates in the child hits. All other hits will be deleted.
    *
-   * Id useNStates is 0, all states are used.
+   * If m_param_useNHits is 0, all hits are used.
    */
   template <class AHit, class AFilter>
   class LimitedOnHitApplier : public OnHitApplier<AHit> {
@@ -39,7 +39,7 @@ namespace Belle2 {
     /// Constructor adding the findlet as a listener.
     LimitedOnHitApplier();
 
-    /// Apply the filter to each pair of states and current path and let only pass the best N states.
+    /// Apply the filter to each pair of hits and current path and let only pass the best N hits.
     void apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
 
@@ -53,7 +53,7 @@ namespace Belle2 {
     /// Parameter how many objects should pass maximal
     int m_param_useNHits = 0;
 
-    /// Filter to decide on the states
+    /// Filter to decide on the hits
     AFilter m_filter;
   };
 }

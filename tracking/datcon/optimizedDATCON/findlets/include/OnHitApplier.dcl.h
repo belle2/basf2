@@ -19,8 +19,8 @@
 namespace Belle2 {
 
   /**
-   * Helper findlet which applies its () operator to all pairs of path and state with all states in the given
-   * child state list. It deletes all states in the list, where the operator () return NAN.
+   * Helper findlet which applies its () operator to all pairs of path and hit with all hits in the given
+   * child hit list. It deletes all hits in the list, where the operator () return NAN.
    * Should probably be overloaded in derived classes.
    */
   template <class AHit>
@@ -34,7 +34,7 @@ namespace Belle2 {
     /// The object this filter refers to
     using Object = std::pair<const std::vector<TrackFindingCDC::WithWeight<const AHit*>>, AHit*>;
 
-    /// Apply the () operator to all pairs of state and current path.
+    /// Apply the () operator to all pairs of hit and current path.
     void apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
 

@@ -11,6 +11,22 @@
 import basf2 as b2
 import random
 import pandas as pd
+import argparse
+
+# add argument to get the input file with energy bias correction values
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-i',
+    '--input_path',
+    default="/nfs/dust/belle2/user/kovalch/energyBiasCorrFiles/Feb2021.txt",
+    help='Path to input file with energy bias correction values .')
+args = parser.parse_args()
+
+weightsDB = args.input_path
+df_weightDB = pd.read_csv(weightsDB, delimiter=r"\s+")
+
+tableName = "Feb2021:TestEnergy"
+tableName2 = "Feb2021:TestEnergy2"
 
 # Add some bin constructors
 
@@ -45,8 +61,6 @@ def make_3D_bin(bin_x, bin_y, bin_z):
 #  1-2| 1 | 3 | 5 |
 #     -------------
 
-weightsDB = '/nfs/dust/belle2/user/kovalch/energyBiasCorrFiles/Feb2021.txt'
-df_weightDB = pd.read_csv(weightsDB, delimiter=r"\s+")
 
 bins_x = []
 bins_y = []
@@ -77,7 +91,7 @@ addtable.param('experimentHigh', -1)
 addtable.param('experimentLow', 0)
 addtable.param('runHigh', -1)
 addtable.param('runLow', 0)
-addtable.param('tableName', "Feb2021:TestEnergy")
+addtable.param('tableName', tableName)
 
 addtable2 = b2.register_module('ParticleWeightingLookUpCreator')
 addtable2.param('tableIDNotSpec', tableIDNotSpec)
@@ -86,7 +100,7 @@ addtable2.param('experimentHigh', -1)
 addtable2.param('experimentLow', 0)
 addtable2.param('runHigh', -1)
 addtable2.param('runLow', 0)
-addtable2.param('tableName', "Feb2021:TestEnergy2")
+addtable2.param('tableName', tableName2)
 
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])

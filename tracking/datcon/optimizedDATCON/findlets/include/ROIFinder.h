@@ -130,6 +130,8 @@ namespace Belle2 {
     const double m_const_sensorMinY = -0.36;
     /// Maximum y coordinate if x-axis is perpendicular to the sensor:
     const double m_const_sensorMaxY =  0.89;
+    /// PXD sensors in L1 and L2 have the same size in u direction (=width):
+    const double m_const_activeSensorWidth = (m_const_sensorMaxY - m_const_sensorMinY);
     /// Shift of the center position in y if the x-axis is perpendicular to the sensor:
     const double m_const_shiftY = (m_const_sensorMaxY + m_const_sensorMinY) / 2.0;
     /// Radius of the two layers

@@ -9,7 +9,7 @@ import os
 sys_tests = ['def', 'scale']
 
 # Select the variation from the list
-test = 'def'
+test = 'scale'
 
 if test not in sys_tests:
     print("Unknown systematic test {}".format(test))
@@ -47,7 +47,7 @@ ma.fillParticleList(decayString='gamma:sel',
 if test == 'def':
     pass
 elif test == 'scale':  # weight_table_id+"_Weight" is used to scale photon energy
-    ma.energyBiasCorrection(inputListNames=['gamma:sel'], tableName=weight_table_id, path=my_path)
+    ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=weight_table_id, path=my_path)
 
 var1 = ['M',
         'p',

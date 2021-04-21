@@ -3214,7 +3214,7 @@ def scaleError(outputListName, inputListName,
     path.add_module(scale_error)
 
 
-def energyBiasCorrection(inputListNames, tableName, path=None):
+def correctEnergyBias(inputListNames, tableName, path=None):
     """
     Scale energy of the particles according to the scaling factor.
     If the particle list contains composite particles, the energy of the daughters are scaled.
@@ -3226,10 +3226,10 @@ def energyBiasCorrection(inputListNames, tableName, path=None):
         path (basf2.Path): module is added to this path
     """
 
-    energybiascorrection = register_module('EnergyBiasCorrection')
-    energybiascorrection.param('particleLists', inputListNames)
-    energybiascorrection.param('tableName', tableName)
-    path.add_module(energybiascorrection)
+    correctenergybias = register_module('EnergyBiasCorrection')
+    correctenergybias.param('particleLists', inputListNames)
+    correctenergybias.param('tableName', tableName)
+    path.add_module(correctenergybias)
 
 
 def getAnalysisGlobaltag():

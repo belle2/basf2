@@ -67,6 +67,11 @@ WeightInfo EnergyBiasCorrectionModule::getInfo(const Particle* particle)
 
 void EnergyBiasCorrectionModule::beginRun()
 {
+  //check if this module is used only for data
+  if (Environment::Instance().isMC()) {
+    B2ERROR("Attempting to run EnergyBiasCorrection on MC but this is only for data");
+  }
+
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
 }
 
@@ -75,7 +80,6 @@ void EnergyBiasCorrectionModule::event()
 {
   //check if this module is used only for data
   if (Environment::Instance().isMC()) {
-    B2ERROR("Attempting to run EnergyBiasCorrection on MC but this is only for data");
     return;
   }
 

@@ -34,8 +34,7 @@ namespace Belle2 {
 
   private:
     /// virtual IP SpacePoint
-    SpacePoint m_virtualIPSpacePoint;/* = SpacePoint(B2Vector3D(0., 0., 0.), B2Vector3D(0.1, 0.1, 0.5), {0.5, 0.5}, {false, false},
-                                                        VxdID(0), Belle2::VXD::SensorInfoBase::VXD);*/
+    SpacePoint m_virtualIPSpacePoint;
     /// cut on the POCA distance in xy obtained from the helixFitEstimator
     double m_param_helixFitPocaVirtIPDCut = 1.0;
 

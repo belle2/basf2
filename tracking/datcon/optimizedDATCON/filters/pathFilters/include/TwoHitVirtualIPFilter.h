@@ -13,6 +13,9 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitVariables.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 #include <math.h>
 
 namespace Belle2 {
@@ -32,7 +35,7 @@ namespace Belle2 {
 
   private:
     /// virtual IP vector
-    const B2Vector3D m_virtualIPPosition;
+    B2Vector3D m_virtualIPPosition;
     /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
     double m_cosRZCut = 0.95;
     /// cut on the difference between circle radius and circle center position in the x-y plane
@@ -41,5 +44,10 @@ namespace Belle2 {
 
     /// Construct empty ThreeHitVariables instance
     ThreeHitVariables m_threeHitVariables;
+
+    /// BeamSpot from DB
+    DBObjPtr<BeamSpot> m_BeamSpotDB;
+    /// Actual BeamSpot
+    BeamSpot m_BeamSpot;
   };
 }

@@ -44,11 +44,6 @@ SimpleRelationFilter::operator()(const std::pair<const HitData*, const HitData*>
 
   return NAN;
 
-//   if (!(fabs(phiDiff) < m_param_SimplePhiCut and absThetaDiff < m_param_SimpleThetaCut)) {
-//     return NAN;
-//   }
-//
-//   return 1.0;
 }
 
 void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

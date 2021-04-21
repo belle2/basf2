@@ -77,12 +77,6 @@ QualityIndicatorFilter::operator()(const BasePathFilter::Object& pair)
 
   const auto& estimatorResult = m_estimator->estimateQualityAndProperties(spacePoints);
 
-//   const double absHelixPocaD = (estimatorResult.pocaD) ? fabs(*estimatorResult.pocaD) : 1e-6;
-//   const double chi2 = (estimatorResult.chiSquared) ? *estimatorResult.chiSquared : 1e6;
-//
-//   if (absHelixPocaD > m_helixFitPocaDCut) {
-//     return NAN;
-//   }
   if (estimatorResult.qualityIndicator < m_QIcut) {
     return NAN;
   }

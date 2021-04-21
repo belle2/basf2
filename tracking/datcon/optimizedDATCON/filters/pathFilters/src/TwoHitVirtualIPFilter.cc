@@ -21,6 +21,14 @@ void TwoHitVirtualIPFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_threeHitVariables.setBFieldZ(bFieldZ);
+
+  if (m_BeamSpotDB.isValid()) {
+    m_BeamSpot = *m_BeamSpotDB;
+    const B2Vector3D& BeamSpotPosition = m_BeamSpot.getIPPosition();
+    m_virtualIPPosition.SetXYZ(BeamSpotPosition.X(), BeamSpotPosition.Y(), BeamSpotPosition.Z());
+  } else {
+    m_virtualIPPosition.SetXYZ(0., 0., 0.);
+  }
 }
 
 

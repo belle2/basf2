@@ -90,13 +90,6 @@ TwoHitVirtualIPQIFilter::operator()(const BasePathFilter::Object& pair)
   spacePointsVirtIP.emplace_back(previousHits.at(0)->getHit());
   const auto& estimatorResultVirtIP = m_estimator->estimateQualityAndProperties(spacePointsVirtIP);
 
-//   const double absHelixPocaDVirtIP = (estimatorResultVirtIP.pocaD) ? fabs(*estimatorResultVirtIP.pocaD) : 1e-6;
-//   const double chi2VirtIP = (estimatorResultVirtIP.chiSquared) ? *estimatorResultVirtIP.chiSquared : 1e6;
-//
-//   if (absHelixPocaDVirtIP > m_helixFitPocaVirtIPDCut) {
-//     return NAN;
-//   }
-
   return estimatorResultVirtIP.qualityIndicator;
 }
 

@@ -44,18 +44,6 @@ namespace Belle2 {
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: cm */
     double getCircleRadiusDifference()
     {
-//       B2Vector3D outerCircleCenter = getCircleCenterXY(m_oHit, m_ocHit, m_icHit);
-//       if (outerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-//       double outerCircleRadius = calcAvgDistanceXY(m_oHit, m_ocHit, m_icHit, outerCircleCenter);
-//
-//       B2Vector3D innerCircleCenter = getCircleCenterXY(m_ocHit, m_icHit, m_iHit);
-//       if (innerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-//       double innerCircleRadius = calcAvgDistanceXY(m_ocHit, m_icHit, m_iHit, innerCircleCenter);
-
       B2Vector3D outerCircleCenter = m_outerThreeHitVariables.getCircleCenterXY();
       B2Vector3D innerCircleCenter = m_innerThreeHitVariables.getCircleCenterXY();
       if (outerCircleCenter.Perp2() > 1e30 or innerCircleCenter.Perp2() > 1e30) {
@@ -71,15 +59,6 @@ namespace Belle2 {
     /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm */
     double getCircleCenterPositionDifference()
     {
-//       B2Vector3D outerCircleCenter = getCircleCenterXY(m_oHit, m_ocHit, m_icHit);
-//       if (outerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-//       B2Vector3D innerCircleCenter = getCircleCenterXY(m_ocHit, m_icHit, m_iHit);
-//       if (innerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-
       B2Vector3D outerCircleCenter = m_outerThreeHitVariables.getCircleCenterXY();
       B2Vector3D innerCircleCenter = m_innerThreeHitVariables.getCircleCenterXY();
       if (outerCircleCenter.Perp2() > 1e30 or innerCircleCenter.Perp2() > 1e30) {
@@ -93,18 +72,6 @@ namespace Belle2 {
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */
     double getDeltaPT()
     {
-//       B2Vector3D outerCircleCenter = getCircleCenterXY(m_oHit, m_ocHit, m_icHit);
-//       if (outerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-//       double outerCircleRadius = calcAvgDistanceXY(m_oHit, m_ocHit, m_icHit, outerCircleCenter);
-//
-//       B2Vector3D innerCircleCenter = getCircleCenterXY(m_ocHit, m_icHit, m_iHit);
-//       if (innerCircleCenter.Perp2() > 1e30) {
-//         return NAN;
-//       }
-//       double innerCircleRadius = calcAvgDistanceXY(m_ocHit, m_icHit, m_iHit, innerCircleCenter);
-
       B2Vector3D outerCircleCenter = m_outerThreeHitVariables.getCircleCenterXY();
       B2Vector3D innerCircleCenter = m_innerThreeHitVariables.getCircleCenterXY();
       if (outerCircleCenter.Perp2() > 1e30 or innerCircleCenter.Perp2() > 1e30) {

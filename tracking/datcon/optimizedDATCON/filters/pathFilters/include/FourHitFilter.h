@@ -31,9 +31,9 @@ namespace Belle2 {
     void beginRun() override;
 
   private:
-    /// TODO: Cut on relations in theta for overlay region on same layer but different ladder
+    /// Cut on difference of the two circle radii estimated from two triplets
     double m_param_CircleRadiusDifferenceCut = 10.;
-    /// TODO: Filter relations in theta between hit states where the layer difference is +-1
+    /// Cut on difference of the two circle center estimated from two triplets
     double m_param_CircleCenterPositionDifferenceCut = 10.;
 
     /// Construct empty ThreeHitVariables instance

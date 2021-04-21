@@ -73,6 +73,7 @@ Modules
    ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
  * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
  * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into
+ * Added a ``EnergyBiasCorrection`` module, sub-percent correction only applied to E of the photons and only on data.
    ROE 4-vector computation.
 
    .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.

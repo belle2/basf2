@@ -51,6 +51,8 @@ namespace Belle2 {
       m_cosTotal = m_yScanner->getCosTotal();
       m_minTime = TOPRecoManager::getMinTime();
       m_maxTime = TOPRecoManager::getMaxTime();
+      m_selectedHits = track.getSelectedHits();
+      m_bkgRate = track.getBkgRate();
 
       // prepare the memory for storing signal PDF
 
@@ -72,7 +74,7 @@ namespace Belle2 {
       m_deltaRayPDF.prepare(track, hypothesis);
       m_deltaPhotons = m_deltaRayPDF.getNumPhotons();
 
-      m_bkgPhotons = std::max(m_track.getBkgRate() * (m_maxTime - m_minTime), 0.1);
+      m_bkgPhotons = std::max(m_bkgRate * (m_maxTime - m_minTime), 0.1);
     }
 
 
@@ -267,7 +269,6 @@ namespace Belle2 {
             if (abs(y) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
             if (y * y1 < 0) {
               x2 = x;
-              y2 = y;
             } else {
               x1 = x;
               y1 = y;
@@ -512,7 +513,6 @@ namespace Belle2 {
         if (y != y or abs(y) == INFINITY) return -Ah;
         if (y * y1 < 0) {
           x2 = x;
-          y2 = y;
         } else {
           x1 = x;
           y1 = y;
@@ -732,7 +732,7 @@ namespace Belle2 {
       }
 
       LogL LL(getExpectedPhotons());
-      for (const auto& hit : m_track.getSelectedHits()) {
+      for (const auto& hit : m_selectedHits) {
         if (hit.time < m_minTime or hit.time > m_maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
         if (f <= 0) {
@@ -755,7 +755,7 @@ namespace Belle2 {
       }
 
       LogL LL(expectedPhotons(minTime - t0, maxTime - t0));
-      for (const auto& hit : m_track.getSelectedHits()) {
+      for (const auto& hit : m_selectedHits) {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
@@ -779,7 +779,7 @@ namespace Belle2 {
 
       initializePixelLogLs(minTime - t0, maxTime - t0);
 
-      for (const auto& hit : m_track.getSelectedHits()) {
+      for (const auto& hit : m_selectedHits) {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
@@ -827,7 +827,7 @@ namespace Belle2 {
     const std::vector<PDFConstructor::Pull>& PDFConstructor::getPulls() const
     {
       if (m_pulls.empty() and m_valid) {
-        for (const auto& hit : m_track.getSelectedHits()) {
+        for (const auto& hit : m_selectedHits) {
           if (hit.time < m_minTime or hit.time > m_maxTime) continue;
           appendPulls(hit);
         }

@@ -16,6 +16,7 @@
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <top/dbobjects/TOPFrontEndSetting.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
@@ -272,6 +273,7 @@ namespace Belle2 {
       double m_length = 0; /**< trajectory length within quartz */
       TOP::HelixSwimmer m_helix; /**< trajectory helix in nominal slot frame */
       DBObjPtr<TOPCalModuleAlignment> m_alignment;   /**< module alignment constants */
+      DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
 
       const Track* m_track = 0;  /**< mdst track */
       const ExtHit* m_extHit = 0;  /**< extrapolated hit */

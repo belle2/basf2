@@ -88,30 +88,28 @@ namespace Belle2 {
 
       // selection of photon hits belonging to this track
 
-      double minTime = TOPRecoManager::getMinTime();
-      double maxTime = TOPRecoManager::getMaxTime();
       unsigned numHitsOtherSlots = 0;
-
       StoreArray<TOPDigit> digits(digitsName);
       for (const auto& digit : digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getModuleID() == m_moduleID) {
           m_selectedHits.push_back(SelectedHit(digit.getPixelID(), digit.getTime(), digit.getTimeError()));
         } else {
-          double time = digit.getTime();
-          if (time < minTime or time > maxTime) continue;
           numHitsOtherSlots++;
         }
       }
 
       // background rate estimation (TODO to be improved ...)
 
+      const auto& tdc = geo->getNominalTDC();
+      double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+
       const auto& backgroundPDFs = TOPRecoManager::getBackgroundPDFs();
       unsigned k = m_moduleID - 1;
       double effi = (k < backgroundPDFs.size()) ? backgroundPDFs[k].getEfficiency() : 0;
       double effiSum = 0;
       for (const auto& bkg : backgroundPDFs) effiSum += bkg.getEfficiency();
-      m_bkgRate = (effiSum > effi) ? numHitsOtherSlots * effi / (effiSum - effi) / (maxTime - minTime) : 0;
+      m_bkgRate = (effiSum > effi) ? numHitsOtherSlots * effi / (effiSum - effi) / timeWindow : 0;
 
       // selected photon hits mapped to pixel columns
 
@@ -127,7 +125,7 @@ namespace Belle2 {
         m_columnHits.emplace(col, &hit);
       }
 
-      m_valid = effi > 0; // no sense to provide PID for this track since the module is fully inefficient
+      m_valid = effi > 0; // no sense to provide PID for the track if the module is fully inefficient
     }
 
 

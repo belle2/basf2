@@ -26,9 +26,11 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("std_charged",
+    parser.add_argument("--std_charged",
                         type=str,
-                        choices=["e", "mu", "pi", "K", "p"],
+                        nargs="+",
+                        choices=["e", "mu", "pi", "K"],
+                        default=["e", "mu", "pi", "K"],
                         help="The base name of the standard charged particle list to consider.")
     parser.add_argument("--detectors",
                         type=str,
@@ -48,6 +50,58 @@ def argparser():
     return parser
 
 
+def register_trackiso_modules(path, args, charges=["+", "-"]):
+    """
+    Prepare basf2 path.
+
+    Args:
+        path (basf2.Path): the input path.
+        args (Namespace): the CLI arguments.
+        charges (Optional[list(str)]): the particle list charges to check.
+                                       Default: ['+', '-']
+                                       Note that this is just to test module behaviour against different user's input:
+                                       in fact, for any choice of particle list's charge, the charge-conjugated one
+                                       gets loaded automatically.
+
+    Returns:
+        basf2.Path: the updated path.
+    """
+
+    ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
+    ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
+
+    for std_charged in args.std_charged:
+
+        for charge in charges:
+
+            # Fill a particle list of charged stable particles.
+            # Apply (optionally) some quality selection.
+            plist_name = f"{std_charged}{charge}:my_std_charged"
+            ma.fillParticleList(plist_name, "", path=path)
+            ma.applyCuts(plist_name, "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+
+            # 3D distance (default).
+            ma.calculateTrackIsolation(plist_name,
+                                       path,
+                                       *args.detectors,
+                                       alias="dist3DToClosestTrkAtSurface")
+            # 2D distance on rho-phi plane (chord length).
+            ma.calculateTrackIsolation(plist_name,
+                                       path,
+                                       *args.detectors,
+                                       use2DRhoPhiDist=True,
+                                       alias="dist2DRhoPhiToClosestTrkAtSurface")
+
+            # Dump isolation variables in a ntuple.
+            ma.variablesToNtuple(plist_name,
+                                 ntup_vars,
+                                 treename=f"{std_charged}{charge}",
+                                 filename="TrackIsolationVariables.root",
+                                 path=path)
+
+    return path
+
+
 if __name__ == "__main__":
 
     # Argparse options.
@@ -65,25 +119,7 @@ if __name__ == "__main__":
     # Add input data and ParticleLoader modules to the path.
     ma.inputMdstList("default", filelist=[b2.find_file("mdst14.root", "validation")], path=path)
 
-    # Fill a particle list of charged stable particles (eg. pions).
-    # Apply (optionally) some quality selection.
-    ma.fillParticleList(f"{args.std_charged}+:my_std_charged", "", path=path)
-    ma.applyCuts(f"{args.std_charged}+:my_std_charged", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
-
-    # 3D distance (default).
-    ma.calculateTrackIsolation(f"{args.std_charged}+:my_std_charged",
-                               path,
-                               *args.detectors,
-                               alias="dist3DToClosestTrkAtSurface")
-    # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation(f"{args.std_charged}+:my_std_charged",
-                               path,
-                               *args.detectors,
-                               use2DRhoPhiDist=True,
-                               alias="dist2DRhoPhiToClosestTrkAtSurface")
-
-    ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
-    ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
+    path = register_trackiso_modules(path, args)
 
     # Optionally activate debug mode for the TrackIsoCalculator module(s).
     if args.debug:
@@ -91,13 +127,6 @@ if __name__ == "__main__":
             if "TrackIsoCalculator" in m.name():
                 m.set_log_level(b2.LogLevel.DEBUG)
                 m.set_debug_level(args.debug)
-
-    # Dump isolation variables in a ntuple.
-    ma.variablesToNtuple(f"{args.std_charged}+:my_std_charged",
-                         ntup_vars,
-                         treename=args.std_charged,
-                         filename="TrackIsolationVariables.root",
-                         path=path)
 
     path.add_module("Progress")
 

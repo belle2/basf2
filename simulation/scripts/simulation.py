@@ -3,6 +3,7 @@
 
 import basf2 as b2
 from geometry import check_components
+from L1trigger import add_tsim
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
@@ -126,6 +127,7 @@ def add_simulation(
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
+    @param simulateT0jitter: if True simulate L1 trigger jitter
     """
 
     # Check compoments.
@@ -179,34 +181,11 @@ def add_simulation(
     # not necessary for running simulation jobs and it should be possible to
     # have them in the path more than once
 
-    # SVD digitization
-    if components is None or 'SVD' in components:
-        add_svd_simulation(path)
-
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
-
-    # PXD digitization
-    pxd_digits_name = ''
-    if components is None or 'PXD' in components:
-        if forceSetPXDDataReduction:
-            if usePXDDataReduction:
-                pxd_digits_name = 'pxd_unfiltered_digits'
-            add_pxd_simulation(path, digitsName=pxd_digits_name)
-        else:
-            # use DB conditional module to decide whether ROI finding should be activated
-            path_disableROI_Sim = b2.create_path()
-            path_enableROI_Sim = b2.create_path()
-
-            add_pxd_simulation(path_disableROI_Sim, digitsName='PXDDigits')
-            add_pxd_simulation(path_enableROI_Sim, digitsName='pxd_unfiltered_digits')
-
-            roi_condition_module_Sim = path.add_module("ROIfindingConditionFromDB")
-            roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)
-            roi_condition_module_Sim.if_false(path_disableROI_Sim, b2.AfterConditionPath.CONTINUE)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -230,7 +209,39 @@ def add_simulation(
         klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
+    # TO DO:
+    # add BG Overlay for: KLM, ECL, ARICH, TOP, CDC
+
+    # TO DO: L1 TRIGGER simulation
+    # !!! DO NOT UNCOMMENT !!!
+    # if simulateL1trigger:
+    #    add_tsim(path)
+
+    # SVD digitization
+    if components is None or 'SVD' in components:
+        add_svd_simulation(path)
+
+    # PXD digitization
+    pxd_digits_name = ''
+    if components is None or 'PXD' in components:
+        if forceSetPXDDataReduction:
+            if usePXDDataReduction:
+                pxd_digits_name = 'pxd_unfiltered_digits'
+            add_pxd_simulation(path, digitsName=pxd_digits_name)
+        else:
+            # use DB conditional module to decide whether ROI finding should be activated
+            path_disableROI_Sim = b2.create_path()
+            path_enableROI_Sim = b2.create_path()
+
+            add_pxd_simulation(path_disableROI_Sim, digitsName='PXDDigits')
+            add_pxd_simulation(path_enableROI_Sim, digitsName='pxd_unfiltered_digits')
+
+            roi_condition_module_Sim = path.add_module("ROIfindingConditionFromDB")
+            roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)
+            roi_condition_module_Sim.if_false(path_disableROI_Sim, b2.AfterConditionPath.CONTINUE)
+
     # background overlay executor - after all digitizers
+    # TO DO: overlay ONLY for PXD and SVD
     if bkgfiles is not None and bkgOverlay:
         if forceSetPXDDataReduction:
             path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)

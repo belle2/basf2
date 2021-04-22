@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
-#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
-#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2DSimple.h>
+#include <tracking/datcon/optimizedDATCON/findlets/MultiHoughSpaceFastInterceptFinder.h>
+#include <tracking/datcon/optimizedDATCON/findlets/SingleHoughSpaceFastInterceptFinder.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 #include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
@@ -59,9 +59,9 @@ namespace Belle2 {
     SpacePointLoaderAndPreparer m_spacePointLoaderAndPreparer;
 
     /// Hough Space intercept finder
-    FastInterceptFinder2D m_interceptFinder;
+    MultiHoughSpaceFastInterceptFinder m_multiHouthSpaceInterceptFinder;
     /// Simple Hough Space intercept finder
-    FastInterceptFinder2DSimple m_interceptFinderSimple;
+    SingleHoughSpaceFastInterceptFinder m_singleHouthSpaceInterceptFinder;
 
     /// Raw track candidate cleaner
     RawTrackCandCleaner<HitData> m_rawTCCleaner;
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     /// Use the elaborate FastInterceptFinder2D with multiple Hough spaces (true)
     /// or the simple one with just one Hough space (false)
-    bool m_param_useSubHoughSpaces = false;
+    bool m_param_useMultiHoughSpaceInterceptFinding = false;
 
   };
 }

@@ -29,7 +29,7 @@ namespace Belle2 {
    * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
    * and stored in the output vector.
    */
-  class FastInterceptFinder2D : public TrackFindingCDC::Findlet<HitData, std::vector<HitData*>> {
+  class MultiHoughSpaceFastInterceptFinder : public TrackFindingCDC::Findlet<HitData, std::vector<HitData*>> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<HitData, std::vector<HitData*>>;
 
@@ -37,7 +37,7 @@ namespace Belle2 {
 
   public:
     /// Find intercepts in the 2D Hough space
-    FastInterceptFinder2D();
+    MultiHoughSpaceFastInterceptFinder();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

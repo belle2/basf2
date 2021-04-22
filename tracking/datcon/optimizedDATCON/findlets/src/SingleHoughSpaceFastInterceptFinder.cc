@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/datcon/optimizedDATCON/findlets/FastInterceptFinder2D.h>
+#include <tracking/datcon/optimizedDATCON/findlets/SingleHoughSpaceFastInterceptFinder.h>
 
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
@@ -26,12 +26,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FastInterceptFinder2D::FastInterceptFinder2D() : Super()
+SingleHoughSpaceFastInterceptFinder::SingleHoughSpaceFastInterceptFinder() : Super()
 {
-  addProcessingSignalListener(&m_HitSelector);
 }
 
-void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SingleHoughSpaceFastInterceptFinder::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -87,7 +86,7 @@ void FastInterceptFinder2D::exposeParameters(ModuleParamList* moduleParamList, c
 
 }
 
-void FastInterceptFinder2D::initialize()
+void SingleHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
@@ -120,39 +119,19 @@ void FastInterceptFinder2D::initialize()
   }
   B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
-
-  initializeSectorFriendMap();
-
 }
 
 
-void FastInterceptFinder2D::apply(std::vector<HitData>& hits, std::vector<std::vector<HitData*>>& rawTrackCandidates)
+void SingleHoughSpaceFastInterceptFinder::apply(std::vector<HitData>& hits, std::vector<std::vector<HitData*>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
+  m_activeSectors.clear();
 
-  for (auto& friends : m_fullFriendMap) {
-    m_activeSectors.clear();
-    m_currentSensorsHitList.clear();
+  const std::vector<HitData*> currentEventHitList = TrackFindingCDC::as_pointers<HitData>(hits);
 
-    m_HitSelector.apply(hits, friends.second, m_currentSensorsHitList);
+  fastInterceptFinder2d(currentEventHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
 
-    fastInterceptFinder2d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
-
-    FindHoughSpaceCluster();
-
-    if (m_breakFlag) {
-      gnuplotoutput(m_currentSensorsHitList);
-      uint count = 0;
-      for (auto& hit : hits) {
-        double X = hit.getDataCache().x;
-        double Y = hit.getDataCache().y;
-        double Z = hit.getDataCache().z;
-        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.getDataCache().sensorID);
-        count++;
-      }
-      B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
-    }
-  }
+  FindHoughSpaceCluster();
 
   for (auto& trackCand : m_trackCandidates) {
     // sort for layer, and 2D radius in case of same layer before storing as SpacePointTrackCand
@@ -172,84 +151,9 @@ void FastInterceptFinder2D::apply(std::vector<HitData>& hits, std::vector<std::v
 
 }
 
-void FastInterceptFinder2D::initializeSectorFriendMap()
-{
-  const std::vector<VxdID> friends6XX1 = {VxdID(3, 0, 1), VxdID(3, 0, 2), VxdID(4, 0, 1), VxdID(4, 0, 2), VxdID(5, 0, 1), VxdID(5, 0, 2), VxdID(5, 0, 3), VxdID(6, 0, 2), VxdID(6, 0, 3)};
-  const std::vector<VxdID> friends6XX5 = {VxdID(3, 0, 2), VxdID(4, 0, 2), VxdID(4, 0, 3), VxdID(5, 0, 3), VxdID(5, 0, 4), VxdID(6, 0, 3), VxdID(6, 0, 4)};
 
-  friendSensorMap thetaFriends;
-  thetaFriends.insert(std::make_pair(VxdID(6, 0, 1), friends6XX1));
-  thetaFriends.insert(std::make_pair(VxdID(6, 0, 5), friends6XX5));
-
-  const std::vector<VxdID> friends601X = {VxdID(3, 1, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 12, 0), VxdID(6, 1, 0)};
-  const std::vector<VxdID> friends602X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 2, 0), VxdID(5, 3, 0), VxdID(6, 2, 0)};
-  const std::vector<VxdID> friends603X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 2, 0), VxdID(5, 3, 0), VxdID(6, 3, 0)};
-  const std::vector<VxdID> friends604X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(6, 4, 0)};
-  const std::vector<VxdID> friends605X = {VxdID(3, 1, 0), VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 2, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(5, 3, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(6, 5, 0)};
-  const std::vector<VxdID> friends606X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(4, 3, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 4, 0), VxdID(5, 5, 0), VxdID(5, 6, 0), VxdID(6, 6, 0)};
-  const std::vector<VxdID> friends607X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(5, 5, 0), VxdID(5, 6, 0), VxdID(6, 7, 0)};
-  const std::vector<VxdID> friends608X = {VxdID(3, 2, 0), VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(4, 4, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(6, 8, 0)};
-  const std::vector<VxdID> friends609X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 6, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(6, 9, 0)};
-  const std::vector<VxdID> friends610X = {VxdID(3, 3, 0), VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(5, 7, 0), VxdID(5, 8, 0), VxdID(5, 9, 0), VxdID(6, 10, 0)};
-  const std::vector<VxdID> friends611X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(4, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 8, 0), VxdID(5, 9, 0), VxdID(6, 11, 0)};
-  const std::vector<VxdID> friends612X = {VxdID(3, 4, 0), VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(6, 12, 0)};
-  const std::vector<VxdID> friends613X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(4, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(5, 9, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(6, 13, 0)};
-  const std::vector<VxdID> friends614X = {VxdID(3, 5, 0), VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 8, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0), VxdID(6, 14, 0)};
-  const std::vector<VxdID> friends615X = {VxdID(3, 6, 0), VxdID(3, 7, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 11, 0), VxdID(5, 12, 0), VxdID(6, 15, 0)};
-  const std::vector<VxdID> friends616X = {VxdID(3, 1, 0), VxdID(3, 7, 0), VxdID(4, 1, 0), VxdID(4, 9, 0), VxdID(4, 10, 0), VxdID(5, 1, 0), VxdID(5, 12, 0), VxdID(6, 16, 0)};
-
-  friendSensorMap phiFriends;
-  phiFriends.insert(std::make_pair(VxdID(6, 1, 0), friends601X));
-  phiFriends.insert(std::make_pair(VxdID(6, 2, 0), friends602X));
-  phiFriends.insert(std::make_pair(VxdID(6, 3, 0), friends603X));
-  phiFriends.insert(std::make_pair(VxdID(6, 4, 0), friends604X));
-  phiFriends.insert(std::make_pair(VxdID(6, 5, 0), friends605X));
-  phiFriends.insert(std::make_pair(VxdID(6, 6, 0), friends606X));
-  phiFriends.insert(std::make_pair(VxdID(6, 7, 0), friends607X));
-  phiFriends.insert(std::make_pair(VxdID(6, 8, 0), friends608X));
-  phiFriends.insert(std::make_pair(VxdID(6, 9, 0), friends609X));
-  phiFriends.insert(std::make_pair(VxdID(6, 10, 0), friends610X));
-  phiFriends.insert(std::make_pair(VxdID(6, 11, 0), friends611X));
-  phiFriends.insert(std::make_pair(VxdID(6, 12, 0), friends612X));
-  phiFriends.insert(std::make_pair(VxdID(6, 13, 0), friends613X));
-  phiFriends.insert(std::make_pair(VxdID(6, 14, 0), friends614X));
-  phiFriends.insert(std::make_pair(VxdID(6, 15, 0), friends615X));
-  phiFriends.insert(std::make_pair(VxdID(6, 16, 0), friends616X));
-
-  std::vector<VxdID> friendSensors;
-
-  // loop over all phiFriends containing layer 6 ladders
-  for (auto& phiFriendPair : phiFriends) {
-    // get the according vector friends6XX0 for this phiFriendPair
-    std::vector<VxdID> phiFriendLadders = phiFriendPair.second;
-    unsigned short layer6Ladder = phiFriendPair.first.getLadderNumber();
-    // loop over all thetafriends containing layer 6 sensors
-    for (auto& thetaFriendPair : thetaFriends) {
-      friendSensors.clear();
-      // get the according vector friends600Y
-      std::vector<VxdID> thetaFriendSensors = thetaFriendPair.second;
-      unsigned short layer6Sensor = thetaFriendPair.first.getSensorNumber();
-
-      // loop over all the layers/ladders in this phifriends vector, one specific friends6XX0
-      for (auto& phiFriend : phiFriendLadders) {
-        // loop over all sensor number in the different layers 3-5, one specific friends600Y
-        for (auto& thetaFriend : thetaFriendSensors) {
-          if (phiFriend.getLayerNumber() == thetaFriend.getLayerNumber()) {
-            // get layer number of either phiFriend or thetaFriend, ladder number from phiFriend, and the sensor number from the thetaFriend
-            friendSensors.emplace_back(VxdID(phiFriend.getLayerNumber(), phiFriend.getLadderNumber(), thetaFriend.getSensorNumber()));
-          }
-        }
-      }
-      // add the layer 6 sensor to the list of its own friends to check the vector with std::find in fillThisSensorsHitMap
-      friendSensors.emplace_back(VxdID(6, layer6Ladder, layer6Sensor));
-      m_fullFriendMap.insert(std::make_pair(VxdID(6, layer6Ladder, layer6Sensor), friendSensors));
-    }
-  }
-}
-
-
-void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitData*>& hits, uint xmin, uint xmax, uint ymin,
-                                                  uint ymax, uint currentRecursion)
+void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<HitData*>& hits, uint xmin, uint xmax, uint ymin,
+    uint ymax, uint currentRecursion)
 {
   std::vector<HitData*> containedHits;
   containedHits.reserve(hits.size());
@@ -333,7 +237,7 @@ void FastInterceptFinder2D::fastInterceptFinder2d(const std::vector<HitData*>& h
 }
 
 
-void FastInterceptFinder2D::FindHoughSpaceCluster()
+void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
 {
   m_clusterCount = 1;
 
@@ -360,17 +264,16 @@ void FastInterceptFinder2D::FindHoughSpaceCluster()
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
-//       if (m_currentTrackCandidate.size() > 200) {
-// //         m_breakFlag = true;
-//         gnuplotoutput(m_currentTrackCandidate);
-//       }
+      if (m_currentTrackCandidate.size() > 20000) {
+        gnuplotoutput(m_currentTrackCandidate);
+      }
       m_currentTrackCandidate.clear();
     }
     m_clusterCount++;
   }
 }
 
-void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
+void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
   if (m_clusterSize >= m_param_MaximumHSClusterSize) return;
 
@@ -405,17 +308,16 @@ void FastInterceptFinder2D::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
           // search in the next Hough Space cells...
           DepthFirstSearch(currentIndexX, currentIndexY);
         }
-
       }
     }
   }
 }
 
 
-void FastInterceptFinder2D::gnuplotoutput(const std::vector<HitData*>& hits)
+void SingleHoughSpaceFastInterceptFinder::gnuplotoutput(const std::vector<HitData*>& hits)
 {
   std::ofstream outstream;
-  outstream.open("gnuplotlog.plt", std::ios::trunc);
+  outstream.open("gnuplotlogSimple.plt", std::ios::trunc);
   outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
   outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
   outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;

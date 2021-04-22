@@ -24,8 +24,8 @@ DATCONFindlet::~DATCONFindlet() = default;
 DATCONFindlet::DATCONFindlet()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
-  addProcessingSignalListener(&m_interceptFinder);
-  addProcessingSignalListener(&m_interceptFinderSimple);
+  addProcessingSignalListener(&m_multiHouthSpaceInterceptFinder);
+  addProcessingSignalListener(&m_singleHouthSpaceInterceptFinder);
   addProcessingSignalListener(&m_rawTCCleaner);
   addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_recoTrackStorer);
@@ -37,8 +37,8 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   Super::exposeParameters(moduleParamList, prefix);
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
-  m_interceptFinder.exposeParameters(moduleParamList, prefix);
-  m_interceptFinderSimple.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
+  m_multiHouthSpaceInterceptFinder.exposeParameters(moduleParamList, prefix);
+  m_singleHouthSpaceInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "finalOverlapResolver"));
   m_recoTrackStorer.exposeParameters(moduleParamList, prefix);
@@ -50,9 +50,10 @@ void DATCONFindlet::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("qualityIndicator");
   moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useSubHoughSpaces"), m_param_useSubHoughSpaces,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useMultiHoughSpaceInterceptFinding"),
+                                m_param_useMultiHoughSpaceInterceptFinding,
                                 "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
-                                m_param_useSubHoughSpaces);
+                                m_param_useMultiHoughSpaceInterceptFinding);
 }
 
 void DATCONFindlet::beginEvent()
@@ -70,10 +71,10 @@ void DATCONFindlet::apply()
   m_spacePointLoaderAndPreparer.apply(m_spacePointVector, m_hitDataVector);
   B2DEBUG(29, "m_hitDataVector.size(): " << m_hitDataVector.size());
 
-  if (m_param_useSubHoughSpaces) {
-    m_interceptFinder.apply(m_hitDataVector, m_rawTrackCandidates);
+  if (m_param_useMultiHoughSpaceInterceptFinding) {
+    m_multiHouthSpaceInterceptFinder.apply(m_hitDataVector, m_rawTrackCandidates);
   } else {
-    m_interceptFinderSimple.apply(m_hitDataVector, m_rawTrackCandidates);
+    m_singleHouthSpaceInterceptFinder.apply(m_hitDataVector, m_rawTrackCandidates);
   }
   B2DEBUG(29, "m_rawTrackCandidates.size: " << m_rawTrackCandidates.size());
 

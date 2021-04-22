@@ -54,14 +54,12 @@ namespace Belle2 {
     addParam("asicChannels", m_asicChannels,
              "ASIC calibration channels (0 - 7), empty list means all channels.",
              m_asicChannels);
-    addParam("amplitude", m_amplitude,
-             "amplitude of cal pulse [ADC counts]", 700.0);
-
+    // default for these three below are set according to laser run 8/414
+    addParam("amplitude", m_amplitude, "amplitude of cal pulse [ADC counts]", 600.0);
+    addParam("delay", m_delay, "delay of cal pulse [ns]", 10.5);
+    addParam("windowSize", m_windowSize, "size of time window in which to generate cal pulses [ns]", 8.0);
   }
 
-  TOPCalPulseGeneratorModule::~TOPCalPulseGeneratorModule()
-  {
-  }
 
   void TOPCalPulseGeneratorModule::initialize()
   {
@@ -96,41 +94,22 @@ namespace Belle2 {
   }
 
 
-  void TOPCalPulseGeneratorModule::beginRun()
-  {
-  }
-
-
   void TOPCalPulseGeneratorModule::event()
   {
-
     const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
-    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double windowWidth = tdc.getSyncTimeBase() / 2;
 
+    double time = m_delay + gRandom->Uniform(m_windowSize);
     for (auto moduleID : m_moduleIDs) {
       for (unsigned asic = 0; asic < 64; asic++) {
         for (auto asicChannel : m_asicChannels) {
           unsigned channel = asic * 8 + asicChannel;
           auto pixelID = chMapper.getPixelID(channel);
-          double time = windowWidth + gRandom->Uniform(windowWidth);
           m_calPulses.appendNew(moduleID, channel, pixelID, time, m_amplitude);
         }
       }
     }
 
   }
-
-
-  void TOPCalPulseGeneratorModule::endRun()
-  {
-  }
-
-  void TOPCalPulseGeneratorModule::terminate()
-  {
-  }
-
-
 
 } // end Belle2 namespace
 

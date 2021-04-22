@@ -90,8 +90,11 @@ Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
+Untested method TRGSummary::getInputBitNumber
+Untested method TRGSummary::getOutputBitNumber
 Untested method TRGSummary::setFtdlBits
 Untested method TRGSummary::setInputBits
+Untested method TRGSummary::setPoissonInInjectionVeto
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
@@ -3477,6 +3480,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -9185,6 +9189,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -13709,6 +13714,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -21823,6 +21829,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -29074,6 +29081,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair

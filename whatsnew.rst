@@ -17,6 +17,17 @@ be adapted when changing to the new release.
 Changes since release-05
 ========================
 
+.. rubric:: Discontinue the support of the old "fullFormat" for cDSTs and extend the "rawFormat" cDSTs to MC
+
+The support of the ``fullFormat`` cDSTs is discontinued. :py:func:`reconstruction.add_cdst_output` does not store
+anymore additional branches when the option ``rawFormat=False`` is selected, being simply an alias of
+:py:func:`mdst.add_mdst_output`. The users have to explicitly define the additional branches they want to store
+using the ``additionalBranches`` paramenter.
+
+The only supported format is the ``rawFormat``, that is now extended to MC. If ``rawFormat=True`` and ``mc=False`` are
+selected, the rawdata + tracking data objects are stored, while with ``rawFormat=True`` and ``mc=True`` the digits +
+tracking data objects, including the ``MCParticles`` and the relations between them and the digits, are stored.
+
 .. rubric:: Removal of old and deprecated database functions
 
 Some functions used in the past to handle the conditions database (like ``basf2.use_local_database`` or ``basf2.reset_database``) are removed, and any script using them does not work anymore.

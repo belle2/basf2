@@ -8,6 +8,7 @@ The main module of the Belle II Analysis Software Framework
 # import most things to be backwards compatible
 from basf2.core import *  # noqa
 from basf2.utils import print_params, print_path  # noqa
+from pybasf2 import logging
 import sys as _sys
 
 # check for jupyter notebook

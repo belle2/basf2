@@ -18,6 +18,9 @@
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
+#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
+#include <framework/database/DBObjPtr.h>
+
 namespace Belle2 {
 
   namespace PXD {
@@ -40,6 +43,8 @@ namespace Belle2 {
     private:
       /** Initialize the module */
       void initialize() override final;
+      /** begin run */
+      void beginRun() override final;
       /** do the packing */
       void event() override final;
       /** Terminate the module */
@@ -92,6 +97,14 @@ namespace Belle2 {
       StoreArray<RawPXD> m_storeRaws;
       /** Input Obj InjectionBGTiming */
       StoreObjPtr<PXDInjectionBGTiming> m_storeInjectionBGTiming;
+
+      /** Firmware version, must be read from database on run change */
+      int m_firmware{0};
+
+      /** firmware version from DB. */
+      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB;
+      /** override firmware version from DB. */
+      int m_overrideFirmwareVersion{0};
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */

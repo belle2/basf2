@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 #include <cmath>
 
 #include <fstream>
@@ -236,15 +237,15 @@ void FANGSStudyModule::event()
     //cout <<" x " << position.X()  << " y " << position.Y() << " z " << position.Z()  << endl;
     h_time->Fill(detNB, timeBin);
     h_edep->Fill(detNB, adep * 1e3);
-    if (fabs(pdg) == 11)h_edep1->Fill(detNB, adep * 1e3);
-    if (pdg == 22)h_edep2->Fill(detNB, adep * 1e3);
-    if (pdg != 22 && fabs(pdg) != 11)h_edep3->Fill(detNB, adep * 1e3);
+    if (fabs(pdg) == Const::electron.getPDGCode())h_edep1->Fill(detNB, adep * 1e3);
+    if (pdg == Const::photon.getPDGCode())h_edep2->Fill(detNB, adep * 1e3);
+    if (pdg != Const::photon.getPDGCode() && fabs(pdg) != Const::electron.getPDGCode())h_edep3->Fill(detNB, adep * 1e3);
     if (adep > 50.*1e-6) {
       h_timeThres->Fill(detNB, timeBin);
       h_edepThres->Fill(detNB, adep * 1e3);
-      if (fabs(pdg) == 11)h_edepThres1->Fill(detNB, adep * 1e3);
-      if (pdg == 22)h_edepThres2->Fill(detNB, adep * 1e3);
-      if (pdg != 22 && fabs(pdg) != 11)h_edepThres3->Fill(detNB, adep * 1e3);
+      if (fabs(pdg) == Const::electron.getPDGCode())h_edepThres1->Fill(detNB, adep * 1e3);
+      if (pdg == Const::photon.getPDGCode())h_edepThres2->Fill(detNB, adep * 1e3);
+      if (pdg != Const::photon.getPDGCode() && fabs(pdg) != Const::electron.getPDGCode())h_edepThres3->Fill(detNB, adep * 1e3);
     }
     h_zvedep[lad - 1]->Fill(position.Z());
     h_xvzvedep[lad - 1]->Fill(position.X(), position.Z());

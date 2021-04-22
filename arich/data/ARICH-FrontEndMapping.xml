@@ -539,12 +539,12 @@
       </Module>
       <Module FEBSlot='2'>
         <Sector>2</Sector>
-        <Ring>3</Ring>
+        <Ring>4</Ring>
         <Azimuth>1</Azimuth>
       </Module>
       <Module FEBSlot='3'>
         <Sector>2</Sector>
-        <Ring>4</Ring>
+        <Ring>3</Ring>
         <Azimuth>1</Azimuth>
       </Module>
       <Module FEBSlot='4'>

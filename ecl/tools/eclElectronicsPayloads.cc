@@ -23,7 +23,7 @@
  *                                                                        *
  * Usage:                                                                 *
  * eclElectronicsPayloads payloadName exp run [writeToDB]                 *
- * where payloadName = ECLCrystalElectronics, ECLCrystalElectronicsName,  *
+ * where payloadName = ECLCrystalElectronics, ECLCrystalElectronicsTime,  *
  * ECLRefAmplNom, or ECLRefTimeNom                                        *
  *                                                                        *
  * exp and run specify the start of the iov, and are used to read         *
@@ -89,6 +89,9 @@ int main(int argc, char** argv)
   //------------------------------------------------------------------------
   //..Specify database
   auto& conf = Conditions::Configuration::getInstance();
+  auto states = conf.getUsableTagStates();
+  states.insert("OPEN");
+  conf.setUsableTagStates(states);
   conf.prependGlobalTag("ECL_localrun_data");
   conf.prependTestingPayloadLocation("localdb/database.txt");
 

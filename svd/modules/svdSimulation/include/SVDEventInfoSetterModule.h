@@ -58,8 +58,8 @@ namespace Belle2 {
     int m_runType; /**< run type */
     int m_eventType; /**< event type */
     int m_daqMode; /**< DAQ mode */
-    int m_triggerBin; /**< trigger time */
-    bool m_randomTriggerBin = true; /**< if true randomize trigger bin 0/1/2/3 */
+    int m_triggerBin = -1; /**< trigger bin */
+    int m_fixedTriggerBin = 999; /**< fixed trigger bin */
     uint8_t m_triggerType; /**<  Trigger type content to be set */
 
     bool m_xTalk; /**<  Cross-talk flag to be set */

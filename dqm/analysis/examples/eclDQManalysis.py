@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# -----------------------------------------------------------------------------------------------
+# BASF2 (Belle Analysis Framework 2)
+# Copyright(C) 2020  Belle II Collaboration
+#
+# Author: The Belle II Collaboration
+# Contributors: Dmitry Matvienko, Iana Antonova (dmitry.matvienko@gmail.com, yanansk11@gmail.com)
+#
+# This software is provided "as is" without any warranty.
+#
+# eclDQManalysis creates DQM analysis histograms from raw histograms
+#
+# Usage: basf2 eclDQManalysis.py input_files output_file
+#   input_files: one of the raw dqm files placed under /group/belle2/phase3/dqm/
+#
+#   output_file: dqm output file placed under /group/belle2/group/detector/ECL/tmp/DQManalysis/
+# -----------------------------------------------------------------------------------------------
+
 import basf2 as b2
 import sys
 argv = sys.argv
@@ -18,7 +35,8 @@ main = b2.create_path()
 
 # Modules
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
-inroot.param('InputRootFile', argv[1])
+inroot.param('FileList', argv[1])
+inroot.param('SelectHistograms', "ECL/*")
 main.add_module(inroot)
 
 ecl = b2.register_module('DQMHistAnalysisECL')

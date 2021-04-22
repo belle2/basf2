@@ -26,6 +26,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -1925,9 +1926,9 @@ namespace Belle2 {
 
         std::string roeListName = arguments[0];
         std::string cutString = arguments[1];
-        int pdgCode = 11;
+        int pdgCode = Const::electron.getPDGCode();
         if (arguments.size() == 2) {
-          B2INFO("Use pdgCode 11 as default in meta variable veto, other arguments: " << roeListName << ", " << cutString);
+          B2INFO("Use pdgCode of electron as default in meta variable veto, other arguments: " << roeListName << ", " << cutString);
         } else {
           try {
             pdgCode = Belle2::convertString<int>(arguments[2]);;

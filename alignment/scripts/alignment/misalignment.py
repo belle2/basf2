@@ -253,6 +253,5 @@ class CreateMisalignmentModule(b2.Module):
 
         txt.close()
 
-        iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
         Belle2.Database.Instance().storeData('VXDAlignment', alignment, self.iov)
         txt.close()

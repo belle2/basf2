@@ -40,8 +40,10 @@ namespace Belle2 {
       PXDPostErrorCheckerModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Event */
       void event() override final;
 
     private:

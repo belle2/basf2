@@ -22,6 +22,7 @@ from stdPhotons import stdPhotons
 import vertex as vertex
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -389,7 +390,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         # unpack prescales and convert from trigger convention to a number we can
         # compare with a float
         prescale_high, prescale_low = self.prescale_high, self.prescale_low
-        if (prescale_high, prescale_low) is not (1, 1):
+        if (prescale_high, prescale_low) != (1, 1):
             b2.B2INFO(
                 "GammaGammaControlKLMDarkList is prescaled. "
                 f"prescale_high={prescale_high}, prescale_low={prescale_low}"

@@ -964,8 +964,8 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
         B2FATAL('FlavorTagger: combinerLevelTeacher did not find any ' +
                 methodPrefixCombinerLevel + 'sampled*.root file. Please run the flavorTagger in "Sampler" mode.')
 
-    ReadyTMVAfbdt = False
-    ReadyFANNmlp = False
+    # ReadyTMVAfbdt = False
+    # ReadyFANNmlp = False
 
     if TMVAfbdt:
 

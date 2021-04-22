@@ -36,7 +36,7 @@
 #pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
 #pragma link C++ class pair<short, short>+; // checksum=0x7069a6e4, version=-1
 #pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x6360bfbf, version=2
-#pragma link C++ class Belle2::TRGSummary+; // checksum=0xe442ad4e, version=6
+#pragma link C++ class Belle2::TRGSummary+; // checksum=0x62d98033, version=7
 #pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
 
 // ----------------------------------------------------------------------------

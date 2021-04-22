@@ -5,13 +5,8 @@
 Importer of the SVD Reconstruction Configuration
 """
 import basf2
-from basf2 import *
-from svd import *
-import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDRecoConfiguration
 import datetime
-import os
 
 now = datetime.datetime.now()
 
@@ -59,14 +54,14 @@ class recoConfigurationImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
 
 
-main = create_path()
+main = basf2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module(recoConfigurationImporter())
 
 # Process events
-process(main)
+basf2.process(main)

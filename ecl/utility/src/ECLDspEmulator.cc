@@ -26,7 +26,10 @@ namespace Belle2 {
     namespace ShapeFitter {
       bool amplitudeOverflow(long long amp)
       {
-        return amp > 262015;
+        // There are 18 bits reserved for the amplitude,
+        // in range [-128, 262015]
+        static const long long max_amp = 0x3FFFF - 128;
+        return amp > max_amp;
       }
     }
   }
@@ -35,9 +38,9 @@ namespace Belle2 {
 namespace Belle2 {
   namespace ECL {
     template <typename INT>
-    ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
-                       INT* fg43, INT* fg31, INT* fg32,
-                       INT* fg33, int* y, int ttrig2, int la_thr,
+    ECLShapeFit lftda_(const INT* f, const INT* f1, const INT* fg41,
+                       const INT* fg43, const INT* fg31, const INT* fg32,
+                       const INT* fg33, int* y, int ttrig2, int la_thr,
                        int hit_thr, int skip_thr, int k_a, int k_b,
                        int k_c, int k_16, int k1_chi, int k2_chi,
                        int chi_thres, bool adjusted_timing)
@@ -416,15 +419,15 @@ namespace Belle2 {
       return result;
     }
 
-    template ECLShapeFit lftda_<short>(short* f, short* f1, short* fg41,
-                                       short* fg43, short* fg31, short* fg32,
-                                       short* fg33, int* y, int ttrig2, int la_thr,
+    template ECLShapeFit lftda_<short>(const short* f, const short* f1, const short* fg41,
+                                       const short* fg43, const short* fg31, const short* fg32,
+                                       const short* fg33, int* y, int ttrig2, int la_thr,
                                        int hit_thr, int skip_thr, int k_a, int k_b,
                                        int k_c, int k_16, int k1_chi, int k2_chi,
                                        int chi_thres, bool adjusted_timing);
-    template ECLShapeFit lftda_<int>(int* f, int* f1, int* fg41,
-                                     int* fg43, int* fg31, int* fg32,
-                                     int* fg33, int* y, int ttrig2, int la_thr,
+    template ECLShapeFit lftda_<int>(const int* f, const int* f1, const int* fg41,
+                                     const int* fg43, const int* fg31, const int* fg32,
+                                     const int* fg33, int* y, int ttrig2, int la_thr,
                                      int hit_thr, int skip_thr, int k_a, int k_b,
                                      int k_c, int k_16, int k1_chi, int k2_chi,
                                      int chi_thres, bool adjusted_timing);

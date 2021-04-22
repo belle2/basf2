@@ -14,7 +14,6 @@
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
 #include <cmath>
@@ -148,18 +147,16 @@ namespace Belle2 {
 
       const double unitFactor = Unit::cm / Unit::mm;
 
-      map<string, CryostatElement> elements;
-
-      GearDir her("/Detector/SuperKEKB/HER/");
-      GearDir ler("/Detector/SuperKEKB/LER/");
-      double crossingAngleHER = her.getDouble("angle");
-      double crossingAngleLER = ler.getDouble("angle");
+      double crossingAngleHER = m_config.getParameter("CrossingAngle.HER", 0.0415);
+      double crossingAngleLER = m_config.getParameter("CrossingAngle.LER", -0.0415);
 
       G4Transform3D transform_HER = G4Translate3D(0., 0., 0.);
       transform_HER = transform_HER * G4RotateY3D(crossingAngleHER);
 
       G4Transform3D transform_LER = G4Translate3D(0., 0., 0.);
       transform_LER = transform_LER * G4RotateY3D(crossingAngleLER);
+
+      map<string, CryostatElement> elements;
 
       //--------------
       //-   Bounding shapes

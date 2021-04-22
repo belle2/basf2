@@ -3,7 +3,8 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Zbynek Drasal, Martin Ritter, Peter Kvasnicka            *
+ * Contributors: Zbynek Drasal, Martin Ritter, Peter Kvasnicka,           *
+ *               Giulia Casarosa
  *                                                                        *
  **************************************************************************/
 
@@ -22,7 +23,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDModeByte.h>
+//#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <fstream>
 #include <sstream>
@@ -100,7 +101,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
            m_shapingTime);
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns", m_samplingTime);
+           "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload", m_samplingTime);
   addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", m_startSampling);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
@@ -123,6 +124,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
 
 void SVDDigitizerModule::initialize()
 {
+
   //Register all required collections
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
@@ -245,6 +247,14 @@ void SVDDigitizerModule::initialize()
                                  30, 0, 30);
     m_histDriftTime_h->GetXaxis()->SetTitle("Hole Drift Time");
 
+    m_histHitTime = new TH1D("h_startAPVTime", "start APV Time",
+                             200, -100, 100);
+    m_histHitTime->GetXaxis()->SetTitle("time (ns)");
+    m_histHitTimeTB = new TH2F("h_startAPVTimeTB", "start APV Time vs TB",
+                               200, -100, 100, 4, -0.5, 3.5);
+    m_histHitTimeTB->GetXaxis()->SetTitle("time (ns)");
+    m_histHitTimeTB->GetYaxis()->SetTitle("TB");
+
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
       m_waveTree->Branch("sensor", &tree_vxdID, "sensor/I");
@@ -262,6 +272,12 @@ void SVDDigitizerModule::beginRun()
 {
 
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  //read sampling time from HardwareClockSettings
+  if (m_samplingTime == -1 && m_hwClock.isValid())
+    m_samplingTime = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+  else if (m_samplingTime == -1)
+    m_samplingTime = 16000. / 509;
 
   //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not
@@ -358,14 +374,6 @@ void SVDDigitizerModule::event()
       m_sensorThickness = info.getThickness();
       m_depletionVoltage = info.getDepletionVoltage();
       m_biasVoltage = info.getBiasVoltage();
-      m_backplaneCapacitanceU = info.getBackplaneCapacitanceU();
-      m_interstripCapacitanceU = info.getInterstripCapacitanceU();
-      m_couplingCapacitanceU = info.getCouplingCapacitanceU();
-      m_backplaneCapacitanceV = info.getBackplaneCapacitanceV();
-      m_interstripCapacitanceV = info.getInterstripCapacitanceV();
-      m_couplingCapacitanceV = info.getCouplingCapacitanceV();
-      m_elNoiseU = info.getElectronicNoiseU();
-      m_elNoiseV = info.getElectronicNoiseV();
 
       m_currentSensor = &m_sensors[sensorID];
       B2DEBUG(20,
@@ -378,14 +386,6 @@ void SVDDigitizerModule::event()
               << " --> Thickness:      " << m_currentSensorInfo->getThickness() << endl
               << " --> Deplet. voltage:" << m_currentSensorInfo->getDepletionVoltage() << endl
               << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl
-              << " --> Backplane cap.U: " << m_currentSensorInfo->getBackplaneCapacitanceU() << endl
-              << " --> Interstrip cap.U:" << m_currentSensorInfo->getInterstripCapacitanceU() << endl
-              << " --> Coupling cap.U:  " << m_currentSensorInfo->getCouplingCapacitanceU() << endl
-              << " --> Backplane cap.V: " << m_currentSensorInfo->getBackplaneCapacitanceV() << endl
-              << " --> Interstrip cap.V:" << m_currentSensorInfo->getInterstripCapacitanceV() << endl
-              << " --> Coupling cap.V:  " << m_currentSensorInfo->getCouplingCapacitanceV() << endl
-              << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
-              << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
              );
 
     }
@@ -401,6 +401,16 @@ void SVDDigitizerModule::event()
   if (m_signalsList != "")
     saveSignals();
 
+  //Compute time of the first sample and update latency
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  B2DEBUG(25, "triggerBin = " << (int)modeByte.getTriggerBin());
+  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
+  int triggerBin = modeByte.getTriggerBin();
+  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
+  //determine number fo samples
+  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
+
   saveDigits();
 }
 
@@ -415,7 +425,7 @@ void SVDDigitizerModule::processHit()
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength < 0.1 * Unit::um) {
+  if (m_currentHit->getPDGcode() == Const::photon.getPDGCode() || trackLength < 0.1 * Unit::um) {
     //Photons deposit energy at the end of their step
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::electron);
     driftCharge(stopPoint, m_currentHit->getElectrons(), SVD::SensorInfo::hole);
@@ -547,48 +557,47 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 #undef NORMAL_CDF
 
   // Pad with zeros for smoothing
-  int npads = (strips.front() - floor(strips.front()) == 0) ? 4 : 3;
+  int npads = (strips.front() - floor(strips.front()) == 0) ? 5 : 4;
   for (int i = 0; i < npads; ++i) {
     strips.push_front(strips.front() - 0.5);
     stripCharges.push_front(0);
   }
-  npads = (strips.back() - floor(strips.back()) == 0) ? 4 : 3;
+  npads = (strips.back() - floor(strips.back()) == 0) ? 5 : 4;
   for (int i = 0; i < npads; ++i) {
     strips.push_back(strips.back() + 0.5);
     stripCharges.push_back(0);
   }
-  // Cross-talk
+  // Charge sharing
   B2DEBUG(30, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
-  for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
+  for (std::size_t index = 3; index <  strips.size() - 3; index += 2) {
     B2DEBUG(30, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
-    double Cc = (!have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
-                info.getCouplingCapacitanceV(currentStrip);
-    double Ci = (!have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
-                info.getInterstripCapacitanceV(currentStrip);
-    double Cb = (!have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
-                info.getBackplaneCapacitanceV(currentStrip);
+    VxdID currentSensorID = m_currentHit->getSensorID();
 
-    double cNeighbour2 = 0.5 * Ci / (Ci + Cb + Cc);
-    double cNeighbour1 = Ci / (2 * Ci + Cb);
-    double cSelf = Cc / (Ci + Cb + Cc);
+    double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C0");
+    double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C1");
+    double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C2");
+    double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C3");
 
     B2DEBUG(30, "  current strip = " << currentStrip);
+    B2DEBUG(30, "     index-3 = " << index - 3 << ", strip = " << strips[index - 3] << ", stripCharge = " << stripCharges[index - 3]);
     B2DEBUG(30, "     index-2 = " << index - 2 << ", strip = " << strips[index - 2] << ", stripCharge = " << stripCharges[index - 2]);
     B2DEBUG(30, "     index-1 = " << index - 1 << ", strip = " << strips[index - 1] << ", stripCharge = " << stripCharges[index - 1]);
     B2DEBUG(30, "     index   = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     B2DEBUG(30, "     index+1 = " << index + 1 << ", strip = " << strips[index + 1] << ", stripCharge = " << stripCharges[index + 1]);
     B2DEBUG(30, "     index+2 = " << index + 2 << ", strip = " << strips[index + 2] << ", stripCharge = " << stripCharges[index + 2]);
-    //se index e' di readout va bene
-    readoutCharges.push_back(cSelf * (
-                               cNeighbour2 * stripCharges[index - 2]
-                               + cNeighbour1 * stripCharges[index - 1]
-                               + stripCharges[index]
-                               + cNeighbour1 * stripCharges[index + 1]
-                               + cNeighbour2 * stripCharges[index + 2]
-                             ));
+    B2DEBUG(30, "     index+3 = " << index + 3 << ", strip = " << strips[index + 3] << ", stripCharge = " << stripCharges[index + 3]);
+
+    readoutCharges.push_back(c3 * stripCharges[index - 3]
+                             + c2 * stripCharges[index - 2]
+                             + c1 * stripCharges[index - 1]
+                             + c0 * stripCharges[index]
+                             + c1 * stripCharges[index + 1]
+                             + c2 * stripCharges[index + 2]
+                             + c3 * stripCharges[index + 3]
+                            );
     readoutStrips.push_back(currentStrip);
     B2DEBUG(30, "    post simulation: " << index << ", strip = " << currentStrip << ", readoutCharge = " <<
             readoutCharges[readoutCharges.size() - 1]);
@@ -622,7 +631,17 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
       histo->Fill(dist / Unit::um, readoutCharges[index]);
     }
   }
+  if (m_histHitTime) {
+    m_histHitTime->Fill(m_currentTime);
+    StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+    SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+    m_histHitTimeTB->Fill(m_currentTime, modeByte.getTriggerBin());
+  }
+
   // Store
+  B2DEBUG(25, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
+          driftTime);
+
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
@@ -649,8 +668,6 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
 
 void SVDDigitizerModule::saveDigits()
 {
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
@@ -660,17 +677,10 @@ void SVDDigitizerModule::saveDigits()
   RelationArray relShaperDigitTrueHit(storeShaperDigits, storeTrueHits,
                                       m_relShaperDigitTrueHitName);
 
-  //Get time of the first sample
-  const double bunchTimeSep = 2 * 1.96516; //in ns
-  int triggerBin = modeByte.getTriggerBin();
-  int bunchXingsSinceAPVstart  = 2 * triggerBin;
-  double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
-
   //Get SVD config from SVDEventInfo
   //  int runType = (int) modeByte.getRunType();
   //  int eventType = (int) modeByte.getEventType();
 
-  int nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -679,22 +689,8 @@ void SVDDigitizerModule::saveDigits()
 
   for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
-    const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
-    double elNoiseU = info.getElectronicNoiseU();
-    double aduEquivalentU = info.getAduEquivalentU();
-    double charge_thresholdU = m_SNAdjacent * elNoiseU;
-    // Add noisy digits
-    if (m_applyNoise) {
-      double fraction = 1.0 - m_noiseFraction;
-      int nU = info.getUCells();
-      int uNoisyStrips = gRandom->Poisson(fraction * nU);
-      for (short ns = 0; ns < uNoisyStrips; ++ns) {
-        short iStrip = gRandom->Integer(nU);
-        sensor.second.first[iStrip].add(0, -1, 0, 0, 0);
-      } // for ns
-    } // Add noise digits
+
     // Cycle through signals and generate samples
     for (StripSignals::value_type& stripSignal : sensor.second.first) {
       short int iStrip = stripSignal.first;
@@ -704,37 +700,34 @@ void SVDDigitizerModule::saveDigits()
       // ... to store digit-digit relations
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
-      // For noise digits, just generate random variates on randomly selected samples
-      if (s.isNoise()) {
-        double pSelect = 1.0 / nAPV25Samples;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
-          if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1, elNoiseU));
-          else
-            samples.push_back(gRandom->Gaus(0, elNoiseU));
-        }
-      } else {
-        double t = initTime;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t), elNoiseU));
-          t += m_samplingTime;
-        }
-        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
-          samples.push_back(0);
+
+      double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, true, iStrip);
+      double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, true, iStrip, 1);
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, true);
+
+      double t = m_initTime;
+      B2DEBUG(25, "start sampling at " << m_initTime);
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+        samples.push_back(addNoise(electronWeight * s(t), elNoise));
+        t += m_samplingTime;
       }
+      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
+        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
 
       // Save SVDShaperDigits
+
       // 1. Convert to ADU
       SVDShaperDigit::APVRawSamples rawSamples;
       std::transform(samples.begin(), samples.end(), rawSamples.begin(),
       [&](double x)->SVDShaperDigit::APVRawSampleType {
-        return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
+        return SVDShaperDigit::trimToSampleRange(x * gain);
       });
+
       // 2.a Check if over threshold
-      auto rawThreshold = charge_thresholdU / aduEquivalentU;
+      auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)
@@ -763,19 +756,7 @@ void SVDDigitizerModule::saveDigits()
     } // for stripSignals
 
     // v-side digits:
-    double elNoiseV = info.getElectronicNoiseV();
-    double aduEquivalentV = info.getAduEquivalentV();
-    double charge_thresholdV = m_SNAdjacent * elNoiseV;
-    // Add noise digits
-    if (m_applyNoise) {
-      double fraction = 1.0 - m_noiseFraction;
-      int nV = info.getVCells();
-      int vNoisyStrips = gRandom->Poisson(fraction * nV);
-      for (short ns = 0; ns < vNoisyStrips; ++ns) {
-        short iStrip = gRandom->Integer(nV);
-        sensor.second.second[iStrip].add(0, -1, 0, 0, 0);
-      } // for ns
-    } // Add noise digits
+
     // Cycle through signals and generate samples
     for (StripSignals::value_type& stripSignal : sensor.second.second) {
       short int iStrip = stripSignal.first;
@@ -785,24 +766,18 @@ void SVDDigitizerModule::saveDigits()
       // ... to store digit-digit relations
       digit_weights.clear();
       digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
-      // For noise digits, just generate random variates on randomly selected samples
-      if (s.isNoise()) {
-        double pSelect = 1.0 / nAPV25Samples;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample++) {
-          if (gRandom->Uniform() < pSelect)
-            samples.push_back(addNoise(-1, elNoiseV));
-          else
-            samples.push_back(gRandom->Gaus(0, elNoiseV));
-        }
-      } else {
-        double t = initTime;
-        for (int iSample = 0; iSample < nAPV25Samples; iSample ++) {
-          samples.push_back(addNoise(s(t), elNoiseV));
-          t += m_samplingTime;
-        }
-        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
-          samples.push_back(0);
+
+      double elNoise = m_NoiseCal.getNoiseInElectrons(sensorID, false, iStrip);
+      double gain = 1 / m_PulseShapeCal.getChargeFromADC(sensorID, false, iStrip, 1);
+      double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false);
+
+      double t = m_initTime;
+      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+        samples.push_back(addNoise(electronWeight * s(t), elNoise));
+        t += m_samplingTime;
       }
+      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
+        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -812,10 +787,11 @@ void SVDDigitizerModule::saveDigits()
       SVDShaperDigit::APVRawSamples rawSamples;
       std::transform(samples.begin(), samples.end(), rawSamples.begin(),
       [&](double x)->SVDShaperDigit::APVRawSampleType {
-        return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
+        return SVDShaperDigit::trimToSampleRange(x * gain);
       });
+
       // 2.a Check if over threshold
-      auto rawThreshold = charge_thresholdV / aduEquivalentV;
+      auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
                                   std::bind2nd(std::greater<double>(), rawThreshold)
@@ -941,4 +917,3 @@ void SVDDigitizerModule::terminate()
     m_rootFile->Close();
   }
 }
-

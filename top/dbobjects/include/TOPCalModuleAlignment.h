@@ -10,13 +10,17 @@
 
 #pragma once
 #include <TObject.h>
+#include <TVector3.h>
+#include <TRotation.h>
+#include <vector>
 
 namespace Belle2 {
 
   /**
-   * Alignment constants constants for all 16 modules.
+   * Alignment constants for all 16 modules.
    * The constants are three rotation angles around the x, y and z axes (alpha, beta, gamma),
    * and three shifts along the same axes  (x, y, z).
+   * The meaning of constants is the same as in TOPGeoModuleDisplacement.
    * From muon events.
    */
   class TOPCalModuleAlignment: public TObject {
@@ -203,6 +207,20 @@ namespace Belle2 {
     bool isUnusable(int moduleID) const;
 
     /**
+     * Returns the rotation from local to nominal frame
+     * Transformation is: rotation first then translation.
+     * @return rotation
+     */
+    const TRotation& getRotation(int moduleID) const;
+
+    /**
+     * Returns the translation from local to nominal frame
+     * Transformation is: rotation first then translation.
+     * @return translation
+     */
+    const TVector3& getTranslation(int moduleID) const;
+
+    /**
      * Returns true if all modules are calibrated
      */
     bool areAllCalibrated() const;
@@ -215,6 +233,11 @@ namespace Belle2 {
     bool areAllPrecise(double spatialPrecision, double angularPrecision) const;
 
   private:
+
+    /**
+     * Sets the transformation cache
+     */
+    void setTransformations() const;
 
     /**
      * Sizes
@@ -237,6 +260,11 @@ namespace Belle2 {
     float m_errZ[c_numModules] = {0}; /**< error on the z displacement */
 
     EStatus m_status[c_numModules] = {c_Default}; /**< calibration status */
+
+    /** cache for rotations (from local to nominal) */
+    mutable std::vector<TRotation> m_rotations; //! do not write out
+    /** cache for translations (from local to nominal) */
+    mutable std::vector<TVector3> m_translations; //! do not write out
 
     ClassDef(TOPCalModuleAlignment, 3); /**< ClassDef */
 

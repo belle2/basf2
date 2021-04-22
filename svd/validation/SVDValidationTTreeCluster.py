@@ -49,6 +49,10 @@ gROOT.ProcessLine('struct EventDataCluster {\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
     float truehit_time;\
+    float eventt0_all;\
+    float eventt0_top;\
+    float eventt0_cdc;\
+    float eventt0_ecl;\
 };')
 
 
@@ -81,6 +85,34 @@ class SVDValidationTTreeCluster(b2.Module):
     def event(self):
         """ Find clusters with a truehit and save needed information """
         clusters = Belle2.PyStoreArray('SVDClusters')
+        eventt0 = Belle2.PyStoreObj('EventT0')
+
+        # get EventT0: combined, TOP, CDC, ECL
+        self.data.eventt0_all = -1
+        self.data.eventt0_top = -1
+        self.data.eventt0_cdc = -1
+        self.data.eventt0_ecl = -1
+        top = Belle2.Const.DetectorSet(Belle2.Const.TOP)
+        cdc = Belle2.Const.DetectorSet(Belle2.Const.CDC)
+        ecl = Belle2.Const.DetectorSet(Belle2.Const.ECL)
+        if eventt0.hasEventT0():
+            self.data.eventt0_all = eventt0.getEventT0()
+        if eventt0.hasTemporaryEventT0(cdc):
+            tmp = eventt0.getTemporaryEventT0s(Belle2.Const.CDC)
+            self.data.eventt0_cdc = tmp.back().eventT0
+        if eventt0.hasTemporaryEventT0(top):
+            tmp = eventt0.getTemporaryEventT0s(Belle2.Const.TOP)
+            self.data.eventt0_top = tmp.back().eventT0
+        if eventt0.hasTemporaryEventT0(ecl):
+            evtT0List_ECL = eventt0.getTemporaryEventT0s(Belle2.Const.ECL)
+            # Select the event t0 value from the ECL as the one with the smallest chi squared value (defined as ".quality")
+            smallest_ECL_t0_minChi2 = evtT0List_ECL[0].quality
+            self.data.eventt0_ecl = evtT0List_ECL[0].eventT0
+            for tmp in evtT0List_ECL:
+                if tmp.quality < smallest_ECL_t0_minChi2:
+                    smallest_ECL_t0_minChi2 = tmp.quality
+                    self.data.eventt0_ecl = tmp.eventT0
+
         for cluster in clusters:
             cluster_truehits = cluster.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
             cluster_TrueHit_Length = len(cluster_truehits)
@@ -198,6 +230,7 @@ class SVDValidationTTreeCluster(b2.Module):
                     self.data.truehit_deposEnergy = truehit.getEnergyDep()
                     self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
                     self.data.truehit_time = truehit.getGlobalTime()
+
                     # Fill tree
                     self.file.cd()
                     self.tree.Fill()

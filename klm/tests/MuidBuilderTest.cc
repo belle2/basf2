@@ -21,6 +21,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 /* C++ headers. */
 #include <bitset>
@@ -79,7 +80,7 @@ namespace Belle2 {
   TEST_F(MuidBuilderTest, MuidBuilder01)
   {
     StoreArray<KLMMuidLikelihood> muids;
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     unsigned int hitPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
@@ -123,7 +124,7 @@ namespace Belle2 {
   TEST_F(MuidBuilderTest, MuidBuilder02)
   {
     StoreArray<KLMMuidLikelihood> muids;
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     std::bitset<30> bitHitPattern(std::string("11011111111101"));
@@ -158,7 +159,7 @@ namespace Belle2 {
   TEST_F(MuidBuilderTest, MuidBuilder03)
   {
     StoreArray<KLMMuidLikelihood> muids;
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     std::bitset<30> bitHitPattern(std::string("11"));
@@ -193,7 +194,7 @@ namespace Belle2 {
   TEST_F(MuidBuilderTest, MuidBuilder04)
   {
     StoreArray<KLMMuidLikelihood> muids;
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     std::bitset<30> bitExtPattern(std::string("1111111000000000000111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     unsigned int hitPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
@@ -241,7 +242,7 @@ namespace Belle2 {
   TEST_F(MuidBuilderTest, MuidBuilder05)
   {
     StoreArray<KLMMuidLikelihood> muids;
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     std::bitset<30> bitExtPattern(std::string("1111111000000000000111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     std::bitset<30> bitHitPattern(std::string("1100111000000000000101"));

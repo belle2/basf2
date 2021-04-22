@@ -6,49 +6,6 @@ Variables
 
  * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
    theme.
- * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
-   :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.
-
-Modules
-+++++++
-
- * Added a module :b2:mod:`TrackIsoCalculator`, which takes as input a standard charged particle list, and calculates for every particle's track in the list the
-   3D distance to the closest track in the event. The distance is calculated as the 3D separation between the points where two extraplolated track helices cross a given
-   detector's inner surface, where the detector is an input parameter to the module. This variable can be used to parametrise charged particle
-   identification efficiencies and mis-identification probabilities, as they can depend on the activity around each charged particle candidate.
- * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
-   :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
- * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
-   beamspot is added.
- * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
- * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
-   download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
-   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon.
-   Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
-   ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
- * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
- * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into
-   ROE 4-vector computation.
-
-   .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.
-
- * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
-   has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
-   much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
- * The :b2:mod:`ParticleLoader` now creates photon candidates from KLMCluster if the parameter ``loadPhotonsFromKLM`` is set to
-   true. It is off by default.
-
-   .. warning:: Photons from KLMCluster should only be used in specific use-cases and after a thorough study of their effect.
-
- * In :b2:mod:`BtubeCreator`, new extrainfo ``TubeB_p_estimated`` was added. This returns the magnitude of the estimated momentum
-   of the B which should fly in the direction of the Btube.
- * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles
-   and stores them in a new list.
- * In :b2:mod:`ParticleStats` add functionaly to produce a json containing the information printed on stdout. Added also a tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
- * The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
-   that case the momenta of all track-based daughter particles are scaled by the provided factor.
- * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
-   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
 
 Full Event Interpretation
 +++++++++++++++++++++++++

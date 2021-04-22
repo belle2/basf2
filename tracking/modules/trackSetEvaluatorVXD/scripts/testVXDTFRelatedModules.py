@@ -8,10 +8,9 @@ from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
                                  setup_spCreatorPXD,
                                  setup_spCreatorSVD,
                                  setup_sp2thConnector,
-                                 setup_qualityEstimators,
-                                 setup_trackSetEvaluators)
+                                 setup_qualityEstimators)
 
-from VXDTF.setup_modules_ml import *
+from VXDTF.setup_modules_ml import add_fbdtclassifier_training, add_ml_threehitfilters
 
 # ################
 # rootInputFileName = "seed4nEv100000pGun1_1T.root"
@@ -198,7 +197,7 @@ if useOldTFinstead:
              'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
              ]
         tuneValue = 0.22
-    vxdtf = register_module('VXDTF')  # VXDTF TFRedesign
+    vxdtf = b2.register_module('VXDTF')  # VXDTF TFRedesign
     vxdtf.logging.log_level = b2.LogLevel.DEBUG
     vxdtf.logging.debug_level = 1
     vxdtf.param('sectorSetup', secSetup)
@@ -286,7 +285,8 @@ main.add_module(eventCounter)
 main.add_module(secMapBootStrap)
 
 setup_spCreatorSVD(path=main, nameOutput='nosingleSP', createSingleClusterSPs=False, logLevel=b2.LogLevel.INFO)
-setup_spCreatorPXD(path=main, nameOutput='pxdOnly', logLevel=LogLevel.INFO)  # needed since 2gftc-converter does not work without it
+# needed since 2gftc-converter does not work without it
+setup_spCreatorPXD(path=main, nameOutput='pxdOnly', logLevel=b2.LogLevel.INFO)
 setup_gfTCtoSPTCConverters(
     path=main,
     pxdSPs='pxdOnly',

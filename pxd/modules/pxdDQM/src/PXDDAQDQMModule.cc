@@ -175,6 +175,7 @@ void PXDDAQDQMModule::beginRun()
 
 void PXDDAQDQMModule::event()
 {
+  hDAQErrorEvent->Fill(-1);// Event counter
   hDAQStat->Fill(-1); // to normalize to the number of events
   hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   hDAQErrorDHC->Fill(-1, -1); // to normalize to the number of events

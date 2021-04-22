@@ -27,7 +27,8 @@
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
-
+#include <simulation/dataobjects/SimClockState.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <TH1I.h>
 
 namespace Belle2 {
@@ -278,6 +279,12 @@ namespace Belle2 {
     int getNbitsInp(void) {return _inpBitNames.size();}
 
     bool _algFromDB;
+
+    /** generated hardware clock state */
+    StoreObjPtr<SimClockState> m_simClockState;
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+
 
     friend class TRGGDLModule;
   };

@@ -26,10 +26,15 @@ babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
 
-add_simulation(main)
+add_simulation(main, simulateT0jitter=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
 # add trigger
 add_tsim(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
+
+for m in main.modules():
+    if m.name() == "TRGGDL":
+        m.set_log_level(b2.LogLevel.DEBUG)
+#        m.set_debug_level(25)
 
 # output
 rootoutput = b2.register_module('RootOutput')

@@ -328,15 +328,29 @@ namespace Belle2 {
       }
 
       //set timing qulaity flag based on MC truth jitter, which is NOT simulated by TSIM
-      //get true jitter
-      double jitter = 0;
-      //set timing quality flag with the jitter
       TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
-      if (jitter < _timquality_threshold_sfin) {timQuality = TRGSummary::TTYQ_SFIN;}
-      else if (jitter < _timquality_threshold_fine) {timQuality = TRGSummary::TTYQ_FINE;}
-      else                                           {timQuality = TRGSummary::TTYQ_CORS;}
-      B2DEBUG(20, "TRGGDL::set timing qualiry" << jitter << " " << timQuality << " " << _timquality_threshold_sfin << " " <<
+      double jitter = 0;
+
+      //get true jitter if SimClockState is valid
+      if (m_simClockState.isValid() && m_hwClock.isValid()) {
+
+        jitter = m_simClockState->getRelativeBucketNo() / m_hwClock->getAcceleratorRF(); // in ns
+
+        //set timing quality flag with the jitter
+        if (abs(jitter) < _timquality_threshold_sfin)
+          timQuality = TRGSummary::TTYQ_SFIN;
+        else {
+          if (abs(jitter) < _timquality_threshold_fine)
+            timQuality = TRGSummary::TTYQ_FINE;
+          else
+            timQuality = TRGSummary::TTYQ_CORS;
+        }
+      }
+
+      B2DEBUG(20, "TRGGDL::set timing quality, jitter = " << jitter << ": timQuality =  " << timQuality << " sfin threshold = " <<
+              _timquality_threshold_sfin << " fine threshold = " <<
               _timquality_threshold_fine);
+
       //fill the flag to TRGSummary
       GDLResult->setTimQuality(timQuality);
     }

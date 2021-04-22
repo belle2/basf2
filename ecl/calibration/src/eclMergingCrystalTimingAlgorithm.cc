@@ -2,6 +2,7 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/digitization/EclConfiguration.h>
 #include "TH1F.h"
 #include "TString.h"
 #include "TFile.h"
@@ -13,9 +14,13 @@ using namespace ECL;
 using namespace Calibration;
 
 /**-----------------------------------------------------------------------------------------------*/
-eclMergingCrystalTimingAlgorithm::eclMergingCrystalTimingAlgorithm(): CalibrationAlgorithm("DummyCollector"),
-  m_ECLCrystalTimeOffsetBhabha("ECLCrystalTimeOffsetBhabha"), m_ECLCrystalTimeOffsetBhabhaGamma("ECLCrystalTimeOffsetBhabhaGamma"),
-  m_ECLCrystalTimeOffsetCosmic("ECLCrystalTimeOffsetCosmic"), m_ECLReferenceCrystalPerCrateCalib("ECLReferenceCrystalPerCrateCalib"),
+eclMergingCrystalTimingAlgorithm::eclMergingCrystalTimingAlgorithm():
+  CalibrationAlgorithm("DummyCollector"),
+  readPrevCrysPayload(false),
+  m_ECLCrystalTimeOffsetBhabha("ECLCrystalTimeOffsetBhabha"),
+  m_ECLCrystalTimeOffsetBhabhaGamma("ECLCrystalTimeOffsetBhabhaGamma"),
+  m_ECLCrystalTimeOffsetCosmic("ECLCrystalTimeOffsetCosmic"),
+  m_ECLReferenceCrystalPerCrateCalib("ECLReferenceCrystalPerCrateCalib"),
   m_ECLCrateTimeOffset("ECLCrateTimeOffset")
 {
   setDescription(
@@ -25,6 +30,9 @@ eclMergingCrystalTimingAlgorithm::eclMergingCrystalTimingAlgorithm(): Calibratio
 
 CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 {
+  /** Write out job parameters */
+  B2INFO("readPrevCrysPayload = " << readPrevCrysPayload);
+
   //------------------------------------------------------------------------
   // Get the input run list to use to update the DBObjectPtrs
   auto runs = getRunList();
@@ -83,6 +91,56 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
     return c_Failure;
   }
 
+
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
+     Same for all crystals.  Proper accurate value*/
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+
+
+
+  // Set the rootfile name
+  bool minRunNumBool = false;
+  bool maxRunNumBool = false;
+  int minRunNum = -1;
+  int maxRunNum = -1;
+  int minExpNum = -1;
+  int maxExpNum = -1;
+  for (auto expRun : getRunList()) {
+    int expNumber = expRun.first;
+    int runNumber = expRun.second;
+    if (!minRunNumBool) {
+      minExpNum = expNumber;
+      minRunNum = runNumber;
+      minRunNumBool = true;
+    }
+    if (!maxRunNumBool) {
+      maxExpNum = expNumber;
+      maxRunNum = runNumber;
+      maxRunNumBool = true;
+    }
+    if (((minRunNum > runNumber)   && (minExpNum >= expNumber))  ||
+        (minExpNum > expNumber)) {
+      minExpNum = expNumber;
+      minRunNum = runNumber;
+    }
+    if (((maxRunNum < runNumber)   && (maxExpNum <= expNumber))  ||
+        (maxExpNum < expNumber))
+
+    {
+      maxExpNum = expNumber;
+      maxRunNum = runNumber;
+    }
+  }
+
+  string debugFilenameBase = "ECLCrystalTimeOffsetMerged";
+  B2INFO("debugFilenameBase = " << debugFilenameBase);
+  string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") +
+                         to_string(maxExpNum) + "_" + to_string(maxRunNum);
+  string debugFilename = debugFilenameBase + runNumsString + string(".root");
+
+
+
+
   //------------------------------------------------------------------------
   /** Get the vectors from the input payloads */
   vector<float> bhabhaCalib = m_ECLCrystalTimeOffsetBhabha->getCalibVector();
@@ -106,11 +164,41 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   B2INFO("Loaded 'ECLCrateTimeOffset' calibration");
 
 
+  // Get the previous crystal payloads
+  DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
+  vector<float> prevValuesCrys(8736);
+  vector<float> prevValuesCrysUnc(8736);
+
+  DBObjPtr<Belle2::ECLCrystalCalib> customPrevBhabhaCrystalTimeObject("ECLCrystalTimeOffsetBhabhaPreviousValues");
+  vector<float> prevBhabhaValuesCrys(8736);
+  vector<float> prevBhabhaValuesCrysUnc(8736);
+
+  if (readPrevCrysPayload) {
+    //..Get vectors of values from the payloads
+    prevValuesCrys = customPrevCrystalTimeObject->getCalibVector();
+    prevValuesCrysUnc = customPrevCrystalTimeObject->getCalibUncVector();
+
+    prevBhabhaValuesCrys = customPrevBhabhaCrystalTimeObject->getCalibVector();
+    prevBhabhaValuesCrysUnc = customPrevBhabhaCrystalTimeObject->getCalibUncVector();
+
+    //..Print out a few values for quality control
+    B2INFO("Previous values read from database.  Write out for their values for comparison");
+    for (int ic = 0; ic < 8736; ic += 500) {
+      B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
+    }
+    B2INFO("Previous bhabha values read from database.  Write out for their values for comparison");
+    for (int ic = 0; ic < 8736; ic += 500) {
+      B2INFO("ts custom previous bhabha payload: cellID " << ic + 1 << " " << prevBhabhaValuesCrys[ic]);
+    }
+  }
+
+
+
   //------------------------------------------------------------------------
   /** Shift cosmic calibrations.  The cosmic calibrations were made assuming
       all crate times were zero (taken before the crate calibrations were
       even created).  As such, the cosmic crystal calibrations for the merged
-      payload should be shifted by the the appropriate amount to accommodate
+      payload should be shifted by the appropriate amount to accommodate
       the non-zero crate time calibrations.  Also, the cosmic calibrations
       should be shifted to better match the bhabha calibrations.  The
       average crystal calibration per crate is calculated for both the
@@ -135,8 +223,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
 
   //------------------------------------------------------------------------
-  /* Determine the bhabha and radiavtive bhabha calibration quality*/
-
+  /* Determine the bhabha and radiative bhabha calibration quality*/
 
   vector<bool> bhabhaCalibGoodQuality(m_numCrystals, false);
   vector<bool> bhabhaGammaCalibGoodQuality(m_numCrystals, false);
@@ -241,6 +328,11 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   vector<float> newCalib(m_numCrystals);
   vector<float> newCalibUnc(m_numCrystals);
 
+  vector<float> newBhabhaMinusCustomPrevCalib__cid(m_numCrystals);
+  vector<float> newBhabhaMinusCustomPrevBhabhaCalib__cid(m_numCrystals);
+  vector<float> newBhabhaMinusCustomPrevCalib;
+  vector<float> newBhabhaMinusCustomPrevBhabhaCalib;
+
 
   // Loop over each crystal we want to check
   for (int ic = 0; ic < m_numCrystals; ic++) {
@@ -260,21 +352,19 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
     B2DEBUG(29, "Checked ref crystal");
 
     string whichCalibUsed = "bhabha";
+
     // By default set the new calibration to the bhabha calibration
     newCalib[ic] = bhabhaCalib[ic];
     newCalibUnc[ic] = bhabhaCalibUnc[ic];
 
-    B2DEBUG(29, "Set new calib to bhabha for now...");
+    double newMinusMerged ;
+    double newMinusBhabha ;
+
 
     /* If the crystal is not a reference crystal and there is no bhabha
        calib for that crystal then use a different calibration.  If the
        crystal is not a reference crystal and the crystal has a bad bhabha
        crystal calibration uncertainty. */
-    /*
-        if (    (!isRefCrys)                 &&
-                (  (bhabhaCalib[ic] == 0)    ||
-                   (  (bhabhaCalibUnc[ic]>2) && ( (ic<=288) || (ic>=8545) )  )   )    ) {}
-    */
     if ((!isRefCrys)             &&
         ((bhabhaCalib[ic] == 0) || (! bhabhaCalibGoodQuality[ic]))) {
 
@@ -289,45 +379,78 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
         newCalibUnc[ic] = cosmicCalibShiftedUnc[ic];
         whichCalibUsed = "cosmic";
       }
+    } else {
+      newMinusMerged = (newCalib[ic] - prevValuesCrys[ic]) * TICKS_TO_NS;
+      newMinusBhabha = (newCalib[ic] - prevBhabhaValuesCrys[ic]) * TICKS_TO_NS;
+
+      newBhabhaMinusCustomPrevCalib__cid[ic] = newMinusMerged;
+      newBhabhaMinusCustomPrevBhabhaCalib__cid[ic] = newMinusBhabha;
+      newBhabhaMinusCustomPrevCalib.push_back(newMinusMerged);
+      newBhabhaMinusCustomPrevBhabhaCalib.push_back(newMinusBhabha);
     }
+
+    newMinusMerged = (newCalib[ic] - prevValuesCrys[ic]) * TICKS_TO_NS;
+    newMinusBhabha = (newCalib[ic] - prevBhabhaValuesCrys[ic]) * TICKS_TO_NS;
+
+
     B2INFO("Crystal " << ic + 1 << ", crate " << crate_id_from_crystal <<
            "::: bhabha = " << bhabhaCalib[ic] << "+-" << bhabhaCalibUnc[ic] <<
            " ticks, rad bhabha = " << bhabhaGammaCalib[ic] << "+-" << bhabhaGammaCalibUnc[ic]  <<
            " ticks, cosmic UNshifted = " << cosmicCalib[ic] << "+-" << cosmicCalibUnc[ic]  <<
            " ticks, cosmic shifted = " << cosmicCalibShifted[ic] << "+-" << cosmicCalibShiftedUnc[ic]  <<
            " ticks. ||| New calib = " << newCalib[ic] << " ticks, selected " << whichCalibUsed);
+    B2INFO("   Crystal " << ic + 1 << ", pre calib ts = " << prevValuesCrys[ic] <<
+           ", pre calib bhabha ts = " << prevBhabhaValuesCrys[ic] <<
+           " ticks |||  new - pre calib ts = " << newMinusMerged <<
+           ", new - pre calib bhabha ts = " << newMinusBhabha << " ns");
   } // end of setting new calibration for each crystal
 
 
+
   //------------------------------------------------------------------------
-  //..Histograms of existing calibration, new calibration, and ratio new/old
+  //..Histograms of calibrations
 
   // Just in case, we remember the current TDirectory so we can return to it
   TDirectory* executeDir = gDirectory;
 
-  TString fname = m_payloadName;
-  fname += ".root";
+  TString fname = debugFilename;
   TFile hfile(fname, "recreate");
 
-  TString htitle = m_payloadName;
-  htitle += " bhabha values;cellID";
+  TString htitle = "ECLCrystalTimeOffsetBhabha;cellID;Bhabha ts values  [ticks]";
   TH1F* bhabhaPayload = new TH1F("bhabhaPayload", htitle, m_numCrystals, 1, 8737);
 
-  htitle = m_payloadName;
-  htitle += " bhabhaGamma values;cellID";
+  htitle = "ECLCrystalTimeOffsetBhabhaGamma;cellID;Radiative bhabha ts values  [ticks]";
   TH1F* bhabhaGammaPayload = new TH1F("bhabhaGammaPayload", htitle, m_numCrystals, 1, 8737);
 
-  htitle = m_payloadName;
-  htitle += " cosmic unshifted values;cellID";
+  htitle = "ECLCrystalTimeOffsetCosmic : unshifted;cellID;Unshifted cosmic ts values  [ticks]";
   TH1F* cosmicPayload = new TH1F("cosmicUnshiftedPayload", htitle, m_numCrystals, 1, 8737);
 
-  htitle = m_payloadName;
-  htitle += " cosmic shifted values;cellID";
+  htitle = "ECLCrystalTimeOffsetCosmic : shifted;cellID;Shifted cosmic ts values  [ticks]";
   TH1F* cosmicShiftedPayload = new TH1F("cosmicShiftedPayload", htitle, m_numCrystals, 1, 8737);
 
-  htitle = m_payloadName;
-  htitle += " new values;cellID";
+  htitle = "New ECLCrystalTimeOffset;cellID;New (merged) ts values  [ticks]";
   TH1F* newPayload = new TH1F("newPayload", htitle, m_numCrystals, 1, 8737);
+
+
+  htitle = "ECLCrystalTimeOffsetBhabha : 'pre-calib' values;cellID;Pre-calibration bhabha ts values  [ticks]";
+  TH1F* tsCustomPrevBhabha_payload = new TH1F("tsCustomPrevBhabha_payload", htitle, m_numCrystals, 1, 8737);
+
+  htitle = "ECLCrystalTimeOffset : 'pre-calib' values;cellID;Pre-calibration merged ts values  [ticks]";
+  TH1F* tsCustomPrev_payload = new TH1F("tsCustomPrev_payload", htitle, m_numCrystals, 1, 8737);
+
+
+
+  htitle = "-Only for crystals where the new bhabha ts value is used-;cellID;ts(new | bhabha) - ts(old = 'pre-calib' | merged)  [ns]";
+  TH1F* newBhabhaMinusCustomPrev__cid = new TH1F("newBhabhaMinusCustomPrev__cid", htitle, m_numCrystals, 1, 8737);
+
+  htitle = "-Only for crystals where the new bhabha ts value is used-;cellID;ts(new | bhabha) - ts(old = 'pre-calib' | bhabha)  [ns]";
+  TH1F* newBhabhaMinusCustomPrevBhabha__cid = new TH1F("newBhabhaMinusCustomPrevBhabha__cid", htitle, m_numCrystals, 1, 8737);
+
+  htitle = "-Only for crystals where the new bhabha ts value is used-;ts(new | bhabha) - ts(old = 'pre-calib' | merged)  [ns];Number of crystals";
+  auto tsNewBhabha_MINUS_tsCustomPrev = new TH1F("TsNewBhabha_MINUS_TsCustomPrev", htitle, 285, -69.5801, 69.5801);
+
+  htitle = "-Only for crystals where the new bhabha ts value is used-;ts(new | bhabha) - ts(old = 'pre-calib' | bhabha)  [ns];Number of crystals";
+  auto tsNewBhabha_MINUS_tsCustomPrevBhabha = new TH1F("TsNewBhabha_MINUS_TsCustomPrevBhabha", htitle, 285, -69.5801, 69.5801);
 
 
   for (int cellID = 1; cellID <= m_numCrystals; cellID++) {
@@ -345,7 +468,34 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
     newPayload->SetBinContent(cellID, newCalib[cellID - 1]);
     newPayload->SetBinError(cellID, newCalibUnc[cellID - 1]);
+
+    // Comparisons of change in ts
+    if (readPrevCrysPayload) {
+      newBhabhaMinusCustomPrev__cid->SetBinContent(cellID, newBhabhaMinusCustomPrevCalib__cid[cellID - 1]);
+      newBhabhaMinusCustomPrev__cid->SetBinError(cellID, 0);
+
+      newBhabhaMinusCustomPrevBhabha__cid->SetBinContent(cellID, newBhabhaMinusCustomPrevBhabhaCalib__cid[cellID - 1]);
+      newBhabhaMinusCustomPrevBhabha__cid->SetBinError(cellID, 0);
+
+
+      tsCustomPrev_payload->SetBinContent(cellID, prevValuesCrys[cellID - 1]);
+      tsCustomPrev_payload->SetBinError(cellID, prevValuesCrysUnc[cellID - 1]);
+
+      tsCustomPrevBhabha_payload->SetBinContent(cellID, prevBhabhaValuesCrys[cellID - 1]);
+      tsCustomPrevBhabha_payload->SetBinError(cellID, prevBhabhaValuesCrysUnc[cellID - 1]);
+    }
   }
+
+  if (readPrevCrysPayload) {
+    for (long unsigned int ib = 0; ib < newBhabhaMinusCustomPrevCalib.size(); ib++) {
+      tsNewBhabha_MINUS_tsCustomPrev->Fill(newBhabhaMinusCustomPrevCalib[ib]);
+    }
+
+    for (long unsigned int ib = 0; ib < newBhabhaMinusCustomPrevBhabhaCalib.size(); ib++) {
+      tsNewBhabha_MINUS_tsCustomPrevBhabha->Fill(newBhabhaMinusCustomPrevBhabhaCalib[ib]);
+    }
+  }
+
 
   hfile.cd();
   hfile.Write();
@@ -367,6 +517,6 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   // Save the new merged calibrations to a payload
   ECLCrystalCalib* newCrystalTimes = new ECLCrystalCalib();
   newCrystalTimes->setCalibVector(newCalib, newCalibUnc);
-  saveCalibration(newCrystalTimes, m_payloadName);
+  saveCalibration(newCrystalTimes, "ECLCrystalTimeOffset");
   return c_OK;
 }

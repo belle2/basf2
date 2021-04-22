@@ -35,15 +35,18 @@ namespace Belle2 {
       /**..Destructor */
       ~eclMergingCrystalTimingAlgorithm() {}
 
+
+      /*** Parameters ***/
+
+      /**< Read the previous crystal payload values for comparison */
+      bool readPrevCrysPayload;
+
     protected:
 
       /**..Run algorithm */
       EResult calibrate() override;
 
     private:
-
-      /** The output payload name */
-      const std::string m_payloadName = "ECLCrystalTimeOffset";
 
       // Payloads to be merged
       /** ECLCrystalTimeOffsetBhabha payload that we want to read from the DB */

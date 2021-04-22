@@ -4,7 +4,7 @@
    merges the relevant crystal payloads, and makes validation plots."""
 
 from prompt import CalibrationSettings
-from reconstruction import prepare_cdst_analysis
+from reconstruction import prepare_cdst_analysis, add_reconstruction
 from caf.utils import IoV, ExpRun
 import copy
 
@@ -26,25 +26,15 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
-    # input_data_filters={
-    #         "bhabha_all_calib": [
-    #             "bhabha_all_calib",
-    #             "4S",
-    #             "Continuum",
-    #             "Scan",
-    #             "Good",
-    #             "physics",
-    #             "On"],
-    #         "hadron_calib": [
-    #             "hadron_calib",
-    #             "4S",
-    #             "Continuum",
-    #             "Scan",
-    #             "Good",
-    #             "physics",
-    #             "On"]},
+    # input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
+    #                                          input_data_filters["Beam Energy"]["4S"],
+    #                                          input_data_filters["Beam Energy"]["Continuum"],
+    #                                          input_data_filters["Beam Energy"]["Scan"],
+    #                                          input_data_filters["Data Quality Tag"]["Good"],
+    #                                          input_data_filters["Run Type"]["physics"],
+    #                                          input_data_filters["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": []})
+    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": [], "t0_bhabhaToHadron_correction": -0.9})
 
 
 ##############################
@@ -133,6 +123,11 @@ def get_calibrations(input_data, **kwargs):
     numCrysCrateIterations = expert_config["numCrysCrateIterations"]
     print("expert_config:  numCrysCrateIterations = ", numCrysCrateIterations)
 
+    # Determine how large of an offset should be applied to correct for
+    # differences in the CDC event t0 in bhabha and hadronic events
+    t0_bhabhaToHadron_correction = expert_config["t0_bhabhaToHadron_correction"]
+    print("expert_config:  t0_bhabhaToHadron_correction = ", t0_bhabhaToHadron_correction)
+
     # Interval of validity for the calibrations
     intermediate_iov = IoV(0, 0, -1, -1)
     requested_iov = kwargs.get("requested_iov", None)
@@ -156,6 +151,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Collector setup for both crates and crystals calibrations
+    print("Set up the base for the collectors for the calibrations")
 
     root_input = register_module('RootInput')
     rec_path_bhabha = create_path()
@@ -168,7 +164,8 @@ def get_calibrations(input_data, **kwargs):
     prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
 
     # ====================================================
-    t0BiasCorrection = -0.9  # Correct for the CDC t0 bias
+    # t0BiasCorrection = -0.9  # Correct for the CDC t0 bias in ns
+    t0BiasCorrection = t0_bhabhaToHadron_correction  # Correct for the CDC t0 bias in ns
     # ====================================================
 
     col_bhabha = register_module('ECLBhabhaTCollector')
@@ -188,6 +185,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup for crates
+    print("Set up the base for the crate calibration algorithm")
 
     eclTAlgCrates = Belle2.ECL.eclBhabhaTAlgorithm()
 
@@ -203,6 +201,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup for crystals
+    print("Set up the base for the crystal calibration algorithm")
 
     eclTAlgCrystals = Belle2.ECL.eclBhabhaTAlgorithm()
 
@@ -228,6 +227,16 @@ def get_calibrations(input_data, **kwargs):
 
     eclTAlgCrystals_readNotSavePrevPayload.savePrevCrysPayload = False
     eclTAlgCrystals_readNotSavePrevPayload.readPrevCrysPayload = True
+
+    ###################################################
+    # Algorithm setup for crystal payload merger
+    print("Set up the base for the crystal merger algorithm")
+
+    merging_alg = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
+    if numCrysCrateIterations == 1:
+        merging_alg.readPrevCrysPayload = False
+    else:
+        merging_alg.readPrevCrysPayload = True
 
     ####################################################
     # Introduce the number of crate+crystal iterations
@@ -269,12 +278,14 @@ def get_calibrations(input_data, **kwargs):
             cal_crates_i.algorithms = [eclTAlgCrates]
             cal_crates_i.save_payloads = False
             cal_crates_i.strategies = SimpleRunByRun
+            cal_crates_i.backend_args = {"request_memory": "4 GB"}
 
             ###################################################
             # Calibration setup for crystals iteration
 
             cal_crystals_i = Calibration(crysCalibName)
             cal_crystals_i.add_collection(name="bhabha", collection=eclTCol_crys)
+            cal_crystals_i.backend_args = {"request_memory": "4 GB"}
 
             # If this is the first iteration then save the previous crystal payload
             # values to a temporary storage payload.  If this is not the first iteration
@@ -310,14 +321,25 @@ def get_calibrations(input_data, **kwargs):
 
             ###################################################
             # Setup for merging crystals payloads
-            merging_alg_i = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
 
-            cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector", algorithms=[merging_alg_i],
+            cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector",
                                           input_files=input_files_bhabha_1perRun)
+
+            # If there is not only one iteration then read in the previous stored payload
+            # and plot the change in the crystal ts
+            if i == 0 and numCrysCrateIterations == 1:
+                cal_ecl_merge_i.algorithms = [merging_alg]
+                print("merge algorithm: do not read previous payload")
+                print("merging_alg.readPrevCrysPayload = ", merging_alg.readPrevCrysPayload)
+            else:
+                cal_ecl_merge_i.algorithms = [merging_alg]
+                print("merge algorithm: read previous payload for comparison purposes")
+                print("merging_alg.readPrevCrysPayload = ", merging_alg.readPrevCrysPayload)
 
             cal_ecl_merge_i.save_payloads = False
             ecl_merge_pre_path_i = basf2.create_path()
-            prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
+            # prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
+            prepare_cdst_analysis(ecl_merge_pre_path_i)
             ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
 
             # If payload boundaries are set use SequentialBoundaries
@@ -398,6 +420,7 @@ def get_calibrations(input_data, **kwargs):
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
         prepare_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
+        # add_reconstruction(rec_path_bhabha_val)
 
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -417,6 +440,7 @@ def get_calibrations(input_data, **kwargs):
         # Define the CAF algorithm arguments
         eclValTAlgBhabha.meanCleanRebinFactor = 3
         eclValTAlgBhabha.meanCleanCutMinFactor = 0.4
+        eclValTAlgBhabha.clusterTimesFractionWindow_maxtime = 1.5
         eclValTAlgBhabha.debugFilenameBase = "eclBhabhaTValidationAlgorithm"
 
         ####################################################################
@@ -427,6 +451,7 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha = Calibration("ECLcrystalTimeCalValidation_bhabhaPhysics")
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
         valid_cal_bhabha.save_payloads = False
+        valid_cal_bhabha.backend_args = {"request_memory": "4 GB"}
 
         # Make a second version of this algorithm that differs only in
         #    that it is instructed to read the previous crystal payload
@@ -475,6 +500,7 @@ def get_calibrations(input_data, **kwargs):
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
         prepare_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
+        # add_reconstruction(rec_path_hadron_val)
 
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)
@@ -494,6 +520,7 @@ def get_calibrations(input_data, **kwargs):
         # Define the CAF algorithm arguments
         eclValTAlgHadronic.meanCleanRebinFactor = 3
         eclValTAlgHadronic.meanCleanCutMinFactor = 0.4
+        eclValTAlgHadronic.clusterTimesFractionWindow_maxtime = 8
         eclValTAlgHadronic.debugFilenameBase = "eclHadronTValidationAlgorithm"
 
         ####################################################################
@@ -504,6 +531,7 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron = Calibration("ECLcrystalTimeCalValidation_hadronPhysics")
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
         valid_cal_hadron.save_payloads = False
+        valid_cal_hadron.backend_args = {"request_memory": "4 GB"}
 
         # Make a second version of this algorithm that differs only in
         #    that it is instructed to read the previous crystal payload
@@ -650,6 +678,7 @@ def get_calibrations(input_data, **kwargs):
         cal_crates_1.add_collection(name="bhabha", collection=eclTCol)
         cal_crates_1.algorithms = [eclTAlgCrates]
         cal_crates_1.save_payloads = False
+        cal_crates_1.backend_args = {"request_memory": "4 GB"}
 
         # Here we set the AlgorithmStrategy for our algorithm
 
@@ -670,6 +699,7 @@ def get_calibrations(input_data, **kwargs):
         cal_crystals_1 = Calibration("ECLcrystalTimeCalibration_physics_1")
         cal_crystals_1.add_collection(name="bhabha", collection=eclTCol_crys)
         cal_crystals_1.algorithms = [eclTAlgCrystals]
+        cal_crystals_1.backend_args = {"request_memory": "4 GB"}
 
         # Two sets of payloads are created here:
         #    * ECLCrystalTimeOffset
@@ -698,6 +728,7 @@ def get_calibrations(input_data, **kwargs):
         cal_crates_2.add_collection(name="bhabha", collection=eclTCol)
         cal_crates_2.algorithms = [eclTAlgCrates]
         cal_crates_2.strategies = SimpleRunByRun
+        cal_crates_2.backend_args = {"request_memory": "4 GB"}
 
         ###################################################
         ###################################################
@@ -708,8 +739,6 @@ def get_calibrations(input_data, **kwargs):
         # we spawn only one very fast job.
         # It doesn't matter which input file we choose as the output is never used.
 
-        merging_alg = Belle2.ECL.eclMergingCrystalTimingAlgorithm()
-
         cal_ecl_merge = Calibration(name="ecl_t_merge", collector="DummyCollector", algorithms=[merging_alg],
                                     input_files=input_files_bhabha_1perRun)
 
@@ -718,7 +747,8 @@ def get_calibrations(input_data, **kwargs):
 
         # ..Uses cdst data so it requires prepare_cdst_analysis
         ecl_merge_pre_path = basf2.create_path()
-        prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
+        # prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
+        prepare_cdst_analysis(ecl_merge_pre_path)
         ecl_merge_pre_path.pre_collector_path = ecl_merge_pre_path
 
         # If payload boundaries are set use SequentialBoundaries
@@ -759,6 +789,7 @@ def get_calibrations(input_data, **kwargs):
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
         prepare_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
+        # add_reconstruction(rec_path_bhabha_val)
 
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -778,6 +809,7 @@ def get_calibrations(input_data, **kwargs):
         # Define the CAF algorithm arguments
         eclValTAlgBhabha.meanCleanRebinFactor = 3
         eclValTAlgBhabha.meanCleanCutMinFactor = 0.4
+        eclValTAlgBhabha.clusterTimesFractionWindow_maxtime = 1.5
         eclValTAlgBhabha.debugFilenameBase = "eclBhabhaTValidationAlgorithm"
 
         ####################################################################
@@ -789,6 +821,8 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
         valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
         valid_cal_bhabha.save_payloads = False
+        valid_cal_bhabha.backend_args = {"request_memory": "4 GB"}
+
         eclValTAlgBhabha.readPrevCrysPayload = True
         print("eclValTAlgBhabha.readPrevCrysPayload = ", eclValTAlgBhabha.readPrevCrysPayload)
 
@@ -829,6 +863,7 @@ def get_calibrations(input_data, **kwargs):
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
         prepare_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
+        # add_reconstruction(rec_path_hadron_val)
 
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)
@@ -848,6 +883,7 @@ def get_calibrations(input_data, **kwargs):
         # Define the CAF algorithm arguments
         eclValTAlgHadronic.meanCleanRebinFactor = 3
         eclValTAlgHadronic.meanCleanCutMinFactor = 0.4
+        eclValTAlgHadronic.clusterTimesFractionWindow_maxtime = 8
         eclValTAlgHadronic.debugFilenameBase = "eclHadronTValidationAlgorithm"
 
         ####################################################################
@@ -859,6 +895,8 @@ def get_calibrations(input_data, **kwargs):
         valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
         valid_cal_hadron.algorithms = [eclValTAlgHadronic]
         valid_cal_hadron.save_payloads = False
+        valid_cal_bhabha.backend_args = {"request_memory": "4 GB"}
+
         eclValTAlgHadronic.readPrevCrysPayload = True
         print("eclValTAlgHadronic.readPrevCrysPayload = ", eclValTAlgHadronic.readPrevCrysPayload)
 

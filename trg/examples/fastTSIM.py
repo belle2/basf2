@@ -7,6 +7,7 @@ import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_tsim
 
+# b2.set_log_level(b2.LogLevel.DEBUG)
 
 main = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')
@@ -28,7 +29,7 @@ main.add_module(babayaganlo)
 add_simulation(main)
 
 # add trigger
-add_tsim(main, component=["CDC", "ECL", "KLM", "GRL", "GDL"])
+add_tsim(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = b2.register_module('RootOutput')

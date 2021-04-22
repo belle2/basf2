@@ -53,7 +53,9 @@ namespace Belle2 {
                              const std::string& Phase = "Phase",
                              bool algFromDB = true,
                              const std::string& algFilePath = "ftd.alg",
-                             int debugLevel = 0);
+                             int debugLevel = 0,
+                             double timquality_threshold_sfin = 0,
+                             double timquality_threshold_fine = 0);
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -69,7 +71,9 @@ namespace Belle2 {
            const std::string& Phase,
            bool algFromDB = true,
            const std::string& algFilePath = "ftd.alg",
-           int debugLevel = 0);
+           int debugLevel = 0,
+           double timquality_threshold_sfin = 0,
+           double timquality_threshold_fine = 0);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -256,6 +260,12 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
     DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
     DBObjPtr<TRGGDLDBAlgs> db_algs;
+
+    /// Threshold to determine timing quality flag with MC truth: super fine
+    double _timquality_threshold_sfin;
+
+    /// Threshold to determine timing quality flag with MC truth: fine
+    double _timquality_threshold_fine;
 
     ///
     std::vector<bool> _inpBits;

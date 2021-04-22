@@ -227,7 +227,7 @@ results.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/059_vertex_fitting.py
-         :emphasize-lines: 11, 62-63, 85-86, 114, 128
+         :emphasize-lines: 11, 61-62, 84-85, 113, 127
          :linenos:
 
 You can now plot some relevant vertex variables. In general, the choice would
@@ -304,7 +304,7 @@ As an exercise we will focus on the first two.
       ``TreeFitter`` to fit complex trees.
     * Use ``TagV`` to reconstruct a vertex from the ROE.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

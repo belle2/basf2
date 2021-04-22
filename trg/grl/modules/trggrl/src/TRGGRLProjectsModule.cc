@@ -185,7 +185,7 @@ void TRGGRLProjectsModule::initialize()
 void
 TRGGRLProjectsModule::beginRun()
 {
-  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
+  B2DEBUG(20, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -889,7 +889,14 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "nimin1") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
 
+    //other trigger bits
+    else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "f2f30") {bit = false;}
+    else if (bitname == "s2f30") {bit = false;}
+    else if (bitname == "s2s30") {bit = false;}
 
+    //DITTO: please don't change the WARNING message below.
+    //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
     else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
@@ -900,7 +907,7 @@ void TRGGRLProjectsModule::event()
 void
 TRGGRLProjectsModule::endRun()
 {
-  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
+  B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

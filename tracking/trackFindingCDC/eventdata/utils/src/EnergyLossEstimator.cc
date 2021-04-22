@@ -16,6 +16,7 @@
 #include <geometry/GeometryManager.h>
 
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include "G4ThreeVector.hh"
@@ -84,19 +85,19 @@ EnergyLossEstimator EnergyLossEstimator::forCDC()
 
 double EnergyLossEstimator::getMass(int pdgCode)
 {
-  if (std::abs(pdgCode) == 11) {
+  if (std::abs(pdgCode) == Const::electron.getPDGCode()) {
     const double electronMass = 0.511 * Unit::MeV;
     return electronMass;
-  } else if (std::abs(pdgCode) == 13) {
-    const double muonMass = 195.658 * Unit::MeV;
+  } else if (std::abs(pdgCode) == Const::muon.getPDGCode()) {
+    const double muonMass = 105.658 * Unit::MeV;
     return muonMass;
-  } else if (std::abs(pdgCode) == 321) {
+  } else if (std::abs(pdgCode) == Const::kaon.getPDGCode()) {
     const double kaonMass = 0.493677;
     return kaonMass;
-  } else if (std::abs(pdgCode) == 211) {
+  } else if (std::abs(pdgCode) == Const::pion.getPDGCode()) {
     const double pionMass = 0.13957;
     return pionMass;
-  } else if (std::abs(pdgCode) == 2212) {
+  } else if (std::abs(pdgCode) == Const::proton.getPDGCode()) {
     const double protonMass = 0.938272;
     return protonMass;
   }
@@ -105,15 +106,15 @@ double EnergyLossEstimator::getMass(int pdgCode)
 
 int EnergyLossEstimator::getCharge(int pdgCode)
 {
-  if (std::abs(pdgCode) == 11) {
+  if (std::abs(pdgCode) == Const::electron.getPDGCode()) {
     return -sign(pdgCode);
-  } else if (std::abs(pdgCode) == 13) {
+  } else if (std::abs(pdgCode) == Const::muon.getPDGCode()) {
     return -sign(pdgCode);
-  } else if (std::abs(pdgCode) == 321) {
+  } else if (std::abs(pdgCode) == Const::kaon.getPDGCode()) {
     return sign(pdgCode);
-  } else if (std::abs(pdgCode) == 211) {
+  } else if (std::abs(pdgCode) == Const::pion.getPDGCode()) {
     return sign(pdgCode);
-  } else if (std::abs(pdgCode) == 2212) {
+  } else if (std::abs(pdgCode) == Const::proton.getPDGCode()) {
     return sign(pdgCode);
   }
   return 0;

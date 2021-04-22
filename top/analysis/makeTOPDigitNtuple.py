@@ -83,10 +83,10 @@ if calCh < 0 or calCh > 7:
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
     outputRoot = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+", inputFile):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics|hlttest)\.[0-9]+\.[0-9]+", inputFile):
     isGlobalDAQ = True
     outputRoot = re.search(
-        r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+",
+        r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics|hlttest)\.[0-9]+\.[0-9]+",
         inputFile).group() + "_ntuple.root"
 else:
     outputRoot = inputFile + "_ntuple.root"

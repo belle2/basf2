@@ -14,9 +14,13 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDChargeSimulationCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
 
@@ -24,6 +28,7 @@
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
+#include <root/TH2F.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -120,7 +125,7 @@ namespace Belle2 {
       double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
-      /** Whether or not to apply poisson fluctuation of charge */
+      /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
       bool  m_applyNoise = false;
@@ -134,10 +139,12 @@ namespace Belle2 {
       double m_noiseFraction = 0.01;
 
       // 4. Timing
+      /** Hardware Clocks*/
+      DBObjPtr<HardwareClockSettings> m_hwClock;
       /** Shaping time of the APV25 shapers.*/
       double m_shapingTime = 250.0;
-      /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 16000. / 509.;
+      /** Interval between two waveform samples, by default taken from HardwareClockSettings */
+      double m_samplingTime = -1;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -151,12 +158,19 @@ namespace Belle2 {
        * This is what gets randomized if m_randomizeEventTimes is true.
        */
       float m_currentEventTime = 0.0;
+      /** number of digitized samples
+       * read from SVDEventInfo
+       */
+      int m_nAPV25Samples = 6;
 
-
-      /** Time window start.
+      /** Time window start, excluding trigger bin effect.
+       * This is the parameter used to tune the latency wrt L1 trigger.
+       */
+      double m_startSampling = -2;
+      /** Time window start, including the triggerBin effect.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
-      double m_startSampling = -2.0;
+      double m_initTime = 0;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
@@ -189,32 +203,16 @@ namespace Belle2 {
       double m_depletionVoltage = 40;
       /** The bias voltage on the sensor */
       double m_biasVoltage = 100;
-      /** The backplane capacitanceU wrt. the strips. */
-      double m_backplaneCapacitanceU = 0.1; //pF/cm
-      /** The interstrip capacitanceU for the sensor. */
-      double m_interstripCapacitanceU = 0.7; //pF/cm
-      /** The coupling capacitanceU for the sensor. */
-      double m_couplingCapacitanceU = 15; //pF/cm
-      /** The backplane capacitanceV wrt. the strips. */
-      double m_backplaneCapacitanceV = 0.4; //pF/cm
-      /** The interstrip capacitanceV for the sensor. */
-      double m_interstripCapacitanceV = 0.7; //pF/cm
-      /** The coupling capacitanceV for the sensor. */
-      double m_couplingCapacitanceV = 30; //pF/cm
-      /** ADU equivalent charge for u-strips. */
-      //      double m_aduEquivalentU;
-      /** ADU equivalent charge for v-strips. */
-      //      double m_aduEquivalentV;
-      /** Electronic noise for u-strips. */
-      double m_elNoiseU = 500; //e-
-      /** Electronic noise for v-strips. */
-      double m_elNoiseV = 500; //e-
 
-      //run-dependent MC payloads:
+      // run-dependent MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
       std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
+
+      SVDChargeSimulationCalibrations m_ChargeSimCal; /**<SVDChargeSimulationCalibrations calibrations db object*/
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
@@ -240,6 +238,10 @@ namespace Belle2 {
       TH1D*  m_histDriftTime_e = nullptr;
       /** Histogram showing the drift time of h. */
       TH1D*  m_histDriftTime_h = nullptr;
+      /** Histogram showing the hit time. */
+      TH1D*  m_histHitTime = nullptr;
+      /** Histogram showing the hit time vs TB. */
+      TH2F*  m_histHitTimeTB = nullptr;
 
       /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u = nullptr;

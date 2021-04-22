@@ -48,7 +48,7 @@ class Histogrammer(b2.Module):
 
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
-            quality = digit.getHitQuality()
+            # quality = digit.getHitQuality()
             slotID = digit.getModuleID()
             hwchan = digit.getChannel()
             self.hist[slotID - 1].Fill(digit.getPulseHeight(), digit.getPulseWidth())

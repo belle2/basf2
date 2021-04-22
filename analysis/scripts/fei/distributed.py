@@ -367,7 +367,6 @@ if __name__ == '__main__':
             raise RuntimeError(f'Unknown skip parameter {args.skip}')
 
         if start == 7:
-            import sys
             create_report(args)
             sys.exit(0)
 

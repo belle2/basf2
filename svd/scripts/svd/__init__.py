@@ -2,17 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-from ROOT import Belle2
 import sys
 
 
-def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False):
+def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, applyMasking=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
-        recoDigitsName = '__ROIsvdRecoDigits'
+        # recoDigitsName = '__ROIsvdRecoDigits'
         clustersName = '__ROIsvdClusters'
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
@@ -20,10 +19,25 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Fal
         clusterizerName = 'SVDClusterizer'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
-        recoDigitsName = ""
+        # recoDigitsName = ""
         clustersName = ""
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
+
+        # mask HotStrips from SVDHotStripsCalibration payloads
+    if(applyMasking):
+        if(isROIsimulation):
+            shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
+            maskingName = '__ROISVDStripMasking'
+        else:
+            shaperDigitsName = 'SVDShaperDigitsUnmasked'
+            maskingName = 'SVDStripMasking'
+
+        if maskingName not in [e.name() for e in path.modules()]:
+            masking = b2.register_module('SVDStripMasking')
+            masking.set_name(maskingName)
+            masking.param('ShaperDigitsUnmasked', shaperDigitsName)
+            path.add_module(masking)
 
     # data format check NOT appended
     if dataFormatName not in [e.name() for e in path.modules()]:
@@ -33,6 +47,7 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Fal
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = b2.register_module('SVDClusterizer')
         clusterizer.set_name(clusterizerName)
+        clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
         clusterizer.param('timeAlgorithm6Samples', "CoG6")
         clusterizer.param('timeAlgorithm3Samples', "CoG6")
@@ -58,13 +73,14 @@ def add_new_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=Fal
     if createRecoDigits and not isROIsimulation:
         # Add SVDRecoDigit creator module if not ROI simulation
         # useful for SVD performance studies
-        add_svd_create_recodigits(path, recocreatorName)
+        add_svd_create_recodigits(path, recocreatorName, shaperDigitsName)
 
 
-def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator"):
+def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shaperDigitsName=""):
 
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
+        recoDigitCreator.param('ShaperDigits', shaperDigitsName)
         recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
         recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
         recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
@@ -73,11 +89,11 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator"):
         path.add_module(recoDigitCreator)
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
+def add_rel5_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
-        add_svd_reconstruction_tb(path, isROIsimulation)
+        add_svd_reconstruction_CoG(path, isROIsimulation)
     elif(useNN):
         add_svd_reconstruction_nn(path, isROIsimulation)
 
@@ -141,7 +157,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
-# add strip masking if needed
+        # add strip masking if needed
     if(applyMasking):
         if(isROIsimulation):
             shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
@@ -181,43 +197,6 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
-
-
-def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
-
-    if direct:
-        if(isROIsimulation):
-            clusterizerName = '__ROISVDClusterizerDirect'
-            clusterName = '__ROIsvdClusters'
-        else:
-            clusterizerName = 'SVDClusterizerDirect'
-            clusterName = ""
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDClusterizerDirect')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-    else:
-        if(isROIsimulation):
-            fitterName = '__ROISVDNNShapeReconstructor'
-            clusterizerName = '__ROISVDNNClusterizer'
-            clusterName = '__ROIsvdClusters'
-        else:
-            fitterName = 'SVDNNShapeReconstructor'
-            clusterizerName = 'SVDNNClusterizer'
-            clusterName = ''
-
-        if fitterName not in [e.name() for e in path.modules()]:
-            fitter = b2.register_module('SVDNNShapeReconstructor')
-            fitter.set_name(fitterName)
-            path.add_module(fitter)
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDNNClusterizer')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
 
 
 def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):

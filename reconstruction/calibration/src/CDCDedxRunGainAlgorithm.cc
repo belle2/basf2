@@ -28,9 +28,10 @@ CDCDedxRunGainAlgorithm::CDCDedxRunGainAlgorithm() :
   isMergePayload(true),
   fsrun(""),
   fSigLim(2.5),
-  fdEdxBins(500),
+  fdEdxBins(1000),
   fdEdxMin(0.0),
-  fdEdxMax(2.5)
+  fdEdxMax(5.0),
+  fAdjust(1.00)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx run gains");
@@ -99,7 +100,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   double RGrel_Mean = 1.0, RGrel_MeanErr = -99.0, RGrel_Sigma = -99.0;
   FitGaussianWRange(hDedx, status);
   if (status != "FitOK") {
-    RGrel_Mean = 1.0; //No cal result and setting manually to 1.0
+    RGrel_Mean = hDedx->GetMean(); //mean for hist for fit failure
     hDedx->SetTitle(Form("dE/dx abs, Run %s (%s)", fsrun.Data(), status.Data()));
   } else {
     RGrel_Mean = hDedx->GetFunction("gaus")->GetParameter(1);
@@ -175,9 +176,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 void CDCDedxRunGainAlgorithm::generateNewPayloads(double RGrel_Mean, double ExistingRG)
 {
   if (isMergePayload) {
-    B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RGrel_Mean << ", Merged (saved) = " << RGrel_Mean *
-           ExistingRG);
+    B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RGrel_Mean << ", Adjustment = " << fAdjust <<
+           ", Merged (saved) = " << RGrel_Mean *
+           ExistingRG * fAdjust);
     RGrel_Mean *= ExistingRG;
+    RGrel_Mean *= fAdjust; //default is 1.0
   } else {
     B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative (saved) = " << RGrel_Mean);
   }
@@ -189,8 +192,12 @@ void CDCDedxRunGainAlgorithm::generateNewPayloads(double RGrel_Mean, double Exis
 
 void CDCDedxRunGainAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
-  temphist->GetXaxis()->SetRange(temphist->FindFirstBinAbove(0, 1), temphist->FindLastBinAbove(0, 1));
-  int fs = temphist->Fit("gaus", "QR");
+
+  double histmean = temphist->GetMean();
+  double histrms = temphist->GetRMS();
+  temphist->GetXaxis()->SetRangeUser(histmean - 5.0 * histrms, histmean + 5.0 * histrms);
+
+  int fs = temphist->Fit("gaus", "Q0");
   if (fs != 0) {
     B2INFO(Form("\tFit (round 1) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
     status = "FitFailed";

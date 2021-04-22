@@ -15,13 +15,18 @@ from skimExpertFunctions import CombinedSkim
     from {{ module }} import {{ ", ".join(ModuleSkims) }}
 {% endfor %}
 path = b2.Path()
-{% if skims|length == 1 -%}
+{% if skims|length == 1 and not mdstOutput -%}
     skim = {{ skims[0] }}(){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
         {{ skim|indent(4, True) }}(),
     {% endfor -%}
+    {%- if mdstOutput -%}
+    {{ "    " }}udstOutput=False,
+    mdstOutput=True,
+    mdst_kwargs=dict(),
+    {% endif -%}
     )
 {% endif %}
 ma.inputMdstList("default", skim.TestFiles, path=path)
@@ -30,20 +35,24 @@ skim(path)
 {%- if hints %}
 
 # The skim list names are contained in the Python list skim.SkimLists.
-# The attribute skim.flag is a variable indicating whether an event passed the skim.
 #
 # Add all subsequent modules to skim.postskim_path, but call b2.process on
-# the main path. For example...
+# the main path. For example:
 #
 #     ma.variablesToNtuple(
 #         skim.SkimLists[0],
 #         ["pt", "E"],
 #         path=skim.postskim_path
 #     )
+#
+# The one exception to this is the attribute skim.flag, which is an event-level variable
+# indicating whether an event passed the skim. This variable is available for all events
+# on the main path (`path` in this steering file). For example:
+#
+#     ma.variablesToNtuple("", {% if skims|length == 1 %}[skim.flag]{% else %}skim.flags{% endif %}, path=path)
 {%- endif %}
 
 b2.process(path)
 {%- if stats %}
 print(b2.statistics)
 {%- endif %}
-

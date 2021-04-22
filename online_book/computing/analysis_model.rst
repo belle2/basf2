@@ -3,4 +3,4 @@
 Analysis model
 ==============
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

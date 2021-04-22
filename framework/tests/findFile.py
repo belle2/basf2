@@ -43,11 +43,13 @@ assert len(testdir) > 0
 # paths relative to PWD are also ok (no, prefixing this with / is not allowed)
 os.chdir(testdir)
 assert abspath == rl(find_file('findFile.py'))
+assert abspath == rl(find_file('./findFile.py'))
 
 # try finding relative to basf2 dir again (from different location)
 os.chdir('/')
 assert abspath == rl(find_file('framework/tests/findFile.py'))
 assert abspath == rl(find_file('/framework/tests/findFile.py'))
+assert abspath == rl(find_file('./framework/tests/findFile.py'))
 
 # set BELLe2_TEST_DATA_DIR and try to find data file
 os.environ['BELLE2_TEST_DATA_DIR'] = os.environ.get('BELLE2_RELEASE_DIR', os.environ.get('BELLE2_LOCAL_DIR'))

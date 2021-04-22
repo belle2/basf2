@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# @cond SUPPRESS_DOXYGEN
+
 """
 <header>
 <output>validationTestEmptyRootFile.root</output>
@@ -18,5 +20,9 @@ from ROOT import TFile
 
 VALIDATION_OUTPUT_FILE = 'validationTestEmptyRootFile.root'
 
-tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-tfile.Close()
+
+if __name__ == "__main__":
+    tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
+    tfile.Close()
+
+# @endcond

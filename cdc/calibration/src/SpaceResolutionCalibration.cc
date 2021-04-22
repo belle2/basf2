@@ -220,6 +220,8 @@ void SpaceResolutionCalibration::createHisto()
             m_fitflag[il][lr][al][th] = -1;
             continue;
           }
+          //clean up container before adding new values
+          xl.clear(); dxl.clear(); dxl0.clear(); sigma.clear(); dsigma.clear(); s2.clear(); ds2.clear();
           for (Int_t j = 1; j < hu_s[il][lr][al][th]->GetNbinsX(); j++) {
             if (hu_s[il][lr][al][th]->GetBinContent(j) == 0) continue;
             if (hb_s[il][lr][al][th]->GetBinContent(j) == 0) continue;
@@ -242,7 +244,7 @@ void SpaceResolutionCalibration::createHisto()
             ds2.push_back(2 * s_int * ds_int);
           }
 
-          if (xl.size() < 8 || xl.size() > Max_np) {
+          if (xl.size() < 7 || xl.size() > Max_np) {
             m_fitflag[il][lr][al][th] = -1;
             B2WARNING("number of element might out of range"); continue;
           }
@@ -266,7 +268,7 @@ void SpaceResolutionCalibration::createHisto()
           gfit[il][lr][al][th]->SetTitle(Form("L%d-lr%d | #alpha = %3.0f | #theta = %3.0f ", il, lr, ialpha[al], itheta[th]));
           gfit[il][lr][al][th]->SetName(Form("sigma2_lay%d_lr%d_al%d_th%d", il, lr, al, th));
 
-          xl.clear(); dxl.clear(); dxl0.clear(); sigma.clear(); dsigma.clear(); s2.clear(); ds2.clear();
+
           gDirectory->Delete("hu_%d_%d_%d_%d_0");
         }
       }

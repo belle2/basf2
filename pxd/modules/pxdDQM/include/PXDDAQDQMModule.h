@@ -85,12 +85,16 @@ namespace Belle2 {
       TH1I* hMissTrgDiff{};          /**< Histogram MissFrame after  last trigger */
       TH1D* hDAQStat{};                 /**< Histogram for Truncation etc Stats */
 
+      /** Initialize */
       void initialize() override final;
 
+      /** Begin run */
       void beginRun() override final;
 
+      /** Event */
       void event() override final;
 
+      /** Define histograms */
       void defineHisto() override final;
 
       /** vector of errors */

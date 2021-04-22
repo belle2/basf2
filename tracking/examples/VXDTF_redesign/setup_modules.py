@@ -305,7 +305,7 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('useMCInfo', True)
     # sptcReferee.logging.log_level = LogLevel.DEBUG
 
-    if path is 0:
+    if path == 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]
     else:
         path.add_module(sp2thConnector)
@@ -432,7 +432,7 @@ def setup_sim(path=0, useEDeposit=True, useMultipleScattering=True, allowDecay=T
     g4sim.param('UICommandsAtIdle', uiCommandList)
 
     # print(uiCommandList)
-    if (path is 0):
+    if (path == 0):
         return g4sim
     else:
         path.add_module(g4sim)

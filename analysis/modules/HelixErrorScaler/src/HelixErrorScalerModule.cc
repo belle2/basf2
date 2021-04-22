@@ -35,14 +35,16 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0)
   setDescription(R"DOC("scale the error of helix parameters
 
     Creates a new charged particle list whose helix errors are scaled by constant factors.
-    Lower bounds can be defined for the helix errors.
+    Parameters (a, b) can be set to define impact parameter resolution,
+    which limits d0 and z0 errors so that they do not shrink below the resolution.
      )DOC");
 
   // Parameter definitions
   addParam("inputListName", m_inputListName, "The name of input charged particle list", std::string(""));
   addParam("outputListName", m_outputListName, "The name of output charged particle list", std::string(""));
   addParam("scaleFactors", m_scaleFactors, "vector of five scale factors for helix parameter errors", {1.0, 1.0, 1.0, 1.0, 1.0});
-  addParam("minErrors", m_minErrors, "vector of five scale lower bounds for helix parameter errors", {0.0, 0.0, 0.0, 0.0, 0.0});
+  addParam("d0ResolutionParameters", m_d0ResolPars, "d0 resolution parameters", {0.0, 0.0});
+  addParam("z0ResolutionParameters", m_z0ResolPars, "z0 resolution parameters", {0.0, 0.0});
 
 }
 
@@ -92,8 +94,7 @@ void HelixErrorScalerModule::event()
   const unsigned int nPar = m_inputparticleList->getListSize();
   for (unsigned i = 0; i < nPar; i++) {
     const Particle* charged = m_inputparticleList->getParticle(i);
-    const TrackFitResult* trkfit = charged->getTrackFitResult();
-    TrackFitResult* new_trkfit = getTrackFitResultWithScaledError(trkfit);
+    TrackFitResult* new_trkfit = getTrackFitResultWithScaledError(charged);
 
     Const::ChargedStable chargedtype(abs(charged->getPDGCode()));
 
@@ -110,8 +111,9 @@ void HelixErrorScalerModule::event()
   } // loop over the charged particles
 }
 
-TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const TrackFitResult* trkfit)
+TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const Particle* particle)
 {
+  const TrackFitResult* trkfit = particle->getTrackFitResult();
   const std::vector<float>  helix  = trkfit->getTau();
   const std::vector<float>  cov5   = trkfit->getCov();
   const Const::ParticleType ptype  = trkfit->getParticleType();
@@ -120,15 +122,22 @@ TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const T
   const ULong64_t           hitVXD = trkfit->getHitPatternVXD().getInteger();
   const int                 ndf    = trkfit->getNDF();
 
-  std::vector<float> scaleFactors;
-  for (unsigned int j = 0; j < 5; j++) {
-    if (m_minErrors[j] == 0.0) {
-      scaleFactors.push_back(m_scaleFactors[j]);
-    } else {
-      float err = TMath::Sqrt(trkfit->getCovariance5()[j][j]);
-      scaleFactors.push_back(TMath::Max(m_minErrors[j] / err, m_scaleFactors[j]));
-    }
-  }
+  // d0, z0 resolution = a (+) b / pseudo-momentum
+  TVector3 p = particle->getMomentum();
+  double sinTheta = TMath::Sin(p.Theta());
+  double pD0 = p.Mag2() / (particle->getEnergy()) * TMath::Power(sinTheta, 1.5); // p*beta*sinTheta**1.5
+  double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5
+  double d0Resol = TMath::Sqrt(TMath::Power(m_d0ResolPars[0], 2) + TMath::Power(m_d0ResolPars[1] / pD0, 2));
+  double z0Resol = TMath::Sqrt(TMath::Power(m_z0ResolPars[0], 2) + TMath::Power(m_z0ResolPars[1] / pZ0, 2));
+  double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);
+  double z0Err = TMath::Sqrt(trkfit->getCovariance5()[3][3]);
+
+  double scaleFactors[5] = { TMath::Max(d0Resol / d0Err, m_scaleFactors[0]),
+                             m_scaleFactors[1],
+                             m_scaleFactors[2],
+                             TMath::Max(z0Resol / z0Err, m_scaleFactors[3]),
+                             m_scaleFactors[4]
+                           };
 
   std::vector<float> cov5_scaled;
   unsigned int counter = 0;

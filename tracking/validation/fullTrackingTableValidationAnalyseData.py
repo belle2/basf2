@@ -93,7 +93,6 @@ def write_value_cell(key, value):
 def make_html_row(x):
     keys = [key for key, _ in x.iteritems()]
     titles = [key[2] for key, _ in x.iteritems()]
-    values = [value for _, value in x.iteritems()]
 
     chunked_titles = make_chunks(titles, 2)
     common_prefixes = list(map(os.path.commonprefix, chunked_titles))

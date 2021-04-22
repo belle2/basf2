@@ -74,7 +74,7 @@ class MinModule(b2.Module):
                 momentum = momentumVec.Mag()
                 if momentum > 3.5:  # cut off
                     continue
-                theta = momentumVec.CosTheta()
+                # theta = momentumVec.CosTheta()
 
                 # particle to compare with pions
                 selectedpart = Belle2.Const.kaon

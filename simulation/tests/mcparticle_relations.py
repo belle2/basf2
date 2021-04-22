@@ -26,8 +26,8 @@ class TestModule(b2.Module):
         mcparticles = Belle2.PyStoreArray('MCParticles')
         # this will generate an index internally, checking consistency
         # (will die with a FATAL if something goes wrong)
-        from_relations = mcparticles[0].getRelationsFrom("ALL")
-        to_relations = mcparticles[0].getRelationsTo("ALL")
+        from_relations = mcparticles[0].getRelationsFrom("ALL")  # noqa
+        to_relations = mcparticles[0].getRelationsTo("ALL")  # noqa
 
 
 eventinfosetter = b2.register_module('EventInfoSetter')

@@ -30,6 +30,7 @@
 #include <TVector3.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -295,7 +296,7 @@ void SVDPerformanceTTreeModule::event()
               array<float, 6> Samples = ShaperDigit->getSamples();
 
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-              for (int k = 0; k < 6; k++) {m_svdStrip6Samples.push_back(Samples[k]);}
+              std::copy(std::begin(Samples), std::end(Samples), std::back_inserter(m_svdStrip6Samples));
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID());
               //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -365,7 +366,7 @@ void SVDPerformanceTTreeModule::event()
               SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
               array<float, 6> Samples = ShaperDigit->getSamples();
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-              for (int k = 0; k < 6; k++) { m_svdStrip6Samples.push_back(Samples[k]);}
+              std::copy(std::begin(Samples), std::end(Samples), std::back_inserter(m_svdStrip6Samples));
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID());
               //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)

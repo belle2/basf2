@@ -27,6 +27,7 @@
 #include <TDirectory.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -744,7 +745,7 @@ void OverlapResidualsModule::event()
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
                   array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
-                  for (int k = 0; k < 6; k++) {svdStrip6Samples_U_int.push_back(Samples_1[k]);}
+                  std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_U_int));
                   svdStripTime_U_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits_1[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -798,7 +799,7 @@ void OverlapResidualsModule::event()
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
                   array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
-                  for (int k = 0; k < 6; k++) {svdStrip6Samples_U_ext.push_back(Samples_2[k]);}
+                  std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_U_ext));
                   svdStripTime_U_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getUCellPosition(theRecoDigits_2[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -925,7 +926,7 @@ void OverlapResidualsModule::event()
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
                   array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
-                  for (int k = 0; k < 6; k++) {svdStrip6Samples_V_int.push_back(Samples_1[k]);}
+                  std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_V_int));
                   svdStripTime_V_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits_1[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -979,7 +980,7 @@ void OverlapResidualsModule::event()
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
                   array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
-                  for (int k = 0; k < 6; k++) {svdStrip6Samples_V_ext.push_back(Samples_2[k]);}
+                  std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_V_ext));
                   svdStripTime_V_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getVCellPosition(theRecoDigits_2[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)

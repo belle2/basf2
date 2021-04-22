@@ -45,11 +45,32 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
   addParam("relativeShift", m_relativeShift, "Relative shift between 3- and 6-sample events, in units of APV clock / 4", int(0));
+  addParam("useDB", m_useDB, "default = False. If true reads teh DAQMode from SVDDetectorConfiguration", bool(false));
+  addParam("TRGSummaryName", m_objTrgSummaryName, "TRGSummary name", m_objTrgSummaryName);
 
   // default ModeByte settings: 10 0 10 000 (144)
 }
 
 SVDEventInfoSetterModule::~SVDEventInfoSetterModule() = default;
+
+void SVDEventInfoSetterModule::beginRun()
+{
+  if (m_useDB) {
+    if (!m_svdConfig.isValid()) {
+      B2WARNING("No valid SVDDetectorConfiguration for the requested IoV, simulating a 6-sample event");
+      m_daqMode = 2; //6-sample event
+      m_relativeShift = 0; // not needed later in reconstruction
+    } else {
+      m_relativeShift = m_svdConfig.getRelativeTimeShift();
+      int nFrames = m_svdConfig.getNrFrames();
+      if (nFrames == 3) m_daqMode = 1;
+      else if (nFrames == 6) m_daqMode = 2;
+      else if (nFrames == 9) m_daqMode = 3;
+      else
+        B2ERROR("Invalid number of frames (" << nFrames << ") in SVDDetectorConfiguration");
+    }
+  }
+}
 
 void SVDEventInfoSetterModule::initialize()
 {
@@ -97,12 +118,21 @@ void SVDEventInfoSetterModule::event()
 
   if (m_daqMode == 1) nAPVsamples = 3;
   else if (m_daqMode == 3) {
-    if (m_triggerType == TRGSummary::ETimingType::TTYP_TOP or m_triggerType == TRGSummary::ETimingType::TTYP_ECL
-        or m_triggerType == TRGSummary::ETimingType::TTYP_PID1 or m_triggerType == TRGSummary::ETimingType::TTYP_PID2
-        or m_triggerType == TRGSummary::ETimingType::TTYP_PID3) nAPVsamples = 3;
+
+    StoreObjPtr<TRGSummary> storeTRGSummary(m_objTrgSummaryName);
+
+    if (storeTRGSummary.isValid()) {
+      int trgQuality = storeTRGSummary->getTimQuality();
+
+      if (trgQuality == TRGSummary::ETimingQuality::TTYQ_FINE or trgQuality == TRGSummary::ETimingQuality::TTYQ_SFIN)
+        nAPVsamples = 3;
+    } else B2DEBUG(25, "DAQMode = 3, but no valid TRGSummary! We simulate a 6-sample event");
   }
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);
+
+  if (nAPVsamples == 3)
+    B2DEBUG(25, " relativeShift = " << m_relativeShift);
 
 }
 

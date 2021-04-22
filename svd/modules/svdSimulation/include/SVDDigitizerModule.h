@@ -20,6 +20,7 @@
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
@@ -127,8 +128,6 @@ namespace Belle2 {
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
-      /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
       double m_SNAdjacent = 3.0;
       /** Round ZS cut to nearest ADU */
@@ -145,6 +144,15 @@ namespace Belle2 {
       double m_shapingTime = 250.0;
       /** Interval between two waveform samples, by default taken from HardwareClockSettings */
       double m_samplingTime = -1;
+      /** Time window start, excluding trigger bin effect.
+       * This is the parameter used to tune the latency wrt L1 trigger.
+       */
+      double m_startSampling = -2;
+      /** Time window start, including the triggerBin effect.
+       * Starting from this time, signal samples are taken in samplingTime intervals.
+       */
+      double m_initTime = 0;
+
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -158,27 +166,21 @@ namespace Belle2 {
        * This is what gets randomized if m_randomizeEventTimes is true.
        */
       float m_currentEventTime = 0.0;
-      /** number of digitized samples
-       * read from SVDEventInfo
-       */
+
+      // 5. 3-mixed-6 and 3-sample daqMode
+      /** True if the event should be simulated with 3 sample */
+      bool m_is3sampleEvent = false;
+      /** number of digitized samples read from SVDEventInfo */
       int m_nAPV25Samples = 6;
 
-      /** Time window start, excluding trigger bin effect.
-       * This is the parameter used to tune the latency wrt L1 trigger.
-       */
-      double m_startSampling = -2;
-      /** Time window start, including the triggerBin effect.
-       * Starting from this time, signal samples are taken in samplingTime intervals.
-       */
-      double m_initTime = 0;
-
-      // 5. Reporting
+      // 6. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms = false;
       /** Name of the tab-delimited listing of signals */
       std::string m_signalsList = "";
+
 
       // Other data members:
 
@@ -199,12 +201,16 @@ namespace Belle2 {
       double m_currentTime = 0;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness = 0.03;
-      /** The depletion voltage of the Silicon sensor */
-      double m_depletionVoltage = 40;
-      /** The bias voltage on the sensor */
-      double m_biasVoltage = 100;
 
-      // run-dependent MC payloads:
+      /** relative shift in SVDEventInfo obj */
+      int m_relativeShift = 0;
+      /** Starting sample for the selection of 3 samples in 3-mixed-6 */
+      int m_startingSample = 0;
+
+      /** return the starting sample */
+      int getFirstSample(int triggerBin, int relativShift);
+
+      //payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/

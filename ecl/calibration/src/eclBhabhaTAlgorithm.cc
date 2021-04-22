@@ -96,6 +96,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev__cid(new TH1F("TsNew_MINUS_TsCustomPrev__cid",
                                                           ";cell id; ts(new|bhabha) - ts(old = 'before 1st iter'|merged)  [ns]",
                                                           8736, 1, 8736 + 1));
+  unique_ptr<TH1F> tsNew_MINUS_tsOldBhabha__cid(new TH1F("TsNew_MINUS_TsOldBhabha__cid",
+                                                         ";cell id; ts(new|bhabha) - ts(previous iteration|bhabha)  [ns]", 8736,
+                                                         1, 8736 + 1));
+
 
   // Histogram of the new time constant values minus values from previous iteration
   unique_ptr<TH1F> tsNew_MINUS_tsOld(new TH1F("TsNew_MINUS_TsOld",
@@ -107,6 +111,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev(new TH1F("TsNew_MINUS_TsCustomPrev",
                                                      ";ts(new | bhabha) - ts(old = 'before 1st iter' | merged)  [ns];Number of crystals",
                                                      285, -69.5801, 69.5801));
+  unique_ptr<TH1F> tsNew_MINUS_tsOldBhabha(new TH1F("TsNew_MINUS_TsOldBhabha",
+                                                    ";ts(new | bhabha) - ts(previous iteration | bhabha)  [ns];Number of crystals",
+                                                    201, -10.05, 10.05));
 
 
 
@@ -205,9 +212,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   //------------------------------------------------------------------------
   //..Read payloads from database
+  B2INFO("Reading payloads: ECLCrystalTimeOffset and ECLCrateTimeOffset");
   DBObjPtr<Belle2::ECLCrystalCalib> crystalTimeObject("ECLCrystalTimeOffset");
   DBObjPtr<Belle2::ECLCrystalCalib> crateTimeObject("ECLCrateTimeOffset");
-  B2INFO("Dumping payload");
 
   //..Get vectors of values from the payloads
   vector<float> currentValuesCrys = crystalTimeObject->getCalibVector();
@@ -224,9 +231,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
   //..Read in the previous crystal payload values
-  DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
   vector<float> prevValuesCrys(8736);
   if (readPrevCrysPayload) {
+    DBObjPtr<Belle2::ECLCrystalCalib> customPrevCrystalTimeObject("ECLCrystalTimeOffsetPreviousValues");
     //..Get vectors of values from the payloads
     prevValuesCrys = customPrevCrystalTimeObject->getCalibVector();
 
@@ -235,6 +242,20 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     for (int ic = 0; ic < 8736; ic += 500) {
       B2INFO("ts custom previous payload: cellID " << ic + 1 << " " << prevValuesCrys[ic]);
     }
+  }
+
+
+  //..Read bhabha payloads from database
+  B2INFO("Reading payloads: ECLCrystalTimeOffsetBhabha");
+  DBObjPtr<Belle2::ECLCrystalCalib> crystalBhabhaTimeObject("ECLCrystalTimeOffsetBhabha");
+
+  //..Get vectors of values from the payloads
+  vector<float> currentBhabhaValuesCrys = crystalBhabhaTimeObject->getCalibVector();
+  vector<float> currentBhabhaUncCrys = crystalBhabhaTimeObject->getCalibUncVector();
+
+  //..Print out a few values for quality control
+  for (int ic = 0; ic < 8736; ic += 500) {
+    B2INFO("ts bhabha: cellID " << ic + 1 << " " << currentBhabhaValuesCrys[ic] << " +/- " << currentBhabhaUncCrys[ic]);
   }
 
 
@@ -642,15 +663,31 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
       // Fill histograms with the difference in the ts values between iterations
       double tsDiff_ns = (t_offsets[crys_id - 1] - t_offsets_prev[crys_id - 1]) * TICKS_TO_NS;
+      double tsDiffBhabha_ns = -999;
+      if (readPrevCrysPayload) {
+        tsDiffBhabha_ns = (t_offsets[crys_id - 1] - currentBhabhaValuesCrys[crys_id - 1]) * TICKS_TO_NS;
+      }
+
       B2INFO("Crystal " << crys_id << ": ts new bhabha - old merged = (" <<
              t_offsets[crys_id - 1]  << " - " << t_offsets_prev[crys_id - 1]  <<
              ") ticks * " << TICKS_TO_NS << " ns/tick = " << tsDiff_ns << " ns");
+      B2INFO("Crystal " << crys_id << ": ts new bhabha - old bhabha = (" <<
+             t_offsets[crys_id - 1]  << " - " << currentBhabhaValuesCrys[crys_id - 1]  <<
+             ") ticks * " << TICKS_TO_NS << " ns/tick = " << tsDiffBhabha_ns << " ns");
+
       tsNew_MINUS_tsOld__cid->SetBinContent(crys_id, tsDiff_ns);
       tsNew_MINUS_tsOld__cid->SetBinError(crys_id, 0);
       tsNew_MINUS_tsOld__cid->ResetStats();
 
       tsNew_MINUS_tsOld->Fill(tsDiff_ns);
-      tsNew_MINUS_tsOld->ResetStats();
+
+
+      tsNew_MINUS_tsOldBhabha__cid->SetBinContent(crys_id, tsDiffBhabha_ns);
+      tsNew_MINUS_tsOldBhabha__cid->SetBinError(crys_id, 0);
+      tsNew_MINUS_tsOldBhabha__cid->ResetStats();
+
+      tsNew_MINUS_tsOldBhabha->Fill(tsDiffBhabha_ns);
+
 
 
       /* Fill histograms with the difference in the ts values from this iteration
@@ -667,7 +704,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       tsNew_MINUS_tsCustomPrev__cid->ResetStats();
 
       tsNew_MINUS_tsCustomPrev->Fill(tsDiffCustomOld_ns);
-      tsNew_MINUS_tsCustomPrev->ResetStats();
 
     }
 
@@ -677,22 +713,32 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     histfile->WriteTObject(tsNew_MINUS_tsCustomPrev__cid.get(), "tsNew_MINUS_tsCustomPrev__cid");
     histfile->WriteTObject(tsNew_MINUS_tsCustomPrev.get(), "tsNew_MINUS_tsCustomPrev");
+
+    histfile->WriteTObject(tsNew_MINUS_tsOldBhabha__cid.get(), "tsNew_MINUS_tsOldBhabha__cid");
+    histfile->WriteTObject(tsNew_MINUS_tsOldBhabha.get(), "tsNew_MINUS_tsOldBhabha");
   }
 
 
-  //..Store previous crystal calibration constants to payload under a different
-  // name so that they can be read in for comparison later.  This is a temporary
-  // payload that is only used for plotting purposes while running the calibration
+  //..Store previous crystal calibration constants to payload under different
+  // names so that they can be read in for comparison later.  These are temporary
+  // payloads that are only used for plotting purposes while running the calibration
   // and does not need to be added to any global tag.
   if (savePrevCrysPayload) {
-    ECLCrystalCalib* BhabhaTCalib_prev = new ECLCrystalCalib();
-    BhabhaTCalib_prev->setCalibVector(currentValuesCrys, currentUncCrys);
+    ECLCrystalCalib* crysTCalib_prev = new ECLCrystalCalib();
+    crysTCalib_prev->setCalibVector(currentValuesCrys, currentUncCrys);
+
+    ECLCrystalCalib* crysBhabhaTCalib_prev = new ECLCrystalCalib();
+    crysBhabhaTCalib_prev->setCalibVector(currentBhabhaValuesCrys, currentBhabhaUncCrys);
+
 
     // Save the information to the payload if there is at least one crystal
     //    begin calibrated.
     if (cellIDLo <= cellIDHi) {
-      saveCalibration(BhabhaTCalib_prev, "ECLCrystalTimeOffsetPreviousValues");
-      B2INFO("Previous crystal payload made");
+      saveCalibration(crysTCalib_prev, "ECLCrystalTimeOffsetPreviousValues");
+      B2INFO("Previous overall crystal payload made");
+
+      saveCalibration(crysBhabhaTCalib_prev, "ECLCrystalTimeOffsetBhabhaPreviousValues");
+      B2INFO("Previous bhabha crystal payload made");
     }
   }
 
@@ -932,7 +978,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       tcrateNew_MINUS_tcrateOld__crateID->ResetStats();
 
       tcrateNew_MINUS_tcrateOld->Fill(tCrateDiff_ns);
-      tcrateNew_MINUS_tcrateOld->ResetStats();
     }
 
     // Save the histograms to the output root file

@@ -54,7 +54,7 @@ eclHadronTimeCalibrationValidationCollectorModule::eclHadronTimeCalibrationValid
   setDescription("This module validates the ECL cluster times");
 
   addParam("timeAbsMax", m_timeAbsMax, // (Time in ns)
-           "Events with abs(getTimeFit) > m_timeAbsMax "
+           "Events with fabs(getTimeFit) > m_timeAbsMax "
            "are excluded", (short)80);
 
   addParam("saveTree", m_saveTree,
@@ -169,6 +169,12 @@ void eclHadronTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("eventT0", eventT0) ;
 
 
+  auto clusterTimeE0E1diff = new TH1F("clusterTimeE0E1diff",
+                                      ";ECL cluster time of max E photon - ECL cluster time of 2nd max E photon [ns]; number of photon ECL cluster time differences",
+                                      nbins, min_t, max_t) ;
+  registerObject<TH1F>("clusterTimeE0E1diff", clusterTimeE0E1diff) ;
+
+
   //=== Required data objects
   tracks.isRequired() ;
   m_eclClusterArray.isRequired() ;
@@ -247,10 +253,10 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
     /* Test if loose track  */
 
     // d0 and z0 cuts
-    if (abs(d0) > m_looseTrkD0) {
+    if (fabs(d0) > m_looseTrkD0) {
       continue;
     }
-    if (abs(z0) > m_looseTrkZ0) {
+    if (fabs(z0) > m_looseTrkZ0) {
       continue;
     }
     // Number of hits in the CDC
@@ -268,10 +274,10 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
       continue;
     }
     // d0 and z0 cuts
-    if (abs(d0) > m_tightTrkD0) {
+    if (fabs(d0) > m_tightTrkD0) {
       continue;
     }
-    if (abs(z0) > m_tightTrkZ0) {
+    if (fabs(z0) > m_tightTrkZ0) {
       continue;
     }
     nTrkTight++;
@@ -411,6 +417,18 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // Fill the histogram for the event level variables
   getObjectPtr<TH1F>("eventT0")->Fill(evt_t0) ;
 
+  bool isCDCt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::CDC);
+  bool isECLt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::ECL);
+  string t0Detector = "UNKNOWN... WHY?";
+  if (isCDCt0) {
+    t0Detector = "CDC" ;
+  } else if (isECLt0) {
+    t0Detector = "ECL" ;
+  }
+
+  B2DEBUG(26, "t0 = " << evt_t0 << " ns.  t0 is from CDC?=" << isCDCt0 << ", t0 is from ECL?=" << isECLt0 << " t0 from " <<
+          t0Detector);
+
 
 
   //=== For each good photon cluster in the processed event and fill histogram.
@@ -443,6 +461,12 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
     }
   }
   B2DEBUG(26, "Filled cluster tree") ;
+
+  //=== Fill histogram for cluster time difference of the two max E photons
+  if (pair_energy_time.size() >= 2) {
+    getObjectPtr<TH1F>("clusterTimeE0E1diff")->Fill(pair_energy_time[0].second - pair_energy_time[1].second) ;
+  }
+
 
 
   if (m_saveTree) {

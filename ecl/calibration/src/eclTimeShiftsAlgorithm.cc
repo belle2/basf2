@@ -710,7 +710,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
       g_crateCrystalTime_vs_runCounter->SetName(tgraph_name_short.c_str()) ;
       g_crateCrystalTime_vs_runCounter->SetTitle(tgraph_title.c_str()) ;
-      g_crateCrystalTime_vs_runCounter->GetXaxis()->SetTitle("Run number") ;
+      g_crateCrystalTime_vs_runCounter->GetXaxis()->SetTitle("Run counter (remove gaps from run numbers)") ;
       g_crateCrystalTime_vs_runCounter->GetYaxis()->SetTitle("Crate time + Crystal time + centring overall offset [ns]") ;
 
       g_crateCrystalTime_vs_runCounter->GetYaxis()->SetRangeUser(crysCrateShift_min, crysCrateShift_max) ;

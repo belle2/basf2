@@ -53,7 +53,7 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   setDescription("This module generates sum of all event times per crystal");
 
   addParam("timeAbsMax", m_timeAbsMax, // (Time in ns)
-           "Events with abs(getTimeFit) > m_timeAbsMax "
+           "Events with fabs(getTimeFit) > m_timeAbsMax "
            "are excluded", (short)80);
 
   addParam("minCrystal", m_minCrystal,
@@ -593,10 +593,10 @@ void ECLBhabhaTCollectorModule::collect()
     /* Test if loose track  */
 
     // d0 and z0 cuts
-    if (abs(d0) > m_looseTrkD0) {
+    if (fabs(d0) > m_looseTrkD0) {
       continue;
     }
-    if (abs(z0) > m_looseTrkZ0) {
+    if (fabs(z0) > m_looseTrkZ0) {
       continue;
     }
     // Number of hits in the CDC
@@ -616,10 +616,10 @@ void ECLBhabhaTCollectorModule::collect()
 
 
     // d0 and z0 cuts
-    if (abs(d0) > m_tightTrkD0) {
+    if (fabs(d0) > m_tightTrkD0) {
       continue;
     }
-    if (abs(z0) > m_tightTrkZ0) {
+    if (fabs(z0) > m_tightTrkZ0) {
       continue;
     }
     nTrkTight++;

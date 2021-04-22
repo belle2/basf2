@@ -13,25 +13,21 @@ from reconstruction import prepare_cdst_analysis
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-#: Tells the automated system some details of this script.
-#     Default is to read in "bhabha_all_calib" since we want to
-#     run over cdst bhabha_all_calib skim files.
-settings = CalibrationSettings(
-    name="ECL crate time calibrations",
-    expert_username="ehill",
-    description=__doc__,
-    input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib"],
-    input_data_filters={
-        "bhabha_all_calib": [
-            "bhabha_all_calib",
-            "4S",
-            "Continuum",
-            "Scan",
-            "Good",
-            "physics",
-            "On"]},
-    depends_on=[])
+#     Default is to read bhabha skim files.
+settings = CalibrationSettings(name="ECL crate time calibrations",
+                               expert_username="ehill",
+                               description=__doc__,
+                               input_data_formats=["cdst"],
+                               input_data_names=["bhabha_all_calib"],
+                               # input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
+                               #                                          input_data_filters["Beam Energy"]["4S"],
+                               #                                          input_data_filters["Beam Energy"]["Continuum"],
+                               #                                          input_data_filters["Beam Energy"]["Scan"],
+                               #                                          input_data_filters["Data Quality Tag"]["Good"],
+                               #                                          input_data_filters["Run Type"]["physics"],
+                               #                                          input_data_filters["Magnet"]["On"]]},
+                               depends_on=[])
+
 
 ##############################
 

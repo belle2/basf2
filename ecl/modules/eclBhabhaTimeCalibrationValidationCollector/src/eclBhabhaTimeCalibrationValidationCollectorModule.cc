@@ -67,7 +67,7 @@ eclBhabhaTimeCalibrationValidationCollectorModule::eclBhabhaTimeCalibrationValid
   setDescription("This module validates the ECL cluster times");
 
   addParam("timeAbsMax", m_timeAbsMax, // (Time in ns)
-           "Events with abs(getTimeFit) > m_timeAbsMax "
+           "Events with fabs(getTimeFit) > m_timeAbsMax "
            "are excluded", (short)80);
 
   addParam("saveTree", m_saveTree,
@@ -178,17 +178,20 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
 
   auto clusterTimeClusterE = new TH2F("clusterTimeClusterE",
                                       ";Electron cluster energy [GeV];Electron cluster time [ns]", N_E_BINS, energyBinEdges, nbins, min_t, max_t) ;
-  //";Electron cluster energy [GeV];Electron cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTimeClusterE", clusterTimeClusterE) ;
 
   auto dt99_clusterE = new TH2F("dt99_clusterE",
                                 ";Electron cluster energy [GeV];dt99 [ns]", N_E_BINS, energyBinEdges, nbins, 0, max_t) ;
-  //";Electron cluster energy [GeV];dt99 [ns]", 1600, 0, 8.0, nbins, 0, max_t) ;
   registerObject<TH2F>("dt99_clusterE", dt99_clusterE) ;
 
 
   auto eventT0 = new TH1F("eventT0", ";event t0 [ns]; number of events", nbins, min_t, max_t) ;
   registerObject<TH1F>("eventT0", eventT0) ;
+
+  auto clusterTimeE0E1diff = new TH1F("clusterTimeE0E1diff",
+                                      ";ECL cluster time of max E photon - ECL cluster time of 2nd max E photon [ns]; number of photon ECL cluster time differences",
+                                      nbins, min_t, max_t) ;
+  registerObject<TH1F>("clusterTimeE0E1diff", clusterTimeE0E1diff) ;
 
 
   //=== Required data objects
@@ -306,10 +309,10 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     /* Test if loose track  */
 
     // d0 and z0 cuts
-    if (abs(d0) > m_looseTrkD0) {
+    if (fabs(d0) > m_looseTrkD0) {
       continue;
     }
-    if (abs(z0) > m_looseTrkZ0) {
+    if (fabs(z0) > m_looseTrkZ0) {
       continue;
     }
     // Number of hits in the CDC
@@ -327,10 +330,10 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
       continue;
     }
     // d0 and z0 cuts
-    if (abs(d0) > m_tightTrkD0) {
+    if (fabs(d0) > m_tightTrkD0) {
       continue;
     }
-    if (abs(z0) > m_tightTrkZ0) {
+    if (fabs(z0) > m_tightTrkZ0) {
       continue;
     }
     nTrkTight++;
@@ -512,6 +515,18 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // Fill the histogram for the event level variables
   getObjectPtr<TH1F>("eventT0")->Fill(evt_t0) ;
 
+  bool isCDCt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::CDC);
+  bool isECLt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::ECL);
+  string t0Detector = "UNKNOWN... WHY?";
+  if (isCDCt0) {
+    t0Detector = "CDC" ;
+  } else if (isECLt0) {
+    t0Detector = "ECL" ;
+  }
+
+  B2DEBUG(26, "t0 = " << evt_t0 << " ns.  t0 is from CDC?=" << isCDCt0 << ", t0 is from ECL?=" << isECLt0 << " t0 from " <<
+          t0Detector);
+
 
   //=== For each good electron cluster in the processed event and fill histogram.
 
@@ -542,6 +557,17 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     }
   }
   B2DEBUG(26, "Filled cluster tree") ;
+
+  //=== Fill histogram for cluster time difference of the two electrons
+  double tDiff;
+  if (goodClustE[0] > goodClustE[1]) {
+    tDiff = goodClustTimes[0] - goodClustTimes[1];
+  } else {
+    tDiff = goodClustTimes[1] - goodClustTimes[0];
+  }
+
+  getObjectPtr<TH1F>("clusterTimeE0E1diff")->Fill(tDiff) ;
+
 
 
   if (m_saveTree) {

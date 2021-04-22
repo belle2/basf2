@@ -41,6 +41,8 @@ namespace Belle2 {
       double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
                                           less than meanCleanCutMinFactor times the maximum bin value.
                                           Expand mask and apply to non-rebinned histogram. */
+      double clusterTimesFractionWindow_maxtime;  /**< Maximum time for window to calculate cluster
+                                                       time fraction, in ns*/
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclTValidationAlgorithm.root by default */
       std::string debugFilenameBase;

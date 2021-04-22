@@ -3,6 +3,7 @@
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
@@ -18,7 +19,9 @@
 #include <TGaxis.h>
 #include <TLegend.h>
 #include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
 #include <TMultiGraph.h>
+#include "TString.h"
 
 using namespace std;
 using namespace Belle2;
@@ -37,6 +40,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm():
   readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
+  clusterTimesFractionWindow_maxtime(8),
   debugFilenameBase("eclTValidationAlgorithm")
 {
   setDescription("Fit gaussian function to the cluster times to validate results.");
@@ -57,6 +61,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm(string physicsProcessCollectorN
   readPrevCrysPayload(false),
   meanCleanRebinFactor(1),
   meanCleanCutMinFactor(0),
+  clusterTimesFractionWindow_maxtime(8),
   debugFilenameBase("eclTValidationAlgorithm")
 {
   setDescription("Fit gaussian function to the cluster times to validate results.");
@@ -78,6 +83,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   B2INFO("readPrevCrysPayload = " << readPrevCrysPayload);
   B2INFO("meanCleanRebinFactor = " << meanCleanRebinFactor);
   B2INFO("meanCleanCutMinFactor = " << meanCleanCutMinFactor);
+  B2INFO("clusterTimesFractionWindow_maxtime = " << clusterTimesFractionWindow_maxtime);
 
 
   /* Histogram with the data collected by eclTimeCalibrationValidationCollector*/
@@ -87,6 +93,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   auto clusterTimeClusterE = getObjectPtr<TH2F>("clusterTimeClusterE");
   auto dt99_clusterE = getObjectPtr<TH2F>("dt99_clusterE");
   auto eventT0 = getObjectPtr<TH1F>("eventT0");
+  auto clusterTimeE0E1diff = getObjectPtr<TH1F>("clusterTimeE0E1diff");
 
   // Collect other plots just for reference - combines all the runs for these plots.
   auto cutflow = getObjectPtr<TH1F>("cutflow");
@@ -193,7 +200,6 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
 
-
   //------------------------------------------------------------------------
   //..Read payloads from database
   DBObjPtr<Belle2::ECLCrystalCalib> crystalTimeObject("ECLCrystalTimeOffset");
@@ -238,6 +244,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   clusterTimeClusterE ->Write();
   dt99_clusterE       ->Write();
   eventT0             ->Write();
+  clusterTimeE0E1diff ->Write();
 
   cutflow->Write();
 
@@ -278,7 +285,42 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
                                            285, -69.5801, 69.5801);
 
 
+
+  // Histogram to keep track of the fraction of cluster times within a window.
+  double timeWindow_maxTime = clusterTimesFractionWindow_maxtime;
+  B2INFO("timeWindow_maxTime = " << timeWindow_maxTime);
+  int binyLeft = clusterTime_cid->GetYaxis()->FindBin(-timeWindow_maxTime);
+  int binyRight = clusterTime_cid->GetYaxis()->FindBin(timeWindow_maxTime);
+  double windowLowTimeFromBin = clusterTime_cid->GetYaxis()->GetBinLowEdge(binyLeft);
+  double windowHighTimeFromBin = clusterTime_cid->GetYaxis()->GetBinLowEdge(binyRight + 1);
+  std::string s_lowTime = std::to_string(windowLowTimeFromBin);
+  std::string s_highTime = std::to_string(windowHighTimeFromBin);
+  TString fracWindowTitle = "Fraction of cluster times in window [" + s_lowTime + ", " + s_highTime +
+                            "] ns;cell id;Fraction of cluster times in window";
+  B2INFO("fracWindowTitle = " << fracWindowTitle);
+  TString fracWindowInGoodECLRingsTitle = "Fraction of cluster times in window [" + s_lowTime + ", " + s_highTime +
+                                          "] ns and in good ECL theta rings;cell id;Fraction cluster times in window + good ECL rings";
+  B2INFO("fracWindowInGoodECLRingsTitle = " << fracWindowInGoodECLRingsTitle);
+  B2INFO("Good ECL rings skip gaps in the acceptance, and includes ECL theta IDs: 3-10, 15-39, 44-56, 61-66.");
+
+  TString fracWindowHistTitle = "Fraction of cluster times in window [" + s_lowTime + ", " + s_highTime +
+                                "] ns;Fraction of cluster times in window;Number of crystals";
+
+  auto clusterTimeNumberInWindow__cid = new TH1F("clusterTimeNumberInWindow__cid", fracWindowTitle, 8736, 1, 8736 + 1);
+  auto clusterTimeNumberInWindowInGoodECLRings__cid = new TH1F("clusterTimeNumberInWindowInGoodECLRings__cid", fracWindowTitle, 8736,
+      1, 8736 + 1);
+  auto clusterTimeNumber__cid = new TH1F("clusterTimeNumber_cid", fracWindowTitle, 8736, 1, 8736 + 1);
+  auto clusterTimeFractionInWindow = new TH1F("clusterTimeFractionInWindow", fracWindowHistTitle, 110, 0.0, 1.1);
+
+  clusterTimeNumberInWindow__cid->Sumw2();
+  clusterTimeNumberInWindowInGoodECLRings__cid->Sumw2();
+  clusterTimeNumber__cid->Sumw2();
+
+
+
   /* CRYSTAL BY CRYSTAL VALIDATION */
+
+  ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
 
   // Loop over all the crystals for doing the crystal calibation
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
@@ -287,6 +329,8 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
     B2INFO("Crystal cell id = " << crys_id);
 
+    eclgeo->Mapping(crys_id - 1);
+    int thetaID = eclgeo->GetThetaID();
 
 
     /* Determining which bins to mask out for mean calculation
@@ -470,8 +514,42 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
     }
 
 
+    // Find the fraction of cluster times within +-X ns and fill histograms
+    double numClusterTimesWithinWindowFraction = h_time->Integral(binyLeft, binyRight) ;
+    double clusterTimesWithinWindowFraction = numClusterTimesWithinWindowFraction;
+    if (numEntries > 0) {
+      clusterTimesWithinWindowFraction /= numEntries;
+    } else {
+      clusterTimesWithinWindowFraction = -0.1;
+    }
+
+    B2INFO("Crystal cell id = " << crys_id << ", theta id = " <<
+           thetaID << ", clusterTimesWithinWindowFraction = " <<
+           numClusterTimesWithinWindowFraction << " / " << numEntries << " = " <<
+           clusterTimesWithinWindowFraction);
+
+    clusterTimeFractionInWindow->Fill(clusterTimesWithinWindowFraction);
+    clusterTimeNumberInWindow__cid->SetBinContent(crys_id, numClusterTimesWithinWindowFraction);
+    clusterTimeNumber__cid->SetBinContent(crys_id, numEntries);
+
+    if ((thetaID >= 3   &&  thetaID <= 10)    ||
+        (thetaID >= 15  &&  thetaID <= 39)    ||
+        (thetaID >= 44  &&  thetaID <= 56)    ||
+        (thetaID >= 61  &&  thetaID <= 66)) {
+      clusterTimeNumberInWindowInGoodECLRings__cid->SetBinContent(crys_id, numClusterTimesWithinWindowFraction);
+    }
+
+
     delete gaus;
   }
+
+  // Find the fraction of cluster times within +-X ns and fill histogram
+  auto g_clusterTimeFractionInWindow__cid = new TGraphAsymmErrors(clusterTimeNumberInWindow__cid, clusterTimeNumber__cid, "w");
+  auto g_clusterTimeFractionInWindowInGoodECLRings__cid = new TGraphAsymmErrors(clusterTimeNumberInWindowInGoodECLRings__cid,
+      clusterTimeNumber__cid, "w");
+  g_clusterTimeFractionInWindow__cid->SetTitle(fracWindowTitle);
+  g_clusterTimeFractionInWindowInGoodECLRings__cid->SetTitle(fracWindowInGoodECLRingsTitle);
+
 
   peakClusterTime_cid->ResetStats();
   peakClusterTimesGoodFit__cid->ResetStats();
@@ -480,6 +558,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   histfile->WriteTObject(peakClusterTimes, "peakClusterTimes");
   histfile->WriteTObject(peakClusterTimesGoodFit__cid, "peakClusterTimesGoodFit__cid");
   histfile->WriteTObject(peakClusterTimesGoodFit, "peakClusterTimesGoodFit");
+  histfile->WriteTObject(g_clusterTimeFractionInWindow__cid, "g_clusterTimeFractionInWindow__cid");
+  histfile->WriteTObject(g_clusterTimeFractionInWindowInGoodECLRings__cid, "g_clusterTimeFractionInWindowInGoodECLRings__cid");
+  histfile->WriteTObject(clusterTimeFractionInWindow, "clusterTimeFractionInWindow");
 
 
 

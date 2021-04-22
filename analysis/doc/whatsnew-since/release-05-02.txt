@@ -95,8 +95,8 @@ Modules
    that case the momenta of all track-based daughter particles are scaled by the provided factor.
  * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
    and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
-
- * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only be applied on data. The corresponding wrapper function `correctEnergyBias`.
+ * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
+ be applied on data. `correctEnergyBias` is a corresponding wrapper function.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

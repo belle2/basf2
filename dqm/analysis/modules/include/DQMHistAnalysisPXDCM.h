@@ -59,6 +59,8 @@ namespace Belle2 {
     double m_warnOutside{};
     /** error level for outside fraction */
     double m_errorOutside{};
+    /** threshold level/line for outside fraction */
+    int m_upperLine{};
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

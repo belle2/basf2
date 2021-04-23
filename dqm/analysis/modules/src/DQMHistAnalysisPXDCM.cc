@@ -34,11 +34,11 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
-  addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 1.0);
-  addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 2.0);
+  addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);
+  addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 3.0);
   addParam("warnOutside", m_warnOutside, "warn level for outside fraction", 1e-5);
   addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
-  addParam("upperLine", m_upperLine, "upper threshofl and line for outside fraction", 16);
+  addParam("upperLine", m_upperLine, "upper threshofl and line for outside fraction", 17);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 

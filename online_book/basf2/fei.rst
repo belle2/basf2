@@ -121,7 +121,7 @@ There is also a convenience function for that!
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You can get the recommended tag using `modularAnalaysis.getAnalysisGlobaltag`
+    You can get the recommended tag using `modularAnalysis.getAnalysisGlobaltag`
 
 .. admonition:: Hint
     :class: toggle xhint stacked

@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
 
 """
-Airflow script for TOP post-tracking calibration:
-   BS13d carrier shifts, module T0 and common T0
+Airflow script for TOP pre-tracking calibration:
+   channel masks
 
-Author: Marko Staric, Umberto Tamponi, Shahab Kohani
+Author: Marko Staric
 """
 
 from prompt import CalibrationSettings, input_data_filters
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
-from top_calibration import BS13d_calibration_cdst
-from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
-from top_calibration import commonT0_calibration_BF
-from prompt.calibrations.caf_top_pre import settings as top_pretracking
+from top_calibration import channel_mask_calibration
 
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
-    name="TOP post-tracking calibration",
+    name="TOP pre-tracking calibration",
     expert_username="skohani",
     description=__doc__,
-    input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib"],
+    input_data_formats=["raw"],
+    input_data_names=["hadron_calib"],
     input_data_filters={
-        "bhabha_all_calib": [
-            input_data_filters["Data Tag"]["bhabha_all_calib"],
+        "hadron_calib": [
+            input_data_filters["Data Tag"]["hadron_calib"],
             input_data_filters["Run Type"]["physics"],
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
-    depends_on=[top_pretracking],
+    depends_on=[],
     expert_config={
         "max_files_per_run": 10,
         "payload_boundaries": None,
@@ -43,17 +40,13 @@ def get_calibrations(input_data, **kwargs):
     :**kwargs: Configuration options to be sent in.
     '''
 
-    file_to_iov = input_data["bhabha_all_calib"]
-    sample = 'bhabha'
+    file_to_iov = input_data["hadron_calib"]
     inputFiles = list(file_to_iov.keys())
     requested_iov = kwargs.get("requested_iov", None)
     expert_config = kwargs.get("expert_config")
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
-           moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
-           moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
-           commonT0_calibration_BF(inputFiles)]  # this is run-dep
+    cal = [channel_mask_calibration(inputFiles)]  # this is run-dep
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file
@@ -74,12 +67,5 @@ def get_calibrations(input_data, **kwargs):
         else:
             for alg in c.algorithms:
                 alg.params = {"iov_coverage": output_iov}
-
-    # Don't save the rough moduleT0 result
-    cal[1].save_payloads = False
-
-    cal[1].depends_on(cal[0])
-    cal[2].depends_on(cal[1])
-    cal[3].depends_on(cal[2])
 
     return cal

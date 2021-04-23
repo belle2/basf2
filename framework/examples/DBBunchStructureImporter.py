@@ -13,24 +13,27 @@ if minexp is 1003 the early phase 3 pattern will be created. Meaning 1001001001.
 
 from ROOT import Belle2
 from rundb import RunDB
-import pandas as pd
-from optparse import OptionParser
 import sys
 import basf2
 
 
 def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
 
-    fillPatternBin = bin(int(theFillPatternHex, 16))
+    if fillPatternHex is None:
+        return
+
+    bunches = Belle2.BunchStructure()
+
+    fillPatternBin = bin(int(fillPatternHex, 16))
     fillPatternBin = fillPatternBin.replace('0b', '')
 
     for num, bucket in enumerate(fillPatternBin):
         if(bucket == "1"):
             bunches.setBucket(num)
 
-    print("Filling new payload. iov:", firstExp, firstRun, currentExp, currentRun)
+    print("Filling new payload. iov:", firstExp, firstRun, lastExp, lastRun)
 
-    iov = Belle2.IntervalOfValidity(firstExp, firstRun, currentExp, currentRun)
+    iov = Belle2.IntervalOfValidity(firstExp, firstRun, lastExp, lastRun)
 
     db = Belle2.Database.Instance()
     db.storeData("BunchStructure", bunches, iov)
@@ -59,9 +62,8 @@ if(minexp == "0"):
 
     bunches = Belle2.BunchStructure()
 
-    for b in range(0, 5120):
-        if(b % 2 == 0):
-            bunches.setBucket(b)
+    for b in range(0, 5120, 2):
+        bunches.setBucket(b)
 
     iov = Belle2.IntervalOfValidity(0, 0, 0, -1)
 
@@ -71,9 +73,8 @@ if(minexp == "0"):
 elif(minexp == "1003"):
     bunches = Belle2.BunchStructure()
 
-    for b in range(0, 5120):
-        if(b % 3 == 0):
-            bunches.setBucket(b)
+    for b in range(0, 5120, 3):
+        bunches.setBucket(b)
 
     iov = Belle2.IntervalOfValidity(1003, 0, 1003, -1)
 
@@ -89,39 +90,30 @@ else:
         max_experiment=maxexp,
         min_run=minrun,
         max_run=maxrun,
+        run_type='physics',
         expand=True
     )
 
-    theFillPatternHex = []
-    newiov = True
+current_pattern = None
+current_start = None, None
+current_end = None, None
 
-    currentRun = minexp
-    currentExp = minrun
+for it in runInfo:
 
-    for it in runInfo:
+    exprun = it['experiment'], it['run']
+    pattern = it['ler']['fill_pattern']
 
-        bunches = Belle2.BunchStructure()
-        fillPatternHex = it['ler']['fill_pattern']
+    # pattern different to previous one or first run
+    if pattern != current_pattern:
+        # close the last iov if any
+        fill(current_pattern, *current_start, *current_end)
+        # and remember new values
+        current_pattern = pattern
+        current_start = exprun
+        current_end = exprun
+    else:
+        # pattern unchanged, extend current iov
+        current_end = exprun
 
-        if(it['run_type'] != 'physics'):
-            continue
-
-        currentExp = it['experiment']
-        currentRun = it['run']
-
-        if(fillPatternHex == theFillPatternHex or newiov):
-            theFillPatternHex = fillPatternHex
-
-            if(newiov):
-                firstExp = int(it['experiment'])
-                firstRun = int(it['run'])
-                newiov = False
-
-        if(fillPatternHex != theFillPatternHex):
-            fill(theFillPatternHex, firstExp, firstRun, currentExp, currentRun)
-
-            newiov = True
-
-    # in order to close the db with last run
-    if(fillPatternHex == theFillPatternHex):
-        fill(theFillPatternHex, firstExp, firstRun, currentExp, currentRun)
+# close the last iov if any
+fill(current_pattern, *current_start, *current_end)

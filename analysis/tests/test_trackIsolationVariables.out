@@ -1,6 +1,7 @@
 [INFO] Steering file: analysis/tests/test_trackIsolationVariables.py
-[INFO] Starting event processing, random seed is set to '7c48e6a5fd00b3553d042bf9897ee137c98d6d0df2e4c62cc27ecc60c9beacf1'
-[INFO] Added file /sw/belle2/validation-data/mdst14.root
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks

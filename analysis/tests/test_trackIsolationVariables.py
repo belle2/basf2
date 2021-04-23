@@ -5,8 +5,11 @@ import b2test_utils
 
 path = b2.create_path()
 
+b2test_utils.configure_logging_for_tests()
+b2.set_random_seed("1337")
+
 ma.inputMdstList("default",
-                 filelist=[b2.find_file("mdst14.root", "validation")],
+                 filelist=[b2test_utils.require_file("mdst14.root", "validation")],
                  entrySequences=["0:1"],
                  path=path)
 

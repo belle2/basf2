@@ -34,22 +34,7 @@ namespace Belle2 {
 
     TOPTrack::TOPTrack(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable)
     {
-      // require fitResult
-
-      const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
-      if (not fitResult) {
-        B2ERROR("No TrackFitResult available for: "
-                << LogVar("PDG code", chargedStable.getPDGCode()));
-        return;
-      }
-
-      // require hits in CDC
-
-      if (fitResult->getHitPatternCDC().getNHits() == 0) return;
-
-      // find extHit and set pointers
-
-      m_track = &track;
+      // find extrapolated track hit at TOP
 
       Const::EDetector myDetID = Const::EDetector::TOP;
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -69,6 +54,53 @@ namespace Belle2 {
       }
       if (not m_extHit) return;
 
+      // set the object
+
+      set(track, digitsName, chargedStable);
+    }
+
+
+    TOPTrack::TOPTrack(const ExtHit* extHit, std::string digitsName)
+    {
+      if (not extHit) return;
+      m_extHit = extHit;
+
+      const auto* track = extHit->getRelated<Track>();
+      if (not track) {
+        B2ERROR("No related Track found for valid extHit");
+        return;
+      }
+
+      auto chargedStable = Const::chargedStableSet.find(abs(extHit->getPdgCode()));
+      if (chargedStable == Const::invalidParticle) {
+        B2ERROR("Extrapolation hypothesis of extHit is not chargedStable particle");
+        return;
+      }
+
+      // set the object
+
+      set(*track, digitsName, chargedStable);
+    }
+
+
+    void TOPTrack::set(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable)
+    {
+      // require fitResult
+
+      const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
+      if (not fitResult) {
+        B2ERROR("No TrackFitResult available for: "
+                << LogVar("PDG code", chargedStable.getPDGCode()));
+        return;
+      }
+
+      // require hits in CDC
+
+      if (fitResult->getHitPatternCDC().getNHits() == 0) return;
+
+      // set pointers
+
+      m_track = &track;
       m_mcParticle = track.getRelated<MCParticle>();
       if (m_mcParticle) {
         const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
@@ -101,6 +133,7 @@ namespace Belle2 {
 
       // background rate estimation (TODO to be improved ...)
 
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& tdc = geo->getNominalTDC();
       double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
 

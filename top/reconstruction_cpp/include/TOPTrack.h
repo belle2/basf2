@@ -111,6 +111,13 @@ namespace Belle2 {
                         const Const::ChargedStable& chargedStable = Const::pion);
 
       /**
+       * Constructor from extrapolated track hit - isValid() must be checked before using the object
+       * @param extHit extrapolated track hit
+       * @param digitsName name of TOPDigits collection
+       */
+      explicit TOPTrack(const ExtHit* extHit, std::string digitsName = "");
+
+      /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
        * Needed for module alignment.
        * @param rotation rotation matrix from local to nominal frame (rotation first ...)
@@ -244,6 +251,14 @@ namespace Belle2 {
       bool isScanRequired(unsigned col, double time, double wid) const;
 
     private:
+
+      /**
+       * Sets the object (called by constructors)
+       * @param track mdst track
+       * @param digitsName name of TOPDigits collection
+       * @param chargedStable hypothesis used in mdst track extrapolation
+       */
+      void set(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable);
 
       /**
        * Sets helix (helix is given in nominal frame)

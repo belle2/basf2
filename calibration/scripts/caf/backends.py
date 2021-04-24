@@ -2143,7 +2143,7 @@ class HTCondor(Batch):
         except BaseException:
             records = None
 
-        if records is not None:
+        if records:
             records = decode_json_string(records)
         else:
             records = []
@@ -2207,7 +2207,7 @@ class HTCondor(Batch):
         except BaseException:
             records = None
 
-        if records is not None:
+        if records:
             records = decode_json_string(records)
         else:
             records = []

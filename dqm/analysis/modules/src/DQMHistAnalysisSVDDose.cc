@@ -30,6 +30,8 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
            "Minimum interval between two successive PV updates (in seconds).", 300.0);
   addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":OccPois:Avg"));
+  addParam("deltaTPVSuffix", m_deltaTPVSuffix, "Suffix for the PV that monitors the update interval of the PVs.",
+           std::string("OccPoisUpdateInterval"));
 }
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
@@ -128,6 +130,8 @@ void DQMHistAnalysisSVDDoseModule::initialize()
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++)
       SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
                                NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel");
+    SEVCHK(ca_create_channel((m_pvPrefix + m_deltaTPVSuffix).data(),
+                             NULL, NULL, 10, &m_timeSinceLastPVUpdateChan), "ca_create_channel");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
   }
@@ -138,7 +142,8 @@ void DQMHistAnalysisSVDDoseModule::event()
 {
   // Update PVs ("write" to EPICS)
 #ifdef _BELLE2_EPICS
-  if (m_useEpics && getClockSeconds() >= m_lastPVUpdate + m_epicsUpdateSeconds) {
+  m_timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
+  if (m_useEpics && m_timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
       double nHits = 0.0, nEvts = 0.0;
@@ -168,6 +173,8 @@ void DQMHistAnalysisSVDDoseModule::event()
       pv.lastNEvts = nEvts;
       pv.lastNHits = nHits;
     }
+    if (m_timeSinceLastPVUpdateChan)
+      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&m_timeSinceLastPVUpdate), "ca_put");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
   }

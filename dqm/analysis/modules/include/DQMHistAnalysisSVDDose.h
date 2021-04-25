@@ -107,6 +107,7 @@ namespace Belle2 {
     bool m_useEpics; ///< Whether to update EPICS PVs
     double m_epicsUpdateSeconds; ///< Minimum interval between successive PV updates
     std::string m_pvSuffix; ///< Suffix for EPICS PVs
+    std::string m_deltaTPVSuffix; ///< Suffix of the update-time monitoring PV
 
     // Data members for outputs
     MonitoringObject* m_monObj = nullptr; ///< Monitoring object for MiraBelle
@@ -135,6 +136,8 @@ namespace Belle2 {
 #ifdef _BELLE2_EPICS
     std::vector<MyPV> m_myPVs; ///< EPICS stuff for each sensor group / PV
     double m_lastPVUpdate; ///< Time of the last PV update (seconds)
+    chid m_timeSinceLastPVUpdateChan;
+    double m_timeSinceLastPVUpdate = -1.0;
 #endif
 
     /** List of sensors groups. Must match Belle2::SVD::SVDDQMDoseModule::c_sensorGroups.

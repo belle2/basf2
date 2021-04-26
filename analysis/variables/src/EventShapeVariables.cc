@@ -162,7 +162,7 @@ namespace Belle2 {
       boost::to_lower(axisName);
 
       if (order < 0 || order > 8) {
-        B2ERROR("The CLEO cone order must be within 0 and 9.");
+        B2ERROR("The CLEO cone order must be within 0 and 8.");
         return nullptr;
       }
       if (axisName != "thrust" && axisName != "collision") {
@@ -628,23 +628,24 @@ namespace Belle2 {
     VARIABLE_GROUP("EventShape");
 
     REGISTER_VARIABLE("foxWolframR(i)", foxWolframR,
-                      "[Eventbased] ratio of the i-th to the 0-th order Fox Wolfram moments. The order can go up to 8th.");
-    REGISTER_VARIABLE("foxWolframH(i)", foxWolframH, "[Eventbased] i-th order Fox Wolfram moment. The order can go up to 8th.");
+                      "[Eventbased] Ratio of the i-th to the 0-th order Fox Wolfram moments. The order can go from 0 up to 8th.");
+    REGISTER_VARIABLE("foxWolframH(i)", foxWolframH,
+                      "[Eventbased] Returns i-th order Fox Wolfram moment. The order can go from 0 up to 8th.");
     REGISTER_VARIABLE("harmonicMoment(i, axisName)", harmonicMoment,
-                      "[Eventbased] i-th order harmonic moment, calculated respect to the axis axisName. The order can go up to 8th., the axisName can be either 'thrust' or 'collision'");
+                      "[Eventbased] Returns i-th order harmonic moment, calculated respect to the axis ``axisName``. The order can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.");
     REGISTER_VARIABLE("cleoCone(i, axisName)", cleoCone,
-                      "[Eventbased] i-th order cleoCone, calculated respect to the axis axisName. The order can go up to 9th., the axisName can be either 'thrust' or 'collision'");
+                      "[Eventbased] Returns i-th order Cleo cone, calculated with respect to the axis ``axisName``. The order can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.");
     REGISTER_VARIABLE("useThrustFrame(variable)", useThrustFrame, "Evaluates a variable value in the thrust reference frame.");
 
 
     REGISTER_VARIABLE("foxWolframR1", foxWolframR1,
-                      "[Eventbased]  ratio of the 1-st to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(1) defined for the user's covenience.");
+                      "[Eventbased]  Ratio of the 1-st to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(1) defined for the user's convenience.");
     REGISTER_VARIABLE("foxWolframR2", foxWolframR2,
-                      "[Eventbased]  ratio of the 2-nd to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(2) defined for the user's covenience.");
+                      "[Eventbased]  Ratio of the 2-nd to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(2) defined for the user's convenience.");
     REGISTER_VARIABLE("foxWolframR3", foxWolframR3,
-                      "[Eventbased]  ratio of the 3-rd to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(3) defined for the user's covenience.");
+                      "[Eventbased]  Ratio of the 3-rd to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(3) defined for the user's convenience.");
     REGISTER_VARIABLE("foxWolframR4", foxWolframR4,
-                      "[Eventbased]  ratio of the 4-th to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(4) defined for the user's covenience.");
+                      "[Eventbased]  Ratio of the 4-th to the 0-th order Fox Wolfram moments. This is just an alias of foxWolframR(4) defined for the user's convenience.");
 
     REGISTER_VARIABLE("harmonicMomentThrust0", harmonicMomentThrust0,
                       "[Eventbased] Harmonic moment of the 0th order calculated respect to the thrust axis.");
@@ -678,7 +679,7 @@ namespace Belle2 {
 
 
     REGISTER_VARIABLE("sphericity", sphericity,
-                      "[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvlaues S = (3/2)(lambda2+lambda3)");
+                      "[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvalues :math:`\\lambda_i`: :math:`S = (3/2)(\\lambda_2+\\lambda_3)`");
     REGISTER_VARIABLE("aplanarity", aplanarity,
                       "[Eventbased] Event aplanarity, defined as the 3/2 of the third sphericity eigenvalue.");
 
@@ -704,13 +705,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("backwardHemisphereMass", backwardHemisphereMass,
                       "[Eventbased] Invariant mass of the particles flying in the direction opposite to the thrust axis.");
     REGISTER_VARIABLE("backwardHemisphereX", backwardHemisphereX,
-                      "[Eventbased] X component of the total momentum of the particles flying in the direciton opposite to the thrust axis");
+                      "[Eventbased] X component of the total momentum of the particles flying in the direciton opposite to the thrust axis.");
     REGISTER_VARIABLE("backwardHemisphereY", backwardHemisphereY,
-                      "[Eventbased] Y component of the total momentum of the particles flying in the direction opposite to the thrust axis");
+                      "[Eventbased] Y component of the total momentum of the particles flying in the direction opposite to the thrust axis.");
     REGISTER_VARIABLE("backwardHemisphereZ", backwardHemisphereZ,
-                      "[Eventbased] Z component of the total momentum of the particles flying in the direction opposite to the thrust axis");
+                      "[Eventbased] Z component of the total momentum of the particles flying in the direction opposite to the thrust axis.");
     REGISTER_VARIABLE("backwardHemisphereMomentum", backwardHemisphereMomentum,
-                      "[Eventbased] Total momentum the particles flying in the  direction opposite to the thrust axis.");
+                      "[Eventbased] Total momentum the particles flying in the direction opposite to the thrust axis.");
     REGISTER_VARIABLE("backwardHemisphereEnergy", backwardHemisphereEnergy,
                       "[Eventbased] Total energy the particles flying in the direction opposite to the thrust axis.");
   }

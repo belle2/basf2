@@ -299,26 +299,49 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2");
-    REGISTER_VARIABLE("R2"          , R2          , "Reduced Fox-Wolfram moment R2");
-    REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Magnitude of the signal B thrust axis");
-    REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");
-    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of the signal B and thrust axis of ROE");
-    REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of the signal B and z-axis");
-    REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,
-                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.");
-    REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS,
-                      "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
-                      "Useful for ContinuumSuppression.\n"
-                      "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns NaN if particle has no related ContinuumSuppression object.");
-    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
-                      "Transforms the network output :math:`C\\to C`' via: :math:`C'=\\operatorname{log}((C-\\mathrm{low})/(\\mathrm{high}-C))`");
-    REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,
-                      "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
-                      "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"
-                      "If mode is set to Auto the function use the thrust axis based on isInRestOfEvent(particle).\n"
-                      "Like isinRestofEvent, you have to use path.for_each( . . .) to use this MetaVariable.")
+    REGISTER_VARIABLE("R2EventLevel", R2EventLevel,
+                      "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2. Deprecated, please use :b2:var:`foxWolframR`.");
+    REGISTER_VARIABLE("R2"          , R2          ,
+                      "Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.");
+    REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Returns magnitude of the signal B thrust axis.");
+    REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Returns magnitude of the ROE thrust axis.");
+    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     ,
+                      "Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.");
+    REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Returns cosine of angle between thrust axis of the signal B and z-axis.");
+    REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,  R"DOC(
+Returns variable et, mm2, or one of the 16 KSFW moments. If only the ``variable`` argument is specified, the KSFW moment calculated from the B primary daughters is returned. 
+If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.
+Allowed input values for ``variable`` argument are the following:
+
+* mm2,   et
+* hso00, hso01, hso02, hso03, hso04
+* hso10, hso12, hso14
+* hso20, hso22, hso24
+* hoo0,  hoo1,  hoo2,  hoo3,  hoo4.
+)DOC");
+
+    REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
+Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. 
+The allowed inputs for ``integer`` argument are integers from 1 to 9.
+The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
+)DOC");
+
+    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
+Transforms the network output :math:`C \to C'` via: :math:`C'=\operatorname{log}((C-\mathrm{low})/(\mathrm{high}-C))`.
+The arguments of the metavariable are the following:
+
+* ``name`` is the `extraInfo` name, where the network output :math:`C` has been stored. If particle is not specified, event `extraInfo` is used instead;
+* ``low``, ``high`` are floating point numbers.
+
+Returns NaN, if the `extraInfo` has not been found.
+)DOC");
+
+    REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
+Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.
+If mode is set to ``Signal`` it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.
+If mode is set to ``Auto`` the function use the thrust axis based on Rest Of Event (ROE) particles.
+Like :b2:var:`isInRestOfEvent`, one has to use this metavariable in ROE loop.
+)DOC");
 
   }
 }

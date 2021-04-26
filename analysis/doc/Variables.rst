@@ -349,7 +349,9 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
-For a detailed description of the continuum suppression, see `ContinuumSuppression`
+For a detailed description of the continuum suppression, see `ContinuumSuppression`.
+All variables in this group require :b2:mod:`ContinuumSuppressionBuilder` module to be added to the path, 
+which can be done using `buildContinuumSuppression` method.
 
 .. b2-variables::
     :group: Continuum Suppression

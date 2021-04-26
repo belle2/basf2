@@ -133,6 +133,6 @@ A context-dependent :math:`\chi^2` probability for 'the fit' related to this par
                       "Returns number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType,
                       "Returns 1.0 if particle is flavored type, 0.0 if it is unflavored.");
-    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle.");
+    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.");
   }
 }

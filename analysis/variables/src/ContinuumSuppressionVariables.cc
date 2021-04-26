@@ -321,8 +321,8 @@ Allowed input values for ``variable`` argument are the following:
 )DOC");
 
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
-Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. 
-The allowed inputs for ``integer`` argument are integers from 1 to 9.
+Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from 1 to 9. 
+If only the ``integer`` argument is specified, the CleoCones are calculated from all final state particles. 
 The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
 )DOC");
 
@@ -337,7 +337,7 @@ Returns NaN, if the `extraInfo` has not been found.
 )DOC");
 
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
-Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.
+Returns the variable with respect to rotated coordinates, in which z lies on the specified thrust axis.
 If mode is set to ``Signal`` it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.
 If mode is set to ``Auto`` the function use the thrust axis based on Rest Of Event (ROE) particles.
 Like :b2:var:`isInRestOfEvent`, one has to use this metavariable in ROE loop.

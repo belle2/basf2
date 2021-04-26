@@ -53,30 +53,23 @@ def setupB2BIIDatabase(isMC=False):
     tagname = "B2BII%s" % ("_MC" if isMC else "")
     # and we want to cache them in a meaningful but separate directory
     payloaddir = tagname + "_database"
-    b2.reset_database()
-    b2.use_database_chain()
     # fallback to previously downloaded payloads if offline
     if not isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            True,
-            b2.LogLevel.ERROR)
+            payloaddir)
         # get payloads from central database
-        b2.use_central_database(tagname, b2.LogLevel.WARNING, payloaddir)
+        b2.conditions.prepend_globaltag(tagname)
     # unless they are already found locally
     if isMC:
-        b2.use_local_database(
+        b2.conditions.prepend_testing_payloads(
             "%s/dbcache.txt" %
-            payloaddir,
-            payloaddir,
-            False,
-            b2.LogLevel.WARNING)
+            payloaddir)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
+                                  convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
@@ -84,7 +77,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2):
+                                  SmearTrack=2, enableLocalDB=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -93,6 +86,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
         useBelleDBServer (str): None to use the recommended BelleDB server.
+        convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
         path (basf2.Path): Path to add modules in.
@@ -110,6 +104,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             Details about the difference between those two options can be found
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
+        enableLocalDB (bool): Enables to use local payloads.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -129,6 +124,14 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
     b2bii.setB2BII()
+
+    if enableLocalDB is True:
+        b2.B2WARNING("B2BII is accessing the payloads from the local database.\n"
+                     "This is the recommended procedure and significantly faster than using the global database.\n"
+                     "Only if you need the latest payloads of the flavor tagging or the FEI,\n"
+                     "you should turn off this feature and set enableLocalDB to True.")
+        b2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+        b2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:
@@ -176,6 +179,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         b2.B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
     # Convert MDST Module
     convert = b2.register_module('B2BIIConvertMdst')
+    convert.param('convertBeamParameters', convertBeamParameters)
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)

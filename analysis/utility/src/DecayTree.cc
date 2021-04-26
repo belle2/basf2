@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/utility/DecayTree.h>
+#include <framework/gearbox/Const.h>
 
 #include <stdexcept>
 
@@ -114,7 +115,7 @@ std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring, boo
     try {
       const int pdg = std::stoi(decaystring.substr(m_i, j - m_i));
       if (removeRadiativeGammaFlag) {
-        if (nodes.size() < 2 or pdg != 22) {
+        if (nodes.size() < 2 or pdg != Const::photon.getPDGCode()) {
           nodes.emplace_back(pdg);
           m_token_count++;
         }

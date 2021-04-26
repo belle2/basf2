@@ -76,7 +76,7 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
         })
         main_path.add_module(segment_finder)
 
-        main_path.add_module(Filler())
+        # main_path.add_module(Filler())
 
         segment_quad_tree = basf2.register_module("SegmentQuadTree")
         segment_quad_tree.param({

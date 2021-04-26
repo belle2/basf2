@@ -110,6 +110,7 @@ TrgEclBhabha::TrgEclBhabha():
 TrgEclBhabha::~TrgEclBhabha()
 {
   delete _TCMap;
+  delete _database;
 }
 //
 //

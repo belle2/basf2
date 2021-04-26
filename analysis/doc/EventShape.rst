@@ -1,3 +1,5 @@
+.. _analysis_eventshape:
+
 EventShape
 ==========
 

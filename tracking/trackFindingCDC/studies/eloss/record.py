@@ -63,7 +63,7 @@ def getBetheStoppingPower(p, pdg_code):
     I2 = m_I * m_I
 
     factor = 178.6 * 0.00015e-04 / 2  # Miriam's / Sasha's value - to big...
-    eDensity = factor / K
+    # eDensity = factor / K
     dEdx = factor / beta2 * (math.log(2 * eMass * beta2 * gamma2 * Wmax / I2) - beta2)
 
     # Miriam's / Sasha's original
@@ -191,9 +191,6 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     def peel(self, track):
         """Aggregate the track and MC information for dE/dx analysis"""
         mc_track_lookup = self.mc_track_lookup
-        mc_hit_lookup = self.mc_hit_lookup
-
-        track_fitter = self.track_fitter
 
         # rl_drift_circle = 1
         # unit_variance = 0
@@ -232,7 +229,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
             return
         # Make sure we start the track in the last layer to avoid some confusion
         # if last_sim_hit.getWireID().getICLayer() != 55: return
-        last_sim_mom3D = TFCDC.Vector3D(last_sim_hit.getMomentum())
+        # last_sim_mom3D = TFCDC.Vector3D(last_sim_hit.getMomentum())
 
         first_sim_pos3D = TFCDC.Vector3D(first_sim_hit.getPosTrack())
         first_sim_mom3D = TFCDC.Vector3D(first_sim_hit.getMomentum())

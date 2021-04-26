@@ -1,7 +1,6 @@
 import basf2
 from collections import namedtuple
 import json
-import subprocess
 
 prompt_script_package = "prompt.calibrations."
 prompt_script_dir = "calibration/scripts/prompt/calibrations"
@@ -9,9 +8,44 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 prompt_validation_script_package = "prompt.validations."
 prompt_validation_script_dir = "calibration/scripts/prompt/validations"
 
+input_data_filters = {"Magnet": {"On": "On",
+                                 "Off": "Off",
+                                 "Either": "Either"},
+                      "Beam Energy": {"No Beam": "No Beam",
+                                      "4S": "4S",
+                                      "Continuum": "Continuum",
+                                      "Scan": "Scan"},
+                      "Run Type": {"beam": "beam",
+                                   "cosmic": "cosmic",
+                                   "debug": "debug", "null": "null",
+                                   "physics": "physics"},
+                      "Data Tag": {"bhabha_all_calib": "bhabha_all_calib",
+                                   "cosmic_calib": "cosmic_calib",
+                                   "gamma_gamma_calib": "gamma_gamma_calib",
+                                   "hadron_calib": "hadron_calib",
+                                   "mumutight_calib": "mumutight_calib",
+                                   "offip_calib": "offip_calib",
+                                   "radmumu_calib": "radmumu_calib",
+                                   "random_calib": "random_calib"},
+                      "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
+                                           "Bad For Alignment": "Bad For Alignment",
+                                           "Good": "Good",
+                                           "Good Shifter": "Good Shifter",
+                                           "Good For PXD": "Good For PXD",
+                                           "Good Or Recoverable": "Good Or Recoverable",
+                                           "Good Or Recoverable Shifter": "Good Or Recoverable Shifter"}
+                      }
 
-class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username", "description",
-                                                        "input_data_formats", "input_data_names", "depends_on", "expert_config"])):
+
+class CalibrationSettings(namedtuple('CalSet_Factory',
+                                     ["name",
+                                      "expert_username",
+                                      "description",
+                                      "input_data_formats",
+                                      "input_data_names",
+                                      "input_data_filters",
+                                      "depends_on",
+                                      "expert_config"])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 
@@ -30,7 +64,17 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
 
         input_data_names (frozenset(str)): The names that you will use when accessing the input data given to the
             prompt calibration process i.e. Use these in the ``get_calibrations`` function to access the correct input
-            data files.
+            data files. e.g. input_data_names=["all_events", "offres_photon_events"]
+
+        input_data_filters (dict): The data selection for the data input names, used for automated calibration.
+            The keys should correspond to one of the ``input_data_names`` with the values being a list of the various data
+            filters, e.g. Data Tag, Beam Energy, Run Type, Run Quality Tag and Magnet. All available filters can be found in the
+            input_data_filters dictionary e.g. from prompt import input_data_filters with details about data tags and run quality
+            tags found at: https://calibration.belle2.org/belle2/data_tags/list/.
+            To exclude specific filters, pre-append with *NOT* e.g.
+            {"all_events": ["mumutight_calib", "hadron_calib", "Good", "On"],
+            "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
+            Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
         depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of
@@ -52,7 +96,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, expert_username, description,
-                input_data_formats=None, input_data_names=None, depends_on=None, expert_config=None):
+                input_data_formats=None, input_data_names=None, input_data_filters=None, depends_on=None, expert_config=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
@@ -90,7 +134,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             depends_on = []
 
         return super().__new__(cls, name, expert_username, description,
-                               input_data_formats, input_data_names, depends_on, expert_config)
+                               input_data_formats, input_data_names, input_data_filters, depends_on, expert_config)
 
     def json_dumps(self):
         """
@@ -102,6 +146,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
                            "expert_username": self.expert_username,
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),
+                           "input_data_filters": self.input_data_filters,
                            "depends_on": list(depends_on_names),
                            "description": self.description,
                            "expert_config": self.expert_config
@@ -113,6 +158,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         output_str += f"  expert_username='{self.expert_username}'\n"
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
+        output_str += f"  input_data_filters={list(self.input_data_filters)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
         output_str += f"  description='{self.description}'\n"
         output_str += f"  expert_config={self.expert_config}"

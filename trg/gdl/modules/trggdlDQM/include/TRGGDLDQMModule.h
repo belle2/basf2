@@ -144,7 +144,7 @@ namespace Belle2 {
     unsigned _run = 0;
     std::vector<int> skim;
 
-    static const int n_output_extra = 73;
+    static const int n_output_extra = 94;
     static const char* output_extra[n_output_extra];
     static const int n_output_overlap = 10;
     static const char* output_overlap[n_output_overlap];

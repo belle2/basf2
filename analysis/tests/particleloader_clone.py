@@ -21,7 +21,9 @@ fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 
 testpath = basf2.create_path()
 testpath.add_module('RootInput', inputFileName=inputFile)
 for fsp in fsps:
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
+    testpath.add_module('ParticleLoader', decayStrings=[fsp])
+testpath.add_module('ParticleListManipulator', outputListName='gamma',
+                    inputListNames=['gamma:all'], cut='isFromECL')
 
 # manipulate the string to remove the daughters in case of v0
 for i in range(len(fsps)):
@@ -29,24 +31,27 @@ for i in range(len(fsps)):
         fsps[i] = fsps[i].split(' ->', 1)[0]
 
 # also load MC particles
-mcps = [particle + ':frommc' for particle in fsps + ['B0', 'D0']]
-for mcp in mcps:
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(mcp, '')],
-                        useMCParticles=True)
+mcps = [particle + ':MC' for particle in fsps + ['B0', 'D0']]
+testpath.add_module('ParticleLoader', decayStrings=mcps, useMCParticles=True)
 
 # load photons from KLMCluster
-testpath.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:fromKLM', 'isFromKLM')],
-                    loadPhotonsFromKLM=True)
+testpath.add_module('ParticleListManipulator', outputListName='gamma:fromKLM',
+                    inputListNames=['gamma:all'], cut='isFromKLM')
 
 # add RestOfEvents
-signal_side = 'K_S0'
-roe_side = 'Upsilon(4S)'
+signal_side = 'K_S0:V0'
+roe_side = 'Upsilon(4S):ROE'
 testpath.add_module('RestOfEventBuilder', particleList=signal_side,
-                    particleListsInput=['pi+', 'gamma', 'K_L0'])
+                    particleListsInput=['pi+:all', 'gamma', 'K_L0:all'])
 # Load RestOfEvents
-testpath.add_module('ParticleLoader', decayStringsWithCuts=[(roe_side, '')],
+testpath.add_module('ParticleLoader', decayStrings=[roe_side],
                     sourceParticleListName=signal_side, useROEs=True)
 
+for i in range(len(fsps)):
+    if 'K_S0' in fsps[i] or 'Lambda0' in fsps[i]:
+        fsps[i] = fsps[i] + ':V0'
+    elif "gamma" not in fsps[i]:
+        fsps[i] = fsps[i] + ':all'
 
 testpath.add_module('ParticleStats', particleLists=fsps)
 testpath.add_module('ParticleStats', particleLists=mcps)

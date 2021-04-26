@@ -14,7 +14,7 @@ from rawdata import add_unpackers
 
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
-from tracking import (
+from tracking import (  # noqa
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
     add_cr_tracking_reconstruction,
@@ -29,6 +29,33 @@ from softwaretrigger.path_utils import (
 )
 
 import mdst
+
+
+CDST_TRACKING_OBJECTS = (
+    'RecoTracks',
+    'Tracks',
+    'V0s',
+    'TrackFitResults',
+    'EventT0',
+    'CDCDedxTracks',
+    'SVDShaperDigitsFromTracks',
+    'PXDClustersFromTracks',
+    'VXDDedxTracks',
+    'CDCDedxLikelihoods',
+    'VXDDedxLikelihoods'
+)
+
+
+DIGITS_OBJECTS = (
+    'ARICHDigits',
+    'CDCHits',
+    'ECLDigits',
+    'KLMDigits',
+    'PXDDigits',
+    'SVDEventInfoSim',
+    'SVDShaperDigits',
+    'TOPRawDigits'
+)
 
 
 def default_event_abort(module, condition, error_flag):
@@ -77,6 +104,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     doom = path.add_module("EventsOfDoomBuster")
     event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
+    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -106,7 +134,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         if not components or ('SVD' in components):
             path.add_module("SVDShaperDigitsFromTracks")
 
-        # if you need to calculat the triggerResult, then you will need the full post-tracking recostruction
+        # if you need to calculate the triggerResult, then you will need the full post-tracking recostruction
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
             add_posttracking_reconstruction(path,
                                             components=components,
@@ -320,8 +348,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     add_arich_modules(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_PID')
-
     # Not add EventT0Combiner module in prepare_cdst_analysis()
     if not for_cdst_analysis:
         path.add_module("EventT0Combiner")
@@ -356,7 +382,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         if pruneTracks:
             add_prune_tracks(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
+    path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
 
 
 def add_mdst_output(
@@ -386,7 +412,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
-    rawFormat=False,
+    rawFormat=True,
     ignoreInputModulesCheck=False
 ):
     """
@@ -398,115 +424,39 @@ def add_cdst_output(
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
-    @param rawFormat saves the cdsts in the raw+tracking format.
+    @param rawFormat Saves the cDST file in the raw+tracking format if mc=False, otherwise saves the cDST file
+           in the digits+tracking format.
     @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
            Needed when a conditional path is passed as input.
     """
 
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'EventLevelTrackingInfo',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracksNamedBremsstrahlung',
-        'EventLevelClusteringInfo',
-        'TracksToECLClusters',
-        'KLMClusters',
-        'KlIds',
-        'KLMClustersToKlIds',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-        'RecoTracks',
-        'EventT0',
-        'PXDClustersFromTracks',
-        'SVDEventInfo',
-        'SVDShaperDigits',
-        'SVDRecoDigits',
-        'SVDClusters',
-        'CDCDedxTracks',
-        'TOPDigits',
-        'ExtHits',
-        'TOPLikelihoods',
-        'TOPRecBunch',
-        'TOPTimeZeros',
-        'TOPAsicMask',
-        'ECLDigits',
-        'ECLCalDigits',
-        'TRGECLClusters',
-        'TRGECLUnpackerStores',
-        'TRGECLUnpackerEvtStores',
-        'TRGGRLUnpackerStore',
-        'CDCTriggerSegmentHits',
-        'CDCTrigger2DFinderTracks',
-        'CDCTrigger2DFinderClones',
-        'CDCTriggerNNInputSegmentHits',
-        'CDCTriggerNNInput2DFinderTracks',
-        'CDCTriggerNeuroTracks',
-        'CDCTriggerNeuroTracksInput',
-        'CDCTriggerNNInputFinderTracks',
-        'CDCTriggerNNInputBits',
-        'CDCTriggerNNOutputBits',
-        'TRGGDLUnpackerStores',
-        'TRGTOPUnpackerStores',
-        'RecoHitInformations',
-        'RecoHitInformationsToBKLMHit2ds',
-        'TracksToARICHLikelihoods',
-        'TracksToExtHits',
-        'ARICHDigits',
-        'ARICHInfo',
-        'ARICHTracks',
-        'ARICHLikelihoods',
-        'ARICHTracksToExtHits',
-        'SoftwareTriggerVariables',
-        'KLMDigits',
-        'KLMMuidLikelihoods',
-        'TracksToKLMMuidLikelihoods',
-        'BKLMHit1ds',
-        'BKLMHit1dsToKLMDigits',
-        'BKLMHit2ds',
-        'BKLMHit2dsToBKLMHit1ds',
-        'EKLMAlignmentHits',
-        'EKLMHit2ds',
-        'EKLMHit2dsToKLMDigits',
-        'TracksToBKLMHit2ds',
-        'TracksToEKLMHit2ds',
-        'SVDShaperDigitsFromTracks',
-        'TRGGDLUnpackerStores',
-        'VXDDedxTracks',
-        'VXDDedxLikelihoods',
-    ]
+    branches = []
+    persistentBranches = ['FileMetaData']
 
     if rawFormat:
-        branches = ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
-            'RecoTracks',
-            'Tracks',
-            'V0s',
-            'TrackFitResults',
-            'EventT0',
-            'TRGECLClusters',
-            'CDCDedxTracks',
-            'SVDShaperDigitsFromTracks',
-            'PXDClustersFromTracks',
-            'VXDDedxTracks',
-            'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods'
-            ]
-
+        branches += list(CDST_TRACKING_OBJECTS)
+        if not mc:
+            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
+        else:
+            branches += list(DIGITS_OBJECTS) + [
+                'SoftwareTriggerResult',
+                'TRGSummary']
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
             basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
+    else:
+        if not additionalBranches:
+            B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
+                      'This is equivalent to calling add_mdst_output().')
+        branches += list(mdst.MDST_OBJECTS)
 
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
 
-    persistentBranches = ['FileMetaData']
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        branches += ['MCParticles']
         persistentBranches += ['BackgroundInfo']
+
     branches += additionalBranches
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
@@ -729,23 +679,30 @@ def add_dedx_modules(path, components=None):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None):
+def prepare_cdst_analysis(path, components=None, mc=False):
     """
-    Adds to a (analysis) path all the modules needed to
-    analyse a cdsts file in the raw+tracking format.
+    Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
+    for collisions/cosmics data or in the digits+tracking format for MC data.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param mc: Are we running over MC data or not? If so, do not run the unpackers.
     """
-    # unpackers
-    add_unpackers(path,
-                  components=components)
+    # Add the unpackers only if not running on MC, otherwise check the components and simply add
+    # the Gearbox and the Geometry modules
+    if not mc:
+        add_unpackers(path,
+                      components=components)
+    else:
+        check_components(components)
+        path.add_module('Gearbox')
+        path.add_module('Geometry')
 
-    # this is currently just calls add_ecl_modules
+    # This currently just calls add_ecl_modules
     add_pretracking_reconstruction(path,
                                    components=components)
 
-    # needed to retrieve the PXD and SVD clusters out of the raws
+    # Needed to retrieve the PXD and SVD clusters out of the raw data
     if components is None or 'SVD' in components:
         add_svd_reconstruction(path)
     if components is None or 'PXD' in components:
@@ -756,7 +713,7 @@ def prepare_cdst_analysis(path, components=None):
                     energyLossBrems=False,
                     noiseBrems=False)
 
-    # add the posttracking modules needed for cdst analysis
+    # Add the posttracking modules needed for the cDST analysis
     add_posttracking_reconstruction(path,
                                     components=components,
                                     for_cdst_analysis=True)

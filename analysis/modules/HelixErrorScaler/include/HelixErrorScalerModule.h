@@ -27,8 +27,9 @@ namespace Belle2 {
   * scale the error of helix parameters
   *
   * Creates a new charged particle list whose helix errors are scaled by constant factors.
-  * Lower bounds can be defined for the helix errors.
-
+  * Parameters (a, b) can be set to define impact parameter resolution,
+  * which limits d0 and z0 errors so that they do not shrink below the resolution.
+  *
   */
   class HelixErrorScalerModule : public Module {
 
@@ -46,7 +47,7 @@ namespace Belle2 {
     virtual void event() override;
 
     /** create a TrackFitResult with scaled errors */
-    TrackFitResult* getTrackFitResultWithScaledError(const TrackFitResult* trkfit);
+    TrackFitResult* getTrackFitResultWithScaledError(const Particle* particle);
 
   private:
 
@@ -54,7 +55,8 @@ namespace Belle2 {
     std::string m_outputListName;  /**< The name of output charged particle list */
     std::string m_outputAntiListName;   /**< output anti-particle list name */
     std::vector<double> m_scaleFactors;  /**< vector of five scale factors for helix parameter errors */
-    std::vector<double> m_minErrors;  /**< vector of five scale lower bounds for helix parameter errors */
+    std::vector<double> m_d0ResolPars; /**< parameters (a,b) to define d0 resolution = a (+) b / (p*beta*sinTheta**1.5)  */
+    std::vector<double> m_z0ResolPars; /**< parameters (a,b) to define z0 resolution = a (+) b / (p*beta*sinTheta**2.5)  */
     int m_pdgCode;                /**< PDG code of the charged particle to be scaled */
     std::string m_decayString;   /**< Input DecayString specifying the input particle */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the charged particle */

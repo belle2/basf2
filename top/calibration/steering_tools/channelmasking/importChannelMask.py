@@ -28,7 +28,7 @@ dbImporter = TOPDatabaseImporter()
 # import constants
 fileNames = sorted(glob.glob('masks/*.root'))
 numFiles = len(fileNames)
-if numFiles is 0:
+if numFiles == 0:
     print('No files found')
     sys.exit()
 

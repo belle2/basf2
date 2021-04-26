@@ -239,6 +239,9 @@ void PXDDAQDQMModule::event()
         for (int i = 0; i < 4; i++) {
           if ((dhe.getDHPFoundMask() & (1 << i)) == 0) hDAQDHPDataMissing->Fill(dhe.getDHEID() + i * 0.25);
         }
+        for (auto& dhp : dhe) {
+          truncFlag |= dhp.getTruncated(); // new firmware workaround flag
+        }
         unsigned int emask = dhe.getEndErrorInfo();
         // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {

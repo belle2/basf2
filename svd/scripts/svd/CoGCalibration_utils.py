@@ -80,7 +80,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
-            tZero_err = 5.1
+            # tZero_err = 5.1
             tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
@@ -305,21 +305,21 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
         """
         svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
         mode_byte = svd_evt_info.getModeByte()
-        timeClusterU = 0
-        timeClusterV = 0
-        sideIndex = 0
-        TBIndexU = 0
-        TBIndexV = 0
+        # timeClusterU = 0
+        # timeClusterV = 0
+        # sideIndex = 0
+        # TBIndexU = 0
+        # TBIndexV = 0
         #: counts the number of events
         self.Evt = self.Evt + 1
 
         #: registers PyStoreObj EventT0
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
-        svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
+        # svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
 
         for svdCluster in svdCluster_list:
-            svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
+            # svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
             self.fillLists(mode_byte, svdCluster)
 
     def terminate(self):
@@ -338,7 +338,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
         tbScale = [1, 1, 1, 1]
         tbBias_err = [1, 1, 1, 1]
         tbScale_err = [1, 1, 1, 1]
-        tbCovScaleBias = [1, 1, 1, 1]
+        # tbCovScaleBias = [1, 1, 1, 1]
 
         TCOGMEAN = 0
         T0MEAN = 0
@@ -402,11 +402,11 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
                             cdc.Write()
                             # SNR Distribution Histograms
                             snr = self.snrList[li][ldi][si][side][tb]
-                            snrMean = snr.GetMean()
+                            # snrMean = snr.GetMean()
                             snr.Write()
                             # ScatterPlot Histograms with Linear Fit
                             sp = self.spList[li][ldi][si][side][tb]
-                            covscalebias = sp.GetCovariance()
+                            # covscalebias = sp.GetCovariance()
                             pfxsp = sp.ProfileX()
                             sp.Write()
                             pfxsp.Write()

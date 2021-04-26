@@ -48,7 +48,7 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     """
 
     # SVD reconstruction
-    svd_cluster = '__ROIsvdClusters'
+    # svd_cluster = '__ROIsvdClusters'
     add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking
@@ -260,6 +260,9 @@ def add_simulation(
             roi_condition_module_Bkg = path.add_module("ROIfindingConditionFromDB")
             roi_condition_module_Bkg.if_true(path_enableROI_Bkg, b2.AfterConditionPath.CONTINUE)
             roi_condition_module_Bkg.if_false(path_disableROI_Bkg, b2.AfterConditionPath.CONTINUE)
+
+    if components is None or 'SVD' in components:
+        path.add_module("SVDZeroSuppressionEmulator")
 
     # PXD data reduction - after background overlay executor
     if components is None or 'PXD' in components:

@@ -365,7 +365,7 @@ documentation helpful.
       between analysts and skim liaisons, so don't hesitate to contact your
       working group's liaison.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

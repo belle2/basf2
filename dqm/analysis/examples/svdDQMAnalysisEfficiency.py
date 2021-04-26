@@ -8,9 +8,7 @@ mypath = b2.Path()
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-# reset_database()
-b2.use_database_chain()
-b2.use_central_database('data_reprocessing_prompt')
+b2.conditions.prepend_globaltag('data_reprocessing_prompt')
 
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', inputFile)
@@ -21,7 +19,6 @@ mypath.add_module('Geometry')
 
 dqm = b2.register_module('DQMHistAnalysisSVDEfficiency')
 dqm.set_log_level(b2.LogLevel.INFO)
-dqm.param("printCanvas", True)
 mypath.add_module(dqm)
 
 outroot = b2.register_module('DQMHistAnalysisOutputFile')

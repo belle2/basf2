@@ -189,7 +189,7 @@ def raveFit(
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
     # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if constraint is '':
+    if constraint == '':
         message_if = ""
     else:
         message_if = (
@@ -353,8 +353,8 @@ def fitPseudo(
 
         from modularAnalysis import fitPseudo
         from stdPi0s import stdPi0s
-        stdPi0s("eff40_Jan2020", path=mypath)
-        fitPseudo("pi0:eff40_Jan2020", path=mypath)
+        stdPi0s("eff40_May2020", path=mypath)
+        fitPseudo("pi0:eff40_May2020", path=mypath)
 
     Parameters:
         list_name (str): the name of the list to add the covariance matrix to

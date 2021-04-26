@@ -23,7 +23,7 @@ from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
+globalTags = ['data_reprocessing_proc11']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'

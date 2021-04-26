@@ -45,8 +45,8 @@ class TesterModule(basf2.Module):
 
 
 if __name__ == '__main__':
-    basf2.reset_database()
-    basf2.use_central_database("data_reprocessing_prompt")
+    basf2.conditions.reset()
+    basf2.conditions.prepend_globaltag("data_reprocessing_prompt")
     basf2.set_nprocesses(1)
 
     parser = ArgumentParser()

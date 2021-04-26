@@ -104,8 +104,9 @@ void SVDRecoDigitCreatorModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
 
-  m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
-  m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
+  bool returnRawClusterTime = false;
+  m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm, returnRawClusterTime);
+  m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm, returnRawClusterTime);
   m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
 
@@ -218,3 +219,12 @@ void SVDRecoDigitCreatorModule::event()
 }
 
 
+void SVDRecoDigitCreatorModule::endRun()
+{
+
+  delete m_time6SampleClass;
+  delete m_time3SampleClass;
+  delete m_charge6SampleClass;
+  delete m_charge3SampleClass;
+
+}

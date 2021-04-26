@@ -149,6 +149,7 @@ TrgEclMaster::~TrgEclMaster()
   delete obj_bhabha;
   delete obj_timing;
   delete obj_map;
+  delete obj_database;
 }
 //
 //

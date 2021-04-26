@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import re
 import os
@@ -198,7 +197,7 @@ class Script:
         Generates a unique name from the package and name of the script
         which only occurs once in th whole validation suite
         """
-        return "script_unique_name_{}_{}".format(self.package, self.name)
+        return f"script_unique_name_{self.package}_{self.name}"
 
     def compute_dependencies(self, scripts):
         """!
@@ -251,7 +250,7 @@ class Script:
         # Read the file as a whole
         # We specify encoding and errors here to avoid exceptions for people
         # with strange preferred encoding settings in their OS
-        with open(self.path, "r", encoding="utf-8", errors="replace") as data:
+        with open(self.path, encoding="utf-8", errors="replace") as data:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags

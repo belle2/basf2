@@ -22,12 +22,12 @@ class TestNewMCDecayFinder(unittest.TestCase):
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
         inputMdst('default', inputfile, path=main)
 
-        fillParticleListFromMC('gamma:MC', 'mcPrimary', path=main)
-        fillParticleListFromMC('K+:MC', 'mcPrimary', path=main)
-        fillParticleListFromMC('pi+:MC', 'mcPrimary', path=main)
+        fillParticleListFromMC('gamma:primaryMC', 'mcPrimary', path=main)
+        fillParticleListFromMC('K+:primaryMC', 'mcPrimary', path=main)
+        fillParticleListFromMC('pi+:primaryMC', 'mcPrimary', path=main)
 
         reconstructMCDecay(
-            'B0:DstD0Kpi =direct=> [D*+:MC =direct=> [D0:MC =direct=> K-:MC pi+:MC ] pi+:MC] pi-:MC',
+            'B0:DstD0Kpi =direct=> [D*+:MC =direct=> [D0:MC =direct=> K-:primaryMC pi+:primaryMC ] pi+:primaryMC] pi-:primaryMC',
             '',
             path=main)
 

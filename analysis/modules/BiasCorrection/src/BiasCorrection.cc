@@ -120,7 +120,8 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
     }
     const TLorentzVector vec(px, py, pz, E);
     particle->set4Vector(vec);
-  } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster && particle->getPDGCode() == 22) {
+  } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
+             && particle->getPDGCode() == Const::photon.getPDGCode()) {
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {

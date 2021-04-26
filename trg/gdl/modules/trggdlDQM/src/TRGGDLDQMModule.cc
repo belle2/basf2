@@ -344,15 +344,11 @@ void TRGGDLDQMModule::initialize()
   nword_input  = m_unpacker->get_nword_input();
   nword_output = m_unpacker->get_nword_output();
 
-  std::vector<int> temp_h_0_vec(n_leafs + n_leafsExtra, 0);
-  std::vector<int> temp_h_p_vec(n_outbit, 0);
-  std::vector<int> temp_h_f_vec(n_outbit, 0);
-  std::vector<int> temp_h_i_vec(n_inbit, 0);
   for (unsigned i = 0; i < n_clocks; i++) {
-    h_0_vec.push_back(temp_h_0_vec);
-    h_p_vec.push_back(temp_h_p_vec);
-    h_f_vec.push_back(temp_h_f_vec);
-    h_i_vec.push_back(temp_h_i_vec);
+    for (int j = 0; j < n_leafs + n_leafsExtra; j++)h_0_vec.push_back(0);
+    for (int j = 0; j < n_outbit; j++)              h_p_vec.push_back(0);
+    for (int j = 0; j < n_outbit; j++)              h_f_vec.push_back(0);
+    for (int j = 0; j < n_inbit; j++)               h_i_vec.push_back(0);
   }
 
 }
@@ -481,16 +477,16 @@ void TRGGDLDQMModule::event()
 
   for (unsigned i = 0; i < n_clocks; i++) {
     for (int j = 0; j < n_leafs + n_leafsExtra; j++) {
-      h_0_vec[i][j] = 0;
+      h_0_vec[i * (n_leafs + n_leafsExtra) + j] = 0;
     }
     for (unsigned j = 0; j < n_outbit; j++) {
-      h_p_vec[i][j] = 0;
+      h_p_vec[i * n_outbit + j] = 0;
     }
     for (unsigned j = 0; j < n_outbit; j++) {
-      h_f_vec[i][j] = 0;
+      h_f_vec[i * n_outbit + j] = 0;
     }
     for (unsigned j = 0; j < n_inbit; j++) {
-      h_i_vec[i][j] = 0;
+      h_i_vec[i * n_inbit + j] = 0;
     }
   }
 
@@ -506,16 +502,16 @@ void TRGGDLDQMModule::event()
       }
     }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      h_0_vec[entAry[ii]->m_unpacker[clk_map]][leaf] = *Bits[leaf];
+      h_0_vec[(entAry[ii]->m_unpacker[clk_map]) * (n_leafs + n_leafsExtra) + leaf] = *Bits[leaf];
     }
   }
-  int coml1rvc      = h_0_vec[0         ][_e_coml1rvc];
-  int toprvc        = h_0_vec[0         ][_e_toprvc];
-  int eclrvc        = h_0_vec[0         ][_e_eclrvc];
-  int cdcrvc        = h_0_vec[0         ][_e_cdcrvc];
-  int c1_top_timing = h_0_vec[n_clocks - 1][_e_toptiming];
-  int c1_ecl_timing = h_0_vec[n_clocks - 1][_e_ecltiming];
-  int c1_cdc_timing = h_0_vec[n_clocks - 1][_e_cdctiming];
+  int coml1rvc      = h_0_vec[0 * (n_leafs + n_leafsExtra) + _e_coml1rvc];
+  int toprvc        = h_0_vec[0 * (n_leafs + n_leafsExtra) + _e_toprvc];
+  int eclrvc        = h_0_vec[0 * (n_leafs + n_leafsExtra) + _e_eclrvc];
+  int cdcrvc        = h_0_vec[0 * (n_leafs + n_leafsExtra) + _e_cdcrvc];
+  int c1_top_timing = h_0_vec[(n_clocks - 1) * (n_leafs + n_leafsExtra) + _e_toptiming];
+  int c1_ecl_timing = h_0_vec[(n_clocks - 1) * (n_leafs + n_leafsExtra) + _e_ecltiming];
+  int c1_cdc_timing = h_0_vec[(n_clocks - 1) * (n_leafs + n_leafsExtra) + _e_cdctiming];
   int c8_top_timing = c1_top_timing >> 3;
   int c2_top_timing = c1_top_timing >> 1;
   int c8_ecl_timing = c1_ecl_timing >> 3;
@@ -538,7 +534,7 @@ void TRGGDLDQMModule::event()
   int timtype  = 0;
 
 
-  int gdll1_rvc = h_0_vec[n_clocks - 1][_e_gdll1rvc];
+  int gdll1_rvc = h_0_vec[(n_clocks - 1) * (n_leafs + n_leafsExtra) + _e_gdll1rvc];
 
   // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
@@ -546,46 +542,46 @@ void TRGGDLDQMModule::event()
     int ftd_tmp[10] = {0};
     int itd_tmp[10] = {0};
     for (unsigned j = 0; j < (unsigned)nword_input; j++) {
-      itd_tmp[j] = h_0_vec[clk - 1][ee_itd[j]];
+      itd_tmp[j] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_itd[j]];
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
-        if (i + j * 32 >= h_i_vec[clk - 1].size())continue;
-        if (itd_tmp[j] & (1u << i)) h_i_vec[clk - 1][i +  j * 32] = 1;
+        if (i + j * 32 >= n_inbit)continue;
+        if (itd_tmp[j] & (1 << i)) h_i_vec[(clk - 1)*n_inbit + i +  j * 32] = 1;
       }
     }
     if (nconf == 0) {
-      psn_tmp[0] = h_0_vec[clk - 1][ee_psn[0]];
-      ftd_tmp[0] = h_0_vec[clk - 1][ee_ftd[0]];
+      psn_tmp[0] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_psn[0]];
+      ftd_tmp[0] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_ftd[0]];
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
       for (int i = 0; i < 32; i++) {
-        if (i >= (int)h_p_vec[clk - 1].size())continue;
-        if (psn_tmp[0] & (1u << i)) h_p_vec[clk - 1][i] = 1;
-        if (ftd_tmp[0] & (1u << i)) h_f_vec[clk - 1][i] = 1;
+        if (i >= n_outbit)continue;
+        if (psn_tmp[0] & (1 << i)) h_p_vec[(clk - 1)*n_outbit + i] = 1;
+        if (ftd_tmp[0] & (1 << i)) h_f_vec[(clk - 1)*n_outbit + i] = 1;
       }
-      psn_tmp[1] = h_0_vec[clk - 1][ee_psn[2]] * (1 << 16) + h_0_vec[clk - 1][ee_psn[1]];
-      ftd_tmp[1] = h_0_vec[clk - 1][ee_ftd[2]] * (1 << 16) + h_0_vec[clk - 1][ee_ftd[1]];
+      psn_tmp[1] = h_0_vec[(clk - 1) * n_outbit + ee_psn[2]] * (1 << 16) + h_0_vec[(clk - 1) * n_outbit + ee_psn[1]];
+      ftd_tmp[1] = h_0_vec[(clk - 1) * n_outbit + ee_ftd[2]] * (1 << 16) + h_0_vec[(clk - 1) * n_outbit + ee_ftd[1]];
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
       for (int i = 0; i < 32; i++) {
-        if (i + 32 >= (int)h_p_vec[clk - 1].size())continue;
-        if (psn_tmp[1] & (1u << i)) h_p_vec[clk - 1][i + 32] = 1;
-        if (ftd_tmp[1] & (1u << i)) h_f_vec[clk - 1][i + 32] = 1;
+        if (i + 32 >= n_outbit)continue;
+        if (psn_tmp[1] & (1 << i)) h_p_vec[(clk - 1)*n_outbit + i + 32] = 1;
+        if (ftd_tmp[1] & (1 << i)) h_f_vec[(clk - 1)*n_outbit + i + 32] = 1;
       }
     } else {
       for (unsigned j = 0; j < (unsigned)nword_output; j++) {
-        psn_tmp[j] = h_0_vec[clk - 1][ee_psn[j]];
-        ftd_tmp[j] = h_0_vec[clk - 1][ee_ftd[j]];
+        psn_tmp[j] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_psn[j]];
+        ftd_tmp[j] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_ftd[j]];
         psn[j] |= psn_tmp[j];
         ftd[j] |= ftd_tmp[j];
         for (int i = 0; i < 32; i++) {
-          if (i + j * 32 >= h_p_vec[clk - 1].size())continue;
-          if (psn_tmp[j] & (1u << i)) h_p_vec[clk - 1][i  +  j * 32] = 1;
-          if (ftd_tmp[j] & (1u << i)) h_f_vec[clk - 1][i  +  j * 32] = 1;
+          if (i + j * 32 >= n_outbit)continue;
+          if (psn_tmp[j] & (1 << i)) h_p_vec[(clk - 1)*n_outbit + i  +  j * 32] = 1;
+          if (ftd_tmp[j] & (1 << i)) h_f_vec[(clk - 1)*n_outbit + i  +  j * 32] = 1;
         }
       }
     }
-    int timtype_tmp = h_0_vec[clk - 1][_e_timtype];
+    int timtype_tmp = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + _e_timtype];
     timtype = (timtype_tmp == 0) ? timtype : timtype_tmp;
 
   } // clk
@@ -828,23 +824,23 @@ void TRGGDLDQMModule::genVcd(void)
     seqnum = 0;
     outf << "#" << clk - 1 << endl;
     for (unsigned k = 1; k <= n_inbit; k++) {
-      if (clk == 1 || prev_i[k - 1] != h_i_vec[clk - 1][k - 1]) {
-        prev_i[k - 1] = h_i_vec[clk - 1][k - 1];
-        outf << h_i_vec[clk - 1][k - 1] << "n" << seqnum << endl;
+      if (clk == 1 || prev_i[k - 1] != h_i_vec[(clk - 1)*n_inbit + k - 1]) {
+        prev_i[k - 1] = h_i_vec[(clk - 1) * n_inbit + k - 1];
+        outf << h_i_vec[(clk - 1)*n_inbit + k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
     for (unsigned k = 1; k <= n_outbit; k++) {
-      if (clk == 1 || prev_f[k - 1] != h_f_vec[clk - 1][k - 1]) {
-        prev_f[k - 1] = h_f_vec[clk - 1][k - 1];
-        outf << h_f_vec[clk - 1][k - 1] << "n" << seqnum << endl;
+      if (clk == 1 || prev_f[k - 1] != h_f_vec[(clk - 1)*n_outbit + k - 1]) {
+        prev_f[k - 1] = h_f_vec[(clk - 1) * n_outbit + k - 1];
+        outf << h_f_vec[(clk - 1)*n_outbit + k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
     for (unsigned k = 1; k <= n_outbit; k++) {
-      if (clk == 1 || prev_p[k - 1] != h_p_vec[clk - 1][k - 1]) {
-        prev_p[k - 1] = h_p_vec[clk - 1][k - 1];
-        outf << h_p_vec[clk - 1][k - 1] << "n" << seqnum << endl;
+      if (clk == 1 || prev_p[k - 1] != h_p_vec[(clk - 1)*n_outbit + k - 1]) {
+        prev_p[k - 1] = h_p_vec[(clk - 1) * n_outbit + k - 1];
+        outf << h_p_vec[(clk - 1)*n_outbit + k - 1] << "n" << seqnum << endl;
       }
       seqnum++;
     }
@@ -878,10 +874,10 @@ TRGGDLDQMModule::isFired_quick(const std::string& bitname, const bool& isPsnm = 
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
       if (isPsnm) {
-        if (h_p_vec[clk][bn] > 0)
+        if (h_p_vec[clk * n_outbit + bn] > 0)
           return true;
       } else {
-        if (h_f_vec[clk][bn] > 0)
+        if (h_f_vec[clk * n_outbit + bn] > 0)
           return true;
       }
     }
@@ -889,7 +885,7 @@ TRGGDLDQMModule::isFired_quick(const std::string& bitname, const bool& isPsnm = 
   bn = getinbitnum(bitname.c_str());
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
-      if (h_i_vec[clk][bn] > 0)
+      if (h_i_vec[clk * n_inbit + bn] > 0)
         return true;
     }
   }
@@ -929,10 +925,10 @@ TRGGDLDQMModule::isFired(std::string bitname)
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
       if (isPsnm) {
-        if (h_p_vec[clk][bn] > 0)
+        if (h_p_vec[clk * n_outbit + bn] > 0)
           return true;
       } else {
-        if (h_f_vec[clk][bn] > 0)
+        if (h_f_vec[clk * n_outbit + bn] > 0)
           return true;
       }
     }
@@ -940,7 +936,7 @@ TRGGDLDQMModule::isFired(std::string bitname)
   bn = m_dbinput->getinbitnum(bitname.c_str());
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn > -1) {
-      if (h_i_vec[clk][bn] > 0)
+      if (h_i_vec[clk * n_inbit + bn] > 0)
         return true;
     }
   }
@@ -969,7 +965,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_i_vec[clk][i] > 0) {
+        if (h_i_vec[clk * n_inbit + i] > 0) {
           if (! rising_done) {
             h_itd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -977,7 +973,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_i_vec[clk][i] == 0) {
+        } else if (h_i_vec[clk * n_inbit + i] == 0) {
           if (rising_done && ! falling_done) {
             h_itd_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;
@@ -1004,7 +1000,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_f_vec[clk][i] > 0) {
+        if (h_f_vec[clk * n_outbit + i] > 0) {
           if (! rising_done) {
             h_ftd_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -1012,7 +1008,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_f_vec[clk][i] == 0) {
+        } else if (h_f_vec[clk * n_outbit + i] == 0) {
           if (rising_done && ! falling_done) {
             h_ftd_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;
@@ -1022,7 +1018,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       rising_done = false;
       falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
-        if (h_p_vec[clk][i] > 0) {
+        if (h_p_vec[clk * n_outbit + i] > 0) {
           if (! rising_done) {
             h_psn_rise[i][skim[ifill]]->Fill(clk + 0.5);
             rising_done = true;
@@ -1030,7 +1026,7 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
           } else if (rising_done && !falling_done && clk == n_clocks - 1) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
           }
-        } else if (h_p_vec[clk][i] == 0) {
+        } else if (h_p_vec[clk * n_outbit + i] == 0) {
           if (rising_done && ! falling_done) {
             h_psn_fall[i][skim[ifill]]->Fill(clk + 0.5);
             falling_done = true;

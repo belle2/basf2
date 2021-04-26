@@ -108,13 +108,13 @@ namespace Belle2 {
     TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
-    std::vector<std::vector<int>> h_0_vec;
+    std::vector<int> h_0_vec;
     ////! event by event psnm timing distribution
-    std::vector<std::vector<int>> h_p_vec;
+    std::vector<int> h_p_vec;
     ////! event by event ftdl timing distribution
-    std::vector<std::vector<int>> h_f_vec;
+    std::vector<int> h_f_vec;
     ////! event by event input timing distribution
-    std::vector<std::vector<int>> h_i_vec;
+    std::vector<int> h_i_vec;
 
     TDirectory* oldDir = nullptr;
     TDirectory* dirDQM = nullptr;

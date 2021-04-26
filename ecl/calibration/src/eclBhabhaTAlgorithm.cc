@@ -563,7 +563,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     if ((fabs(meanDiff) > 10)      ||
         (fabs(meanUncDiff) > 10)   ||
         (fabs(sigmaDiff) > 10)     ||
-        (fit_mean_unc > 3)         ||
+        (fit_mean_unc > 0.09)      ||
         (fit_sigma < 0.1)          ||
         (fit_mean < time_fit_min)  ||
         (fit_mean > time_fit_max)) {
@@ -583,7 +583,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       if (fabs(meanDiff) > 10)       B2INFO("fit mean diff too large");
       if (fabs(meanUncDiff) > 10)    B2INFO("fit mean unc diff too large");
       if (fabs(sigmaDiff) > 10)      B2INFO("fit mean sigma diff too large");
-      if (fit_mean_unc > 3)          B2INFO("fit mean unc too large");
+      if (fit_mean_unc > 0.09)       B2INFO("fit mean unc too large");
       if (fit_sigma < 0.1)           B2INFO("fit sigma too small");
 
     } else {
@@ -605,7 +605,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       database_mean_unc = fit_mean_unc;
     } else {
       database_mean = default_mean;
-      database_mean_unc = default_mean_unc;
+      database_mean_unc = -fabs(default_mean_unc);
     }
 
     if (numEntries < minNumEntries)   B2INFO("Number of entries less than minimum");

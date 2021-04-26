@@ -144,10 +144,10 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   //------------------------------------------------------------------------
   /** Get the vectors from the input payloads */
   vector<float> bhabhaCalib = m_ECLCrystalTimeOffsetBhabha->getCalibVector();
-  vector<float> bhabhaCalibUnc = m_ECLCrystalTimeOffsetBhabha->getCalibUncVector();
+  vector<float> bhabhaCalibUnc = m_ECLCrystalTimeOffsetBhabha->getCalibUncVector();  // Negative uncertainties are flags of bad fits
 
   vector<float> bhabhaGammaCalib = m_ECLCrystalTimeOffsetBhabhaGamma->getCalibVector();
-  vector<float> bhabhaGammaCalibUnc = m_ECLCrystalTimeOffsetBhabhaGamma->getCalibUncVector();
+  vector<float> bhabhaGammaCalibUnc = m_ECLCrystalTimeOffsetBhabhaGamma->getCalibUncVector();  // Negative uncertainties can be flags
 
   vector<float> cosmicCalib = m_ECLCrystalTimeOffsetCosmic->getCalibVector();
   vector<float> cosmicCalibUnc = m_ECLCrystalTimeOffsetCosmic->getCalibUncVector();
@@ -208,7 +208,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       Some of the conditions that define a bad fit in the bhabha
       calibrations.
 
-           (fit_mean_unc < 3)    <<--- uncertianty on mean
+           (fit_mean_unc < 0.09ns)    <<--- uncertianty on mean
            (fit_sigma < 0.1)     <<--- sigma, not uncertainty on mean
            (numEntries < 40 )
 
@@ -231,9 +231,18 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
     /* Define a good bhabha calibration value.  This is the
        uncertainty on the calibration constant (e.g. fit mean),
        not the guassian width of the timing distribution for
-       that crystal (i.e. resolution). */
+       that crystal (i.e. resolution).
+
+       Uncertainty stored as ticks so converted to ns for
+       more human readable cut.*/
     if (bhabhaCalibUnc[ic] != 0
-        && bhabhaCalibUnc[ic] < 1) {    // The limits on the uncertainties are not yet optimized !!!!!!!!!!!!!!!!!!!!!!!!!!
+        && fabs(bhabhaCalibUnc[ic])*TICKS_TO_NS < 2) {
+      // The limits on the uncertainties are not fully optimized !!!!!!!!!!!!!!!!!!!!!!!!!!
+      // Tighten the uncertainty cut after introduction of bhabha gamma calibration.  Perhaps checking if the
+      // value is negative as that flags poor fits / the overall hist mean was used.  In these cases,
+      // the bhabha gamma calibration should be used (if it has good stats) but until that calibration is
+      // properly made (not all zeros) then the bhabha calibration should be used instead as the only
+      // other option is the cosmic calibration.
       bhabhaCalibGoodQuality[ic] = true ;
     }
     /* Define a good radiative bhabha calibration value, which
@@ -241,9 +250,13 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
        the radiative bhabha calibration is the backup choice.
        If the radiative bhabha calibration is not good then
        we resort to using the cosmic calibration so the
-       radiative bhabha requirements should be fairly loose*/
+       radiative bhabha requirements should be fairly loose.
+
+       Uncertainty stored as ticks so converted to ns for
+       more human readable cut.*/
     if (bhabhaGammaCalibUnc[ic] != 0
-        && bhabhaGammaCalibUnc[ic] < 2) {     // The limits on the uncertainties are not yet optimized !!!!!!!!!!!!!!!!!!!!!!!!!!
+        && fabs(bhabhaGammaCalibUnc[ic])*TICKS_TO_NS <
+        3.5) {     // The limits on the uncertainties are not fully optimized !!!!!!!!!!!!!!!!!!!!!!!!!!
       bhabhaGammaCalibGoodQuality[ic] = true ;
     }
   }
@@ -355,7 +368,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
     // By default set the new calibration to the bhabha calibration
     newCalib[ic] = bhabhaCalib[ic];
-    newCalibUnc[ic] = bhabhaCalibUnc[ic];
+    newCalibUnc[ic] = fabs(bhabhaCalibUnc[ic]);
 
     double newMinusMerged ;
     double newMinusBhabha ;
@@ -372,7 +385,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
          use it otherwise use the cosmic calibration */
       if (bhabhaGammaCalib[ic] != 0 || bhabhaGammaCalibGoodQuality[ic]) {
         newCalib[ic] = bhabhaGammaCalib[ic] ;
-        newCalibUnc[ic] = bhabhaGammaCalibUnc[ic];
+        newCalibUnc[ic] = fabs(bhabhaGammaCalibUnc[ic]);
         whichCalibUsed = "bhabhaGamma";
       } else {
         newCalib[ic] = cosmicCalibShifted[ic] ;
@@ -455,10 +468,10 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
   for (int cellID = 1; cellID <= m_numCrystals; cellID++) {
     bhabhaPayload->SetBinContent(cellID, bhabhaCalib[cellID - 1]);
-    bhabhaPayload->SetBinError(cellID, bhabhaCalibUnc[cellID - 1]);
+    bhabhaPayload->SetBinError(cellID, fabs(bhabhaCalibUnc[cellID - 1]));
 
     bhabhaGammaPayload->SetBinContent(cellID, bhabhaGammaCalib[cellID - 1]);
-    bhabhaGammaPayload->SetBinError(cellID, bhabhaGammaCalibUnc[cellID - 1]);
+    bhabhaGammaPayload->SetBinError(cellID, fabs(bhabhaGammaCalibUnc[cellID - 1]));
 
     cosmicPayload->SetBinContent(cellID, cosmicCalib[cellID - 1]);
     cosmicPayload->SetBinError(cellID, cosmicCalibUnc[cellID - 1]);
@@ -482,7 +495,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       tsCustomPrev_payload->SetBinError(cellID, prevValuesCrysUnc[cellID - 1]);
 
       tsCustomPrevBhabha_payload->SetBinContent(cellID, prevBhabhaValuesCrys[cellID - 1]);
-      tsCustomPrevBhabha_payload->SetBinError(cellID, prevBhabhaValuesCrysUnc[cellID - 1]);
+      tsCustomPrevBhabha_payload->SetBinError(cellID, fabs(prevBhabhaValuesCrysUnc[cellID - 1]));
     }
   }
 

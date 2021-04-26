@@ -24,15 +24,6 @@ from svd import add_svd_reconstruction
 from svd.executionTime_utils import SVDExtraEventStatisticsModule
 
 
-def add_module_name(path, module, name_suffix="", **kwargs):
-    mod = b2.register_module(module)
-    if name_suffix:
-        mod.set_name(f"{mod.name()}_{name_suffix}")
-    for k, v in kwargs.items():
-        mod.param(k, v)
-    path.add_module(mod)
-
-
 def prepend_to_filename(file_path, prefix):
     dn, bn = os.path.dirname(file_path), os.path.basename(file_path)
     return os.path.join(dn, f"{prefix}{bn}")
@@ -74,20 +65,25 @@ add_svd_reconstruction(main)  # Required for the statistics
 
 # SVDDQMDose module (Poisson trigger only)
 params = {'trgTypes': []} if args.no_trg_filter else {}
-add_module_name(main, 'SVDDQMDose', "HERInjPois",
-                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInjPois", **params)
-add_module_name(main, 'SVDDQMDose', "LERInjPois",
-                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInjPois", **params)
-add_module_name(main, 'SVDDQMDose', "NoInjPois",
-                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInjPois", **params)
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=1,
+    histogramDirectoryName="SVDDoseHERInjPois", **params).set_name("SVDDQMDose_HERInjPois")
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=2,
+    histogramDirectoryName="SVDDoseLERInjPois", **params).set_name("SVDDQMDose_LERInjPois")
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=4,
+    histogramDirectoryName="SVDDoseNoInjPois", **params).set_name("SVDDQMDose_NoInjPois")
 # SVDDQMDose module (all events)
-params = {'trgTypes': []}
-add_module_name(main, 'SVDDQMDose', "HERInjAll",
-                eventTypeFilter=1, histogramDirectoryName="SVDDoseHERInjAll", **params)
-add_module_name(main, 'SVDDQMDose', "LERInjAll",
-                eventTypeFilter=2, histogramDirectoryName="SVDDoseLERInjAll", **params)
-add_module_name(main, 'SVDDQMDose', "NoInjAll",
-                eventTypeFilter=4, histogramDirectoryName="SVDDoseNoInjAll", **params)
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=1,
+    histogramDirectoryName="SVDDoseHERInjAll", trgTypes=[]).set_name("SVDDQMDose_HERInjAll")
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=2,
+    histogramDirectoryName="SVDDoseLERInjAll", trgTypes=[]).set_name("SVDDQMDose_LERInjAll")
+main.add_module(
+    'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=4,
+    histogramDirectoryName="SVDDoseNoInjAll", trgTypes=[]).set_name("SVDDQMDose_NoInjAll")
 
 # SVDDQMInjection for execution time comparison
 main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')

@@ -37,6 +37,10 @@ if __name__ == "__main__":
     ignoreaddsimulation = 'add_simulation'
     #: ignore add_reconstruction of reconstruction package
     ignoreaddreconstruction = 'add_reconstruction'
+    #: ignore add_cdst_output of reconstruction package
+    ignoreaddcdstoutput = 'add_cdst_output'
+    #: ignore validation_tools of validation package
+    ignorevalidationtools = 'validation_tools'
     #: ignore missing include directives
     ignoreincludeproblem = 'Problems with "include" directive path'
     if light_build:
@@ -50,6 +54,8 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatedescriptionofrole, x) or
                          re.findall(ignoreaddsimulation, x) or
                          re.findall(ignoreaddreconstruction, x) or
+                         re.findall(ignoreaddcdstoutput, x) or
+                         re.findall(ignorevalidationtools, x) or
                          re.findall(ignoreincludeproblem, x) or
                          re.findall(ignoreonlinebook, x) or
                          re.findall(ignoregeometry, x),

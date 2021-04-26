@@ -11,18 +11,18 @@
 #
 #
 
-Alias MyB B+
-Alias Myanti-B B-
-ChargeConj MyB Myanti-B
+Alias Bsig B+
+Alias anti-Bsig B-
+ChargeConj Bsig anti-Bsig
 
 Decay Upsilon(4S)
-0.5 MyB B- VSS;
-0.5 Myanti-B B+ VSS;
+0.5 Bsig B- VSS;
+0.5 anti-Bsig B+ VSS;
 Enddecay
 
-Decay MyB
+Decay Bsig
 1.0 K+ K_S0 gamma		PHSP;
 Enddecay
-CDecay Myanti-B
+CDecay anti-Bsig
 
 End

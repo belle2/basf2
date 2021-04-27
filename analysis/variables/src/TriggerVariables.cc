@@ -293,12 +293,28 @@ namespace Belle2 {
       }
     }
 
-    double getTimType(const Particle*)
+    double L1TimeType(const Particle*)
     {
       StoreObjPtr<TRGSummary> trg;
       if (!trg)
         return std::numeric_limits<double>::quiet_NaN();
       return trg->getTimType();
+    }
+
+    double L1TimeQuality(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
+      return trg->getTimQuality();
+    }
+
+    double isPoissonInInjectionVeto(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
+      return trg->isPoissonInInjectionVeto();
     }
 
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)
@@ -390,8 +406,12 @@ namespace Belle2 {
                       "[Eventbased] Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
-    REGISTER_VARIABLE("L1TimType", getTimType,
+    REGISTER_VARIABLE("L1TimeType", L1TimeType,
                       "[Eventbased] Returns ETimingType time type.");
+    REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,
+                      "[Eventbased] Returns ETimingQuality time quality.");
+    REGISTER_VARIABLE("isPoissonTriggerInInjectionVeto", isPoissonInInjectionVeto,
+                      "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(

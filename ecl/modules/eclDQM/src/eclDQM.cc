@@ -46,6 +46,7 @@
 #include <iostream>
 #include <iterator>
 #include <cmath>
+#include <stdexcept>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -317,7 +318,10 @@ void ECLDQMModule::event()
   bool bhatrig = false;
 
   if (m_l1Trigger.isValid() && m_DPHYTTYP) bhatrig = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
-  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) bhatrig = m_l1Trigger->testInput("bha_delay");
+  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) {
+    try { bhatrig = m_l1Trigger->testInput("bha_delay"); }
+    catch (const std::exception&) { bhatrig = false; }
+  }
 
   m_iEvent = -1;
   if (m_eventmetadata.isValid()) {

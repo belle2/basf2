@@ -22,6 +22,9 @@
 //ROOT
 #include "TDirectory.h"
 
+//STL
+#include <stdexcept>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::ECL;
@@ -164,7 +167,10 @@ void ECLDQMInjectionModule::event()
   bool bhatrig = false;
 
   if (m_l1Trigger.isValid() && m_DPHYTTYP) bhatrig = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
-  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) bhatrig = m_l1Trigger->testInput("bha_delay");
+  else if (m_l1Trigger.isValid() && !m_DPHYTTYP) {
+    try { bhatrig = m_l1Trigger->testInput("bha_delay"); }
+    catch (const std::exception&) { bhatrig = false; }
+  }
 
   if (m_eventmetadata.isValid() && m_eventmetadata->getErrorFlag() != 0x10) {
     m_iEvent = m_eventmetadata->getEvent();

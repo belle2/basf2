@@ -27,26 +27,6 @@ namespace Belle2 {
     double L1Trigger(const Particle*);
 
     /**
-     * returns trigger FTDL bit (Final Trigger Decision Logic before prescale)
-     */
-    double L1FTDLBit(const Particle*, const std::vector<double>& bit);
-
-    /**
-     * returns trigger PSNM bit (prescale and mask), i.e. after prescale
-     */
-    double L1PSNMBit(const Particle*, const std::vector<double>& bit);
-
-    /**
-     * returns trigger input bit i
-     */
-    double L1InputBit(const Particle*, const std::vector<double>& bit);
-
-    /**
-     * returns trigger prescale for a given trigger bit
-     */
-    double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
-
-    /**
      * returns true L1 time type
      */
     double getTimType(const Particle*);

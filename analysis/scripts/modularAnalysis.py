@@ -3352,6 +3352,24 @@ def scaleError(outputListName, inputListName,
     path.add_module(scale_error)
 
 
+def correctEnergyBias(inputListNames, tableName, path=None):
+    """
+    Scale energy of the particles according to the scaling factor.
+    If the particle list contains composite particles, the energy of the daughters are scaled.
+    Subsequently, the energy of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : stored in localdb and created using ParticleWeightingLookUpCreator
+        path (basf2.Path): module is added to this path
+    """
+
+    correctenergybias = register_module('EnergyBiasCorrection')
+    correctenergybias.param('particleLists', inputListNames)
+    correctenergybias.param('tableName', tableName)
+    path.add_module(correctenergybias)
+
+
 def getAnalysisGlobaltag():
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.

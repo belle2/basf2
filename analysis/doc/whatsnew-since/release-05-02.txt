@@ -60,7 +60,7 @@ Modules
 +++++++
 
  * Added a module :b2:mod:`TrackIsoCalculator`, which takes as input a standard charged particle list, and calculates for every particle's track in the list the
-   3D distance to the closest track in the event. The distance is calculated as the 3D separation between the points where two extraplolated track helices cross a given
+   3D distance to the closest track in the event. The distance is calculated as the 3D separation between the points where two extrapolated track helices cross a given
    detector's inner surface, where the detector is an input parameter to the module. This variable can be used to parametrise charged particle
    identification efficiencies and mis-identification probabilities, as they can depend on the activity around each charged particle candidate.
  * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
@@ -91,11 +91,13 @@ Modules
    of the B which should fly in the direction of the Btube.
  * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles
    and stores them in a new list.
- * In :b2:mod:`ParticleStats` add functionaly to produce a json containing the information printed on stdout. Added also a tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
+ * In :b2:mod:`ParticleStats` add functionality to produce a json containing the information printed on stdout. Added also a tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
  * The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
    that case the momenta of all track-based daughter particles are scaled by the provided factor.
  * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
    and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
+ * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
+   be applied on data. `correctEnergyBias` is a corresponding wrapper function.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

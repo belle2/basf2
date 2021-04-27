@@ -378,7 +378,7 @@ namespace Belle2 {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
       double surf = m_yScanner->getBars().front().reflectivity;
       double p = exp(-propLen / bulk) * pow(surf, abs(nx) + abs(ny));
-      if (type == SignalPDF::c_Reflected) p *= m_yScanner->getMirror().reflectivity;
+      if (type == SignalPDF::c_Reflected) p *= std::min(m_yScanner->getMirror().reflectivity, 1.0);
       return p;
     }
 

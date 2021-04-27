@@ -1,0 +1,89 @@
+[INFO] Steering file: dqm/tests/test_analysisdqm_path.py
+[INFO] Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.
+[WARNING] Creating the default lists with no cleanup.
+[INFO] Modules and parameter settings in the path:
+  1. RootInput
+      inputFileName=/nfs/dust/belle2/user/b2soft/validation-data/mdst13.root
+  2. HistoManager
+  3. ParticleLoader_gamma:physDQM
+      decayStrings=['gamma:physDQM']
+  4. PListCopy_gamma:physDQM
+      inputListNames=['gamma:all']
+      outputListName=gamma:physDQM
+  5. ParticleSelector_applyCuts_gamma:physDQM
+      cut=E > 0.15
+      decayString=gamma:physDQM
+  6. ParticleSelector_applyCuts_gamma:physDQM
+      cut=isFromECL
+      decayString=gamma:physDQM
+  7. ParticleLoader_pi+:physDQM
+      decayStrings=['pi+:physDQM']
+  8. PListCopy_pi+:physDQM
+      inputListNames=['pi+:all']
+      outputListName=pi+:physDQM
+  9. ParticleSelector_applyCuts_pi+:physDQM
+      cut=pt>0.2 and abs(d0) < 2 and abs(z0) < 4
+      decayString=pi+:physDQM
+  10. ParticleCombiner_pi0:physDQM -> gamma:physDQM gamma:physDQM
+      cut=0.10 < M < 0.15
+      decayMode=1
+      decayString=pi0:physDQM -> gamma:physDQM gamma:physDQM
+      writeOut=True
+  11. ParticleCombiner_K_S0:physDQM -> pi-:physDQM pi+:physDQM
+      cut=0.48 < M < 0.52
+      decayMode=1
+      decayString=K_S0:physDQM -> pi-:physDQM pi+:physDQM
+      writeOut=True
+  12. ParticleLoader_pi+:evtshape
+      decayStrings=['pi+:evtshape']
+  13. PListCopy_pi+:evtshape
+      inputListNames=['pi+:all']
+      outputListName=pi+:evtshape
+  14. ParticleLoader_gamma:evtshape
+      decayStrings=['gamma:evtshape']
+  15. PListCopy_gamma:evtshape
+      inputListNames=['gamma:all']
+      outputListName=gamma:evtshape
+  16. ParticleSelector_applyCuts_gamma:evtshape
+      cut=isFromECL
+      decayString=gamma:evtshape
+  17. MVAExpert
+      extraInfoName=beamBackgroundProbabilityMVA
+      identifier=BeamBackgroundMVA
+      listNames=['gamma:evtshape']
+  18. EventShape
+      enableCleoCones=False
+      enableCollisionAxis=False
+      enableHarmonicMoments=False
+      enableJets=False
+      enableSphericity=False
+      enableThrust=False
+      particleListNames=['pi+:evtshape', 'gamma:evtshape']
+  19. PhysicsObjectsDQM
+[INFO] The random number seed is set to ""
+[INFO] Starting event processing, random seed is set to ''
+[INFO] Added file /nfs/dust/belle2/user/b2soft/validation-data/mdst13.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO] ParticleSelector: gamma:physDQM
+[INFO]    -> With cuts  : E > 0.15
+[INFO] ParticleSelector: gamma:physDQM
+[INFO]    -> With cuts  : isFromECL
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: pi+:physDQM
+[INFO]    -> With cuts  : pt>0.2 and abs(d0) < 2 and abs(z0) < 4
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO] ParticleSelector: gamma:evtshape
+[INFO]    -> With cuts  : isFromECL
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_light-2012-minos, mc_production_MC13a_rev1, release-04-00-03
+[INFO] RbTupleManager: initialized for single process.

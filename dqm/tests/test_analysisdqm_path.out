@@ -1,6 +1,4 @@
 [INFO] Steering file: dqm/tests/test_analysisdqm_path.py
-[INFO] Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.
-[WARNING] Creating the default lists with no cleanup.
 [INFO] Modules and parameter settings in the path:
   1. RootInput
       inputFileName=/nfs/dust/belle2/user/b2soft/validation-data/mdst13.root
@@ -47,11 +45,7 @@
   16. ParticleSelector_applyCuts_gamma:evtshape
       cut=isFromECL
       decayString=gamma:evtshape
-  17. MVAExpert
-      extraInfoName=beamBackgroundProbabilityMVA
-      identifier=BeamBackgroundMVA
-      listNames=['gamma:evtshape']
-  18. EventShape
+  17. EventShape
       enableCleoCones=False
       enableCollisionAxis=False
       enableHarmonicMoments=False
@@ -59,7 +53,7 @@
       enableSphericity=False
       enableThrust=False
       particleListNames=['pi+:evtshape', 'gamma:evtshape']
-  19. PhysicsObjectsDQM
+  18. PhysicsObjectsDQM
 [INFO] The random number seed is set to ""
 [INFO] Starting event processing, random seed is set to ''
 [INFO] Added file /nfs/dust/belle2/user/b2soft/validation-data/mdst13.root
@@ -83,7 +77,7 @@
 [INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleSelector: gamma:evtshape
 [INFO]    -> With cuts  : isFromECL
+[INFO] RbTupleManager: initialized for single process.
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are analysis_tools_light-2012-minos, mc_production_MC13a_rev1, release-04-00-03
-[INFO] RbTupleManager: initialized for single process.
+[INFO] Conditions data: configured globaltags (highest priority first) are mc_production_MC13a_rev1, release-04-00-03

@@ -293,6 +293,7 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
       double CoGY = m_param_verticalHoughSpaceSize - ((double)m_clusterCoG.second / (double)m_clusterSize - 0.5) * m_unitY;
 
       if (m_param_isUFinder) {
+        // Angle from Hough space only yields phi-pi/2, so adjust for this and make sure phi still is in -pi...+pi
         double trackPhi = CoGX + M_PI_2;
         if (trackPhi < -M_PI) trackPhi += 2 * M_PI;
         if (trackPhi >  M_PI) trackPhi -= 2 * M_PI;

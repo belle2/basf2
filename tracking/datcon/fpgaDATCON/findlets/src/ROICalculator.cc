@@ -88,8 +88,7 @@ void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
       const unsigned short& vROIsize = (uHitSensorID.getLayerNumber() == 1 ? m_param_vROIsizeL1 : m_param_vROIsizeL2);
 
       B2DEBUG(29, "sensorID: " << uHitSensorID << ", localUCoordinate: " << uCoordinateInCM << ", localVCoordinate: " << vCoordinateInCM
-              <<
-              ", localUCell: " << uCell << ", localVCell: " << vCell << ", uROIsize : " << uROIsize << ", vROIsize: " << vROIsize);
+              << ", localUCell: " << uCell << ", localVCell: " << vCell << ", uROIsize : " << uROIsize << ", vROIsize: " << vROIsize);
 
       /** Lower left corner */
       short uCellDownLeft = uCell - uROIsize / 2;
